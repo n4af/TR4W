@@ -1,0 +1,31 @@
+
+            CQ-WPX-CW SUMMARY SHEET
+
+               CONTEST: CQ-WPX-CW
+            START DATE: 16-04-14
+         CALLSIGN USED: N4AF
+               LOCATOR: FM15
+
+     CATEGORY-ASSISTED: NON-ASSISTED
+         CATEGORY-BAND: ALL
+         CATEGORY-MODE: CW
+     CATEGORY-OPERATOR: SINGLE-OP
+        CATEGORY-POWER: HIGH
+
+        OPERATING TIME: 02:47:51
+            CQ COUNTER: 8
+            RUN/SEARCH: 53/0 Qs
+      UNIQUE CALLSIGNS: 50
+
+              SOFTWARE: TR4W v.4.30.3 http://www.tr4w.com
+
+  BAND   Raw QSOs   Valid QSOs   Points  Prefixes
+ __________________________________________________________
+ 160CW          4            4        4         4
+  80CW         43           43       77        24
+  40CW          6            6        6         3
+ __________________________________________________________
+
+ Totals        53           53       87        31
+
+    Final Score = 2697 points.

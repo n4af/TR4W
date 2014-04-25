@@ -1,0 +1,19 @@
+50 STATES, DC and 14 PROVINCES
+
+INCLUDE FILE S50.DOM
+Dc = DC
+
+Nb = VE9, NB
+Ns = VE1, NS
+Qc = VE2, QU, PQ, QC
+On = VE3, ON
+Mb = VE4, MB, MAN
+Sk = VE5, SK, SAS
+Ab = VE6, AB, ALT, ALB
+Bc = VE7, BC
+Nt = VE8, NW, NT
+Nf = VO1, NF
+Lb = VO2, LAB, LB
+Nu = VY0, NU
+Yt = VY1, YU, YK, YT
+Pe = VY2, PE

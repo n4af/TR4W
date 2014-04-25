@@ -1,0 +1,119 @@
+CONNECTED
+-------------------------------------------------------------------
+|                                                                 |
+|         Welcome to the RBN Telnet Server #1                     |
+|                                                                 |
+|                                                                 |
+|         Running AR-Cluster Version 6 Software                   |
+|                                                                 |
+|             CW skimmer spots are defaulted OFF                  |
+|            but can be turned ON with filters                    |
+|                                                                 |
+|                 Filter information at:                          |
+|       http://ab5k.net/ArcDocsVer6/UserManual/ArcCmdSummary.htm  |
+|                                                                 |
+|             AR-Cluster Client desktop app available             |
+|     Demo at:  http://www.youtube.com/watch?v=7tq5j20kXuo        |
+|                Info at:  http://www.ab5k.net                    |
+|                                                                 |
+-------------------------------------------------------------------
+At the login prompt please enter your amateur radio callsign.
+Please enter your call:  
+N4AF
+Hello   N4AF
+Welcome to the SK1MMR-1 AR-Cluster node version 6.1.5123
+New commands:
+Set Dx Filter Not Skimmer    -> Turns off skimmer spots
+Set Dx Filter                -> Turns on all spots including skimmer
+N4AF de SK1MMR-1 19-Apr 1359Z arc6>
+DX de OH6BG-#:   24900.0  ZB2CW          CW    14 dB  27 WPM  CQ      1359Z
+DX de DQ8Z-#:    14013.1  4Z5TK          CW    26 dB  27 WPM  CQ      1359Z
+DX de DQ8Z-#:    21021.8  RT9X           CW    22 dB  28 WPM  CQ      1359Z
+DX de DF7GB-#:   28017.5  PQ7MM          CW    06 dB  28 WPM  CQ      1359Z
+DX de LA6TPA-#:  21021.8  RT9X           CW    13 dB  28 WPM  CQ      1359Z
+DX de DF7GB-#:   21021.9  RT9X           CW    06 dB  28 WPM  CQ      1359Z
+DX de DF7GB-#:   28020.1  RM9RZ          CW    14 dB  37 WPM  CQ      1359Z
+DX de DF7GB-#:   14013.1  4Z5TK          CW    24 dB  28 WPM  CQ      1359Z
+DX de TF3Y-#:    21021.8  RT9X           CW    06 dB  27 WPM  CQ      1359Z
+DX de EA4TX-#:   21022.1  RT9X           CW    11 dB  28 WPM  CQ      1359Z
+DX de S50ARX-#:  21008.1  VO1MP          CW    27 dB  36 WPM  CQ      1359Z
+DX de DK9IP-#:   21021.8  RT9X           CW    06 dB  28 WPM  CQ      1359Z
+DX de HA6M-#:    21021.8  RT9X           CW    10 dB  28 WPM  CQ      1359Z
+DX de HA6M-#:    28020.0  RM9RZ          CW    09 dB  37 WPM  CQ      1359Z
+DX de LA5EKA-#:  28071.0  RM9RZ          CW    24 dB  38 WPM  CQ      1359Z
+DX de US0KW-#:   21008.0  VO1MP          CW    24 dB  36 WPM  CQ      1359Z
+DX de US0KW-#:   21031.6  EI3KG          CW    37 dB  30 WPM  CQ      1359Z
+DX de S55HHH-#:  14013.1  4Z5TK          CW    16 dB  26 WPM  CQ      1359Z
+DX de W4KKN-#:   28166.0  XE2O/B         CW    15 dB  13 WPM  BEACON  1359Z
+DX de HA1VHF-#:  18091.0  UR5UEY         CW    24 dB  31 WPM  CQ      1359Z
+DX de RZ3DVP-#:  21008.1  VO1MP          CW    25 dB  37 WPM  CQ      1359Z
+DX de ES5PC-#:   14013.0  4Z5TK          CW    33 dB  27 WPM  CQ      1359Z
+DX de V51YJ-#:   28014.5  RX9CC          CW    07 dB  24 WPM  CQ      1359Z
+DX de V51YJ-#:   21016.4  LA8HGA         CW    04 dB  32 WPM  CQ      1359Z
+DX de F6IIT-#:   14013.1  4Z5TK          CW    23 dB  27 WPM  CQ      1359Z
+DX de SM6FMB-#:  14013.2  4Z5TK          CW    12 dB  27 WPM  CQ      1359Z
+DX de JG1VGX-#:   7010.8  JP7DKQ         CW    13 dB  29 WPM  CQ      1359Z
+DX de S52AW-#:   21031.5  EI3KG          CW    16 dB  31 WPM  CQ      1359Z
+DX de DF4UE-#:   28041.6  PP1CZ          CW    17 dB  35 WPM  CQ      1359Z
+DX de DF4UE-#:   28056.8  RA9LT          CW    24 dB  44 WPM  CQ      1359Z
+DX de DR1A-#:    28047.2  JF3BFS         CW    08 dB  27 WPM  CQ      1359Z
+DX de DQ8Z-#:    21008.1  VO1MP          CW    19 dB  36 WPM  CQ      1359Z
+DX de DF7GB-#:    7034.8  PE1NNZ         CW    16 dB  30 WPM  CQ      1359Z
+DX de DF7GB-#:    7024.5  IK3SSO         CW    27 dB  18 WPM  CQ      1359Z
+DX de DF7GB-#:   28038.6  CX5CBA         CW    07 dB  20 WPM  CQ      1359Z
+DX de DF7GB-#:   28021.7  PI4DX          CW    14 dB  27 WPM  CQ      1359Z
+DX de S50ARX-#:   7024.5  IK3SSO         CW    23 dB  19 WPM  CQ      1359Z
+DX de S50ARX-#:  14009.0  DL8MEL         CW    17 dB  25 WPM  CQ      1359Z
+DX de S50ARX-#:  28056.8  RA9LT          CW    19 dB  44 WPM  CQ      1359Z
+DX de W8WWV-#:   21015.3  CO6RD          CW    22 dB  30 WPM  CQ      1359Z
+DX de DJ3AK-#:   28056.8  RA9LT          CW    20 dB  43 WPM  CQ      1359Z
+DX de W4KKN-#:   21015.0  CO6RD          CW    31 dB  29 WPM  CQ      1359Z
+DX de S55HHH-#:   7024.5  IK3SSO         CW    22 dB  18 WPM  CQ      1359Z
+DX de ES5PC-#:   14020.9  9A1ZZ          CW    26 dB  23 WPM  CQ      1359Z
+DX de F6IIT-#:   21012.7  UD8A           CW    23 dB  28 WPM  CQ      1359Z
+DX de DL3KR-#:   14009.0  DL8MEL         CW    11 dB  24 WPM  CQ      1359Z
+DX de DL3KR-#:   14021.0  9A1ZZ          CW    30 dB  23 WPM  CQ      1359Z
+DX de DL9GTB-#:  14021.0  9A1ZZ          CW    34 dB  23 WPM  CQ      1359Z
+DX de SM6FMB-#:  28038.8  CX5CBA         CW    08 dB  20 WPM  CQ      1359Z
+DX de RT0F-#:     7012.6  JA7QOU         CW    22 dB  28 WPM  CQ      1359Z
+DX de DF4UE-#:   21012.6  UD8A           CW    33 dB  31 WPM  CQ      1359Z
+DX de DF4UE-#:   21008.1  VO1MP          CW    16 dB  36 WPM  CQ      1359Z
+DX de OH6BG-#:   28005.0  CX2AQ          CW    24 dB  23 WPM  CQ      1359Z
+DX de TF3Y-#:    14013.0  4Z5TK          CW    10 dB  25 WPM  CQ      1359Z
+DX de DL2CC-#:   24902.8  IK3VUT         CW    06 dB  21 WPM  CQ      1359Z
+DX de DF7GB-#:   21034.6  DK3KD          CW    10 dB  32 WPM  CQ      1359Z
+DX de DF7GB-#:   28005.0  CX2AQ          CW    11 dB  24 WPM  CQ      1359Z
+DX de DF7GB-#:   21008.1  VO1MP          CW    20 dB  36 WPM  CQ      1359Z
+DX de DL2CC-#:    7034.8  PE1NNZ         CW    22 dB  29 WPM  CQ      1359Z
+DX de SK3W-#:    14021.0  9A1ZZ          CW    25 dB  24 WPM  CQ      1359Z
+DX de RN4WA-#:   21033.6  Z35F           CW    06 dB  30 WPM  CQ      1359Z
+DX de HA6M-#:    21012.5  UD8A           CW    13 dB  32 WPM  CQ      1359Z
+DX de DK9IP-#:   21012.5  UD8A           CW    22 dB  30 WPM  CQ      1359Z
+DX de RN4WA-#:   28025.1  SV3/SV1NN      CW    05 dB  24 WPM  CQ      1359Z
+DX de RN4WA-#:   21008.1  VO1MP          CW    15 dB  36 WPM  CQ      1359Z
+DX de W8WWV-#:   14009.2  DL8MEL         CW    07 dB  25 WPM  CQ      1359Z
+DX de LA5EKA-#:  21021.8  RT9X           CW    27 dB  28 WPM  CQ      1359Z
+DX de ZL1AOX-#:  21003.9  4Z1DZ          CW    11 dB  22 WPM  CQ      1359Z
+DX de LA5EKA-#:  21033.5  Z35F           CW    03 dB  29 WPM  CQ      1359Z
+DX de W4KKN-#:   21008.0  VO1MP          CW    23 dB  36 WPM  CQ      1359Z
+DX de EA4TX-#:   21019.3  RA6MQ          CW    09 dB  29 WPM  CQ      1359Z
+DX de JK4USW-#:   7012.6  JA7QOU         CW    31 dB  28 WPM  CQ      1359Z
+DX de RZ3DVP-#:  24895.0  IK5ZWU         CW    24 dB  19 WPM  CQ      1359Z
+DX de JA1LZR-#:   7012.6  JA7QOU         CW    33 dB  27 WPM  CQ      1359Z
+DX de ES5PC-#:   21018.9  RA6MQ          CW    17 dB  29 WPM  CQ      1359Z
+DX de JA1LZR-#:   3513.0  JJ1NYH         CW    47 dB  20 WPM  CQ      1359Z
+DX de OZ5W-#:    21029.0  RA6MQ          CW    02 dB  29 WPM  CQ      1359Z
+DX de PJ2T-#:    28018.5  XQ1KZ          CW    23 dB  29 WPM  CQ      1359Z
+DX de PJ2T-#:    24894.8  IK5ZWU         CW    09 dB  19 WPM  CQ      1359Z
+DX de HB9DCO-#:  10117.8  MW/SM0HPL/P    CW    08 dB  22 WPM  CQ      1359Z
+DX de HB9DCO-#:  24902.6  IK3VUT         CW    10 dB  21 WPM  CQ      1359Z
+DX de SM6FMB-#:  21033.8  Z35F           CW    17 dB  29 WPM  CQ      1359Z
+DX de HA6PX-#:   21033.1  YO2RR          CW    10 dB  25 WPM  CQ      1359Z
+DX de W3LPL-#:   21015.1  CO6RD          CW    16 dB  30 WPM  CQ      1359Z
+DX de DR1A-#:    21033.6  Z35F           CW    03 dB  29 WPM  CQ      1359Z
+DX de OH6BG-#:   24894.9  IK5ZWU         CW    34 dB  19 WPM  CQ      1359Z
+DX de TF3Y-#:    24894.8  IK5ZWU         CW    22 dB  19 WPM  CQ      1359Z
+DX de AC0C-#:    21014.8  CO6RD          CW    37 dB  30 WPM  CQ      1359Z
+DX de DJ3AK-#:   21040.0  ZW8T           CW    16 dB  35 WPM  CQ      1359Z
+DX de N7TR-#:    21015.0  CO6RD          CW    11 dB  29 WPM  CQ      1359Z
+DX de S55HHH-#:  21031.6  EI3KG          CW    33 dB  32 WPM  CQ      1359Z
