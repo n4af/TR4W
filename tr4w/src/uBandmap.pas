@@ -75,8 +75,8 @@ var
   tBlinkerRect                          : TRect;
   tIvertedBlinker                       : boolean;
   //  DoNotAddToBandMap                : boolean;
-//  BandMapListBoxHDC                     : HDC;
-  tr4w_NeedToBlink                      : boolean;
+  // BandMapListBoxHDC                     : HDC;
+  tr4w_NetedToBlink                      : boolean;
   BMWSBUFFER                            : array[0..16] of Char;
   PreviousDisplayedBandmapBand          : BandType {= NoBand};
   BandColor                             : Cardinal;
@@ -194,16 +194,15 @@ begin
 
           CursorFontColor := clwhite;
 
-          if (Spot.FBand = BandmapBand) then                                //GAV change Activeband to BandmapBand
+          if Spot.FBand = BandmapBand then                                                    //GAV change Activeband to BandmapBand
             begin
-              if   (Abs(spot.FFrequency - BandMapCursorFrequency) <= BandMapGuardBand) then    //GAV added to change turn current spot in bandmap red
+              if (Abs(spot.FFrequency - BandMapCursorFrequency) <= BandMapGuardBand)  then    //GAV added to change turn current spot in bandmap red
                 BandColor := clred
                else
                 BandColor := clblue;
              end
           else
             BandColor := clsilver;
-
 
 
           if (lobyte(BandmapDRAWITEMSTRUCT^.itemState) = ODS_SELECTED) then SelectedItem := True;
@@ -326,10 +325,10 @@ begin
 
         BandMapEnable := True;
         SendMessage(BandMapStatusBar, SB_SETPARTS, 6, integer(@BMPanelWidth));
-//        SetTimer(hwnddlg, BANDMAP_BLINK_TIMER_HANDLE, 600, nil);
+      SetTimer(hwnddlg, BANDMAP_BLINK_TIMER_HANDLE, 600, nil);     //n4af
         tr4w_WindowsArray[tw_BANDMAPWINDOW_INDEX].WndHandle := hwnddlg;
-//        BandMapListBoxHDC := Windows.GetDC(BandMapListBox);
-        //        DoNotAddToBandMap := False;
+   //      BandMapListBoxHDC := Windows.GetDC(BandMapListBox);
+     //           DoNotAddToBandMap := False;       
 {
         for TempInt := 0 to BandMapButtonsCount - 1 do
           begin
@@ -354,10 +353,11 @@ begin
 {                                
     WM_TIMER:
       begin
-        if tr4w_NeedToBlink then
+      if tr4w_NeedToBlink then          //n4af
         begin
 
-          if Windows.InvertRect(BandMapListBox, tBlinkerRect) then
+           if Windows.InvertRect(BandMapListBox, tBlinkerRect) then       //n4af
+		   if (Abs(spot.FFrequency = BandMapCursorFrequency)
             TF.InvertBoolean(tIvertedBlinker)
           else
             asm
@@ -428,7 +428,7 @@ begin
       begin
         BandMapEnable := False;
         BandMapListBox := 0;
-//        ReleaseDC(BandMapListBox, BandMapListBoxHDC);
+ //      ReleaseDC(BandMapListBox, BandMapListBoxHDC);
       end;
 
   end;

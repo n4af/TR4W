@@ -374,7 +374,7 @@ begin
           if ActiveRadioPtr^.LastDisplayedFreq <> 0 then
           begin
             Str(TotalContacts + 1, QSONumberString);
-     //     BandMapCursorFrequency := ActiveRadioPtr^.LastDisplayedFreq;             // GAV Removed, not required
+            BandMapCursorFrequency := ActiveRadioPtr^.LastDisplayedFreq;
             tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, ActiveRadioPtr);
             LastCQFrequency := ActiveRadioPtr^.LastDisplayedFreq;
             LastCQMode := ActiveMode;
@@ -399,7 +399,7 @@ begin
               Str(TotalContacts + 1, QSONumberString);
               BandMapCursorFrequency := Frequency;
               tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, @Radio2);
-              LastCQFrequency := Radio2.LastDisplayedFreq;
+              LastCQFrequency := Radio2.LastDisplayedFreq
                 LastCQMode := ActiveMode;
             end;
              }
@@ -639,7 +639,7 @@ begin
     SetSpeed(CodeSpeed);
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
-//  ClearRadioStatus(ActiveRadioPtr);
+  ClearRadioStatus(ActiveRadioPtr); //n4af 04.30.3
 
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);
