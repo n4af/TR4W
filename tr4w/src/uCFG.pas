@@ -290,7 +290,7 @@ var
 
 const
 
-  CommandsArraySize                     = 347 {supp} + 72{$IF OZCR2008} + 1{$IFEND};
+  CommandsArraySize                     = 348 {supp} + 72{$IF OZCR2008} + 1{$IFEND};
 
   CFGCA                                 : array[1..CommandsArraySize] of CFGRecord =
     (
@@ -327,9 +327,11 @@ const
  (crCommand: 'BAND MAP CUTOFF FREQUENCY';     crAddress: @tBandMapCutoffFrequency;        crMin:0;  crMax:MAXWORD-1; crS: csOld; crA: 17;crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctFreqList),
  (crCommand: 'BAND MAP DECAY TIME';           crAddress: @BandMapDecayTime{BandMapDecayValue};              crMin:0;  crMax:MAXWORD; crS: csOld; crA: 5; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'BAND MAP DISPLAY CQ';           crAddress: @BandMapDisplayCQ;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'BAND MAP DISPLAY LIMIT';        crAddress: @BandMapDisplayLimit;            crMin:30;  crMax:1000;   crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'BAND MAP DUPE DISPLAY';         crAddress: @BandMapDupeDisplay;             crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'BAND MAP ENABLE';               crAddress: @BandMapEnable;                  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'BAND MAP GUARD BAND';           crAddress: @BandMapGuardBand;               crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
+
 
  (crCommand: 'BAND MAP ITEM HEIGHT';           crAddress: @BandMapItemHeight;              crMin:15; crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'BAND MAP ITEM WIDTH';            crAddress: @BandMapItemWidth;               crMin:100;crMax:200;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger),

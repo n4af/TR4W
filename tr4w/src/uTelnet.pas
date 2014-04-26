@@ -78,7 +78,7 @@ var
 
 //  tClusterType                          : ClusterType = ctDXSpider;
 
-  TelnetServer                          : Str50 = 'telnet.reversebeacon.net:7300';  //n4af 04-11-2013
+  TelnetServer                          : Str50 = 'sk3w.se:8000';
   TempSpot                              : TSpotRecord;
 
   tbButtons                             : array[0..TELNETBUTTONS - 1] of TTBButton = (
@@ -431,7 +431,7 @@ begin
 
           //            ScrollWindowEx(TelnetListBox, 0, -50, 0, 0, 0, 0, SW_SMOOTHSCROLL);
 //          205: SendViaSocket('SH/USERS');
-          206: SendViaTelnetSocket('SH/DX 100'); //n4af 04-11-2014
+          206: SendViaTelnetSocket('SH/FDX 100');
 
 {$IF LANG = 'RUS'}
           207: ShowHelp('ru_dxcluster');
@@ -1117,7 +1117,7 @@ begin
   if PInteger(@Call[1])^ = tCQAsInteger then
   begin
     Mult := False;
-    TempSpot.FCQ := False;
+    TempSpot.FCQ := True;                         //GAV changed from true to false
     goto 1;
   end;
 
@@ -1134,10 +1134,19 @@ begin
   TempSpot.FCall := Call;
 
   TempSpot.FFrequency := TempFrequency;
-  TempSpot.FBand := BandmapBand;              //GAV      issue, picking activeband on dupecheck   changed from ActiveBand to BandmapBand
-  TempSpot.FMode := BandmapMode;                //GAV     issue, picking activemode on dupecheck   changed ActiveMode to BandmapMode
-  TempSpot.FQSXFrequency := 0;
 
+  if  TempSpot.FCQ then                     //GAV      issue, picking activeband on dupecheck   changed from ActiveBand / mode to BandmapBand / mode  if not CQ
+    begin
+        TempSpot.FBand := ActiveBand;
+        TempSpot.FMode := ActiveMode;
+    end
+  else
+    begin
+        TempSpot.FBand := BandmapBand;
+        TempSpot.FMode := BandmapMode;
+     end;
+
+  TempSpot.FQSXFrequency := 0;
   TempSpot.FDupe := Dupe;
   TempSpot.FMult := Mult;
   TempSpot.FMinutesLeft := 0;
