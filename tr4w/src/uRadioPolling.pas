@@ -2072,7 +2072,7 @@ begin
           if AutoSAPEnable then
             if OpMode = CQOpMode then
               SetOpMode(SearchAndPounceOpMode);
-     pTTStatusChanged;
+
     if rig.FilteredStatus.Freq = 0 then Exit;
 
     if (rig.BandMemory <> rig.FilteredStatus.Band) or (rig.ModeMemory <> rig.FilteredStatus.Mode) then
@@ -2128,7 +2128,7 @@ begin
  //GAV End of added
 
   end;
-{$IF tDebugMode}
+// {$IF tDebugMode}
 {
   if boolean(tPTTStatus) <> rig.FilteredStatus.TXOn then
   begin
@@ -2136,7 +2136,8 @@ begin
     PTTStatusChanged;
   end;
 }
-{$IFEND}
+//{$IFEND}
+
   rig.BandMemory := rig.FilteredStatus.Band;
   rig.ModeMemory := rig.FilteredStatus.Mode;
   rig.LastDisplayedFreq := rig.FilteredStatus.Freq;
@@ -2525,10 +2526,10 @@ end;
 
 procedure PTTStatusChanged;
 begin
-  if ActiveRadioPtr.tPTTStatus = PTT_ON then      
-    tr4w_PTTStartTime := GetTickCount  ;
-//  else      //n4af 04.30.3
-   begin          
+  if ActiveRadioPtr.tPTTStatus = PTT_ON then
+    tr4w_PTTStartTime := GetTickCount
+  else
+  begin
     if tr4w_PTTStartTime <> 0 then
       tRestartInfo.riPTTOnTotalTime := tRestartInfo.riPTTOnTotalTime + GetTickCount - tr4w_PTTStartTime;
     tDispalyOnAirTime;
