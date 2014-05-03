@@ -219,7 +219,7 @@ procedure SendB4;
 function TryLogContact: boolean;
 procedure SpaceBarProc;
 procedure SpaceBarProc2;
-//procedure TR4W_WM_SetTest(h: HWND; Control: Byte {id должен быть меньше 256}; Text: string);
+//procedure TR4W_WM_SetTest(h: HWND; Control: Byte {id пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ 256}; Text: string);
 
 procedure FindAndSaveRectOfAllWindows;
 procedure sm1;
@@ -360,14 +360,14 @@ const
     ' - ' +
     TR4W_CURRENTVERSIONDATE +
     #13 +
-    '© 2006 - 2012 Dmitriy Gulyaev UA4WLI' + #13 +
+    'пїЅ 2006 - 2012 Dmitriy Gulyaev UA4WLI' + #13 +
     'TR4WSERVER version - ' + TR4WSERVER_CURRENTVERSION + #13#13 +
     'http://www.tr4w.com'#13#10
 
 //    'Log format version - v.1.' + LOGVERSION4 + #13 +
 //    'Compiler directives: ['{$IFOPT I+} + 'I'{$ENDIF}{$IFOPT R+} + 'R'{$ENDIF}{$IFOPT Q+} + 'Q'{$ENDIF} + ']'
 {$IF LANG <> 'ENG'} + #13'Language: ' + TC_TRANSLATION_LANGUAGE + ' (by ' + TC_TRANSLATION_AUTHOR + ')'{$IFEND} + #13#10 +
-  'On basis of the source code of the TRLog v.6.80 © Larry Tyree N6TR' + #13 +     //n4af 4.30.0
+  'On basis of the source code of the TRLog v.6.80 пїЅ Larry Tyree N6TR' + #13 +     //n4af 4.30.0
   'Current development team = GM0GAV, K7GK, K0TO, LU5DX, N4AF, NY4I ';              //n4af 4.30.0
 //  Radio1AsPchar                         : PChar = TC_RADIO1;
 //  Radio2AsPchar                         : PChar = TC_RADIO2;
@@ -866,7 +866,7 @@ begin
     VisibleLog.ShowQSOStatus(@CallWindowString);
     VisibleLog.DoPossibleCalls(CallWindowString);
   end;
-
+CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
   if AutoDupeEnableCQ and tCallWindowStringIsDupe {VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode)} then
   begin
 
@@ -1789,7 +1789,7 @@ int GetWindowText(
     HWND hWnd,	// handle of window or control with text
     LPTSTR lpString,	// address of buffer for text
     int nMaxCount 	// maximum number of characters to copy
-    nMaxCount = кол-во символов для копирования плюс нулевой байт в конце
+    nMaxCount = пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
    );
 }
 
@@ -2370,7 +2370,7 @@ begin
     menu_alt_multbell:
       begin
         InvertBoolean(MultiplierAlarm);
-        //надо долелать        m20.Checked := MultiplierAlarm;
+        //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ        m20.Checked := MultiplierAlarm;
         if MultiplierAlarm then DoABeep(BeepCongrats);
       end;
     menu_alt_killcw: ToggleCW(True);
@@ -5630,7 +5630,7 @@ procedure tEnumeratePorts;
 //  InfoPtr                               : PPortInfo1;
 begin
 
-{Запрос размера нужного буфера}
+{пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ}
 {
   Success := EnumPorts(nil, 1, nil, 0, BytesNeeded, Returned);
 
@@ -6406,42 +6406,42 @@ var
   adr                                   : PUCHAR;
 begin
   asm
-	mov eax,Code                   // Так. Посмотрим, что за код к нам пришёл.
+	mov eax,Code                   // пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.
 
-	cmp eax,IOCTL_READ_PORTS       // Чтение регистров LPT-порта
+	cmp eax,IOCTL_READ_PORTS       // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ LPT-пїЅпїЅпїЅпїЅпїЅ
 	jz	@@loc_read_port
-	cmp eax,IOCTL_WRITE_PORTS      // Запись в регистры LPT-порта
+	cmp eax,IOCTL_WRITE_PORTS      // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ LPT-пїЅпїЅпїЅпїЅпїЅ
 	jz	@@loc_write_port
-	mov eax,0//STATUS_NOT_IMPLEMENTED // Непредусмотренный код запроса
+	mov eax,0//STATUS_NOT_IMPLEMENTED // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	ret
 
-	// Чтение из регистров порта LPT
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ LPT
 @@loc_read_port:
-	mov eax,InputBufferLength      // Длина выходного буфера должна быть равна длине входного
+	mov eax,InputBufferLength      // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	cmp eax,OutputBufferLength
 	jnz @@loc_fault_ioctl
 
-	and eax,0FFFEH                 // Чётное количество пар Адрес-Данные
+	and eax,0FFFEH                 // ЧёпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ
 	mov store_count,eax
-	cmp eax,0                      // Ненулевая длина
+	cmp eax,0                      // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	jz  @@loc_fault_ioctl
 
 	mov eax,pBuffer
 	mov data_ptr,eax
 
-@@in_loop:			// Цикл ввода данных
+@@in_loop:			// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	push ebx
 	push edx
 	mov ebx,data_ptr
 	xor eax,eax
-	mov al,BYTE ptr [ebx]	// Первый байт -- номер порта и смещение регистра
+	mov al,BYTE ptr [ebx]	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ -- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	inc ebx
 	mov data_ptr,ebx
 	mov ah,al
 	shr al,1
 	shr al,1
 	shr al,1
-	shr al,1	// al -- номер порта LPT -- 1,2 или 3
+	shr al,1	// al -- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ LPT -- 1,2 пїЅпїЅпїЅ 3
 	and al,3
 	mov edx,3BCH	// LPT1
 	cmp al,1
@@ -6453,30 +6453,30 @@ begin
  @@1:
 	mov al,ah
 	mov ah,0
-	and al,7	// Смещение регистра LPT -- 0..7
-	add edx,eax	// База порта + смещение регистра
+	and al,7	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ LPT -- 0..7
+	add edx,eax	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ + пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	mov adr,edx
 	pop edx
 	pop ebx
 
-//	invoke READ_PORT_UCHAR, adr	// Читаем порт
+//	invoke READ_PORT_UCHAR, adr	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
 
 	push ebx
 	mov ebx,data_ptr
-	mov BYTE ptr [ebx],0//al	 //Запомнили прочитанный байт в буфере
+	mov BYTE ptr [ebx],0//al	 //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	inc ebx
 	mov data_ptr,ebx
 	pop ebx
 
-	mov eax,store_count	// Проверим счётчик циклов
+	mov eax,store_count	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	sub eax,2
 	mov store_count,eax
 	cmp eax,0
-	jnz @@in_loop		// Если не все пары обработаны -- выход.
+	jnz @@in_loop		// пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ -- пїЅпїЅпїЅпїЅпїЅ.
 
 	push ebx
 	mov eax,OutputBufferLength
-	mov ebx,pOutputLength	// Длина данных, передаваемых обратно приложению пользователя.
+	mov ebx,pOutputLength	// пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 	mov DWORD ptr [ebx],eax
 	pop ebx
 
@@ -6485,25 +6485,25 @@ begin
 jmp @@all
 
 
-	// Запись в регистры порта LPT
+	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ LPT
 @@loc_write_port:
 //	mov eax,InputBufferLength
-//	and eax,0FFFEH	// Чётное количество пар Адрес-Данные
+//	and eax,0FFFEH	// ЧёпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ
 //	mov store_count,eax
-//	cmp eax,0	// Ненулевая длина!!!
+//	cmp eax,0	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ!!!
 //	jz  @@loc_fault_ioctl
 
 	mov eax,pBuffer
 	mov data_ptr,eax
 
-@@out_loop:			// Цикл вывода данных
+@@out_loop:			// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	push ebx
 	push edx
 	mov ebx,data_ptr
         inc ebx
         inc ebx
 	xor eax,eax
-	mov ax,word ptr [ebx]	// Первый байт -- номер порта и смещение регистра
+	mov ax,word ptr [ebx]	// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ -- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	inc ebx
         add ebx,4
 
@@ -6511,7 +6511,7 @@ jmp @@all
 	shr al,1
 	shr al,1
 	shr al,1
-	shr al,1	// al -- номер порта LPT -- 1,2 или 3;
+	shr al,1	// al -- пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ LPT -- 1,2 пїЅпїЅпїЅ 3;
 	and al,3
 	mov edx,3BCH	// LPT1
 	cmp al,1
@@ -6523,11 +6523,11 @@ jmp @@all
  @@2:
 	mov al,ah
 	mov ah,0
-	and al,7	// Смещение регистра LPT -- 0..7
-	add edx,eax	// База порта + смещение регистра
+	and al,7	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ LPT -- 0..7
+	add edx,eax	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ + пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	mov adr,edx
 
-	mov al,BYTE ptr [ebx]	// байт данных
+	mov al,BYTE ptr [ebx]	// пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	mov data,al
 	inc ebx
 	mov data_ptr,ebx
@@ -6535,13 +6535,13 @@ jmp @@all
 	pop edx
 	pop ebx
 
-//	invoke WRITE_PORT_UCHAR, adr, data	// Пишем в порт
+//	invoke WRITE_PORT_UCHAR, adr, data	// пїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅ
 
-	mov eax,store_count	// Проверим счётчик циклов
+	mov eax,store_count	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	sub eax,2
 	mov store_count,eax
 	cmp eax,0
-	jnz @@out_loop		// Если не все пары обработаны -- выход.
+	jnz @@out_loop		// пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ -- пїЅпїЅпїЅпїЅпїЅ.
 
 	mov eax,0//STATUS_SUCCESS
 	ret
