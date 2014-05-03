@@ -1784,14 +1784,6 @@ var
 begin
 
 //CPUButtonProc;
-{
-int GetWindowText(
-    HWND hWnd,	// handle of window or control with text
-    LPTSTR lpString,	// address of buffer for text
-    int nMaxCount 	// maximum number of characters to copy
-    nMaxCount = ���-�� �������� ��� ����������� ���� ������� ���� � �����
-   );
-}
 
   {20000}
 //  Windows.ZeroMemory(@CallWindowString, SizeOf(CallWindowString));
@@ -2370,7 +2362,7 @@ begin
     menu_alt_multbell:
       begin
         InvertBoolean(MultiplierAlarm);
-        //���� ��������        m20.Checked := MultiplierAlarm;
+        
         if MultiplierAlarm then DoABeep(BeepCongrats);
       end;
     menu_alt_killcw: ToggleCW(True);
@@ -5630,8 +5622,7 @@ procedure tEnumeratePorts;
 //  InfoPtr                               : PPortInfo1;
 begin
 
-{������ ������� ������� ������}
-{
+
   Success := EnumPorts(nil, 1, nil, 0, BytesNeeded, Returned);
 
   if (not Success) and (GetLastError = ERROR_INSUFFICIENT_BUFFER) then
