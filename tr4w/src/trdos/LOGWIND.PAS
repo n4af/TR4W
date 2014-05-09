@@ -5584,7 +5584,7 @@ end;
 
 procedure tDispalyOnAirTime;
 begin
- //  SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(tRestartInfo.riPTTOnTotalTime, True));      //n4af 04.30.4
+ //  SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(tRestartInfo.riPTTOnTotalTime, True));      //n4af 
 
 
 end;
