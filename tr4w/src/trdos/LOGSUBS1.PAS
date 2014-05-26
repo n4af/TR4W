@@ -374,7 +374,7 @@ begin
           if ActiveRadioPtr^.LastDisplayedFreq <> 0 then
           begin
             Str(TotalContacts + 1, QSONumberString);
-            BandMapCursorFrequency := ActiveRadioPtr^.LastDisplayedFreq;
+       //   BandMapCursorFrequency := ActiveRadioPtr^.LastDisplayedFreq;      // GAV Removed, not required
             tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, ActiveRadioPtr);
             LastCQFrequency := ActiveRadioPtr^.LastDisplayedFreq;
             LastCQMode := ActiveMode;

@@ -1117,7 +1117,7 @@ begin
   if PInteger(@Call[1])^ = tCQAsInteger then
   begin
     Mult := False;
-    TempSpot.FCQ := False;
+	 TempSpot.FCQ := True;                         //GAV changed from true to false
     goto 1;
   end;
 
@@ -1134,10 +1134,19 @@ begin
   TempSpot.FCall := Call;
 
   TempSpot.FFrequency := TempFrequency;
-  TempSpot.FBand := BandmapBand;              //GAV      issue, picking activeband on dupecheck   changed from ActiveBand to BandmapBand
-  TempSpot.FMode := BandmapMode;                //GAV     issue, picking activemode on dupecheck   changed ActiveMode to BandmapMode
+  
+    if  TempSpot.FCQ then                     //GAV      issue, picking activeband on dupecheck   changed from ActiveBand / mode to BandmapBand / mode  if not CQ
+    begin
+        TempSpot.FBand := ActiveBand;
+        TempSpot.FMode := ActiveMode;
+    end
+  else
+    begin
+        TempSpot.FBand := BandmapBand;
+        TempSpot.FMode := BandmapMode;
+     end;
+  
   TempSpot.FQSXFrequency := 0;
-
   TempSpot.FDupe := Dupe;
   TempSpot.FMult := Mult;
   TempSpot.FMinutesLeft := 0;
