@@ -5621,7 +5621,7 @@ procedure tEnumeratePorts;
 //  PortsPtr                              : Pointer;
 //  InfoPtr                               : PPortInfo1;
 begin
-
+{
 
   Success := EnumPorts(nil, 1, nil, 0, BytesNeeded, Returned);
 
