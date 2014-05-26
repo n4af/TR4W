@@ -250,7 +250,7 @@ var
   InactiveRadio                         : RadioType = RadioTwo; {KK1L: 6.73}
   ActiveStereoPort                      : PortType {= NoPort}; {KK1L: 6.71}
 
-  BeepEnable                            : boolean = True;
+  BeepEnable                            : boolean = False; //N4AF performance change
   BeepFreq                              : integer = 1200;
 
 //  CountsSinceLastCW                     : LONGINT = 0;
