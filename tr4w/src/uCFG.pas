@@ -290,7 +290,7 @@ var
 
 const
 
-  CommandsArraySize                     = 347 {supp} + 72{$IF OZCR2008} + 1{$IFEND};
+  CommandsArraySize                     = 348 {supp} + 72{$IF OZCR2008} + 1{$IFEND};
 
   CFGCA                                 : array[1..CommandsArraySize] of CFGRecord =
     (
