@@ -1,4 +1,4 @@
-!define TR4WVERSION    '248-wrtc2014'
+!define TR4WVERSION    '31.0'
 !define TR4WINSTFOLDER 'Software\TR4W'
 !define TR4WDRVREG     'SYSTEM\CurrentControlSet\Services\TR4WIO'
 

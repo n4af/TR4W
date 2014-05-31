@@ -57,21 +57,7 @@ const
 
   ProcessedMultiMessageBufferLength     = 256;
 
-  {
-  Очки за связи начисляются по таблице (см. "комментарий").
-  За каждую новую зону на каждом диапазоне, независимо от периода, начисляется 50 очков.
-  За каждую новую область, независимо от диапазона и периода, начисляется 50 очков.
-
-  Зоны 1-я 2-я 3-я 4-я 5-я 6-я 7-я
-  --------------------------------
-  1-я  11  12  13  14  16  20  25
-  2-я  12  11  12  13  15  19  23
-  3-я  13  12  11  12  14  18  21
-  4-я  14  13  12  11  12  15  18
-  5-я  16  15  14  12  11  12  14
-  6-я  20  19  18  15  12  11  12
-  7-я  25  23  21  18  14  12  11
-  }
+ 
 
   ChampionshipRFPointsArray             : array[1..49] of Byte =
     (
@@ -206,17 +192,7 @@ const
     22
 
     );
-  {
-  CQ-M положение 2007 года
-  Список федеральных округов:
-  Дальневосточный федеральный округ: R0 C, D, F, I, J, K, L, Q, X, Z.
-  Приволжский федеральный округ: R3T; R4 C, F, H, L, N, P, S, U, W,Y; R9 F, S, W.
-  Северо-Западный федеральный округ: R1 A, C, N, O, P, Q, T, W, Z; R2F; R9X.
-  Сибирский федеральный округ: R8 V, T; R9 H, M, O, U, Y, Z; R0 A, B, H, O, S, U, W, Y.
-  Уральский федеральный округ: R9 A, C, J, L, K, Q.
-  Центральный федеральный округ: R3 A, D, E, G, I, J, L, M, N, P, Q, R, S, U, V, W, X, Y, Z.
-  Южный федеральный округ: R4A; R6 A, E, H, I, J, L, P, Q, U, W, X, Y.
-  }
+
 
 type
 
@@ -1083,88 +1059,7 @@ begin
       Exit;
     end;
 
-      {
-          case TempQTHData.Zone of
-            1: ZeroZuluOffset := 14;
-            2: ZeroZuluOffset := 16;
-            3: ZeroZuluOffset := 17;
-            4: ZeroZuluOffset := 18;
-            5: ZeroZuluOffset := 19;
-            6: ZeroZuluOffset := 16;
-            7: ZeroZuluOffset := 18;
-            8: ZeroZuluOffset := 19;
-            9: ZeroZuluOffset := 19;
-            10: ZeroZuluOffset := 17;
-
-            11: ZeroZuluOffset := 19;
-            12: ZeroZuluOffset := 19;
-            13: ZeroZuluOffset := 21;
-            14: ZeroZuluOffset := 19;
-            15: ZeroZuluOffset := 21;
-            16: ZeroZuluOffset := 20;
-            17: ZeroZuluOffset := 23;
-            18: ZeroZuluOffset := 1;
-            19: ZeroZuluOffset := 2;
-            20: ZeroZuluOffset := 4;
-
-            21: ZeroZuluOffset := 4;
-            22: ZeroZuluOffset := 5;
-            23: ZeroZuluOffset := 6;
-            24: ZeroZuluOffset := 7;
-            25: ZeroZuluOffset := 8;
-            26: ZeroZuluOffset := 9;
-            27: ZeroZuluOffset := 1;
-            28: ZeroZuluOffset := 2;
-            29: ZeroZuluOffset := 3;
-            30: ZeroZuluOffset := 4;
-
-            31: ZeroZuluOffset := 5;
-            32: ZeroZuluOffset := 6;
-            33: ZeroZuluOffset := 7;
-            34: ZeroZuluOffset := 8;
-            35: ZeroZuluOffset := 9;
-            36: ZeroZuluOffset := 1;
-            37: ZeroZuluOffset := 1;
-            38: ZeroZuluOffset := 3;
-            39: ZeroZuluOffset := 3;
-            40: ZeroZuluOffset := 4;
-
-            41: ZeroZuluOffset := 5;
-            42: ZeroZuluOffset := 5;
-            43: ZeroZuluOffset := 6;
-            44: ZeroZuluOffset := 8;
-            45: ZeroZuluOffset := 9;
-            46: ZeroZuluOffset := 0;
-            47: ZeroZuluOffset := 1;
-            48: ZeroZuluOffset := 2;
-            49: ZeroZuluOffset := 6;
-            50: ZeroZuluOffset := 8;
-
-            51: ZeroZuluOffset := 9;
-            52: ZeroZuluOffset := 0;
-            53: ZeroZuluOffset := 3;
-            54: ZeroZuluOffset := 7;
-            55: ZeroZuluOffset := 9;
-            56: ZeroZuluOffset := 12;
-            57: ZeroZuluOffset := 2;
-            58: ZeroZuluOffset := 8;
-            59: ZeroZuluOffset := 10;
-            60: ZeroZuluOffset := 11;
-
-            61: ZeroZuluOffset := 13;
-            62: ZeroZuluOffset := 13;
-            63: ZeroZuluOffset := 13;
-            64: ZeroZuluOffset := 10;
-            65: ZeroZuluOffset := 10;
-            66: ZeroZuluOffset := 22;
-
-          else
-            begin
-              ProperSalutation := 'TU';
-              Exit;
-            end;
-          end;
-      }
+  
   end;
 
   Hours := GetIntegerTime div 100;
@@ -1204,12 +1099,7 @@ begin
 end;
 
 procedure LoadSpecialHelloFile;
-{
-var
-  FileRead                         : Text;
-  FileString                       : ShortString;
-  Greeting, ID                     : Str20;
-}
+
 begin
   if FirstHelloRecord <> nil then Exit;
   EnumerateLinesInFile('HELLO.DAT', EnumHelloDAT, True);
@@ -6576,9 +6466,21 @@ begin
 
       end;
 
-    LZDXQSOPointMethod:
+    MMCQSOPointMethod:           //n4af added for marcon memorial contest
       begin
-        begin
+
+        if RXData.QTH.Continent <> MyContinent then RXData.QSOPoints := 5
+        else
+        if RXCty = MyCountry then  RXData.QSOPoints := 1
+        else
+        RXData.QSOPoints := 3;
+        
+
+        end;
+      
+      LZDXQSOPointMethod:
+      begin
+        
           if RXCty = 'LZ' then
           begin
             if MyCountry = 'LZ' then RXData.QSOPoints := 1 else RXData.QSOPoints := 10;
@@ -6591,7 +6493,8 @@ begin
               RXData.QSOPoints := 1;
           end;
         end;
-      end;
+     
+
 
     OldNewYearQSOPointMethod:
       begin

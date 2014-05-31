@@ -516,6 +516,7 @@ var
   {KK1L: 6.65 Expanded array to cover all cases to keep BM from going whacko when tuning out of band}
   BandMapFirstEntryList                 : array[Band160..NoBand, CW..FM] of BandMapEntryPointer;
   BandMapGuardBand                      : integer = 200;
+  BandMapDisplayLimit                   : integer = 164;   //GAV added for centred   bandmap
   BandMapMultsOnly                      : boolean; {KK1L: 6.68}
   BandMapSplitMode                      : BandMapSplitModeType {= ByCutoffFrequency}; {KK1L: 6.64}
   BandMapTotalCalls                     : integer;
@@ -1470,7 +1471,7 @@ begin
       Str(Heading, HeadingString);
 
       Windows.ZeroMemory(@TempString, SizeOf(TempString));
-      TempString := CountryID + '   ' + HeadingString + '°';
+      TempString := CountryID + '   ' + HeadingString + 'пїЅ';
 
       if DistanceMode <> NoDistanceDisplay then
       begin
@@ -3410,7 +3411,7 @@ begin
       DisplayCountryName(CallWindowString);
       DisplayBeamHeading(CallWindowString, '');
 
-        //        DispalayB4; //убрать?
+        //        DispalayB4; //пїЅпїЅпїЅпїЅпїЅпїЅ?
 
       if Contest <> GENERALQSO then
       begin
@@ -3489,8 +3490,8 @@ begin
       begin
         Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
             {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
-//временно        if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
-//временно          if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ        if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ          if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
         if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
           if ((BandMapEntryRecord^.StatusByte and $40) = 0) then
           begin
@@ -3595,8 +3596,8 @@ begin
       begin
         Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
             {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
-//временно        if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
-//временно          if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ        if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ          if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
         if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
           if ((BandMapEntryRecord^.StatusByte and $80) <> 0) then
           begin
@@ -3660,8 +3661,8 @@ begin
   begin
     Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
       {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
-//временно    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
-//временно      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
     if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
       if ((BandMapEntryRecord^.StatusByte and $40) = 0) then
       begin
@@ -3722,8 +3723,8 @@ begin
   begin
     Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
       {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
-//временно    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
-//временно      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
+//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
     if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
       if ((BandMapEntryRecord^.StatusByte and $80) <> 0) then
       begin
@@ -4355,7 +4356,7 @@ begin
         if ((BandMapEntryRecord^.StatusByte and $40) <> 0) and BandMapDupeDisplay then
         begin {entry is a dupe and we are displaying dupes }
 
-                {wli проверка на nil BandMapCursorData}
+                {wli пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ nil BandMapCursorData}
           if BandMapCursorData <> nil then
             if BandMapEntryRecord^.Frequency = BandMapCursorData^.Frequency then
             begin
@@ -4371,7 +4372,7 @@ begin
           if ((BandMapEntryRecord^.StatusByte and $40) = 0) then
           begin {KK1L: 6.64 entry is not a dupe so just check it}
 
-                  {wli проверка на nil BandMapCursorData}
+                  {wli пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ nil BandMapCursorData}
             if BandMapCursorData <> nil then
               if BandMapEntryRecord^.Frequency = BandMapCursorData^.Frequency then
               begin
@@ -4773,7 +4774,7 @@ begin
         begin
               //          SaveSetAndClearActiveWindow(BeamHeadingWindow);
           Heading := round(GetBeamHeading(MyGrid, data.Grid));
-              //          Write(data.Grid, ' at ', Heading, 'ш');
+              //          Write(data.Grid, ' at ', Heading, 'пїЅ');
                                    //          RestorePreviousWindow;
         end;
       end;
@@ -4922,7 +4923,7 @@ begin
                   //              begin
                   //                SaveSetAndClearActiveWindow(BeamHeadingWindow);
                   //                Heading := round(GetBeamHeading(MyGrid, data.Grid));
-                  //                Write(data.Grid, ' at ', Heading, 'ш');
+                  //                Write(data.Grid, ' at ', Heading, 'пїЅ');
                   //    SetTR4WWindowText(BeamHeadingWindowHandle, data.Grid+ ' at '+ inttostr(Heading)+ '*');
                   //                RestorePreviousWindow;
                   //              end;
@@ -5149,20 +5150,20 @@ var
   TZ                                    : TIME_ZONE_INFORMATION;
 begin
   {
-  В России и в Европе переход на летнее время осуществляется в последнее воскресенье марта
-  в 2:00 переводом часовых стрелок на 1 час вперед, а обратный переход осуществляется
-  в последнее воскресенье октября в 3:00 переводом стрелок на 1 час назад.
+  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+  пїЅ 2:00 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 1 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ 3:00 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ 1 пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 
-  Из-за применения летнего времени на территории России, россияне живут со сдвигом +2 часа по отношению к поясному времени.
-  Сдвиг в 2 часа вызван тем, что на территории России действует так называемое «декретное время»,
-  отличающееся от поясного на +1 час. Летнее время добавляет еще +1 час к декретному времени,
-  что в сумме составляет +2 часа по отношению к поясному времени.
+  пїЅпїЅ-пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ +2 пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  пїЅпїЅпїЅпїЅпїЅ пїЅ 2 пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ,
+  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ +1 пїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ +1 пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ,
+  пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ +2 пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
-  В США и Канаде с 2007 года переход на летнее время осуществляется
-  во второе воскресенье марта в 2:00, и возвращается обратно
-  в первое воскресенье ноября, также в 2:00[1].
-  Следует заметить, что не по всей территории Штатов и Канады летнее время используется одинаково.
-  К примеру, на северо-западе канадской провинции Онтарио жители отказываются переводить стрелки летом.
+  пїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ 2007 пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ 2:00, пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅ 2:00[1].
+  пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
+  пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
 
   }
 
@@ -5584,8 +5585,8 @@ end;
 
 procedure tDispalyOnAirTime;
 begin
-  SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(tRestartInfo.riPTTOnTotalTime, True));      //n4af
-// SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(d,false));
+   SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(tRestartInfo.riPTTOnTotalTime, True));      //n4af
+
 
 end;
 

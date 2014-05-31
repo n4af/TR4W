@@ -459,13 +459,13 @@ begin
 
   Band := Radio.BandMemory;
   Mode := Radio.ModeMemory;
-//{      n4af 04.30.0
-  if TwoRadioMode then
+//      n4af 04.30.0
+ { if TwoRadioMode then
   begin
     Band := InActiveRadioPtr.BandMemory;
     Mode := InActiveRadioPtr.ModeMemory;
-  end;
-// } n4af 04.30.0
+  end;     }
+//  n4af 04.30.0
 //  if not ColumnDupeSheetEnable then
   SendMessage(VDListBox, LB_RESETCONTENT, 0, 0);
 //  else

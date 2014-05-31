@@ -866,7 +866,7 @@ begin
     VisibleLog.ShowQSOStatus(@CallWindowString);
     VisibleLog.DoPossibleCalls(CallWindowString);
   end;
-CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
+// CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
   if AutoDupeEnableCQ and tCallWindowStringIsDupe {VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode)} then
   begin
 
