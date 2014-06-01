@@ -508,10 +508,10 @@ begin
 //  WritePrivateProfileSection('CABRILLO', nil, TR4W_INI_FILENAME);
 
   ReadInConfigFile(cfgINI);
-  ReadInConfigFile(cfgCFG);
+
 //  MyZone := MyZone;
   ReadInConfigFile(cfgCommMes);
-
+  ReadInConfigFile(cfgCFG);    //n4af cfg gets top precedence
 {
   TempCardinal := 0;
   Windows.ZeroMemory(@TempString, SizeOf(TempString));
