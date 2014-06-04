@@ -4232,7 +4232,7 @@ end;
 
 procedure tAddContestExchangeToLog(RXData: ContestExchange; ListViewHandle: HWND; var Index: integer);
 label
-  setitem;
+  setitem,Domestic; //n4af
 var
   elvi                                  : TLVItem;
   Mults                                 : Cardinal;
@@ -4417,10 +4417,13 @@ END;
 
   Mults := 0;
   if RXData.DXMult then
+  if RXdata.DomesticMult then goto Domestic //n4af
+   else
   begin
     MultString[Mults] := 'x';
     inc(Mults);
   end;
+Domestic:
 
   if RXData.DomesticMult then
   begin
