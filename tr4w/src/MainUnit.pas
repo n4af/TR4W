@@ -1783,15 +1783,12 @@ var
   nCmdShow                              : integer;
 begin
 
-//CPUButtonProc;
+if    ActiveRadioPtr.CurrentStatus.Split Then QuickDisplay('Warning: SPLIT MODE...')      //N4AF  4.31.3
+else                                                                                     //N4AF
+ QuickDisplay(nil);                                                                      //N4AF 4.31.3
 
-  {20000}
-//  Windows.ZeroMemory(@CallWindowString, SizeOf(CallWindowString));
-//  CallWindowString[0] := Char(Windows.GetWindowText(wh[mweCall], @CallWindowString[1], CallstringLength));
+
   CallWindowString[0] := Char(Windows.SendMessage(wh[mweCall], WM_GETTEXT, CallstringLength, integer(@CallWindowString[1])));
-
-//  ctyLocateCall(CallWindowString, QTH);
-//  SetMainWindowText(mweDupeInfoCall, tContinentArray[QTH.Continent]);
 
   CallWindowEmpty := CallWindowString[0] = #0;
   if CallWindowEmpty then CallsignIsTypedByOperator := False;
