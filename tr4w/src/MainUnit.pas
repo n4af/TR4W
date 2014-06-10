@@ -330,6 +330,7 @@ procedure tUpdateLog(UpdAction: UpadateAction);
 
 procedure PTTOn;
 procedure PTTOff;
+procedure WagCheck;
 
 type
   Tmain = procedure(
@@ -1778,15 +1779,75 @@ begin
 {$IFEND}
 end;
 
+Procedure WagCheck;          //added by n4af at behest of wag contest mgr
+var
+ARF                                  : integer;
+Const
+WagWarn =     'Warning: Out of WAG allowed frequency range';
+
+begin
+ARF :=  ActiveRadioPtr.CurrentStatus.Freq div 1000;
+
+if   (ARF > 3560) and (ARF < 3800) then
+begin
+QuickDisplay(WagWarn);
+exit ;
+end;
+
+if   (ARF > 3650) and (ARF < 3700)  then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+
+if   (ARF > 7043) and (ARF < 7080) then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+
+if   (ARF > 7080) and (ARF < 7143) then
+begin
+QuickDisplay(WagWarn);
+exit
+end;
+
+if   (ARF > 14060) and (ARF < 14125)  then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+
+if   (ARF > 14280) and (ARF < 14350) then
+begin
+QuickDisplay(WagWarn);
+exit
+end;
+
+
+if   (ARF > 21347) and (ARF < 21450)  then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+
+if   (ARF > 28225) and (ARF < 28400)  then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+end;
+
 procedure CallWindowChange;
 var
   nCmdShow                              : integer;
 begin
 
-if    ActiveRadioPtr.CurrentStatus.Split Then QuickDisplay('Warning: SPLIT MODE...')      //N4AF  4.31.3
+ if    ActiveRadioPtr.CurrentStatus.Split Then QuickDisplay('Warning: SPLIT MODE...')      //N4AF  4.31.3
 else                                                                                     //N4AF
  QuickDisplay(nil);                                                                      //N4AF 4.31.3
-
+ if Contest = WAG Then             //n4af 4.31.4
+ WagCheck;                          //n4af
 
   CallWindowString[0] := Char(Windows.SendMessage(wh[mweCall], WM_GETTEXT, CallstringLength, integer(@CallWindowString[1])));
 
