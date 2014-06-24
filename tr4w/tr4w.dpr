@@ -25,11 +25,13 @@ uses
   LogStuff in 'src\trdos\LOGSTUFF.PAS',
   LOGWAE in 'src\trdos\LOGWAE.PAS',
   LogWind in 'src\trdos\LOGWIND.PAS',
+  //MySU in 'src\MySU.pas',
   Tree in 'src\trdos\tree.pas',
   ZoneCont in 'src\trdos\ZONECONT.PAS',
   LOGSUBS2 in 'src\trdos\LOGSUBS2.PAS',
   LOGSUBS1 in 'src\trdos\LOGSUBS1.PAS',
   LOGSend in 'src\trdos\LogSend.pas',
+  //SysUtils in '..\utils\SysUtils.pas',
   uCT1BOH in 'src\uCT1BOH.pas',
   PostUnit in 'src\trdos\PostUnit.PAS',
   uInputQuery in 'src\uInputQuery.pas',
@@ -406,12 +408,15 @@ end;
 label
   NoTransMess, TransMess, CommandLine;
 var
+
   TempHDC                               : HDC;
   TempColor                             : tr4wColors;
   TempTLogBrush                         : TLogBrush {= (lbStyle: BS_SOLID; lbHatch: 0)};
   c                                     : Cardinal;
   TempString                            : ShortString;
-//  TempCardinal                          : Cardinal;
+     P                                   : Pchar; //n4af
+      P1                                   : boolean; //n4af
+   S1                                   : String; //n4af
 {$IF not tDebugMode}
   s                                     : string;
 {$IFEND}
@@ -431,14 +436,14 @@ begin
     Exit;
   end;
 
-{$IF LANG = 'ENG'}
+//{$IF LANG = 'ENG'}
 //  if TryToCheckTheLatestVersion then Exit;
-{$IFEND}
+//{$IFEND}
 
   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
 
-  Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
-
+ Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
+ // Format(TempBuffer, '%s%s', tempstring, 'tr4w.ini');
   LuconSZLoadded := AddFontResource(TR4W_LC_FILENAME) <> 0;
   MainFixedFont := tCreateFont(15, FW_BOLD * Ord(BoldFont), @MainFontName[1]);
   MSSansSerifFont := tCreateFont(15, FW_DONTCARE, 'MS Sans Serif');
@@ -504,33 +509,15 @@ begin
   SetConfigurationDefaultValues;
 
   {Temporary - Feb 2010}
-//  WritePrivateProfileSection('ERMAK', nil, TR4W_INI_FILENAME);
-//  WritePrivateProfileSection('CABRILLO', nil, TR4W_INI_FILENAME);
+
 
   ReadInConfigFile(cfgINI);
 
-//  MyZone := MyZone;
-  ReadInConfigFile(cfgCommMes);
-  ReadInConfigFile(cfgCFG);    //n4af cfg gets top precedence
-{
-  TempCardinal := 0;
-  Windows.ZeroMemory(@TempString, SizeOf(TempString));
-  for c := 0 to Windows.GetPrivateProfileSection('Messages', wsprintfBuffer, SizeOf(wsprintfBuffer), TR4W_INI_FILENAME) do
-  begin
-    if wsprintfBuffer[c] = #0 then
-    begin
-      if TempCardinal <> 0 then EnmuCFGFile(@TempString);
-      TempCardinal := 0;
-      Windows.ZeroMemory(@TempString, SizeOf(TempString));
-    end
-    else
-    begin
-      inc(TempCardinal);
-      TempString[TempCardinal] := wsprintfBuffer[c];
-      TempString[0] := CHR(Ord(TempString[0]) + 1);
-    end;
-  end;
-}
+  ReadInConfigFile(cfgCFG);          //n4af 4.31.5
+  ReadInConfigFile(cfgCommMes);      //common messages gets precedence - n4af
+  
+
+
   if CTY.ctyR150SMode then
   begin
     ctyLoadInR150SList;
