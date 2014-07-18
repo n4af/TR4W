@@ -160,10 +160,10 @@ const
 
   //OZCR2008                              = True;
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.31.1';
-  TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
+  TR4W_CURRENTVERSION_NUMBER            = '4.31.6';
+  TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'May 27, 2014';
+  TR4W_CURRENTVERSIONDATE               = 'June 24, 2014';
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -2554,6 +2554,7 @@ const
     'JA INTERNATIONAL DX', //    JapanInternationalDXQSOPointMethod,
     'KCJ', //    KCJQSOPointMethod,
     'LQP',//    'MQP', //    MQPQSOPointMethod,
+  	'MARCONI MEMORIAL', // MMCQsoPointMethod,      //n4af
     'NZ FIELD DAY', //    NZFieldDayQSOPointMethod,
     'OK DX', //    OKDXQSOPointMethod,
     'RAEM', //    RAEMQSOPointMethod,
@@ -2592,7 +2593,6 @@ const
     'UKR CHAMP', //    ChampionshipUkrMethod,
     'RADIO VHF FD', //    RadioVHFFDQSOPointMethod,
     'LZ', //    LZDXQSOPointMethod,
-    'Marconi Memorial', // MMCQsoPointMethod,      //n4af
     'ONY', //    OldNewYearQSOPointMethod,
     'RF AS CHAMP', //    ChampionshipRFASMethod,
     'SRR JR', //    YouthChampionshipRFMethod,
