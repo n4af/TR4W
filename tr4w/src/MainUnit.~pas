@@ -330,6 +330,7 @@ procedure tUpdateLog(UpdAction: UpadateAction);
 
 procedure PTTOn;
 procedure PTTOff;
+procedure WagCheck;
 
 type
   Tmain = procedure(
@@ -360,7 +361,7 @@ const
     ' - ' +
     TR4W_CURRENTVERSIONDATE +
     #13 +
-    '� 2006 - 2012 Dmitriy Gulyaev UA4WLI' + #13 +
+    '2006 - 2012 Dmitriy Gulyaev UA4WLI' + #13 +
     'TR4WSERVER version - ' + TR4WSERVER_CURRENTVERSION + #13#13 +
     'http://www.tr4w.com'#13#10
 
@@ -368,7 +369,7 @@ const
 //    'Compiler directives: ['{$IFOPT I+} + 'I'{$ENDIF}{$IFOPT R+} + 'R'{$ENDIF}{$IFOPT Q+} + 'Q'{$ENDIF} + ']'
 {$IF LANG <> 'ENG'} + #13'Language: ' + TC_TRANSLATION_LANGUAGE + ' (by ' + TC_TRANSLATION_AUTHOR + ')'{$IFEND} + #13#10 +
   'On basis of the source code of the TRLog v.6.80 � Larry Tyree N6TR' + #13 +     //n4af 4.30.0
-  'Current development team = GM0GAV, K7GK, K0TO, LU5DX, N4AF, NY4I ';              //n4af 4.30.0
+  'Current development team = GM0GAV, K0TO, LU5DX, N4AF, NY4I ';              //n4af 4.30.0
 //  Radio1AsPchar                         : PChar = TC_RADIO1;
 //  Radio2AsPchar                         : PChar = TC_RADIO2;
 
@@ -866,7 +867,7 @@ begin
     VisibleLog.ShowQSOStatus(@CallWindowString);
     VisibleLog.DoPossibleCalls(CallWindowString);
   end;
-CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
+// CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
   if AutoDupeEnableCQ and tCallWindowStringIsDupe {VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode)} then
   begin
 
@@ -1778,20 +1779,77 @@ begin
 {$IFEND}
 end;
 
+Procedure WagCheck;          //added by n4af at behest of wag contest mgr
+var
+ARF                                  : integer;
+Const
+WagWarn =     'Warning: Out of WAG allowed frequency range';
+
+begin
+ARF :=  ActiveRadioPtr.CurrentStatus.Freq div 1000;
+
+if   (ARF > 3560) and (ARF < 3800) then
+begin
+QuickDisplay(WagWarn);
+exit ;
+end;
+
+if   (ARF > 3650) and (ARF < 3700)  then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+
+if   (ARF > 7043) and (ARF < 7080) then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+
+if   (ARF > 7080) and (ARF < 7143) then
+begin
+QuickDisplay(WagWarn);
+exit
+end;
+
+if   (ARF > 14060) and (ARF < 14125)  then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+
+if   (ARF > 14280) and (ARF < 14350) then
+begin
+QuickDisplay(WagWarn);
+exit
+end;
+
+
+if   (ARF > 21347) and (ARF < 21450)  then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+
+if   (ARF > 28225) and (ARF < 28400)  then
+begin
+QuickDisplay(WagWarn);
+exit;
+end;
+end;
+
 procedure CallWindowChange;
 var
   nCmdShow                              : integer;
 begin
 
-//CPUButtonProc;
+ if    ActiveRadioPtr.CurrentStatus.Split Then QuickDisplay('Warning: SPLIT MODE...')      //N4AF  4.31.3
+else                                                                                     //N4AF
+ QuickDisplay(nil);                                                                      //N4AF 4.31.3
+ if Contest = WAG Then             //n4af 4.31.4
+ WagCheck;                          //n4af
 
-  {20000}
-//  Windows.ZeroMemory(@CallWindowString, SizeOf(CallWindowString));
-//  CallWindowString[0] := Char(Windows.GetWindowText(wh[mweCall], @CallWindowString[1], CallstringLength));
   CallWindowString[0] := Char(Windows.SendMessage(wh[mweCall], WM_GETTEXT, CallstringLength, integer(@CallWindowString[1])));
-
-//  ctyLocateCall(CallWindowString, QTH);
-//  SetMainWindowText(mweDupeInfoCall, tContinentArray[QTH.Continent]);
 
   CallWindowEmpty := CallWindowString[0] = #0;
   if CallWindowEmpty then CallsignIsTypedByOperator := False;
@@ -4232,7 +4290,7 @@ end;
 
 procedure tAddContestExchangeToLog(RXData: ContestExchange; ListViewHandle: HWND; var Index: integer);
 label
-  setitem;
+  setitem,Domestic; //n4af
 var
   elvi                                  : TLVItem;
   Mults                                 : Cardinal;
@@ -4417,10 +4475,13 @@ END;
 
   Mults := 0;
   if RXData.DXMult then
+  if RXdata.DomesticMult then goto Domestic //n4af
+   else
   begin
     MultString[Mults] := 'x';
     inc(Mults);
   end;
+Domestic:
 
   if RXData.DomesticMult then
   begin

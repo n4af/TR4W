@@ -153,17 +153,13 @@ const
   MAKE_DEFAULT_VALUES                   = True;
 {$IFEND}
 
-//  VERSION_YEAR                          = 2012;
-//  VERSION_MONTH                         = 10;
-//  VERSION_DAY                           = 29;
-//  EXPIREDDAY                            = VERSION_YEAR * 12 * 30 + VERSION_MONTH * 30 + VERSION_DAY + 120;
 
-  //OZCR2008                              = True;
+
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.31.6';
+  TR4W_CURRENTVERSION_NUMBER            = '4.32.0';               
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'June 24, 2014';
+  TR4W_CURRENTVERSIONDATE               = 'July 28, 2014';
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';

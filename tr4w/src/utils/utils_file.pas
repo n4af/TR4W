@@ -30,7 +30,7 @@ begin
     FindClose(h);
     Result := True;
   end;
-end;
+ end;
 
 function tWriteFile(hFile: THandle; const Buffer; nNumberOfBytesToWrite: DWORD; var lpNumberOfBytesWritten: DWORD): BOOL;
 begin

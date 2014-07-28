@@ -1471,7 +1471,7 @@ begin
       Str(Heading, HeadingString);
 
       Windows.ZeroMemory(@TempString, SizeOf(TempString));
-      TempString := CountryID + '   ' + HeadingString + '�';
+      TempString := CountryID + '   ' + HeadingString + '';
 
       if DistanceMode <> NoDistanceDisplay then
       begin

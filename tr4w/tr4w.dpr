@@ -2,8 +2,9 @@ program tr4w;
 {$IMPORTEDDATA OFF}
 //https://groups.google.com/group/tr4w/feeds?hl=ru
 uses
-  MMSystem,
+
   Messages,
+  MMSystem,
   Windows,
   MainUnit in 'src\MainUnit.pas',
   BeepUnit in 'src\trdos\BeepUnit.pas',

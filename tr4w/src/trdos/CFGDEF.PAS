@@ -295,7 +295,7 @@ begin
 
   Packet.PacketBandSpots := False;
   //  Packet.PacketBaudRate := 2400;
-  Packet.PacketBeep := True;
+  Packet.PacketBeep := False;
   Packet.PacketLogFileName := '';
   Packet.PacketSpots := MultSpots;
   Packet.BroadcastAllPacketData := True;
@@ -393,8 +393,8 @@ begin
 //  SendCompleteFourLetterCall := False;
 //  SendQSOImmediately := True;
 
-  SetCQMemoryString(CW, F1, 'CQTEST \ \ TEST');
-  SetCQMemoryString(CW, F2, 'CQTEST CQTEST CQTEST \ \ TEST');
+  SetCQMemoryString(CW, F1, 'CQ TEST \  \ TEST');
+  SetCQMemoryString(CW, F2, 'CQ TEST CQ TEST CQ TEST \  \ TEST');
   SetCQMemoryString(CW, F4, 'TU \ TEST');
   SetCQMemoryString(CW, F6, 'DE \');
   SetCQMemoryString(CW, F7, 'SRI QSO B4 TU \ TEST');
@@ -415,15 +415,16 @@ begin
   SetEXCaptionMemoryString(CW, F1, 'Мой позывной');
   SetEXCaptionMemoryString(CW, F2, 'Контр. номер');
 {$ELSE}
-  SetEXCaptionMemoryString(CW, F1, 'DE+Call');
+ SetEXCaptionMemoryString(CW, F1, 'DE+Call');
   SetEXCaptionMemoryString(CW, F2, 'S&P Exchange');
   SetEXCaptionMemoryString(Phone, F2, 'S&P Exchange');
+
 {$IFEND}
 
 {$IF MMTTYMODE}
 
-  SetCQMemoryString(CW, F1, 'CQ CQ \ \ TEST');
-  SetCQMemoryString(CW, F2, 'CQ CQ CQ CQ CQ CQ \ \ TEST');
+  SetCQMemoryString(CW, F1, 'CQ CQ \  \ TEST');
+  SetCQMemoryString(CW, F2, 'CQ CQ CQ CQ CQ CQ \  \ TEST');
 
   SetCQMemoryString(CW, F9, '???');
 

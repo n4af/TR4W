@@ -361,7 +361,7 @@ const
     ' - ' +
     TR4W_CURRENTVERSIONDATE +
     #13 +
-    '� 2006 - 2012 Dmitriy Gulyaev UA4WLI' + #13 +
+    '2006 - 2012 Dmitriy Gulyaev UA4WLI' + #13 +
     'TR4WSERVER version - ' + TR4WSERVER_CURRENTVERSION + #13#13 +
     'http://www.tr4w.com'#13#10
 
@@ -369,7 +369,7 @@ const
 //    'Compiler directives: ['{$IFOPT I+} + 'I'{$ENDIF}{$IFOPT R+} + 'R'{$ENDIF}{$IFOPT Q+} + 'Q'{$ENDIF} + ']'
 {$IF LANG <> 'ENG'} + #13'Language: ' + TC_TRANSLATION_LANGUAGE + ' (by ' + TC_TRANSLATION_AUTHOR + ')'{$IFEND} + #13#10 +
   'On basis of the source code of the TRLog v.6.80 � Larry Tyree N6TR' + #13 +     //n4af 4.30.0
-  'Current development team = GM0GAV, K7GK, K0TO, LU5DX, N4AF, NY4I ';              //n4af 4.30.0
+  'Current development team = GM0GAV, K0TO, LU5DX, N4AF, NY4I UR7QM ';              //n4af 4.30.0
 //  Radio1AsPchar                         : PChar = TC_RADIO1;
 //  Radio2AsPchar                         : PChar = TC_RADIO2;
 

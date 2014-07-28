@@ -2885,6 +2885,7 @@ begin
   end
   else
   begin
+    GetRidOfPrecedingSpaces(TempString);  //n4af 4.31.7
     GetRidOfPostcedingSpaces(TempString);
 
     if (ActiveExchange = QSONumberDomesticOrDXQTHExchange) or

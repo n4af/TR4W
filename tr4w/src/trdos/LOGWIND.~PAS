@@ -5585,7 +5585,7 @@ end;
 
 procedure tDispalyOnAirTime;
 begin
-   SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(tRestartInfo.riPTTOnTotalTime, True));      //n4af
+SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(Windows.GetTickCount-StartCPU, False));       //n4af
 
 
 end;

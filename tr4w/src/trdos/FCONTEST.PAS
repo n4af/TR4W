@@ -1493,18 +1493,7 @@ begin
     end;
 }
 
-    {
-        if CMD = 'OZCR' then
-        begin
-          ContestName := 'ÎÇ×Ð - Î÷íûé òóð';
-          ActiveBand := Band10;
-          ActiveQSOPointMethod := OnePointPerQSO;
-          //QSOByMode := False;
-          ActiveExchange := RSTQSONumberExchange;
-          tDupesInteval := 5;
-          FoundContest := True;Contest :=
-        end;
-    }
+   
 
   //  ContestTitle := GetYearString + ' ' + ContestName + ' ' + MyCall;
 

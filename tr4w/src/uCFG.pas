@@ -857,15 +857,7 @@ begin
 
   Command[Ord(Command[0]) + 1] := #0;
   Result := False;
-{
-123456789012345
-CQ DIG MEMORY F1=CQ CQ CQ \ \ TEST
-CQ DIG MEMORY F1 CAPTION=
-CQ CW MEMORY CONTROLF5=<03>SRS=PB1;<04>
-CQ CW MEMORY CONTROLF5 CAPTION=PLAYCH1MSG
-CQ MEMORY CONTROLF5 CAPTION=PLAYCH1MSG
-CQ COUNTER WINDOW COLOR = GREEN
-}
+
   if length(pshortstring(Command)^) > 5 then
 
     if pshortstring(Command)^[1] in ['C', 'E'] then
@@ -878,17 +870,7 @@ CQ COUNTER WINDOW COLOR = GREEN
 
             Exit;
           end;
-{
-  TempString := Copy(pshortstring(Command)^, 1, 3);
 
-  if (TempString = 'CQ ') or (TempString = 'EX ') then
-    if StringHas(pshortstring(Command)^, 'MEMORY') then
-    begin
-      ProcessMessage(pshortstring(Command)^, CustomCMD);
-      Result := True;
-      Exit;
-    end;
-}
   if pshortstring(Command)^ = 'REMINDER' then
   begin
     ProcessReminder(pshortstring(Command)^, CustomCMD);

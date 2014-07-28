@@ -468,6 +468,7 @@ var
   LineNumber                            : integer;
   //  ConfigRead                            : Text;
   FileName                              : ShortString;
+
 begin
   if ConfigFileName = cfgCFG then ClearDomesticCountryList;
   LineNumberInConfigFile := 0;
@@ -486,17 +487,16 @@ var
 
 begin
   PacketFile := False;
-
-  for ParameterCount := 1 to ParamCount do
+   for ParameterCount := 1 to ParamCount do
   begin
 //    if FileExists(ParamStr(ParameterCount) + '.CFG') then      ContestConfigFileTitle := ParamStr(ParameterCount);
 
-    if UpperCase(ParamStr(ParameterCount)) = 'B64DECODE' then
+  {  if UpperCase(ParamStr(ParameterCount)) = 'B64DECODE' then
     begin
 //      Bin64Decode;
       halt;
-    end;
-
+    end;      }
+ 
     if UpperCase(ParamStr(ParameterCount)) = 'BANDMAP' then
       FakeBandMap := True;
 
