@@ -253,6 +253,7 @@ const
   TC_C9_EUROPE                          = 'Europe';
   TC_C9_AFRICA                          = 'Africa';
   TC_C9_OCEANIA                         = 'Oceania';
+  TC_C9_ANTARTICA                     ='Antartica';
   TC_C9_ASIA                            = 'Asia';
   TC_C9_UNKNOWN                         = 'Unknown';
 
