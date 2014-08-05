@@ -156,10 +156,10 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.32.0';               
+  TR4W_CURRENTVERSION_NUMBER            = '4.32.2';
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'July 28, 2014';
+  TR4W_CURRENTVERSIONDATE               = 'Aug 5,2014';
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -510,7 +510,9 @@ type
     Europe,
     Africa,
     Asia,
-    Oceania);
+    Oceania,
+    Antartica
+    );
 
 const
   tContinentArray                       : array[ContinentType] of PChar =
@@ -521,7 +523,8 @@ const
     TC_C9_EUROPE,
     TC_C9_AFRICA,
     TC_C9_ASIA,
-    TC_C9_OCEANIA
+    TC_C9_OCEANIA,
+    TC_C9_ANTARTICA
     );
 
 type
@@ -690,7 +693,7 @@ const
   CabrilloExtantionSA                   : array[CabrilloExtantionType] of PChar = ('%s%s.CBR', '%s%s.LOG');
 
   ContinentTypeSA                       : array[ContinentType] of PChar =
-    ('NONE', 'NA', 'SA', 'EU', 'AF', 'AS', 'OC');
+    ('NONE', 'NA', 'SA', 'EU', 'AF', 'AS', 'OC', 'AN');
 
 type
   RadioType = (NoRadio, RadioOne, RadioTwo);
@@ -748,6 +751,7 @@ type
     ARRLVHFQSO,
     ARRLVHFSS,
     BALTIC,
+    BWQP,
     CIS,
     COUNTYHUNTER,
     CQ160CW,
@@ -2416,6 +2420,7 @@ type
     ARRLVHFQSOPointMethod,
     ARRLVHFSSPointMethod,
     BalticQSOPointMethod,
+    BWQPQSOPointMethod,
     CISQSOPointMethod,
     CQ160QSOPointMethod,
     CQMQSOPointMethod,
@@ -2529,6 +2534,7 @@ const
     'ARRL VHF', //    ARRLVHFQSOPointMethod,
     'ARRL VHF SS', //    ARRLVHFSSPointMethod,
     'BALTIC', //    BalticQSOPointMethod,
+    'BWQP', // BWQPQSOPointMethod,
     'CIS', //    CISQSOPointMethod,
     'CQ 160', //    CQ160QSOPointMethod,
     'CQ M', //    CQMQSOPointMethod,
@@ -2649,6 +2655,7 @@ type
     RSTDomesticQTHExchange,
     RSTDomesticQTHOrQSONumberExchange,
     RSTNameAndQTHExchange,
+    RSTNameAndPossibleFOCNumber,
     RSTPossibleDomesticQTHAndPower,
     RSTPowerExchange,
     RSTPrefectureExchange,
@@ -2707,6 +2714,7 @@ const
     'RST DOMESTIC QTH',
     'RST DOMESTIC QTH OR QSO NUMBER',
     'RST NAME QTH',
+    'RST NAME AND POSSIBLE FOC NUMBER',
     'RST POSSIBLE DOMESTIC QTH AND POWER',
     'RST POWER',
     'RST PREFECTURE',
@@ -2805,6 +2813,7 @@ QSOPartiesCount = 12;
  ({Name: 'ARRL VHF QSO';               }Email: nil;                      DF: nil;                 WA7BNM:   43; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:ARRLVHFQSOPointMethod),
  ({Name: 'ARRL VHF SS';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:ARRLVHFSSPointMethod),
  ({Name: 'BALTIC';                     }Email: nil;                      DF: nil;                 WA7BNM:   28; {SK3BG: nil;          } QRZRUID: 161 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:BalticQSOPointMethod),
+ ({Name: 'BWQP';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000;      {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults;    P: 0; AE: RSTNameAndQTHExchange;              XM:NoDXMults; QP:BWQPQSOPointMethod),
  ({Name: 'CIS';                        }Email: nil;                      DF: 'cis';               WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 500 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:CISQSOPointMethod),
  ({Name: 'COUNTY HUNTER';              }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQTHExchange;                              XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'CQ-160-CW';                  }Email: '160CW@kkn.net';          DF: 's48p14dc';          WA7BNM:  232; {SK3BG: 'cqww160';    } QRZRUID: 311 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                        XM:CQDXCCWithNoUSAOrCanada; QP:CQ160QSOPointMethod),
@@ -2966,6 +2975,7 @@ QSOPartiesCount = 12;
       'ARRL-VHF-QSO',
       'ARRL-VHF-SS',
       'BALTIC',
+      'BWQP',
       'CIS',
       'COUNTY HUNTER',
       'CQ-160-CW',
@@ -3166,6 +3176,7 @@ QSOPartiesCount = 12;
       ({Name: 'ARRL VHF QSO';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'ARRL VHF SS';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'BALTIC';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM1 + ciMB0 + ciMM0),
+      ({Name: 'BWQP';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'CIS';                        }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'COUNTY HUNTER';              }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'CQ-160-CW';                  }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),

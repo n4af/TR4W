@@ -3296,6 +3296,59 @@ begin
   end;
 end;
 
+function ProcessRSTNameAndPossibleFOCNumber(Exchange:Str80; var RXData:ContestExchange):boolean;
+//    ProcessExchange := ProcessRSTNAMEAndPossibleFOCNumber(ExchangeString, RData);
+var
+  NumberEntries,  Result1       : integer;
+    EntryList                             : EntryArray;
+  begin
+ ProcessRSTNameAndPossibleFOCNumber := False;
+
+  ParseExchangeIntoFields(Exchange, EntryList, NumberEntries);
+   if StringIsAllNumbers(EntryList[1]) then
+   begin
+   RXData.RSTReceived := StrToInt(EntryList[1]) ;
+   RXData.Name := (EntryList[2]);
+   RXData.Power := (EntryList[3]);
+   end
+   else
+   begin
+   RXData.RSTReceived := 599;
+    RXData.Name := (EntryList[1]);
+   RXData.Power := (EntryList[2]);
+   end;
+   //Exchange := RXData.RSTReceived + RXData.Name + RXData.Power;
+   Exchange := EntryList[1] + EntryList[2] + EntryList[3];
+   ProcessRSTNameAndPossibleFOCNumber := True;
+   end;
+
+   {
+   if StringIsAllNumbers(FirstString) then
+   FirstString := StrToInt(FirstString);
+   else
+   FirstString := DefaultRST;
+
+    SecondString := RXData.Name;
+  if StringIsAllNumbers(ThirdString)  then
+     ThirdString := StrToInt(ThirdString);
+	 
+    if ThirdString <> '' then
+    begin
+      if StringIsAllNumbers(ThirdString) then
+      RXData.NumberReceived := StrToInt(ThirdString);
+    end 
+    else
+      RXData.NumberReceived := ' ';
+    Exit;      }
+  
+  
+
+  
+
+  
+ 
+  
+  
 function ProcessRSTAndDomesticOrDXQTHExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
 
 begin
@@ -3349,8 +3402,8 @@ begin
     RXData.RSTReceived := StrToInt(FirstString);
     if ThirdString <> '' then
     begin
-      RXData.QTHString := SecondString;
-      RXData.Name := ThirdString;
+      RXData.QTHString := ThirdString;
+      RXData.Name := SecondString;
     end
     else
       RXData.Name := SecondString;
@@ -3360,8 +3413,8 @@ begin
   if StringIsAllNumbers(SecondString) then
   begin
     RXData.Name := FirstString;
-    RXData.RSTReceived := StrToInt(SecondString);
-    RXData.QTHString := ThirdString;
+    RXData.RSTReceived := DefaultRST;
+    RXData.QTHString := SecondString;
     Exit;
   end;
 
@@ -5482,6 +5535,15 @@ begin
             RXData.QSOPoints := 1;
       end;
 
+	  BWQPQSOPointMethod:
+
+ 	  if StringIsAllNumbers(RXData.QTHString) then
+	  RXData.QSOPoints := 1 
+	  else
+	  RXData.QSOPoints := 0;
+
+
+    
     CISQSOPointMethod:
       begin
         RXData.QSOPoints := 1;
@@ -7244,6 +7306,10 @@ begin
         ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData)
       else
         ProcessExchange := ProcessRSTAndQSONumberExchange(ExchangeString, RData);
+
+    RSTNameAndPossibleFOCNumber:
+
+    ProcessExchange := ProcessRSTNameAndPossibleFOCNumber(ExchangeString, Rdata);
 
     RSTNameAndQTHExchange:
       ProcessExchange := ProcessRSTNameAndQTHExchange(ExchangeString, RData);
