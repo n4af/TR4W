@@ -208,13 +208,13 @@ begin
       begin
 
         case wParam of
-          2: goto 1;
+           2: goto 1;
           90..98:
             begin
               TempString := GetDialogItemText(hwnddlg, wParam);
               SendStringAndStop(TempString);
             end;
-          1: SaveQTCR;
+          1: ;//SaveQTCR;
           110: SetFocus(QTCNrWndHandle);
 
         end;
@@ -244,7 +244,8 @@ begin
 
   end;
 
-end;
+
+ end;
 
 procedure SaveQTCR;
 var
