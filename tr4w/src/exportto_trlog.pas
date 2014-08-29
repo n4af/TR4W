@@ -48,6 +48,7 @@ begin
   end;
 end;
 
+
 procedure TenTenNumReceivedHeader(var LogString: Str80; var Underline: Str80);
 
 begin
@@ -131,6 +132,12 @@ begin
   Underline := Underline + '---- ';
 end;
 
+procedure FOCNumberHeader(var LogString: Str80; var Underline: Str80);
+
+begin
+  LogString := LogString + 'Rcvd ';
+  Underline := Underline + '---- ';
+end;
 procedure QSONumberReceivedHeader(var LogString: Str80; var Underline: Str80);
 
 begin
@@ -495,6 +502,23 @@ begin
 
   LogString := LogString + TempString + '  ';
 end;
+
+procedure FOCReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
+
+var
+  TempString                            : Str80;
+
+begin
+  TempString := Exchange.FOCNumber;
+
+
+
+    while length(TempString) < 5 do
+      TempString := ' ' + TempString;
+
+  LogString := LogString + TempString + ' ';
+end;
+
 
 procedure ZoneReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
@@ -916,6 +940,7 @@ begin
       if Name then NameReceivedStamp(RXData, LogString);
       if QSONumber then QSONumberReceivedStamp(RXData, LogString);
       if Power then PowerReceivedStamp(RXData, LogString);
+      if FOCNumber then FOCReceivedStamp(RXData, LogString);
     end
     else
     begin
@@ -969,6 +994,13 @@ begin
     Underline := Underline + ' ---  --- --- ----      -------';
   end
   else
+  // if ActiveExchange = RSTAndFOCNumberExchange then
+  if Contest = FOCMARATHON then  //n4af 4.32.5
+  begin
+    LogString := LogString + ' TXR  RXR QTH    FOC NUM';
+    Underline := Underline + ' ---  --- ---    -------';
+  end
+  else
   begin
       { Very nice generic way of doing things }
 
@@ -984,7 +1016,7 @@ begin
       if QSONumber then QSONumberReceivedHeader(LogString, Underline);
 //      if PostalCode then PostalCodeReceivedHeader(LogString, Underline);
       if RandomChars then RandomCharsSentAndReceivedHeader(LogString, Underline);
-      if Power then PowerReceivedHeader(LogString, Underline);
+     if Power then PowerReceivedHeader(LogString, Underline);
       if Name then NameReceivedHeader(LogString, Underline);
       if Chapter then ChapterReceivedHeader(LogString, Underline);
       if Age then AgeReceivedHeader(LogString, Underline);

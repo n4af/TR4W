@@ -3296,30 +3296,35 @@ begin
   end;
 end;
 
-function ProcessRSTNameAndPossibleFOCNumber(Exchange:Str80; var RXData:ContestExchange):boolean;
-//    ProcessExchange := ProcessRSTNAMEAndPossibleFOCNumber(ExchangeString, RData);
+function ProcessRSTAndFOCNumberExchange(Exchange:Str80; var RXData:ContestExchange):boolean;     //n4af function added 4.32.5
+//    ProcessExchange := ProcessRSTNAMEAndPossibleFOCNumber(ExchangeString, RData);             //n4af add foc marathon
 var
   NumberEntries,  Result1       : integer;
     EntryList                             : EntryArray;
+    Exch : Str10;
   begin
- ProcessRSTNameAndPossibleFOCNumber := False;
-
+ ProcessRSTAndFOCNumberExchange := False;
   ParseExchangeIntoFields(Exchange, EntryList, NumberEntries);
-   if StringIsAllNumbers(EntryList[1]) then
+   if NumberEntries = 1 then
    begin
-   RXData.RSTReceived := StrToInt(EntryList[1]) ;
-   RXData.Name := (EntryList[2]);
-   RXData.Power := (EntryList[3]);
+   RXData.RSTReceived := DefaultRST;
+   RXData.FOCNumber := EntryList[1];
+      end
+   else
+   if ((EntryList[2][1] = '5') and (EntryList[2][3] = '9'))     then
+   begin
+   RXData.RSTReceived := StrToInt(EntryList[2]);
+   RXData.FOCNumber := EntryList[1];
    end
    else
    begin
-   RXData.RSTReceived := 599;
-    RXData.Name := (EntryList[1]);
-   RXData.Power := (EntryList[2]);
+   RXData.RSTReceived := StrToInt(EntryList[1]);
+   RXData.FOCNumber := EntryList[2];
    end;
-   //Exchange := RXData.RSTReceived + RXData.Name + RXData.Power;
-   Exchange := EntryList[1] + EntryList[2] + EntryList[3];
-   ProcessRSTNameAndPossibleFOCNumber := True;
+   RXData.FOCNumber := Exchange;
+ ProcessRSTAndFOCNumberExchange := RXData.FOCNumber <> '';
+ 
+   ProcessRSTAndFOCNumberExchange := True;
    end;
 
    {
@@ -4194,7 +4199,9 @@ begin
     ProcessRSTZoneAndPossibleDomesticQTHExchange := True;
 end;
 
-function ProcessRSTAndPowerExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+
+
+ function ProcessRSTAndPowerExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -5842,6 +5849,15 @@ begin
         else
           RXData.QSOPoints := 0;
 
+          FOCMarathonQSOPointMethod:
+
+          if RXData.Callsign = 'G4FOC' then
+      //    if RXData.Callsign = GM4FOC then
+          RXData.QSOPoints := 2
+
+          else
+          RXData.QSOPoints := 1;
+
     RadioVHFFDQSOPointMethod {, ChampionshipRFVHFQSOPointMethod}:
       begin
         if MyGrid <> '' then
@@ -7257,6 +7273,9 @@ begin
     RSTAgeExchange:
       ProcessExchange := ProcessRSTAndAgeExchange(ExchangeString, RData);
 
+    RSTAndFOCNumberExchange:     //n4af
+      ProcessExchange := ProcessRSTAndPowerExchange(ExchangeString, RData);   //n4af
+
     AgeAndQSONumberExchange: ProcessExchange := ProcessAgeAndQSONumberExchange(ExchangeString, RData);
 
     RSTAgeAndPossibleSK:
@@ -7292,25 +7311,14 @@ begin
     RSTDomesticOrDXQTHExchange:
       ProcessExchange := ProcessRSTAndDomesticOrDXQTHExchange(ExchangeString, RData);
 
-    {       RSTDomesticQTHOrQSONumberExchange:
-                IF RData.DXQTH <> '' THEN
-                    ProcessExchange := ProcessRSTAndQSONumberExchange (ExchangeString, RData)
-                ELSE
-                    ProcessExchange := ProcessRSTAndDomesticQTHExchange (ExchangeString, RData);
 
-                    Changed in 6.57
-
-    }
-    RSTDomesticQTHOrQSONumberExchange:
+       RSTDomesticQTHOrQSONumberExchange:
       if DomesticCountryCall(RData.Callsign) then
         ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData)
       else
         ProcessExchange := ProcessRSTAndQSONumberExchange(ExchangeString, RData);
 
-    RSTNameAndPossibleFOCNumber:
-
-    ProcessExchange := ProcessRSTNameAndPossibleFOCNumber(ExchangeString, Rdata);
-
+    
     RSTNameAndQTHExchange:
       ProcessExchange := ProcessRSTNameAndQTHExchange(ExchangeString, RData);
 
@@ -7343,6 +7351,8 @@ begin
 
     QSONumberAndPossibleDomesticQTHExchange:
       ProcessExchange := ProcessQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData); {KK1L: 6.73}
+
+    
 
     RSTQSONumberAndRandomCharactersExchange:
       ProcessExchange := ProcessRSTQSONumberAndRandomCharactersExchange(ExchangeString, RData);
