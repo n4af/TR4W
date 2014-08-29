@@ -109,7 +109,7 @@ begin
             Number,
             5 + I * 55,
             255,
-            53,
+             53,
             QTCHEIGHT * 2,
             hwnddlg,
             I + 100
@@ -141,7 +141,8 @@ begin
             WS_CHILD or SS_SUNKEN or SS_NOTIFY or SS_LEFT or WS_VISIBLE,
             70,
             (I - 1) * (QTCHEIGHT + QTCROWSDIS) + 5,
-            310,
+          //  310,
+           410,     // n4af 4.32.4
             QTCHEIGHT,
             hwnddlg,
             I + 200
