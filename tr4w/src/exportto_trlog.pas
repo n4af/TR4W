@@ -509,7 +509,7 @@ var
   TempString                            : Str80;
 
 begin
-  TempString := Exchange.FOCNumber;
+  TempString := Exchange.Power;
 
 
 
@@ -940,7 +940,7 @@ begin
       if Name then NameReceivedStamp(RXData, LogString);
       if QSONumber then QSONumberReceivedStamp(RXData, LogString);
       if Power then PowerReceivedStamp(RXData, LogString);
-      if FOCNumber then FOCReceivedStamp(RXData, LogString);
+      if Contest = FOCMARATHON then FOCReceivedStamp(RXData, LogString);
     end
     else
     begin
