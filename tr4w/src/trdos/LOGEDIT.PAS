@@ -2889,6 +2889,7 @@ begin
     GetRidOfPostcedingSpaces(TempString);
 
     if (ActiveExchange = QSONumberDomesticOrDXQTHExchange) or
+    (ActiveExchange = RSTAndFOCNumberExchange) or
       (ActiveExchange = QSONumberDomesticQTHExchange) or
       (ActiveExchange = QSONumberAndGridSquare) or
       (ActiveExchange = RSTAndQSONumberOrDomesticQTHExchange) or

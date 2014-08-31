@@ -523,22 +523,22 @@ begin
 //        DomesticQTHDataFileName := 'ARRLSECT';
         AddARRLSectionDomesticCountries;
       end;
-
+ 
     ARRLDXCW, ARRLDXSSB:
       begin
         if (MyCountry = 'K') or (MyCountry = 'VE') then
         begin
           ActiveExchange := RSTPowerExchange; {*}
-          ActiveDXMult := ARRLDXCCWithNoUSAOrCanada;
+      ActiveDXMult := ARRLDXCCWithNoUSAOrCanada;
         end
         else
         begin
           ActiveDomesticMult := DomesticFile;
           TempDomesticQTHDataFileName := 'S48P14DC';
           ActiveExchange := RSTDomesticQTHExchange; {*}
-        end;
+    end;
 
-//        ContestName := 'ARRL DX Test';
+        ContestName := 'ARRL DX Test';
         Add_KVE;
       end;
 
@@ -591,6 +591,9 @@ begin
       begin
         ActiveBand := Band80;
       end;
+      
+ //    BWQP:
+   //   ActiveExchange := RSTPowerExchange;
 
     CALQSOPARTY:
       begin
@@ -723,7 +726,9 @@ begin
         end;
 //        Add_KVEKH6KL;
       end;
-
+  FOCMARATHON:
+  ExchangeMemoryEnable := True;
+  
     GENERALQSO:
       begin
 //        ActiveInitialExchange := NameQTHInitialExchange;

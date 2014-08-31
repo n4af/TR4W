@@ -508,6 +508,7 @@ begin
   if Cont = 'AF' then Result := Africa;
   if Cont = 'AS' then Result := Asia;
   if Cont = 'OC' then Result := Oceania;
+  if Cont = 'AN' then Result := Antartica;
 end;
 
 //begin

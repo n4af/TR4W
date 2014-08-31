@@ -442,6 +442,7 @@ begin
   Windows.ZeroMemory(@Radio1IDs, SizeOf(Radio1IDs));
   SetTransmittersId := TF.SendDlgItemMessage(CreateCabrilloWindow, $CF {124}, CB_GETCURSEL) = 1;
 
+
   if Contest = IOTA then
     if TF.SendDlgItemMessage(CreateCabrilloWindow, 120, CB_GETCURSEL) = 1 then SetTransmittersId := True;
 
@@ -1917,8 +1918,12 @@ begin
         nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<NAME:%u>%s', length(TempRXData.Name), @TempRXData.Name[1]);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);         //n4af 04.30.2
       end;
-
-      if TempRXData.Power <> '' then
+   if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then
+      begin
+        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
+        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);          
+      end;
+      if ((TempRXData.Power <> '') and (Contest <> FOCMARATHON)) then
       begin
         nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<RX_PWR:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);          //n4af 04.30.2
@@ -2337,10 +2342,10 @@ var
   cMyState                              : PChar;
   cMyName                               : PChar;
   csName                                : PChar;
-
+  cMyFOCNumber                          : PChar;
   cMyCheck                              : PChar;
   csCheck                               : integer {PChar};
-
+  crFOCNr                               : PChar;
   cMyGrid                               : PChar;
   csPower                               : PChar;
 
@@ -2366,6 +2371,7 @@ begin
   if Contest = IOTA then TransmitterIDPos := 90;
   contacts := 0;
   Result := False;
+
 
   if not OpenLogFile then Exit;
 
@@ -2496,7 +2502,7 @@ begin
             Format(CABRILLO_MYEX, '%-3s %-5s %-7s', RSTSent, cMyName, cMyState);
             Format(CABRILLO_HISEX, '%-3s %-5s %-7s', RSTReceived, csName, csQTHString);
           end;
-
+        
         QSONumberAndNameExchange:
           begin
             asm
@@ -2515,6 +2521,9 @@ begin
             asm add esp,16
             end;
           end;
+
+
+          
 
         RSTAndPostalCodeExchange:
           begin
@@ -2599,6 +2608,7 @@ begin
             csCheck := {inttopchar}(TempRXData.Check);
             cMyCheck := @MyCheck[1];
             cMyState := @MySection[1];
+
             asm
                 push cMyState
                 push cMyCheck
@@ -2711,10 +2721,58 @@ begin
             asm add esp,16
             end;
           end;
+          {
+          if Contest = FOCMARATHON then      //n4af 4.32.5
 
+        begin
+        cMyFOCNumber :=  @MyFOCNumber[1];
+            asm
+                        push cMyFOCNumber
+                        push RSTSent
+            end;
+
+            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
+            asm add esp,16
+            end;
+
+             nrReceived := StrToInt(TempRXData.FOCNumber);
+            asm
+                        push nrReceived
+                        push RSTReceived
+            end;
+
+            wsprintf(CABRILLO_HISEX, '%-3s %-7d');
+            asm add esp,16
+            end;
+
+             end;
+         }
         RSTPowerExchange:
-          begin
-            csPower := @TempRXData.Power[1];
+        begin
+        if contest = FOCMARATHON then
+        begin
+        cMyFOCNumber :=  @MyFOCNumber[1];
+        crFOCNr := @TempRXData.Power[1];
+         asm
+                        push cMyFOCNumber
+                        push RSTSent
+            end;
+            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
+            asm add esp,16
+            end;
+
+            asm
+                       push crFOCnr
+                       push RSTReceived
+            end;
+            wsprintf(CABRILLO_HISEX, '%-3s %-7s');
+            asm add esp,16
+            end;
+
+             end;
+             if Contest <> FOCMARATHON then
+              begin
+
             asm
                         push csPower
                         push RSTReceived
@@ -2731,7 +2789,7 @@ begin
             asm add esp,16
             end;
           end;
-
+          end;
         RSTAndOrGridExchange:
           begin
             asm

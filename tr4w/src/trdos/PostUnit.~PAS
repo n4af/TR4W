@@ -442,6 +442,7 @@ begin
   Windows.ZeroMemory(@Radio1IDs, SizeOf(Radio1IDs));
   SetTransmittersId := TF.SendDlgItemMessage(CreateCabrilloWindow, $CF {124}, CB_GETCURSEL) = 1;
 
+
   if Contest = IOTA then
     if TF.SendDlgItemMessage(CreateCabrilloWindow, 120, CB_GETCURSEL) = 1 then SetTransmittersId := True;
 
@@ -1917,8 +1918,12 @@ begin
         nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<NAME:%u>%s', length(TempRXData.Name), @TempRXData.Name[1]);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);         //n4af 04.30.2
       end;
-
-      if TempRXData.Power <> '' then
+   if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then
+      begin
+        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power)+1, @TempRXData.Power[1]);
+        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite-1);          //n4af 04.30.5
+      end;
+      if ((TempRXData.Power <> '') and (Contest <> FOCMARATHON)) then
       begin
         nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<RX_PWR:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);          //n4af 04.30.2
@@ -2156,174 +2161,7 @@ begin
       nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER,
         '%s,%s,%s,%u%02d%02d,%02d%02d%02d,%u,%u,%s');
 
- //    asm add esp,80
- //    end;
- //    sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      {
-      if TempRXData.Frequency <> 0 then //14149280  or 7025000
-      begin
-
-        asm
-        mov eax,[TempRXData.Frequency]
-        mov ecx,1000000
-        cdq
-        idiv ecx
-        push edx
-        push eax
-        end;
-        nNumberOfBytesToWrite := wsprintf(ADIF_FREQ_STRING, '%u.%06u');
-        asm add esp,16 end;
-
-        asm
-        lea eax,ADIF_FREQ_STRING
-        push eax
-    //    push nNumberOfBytesToWrite
-        end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s,');
-        asm add esp,16 end;
-
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '%s,',nNumberOfBytesToWrite,ADIF_FREQ_STRING);
-         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-
-      if TempRXData.Precedence <> #0 then
-      begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '%c,', TempRXData.Precedence);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-
-      if TempRXData.Check <> 0 then
-      begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '%02u,', TempRXData.Check);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-
-      if TempRXData.QTHString <> '' then
-      begin
-        p := @TempRXData.QTHString[1];
-        tCallStringLength := length(TempRXData.QTHString);
-
-        if (LooksLikeAGrid(TempRXData.DomesticQTH) and (ActiveDomesticMult <> RDADistrict)) then
-        begin
-          nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '%s', tCallStringLength, p);
-          sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-        end
-       end;
-
-      if TempRXData.Name <> '' then
-      begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '%s', @TempRXData.Name[1]);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);         //n4af 04.30.2
-      end;
-
-      if TempRXData.Power <> '' then
-      begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '%s',  @TempRXData.Power[1]);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);          //n4af 04.30.2
-      end;
-
-      if ExchangeInformation.QSONumber then
-      begin
-        if TempRXData.NumberReceived <> -1 then
-        begin
-          asm
-          push TempRXData.NumberReceived
-          end;
-          nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%05u');
-          asm add esp,12
-          end;
-          sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-        end;
-
-        asm
-          push TempRXData.NumberSent
-        end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%05u');
-        asm add esp,12
-        end;
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-      if TempRXData.Zone <> DUMMYZONE then
-      begin
-        if ActiveZoneMult in [CQZones, ITUZones] then
-        begin
-          if ActiveZoneMult = CQZones then p := '%02u' else p := '%02u';
-          asm
-        xor  eax,eax
-        mov  al,TempRXData.Zone
-        push eax
-          end;
-          nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, p);
-          asm add esp,12
-          end;
-          sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-        end
-        else
-        begin
-          if (ExchangeInformation.Zone and (ActiveZoneMult = NoZoneMults)) then
-          begin
-
-            if CTY.ctyZoneMode = CQZoneMode then p := '%02u' else p := '%02u';
-            asm
-        xor  eax,eax
-        mov  al,TempRXData.Zone
-        push eax
-            end;
-            nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, p);
-            asm add esp,12
-            end;
-            sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-          end;
-        end;
-      end;
-
-{      if TempRXData.TenTenNum <> MAXWORD then
-      begin
-        asm
-        xor  eax,eax
-        mov  ax, TempRXData.TenTenNum
-        push eax
-        end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%05u');
-      end;    }
-   //     sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-   //   end;
-   {
-      if TempRXData.Age <> 0 then
-      begin
-        asm
-        xor  eax,eax
-        mov  al, TempRXData.Age
-        push eax
-        end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%03u');
-        asm add esp,12
-        end;
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-       
-      if TempRXData.ceOperator[0] <> #0 then
-      begin
-        asm
-        lea eax, TempRXData.ceOperator
-        push eax
-        end;
-        Windows.lstrlen(TempRXData.ceOperator);
-        asm push eax end;
-      end
-
-      else
-
-        asm
-      //lea eax,MyCall+1
-       //push eax
-        xor eax,eax
-        mov al, byte ptr MyCall
-        push eax
-        end;
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s');
-      asm add esp,16 end;
-      }
+ 
       end;   
 
       sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
@@ -2504,10 +2342,10 @@ var
   cMyState                              : PChar;
   cMyName                               : PChar;
   csName                                : PChar;
-
+  cMyFOCNumber                          : PChar;
   cMyCheck                              : PChar;
   csCheck                               : integer {PChar};
-
+  crFOCNr                               : PChar;
   cMyGrid                               : PChar;
   csPower                               : PChar;
 
@@ -2533,6 +2371,7 @@ begin
   if Contest = IOTA then TransmitterIDPos := 90;
   contacts := 0;
   Result := False;
+
 
   if not OpenLogFile then Exit;
 
@@ -2663,7 +2502,7 @@ begin
             Format(CABRILLO_MYEX, '%-3s %-5s %-7s', RSTSent, cMyName, cMyState);
             Format(CABRILLO_HISEX, '%-3s %-5s %-7s', RSTReceived, csName, csQTHString);
           end;
-
+        
         QSONumberAndNameExchange:
           begin
             asm
@@ -2682,6 +2521,9 @@ begin
             asm add esp,16
             end;
           end;
+
+
+          
 
         RSTAndPostalCodeExchange:
           begin
@@ -2766,6 +2608,7 @@ begin
             csCheck := {inttopchar}(TempRXData.Check);
             cMyCheck := @MyCheck[1];
             cMyState := @MySection[1];
+
             asm
                 push cMyState
                 push cMyCheck
@@ -2878,10 +2721,58 @@ begin
             asm add esp,16
             end;
           end;
+          {
+          if Contest = FOCMARATHON then      //n4af 4.32.5
 
+        begin
+        cMyFOCNumber :=  @MyFOCNumber[1];
+            asm
+                        push cMyFOCNumber
+                        push RSTSent
+            end;
+
+            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
+            asm add esp,16
+            end;
+
+             nrReceived := StrToInt(TempRXData.FOCNumber);
+            asm
+                        push nrReceived
+                        push RSTReceived
+            end;
+
+            wsprintf(CABRILLO_HISEX, '%-3s %-7d');
+            asm add esp,16
+            end;
+
+             end;
+         }
         RSTPowerExchange:
-          begin
-            csPower := @TempRXData.Power[1];
+        begin
+        if contest = FOCMARATHON then
+        begin
+        cMyFOCNumber :=  @MyFOCNumber[1];
+        crFOCNr := @TempRXData.Power[1];
+         asm
+                        push cMyFOCNumber
+                        push RSTSent
+            end;
+            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
+            asm add esp,16
+            end;
+
+            asm
+                       push crFOCnr
+                       push RSTReceived
+            end;
+            wsprintf(CABRILLO_HISEX, '%-3s %-7s');
+            asm add esp,16
+            end;
+
+             end;
+             if Contest <> FOCMARATHON then
+              begin
+
             asm
                         push csPower
                         push RSTReceived
@@ -2898,7 +2789,7 @@ begin
             asm add esp,16
             end;
           end;
-
+          end;
         RSTAndOrGridExchange:
           begin
             asm

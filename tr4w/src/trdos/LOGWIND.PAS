@@ -717,7 +717,6 @@ var
   MyContinent                           : ContinentType {= UnknownContinent};
   MyCountry                             : Str20;
   MyZone                                : Str20; //ZoneMultiplierString;
-
   MyContinentIsSet                      : boolean;
   MyCountryIsSet                        : boolean;
   MyZoneIsSet                           : boolean;
@@ -726,6 +725,7 @@ var
 
   //MyCounty                              : Str20 = '';
   MyFDClass                             : Str10;
+  MyFOCNumber                                 : Str10;
   MyName                                : Str20;
   MyPostalCode                          : Str20;
   MyPrec                                : Str10; {KK1L: 6.67 Was Str20}
