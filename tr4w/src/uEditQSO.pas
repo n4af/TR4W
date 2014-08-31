@@ -638,7 +638,7 @@ begin
   inc(CurrentEditRow, 1);
   if ExchangeInformation.QTH then MakeEditWindow('QTH', ctString, @EditableQSORXData.QTHString[1]);
   if ExchangeInformation.Power then MakeEditWindow('Power', ctString, @EditableQSORXData.Power[1]);
-//  if ExchangeInformation.Age then MakeEditWindow('Age', ctByte, @EditableQSORXData.Age);
+ // if ExchangeInformation.FOCNumber then MakeEditWindow('FOC', ctByte, @EditableQSORXData.FOCNumber[1]);
   if ExchangeInformation.RST then
   begin
     MakeEditWindow('RST recv', ctWord, @EditableQSORXData.RSTReceived);

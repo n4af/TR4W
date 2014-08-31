@@ -66,7 +66,8 @@ const
   QTCLEFT                               = 5;
 //  QTCHEIGHT                        = 22;
 //  QTCROWSDIS                       = 2;
-  QTCWIDTHARRAY                         : array[1..4] of integer = (20, 60, 160, 80);
+   QTCWIDTHARRAY                         : array[1..4] of integer = (20, 60, 160, 80);
+ 
   QTCLEFTARRAY                          : array[1..4] of integer = (5, 27, 89, 251);
 //  LeftArray                        : array[1..3] of integer = (30, 95 - 3, 95 + 170 - 1);
   NumberStyle                           = WS_DISABLED or WS_CHILD or WS_VISIBLE or WS_TABSTOP or ES_UPPERCASE or ES_NUMBER;
@@ -84,8 +85,8 @@ begin
     WM_INITDIALOG:
       begin
         Windows.SetWindowText(hwnddlg, RC_RECVQTC);
-        CreateStatic(nil, 5, 285, 325, hwnddlg, 106);
-
+  //      CreateStatic(nil, 5, 285, 325, hwnddlg, 106);
+   CreateStatic(nil, 5, 325, 325, hwnddlg, 106);
         QTCRWindow := hwnddlg;
         SendStringAndStop('QTC?');
         tCreateStaticWindow(TC_QTC_CALLSIGN, WS_CHILD or SS_SUNKEN or SS_NOTIFY or SS_CENTER or WS_VISIBLE, QTCLEFT, 5, QTCWIDTHARRAY[1] + QTCROWSDIS + QTCWIDTHARRAY[2], 18, hwnddlg, 10);
@@ -158,7 +159,8 @@ begin
             QTCWIDTHARRAY[4],
             QTCHEIGHT,
             hwnddlg,
-            r + 400, hInstance, nil);
+           r + 400, hInstance, nil);
+
           asm
             mov edx,[MainWindowEditFont]
             call tWM_SETFONT
@@ -214,7 +216,7 @@ begin
               TempString := GetDialogItemText(hwnddlg, wParam);
               SendStringAndStop(TempString);
             end;
-          1: ;//SaveQTCR;
+          1: ;//SaveQTCR;     //N4AF 04.32.3
           110: SetFocus(QTCNrWndHandle);
 
         end;

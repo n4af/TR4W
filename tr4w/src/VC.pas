@@ -81,6 +81,7 @@ type
     Chapter: boolean;
     Check: boolean;
     ClassEI: boolean;
+    FOCNumber: boolean;
     Kids: boolean;
     Name: boolean;
 //    PostalCode: boolean;
@@ -156,10 +157,10 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.32.2';
+  TR4W_CURRENTVERSION_NUMBER            = '4.32.5';
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'Aug 5,2014';
+  TR4W_CURRENTVERSIONDATE               = 'Aug 12,2014';
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -774,6 +775,7 @@ type
     EUROPEANVHF,
     ARRLFIELDDAY,
     FISTS,
+    FOCMARATHON,     //n4af
     FLORIDAQSOPARTY,
     GACWWWSACW,
     GAGARINCUP,
@@ -1365,7 +1367,7 @@ type
   {(*}
 type
 
-   ContestExchange = record
+  ContestExchange = record
 {COMMON START}
 
 {06}  tSysTime:            TQSOTime;
@@ -1716,6 +1718,7 @@ type
     logColAge,
     logColChapter,
     logColPower,
+    logColFOC,
     logColKids,
 //    logColPostCode,
 
@@ -1755,7 +1758,6 @@ var
     ( Text: RC_DATE;      Width: 4; Align: LVCFMT_CENTER; Enable: True;  Pos: 0),
     ( Text: 'UTC';        Width: 3; Align: LVCFMT_CENTER; Enable: True;  Pos: 0),
     ( Text: 'QsS';        Width: 4; Align: LVCFMT_RIGHT;  Enable: True;  Pos: 0),
-
     ( Text: RC_CALLSIGN;  Width: 8; Align: LVCFMT_LEFT;   Enable: True;  Pos: 0),
     ( Text: 'QTC';        Width: 7; Align: LVCFMT_LEFT;   Enable: False; Pos: 0),
     ( Text: 'QsR';        Width: 3; Align: LVCFMT_RIGHT;  Enable: False; Pos: 0),
@@ -1771,8 +1773,8 @@ var
     ( Text: 'QTH';        Width: 4; Align: LVCFMT_CENTER; Enable: False; Pos: 0),
     ( Text: 'Age';        Width: 3; Align: LVCFMT_CENTER; Enable: False; Pos: 0),
     ( Text: 'Ch.';        Width: 2; Align: LVCFMT_CENTER; Enable: False; Pos: 0),
-    ( Text: 'Pwr';        Width: 3; Align: LVCFMT_CENTER; Enable: False; Pos: 0),
-
+    ( Text: 'PWR';        Width: 3; Align: LVCFMT_CENTER; Enable: False; Pos: 0),
+    ( Text: 'FOC#';       Width: 4; Align: LVCFMT_CENTER; Enable: False; Pos: 0),
     ( Text: 'Kids';       Width: 7; Align: LVCFMT_CENTER; Enable: False; Pos: 0),
 
 //    ( Text: 'PC';         Width: 4; Align: LVCFMT_CENTER; Enable: False; Pos: 0),
@@ -2142,7 +2144,7 @@ var
 //  CQTotalWindowHandle                   : HWND;
 //  QSOsWithThisStationWindowHandle       : HWND;
   IntitialExLoaded                      : boolean;
-//  DupeInfoCallWindowHandle              : HWND;
+  DupeInfoCallWindowHandle              : HWND;
 
   TorDurationWindow                     : HWND;
   TorDurationPrBarWindow                : HWND;
@@ -2193,7 +2195,7 @@ var
   MesWindow                             : MesWindowType;
   ConfirmEditChanges                    : boolean = True;
   tEightBitsPerPixel                    : boolean;
-//  EditabledLogFocused                   : boolean = False;
+  EditabledLogFocused                   : boolean = False;
 
   UTC                                   : SYSTEMTIME;
   CompleteCallsignMask                  : CallString;
@@ -2409,7 +2411,7 @@ type
 
   QSOPointMethodType =
     (
-    NoQSOPointMethod, { Score = 0 }
+     NoQSOPointMethod, { Score = 0 }
     AllAsianQSOPointMethod,
     ARCIQSOPointMethod,
     ARIQSOPointMethod,
@@ -2434,6 +2436,7 @@ type
     EuropeanSprintQSOPointMethod,
     EuropeanVHFQSOPointMethod,
     FistsQSOPointMethod,
+    FOCMarathonQSOPointMethod,
     HADXQSOPointMethod,
     HelvetiaQSOPointMethod,
     IARUQSOPointMethod,
@@ -2548,6 +2551,7 @@ const
     'EUROPEAN SPRINT', //    EuropeanSprintQSOPointMethod,
     'EUROPEAN VHF', //    EuropeanVHFQSOPointMethod,
     'FISTS', //    FistsQSOPointMethod,
+    'FOC MARATHON' , // FOCMarathonPointMethod,
     'HA DX', //    HADXQSOPointMethod,
     'HELVETIA', //    HelvetiaQSOPointMethod,
     'IARU', //    IARUQSOPointMethod,
@@ -2647,6 +2651,7 @@ type
     RSTAgeExchange,
     RSTALLJAPrefectureAndPrecedenceExchange,
     RSTAndContinentExchange,
+    RSTAndFOCNumberExchange, //n4af
     RSTAndGridExchange,
     RSTAndOrGridExchange,
     RSTAndQSONumberOrDomesticQTHExchange,
@@ -2721,6 +2726,7 @@ const
     'RST QSO NUMBER AND DOMESTIC QTH',
     'RST QSO NUMBER AND GRID SQUARE',
     'RST QSO NUMBER AND POSSIBLE DOMESTIC QTH',
+    'RST AND DOMESTIC QTH',       //n4af
     'RST QSO NUMBER AND RANDOM CHARACTERS',
     'RST QTH NAME AND FISTS NUMBER OR POWER',
     'RST QSO NUMBER',
@@ -2836,6 +2842,7 @@ QSOPartiesCount = 12;
  ({Name: 'EUROPEAN VHF';               }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:EuropeanVHFQSOPointMethod),
  ({Name: 'ARRL FIELD DAY';             }Email: 'fieldday@arrl.org';      DF: 'arrlsect';          WA7BNM:   57; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:NoDXMults; QP:ARRLFieldDayQSOPointMethod),
  ({Name: 'FISTS';                      }Email: nil;                      DF: 's49p8';             WA7BNM:  251; {SK3BG: 'fistsspr';   } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQTHNameAndFistsNumberOrPowerExchange;     XM:NoDXMults; QP:FistsQSOPointMethod),
+ ({Name: 'FOC MARATHON';               }Email: nil;                      DF: nil;                 WA7BNM:  0000; {SK3BG: nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTPowerExchange;                  XM:CQDXCC; QP:FOCMarathonQSOPointMethod),            //n4af
  ({Name: 'FCG-FQP';                    }Email: nil;                      DF: nil;                 WA7BNM:  325; {SK3BG: 'flqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticOrDXQTHExchange;                  XM:NoDXMults; QP:OnePhoneTwoCW),
  ({Name: 'GACW-WWSA-CW';               }Email: nil;                      DF: nil;                 WA7BNM:   45; {SK3BG: 'gacwdxc';    } QRZRUID: 321 ; Pxm: NoPrefixMults; ZnM: CQZones; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:CQDXCC; QP:GACWWWSACWQSOPointMethod),
  ({Name: 'GAGARIN-CUP';                }Email: nil;                      DF: nil;                 WA7BNM:  367; {SK3BG: 'ygintc';     } QRZRUID: 82  ; Pxm: GCStation; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:GagarinCupQSOPointMethod),
@@ -2998,6 +3005,7 @@ QSOPartiesCount = 12;
       'EUROPEAN VHF',
       'ARRL-FD',
       'FISTS',
+      'FOC MARATHON',  //n4af
       'FCG-FQP',
       'GACW-WWSA-CW',
       'GAGARIN-CUP',
@@ -3176,7 +3184,7 @@ QSOPartiesCount = 12;
       ({Name: 'ARRL VHF QSO';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'ARRL VHF SS';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'BALTIC';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM1 + ciMB0 + ciMM0),
-      ({Name: 'BWQP';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
+      ({Name: 'BWQP';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),        //n4af
       ({Name: 'CIS';                        }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'COUNTY HUNTER';              }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'CQ-160-CW';                  }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
@@ -3199,6 +3207,7 @@ QSOPartiesCount = 12;
       ({Name: 'EUROPEAN VHF';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'ARRL-FIELD DAY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'FISTS';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
+      ({Name: 'FOC MARATHON';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),    //n4af
       ({Name: 'FCG-FQP';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM1),
       ({Name: 'GACW-WWSA-CW';               }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'GAGARIN-CUP';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
@@ -3316,18 +3325,7 @@ QSOPartiesCount = 12;
       ({Name: 'ALRS-UA1DZ-CUP';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0)
       );
 
-{
-type
-  TLogHeader = record
-    lhVersionString: array[0..7] of Char;
-    lhWarningString: array[0..35] of Char;
-    lhDay: Byte;
-    lhMonth: Byte;
-    lhYear: Word;
-    lhDummy: array[0..206] of Char;
-    lhContest: ContestType;
-  end;
-}
+
 
   type
     tWindowColorRecord = record
@@ -3336,7 +3334,8 @@ type
       wcbackground: ptr4wColors;
     end;
 
-    TLogHeader = record
+
+  TLogHeader = record
       lhVersionString: array[0..7] of Char;
       lhFileDesc: array[0..15] of Char;
       lhWarningString: array[0..35] of Char;

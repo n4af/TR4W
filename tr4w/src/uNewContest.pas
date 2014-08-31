@@ -17,7 +17,7 @@ uses
   ;
 type
   InitialCommands =
-    (icmyCheck, icmyFDClass, icmyGrid, icmyIOTA, icmyName, icmyPrec, icmyQTH, icmySection, icmyState, icmyZone, icmyPostalCode);
+    (icmyCheck, icmyFDClass, icmyGrid, icmyFOC, icmyIOTA, icmyName, icmyPrec, icmyQTH, icmySection, icmyState, icmyZone, icmyPostalCode);
 
 function NewContestDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 procedure BeginNewContest(h: HWND);
@@ -54,6 +54,7 @@ const
     'MY CHECK',
     'MY FD CLASS',
     'MY GRID',
+    'My FOC NUMBER',
     'MY IOTA',
     'MY NAME',
     'MY PREC',
@@ -410,6 +411,12 @@ begin
                   SetCommentAndEnableEditControl(TC_ENTERYOURNAMEANDQTH, icmyState);
                 end;
 
+             FOCMarathon:
+             begin
+          //    DisplayInitialCommand(icmyFOC);
+             SetCommentAndEnableEditControl(TC_ENTERYOURFOCNUMBER,icmyFOC);
+             end;
+             
               ARRLFIELDDAY:
                 begin
                   DisplayInitialCommand(icmyFDClass);

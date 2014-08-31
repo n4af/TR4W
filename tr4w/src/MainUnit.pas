@@ -4412,12 +4412,7 @@ begin
     asm call setitem    end;
     Exit;
   end;
-{
-if RXData.Callsign='RP7X' THEN
-ASM
-NOP
-END;
-}
+
 
   if ColumnsArray[logColClass].Enable then
   begin
@@ -4446,25 +4441,38 @@ END;
     end;
   end;
 
-  if ColumnsArray[logColPower].Enable then
+  if ((ColumnsArray[logColPower].Enable) and (Contest <> FOCMARATHON)) then      //n4af 4.32.5
   begin
     if RXData.Power <> '' then
     begin
-      elvi.iSubItem := ColumnsArray[logColPower].pos; //Ord(logColZoneMult);
+      elvi.iSubItem := ColumnsArray[logColPower].pos; 
       elvi.pszText := @RXData.Power[1];
       asm call setitem
       end;
-    end;
+      end;
+    end
+    else
+    if (ColumnsArray[logColFOC].Enable)  then 
+    begin
+    elvi.iSubItem := ColumnsArray[logColFOC].pos;
+      elvi.pszText := @RXData.Power[1];
+      asm call setitem
+      end;
+
   end;
-{
-  if ColumnsArray[logColDomMult].Enable then
+  {
+  if ColumnsArray[logColFOC].Enable then
+ if Contest = FOCMARATHON then
   begin
-    elvi.iSubItem := ColumnsArray[logColDomMult].pos; //Ord(logColDomMult);
-    elvi.pszText := @RXData.DomMultQTH[1];
+    elvi.iSubItem := ColumnsArray[logColFOC].pos; //n4af 4.32.5
+    Format(LogDisplayBuffer, '%s',  @RXData.Power[1]);
+    elvi.pszText := LogDisplayBuffer;
+
+ //      elvi.pszText := @RXData.FOCNumber[1];
     asm call setitem
     end;
   end;
-}
+ }
   if ColumnsArray[logColPrefixMult].Enable then
   begin
     elvi.iSubItem := ColumnsArray[logColPrefixMult].pos; //Ord(logColPrefixMult);
@@ -5368,7 +5376,10 @@ begin
 
   ColumnsArray[logColName].Enable := ExchangeInformation.Name;
   ColumnsArray[logColZoneMult].Enable := ExchangeInformation.Zone;
+  if Contest <> FOCMARATHON then      //n4af 4.32.5
   ColumnsArray[logColPower].Enable := ExchangeInformation.Power;
+  if Contest = FOCMARATHON then   //n4af 4.32.5
+  ColumnsArray[logColFOC].Enable := ExchangeInformation.Power;      //n4af 4.32.5
   ColumnsArray[logColChapter].Enable := ExchangeInformation.Chapter;
 
   ColumnsArray[logColNumberReceive].Enable := ExchangeInformation.QSONumber;

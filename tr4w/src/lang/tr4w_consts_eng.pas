@@ -92,6 +92,7 @@ const
   TC_ENTERYOURCOUNTYCODE                = 'Enter your county code:';
   TC_ENTERYOURDOK                       = 'Enter your DOK:';
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Enter your district abbreviation:';
+  TC_ENTERYOURFOCNUMBER                 = 'Enter your FOC number:';
   TC_ENTERYOURRDAID                     = 'Enter your RDA ID:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Enter your IOTA Reference Designator:';
   TC_ENTERYOURCITYIDENTIFIER            = 'Enter your city identifier:';
