@@ -2177,6 +2177,7 @@ begin
     Chapter := False;
     Check := False;
     ClassEI := False;
+//    FOCNumber := False;
     Name := False;
 //    PostalCode := False;
     Power := False;
@@ -2239,7 +2240,7 @@ begin
         ExchangeInformation.QSONumber := True;
         ExchangeInformation.Zone := True;
       end;
-
+  
     QSONumberAndCoordinatesSum, QSONumberAndGeoCoordinates:
       begin
         ExchangeInformation.QTH := True;
@@ -2372,6 +2373,11 @@ begin
         ExchangeInformation.Name := True;
         ExchangeInformation.QTH := True;
       end;
+  RSTAndFOCNumberExchange:
+  begin
+  ExchangeInformation.RST := True;
+  ExchangeInformation.Power := True;
+  end;
 
     RSTPowerExchange:
       begin
@@ -2492,6 +2498,7 @@ begin
     if StringIsAllNumbers(GetFirstString(ExchangeString)) then
       RXData.RSTReceived := StrToInt(RemoveFirstString(ExchangeString));
   end;
+
 
   if (ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange) then {KK1L: 6.70 for FISTS funny exchange}
   begin

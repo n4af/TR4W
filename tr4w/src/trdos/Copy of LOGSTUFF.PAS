@@ -2234,7 +2234,7 @@ begin
             if ContPrefix = 'AS' then RXData.QTH.Continent := Asia;
             if ContPrefix = 'OC' then RXData.QTH.Continent := Oceania;
             if ContPrefix = 'EU' then RXData.QTH.Continent := Europe;
-
+            if ContPrefix = 'AN' then RXData.QTH.Continent := Antartica;
             if (ContPrefix = 'SO') or (ContPrefix = 'SA') then RXData.QTH.Continent := SouthAmerica;
             if (ContPrefix = 'NO') or (ContPrefix = 'NA') then RXData.QTH.Continent := NorthAmerica;
       }
@@ -3792,6 +3792,10 @@ begin
         ProcessRSTAndAgeExchange := True;
       end;
   end; { of case Length (Exchange) }
+end;
+
+function ProcessRSTAndFOCNumber(Exchange: Str80; var RXData: ContestExchange): boolean;
+ begin
 end;
 
 function ProcessRSTAndPrefectureExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
