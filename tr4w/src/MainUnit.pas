@@ -219,7 +219,7 @@ procedure SendB4;
 function TryLogContact: boolean;
 procedure SpaceBarProc;
 procedure SpaceBarProc2;
-//procedure TR4W_WM_SetTest(h: HWND; Control: Byte {id ������ ���� ������ 256}; Text: string);
+//procedure TR4W_WM_SetTest(h: HWND; Control: Byte {id ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 256}; Text: string);
 
 procedure FindAndSaveRectOfAllWindows;
 procedure sm1;
@@ -368,7 +368,7 @@ const
 //    'Log format version - v.1.' + LOGVERSION4 + #13 +
 //    'Compiler directives: ['{$IFOPT I+} + 'I'{$ENDIF}{$IFOPT R+} + 'R'{$ENDIF}{$IFOPT Q+} + 'Q'{$ENDIF} + ']'
 {$IF LANG <> 'ENG'} + #13'Language: ' + TC_TRANSLATION_LANGUAGE + ' (by ' + TC_TRANSLATION_AUTHOR + ')'{$IFEND} + #13#10 +
-  'On basis of the source code of the TRLog v.6.80 � Larry Tyree N6TR' + #13 +     //n4af 4.30.0
+  'On basis of the source code of the TRLog v.6.80 ï¿½ Larry Tyree N6TR' + #13 +     //n4af 4.30.0
   'Current development team = GM0GAV, K0TO, LU5DX, N4AF, NY4I UR7QM ';              //n4af 4.30.0
 //  Radio1AsPchar                         : PChar = TC_RADIO1;
 //  Radio2AsPchar                         : PChar = TC_RADIO2;
@@ -1845,7 +1845,13 @@ begin
 
  if    ActiveRadioPtr.CurrentStatus.Split Then QuickDisplay('Warning: SPLIT MODE...')      //N4AF  4.31.3
 else                                                                                     //N4AF
- QuickDisplay(nil);                                                                      //N4AF 4.31.3
+ QuickDisplay(nil);
+//  SetMainWindowText(mweName, nil);
+// CallDataBase.ClearDataEntry;
+SetMainWindowText(mweName, '');
+SetMainWindowText(mweUserInfo, '');
+
+// SetMainWindowText(mweUserInfo, nil);                                                                     //N4AF 4.31.3
  if Contest = WAG Then             //n4af 4.31.4
  WagCheck;                          //n4af
 
@@ -6469,42 +6475,42 @@ var
   adr                                   : PUCHAR;
 begin
   asm
-	mov eax,Code                   // ���. ���������, ��� �� ��� � ��� ������.
+	mov eax,Code                   // ï¿½ï¿½ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 
-	cmp eax,IOCTL_READ_PORTS       // ������ ��������� LPT-�����
+	cmp eax,IOCTL_READ_PORTS       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ LPT-ï¿½ï¿½ï¿½ï¿½ï¿½
 	jz	@@loc_read_port
-	cmp eax,IOCTL_WRITE_PORTS      // ������ � �������� LPT-�����
+	cmp eax,IOCTL_WRITE_PORTS      // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ LPT-ï¿½ï¿½ï¿½ï¿½ï¿½
 	jz	@@loc_write_port
-	mov eax,0//STATUS_NOT_IMPLEMENTED // ����������������� ��� �������
+	mov eax,0//STATUS_NOT_IMPLEMENTED // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	ret
 
-	// ������ �� ��������� ����� LPT
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ LPT
 @@loc_read_port:
-	mov eax,InputBufferLength      // ����� ��������� ������ ������ ���� ����� ����� ��������
+	mov eax,InputBufferLength      // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	cmp eax,OutputBufferLength
 	jnz @@loc_fault_ioctl
 
-	and eax,0FFFEH                 // ׸���� ���������� ��� �����-������
+	and eax,0FFFEH                 // ×¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	mov store_count,eax
-	cmp eax,0                      // ��������� �����
+	cmp eax,0                      // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 	jz  @@loc_fault_ioctl
 
 	mov eax,pBuffer
 	mov data_ptr,eax
 
-@@in_loop:			// ���� ����� ������
+@@in_loop:			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	push ebx
 	push edx
 	mov ebx,data_ptr
 	xor eax,eax
-	mov al,BYTE ptr [ebx]	// ������ ���� -- ����� ����� � �������� ��������
+	mov al,BYTE ptr [ebx]	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -- ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	inc ebx
 	mov data_ptr,ebx
 	mov ah,al
 	shr al,1
 	shr al,1
 	shr al,1
-	shr al,1	// al -- ����� ����� LPT -- 1,2 ��� 3
+	shr al,1	// al -- ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ LPT -- 1,2 ï¿½ï¿½ï¿½ 3
 	and al,3
 	mov edx,3BCH	// LPT1
 	cmp al,1
@@ -6516,30 +6522,30 @@ begin
  @@1:
 	mov al,ah
 	mov ah,0
-	and al,7	// �������� �������� LPT -- 0..7
-	add edx,eax	// ���� ����� + �������� ��������
+	and al,7	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ LPT -- 0..7
+	add edx,eax	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ + ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	mov adr,edx
 	pop edx
 	pop ebx
 
-//	invoke READ_PORT_UCHAR, adr	// ������ ����
+//	invoke READ_PORT_UCHAR, adr	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 	push ebx
 	mov ebx,data_ptr
-	mov BYTE ptr [ebx],0//al	 //��������� ����������� ���� � ������
+	mov BYTE ptr [ebx],0//al	 //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	inc ebx
 	mov data_ptr,ebx
 	pop ebx
 
-	mov eax,store_count	// �������� ������� ������
+	mov eax,store_count	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	sub eax,2
 	mov store_count,eax
 	cmp eax,0
-	jnz @@in_loop		// ���� �� ��� ���� ���������� -- �����.
+	jnz @@in_loop		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ -- ï¿½ï¿½ï¿½ï¿½ï¿½.
 
 	push ebx
 	mov eax,OutputBufferLength
-	mov ebx,pOutputLength	// ����� ������, ������������ ������� ���������� ������������.
+	mov ebx,pOutputLength	// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 	mov DWORD ptr [ebx],eax
 	pop ebx
 
@@ -6548,25 +6554,25 @@ begin
 jmp @@all
 
 
-	// ������ � �������� ����� LPT
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ LPT
 @@loc_write_port:
 //	mov eax,InputBufferLength
-//	and eax,0FFFEH	// ׸���� ���������� ��� �����-������
+//	and eax,0FFFEH	// ×¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //	mov store_count,eax
-//	cmp eax,0	// ��������� �����!!!
+//	cmp eax,0	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½!!!
 //	jz  @@loc_fault_ioctl
 
 	mov eax,pBuffer
 	mov data_ptr,eax
 
-@@out_loop:			// ���� ������ ������
+@@out_loop:			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	push ebx
 	push edx
 	mov ebx,data_ptr
         inc ebx
         inc ebx
 	xor eax,eax
-	mov ax,word ptr [ebx]	// ������ ���� -- ����� ����� � �������� ��������
+	mov ax,word ptr [ebx]	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ -- ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	inc ebx
         add ebx,4
 
@@ -6574,7 +6580,7 @@ jmp @@all
 	shr al,1
 	shr al,1
 	shr al,1
-	shr al,1	// al -- ����� ����� LPT -- 1,2 ��� 3;
+	shr al,1	// al -- ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ LPT -- 1,2 ï¿½ï¿½ï¿½ 3;
 	and al,3
 	mov edx,3BCH	// LPT1
 	cmp al,1
@@ -6586,11 +6592,11 @@ jmp @@all
  @@2:
 	mov al,ah
 	mov ah,0
-	and al,7	// �������� �������� LPT -- 0..7
-	add edx,eax	// ���� ����� + �������� ��������
+	and al,7	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ LPT -- 0..7
+	add edx,eax	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ + ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	mov adr,edx
 
-	mov al,BYTE ptr [ebx]	// ���� ������
+	mov al,BYTE ptr [ebx]	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	mov data,al
 	inc ebx
 	mov data_ptr,ebx
@@ -6598,13 +6604,13 @@ jmp @@all
 	pop edx
 	pop ebx
 
-//	invoke WRITE_PORT_UCHAR, adr, data	// ����� � ����
+//	invoke WRITE_PORT_UCHAR, adr, data	// ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-	mov eax,store_count	// �������� ������� ������
+	mov eax,store_count	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	sub eax,2
 	mov store_count,eax
 	cmp eax,0
-	jnz @@out_loop		// ���� �� ��� ���� ���������� -- �����.
+	jnz @@out_loop		// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ -- ï¿½ï¿½ï¿½ï¿½ï¿½.
 
 	mov eax,0//STATUS_SUCCESS
 	ret
@@ -6931,4 +6937,3 @@ begin
 {$IFEND}
 
 end.
-
