@@ -35,6 +35,12 @@ type
     caAddress: Pointer;
   end;
 
+  type
+  TsCWCharsArrayType = packed record
+    CWChars: PChar;
+    CWAddress: Pointer;
+  end;
+  
 procedure scSRS;
 procedure scSRSI;
 procedure scSRS1;
@@ -75,9 +81,10 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 
 const
 
-  sCommands                             = 41{$IF MMTTYMODE} + 5{$IFEND};
+  sCommands                             = 58;    {$IF CWMODE} + 20 {$IFEND} ;    //n4af
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
+
 {$IF MMTTYMODE}
     (caCommand: 'MM_CLEAR_THE_TX_BUFFER'; caAddress: @csMMTTY_CLEAR_THE_TX_BUFFER),
     (caCommand: 'MM_SWITCH_TO_TX'; caAddress: @csMMTTY_SWITCH_TO_TX),
@@ -85,14 +92,29 @@ const
     (caCommand: 'MM_SWITCH_TO_RX_AFTER_THE_TRANSMISSION_IS_COMPLETED'; caAddress: @csMMTTY_SWITCH_TO_RX_AFTER_THE_TRANSMISSION_IS_COMPLETED),
     (caCommand: 'MM_GRABLASTCALL'; caAddress: @csMMTTY_GRABLASTCALL),
 {$IFEND}
-    (caCommand: 'EXCHANGERADIOS'; caAddress: @scEXCHANGERADIOS),
-    (caCommand: 'WK_SWAPTUNE'; caAddress: @scWK_SWAPTUNE),
-    (caCommand: 'WK_RESET'; caAddress: @scWK_RESET),
-    (caCommand: 'SENDMESSAGE'; caAddress: @scSENDMESSAGE),
-    (caCommand: 'BOOLSWAP'; caAddress: @scBOOLSWAP),
-    (caCommand: 'CLEARDUPESHEET'; caAddress: @tClearDupesheet),
-    (caCommand: 'CLEARMULTSHEET'; caAddress: @tClearMultSheet),
-    (caCommand: 'DUPECHECK'; caAddress: @scDUPECHECK),
+
+
+(caCommand: '  # = QSO Number '; caAddress: @scEXCHANGERADIOS),     //n4af 04.33.2
+(caCommand: '  @ = HisCall '; caAddress: @scEXCHANGERADIOS),
+(caCommand: '  $ = Salutation/Name '; caAddress: @scEXCHANGERADIOS),
+(caCommand: '  % = Name from Names DB'; caAddress: @scEXCHANGERADIOS),
+(caCommand: ' : = Send from K.B.'; caAddress: @scEXCHANGERADIOS),
+(caCommand: ' ~ = Salutation - no name'; caAddress: @scEXCHANGERADIOS),
+(caCommand: '  \ = My Call'; caAddress: @scEXCHANGERADIOS),
+(caCommand: ' | = Name from Exch Window'; caAddress: @scEXCHANGERADIOS),
+(caCommand: ' [ = Wait for # (RST)'; caAddress: @scEXCHANGERADIOS),
+(caCommand: ' ] = Repeat last RST from ['; caAddress: @scEXCHANGERADIOS),
+(caCommand: '  ^ = Half space'; caAddress: @scEXCHANGERADIOS),
+(caCommand: '  CTRL-P CTRL-F = Faster'; caAddress: @scEXCHANGERADIOS),
+(caCommand: '  CTRL-P CTRL-S = Slower'; caAddress: @scWK_SWAPTUNE),
+(caCommand: ' + = AR'; caAddress: @scWK_RESET),
+(caCommand: '  > = Reset RIT'; caAddress: @scSENDMESSAGE),
+(caCommand: ' < = SK'; caAddress: @scBOOLSWAP),
+(caCommand: ' = = BT'; caAddress: @tClearDupesheet),
+(caCommand: ' ! = SN'; caAddress: @tClearMultSheet),
+(caCommand: ' & = AS'; caAddress: @scDUPECHECK),
+(caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
+ 
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),
