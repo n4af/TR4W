@@ -514,7 +514,7 @@ const
   TC_THISVERSION2                       = 'This version';
   TC_DOWNLOADIT                         = 'Would you like to download the latest version?';
 
-  TC_LIST_OF_COMMAND                    = '&List of commands';
+  TC_LIST_OF_COMMAND                    = 'List of commands';
 
   RC_VIEWEDITLOG2                       = 'View / Edit log';
   RC_CT1BOHIS2                          = 'CT1BOH info screen';
