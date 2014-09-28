@@ -679,6 +679,7 @@ var
   RadioOneReadOkay, RadioTwoReadOkay    : boolean;
 
 begin
+
   { Needs to be put back }
 end;
 

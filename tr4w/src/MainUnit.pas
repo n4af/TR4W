@@ -368,8 +368,8 @@ const
 //    'Log format version - v.1.' + LOGVERSION4 + #13 +
 //    'Compiler directives: ['{$IFOPT I+} + 'I'{$ENDIF}{$IFOPT R+} + 'R'{$ENDIF}{$IFOPT Q+} + 'Q'{$ENDIF} + ']'
 {$IF LANG <> 'ENG'} + #13'Language: ' + TC_TRANSLATION_LANGUAGE + ' (by ' + TC_TRANSLATION_AUTHOR + ')'{$IFEND} + #13#10 +
-  'On basis of the source code of the TRLog v.6.80 ï¿½ Larry Tyree N6TR' + #13 +     //n4af 4.30.0
-  'Current development team = GM0GAV, K0TO, LU5DX, N4AF, NY4I UR7QM ';              //n4af 4.30.0
+  'On basis of the source code of the TRLog v.6.80 UA4WLI + Larry Tyree N6TR' + #13 +     //n4af 4.30.0
+  'Current development team = GM0GAV, K0TO, LU5DX, N4AF, NY4I, UR7QM ';              //n4af 4.30.0
 //  Radio1AsPchar                         : PChar = TC_RADIO1;
 //  Radio2AsPchar                         : PChar = TC_RADIO2;
 
@@ -4066,6 +4066,7 @@ begin
   tCleareCallWindow;
   tCleareExchangeWindow;
   tCallWindowSetFocus;
+  ClearAltD;
   if OpMode = CQOpMode then
   begin
     OpMode2 := CQOpMode;

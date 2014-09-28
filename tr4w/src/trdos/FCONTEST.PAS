@@ -710,7 +710,7 @@ begin
         else
           DomesticQTHDataFileName := 'FQP';
       end;
-}
+
     FLORIDAQSOPARTY:
       begin
         if FoundMyStateInDomFile then
@@ -726,6 +726,7 @@ begin
         end;
 //        Add_KVEKH6KL;
       end;
+      }
   FOCMARATHON:
   ExchangeMemoryEnable := True;
   
@@ -1633,6 +1634,7 @@ begin
   Format(TempFileName, '%sDOM\%s.DOM', TR4W_PATH_NAME, ContestsArray[Contest].DF);
   if not EnumerateLinesInFile(TempFileName, EnumDOM2, True) then Exit;
   Result := InState;
+// Result := True;
 end;
 end.
 

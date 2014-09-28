@@ -320,7 +320,7 @@ begin
             Windows.ShowWindow(NewContestCheckBox, SW_HIDE);
             Windows.SendMessage(NewContestCheckBox, BM_SETCHECK, BST_UNCHECKED, 0);
 
-            if ContestsArray[SelectedContest].p <> 0 then
+            if ContestsArray[SelectedContest].p <> 0  then
               EnterCountyOrState(QSOParties[ContestsArray[SelectedContest].p].StateName);
 
             case SelectedContest of

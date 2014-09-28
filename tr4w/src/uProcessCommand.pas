@@ -81,11 +81,11 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 
 const
 
-  sCommands                             = 58;    {$IF CWMODE} + 20 {$IFEND} ;    //n4af
+  sCommands                             = 54      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
 
-{$IF MMTTYMODE}
+{$IF MMTTYMODE}    //5
     (caCommand: 'MM_CLEAR_THE_TX_BUFFER'; caAddress: @csMMTTY_CLEAR_THE_TX_BUFFER),
     (caCommand: 'MM_SWITCH_TO_TX'; caAddress: @csMMTTY_SWITCH_TO_TX),
     (caCommand: 'MM_SWITCH_TO_RX_IMMEDIATELY'; caAddress: @csMMTTY_SWITCH_TO_RX_IMMEDIATELY),
@@ -93,7 +93,7 @@ const
     (caCommand: 'MM_GRABLASTCALL'; caAddress: @csMMTTY_GRABLASTCALL),
 {$IFEND}
 
-
+//{$IF CWMODE}     //20
 (caCommand: '  # = QSO Number '; caAddress: @scEXCHANGERADIOS),     //n4af 04.33.2
 (caCommand: '  @ = HisCall '; caAddress: @scEXCHANGERADIOS),
 (caCommand: '  $ = Salutation/Name '; caAddress: @scEXCHANGERADIOS),
@@ -114,7 +114,7 @@ const
 (caCommand: ' ! = SN'; caAddress: @tClearMultSheet),
 (caCommand: ' & = AS'; caAddress: @scDUPECHECK),
 (caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
- 
+//{$IFEND} 
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),
@@ -132,6 +132,7 @@ const
     (caCommand: 'WINEXEC'; caAddress: @scWINEXEC),
     (caCommand: 'DISABLECW'; caAddress: @scDISABLECW),
     (caCommand: 'ENABLECW'; caAddress: @scENABLECW),
+    (caCommand: 'EXCHANGERADIOS'; caAddress: @scEXCHANGERADIOS),
     (caCommand: 'SAPMODE'; caAddress: @scSAPMODE),
     (caCommand: 'CQMODE'; caAddress: @scCQMODE),
     (caCommand: 'CONTROLENTER'; caAddress: @tr4w_log_qso_without_cw),

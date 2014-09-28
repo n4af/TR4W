@@ -1920,8 +1920,8 @@ begin
       end;
    if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then
       begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power)+1, @TempRXData.Power[1]);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite-1);          //n4af 04.30.5
+        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
+        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);          
       end;
       if ((TempRXData.Power <> '') and (Contest <> FOCMARATHON)) then
       begin

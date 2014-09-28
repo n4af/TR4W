@@ -15,7 +15,7 @@ uses
   Messages;
 
 function DupesheetDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
-
+procedure ClearAltD;
 const
   VDColorsArray                         : array[Ord('0')..Ord('9') + 1] of tr4wColors =
     (
@@ -35,8 +35,18 @@ const
 implementation
 uses MainUnit;
 
-//var
-//  VDCurrentCallDistrict                 : Byte;
+ var
+    VDCurrentCallDistrict                 : Byte;
+procedure ClearAltD;
+
+begin
+DupeInfoCallWindowState := diNone;
+SetMainWindowText(mweDupeInfoCall, nil);
+DupeInfoCallWindowCleared := True;
+Windows.ShowWindow(wh[mweDupeInfoCall], SW_HIDE);
+
+
+end;
 
 function DupesheetDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 var
@@ -82,7 +92,8 @@ begin
           inc(LengthOfTheString);
         end;
 }
-        bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0);
+//    if ColumnDupesheetColor then
+//        bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0);
 
 //        if Left <> 0 then
         GradientRect(
