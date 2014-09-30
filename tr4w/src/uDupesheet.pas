@@ -29,7 +29,7 @@ const
     trGreen, //7
     trMagenta, //8
     trBrown, ///9
-    trBrown ///10
+    trBlue ///10
     );
 
 implementation
@@ -59,22 +59,34 @@ var
   VDDRAWITEMSTRUCT                      : PDrawItemStruct;
   CallsBuf                              : array[0..63] of Char;
   bgColor                               : integer;
+  Left                                  : integer;
 begin
   Result := False;
   case Msg of
     WM_WINDOWPOSCHANGING, WM_EXITSIZEMOVE: DefTR4WProc(Msg, lParam, hwnddlg);
 
-    WM_CTLCOLORLISTBOX: //RESULT := BOOL(WhiteBrush);
-//      if ColumnDupeSheetEnable then
+    WM_CTLCOLORLISTBOX:
+    //n4af 4.33.7 reactivate columndupesheetenable
+    begin
+       if ColumnDupeSheetEnable then  Result := BOOL(tr4wBrushArray[trBlack])
+   else
+     Result := BOOL(tr4wBrushArray[trWhite]);
+     
 
-      begin
-        SetTextColor(HDC(wParam), $FFFFFF);
-        Result := BOOL(tr4wBrushArray[trWhite]);
-//        Windows.GetClientRect(HWND(lParam), temprect);
-//        GradientRect(HDC(wParam), temprect, VDColorsArray[GetDlgCtrlID(HWND(lParam))], clwhite, gdVertical);
-      end;
+   {  begin
+        SetTextColor(HDC(wParam), $000000);
+       bgColor := $FFFFFF;
+     end
+     else    }
+  //   begin
+      SetTextColor(HDC(wParam), $FFFFFF);
 
-    WM_DRAWITEM:
+    //  Result := BOOL(tr4wBrushArray[trBlack]);
+        Windows.GetClientRect(HWND(lParam), temprect);
+     //       GradientRect(HDC(wParam), temprect, VDColorsArray[GetDlgCtrlID(HWND(lParam))], 0, gdVertical);
+     end;  
+        
+      WM_DRAWITEM:
       begin
         VDDRAWITEMSTRUCT := Pointer(lParam);
 
@@ -92,34 +104,33 @@ begin
           inc(LengthOfTheString);
         end;
 }
-//    if ColumnDupesheetColor then
-//        bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0);
+    bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0);
 
-//        if Left <> 0 then
+        if Left <> 0 then
         GradientRect(
           VDDRAWITEMSTRUCT^.HDC,
           VDDRAWITEMSTRUCT^.rcItem,
           tr4wColorsArray[VDColorsArray[bgColor]],
           tr4wColorsArray[VDColorsArray[bgColor]],
           gdHorizontal
-          );
-//        else
-//        begin
-//          GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict]], tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict + 1]], gdVertical);
-//          GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, clWhite, clwhite, gdVertical);
-//          inc(VDCurrentCallDistrict);
-//          if VDCurrentCallDistrict = Ord('9') + 1 then VDCurrentCallDistrict := Ord('0');
-//        end;
+          ) 
+        else
+         begin
+           GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict]], tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict + 1]], gdVertical);
+           GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, clWhite, clwhite, gdVertical);
+          inc(VDCurrentCallDistrict);
+          if VDCurrentCallDistrict = Ord('9') + 1 then VDCurrentCallDistrict := Ord('0');
+         end;
 
         SetBkMode(VDDRAWITEMSTRUCT^.HDC, TRANSPARENT);
 
-        //        Windows.TextOut(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem.Left, VDDRAWITEMSTRUCT^.rcItem.Top + 1, @CallsBuf, Left);
+        //       Windows.TextOut(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem.Left, VDDRAWITEMSTRUCT^.rcItem.Top + 1, @CallsBuf, Left);
         Windows.DrawText(VDDRAWITEMSTRUCT^.HDC, @CallsBuf, LengthOfTheString, VDDRAWITEMSTRUCT^.rcItem, DT_END_ELLIPSIS + DT_SINGLELINE + DT_CENTER + DT_VCENTER);
       end;
 
     WM_SIZE:
       begin
-{
+
         if ColumnDupeSheetEnable then
         begin
           Windows.GetClientRect(hwnddlg, temprect);
@@ -134,7 +145,7 @@ begin
           InvalidateRect(hwnddlg, nil, False);
         end
         else
-         }tListBoxClientAlign(hwnddlg);
+          tListBoxClientAlign(hwnddlg);
 
       end;
     WM_INITDIALOG:
@@ -142,7 +153,7 @@ begin
 //        tHWND := Get101Window(hwnddlg);
         tHWND := CreateOwnerDrawListBox(LB_STYLE_2,hwnddlg);
 
-{        if ColumnDupeSheetEnable then
+        if ColumnDupeSheetEnable then
         begin
           ShowWindow(tHWND, SW_HIDE);
           for c := 0 to 9 do
@@ -158,11 +169,11 @@ begin
           end;
         end
         else
-        }begin
+         begin
           tLB_SETCOLUMNWIDTH(hwnddlg, 80+Ord(BoldFont)*15);
           tWM_SETFONT(tHWND, LucidaConsoleFont {MainFixedFont});
         end;
-//        VDCurrentCallDistrict := Ord('0');
+         VDCurrentCallDistrict := Ord('0');
 
         tr4w_WindowsArray[WindowsType(lParam) {tw_DUPESHEETWINDOW1_INDEX}].WndHandle := hwnddlg;
 
@@ -197,4 +208,5 @@ begin
   end;
 end;
 end.
+
 

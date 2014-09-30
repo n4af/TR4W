@@ -450,6 +450,8 @@ var
   Mode                                  : ModeType;
   TempChar                              : Char;
   Item                                  : integer;
+  p1                                    : pchar;
+  p2                                    : pchar;
 begin
 //  if not Sheet.DupeSheetEnable then Exit;
   TempDSHandle := Radio.tDupeSheetWnd;// tr4w_WindowsArray[tw_DUPESHEETWINDOW1_INDEX].WndHandle;
@@ -459,17 +461,11 @@ begin
 
   Band := Radio.BandMemory;
   Mode := Radio.ModeMemory;
-//      n4af 04.30.0
- { if TwoRadioMode then
-  begin
-    Band := InActiveRadioPtr.BandMemory;
-    Mode := InActiveRadioPtr.ModeMemory;
-  end;     }
-//  n4af 04.30.0
-//  if not ColumnDupeSheetEnable then
-  SendMessage(VDListBox, LB_RESETCONTENT, 0, 0);
-//  else
-//    for Index := 48 to 57 do SendDlgItemMessage(TempDSHandle, Index, LB_RESETCONTENT, 0, 0);
+
+  if not ColumnDupeSheetEnable then      //n4af 04.33.7 reactive columndupesheetenable
+  SendMessage(VDListBox, LB_RESETCONTENT, 0, 0) 
+  else
+    for Index := 48 to 57 do SendDlgItemMessage(TempDSHandle, Index, LB_RESETCONTENT, 0, 0);
 
   SendMessage(VDListBox, WM_SETREDRAW, wParam(False), 0);
 
@@ -485,9 +481,9 @@ begin
             begin
               if FList^[Index].FCall[i] = TempChar then
               begin
-//            if ColumnDupeSheetEnable then
-//              SendDlgItemMessage(TempDSHandle, Ord(FList^[Index].FCall[i]), LB_ADDSTRING, 0, integer(@FList^[Index].FCall[1]))
-//            else
+            if ColumnDupeSheetEnable then
+             SendDlgItemMessage(TempDSHandle, Ord(FList^[Index].FCall[i]), LB_ADDSTRING, 0, integer(@FList^[Index].FCall[1]))
+           else
                 Item := SendMessage(VDListBox, LB_ADDSTRING, 0, integer(@FList^[Index].FCall[1]));
                 SendMessage(VDListBox, LB_SETITEMDATA, Item, Ord(TempChar));
               end;
@@ -495,22 +491,24 @@ begin
             end;
       end;
     end;
-//    if not ColumnDupeSheetEnable then
-//    Item := SendDlgItemMessage(TempDSHandle, 101, LB_ADDSTRING, 0, integer(pchar('*********')));
+    if not ColumnDupeSheetEnable then
+    begin
+ //   Item := SendDlgItemMessage(TempDSHandle, 101, LB_ADDSTRING, 0, integer(pchar('*********')));
 
-//    Item := SendMessage(VDListBox, LB_ADDSTRING, 0, integer(PChar('---------')));
-//    SendMessage(VDListBox, LB_SETITEMDATA, Item, Ord(TempChar));
+ //  Item := SendMessage(VDListBox, LB_ADDSTRING, 0, integer(PChar('---------')));
+ //   SendMessage(VDListBox, LB_SETITEMDATA, Item, Ord(TempChar));
+    end;
   end;
 
   SendDlgItemMessage(TempDSHandle, 101, WM_SETREDRAW, wParam(True), 0);
-{
+
   P1 := BandStringsArray[Band];
-  P2 := ModeString[Mode];
+  P2 := ModeStringarray[Mode];
   asm
   push p2
   push p1
   end;
-}
+ 
   Format(wsprintfBuffer, TC_DUPESHEET+' - %s', BandStringsArray[Band], ModeStringArray[Mode],@Radio.RadioName[1]);
 //  asm add esp,16  end;
   Windows.SetWindowText(Radio.tDupeSheetWnd, wsprintfBuffer);
