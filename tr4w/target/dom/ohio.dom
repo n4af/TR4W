@@ -1,0 +1,5 @@
+Domestic template for Ohio stations in OH QSO Party
+
+INCLUDE FILE OHIO_CTY.DOM
+INCLUDE FILE S50.DOM
+INCLUDE FILE P13.DOM
