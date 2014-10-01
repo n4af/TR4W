@@ -46,7 +46,7 @@ begin
         Format(TempBuffer1, TC_ENTERCALLTOBECHECKEDON, BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
         CreateStatic(TempBuffer1, 15, 3, 250, hwnddlg, 102);
 
-        AltDEditWindowHandle := CreateEdit(ES_CENTER or ES_UPPERCASE or WS_SIZEBOX, 15, 27, 250, 30, hwnddlg, 101);
+         AltDEditWindowHandle := CreateEdit(ES_CENTER or ES_UPPERCASE or WS_BORDER, 15, 27, 250, 30, hwnddlg, 101);
         asm
     mov edx,[MainWindowEditFont]
     call tWM_SETFONT
