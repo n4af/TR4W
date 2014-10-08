@@ -563,7 +563,7 @@ begin
     #13#10'            CQ COUNTER: %d' +
     #13#10'            RUN/SEARCH: %d/%d Qs' +
     #13#10'      UNIQUE CALLSIGNS: %d'#13#10 +
-    #13#10'              SOFTWARE: ' + TR4W_CURRENTVERSION + ' http://www.tr4w.com'#13#10
+    #13#10'              SOFTWARE: ' + TR4W_CURRENTVERSION + ' http://www.n4af.net/TR4W'#13#10
     );
   asm add esp,28
   end;
@@ -1863,8 +1863,16 @@ begin
 
       if TempRXData.QTHString <> '' then
       begin
+   //   getridofprecedingspaces(TempRXData.QTHString);
+      p := nil;
         p := @TempRXData.QTHString[1];
-        tCallStringLength := length(TempRXData.QTHString);
+        if TempRXData.QTHString[1] = ' ' then        //n4af 4.34.6
+       begin
+       inc(p);                                          //n4af 4.34.6
+       tCallStringLength := length(TempRXData.QTHString)-1;  //n4af 4.34.6
+       end
+       else
+       tCallStringLength := length(TempRXData.QTHString);
 
         if (LooksLikeAGrid(TempRXData.DomesticQTH) and (ActiveDomesticMult <> RDADistrict)) then
         begin
@@ -1873,7 +1881,6 @@ begin
         end
         else
           case Contest of
-
             WAG:
               begin
                 nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<DOK:%u>%s', tCallStringLength, p);
@@ -1906,18 +1913,19 @@ begin
               end;
           else
             begin
-              nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<QTH:%u>%s', tCallStringLength, p);
-              sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);  //n4af 04.30.2
+               nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<QTH:%u>%s',tCallStringLength, p);
+               sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);  //n4af 04.30.2
             end;
           end;
+        end;
 
-      end;
 
       if TempRXData.Name <> '' then
       begin
         nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<NAME:%u>%s', length(TempRXData.Name), @TempRXData.Name[1]);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);         //n4af 04.30.2
       end;
+
    if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then
       begin
         nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
@@ -2449,6 +2457,19 @@ begin
     else
       csQTHString := @TempRXData.DomMultQTH[1];
 }
+ if Contest in [CALQSOPARTY]  then
+  begin
+
+
+     csQTHString := @TempRXData.QTHString[1] ;
+   // else
+   //    csQTHString := @TempRXData.DomMultQTH[1];
+if TempRXData.DomMultQTH = '' then
+  begin
+  TempRXData.DomMultQTH := 'DX';
+  csQTHString := 'DX';
+  end; 
+  end;
     HisZone := TempRXData.Zone;
 
     csName := @TempRXData.Name[1];

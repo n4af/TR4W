@@ -2084,7 +2084,9 @@ begin
   if not DomesticCountryCall(RXData.Callsign) then
   begin
     ParseExchange(Exchange, FirstString, SecondString, ThirdString);
-
+    getridofprecedingspaces(FirstString);
+    getridofprecedingspaces(SecondString);
+    getridofprecedingspaces(ThirdString);
     if StringIsAllNumbers(FirstString) then
     begin
       Val(FirstString, RXData.NumberReceived, Result1);

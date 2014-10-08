@@ -157,10 +157,10 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.34.4';
+  TR4W_CURRENTVERSION_NUMBER            = '4.34.6'  ;
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'Sept 25,2014';
+  TR4W_CURRENTVERSIONDATE               = 'October 7'   ;
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -754,10 +754,10 @@ type
     BALTIC,
     BWQP,
     CIS,
+    CALQSOPARTY,
     COUNTYHUNTER,
     CQ160CW,
     CQ160SSB,
-    CALQSOPARTY,
     CQM,
     CQVHF,
     CQWPXCW,

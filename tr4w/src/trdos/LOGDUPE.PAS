@@ -461,37 +461,9 @@ begin
   GetRidOfPrecedingSpaces(QTHString);
   GetRidOfPostcedingSpaces(QTHString);
   FoundDomesticQTH := DomQTHTable.GetDomQTH(QTHString, RXData.DomMultQTH, RXData.DomesticQTH);
-{
-  if Contest in [CUPUA1DZ] then
-  begin
-    if IsUA1AStation(MyCall) then
-    begin
-      if RussianID(RXData.QTH.CountryID) then
-        RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign)
-      else
-        Windows.ZeroMemory(@RXData.DomMultQTH, SizeOf(RXData.DomMultQTH));
-    end
-    else
-    begin
-      if not IsUA1AStation(RXData.Callsign) then
-        Windows.ZeroMemory(@RXData.DomMultQTH, SizeOf(RXData.DomMultQTH));
-    end;
-  end;
-}
-//  if not Result then
-{
-  if DomesticMultIsRussianOblast then
-  begin
-    Result := True;
-    if RussianID(RXData.QTH.CountryID) then
-    begin
-      RXData.DomesticQTH := GetRussiaOblastID(RXData.Callsign);
-      RXData.DomMultQTH := RXData.DomesticQTH;
 
-    end;
-  end;
-}
-end;
+
+ end;
 {
 function GetPartialCall(CallAddress: integer): CallString;
 

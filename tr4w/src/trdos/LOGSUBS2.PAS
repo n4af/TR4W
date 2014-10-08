@@ -1019,13 +1019,13 @@ begin
           InitialExchangePutUp := ExchangeWindowString <> '';
 
         if InitialExchangeCursorPos = AtEnd then
-              //{WLI}                    GoToXY (Length (InitialExchange) + 1, 1)
-        else
+               //                    GoToXY (Length (InitialExchange) + 1, 1)
+    //    else
               //{WLI}                    GoToXY (1, 1);
       end
       else
           //{WLI}                Write (ExchangeWindowString);
-
+ //         GoToXY (1,1);
         ShowStationInformation(@CallWindowString);
       DisplayGridSquareStatus(CallWindowString);
       GoodCallPutUp := True;
