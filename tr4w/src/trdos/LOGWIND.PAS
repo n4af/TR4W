@@ -3490,8 +3490,8 @@ begin
       begin
         Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
             {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
-//��������        if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
-//��������          if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
+//       if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
+//        if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
         if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
           if ((BandMapEntryRecord^.StatusByte and $40) = 0) then
           begin

@@ -2511,7 +2511,7 @@ begin
       if SSEx.Check = '' then
         SSEx.Check := NumberStr
       else
-        if (SSEx.Number = '') and (SSEx.Prec <> CHR(0)) then
+        if (SSEx.Number = '') {and (SSEx.Prec <> CHR(0))} then
           SSEx.Number := NumberStr;
     end
     else

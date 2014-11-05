@@ -1866,9 +1866,9 @@ begin
    //   getridofprecedingspaces(TempRXData.QTHString);
       p := nil;
         p := @TempRXData.QTHString[1];
-        if TempRXData.QTHString[1] = ' ' then        //n4af 4.34.6
-       begin
-       inc(p);                                          //n4af 4.34.6
+        if TempRXData.QTHString[1] = ' ' then        //n4af 4.34.6    remove preceding space using pointer math
+       begin                                           //n4af 4.34.6
+       inc(p);                                          //n4af 4.34.6    bump pointer past space
        tCallStringLength := length(TempRXData.QTHString)-1;  //n4af 4.34.6
        end
        else

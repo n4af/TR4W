@@ -156,7 +156,7 @@ begin
 
         SetUpToSendOnInactiveRadio;
 
-        Sleep(5); // Added to get rid of relay flicking on old radio
+    //    Sleep(5); // Added to get rid of relay flicking on old radio
       end;
 
     if TempChar = ControlB then
@@ -679,6 +679,7 @@ var
   RadioOneReadOkay, RadioTwoReadOkay    : boolean;
 
 begin
+
   { Needs to be put back }
 end;
 

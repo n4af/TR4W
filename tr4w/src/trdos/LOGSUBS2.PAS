@@ -1315,13 +1315,13 @@ begin
 
   if tLastLogEntryIsDeleted then
   begin
-      //добавить
+     
     TempRXData.ceQSO_Skiped := False;
     p := TC_YOUHAVERESTOREDTHELASTDELETED;
   end
   else
   begin
-      //удалить
+
     TempRXData.ceQSO_Skiped := True;
     p := TC_YOUHAVEDELETEDTHELASTLOGENTRY;
   end;

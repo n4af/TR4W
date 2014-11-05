@@ -363,7 +363,7 @@ const
     #13 +
     '2006 - 2012 Dmitriy Gulyaev UA4WLI' + #13 +
     'TR4WSERVER version - ' + TR4WSERVER_CURRENTVERSION + #13#13 +
-    'http://www.tr4w.com'#13#10
+    'http://www.tr4w.net'#13#10
 
 //    'Log format version - v.1.' + LOGVERSION4 + #13 +
 //    'Compiler directives: ['{$IFOPT I+} + 'I'{$ENDIF}{$IFOPT R+} + 'R'{$ENDIF}{$IFOPT Q+} + 'Q'{$ENDIF} + ']'
@@ -863,11 +863,12 @@ begin
 
   if Contest <> GENERALQSO then
   begin
-//    VisibleLog.ShowMultiplierStatus(@CallWindowString);
+ //  CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
+     VisibleLog.ShowMultiplierStatus(@CallWindowString);
     VisibleLog.ShowQSOStatus(@CallWindowString);
     VisibleLog.DoPossibleCalls(CallWindowString);
   end;
-// CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
+  CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK;
   if AutoDupeEnableCQ and tCallWindowStringIsDupe {VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode)} then
   begin
 
@@ -4549,7 +4550,7 @@ Domestic:
 
   if ColumnsArray[logColCheck].Enable then
   begin
-    if RXData.Check <> 0 then
+  //  if RXData.Check <> 0 then       //n4af 4.34.7
     begin
       elvi.iSubItem := ColumnsArray[logColCheck].pos; //Ord(logColCheck);
       elvi.pszText := inttopchar(RXData.Check);
@@ -5038,11 +5039,9 @@ begin
 
   DisplayBeamHeading(CallWindowString, '');
 
-//  if QSOByMode then TempMode := ActiveMode else TempMode := Both;
-//  if QSOByBand then TempBand := ActiveBand else TempBand := All;
   tCallWindowStringIsDupe := VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode);
   DispalayB4(integer(tCallWindowStringIsDupe));
-//  tCallWindowStringIsDupe := CallsignsList.CallsignIsDupe(CallWindowString, TempBand, TempMode, Index);
+  
 
   if not CallsignsList.FindCallsign(CallWindowString, Index) then Exit;
   QSOs := CallsignsList.GetQSOs(Index);
@@ -5761,9 +5760,15 @@ procedure CheckInactiveRigCallingCQ;
 begin
   if InactiveRigCallingCQ then //n4af 4.30.1 
   begin                        //n4af 4.30.1
-  SwapRadios;          
-  ShowInformation;             //n4af 4.30.1
-  end;                         //n4af 4.30.1 
+ SetUpToSendOnInactiveRadio;
+
+  SwapRadios;
+
+
+ ShowInformation;
+
+
+  end;
 end;
 
 function CheckWindowAndColor(Window: HWND; var Brush: HBRUSH; var Color: integer): boolean;

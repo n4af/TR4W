@@ -156,7 +156,7 @@ begin
 
         SetUpToSendOnInactiveRadio;
 
-        Sleep(5); // Added to get rid of relay flicking on old radio
+    //    Sleep(5); // Added to get rid of relay flicking on old radio
       end;
 
     if TempChar = ControlB then
@@ -603,7 +603,6 @@ begin
   begin
     Windows.EnableWindow(wh[mweRadioOne], False);
     Windows.EnableWindow(Radio1.FreqWindowHandle, False);
-
     Windows.EnableWindow(wh[mweRadioTwo], True);
     Windows.EnableWindow(Radio2.FreqWindowHandle, True);
     ActiveRadioPtr := @Radio2;
@@ -623,7 +622,6 @@ begin
   begin
     Windows.EnableWindow(wh[mweRadioOne], True);
     Windows.EnableWindow(Radio1.FreqWindowHandle, True);
-
     Windows.EnableWindow(wh[mweRadioTwo], False);
     Windows.EnableWindow(Radio2.FreqWindowHandle, False);
     ActiveRadioPtr := @Radio1;
@@ -639,7 +637,7 @@ begin
     SetSpeed(CodeSpeed);
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
-  ClearRadioStatus(ActiveRadioPtr); //n4af 04.30.3
+  //ClearRadioStatus(ActiveRadioPtr); //n4af 04.30.3
 
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);

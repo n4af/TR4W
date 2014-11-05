@@ -35,6 +35,7 @@ label
   1;
 var
   P1, P2                                : PChar;
+
 begin
   Result := False;
   case Msg of
@@ -44,9 +45,16 @@ begin
         Windows.SetWindowText(hwnddlg, RC_DUPECHECKOAR);
 
         Format(TempBuffer1, TC_ENTERCALLTOBECHECKEDON, BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
-        CreateStatic(TempBuffer1, 15, 3, 250, hwnddlg, 102);
+          CreateStatic(TempBuffer1, 15, 3, 250, hwnddlg, 102);
 
-         AltDEditWindowHandle := CreateEdit(ES_CENTER or ES_UPPERCASE or WS_BORDER, 15, 27, 250, 30, hwnddlg, 101);
+
+
+
+  //      tcreatestaticwindow(tempbuffer1,es_center,15,3,250,30,hwnddlg,0);
+  //      tcreateeditwindow($00020014,tempbuffer1,$50010014,es_center,15,27,250,30,hwnddlg);
+          AltDEditWindowHandle := CreateEdit(WS_MaximizeBox or WS_MinimizeBOX or ES_CENTER or ES_UPPERCASE or WS_BORDER,15, 27, 250, 30, hwnddlg, 101);
+      //  altdeditwindowhandle := createmodaldialog( 250,15,hwnddlg,@newaltdeditproc,0);
+
         asm
     mov edx,[MainWindowEditFont]
     call tWM_SETFONT

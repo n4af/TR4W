@@ -43,7 +43,7 @@ begin
 DupeInfoCallWindowState := diNone;
 SetMainWindowText(mweDupeInfoCall, nil);
 DupeInfoCallWindowCleared := True;
-Windows.ShowWindow(wh[mweDupeInfoCall], SW_HIDE);
+Windows.ShowWindow(wh[mweDupeInfoCall], SW_RESTORE);
 
 
 end;
@@ -83,7 +83,7 @@ begin
 
     //  Result := BOOL(tr4wBrushArray[trBlack]);
         Windows.GetClientRect(HWND(lParam), temprect);
-     //       GradientRect(HDC(wParam), temprect, VDColorsArray[GetDlgCtrlID(HWND(lParam))], 0, gdVertical);
+      //      GradientRect(HDC(wParam), temprect, VDColorsArray[GetDlgCtrlID(HWND(lParam))], TempColor,gdVertical);
      end;  
         
       WM_DRAWITEM:
@@ -123,8 +123,13 @@ begin
          end;
 
         SetBkMode(VDDRAWITEMSTRUCT^.HDC, TRANSPARENT);
+            {
+             Result := BOOL(tr4wBrushArray[trWhite]);
+           bgColor := $FFFFFF;
+             SetTextColor(HDC(wParam), $3333FF);
+                Windows.TextOut(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem.Left, VDDRAWITEMSTRUCT^.rcItem.Top + 1, @CallsBuf, Left);
+          }
 
-        //       Windows.TextOut(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem.Left, VDDRAWITEMSTRUCT^.rcItem.Top + 1, @CallsBuf, Left);
         Windows.DrawText(VDDRAWITEMSTRUCT^.HDC, @CallsBuf, LengthOfTheString, VDDRAWITEMSTRUCT^.rcItem, DT_END_ELLIPSIS + DT_SINGLELINE + DT_CENTER + DT_VCENTER);
       end;
 
