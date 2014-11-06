@@ -65,6 +65,7 @@ var
 begin
   ActiveMode := LogWind.ActiveMode;
   if ActiveMode = FM then ActiveMode := Phone;
+ 
 
   if Band = NoBand then
   begin
@@ -170,11 +171,20 @@ procedure UpdateTotals2;
   generic six band total summary with both modes shown.  Someone should
   put a case statement in here someday and make it more appropriate to
   different contest.                                                    }
-
+label
+skip;
 var
   i                                : integer;
   TempBand                         : BandType;
   ActiveMode                       : ModeType;
+  CWi: real;
+  PHi :  real;
+  CWR : integer;
+  PHR : integer;
+  CWp  : pchar;
+  PHp : pchar;
+  s1 : string;
+  S2 : string;
 begin
   ActiveMode := LogWind.ActiveMode;
   if ActiveMode = FM then ActiveMode := Phone;
@@ -191,13 +201,31 @@ begin
   Row := -1;
   if QSOByMode then
   begin
-    if (ActiveMode = CW) or ((QTotals[All, CW] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText(TC_CWQSOS);
+  if Contest = OZCR_O   then      //n4af 04.34.8
+  if (QTotals[All,CW] > 0) and (QTotals[All,Phone]> 0)   then
+  begin
+  CWi  := (QTotals[All,CW]) / ((Qtotals[All,CW])+(Qtotals[All,Phone])) * 100;
+  PHi  := ((QTotals[All,Phone]) / (Qtotals[All,CW]+Qtotals[All,Phone]) * 100);
+  Str(round(CWi),s1);
+   S1 := concat('CW: ',s1,'%');
+    CWp := pchar(S1);
+   S2 := concat('PH: ',inttostr(round(PHi)),'%');
+    PHp := pchar(S2);
+
+  WriteLeftColumnText(CWP);
+  WriteLeftColumnText(PHp);
+   goto skip;
+  end;
+  end;
+  if QSOByMode then
+  begin
+    if (ActiveMode = CW) or ((QTotals[All, CW] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText('CW - ');
     if (ActiveMode = Phone) or ((QTotals[All, Phone] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText(TC_SSBQSOS);
     if (ActiveMode = Digital) or ((QTotals[All, Digital] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText(TC_DIGQSOS);
   end
   else
     WriteLeftColumnText(TC_QSOS);
-
+  skip:
   if DoingDomesticMults then
   begin
     if MultByMode then
@@ -257,14 +285,15 @@ begin
     end
     else
       WriteLeftColumnText(TC_ZONE);
-
+  //    WriteLeftColumnText('CW-Ratio');
+  //    WriteLeftColumnText('PH-Ratio');
   end;
 
   {--------------------------------------------------}
 
   if ActiveBand in [Band160..Band10] then
   begin
-    for TempBand := Band160 to Band10 do DisplayBandTotals(TempBand);
+     for TempBand := Band160 to Band10 do DisplayBandTotals(TempBand);
   end
   else
     if ActiveBand in [Band30..Band12] then
@@ -292,8 +321,8 @@ begin
   begin
     DisplayBandTotals(NoBand);
   end;
-  DisplayBandTotals(All);
-
+   DisplayBandTotals(All);
+ //  TotalTextOut('Ratio',column+1,0);
   if QTCsEnabled then
   begin
     WriteLeftColumnText('QTCs');
