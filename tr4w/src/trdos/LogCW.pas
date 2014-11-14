@@ -275,7 +275,7 @@ begin
 //  CPUKeyer.PTTUnForce;
   tAutoSendMode := False;
   CPUKeyer.FlushCWBuffer;
-//  if wkActive then wkClearBuffer;
+//   if key = EscapeKey then wkClearBuffer;
 end;
 
 procedure FlushCWBufferAndClearPTT;

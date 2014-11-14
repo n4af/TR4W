@@ -558,6 +558,7 @@ var
   TimeOut                               : integer;
 
 begin
+
   if SingleRadioMode then
   begin
     QuickDisplay(TC_ALTRCOMMANDDISABLED);

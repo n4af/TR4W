@@ -974,9 +974,11 @@ end;
 
 function RadioObject.WritePollRequest(const Buffer; nNumberOfBytesToWrite: DWORD): LongBool;
 begin
-  if NoPollDuringPTT then while tPTTStatus = PTT_ON do Sleep(200);
+ { if NoPollDuringPTT then
+  if tPTTStatus = PTT_ON then
+  Sleep(500);   }
   Result := WriteToCATPort(Buffer, nNumberOfBytesToWrite);
-  if not Result then Sleep(500);
+  if not Result then Sleep(200);
 end;
 
 function RadioObject.AddToOutputBuffer(Buffer: PChar; nNumberOfBytesToWrite: DWORD): LongBool;

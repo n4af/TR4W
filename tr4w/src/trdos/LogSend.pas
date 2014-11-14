@@ -308,12 +308,12 @@ begin
                                                UNTIL ((Key >= '1') AND (Key <= '9')) OR (Key = EscapeKey);
                               }
 
-            {            if Key = EscapeKey then
+  {                       if Key = EscapeKey then
                         begin
                           FlushCWBufferAndClearPTT;
                           Exit;
                         end;
-            }
+  }
             if i = -1 then
             begin
               FlushCWBufferAndClearPTT;
