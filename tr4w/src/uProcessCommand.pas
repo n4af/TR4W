@@ -263,10 +263,10 @@ begin
       CompleteCallsign;
     end;
 }
-{
+
     if CommandString = 'ENTER' then ProcessReturn;
     if CommandString = 'ESCAPE' then Escape_proc;
-}
+ 
 
 {
     if CommandString = 'BANDUP' then

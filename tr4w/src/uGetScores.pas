@@ -418,7 +418,7 @@ begin
 
   Index := Format(RequestBody,
 
-    'xml=<?xml version="1.0"?><dynamicresults>' +
+   'xml=<?xml version="1.0"?><dynamicresults>' +
     GSCR + '<soft>' + TR4W_CURRENTVERSION + '</soft>' +
     GSCR + '<contest>%s</contest>' +
     GSCR + '<call>%s</call>' +
@@ -432,7 +432,6 @@ begin
     tCategoryBandSA[CategoryBand],
     tCategoryTransmitterSA[CategoryTransmitter]
     );
-
   for TempBand := Band160 to All do
     for TempMode := CW to Both do
     begin

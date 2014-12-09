@@ -378,11 +378,14 @@ begin
 
 //  Windows.ZeroMemory(@CTY.CTYTable, SizeOf(CountryInfoArrayType));
 
-  Size := Windows.GetFileSize(h, nil);
+    Size := Windows.GetFileSize(h, nil);
 
   for i := 0 to Size - 1 do
   begin
-    case p[i] of
+   //   if i = 71469 then
+   //   e := e;
+
+           case p[i] of
       ':':
         begin
           l := i - s;
@@ -508,10 +511,10 @@ begin
             inc(s);
             pr.FullCallsigns := True;
           end;
-
-          l := i - s;
+               l := i - s;
           if e <> 0 then
-            l := e - s - 1;
+          if (s <= e)  then   //n4af 4.35.2
+          l := (e - s - 1);
           Windows.CopyMemory(@pr.Prefix, @p[s], l);
           pr.PrefLength := l;
 

@@ -214,7 +214,7 @@ const
 //  NumberBandCategories                  = 13;
 //  NumberPowerCategories                 = 3;
 //  NumberModeCategories                  = 4;
-  NumberOverlayCategories               = 4;
+  NumberOverlayCategories               = 5;
   NumberAssistedCategories              = 2;
   NumberStationCategories               = 7;
   NumberTimeCategories                  = 3;
@@ -300,6 +300,7 @@ const
     'MIXED');
 }
   OverlayCategory                       : array[0..NumberOverlayCategories - 1] of PChar = (
+    'CLASSIC',  //n4af 4.35.4
     'ROOKIE',
     'NOVICE-TECH',
     'TB-WIRES',
@@ -691,8 +692,13 @@ var
   TempMode                              : ModeType;
   TimeDifference                        : integer;
   PreviousQSOTime                       : TQSOTime;
+  Min                                   : Integer;
 begin
 
+if pos('CQ-WW', ContestName ) <> 0 then       //n4af 4.35.3
+Min := 60
+else
+Min := 30;
   NumberDates := 0;
 //  OperatingTime := 0;
   CalculateTotals := False;
@@ -731,7 +737,7 @@ begin
         if not FirstRecord then
         begin
           TimeDifference := QSOTimeToSeconds(TempRXData.tSysTime) - QSOTimeToSeconds(PreviousQSOTime);
-          if TimeDifference <= 30 {min} * 60 then
+          if TimeDifference <= Min {min} * 60 then      //n4af 4.35.3
 //            OperatingTime := OperatingTime + TimeDifference;
           begin
             if PreviousBand = TempRXData.Band then

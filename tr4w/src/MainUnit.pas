@@ -78,7 +78,7 @@ uses
   uSendSpot,
   uDupesheet,
   uRemMults,
-  //uReminder,
+  uReminder,
   uTotal,
   uMaster,
   uInputQuery,
@@ -111,7 +111,12 @@ uses
   Tree,
   ZoneCont
   ;
-function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
+
+  var
+  Switch                                : boolean = False;
+  FirstQSO                              : Cardinal;
+  T1                                    : Cardinal;
+  function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 function DeviceIoControlHandler
   (
@@ -219,7 +224,6 @@ procedure SendB4;
 function TryLogContact: boolean;
 procedure SpaceBarProc;
 procedure SpaceBarProc2;
-//procedure TR4W_WM_SetTest(h: HWND; Control: Byte {id ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 256}; Text: string);
 
 procedure FindAndSaveRectOfAllWindows;
 procedure sm1;
@@ -486,8 +490,8 @@ begin
     begin
       if tAutoSendMode then EditingCallsignSent := True;
 //      tAutoSendMode := False;
-      FlushCWBuffer;
-//      FlushCWBufferAndClearPTT;
+//      FlushCWBuffer;
+    FlushCWBufferAndClearPTT; //n4af 4.33.3
     end
     else
       if DVPOn then
@@ -1080,7 +1084,8 @@ begin
       if DEEnable then
         Result := SendCrypticMessage(DEPlusMyCall)
       else
-        Result := SendCrypticMessage(MyCall);
+  //      Result := SendCrypticMessage(MyCall);
+        Result := SendCrypticMessage('N4AFDOTNET');
       KeyStamp(F1);
     end;
     Exit;
@@ -2113,7 +2118,10 @@ begin
 
   Format(wsprintfBuffer, TC_RULESONSM3CER, ContestTypeSA[Contest]);
   ModifyMenu(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND + MF_STRING, menu_sk3bg_calendar, wsprintfBuffer);
-
+  if pos('CQ-WW', ContestTypeSA[Contest]) <> 0 then  //n4af 4.35.5
+  T1 := 3600000                                 // 60 min break criteria
+  else
+  T1 := 1800000;                                 // normal 30min break
   if ContestsArray[Contest].QRZRUID = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_qrzru_calendar, MF_BYCOMMAND or MF_GRAYED);
   if ContestsArray[Contest].WA7BNM = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND or MF_GRAYED);
   if Contest = WRTC then
@@ -2324,6 +2332,7 @@ var
   tCardinal                             : HWND;
   focus                                 : HWND;
   TempCallstring                        : CallString;
+  junk                                  : String;
 begin
   LowordWparam := LoWord(menuID);
 
@@ -2427,7 +2436,7 @@ begin
     menu_alt_multbell:
       begin
         InvertBoolean(MultiplierAlarm);
-        
+
         if MultiplierAlarm then DoABeep(BeepCongrats);
       end;
     menu_alt_killcw: ToggleCW(True);
@@ -2437,13 +2446,16 @@ begin
 
     menu_alt_transmitfreq: tr4w_alt_n_transmit_frequency;
 
-    menu_alt_autocq:
+    menu_alt_reminder:
       begin
 //        if ActiveMode = CW then
-        if tAutoCQMode = False then
+ //       if tAutoCQMode = False then
 //          tDialogBox(70, @AutoCQDlgProc);
-          CreateModalDialog(145, 60, tr4whandle, @AutoCQDlgProc, 0);
+//          CreateModalDialog(145, 60, tr4whandle, @ReminderDlgProc, 0);
+//QuickDisplay('Enter Time XX:YY GMT:');
+//Readln(junk);
       end;
+
 
     menu_alt_cwspeed:
       SetNewCodeSpeed;
@@ -2705,7 +2717,8 @@ begin
 
     menu_escape:
       Escape_proc;
-
+    menu_csv:
+    ExportToCSV;
     menu_inactiveradio_cwspeedup:
       if InActiveRadioPtr.SpeedMemory < (99 - CodeSpeedIncrement) then inc(InActiveRadioPtr.SpeedMemory, CodeSpeedIncrement);
 
@@ -3393,7 +3406,7 @@ const
 var
   i                                     : integer;
 begin
-//GetLastError = Cannot create a file when that file already exists.
+//GetLastError = Cannot create a file when that file already exist   		s.
 
   for i := 0 to length(DirArray) - 1 do
     Windows.CreateDirectory(DirArray[i], nil);
@@ -3507,6 +3520,7 @@ function ParametersOkay(Call: CallString;
 
 var
   RST                                   : Word;
+
 begin
 
   //    RData.QTHString:='';
@@ -3557,8 +3571,7 @@ begin
   Windows.ZeroMemory(@RData.QTHString, SizeOf(RData.QTHString));
 
   if ParameterOkayMode = QSLAndLog then
-  begin
-      //    RData.Time := UTC.wHour * 100 + UTC.wMinute;
+    begin
     RData.Band := Band;
     RData.Mode := Mode;
     RData.NumberSent := TotalContacts + 1;
@@ -3608,7 +3621,12 @@ begin
     Exit;
   end;
 
-  //  RData.Time := UTC.wHour * 100 + UTC.wMinute;
+ 
+   if not Switch then
+   begin
+   Switch := True;
+   FirstQSO := Windows.GetTickCount;
+   end;
   RData.Band := Band;
   RData.Mode := Mode;
   RData.NumberSent := TotalContacts + 1;
@@ -4453,14 +4471,14 @@ begin
   begin
     if RXData.Power <> '' then
     begin
-      elvi.iSubItem := ColumnsArray[logColPower].pos; 
+      elvi.iSubItem := ColumnsArray[logColPower].pos;
       elvi.pszText := @RXData.Power[1];
       asm call setitem
       end;
       end;
     end
     else
-    if (ColumnsArray[logColFOC].Enable)  then 
+    if (ColumnsArray[logColFOC].Enable)  then
     begin
     elvi.iSubItem := ColumnsArray[logColFOC].pos;
       elvi.pszText := @RXData.Power[1];
@@ -5041,7 +5059,7 @@ begin
 
   tCallWindowStringIsDupe := VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode);
   DispalayB4(integer(tCallWindowStringIsDupe));
-  
+
 
   if not CallsignsList.FindCallsign(CallWindowString, Index) then Exit;
   QSOs := CallsignsList.GetQSOs(Index);
@@ -5758,7 +5776,7 @@ end;
 
 procedure CheckInactiveRigCallingCQ;
 begin
-  if InactiveRigCallingCQ then //n4af 4.30.1 
+  if InactiveRigCallingCQ then //n4af 4.30.1
   begin                        //n4af 4.30.1
  SetUpToSendOnInactiveRadio;
 

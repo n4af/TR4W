@@ -542,7 +542,7 @@ begin
   end;
 
   { Does this really ever work? }
-{wli
+{
   if StringHas(CallWindowString, ',') then
     begin
       TailEndCallString := PostcedingString(CallWindowString, ',');

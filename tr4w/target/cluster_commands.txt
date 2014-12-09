@@ -16,9 +16,8 @@ SET/FILTER DXBANDMODE/PASS 15-CW
 SET/FILTER DXBANDMODE/PASS 15-SSB
 SET/FILTER DXBANDMODE/PASS 10-CW
 SET/FILTER DXBANDMODE/PASS 10-SSB
--
-SET/FILTER DXCTY/PASS K,XE,VE
-SET/FILTER DXCTY/PASS UA
+set/dx/filter call=N4AF or (not skimmer and spottercont=NA) or ((skimmer and unique>2) and  not skimbusted and (spotterstate=[WV,MD,VA,PA,NC]))
+set/dx/filter call=N4AF or (not skimmer and spottercont=NA) or ((skimmer and unique>2) and skimvalid and (spotterstate=[WV,MD,VA,PA,NC]))
 .
 -
 #DXSPIDER CLUSTER COMMANDS:

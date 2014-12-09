@@ -52,6 +52,7 @@ uses
   uOption in 'src\uOption.pas',
   uRadio12 in 'src\uRadio12.pas',
   uFunctionKeys in 'src\uFunctionKeys.pas',
+  uinet in 'src\uinet.pas',
   uTelnet in 'src\uTelnet.pas',
   uBandmap in 'src\uBandmap.pas',
   uFileView in 'src\uFileView.pas',

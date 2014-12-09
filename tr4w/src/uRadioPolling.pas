@@ -602,7 +602,7 @@ begin
       rig.CurrentStatus.VFOStatus := ActiveVFOStatusType(Ord(rig^.tBuf[31]) - Ord('0') + 1);
 
       rig.CurrentStatus.Freq := BufferToInt(@rig^.tBuf, 3, 11);
-      if rig.CurrentStatus.Freq = rig.PreviousStatus.Freq then Sleep(250);
+      if rig.CurrentStatus.Freq = rig.PreviousStatus.Freq then Sleep(200);
 
       CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
       case rig^.tBuf[30] of
@@ -2032,7 +2032,7 @@ var
   TempInteger                           : integer;
 begin
   StatusChanged := False;
-  //CompareString(LOCALE_SYSTEM_DEFAULT, 0, @rig.CurrentStatus, SizeOf(RadioStatusRecord), @rig.PreviousStatus, SizeOf(RadioStatusRecord)) <> 2;
+//  CompareString(LOCALE_SYSTEM_DEFAULT, 0, @rig.CurrentStatus, SizeOf(RadioStatusRecord), @rig.PreviousStatus, SizeOf(RadioStatusRecord)) <> 2;
   for TempInteger := 0 to SizeOf(RadioStatusRecord) - 1 do
   begin
     if PChar(@rig.CurrentStatus)[TempInteger] <> PChar(@rig.PreviousStatus)[TempInteger] then
@@ -2525,14 +2525,15 @@ end;
 
 procedure PTTStatusChanged;
 begin
-  if ActiveRadioPtr.tPTTStatus = PTT_ON then      
-    tr4w_PTTStartTime := GetTickCount  ;
-//  else      //n4af 04.30.3
-   begin          
+  if ActiveRadioPtr.tPTTStatus = PTT_ON then
+    tr4w_PTTStartTime := GetTickCount
+   else      //n4af 04.30.3
+
     if tr4w_PTTStartTime <> 0 then
       tRestartInfo.riPTTOnTotalTime := tRestartInfo.riPTTOnTotalTime + GetTickCount - tr4w_PTTStartTime;
-    tDispalyOnAirTime;
-  end;
+    
+
+  tDispalyOnAirTime;
   SetMainWindowText(mwePTTStatus, PTTStatusString[ActiveRadioPtr.tPTTStatus]);
   SendStationStatus(sstPTT);
 end;

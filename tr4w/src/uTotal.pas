@@ -274,7 +274,7 @@ begin
     end
     else
       WriteLeftColumnText(TC_PREFIX);
-  end;
+  end;                                                                       
 
   if DoingZoneMults then
   begin

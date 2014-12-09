@@ -1014,12 +1014,13 @@ begin
 
   for i := 1 to length(Msg) do
   begin
-    if Msg[i] in ['A'..'Z', ' ', '0'..'9', '/', '?'] then
+    if Msg[i] in ['A'..'Z', ' ', '0'..'9','.', '/', '?'] then
     begin
       CheckSpeedChange;
       wkAddCharToHostBuffer(Msg[i]);
 
     end;
+
     if Msg[i] = '^' then wkAddCharToHostBuffer('|');
     if Msg[i] = #$06 then inc(wkSpeedUp);
     if Msg[i] = #$13 then inc(wkSpeedDown);

@@ -131,17 +131,18 @@ begin
         Continue;
       end;
 
-      case SendChar of
-        '.':
+        case SendChar of
+           '.':
           begin
-            case SendString[CharacterCount + 1] of
+          AddStringToBuffer('.', CWTone);     // n4af 04.35.2
+ {            case SendString[CharacterCount + 1] of
               'T':
                 begin
                   AddStringToBuffer(TimeString, CWTone);
                   inc(CharacterCount);
                 end;
+             end;    }
             end;
-          end;
 
         '#':
           begin
@@ -199,7 +200,7 @@ begin
 
             AddStringToBuffer(TempString, CWTone);
           end;
-
+         
         '_': AddStringToBuffer(' ', CWTone);
 
         ControlD:
@@ -256,7 +257,7 @@ begin
             ProcessMenu(menu_ctrl_sendkeyboardinput);
             RITEnable := True;
           end;
-
+  
         '~': SendSalutation(CallWindowString);
         '\': AddStringToBuffer(MyCall, CWTone);
         '&': AddStringToBuffer(MyState, CWTone);

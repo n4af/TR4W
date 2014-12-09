@@ -2563,6 +2563,7 @@ var
   TempExchange                          : ContestExchange;
   data                                  : DataBaseEntryRecord;
   TempZone                              : Byte;
+
 begin
   {TR6.74 - Removed any manipulation of IntialExchangePutUp from this
    routine.  It is up to whomever calls it to decide if they want to
@@ -2588,6 +2589,7 @@ begin
       CustomInitialExchange:
         begin
           Exchange := '';
+
           CustomString := CustomInitialExchangeString;
 
           while CustomString <> '' do
@@ -2670,8 +2672,9 @@ begin
 
             if Command = 'FOC' then
               if CD.GetEntry(StandardCall, data) and (data.FOC <> '') then
-                Exchange := Exchange + data.FOC + ' ';
+               Exchange := Exchange + data.FOC + ' ';
 
+              
             if Command = 'CHECK' then
               if CD.GetEntry(Call, data) and (data.Check <> '') then
                 Exchange := Exchange + data.Check + ' ';
@@ -3201,4 +3204,5 @@ begin
 end;
 
 end.
+
 

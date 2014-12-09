@@ -11,7 +11,8 @@ uses
   Messages,
   LogWind;
 
-function ReminderDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
+
+  function ReminderDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 var
   flashreminder                         : boolean = False;
   ReminderDlgHandle                     : HWND;

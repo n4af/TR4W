@@ -1,4 +1,4 @@
-!define TR4WVERSION    '34.6'
+!define TR4WVERSION    '35.5'
 !define TR4WINSTFOLDER 'Software\TR4W'
 !define TR4WDRVREG     'SYSTEM\CurrentControlSet\Services\TR4WIO'
 

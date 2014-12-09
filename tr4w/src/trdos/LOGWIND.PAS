@@ -2,7 +2,6 @@ unit LogWind;
 
 {$IMPORTEDDATA OFF}
 interface
-
 uses
 utils_text,
   uWinKey,
@@ -31,8 +30,9 @@ utils_text,
 const
   tBaseFrequencys                       : array[Band160..Band12] of integer =
     (1000, 3000, 7000, 14000, 21000, 28000, 10000, 18000, 24000);
-
+//T1 : Cardinal = 1800000;
 var
+
   //   StringInQuickDisplayWindow      : string;
   tBandMapCutoffFrequency               : integer;
 //  tDoubleMult                           : boolean;
@@ -43,7 +43,11 @@ var
   tCountryNamePrevState                 : Word;
   tBeamHeadingPrevState                 : GridString;
   tLocalTimePrevState                   : Word;
-
+  Gate                                  : boolean = False;
+  T2                                    : cardinal = 0;
+  d2                                    : cardinal = 0;
+  Start                                 : boolean = False;
+  Save                                  : cardinal = 0;
 const
   PendingQTCArraySize                   = 600;
 
@@ -1059,7 +1063,7 @@ uses
   uStations,
   uSpots,
   uRemMults,
-//  uReminder,
+  uReminder,
   uFunctionKeys,
   LogPack,
   uTelnet,
@@ -4737,6 +4741,8 @@ var
   Zone                                  : integer;
   FoundCall                             : boolean;
   Heading                               : integer;
+  qe                                   : pChar;
+  pstr                                 : str80;
 
 begin
   if UserInfoShown = NoUserInfo then Exit;
@@ -4931,8 +4937,12 @@ begin
 
           if Command = 'FOC' then
             if FoundCall and (data.FOC <> '') then
+         //   begin
               InfoString := InfoString + data.FOC + ' ';
-
+        {       pStr := InfoString;
+               qe := @pStr;
+               QuickDisplay(qe);
+               end;       }
           if Command = 'CHECK' then
             if FoundCall and (data.Check <> '') then
               InfoString := InfoString + data.Check + ' ';
@@ -5149,23 +5159,7 @@ var
   r                                     : integer;
   TZ                                    : TIME_ZONE_INFORMATION;
 begin
-  {
-  � ������ � � ������ ������� �� ������ ����� �������������� � ��������� ����������� �����
-  � 2:00 ��������� ������� ������� �� 1 ��� ������, � �������� ������� ��������������
-  � ��������� ����������� ������� � 3:00 ��������� ������� �� 1 ��� �����.
 
-  ��-�� ���������� ������� ������� �� ���������� ������, �������� ����� �� ������� +2 ���� �� ��������� � �������� �������.
-  ����� � 2 ���� ������ ���, ��� �� ���������� ������ ��������� ��� ���������� ���������� ������,
-  ������������ �� �������� �� +1 ���. ������ ����� ��������� ��� +1 ��� � ���������� �������,
-  ��� � ����� ���������� +2 ���� �� ��������� � �������� �������.
-
-  � ��� � ������ � 2007 ���� ������� �� ������ ����� ��������������
-  �� ������ ����������� ����� � 2:00, � ������������ �������
-  � ������ ����������� ������, ����� � 2:00[1].
-  ������� ��������, ��� �� �� ���� ���������� ������ � ������ ������ ����� ������������ ���������.
-  � �������, �� ������-������ ��������� ��������� ������� ������ ������������ ���������� ������� �����.
-
-  }
 
   if tLocalTimePrevState = Country then Exit;
   tLocalTimePrevState := Country;
@@ -5584,21 +5578,86 @@ begin
 end;
 
 procedure tDispalyOnAirTime;
-begin
-SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(Windows.GetTickCount-StartCPU, False));       //n4af
-
-
-end;
-
-procedure tDispalyTimeFromLastQSO;
 var
-  d                                     : Cardinal;
+d              : integer;
+OperatingTime                        : integer;
+  PreviousQSOTime                       : TQSOTime;
 begin
-  d := Windows.GetTickCount - tElapsedTimeFromLastQSO;
-  if (d div 1000) mod 5 = 0 then
-    SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(d, False));
+{
+if tElapsedTimeFromLastQSO <= 0  then
+tElapsedTimeFromLastQSO := 0
+else
+begin
+
+d := numberminutesprogramrunning  ;
+ if (d div 1000) mod 5 = 0 then
+SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d, False));
+end  ;
+ }
 end;
 
+
+procedure tDispalyTimeFromLastQSO;      // n4af 4.35.5
+{ Try keying on tElapsedTimeFromLastQSO.
+Procedure modified by N4AF to also display total OFF TIME.
+If it total elapsed drops, enter was pressed so
+ save into var d2 contents of tElapsedTimeFromLastQSO on procedure exit to compare to value on entry.
+set Constant T1 to length of break time
+normally onairtime = d - T1 where d is current tick minus tick at elapsed.
+when elapsed drops, set elapsed to zero and save onairtime. Now elapsed will tick up and at T1,
+onairtime will increment from save + d
+}
+
+var
+  c                                    : Boolean ;
+  d                                    : Cardinal;
+  d1                                   : Cardinal ;
+  TimeDifference                       : Integer;
+
+ begin
+
+ d := Windows.GetTickCount - tElapsedTimeFromLastQSO;     // time from last qso
+
+  if (d div 1000) mod 2 = 0 then         // if 5 seconds elapsed
+    SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(d, False));     // display elapsed since last qso
+  // for performance, T1 set in MainUnit rtn CREATEMAINWINDOW
+
+           if d  > T1   then  // > 30min ?   or allowable break time exceeded
+          begin
+          if not Start then    //if first time thru zero break total
+        begin
+        Start := True;
+        d2   := 0;
+        SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d1, False)) ;      // ensure zero first time thru
+         end ;
+
+ if d2 > d  then       // New QSO ?
+  if Start   then      // ensure not first time thru
+  begin
+   save := d2 - T1 + Save;
+
+   end;
+
+ d1 :=  d + Save  - T1    ;                         // counter = elapsed plus saved minute minus break time allowance
+
+    if (d1  div 1000) mod 60 = 0 then     //progressed 60 sec ?
+     SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d1, False)) ;
+  
+   
+
+
+ d2 := d;             // save d at end of every pass
+
+  end;
+ 
+
+  end;
+
+
+
+
+
+ 
 procedure tDispalyMyComputerID;
 begin
   CID_TWO_BYTES[0] := ComputerID;

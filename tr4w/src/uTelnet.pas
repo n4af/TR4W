@@ -313,7 +313,8 @@ begin
 }
         EnumerateLinesInFile('TRCLUSTER.DAT', EmunTRCLUSTERDAT, False);
 
-        i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRINGEXACT, -1, integer(@TelnetServer[1]));
+         i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRING, -1, integer(@TelnetServer[1]));
+    //   i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRINGEXACT, -1, @TelnetServer[1]);
         if i <> CB_ERR then tCB_SETCURSEL(hwnddlg, 102, i);
 
         TelToolbar := uCommctrl.CreateToolBarEx(hwnddlg,
@@ -379,18 +380,18 @@ begin
 
 //    WM_MENUSELECT:      if lParam = 0 then        DestroyMenu(TelPopMemu);
 
-//      if HiWord(wParam) = MF_CHECKED then
-//        GetMenuString(TelPopMemu, 1000, wsprintfBuffer, 100, MF_BYCOMMAND);
+  //     if HiWord(wParam) = MF_CHECKED then     //n4af
+    //    GetMenuString(TelPopMemu, 1000, wsprintfBuffer, 100, MF_BYCOMMAND);      
 
     WM_COMMAND:
       begin
-//        if HiWord(wParam) = LBN_SELCHANGE then DlgDirSelectEx(hwnddlg, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);
+        if HiWord(wParam) = LBN_SELCHANGE then DlgDirSelectEx(hwnddlg, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);     //n4af
 
         if HiWord(wParam) = LBN_DBLCLK then
         begin
-//          DlgDirSelectEx(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);
-//          DlgDirList(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, 101, 106, DDL_ARCHIVE or DDL_DIRECTORY);
-//          ShowMessage(SysErrorMessage(GetLastError));
+           DlgDirSelectEx(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);  //n4af
+          DlgDirList(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, 101, 106, DDL_ARCHIVE or DDL_DIRECTORY);       //n4af
+         ShowMessage(SysErrorMessage(GetLastError));
           i := SendMessage(TelnetListBox, LB_GETCURSEL, 0, 0);
           if i = LB_ERR then Exit;
           SendMessage(TelnetListBox, LB_GETTEXT, i, integer(@TelnetBuffer[0]));
@@ -442,8 +443,8 @@ begin
               if tClusterType = ctARCluster then tDialogBox(44, @ARSpotsFilterDlgProc);
               if tClusterType = ctDXSpider then tDialogBox(65, @DXSSpotsFilterDlgProc);
             end;
-}
-
+ 
+ }
           //          DialogBox(hInstance, MAKEINTRESOURCE(44), hwnddlg, @SpotsFilterDlgProc);
           200: if TelThreadID = 0 then
             begin
@@ -766,6 +767,8 @@ var
   CountryID                             : Word;
   Offset                                : integer;
   ct                                    : Cardinal;
+  AMode                                 : pChar;
+  Buffer                                : pChar;
 begin
   Result := False;
   Stringtype := tstReceived;
@@ -968,7 +971,12 @@ begin
 
   TempSpot.FDupe := //CallsignsList.CallsignIsDupe(TempSpot.FCall, TempSpot.FBand, TempSpot.FMode, I1);
     VisibleLog.CallIsADupe(TempSpot.FCall, TempSpot.FBand, TempSpot.FMode);
-
+    {
+     Buffer := TelnetBuffer;
+    if StrPos(Buffer,'CW') = Nil then exit;
+    if StrPos(Buffer,'BEACON') <> Nil then exit;
+    if StrPos(Buffer,'NCDXF') <> Nil then exit;
+  } 
   if TempSpot.FDupe then Stringtype := tstReceivedDupe;
 
   if not TempSpot.FDupe then
@@ -1175,7 +1183,7 @@ begin
       ClusterTypeDetermined := True;
     end;
   end;
-}
+} 
 end;
 
 procedure SendClientStatus;

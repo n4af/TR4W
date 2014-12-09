@@ -51,7 +51,7 @@ function ProcessRadioTypeold(CMD: ShortString; RadioPointer: RadioPtr): boolean;
 function GetLPTPortFromChar(port: ShortString): PortType;
 
 var
-//  ConfigFileRead                        : Text;
+  ConfigFileRead                        : Text;
   ClearDupeSheetCommandGiven            : boolean;
   RunningConfigFile                     : boolean; { True when using Control-V command }
 
@@ -111,9 +111,9 @@ var
   StackBool                             : boolean;
 begin
   ProcessConfigInstructions1 := False;
-  //if ID = ALL_CW_MESSAGES_CHAINABLE then
-//  id := PChar(string(ID1));
-{
+{   if ID = ALL_CW_MESSAGES_CHAINABLE then
+   id := PChar(string(ID1));
+ 
   if ID = '_DC' then
     begin
       _showDevCaps := StackBool;
@@ -126,7 +126,7 @@ begin
     ProcessConfigInstructions1 := True;
     Exit;
   end;
-{
+ {
   if ID = '_ST' then
   begin
     _showstarttime := StackBool;
@@ -1251,7 +1251,7 @@ begin
     ProcessConfigInstructions1 := True;
     Exit;
   end;
-}
+} 
 {
   if ID = 'CUSTOM INITIAL EXCHANGE STRING' then
   begin

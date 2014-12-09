@@ -62,7 +62,9 @@ type
    //const
 var
 
-   cw_marks                        : array[1..44] of string[6] = (
+   cw_marks                        : array[1..45] of string[6] = (
+   { . }
+   '.-.-.-',
       {     /  }
       '-..-.',
 
@@ -77,9 +79,8 @@ var
       '--...',
       '---..',
       '----.',
-
-      {     :       ;       <       =       >       ?       @}
-      '', '', '', '', '', '..--..', '',
+      { :    ;   <   =  >       ?       @}
+       '', '', '', '', '', '..--..', '',
 
       {  A          B         C        D       E            F        G          H       I           J}
       '.-', '-...', '-.-.', '-..', '.', '..-.', '--.', '....', '..', '.---',
@@ -133,7 +134,7 @@ begin
    for trcw_pos := 1 to length(CW_TEXT) do
       begin
 
-         str_to_send := cw_marks[ord(CW_TEXT[trcw_pos]) - 46];
+         str_to_send := cw_marks[ord(CW_TEXT[trcw_pos]) - 45];
          if CW_TEXT[trcw_pos] = ' ' then
             begin
                sleep(CW_SPEED * 3);
