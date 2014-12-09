@@ -1084,8 +1084,8 @@ begin
       if DEEnable then
         Result := SendCrypticMessage(DEPlusMyCall)
       else
-  //      Result := SendCrypticMessage(MyCall);
-        Result := SendCrypticMessage('N4AFDOTNET');
+        Result := SendCrypticMessage(MyCall);
+   //     Result := SendCrypticMessage('N4AFDOTNET');
       KeyStamp(F1);
     end;
     Exit;

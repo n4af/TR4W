@@ -300,7 +300,7 @@ const
     'MIXED');
 }
   OverlayCategory                       : array[0..NumberOverlayCategories - 1] of PChar = (
-    'CLASSIC',
+    'CLASSIC',  //n4af 4.35.4
     'ROOKIE',
     'NOVICE-TECH',
     'TB-WIRES',
