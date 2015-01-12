@@ -1,0 +1,14 @@
+CONNECTED
+Please enter your call: 
+N4AF
+Local users =  81
+Current spot rate is 6792 per hour
+N4AF de SK1MMR-1  13-Nov-2014 22:40Z >
+DX de VK3FFB-#:  28204.8  KE4TWI         CW     7 dB  15 WPM  BEACON  2240Z
+DX de UA4M-#:     3563.5  DF4DP          CW     4 dB  15 WPM  CQ      2240Z
+DX de HB9DCO-#:   3563.5  DF4DP          CW     6 dB  15 WPM  CQ      2240Z
+DX de K1TTT-#:    1823.0  IZ8JAI         CW     0 dB  21 WPM  CQ      2240Z
+DX de NC7J-#:    18071.9  W1AW/1         CW    26 dB  35 WPM  CQ      2240Z
+DX de SE0X-#:     7005.9  IX1CKF         CW    42 dB  21 WPM  CQ      2240Z
+DX de SK3W-#:     7005.9  IX1CKF         CW    28 dB  21 WPM  CQ      2240Z
+DX de LA6TPA-#:   7005.8  IX1CKF         CW    11 dB  21 WPM  CQ      2240Z

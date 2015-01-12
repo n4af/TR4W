@@ -78,7 +78,7 @@ var
 
 //  tClusterType                          : ClusterType = ctDXSpider;
 
-  TelnetServer                          : Str50 = 'telnet.reversebeacon.net:7300';  //n4af 04-11-2013
+  TelnetServer                          : Str50;  //n4af 04-11-2013
   TempSpot                              : TSpotRecord;
 
   tbButtons                             : array[0..TELNETBUTTONS - 1] of TTBButton = (
@@ -313,8 +313,8 @@ begin
 }
         EnumerateLinesInFile('TRCLUSTER.DAT', EmunTRCLUSTERDAT, False);
 
-         i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRING, -1, integer(@TelnetServer[1]));
-    //   i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRINGEXACT, -1, @TelnetServer[1]);
+         i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRING, -1, integer(@TelnetServer[1]));    //n4af 4.35.1
+   //     i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRINGEXACT, -1,integer(@TelnetServer[1]));
         if i <> CB_ERR then tCB_SETCURSEL(hwnddlg, 102, i);
 
         TelToolbar := uCommctrl.CreateToolBarEx(hwnddlg,
@@ -389,9 +389,9 @@ begin
 
         if HiWord(wParam) = LBN_DBLCLK then
         begin
-           DlgDirSelectEx(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);  //n4af
-          DlgDirList(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, 101, 106, DDL_ARCHIVE or DDL_DIRECTORY);       //n4af
-         ShowMessage(SysErrorMessage(GetLastError));
+      //      DlgDirSelectEx(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);  //n4af
+      //    DlgDirList(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, 101, 106, DDL_ARCHIVE or DDL_DIRECTORY);       //n4af
+      //   ShowMessage(SysErrorMessage(GetLastError));
           i := SendMessage(TelnetListBox, LB_GETCURSEL, 0, 0);
           if i = LB_ERR then Exit;
           SendMessage(TelnetListBox, LB_GETTEXT, i, integer(@TelnetBuffer[0]));
@@ -432,7 +432,7 @@ begin
 
           //            ScrollWindowEx(TelnetListBox, 0, -50, 0, 0, 0, 0, SW_SMOOTHSCROLL);
 //          205: SendViaSocket('SH/USERS');
-          206: SendViaTelnetSocket('SH/DX 100'); //n4af 04-11-2014
+          206: SendViaTelnetSocket('SH/DX 50'); //n4af 04-11-2014
 
 {$IF LANG = 'RUS'}
           207: ShowHelp('ru_dxcluster');
@@ -460,7 +460,8 @@ begin
               SendViaTelnetSocket(TempBuffer1);
               Windows.SetWindowText(TelnetCommandWindow, nil);
               if
-                SendMessage(TelnetCommandWindow, CB_FINDSTRINGEXACT, -1, integer(PChar(@TempBuffer1))) = CB_ERR then
+               SendMessage(TelnetCommandWindow, CB_FINDSTRING, -1, integer(PChar(@TempBuffer1))) = CB_ERR then
+              //  SendMessage(TelnetCommandWindow, CB_FINDSTRINGEXACT, -1, integer(PChar(@TempBuffer1))) = CB_ERR then
                 tCB_ADDSTRING_PCHAR(hwnddlg, 106, TempBuffer1);
 
             end;
@@ -678,7 +679,7 @@ begin
   SetToolButSt(201);
   SetToolButSt(202);
 //  SetToolButSt(205);
-  SetToolButSt(206);
+ // SetToolButSt(206);
 //  SetToolButSt(207);
 //  SetToolButSt(208);
 end;
@@ -984,14 +985,7 @@ begin
     TempSpot.FMult := VisibleLog.DetermineIfNewMult(TempSpot.FCall, TempSpot.FBand, TempSpot.FMode);
 //    TempSpot.FMult := MultString <> 0;
     if TempSpot.FMult then Stringtype := tstReceivedMult;
-{
-    if MyCall = 'UA4WLI' then
-    begin
-      CountryID := ctyGetCountry(TempSpot.FCall);
-      if (CountryID = $10D) or ((CountryID = $10F)) then
-        Stringtype := tstAlert;
-    end;
-}
+
   end;
 
 //  Windows.GetSystemTime(TempSpot.FSysTime);

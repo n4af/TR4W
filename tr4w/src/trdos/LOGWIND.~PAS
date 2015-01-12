@@ -48,6 +48,7 @@ var
   d2                                    : cardinal = 0;
   Start                                 : boolean = False;
   Save                                  : cardinal = 0;
+  d1                                  : cardinal = 0;
 const
   PendingQTCArraySize                   = 600;
 
@@ -5611,47 +5612,41 @@ onairtime will increment from save + d
 var
   c                                    : Boolean ;
   d                                    : Cardinal;
-  d1                                   : Cardinal ;
   TimeDifference                       : Integer;
-
+ //n4af 4.35.5
  begin
-
+ if not Start then
+ begin
+ T2 := tElapsedTimeFromLastQSO;  // T2 = initial elapsed
+ Start := True;
+ end;
  d := Windows.GetTickCount - tElapsedTimeFromLastQSO;     // time from last qso
 
   if (d div 1000) mod 2 = 0 then         // if 5 seconds elapsed
     SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(d, False));     // display elapsed since last qso
-  // for performance, T1 set in MainUnit rtn CREATEMAINWINDOW
-
-           if d  > T1   then  // > 30min ?   or allowable break time exceeded
-          begin
-          if not Start then    //if first time thru zero break total
-        begin
-        Start := True;
-        d2   := 0;
-        SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d1, False)) ;      // ensure zero first time thru
-         end ;
-
- if d2 > d  then       // New QSO ?
-  if Start   then      // ensure not first time thru
-  begin
-   save := d2 - T1 + Save;
-
-   end;
-
- d1 :=  d + Save  - T1    ;                         // counter = elapsed plus saved minute minus break time allowance
-
-    if (d1  div 1000) mod 60 = 0 then     //progressed 60 sec ?
-     SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d1, False)) ;
-  
-   
-
-
- d2 := d;             // save d at end of every pass
-
-  end;
  
 
+  // for performance, T1 set in MainUnit rtn CREATEMAINWINDOW
+          if d  <= T1   then  // > 30min ?   or allowable break time exceeded
+      begin
+      d1 := Windows.GetTickCount - T2;
+          if (d1 div 1000) mod 2 = 0 then
+          SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d1, False)) ;
+           
+  end
+  else
+  begin
+  if Gate = False then
+  begin
+  Gate := True;
+  D1 := D1 - 30000;
   end;
+  end;
+
+
+
+    d2 := d1;
+   end;
 
 
 

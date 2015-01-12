@@ -1,0 +1,1598 @@
+CONNECTED
+*** Connected to VE7CC-1:
+Greetings from the VE7CC-1 cluster.
+Located near Vancouver BC
+Running CC Cluster software version 3.087
+ 
+*************************************************************************
+*                                                                       *
+*     Please login with a callsign indicating your correct country      * 
+*                          Portable calls are ok.                       * 
+*                                                                       *  
+************************************************************************* 
+ 
+New commands:
+ 
+set/skimmer   turns on Skimmer spots.
+set/noskimmer turns off Skimmer spots.
+ 
+set/own      turns on Skimmer spots for own call.
+set/noown    turns them off.
+ 
+set/nobeacon  turns off spots for beacons.
+set/beacon    turns them back on.
+ 
+For information on CC Cluster software see:
+http://bcdxc.org/ve7cc/ccc/CCC_Commands.htm
+ 
+AR User program now at ver. 2.447
+Please enter your call: 
+login: 
+N4AF
+N4AF
+Hello Howie.
+Cluster: 394 nodes  1002 Locals  5394 Total users   Uptime   5 days 15:13
+Date        Hour   SFI   A   K Forecast                               Logger
+16-Dec-2014   12   169  15   2 No Storms -> No Storms                <AE5E>
+16-Dec-2014   15   169  15   3 No Storms -> No Storms                <AE5E>
+N4AF de VE7CC-1 16-Dec-2014 1524Z   CCC >
+N4AF de VE7CC-1 16-Dec-2014 1524Z   CCC >
+DX de VU2PTT-#:  28015.2  PR7AR        CW 06 DB 39 WPM CQ             1524Z
+DX de DL1EMY-#:   7020.5  DL3UKH       CW 02 DB 16 WPM CQ             1524Z
+DX de SE0X-#:    14029.8  DJ7EC        CW 24 DB 21 WPM CQ             1524Z
+DX de HA1VHF-#:   7007.2  BD8SZ        CW 06 DB 27 WPM CQ             1524Z
+DX de KM3T-#:    21005.7  DJ1KJ        CW 19 DB 22 WPM CQ             1524Z NH
+DX de WZ7I-#:    24926.2  ES5GP        RTTY  35 DB CQ                 1524Z PA
+DX de WE9V-#:    14030.9  AA5AE        CW 19 DB 15 WPM CQ          NM 1524Z WI
+DX de DF7GB-#:   10111.1  UE55SM       CW 23 DB 25 WPM CQ             1524Z
+DX de ON5KQ-#:    7035.0  OZ1JB        CW 17 DB 19 WPM CQ             1524Z
+DX de KS4XQ-#:   28013.0  KW7D         CW 26 DB 23 WPM CQ          NM 1524Z SC
+DX de DL9GTB-#:  10141.1  RV3LE        PSK31 28 DB CQ                 1524Z
+DX de DK9IP-#:    7015.0  IW2KFM       CW 04 DB 21 WPM CQ             1524Z
+DX de VE2WU-#:   28043.4  ON3BZ        CW 05 DB 26 WPM CQ             1524Z QC
+DX de ON5KQ-#:   14015.1  SC2014ECC    CW 43 DB 36 WPM CQ             1524Z
+DX de DL4RCK-#:  14071.6  R6JY         PSK63 20 DB CQ                 1524Z
+DX de K3LR-#:    28005.2  IZ2FDU       CW 37 DB 23 WPM CQ             1524Z PA
+DX de EA4GJP:     7065.0  EA7MV        DIPLOMA FELIZ NAVIDAD 2014     1525Z
+DX de R6YY-#:    21005.7  DJ1KEO       CW 12 DB 21 WPM CQ             1525Z
+DX de F5RRS-#:    7025.6  DJ6IH        CW 06 DB 29 WPM CQ             1525Z
+DX de VE2WU-#:   14038.0  W1AW/7       CW 32 DB 32 WPM CQ             1525Z QC
+DX de KQ8M-#:    28031.1  EA6UN        CW 01 DB 22 WPM CQ             1525Z OH
+DX de DL9GTB-#:  10140.6  F6FXF        PSK31 45 DB CQ                 1525Z
+DX de DL9GTB-#:   7041.2  SV7JLA       PSK31 19 DB CQ                 1525Z
+sh/dx 200
+ 24960.0  M1MST       16-Dec-2014 1451Z  smpx                      <WB9DLC>
+ 28462.0  F5PAU       16-Dec-2014 1451Z                            <VE2EB>
+ 14207.0  US4AS       16-Dec-2014 1452Z  TNX for QSO !!!           <IZ1HHT>
+ 28121.0  YD1MRI      16-Dec-2014 1452Z  nice PSK31 sig into Slove <S52R>
+ 21025.0  3B9FR       16-Dec-2014 1452Z                            <HA6VH>
+ 18107.0  AB1J        16-Dec-2014 1452Z  CQ ARRL CENT              <AB1J>
+ 28425.0  8P6FX       16-Dec-2014 1452Z                            <PA1MR>
+ 24985.0  OD5ZZ       16-Dec-2014 1453Z  5/9 in Gdynia             <SP2LIG>
+ 21025.0  3B9FR       16-Dec-2014 1453Z                            <G0IBN>
+ 28020.0  TG9GJG      16-Dec-2014 1453Z  tnx                       <4Z5RT>
+ 21011.0  SC2014ECC   16-Dec-2014 1453Z                            <PY2CX>
+  3540.0  NK7Z        16-Dec-2014 1453Z  OR CW SIMPLEX GOOD SIG IN <W7BQ>
+ 28020.0  TG9GJG      16-Dec-2014 1452Z                            <SP3HSZ>
+  7085.0  EA7VL/P     16-Dec-2014 1453Z  VGMA-088  DME-29051       <EA7YT>
+ 14072.0  SM7KSZ      16-Dec-2014 1453Z  bpsk31                    <M5PLY>
+ 28390.0  K8NY        16-Dec-2014 1453Z  5/9 from spain merri cris <EB5GC>
+ 28462.0  F5PAU       16-Dec-2014 1452Z                            <KC9WER>
+ 28445.0  W1AW/9      16-Dec-2014 1454Z  INDIANA-ARRL-OP: LOU      <WA5LOU>
+ 10130.9  W1AW/7      16-Dec-2014 1454Z  RTTY workable from Toront <VE3MV>
+ 28475.0  CO6
+HK       16-Dec-2014 1454Z  tnx                       <DL6YAO>
+ 24940.0  F4FVH       16-Dec-2014 1454Z  Laurent cq cq             <EA7JUI>
+  7028.9  W1AW/9      16-Dec-2014 1454Z                            <KC8ZH>
+ 24900.4  PJ2/WI9WI   16-Dec-2014 1454Z  up 1-1,5                  <SP3QDM>
+ 28076.0  K0HAN       16-Dec-2014 1455Z                            <CA3SOC>
+ 28512.0  K1ZR        16-Dec-2014 1455Z  CQ TNX SHANE              <IV3NVB>
+ 28512.0  K1ZR        16-Dec-2014 1455Z  strong here 5/9           <IZ1MHY>
+ 24973.0  9K2IC       16-Dec-2014 1455Z                            <SP9KR>
+  3576.0  VK4CMV      16-Dec-2014 1456Z  SWL CQ JT9                <NA6L>
+  7108.0  IT9EYV      16-Dec-2014 1456Z  award penne nere 2 p.     <IT9EYV>
+ 28497.0  ZD7FT       16-Dec-2014 1456Z  58 Maine USA              <WK1W>
+ 28497.0  ZD7FT       16-Dec-2014 1456Z                            <KF5WFL>
+ 28095.0  W1AW/9      16-Dec-2014 1456Z  599 tnx up 1-2            <EC7RC>
+ 14255.0  7X2YOTA     16-Dec-2014 1456Z  CQ                        <OK2ZDL>
+ 28512.0  K1ZR        16-Dec-2014 1456Z                            <IV3OKO>
+  7150.0  EC7TL/P     16-Dec-2014 1457Z  VGH-011                   <EA7IGF>
+ 21025.0  3B9FR       16-Dec-2014 1456Z                            <SP3HSZ>
+ 24894.5  LY2MM       16-Dec-2014 1457Z                            <W4VQ>
+  7036.5  W1AW/7      16-Dec-2014 1457Z  MT now here, BC sta lower <KJ9C>
+ 28445.0  9H5BZ      
+ 16-Dec-2014 1458Z                            <K5DC>
+ 18105.6  SV3DCX      16-Dec-2014 1458Z  cq dx rtty                <SP3JHY>
+ 28445.0  9H5BZ       16-Dec-2014 1458Z                            <WD8JP>
+ 21076.8  IK2QIN      16-Dec-2014 1458Z  Thanks for the QSO....JT6 <HK2PMR>
+ 28497.0  ZD7FT       16-Dec-2014 1458Z  JN68MF<>IH74DB            <OE5IIO>
+ 21011.0  SC2014ECC   16-Dec-2014 1457Z                            <SP3HSZ>
+ 28119.9  N9SB        16-Dec-2014 1458Z  PSK31                     <F1PKH>
+ 24922.0  A61DJ       16-Dec-2014 1458Z  mny tnx rtty qso 73       <DJ9VS>
+ 28512.0  K1ZR        16-Dec-2014 1459Z  5/9 from spain merri cris <EB5GC>
+ 28040.0  W1AW/9      16-Dec-2014 1459Z  up 1 BEGGING              <K9FN>
+ 21076.0  HK2PMR      16-Dec-2014 1459Z  HNY 2015 73               <IK2QIN>
+ 28089.0  WB7S        16-Dec-2014 1459Z  ARRL Cent  ASM 35 Points  <VA3MJR>
+ 28512.0  K1ZR        16-Dec-2014 1459Z  MERRY CHRISTMAS...5/9 +   <SY1BCL>
+ 24900.4  PJ2/WI9WI   16-Dec-2014 1459Z                            <UR7QU>
+  7150.0  EC7TL/P     16-Dec-2014 1459Z  VGH  011                  <EA7IV>
+ 14071.7  HF2014PRNF  16-Dec-2014 1500Z                            <SQ3BKH>
+ 28095.0  W1AW/9      16-Dec-2014 1500Z  WHERE U GO? NEED 10+17m R <N4KG>
+  7043.4  RA9AJ       16-Dec-2014 1500Z  tnx QSO                   <RA9AJ>
+ 21011.0  SC2014ECC   16-Dec-2014 1500Z  tnx !!!                   <IZ2LTW>
+ 28436.2  8P6FX       16-Dec-20
+14 1500Z  robert                    <M0BSV>
+ 28076.0  K7DD        16-Dec-2014 1501Z                            <CA3SOC>
+ 28445.0  W1AW/9      16-Dec-2014 1501Z  CENTENNIAL-OP: LOU        <WA5LOU>
+  3794.0  AB7TJ       16-Dec-2014 1501Z  cq dx                     <W6AD>
+ 28515.0  F4GTG       16-Dec-2014 1502Z  cq dx 5/9 73!             <PU3KTM>
+ 14230.0  HB9RJG      16-Dec-2014 1502Z  SSTV Scottie 2            <F4DBS>
+  7036.5  W1AW/7      16-Dec-2014 1502Z                            <KD8IGK>
+ 21070.0  N4DLT       16-Dec-2014 1502Z  ARRL Cent. VE 5 points PS <N4DLT>
+  7007.2  BD8SZ       16-Dec-2014 1502Z  cq                        <DL4MO>
+ 14020.0  DK8LG       16-Dec-2014 1502Z  Frank tnx fb qso 73 marte <VE2WU>
+  7082.0  EA1BKO      16-Dec-2014 1503Z  DIPLOMA FELIZ NAVIDAD 201 <EA1HT>
+ 28415.0  F4GTG       16-Dec-2014 1503Z  frequencia correta        <PU3KTM>
+ 21024.9  3B9FR       16-Dec-2014 1503Z                            <K4TO>
+ 28512.0  K1ZR        16-Dec-2014 1503Z  JN68MF<>FN42KW            <OE5IIO>
+ 18084.5  EA8TL       16-Dec-2014 1503Z                            <E77E>
+ 28475.0  CO6HK       16-Dec-2014 1502Z                            <KC9WER>
+  7090.0  EB5JKV      16-Dec-2014 1503Z  EV-356, DEM-46145         <EA6AIU>
+ 28390.0  K8NY        16-Dec-2014 1503Z                            <IV3OKO>
+ 24906.1  DL5YM       16-Dec-2014 1503Z  Fred, Wk'd QRP 5w         <WA8QFE>
+144205.0  KA1ZE/3     16-Dec-2014 1503Z 
+ EN61VV<>FN01XT            <KA8TBW>
+ 14255.0  7X2YOTA     16-Dec-2014 1504Z                            <HA6VH>
+ 21285.0  SV1BDO/3    16-Dec-2014 1504Z  44 tnx for qso 73 72      <VA3OPA>
+ 14255.0  7X2YOTA     16-Dec-2014 1504Z  ---73!                    <UA3GJM>
+ 28089.0  WB7S        16-Dec-2014 1504Z  RTTY                      <ND4Q>
+ 28095.0  W1AW/9      16-Dec-2014 1505Z  Still here RTTY UP 1-2    <KT9L>
+ 14243.0  PA6YOTA     16-Dec-2014 1505Z                            <IZ1HHT>
+ 28512.0  K1ZR        16-Dec-2014 1505Z  5/9 in Gdynia             <SP2LIG>
+ 21285.0  SV1BDO/3    16-Dec-2014 1505Z                            <SV3EXU>
+ 28436.2  8P6FX       16-Dec-2014 1505Z  5/9 from spain merri cris <EB5GC>
+ 28040.0  W1AW/9      16-Dec-2014 1507Z  Tnc cq cq up1             <IZ3XEF>
+ 24900.4  PJ2/WI9WI   16-Dec-2014 1505Z  5nn tnx up1               <EC7RC>
+ 24921.4  F6IJT       16-Dec-2014 1505Z                            <PY2CX>
+ 28405.0  FR4OZ       16-Dec-2014 1506Z                            <9A6RMI>
+  7077.0  UE55ST      16-Dec-2014 1506Z  UP 1-----73!              <UA3GJM>
+ 28512.0  K1ZR        16-Dec-2014 1506Z  big signal,tnx steve      <GW0OGI>
+ 28120.0  DJ2XO       16-Dec-2014 1506Z                            <WA3ERQ>
+  7028.9  W1AW/9      16-Dec-2014 1506Z  slowwww.....              <KC8ZH>
+ 18084.4  EA8TL       16-Dec-2014 1506Z  TKS QSO 73 VAL            <PY2XU>
+ 28512.0  K1ZR        16-Dec-2014 1506Z  59+20db!                  <IZ8GNR>
+ 28089.0  WB7S        16-Dec-2014 1505Z  RTTY                      <N5KDV>
+ 14255.0  7X2YOTA     16-Dec-2014 1507Z                            <IZ1HHT>
+ 24922.0  GI4SNA      16-Dec-2014 1507Z  73s                       <PY2PRB>
+ 14255.0  7X2YOTA     16-Dec-2014 1507Z  nice signal               <OM7DX>
+  7147.0  DB2BO       16-Dec-2014 1507Z                            <ZL1PB>
+ 10111.0  UE55SM      16-Dec-2014 1507Z                            <UA3LDU>
+ 21285.0  SV1BDO/3    16-Dec-2014 1507Z                            <SY1BCL>
+ 28512.0  K1ZR        16-Dec-2014 1508Z  tnz qso                   <SM7LFA>
+ 18130.0  WM5H        16-Dec-2014 1508Z  arrl cent 5 pts           <WM5H>
+ 28076.0  SP3AMZ      16-Dec-2014 1508Z  JT65                      <IT9DDS>
+ 18106.0  W1AW/9      16-Dec-2014 1508Z  RTTY                      <W9PA>
+ 28452.5  KP4AW       16-Dec-2014 1508Z                            <NP4EG>
+ 28448.0  W1AW/9      16-Dec-2014 1508Z  ARRL CENT - IN - OP: LOU  <WA5LOU>
+ 28477.3  F6HRP       16-Dec-2014 1508Z                            <VE3WTD>
+ 24921.8  RA3QSV      16-Dec-2014 1509Z                            <PY2CX>
+ 28014.0  SC2014ECC   16-Dec-2014 1509Z                            <SK2AT>
+ 21285.0  SV1BDO/3    16-Dec-2014 1509Z  73 sotiri..               <SY1BCL>
+  7006.9  NB7Z        16-Dec-2014 1509Z  TNX Neil                  <DK3HM>
+ 28475.0  CO6HK       16-Dec-2014 1509Z  57 north Germa
+ny 73 de Pe <DD4BY>
+ 18084.5  EA8TL       16-Dec-2014 1509Z                            <OH7MK>
+  7007.0  BD8SZ       16-Dec-2014 1510Z  cq dx                     <BG3ATI>
+ 21002.0  W100AW      16-Dec-2014 1510Z  n1rr OP                   <NJ1Q>
+ 24912.3  W100AW      16-Dec-2014 1510Z  rtty                      <NJ1Q>
+ 24916.0  DG1VB       16-Dec-2014 1511Z  JT65 tu                   <KB8M>
+ 21005.1  K5WE        16-Dec-2014 1511Z  tnx qso Jeff              <LZ1NT>
+  7041.3  R100DA      16-Dec-2014 1511Z  bpsk-63                   <RV4CO>
+ 28436.2  8P6FX       16-Dec-2014 1511Z                            <IK1DKF>
+ 24929.0  HA5WA       16-Dec-2014 1511Z  RTTY , CQ                 <HA5AGS>
+ 24921.0  F6ECI       16-Dec-2014 1511Z                            <PY2CX>
+  3774.0  4L4O        16-Dec-2014 1512Z  Otari QTH Matani          <4L5P>
+ 28020.1  TG9GJG      16-Dec-2014 1512Z  tnx up !                  <DL6YAO>
+ 28009.0  LU7XX       16-Dec-2014 1512Z  IOTA SA 008               <LU6XSG>
+ 28095.0  W1AW/9      16-Dec-2014 1512Z  mny tnx rtty qso 73       <DJ9VS>
+ 28089.0  WB7S        16-Dec-2014 1514Z  RTTY                      <N2ESP>
+ 28120.0  WB8SIG      16-Dec-2014 1514Z  tnx QSO                   <F4BAL>
+  7085.0  EA7VL/P     16-Dec-2014 1515Z  VGMA-088.DME-29051        <EA1HLK>
+ 10110.0  W1AW/7      16-Dec-2014 1515Z  Montana last day          <KJ9C>
+ 24925.0  AB1J        16-Dec-2014 1515Z  CQ ARRL CENT              <AB
+1J>
+  7085.0  EA7VL/P     16-Dec-2014 1515Z  VGMA 088 DME 29051        <EA7BM>
+  7147.0  DF2BO       16-Dec-2014 1515Z  CQ DX LP light            <N7EKD>
+ 14243.0  PA6YOTA     16-Dec-2014 1515Z  59, gracias,  YOTA        <EA5HRV>
+  7120.0  EA7RCK      16-Dec-2014 1515Z  SOTEO PRO NAVIDAD rcMALAK <EA7JIF>
+ 28512.0  K1ZR        16-Dec-2014 1515Z  59 73                     <ON3RY>
+ 21076.8  DL2SBL      16-Dec-2014 1516Z  Thanks for the QSO....JT6 <HK2PMR>
+  7085.0  EA7VL/P     16-Dec-2014 1516Z  VGMA 088 DME 29051        <EA4GJP>
+  7085.0  EA7TL/P     16-Dec-2014 1516Z                            <EA7LD>
+ 24985.0  OD5ZZ       16-Dec-2014 1516Z                            <DL3SG>
+ 18107.0  W1AW/9      16-Dec-2014 1516Z  RTTY                      <W9PA>
+ 21010.4  PZ1DV       16-Dec-2014 1516Z                            <YO5AMF>
+ 24923.1  N1CC        16-Dec-2014 1516Z  RTTY  ARRL CENT VE 5 PTS  <N1CC>
+  7090.0  EB5JKV      16-Dec-2014 1517Z  EV-356, DEM-46145         <EA4GJP>
+ 24985.0  OD5ZZ       16-Dec-2014 1517Z                            <N2FF>
+ 24973.0  SP9KR       16-Dec-2014 1516Z                            <KC9WER>
+ 28014.0  SC2014ECC   16-Dec-2014 1517Z  big sigs here             <OK1NU>
+ 18080.0  ER3GQ       16-Dec-2014 1517Z  alex                      <W4TUN>
+  7150.0  EC7TL/P     16-Dec-2014 1517Z  VGH-011 DME-21005         <EA4GJP>
+ 24894.3  YL3CW       16-Dec-2014 1518Z  tks Valery                <LU1AJH>
+  715
+0.0  EC7TL/P     16-Dec-2014 1518Z  VGH011 DME21005           <EA2ECA>
+ 24942.0  N5PHT       16-Dec-2014 1518Z  5 PTS ARRL CENT           <N5PHT>
+ 24925.0  AB1J        16-Dec-2014 1518Z  RTTY                      <ND4Q>
+ 14186.9  IV3CNZ      16-Dec-2014 1518Z  Tnx Angelo                <W6HDG>
+  7082.0  EA1BKO      16-Dec-2014 1518Z  DIPLOMA FELIZ NAVIDAD 201 <EA4GJP>
+ 14186.9  IV3CNZ      16-Dec-2014 1518Z  Tnx Angelo - long path    <W6HDG>
+ 28094.9  W1AW/9      16-Dec-2014 1519Z  up 2 rtty                 <SV1EHP>
+ 21002.0  W100AW      16-Dec-2014 1519Z  100 YEARS ARRL            <F6EDO>
+ 28477.0  F6HRP       16-Dec-2014 1519Z                            <AA8M>
+ 14092.0  K3WW        16-Dec-2014 1520Z  RTTY centennial 40 points <K3WW>
+ 14243.0  PA6YOTA     16-Dec-2014 1520Z  STRONG                    <OM7DX>
+ 24912.3  W100AW      16-Dec-2014 1520Z                            <S54A>
+ 28042.0  HR1LW       16-Dec-2014 1520Z  tnx QSO                   <UY7QN>
+  7067.0  EA4EQ       16-Dec-2014 1520Z  COMUNIDADES Y PROVINCIAS  <EA7RCL>
+ 28039.0  KC9WJK      16-Dec-2014 1520Z  tnx dr Bob hny            <DM2DMI>
+  7008.0  SM6CPY      16-Dec-2014 1520Z  tnx nice qso              <BG3ATI>
+ 28009.0  LU7XX       16-Dec-2014 1520Z  Ushuaia - Tierra Del Fueg <DK3DUA>
+  7082.0  EA1BKO      16-Dec-2014 1521Z  Diploma Navidad           <EA2ECA>
+ 28076.0  DD5ZZ       16-Dec-2014 1521Z                            <CA3SOC>
+ 24927.0  S54A  
+      16-Dec-2014 1521Z                            <S54A>
+ 28470.0  YT5EA       16-Dec-2014 1521Z  cq                        <YU5LJ>
+ 14244.0  NB7PX       16-Dec-2014 1522Z  Jery OR dxnet controler   <S51ZZ>
+ 10130.9  W1AW/7      16-Dec-2014 1522Z  Simplex RTTY easy from CA <NJ6G>
+ 14241.0  GB1WH       16-Dec-2014 1522Z                            <HA6VH>
+ 28447.0  K0HUU       16-Dec-2014 1522Z  DON ..MISSOURI ..USA  CQC <I0DJV>
+  7065.0  EA4EQ       16-Dec-2014 1522Z  COMUNIDADES Y PROVINCIAS  <EA7SS>
+  7065.0  EA4EQ       16-Dec-2014 1522Z  RECTIFICADO COMUNIADES    <EA7RCL>
+ 21002.0  W100AW      16-Dec-2014 1521Z  QSX 21003.0 VIA LOTW AND  <W5AP>
+  7062.0  RA4DR       16-Dec-2014 1522Z  RVSN-55                   <RA4DR>
+  7077.0  HL3IB       16-Dec-2014 1522Z  JT65 30w -9dB             <NA6L>
+ 14244.0  HB9CPH      16-Dec-2014 1523Z  Walter                    <S51ZZ>
+ 14100.0  ZS6DN/B     16-Dec-2014 1523Z  poor LP today             <KF7E>
+  7006.8  S57Z        16-Dec-2014 1523Z  CW, CQ DX LP , s9+40      <I2JJR>
+ 28475.0  CO6HK       16-Dec-2014 1523Z  59 tnx Rudy               <MM0CEZ>
+ 14070.6  Y01989BV    16-Dec-2014 1523Z  psk125                    <R6JY>
+ 14100.0  5Z4B/B      16-Dec-2014 1524Z  ESP via LP                <KF7E>
+ 10110.0  W1AW/7      16-Dec-2014 1524Z  Simplex CW easy from CA   <NJ6G>
+ 21000.0  RU9SN       16-Dec-2014 1524Z  tnx QSO                   <RA9STZ>
+ 14070.6  YO1989BV    16-Dec-2014 1524Z  psk125                    <R6JY>
+ 21011.9  9H1EJ       16-Dec-2014 1524Z  tnx QSO                   <UY7QN>
+ 28021.1  TG9GJG      16-Dec-2014 1524Z                            <AC4CA>
+ 14238.0  YU1FE       16-Dec-2014 1524Z  Tnx Predrag! 73'          <PA3KME>
+ 28013.0  KW7D        16-Dec-2014 1524Z  CQ no takers, nice sigs P <G4RCG>
+ 28420.0  TM210CN     16-Dec-2014 1524Z                            <ND7J>
+ 14100.0  4X6TU/B     16-Dec-2014 1524Z  559 LP in AZ              <KF7E>
+  7065.0  EA7MV       16-Dec-2014 1525Z  DIPLOMA FELIZ NAVIDAD 201 <EA4GJP>
+  7000.0  EA8ED       16-Dec-2014 1525Z  COMODIN COMUNIDADES EN 14 <EA8DAB>
+N4AF de VE7CC-1 16-Dec-2014 1525Z   CCC >
+DX de WA7LNW-#:  28040.0  W1AW/9       CW 32 DB 27 WPM CQ             1525Z UT
+DX de SK3W-#:     7022.0  DL2IAD       CW 24 DB 16 WPM CQ             1525Z
+DX de YT5EA:     28475.0  CO6HK                                       1525Z
+DX de OH6BG-#:    7013.7  RA4LOC       CW 07 DB 24 WPM CQ             1525Z
+DX de DL3SG:     28515.0  CE4WJK       CALLING CQ                     1525Z
+DX de WZ7I-#:    21072.0  UR5LAK       PSK31 15 DB CQ                 1525Z PA
+DX de G0TMX-#:    7029.8  EW8O         CW 15 DB 26 WPM CQ             1525Z
+DX de DF7GB-#:   18070.8  W100AW       CW 34 DB 28 WPM CQ          CT 1525Z
+DX de DL9GTB-#:  14071.8  G0RUD        PSK31 27 DB CQ                 1525Z
+DX de KQ8M-#:    28024.9  G4RCG        CW 11 DB 25 WPM CQ             1525Z OH
+DX de G4PNF-#:    7028.5  DL2ZBO       CW 26 DB 25 WPM CQ             1525Z
+DX de HA1VHF-#:  10116.0  OZ6ABZ       CW 11 DB 15 WPM CQ             1525Z
+DX de VK4CT-#:   14007.9  Z33A         CW 15 DB 26 WPM CQ             1525Z
+DX de DK0TE-#:    7033.2  HA8YOTA      CW 21 DB 24 WPM CQ             1525Z
+DX de DF4UE-#:   24929.0  HA5WA        RTTY  01 DB CQ                 1525Z
+DX de DF4UE-#:   18076.0  W1AW/9       CW 06 DB 31 WPM CQ             1525Z
+DX de WE9V-#:    28020.0  TG9GJG       CW 11 DB 33 WPM CQ             1525Z WI
+DX de WA7LNW-#:  10110.0  W1AW/7       CW 41 DB 23 WPM CQ             1525Z UT
+DX de K8ND-#:    28012.1  EA6FG        CW 12 DB 20 WPM CQ             1525Z OH
+DX de K8ND-#:    24894.1  6Y6N         CW 17 DB 31 WPM CQ             1525Z OH
+DX de F6IIT-#:   18084.7  EA8TL        CW 24 DB 31 WPM CQ             1525Z
+sh/dx 200
+ 14207.0  US4AS       16-Dec-2014 1452Z  TNX for QSO !!!           <IZ1HHT>
+ 28121.0  YD1MRI      16-Dec-2014 1452Z  nice PSK31 sig into Slove <S52R>
+ 21025.0  3B9FR       16-Dec-2014 1452Z                            <HA6VH>
+ 18107.0  AB1J        16-Dec-2014 1452Z  CQ ARRL CENT              <AB1J>
+ 28425.0  8P6FX       16-Dec-2014 1452Z                            <PA1MR>
+ 24985.0  OD5ZZ       16-Dec-2014 1453Z  5/9 in Gdynia             <SP2LIG>
+ 21025.0  3B9FR       16-Dec-2014 1453Z                            <G0IBN>
+ 28020.0  TG9GJG      16-Dec-2014 1453Z  tnx                       <4Z5RT>
+ 21011.0  SC2014ECC   16-Dec-2014 1453Z                            <PY2CX>
+  3540.0  NK7Z        16-Dec-2014 1453Z  OR CW SIMPLEX GOOD SIG IN <W7BQ>
+ 28020.0  TG9GJG      16-Dec-2014 1452Z                            <SP3HSZ>
+  7085.0  EA7VL/P     16-Dec-2014 1453Z  VGMA-088  DME-29051       <EA7YT>
+ 14072.0  SM7KSZ      16-Dec-2014 1453Z  bpsk31                    <M5PLY>
+ 28390.0  K8NY        16-Dec-2014 1453Z  5/9 from spain merri cris <EB5GC>
+ 28462.0  F5PAU       16-Dec-2014 1452Z                            <KC9WER>
+ 28445.0  W1AW/9      16-Dec-2014 1454Z  INDIANA-ARRL-OP: LOU      <WA5LOU>
+ 10130.9  W1AW/7      16-Dec-2014 1454Z  RTTY workable from Toront <VE3MV>
+ 28475.0  CO6HK       16-Dec-2014 1454Z  tnx                       <DL6YAO>
+ 24940.0  F4FVH       16-Dec-2014 1454Z  Laurent cq cq             <EA7JUI>
+  7028.9  W1
+AW/9      16-Dec-2014 1454Z                            <KC8ZH>
+ 24900.4  PJ2/WI9WI   16-Dec-2014 1454Z  up 1-1,5                  <SP3QDM>
+ 28076.0  K0HAN       16-Dec-2014 1455Z                            <CA3SOC>
+ 28512.0  K1ZR        16-Dec-2014 1455Z  CQ TNX SHANE              <IV3NVB>
+ 28512.0  K1ZR        16-Dec-2014 1455Z  strong here 5/9           <IZ1MHY>
+ 24973.0  9K2IC       16-Dec-2014 1455Z                            <SP9KR>
+  3576.0  VK4CMV      16-Dec-2014 1456Z  SWL CQ JT9                <NA6L>
+  7108.0  IT9EYV      16-Dec-2014 1456Z  award penne nere 2 p.     <IT9EYV>
+ 28497.0  ZD7FT       16-Dec-2014 1456Z  58 Maine USA              <WK1W>
+ 28497.0  ZD7FT       16-Dec-2014 1456Z                            <KF5WFL>
+ 28095.0  W1AW/9      16-Dec-2014 1456Z  599 tnx up 1-2            <EC7RC>
+ 14255.0  7X2YOTA     16-Dec-2014 1456Z  CQ                        <OK2ZDL>
+ 28512.0  K1ZR        16-Dec-2014 1456Z                            <IV3OKO>
+  7150.0  EC7TL/P     16-Dec-2014 1457Z  VGH-011                   <EA7IGF>
+ 21025.0  3B9FR       16-Dec-2014 1456Z                            <SP3HSZ>
+ 24894.5  LY2MM       16-Dec-2014 1457Z                            <W4VQ>
+  7036.5  W1AW/7      16-Dec-2014 1457Z  MT now here, BC sta lower <KJ9C>
+ 28445.0  9H5BZ       16-Dec-2014 1458Z                            <K5DC>
+ 18105.6  SV3DCX      16-Dec-2014 1458Z  cq dx rtty                <SP3JHY>
+ 28445.0  9H5BZ       
+16-Dec-2014 1458Z                            <WD8JP>
+ 21076.8  IK2QIN      16-Dec-2014 1458Z  Thanks for the QSO....JT6 <HK2PMR>
+ 28497.0  ZD7FT       16-Dec-2014 1458Z  JN68MF<>IH74DB            <OE5IIO>
+ 21011.0  SC2014ECC   16-Dec-2014 1457Z                            <SP3HSZ>
+ 28119.9  N9SB        16-Dec-2014 1458Z  PSK31                     <F1PKH>
+ 24922.0  A61DJ       16-Dec-2014 1458Z  mny tnx rtty qso 73       <DJ9VS>
+ 28512.0  K1ZR        16-Dec-2014 1459Z  5/9 from spain merri cris <EB5GC>
+ 28040.0  W1AW/9      16-Dec-2014 1459Z  up 1 BEGGING              <K9FN>
+ 21076.0  HK2PMR      16-Dec-2014 1459Z  HNY 2015 73               <IK2QIN>
+ 28089.0  WB7S        16-Dec-2014 1459Z  ARRL Cent  ASM 35 Points  <VA3MJR>
+ 28512.0  K1ZR        16-Dec-2014 1459Z  MERRY CHRISTMAS...5/9 +   <SY1BCL>
+ 24900.4  PJ2/WI9WI   16-Dec-2014 1459Z                            <UR7QU>
+  7150.0  EC7TL/P     16-Dec-2014 1459Z  VGH  011                  <EA7IV>
+ 14071.7  HF2014PRNF  16-Dec-2014 1500Z                            <SQ3BKH>
+ 28095.0  W1AW/9      16-Dec-2014 1500Z  WHERE U GO? NEED 10+17m R <N4KG>
+  7043.4  RA9AJ       16-Dec-2014 1500Z  tnx QSO                   <RA9AJ>
+ 21011.0  SC2014ECC   16-Dec-2014 1500Z  tnx !!!                   <IZ2LTW>
+ 28436.2  8P6FX       16-Dec-2014 1500Z  robert                    <M0BSV>
+ 28076.0  K7DD        16-Dec-2014 1501Z                            <CA3SOC>
+ 28445.0  W1AW/9      16-Dec-20
+14 1501Z  CENTENNIAL-OP: LOU        <WA5LOU>
+  3794.0  AB7TJ       16-Dec-2014 1501Z  cq dx                     <W6AD>
+ 28515.0  F4GTG       16-Dec-2014 1502Z  cq dx 5/9 73!             <PU3KTM>
+ 14230.0  HB9RJG      16-Dec-2014 1502Z  SSTV Scottie 2            <F4DBS>
+  7036.5  W1AW/7      16-Dec-2014 1502Z                            <KD8IGK>
+ 21070.0  N4DLT       16-Dec-2014 1502Z  ARRL Cent. VE 5 points PS <N4DLT>
+  7007.2  BD8SZ       16-Dec-2014 1502Z  cq                        <DL4MO>
+ 14020.0  DK8LG       16-Dec-2014 1502Z  Frank tnx fb qso 73 marte <VE2WU>
+  7082.0  EA1BKO      16-Dec-2014 1503Z  DIPLOMA FELIZ NAVIDAD 201 <EA1HT>
+ 28415.0  F4GTG       16-Dec-2014 1503Z  frequencia correta        <PU3KTM>
+ 21024.9  3B9FR       16-Dec-2014 1503Z                            <K4TO>
+ 28512.0  K1ZR        16-Dec-2014 1503Z  JN68MF<>FN42KW            <OE5IIO>
+ 18084.5  EA8TL       16-Dec-2014 1503Z                            <E77E>
+ 28475.0  CO6HK       16-Dec-2014 1502Z                            <KC9WER>
+  7090.0  EB5JKV      16-Dec-2014 1503Z  EV-356, DEM-46145         <EA6AIU>
+ 28390.0  K8NY        16-Dec-2014 1503Z                            <IV3OKO>
+ 24906.1  DL5YM       16-Dec-2014 1503Z  Fred, Wk'd QRP 5w         <WA8QFE>
+144205.0  KA1ZE/3     16-Dec-2014 1503Z  EN61VV<>FN01XT            <KA8TBW>
+ 14255.0  7X2YOTA     16-Dec-2014 1504Z                            <HA6VH>
+ 21285.0  SV1BDO/3    16-Dec-2014 1504Z  44 tnx for qso 73 72      <VA3OPA>
+ 14255.0  7X2YOTA     16-Dec-2014 1504Z  ---73!                    <UA3GJM>
+ 28089.0  WB7S        16-Dec-2014 1504Z  RTTY                      <ND4Q>
+ 28095.0  W1AW/9      16-Dec-2014 1505Z  Still here RTTY UP 1-2    <KT9L>
+ 14243.0  PA6YOTA     16-Dec-2014 1505Z                            <IZ1HHT>
+ 28512.0  K1ZR        16-Dec-2014 1505Z  5/9 in Gdynia             <SP2LIG>
+ 21285.0  SV1BDO/3    16-Dec-2014 1505Z                            <SV3EXU>
+ 28436.2  8P6FX       16-Dec-2014 1505Z  5/9 from spain merri cris <EB5GC>
+ 28040.0  W1AW/9      16-Dec-2014 1507Z  Tnc cq cq up1             <IZ3XEF>
+ 24900.4  PJ2/WI9WI   16-Dec-2014 1505Z  5nn tnx up1               <EC7RC>
+ 24921.4  F6IJT       16-Dec-2014 1505Z                            <PY2CX>
+ 28405.0  FR4OZ       16-Dec-2014 1506Z                            <9A6RMI>
+  7077.0  UE55ST      16-Dec-2014 1506Z  UP 1-----73!              <UA3GJM>
+ 28512.0  K1ZR        16-Dec-2014 1506Z  big signal,tnx steve      <GW0OGI>
+ 28120.0  DJ2XO       16-Dec-2014 1506Z                            <WA3ERQ>
+  7028.9  W1AW/9      16-Dec-2014 1506Z  slowwww.....              <KC8ZH>
+ 18084.4  EA8TL       16-Dec-2014 1506Z  TKS QSO 73 VAL            <PY2XU>
+ 28512.0  K1ZR        16-Dec-2014 1506Z  59+20db!                  <IZ8GNR>
+ 28089.0  WB7S        16-Dec-2014 1505Z  RTTY                      <N5KDV>
+ 14255.0  7X2YOTA     16-Dec-2014 1507Z                            <IZ1HHT>
+ 24922.0  GI4SNA      16-Dec-2014 1507Z  73s                       <PY2PRB>
+ 14255.0  7X2YOTA     16-Dec-2014 1507Z  nice signal               <OM7DX>
+  7147.0  DB2BO       16-Dec-2014 1507Z                            <ZL1PB>
+ 10111.0  UE55SM      16-Dec-2014 1507Z                            <UA3LDU>
+ 21285.0  SV1BDO/3    16-Dec-2014 1507Z                            <SY1BCL>
+ 28512.0  K1ZR        16-Dec-2014 1508Z  tnz qso                   <SM7LFA>
+ 18130.0  WM5H        16-Dec-2014 1508Z  arrl cent 5 pts           <WM5H>
+ 28076.0  SP3AMZ      16-Dec-2014 1508Z  JT65                      <IT9DDS>
+ 18106.0  W1AW/9      16-Dec-2014 1508Z  RTTY                      <W9PA>
+ 28452.5  KP4AW       16-Dec-2014 1508Z                            <NP4EG>
+ 28448.0  W1AW/9      16-Dec-2014 1508Z  ARRL CENT - IN - OP: LOU  <WA5LOU>
+ 28477.3  F6HRP       16-Dec-2014 1508Z                            <VE3WTD>
+ 24921.8  RA3QSV      16-Dec-2014 1509Z                            <PY2CX>
+ 28014.0  SC2014ECC   16-Dec-2014 1509Z                            <SK2AT>
+ 21285.0  SV1BDO/3    16-Dec-2014 1509Z  73 sotiri..               <SY1BCL>
+  7006.9  NB7Z        16-Dec-2014 1509Z  TNX Neil                  <DK3HM>
+ 28475.0  CO6HK       16-Dec-2014 1509Z  57 north Germany 73 de Pe <DD4BY>
+ 18084.5  EA8TL       16-Dec-2014 1509Z                            <OH7MK>
+  7007.0  BD8SZ       16-Dec-2014 1510Z  cq dx          
+           <BG3ATI>
+ 21002.0  W100AW      16-Dec-2014 1510Z  n1rr OP                   <NJ1Q>
+ 24912.3  W100AW      16-Dec-2014 1510Z  rtty                      <NJ1Q>
+ 24916.0  DG1VB       16-Dec-2014 1511Z  JT65 tu                   <KB8M>
+ 21005.1  K5WE        16-Dec-2014 1511Z  tnx qso Jeff              <LZ1NT>
+  7041.3  R100DA      16-Dec-2014 1511Z  bpsk-63                   <RV4CO>
+ 28436.2  8P6FX       16-Dec-2014 1511Z                            <IK1DKF>
+ 24929.0  HA5WA       16-Dec-2014 1511Z  RTTY , CQ                 <HA5AGS>
+ 24921.0  F6ECI       16-Dec-2014 1511Z                            <PY2CX>
+  3774.0  4L4O        16-Dec-2014 1512Z  Otari QTH Matani          <4L5P>
+ 28020.1  TG9GJG      16-Dec-2014 1512Z  tnx up !                  <DL6YAO>
+ 28009.0  LU7XX       16-Dec-2014 1512Z  IOTA SA 008               <LU6XSG>
+ 28095.0  W1AW/9      16-Dec-2014 1512Z  mny tnx rtty qso 73       <DJ9VS>
+ 28089.0  WB7S        16-Dec-2014 1514Z  RTTY                      <N2ESP>
+ 28120.0  WB8SIG      16-Dec-2014 1514Z  tnx QSO                   <F4BAL>
+  7085.0  EA7VL/P     16-Dec-2014 1515Z  VGMA-088.DME-29051        <EA1HLK>
+ 10110.0  W1AW/7      16-Dec-2014 1515Z  Montana last day          <KJ9C>
+ 24925.0  AB1J        16-Dec-2014 1515Z  CQ ARRL CENT              <AB1J>
+  7085.0  EA7VL/P     16-Dec-2014 1515Z  VGMA 088 DME 29051        <EA7BM>
+  7147.0  DF2BO       16-Dec-2014 1515Z  CQ DX LP light            <N7EKD>
+ 14243.0  PA6YOTA     16-Dec-2014 1515Z  59, gracias,  YOTA        <EA5HRV>
+  7120.0  EA7RCK      16-Dec-2014 1515Z  SOTEO PRO NAVIDAD rcMALAK <EA7JIF>
+ 28512.0  K1ZR        16-Dec-2014 1515Z  59 73                     <ON3RY>
+ 21076.8  DL2SBL      16-Dec-2014 1516Z  Thanks for the QSO....JT6 <HK2PMR>
+  7085.0  EA7VL/P     16-Dec-2014 1516Z  VGMA 088 DME 29051        <EA4GJP>
+  7085.0  EA7TL/P     16-Dec-2014 1516Z                            <EA7LD>
+ 24985.0  OD5ZZ       16-Dec-2014 1516Z                            <DL3SG>
+ 18107.0  W1AW/9      16-Dec-2014 1516Z  RTTY                      <W9PA>
+ 21010.4  PZ1DV       16-Dec-2014 1516Z                            <YO5AMF>
+ 24923.1  N1CC        16-Dec-2014 1516Z  RTTY  ARRL CENT VE 5 PTS  <N1CC>
+  7090.0  EB5JKV      16-Dec-2014 1517Z  EV-356, DEM-46145         <EA4GJP>
+ 24985.0  OD5ZZ       16-Dec-2014 1517Z                            <N2FF>
+ 24973.0  SP9KR       16-Dec-2014 1516Z                            <KC9WER>
+ 28014.0  SC2014ECC   16-Dec-2014 1517Z  big sigs here             <OK1NU>
+ 18080.0  ER3GQ       16-Dec-2014 1517Z  alex                      <W4TUN>
+  7150.0  EC7TL/P     16-Dec-2014 1517Z  VGH-011 DME-21005         <EA4GJP>
+ 24894.3  YL3CW       16-Dec-2014 1518Z  tks Valery                <LU1AJH>
+  7150.0  EC7TL/P     16-Dec-2014 1518Z  VGH011 DME21005           <EA2ECA>
+ 24942.0  N5PHT       16-Dec-2014 1518Z  5 PTS ARRL CENT           <N5PHT>
+ 24925.0  AB1J        16-Dec-2014 1518Z  RTTY                      <ND4Q>
+ 14186.9  IV3CNZ      16-Dec-2014 1518Z  Tnx Angelo                <W6HDG>
+  7082.0  EA1BKO      16-Dec-2014 1518Z  DIPLOMA FELIZ NAVIDAD 201 <EA4GJP>
+ 14186.9  IV3CNZ      16-Dec-2014 1518Z  Tnx Angelo - long path    <W6HDG>
+ 28094.9  W1AW/9      16-Dec-2014 1519Z  up 2 rtty                 <SV1EHP>
+ 21002.0  W100AW      16-Dec-2014 1519Z  100 YEARS ARRL            <F6EDO>
+ 28477.0  F6HRP       16-Dec-2014 1519Z                            <AA8M>
+ 14092.0  K3WW        16-Dec-2014 1520Z  RTTY centennial 40 points <K3WW>
+ 14243.0  PA6YOTA     16-Dec-2014 1520Z  STRONG                    <OM7DX>
+ 24912.3  W100AW      16-Dec-2014 1520Z                            <S54A>
+ 28042.0  HR1LW       16-Dec-2014 1520Z  tnx QSO                   <UY7QN>
+  7067.0  EA4EQ       16-Dec-2014 1520Z  COMUNIDADES Y PROVINCIAS  <EA7RCL>
+ 28039.0  KC9WJK      16-Dec-2014 1520Z  tnx dr Bob hny            <DM2DMI>
+  7008.0  SM6CPY      16-Dec-2014 1520Z  tnx nice qso              <BG3ATI>
+ 28009.0  LU7XX       16-Dec-2014 1520Z  Ushuaia - Tierra Del Fueg <DK3DUA>
+  7082.0  EA1BKO      16-Dec-2014 1521Z  Diploma Navidad           <EA2ECA>
+ 28076.0  DD5ZZ       16-Dec-2014 1521Z                            <CA3SOC>
+ 24927.0  S54A        16-Dec-2014 1521Z                            <S54A>
+ 28470.0  YT5EA       16-Dec-2014 1521Z  cq                        <YU5LJ>
+ 14244.0  NB7PX       16-Dec-2014 1522Z  Jery OR dxnet controler   <S51ZZ>
+ 10130.9  W1AW/7      16-Dec-2014 1522Z  Simplex RTTY easy from CA <NJ6G>
+ 14241.0  GB1WH       16-Dec-2014 1522Z                            <HA6VH>
+ 28447.0  K0HUU       16-Dec-2014 1522Z  DON ..MISSOURI ..USA  CQC <I0DJV>
+  7065.0  EA4EQ       16-Dec-2014 1522Z  COMUNIDADES Y PROVINCIAS  <EA7SS>
+  7065.0  EA4EQ       16-Dec-2014 1522Z  RECTIFICADO COMUNIADES    <EA7RCL>
+ 21002.0  W100AW      16-Dec-2014 1521Z  QSX 21003.0 VIA LOTW AND  <W5AP>
+  7062.0  RA4DR       16-Dec-2014 1522Z  RVSN-55                   <RA4DR>
+  7077.0  HL3IB       16-Dec-2014 1522Z  JT65 30w -9dB             <NA6L>
+ 14244.0  HB9CPH      16-Dec-2014 1523Z  Walter                    <S51ZZ>
+ 14100.0  ZS6DN/B     16-Dec-2014 1523Z  poor LP today             <KF7E>
+  7006.8  S57Z        16-Dec-2014 1523Z  CW, CQ DX LP , s9+40      <I2JJR>
+ 28475.0  CO6HK       16-Dec-2014 1523Z  59 tnx Rudy               <MM0CEZ>
+ 14070.6  Y01989BV    16-Dec-2014 1523Z  psk125                    <R6JY>
+ 14100.0  5Z4B/B      16-Dec-2014 1524Z  ESP via LP                <KF7E>
+ 10110.0  W1AW/7      16-Dec-2014 1524Z  Simplex CW easy from CA   <NJ6G>
+ 21000.0  RU9SN       16-Dec-2014 1524Z  tnx QSO                   <RA9STZ>
+ 14070.6  YO1989BV    16-Dec-2014 1524Z  psk125                    <R6JY>
+ 21011.9  9H1EJ       16-Dec-2014 1524Z  tnx QSO                   <UY7QN>
+ 28021.1  TG9GJG      16-Dec-2014 1524Z
+                            <AC4CA>
+ 14238.0  YU1FE       16-Dec-2014 1524Z  Tnx Predrag! 73'          <PA3KME>
+ 28013.0  KW7D        16-Dec-2014 1524Z  CQ no takers, nice sigs P <G4RCG>
+ 28420.0  TM210CN     16-Dec-2014 1524Z                            <ND7J>
+ 14100.0  4X6TU/B     16-Dec-2014 1524Z  559 LP in AZ              <KF7E>
+  7065.0  EA7MV       16-Dec-2014 1525Z  DIPLOMA FELIZ NAVIDAD 201 <EA4GJP>
+  7000.0  EA8ED       16-Dec-2014 1525Z  COMODIN COMUNIDADES EN 14 <EA8DAB>
+ 28475.0  CO6HK       16-Dec-2014 1525Z                            <YT5EA>
+ 28515.0  CE4WJK      16-Dec-2014 1525Z  calling cq                <DL3SG>
+N4AF de VE7CC-1 16-Dec-2014 1525Z   CCC >
+DX de DF4UE-#:   28120.8  LU4JHF       PSK31 11 DB CQ                 1525Z
+DX de OE6TZE-#:  28009.3  LU7XX        CW 08 DB 24 WPM CQ             1525Z
+DX de WZ7I-#:    28096.1  OE3RTB       RTTY  04 DB CQ                 1525Z PA
+DX de OZ1DJJ-#:  28037.7  W4CI         CW 16 DB 24 WPM CQ          FL 1525Z
+DX de AA4VV-#:   18086.8  OK1APY       CW 05 DB 25 WPM CQ             1525Z NC
+DX de W3LPL-#:   24904.7  9A2YM        CW 19 DB 21 WPM CQ             1525Z MD
+DX de HA2KSD-#:   7037.0  DJ6UX        CW 30 DB 18 WPM CQ             1525Z
+DX de K1TTT-#:   14014.6  DK0TF        CW 10 DB 32 WPM CQ             1525Z MA
+DX de ON5KQ-#:    7028.0  M6MPC        CW 24 DB 22 WPM CQ             1525Z
+DX de DL4RCK-#:  14071.7  IW5CKO       PSK31 34 DB CQ                 1525Z
+DX de DL9GTB-#:  10142.4  HA6ZX        PSK31 20 DB CQ                 1525Z
+DX de DF4UE-#:   24920.0  K4MIL        RTTY  -6 DB CQ              VA 1525Z
+DX de NC7J-#:    21030.3  W1AW/9       CW 14 DB 25 WPM CQ             1525Z UT
+DX de K1TTT-#:   10114.7  W9CBT        CW 22 DB 18 WPM CQ          IL 1526Z MA
+DX de K1TTT-#:   21028.9  PA7G         CW 13 DB 19 WPM CQ             1526Z MA
+DX de WZ7I-#:    28121.6  F4GMM        PSK31 17 DB CQ                 1526Z PA
+DX de WZ7I-#:    14034.9  W4LYH        CW 26 DB 20 WPM CQ          TN 1526Z PA
+DX de DF4UE-#:   14071.4  M5PLY        PSK31 36 DB CQ                 1526Z
+DX de DF4UE-#:   24922.2  F6ECI        PSK63 13 DB CQ                 1526Z
+DX de W8WTS-#:   28048.8  DL5EC        CW 02 DB 19 WPM CQ             1526Z OH
+DX de SK3W-#:    28031.9  SM4DDE       CW 11 DB 23 WPM CQ             1526Z
+DX de K8AZ-#:    14056.6  WA4EEZ       CW 37 DB 19 WPM CQ          FL 1526Z OH
+DX de WZ7I-#:    28122.0  IK8DYE       PSK31 19 DB CQ                 1526Z PA
+DX de HB9BOI:    28089.0  WB7S                                     WY 1526Z
+DX de K1TTT-#:    7029.0  W1AW/9       CW 23 DB 25 WPM CQ             1526Z MA
+DX de DK0TE-#:    7006.9  S57Z         CW 46 DB 28 WPM CQ             1526Z
+DX de HA1VHF-#:  10106.0  DL7SO        CW 16 DB 19 WPM CQ             1526Z
+DX de TF3Y-#:    18080.0  ER3GQ        CW 05 DB 22 WPM CQ             1526Z
+DX de ON5KQ-#:   21012.1  9H1EJ        CW 15 DB 21 WPM CQ             1526Z
+DX de K5TIA:     18084.5  EA8TL                                       1526Z TX
+DX de SK3W-#:     7003.6  SM0BRF       CW 23 DB 20 WPM CQ             1526Z
+DX de F2YV:      21002.0  W100AW       UP 1                        CT 1526Z
+DX de SK3W-#:     7027.5  R4CA         CW 34 DB 33 WPM CQ             1526Z
+DX de DL9GTB-#:  14070.9  YP35KZA      PSK31 41 DB CQ                 1526Z
+DX de GW8IZR-#:   7024.8  DJ2OD        CW 28 DB 16 WPM CQ             1526Z
+DX de WZ7I-#:    24915.0  EA1DR        RTTY  26 DB CQ                 1526Z PA
+DX de K8ND-#:    28019.1  IZ4AYB       CW 05 DB 24 WPM CQ             1526Z OH
+DX de VE2WU-#:   14023.0  K5LN         CW 19 DB 18 WPM CQ          TX 1526Z QC
+DX de DQ8Z-#:    10102.0  S53BH        CW 06 DB 15 WPM CQ             1526Z
+DX de N7TR-#:     7009.5  S59AA        CW 37 DB 31 WPM CQ             1526Z NV
+DX de PY1NB-#:   28016.9  DK2FE        CW 07 DB 28 WPM CQ             1526Z
+DX de PY1NB-#:   21024.9  3B9FR        CW 06 DB 29 WPM CQ             1526Z
+DX de 9A9TT:     24919.0  W2WC         PSK31 TNX DICK DE 9A9TT 9A9 NY 1526Z
+DX de RU9CZD-#:   7029.0  RA1QE        CW 11 DB 29 WPM CQ             1526Z
+DX de EB4SM:      7099.0  EB5CS/P      ECS-142 DME 12084              1526Z
+DX de HA6VH:     21010.5  PZ1DV                                       1526Z
+DX de HA2KSD-#:   7008.0  BD8SZ        CW 05 DB 27 WPM CQ             1526Z
+DX de JA4ZRK-#:   7012.0  7M4NIV       CW 07 DB 22 WPM CQ             1526Z
+DX de DF4UE-#:   24912.3  W100AW       RTTY  29 DB CQ              CT 1526Z
+DX de DL9GTB-#:   7040.9  UT1UW        PSK63 29 DB CQ                 1526Z
+DX de TF3Y-#:    28054.9  IZ2QXG       CW 10 DB 17 WPM CQ             1526Z
+DX de WZ7I-#:    14071.4  WB8WOB       PSK31 21 DB CQ              OH 1526Z PA
+DX de YO5AMF:    21002.0  W100AW                                   CT 1527Z
+DX de WZ7I-#:    28011.4  DL5FCZ       CW 22 DB 29 WPM CQ             1527Z PA
+DX de W4KKN-#:   14060.9  K2MJ         CW 13 DB 23 WPM CQ          NY 1527Z VA
+DX de OE6TZE-#:   3544.5  DF8SB        CW 24 DB 17 WPM CQ             1527Z
+DX de DL9GTB-#:  10125.0  UA6LKW       CW 12 DB 19 WPM CQ             1527Z
+DX de WZ7I-#:    28120.8  ON4KEB       PSK31 20 DB CQ                 1527Z PA
+DX de WZ7I-#:    21073.2  DF9FR        PSK63 36 DB CQ                 1527Z PA
+DX de N2ESP:     18107.0  W1AW/9       RTTY                           1527Z FL
+DX de HA0IR:     14255.0  7X2YOTA      TNX QSO! VIA.:OM2FY            1527Z
+DX de GW8IZR-#:  14010.0  ON5TC        CW 19 DB 27 WPM CQ             1527Z
+DX de IZ1HHT:    14278.0  LA1EOA       TNX ROAR !!! 73.               1527Z
+DX de WZ7I-#:    28090.6  SV3DCX       RTTY  05 DB CQ                 1527Z PA
+DX de GW8IZR-#:  10122.2  DL5YM        CW 44 DB 27 WPM CQ             1527Z
+DX de HB9DCO-#:  28038.1  HB9BPP       CW 27 DB 30 WPM CQ             1527Z
+DX de HA1VHF-#:   7027.0  DK8OV        CW 23 DB 28 WPM CQ             1527Z
+DX de DL9GTB-#:  14072.0  R6JY         PSK63 17 DB CQ                 1527Z
+DX de DL1EMY-#:  10118.0  F5RJW        CW 12 DB 20 WPM CQ             1527Z
+DX de SK3W-#:    14019.9  DL3RDM       CW 44 DB 24 WPM CQ             1527Z
+DX de WZ7I-#:    21072.7  KG5CR        PSK31 45 DB CQ              AR 1527Z PA
+DX de DL8BV:     21025.0  3B8FR        CQ                             1527Z
+DX de K6AAB:     21030.2  W1AW/9                                      1527Z CA
+DX de G0JEI:     28077.0  W2REA        TNX -05 TERRY CHEERS LES    NY 1527Z
+DX de WZ7I-#:    28096.7  F6CQU        RTTY  33 DB CQ                 1527Z PA
+DX de DF4UE-#:    3587.1  OH4JOU       RTTY  -6 DB CQ                 1527Z
+DX de W3LPL-#:   18074.0  KB4JR        CW 14 DB 13 WPM CQ          FL 1527Z MD
+DX de KM3T-#:    21006.9  US5EVJ       CW 12 DB 19 WPM CQ             1527Z NH
+DX de EA7JIA:     7150.0  EC7TL/P      73                             1527Z
+DX de WZ7I-#:    28088.3  PA3EVY       RTTY  09 DB CQ                 1527Z PA
+DX de DL4RCK-#:  14070.9  DG4BR        PSK31 26 DB CQ                 1527Z
+DX de WZ7I-#:    18107.0  I1EIS        RTTY  26 DB CQ                 1528Z PA
+DX de HA6M-#:     7026.5  DL2IAD       CW 23 DB 17 WPM CQ             1527Z
+DX de DL9GTB-#:  10142.6  R100DA       PSK63 28 DB CQ                 1527Z
+DX de SV1PAJ:    28475.0  CO6HK                                       1527Z
+DX de DK9IP-#:    7030.5  I3UK         CW 22 DB 15 WPM CQ             1527Z
+DX de SE0X-#:     7014.7  RV3UF        CW 29 DB 30 WPM CQ             1527Z
+DX de WZ7I-#:    24924.0  GI4SNA       RTTY  38 DB CQ                 1527Z PA
+DX de K3LR-#:    28013.1  KW7D         CW 24 DB 23 WPM CQ          NM 1527Z PA
+DX de HA1VHF-#:   7022.9  DL0FBG       CW 28 DB 25 WPM CQ             1528Z
+DX de TF3Y-#:    28004.9  IZ2FDU       CW 14 DB 22 WPM CQ             1528Z
+DX de DQ8Z-#:    10111.0  UE55SM       CW 21 DB 25 WPM CQ             1528Z
+DX de OE6TZE-#:  10109.1  ER3GQ        CW 18 DB 24 WPM CQ             1528Z
+DX de K3LR-#:    28018.2  9A2N         CW 12 DB 27 WPM CQ             1528Z PA
+DX de EA4GJP:     7099.0  EB5CS/P      ECS-142 DME 12084              1528Z
+DX de DL4RCK-#:  14071.5  OH2JLN       PSK31 29 DB CQ                 1528Z
+DX de WB6CZG:    24942.0  N5PHT        59 N CA TRUCKEE             TX 1528Z CA
+DX de W8WTS-#:   28031.5  EA6UN        CW 07 DB 22 WPM CQ             1528Z OH
+DX de CA3SOC:    28076.0  SP3AMZ                                      1528Z
+DX de DF4UE-#:   28121.1  N4VBR        PSK31 21 DB CQ              FL 1528Z
+DX de SM2IUF-#:  14014.2  DK0TF        CW 30 DB 31 WPM CQ             1528Z
+DX de DF4UE-#:   18101.0  OD5PY        PSK31 22 DB CQ                 1528Z
+DX de DL2CC-#:    7020.5  DL3UKH       CW 29 DB 16 WPM CQ             1528Z
+DX de N8MSA-#:   28050.0  IZ2QXG       CW 13 DB 17 WPM CQ             1528Z MI
+DX de NY3A-#:    28050.0  IZ2QXG       CW 24 DB 17 WPM CQ             1528Z PA
+DX de WZ7I-#:    18076.0  W1AW/9       CW 49 DB 32 WPM CQ             1528Z PA
+DX de YV5HV:     21285.0  SV1BDO/3     5/9 MIRANDA VENEZUELA 73S      1528Z
+DX de KA9SWE-#:  18070.8  W100AW       CW 25 DB 27 WPM CQ          CT 1528Z WI
+DX de K3LR-#:    14038.2  W1AW/7       CW 27 DB 29 WPM CQ             1528Z PA
+DX de W8WTS-#:   28011.8  DL5FCZ       CW 12 DB 29 WPM CQ             1528Z OH
+DX de DL9GTB-#:  10140.8  IZ1JID       PSK31 29 DB CQ                 1528Z
+DX de OH6BG-#:    7027.5  R4KU         CW 23 DB 33 WPM CQ             1528Z
+DX de WZ7I-#:    28088.9  IZ2EIH       RTTY  25 DB CQ                 1528Z PA
+DX de OK1NU:     28514.8  CE4WJK       CQ                             1528Z
+DX de KM3T-#:    21016.9  OO7N         CW 37 DB 18 WPM CQ             1528Z NH
+DX de W8WTS-#:   28008.2  AB3CX        CW 08 DB 30 WPM CQ          NY 1528Z OH
+DX de WZ7I-#:    21071.9  US0QV        PSK31 17 DB CQ                 1528Z PA
+DX de DK5GU:     28475.0  CO6HK        5/9                            1529Z
+DX de K8AZ-#:    21014.2  DK2FE        CW 14 DB 27 WPM CQ             1529Z OH
+DX de SK3W-#:     3535.0  GW4HDB       CW 14 DB 21 WPM CQ             1529Z
+DX de WZ7I-#:    28012.0  EA6FG        CW 30 DB 22 WPM CQ             1529Z PA
+DX de WZ7I-#:    18107.0  W1AW/9       RTTY  32 DB CQ                 1529Z PA
+DX de DF4UE-#:   18084.5  EA8TL        CW 20 DB 32 WPM CQ             1529Z
+DX de DF4UE-#:   24925.5  W9MU         RTTY  05 DB CQ              IL 1529Z
+DX de S59GS:     28436.2  8P6FX        JN75OO<>GK03FE MXMAS,GL ROBERT 1529Z
+DX de WZ7I-#:    28096.9  KE8UN        RTTY  00 DB CQ              WV 1529Z PA
+DX de VA3OPA:    28475.0  CO6HK        54 TNX 73 72 FRED              1529Z ON
+DX de W4KKN-#:   21030.3  W1AW/9       CW 03 DB 26 WPM CQ             1529Z VA
+DX de WZ7I-#:    28121.6  PP5NS        PSK31 13 DB CQ                 1529Z PA
+DX de WZ7I-#:    14070.5  WC3A         PSK31 10 DB CQ              FL 1529Z PA
+DX de W4KKN-#:   28037.5  OE6BMG       CW 11 DB 25 WPM CQ             1529Z VA
+DX de WZ7I-#:    21070.4  IK1CJO       PSK31 21 DB CQ                 1529Z PA
+DX de PT2OM:     24972.8  SP9KR                                       1529Z
+DX de ON5KQ-#:   10108.0  Z33A         CW 22 DB 26 WPM CQ             1529Z
+DX de BD8SZ:      7007.0  S57Z         FB SIG                         1529Z
+DX de K1TTT-#:   24898.9  9A4W         CW 23 DB 27 WPM CQ             1529Z MA
+DX de F6IIT-#:   10116.1  OZ6ABZ       CW 11 DB 15 WPM CQ             1529Z
+DX de N2ESP:     28094.9  W1AW/9       RTTY UP 1                      1529Z FL
+DX de AA4VV-#:   14014.4  DK2FE        CW 05 DB 28 WPM CQ             1529Z NC
+DX de DL9GTB-#:  28020.1  TG9GJG       CW 08 DB 29 WPM CQ             1529Z
+DX de SK3W-#:     7016.6  UA3AFO       CW 27 DB 22 WPM CQ             1529Z
+DX de DL9GTB-#:  14071.7  IU1BPA       PSK31 40 DB CQ                 1529Z
+To ALL de F6BBO <1529Z> : looking for W1AW/7 10 12 15 17M RTTY  12 17 M SSB 
+DX de W2YC:      28086.0  W2YC         RTTY ARRL MEMBERS PSE       NJ 1529Z NJ
+DX de W8WTS-#:   14050.5  WA5JUL       CW 08 DB 16 WPM CQ          TX 1529Z OH
+DX de WZ7I-#:    21072.3  F6BWJ        PSK63 20 DB CQ                 1529Z PA
+DX de DK9IP-#:   28015.0  F2QJ         CW 04 DB 23 WPM CQ             1529Z
+DX de AA4VV-#:   28044.1  OE6BMG       CW 09 DB 25 WPM CQ             1529Z NC
+DX de W8WTS-#:   28019.3  IZ4AYB       CW 11 DB 23 WPM CQ             1529Z OH
+DX de DF4UE-#:    7041.4  RX1A         PSK31 23 DB CQ                 1529Z
+DX de DF4UE-#:   28085.9  W2YC         RTTY  22 DB CQ              NJ 1529Z
+DX de N7TR-#:    28058.0  KA9DVX       CW 17 DB 12 WPM CQ          IL 1529Z NV
+DX de N2QT-#:    28095.0  W1AW/9       RTTY  -2 DB CQ                 1529Z VA
+DX de W4NL:      21002.0  W100AW       UP                          CT 1530Z TN
+DX de IK3STG-#:  10115.0  DL7SO        CW 14 DB 19 WPM CQ             1530Z
+DX de HA1VHF-#:  21025.0  3B9FR        CW 19 DB 28 WPM CQ             1530Z
+DX de W7FW:       7013.0  3W7W                                        1530Z AZ
+DX de DL4RCK-#:  14070.9  UR5NBN       PSK31 15 DB CQ                 1530Z
+DX de SV8RV-#:    7033.1  HA8YOTA      CW 18 DB 23 WPM CQ             1530Z
+DX de DL9GTB-#:  10140.5  R100DA       PSK31 26 DB CQ                 1530Z
+DX de KM3T-#:    28025.2  G8VG         CW 15 DB 27 WPM CQ             1530Z NH
+DX de DL5YM:     10122.0  HA7QRP       (?`?)                          1530Z
+DX de R3RT:       7009.5  S59AA        CQ DX                          1530Z
+DX de NC7J-#:    10110.0  W1AW/7       CW 33 DB 27 WPM CQ             1530Z UT
+DX de GW8IZR-#:  14022.5  DL6SK        CW 35 DB 22 WPM CQ             1530Z
+DX de SV8RV-#:   14022.5  IZ1VNT       CW 17 DB 24 WPM CQ             1530Z
+DX de HB9DCO-#:  14047.5  SQ2DMX       CW 32 DB 24 WPM CQ             1530Z
+DX de LA5EKA-#:   7035.0  OZ1JB        CW 06 DB 23 WPM CQ             1530Z
+DX de WZ7I-#:    24926.4  YO3RU        RTTY  21 DB CQ                 1530Z PA
+DX de NJ1Q:      24910.4  W100AW       RTTY                        CT 1530Z CT
+DX de K5TIA:     28005.0  IZ2FDU                                      1530Z TX
+DX de WZ7I-#:    24910.4  W100AW       RTTY  16 DB CQ              CT 1530Z PA
+DX de NY3A-#:    28034.4  DL7SX        CW 19 DB 26 WPM CQ             1530Z PA
+DX de DL8LAS-#:   7030.7  PA0WKI       CW 30 DB 14 WPM CQ             1530Z
+DX de IK3STG-#:  21018.0  EA1PF        CW 17 DB 16 WPM CQ             1530Z
+DX de DF4UE-#:    7040.6  UT8IT        PSK31 15 DB CQ                 1530Z
+DX de DF4UE-#:   24925.0  AB1J         RTTY  01 DB CQ              MA 1530Z
+DX de DJ9IE-#:    7006.9  S57Z         CW 44 DB 29 WPM CQ             1530Z
+DX de WZ7I-#:    10130.9  KR4F         RTTY  25 DB CQ              AL 1530Z PA
+DX de K6URK:      7013.0  3W7W         SIMPLEX GUD SIG WEST COAST     1530Z CA
+DX de ON5KQ-#:    7008.0  BD8SZ        CW 10 DB 27 WPM CQ             1530Z
+DX de N4ZR-#:    24913.1  ON4AXU       RTTY  -3 DB CQ                 1530Z WV
+DX de ON5KQ-#:    7027.5  R4CA         CW 20 DB 32 WPM CQ             1530Z
+DX de DL9GTB-#:  28009.1  LU7XX        CW 16 DB 24 WPM CQ             1530Z
+DX de DL9GTB-#:  14072.4  2M0MZO       PSK31 25 DB CQ                 1530Z
+DX de ON5KQ-#:    7029.0  RA1QE        CW 23 DB 28 WPM CQ             1530Z
+DX de N8MSA-#:   28043.5  ON3BZ        CW 02 DB 25 WPM CQ             1530Z MI
+DX de F5RRS-#:    7034.1  SM6NT        CW 15 DB 20 WPM CQ             1530Z
+DX de DF4UE-#:   10141.6  HF2014PRNF   PSK63 23 DB CQ                 1530Z
+DX de OE6TZE-#:  24894.3  6Y6N         CW 10 DB 31 WPM CQ             1530Z
+DX de DL9GTB-#:  21070.7  EA1GN        PSK31 30 DB CQ                 1530Z
+DX de NC7J-#:    18073.9  KB4JR        CW 07 DB 12 WPM CQ          FL 1530Z UT
+DX de DL9GTB-#:   7042.3  RA1APV       PSK63 25 DB CQ                 1530Z
+DX de OH6BG-#:    7029.8  EW8O         CW 21 DB 28 WPM CQ             1531Z
+DX de DQ8Z-#:    24900.4  PJ2/WI9WI    CW 17 DB 31 WPM CQ             1531Z
+DX de IU8DHI:    14255.0  7X2YOTA                                     1531Z
+DX de ON3FZT:    24942.0  N5PHT        ARRL CENTENNIAL 5POINTS     TX 1531Z
+DX de WZ7I-#:    21070.9  N1VP         PSK31 33 DB CQ              FL 1531Z PA
+DX de DL1ET:     18084.5  EA8TL                                       1531Z
+DX de OL5Q-#:    28040.1  W1AW/9       CW 05 DB 27 WPM CQ             1531Z
+DX de LA6TPA-#:  14010.0  ON5TC        CW 14 DB 27 WPM CQ             1531Z
+DX de W8WWV-#:   21019.1  G0XCF        CW 04 DB 21 WPM CQ             1531Z OH
+DX de WZ7I-#:    21071.4  HB9EBV       PSK63 20 DB CQ                 1531Z PA
+DX de DK0TE-#:   14015.0  SC2014ECC    CW 32 DB 38 WPM CQ             1531Z
+DX de DL9GTB-#:  10142.0  HA6ZX        PSK63 16 DB CQ                 1531Z
+DX de DL9GTB-#:  14070.8  R6AV         PSK63 26 DB CQ                 1531Z
+DX de OE6BMG:    28044.0  NW0ERE                                   ?? 1531Z
+DX de K1TTT-#:   24903.8  9A2YM        CW 25 DB 22 WPM CQ             1531Z MA
+DX de WA7LNW-#:  28030.0  N8DX         CW 28 DB 23 WPM CQ          OH 1531Z UT
+DX de NY3A-#:    28029.0  N3BB/M       CW 20 DB 29 WPM CQ          TX 1531Z PA
+DX de WZ7I-#:    24923.0  EA1DR        RTTY  39 DB CQ                 1531Z PA
+DX de KA9SWE-#:   7029.0  W1AW/9       CW 21 DB 25 WPM CQ             1531Z WI
+DX de WZ7I-#:    21082.0  IT9MUO       RTTY  18 DB CQ                 1531Z PA
+DX de ON5KQ-#:   10122.3  DL5YM        CW 43 DB 26 WPM CQ             1531Z
+DX de F6IIT-#:    7014.8  RV3UF        CW 14 DB 30 WPM CQ             1531Z
+DX de DL8LAS-#:   3555.0  DF7FX        CW 24 DB 16 WPM CQ             1531Z
+DX de HA1VHF-#:  18086.0  OD5PY        CW 22 DB 25 WPM CQ             1531Z
+DX de NC7J-#:    18076.0  W1AW/9       CW 15 DB 31 WPM CQ             1531Z UT
+DX de ON5KQ-#:    7026.9  DJ6IH        CW 28 DB 28 WPM CQ             1531Z
+DX de WA0JIM:    28462.0  F6HRP                                       1531Z MO
+DX de WZ7I-#:    14071.4  KM5DW        PSK31 32 DB CQ              NC 1531Z PA
+DX de ON5KQ-#:    3512.0  RW9JZ        CW 11 DB 18 WPM CQ             1531Z
+DX de W4AX-#:    14038.1  W1AW/7       CW 15 DB 29 WPM CQ             1531Z GA
+DX de EA7AQC:     7123.0  EA7HZM       2 EST COMUNIDADES Y PROVINCIAS 1531Z
+DX de OZ1DJJ-#:  28005.1  IZ2FDU       CW 07 DB 22 WPM CQ             1531Z
+DX de DF4UE-#:   21071.9  RW3WY        PSK63 27 DB CQ                 1531Z
+DX de K1RO:      24913.0  ON4AXU       RTTY                           1531Z NH
+DX de HA2KSD-#:   7022.4  DK5SF        CW 35 DB 19 WPM CQ             1531Z
+DX de DM2RN:     18070.6  W100AW                                   CT 1531Z
+DX de W8WWV-#:   28018.6  DL5FCZ       CW 10 DB 28 WPM CQ             1532Z OH
+DX de DK9IP-#:    7020.5  DL3UKH       CW 28 DB 16 WPM CQ             1532Z
+DX de NC7J-#:    10115.5  K6KQV        CW 23 DB 19 WPM CQ          CA 1532Z UT
+DX de N8MSA-#:   28013.0  KW7D         CW 40 DB 23 WPM CQ          NM 1532Z MI
+DX de NW6V:      24894.0  6Y6N         TNX NEW ONE                    1532Z OR
+DX de DF4UE-#:    7042.0  RZ3DZ        PSK63 17 DB CQ                 1532Z
+DX de EA8/IK1PMR:21025.0  3B9FR                                       1532Z
+DX de WZ7I-#:    28083.0  PA3EVY       RTTY  19 DB CQ                 1532Z PA
+DX de W3LPL-#:   18084.5  EA8TL        CW 38 DB 30 WPM CQ             1532Z MD
+DX de W4KKN-#:   28014.0  6Y6N         CW 19 DB 31 WPM CQ             1532Z VA
+DX de DL4RCK-#:  14070.5  UA6ARR       PSK31 41 DB CQ                 1532Z
+DX de R6JY:      18102.0  G0RUD        PSK63                          1532Z
+DX de SK3W-#:     7025.5  DJ6IH        CW 13 DB 28 WPM CQ             1532Z
+DX de DL8LAS-#:   7027.5  R4KU         CW 13 DB 33 WPM CQ             1532Z
+DX de DL9GTB-#:   7030.4  I3UK         CW 25 DB 15 WPM CQ             1532Z
+DX de WZ7I-#:    24912.3  IT9MUO       RTTY  24 DB CQ                 1532Z PA
+DX de DF4UE-#:   28120.4  VE3NOO       PSK31 30 DB CQ              ON 1532Z
+DX de DF4UE-#:    7041.7  UT3MI        PSK31 16 DB CQ                 1532Z
+DX de ON5KQ-#:    1835.0  SM6NT        CW 09 DB 20 WPM CQ             1532Z
+DX de WZ7I-#:    21070.7  K5YRT        PSK63 41 DB CQ              LA 1532Z PA
+DX de WZ7I-#:    14081.0  K9FL         RTTY  30 DB CQ              FL 1532Z PA
+DX de KB6VSE-#:   7037.2  W6JL         CW 33 DB 20 WPM CQ          CA 1532Z CA
+DX de RA3ATX:    10111.0  UE55SM       CQ                             1532Z
+DX de K1TTT-#:   10106.2  W9CBT        CW 26 DB 21 WPM CQ          IL 1532Z MA
+DX de DL9GTB-#:  10142.3  ES3B         PSK31 12 DB CQ                 1532Z
+DX de K1TTT-#:   28038.9  DJ1KEO       CW 15 DB 19 WPM CQ             1532Z MA
+DX de WZ7I-#:    21072.5  G4KHG        PSK31 21 DB CQ                 1532Z PA
+DX de DL9GTB-#:  14070.7  F6ENI        PSK31 18 DB CQ                 1532Z
+DX de NC7J-#:    18070.7  W100AW       CW 19 DB 27 WPM CQ          CT 1532Z UT
+DX de W4KKN-#:   28025.0  G4RCG        CW 34 DB 26 WPM CQ             1532Z VA
+DX de DL9GTB-#:  14071.7  R6JY         PSK63 20 DB CQ                 1532Z
+DX de DL4RCK-#:  14072.4  YO1989BV     PSK63 17 DB CQ                 1532Z
+DX de W4KKN-#:   28050.0  IZ2QXG       CW 11 DB 17 WPM CQ             1532Z VA
+DX de HA1VHF-#:  14021.0  DJ7MH        CW 29 DB 15 WPM CQ             1532Z
+DX de W8WTS-#:   14062.1  W6JL         CW 10 DB 21 WPM CQ          CA 1532Z OH
+DX de KM3T-#:     7016.3  VA2ZZ        CW 35 DB 35 WPM CQ          QC 1532Z NH
+DX de WZ7I-#:    28121.3  EA3BBS       PSK31 18 DB CQ                 1532Z PA
+DX de SK3W-#:     3538.0  SM7ERE       CW 36 DB 14 WPM CQ             1533Z
+DX de S54A:      24972.8  SP9KR                                       1533Z
+DX de ON5KQ-#:    7028.5  DL2ZBO       CW 24 DB 24 WPM CQ             1533Z
+DX de DL4MFF:    18070.7  W100AW       TNX, UP                     CT 1533Z
+DX de DL9GTB-#:  10142.2  OE2VDL       PSK31 34 DB CQ                 1533Z
+DX de NY3A-#:    28018.0  9A2N         CW 14 DB 27 WPM CQ             1533Z PA
+DX de DL2CC-#:    7016.6  UA3AFO       CW 09 DB 22 WPM CQ             1533Z
+DX de F6IIT-#:   14003.6  I0VBR        CW 18 DB 12 WPM CQ             1533Z
+DX de SM2IUF-#:  14042.0  IK3RJQ       CW 17 DB 14 WPM CQ             1533Z
+DX de WA0JIM:    28477.0  F6HRP        SORRY CORRECT FREQ             1533Z MO
+DX de W3LPL-#:   24907.8  PA2PIM       CW 12 DB 18 WPM CQ             1533Z MD
+DX de DK0TE-#:    7014.8  OZ3NP        CW 30 DB 23 WPM CQ             1533Z
+DX de N7TR-#:    28061.0  AA9AA        CW 05 DB 16 WPM CQ          WI 1533Z NV
+DX de OE6TZE-#:  28015.3  PR7AR        CW 13 DB 37 WPM CQ             1533Z
+DX de DL9GTB-#:  21017.0  EA6FG        CW 36 DB 20 WPM CQ             1533Z
+DX de WZ7I-#:    28121.1  IZ5OQJ       PSK31 19 DB CQ                 1533Z PA
+DX de W2AXR-#:   28032.9  AC4CA        CW 09 DB 25 WPM CQ          TX 1533Z NY
+DX de K1TTT-#:   21025.0  3B9FR        CW 19 DB 28 WPM CQ             1533Z MA
+DX de DL9GTB-#:  10141.4  IU1BSV       PSK63 16 DB CQ                 1533Z
+DX de F6IIT-#:   21012.2  9H1EJ        CW 18 DB 21 WPM CQ             1533Z
+DX de DJ9IE-#:    3541.0  DK8OV        CW 26 DB 27 WPM CQ             1533Z
+DX de N1CC:      24927.0  N1CC         RTTY  ARRL CENT VE 5 PTS    TX 1533Z TX
+DX de M5PLY:     14071.4  OK1KAO       BPSK31 VASEK                   1533Z
+DX de DL9GTB-#:   7041.5  RU90WZ       PSK63 25 DB CQ                 1533Z
+DX de F5RRS-#:   14013.2  RA4HQT       CW 13 DB 20 WPM CQ             1533Z
+DX de HA1VHF-#:  28009.1  LU7XX        CW 17 DB 24 WPM CQ             1533Z
+DX de DL9GTB-#:  10141.8  UA3LKM       PSK63 24 DB CQ                 1533Z
+DX de SK3W-#:    18081.9  Z33A         CW 30 DB 25 WPM CQ             1533Z
+DX de WZ7I-#:    14082.1  4J3DJ        RTTY  04 DB CQ                 1533Z PA
+DX de W4TUN:     28031.1  EA6UN        TNX JUREK                      1533Z SC
+DX de DL8LAS-#:   7033.5  DL3KVT       CW 16 DB 19 WPM CQ             1533Z
+DX de KM3T-#:    28046.1  OM3CM        CW 25 DB 20 WPM CQ             1533Z NH
+DX de AC0C-#:    21002.0  W100AW       CW 36 DB 37 WPM CQ          CT 1533Z KS
+DX de WA8QFE:    24904.0  9A2YM        599 IN INDIANA, WK'D QRP 5W    1533Z IN
+DX de HA1VHF-#:   7061.3  RA4DR        CW 22 DB 21 WPM CQ             1533Z
+DX de DL4RCK-#:  14071.0  DQ0HARZ      PSK31 24 DB CQ                 1533Z
+DX de HA2KSD-#:   7006.8  S57Z         CW 58 DB 28 WPM CQ             1533Z
+DX de WA1PCY:    28422.1  F5POJ        HEARD IN NJ                    1533Z NJ
+DX de W4KKN-#:   28031.2  EA6UN        CW 23 DB 23 WPM CQ             1534Z VA
+DX de K1TTT-#:   28042.0  F6IRG        CW 33 DB 18 WPM CQ             1534Z MA
+DX de W4KKN-#:   28042.0  F6IRG        CW 22 DB 18 WPM CQ             1534Z VA
+DX de W3OA-#:    28019.0  IZ4AYB       CW 03 DB 23 WPM CQ             1534Z NC
+DX de DL9GTB-#:  14071.9  IZ2SXZ       PSK31 44 DB CQ                 1534Z
+DX de F6IIT-#:   10117.6  SQ2DMX       CW 25 DB 23 WPM CQ             1534Z
+DX de KM3T-#:    24893.9  6Y6N         CW 30 DB 31 WPM CQ             1534Z NH
+DX de DL1REM-#:  10111.0  UE55SM       CW 20 DB 26 WPM CQ             1534Z
+DX de SE0X-#:     1834.0  SM6NT        CW 12 DB 20 WPM CQ             1534Z
+DX de K1TTT-#:   28019.8  DL7VBJ       CW 10 DB 16 WPM CQ             1534Z MA
+DX de EA7IXJ:     7099.0  EB5CS/P      ECS-142 DME- 12084             1534Z
+DX de OK1NU:     28514.8  N1WRK                                    MA 1534Z
+DX de F6IIT-#:   21007.3  US5EVJ       CW 25 DB 19 WPM CQ             1534Z
+DX de HB9DCO-#:  10117.0  DL7SO        CW 19 DB 20 WPM CQ             1534Z
+DX de KM3T-#:    10110.0  W1AW/7       CW 22 DB 26 WPM CQ             1534Z NH
+DX de F6IIT-#:    7029.9  EW8O         CW 26 DB 28 WPM CQ             1534Z
+DX de DL8LAS-#:   3532.4  SM5RDW       CW 13 DB 22 WPM CQ             1534Z
+DX de OZ5W-#:    21018.0  EA1PF        CW 23 DB 15 WPM CQ             1534Z
+DX de KC9YIJ:    28455.0  HZ1PS                                       1534Z IL
+DX de WZ7I-#:    28007.9  AB3CX        CW 15 DB 31 WPM CQ          NY 1534Z PA
+DX de RA9AJ:      7041.3  R100DA       TNX QSO                        1534Z
+DX de IZ8GNR:    28076.0  K7IPP        JT65                        AZ 1534Z
+DX de DL1ET:     18082.0  Z33A                                        1534Z
+DX de WZ7I-#:    10120.0  AB6OJ        CW 15 DB 13 WPM CQ          CA 1534Z PA
+DX de WZ7I-#:    28121.6  DJ2XO        PSK31 12 DB CQ                 1534Z PA
+DX de F4GMM:     28475.0  CO6HK                                       1534Z
+DX de OH6BG-#:    7035.0  OZ1JB        CW 08 DB 22 WPM CQ             1534Z
+DX de F4BAL:     28120.0  W9SBE        TNX QSO                     IL 1534Z
+DX de DF4UE-#:   24924.0  GI4SNA       RTTY  04 DB CQ                 1534Z
+DX de WZ7I-#:    24913.0  ON4AXU       RTTY  26 DB CQ                 1534Z PA
+DX de DF7GB-#:   28016.8  LU1JIC       CW 12 DB 24 WPM CQ             1534Z
+DX de DL9GTB-#:  10141.9  DJ6SX        PSK63 18 DB CQ                 1534Z
+DX de WA7LNW-#:  21014.0  6Y6N         CW 15 DB 31 WPM CQ             1534Z UT
+DX de GW8IZR-#:  21030.3  W1AW/9       CW 24 DB 21 WPM CQ             1534Z
+DX de WZ7I-#:    28025.0  K5LY         CW 44 DB 26 WPM CQ          TX 1534Z PA
+DX de OE6BMG:    21044.0  NW0HERE      .....!                      ?? 1534Z
+DX de DF4UE-#:    7040.9  UR5NBN       PSK31 25 DB CQ                 1534Z
+DX de OK1NU:     28571.9  N1WRK        CORRECT FREQ                MA 1534Z
+DX de K1TTT-#:   10113.2  K5HZ         CW 25 DB 22 WPM CQ          MI 1534Z MA
+DX de ON5KQ-#:   10107.0  R4CA         CW 33 DB 33 WPM CQ             1534Z
+DX de SP6OUL:    14255.0  7X2YOTA      TNX 73                         1534Z
+DX de K3LR-#:    28034.7  S51UJ        CW 21 DB 23 WPM CQ             1534Z PA
+DX de DF4UE-#:    7016.5  LZ1ICZ       CW 20 DB 23 WPM CQ             1534Z
+DX de DF7GB-#:   28040.1  W1AW/9       CW 08 DB 26 WPM CQ             1535Z
+DX de WZ7I-#:    21026.7  SM4DDE       CW 27 DB 23 WPM CQ             1535Z PA
+DX de KM3T-#:    21043.9  OE6BMG       CW 24 DB 26 WPM CQ             1535Z NH
+DX de F6IIT-#:    7036.1  SM5CBV       CW 19 DB 17 WPM CQ             1535Z
+DX de WZ7I-#:    18107.9  ES5GP        RTTY  15 DB CQ                 1535Z PA
+DX de IK3STG-#:   7020.5  DL3UKH       CW 39 DB 15 WPM CQ             1535Z
+DX de DL9GTB-#:  21071.4  IT9CCB       PSK31 19 DB CQ                 1535Z
+DX de GW8IZR-#:  21017.8  7X4AN        CW 22 DB 26 WPM CQ             1535Z
+DX de DJ9IE-#:    7014.0  OZ3NP        CW 37 DB 23 WPM CQ             1535Z
+DX de 4Z5SM:      7131.7  4Z5MK/M      4X-00027 FORTRESS              1535Z
+DX de CA3SOC:    28076.0  DG0RG                                       1535Z
+DX de WZ7I-#:    24926.6  9A3SM        RTTY  04 DB CQ                 1535Z PA
+DX de HA1VHF-#:   7008.0  BD8SZ        CW 04 DB 28 WPM CQ             1535Z
+DX de K1TTT-#:   21019.0  G0XCF        CW 09 DB 20 WPM CQ             1535Z MA
+DX de K3LR-#:    28043.3  PD1EL        CW 15 DB 20 WPM CQ             1535Z PA
+DX de K1TTT-#:   21025.4  G8VG         CW 14 DB 25 WPM CQ             1535Z MA
+DX de HB9DCO-#:  10115.0  G0IIK        CW 10 DB 21 WPM CQ             1535Z
+DX de HA6VH:     21002.0  W100AW                                   CT 1535Z
+DX de DF4UE-#:   24932.3  VO2NS        RTTY  11 DB CQ              NL 1535Z
+DX de DL9GTB-#:  10141.4  IK1CJO       PSK31 24 DB CQ                 1535Z
+DX de WZ7I-#:    28122.0  M0SAS        PSK31 18 DB CQ                 1535Z PA
+DX de W2AXR-#:   28045.1  OM3CM        CW 17 DB 20 WPM CQ             1535Z NY
+DX de IV3OKO:    28436.2  8P6FX                                       1535Z
+DX de DK9IP-#:   18086.0  OD5PY        CW 05 DB 26 WPM CQ             1535Z
+DX de ON6ZQ-#:    7027.3  RA1WX        CW 22 DB 23 WPM CQ             1535Z
+DX de G4PNF-#:    7030.3  PA0WKI       CW 21 DB 16 WPM CQ             1535Z
+DX de WZ7I-#:    28121.7  XE2EX        PSK63 14 DB CQ                 1535Z PA
+DX de AC0C-#:    14052.2  WA5ZKP       CW 21 DB 15 WPM CQ          NM 1535Z KS
+DX de K8AZ-#:    21010.6  PZ1IV        CW 14 DB 24 WPM CQ             1535Z OH
+DX de GW8IZR-#:  28012.9  KW7D         CW 09 DB 17 WPM CQ          NM 1535Z
+DX de DL5YM:     10122.5  OE6XQRP                                     1535Z
+DX de HA6M-#:    10119.0  DJ6IH        CW 14 DB 25 WPM CQ             1535Z
+DX de DF4UE-#:   14082.0  F6FZQ        RTTY  03 DB CQ                 1535Z
+DX de WB7BBI:    28491.0  IZ2FOS       EL29HV<>JN55FK 55 TNX LOR      1535Z TX
+DX de S50ARX-#:  14015.0  SC2014ECC    CW 18 DB 36 WPM CQ             1535Z
+DX de DL4RCK-#:  14071.6  R6JY         PSK63 26 DB CQ                 1535Z
+DX de F5RRS-#:    7011.1  YL2AG        CW 06 DB 26 WPM CQ             1536Z
+DX de WZ7I-#:    28082.7  OE9PCJ       RTTY  12 DB CQ                 1536Z PA
+DX de HA0IR:     14243.0  PA6YOTA      TNX QSO! VIA.:OM2FY            1535Z
+DX de RA4CSP:     7062.0  RA4DR        RVSN-55                        1535Z
+DX de W4KKN-#:   28056.0  KC7HCR       CW 06 DB 22 WPM CQ          MT 1536Z VA
+DX de WZ7I-#:    28121.4  CM8IH        PSK31 24 DB CQ                 1536Z PA
+DX de DL3SG:     28451.0  DL1NKS       CQ                             1536Z
+DX de HA6VH:     21018.0  7X4AN                                       1536Z
+DX de F6IIT-#:   18084.7  EA8TL        CW 29 DB 33 WPM CQ             1536Z
+DX de W3LPL-#:   14038.1  W1AW/7       CW 13 DB 29 WPM CQ             1536Z MD
+DX de DL1REM-#:  10122.2  DL5YM        CW 28 DB 15 WPM CQ             1536Z
+DX de SM2IUF-#:  14019.5  PI30DIG      CW 36 DB 22 WPM CQ             1536Z
+DX de DF4UE-#:    7041.7  DL2IAD       PSK31 28 DB CQ                 1536Z
+DX de YT1AA:      7147.0  DF2BO                                       1536Z
+DX de IK3STG-#:  14057.2  G0AZD        CW 15 DB 15 WPM CQ             1536Z
+DX de WZ7I-#:    28082.3  HB9CIC       RTTY  10 DB CQ                 1536Z PA
+DX de WZ7I-#:    14072.4  N8AGG        PSK31 49 DB CQ              IN 1536Z PA
+DX de KB8M:      18070.0  W100AW       TNX FOR CONTACT. FIRST W100 CT 1536Z MI
+DX de GW8IZR-#:  21023.4  N4DSP        CW 15 DB 24 WPM CQ          NC 1536Z
+DX de DF7GB-#:    7027.0  IK6IHM       CW 30 DB 19 WPM CQ             1536Z
+DX de AC0C-#:    28005.0  IZ2FDU       CW 26 DB 22 WPM CQ             1536Z KS
+DX de W4KKN-#:   21027.7  KP4CPC       CW 16 DB 19 WPM CQ          PR 1536Z VA
+DX de HA6M-#:    21025.0  3B9FR        CW 04 DB 28 WPM CQ             1536Z
+DX de DL9GTB-#:  14072.4  YO1989BV     PSK63 19 DB CQ                 1536Z
+DX de DL4RCK-#:  14071.3  US1MM        PSK63 33 DB CQ                 1536Z
+DX de OE6TZE-#:  28011.3  VE2DQO       CW 30 DB 25 WPM CQ          QC 1536Z
+DX de SK3W-#:    28008.0  LU6UO        CW 19 DB 23 WPM CQ             1537Z
+DX de F6IIT-#:    7016.1  OZ3NP        CW 34 DB 23 WPM CQ             1537Z
+DX de AC0C-#:    28041.9  F6IRG        CW 18 DB 18 WPM CQ             1537Z KS
+DX de GW8IZR-#:  24897.8  WB2YL        CW 18 DB 33 WPM CQ          FL 1537Z
+DX de SE0X-#:    14014.1  IK7XTE       CW 20 DB 18 WPM CQ             1537Z
+DX de JA1LZR-#:   7013.1  3W7W         CW 15 DB 17 WPM CQ             1537Z
+DX de NC7J-#:    10106.3  N7XM         CW 43 DB 25 WPM CQ          NV 1537Z UT
+DX de DL2CC-#:    7012.0  SC2014ECC    CW 18 DB 36 WPM CQ             1537Z
+DX de NY3A-#:    28012.6  ON6BV        CW 13 DB 20 WPM CQ             1537Z PA
+DX de DF4UE-#:   18107.0  W1AW/9       RTTY  09 DB CQ                 1537Z
+DX de AC0C-#:    24894.9  KP4JFR       CW 18 DB 25 WPM CQ          PR 1537Z KS
+DX de DL9GTB-#:  21071.6  EA5ALJ       PSK31 27 DB CQ                 1537Z
+DX de DJ9IE-#:    7029.8  EW8O         CW 28 DB 28 WPM CQ             1537Z
+DX de K1TTT-#:    7029.0  W1AW/9       CW 25 DB 25 WPM CQ             1537Z MA
+DX de 9V1RM-#:    7037.1  W6JL         CW 10 DB 21 WPM CQ          CA 1537Z
+DX de DL4RCK-#:  14072.8  RA1APV       PSK63 23 DB CQ                 1537Z
+DX de VE2WU-#:   28006.0  EA1EYL       CW 18 DB 21 WPM CQ             1537Z QC
+DX de IV3OKO:    24942.0  N5PHT                                    TX 1537Z
+DX de HB9DCO-#:  18077.5  9A4W         CW 07 DB 27 WPM CQ             1537Z
+DX de K8ND-#:     7041.9  N0FL         CW 24 DB 24 WPM CQ          MO 1537Z OH
+DX de KB8M:      18070.6  W100AW       CENTENNIAL!                 CT 1537Z MI
+DX de SV8RV-#:   21013.0  RU1MQ        CW 19 DB 29 WPM CQ             1537Z
+DX de NK7Z:      14257.0  NK7Z         30 CENT PNTS BE HERE        OR 1537Z OR
+DX de N8MSA-#:   28028.5  G0CHV        CW 09 DB 22 WPM CQ             1537Z MI
+DX de IK7XGH:    14243.0  PA6YOTA                                     1537Z
+DX de F6IIT-#:   24900.6  PJ2/WI9WI    CW 09 DB 30 WPM CQ             1537Z
+DX de DF7GB-#:   18076.1  W1AW/9       CW 08 DB 31 WPM CQ             1537Z
+DX de AC0C-#:    28007.0  WA7MMM       CW 14 DB 24 WPM CQ          OR 1537Z KS
+DX de N2QT-#:    28084.8  OE9PCJ       RTTY  03 DB CQ                 1537Z VA
+DX de R6YY-#:    21016.0  IW2NBW       CW 22 DB 25 WPM CQ             1537Z
+DX de NC7J-#:    21025.4  K5LY         CW 07 DB 26 WPM CQ          TX 1537Z UT
+DX de W9PA:      18107.0  W1AW/8       RTTY                           1537Z IN
+DX de NY3A-#:    21019.9  DL7SX        CW 13 DB 27 WPM CQ             1537Z PA
+DX de HA1VHF-#:  18070.8  W100AW       CW 27 DB 27 WPM CQ          CT 1537Z
+DX de W6SX:      24908.8  W6SX         CENT 100 PTS                CA 1537Z CA
+DX de DF4UE-#:   14071.4  LY2BAA       PSK31 27 DB CQ                 1537Z
+DX de DL4RCK-#:  14070.9  YP35KZA      PSK31 40 DB CQ                 1537Z
+DX de WZ7I-#:    24924.0  GI4SNA       RTTY  24 DB CQ                 1538Z PA
+DX de KQ8M-#:    14062.0  W6JL         CW 06 DB 21 WPM CQ          CA 1538Z OH
+DX de ON5KQ-#:    3535.0  GW4HDB       CW 14 DB 21 WPM CQ             1538Z
+DX de K8ND-#:    24894.1  6Y6N         CW 06 DB 30 WPM CQ             1538Z OH
+DX de AC0C-#:     7030.5  W0DQ         CW 27 DB 19 WPM CQ          IA 1538Z KS
+DX de HA6M-#:     7033.2  DL2DWP       CW 31 DB 22 WPM CQ             1538Z
+DX de DL4RCK-#:  10140.4  R100DA       PSK31 28 DB CQ                 1538Z
+DX de DF4UE-#:   18103.7  PZ5RA        RTTY  14 DB CQ                 1538Z
+DX de DL1ET:     18077.5  9A4W                                        1538Z
+DX de OE6TZE-#:  28040.3  W1AW/9       CW 06 DB 27 WPM CQ             1538Z
+DX de K1TTT-#:   24908.0  KX9X/4       CW 08 DB 26 WPM CQ             1538Z MA
+DX de GW8IZR-#:  14053.4  LZ2JB        CW 19 DB 14 WPM CQ             1538Z
+DX de DL8LAS-#:   3570.0  DM2BCA       CW 45 DB 21 WPM CQ             1538Z
+DX de KB9WMJ:    21014.0  6Y6N                                        1538Z WI
+DX de WZ7I-#:    28121.9  IK8DYE       PSK31 31 DB CQ                 1538Z PA
+DX de DL9GTB-#:   7024.8  DJ2OD        CW 39 DB 17 WPM CQ             1538Z
+DX de WZ7I-#:    24913.6  OK2PAY       RTTY  31 DB CQ                 1538Z PA
+DX de DF7GB-#:   28009.1  LU7XX        CW 16 DB 24 WPM CQ             1538Z
+DX de W6LG:      14206.0  US4AS                                       1538Z CA
+DX de KS4XQ-#:   21017.0  OO7N         CW 08 DB 17 WPM CQ             1538Z SC
+DX de DL9GTB-#:  10111.0  UE55SM       CW 28 DB 27 WPM CQ             1538Z
+DX de DL9GTB-#:   7041.1  RA9LL/P      PSK31 20 DB CQ                 1538Z
+DX de IK0XBX-#:   7006.8  S57Z         CW 44 DB 28 WPM CQ             1538Z
+DX de DJ9IE-#:    3512.1  RW9JZ        CW 40 DB 21 WPM CQ             1538Z
+DX de DL4RCK-#:  14070.5  G7EZH        PSK31 38 DB CQ                 1538Z
+DX de DL2CC-#:    7025.5  DJ6IH        CW 17 DB 26 WPM CQ             1538Z
+DX de WZ7I-#:    21028.4  SM7CFZ       CW 29 DB 23 WPM CQ             1538Z PA
+DX de HA6M-#:    10107.0  R4CA         CW 18 DB 33 WPM CQ             1538Z
+DX de GW8IZR-#:  21012.0  9H1EJ        CW 17 DB 21 WPM CQ             1538Z
+DX de DL9GTB-#:  10141.9  RQ0C/4       PSK31 16 DB CQ                 1538Z
+DX de HA1VHF-#:  14018.0  UA3YDZ       CW 24 DB 22 WPM CQ             1538Z
+DX de RU9CZD-#:   7009.0  UA3YDZ       CW 21 DB 22 WPM CQ             1538Z
+DX de TF3Y-#:    18081.9  Z33A         CW 10 DB 26 WPM CQ             1538Z
+DX de VK4CT-#:   21011.3  VU3ARP       CW 15 DB 28 WPM CQ             1538Z
+DX de RK6CC:      7114.0  UE55OB       CQ...CQ                        1538Z
+DX de WZ7I-#:    14071.1  KF1P         PSK31 30 DB CQ              SC 1538Z PA
+DX de AA4VV-#:   10112.4  K5HZ         CW 17 DB 21 WPM CQ          MI 1538Z NC
+DX de NY3A-#:    28032.1  G3RVX        CW 19 DB 15 WPM CQ             1538Z PA
+DX de KM3T-#:    14051.9  N0UMP        CW 30 DB 16 WPM CQ          MO 1539Z NH
+DX de NY3A-#:    28012.9  KW7D         CW 31 DB 23 WPM CQ          NM 1539Z PA
+DX de SK3W-#:     7008.0  BD8SZ        CW 12 DB 27 WPM CQ             1539Z
+DX de R6YY-#:     7024.0  UA6LKW       CW 02 DB 18 WPM CQ             1539Z
+DX de KC9YIJ:    28433.0  DL8YBM                                      1539Z IL
+DX de SE0X-#:    14060.9  HB9BGL       CW 12 DB 20 WPM CQ             1539Z
+DX de DL2CC-#:    7005.0  Z31RQ        CW 28 DB 20 WPM CQ             1539Z
+DX de DK0TE-#:    7022.9  DL0FBG       CW 22 DB 25 WPM CQ             1539Z
+DX de GW8IZR-#:  28025.0  G4RCG        CW 13 DB 25 WPM CQ             1539Z
+DX de K1TTT-#:   28032.0  OK1DMZ       CW 11 DB 26 WPM CQ             1539Z MA
+DX de DL9GTB-#:   7042.6  G3PXT        PSK63 40 DB CQ                 1539Z
+DX de WZ7I-#:    28084.3  EA7AZA       RTTY  15 DB CQ                 1539Z PA
+DX de DL9GTB-#:  14071.2  IZ5VSM       PSK31 20 DB CQ                 1539Z
+DX de DF4UE-#:   18084.5  EA8TL        CW 17 DB 32 WPM CQ             1539Z
+DX de DL1REM-#:  10116.7  G4EBO        CW 09 DB 20 WPM CQ             1539Z
+DX de DL4RCK-#:  10140.9  SQ3MVK       PSK31 14 DB CQ                 1539Z
+DX de DF7GB-#:   28008.0  AB3CX        CW 44 DB 28 WPM CQ          NY 1539Z
+DX de DF7GB-#:    7010.1  YL2AG        CW 18 DB 26 WPM CQ             1539Z
+DX de SK3W-#:     3557.0  DJ6IH        CW 25 DB 28 WPM CQ             1539Z
+DX de ON8DM:      3799.5  G4PEL        CQLP WC                        1539Z
+DX de VE2WU-#:   21030.2  W1AW/9       CW 21 DB 22 WPM CQ             1539Z QC
+DX de LA5EKA-#:   3556.0  OH3GQE       CW 20 DB 15 WPM CQ             1539Z
+DX de DL4MFF:    18084.5  EA8TL        TNX                            1539Z
+DX de SP2SV:      7011.9  SC2014ECC                                   1539Z
+DX de DL4RCK-#:  10141.2  PA7ZZ        PSK63 31 DB CQ                 1539Z
+DX de GW8IZR-#:  10116.0  OZ6ABZ       CW 15 DB 14 WPM CQ             1539Z
+DX de SE0X-#:     7027.0  IK6IHM       CW 30 DB 25 WPM CQ             1539Z
+DX de W3LPL-#:   24904.0  DL1SMA       CW 26 DB 23 WPM CQ             1539Z MD
+DX de HB9DCO-#:   7019.2  IK7MIY       CW 19 DB 17 WPM CQ             1540Z
+DX de 9A5M:      28007.9  AB3CX        CW                          NY 1540Z
+DX de DF4UE-#:   24920.8  W2WC         PSK31 14 DB CQ              NY 1540Z
+DX de HA1VHF-#:  28005.1  IZ2FDU       CW 16 DB 22 WPM CQ             1540Z
+DX de N2QT-#:    28086.0  W2YC         RTTY  00 DB CQ              NJ 1540Z VA
+DX de DL9GTB-#:  10141.3  YO6QT        PSK63 18 DB CQ                 1540Z
+DX de ON6ZQ-#:    7029.0  UE55RW       CW 15 DB 31 WPM CQ             1540Z
+DX de DF4UE-#:   14071.7  LJ9N         PSK31 16 DB CQ                 1540Z
+DX de DL9GTB-#:  14071.5  IZ3KJH       PSK31 23 DB CQ                 1540Z
+DX de DL6YAO:     7003.4  YP60CCC/P    TNX                            1540Z
+DX de F6IIT-#:   10117.1  DL7SO        CW 15 DB 22 WPM CQ             1540Z
+DX de WZ7I-#:    14086.3  F6FZQ        RTTY  -1 DB CQ                 1540Z PA
+DX de DL4RCK-#:  14071.4  I8TUS        PSK31 21 DB CQ                 1540Z
+DX de W6LG:      14197.5  FR5HA                                       1540Z CA
+DX de GW8IZR-#:   7024.9  I2MG         CW 25 DB 16 WPM CQ             1540Z
+DX de DK0TE-#:   10117.5  SQ2DMX       CW 09 DB 23 WPM CQ             1540Z
+DX de G0ATV:     18077.0  9A4W         LONELY CALLING CQ IOTA         1540Z
+DX de IW2DKV:    21310.0  FR5DX        S5/R5  QSB                     1540Z
+DX de WZ7I-#:    28018.4  DL5FCZ       CW 20 DB 29 WPM CQ             1540Z PA
+DX de K1TTT-#:   24905.8  9A2YM        CW 23 DB 22 WPM CQ             1540Z MA
+DX de DK0TE-#:   10105.0  HA7JQK       CW 10 DB 31 WPM CQ             1540Z
+DX de K3LR-#:    28026.2  G3RVX        CW 21 DB 15 WPM CQ             1540Z PA
+DX de WZ7I-#:    18109.0  IT9MUO       RTTY  19 DB CQ                 1540Z PA
+DX de K1TTT-#:   14038.1  W1AW/7       CW 32 DB 29 WPM CQ             1540Z MA
+DX de DL4RCK-#:  14070.6  TF3FIN       PSK31 15 DB CQ                 1540Z
+DX de OH6BG-#:   14022.8  OE5FBL       CW 19 DB 20 WPM CQ             1540Z
+DX de KM3T-#:    10116.0  KC1DI        CW 27 DB 20 WPM CQ          ME 1540Z NH
+DX de SK3W-#:    28012.4  LU6UO        CW 13 DB 25 WPM CQ             1540Z
+DX de HB9DCO-#:  21027.7  KP4CPC       CW 09 DB 20 WPM CQ          PR 1540Z
+DX de KM3T-#:    24896.1  DK7OB        CW 15 DB 24 WPM CQ             1540Z NH
+DX de HB9MXY:    10139.2  R100DA       BPSK31 NICE SIGNAL HERE, TKS F 1540Z
+DX de DJ9IE-#:    7002.0  IK1QHB       CW 41 DB 24 WPM CQ             1540Z
+DX de AC0C-#:    21025.0  3B9FR        CW 31 DB 28 WPM CQ             1540Z KS
+DX de DL1REM-#:  14014.0  IK7XTE       CW 24 DB 18 WPM CQ             1540Z
+DX de DJ9IE-#:   10116.0  OE6C         CW 13 DB 16 WPM CQ             1540Z
+DX de DL2CC-#:    7002.9  YP60CCC/P    CW 14 DB 21 WPM CQ             1540Z
+DX de ON5KQ-#:    7033.5  DM4MM        CW 17 DB 18 WPM CQ             1540Z
+DX de HA6M-#:     7011.4  DJ2OD        CW 19 DB 16 WPM CQ             1540Z
+DX de VE6AO-#:   21071.0  F1AKX        PSK31 22 DB CQ                 1540Z AB
+DX de K9IG:      24907.3  W1AW/9                                      1541Z IN
+DX de AC0C-#:    21057.0  KC7HCR       CW 34 DB 12 WPM CQ          MT 1540Z KS
+DX de RZ3PX:      7008.0  BD8SZ        TNX QSO                        1540Z
+DX de K8ND-#:    28055.0  IZ2QXG       CW 17 DB 16 WPM CQ             1540Z OH
+DX de OE6TZE-#:   3529.0  EW8O         CW 12 DB 24 WPM CQ             1541Z
+DX de W2AXR-#:   28053.1  G4COE        CW 07 DB 24 WPM CQ             1541Z NY
+DX de HA6VH:      7012.0  SC2014ECC                                   1541Z
+DX de K1TTT-#:   14029.0  W1AW/7       CW 20 DB 27 WPM CQ             1541Z MA
+DX de KA9SWE-#:  24900.3  PJ2/WI9WI    CW 15 DB 30 WPM CQ             1541Z WI
+DX de WZ7I-#:    21042.7  DJ5QV        CW 22 DB 25 WPM CQ             1541Z PA
+DX de DF7GB-#:   24907.4  W1AW/9       CW 08 DB 30 WPM CQ             1541Z
+DX de W8WTS-#:   28031.6  EA6UN        CW 14 DB 22 WPM CQ             1541Z OH
+DX de DL1REM-#:   7011.0  HB9ARY       CW 22 DB 17 WPM CQ             1541Z
+DX de K3LR-#:     7041.8  N0FL         CW 19 DB 23 WPM CQ          MO 1541Z PA
+DX de WZ7I-#:    28094.9  W1AW/9       RTTY  06 DB CQ                 1541Z PA
+DX de KJ9C:      14029.0  W1AW/7       MONTANA LAST DAY               1541Z MT
+DX de HA1VHF-#:   7027.4  RA1WX        CW 16 DB 23 WPM CQ             1541Z
+DX de KM3T-#:    28032.8  DJ1KJ        CW 15 DB 22 WPM CQ             1541Z NH
+DX de ON5KQ-#:   10122.3  DL5YM        CW 47 DB 28 WPM CQ             1541Z
+DX de S51ZZ:     14244.0  TI8II        CARLOS DXNET                   1541Z
+DX de K8ND-#:    21026.8  SM4DDE       CW 09 DB 23 WPM CQ             1541Z OH
+DX de WA7LNW-#:  28061.0  AA9AA        CW 09 DB 15 WPM CQ          WI 1541Z UT
+DX de WZ7I-#:    24929.0  HA5WA        RTTY  28 DB CQ                 1541Z PA
+DX de VE2WU-#:   28055.3  DJ5QV        CW 09 DB 26 WPM CQ             1541Z QC
+DX de DL9GTB-#:  10141.7  OP4D         PSK31 25 DB CQ                 1541Z
+DX de DF4UE-#:   28040.0  W1AW/9       CW 13 DB 26 WPM CQ             1541Z
+DX de HA6VH:      7005.0  Z31RQ                                       1541Z
+DX de DL9GTB-#:   7042.2  DL0KGM       PSK31 24 DB CQ                 1541Z
+DX de W4KKN-#:   28034.5  S51UJ        CW 09 DB 22 WPM CQ             1541Z VA
+DX de WZ7I-#:    21072.1  F5HRH        PSK63 16 DB CQ                 1541Z PA
+DX de F5RRS-#:   21002.2  W100AW       CW 16 DB 37 WPM CQ          CT 1541Z
+DX de NC7J-#:    18076.0  W1AW/9       CW 18 DB 31 WPM CQ             1541Z UT
+DX de ON5KQ-#:    3512.0  RW9JZ        CW 26 DB 22 WPM CQ             1541Z
+DX de DL4RCK-#:  10140.8  ES3BR        PSK31 16 DB CQ                 1541Z
+DX de VE2WU-#:   28058.0  G0EKP        CW 09 DB 13 WPM CQ             1541Z QC
+DX de NK7Z:      14260.0  NK7Z         30 CENT PNTS BE HR CHENGE F OR 1542Z OR
+DX de DL9GTB-#:  14071.9  IU1BPA       PSK31 42 DB CQ                 1541Z
+DX de DK9IP-#:    7030.0  G0IIK        CW 12 DB 20 WPM CQ             1542Z
+DX de K3LR-#:    28030.5  G3RVX        CW 16 DB 15 WPM CQ             1542Z PA
+DX de DL4RCK-#:  14070.8  YP35KZA      PSK31 28 DB CQ                 1541Z
+DX de HB9DCO-#:   7023.9  DL0FBG       CW 19 DB 25 WPM CQ             1542Z
+DX de DF7GB-#:   10114.4  OZ3MC        CW 40 DB 28 WPM CQ             1542Z
+DX de RK6CC:      7131.9  4Z5MK/M      73 !!!                         1542Z
+DX de F2YV:      21010.3  PZ1DV        UP 0,15                        1542Z
+DX de HA1VHF-#:   7014.0  UT5MD        CW 29 DB 22 WPM CQ             1542Z
+DX de WZ7I-#:    28005.0  YO4ATW       CW 13 DB 30 WPM CQ             1542Z PA
+DX de DF4UE-#:    7041.8  R4FAM        PSK31 11 DB CQ                 1542Z
+DX de F5RRS-#:   14010.1  9A5M         CW 19 DB 28 WPM CQ             1542Z
+DX de WZ7I-#:    21070.8  W0GN         PSK31 25 DB CQ              IA 1542Z PA
+DX de WZ7I-#:    28083.0  PA3EVY       RTTY  21 DB CQ                 1542Z PA
+DX de KM3T-#:    21016.9  OO7N         CW 21 DB 18 WPM CQ             1542Z NH
+DX de W4KKN-#:    7123.0  W3KC         CW 21 DB 18 WPM CQ          MD 1542Z VA
+DX de HA6M-#:     7006.8  S57Z         CW 37 DB 28 WPM CQ             1542Z
+DX de DL9GTB-#:  14072.5  YO1989BV     PSK63 23 DB CQ                 1542Z
+DX de NY3A-#:     7043.0  N4EUQ        CW 26 DB 14 WPM CQ          VA 1542Z PA
+DX de F5RRS-#:    7022.5  DK5SF        CW 27 DB 18 WPM CQ             1542Z
+DX de DF4UE-#:   10141.8  SQ3TGU       PSK63 29 DB CQ                 1542Z
+DX de DK9IP-#:   10107.0  R4CA         CW 12 DB 33 WPM CQ             1542Z
+DX de KM3T-#:    28043.6  W5FKW        CW 19 DB 17 WPM CQ          TX 1542Z NH
+DX de F6IIT-#:    7005.1  Z31RQ        CW 33 DB 21 WPM CQ             1542Z
+DX de W8WWV-#:   28043.8  W5FKW        CW 14 DB 17 WPM CQ          TX 1542Z OH
+DX de PR7LV:     28031.1  EA6UN        TNX 73                         1542Z
+DX de DL1REM-#:  18089.8  IT9AUP       CW 33 DB 27 WPM CQ             1542Z
+DX de PY1NB-#:   28031.9  OK1DMZ       CW 12 DB 27 WPM CQ             1542Z
+DX de ON5KQ-#:   10111.1  UE55SM       CW 41 DB 28 WPM CQ             1542Z
+DX de K1TTT-#:   28006.7  ON6BV        CW 13 DB 19 WPM CQ             1542Z MA
+DX de JA1LZR-#:  21054.2  JO1KSD       CW 02 DB 19 WPM CQ             1542Z
+DX de DF4UE-#:    7041.7  DM3XIF       PSK31 21 DB CQ                 1542Z
+DX de DQ8Z-#:    18084.5  EA8TL        CW 29 DB 33 WPM CQ             1542Z
+DX de DL1REM-#:  24894.0  6Y6N         CW 09 DB 30 WPM CQ             1542Z
+DX de DF7GB-#:   18086.0  OD5PY        CW 22 DB 25 WPM CQ             1542Z
+DX de ON6ZQ-#:    7033.0  RA4DR        CW 12 DB 21 WPM CQ             1542Z
+DX de WZ7I-#:    28121.8  CO4SM        PSK31 15 DB CQ                 1542Z PA
+DX de HA6M-#:     7016.2  DL1DUS       CW 26 DB 22 WPM CQ             1542Z
+DX de KM3T-#:    28018.0  DK2FE        CW 17 DB 28 WPM CQ             1542Z NH
+DX de DL8LAS-#:   7030.4  I3UK         CW 30 DB 15 WPM CQ             1542Z
+DX de DL9GTB-#:  14072.6  YO9AGN       PSK63 21 DB CQ                 1542Z
+DX de 9A2DI:     18103.6  PZ5RA        CQ RTTY                        1542Z
+DX de DL2CC-#:   14042.9  GM4MTI       CW 02 DB 19 WPM CQ             1542Z
+DX de DL4MFF:    24900.3  PJ2/WI9WI    TNX                            1542Z
+DX de WA7LNW-#:   7037.1  W6JL         CW 43 DB 21 WPM CQ          CA 1542Z UT
+DX de NC7J-#:    14062.0  W6JL         CW 28 DB 21 WPM CQ          CA 1542Z UT
+DX de VE2WU-#:   28045.0  OM3CM        CW 22 DB 22 WPM CQ             1542Z QC
+DX de WZ7I-#:    18107.0  K5JUC        RTTY  38 DB CQ              AR 1543Z PA
+DX de NC7J-#:    18070.7  W100AW       CW 21 DB 27 WPM CQ          CT 1543Z UT
+DX de F6EDO:     28009.0  LU7XX        USHUAIA TIERRA DEL FUEGO       1543Z
+DX de RA4DR:      7033.0  RA4DR        RVSN-55                        1543Z
+DX de OH6BG-#:   14047.2  DJ5QV        CW 29 DB 25 WPM CQ             1543Z
+DX de ON5KQ-#:   21007.1  US5EVJ       CW 46 DB 20 WPM CQ             1543Z
+DX de WA1PCY:    28433.0  DL8YBM       LOOKING FOR 10-10              1543Z NJ
+DX de HA6VH:      7002.8  YP60CCC/P                                   1543Z
+DX de HB9FLU:    50230.0  SM7MBH       TNX FB MS QSO                  1543Z
+DX de ON5KQ-#:   14013.0  RU1MQ        CW 11 DB 29 WPM CQ             1543Z
+DX de WE9V-#:    24894.9  KP4JFR       CW 03 DB 25 WPM CQ          PR 1543Z WI
+DX de W3LPL-#:   10106.3  N7XM         CW 17 DB 23 WPM CQ          NV 1543Z MD
+DX de KS4XQ-#:   28005.1  IZ2FDU       CW 18 DB 24 WPM CQ             1543Z SC
+DX de SP6OUL:    14243.0  PA6YOTA      TNX EDVIN 73                   1543Z
+DX de KM3T-#:    28010.9  G4COE        CW 17 DB 24 WPM CQ             1543Z NH
+DX de DF7GB-#:   21017.9  7X4AN        CW 28 DB 26 WPM CQ             1543Z
+DX de DK9IP-#:    7025.0  IZ7FUN       CW 30 DB 20 WPM CQ             1543Z
+DX de DL9GTB-#:  21072.1  EC8AXS       PSK63 31 DB CQ                 1543Z
+DX de NZ1U-#:    18077.5  9A4W         CW 29 DB 25 WPM CQ             1543Z CT
+DX de K1TTT-#:   18079.5  OE6PJD       CW 30 DB 18 WPM CQ             1543Z MA
+DX de KE8UN:     28095.0  W1AW/9       UP 1-2 TNX                     1543Z WV
+DX de WZ7I-#:    28095.7  G3WYW        RTTY  01 DB CQ                 1543Z PA
+DX de DL1REM-#:  18097.0  IT9MUO       CW 32 DB 30 WPM CQ             1543Z
+DX de ND4Q:      14260.1  NK7Z                                     OR 1543Z AL
+DX de DL9GTB-#:  10140.7  SQ1SNO       PSK63 20 DB CQ                 1543Z
+DX de K1TTT-#:   10120.9  K9TJL        CW 20 DB 17 WPM CQ          IL 1543Z MA
+DX de W3LPL-#:   18083.2  VE1OK        CW 36 DB 23 WPM CQ          NS 1543Z MD
+DX de WZ7I-#:    21012.0  9H1EJ        CW 07 DB 20 WPM CQ             1543Z PA
+DX de ZL2RV-#:   14038.3  W1AW/7       CW 11 DB 29 WPM CQ             1543Z
+DX de WZ7I-#:     7029.0  W1AW/9       CW 31 DB 25 WPM CQ             1543Z PA
+DX de F6IIT-#:   21027.9  KP4CPC       CW 09 DB 20 WPM CQ          PR 1543Z
+DX de N2QT-#:    14084.0  K4MIL        RTTY  00 DB CQ              VA 1543Z VA
+DX de WZ7I-#:    28120.5  F6ECI        PSK31 11 DB CQ                 1543Z PA
+DX de DL9GTB-#:   7040.6  UT8IT        PSK31 24 DB CQ                 1543Z
+DX de JA1LZR-#:   3505.3  JR2GAG       CW 25 DB 21 WPM CQ             1543Z
+DX de DK0TE-#:   21030.3  W1AW/9       CW 09 DB 23 WPM CQ             1543Z
+DX de PY1NB-#:   21015.9  IW2NBW       CW 07 DB 26 WPM CQ             1543Z
+DX de F4GMM:     28514.8  CE4WJK       TNX 57 GUSTAVO                 1543Z
+DX de KQ8M-#:     7052.0  KN4ZQ        CW 31 DB 13 WPM CQ          VA 1544Z OH
+DX de SQ5HUE:    21255.0  VA2PW                                    QC 1544Z
+DX de UN9GD:      7030.9  UP44WFF                                     1544Z
+DX de WZ7I-#:    21050.0  K9NRW        CW 20 DB 14 WPM CQ          IL 1544Z PA
+DX de DL1REM-#:  10119.0  G0EML        CW 32 DB 24 WPM CQ             1544Z
+DX de DK0TE-#:   28012.5  LU6UO        CW 08 DB 30 WPM CQ             1544Z
+DX de WZ7I-#:    28041.9  F6IRG        CW 22 DB 18 WPM CQ             1544Z PA
+DX de N4ZQ:      28095.0  W1AW/9       RTTY * LITE IN FL  BEAM SOUTH  1544Z FL
+DX de DF7GB-#:   28010.1  N2GOT        CW 21 DB 21 WPM CQ          NY 1544Z
+DX de DF4UE-#:   14084.3  F6FZQ        RTTY  01 DB CQ                 1544Z
+DX de WZ7I-#:    28031.3  EA6UN        CW 24 DB 22 WPM CQ             1544Z PA
+DX de EA7JJZ:     7120.0  EA7JIF       SORTEO RADIOCLUB MALAKA        1544Z
+DX de DF4UE-#:   10143.1  R100DA       RTTY  09 DB CQ                 1544Z
+DX de OH6BG-#:   18082.0  Z33A         CW 13 DB 26 WPM CQ             1544Z
+DX de SV8RV-#:    7025.0  I2MG         CW 21 DB 19 WPM CQ             1544Z
+DX de W4KKN-#:   28055.0  IZ2QXG       CW 10 DB 16 WPM CQ             1544Z VA
+DX de G4PNF-#:    7029.5  G0IIK        CW 26 DB 20 WPM CQ             1544Z
+DX de DL9GTB-#:  28009.1  LU7XX        CW 12 DB 24 WPM CQ             1544Z
+DX de DL1REM-#:  10116.0  OE6C         CW 10 DB 16 WPM CQ             1544Z
+DX de WZ7I-#:    24929.0  HA5AGS       RTTY  14 DB CQ                 1544Z PA
+DX de NY3A-#:    28026.1  N3BB/M       CW 23 DB 29 WPM CQ          TX 1544Z PA
+DX de DO5KR:     21310.0  FR5DX        MANY THANKS FOR THE NICE CONTA 1544Z
+DX de DF4UE-#:   14082.1  4J3DJ        RTTY  16 DB CQ                 1544Z
+DX de HB9DCO-#:  10114.2  G4DZE        CW 13 DB 24 WPM CQ             1544Z
+DX de KM3T-#:    21056.0  KC7HCR       CW 10 DB 22 WPM CQ          MT 1544Z NH
+DX de ON5KQ-#:   10123.5  DJ5QV        CW 18 DB 25 WPM CQ             1544Z
+DX de DL9GTB-#:   7041.1  RV3QD        PSK31 17 DB CQ                 1544Z
+DX de DF4UE-#:   28060.9  AA9AA        CW 06 DB 15 WPM CQ          WI 1544Z
+DX de DF4UE-#:    7041.0  UR5NBN       PSK31 23 DB CQ                 1544Z
+DX de WZ7I-#:    21071.3  HB9EBV       PSK63 26 DB CQ                 1544Z PA
+DX de DL9GTB-#:  21019.4  EA4ETU       CW 12 DB 24 WPM CQ             1544Z
+DX de K1TTT-#:   28000.1  YO4ATW       CW 13 DB 31 WPM CQ             1544Z MA
+DX de WZ7I-#:    24910.4  W100AW       RTTY  23 DB CQ              CT 1545Z PA
+DX de SK3W-#:     7016.5  R4SA         CW 18 DB 19 WPM CQ             1545Z
+DX de WZ7I-#:     7023.1  N0AJ         CW 15 DB 20 WPM CQ          MO 1545Z PA
+DX de VE2WU-#:   21002.9  WB5OZA       CW 25 DB 35 WPM CQ          LA 1545Z QC
+DX de OH6BG-#:    7027.4  RA1WX        CW 23 DB 21 WPM CQ             1545Z
+DX de DL4RCK-#:  14072.4  UT0L         PSK31 19 DB CQ                 1545Z
+DX de DF7GB-#:   14025.1  OH2KI        CW 20 DB 26 WPM CQ             1545Z
+DX de WZ7I-#:    21070.9  PA3BMC       PSK31 12 DB CQ                 1545Z PA
+DX de HA1VHF-#:  28040.1  W1AW/9       CW 10 DB 26 WPM CQ             1545Z
+DX de W6LG:      14210.0  YT5EA                                       1545Z CA
+DX de DL1REM-#:   7028.0  G4MLW        CW 25 DB 19 WPM CQ             1545Z
+DX de DL9GTB-#:  14072.0  F6HDW        PSK63 26 DB CQ                 1545Z
+DX de NY3A-#:    28045.0  G0EKP        CW 22 DB 12 WPM CQ             1545Z PA
+DX de WA7LNW-#:  28043.6  W4CI         CW 21 DB 23 WPM CQ          FL 1545Z UT
+DX de DL4RCK-#:  14071.3  UA3IAH       PSK31 37 DB CQ                 1545Z
+DX de G4PNF-#:    7001.0  YU1WN        CW 32 DB 25 WPM CQ             1545Z
+DX de SE0X-#:     3512.0  RW9JZ        CW 27 DB 25 WPM CQ             1545Z
+DX de EA7HZM:     7123.0  EA7FUW       3ST.COMUNIDADES Y PROVINCIAS   1545Z
+DX de WZ7I-#:    18107.9  ES5GP        RTTY  23 DB CQ                 1545Z PA
+DX de UA6AUA:    10106.9  R4CA         RVSN-55                        1545Z
+DX de S50ARX-#:   7022.4  DK5SF        CW 16 DB 18 WPM CQ             1545Z
+DX de AC0C-#:    21016.9  OO7N         CW 08 DB 18 WPM CQ             1545Z KS
+DX de DL9GTB-#:  14072.4  2M0MZO       PSK31 21 DB CQ                 1545Z
+DX de DL9GTB-#:   3530.0  SM5RDW       CW 21 DB 22 WPM CQ             1545Z
+DX de 9A6RMI:    14197.5  FR5HA                                       1545Z
+DX de KM3T-#:    28034.4  S51UJ        CW 26 DB 21 WPM CQ             1545Z NH
+DX de WZ7I-#:    24904.9  IT9AUP       CW 11 DB 27 WPM CQ             1545Z PA
+DX de AB1J:      28089.1  WB7S         CQ ARRL CENT                WY 1545Z MA
+DX de WZ7I-#:    14026.8  W0LS         CW 37 DB 20 WPM CQ          MN 1545Z PA
+DX de DK0TE-#:    3543.3  DJ5QV        CW 33 DB 25 WPM CQ             1545Z
+DX de K8ND-#:     7043.0  N4EUQ        CW 07 DB 14 WPM CQ          VA 1545Z OH
+DX de WZ7I-#:    14050.8  W2B          CW 38 DB 16 WPM CQ             1545Z PA
+DX de WZ7I-#:    21072.5  G4KHG        PSK31 26 DB CQ                 1545Z PA
+DX de SV8RV-#:    7016.0  DL1DUS       CW 07 DB 21 WPM CQ             1545Z
+DX de W4AX-#:    24900.4  PJ2/WI9WI    CW 07 DB 31 WPM CQ             1545Z GA
+DX de DF4UE-#:   28089.1  WB7S         RTTY  03 DB CQ              WY 1545Z
+DX de N2QT-#:    14082.1  HB9CRV       RTTY  -1 DB CQ                 1545Z VA
+DX de N2ESP:     18107.9  ES5GP        RTTY                           1546Z FL
+DX de WZ7I-#:    21072.7  KG5CR        PSK31 40 DB CQ              AR 1545Z PA
+DX de DQ8Z-#:    10116.7  G4EBO        CW 06 DB 19 WPM CQ             1546Z
+DX de EA8ED:     14335.0  EA8ED        COMUNIDADES                    1546Z
+DX de DL9GTB-#:   7041.9  OE2VDL       PSK31 24 DB CQ                 1546Z
+DX de WZ7I-#:    14019.4  PI30DIG      CW 17 DB 21 WPM CQ             1546Z PA
+DX de RU9CZD-#:   7018.0  RV3UF        CW 12 DB 30 WPM CQ             1546Z
+DX de K3LR-#:    14036.1  W3MAT        CW 11 DB 18 WPM CQ          PA 1546Z PA
+DX de F6IIT-#:    7020.1  M6MPC        CW 19 DB 22 WPM CQ             1546Z
+DX de DQ8Z-#:    10106.9  R4CA         CW 24 DB 32 WPM CQ             1546Z
+DX de K8ND-#:     7035.9  W4LGJ        CW 25 DB 22 WPM CQ          KY 1546Z OH
+DX de GW8IZR-#:  14015.8  DL7SX        CW 28 DB 20 WPM CQ             1546Z
+DX de DF4UE-#:   28121.3  CM8IH        PSK31 11 DB CQ                 1546Z
+DX de AB1J:      28092.2  AB1J                                     MA 1546Z MA
+DX de W3OA-#:    18080.0  OE6PJD       CW 21 DB 18 WPM CQ             1546Z NC
+DX de WZ7I-#:    21071.0  IW9ABZ       PSK31 20 DB CQ                 1546Z PA
+DX de UT8IT:     10141.0  UT8IT        QPSK31 CQ CQ CQ                1546Z
+DX de SM2IUF-#:  14021.1  DJ7MH        CW 26 DB 12 WPM CQ             1546Z
+DX de K7EG-#:    28043.7  W5FKW        CW 08 DB 17 WPM CQ          TX 1546Z WA
+DX de W6LG:      14243.0  PA6YOTA                                     1546Z CA
+DX de KJ9C:      14038.0  W1AW/7       MT LAST DAY SIMPLEX            1546Z MT
+DX de WZ7I-#:    28122.2  F6ECI        PSK31 18 DB CQ                 1546Z PA
+DX de IZ4AIB:    18070.8  W100AW       ISO                         CT 1546Z
+DX de WA7LNW-#:  14038.1  W1AW/7       CW 43 DB 29 WPM CQ             1546Z UT
+DX de DJ9IE-#:   10111.0  UE55SM       CW 32 DB 26 WPM CQ             1546Z
+DX de WA5LOU:    24916.0  W1AW/9       RTTY - LISTENING UP 1          1546Z IN
+DX de DJ9IE-#:    7013.5  UE55RW       CW 14 DB 31 WPM CQ             1546Z
+DX de KA9SWE-#:  10106.3  N7XM         CW 21 DB 21 WPM CQ          NV 1546Z WI
+DX de HA6M-#:    10109.6  SM5DYC       CW 21 DB 21 WPM CQ             1546Z
+DX de HA6M-#:    18084.5  EA8TL        CW 08 DB 33 WPM CQ             1546Z
+DX de W1NT-#:    14043.1  AC8LJ        CW 19 DB 25 WPM CQ          WV 1546Z MA
+DX de WZ7I-#:    21072.1  K5YRT        PSK63 37 DB CQ              LA 1546Z PA
+DX de KJ9C:      14075.0  W1AW/7       MT RTTY LAST DAY!              1546Z MT
+DX de K3LR-#:    28032.2  OK1DMZ       CW 08 DB 26 WPM CQ             1547Z PA
+DX de DK9PY:     28014.0  6Y6N                                        1547Z
+DX de K3LR-#:    28014.2  6Y6N         CW 13 DB 30 WPM CQ             1547Z PA
+DX de EA4GJP:     7085.0  EA7VL        VGMA 088 DME 29051             1547Z
+DX de DF4UE-#:   28092.1  AB1J         RTTY  06 DB CQ              MA 1547Z
+DX de DF4UE-#:   10142.2  SQ1SNT       PSK31 21 DB CQ                 1547Z
+DX de SV8RV-#:   14070.9  PA3BMC       PSK31 20 DB CQ                 1547Z
+DX de DL9GTB-#:   7042.2  DL0KGM       PSK31 17 DB CQ                 1547Z
+DX de WZ7I-#:    21071.7  IZ8DGR       PSK63 23 DB CQ                 1547Z PA
+DX de PY4HGM:    28400.5  PY4HGM       CQ                             1547Z
+DX de K8ND-#:    28042.1  F6IRG        CW 20 DB 18 WPM CQ             1547Z OH
+DX de W4QN:      28390.0  EI5HV                                       1547Z FL
+DX de LA5EKA-#:   7003.5  IK1QHB       CW 13 DB 23 WPM CQ             1547Z
+DX de AC0C-#:    28005.0  IZ2FDU       CW 27 DB 22 WPM CQ             1547Z KS
+DX de WE9V-#:    10118.0  K9TJL        CW 28 DB 17 WPM CQ          IL 1547Z WI
+DX de WA7LNW-#:  21030.3  W1AW/9       CW 14 DB 23 WPM CQ             1547Z UT
+DX de DK0TE-#:   14060.5  EW7BW        CW 12 DB 16 WPM CQ             1547Z
+DX de EA6VQ-#:   50110.2  I6BQI        CW 10 DB 22 WPM CQ             1547Z
+DX de KM3T-#:    21060.0  W8KJ         CW 30 DB 17 WPM CQ          OH 1547Z NH
+DX de NK7Z:      14279.0  NK7Z         30 CENT PNTS HR             OR 1547Z OR
+DX de WZ7I-#:    18077.5  9A4W         CW 27 DB 27 WPM CQ             1547Z PA
+DX de DL9GTB-#:   7042.3  DL2IAD       PSK63 31 DB CQ                 1547Z
+DX de K1TTT-#:    7029.0  W1AW/9       CW 24 DB 25 WPM CQ             1547Z MA
+DX de DF4UE-#:   18107.0  W1AW/9       RTTY  11 DB CQ                 1547Z
+DX de DK9IP-#:   21002.0  W100AW       CW 19 DB 37 WPM CQ          CT 1547Z
+DX de WZ7I-#:    24894.9  KP4JFR       CW 13 DB 25 WPM CQ          PR 1547Z PA
+DX de G4PNF-#:    7023.0  G0EML        CW 40 DB 24 WPM CQ             1547Z
+DX de DJ9IE-#:    7035.4  DJ5QV        CW 39 DB 25 WPM CQ             1547Z
+DX de W4KKN-#:   21017.9  7X4AN        CW 09 DB 24 WPM CQ             1547Z VA
+DX de KS4XQ-#:   18082.0  Z33A         CW 12 DB 26 WPM CQ             1547Z SC
+DX de V51YJ-#:   28015.0  PR7AR        CW 07 DB 39 WPM CQ             1547Z
+DX de SK3W-#:     3538.0  SM7ERE       CW 38 DB 14 WPM CQ             1547Z
+DX de DL9GTB-#:  21027.8  KP4CPC       CW 10 DB 20 WPM CQ          PR 1547Z
+DX de OE6TZE-#:   7007.0  LZ3LD        CW 21 DB 19 WPM CQ             1547Z
+DX de WA5LOU:    24916.0  W1AW/9       RTTY - UP 1                    1547Z IN
+DX de WZ7I-#:    24923.0  K1RO         RTTY  17 DB CQ              NH 1547Z PA
+DX de DL5ML:     24900.3  PJ2/WI9WI                                   1547Z
+DX de DL6YRA:    28528.0  VO1CAL       56 QRM LOCAL BY SWITCH POWE NL 1548Z
+DX de K1TTT-#:   28051.4  F5UBZ        CW 12 DB 08 WPM CQ             1547Z MA
+DX de KL7KY:      3799.0  G4AMN        44                             1547Z AK
+DX de WZ7I-#:    10130.9  W1AW/7       RTTY  02 DB CQ                 1547Z PA
+DX de RU9CZD-#:   7008.0  BD8SZ        CW 18 DB 27 WPM CQ             1547Z
+DX de DK9IP-#:   14059.7  G3VZM        CW 08 DB 17 WPM CQ             1547Z
+DX de GW8IZR-#:  10122.2  DL5YM        CW 45 DB 29 WPM CQ             1547Z
+DX de AC0C-#:    18076.0  W1AW/9       CW 41 DB 30 WPM CQ             1548Z KS
+DX de WZ7I-#:    28054.9  IZ2QXG       CW 09 DB 16 WPM CQ             1548Z PA
+DX de JA4ZRK-#:   3505.0  JG1LFF       CW 11 DB 22 WPM CQ             1548Z
+DX de DF4UE-#:   18103.7  PZ5RA        RTTY  16 DB CQ                 1548Z
+DX de DF4UE-#:   24910.4  VE7WJ        RTTY  34 DB CQ              BC 1548Z
+DX de DL9GTB-#:  14072.4  YO1989BV     PSK63 22 DB CQ                 1548Z
+DX de DL4RCK-#:  14072.6  R7RIB        PSK63 14 DB CQ                 1548Z
+DX de AA4VV-#:    7050.0  N4EUQ        CW 11 DB 14 WPM CQ          VA 1548Z NC
+DX de WZ7I-#:    28005.9  EA1EYL       CW 18 DB 19 WPM CQ             1548Z PA
+DX de DK9PY:     28014.0  6Y6N         LAST DAY                       1548Z
+DX de AA4VV-#:   28031.4  EA6UN        CW 09 DB 22 WPM CQ             1548Z NC
+DX de WE9V-#:    10120.0  WB2U         CW 08 DB 14 WPM CQ          MD 1548Z WI
+DX de LA5EKA-#:  28009.0  LU7XX        CW 05 DB 24 WPM CQ             1548Z
+DX de DF4UE-#:   14053.4  LZ2JB        CW 17 DB 16 WPM CQ             1548Z
+DX de DF4UE-#:   24922.1  K1RO         RTTY  23 DB CQ              NH 1548Z
+DX de DK0TE-#:   28043.6  W4CI         CW 18 DB 23 WPM CQ          FL 1548Z
+DX de DF4UE-#:   18104.6  DK8FS        RTTY  00 DB CQ                 1548Z
+DX de DF4UE-#:    7041.0  HA8LD        PSK31 18 DB CQ                 1548Z
+DX de DJ9IE-#:    7015.1  YL2AG        CW 22 DB 26 WPM CQ             1548Z
+DX de OK2LI:     28014.0  6Y6N         SIMPLEX TNX 73!                1548Z
+DX de N7EKD:      3792.0  N7UA         LP                          WA 1548Z OR
+DX de GW8IZR-#:  14045.0  IT9UU        CW 20 DB 22 WPM CQ             1548Z
+DX de KS4XQ-#:   14062.0  W6JL         CW 07 DB 20 WPM CQ          CA 1548Z SC
+DX de PY1NB-#:   28039.9  W1AW/9       CW 08 DB 26 WPM CQ             1548Z
+DX de HA2KSD-#:   7002.8  YP60CCC/P    CW 35 DB 21 WPM CQ             1548Z
+DX de DF4UE-#:    7041.7  DM3XIF       PSK31 18 DB CQ                 1548Z
+DX de WZ7I-#:    14071.1  KC0VCC       PSK31 23 DB CQ              CO 1548Z PA
+DX de DL9GTB-#:  14070.6  TF3FIN       PSK31 24 DB CQ                 1548Z
+DX de RU1S:       7114.0  UE55OB       OP  RM9T                       1548Z
+DX de KS4XQ-#:   28028.4  KM6JD        CW 18 DB 22 WPM CQ          NV 1548Z SC
+DX de DF4UE-#:    7041.8  HB9EBV       PSK63 20 DB CQ                 1548Z
+DX de I0DJV:     28515.0  CE4WJK       OP.GUSTAVO 59++ FROM CHILE     1548Z
+DX de OE6TZE-#:   7023.0  DJ5IZ        CW 28 DB 38 WPM CQ             1548Z
+DX de UA6AUA:     7030.9  UP44WFF      TNX ONE MORE BAND QSO          1548Z
+DX de WZ7I-#:    28121.3  F1PKH        PSK31 21 DB CQ                 1548Z PA
+DX de WZ7I-#:    24923.2  EA8AQV       RTTY  10 DB CQ                 1548Z PA
+DX de WZ7I-#:    14071.3  VE3SAO       PSK31 20 DB CQ              ON 1548Z PA
+DX de SK3W-#:    24900.3  PJ2/WI9WI    CW 11 DB 31 WPM CQ             1549Z
+DX de DL9GTB-#:  10142.1  UR5AB        PSK31 24 DB CQ                 1548Z
+DX de DL9GTB-#:  10142.5  IK1CJO       PSK31 29 DB CQ                 1549Z
+DX de DL9GTB-#:  14071.2  OK2BGB       PSK31 19 DB CQ                 1549Z
+DX de V51YJ-#:   28018.0  PR7AR        CW 11 DB 39 WPM CQ             1549Z
+DX de DL9GTB-#:  14071.8  F5OYM        PSK31 30 DB CQ                 1549Z
+DX de SM2IUF-#:  14026.1  G3KTZ        CW 23 DB 25 WPM CQ             1549Z
+DX de ND4Q:      28092.0  AB1J         RTTY                        MA 1549Z AL
+DX de DL9GTB-#:   7041.3  YO9FTN       PSK31 22 DB CQ                 1549Z
+DX de DL1REM-#:  14059.0  EW7BW        CW 15 DB 16 WPM CQ             1549Z
+DX de K3LR-#:    28041.8  G3JKY        CW 25 DB 14 WPM CQ             1549Z PA
+DX de ON6ZQ-#:    7022.4  DK5SF        CW 39 DB 24 WPM CQ             1549Z
+DX de WZ7I-#:    14071.5  WS4WW        PSK31 33 DB CQ              VA 1549Z PA
+DX de OE6TZE-#:  10112.6  Z33A         CW 22 DB 26 WPM CQ             1549Z
+DX de DL1REM-#:  14014.0  IK7XTE       CW 28 DB 18 WPM CQ             1549Z
+DX de F5RRS-#:   14013.1  RU1MQ        CW 16 DB 29 WPM CQ             1549Z
+DX de WZ7I-#:    28121.6  EA3KY        PSK31 32 DB CQ                 1549Z PA
+DX de K6NA:      18150.0  W1AW/9                                      1549Z CA
+DX de DL1REM-#:  28016.1  K3BEQ        CW 20 DB 24 WPM CQ          MD 1549Z
+DX de K3LR-#:    21035.1  K3RLL        CW 12 DB 17 WPM CQ          PA 1549Z PA
+DX de OH6BG-#:    7011.0  HB9ARY       CW 26 DB 17 WPM CQ             1549Z
+DX de W6LG:      14217.0  US4AS        CQ DX                          1549Z CA
+DX de AA4VV-#:    7023.6  AA3EJ        CW 23 DB 33 WPM CQ          PA 1549Z NC
+DX de GW8IZR-#:  10119.0  DJ8CZ/P      CW 23 DB 26 WPM CQ             1549Z
+DX de DF4UE-#:    7041.8  F4ALP        PSK31 14 DB CQ                 1549Z
+DX de DF4UE-#:   24910.4  W4NL         RTTY  31 DB CQ              TN 1549Z
+DX de DF4UE-#:   14071.6  ES0OU        PSK31 38 DB CQ                 1549Z
+DX de OE6TZE-#:  28016.5  K3BEQ        CW 10 DB 24 WPM CQ          MD 1549Z
+DX de SK3W-#:     3534.1  UR5ZEP       CW 12 DB 19 WPM CQ             1549Z
+DX de LA5EKA-#:   3556.0  OH3GQE       CW 25 DB 16 WPM CQ             1549Z
+DX de HB9DCO-#:  14050.1  UU1CC        CW 15 DB 18 WPM CQ             1549Z
+DX de GW8IZR-#:  10114.2  G4DZE        CW 13 DB 22 WPM CQ             1550Z
+DX de KM3T-#:    18070.7  W100AW       CW 18 DB 27 WPM CQ          CT 1550Z NH
+DX de DF4UE-#:   24916.1  W1AW/9       RTTY  -2 DB CQ                 1550Z
+DX de DF4UE-#:   18080.0  OE6PJD       CW 10 DB 18 WPM CQ             1550Z
+DX de WZ7I-#:    18107.0  G3UHU        RTTY  43 DB CQ                 1550Z PA
+DX de 9A5M:      21035.0  K3RLL        CW                          PA 1550Z
+DX de HA6M-#:     7027.3  RA1WX        CW 16 DB 25 WPM CQ             1550Z
+DX de VE2WU-#:   14018.0  LZ2DB        CW 13 DB 28 WPM CQ             1550Z QC
+DX de DL9GTB-#:   7041.5  RU90WZ       PSK63 29 DB CQ                 1550Z
+DX de WZ7I-#:    28122.0  M0SAS        PSK31 21 DB CQ                 1550Z PA
+DX de W4KKN-#:    7054.0  N4EUQ        CW 19 DB 14 WPM CQ          VA 1550Z VA
+DX de K2NNY-#:   14030.4  N4KE         CW 33 DB 17 WPM CQ          FL 1550Z NY
+DX de WZ7I-#:    21071.4  DF9FR        PSK31 26 DB CQ                 1550Z PA
+DX de NY3A-#:    28013.0  EA6FG        CW 35 DB 21 WPM CQ             1550Z PA
+DX de DF7GB-#:   10114.6  RA1AS        CW 12 DB 24 WPM CQ             1550Z
+DX de DJ9IE-#:   10115.6  RA1AS        CW 20 DB 24 WPM CQ             1550Z
+DX de DL1REM-#:   7013.5  UE55RW       CW 22 DB 31 WPM CQ             1550Z
+DX de IZ4IRJ:    24900.3  PJ2/WI9WI    569 TU JIM                     1550Z
+DX de RU9CZD-#:   7003.7  IK1QHB       CW 08 DB 24 WPM CQ             1550Z
+DX de DL1REM-#:  18084.5  EA8TL        CW 16 DB 33 WPM CQ             1550Z
+DX de KB6VSE-#:   7037.1  W6JL         CW 37 DB 20 WPM CQ          CA 1550Z CA
+DX de WZ7I-#:    21016.9  OO7N         CW 42 DB 20 WPM CQ             1550Z PA
+DX de SK3W-#:     7006.9  LZ3LD        CW 15 DB 19 WPM CQ             1551Z
+DX de AC0C-#:     7018.0  AA3EJ        CW 16 DB 31 WPM CQ          PA 1551Z KS
+DX de DK9IP-#:    7026.6  F2PI         CW 24 DB 20 WPM CQ             1551Z
+DX de AA4VV-#:    7046.5  W9JVW        CW 10 DB 16 WPM CQ          IL 1551Z NC
+DX de ON5KQ-#:    3529.0  EW8O         CW 19 DB 28 WPM CQ             1551Z
+DX de F6IIT-#:   21030.5  W1AW/9       CW 07 DB 23 WPM CQ             1551Z
+DX de DJ9IE-#:    7030.4  PA0WKI       CW 31 DB 16 WPM CQ             1551Z
+DX de DF4UE-#:   24905.0  K5XK         CW 29 DB 28 WPM CQ          AR 1551Z
+DX de DF4UE-#:   18076.0  W1AW/9       CW 08 DB 31 WPM CQ             1551Z
+DX de K1RO:      24922.1  KX9X/4       RTTY CENTENNIAL 75 PTS IOTA NA 1551Z NH
+DX de UA3GJM:     7114.0  UE55OB       ---73!                         1551Z
+DX de HB9FLU:    50230.0  DL5WP        TNX FB MS QSO                  1551Z
+DX de GW8IZR-#:  24907.3  W1AW/9       CW 15 DB 29 WPM CQ             1551Z
+DX de WZ7I-#:    14070.8  WT6E         PSK31 19 DB CQ              CA 1551Z PA
+DX de WZ7I-#:    28100.5  OZ8JD        RTTY  03 DB CQ                 1551Z PA
+DX de DL9GTB-#:  14072.4  YO1989BV     PSK63 18 DB CQ                 1551Z
+DX de SE0X-#:     3515.0  UA3DER       CW 20 DB 28 WPM CQ             1551Z
+DX de HA0IR:      7011.9  SC2014ECC    TNX QSO! VIA.:SK2AT            1551Z
+DX de WZ7I-#:    28094.9  W1AW/9       RTTY  06 DB CQ                 1551Z PA
+DX de UA6AUA:     7013.5  UE55RW       FREE                           1551Z
+DX de WZ7I-#:    24921.9  E75C         RTTY  11 DB CQ                 1551Z PA
+DX de SQ3BKH:    10142.0  HF2014PRNF   CQ CQ CQ BPSK63                1551Z
+DX de KQ8M-#:    10106.0  N7XM         CW 10 DB 22 WPM CQ          NV 1551Z OH
+DX de ON5KQ-#:    7015.5  UX0DA        CW 12 DB 25 WPM CQ             1551Z
+DX de W8WWV-#:   28031.4  EA6UN        CW 08 DB 22 WPM CQ             1551Z OH
+DX de DK9IP-#:   10116.0  OZ6ABZ       CW 08 DB 15 WPM CQ             1551Z
+DX de SK3W-#:     3545.5  SM3IEL       CW 36 DB 16 WPM CQ             1551Z
+DX de HB9DCO-#:  28010.1  N2GOT        CW 09 DB 21 WPM CQ          NY 1551Z
+DX de DL8LAS-#:   7023.3  RU9TN        CW 11 DB 14 WPM CQ             1551Z
+DX de DK0TE-#:    7029.8  OE5EVM       CW 19 DB 17 WPM CQ             1551Z
+DX de OZ3DX:      7147.0  DF2BO        CQ NA SP                       1551Z
+DX de K4UI:      29000.0  IW5EKR/MOBILE cqing                         1551Z KY
+DX de WZ7I-#:    28028.0  K6AR         CW 26 DB 30 WPM CQ          CA 1551Z PA
+DX de DL9GTB-#:   7042.2  HB9EBV       PSK63 37 DB CQ                 1551Z
+DX de DK9IP-#:    7020.5  DL3UKH       CW 31 DB 15 WPM CQ             1551Z
+DX de KT9L:      28095.0  W1AW/9       BEAMING SOUTH RTTY UP          1552Z IN
+DX de F5RRS-#:   10111.1  UE55SM       CW 08 DB 27 WPM CQ             1551Z
+DX de N8MSA-#:   28006.0  EA1EYL       CW 06 DB 19 WPM CQ             1551Z MI
+DX de WZ7I-#:    18101.0  TG9AJR       RTTY  05 DB CQ                 1552Z PA
+DX de F2YV:      21310.0  FR5DX        73.HERIK                       1552Z
+DX de F6IIT-#:   10107.1  R4CA         CW 18 DB 33 WPM CQ             1552Z
+DX de DL9GTB-#:  14070.5  TF3FIN       PSK31 16 DB CQ                 1552Z
+DX de KS4XQ-#:   14038.1  W1AW/7       CW 17 DB 32 WPM CQ             1552Z SC
+DX de WZ7I-#:    14084.3  F6FZQ        RTTY  06 DB CQ                 1552Z PA
+DX de DF7GB-#:   10124.6  G3MCK        CW 38 DB 22 WPM CQ             1552Z
+DX de WE9V-#:    28048.0  F6HKA        CW 18 DB 16 WPM CQ             1552Z WI
+DX de W6SX:      24908.8  W6SX                                     CA 1552Z CA
+DX de WZ7I-#:    24900.3  PJ2/WI9WI    CW 46 DB 29 WPM CQ             1552Z PA
+DX de HA6M-#:    10122.2  DL5YM        CW 33 DB 27 WPM CQ             1552Z
+DX de SK3W-#:    28014.0  6Y6N         CW 11 DB 33 WPM CQ             1552Z
+DX de K3LR-#:    21027.8  KP4CPC       CW 15 DB 20 WPM CQ          PR 1552Z PA
+DX de DF4UE-#:   28040.0  W1AW/9       CW 12 DB 26 WPM CQ             1552Z
+DX de DF4UE-#:   10142.1  UR5AB        PSK31 11 DB CQ                 1552Z
+DX de OK1NU:     18070.8  W100AW       WORKING SIMPLEX, NO UP1     CT 1552Z
+DX de DL9GTB-#:  21071.8  IT9CCB       PSK31 28 DB CQ                 1552Z
+DX de NJ1Q:      24910.4  W100AW       RTTY BEAMING USA            CT 1552Z CT
+DX de ON5KQ-#:    7008.0  BD8SZ        CW 33 DB 28 WPM CQ             1552Z
+DX de DF7GB-#:   28043.7  W4CI         CW 19 DB 24 WPM CQ          FL 1552Z
+DX de DL4RCK-#:  14072.1  RL3KN        PSK31 30 DB CQ                 1552Z
+DX de DF4UE-#:    7042.6  I4ZXH        PSK31 26 DB CQ                 1552Z
+DX de W4KKN-#:   21008.0  UR4EZ        CW 21 DB 25 WPM CQ             1552Z VA
+DX de DL9GTB-#:   7042.0  OE2VDL       PSK31 24 DB CQ                 1552Z
+DX de K3LR-#:    28019.2  EA5MO        CW 33 DB 14 WPM CQ             1552Z PA
+DX de DL4RCK-#:  14071.3  UX4LX        PSK31 25 DB CQ                 1552Z
+DX de G0TMX-#:    7021.0  G0EML        CW 22 DB 26 WPM CQ             1552Z
+DX de DL9GTB-#:  10142.1  IZ1UJM       PSK31 17 DB CQ                 1552Z
+DX de PA3EWP-#:  24897.6  S52QM        CW 14 DB 27 WPM CQ             1552Z
+DX de F6IIT-#:   10116.8  G4EBO        CW 20 DB 20 WPM CQ             1552Z
+DX de BG8FFE:     7008.0  BD8SZ        CW                             1552Z
+DX de N5PHT:     28458.0  N5PHT        5 PTS ARRL CENT             TX 1552Z TX
+DX de HB9DDZ:    24909.0  W100AW       RTTY                        CT 1552Z
+DX de WZ7I-#:    18108.4  DM7DU        RTTY  06 DB CQ                 1553Z PA
+DX de F6IIT-#:   14021.1  DJ7MH        CW 37 DB 12 WPM CQ             1552Z
+DX de F6IIT-#:   21008.2  UR4EZ        CW 45 DB 26 WPM CQ             1552Z
+DX de WZ7I-#:    14071.0  EA5IJF       PSK31 11 DB CQ                 1552Z PA
+DX de GW8IZR-#:   7029.0  SM7CFZ       CW 29 DB 21 WPM CQ             1552Z
+DX de DL9GTB-#:  10117.7  DK5TM        CW 17 DB 19 WPM CQ             1553Z
+DX de IV3SKB:     3792.0  N7UA         LP 5/7                      WA 1553Z
+DX de DF4UE-#:   10141.5  HF2014PRNF   PSK63 25 DB CQ                 1553Z
+DX de OE6TZE-#:  24895.1  KP4JFR       CW 05 DB 25 WPM CQ          PR 1553Z
+DX de HB9DCO-#:   7007.0  F2PI         CW 25 DB 29 WPM CQ             1553Z
+DX de EA7HZM:     7123.0  EA7AQC       3ESTACIONES  COMU Y PROVINCIAS 1553Z
+DX de HA1VHF-#:   7002.8  YP60CCC/P    CW 33 DB 21 WPM CQ             1553Z
+DX de DF4UE-#:   14071.1  IW9ABZ       PSK31 41 DB CQ                 1553Z
+DX de WZ7I-#:    21071.4  PA0SJM       PSK31 18 DB CQ                 1553Z PA
+DX de WZ7I-#:    14081.8  KD8HSV       RTTY  32 DB CQ              OH 1553Z PA
+DX de G4PNF-#:    7010.0  G0JH         CW 37 DB 16 WPM CQ             1553Z
+DX de DF4UE-#:    7010.0  G0JHK        CW 15 DB 16 WPM CQ             1553Z
+DX de NC7J-#:    14062.0  W6JL         CW 26 DB 21 WPM CQ          CA 1553Z UT
+DX de DJ9IE-#:    7011.0  HB9ARY       CW 32 DB 19 WPM CQ             1553Z
+DX de DF4UE-#:   24917.0  G3VKW        RTTY  03 DB CQ                 1553Z
+DX de RU9CZD-#:   3512.0  RW9JZ        CW 05 DB 18 WPM CQ             1553Z
+DX de KM3T-#:    14023.5  KC6Z         CW 14 DB 41 WPM CQ          CA 1553Z NH
+DX de WZ7I-#:    21072.3  F4FVH        PSK31 21 DB CQ                 1553Z PA
+DX de WZ7I-#:    28092.1  AB1J         RTTY  -1 DB CQ              MA 1553Z PA
+DX de DL9GTB-#:  10118.1  HB9BMZ       CW 27 DB 17 WPM CQ             1553Z
+DX de GW8IZR-#:  21061.0  W8KJ         CW 12 DB 17 WPM CQ          OH 1553Z
+DX de ON5KQ-#:   14002.8  YO4BCP       CW 35 DB 20 WPM CQ             1553Z
+DX de NC7J-#:     7043.0  K7NA         CW 19 DB 20 WPM CQ          WA 1553Z UT
+DX de LA6TPA-#:   7004.0  IK1QHB       CW 10 DB 24 WPM CQ             1553Z
+DX de WZ7I-#:    21040.0  OE6PJD       CW 30 DB 18 WPM CQ             1553Z PA
+DX de SM3KIF:    28018.0  PR7AR                                       1552Z
+DX de F5RRS-#:   21020.6  EA8TL        CW 07 DB 33 WPM CQ             1553Z
+DX de F6IIT-#:   21020.6  EA8TL        CW 19 DB 33 WPM CQ             1553Z
+DX de KM3T-#:    10118.9  AA3EJ        CW 36 DB 31 WPM CQ          PA 1554Z NH
+DX de DF7GB-#:   28009.8  N4YG         CW 23 DB 26 WPM CQ          AL 1554Z
+DX de WA7LNW-#:  28042.0  F6IRG        CW 15 DB 18 WPM CQ             1553Z UT
+DX de DF7GB-#:    7023.1  IK7OFI       CW 22 DB 25 WPM CQ             1554Z
+DX de DL4RCK-#:   7041.7  DM3XIF       PSK31 24 DB CQ                 1554Z
+DX de RU9CZD-#:   7015.1  YL2AG        CW 07 DB 27 WPM CQ             1554Z
+DX de F6IIT-#:   28010.0  N4YG         CW 08 DB 25 WPM CQ          AL 1554Z
+DX de WZ7I-#:    24923.0  ON4AXU       RTTY  15 DB CQ                 1554Z PA
+DX de UA9FBC:     7033.0  RA4DR        TNX QSO RVSN-55                1554Z
+DX de PU2LJH:    28120.0  EC1AOX       TNX FOR QSO PSK31              1554Z
+DX de WA7LNW-#:  21002.0  W100AW       CW 38 DB 34 WPM CQ          CT 1554Z UT
+DX de W9PA:      18107.0  W1AW/9       RTTY IND LAST DAY              1554Z IN
+DX de DJ9IE-#:    3552.1  SM3IEL       CW 18 DB 15 WPM CQ             1554Z
+DX de GW8IZR-#:  21017.6  7X4AN        CW 32 DB 27 WPM CQ             1554Z
+DX de DL8LAS-#:   3515.0  UA3DER       CW 08 DB 28 WPM CQ             1554Z
+DX de LA5EKA-#:   7033.0  RA4DR        CW 12 DB 21 WPM CQ             1554Z
+DX de DL4RCK-#:  14072.6  YO9AGN       PSK63 16 DB CQ                 1554Z
+DX de PY1NB-#:   28033.2  G3TPQ        CW 07 DB 19 WPM CQ             1554Z
+DX de W4KKN-#:   28055.0  IZ2QXG       CW 14 DB 15 WPM CQ             1554Z VA
+DX de DF4UE-#:    7041.0  UR5NBN       PSK31 24 DB CQ                 1554Z
+DX de DF4UE-#:   10143.6  CU3EM        RTTY  -2 DB CQ                 1554Z
+DX de SV8RV-#:   14053.5  SP2DNT       CW 04 DB 20 WPM CQ             1554Z
+DX de SV8RV-#:   14072.0  F5UJK        PSK63 14 DB CQ                 1554Z
+DX de KM3T-#:    28012.9  EA6FG        CW 29 DB 21 WPM CQ             1554Z NH
+DX de DK9IP-#:   14013.0  RU1MQ        CW 26 DB 29 WPM CQ             1554Z
+DX de SM2IUF-#:  14019.9  DL2ROR       CW 32 DB 22 WPM CQ             1554Z
+DX de AA4VV-#:   18074.0  KB4JR        CW 41 DB 13 WPM CQ          FL 1554Z NC
+DX de W8WWV-#:    7032.0  W9ZN         CW 42 DB 25 WPM CQ          IL 1554Z OH
+DX de IZ1PKV:    28095.0  W1AW/9       RTTY INDIANA                   1555Z
+DX de KA9SWE-#:  10106.0  N7XM         CW 34 DB 23 WPM CQ          NV 1555Z WI
+DX de DM2RN:     21002.0  W100AW                                   CT 1555Z
+DX de DK0TE-#:   21030.3  W1AW/9       CW 10 DB 23 WPM CQ             1555Z
+DX de DF4UE-#:   18101.0  TG9AJR       RTTY  06 DB CQ                 1555Z
+DX de F5RRS-#:   14053.6  LZ2JB        CW 15 DB 15 WPM CQ             1555Z
+DX de AC0C-#:    28005.9  EA1EYL       CW 15 DB 19 WPM CQ             1555Z KS
+DX de DL4RCK-#:  14070.8  IZ5GUB       PSK31 28 DB CQ                 1555Z
+DX de EA7JIF:     7120.0  EA7JJZ       SOTEO PRO NAVIDAD RCMALAKA     1555Z
+DX de KQ8M-#:    10112.6  AA3EJ        CW 22 DB 29 WPM CQ          PA 1555Z OH
+DX de DF4UE-#:   24910.4  W100AW       RTTY  31 DB CQ              CT 1555Z
+DX de F6IIT-#:   10107.1  R4CA         CW 26 DB 33 WPM CQ             1555Z
+DX de PA3ANV:    18102.8  PZ5RA        TNX RTTY QSO                   1555Z
+DX de DL1REM-#:   7012.0  UA3PI        CW 23 DB 29 WPM CQ             1555Z
+DX de DF4UE-#:    7041.3  YO9FTN       PSK31 15 DB CQ                 1555Z
+DX de DF4UE-#:    3544.0  IK1WJQ       CW 18 DB 25 WPM CQ             1555Z
+DX de WZ7I-#:    21071.6  F5UJK        PSK63 27 DB CQ                 1555Z PA
+DX de SK3W-#:    28009.0  LU7XX        CW 14 DB 23 WPM CQ             1555Z
+DX de W6LG:      14185.0  VU2DK                                       1555Z CA
+DX de WA7LNW-#:  28040.0  W1AW/9       CW 33 DB 26 WPM CQ             1555Z UT
+DX de WZ7I-#:    14086.2  NZ1R         RTTY  35 DB CQ              MA 1555Z PA
+DX de DQ8Z-#:    28027.9  K6AR         CW 11 DB 25 WPM CQ          CA 1555Z
+DX de HA2KSD-#:   7023.6  IK7OFI       CW 28 DB 26 WPM CQ             1555Z
+DX de HB9DCO-#:  24907.3  W1AW/9       CW 16 DB 29 WPM CQ             1555Z
+DX de HA5AGS:    18101.0  TG9AJR       RTTY,JUAN CQ , TNX QSO         1555Z
+DX de WZ7I-#:    24923.7  E75C         RTTY  13 DB CQ                 1555Z PA
+DX de WA7LNW-#:  28043.6  W4CI         CW 13 DB 24 WPM CQ          FL 1555Z UT
+DX de K3LR-#:    14033.4  S51UJ        CW 06 DB 23 WPM CQ             1555Z PA
+DX de DL9GTB-#:  10141.3  F4ESO        PSK31 34 DB CQ                 1555Z
+DX de VE2WU-#:   21019.9  EA8TL        CW 26 DB 33 WPM CQ             1555Z QC
+DX de F4GMM:     21255.0  VA2PW        73 PIERRE                   QC 1555Z
+DX de DL2CC-#:    7006.9  LZ3LD        CW 25 DB 19 WPM CQ             1555Z
+DX de DF4UE-#:   28121.8  VO2NS        PSK31 11 DB CQ              NL 1555Z
+DX de DL4RCK-#:  14071.9  EA3FYO       PSK31 42 DB CQ                 1555Z
+DX de G4PNF-#:    7025.2  HB9AXG       CW 19 DB 12 WPM CQ             1555Z
+DX de F6IIT-#:   14022.9  OE5FBL       CW 25 DB 20 WPM CQ             1555Z
+DX de DQ8Z-#:    14018.0  LZ2DB        CW 06 DB 27 WPM CQ             1555Z
+DX de R6YY-#:     7008.0  BD8SZ        CW 21 DB 26 WPM CQ             1555Z
+DX de HA1VHF-#:  14010.0  ON5TC        CW 40 DB 27 WPM CQ             1556Z
+DX de ON5KQ-#:    7019.9  IK7OFI       CW 16 DB 26 WPM CQ             1556Z
+DX de OL5Q-#:    10111.0  UE55SM       CW 20 DB 26 WPM CQ             1556Z
+DX de DF4UE-#:   14072.4  YO1989BV     PSK63 20 DB CQ                 1556Z
+DX de DF4UE-#:   24920.8  W2WC         PSK31 37 DB CQ              NY 1556Z
+DX de S53ZO:     14217.0  US4AS                                       1555Z
+DX de R6YY-#:     7016.0  DL1DUS       CW 08 DB 20 WPM CQ             1556Z
+DX de DL4RCK-#:  10141.4  R7RIB        PSK31 24 DB CQ                 1556Z
+DX de KM3T-#:    10120.0  KN4ZQ        CW 41 DB 13 WPM CQ          VA 1556Z NH
+DX de HA1VHF-#:   7021.0  G0EML        CW 14 DB 19 WPM CQ             1556Z
+DX de WZ7I-#:    28121.1  IZ5OQJ       PSK31 15 DB CQ                 1556Z PA
+DX de UF5F:       7008.0  BD8SZ        TNX                            1556Z
+DX de S50ARX-#:  14026.0  G3KTZ        CW 13 DB 27 WPM CQ             1556Z
+DX de DL9GTB-#:  10141.8  HA6ZX        PSK31 17 DB CQ                 1556Z
+DX de DL1REM-#:  24897.6  S52QM        CW 07 DB 27 WPM CQ             1556Z
+DX de OL5Q-#:     7032.0  DL4AUK       CW 19 DB 22 WPM CQ             1556Z
+DX de ON4LDU:    24900.3  PJ2/WI9WI                                   1556Z
+DX de RI1ANT:    14035.0  T6T                                         1556Z
+DX de K1TTT-#:   21042.4  SQ2DMX       CW 26 DB 23 WPM CQ             1556Z MA
+sh/dx

@@ -2119,7 +2119,7 @@ begin
   Format(wsprintfBuffer, TC_RULESONSM3CER, ContestTypeSA[Contest]);
   ModifyMenu(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND + MF_STRING, menu_sk3bg_calendar, wsprintfBuffer);
   if pos('CQ-WW', ContestTypeSA[Contest]) <> 0 then  //n4af 4.35.5
-  T1 := 3600000                                 // 60 min break criteria
+  T1 := 30000                                 // 60 min break criteria
   else
   T1 := 1800000;                                 // normal 30min break
   if ContestsArray[Contest].QRZRUID = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_qrzru_calendar, MF_BYCOMMAND or MF_GRAYED);
@@ -2446,12 +2446,12 @@ begin
 
     menu_alt_transmitfreq: tr4w_alt_n_transmit_frequency;
 
-    menu_alt_reminder:
+    menu_alt_autocq:
       begin
 //        if ActiveMode = CW then
- //       if tAutoCQMode = False then
+        if tAutoCQMode = False then
 //          tDialogBox(70, @AutoCQDlgProc);
-//          CreateModalDialog(145, 60, tr4whandle, @ReminderDlgProc, 0);
+          CreateModalDialog(145, 60, tr4whandle, @AutoCQDlgProc, 0);
 //QuickDisplay('Enter Time XX:YY GMT:');
 //Readln(junk);
       end;
@@ -4120,6 +4120,7 @@ var
   TempMode                              : ModeType;
   T1                                    : Cardinal;
 begin
+
 {$IF tDebugMode}
   T1 := Windows.GetTickCount;
 //  m:=0;
@@ -4185,7 +4186,8 @@ begin
     if TempRXData.ceNeedSendToServerAE = True then inc(tUSQE);
 
     inc(tRestartInfo.riTotalRecordsInLog);
-
+ //   if  tRestartInfo.riTotalRecordsInLog = 3057 then
+//   tRestartInfo.riTotalRecordsInLog := 3057;
       //      if tTotalRecordsInLog mod 1000 = 0 then        DispalyLoadedQSOs(tTotalRecordsInLog);
     if TempRXData.ceRecordKind in [rkQTCR, rkQTCS] then IncrementQTCCount(TempRXData.Callsign);
 
@@ -5440,7 +5442,7 @@ begin
   ClearDupeSheetCommandGiven := False;
   FirstCommand := False;
   if FileExists(@f[1]) then
-    LoadInSeparateConfigFile(f, FirstCommand, MyCall);
+  LoadInSeparateConfigFile(f, FirstCommand, MyCall);
   if ClearDupeSheetCommandGiven then tClearDupesheet;
   RunningConfigFile := False;
 end;

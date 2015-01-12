@@ -149,12 +149,14 @@ label
   Add;
 var
   Value                                 : integer;
+
 begin
+
   if FindCallsign(s, Result) then goto Add;
   if Count = MAXCALLSIGNSINLIST then Exit;
   InsertCallsign(Result, s);
   Add:
-
+ if   FList^[Result].FQSOs < 255 then  //n4af 4.35.8
   inc(FList^[Result].FQSOs);
 
   if JustAddToList then Exit;
@@ -246,7 +248,9 @@ begin
   begin
     i := (l + h) shr 1;
     c := CompareStrings(FList^[i].FCall, s);
-    if c < 0 then l := i + 1 else
+    if c < 0 then
+     l := i + 1
+     else
     begin
       h := i - 1;
       if c = 0 then

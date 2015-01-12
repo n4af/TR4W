@@ -225,8 +225,8 @@ var
   TempMode                              : ModeType;
 begin
 
-  if K5KA.ModeEnabled and (Key = F1) and (OpMode = CQOpMode) then
-    K5KA.State := KAMessageStarted;
+//  if K5KA.ModeEnabled and (Key = F1) and (OpMode = CQOpMode) then
+//    K5KA.State := KAMessageStarted;
   {
       IF ((Key >= F1)         AND (Key <= F10)) OR
          ((Key >= F11)        AND (Key <= F12)) OR

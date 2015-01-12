@@ -1,0 +1,50 @@
+Karelia:                  16:  19:  EU:   61.80:   -34.40:    -3.0:  R1N:
+    R1N,U1N,RA1N,UA1N;
+Tatarstan:                16:  29:  EU:   55.50:   -49.10:    -3.0:  R4P:
+    R4P,U4P,RA4P,UA4P,R4Q,U4Q,RA4Q,UA4Q,R4R,U4R,RA4R,UA4R;
+Marij El:                 16:  29:  EU:   56.60:   -47.90:    -3.0:  R4S:
+    R4S,U4S,RA4S,UA4S,R4T,U4T,RA4T,UA4T;
+Mordovia:                 16:  29:  EU:   54.10:   -45.20:    -3.0:  R4U:
+    R4U,U4U,RA4U,UA4U;
+Udmurtia:                 16:  30:  EU:   56.50:   -53.10:    -3.0:  R4W:
+    R4W,U4W,RA4W,UA4W;
+Chuvashia:                16:  29:  EU:   56.80:   -47.10:    -3.0:  R4Y:
+    R4Y,U4Y,RA4Y,UA4Y,R4Z,U4Z,RA4Z,UA4Z;
+Karachaevo-Cherkesia:     16:  29:  EU:   43.80:   -41.80:    -4.0:  R6E:
+    R6E,U6E,RA6E,UA6E,R7E,U7E,RA7E,UA7E;
+Kalmykia:                 16:  29:  EU:   46.20:   -44.20:    -3.0:  R6I:
+    R6I,U6I,RA6I,UA6I,R7I,U7I,RA7I,UA7I;
+Severnaya Osetia–Alania:  16:  29:  EU:   43.10:   -44.70:    -4.0:  R6J:
+    R6J,U6J,RA6J,UA6J,R7J,U7J,RA7J,UA7J;
+Chechnya:                 16:  29:  EU:   43.20:   -44.80:    -3.0:  R6P:
+    R6P,U6P,RA6P,UA6P,R7P,U7P,RA7P,UA7P;
+Ingushetia:               16:  29:  EU:   43.20:   -44.80:    -3.0:  R6Q:
+    R6Q,U6Q,RA6Q,UA6Q,R7Q,U7Q,RA7Q,UA7Q;
+Dagestan:                 16:  29:  EU:   43.10:   -47.80:    -3.0:  R6W:
+    R6W,U6W,RA6W,UA6W,R7W,U7W,RA7W,UA7W;
+Kabardino-Balkaria:       16:  29:  EU:   43.00:   -43.80:    -3.0:  R6X:
+    R6X,U6X,RA6X,UA6X,R7X,U7X,RA7X,UA7X;
+Adygeya:                  16:  29:  EU:   44.40:   -40.10:    -3.0:  R6Y:
+    R6Y,U6Y,RA6Y,UA6Y,R7Y,U7Y,RA7Y,UA7Y;
+Bashkortostan:            17:  30:  AS:   54.40:   -55.90:    -5.0:  R9W:
+    R9W,U9W,RA9W,UA9W,R8W,U8W,RA8W,UA8W;
+Komi:                     17:  30:  AS:   61.70:   -51.10:    -5.0:  R9X:
+    R9X,U9X,RA9X,UA9X,R8X,U8X,RA8X,UA8X;
+Altay:                    18:  31:  AS:   51.90:   -86.10:    -7.0:  R9Z:
+    R9Z,U9Z,RA9Z,UA9Z,R8Z,U8Z,RA8Z,UA8Z;
+Buryatia:                 18:  32:  AS:   51.90:  -107.80:    -8.0:  R0O:
+    R0O,U0O,RA0O,UA0O,R0P,U0P,RA0P,UA0P;
+Sakha:                    19:  22:  AS:   62.10:  -129.80:    -9.0:  R0Q:
+    R0Q,U0Q,RA0Q,UA0Q,R0R,U0R,RA0R,UA0R;
+Khakassia:                18:  31:  AS:   53.60:   -91.10:    -7.0:  R0W:
+    R0W,U0W,RA0W,UA0W;
+Tyva:                     23:  32:  AS:   51.40:   -94.30:    -7.0:  R0Y:
+    R0Y,U0Y,RA0Y,UA0Y;
+Sakhalin I.:              19:  22:  AS:   62.00:  -130.00:    -8.0:  R0F:
+    R0F,U0F,RA0F,UA0F,R0E,U0E,RA0E,UA0E;
+Abkhazia:                 21:  29:  AS:   40.60:   -43.00:    -3.0:  UF6V:
+    UF6V;
+!UA: UA9:
+!GM: *GM/s:
+!I: *IT9:
+!YU: *YU8:

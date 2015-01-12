@@ -1647,8 +1647,8 @@ begin
 
     end;
 
-    Packet.CheckPacketBuffer(True);
-    Packet.CheckPacketMessage;
+ //   Packet.CheckPacketBuffer(True);
+//    Packet.CheckPacketMessage;
 
     Sleep(4);
   until ({ActiveMultiPort}NoPort <> NoPort) and (ElaspedSec100(TimeMark) > 2000);
@@ -2103,9 +2103,7 @@ begin
         UpdateTimeAndRateDisplays(True, True);
 
           //               if ActiveMultiPort <> NoPort then CheckMultiState;
-
-        Packet.CheckPacket;
-
+      Packet.CheckPacket;
         Sleep(4);
 
       until TimeElasped >= AutoCQDelayTime;
@@ -3424,8 +3422,8 @@ begin
                           END
                       ELSE
                           IF ActiveRTTYPort <> NoPort THEN
-                              TalkToRTTYPort;
-
+                               TalkToRTTYPort;
+                
             ControlV:
                 BEGIN
                 RunningConfigFile := True;
@@ -5410,7 +5408,7 @@ nop
                    end;
 
                end;
-               }
+        }        
             CarriageReturn:
               if length(CallWindowString) > 1 then
               begin

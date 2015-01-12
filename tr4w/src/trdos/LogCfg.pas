@@ -35,7 +35,7 @@ uses
 //  LOGMENU,
   LogNet,
   LogRadio,
-  CFGDEF
+  CFGDEF 
   ;
 
 type
@@ -396,15 +396,17 @@ var
   LineNumber                            : integer;
 
 begin
-{
+ //n4af 4.36.3 ADDED FUNCTION
   LoadInSeparateConfigFile := False;
   LineNumber := 1;
 
   GetRidOfPrecedingSpaces(FileName);
 
-  if OpenFileForRead(ConfigRead, FileName) then
+   if OpenFileForRead_old(ConfigRead, FileName) then         // ADDED 4.36.3
+ //if tf.topenFileForRead(h, FileName) then
+
   begin
-    while not Eof(ConfigRead) do
+     while not Eof(ConfigRead) do
     begin
       ReadLn(ConfigRead, FileString);
 
@@ -439,7 +441,8 @@ begin
 
     Close(ConfigRead);
     LoadInSeparateConfigFile := True;
-  end
+  end   
+  
   else
   begin
     FileName[Ord(FileName[0]) + 1] := #0;
@@ -453,7 +456,7 @@ begin
     showwarning(wsprintfBuffer);
     Exit;
   end;
-}
+ // n4af }
 end;
 
 procedure ReadInConfigFile(ConfigFileName: TCFGType);

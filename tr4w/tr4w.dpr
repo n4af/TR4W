@@ -473,7 +473,7 @@ begin
 
   CommandLine:
 
-  StartCPU := GetTickCount;
+ 
 
   InitializeStrings;
 
