@@ -4074,6 +4074,7 @@ end;
 function ProcessRSTAndQSONumberOrFrenchDepartmentExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
 begin
   Result := False;
+
   if ParserArray.paCount = 2 then
   begin
     if (ParserArray.paElements[0].prType <> eetNumber) or not (sETrst(ParserArray.paElements[0].prInteger, RXData.RSTReceived)) then Exit;
@@ -4081,7 +4082,8 @@ begin
 
   if FrenchID(RXData.QTH.CountryID) then
   begin
-    RXData.QTHString := ParserArray.paElements[ParserArray.paCount - 1].prString;
+   RXData.QTHString := Exchange;    //n4af 4.36.5
+//    RXData.QTHString := ParserArray.paElements[ParserArray.paCount - 1].prString;
     if length(RXData.QTHString) = 1 then RXData.QTHString := '0' + RXData.QTHString;
     if FoundDomesticQTH(RXData) then Result := True;
   end
@@ -5905,7 +5907,8 @@ begin
 //      if MyGrid <> '' then
 //        if RXData.DomesticQTH <> '' then
       begin
-        RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+    //  RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+        RXData.QSOPoints :=  GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);    //n4af 4.36.11
         if MyCountry = '9A' then
         begin
           if RXData.Band = Band432 then RXData.QSOPoints := RXData.QSOPoints * 5;

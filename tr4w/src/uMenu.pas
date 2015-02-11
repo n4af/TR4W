@@ -46,12 +46,14 @@ const
   RC_SEARCHLOG_HK                       = #9'Alt+L';
   RC_TRANSFREQ_HK                       = #9'Alt+N';
   RC_REMINDER_HK                        = #9'Alt+O';
+  RC_ALTP_HK                            = #9'Alt+P';
   RC_AUTOCQ_HK                          = #9'Alt+Q';
   RC_TOOGLERIGS_HK                      = #9'Alt+R';
   RC_CWSPEED_HK                         = #9'Alt+S';
   RC_SETSYSDT_HK                        = #9'Alt+T';
   RC_INITIALIZE_HK                      = #9'Alt+W';
   RC_RESETWAKEUP_HK                     = #9'Alt+Ctrl+W';
+  RC_ALTX_HK                            = #9'Alt+X';
   RC_DELETELASTQSO_HK                   = #9'Alt+Y';
   RC_INITIALEX_HK                       = #9'Alt+Z';
   RC_TOOGLEST_HK                        = #9'Alt+=';
@@ -61,6 +63,7 @@ const
   RC_SSBCWMODE_HK                       = #9'Alt+M';
   RC_SENDKEYBOARD_HK                    = #9'Ctrl+A';
   RC_COMMWITHPP_HK                      = #9'Ctrl+B';
+  RC_CTRLJ_HK                           = #9'Ctrl+J';
   RC_CLEARDUPES_HK                      = #9'Ctrl+K';
   RC_VIEWEDITLOG_HK                     = #9'Ctrl+L';
   RC_NOTE_HK                            = #9'Ctrl+N';
@@ -105,8 +108,8 @@ const
   RC_SHDX_CALLSIGN_HK                   = #9'Ctrl+S';
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
-  //T_MENU_ARRAY_SIZE                     = 173{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
-    T_MENU_ARRAY_SIZE                     = 174{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+  
+    T_MENU_ARRAY_SIZE                     = 173{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -146,7 +149,7 @@ const
 
     (mrText: RC_SETTINGS; mrId: MAXWORD),
  //{
-    (mrText: RC_OPTIONS + RC_OPTIONS_HK; mrId: menu_options),
+
     (mrText: '-'; mrId: 0),
 
     (mrText: RC_COLORS; mrId: menu_colors),
@@ -226,6 +229,7 @@ const
 
     (mrText: '-'; mrId: MAXWORD - 2),
     (mrText: RC_ALARM + RC_ALARM_HK; mrId: menu_alt_alarm),
+    (mrText: RC_BANDUP + RC_BANDUP_HK; mrId: menu_alt_bandup),
     (mrText: RC_AUTOCQRESUME + RC_AUTOCQRESUME_HK; mrId: menu_alt_autocqresume),
     (mrText: RC_DUPECHECK + RC_DUPECHECK_HK; mrId: menu_alt_dupecheck),
     (mrText: RC_EDIT + RC_EDIT_HK; mrId: menu_alt_edit),
@@ -233,33 +237,35 @@ const
     (mrText: RC_SWAPMULTVIEW + RC_SWAPMULTVIEW_HK; mrId: menu_alt_swapmults),
     (mrText: RC_INCNUMBER + RC_INCNUMBER_HK; mrId: menu_alt_incnumber),
     (mrText: RC_TOOGLEMB + RC_TOOGLEMB_HK; mrId: menu_alt_multbell),
-    (mrText: RC_KILLCW + RC_KILLCW_HK; mrId: menu_alt_killcw),
     (mrText: RC_SEARCHLOG + RC_SEARCHLOG_HK; mrId: menu_alt_searchlog),
+    (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
     (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transmitfreq),
     (mrText: RC_REMINDER + RC_REMINDER_HK; mrId: menu_alt_reminder),
+    (mrText: RC_ALTP + RC_ALTP_HK; mrId: menu_alt_p),
     (mrText: RC_AUTOCQ + RC_AUTOCQ_HK; mrId: menu_alt_autocq),
     (mrText: RC_TOOGLERIGS + RC_TOOGLERIGS_HK; mrId: menu_alt_tooglerigs),
     (mrText: RC_CWSPEED + RC_CWSPEED_HK; mrId: menu_alt_cwspeed),
     (mrText: RC_SETSYSDT + RC_SETSYSDT_HK; mrId: menu_alt_settime),
+    (mrText: RC_BANDDOWN + RC_BANDDOWN_HK; mrId: menu_alt_banddown),
     (mrText: RC_INITIALIZE + RC_INITIALIZE_HK; mrId: menu_alt_init_qso),
-    (mrText: RC_RESETWAKEUP + RC_RESETWAKEUP_HK; mrId: menu_alt_resetwakeup),
+    (mrText: RC_ALTX + RC_ALTX_HK;         mrId: menu_alt_x),
     (mrText: RC_DELETELASTQSO + RC_DELETELASTQSO_HK; mrId: menu_alt_deleteqso),
     (mrText: RC_INITIALEX + RC_INITIALEX_HK; mrId: menu_alt_initialexhange),
     (mrText: RC_TOOGLEST + RC_TOOGLEST_HK; mrId: menu_alt_tooglesidetone),
     (mrText: RC_TOOGLEAS + RC_TOOGLEAS_HK; mrId: menu_alt_toogleautosend),
     (mrText: '-'; mrId: 0),
-    (mrText: RC_BANDUP + RC_BANDUP_HK; mrId: menu_alt_bandup),
-    (mrText: RC_BANDDOWN + RC_BANDDOWN_HK; mrId: menu_alt_banddown),
-    (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
+
+
+
  //}
 
     (mrText: 'Ctrl-'; mrId: MAXWORD),
  //{
     (mrText: RC_SENDKEYBOARD + RC_SENDKEYBOARD_HK; mrId: menu_ctrl_sendkeyboardinput),
-//    (mrText: RC_COMMWITHPP + RC_COMMWITHPP_HK; mrId: menu_ctrl_commtopacket),
     (mrText: RC_CLEARMSHEET + RC_CLEARMSHEET_HK; mrId: menu_ctrl_clearmultsheet),
     (mrText: RC_DAQSLINT + RC_DAQSLINT_HK; mrId: menu_ctrl_decAQSLinterval),
     (mrText: RC_IAQSLINT + RC_IAQSLINT_HK; mrId: menu_ctrl_incAQSLinterval),
+    (mrText: RC_OPTIONS + RC_OPTIONS_HK; mrId: menu_options),
     (mrText: RC_CLEARDUPES + RC_CLEARDUPES_HK; mrId: menu_ctrl_cleardupesheet),
     (mrText: RC_VIEWEDITLOG + RC_VIEWEDITLOG_HK; mrId: menu_ctrl_viewlogdat),
     (mrText: RC_NOTE + RC_NOTE_HK; mrId: menu_ctrl_note),
@@ -271,12 +277,12 @@ const
 //    (mrText: RC_VIEWPAKSPOTS + RC_VIEWPAKSPOTS_HK; mrId: menu_ctrl_viewpacketspots),
     (mrText: RC_EXECONFIGFILE + RC_EXECONFIGFILE_HK; mrId: menu_ctrl_execute_config),
     (mrText: RC_REFRESHBM + RC_REFRESHBM_HK; mrId: menu_ctrl_refreshbandmap),
-//    (mrText: RC_DUALINGCQ + RC_DUALINGCQ_HK; mrId: menu_ctrl_dualingcq),
     (mrText: RC_CURSORINBM + RC_CURSORINBM_HK; mrId: menu_ctrl_cursorinbandmap),
-    (mrText: RC_CURSORTELNET + RC_CURSORTELNET_HK; mrId: menu_ctrl_cursorintelnet),
     (mrText: RC_QSOWITHNOCW + RC_QSOWITHNOCW_HK; mrId: menu_ctrl_logqsowithoutcw),
-    (mrText: RC_CT1BOHIS + RC_CT1BOHIS_HK; mrId: menu_ctrl_ct1bohscreen),
+    (mrText: RC_CURSORTELNET + RC_CURSORTELNET_HK; mrId: menu_ctrl_cursorintelnet),
     (mrText: RC_ADDBANDMAPPH + RC_ADDBANDMAPPH_HK; mrId: menu_ctrl_PlaceHolder),
+//    (mrText: RC_DUALINGCQ + RC_DUALINGCQ_HK; mrId: menu_ctrl_dualingcq),
+    (mrText: RC_CT1BOHIS + RC_CT1BOHIS_HK; mrId: menu_ctrl_ct1bohscreen),
     (mrText: RC_ADDINFO; mrId: MAXWORD - 1),
   //{
     (mrText: RC_AI_QSONUMBER + RC_AI_QSONUMBER_HK; mrId: menu_ctrl_showQSONumber),
@@ -341,7 +347,7 @@ const
     (mrText: RC_NET_CLMULT; mrId: menu_clear_multsheet_in_network),
  //}
 
-    (mrText: HELP_WORD; mrId: MAXWORD),
+//    (mrText: HELP_WORD; mrId: MAXWORD),
  //{
 {$IF LANG = 'RUS'}
     (mrText: RC_CONTENTS + RC_CONTENTS_HK; mrId: menu_contents),

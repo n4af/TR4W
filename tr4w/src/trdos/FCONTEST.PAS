@@ -1059,7 +1059,7 @@ begin
         AddDomesticCountry('SP');
       end;
 
-    NASPRINTCW, NASPRINTSSB, NASPRINTRTTY:
+    NASPRINTCW, NASPRINTRTTY:
       begin
         ActiveBand := Band20;
 //        ActiveInitialExchange := NameQTHInitialExchange;
@@ -1098,6 +1098,47 @@ begin
 
         AddDomesticCountry('KL');
       end;
+
+      SPRINTSSB:
+      begin
+        ActiveBand := Band20;
+//        ActiveInitialExchange := NameQTHInitialExchange;
+//        ContestName := 'North American Sprint';
+        SetCQMemoryString(CW, AltF1, 'NA \ NA');
+
+        CQExchange := '^  \   # ' + MyName + ' ' + MyState;
+        QSLMessage := 'TU';
+        QuickQSLMessage1 := 'EE';
+        QSOBeforeMessage := 'B4 \ NA';
+        SearchAndPounceExchange := '@ # ' + MyName + ' ' + MyState + '  \ ';
+        RepeatSearchAndPounceExchange := '# ' + MyName + ' ' + MyState;
+        CorrectedCallMessage := '} R';
+
+        SetCQMemoryString(CW, F1, 'NA \');
+        SetCQMemoryString(CW, F2, 'CQ^NA CQ^NA \ \ NA');
+        SetCQMemoryString(CW, F5, '   ? ');
+        SetCQMemoryString(CW, F6, '   NA \ NA ');
+        SetCQMemoryString(CW, F7, '   CQ^NA \ \ NA ');
+        SetCQMemoryString(CW, F8, '   CQ^NA CQ^NA \ \ NA ');
+        SetCQMemoryString(CW, AltF1, 'NA \ \ NA');
+
+        SetEXMemoryString(CW, F3, 'NR #');
+        SetEXMemoryString(CW, F4, MyName);
+        SetEXMemoryString(CW, F5, MyState);
+        SetEXMemoryString(CW, F6, '@ \ NR^# ' + MyName + ' ' + MyState);
+        SetEXMemoryString(CW, F7, '   CQ^NA \ \ NA ');
+        SetEXMemoryString(CW, F8, '   CQ^NA CQ^NA \ \ NA ');
+        SetEXMemoryString(CW, AltF3, 'NR?');
+        SetEXMemoryString(CW, AltF4, 'NAME?');
+        SetEXMemoryString(CW, AltF5, 'QTH?');
+
+        //QSOByBand := True;
+        SprintQSYRule := True;
+        Add_KVEKH6KL;
+
+   //     AddDomesticCountry('KL');
+      end;
+
 
     ARRLSSCW, ARRLSSSSB:
       begin

@@ -36,33 +36,6 @@ var
 
 implementation
 
-function LooksLikeAGrid(Grid: Str40): boolean;
-
-{ Verifies that the grid square is legitimate }
-
-var
-  CharPosition                          : integer;
-
-begin
-  LooksLikeAGrid := False;
-
-  if not ((length(Grid) = 4) or (length(Grid) = 6)) then Exit;
-
-  Grid := UpperCase(Grid);
-
-  for CharPosition := 1 to length(Grid) do
-    case CharPosition of
-      1, 2, 5, 6:
-        if (Grid[CharPosition] < 'A') or (Grid[CharPosition] > 'Z') then
-          Exit;
-
-      3, 4:
-        if (Grid[CharPosition] < '0') or (Grid[CharPosition] > '9') then
-          Exit;
-    end;
-
-  LooksLikeAGrid := True;
-end;
 
 procedure ConvertGridToLatLon(Grid: GridString; var Lat, Lon: REAL);
 
@@ -681,6 +654,6 @@ begin
   Result := True;
 end;
 
-begin
+
 end.
 

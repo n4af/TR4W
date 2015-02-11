@@ -471,7 +471,7 @@ begin
   else
     for Index := 48 to 57 do SendDlgItemMessage(TempDSHandle, Index, LB_RESETCONTENT, 0, 0);
 
-  SendMessage(VDListBox, WM_SETREDRAW, wParam(False), 0);
+   SendMessage(VDListBox, WM_SETREDRAW, wParam(False), 0);
 
   for TempChar := '0' to '9' do
   begin
@@ -479,7 +479,7 @@ begin
     begin
       if (FList^[Index].FDupesArray[Mode] and (1 shl Ord(Band))) <> 0 then
       begin
-        for i := 2 to length(FList^[Index].FCall) do
+        for i := 0 to length(FList^[Index].FCall) do
           if FList^[Index].FCall[i - 1] in ['A'..'Z'] then
             if FList^[Index].FCall[i] in ['0'..'9'] then
             begin
@@ -495,11 +495,11 @@ begin
             end;
       end;
     end;
-    if not ColumnDupeSheetEnable then
+ //   if not ColumnDupeSheetEnable then
     begin
  //   Item := SendDlgItemMessage(TempDSHandle, 101, LB_ADDSTRING, 0, integer(pchar('*********')));
 
- //  Item := SendMessage(VDListBox, LB_ADDSTRING, 0, integer(PChar('---------')));
+ //   Item := SendMessage(VDListBox, LB_ADDSTRING, 0, integer(PChar('---------')));
  //   SendMessage(VDListBox, LB_SETITEMDATA, Item, Ord(TempChar));
     end;
   end;
@@ -539,37 +539,5 @@ begin
   CallsignsList.Init;
 end.
 
-{
 
-Как работать с битами
-------------------------------------
-
-Есть два способа.
-
-Низкоуровневый подход обеспечивается логическими операциями :
-
-var
-  I : integer;
-  N : integer;                       // Номер бита в диапазоне от 0..SizeOf(TYPE)*8 - 1
-begin
-  I := I or (1 shl N);               // установка бита
-  I := I and not (1 shl N);          // сброс бита
-  I := I xor (1 shl N);              // инверсия бита
-  if (i and (1 shl N)) <> 0 then...  // проверка установленного бита
-end;
-
-Высокоуровневый подход опирается на представление числа в виде множества:
-
-type
-  TIntegerSet = set of 0..SizeOf(Integer)*8 - 1;
-var
-  I : Integer;
-  N : Integer;
-begin
-  Include(TIntegerSet(I), N);     // установили N-ный бит в 1
-  Exclude(TIntegerSet(I), N);     // сбросили N-ный бит в 0
-  if N in TIntegerSet(I) then...  // проверили N-ный бит
-end;
-
-}
 

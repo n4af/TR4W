@@ -430,7 +430,7 @@ begin
                   DisplayInitialCommand(icmySection);
                 end;
 
-              NASPRINTCW, NASPRINTSSB, NASPRINTRTTY:
+              NASPRINTCW, SPRINTSSB, NASPRINTRTTY:
                 begin
                   SetCommentAndEnableEditControl(TC_ENTERYOURQTHANDTHENAME, icmyState);
                   DisplayInitialCommand(icmyName);

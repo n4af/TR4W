@@ -607,7 +607,7 @@ const
   RC_EXIT                               = 'E&xit';
   RC_SETTINGS                           = 'Settings';
 //  RC_CFG_COMMANDS                       = 'Configuration commands';
-  RC_OPTIONS                            = 'Configuration commands';
+  RC_OPTIONS                            =  'Configuration commands';
   RC_PROGRAMMES                         = 'Program messages';
   RC_CATANDCW                           = 'CAT and CW Keying';
   RC_WINDOWS                            = 'Windows';
@@ -626,6 +626,9 @@ const
   RC_QUICKMEM                           = 'Quick Memory';
   RC_MULTSFREQ                          = 'Mults Frequencies';
   RC_ALARM                              = 'Alarm';
+  RC_ALTP                               = 'Open Fkeys';
+  RC_ALTX                               = 'Exit Program';
+  RC_CTRLJ                             = 'Open Configuration commands';
   RC_AUTOCQRESUME                       = 'Auto-CQ resume';
   RC_DUPECHECK                          = 'Dupe check';
   RC_EDIT                               = 'Edit';

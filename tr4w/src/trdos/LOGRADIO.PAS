@@ -778,11 +778,12 @@ begin
       ActiveRadioPtr.WriteBufferToCATPort('UP;');
 
     FT890, {FT920,} FT990, FT1000, FT1000MP:
-      ActiveRadioPtr.WriteBufferToCATPort(CHR(0) +
+      ActiveRadioPtr.WriteBufferToCATPort(
+        CHR($8E) +
         CHR(0) +
         CHR(0) +
         CHR(0) +
-        CHR($8E));
+        CHR(0));
 
     FT767:
       ActiveRadioPtr.WriteBufferToCATPort(
@@ -836,11 +837,12 @@ begin
       ActiveRadioPtr.WriteBufferToCATPort('DN;');
 
     FT890, {FT920,} FT990, FT1000, FT1000MP:
-      ActiveRadioPtr.WriteBufferToCATPort(CHR(0) +
-        CHR(0) +
-        CHR(0) +
+      ActiveRadioPtr.WriteBufferToCATPort(
+        CHR($8E) +
         CHR(1) +
-        CHR($8E));
+        CHR(0) +
+        CHR(0) +
+        CHR(0));
 
     FT767:
       ActiveRadioPtr.WriteBufferToCATPort(

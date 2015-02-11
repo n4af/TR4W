@@ -751,8 +751,14 @@ begin
 //              if Msg.lParam = 2752513 then SendStringAndStop('E');
               if ShiftKeyEnable then
               begin
-                if lobyte(HiWord(Msg.lParam)) = 42 then if OpMode = CQOpMode then RITBumpDown else VFOBumpDown;
-                if lobyte(HiWord(Msg.lParam)) = 54 then if OpMode = CQOpMode then RITBumpUp else VFOBumpUp;
+                if lobyte(HiWord(Msg.lParam)) = 42 then if OpMode = CQOpMode then
+                begin
+                RITBumpDown; VFOBumpDown;
+                end;
+                if lobyte(HiWord(Msg.lParam)) = 54 then if OpMode = CQOpMode then
+                begin
+                RITBumpUp; VFOBumpUp;
+                end;
               end;
             end;
           end;

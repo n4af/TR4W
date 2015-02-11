@@ -1899,7 +1899,7 @@ begin
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
 
-            CQ160CW, CQ160SSB, NASPRINTCW, NASPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
+            CQ160CW, CQ160SSB, NASPRINTCW, SPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
               begin
                 nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s', tCallStringLength, p);
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);

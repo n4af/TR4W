@@ -60,7 +60,9 @@ var
   CallsBuf                              : array[0..63] of Char;
   bgColor                               : integer;
   Left                                  : integer;
+
 begin
+
   Result := False;
   case Msg of
     WM_WINDOWPOSCHANGING, WM_EXITSIZEMOVE: DefTR4WProc(Msg, lParam, hwnddlg);
@@ -68,23 +70,15 @@ begin
     WM_CTLCOLORLISTBOX:
     //n4af 4.33.7 reactivate columndupesheetenable
     begin
-       if ColumnDupeSheetEnable then  Result := BOOL(tr4wBrushArray[trBlack])
-   else
-     Result := BOOL(tr4wBrushArray[trWhite]);
-     
+       if ColumnDupeSheetEnable then
+       Result := BOOL(tr4wBrushArray[trCyan])
+     else
+     Result := BOOL(tr4wBrushArray[trBlack]);
 
-   {  begin
-        SetTextColor(HDC(wParam), $000000);
-       bgColor := $FFFFFF;
-     end
-     else    }
-  //   begin
-      SetTextColor(HDC(wParam), $FFFFFF);
 
-    //  Result := BOOL(tr4wBrushArray[trBlack]);
         Windows.GetClientRect(HWND(lParam), temprect);
-      //      GradientRect(HDC(wParam), temprect, VDColorsArray[GetDlgCtrlID(HWND(lParam))], TempColor,gdVertical);
-     end;  
+     
+      end;  
         
       WM_DRAWITEM:
       begin
@@ -103,9 +97,11 @@ begin
           CallsBuf[LengthOfTheString] := '-';
           inc(LengthOfTheString);
         end;
-}
-    bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0);
-
+    }
+ if Not ColumnDupeSheetEnable then   // n4af 4.36.12
+  bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
+  else
+     bgColor := 11;
         if Left <> 0 then
         GradientRect(
           VDDRAWITEMSTRUCT^.HDC,
@@ -122,7 +118,7 @@ begin
           if VDCurrentCallDistrict = Ord('9') + 1 then VDCurrentCallDistrict := Ord('0');
          end;
 
-        SetBkMode(VDDRAWITEMSTRUCT^.HDC, TRANSPARENT);
+     SetBkMode(VDDRAWITEMSTRUCT^.HDC, TRANSPARENT);
             {
              Result := BOOL(tr4wBrushArray[trWhite]);
            bgColor := $FFFFFF;
@@ -163,7 +159,7 @@ begin
           ShowWindow(tHWND, SW_HIDE);
           for c := 0 to 9 do
           begin
-            CreateWindowEx(0, LISTBOX, nil, WS_CHILD or WS_VISIBLE or LBS_EXTENDEDSEL or LBS_NOINTEGRALHEIGHT or LBS_NOSEL or LBS_OWNERDRAWFIXED or LBS_HASSTRINGS,
+            CreateWindowEx(0, LISTBOX, nil, WS_CHILD or WS_VISIBLE  or LBS_EXTENDEDSEL  or LBS_NOINTEGRALHEIGHT or LBS_NOSEL or LBS_OWNERDRAWFIXED or LBS_HASSTRINGS,
               c * 50, 100, 50, 200, hwnddlg, 48 + c, hInstance, nil);
             asm
             mov edx,[MainFixedFont]
@@ -213,4 +209,5 @@ begin
   end;
 end;
 end.
+
 

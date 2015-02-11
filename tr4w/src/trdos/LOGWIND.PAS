@@ -44,8 +44,14 @@ var
   tBeamHeadingPrevState                 : GridString;
   tLocalTimePrevState                   : Word;
   Gate                                  : boolean = False;
+  a                                     : cardinal = 0;
+  b                                     : cardinal = 0;
+  c                                     : cardinal = 0;
+  e                                    : cardinal = 0;
   T2                                    : cardinal = 0;
   d2                                    : cardinal = 0;
+  d3                                    : cardinal = 0;
+ // d4                                    : cardinal = 0;
   Start                                 : boolean = False;
   Save                                  : cardinal = 0;
   d1                                  : cardinal = 0;
@@ -5604,14 +5610,13 @@ Procedure modified by N4AF to also display total OFF TIME.
 If it total elapsed drops, enter was pressed so
  save into var d2 contents of tElapsedTimeFromLastQSO on procedure exit to compare to value on entry.
 set Constant T1 to length of break time
-normally onairtime = d - T1 where d is current tick minus tick at elapsed.
-when elapsed drops, set elapsed to zero and save onairtime. Now elapsed will tick up and at T1,
-onairtime will increment from save + d
+normally onairtime = elapse since first qso. But when elapsed > break, we must save the elapsed time and
+subtract break time from it.
+Then when elapsed next drops below break length, add saved elapsed to current elapsed.
 }
-
 var
-  c                                    : Boolean ;
   d                                    : Cardinal;
+  k                                    : Cardinal;
   TimeDifference                       : Integer;
  //n4af 4.35.5
  begin
@@ -5620,40 +5625,48 @@ var
  T2 := tElapsedTimeFromLastQSO;  // T2 = initial elapsed
  Start := True;
  end;
- d := Windows.GetTickCount - tElapsedTimeFromLastQSO;     // time from last qso
 
-  if (d div 1000) mod 2 = 0 then         // if 5 seconds elapsed
-    SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(d, False));     // display elapsed since last qso
- 
+  d := Windows.GetTickCount - T2;
+ //d := a;
+ k := Windows.GetTickCount - tElapsedTimeFromLastQSO;     // time from last qso
 
-  // for performance, T1 set in MainUnit rtn CREATEMAINWINDOW
-          if d  <= T1   then  // < 30min ?   or allowable break time exceeded
-      begin
-      Gate := False;
-      d1 := Windows.GetTickCount - T2;
-          if (d1 div 1000) mod 2 = 0 then
-          SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d1, False)) ;
-           
-  end
-  else
+  if (k div 1000) mod 2 = 0 then         // if 5 seconds elapsed
+    SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(k, False));     // display elapsed since last qso
+
+    if (k < T1) then
   begin
-  if Gate = False then
+  if K < B then
   begin
-  Gate := True;
-  D1 := D1 - 30000;
+  A := B;     // restore former K value
+
   end;
+  if Gate then
+  Gate := False;
+  if C = 0 then
+  D1 :=  D        // save previous K
+    else
+  D1 := b + c + e;
+
+
+  if (d1 div 1000) mod 2 = 0 then         // if 2 seconds elapsed
+    SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(d1, False));     // display elapsed since last qso
+   b := K;  // last value of K before enter pressed
+
   end;
 
-
-
-    d2 := d1;
+   if K > T1 then
+   begin
+   
+   if not Gate then
+   begin
+   e := c;    // save old c value into var e  Snap last good K ONCE
+   Gate := true;
    end;
+  
+ C := A;       // c points to the last K
+end;
+end;
 
-
-
-
-
- 
 procedure tDispalyMyComputerID;
 begin
   CID_TWO_BYTES[0] := ComputerID;
@@ -5666,7 +5679,7 @@ var
 begin
 
   if not DoingPaddle then TempBool := False else TempBool := True;
-  Windows.EnableWindow(wh[mwePaddle], TempBool);
+ // Windows.EnableWindow(wh[mwePaddle], TempBool); //n4af 4.36.7
 
   if not tDoingFootSwitchEnable then TempBool := False else TempBool := True;
   Windows.EnableWindow(wh[mweFootSwitch], TempBool);

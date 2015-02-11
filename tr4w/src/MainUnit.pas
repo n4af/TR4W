@@ -872,7 +872,7 @@ begin
     VisibleLog.ShowQSOStatus(@CallWindowString);
     VisibleLog.DoPossibleCalls(CallWindowString);
   end;
-  CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK;
+//  CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK;
   if AutoDupeEnableCQ and tCallWindowStringIsDupe {VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode)} then
   begin
 
@@ -2119,9 +2119,9 @@ begin
   Format(wsprintfBuffer, TC_RULESONSM3CER, ContestTypeSA[Contest]);
   ModifyMenu(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND + MF_STRING, menu_sk3bg_calendar, wsprintfBuffer);
   if pos('CQ-WW', ContestTypeSA[Contest]) <> 0 then  //n4af 4.35.5
-  T1 := 30000                                 // 60 min break criteria
+  T1 := 3600000                                 // 60 min break criteria
   else
-  T1 := 1800000;                                 // normal 30min break
+  T1 := 60000;                                 // normal 30min break
   if ContestsArray[Contest].QRZRUID = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_qrzru_calendar, MF_BYCOMMAND or MF_GRAYED);
   if ContestsArray[Contest].WA7BNM = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND or MF_GRAYED);
   if Contest = WRTC then
@@ -2439,6 +2439,7 @@ begin
 
         if MultiplierAlarm then DoABeep(BeepCongrats);
       end;
+    menu_alt_p: OpenListOfMessages;
     menu_alt_killcw: ToggleCW(True);
     menu_alt_searchlog:
 //    tDialogBox(47, @LogSearchDlgProc);
@@ -2446,6 +2447,8 @@ begin
 
     menu_alt_transmitfreq: tr4w_alt_n_transmit_frequency;
 
+    menu_alt_x:  ExitProgram(True);
+    
     menu_alt_autocq:
       begin
 //        if ActiveMode = CW then
@@ -2889,11 +2892,11 @@ begin
 
     menu_cqmode: SetOpMode(CQOpMode);
     tr4w_accelerator_vkreturn: ProcessReturn;
-
+  {
     menu_alt_resetwakeup:
       WakeUpCount := 0;
     menu_alt_init_qso: InitializeQSO;
-
+  }
     menu_settimezone:
       TimeApplet(1);
 
@@ -2981,7 +2984,8 @@ begin
     menu_run_devicemanager:
 //    tEnumeratePorts;
       WinExec('rundll32.exe devmgr.dll, DeviceManager_Execute', SW_SHOWNORMAL);
-
+      
+   
     menu_ctrl_execute_config:
       begin
         if OpenFileDlg(nil, tr4whandle, TC_CONFIGURATION_FILE + ' (*.cfg)'#0'*.cfg'#0#0, TR4W_EXECONFIGFILE_FILENAME, OFN_HIDEREADONLY or OFN_ENABLESIZING) then
