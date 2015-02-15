@@ -434,6 +434,11 @@ begin
   wkHostBufferIndex := 0; //
   wkHostBufferSendIndex := 0; //
 
+  wkSendByte(wkCMD_NULLIMM);                               //Gav
+  wkSendByte(wkCMD_NULLIMM);                                //Gav
+  wkSendByte(wkCMD_NULLIMM);                                //Gav
+ wkSendByte(wkCMD_CLEARBUFFER);                           //Gav
+
 //  wkBUSY := False;
 {$IF WINKEYDEBUG}
 //  AddStringToTelnetConsole('CLEAR');
