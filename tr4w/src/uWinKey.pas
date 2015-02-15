@@ -422,7 +422,7 @@ begin
   WinKeyHandle := INVALID_HANDLE_VALUE;
 end;
 
-procedure wkClearBuffer;
+procedure wkClearBuffer;            // 4.36.13 GM0GAV
 begin
   if WinKeyHandle = INVALID_HANDLE_VALUE then Exit;
   wkSendByte(wkCMD_CLEARBUFFER);
@@ -434,10 +434,10 @@ begin
   wkHostBufferIndex := 0; //
   wkHostBufferSendIndex := 0; //
 
-  wkSendByte(wkCMD_NULLIMM);                               //Gav
-  wkSendByte(wkCMD_NULLIMM);                                //Gav
-  wkSendByte(wkCMD_NULLIMM);                                //Gav
- wkSendByte(wkCMD_CLEARBUFFER);                           //Gav
+  wkSendByte(wkCMD_NULLIMM);                               //Gav   add 4.36.13
+  wkSendByte(wkCMD_NULLIMM);                                //Gav   4.36.13
+  wkSendByte(wkCMD_NULLIMM);                                //Gav    4.36.13
+ wkSendByte(wkCMD_CLEARBUFFER);                           //Gav     4.36.13
 
 //  wkBUSY := False;
 {$IF WINKEYDEBUG}
