@@ -219,6 +219,7 @@ const
   NumberStationCategories               = 7;
   NumberTimeCategories                  = 3;
   NumberTransmitterCategories           = 5;
+  NumberCertificateCategories           = 2;
   NumberSections                        = 81;
 
   NumberErmakOverlayCategories          = 11;
@@ -305,6 +306,10 @@ const
     'NOVICE-TECH',
     'TB-WIRES',
     'OVER-50');
+
+    tCertificate                 : array[0..NumberCertificateCategories - 1] of PChar = (           //N4AF 37.0.1
+    'YES',
+    'NO');
 
   tCabrilloFreqString                   : array[Band160..BandLight] of PChar =
     (
@@ -1899,7 +1904,7 @@ begin
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
 
-            CQ160CW, CQ160SSB, NASPRINTCW, NASPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
+            CQ160CW, CQ160SSB, NASPRINTCW, SPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
               begin
                 nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s', tCallStringLength, p);
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);

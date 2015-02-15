@@ -28,6 +28,7 @@ type
     ctCategoryTime,
     ctCategoryTransmitter,
     ctCategoryOverlay,
+   ctCertificate,
     ctOperators,
     ctClub,
     ctLocation,
@@ -70,6 +71,7 @@ const
 {   ctCategoryOverlay     }(cvrStart: @OverlayCategory; cvrCount: NumberOverlayCategories - 1)
     );
 
+
   CabrilloTagsArray                     : array[CabrilloTags] of TCabrilloTagRecord =
     (
 {(*}
@@ -82,6 +84,7 @@ const
     (ctrTag: '_CATEGORY-TIME';          ctrCFG:True;  ctrSave: False; ctrList: True),
     (ctrTag: '_CATEGORY-TRANSMITTER';   ctrCFG:True;  ctrSave: False; ctrList: True),
     (ctrTag: '_CATEGORY-OVERLAY';       ctrCFG:True;  ctrSave: False; ctrList: True),
+   (ctrTag: '_CERTIFICATE';            ctrCFG:True;  ctrSave: False; ctrList: False),
     (ctrTag: '_OPERATORS';              ctrCFG:True;  ctrSave: False; ctrList: False),
     (ctrTag: '_CLUB';                   ctrCFG:False; ctrSave: True;  ctrList: False),
     (ctrTag: '_LOCATION';               ctrCFG:True;  ctrSave: False; ctrList: False),
@@ -105,7 +108,7 @@ var
 const
   siCreate                              = 1;
   siCancel                              = 2;
-  CabrSumLabels111                      : array[147..167] of PChar = (
+  CabrSumLabels111                      : array[147..168] of PChar = (
     'CATEGORY-ASSISTED',
     'CATEGORY-BAND',
     'CATEGORY-MODE',
@@ -115,6 +118,7 @@ const
     'CATEGORY-TIME',
     'CATEGORY-TRANSMITTER',
     'CATEGORY-OVERLAY',
+    'CERTIFICATE',
     'OPERATORS',
     'CLUB',
     'LOCATION',

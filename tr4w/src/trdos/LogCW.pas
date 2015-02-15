@@ -275,8 +275,7 @@ begin
 //  CPUKeyer.PTTUnForce;
   tAutoSendMode := False;
   CPUKeyer.FlushCWBuffer;
-  if wkActive  then wkClearBuffer; //GM0GAV 4.36.13
-  //if key = EscapeKey then wkClearBuffer;
+//  if wkActive then wkClearBuffer;    // Gav
 end;
 
 procedure FlushCWBufferAndClearPTT;

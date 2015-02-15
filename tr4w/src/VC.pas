@@ -168,7 +168,7 @@ const
   LOGVERSION3                           = '.';
   LOGVERSION4                           = '5';
   CURRENTVERSIONASINTEGER               = Ord(LOGVERSION1) + Ord(LOGVERSION2) * 256 + Ord(LOGVERSION3) * $10000 + Ord(LOGVERSION4) * $1000000;
-  TR4W_DOWNLOAD_LINK                    : PChar = 'http://www.tr4w.com/download/?' + TR4W_CURRENTVERSION_NUMBER;
+  TR4W_DOWNLOAD_LINK                    : PChar = 'http://www.tr4w.net/download/?' + TR4W_CURRENTVERSION_NUMBER;
 
   LATEST_CONFIG_FILE                    : PChar = 'LATEST CONFIG FILE';
   MAIN_CALLSIGN                         : PChar = 'MAIN CALLSIGN';
@@ -701,7 +701,7 @@ type
   LogRecordKind = (rkQSO, rkQTCR, rkQTCS, rkNote);
   SpotModeType = (NormalSpot, SHDXSpot);
   MesWindowType = (CQMsgWin, ExMsgWin, OtherMsgWin);
-
+  tCertificate = (Yes, No);
   tCategoryAssisted = (caNONASSISTED, caASSISTED);
   tCategoryBand = (cbALL, cb160M, cb80M, cb40M, cb20M, cb15M, cb10M, cb6M, cb2M, cb222, cb432, cb902, cb12G);
   tCategoryMode = (cmCW, cmRTTY, cmSSB, cmMIXED);
@@ -710,6 +710,7 @@ type
   tCategoryTransmitter = (ctONE, ctTWO, ctLIMITED, ctUNLIMITED, ctSWL);
 
 const
+  tCertificateSA                        : array[tCertificate] of PChar = ('Yes', 'No');
   tCategoryAssistedSA                   : array[tCategoryAssisted] of PChar = ('NON-ASSISTED', 'ASSISTED');
   tCategoryBandSA                       : array[tCategoryBand] of PChar = ('ALL', '160M', '80M', '40M', '20M', '15M', '10M', '6M', '2M', '222', '432', '902', '1.2G');
   tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'SSB', 'MIXED');
@@ -717,6 +718,7 @@ const
   tCategoryPowerSA                      : array[tCategoryPower] of PChar = ('HIGH', 'LOW', 'QRP');
   tCategoryTransmitterSA                : array[tCategoryTransmitter] of PChar = ('ONE', 'TWO', 'LIMITED', 'UNLIMITED', 'SWL');
 var
+  Certificate                           : tCertificate;
   CategoryAssisted                      : tCategoryAssisted;
   CategoryBand                          : tCategoryBand;
   CategoryMode                          : tCategoryMode;

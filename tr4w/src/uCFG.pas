@@ -214,7 +214,7 @@ const
     );
 
   {List}
-  ListParamArray                        : array[0..50] of ListParamRecord =
+  ListParamArray                        : array[0..51] of ListParamRecord =
     (
     {(*}
     (lpArray: @RateDisplayTypeStringArray;        lpLength: Byte(High(RateDisplayType));        lpVar: @RateDisplay; ),
@@ -275,7 +275,8 @@ const
     (lpArray: @SidetoneFrequencySA;               lpLength: Byte(High(TWKSidetoneFrequency));   lpVar: @WinKeySettings.wksValueList.vlSidetoneFrequency; ),
 
     (lpArray: @tCategoryTransmitterSA;            lpLength: Byte(High(tCategoryTransmitter));   lpVar: @CategoryTransmitter;),
-    (lpArray: @tCategoryAssistedSA;               lpLength: Byte(High(tCategoryAssisted));      lpVar: @CategoryAssisted;)
+    (lpArray: @tCategoryAssistedSA;               lpLength: Byte(High(tCategoryAssisted));      lpVar: @CategoryAssisted;),
+    (lpArray: @tCertificateSA;                    lpLength: Byte(High(tCertificate));           lpVar: @Certificate;)
     {*)}
     );
 

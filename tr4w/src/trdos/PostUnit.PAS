@@ -219,6 +219,7 @@ const
   NumberStationCategories               = 7;
   NumberTimeCategories                  = 3;
   NumberTransmitterCategories           = 5;
+  NumberCertificateCategories           = 2;
   NumberSections                        = 81;
 
   NumberErmakOverlayCategories          = 11;
@@ -305,6 +306,10 @@ const
     'NOVICE-TECH',
     'TB-WIRES',
     'OVER-50');
+
+    Certificate                 : array[0..NumberCertificateCategories - 1] of PChar = (           //N4AF 37.0.1
+    'YES',
+    'NO');
 
   tCabrilloFreqString                   : array[Band160..BandLight] of PChar =
     (
