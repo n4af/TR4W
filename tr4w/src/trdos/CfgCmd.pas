@@ -35,6 +35,8 @@ uses {SlowTree,} Tree,
 //  ColorCfg,
   LogRadio
   ;
+var
+LPTBaseAddressArray                   : array[Parallel1..Parallel3] of Cardinal = ($378, $278, $3BC);
 
 function ProcessConfigInstruction(var FileString: ShortString; var FirstCommand: boolean): boolean;
 
@@ -1959,7 +1961,8 @@ begin
   end;
 
   //  if iD[1] >= 'M' then goto M_commands;
-{
+
+ 
   if ID = 'LPT1 BASE ADDRESS' then
   begin
     Val(CMD, LPTBaseAddressArray[Parallel1], Result1);
@@ -1980,7 +1983,7 @@ begin
     ProcessConfigInstructions2 := Result1 = 0;
     Exit;
   end;
-
+ {
   if ID = 'FARNSWORTH ENABLE' then
   begin
     FarnsworthEnable := StackBool;

@@ -16,6 +16,8 @@ uses
   Windows,
   Messages;
 
+var
+LPTBaseAddressArray                   : array[Parallel1..Parallel3] of Cardinal = ($378, $278, $3BC);  
 function LPTDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 
 implementation
