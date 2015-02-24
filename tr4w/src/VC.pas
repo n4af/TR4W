@@ -157,7 +157,7 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.37.4'  ;
+  TR4W_CURRENTVERSION_NUMBER            = '4.37.5'  ;
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
   TR4W_CURRENTVERSIONDATE               = 'Feb 23 2015'   ;
@@ -3017,8 +3017,8 @@ QSOPartiesCount = 12;
       'FLORIDA QSO PARTY',
       'GACW-WWSA-CW',
       'GAGARIN-CUP',
-      'GENERAL QSO',
       'GRID LOC',
+      'GENERAL QSO',
       'HA DX',
       'HELVETIA',
       'IARU-HF',
