@@ -2892,11 +2892,11 @@ begin
 
     menu_cqmode: SetOpMode(CQOpMode);
     tr4w_accelerator_vkreturn: ProcessReturn;
-  {
-    menu_alt_resetwakeup:
-      WakeUpCount := 0;
+
+  //  menu_alt_resetwakeup:
+  //    WakeUpCount := 0;
     menu_alt_init_qso: InitializeQSO;
-  }
+
     menu_settimezone:
       TimeApplet(1);
 

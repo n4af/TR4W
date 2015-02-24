@@ -173,7 +173,7 @@ type
     bmMode: ModeType;
   end;
 
-//  BandMapArray = array of {tr4wBandMapEntry} BandMapEntry;
+   BandMapArray = array of {tr4wBandMapEntry} BandMapEntry;
 
   BandMapEntryPointer = ^BandMapEntry;
 
@@ -3661,7 +3661,7 @@ begin
   else
     RadioToUse := ActiveRadio;
 
-  if BandMapFirstEntryList[Band, Mode] = nil then
+   if  BandMapFirstEntryList[Band, Mode] = nil then
     Exit;
 
   BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];

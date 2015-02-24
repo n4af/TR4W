@@ -173,7 +173,7 @@ type
     bmMode: ModeType;
   end;
 
-//  BandMapArray = array of {tr4wBandMapEntry} BandMapEntry;
+   BandMapArray = array of {tr4wBandMapEntry} BandMapEntry;
 
   BandMapEntryPointer = ^BandMapEntry;
 
@@ -3661,7 +3661,7 @@ begin
   else
     RadioToUse := ActiveRadio;
 
-  if BandMapFirstEntryList[Band, Mode] = nil then
+   if  BandMapFirstEntryList[Band, Mode] = nil then
     Exit;
 
   BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
@@ -5645,7 +5645,7 @@ var
   if C = 0 then
   D1 :=  D        // save previous K
     else
-  D1 := k + c + e;
+  D1 := b + c + e;
 
 
   if (d1 div 1000) mod 2 = 0 then         // if 2 seconds elapsed

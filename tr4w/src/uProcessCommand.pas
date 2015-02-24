@@ -16,6 +16,7 @@ utils_text,
   uNet,
   uIO,
   LOGSUBS1,
+  LOGSUBS2,
   Windows,
   Tree,
   LogWind,
@@ -26,7 +27,6 @@ utils_text,
   LogCW,
   LogK1EA,
   CFGCMD,
-  LOGSUBS2,
   LogStuff;
 
 type
@@ -81,7 +81,7 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 
 const
 
-  sCommands                             = 54      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
+  sCommands                             = 55      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
 
@@ -94,6 +94,7 @@ const
 {$IFEND}
 
 //{$IF CWMODE}     //20
+
 (caCommand: '  # = QSO Number '; caAddress: @scEXCHANGERADIOS),     //n4af 04.33.2
 (caCommand: '  @ = HisCall '; caAddress: @scEXCHANGERADIOS),
 (caCommand: '  $ = Salutation/Name '; caAddress: @scEXCHANGERADIOS),
@@ -114,7 +115,8 @@ const
 (caCommand: ' ! = SN'; caAddress: @tClearMultSheet),
 (caCommand: ' & = AS'; caAddress: @scDUPECHECK),
 (caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
-//{$IFEND} 
+//{$IFEND}
+    (caCommand: 'NEXTBANDMAP'; caAddress: @GoToNextBandMapFrequency),
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),
@@ -336,7 +338,7 @@ begin
       RunningConfigFile := False;
     end;
 }
-{
+
     if CommandString = 'NEXTBANDMAP' then
     begin
       if not CommandUseInactiveRadio then
@@ -347,6 +349,7 @@ begin
       if not CommandUseInactiveRadio then //KK1L: 6.73 applies to active radio only
         CWMessageCommand := CWCommandSAPMode; //KK1L: 6.68 Takes you to S&P mode when surfing band map
     end;
+
       //KK1L: 6.64 finds next entry from displayed bandmap rather than just current band/mode
     if CommandString = 'NEXTDISPLAYEDBANDMAP' then
     begin
@@ -380,7 +383,7 @@ begin
       if not CommandUseInactiveRadio then
         CWMessageCommand := CWCommandSAPMode;
     end;
-}
+ 
 
 //    if CommandString = 'LASTCQFREQ' then
 //    begin

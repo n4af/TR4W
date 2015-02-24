@@ -2781,7 +2781,8 @@ if TempRXData.DomMultQTH = '' then
          }
         RSTPowerExchange:
         begin
-        if contest = FOCMARATHON then
+         csPower := @TempRXData.Power[1];
+         if contest = FOCMARATHON then
         begin
         cMyFOCNumber :=  @MyFOCNumber[1];
         crFOCNr := @TempRXData.Power[1];
@@ -2803,6 +2804,7 @@ if TempRXData.DomMultQTH = '' then
 
              end;
              if Contest <> FOCMARATHON then
+
               begin
 
             asm

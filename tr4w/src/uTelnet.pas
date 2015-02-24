@@ -201,6 +201,7 @@ function TelnetWndDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lPar
 label
   1, DrawSpot;
 var
+
   temprect                              : TRect;
   TempFile                              : Text;
   i                                     : integer;
@@ -398,7 +399,8 @@ begin
           if PInteger(@TelnetBuffer[0])^ = $64205844 {DX D} then
             if ProcessDX(0, True, StringType) then
               TuneRadioToSpot(TempSpot, RadioOne);
-            {
+              
+                  {
                         if FoundDXSpot(ListBox_GetSelectedItem(TelnetListBox), TelnetDXspot) then
                           begin
                             BigCompressFormat(TelnetDXspot.Call, CompressedCall);
@@ -407,7 +409,7 @@ begin
                             BandMapEntryRecord.QSXOffset := TelnetDXspot.QSXFrequency;
                             SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);
                           end;
-            }
+                }
         end;
 
         if (wParam >= 1000) then if
@@ -688,6 +690,7 @@ procedure ProcessTelnetString(const ByteReceived: integer);
 label
   Start;
 var
+ BandMapEntryRecord, EntryToBeDisposed, PreviousBandMapEntryRecord: BandMapEntryPointer;
   c                                     : integer;
   AddedSpot                             : boolean;
   pr                                    : integer;
@@ -710,6 +713,7 @@ begin
           AddedSpot := ProcessDX(pr, False, StringType);
 
         AddStringToTelnetConsole(@TelnetBuffer[pr], StringType);
+         SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);
         pr := -1;
       end;
   end;

@@ -877,6 +877,8 @@ begin
   end;
 
   if CMD = 'SPACE' then CMD[1] := ' ';
+  if cmd = 'FM' then
+  CMD := 'FM';
   if not CheckCommand(@ID, CMD) then
   begin
     Format(wsprintfBuffer, TC_INVALIDSTATEMENTINCONFIGFILE, CFGFilesArray[CurrentConfigFile], LineNumberInConfigFile, @FileString^[1]);

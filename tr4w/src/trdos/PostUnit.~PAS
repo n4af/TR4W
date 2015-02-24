@@ -307,7 +307,7 @@ const
     'TB-WIRES',
     'OVER-50');
 
-    tCertificate                 : array[0..NumberCertificateCategories - 1] of PChar = (           //N4AF 37.0.1
+    Certificate                 : array[0..NumberCertificateCategories - 1] of PChar = (           //N4AF 37.0.1
     'YES',
     'NO');
 
@@ -2781,7 +2781,7 @@ if TempRXData.DomMultQTH = '' then
          }
         RSTPowerExchange:
         begin
-        if contest = FOCMARATHON then
+   {     if contest = FOCMARATHON then
         begin
         cMyFOCNumber :=  @MyFOCNumber[1];
         crFOCNr := @TempRXData.Power[1];
@@ -2803,6 +2803,7 @@ if TempRXData.DomMultQTH = '' then
 
              end;
              if Contest <> FOCMARATHON then
+             }
               begin
 
             asm
