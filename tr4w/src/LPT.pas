@@ -86,7 +86,7 @@ begin
     WM_COMMAND:
       begin
         if wParam = 2 then goto ExitAndClose;
-        if wParam = 1 then
+        if wParam = 1 then              //n4af 4.37.6
         begin
           for c := 101 to 109 - 0 do
           begin
