@@ -86,7 +86,7 @@ begin
     WM_COMMAND:
       begin
         if wParam = 2 then goto ExitAndClose;
-        if wParam = 50 then
+        if wParam = 1 then
         begin
           for c := 101 to 109 - 0 do
           begin
@@ -125,7 +125,7 @@ begin
           goto ExitAndClose;
         end;
         if wParam = 51 then goto ExitAndClose;
-//        if wParam = 52 then MainUnit.ProcessMenu(item_calculator);
+        if wParam = 52 then MainUnit.ProcessMenu(item_calculator);
 
         if (HiWord(wParam) = CBN_SELCHANGE) or (HiWord(wParam) = EN_CHANGE) then
           EnableWindowTrue(hwnddlg, 50);

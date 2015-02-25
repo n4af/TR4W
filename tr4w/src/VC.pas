@@ -157,10 +157,10 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.37.5'  ;
+  TR4W_CURRENTVERSION_NUMBER            = '4.37.6'  ;
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'Feb 23 2015'   ;
+  TR4W_CURRENTVERSIONDATE               = 'Feb 25 2015'   ;
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -1113,7 +1113,7 @@ const
   CallstringLength                      = 13;
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
-  ModeStringArray                       : array[ModeType] of PChar = ('CW ', 'DIG', 'SSB', 'BTH', 'NON', 'FM ');
+  ModeStringArray                       : array[ModeType] of PChar = ('CW ', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
 
   BandStringsArray                      : array[BandType] of PChar {string} =
     (
@@ -2307,8 +2307,8 @@ var
 
   tr4w_osverinfo                        : OSVERSIONINFO {= (dwOSVersionInfoSize: SizeOf(OSVERSIONINFO))};
   Msg                                   : TMsg;
-  EditingCallsignSent                   : boolean; //Используется при autosend, когда нажимается backspace
-  ControlAMode                          : boolean; //Режим Ctrl+A
+  EditingCallsignSent                   : boolean; //???????????? ??? autosend, ????? ?????????? backspace
+  ControlAMode                          : boolean; //????? Ctrl+A
   StartCPU                              : DWORD;
   StopCPU                               : DWORD;
 
@@ -3371,4 +3371,3 @@ begin
 //  Windows.CopyMemory(@TR4W_FLOPPY_FILENAME, PChar('LOGBACK.TRW'), 11);
 //  tr4wColorsArray[trSelected] := GetSysColor(COLOR_ACTIVECAPTION);
 end.
-
