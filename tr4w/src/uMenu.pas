@@ -45,7 +45,7 @@ const
   RC_KILLCW_HK                          = #9'Alt+K';
   RC_SEARCHLOG_HK                       = #9'Alt+L';
   RC_TRANSFREQ_HK                       = #9'Alt+N';
-  RC_REMINDER_HK                        = #9'Alt+O';
+//  RC_REMINDER_HK                        = #9'Alt+O';
   RC_ALTP_HK                            = #9'Alt+P';
   RC_AUTOCQ_HK                          = #9'Alt+Q';
   RC_TOOGLERIGS_HK                      = #9'Alt+R';
@@ -109,7 +109,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
   
-    T_MENU_ARRAY_SIZE                     = 173{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 168{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -228,7 +228,7 @@ const
   //}
 
     (mrText: '-'; mrId: MAXWORD - 2),
-    (mrText: RC_ALARM + RC_ALARM_HK; mrId: menu_alt_alarm),
+//    (mrText: RC_ALARM + RC_ALARM_HK; mrId: menu_alt_alarm),    //n4af 04.37.10
     (mrText: RC_BANDUP + RC_BANDUP_HK; mrId: menu_alt_bandup),
     (mrText: RC_AUTOCQRESUME + RC_AUTOCQRESUME_HK; mrId: menu_alt_autocqresume),
     (mrText: RC_DUPECHECK + RC_DUPECHECK_HK; mrId: menu_alt_dupecheck),
@@ -240,7 +240,7 @@ const
     (mrText: RC_SEARCHLOG + RC_SEARCHLOG_HK; mrId: menu_alt_searchlog),
     (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
     (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transmitfreq),
-    (mrText: RC_REMINDER + RC_REMINDER_HK; mrId: menu_alt_reminder),
+//    (mrText: RC_REMINDER + RC_REMINDER_HK; mrId: menu_alt_reminder),
     (mrText: RC_ALTP + RC_ALTP_HK; mrId: menu_alt_p),
     (mrText: RC_AUTOCQ + RC_AUTOCQ_HK; mrId: menu_alt_autocq),
     (mrText: RC_TOOGLERIGS + RC_TOOGLERIGS_HK; mrId: menu_alt_tooglerigs),
@@ -263,13 +263,13 @@ const
  //{
     (mrText: RC_SENDKEYBOARD + RC_SENDKEYBOARD_HK; mrId: menu_ctrl_sendkeyboardinput),
     (mrText: RC_CLEARMSHEET + RC_CLEARMSHEET_HK; mrId: menu_ctrl_clearmultsheet),
-    (mrText: RC_DAQSLINT + RC_DAQSLINT_HK; mrId: menu_ctrl_decAQSLinterval),
-    (mrText: RC_IAQSLINT + RC_IAQSLINT_HK; mrId: menu_ctrl_incAQSLinterval),
+//    (mrText: RC_DAQSLINT + RC_DAQSLINT_HK; mrId: menu_ctrl_decAQSLinterval),  //n4af 04.37.10
+ //   (mrText: RC_IAQSLINT + RC_IAQSLINT_HK; mrId: menu_ctrl_incAQSLinterval),   //n4af 04.37.10
     (mrText: RC_OPTIONS + RC_OPTIONS_HK; mrId: menu_options),
     (mrText: RC_CLEARDUPES + RC_CLEARDUPES_HK; mrId: menu_ctrl_cleardupesheet),
     (mrText: RC_VIEWEDITLOG + RC_VIEWEDITLOG_HK; mrId: menu_ctrl_viewlogdat),
     (mrText: RC_NOTE + RC_NOTE_HK; mrId: menu_ctrl_note),
-    (mrText: RC_MISSMULTSREP + RC_MISSMULTSREP_HK; mrId: menu_ctrl_missmultsreport),
+//    (mrText: RC_MISSMULTSREP + RC_MISSMULTSREP_HK; mrId: menu_ctrl_missmultsreport),  //n4af 04/37.10
     (mrText: RC_REDOPOSSCALLS + RC_REDOPOSSCALLS_HK; mrId: menu_ctrl_redoposscalls),
     (mrText: RC_QTCFUNCTIONS + RC_QTCFUNCTIONS_HK; mrId: menu_ctrl_qtcfunctions),
     (mrText: RC_RECALLLASTENT + RC_RECALLLASTENT_HK; mrId: menu_ctrl_recalllastentry),
