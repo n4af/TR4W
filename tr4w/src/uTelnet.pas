@@ -713,7 +713,7 @@ begin
           AddedSpot := ProcessDX(pr, False, StringType);
 
         AddStringToTelnetConsole(@TelnetBuffer[pr], StringType);
-         SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);
+    //     SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);
         pr := -1;
       end;
   end;

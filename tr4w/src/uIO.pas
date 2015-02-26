@@ -27,6 +27,7 @@ type
 
   TDlPortWritePortUchar = procedure (Port: Integer; Data: byte); stdcall;//  external 'InpOut32.dll';
   TDlPortReadPortUchar = function (Port: Integer): byte; stdcall;//  external 'InpOut32.dll';
+  TIsInpOutDriverOpen =   function ()  : boolean;  stdcall;     //  external 'InpOut32.dll';
   DlPortWritePortUchar = TDlPortWritePortUchar;
   DlPortReadPortUchar = TDlPortReadPortUchar;
 
@@ -35,10 +36,10 @@ type
 
 var
   IOPlugin                              : THandle;
+  IOPLuginisloaded                      : boolean;
   DlWriteByte                           : TDlPortWritePortUchar;
   DlReadByte                            : TDlPortReadPortUchar;
   dwStatus                              : DWORD;
-  FActiveHW                             : boolean; // Is the DLL loaded?
   LPTBaseAA                             : array[Parallel1..Parallel3] of Cardinal = ($378, $278, $3BC);
 
 const
@@ -79,7 +80,7 @@ const
 function DriverIsLoaded: boolean;      // returns true if the DLL/Driver is loaded
 function GetPortByte(Address: Word; Offset: TOffsetType): Byte;
 procedure SetPortByte(Address: Word; Offset: TOffsetType; data: Byte);
-function DriverCreate: boolean;
+procedure DriverCreate;
 procedure DriverDestroy;
 procedure NoInpOut32Message;
 procedure DriverBitOperation(var TempByte: Byte; BitToSet: TBitSet; Operation: TBitOperation);
@@ -95,40 +96,36 @@ implementation
 uses MainUnit;
 
 
-function DriverCreate: boolean;
+procedure DriverCreate;
 begin
-  FActiveHW := false;
-  IOPlugin := LoadLibrary(PChar('inpout32.dll' + #0));
-  if (IOPlugin <> 0) then
+if  not DriverIsLoaded then
   begin
-    DlWriteByte := TDlPortWritePortUchar(GetProcAddress(IOPlugin,'Out32'));
-    DlReadByte := TDlPortReadPortUchar(GetProcAddress(IOPlugin,'Inp32'));
-    if (not Assigned(DlWriteByte)) or (not Assigned(DlReadByte)) then
-      NoInpOut32Message
-    else begin
-      FActiveHW := true;
-      exit; { Got our plugin, we're done }
-    end;
-  end;
-
-
+    IOPlugin := LoadLibrary(PChar('inpout32.dll' + #0));
+    if (IOPlugin <> 0) then
+      begin
+        DlWriteByte := TDlPortWritePortUchar(GetProcAddress(IOPlugin,'Out32'));
+        DlReadByte := TDlPortReadPortUchar(GetProcAddress(IOPlugin,'Inp32'));
+        IOPLuginisloaded :=  TIsInpOutDriverOpen(GetProcAddress(IOPlugin,'IsInpOutDriverOpen'));
+      end
+     else
+     NoInpOut32Message;
+  end   
 end;
 
 procedure DriverDestroy;
 begin
-  if (FActiveHW = true) then FreeLibrary(IOPlugin);
+  if DriverIsLoaded then FreeLibrary(IOPlugin);
   IOPlugin := 0;
   DlWriteByte := nil;
   DlReadByte := nil;
-  FActiveHW := False; // Success
+  IOPLuginisloaded := false;
 end;
-
 
 
 
 function DriverIsLoaded: boolean;
 begin
-  Result := FActiveHW;
+    result := IOPLuginisloaded;
 end;
 
 
