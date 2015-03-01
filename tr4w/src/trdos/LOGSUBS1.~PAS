@@ -638,7 +638,7 @@ begin
     SetSpeed(CodeSpeed);
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
-  ClearRadioStatus(ActiveRadioPtr); //n4af 04.30.3
+  // ClearRadioStatus(ActiveRadioPtr); //n4af 04.30.3
 
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);

@@ -4359,7 +4359,7 @@ begin
     Exit;
   end;
 
-  //  if RXData.ceFMMode then TempMode := FM else TempMode := RXData.Mode;
+ //   if RXData.ceFMMode then TempMode := FM else TempMode := RXData.Mode;
 
 //  P1 := BandStringsArray[RXData.Band];
 //  P2 := ModeString[RXData.Mode];

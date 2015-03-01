@@ -877,7 +877,7 @@ begin
   end;
 
   if CMD = 'SPACE' then CMD[1] := ' ';
-  if cmd = 'FM' then
+   if cmd = 'FM' then
   CMD := 'FM';
   if not CheckCommand(@ID, CMD) then
   begin

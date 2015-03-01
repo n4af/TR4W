@@ -2566,22 +2566,22 @@ var
   Frequency                             : LONGINT;
 
 begin
-  {KK1L: 6.73}
-  if (CommandUseInactiveRadio) and {KK1L: 6.73}
-    (NextNonDupeEntryInBandMap(InActiveRadioPtr.BandMemory {BandMemory[InactiveRadio]}, InActiveRadioPtr.ModeMemory {ModeMemory[InactiveRadio]})) then
-    SetUpBandMapEntry(BandMapCursorData, InactiveRadio)
+
+//  if (CommandUseInactiveRadio) and
+ //   (NextNonDupeEntryInBandMap(InActiveRadioPtr.BandMemory {BandMemory[InactiveRadio]}, InActiveRadioPtr.ModeMemory {ModeMemory[InactiveRadio]})) then
+{    SetUpBandMapEntry(BandMapCursorData, InactiveRadio)
   else
     if NextNonDupeEntryInBandMap(ActiveBand, ActiveMode) then
     begin
-      SetUpBandMapEntry(BandMapCursorData, ActiveRadio); {KK1L: Added ActiveRadio}
+      SetUpBandMapEntry(BandMapCursorData, ActiveRadio);
 
       if ActiveWindow = ExchangeWindow then
       begin
-            //{WLI}                 ClrScr;
+                           ClrScr;
         ExchangeWindowString := '';
             //        RestorePreviousWindow;
       end;
-    end;
+    end;  }
 end;
 
 {KK1L: 6.68}

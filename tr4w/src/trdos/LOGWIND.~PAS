@@ -2050,7 +2050,7 @@ begin
 
   LastDisplayedBand := Band;
   LastDisplayedMode := Mode;
-  //  LastDisplayedFMMode := FMMode;
+   LastDisplayedFMMode := FMMode;
 
   UpdateTotals2;
 {

@@ -183,7 +183,7 @@ begin
           CheckRect.Right := CheckRect.Left + CheckRectWidth;
           CallsignRect.Left := CheckRect.Right + Shift;
 
-                       TempBandMapEntryPointer := Pointer(BandmapDRAWITEMSTRUCT^.itemData);     //hh
+ //                      TempBandMapEntryPointer := Pointer(BandmapDRAWITEMSTRUCT^.itemData);     //hh
 
           Windows.SetTextColor(memDC, 0);
           SetBkMode(memDC, TRANSPARENT);

@@ -1,4 +1,4 @@
-!define TR4WVERSION    '37.4'
+!define TR4WVERSION    '37.11'
 !define TR4WINSTFOLDER 'Software\TR4W'
 !define TR4WDRVREG     'SYSTEM\CurrentControlSet\Services\TR4WIO'
 
@@ -95,6 +95,7 @@ Section "tr4w.exe" secexe
 	SetOutPath "$INSTDIR"
 	File ..\target\tr4w.exe
 	File ..\target\r150s.dat
+	File ..\target\inpout32.dll
 !ifdef TR4WLANG
 !ifdef include_ini_file
 ;!If (${TR4WLANG} == "rus") || (${TR4WLANG} == "cze")
@@ -123,14 +124,14 @@ Section "tr4wserver.exe" secserv
   SetOutPath "$INSTDIR"
 SectionEnd
 
-;Section "DLPORTIO Driver" seclpt
-;	SectionIn RO
-;	SetOutPath "$SYSDIR"
-;	File dlportio.dll
+ ;Section "DLPORTIO Driver" seclpt
+ ;SectionIn RO
+ 	;SetOutPath "$SYSDIR"
+ 	;File inpout32.dll
 ;	SetOutPath "$SYSDIR\DRIVERS"
 ;	File dlportio.sys
 ;	SetOutPath "$INSTDIR"
-;SectionEnd
+ ;SectionEnd
 
 !ifdef TR4WLANG
 !If ${TR4WLANG} == "rus"

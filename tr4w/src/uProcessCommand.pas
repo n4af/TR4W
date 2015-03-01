@@ -337,7 +337,7 @@ begin
 
       RunningConfigFile := False;
     end;
-}
+
 
     if CommandString = 'NEXTBANDMAP' then
     begin
@@ -384,7 +384,7 @@ begin
         CWMessageCommand := CWCommandSAPMode;
     end;
  
-
+ }
 //    if CommandString = 'LASTCQFREQ' then
 //    begin
 //      if not CommandUseInactiveRadio then {KK1L: 6.73 applies to active radio only}

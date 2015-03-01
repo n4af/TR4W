@@ -742,7 +742,7 @@ begin
   if Direction = DirectionDown then
   begin
     TempInteger := TempInteger - 1;
-
+    if TempInteger = 0 then TempInteger := MAXBANDS;
   end;
 
   if Direction = DirectionUp then
@@ -750,23 +750,13 @@ begin
 
 
      TempInteger := TempInteger + 1  ;
-
+     if TempInteger >= MAXBANDS + 1 then TempInteger := 1;
 
   end;
 
   ActiveBand := BandChangeArray[TempInteger].bcBand;
-  // following lines added for n5aw 4.37.11 n4af
-  if  (BandChangeArray[TempInteger].bcWARC) and (Direction = DirectionUp)  then
-  if Contest <> GeneralQSO then
-     ActiveBand := BandChangeArray[TempInteger+1].bcBand;
-      if TempInteger >= MAXBANDS + 1 then TempInteger := 1;
-  if  (BandChangeArray[TempInteger].bcWARC) and (Direction = DirectionDown)  then
-  if Contest <> GeneralQSO then
-     ActiveBand := BandChangeArray[TempInteger-1].bcBand;
-      if TempInteger >= MAXBANDS + 1 then TempInteger := 1;
-      if TempInteger = 0 then TempInteger := MAXBANDS;
 
-  if (not WARCBandsEnabled) and (BandChangeArray[TempInteger].bcWARC) then goto NextBand;
+  if (CONTEST <> GeneralQSO) and (BandChangeArray[TempInteger].bcWARC) then goto NextBand;  //n4af 04.37.11
   if (not VHFBandsEnabled) and (BandChangeArray[TempInteger].bcVHF) then goto NextBand;
 
   if VHFBandsEnabled then
