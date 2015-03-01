@@ -157,10 +157,10 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.37.10'  ;
+  TR4W_CURRENTVERSION_NUMBER            = '4.37.11'  ;
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'Feb 25 2015'   ;
+  TR4W_CURRENTVERSIONDATE               = 'Feb 28 2015'   ;
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -3017,8 +3017,8 @@ QSOPartiesCount = 12;
       'FLORIDA QSO PARTY',
       'GACW-WWSA-CW',
       'GAGARIN-CUP',
-      'GRID LOC',
       'GENERAL QSO',
+      'GRID LOC',
       'HA DX',
       'HELVETIA',
       'IARU-HF',
