@@ -151,8 +151,8 @@ const
     (caCommand: 'RADIOONELPTMASK'; caAddress: @scRADIOONELPTMASK),
     (caCommand: 'FLUSHINITIALEX'; caAddress: @scFLUSHINITIALEX),
     (caCommand: 'SNLOCKOUT'; caAddress: @scSNLOCKOUT),
-    (caCommand: 'CLEARDUPESHEET'; caAddress: @tClearDupesheet_Ctrl_K)  ,
-    (caCommand: 'CLEARMULTSHEET'; caAddress: @ClearMultSheet_CtrlC) 
+    (caCommand: 'CLEARDUPESHEET'; caAddress: @tClearDupeSheet)  ,
+    (caCommand: 'CLEARMULTSHEET'; caAddress: @tClearMultSheet) 
     )
     ;
 
