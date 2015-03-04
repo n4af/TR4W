@@ -1,46 +1,57 @@
 unit uSpots;
 {$IMPORTEDDATA OFF}
+
 interface
 
 uses
   VC,
   TF,
-
   LogStuff,
   WinSock2,
   Windows,
   Messages,
   LogEdit,
   LogPack,
-  //Country9,
-  Tree
-  ;
+  Tree;
 
 type
 
-  PSpotRecord = ^TSpotRecord;
+//  PSpotRecord = ^TSpotRecord;
 
   PSpotsList = ^TSpotsList;
   TSpotsList = array[0..1000] of TSpotRecord;
 
+  PSpotsListBuffer = ^TSpotsListBuffer;
+  TSpotsListBuffer = array[0..1000] of TSpotRecord;
+
   TDXSpotsList = object {class}
+
   private
     FList: PSpotsList;
     FCount: integer;
     FCurrentCursorFreq: integer;
     FCapacity: integer;
+    BList: PSpotsListBuffer;
+    BCount: integer;
+    BCapacity: integer;
     procedure Grow;
+    procedure GrowBuffer;
+
   protected
     function GetCapacity: integer;
     procedure SetCapacity(NewCapacity: integer);
+    procedure SetCapacityBuffer(NewCapacity: integer);
     function CompareStrings(const s1, s2: CallString): integer;
     procedure InsertSpot(Index: integer; const Spot: TSpotRecord); virtual;
+    procedure InsertSpotBuffer(Index: integer; const Spot: TSpotRecord); virtual;
+
   public
 //    destructor Destroy; override;
     constructor Init;
     function Get(Index: integer): TSpotRecord;
     function AddSpot(var Spot: TSpotRecord; SendToNetwork: boolean): integer;
     procedure Clear;
+    procedure SendAndClearBuffer;
     procedure SetCursor;
     procedure DecrementSpotsTimes;
     procedure UpdateSpotsMultiplierStatus;
@@ -50,6 +61,7 @@ type
     //    procedure ClearDupes;
     procedure ResetSpotsTimes;
     procedure ResetSpotsDupes;
+
     procedure DisplayCallsignOnThisFreq(Freq: integer);
     procedure TuneDupeCheck(Freq: integer);
     function FindSpot(const Spot: TSpotRecord; var Index: integer): boolean; virtual;
@@ -59,6 +71,8 @@ type
 var
   SpotsList                             : TDXSpotsList;
   SpotsDisplayed                        : integer;
+
+
 implementation
 uses
   LOGSUBS2,
@@ -73,6 +87,7 @@ uses
 constructor TDXSpotsList.Init;
 begin
   Grow;
+  GrowBuffer;
 end;
 {
 destructor TDXSpotsList.Destroy;
@@ -90,30 +105,34 @@ label
 var
   i                                     : integer;
 begin
-  SetCursor;
 
-  for i := 0 to FCount - 1 do
-  begin
-    if FList^[i].FBand = Spot.FBand then
-      if FList^[i].FCall = Spot.FCall then
+  if BandMapPreventRefresh then                     // Gav 4.37
+    begin
+       InsertSpotBuffer(Bcount , Spot);             // Gav 4.37
+    end
+  else
+    begin
+      SetCursor;
+
+      for i := 0 to FCount - 1 do
       begin
-        Delete(i);
-        Break;
+          if FList^[i].FBand = Spot.FBand then
+          if FList^[i].FCall = Spot.FCall then
+            begin
+              Delete(i);
+              Break;
+            end;
       end;
-  end;
-  if Spot.FBand in [Band30, Band17, Band12] then Spot.FWARCBand := True;
+      if Spot.FBand in [Band30, Band17, Band12] then Spot.FWARCBand := True;
 
-{$IF RDXCMode}
-//  if CountryTable.GetCountry(Spot.FCall, True) = 269 {ua9} then Spot.FLoudSignal := True else Spot.FLoudSignal := False;
-{$IFEND}
+      if FindSpot(Spot, Result) then goto Add;
+      InsertSpot(Result, Spot);
+      Add:
+      FList^[Result] := Spot;
+    end;
 
-  if FindSpot(Spot, Result) then goto Add;
-  InsertSpot(Result, Spot);
-  Add:
-  FList^[Result] := Spot;
-
-  if SendToNetwork then
-    if PInteger(@Spot.FCall[1])^ <> tCQAsInteger then
+      if SendToNetwork then
+      if PInteger(@Spot.FCall[1])^ <> tCQAsInteger then
       if NetSocket <> 0 then
       begin
         NetDXSpot.dsSpot := Spot;
@@ -136,19 +155,19 @@ var
 //    CurCursorPosData                     : integer;
   NumberEntriesDisplayed                   : integer;
 
+
 begin
 
 //  inc(SpotsDisplayed);
 //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then Exit;
+  if  BandMapPreventRefresh then  Exit;                // GAV  4.37.12
   TDXSpotsList.UpdateSpotsMultiplierStatus;
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
   NumberEntriesDisplayed := 0;
   k := 0;
   i := 0;
-
-
 
 
   for i := 0 to FCount - 1 do
@@ -233,28 +252,27 @@ begin
       end;
 
 
+      tSetWindowRedraw(BandMapListBox, False);
+      tLB_RESETCONTENT(BandMapListBox);
+      SendMessage(BandMapListBox, LB_INITSTORAGE, k , 10000);
 
-  tSetWindowRedraw(BandMapListBox, False);
-  tLB_RESETCONTENT(BandMapListBox);
-  SendMessage(BandMapListBox, LB_INITSTORAGE, k , 10000);
+      for  k := bottom to top  do SendMessage(BandMapListBox, LB_ADDSTRING, 0, FiltSpotIndex[k]);
 
-  for  k := bottom to top  do SendMessage(BandMapListBox, LB_ADDSTRING, 0, FiltSpotIndex[k]);
+      tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
+      tSetWindowRedraw(BandMapListBox, True);
+      asm push NumberEntriesDisplayed
+      end;
+      wsprintf(wsprintfBuffer, TC_SPOTS);
+      asm add esp,12
+      end;
+      SetTextInBMSB(5, wsprintfBuffer);
+      if NumberEntriesDisplayed = 0 then ClearSpotInfo;
 
-  tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
-  tSetWindowRedraw(BandMapListBox, True);
-
-  // Gav end of section added
-
-  asm push NumberEntriesDisplayed
-  end;
-  wsprintf(wsprintfBuffer, TC_SPOTS);
-  asm add esp,12
-  end;
-  SetTextInBMSB(5, wsprintfBuffer);
-
-  if NumberEntriesDisplayed = 0 then ClearSpotInfo;
 
 end;
+
+
+// Gav end of section added
 
 
 procedure TDXSpotsList.Clear;
@@ -266,6 +284,24 @@ begin
     SetCapacity(0);
   end;
 end;
+
+
+procedure TDXSpotsList.SendAndClearBuffer;         // Gav 4.37
+var
+  i                            : integer;
+begin
+  if BCount <> 0 then
+  begin
+    i := BCount;
+    for i := 0 to i - 1 do
+      begin
+         AddSpot(BList^[i],False)
+      end;
+  end;
+  BCount := 0;
+end;
+
+
 
 procedure TDXSpotsList.Delete(Index: integer);
 begin
@@ -399,6 +435,18 @@ begin
   SetCapacity(FCapacity + delta);
 end;
 
+
+procedure TDXSpotsList.GrowBuffer;           // Gav 4.37
+var
+  delta                                 : integer;
+begin
+  if BCapacity > 64 then delta := BCapacity div 4 else
+    if BCapacity > 8 then delta := 16 else
+      delta := 4;
+  SetCapacityBuffer(BCapacity + delta);
+end;
+
+
 procedure TDXSpotsList.InsertSpot(Index: integer; const Spot: TSpotRecord);
 begin
   if FCount = FCapacity then Grow;
@@ -409,11 +457,31 @@ begin
   inc(FCount);
 end;
 
+
+procedure TDXSpotsList.InsertSpotBuffer(Index: integer; const Spot: TSpotRecord);          // Gav 4.37
+begin
+  if BCount = BCapacity then GrowBuffer;
+  if Index < BCount then
+    System.Move(BList^[Index], BList^[Index + 1],
+      (BCount - Index) * SizeOf(TSpotRecord));
+  BList^[Index] := Spot;
+  inc(BCount);
+end;
+
+
+
 procedure TDXSpotsList.SetCapacity(NewCapacity: integer);
 begin
   ReallocMem(FList, NewCapacity * SizeOf(TSpotRecord));
   FCapacity := NewCapacity;
 end;
+
+procedure TDXSpotsList.SetCapacityBuffer(NewCapacity: integer);          // Gav 4.37
+begin
+  ReallocMem(BList, NewCapacity * SizeOf(TSpotRecord));
+  BCapacity := NewCapacity;
+end;
+
 
 function TDXSpotsList.CompareStrings(const s1, s2: CallString): integer;
 var
@@ -555,5 +623,8 @@ begin
 //  SpotsList := TDXSpotsList.Create;
   SpotsList.Init;
   SpotsList.FCurrentCursorFreq := -1;
+
+
+
 end.
 

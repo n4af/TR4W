@@ -173,7 +173,7 @@ type
     bmMode: ModeType;
   end;
 
-   BandMapArray = array of {tr4wBandMapEntry} BandMapEntry;
+//  BandMapArray = array of {tr4wBandMapEntry} BandMapEntry;
 
   BandMapEntryPointer = ^BandMapEntry;
 
@@ -778,6 +778,7 @@ var
   QSOPointsDXCW                         : integer = -1;
   QSOPointsDXPhone                      : integer = -1;
 
+  QSYInactiveRadio                      : boolean;        // Gav     4.37.12
   QTCDataArray                          : QTCDataArrayPtr;
   QTCsEnabled                           : boolean;
   QTCMinutes                            : boolean;
@@ -973,7 +974,8 @@ procedure IncrementTime(Count: integer);
 procedure tCalculateRate();
 procedure LoadBandMap;
 procedure LookForOnDeckCall(var ExchangeString: ShortString {Str80});
-
+procedure NextBandMapEntry ;
+procedure BMFirst;
 function NextNonDupeEntryInBandMap(Band: BandType; Mode: ModeType): boolean;
 function NextMultiplierEntryInBandMap(Band: BandType; Mode: ModeType): boolean; {KK1L: 6.68}
 {KK1L: 6.64 created to allow traversal of entrire displayed bandmap}
@@ -2050,7 +2052,7 @@ begin
 
   LastDisplayedBand := Band;
   LastDisplayedMode := Mode;
-   LastDisplayedFMMode := FMMode;
+  //  LastDisplayedFMMode := FMMode;
 
   UpdateTotals2;
 {
@@ -3661,7 +3663,7 @@ begin
   else
     RadioToUse := ActiveRadio;
 
-   if  BandMapFirstEntryList[Band, Mode] = nil then
+  if BandMapFirstEntryList[Band, Mode] = nil then
     Exit;
 
   BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
@@ -5221,6 +5223,45 @@ begin
   SpotsList.Display;
 end;
 
+ procedure NextBandMapEntry ;
+ var
+ BandMapEntryRecord                    : BandMapEntryPointer;
+  NumberEntriesDisplayed                : integer;
+  Band                                  : BandType;
+  Mode                                  : ModeType;
+  CurrentCursorPos                      : integer;
+  CurCursorPosData                      : integer;
+  pos                                   : integer;
+  numberbandentries                     : integer;
+  i                                     : integer;
+ begin
+ if not BandMapEnable then exit;
+ 
+ CurrentCursorPos := GetBMSelItemData;
+ if CurrentCursorPos = LB_ERR then Exit;
+
+             
+
+   CurrentCursorPos := CurrentCursorPos + 1  ;
+
+  tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
+  if QSYInactiveRadio and TwoRadioMode then                                   //Gav 4.37.12
+  //              TuneRadioToSpot(SpotsList.Get(CurrentCursorPos), InActiveRadio)
+  TuneRadioToSpot(@CurrentCursorPos, InActiveRadio)
+              else
+                TuneRadioToSpot(SpotsList.Get(CurrentCursorPos), ActiveRadio);
+            end;
+
+  
+
+procedure BMFirst;
+begin
+
+              
+              tLB_SETCURSEL(BandMapListBox, 0);
+
+end;
+
 procedure DisplayBandMap_proc;
 var
 
@@ -5234,12 +5275,12 @@ var
   //  CallSignString                   : CallString;
 
 begin
-  Exit;
+
   if not BandMapEnable then Exit;
   if (not DisplayBandMapEnable) then Exit;
 
   // tr4w_NeedToBlink := False;         //n4af
-  CurrentCursorPos := 0;
+
 
   CurCursorPosData := GetBMSelItemData;
 
@@ -5292,7 +5333,7 @@ begin
           begin
             if not CQLabel(BandMapExpandedString(BandMapEntryRecord^.Call)) then
             begin
-              SendMessage(BandMapListBox, LB_GETITEMRECT, wParam(NumberEntriesDisplayed), lParam(@tBlinkerRect));
+            SendMessage(BandMapListBox, LB_GETITEMRECT, wParam(NumberEntriesDisplayed), lParam(@tBlinkerRect));
          //     tr4w_NeedToBlink := False;     //n4af
             end;
           end;

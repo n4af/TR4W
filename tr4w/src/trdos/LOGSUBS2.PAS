@@ -2569,19 +2569,21 @@ begin
 
 //  if (CommandUseInactiveRadio) and
  //   (NextNonDupeEntryInBandMap(InActiveRadioPtr.BandMemory {BandMemory[InactiveRadio]}, InActiveRadioPtr.ModeMemory {ModeMemory[InactiveRadio]})) then
-{    SetUpBandMapEntry(BandMapCursorData, InactiveRadio)
-  else
-    if NextNonDupeEntryInBandMap(ActiveBand, ActiveMode) then
+ //   SetUpBandMapEntry(BandMapCursorData, InactiveRadio)
+//  else
+//    if NextNonDupeEntryInBandMap(ActiveBand, ActiveMode) then
     begin
-      SetUpBandMapEntry(BandMapCursorData, ActiveRadio);
+
+ //   BandMapEntryRecord := BandMapEntryRecord^.NextEntry;
+ {     SetUpBandMapEntry(BandMapCursorData, ActiveRadio);
 
       if ActiveWindow = ExchangeWindow then
       begin
-                           ClrScr;
+                      ClrScr;
         ExchangeWindowString := '';
             //        RestorePreviousWindow;
-      end;
-    end;  }
+      end; }
+    end;
 end;
 
 {KK1L: 6.68}

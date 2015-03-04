@@ -33,7 +33,8 @@ uses {SlowTree,} Tree,
 //  LOGPROM, {Crt, }
   LogNet,
 //  ColorCfg,
-  LogRadio
+  LogRadio 
+
   ;
 var
 LPTBaseAddressArray                   : array[Parallel1..Parallel3] of Cardinal = ($378, $278, $3BC);
@@ -1434,7 +1435,7 @@ begin
     Exit;
   end;
 }
-
+ 
 {
   if ID = 'DUPE SHEET ENABLE' then
   begin

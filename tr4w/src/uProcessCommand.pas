@@ -81,7 +81,7 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 
 const
 
-  sCommands                             = 55      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
+  sCommands                             = 57      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
 
@@ -150,8 +150,9 @@ const
     (caCommand: 'SRS2'; caAddress: @scSRS2),
     (caCommand: 'RADIOONELPTMASK'; caAddress: @scRADIOONELPTMASK),
     (caCommand: 'FLUSHINITIALEX'; caAddress: @scFLUSHINITIALEX),
-    (caCommand: 'SNLOCKOUT'; caAddress: @scSNLOCKOUT) {,
-    (caCommand: 'SNRELEASE'; caAddress: @scSNRELEASE)}
+    (caCommand: 'SNLOCKOUT'; caAddress: @scSNLOCKOUT),
+    (caCommand: 'CLEARDUPESHEET'; caAddress: @tClearDupesheet_Ctrl_K)  ,
+    (caCommand: 'CLEARMULTSHEET'; caAddress: @ClearMultSheet_CtrlC) 
     )
     ;
 
@@ -205,13 +206,13 @@ begin
         asm
         call p
         end;
-{
+
         p := PChar(sCommandsArray[i].caCommand);
         asm push p end;
         wsprintf(QuickDisplayBuffer, '"%s" command is executed.');
         asm add esp,12 end;
         QuickDisplay(QuickDisplayBuffer);
-}
+ 
         Break;
 
       end;
@@ -326,7 +327,7 @@ begin
       FirstCommand := False;
 
 //      if FileExists(FileName) then        LoadInSeparateConfigFile(FileName, FirstCommand, MyCall);
-
+  }
       if ClearDupeSheetCommandGiven then
       begin
         tClearDupesheet;
@@ -334,7 +335,7 @@ begin
               //        UpdateTotals2;
               //        Sheet.ClearDupeSheet;
       end;
-
+ {
       RunningConfigFile := False;
     end;
 

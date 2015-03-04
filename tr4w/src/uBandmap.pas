@@ -60,6 +60,7 @@ procedure SetTextInBMSB(Index: integer; Text: PChar);
 function GetBMSelItemData: integer;
 function NEWBMLBPROC(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): integer; stdcall;
 
+
 const
 
   CheckRectWidth                        = 17;
@@ -74,9 +75,10 @@ var
   BandMapBckgrndBrush                   : HBRUSH;
   tBlinkerRect                          : TRect;
   tIvertedBlinker                       : boolean;
+  BandMapPreventRefresh                 : boolean;             // Gav 4.37.12
   //  DoNotAddToBandMap                : boolean;
   // BandMapListBoxHDC                     : HDC;
-  tr4w_NetedToBlink                      : boolean;
+ // tr4w_NetedToBlink                      : boolean;
   BMWSBUFFER                            : array[0..16] of Char;
   PreviousDisplayedBandmapBand          : BandType {= NoBand};
   BandColor                             : Cardinal;
@@ -183,7 +185,7 @@ begin
           CheckRect.Right := CheckRect.Left + CheckRectWidth;
           CallsignRect.Left := CheckRect.Right + Shift;
 
- //                      TempBandMapEntryPointer := Pointer(BandmapDRAWITEMSTRUCT^.itemData);     //hh
+            ///            TempBandMapEntryPointer := Pointer(BandmapDRAWITEMSTRUCT^.itemData);
 
           Windows.SetTextColor(memDC, 0);
           SetBkMode(memDC, TRANSPARENT);
@@ -313,9 +315,6 @@ begin
             call tWM_SETFONT
         end;
 
-        //        OLDBMLBPROC := Pointer(Windows.SetWindowLong(BandMapListBox, GWL_WNDPROC, integer(@NEWBMLBPROC)));
-                //for BandColor:=1 to 100 do
-                //                SendMessage(BandMapListBox, LB_ADDSTRING, 0, 0);
         BandMapStatusBar := Windows.GetDlgItem(hwnddlg, 102);
 
         BandMapStatusBar := tWM_SETFONT(CreateWindow(STATUSCLASSNAME, nil, {SBT_NOBORDERS or} CCS_TOP or CCS_NOMOVEY or WS_CHILD or WS_VISIBLE, 100, 100, 100, 100, hwnddlg, 101, hInstance, nil), MainFixedFont);
@@ -325,7 +324,7 @@ begin
 
         BandMapEnable := True;
         SendMessage(BandMapStatusBar, SB_SETPARTS, 6, integer(@BMPanelWidth));
-      SetTimer(hwnddlg, BANDMAP_BLINK_TIMER_HANDLE, 600, nil);     //n4af
+//      SetTimer(hwnddlg, BANDMAP_BLINK_TIMER_HANDLE, 600, nil);     //n4af
         tr4w_WindowsArray[tw_BANDMAPWINDOW_INDEX].WndHandle := hwnddlg;
    //      BandMapListBoxHDC := Windows.GetDC(BandMapListBox);
      //           DoNotAddToBandMap := False;       
@@ -391,32 +390,37 @@ begin
               SpotsList.Clear;
               SpotsList.Display;
             end;
-          205:
-            begin
-              TempInt := GetBMSelItemData;
-              if TempInt = LB_ERR then Exit;
-              TuneRadioToSpot(SpotsList.Get(TempInt), InactiveRadio);
-//              SwapRadios;
-            end;
+          205: If TwoRadioMode then InvertBooleanCommand(@QSYInactiveRadio);   // Gav     4.37.12
+
         end;
 
         case HiWord(wParam) of
           LBN_SETFOCUS:
             begin
-
+              BandMapPreventRefresh := True;      // Gav     4.37.12
+              SpotsList.SetCursor;
+              ShowSpotInfo;
+            end;
+          LBN_KILLFOCUS:
+            begin
+              BandMapPreventRefresh := False;         // Gav     4.37.12
+              SpotsList.SendAndClearBuffer;
+              SpotsList.Display;
             end;
           LBN_SELCHANGE:
             begin
               SpotsList.SetCursor;
               ShowSpotInfo;
-
             end;
 
           LBN_DBLCLK:
             begin
               TempInt := GetBMSelItemData;
               if TempInt = LB_ERR then Exit;
-              TuneRadioToSpot(SpotsList.Get(TempInt), ActiveRadio);
+              if QSYInactiveRadio and TwoRadioMode then                                   //Gav 4.37.12
+                TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio)
+              else
+                TuneRadioToSpot(SpotsList.Get(TempInt), ActiveRadio);
             end;
           //            TuneOnSpotFromBandmap;
 
@@ -500,6 +504,7 @@ begin
   if BandMapDisplayCQ then Windows.CheckMenuItem(BandMapMenu, 202, MF_CHECKED);
   if BandMapDupeDisplay then Windows.CheckMenuItem(BandMapMenu, 68, MF_CHECKED);
   if BandMapMultsOnly then Windows.CheckMenuItem(BandMapMenu, 69, MF_CHECKED);
+  if QSYInactiveRadio and TwoRadioMode then Windows.CheckMenuItem(BandMapMenu, 205, MF_CHECKED); //GAV  4.37.12
 
   //  SetMenuItemBitmaps(tr4w_main_menu, menu_alt_swapmults, MF_BYCOMMAND,
   //    LoadImage(GetModuleHandle('comctl32.dll'), PChar(140), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR), 0);
@@ -525,7 +530,7 @@ const
   MAX_QZB_OFFSET                        = 30;
 begin
 
-  if OpMode = SearchAndPounceOpMode
+  if (OpMode = SearchAndPounceOpMode)
     then
   begin
     LastSPFrequency := ActiveRadioPtr^.LastDisplayedFreq;
@@ -571,7 +576,12 @@ begin
     PutRadioOutOfSplit(Radio);
   end;
 
-  if Radio = InactiveRadio then Exit;
+  if Radio = InactiveRadio then
+    begin
+      InActiveRadioPtr.BandMemory := Spot.FBand;       //Gav 4.37
+      InActiveRadioPtr.ModeMemory := Spot.FMode;       //Gav 4.37
+      Exit;
+    end;
 
   tCleareExchangeWindow;
   tCallWindowSetFocus;
@@ -646,16 +656,16 @@ begin
   for i := 0 to 4 do SetTextInBMSB(i, nil);
 end;
 
+
 function GetBMSelItemData: integer;
 begin
-  if BandMapListBox = 0 then
+  if BandMapListBox = 0 then Exit;
   begin
-    Result := LB_ERR;
-    Exit;
+      Result := SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
+        if Result = LB_ERR then Exit;
+      Result := SendMessage(BandMapListBox, LB_GETITEMDATA, Result , 0);
   end;
-  Result := SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
-  if Result = LB_ERR then Exit;
-  Result := SendMessage(BandMapListBox, LB_GETITEMDATA, Result, 0);
+
 end;
 
 function NEWBMLBPROC(hwnddlg: HWND; Msg: UINT; wParam: LONGINT; lParam: LONGINT): integer; stdcall;
