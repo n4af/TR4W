@@ -569,8 +569,7 @@ const
 
   RC_DELETESELSPOT                      = 'Delete selected spot';
   RC_REMOVEALLSP                        = 'Remove all spots';
-  RC_SENDINRIG                          = 'Send inacive rig to the frequency';
-
+  RC_SENDINRIG                          = 'QSY Inactive Radio';
   RC_FILE                               = 'File';
   RC_CLEARLOG                           = 'Clear log';
   RC_IMPORT                             = 'Import';
