@@ -418,9 +418,15 @@ begin
               TempInt := GetBMSelItemData;
               if TempInt = LB_ERR then Exit;
               if QSYInactiveRadio and TwoRadioMode then                                   //Gav 4.37.12
-                TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio)
+               begin
+                TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio);
+                Windows.SetFocus(wh[mweCall]); // N4AF 4.38.2 add
+               end
               else
+              begin
                 TuneRadioToSpot(SpotsList.Get(TempInt), ActiveRadio);
+                Windows.SetFocus(wh[mweCall]);    // n4af 4.38.2 add
+                end;
             end;
           //            TuneOnSpotFromBandmap;
 

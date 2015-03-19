@@ -81,7 +81,7 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 
 const
 
-  sCommands                             = 57      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
+  sCommands                             = 58      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
 
@@ -116,7 +116,8 @@ const
 (caCommand: ' & = AS'; caAddress: @scDUPECHECK),
 (caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
 //{$IFEND}
-    (caCommand: 'NEXTBANDMAP'; caAddress: @GoToNextBandMapFrequency),
+    (caCommand: 'NEXTBANDMAP'; caAddress: @NEXTBANDMAPENTRY),
+     (caCommand: 'BMFIRST'; caAddress: @BMFIRST),
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),

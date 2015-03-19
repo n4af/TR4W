@@ -5225,33 +5225,65 @@ end;
 
  procedure NextBandMapEntry ;
  var
+ Result                                : Integer;
  BandMapEntryRecord                    : BandMapEntryPointer;
   NumberEntriesDisplayed                : integer;
   Band                                  : BandType;
   Mode                                  : ModeType;
-  CurrentCursorPos                      : integer;
+  CursorCount                           : integer;
   CurCursorPosData                      : integer;
-  pos                                   : integer;
   numberbandentries                     : integer;
   i                                     : integer;
+  Spot                                  : TSpotRecord;
+  d  : pChar;
+  label
+  next;
  begin
  if not BandMapEnable then exit;
- 
- CurrentCursorPos := GetBMSelItemData;
- if CurrentCursorPos = LB_ERR then Exit;
+   BandMapPreventRefresh := True;
+// SpotsList.Display;
 
+ i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
+ if i = -1 then
+ tLB_SETCURSEL(BandMapListBox, 0);
+//  CurrentCursorPos := GetBMSelItemData;
+ CursorCount := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+ if CursorCount = LB_ERR then Exit;
+ Next:
+   i := i + 1  ;
+ if i = CursorCount then
+ exit ;
+
+  Windows.SendMessage(BandMapListBox, LB_SETCURSEL, i, 0);
+
+ spot := spotslist.get(i);
+   if QSYInactiveRadio and TwoRadioMode then
+   begin
+
+     Band := InActiveRadioPtr.BandMemory;
+       if Spot.FBand = BandmapBand then
+                      begin
+                       TuneRadioToSpot(SpotsList.Get(i), InActiveRadio);
+                       BandMapPreventRefresh := False;
+                       end
+                       else
+                       GoTo Next;
+                       exit;
+
+                    
+    end;
+      spot := spotslist.get(i);
+      Band := ActiveRadioPtr.BandMemory;
+            if (not QSYInactiveRadio) and (Spot.FBand = Band) then
+            begin
+               TuneRadioToSpot(SpotsList.Get(i), ActiveRadio);
+               BandMapPreventRefresh := False;
+             end
+
+                 else
+                 goto next;
              
-
-   CurrentCursorPos := CurrentCursorPos + 1  ;
-
-  tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
-  if QSYInactiveRadio and TwoRadioMode then                                   //Gav 4.37.12
-  //              TuneRadioToSpot(SpotsList.Get(CurrentCursorPos), InActiveRadio)
-//  TuneRadioToSpot(@CurrentCursorPos, InActiveRadio)
-              else
-                TuneRadioToSpot(SpotsList.Get(CurrentCursorPos), ActiveRadio);
-            end;
-
+          end;
   
 
 procedure BMFirst;

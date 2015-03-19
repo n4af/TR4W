@@ -106,9 +106,9 @@ var
   i                                     : integer;
 begin
 
-  if BandMapPreventRefresh then                     // Gav 4.37
+  if BandMapPreventRefresh then                     // Gav 4.37.12
     begin
-       InsertSpotBuffer(Bcount , Spot);             // Gav 4.37
+       InsertSpotBuffer(Bcount , Spot);             // Gav 4.37.12
     end
   else
     begin
@@ -436,7 +436,7 @@ begin
 end;
 
 
-procedure TDXSpotsList.GrowBuffer;           // Gav 4.37
+procedure TDXSpotsList.GrowBuffer;           // Gav 4.37.12
 var
   delta                                 : integer;
 begin
@@ -458,7 +458,7 @@ begin
 end;
 
 
-procedure TDXSpotsList.InsertSpotBuffer(Index: integer; const Spot: TSpotRecord);          // Gav 4.37
+procedure TDXSpotsList.InsertSpotBuffer(Index: integer; const Spot: TSpotRecord);          // Gav 4.37.12
 begin
   if BCount = BCapacity then GrowBuffer;
   if Index < BCount then
@@ -476,7 +476,7 @@ begin
   FCapacity := NewCapacity;
 end;
 
-procedure TDXSpotsList.SetCapacityBuffer(NewCapacity: integer);          // Gav 4.37
+procedure TDXSpotsList.SetCapacityBuffer(NewCapacity: integer);          // Gav 4.37.12
 begin
   ReallocMem(BList, NewCapacity * SizeOf(TSpotRecord));
   BCapacity := NewCapacity;
