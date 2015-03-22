@@ -616,7 +616,8 @@ begin
       ((Call[2] < '0') or (Call[2] > '9')) and
       ((Call[3] < '0') or (Call[3] > '9')) then
       Exit;
-  end
+  end ;
+  { //n4af 4.38.3
   else
     if
       ((Call[2] < '0') or (Call[2] > '9')) and
@@ -629,7 +630,7 @@ begin
 //    if (Call <> 'BP100') and (Call <> 'BV100')and (Call <> 'BM100') then Exit;
     if ((length(Call) <> 5) and (Call[1] = 'B')) then Exit;
   end;
-
+  }
   GoodCallSyntax := True;
 end;
 

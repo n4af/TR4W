@@ -4295,7 +4295,7 @@ end;
 procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);
 
 begin
-  if (Band <> TenMinuteTime.Band) or (Mode <> TenMinuteTime.Mode) then
+  if (Band <> TenMinuteTime.Band) {or (Mode <> TenMinuteTime.Mode)} then
   begin
     TenMinuteTime.Band := Band;
     TenMinuteTime.Mode := Mode;
@@ -5096,7 +5096,7 @@ var
   Band                                  : BandType;
   Mode                                  : ModeType;
 begin
-{
+  {
   for Band := Band160 to All do
     for Mode := CW to Both do
     begin
@@ -5104,7 +5104,7 @@ begin
         Dispose(MultiStatus[Band, Mode]);
       MultiStatus[Band, Mode] := nil;
     end;
-}
+    }
   MarkTime(TenMinuteTime.Time);
 end;
 
@@ -5244,12 +5244,13 @@ end;
 // SpotsList.Display;
 
  i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
- if i = -1 then
- tLB_SETCURSEL(BandMapListBox, 0);
+ //if i = -1 then
+ //tLB_SETCURSEL(BandMapListBox, 0);
 //  CurrentCursorPos := GetBMSelItemData;
+Next:
  CursorCount := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
  if CursorCount = LB_ERR then Exit;
- Next:
+
    i := i + 1  ;
  if i = CursorCount then
  exit ;
@@ -5262,22 +5263,20 @@ end;
 
      Band := InActiveRadioPtr.BandMemory;
        if Spot.FBand = BandmapBand then
-                      begin
-                       TuneRadioToSpot(SpotsList.Get(i), InActiveRadio);
-                       BandMapPreventRefresh := False;
-                       end
+
+                       TuneRadioToSpot(SpotsList.Get(i), InActiveRadio) 
+
                        else
                        GoTo Next;
                        exit;
+                       end;
 
-                    
-    end;
       spot := spotslist.get(i);
       Band := ActiveRadioPtr.BandMemory;
             if (not QSYInactiveRadio) and (Spot.FBand = Band) then
             begin
                TuneRadioToSpot(SpotsList.Get(i), ActiveRadio);
-               BandMapPreventRefresh := False;
+          
              end
 
                  else

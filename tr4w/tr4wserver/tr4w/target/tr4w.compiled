@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <Compiler Value="C:\lazarus\fpc\2.6.2\bin\i386-win32\fpc.exe" Date="1146920661"/>
-  <Params Value=" -Mdelphi -Scghi -O1 -g -gl -WG -vewnhi -FiD:\tr4wsrc\tr4w\src -FiD:\tr4wsrc\tr4w\src\trdos -FiD:\tr4wsrc\include -FiD:\tr4wsrc\tr4w\src\utils -FuD:\tr4wsrc\tr4w\src -FuD:\tr4wsrc\tr4w\src\trdos -FuD:\tr4wsrc\include -FuD:\tr4wsrc\tr4w\src\utils -FuC:\lazarus\lcl\units\i386-win32\win32 -FuC:\lazarus\lcl\units\i386-win32 -FuC:\lazarus\components\lazutils\lib\i386-win32 -FuC:\lazarus\packager\units\i386-win32 -FuD:\tr4wsrc\tr4w\ -FUD:\tr4wsrc\tr4w\target\ -l -FED:\tr4wsrc\tr4w\target\ -dLCL -dLCLwin32 tr4w.lpr"/>
-  <Complete Value="False"/>
-</CONFIG>
