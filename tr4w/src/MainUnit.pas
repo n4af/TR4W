@@ -61,11 +61,7 @@ uses
   uBandmap,
   TF,
   VC,
-//  uLC,
-//  uGrid,
-//  uDistance,
   uGradient,
-//  MMSystem,
   uNet,
   uCAT,
   uAutoCQ,
@@ -1662,20 +1658,23 @@ begin
 end;
 
 procedure tClearDupesheet;
+
 begin
-  //  MoveEditableLogIntoLogFile;
+
   tUpdateLog(actSetClearDupesheetBit);
   UpdateTotals2;
   CallsignsList.ClearDupes;
-  //  Sheet.ClearDupeSheet;
+
   QuickDisplay(TC_DUPESHEETCLEARED {  To restore, delete RESTART.BIN and start program over.'});
-  ShowInformation;
-  CallsignsList.DisplayDupeSheet(@Radio1 {ActiveBand, ActiveMode});
-  CallsignsList.DisplayDupeSheet(@Radio2 {ActiveBand, ActiveMode});
+  
+//  callsignsList.DisplayDupeSheet(@Radio1 {ActiveBand, ActiveMode});      //n4af 4.38.7
+  CallsignsList.DisplayDupeSheet(@Radio2 {ActiveBand, ActiveMode});      // n4af 4.38.7
   SpotsList.ResetSpotsDupes;
   //  ResetBandMapDupes;
   DisplayBandMap;
   UpdateAllStationsList;
+  
+  ShowInformation;
 end;
 
 procedure tr4w_add_note_in_log;
