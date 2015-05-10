@@ -1,3 +1,23 @@
+{
+ Copyright Dmitriy Gulyaev UA4WLI 2015.
+
+ This file is part of TR4W  (SRC)
+
+ TR4W is free software: you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation, either version 2 of the
+ License, or (at your option) any later version.
+
+ TR4W is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General
+     Public License along with TR4W in  GPL_License.TXT. 
+If not, ref: 
+http://www.gnu.org/licenses/gpl-3.0.txt
+ }
 unit VC;
 interface
 
@@ -157,10 +177,10 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.39.1'  ;
+  TR4W_CURRENTVERSION_NUMBER            = '4.39.2'  ;
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'May 01 2015'   ;
+  TR4W_CURRENTVERSIONDATE               = 'May 05, 2015'   ;
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -2964,7 +2984,7 @@ QSOPartiesCount = 12;
  ({Name: 'ARRL RTTY ROUNDUP';       }   Email: 'rttyru@arrl.org';        DF: 's48p14dc';          WA7BNM:  217;                         QRZRUID:  56 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  DM: DomesticFile; P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:OnePointPerQSO),
  ({Name: 'CQIR';                    }   Email: nil;                      DF: 'ireland';           WA7BNM:  434;                         QRZRUID:   0 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  DM: DomesticFile; P: 0; AE: QSONumberAndPossibleDomesticQTHExchange;           XM:NoDXMults; QP:TwoPhoneThreeCW),
  ({Name: 'WWIH';                    }   Email: nil;                      DF: nil;                 WA7BNM:  552;                         QRZRUID:   0 ; Pxm: NoPrefixMults; ZnM: CQZones;  AIE:ZoneInitialExchange;DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;           XM:CQDXCC; QP:CQWWRTTYQSOPointMethod),
- ({Name: 'ALRS_UA1DZ_CUP';          }   Email: nil;                      DF: 'russian';           WA7BNM: 0000;                         QRZRUID: 543 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  AIE:NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAndGridSquareOrRDAExchange;           XM:CQDXCC; QP:ALRSUA1DZCupQSOPointMethod)
+ ({Name: 'ALRS_UA1DZ_CUP';          }   Email: nil;                      DF: 'russian';           WA7BNM: 0000;                         QRZRUID: 543 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  AIE:NoInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTDomesticQTHExchange;           XM:CQDXCC; QP:ALRSUA1DZCupQSOPointMethod)
 
  {*)}
       );

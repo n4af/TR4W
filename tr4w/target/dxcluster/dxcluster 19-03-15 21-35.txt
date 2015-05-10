@@ -1,0 +1,132 @@
+CONNECTED
+Please enter your call: 
+N4AF
+  ***********************************
+  * Welcome to the RBN Relay Server *   
+  *                                 *
+  *     Running Custom Software     *
+  *                                 *
+  *     User Commands are Disabled  *    
+  *                                 *
+  ***********************************
+Local users =  75
+Current spot rate is 6708 per hour
+N4AF de RBN Relay  19-Mar-2015 21:35Z >
+DX de K8ND-#:     7036.0  NO1R           CW    15 dB  20 WPM  CQ      2135Z
+DX de K8ND-#:     7031.5  K4BKD          CW    16 dB  23 WPM  CQ      2135Z
+DX de EI6IZ-#:    7010.6  ON6CC          CW    18 dB  24 WPM  CQ      2135Z
+DX de F5MUX-#:    3512.5  5B/RW9QA       CW    24 dB  34 WPM  CQ      2135Z
+DX de K4XD-#:     7031.5  K4BKD          CW    19 dB  23 WPM  CQ      2135Z
+DX de K4XD-#:    14015.2  PR7BY          CW    14 dB  20 WPM  CQ      2135Z
+DX de IK3STG-#:   7010.6  ON6CC          CW    14 dB  24 WPM  CQ      2135Z
+DX de EA4TX-#:    7013.1  GW4ZCM         CW    25 dB  23 WPM  CQ      2135Z
+DX de EA4TX-#:    7006.5  PP5UP          CW     7 dB  27 WPM  CQ      2135Z
+DX de N2QT-#:     7031.5  K4BKD          CW    26 dB  24 WPM  CQ      2135Z
+DX de F6IIT-#:   3512.50  5B/RW9QA       CW    27 dB  33 WPM  CQ      2135Z
+DX de PA0MBO-#:   7027.0  Z35M           CW     5 dB  26 WPM  CQ      2135Z
+DX de F5RRS-#:    3512.5  5B/RW9QA       CW    36 dB  33 WPM  CQ      2135Z
+DX de F5RRS-#:    7008.0  HA3NU          CW    44 dB  28 WPM  CQ      2135Z
+DX de F5RRS-#:    3542.1  SQ6OEP         CW    32 dB  24 WPM  CQ      2135Z
+DX de N7TR-#:    28028.1  WH6WI          CW    18 dB  13 WPM  CQ      2135Z
+DX de SV8RV-#:    3512.5  5B/RW9QA       CW    25 dB  33 WPM  CQ      2135Z
+DX de W8WWV-#:    7031.5  K4BKD          CW    20 dB  23 WPM  CQ      2135Z
+DX de W8WTS-#:   14016.8  LZ9T           CW     9 dB  32 WPM  CQ      2135Z
+DX de ZL2HAM-#:  28028.1  WH6WI          CW    20 dB  13 WPM  CQ      2135Z
+DX de GW8IZR-#:   3542.1  SQ6OEP         CW    25 dB  24 WPM  CQ      2135Z
+DX de GW8IZR-#:   7010.6  ON6CC          CW    21 dB  21 WPM  CQ      2135Z
+DX de UA4M-#:     3512.5  5B/RW9QA       CW    29 dB  33 WPM  CQ      2135Z
+DX de UA4M-#:     7008.0  HA3NU          CW    14 dB  28 WPM  CQ      2135Z
+DX de UA4M-#:     3542.1  SQ6OEP         CW    11 dB  23 WPM  CQ      2135Z
+DX de AC0C-#:    14015.2  PR7BY          CW    13 dB  20 WPM  CQ      2135Z
+DX de AC0C-#:    21032.7  N4IBG          CW     3 dB  15 WPM  CQ      2135Z
+DX de AA4VV-#:    7031.5  K4BKD          CW    25 dB  23 WPM  CQ      2135Z
+DX de DL1EMY-#:   3512.5  5B/RW9QA       CW    30 dB  33 WPM  CQ      2135Z
+DX de DL1EMY-#:   7008.0  HA3NU          CW    24 dB  28 WPM  CQ      2135Z
+DX de DL1EMY-#:   3542.1  SQ6OEP         CW    26 dB  24 WPM  CQ      2135Z
+DX de LA5EKA-#:   3512.5  5B/RW9QA       CW    17 dB  33 WPM  CQ      2135Z
+DX de LA5EKA-#:   7027.0  Z35M           CW     7 dB  27 WPM  CQ      2135Z
+DX de DK0TE-#:    3542.1  SQ6OEP         CW    31 dB  24 WPM  CQ      2135Z
+DX de DK0TE-#:    3512.5  5B/RW9QA       CW    20 dB  34 WPM  CQ      2135Z
+DX de HB9DCO-#:   3542.1  SQ6OEP         CW    22 dB  24 WPM  CQ      2135Z
+DX de HB9DCO-#:   3512.5  5B/RW9QA       CW    18 dB  34 WPM  CQ      2135Z
+DX de K9IMM-#:   21030.0  N4IBG          CW    22 dB  15 WPM  CQ      2135Z
+DX de NO1D-#:    21029.9  N4IBG          CW     4 dB  15 WPM  CQ      2135Z
+DX de SK3W-#:     3512.5  5B/RW9QA       CW    32 dB  33 WPM  CQ      2135Z
+DX de UD4FD-#:    3512.5  5B/RW9QA       CW    24 dB  34 WPM  CQ      2135Z
+DX de UD4FD-#:   14016.7  LZ90IARU       CW     3 dB  32 WPM  CQ      2135Z
+DX de SE0X-#:     3512.5  5B/RW9QA       CW    27 dB  33 WPM  CQ      2135Z
+DX de W1NT-#:   21010.10  PP8ZAC         CW     6 dB  24 WPM  CQ      2135Z
+DX de W1NT-#:   21030.10  N4IBG          CW     7 dB  15 WPM  CQ      2135Z
+DX de DK9IP-#:    3542.1  SQ6OEP         CW    22 dB  24 WPM  CQ      2135Z
+DX de DL8LAS-#:   3512.5  5B/RW9QA       CW    33 dB  35 WPM  CQ      2135Z
+DX de DL8LAS-#:   3542.1  SQ6OEP         CW    37 dB  24 WPM  CQ      2135Z
+DX de DL9GTB-#:   3580.4  DK2OM          BPSK  18 dB  31 BPS  CQ      2135Z
+DX de DL9GTB-#:   3580.6  SP50PAB        BPSK  21 dB  63 BPS  CQ      2135Z
+DX de DL9GTB-#:  14071.4  EA3GBQ         BPSK  14 dB  31 BPS  CQ      2135Z
+DX de VE2WU-#:   21029.9  N4IBG          CW    22 dB  15 WPM  CQ      2135Z
+DX de ON5KQ-#:    3512.5  5B/RW9QA       CW    20 dB  34 WPM  CQ      2135Z
+DX de W4KAZ-#:   14016.6  LZ90IARU       CW    23 dB  31 WPM  CQ      2135Z
+DX de WZ7I-#:    14010.6  W1MK           CW    21 dB  19 WPM  CQ      2135Z
+DX de WZ7I-#:    21009.9  PP8ZAC         CW    19 dB  24 WPM  CQ      2135Z
+DX de KP3Z-#:    14015.2  PR7BY          CW    15 dB  20 WPM  CQ      2135Z
+DX de KP3Z-#:    21025.3  WQ5R           CW     3 dB  24 WPM  CQ      2135Z
+DX de N8MSA-#:   21030.0  N4IBG          CW     6 dB  15 WPM  CQ      2135Z
+DX de DF7GB-#:    3542.1  SQ6OEP         CW    34 dB  24 WPM  CQ      2135Z
+DX de K1TTT-#:   21030.0  N4IBG          CW    25 dB  14 WPM  CQ      2135Z
+DX de K1TTT-#:    7046.0  N2PH           CW    33 dB  12 WPM  CQ      2135Z
+DX de KM3T-#:     7036.0  NO1R           CW    15 dB  21 WPM  CQ      2135Z
+DX de KM3T-#:     7087.4  N2PH           CW    14 dB  13 WPM  CQ      2135Z
+DX de HA6M-#:     3542.1  SQ6OEP         CW    26 dB  24 WPM  CQ      2135Z
+DX de HA6M-#:    14024.0  TU7QAA         CW    10 dB  29 WPM  CQ      2135Z
+DX de PY1NB-#:   14015.2  PR7BY          CW    23 dB  20 WPM  CQ      2135Z
+DX de PY1NB-#:   14054.0  EA5IIK         CW    12 dB  21 WPM  CQ      2135Z
+DX de PY1NB-#:   21009.9  PP8ZAC         CW    25 dB  24 WPM  CQ      2135Z
+DX de HA6PX-#:    3542.0  SQ6OEP         CW    21 dB  23 WPM  CQ      2135Z
+DX de W4KKN-#:    7045.9  N2PH           CW    42 dB  12 WPM  CQ      2135Z
+DX de DQ8Z-#:     3542.1  SQ6OEP         CW    31 dB  24 WPM  CQ      2135Z
+DX de DQ8Z-#:     3512.5  5B/RW9QA       CW    25 dB  34 WPM  CQ      2135Z
+DX de K8ND-#:    21010.0  PP8ZAC         CW    12 dB  24 WPM  CQ      2135Z
+DX de K8ND-#:     7046.0  N2PH           CW    19 dB  12 WPM  CQ      2135Z
+DX de WE9V-#:    21030.0  N4IBG          CW    23 dB  15 WPM  CQ      2135Z
+DX de WE9V-#:     7036.0  NO1R           CW    11 dB  21 WPM  CQ      2135Z
+DX de WE9V-#:    21010.0  PP8ZAC         CW     7 dB  24 WPM  CQ      2135Z
+DX de WE9V-#:   18102.06  JN4MIV         RTTY   8 dB  45 BPS  CQ      2135Z
+DX de WE9V-#:     7045.9  N2PH           CW    15 dB  12 WPM  CQ      2135Z
+DX de EI6IZ-#:    3512.5  5B/RW9QA       CW    28 dB  33 WPM  CQ      2135Z
+DX de F5MUX-#:    7008.0  HA3NU          CW    34 dB  27 WPM  CQ      2135Z
+DX de IK3STG-#:   3512.5  5B/RW9QA       CW    26 dB  33 WPM  CQ      2135Z
+DX de IK3STG-#:   7025.1  OK1AVG         CW    29 dB  23 WPM  CQ      2135Z
+DX de IK3STG-#:   7008.0  HA3NU          CW    18 dB  27 WPM  CQ      2135Z
+DX de K4XD-#:    21010.0  PP8ZAC         CW    16 dB  24 WPM  CQ      2135Z
+DX de K4XD-#:     7045.9  N2PH           CW    24 dB  12 WPM  CQ      2135Z
+DX de N2QT-#:     7045.9  N2PH           CW    30 dB  12 WPM  CQ      2135Z
+DX de W8WWV-#:    7046.0  N2PH           CW    26 dB  12 WPM  CQ      2135Z
+DX de W8WTS-#:    7046.0  N2PH           CW    32 dB  13 WPM  CQ      2135Z
+DX de W8WTS-#:    7050.1  W9TFC          CW    16 dB  14 WPM  CQ      2135Z
+DX de NC7J-#:    14034.0  WD8MHT         CW    16 dB  19 WPM  CQ      2135Z
+DX de K8AZ-#:     7046.0  N2PH           CW    29 dB  12 WPM  CQ      2135Z
+DX de W1NT-#:    14016.7  LZ90IARU       CW    14 dB  31 WPM  CQ      2135Z
+DX de AC0C-#:     7036.0  NO1R           CW    21 dB  21 WPM  CQ      2135Z
+DX de AA4VV-#:   10107.6  DL1BUG         CW     7 dB  25 WPM  CQ      2135Z
+DX de AA4VV-#:   21010.0  PP8ZAC         CW    16 dB  24 WPM  CQ      2135Z
+DX de AA4VV-#:    7046.0  N2PH           CW    31 dB  12 WPM  CQ      2135Z
+DX de OE6TZE-#:   3542.1  SQ6OEP         CW    32 dB  24 WPM  CQ      2135Z
+DX de K9IMM-#:   21010.0  PP8ZAC         CW    17 dB  24 WPM  CQ      2135Z
+DX de NO1D-#:    21009.9  PP8ZAC         CW    10 dB  23 WPM  CQ      2135Z
+DX de SK3W-#:     3542.1  SQ6OEP         CW    24 dB  24 WPM  CQ      2135Z
+DX de UD4FD-#:    3542.1  SQ6OEP         CW    17 dB  23 WPM  CQ      2135Z
+DX de W1NT-#:   14034.10  WD8MHT         CW    10 dB  19 WPM  CQ      2135Z
+DX de W1NT-#:    14016.7  LZ90IARU       CW    14 dB  31 WPM  CQ      2135Z
+DX de BG5EEF-#:   7008.0  HA3NU          CW    23 dB  27 WPM  CQ      2135Z
+DX de N4ZR-#:    21010.0  PP8ZAC         CW     7 dB  24 WPM  CQ      2135Z
+DX de N4ZR-#:     7045.9  N2PH           CW    31 dB  12 WPM  CQ      2135Z
+DX de DK9IP-#:    1828.2  F5LPY          CW    16 dB  28 WPM  CQ      2135Z
+DX de DL8LAS-#:   1828.2  F5LPY          CW    21 dB  28 WPM  CQ      2135Z
+DX de PJ2T-#:    21029.9  N4IBG          CW    14 dB  15 WPM  CQ      2135Z
+DX de M0BPQ-#:    3542.1  SQ6OEP         CW    39 dB  23 WPM  CQ      2135Z
+DX de VE2WU-#:    7036.0  NO1R           CW    16 dB  20 WPM  CQ      2135Z
+DX de VE2WU-#:   14016.6  LZ90IARU       CW    38 dB  32 WPM  CQ      2135Z
+DX de VE2WU-#:    7045.9  N2PH           CW    35 dB  12 WPM  CQ      2135Z
+DX de VE2WU-#:   14034.0  WD8MHT         CW    19 dB  19 WPM  CQ      2135Z
+DX de DL9GTB-#:   3542.1  SQ6OEP         CW    20 dB  24 WPM  CQ      2135Z
+DX de ON5KQ-#:    3542.1  SQ6OEP         CW    31 dB  24 WPM  CQ      2135Z

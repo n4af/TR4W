@@ -1,4 +1,24 @@
-unit PostUnit;
+{
+ Copyright Larry Tyree, N6TR, 2011,2012,2013,2014,2015.
+
+ This file is part of TR4W    (TRDOS)
+
+ TR4W is free software: you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation, either version 2 of the
+ License, or (at your option) any later version.
+
+ TR4W is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General
+     Public License along with TR4W.  If not, see
+ <http: www.gnu.org/licenses/>.
+ }
+ 
+ unit PostUnit;
 
 {$IMPORTEDDATA OFF}
 interface
@@ -2325,7 +2345,7 @@ begin
         begin
           if TempBuffer1[0] = '1' then
           begin
-            TempPchar := '“ренер';
+            TempPchar := '??????';
             TempInteger := 6;
           end
           else
@@ -4037,40 +4057,4 @@ begin
 end;
 }
 end.
-
-{
- убок –‘
-START-OF-LOG: 2.0
-CREATED-BY: UA1AAF software
-CONTEST: ?У??? ??ССАЙС??Й ФЕДЕ??ЦАА
-CALLSIGN: RW1CW
-QTH: Koltushi LO23
-SECTION: KO59
-CATEGORY1: SOHB
-CATEGORY2:
-TIME ENTRY: 4 hours
-CLAIMED QSO TOTAL:
-CLUB: ??ЛС
-OP1: С??Ѓ? ВЂ†§?ђ??
-OP2:
-OP3:
-ADDRESS: Koltushi LO Shkolnyj 22/1-3
-ADDRESS:
-ADDRESS:
-E-MAIL: serov@kolt.infran.ru
-EQUIPMENT:
-ANTENNAE:
-SOAPBOX:
-     FREQ MODE DATE      UTC  MYCALL        SENT       CALL          RCVD     PTS LOC   DISTANCE
-QSO: 14000 PH 2008-01-06 0603 RW1CW         001KO59    RZ9OJ         1006NO15   42  NO    3056 km
-END-OF-LOG:
-
-ѕриветствую!
-—удейска€ программа имеет допуски по пол€м.ћожно раздвинуть границы. ѕоэтому
-дл€ мен€ без разницы с пробелом или без пробела номера. √лавное чтобы
-столбцы шли по пор€дку и формат совпадал.
-73! јндрей!
-RV9WB  BA-05
-
-}
 

@@ -1,3 +1,22 @@
+{
+ Copyright Larry Tyree, N6TR, 2011,2012,2013,2014,2015.
+
+ This file is part of TR4W    (TRDOS)
+
+ TR4W is free software: you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation, either version 2 of the
+ License, or (at your option) any later version.
+
+ TR4W is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General
+     Public License along with TR4W.  If not, see
+ <http: www.gnu.org/licenses/>.
+ }
 unit LogWind;
 
 {$IMPORTEDDATA OFF}
@@ -532,6 +551,7 @@ var
   BandMapSplitMode                      : BandMapSplitModeType {= ByCutoffFrequency}; {KK1L: 6.64}
   BandMapTotalCalls                     : integer;
   BandMapWindowRY                       : integer;
+  BandSave                              : BandType;
 
 //  BandMemory                  : array[RadioType] of BandType;
 
@@ -1029,7 +1049,7 @@ procedure UpdateK1EAStationInfo(Field: K1EAStationInfoFieldType;
   StationIDChar: Char;
   MessageString: ShortString {Str20});
 
-procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);
+procedure UpdateTenMinuteDate;
 
 procedure UpdateTimeAndRateDisplays(ShowTime: boolean; DoRadios: boolean);
 procedure WindInit;
@@ -4292,14 +4312,15 @@ begin
   DisplayBandMap;
 end;
 
-procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);
+procedure UpdateTenMinuteDate;       //n4af 4.38.6
 
 begin
-  if (Band <> TenMinuteTime.Band) {or (Mode <> TenMinuteTime.Mode)} then
+  if (Band <> BandSave) {or (Mode <> TenMinuteTime.Mode)} then
   begin
     TenMinuteTime.Band := Band;
-    TenMinuteTime.Mode := Mode;
+
     TenMinuteTime.Time := GetTickCount;
+    BandSave := ActiveBand;
   end;
 end;
 
@@ -5692,7 +5713,7 @@ var
   TimeDifference                       : Integer;
  //n4af 4.35.5
  begin
- if not Start then
+{ if not Start then
  begin
  T2 := tElapsedTimeFromLastQSO;  // T2 = initial elapsed
  Start := True;
@@ -5736,7 +5757,7 @@ var
    end;
   
  C := A;       // c points to the last K
-end;
+end;   }
 end;
 
 procedure tDispalyMyComputerID;

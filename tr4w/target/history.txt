@@ -1,0 +1,21 @@
+    Big CTY - 4 March 2015
+    Version entity is Finland, OH
+
+    Added/changed Callsigns/prefixes:
+
+	* E51UFF is North Cook Islands, E5/n
+	* EG90IARU is Spain, EA
+	* GB6RAF is Wales, GW
+	* N0DQD is Hawaii, KH6
+	* KC7IKF, KD0CLU and W7DDG are all Alaska, KL
+	* N5WE is Puerto Rico, KP4
+	* OH1SM/S, OH1UH/S, OH2AUE/S, OH2AUE/SA, OH2BQP/S, OH2HK/S, OH2S/SA,
+	  OH3ABN/S, OH3CT/S, OH3NOB/S, OH7NE/S, OI2ABG/S, OI4PM/S, OI5AY/SA and OI6SP/S
+	  are all Finland, OH
+	* SM2JKI/S and SM7AAL/S are both Sweden, SM
+	* UB1OAD/9/P is European Russia, UA in CQ zone 17, ITU zone 20
+	* RN9O/8 is Asiatic Russia, UA9
+
+    Retired Callsigns/prefixes:
+
+	* VP8DOZ/G in South Georgia Island, VP8/g
