@@ -593,8 +593,8 @@ begin
   //  DisplayEditableLog(VisibleLog.LogEntries);
   ClearMasterListBox;
    // ClearAltD;       // n4af 4.39.3
-//  NameCallsignPutUp := '';   // n4af 4.39.3
- // tClearDupeInfoCall;
+//  NameCallsignPutUp := '';
+ // tClearDupeInfoCall;      //n4af 4.39.3
   if TwoRadioState = CallReady then TwoRadioState := Idle;
 
   tCallWindowSetFocus;
