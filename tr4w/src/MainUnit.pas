@@ -508,7 +508,8 @@ begin
       if tAutoSendMode then EditingCallsignSent := True;
 //      tAutoSendMode := False;
 //      FlushCWBuffer;
-    FlushCWBufferAndClearPTT; //n4af 4.33.3
+     FlushCWBufferAndClearPTT; //n4af 4.33.3
+
     end
     else
       if DVPOn then
@@ -591,9 +592,9 @@ begin
   if tPreviousDupeQSOsShowed then ShowPreviousDupeQSOsWnd(False); //DestroyPreviousDupeQSOsWnd;
   //  DisplayEditableLog(VisibleLog.LogEntries);
   ClearMasterListBox;
-  ClearAltD;
-  NameCallsignPutUp := '';
-  tClearDupeInfoCall;
+   // ClearAltD;       // n4af 4.39.3
+//  NameCallsignPutUp := '';   // n4af 4.39.3
+ // tClearDupeInfoCall;
   if TwoRadioState = CallReady then TwoRadioState := Idle;
 
   tCallWindowSetFocus;
