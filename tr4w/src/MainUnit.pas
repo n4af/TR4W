@@ -591,6 +591,7 @@ begin
   if tPreviousDupeQSOsShowed then ShowPreviousDupeQSOsWnd(False); //DestroyPreviousDupeQSOsWnd;
   //  DisplayEditableLog(VisibleLog.LogEntries);
   ClearMasterListBox;
+  ClearAltD;
   NameCallsignPutUp := '';
   tClearDupeInfoCall;
   if TwoRadioState = CallReady then TwoRadioState := Idle;
@@ -606,7 +607,8 @@ procedure SpaceBarProc2;
 begin
   if (DupeInfoCall <> '') and (CallWindowString = '') then
   begin
-//    FlushCWBufferAndClearPTT;
+  
+ //   FlushCWBufferAndClearPTT;
 
     if TwoRadioMode then
       InActiveRadioPtr^.tTwoRadioMode := TR2
