@@ -177,7 +177,8 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.39.2'  ;
+  TR4W_CURRENTVERSION_NUMBER            = '4.39.4'  ; // ny4i 2
+
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
   TR4W_CURRENTVERSIONDATE               = 'May 05, 2015'   ;

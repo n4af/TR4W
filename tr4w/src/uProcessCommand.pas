@@ -101,7 +101,12 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 
 const
 
-  sCommands                             = 58      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
+
+  sCommands                             = 58
+                                          {$IF MMTYMODE} + 5 {$IFEND}
+                                          + 1 // ny4i 4.39.4 LOGIN  recommit3
+                                          ;  //n4af
+
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
 
