@@ -89,6 +89,7 @@ procedure scSNLOCKOUT;
 procedure scSNRELEASE;
 procedure scLASTSPFREQ;
 procedure scLASTCQFREQ;
+procedure scLOGIN;
 procedure scSENDTOCLUSTER;
 procedure scDUPECHECK;
 procedure scBOOLSWAP;
@@ -146,6 +147,7 @@ const
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),
+    (caCommand: 'LOGIN'; caAddress: @scLOGIN),
     (caCommand: 'ENTER'; caAddress: @ProcessReturn),
     (caCommand: 'ESCAPE'; caAddress: @Escape_proc),
     (caCommand: 'COMPLETECALL'; caAddress: @CompleteCallsign),
@@ -651,6 +653,11 @@ begin
   SetRadioFreq(ActiveRadio, LastCQFrequency, LastCQMode, 'A');
   tCleareCallWindow;
   SetOpMode(CQOpMode);
+end;
+
+procedure scLOGIN;
+begin
+  ProcessMenu(menu_login);
 end;
 
 procedure scSENDTOCLUSTER;
