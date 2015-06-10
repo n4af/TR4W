@@ -2,7 +2,6 @@ program tr4w;
 {$IMPORTEDDATA OFF}
 //https://groups.google.com/group/tr4w/feeds?hl=ru
 uses
-
   Messages,
   MMSystem,
   Windows,
@@ -26,13 +25,11 @@ uses
   LogStuff in 'src\trdos\LOGSTUFF.PAS',
   LOGWAE in 'src\trdos\LOGWAE.PAS',
   LogWind in 'src\trdos\LOGWIND.PAS',
-  //MySU in 'src\MySU.pas',
   Tree in 'src\trdos\tree.pas',
   ZoneCont in 'src\trdos\ZONECONT.PAS',
   LOGSUBS2 in 'src\trdos\LOGSUBS2.PAS',
   LOGSUBS1 in 'src\trdos\LOGSUBS1.PAS',
   LOGSend in 'src\trdos\LogSend.pas',
-  //SysUtils in '..\utils\SysUtils.pas',
   uCT1BOH in 'src\uCT1BOH.pas',
   PostUnit in 'src\trdos\PostUnit.PAS',
   uInputQuery in 'src\uInputQuery.pas',
@@ -108,7 +105,8 @@ uses
   utils_text in 'src\utils\utils_text.pas',
   utils_math in 'src\utils\utils_math.pas',
   utils_file in 'src\utils\utils_file.pas',
-  exportto_trlog in 'src\exportto_trlog.pas';
+  exportto_trlog in 'src\exportto_trlog.pas',
+  uReminder in 'src\uReminder.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}

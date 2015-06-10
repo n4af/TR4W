@@ -14,7 +14,7 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT.
+     Public License along with TR4W in  GPL_License.TXT. 
 If not, ref: 
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
@@ -89,7 +89,6 @@ procedure scSNLOCKOUT;
 procedure scSNRELEASE;
 procedure scLASTSPFREQ;
 procedure scLASTCQFREQ;
-procedure scLOGIN; //ny4i 4.39.4
 procedure scSENDTOCLUSTER;
 procedure scDUPECHECK;
 procedure scBOOLSWAP;
@@ -102,10 +101,7 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 
 const
 
-  sCommands                             = 58
-                                          {$IF MMTYMODE} + 5 {$IFEND}
-                                          + 1 // ny4i 4.39.4 LOGIN
-                                          ;  //n4af
+  sCommands                             = 58      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
 
@@ -177,8 +173,7 @@ const
     (caCommand: 'FLUSHINITIALEX'; caAddress: @scFLUSHINITIALEX),
     (caCommand: 'SNLOCKOUT'; caAddress: @scSNLOCKOUT),
     (caCommand: 'CLEARDUPESHEET'; caAddress: @tClearDupeSheet)  ,
-    (caCommand: 'CLEARMULTSHEET'; caAddress: @tClearMultSheet),
-    (caCommand: 'LOGIN'; caAddress: @scLOGIN)   //ny4i 4.39.4
+    (caCommand: 'CLEARMULTSHEET'; caAddress: @tClearMultSheet) 
     )
     ;
 
@@ -510,13 +505,11 @@ end;
 procedure scDISABLECW;
 begin
   CWEnable := False;
-  DisplayCodeSpeed; // ny4i 4.39.4
 end;
 
 procedure scENABLECW;
 begin
   CWEnable := True;
-  DisplayCodeSpeed; // ny4i 4.39.4
 end;
 
 procedure scSAPMODE;
@@ -532,7 +525,6 @@ end;
 procedure scCWENABLETOGGLE;
 begin
   CWEnable := not CWEnable;
-  DisplayCodeSpeed; // ny4i 4.39.4
 end;
 
 procedure scEXECUTE;
@@ -655,12 +647,7 @@ begin
   tCleareCallWindow;
   SetOpMode(CQOpMode);
 end;
-//------------------------------------------------------------------------------
-procedure scLOGIN;    // ny4i 4.39.4 Allows LOGIN macro command
-begin
-  ProcessMenu(menu_login);
-end; // of scLOGIN
-//------------------------------------------------------------------------------
+
 procedure scSENDTOCLUSTER;
 begin
   uTelnet.SendViaTelnetSocket(@scFileName[1]);
