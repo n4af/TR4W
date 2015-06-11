@@ -3171,7 +3171,7 @@ begin
 
       else
 
-        if (CWEnabled and DeleteLastCharacter) or not CWEnabled then
+        if (CWEnabled and DeleteLastCharacter)  or not CWEnabled then  
         begin
         end
         else
@@ -4112,7 +4112,7 @@ begin
   tCleareCallWindow;
   tCleareExchangeWindow;
   tCallWindowSetFocus;
-  ClearAltD;
+ // ClearAltD;
   if OpMode = CQOpMode then
   begin
     OpMode2 := CQOpMode;

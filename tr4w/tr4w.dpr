@@ -351,7 +351,8 @@ begin
         end;
 {$IFEND}
 
-        if (LoWord(wParam) >= 10000) and (LoWord(wParam) <= 10700) then ProcessMenu(wParam);
+        if (LoWord(wParam) >= 10000) and (LoWord(wParam) <= 10700) then
+        ProcessMenu(wParam);
         if (LoWord(wParam) >= 10700) and (LoWord(wParam) <= 10750) then
           RunPlugin(LoWord(wParam));
 

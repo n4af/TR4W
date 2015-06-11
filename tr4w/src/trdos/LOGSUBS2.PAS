@@ -4966,7 +4966,7 @@ nop
 
                           AltG: SwapMultDisplay;
                           AltK: ToggleCW(true);
-                          AltM:
+                           AltM:
                             begin
                               ToggleModes;
                               DisplayAutoSendCharacterCount;

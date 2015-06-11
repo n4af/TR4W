@@ -20,6 +20,9 @@ Thumbs.db
 *.log
 *.dll
 *.lib
+*.428.pas
+*428.pas
+*.dcu
 *.sbr
 *.dcu
 copy*

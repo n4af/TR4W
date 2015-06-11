@@ -291,7 +291,7 @@ begin
 
     if ActiveMode = CW then
     begin
-      CWEnabled := True;
+   //   CWEnabled := True;     //n4af 04.39.5
       DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
 
       if AllCWMessagesChainable then

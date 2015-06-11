@@ -622,7 +622,7 @@ var
   //   CQMenu                          : Str80;
   CustomInitialExchangeString           : Str40; {KK1L: 6.67 was Str80;}
   CustomUserString                      : Str40; {KK1L: 6.68 shortened from Str80}
-  CWEnabled                             : boolean = True;
+  CWEnabled                             : boolean;// = True;
 
   DigitalModeEnable                     : boolean;
 
@@ -3444,7 +3444,7 @@ begin
       DisplayCountryName(CallWindowString);
       DisplayBeamHeading(CallWindowString, '');
 
-        //        DispalayB4; //������?
+        //        DispalayB4; //???????
 
       if Contest <> GENERALQSO then
       begin
@@ -3629,8 +3629,8 @@ begin
       begin
         Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
             {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
-//��������        if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
-//��������          if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
+//????????        if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
+//????????          if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
         if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
           if ((BandMapEntryRecord^.StatusByte and $80) <> 0) then
           begin
@@ -3694,8 +3694,8 @@ begin
   begin
     Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
       {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
-//��������    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
-//��������      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
+//????????    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
+//????????      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
     if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
       if ((BandMapEntryRecord^.StatusByte and $40) = 0) then
       begin
@@ -3756,8 +3756,8 @@ begin
   begin
     Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
       {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
-//��������    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
-//��������      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
+//????????    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
+//????????      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
     if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
       if ((BandMapEntryRecord^.StatusByte and $80) <> 0) then
       begin
@@ -4390,7 +4390,7 @@ begin
         if ((BandMapEntryRecord^.StatusByte and $40) <> 0) and BandMapDupeDisplay then
         begin {entry is a dupe and we are displaying dupes }
 
-                {wli �������� �� nil BandMapCursorData}
+                {wli ???????? ?? nil BandMapCursorData}
           if BandMapCursorData <> nil then
             if BandMapEntryRecord^.Frequency = BandMapCursorData^.Frequency then
             begin
@@ -4406,7 +4406,7 @@ begin
           if ((BandMapEntryRecord^.StatusByte and $40) = 0) then
           begin {KK1L: 6.64 entry is not a dupe so just check it}
 
-                  {wli �������� �� nil BandMapCursorData}
+                  {wli ???????? ?? nil BandMapCursorData}
             if BandMapCursorData <> nil then
               if BandMapEntryRecord^.Frequency = BandMapCursorData^.Frequency then
               begin
@@ -4810,7 +4810,7 @@ begin
         begin
               //          SaveSetAndClearActiveWindow(BeamHeadingWindow);
           Heading := round(GetBeamHeading(MyGrid, data.Grid));
-              //          Write(data.Grid, ' at ', Heading, '�');
+              //          Write(data.Grid, ' at ', Heading, '?');
                                    //          RestorePreviousWindow;
         end;
       end;
@@ -4959,7 +4959,7 @@ begin
                   //              begin
                   //                SaveSetAndClearActiveWindow(BeamHeadingWindow);
                   //                Heading := round(GetBeamHeading(MyGrid, data.Grid));
-                  //                Write(data.Grid, ' at ', Heading, '�');
+                  //                Write(data.Grid, ' at ', Heading, '?');
                   //    SetTR4WWindowText(BeamHeadingWindowHandle, data.Grid+ ' at '+ inttostr(Heading)+ '*');
                   //                RestorePreviousWindow;
                   //              end;

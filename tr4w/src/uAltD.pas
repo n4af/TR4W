@@ -101,7 +101,7 @@ begin
       begin
         if HiWord(wParam) = EN_CHANGE then
         begin
-          tClearDupeInfoCall;
+      //    tClearDupeInfoCall;   4.39.4
           DupeInfoCall[0] := CHR(Windows.GetDlgItemText(hwnddlg, 101, @DupeInfoCall[1], SizeOf(DupeInfoCall) - 1));
 //          DupeInfoCall := GetDialogItemText(hwnddlg, 101);
           if SCPMinimumLetters > 0 then
