@@ -103,7 +103,7 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 const
 
 
-  sCommands                             = 58
+  sCommands                             = 60
                                           {$IF MMTYMODE} + 5 {$IFEND}
                                           + 1 // ny4i 4.39.4 LOGIN  recommit3
                                           ;  //n4af
@@ -121,8 +121,8 @@ const
 
 //{$IF CWMODE}     //20
 
-(caCommand: '  # = QSO Number '; caAddress: @scEXCHANGERADIOS),     //n4af 04.33.2
-(caCommand: '  @ = HisCall '; caAddress: @scEXCHANGERADIOS),
+(caCommand: '  # = QSO Number '; caAddress: @scEXCHANGERADIOS),     //n4af 04.33.2    DUMMY @ entries
+(caCommand: '  @ = HisCall '; caAddress: @scEXCHANGERADIOS),          // really done by LOGSEND.PAS
 (caCommand: '  $ = Salutation/Name '; caAddress: @scEXCHANGERADIOS),
 (caCommand: '  % = Name from Names DB'; caAddress: @scEXCHANGERADIOS),
 (caCommand: ' : = Send from K.B.'; caAddress: @scEXCHANGERADIOS),
@@ -142,6 +142,8 @@ const
 (caCommand: ' & = AS'; caAddress: @scDUPECHECK),
 (caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
 //{$IFEND}
+      (caCommand: 'WK_SWAPTUNE'; caAddress: @scWK_SWAPTUNE),
+    (caCommand: 'WK_RESET'; caAddress: @scWK_RESET),
     (caCommand: 'NEXTBANDMAP'; caAddress: @NEXTBANDMAPENTRY),
      (caCommand: 'BMFIRST'; caAddress: @BMFIRST),
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
