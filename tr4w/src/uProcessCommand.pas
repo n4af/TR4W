@@ -89,6 +89,7 @@ procedure scSNLOCKOUT;
 procedure scSNRELEASE;
 procedure scLASTSPFREQ;
 procedure scLASTCQFREQ;
+procedure scLOGIN;
 procedure scSENDTOCLUSTER;
 procedure scDUPECHECK;
 procedure scBOOLSWAP;
@@ -101,7 +102,12 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 
 const
 
-  sCommands                             = 58      {$IF MMTYMODE} + 5 {$IFEND} ;  //n4af
+
+  sCommands                             = 58
+                                          {$IF MMTYMODE} + 5 {$IFEND}
+                                          + 1 // ny4i 4.39.4 LOGIN  recommit3
+                                          ;  //n4af
+
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
 
@@ -141,6 +147,7 @@ const
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),
+    (caCommand: 'LOGIN'; caAddress: @scLOGIN),
     (caCommand: 'ENTER'; caAddress: @ProcessReturn),
     (caCommand: 'ESCAPE'; caAddress: @Escape_proc),
     (caCommand: 'COMPLETECALL'; caAddress: @CompleteCallsign),
@@ -646,6 +653,11 @@ begin
   SetRadioFreq(ActiveRadio, LastCQFrequency, LastCQMode, 'A');
   tCleareCallWindow;
   SetOpMode(CQOpMode);
+end;
+
+procedure scLOGIN;
+begin
+  ProcessMenu(menu_login);
 end;
 
 procedure scSENDTOCLUSTER;
