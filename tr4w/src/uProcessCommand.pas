@@ -103,7 +103,10 @@ procedure csMMTTY_CLEAR_THE_TX_BUFFER;
 const
 
 
-  sCommands                             = 60
+
+  sCommands                             = 61
+
+
                                           {$IF MMTYMODE} + 5 {$IFEND}
                                           + 1 // ny4i 4.39.4 LOGIN  recommit3
                                           ;  //n4af
@@ -141,7 +144,9 @@ const
 (caCommand: ' ! = SN'; caAddress: @tClearMultSheet),
 (caCommand: ' & = AS'; caAddress: @scDUPECHECK),
 (caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
+
 //{$IFEND}
+      (caCommand: 'ALT-D'; caAddress: @scDupeCheck),
       (caCommand: 'WK_SWAPTUNE'; caAddress: @scWK_SWAPTUNE),
     (caCommand: 'WK_RESET'; caAddress: @scWK_RESET),
     (caCommand: 'NEXTBANDMAP'; caAddress: @NEXTBANDMAPENTRY),
@@ -149,7 +154,7 @@ const
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),
-    (caCommand: 'LOGIN'; caAddress: @scLOGIN),
+    (caCommand: 'LOGIN'; caAddress: @scLOGIN),     //ny4i 04.39.4
     (caCommand: 'ENTER'; caAddress: @ProcessReturn),
     (caCommand: 'ESCAPE'; caAddress: @Escape_proc),
     (caCommand: 'COMPLETECALL'; caAddress: @CompleteCallsign),
