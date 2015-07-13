@@ -592,7 +592,7 @@ begin
   if tPreviousDupeQSOsShowed then ShowPreviousDupeQSOsWnd(False); //DestroyPreviousDupeQSOsWnd;
   //  DisplayEditableLog(VisibleLog.LogEntries);
   ClearMasterListBox;
-   // ClearAltD;       // n4af 4.39.3
+    ClearAltD;       // n4af 4.39.3
 //  NameCallsignPutUp := '';
  // tClearDupeInfoCall;      //n4af 4.39.3
   if TwoRadioState = CallReady then TwoRadioState := Idle;
