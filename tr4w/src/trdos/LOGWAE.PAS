@@ -77,10 +77,12 @@ var
 
   NumberMessagesToBeSent, {MessageINT, } MaxQTCsThisStation: integer;
 const
-  QTCTOP                                = 15;
-  QTCHEIGHT                             = 22;
-  QTCROWSDIS                            = 2;
+  QTCTOP                                = 10;
 
+QTCHEIGHT                             = 26;
+// QTCHEIGHT                             = 28  ;      //n4af 04.40.2 Q PRINTS AS 'O'
+ QTCROWSDIS                            = 2;
+ 
 //procedure WAEQTC(var QTCCallsign: CallString);
 procedure WAEQTC2;
 procedure LastQTCSent(var Call: CallString; var Time: Str20; var QSONumber: integer);

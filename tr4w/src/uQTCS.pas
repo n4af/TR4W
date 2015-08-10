@@ -130,7 +130,8 @@ begin
             5 + I * 55,
             255,
              53,
-            QTCHEIGHT * 2,
+      //      QTCHEIGHT * 2,
+        QTCHEIGHT * 4,       // n4af 04.40.2
             hwnddlg,
             I + 100
             );
@@ -150,23 +151,25 @@ begin
           push p
           push Time
           end;
-          wsprintf(wsprintfBuffer, '%04u %-13s %u');
+       //    wsprintf(wsprintfBuffer, '%04u %-13s %u');
+          wsprintf(wsprintfBuffer, '%04u %-8s %u');       // n4af 04.40.2
+
           asm add esp,20
           end;
-
           {QTC}
           tCreateStaticWindow
             (
             wsprintfBuffer,
             WS_CHILD or SS_SUNKEN or SS_NOTIFY or SS_LEFT or WS_VISIBLE,
-            70,
-            (I - 1) * (QTCHEIGHT + QTCROWSDIS) + 5,
-          //  310,
-           410,     // n4af 4.32.4
+             70,
+
+           (I - 1) * (QTCHEIGHT + QTCROWSDIS) + 5,
+
+         410,     // n4af 4.32.4
             QTCHEIGHT,
             hwnddlg,
             I + 200
-            );
+                    );
           asm
           mov edx,[MainWindowEditFont]
           call tWM_SETFONT
@@ -181,12 +184,13 @@ begin
             WS_EX_STATICEDGE,
             wsprintfBuffer,
             WS_TABSTOP or WS_DISABLED or BS_PUSHBUTTON or BS_CENTER or WS_CHILD or WS_VISIBLE,
-            380 - 375,
+             380 - 375,
             (I - 1) * (QTCHEIGHT + QTCROWSDIS) + 5,
-            55,
+             55,
+           //40,      // 4.40.2
             QTCHEIGHT,
             hwnddlg,
-            I + 300);
+            I + 200);
         end;
         SetDlgItemText(hwnddlg, 310, '1&0');
 

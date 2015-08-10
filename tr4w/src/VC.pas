@@ -177,11 +177,11 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.40.0' ; // n4af
+  TR4W_CURRENTVERSION_NUMBER            = '4.40.1' ; // n4af
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'July 30, 2015'   ;    //n4af 4.40.0
+  TR4W_CURRENTVERSIONDATE               = 'August 10, 2015';  //n4af 4.40
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';

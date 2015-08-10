@@ -86,9 +86,10 @@ const
   QTCLEFT                               = 5;
 //  QTCHEIGHT                        = 22;
 //  QTCROWSDIS                       = 2;
-   QTCWIDTHARRAY                         : array[1..4] of integer = (20, 60, 160, 80);
- 
-  QTCLEFTARRAY                          : array[1..4] of integer = (5, 27, 89, 251);
+  
+      QTCWIDTHARRAY                         : array[1..4] of integer = (20, 80, 60, 120);
+   QTCLEFTARRAY                          : array[1..4] of integer = (5, 27, 89, 251);
+
 //  LeftArray                        : array[1..3] of integer = (30, 95 - 3, 95 + 170 - 1);
   NumberStyle                           = WS_DISABLED or WS_CHILD or WS_VISIBLE or WS_TABSTOP or ES_UPPERCASE or ES_NUMBER;
   CallsignStyle                         = WS_DISABLED or WS_CHILD or WS_VISIBLE or WS_TABSTOP or ES_UPPERCASE;
