@@ -5808,11 +5808,11 @@ begin
   if InactiveRigCallingCQ then //n4af 4.30.1
   begin                        //n4af 4.30.1
  SetUpToSendOnInactiveRadio;
-
+ ShowInformation ;
   SwapRadios;
 
 
- ShowInformation;
+ ShowInformation ;        // N4AF 4.40.2   Force dupecheck of second radio
 
 
   end;
