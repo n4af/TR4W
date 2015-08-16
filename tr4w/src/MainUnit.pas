@@ -887,15 +887,19 @@ begin
 
   if Contest <> GENERALQSO then
   begin
-//  CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
+
      VisibleLog.ShowMultiplierStatus(@CallWindowString);
     VisibleLog.ShowQSOStatus(@CallWindowString);
-    VisibleLog.DoPossibleCalls(CallWindowString);
+   VisibleLog.DoPossibleCalls(CallWindowString);
   end;
-
+   if InactiveRigCallingCQ then
+       begin
+          CheckInactiveRigCallingCQ;
+          exit ; // n4af 04.40.2
+       end;
   if AutoDupeEnableCQ and tCallWindowStringIsDupe {VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode)} then
   begin
-     CheckInactiveRigCallingCQ; //n4af 4.40.2
+
 //    FlashCallWindow;
 //    EscapeDeletedCallEntry := CallWindowString;
 
@@ -917,9 +921,7 @@ begin
         ShowFMessages(0);
       end;
       if ActiveMode = Digital then SendMessageToMixW('<TX>');
-       CheckInactiveRigCallingCQ;
-
-      if not tAutoSendMode then
+       if not tAutoSendMode then
         if MessageEnable then
           if not SendCrypticMessage(CallWindowString) then Exit;
 
@@ -5808,13 +5810,8 @@ begin
   if InactiveRigCallingCQ then //n4af 4.30.1
   begin                        //n4af 4.30.1
     SetUpToSendOnInactiveRadio;
-//   ShowInformation ;  //N4AF 4.40.2
    SwapRadios;
-
-
-   ShowInformation ;        // N4AF 4.40.2   Force dupecheck of second radio
-
-
+  ReturnInCQOpMode;    //n4af 4.40.2 Redrive dupe check
   end;
 end;
 
