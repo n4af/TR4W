@@ -866,9 +866,14 @@ end;
 
 procedure ReturnInCQOpMode;
 begin
+ if InactiveRigCallingCQ and (length(ExchangeWindowString)=0) then
+   begin
+    CheckInactiveRigCallingCQ;
+    exit;
+   end;
+     
   if length(CallWindowString) = 0 then
     if length(ExchangeWindowString) = 0 then
-
     begin
       if MessageEnable then
       begin
@@ -892,12 +897,7 @@ begin
     VisibleLog.ShowQSOStatus(@CallWindowString);
    VisibleLog.DoPossibleCalls(CallWindowString);
   end;
-   if InactiveRigCallingCQ then
-       begin
-          CheckInactiveRigCallingCQ;
-          exit ; // n4af 04.40.2
-       end;
-  if AutoDupeEnableCQ and tCallWindowStringIsDupe {VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode)} then
+  if AutoDupeEnableCQ and tCallWindowStringIsDupe then
   begin
 
 //    FlashCallWindow;
@@ -3106,11 +3106,12 @@ begin
   if TuneOnFreqFromCallWindow then Exit;
 
   if OpMode = CQOpMode then
+
   begin
     ReturnInCQOpMode;
     Exit;
   end;
-
+ 
   if OpMode = SearchAndPounceOpMode then
   begin
     ReturnInSAPOpMode;
@@ -3118,7 +3119,7 @@ begin
   end;
 
 end;
-
+ 
 procedure CallWindowKeyDownProc(wParam: integer);
 var
   Key                                   : Char;
