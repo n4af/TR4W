@@ -887,15 +887,15 @@ begin
 
   if Contest <> GENERALQSO then
   begin
- //  CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
+//  CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK
      VisibleLog.ShowMultiplierStatus(@CallWindowString);
     VisibleLog.ShowQSOStatus(@CallWindowString);
     VisibleLog.DoPossibleCalls(CallWindowString);
   end;
-//  CheckInactiveRigCallingCQ; //n4af force SWAPRADIOS before DUPECHECK;
+
   if AutoDupeEnableCQ and tCallWindowStringIsDupe {VisibleLog.CallIsADupe(CallWindowString, ActiveBand, ActiveMode)} then
   begin
-
+     CheckInactiveRigCallingCQ; //n4af 4.40.2
 //    FlashCallWindow;
 //    EscapeDeletedCallEntry := CallWindowString;
 
@@ -917,7 +917,7 @@ begin
         ShowFMessages(0);
       end;
       if ActiveMode = Digital then SendMessageToMixW('<TX>');
-      CheckInactiveRigCallingCQ;
+       CheckInactiveRigCallingCQ;
 
       if not tAutoSendMode then
         if MessageEnable then
@@ -1928,7 +1928,7 @@ SetMainWindowText(mweUserInfo, '');
   end;
 
   Windows.ShowWindow(wh[mweMasterStatus], nCmdShow);
-
+// if not InactiveRigCallingCQ then //n4af 04.40.2
   ShowInformation;
 
   if tShowTypedCallsign then SendStationStatus(sstCallsign);
@@ -5090,7 +5090,7 @@ begin
   DispalayB4(integer(tCallWindowStringIsDupe));
 
 
-  if not CallsignsList.FindCallsign(CallWindowString, Index) then Exit;
+  if not CallsignsList.FindCallsign(CallWindowString, Index) then  Exit;
   QSOs := CallsignsList.GetQSOs(Index);
   DisplayQSOsWithThisStation(QSOs);
 end;
@@ -5807,12 +5807,12 @@ procedure CheckInactiveRigCallingCQ;
 begin
   if InactiveRigCallingCQ then //n4af 4.30.1
   begin                        //n4af 4.30.1
- SetUpToSendOnInactiveRadio;
- ShowInformation ;
-  SwapRadios;
+    SetUpToSendOnInactiveRadio;
+//   ShowInformation ;  //N4AF 4.40.2
+   SwapRadios;
 
 
- ShowInformation ;        // N4AF 4.40.2   Force dupecheck of second radio
+   ShowInformation ;        // N4AF 4.40.2   Force dupecheck of second radio
 
 
   end;

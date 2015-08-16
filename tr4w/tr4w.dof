@@ -4,7 +4,7 @@ Version=7.0
 A=8
 B=0
 C=0
-D=1
+D=0
 E=0
 F=0
 G=1
@@ -12,7 +12,7 @@ H=1
 I=1
 J=0
 K=0
-L=1
+L=0
 M=0
 N=1
 O=0
@@ -25,7 +25,7 @@ U=0
 V=1
 W=0
 X=1
-Y=2
+Y=0
 Z=1
 ShowHints=0
 ShowWarnings=0
@@ -130,20 +130,3 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlSearchPath]
-Count=8
-Item0=D:\newsrc\include;D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\src\trdos;D:\newsrc\tr4w\src\\utils;D:\newsrc\tr4w\src
-Item1=D:\sandbox\4.37.10\include;D:\sandbox\4.37.10\tr4w\src\lang;D:\sandbox\4.37.10\tr4w\src\utils;D:\sandbox\4.37.10\tr4w\src;D:\sandbox\4.37.10\tr4w\src\trdos
-Item2=D:\newsrc\include;D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\src\utils;D:\newsrc\tr4w\src;D:\newsrc\tr4w\src\trdos
-Item3=D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\src\utils;I:\tr4w-4.428\tr4w\src;I:\tr4w-4.428\tr4w\src\trdos;D:\newsrc\include
-Item4=D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\include;D:\newsrc\tr4w\src\utils;I:\tr4w-4.428\tr4w\src;I:\tr4w-4.428\tr4w\src\trdos
-Item5=D:\newsrc\tr4w\src;D:\newsrc\tr4w\src\trdos;D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\include;D:\newsrc\tr4w\src\utils
-Item6=D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\include;D:\newsrc\tr4w\src\utils;D:\newsrc\tr4w\src\trdos;D:\newsrc\tr4w\src
-Item7=D:\newsrc\tr4w\include;D:\newsrc\tr4w\src\utils;D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\src\trdos
-[HistoryLists\hlOutputDirectorry]
-Count=2
-Item0=D:\newsrc\tr4w\target
-Item1=D:\sandbox\4.37.10\tr4w\target

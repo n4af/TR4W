@@ -1,3 +1,5 @@
 *.exe 
 *.html 
 *.jpg
+*.ini
+*.pos

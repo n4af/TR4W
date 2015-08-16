@@ -2381,7 +2381,7 @@ procedure DisplayQSOsWithThisStation(QSOs: integer);
 var
   p                                     : PChar;
 begin
-  if tQSOsWithThisStationPrevState = QSOs then Exit;
+//  if tQSOsWithThisStationPrevState = QSOs then Exit;
   tQSOsWithThisStationPrevState := QSOs;
 
   if QSOs <> 0 then
