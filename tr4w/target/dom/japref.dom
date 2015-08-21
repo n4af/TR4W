@@ -1,6 +1,5 @@
 JA PREFECTURE CODES
 
-Ab = AB
 Ac = AC
 Am = AM
 At = AT
@@ -38,6 +37,7 @@ Kt = KT
 
 Me = ME
 Mg = MG
+Mt = MT
 Mz = MZ
 Ni = NI
 
@@ -46,6 +46,8 @@ Nn = NN
 Nr = NR
 Ns = NS
 
+Oh = OH, AB
+Og = OG
 Om = OM
 On = ON
 Os = OS
@@ -72,6 +74,6 @@ Tt = TT
 Ty = TY
 
 Wk = WK
-Ys = YG
+Yg = YG, YS
 Ym = YM
 Yn = YN
