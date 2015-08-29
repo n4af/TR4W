@@ -794,14 +794,14 @@ begin
 
             Exit;
           end;
-
+{
   if pshortstring(Command)^ = 'REMINDER' then
   begin
     ProcessReminder(pshortstring(Command)^, CustomCMD);
     Result := True;
     Exit;
   end;
-
+ }
   if pshortstring(Command)^ = 'TOTAL SCORE MESSAGE' then
   begin
     //ProcessTotalScoreMessage(pshortstring(Command)^, CustomCMD);
@@ -850,7 +850,8 @@ begin
       if CFGCA[i].crKind = ckArray then
       begin
         Val(CustomCMD, TempInteger2, code);
-        if code <> 0 then Exit;
+        if code <> 0 then
+        Exit;
         TempInteger := integer(CFGCA[i].crAddress);
         Result := SetParameterInArray
           (
@@ -859,7 +860,8 @@ begin
           ArrayRecordArray[TempInteger].arVar,
           TempInteger2
           );
-        if not Result then Exit;
+        if not Result then
+        Exit;
         goto AdditionalProc;
       end;
 
@@ -964,7 +966,8 @@ begin
             call Proc
             mov byte ptr result,al
         end;
-        if Result = False then exit;
+        if Result = False then
+        exit;
       end;
 
       Result := True;

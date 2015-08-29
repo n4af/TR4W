@@ -2467,8 +2467,8 @@ begin
     menu_alt_p: OpenListOfMessages;
     menu_alt_killcw: ToggleCW(True);
     menu_alt_searchlog:
-//    tDialogBox(47, @LogSearchDlgProc);
-      CreateModalDialog(387, 150, tr4whandle, @LogSearchDlgProc, 0);
+ //  tDialogBox(47, @LogSearchDlgProc);
+ CreateModalDialog(387, 150, tr4whandle, @LogSearchDlgProc, 0);     
 
     menu_alt_transmitfreq: tr4w_alt_n_transmit_frequency;
 
@@ -3104,7 +3104,7 @@ begin
 
   //set freq
   if TuneOnFreqFromCallWindow then Exit;
-
+  
   if OpMode = CQOpMode then
 
   begin

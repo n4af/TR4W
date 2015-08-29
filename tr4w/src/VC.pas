@@ -177,11 +177,11 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.40.2' ; // n4af
+  TR4W_CURRENTVERSION_NUMBER            = '4.40.4' ; // n4af
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'August 15, 2015';   
+  TR4W_CURRENTVERSIONDATE               = 'August 29, 2015';   
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -2662,7 +2662,7 @@ type
     NameQTHAndPossibleTenTenNumber,
     NameAndPossibleGridSquareExchange,
     NZFieldDayExchange,
-    GridExchange,
+    GridExchange,         
     QSONumberAndPreviousQSONumber, //WLI
     QSONumberAndGeoCoordinates, //WLI
     QSONumberAndCoordinatesSum, //WLI
@@ -2678,6 +2678,7 @@ type
     RSTAgeExchange,
     RSTALLJAPrefectureAndPrecedenceExchange,
     RSTAndContinentExchange,
+    RSTAndDOMESTICQTH,       //n4af
     RSTAndFOCNumberExchange, //n4af
     RSTAndGridExchange,
     RSTAndOrGridExchange,
@@ -2691,12 +2692,12 @@ type
     RSTPossibleDomesticQTHAndPower,
     RSTPowerExchange,
     RSTPrefectureExchange,
+    RSTQSONUMBEREXCHANGE,
     RSTQSONumberAndDomesticQTHExchange,
-    RSTQSONumberAndPossibleDomesticQTHExchange,  //n4af 4.36
     RSTQSONumberAndGridSquareExchange,
+    RSTQSONumberAndPossibleDomesticQTHExchange,  //n4af 4.36
     RSTQSONumberAndRandomCharactersExchange,
     RSTQTHNameAndFistsNumberOrPowerExchange,
-    RSTQSONumberExchange,
     RSTQTHExchange,
     RSTZoneAndPossibleDomesticQTHExchange,
     RSTZoneExchange,
@@ -2712,9 +2713,9 @@ type
 const
   ActiveExchangeArray                   : array[ExchangeType] of PChar =
     (
-    'UNKNOWN',
+     'UNKNOWN',
     'NONE',
-    'QSO NUMBER AND AGE',
+	'AGE AND QSO NUMBER',
     'CHECK AND CHAPTER OR QTH EXCHANGE',
     'CLASS DOMESTIC OR DX QTH',
     'KIDS DAY EXCHANGE',
@@ -2738,25 +2739,26 @@ const
     'RST AGE',
     'RST ALL JA PREFECTURE AND PRECEDENCE',
     'RST AND CONTINENT',
+    'RST AND DOMESTIC QTH',       //n4af
+  	'RST AND FOC NUMBER',
     'RST AND GRID',
     'RST AND OR GRID',
-    'RST QSO NUMBER OR DOMESTIC QTH',
+    'RST AND QSO NUMBER OR DOMESTIC QTH',
     'RST AND POSTAL CODE',
     'RST DOMESTIC OR DX QTH',
     'RST DOMESTIC QTH',
     'RST DOMESTIC QTH OR QSO NUMBER',
-    'RST NAME QTH',
+    'RST NAME AND QTH',
     'RST NAME AND POSSIBLE FOC NUMBER',
     'RST POSSIBLE DOMESTIC QTH AND POWER',
     'RST POWER',
     'RST PREFECTURE',
+    'RST QSO NUMBER',
     'RST QSO NUMBER AND DOMESTIC QTH',
     'RST QSO NUMBER AND GRID SQUARE',
     'RST QSO NUMBER AND POSSIBLE DOMESTIC QTH',
-    'RST AND DOMESTIC QTH',       //n4af
     'RST QSO NUMBER AND RANDOM CHARACTERS',
     'RST QTH NAME AND FISTS NUMBER OR POWER',
-    'RST QSO NUMBER',
     'RST QTH',
     'RST ZONE AND POSSIBLE DOMESTIC QTH',
     'RST ZONE',

@@ -37,7 +37,7 @@ uses
   uCTYDAT,
 //  uMultsFrequencies,
 //  uStack,
-  uStations,
+    uStations,
   uCallsigns,
   uCommctrl,
   //  uMMTTY,
@@ -1048,6 +1048,7 @@ begin
         ShowStationInformation(@CallWindowString);
       DisplayGridSquareStatus(CallWindowString);
       GoodCallPutUp := True;
+
     end;
 end;
 
