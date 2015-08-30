@@ -2695,7 +2695,8 @@ type
     RSTQSONUMBEREXCHANGE,
     RSTQSONumberAndDomesticQTHExchange,
     RSTQSONumberAndGridSquareExchange,
-    RSTQSONumberAndPossibleDomesticQTHExchange,  //n4af 4.36
+    RSTQSONumberAndPossibleDomesticQTHExchange,
+    RSTQSONumberOrDomesticQTHExchange,  //n4af 4.36
     RSTQSONumberAndRandomCharactersExchange,
     RSTQTHNameAndFistsNumberOrPowerExchange,
     RSTQTHExchange,
@@ -2754,10 +2755,11 @@ const
     'RST POWER',
     'RST PREFECTURE',
     'RST QSO NUMBER',
-    'RST QSO NUMBER AND DOMESTIC QTH',
+    'RST QSO NUMBER AND DOMESTIC QTH',           
     'RST QSO NUMBER AND GRID SQUARE',
     'RST QSO NUMBER AND POSSIBLE DOMESTIC QTH',
     'RST QSO NUMBER AND RANDOM CHARACTERS',
+    'RST QSO NUMBER OR DOMESTIC QTH',
     'RST QTH NAME AND FISTS NUMBER OR POWER',
     'RST QTH',
     'RST ZONE AND POSSIBLE DOMESTIC QTH',
