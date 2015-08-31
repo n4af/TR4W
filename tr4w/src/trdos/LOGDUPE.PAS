@@ -2390,6 +2390,7 @@ begin
       end;
 
     RSTAndQSONumberOrFrenchDepartmentExchange,
+    RSTQSONumberOrDomesticQTHExchange, //n4af 04.40.5
       RSTQSONumberAndPossibleDomesticQTHExchange,
       RSTQSONumberAndDomesticQTHExchange,
       RSTQSONumberAndGridSquareExchange,

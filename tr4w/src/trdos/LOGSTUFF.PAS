@@ -3789,16 +3789,19 @@ begin
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
-  if not StringIsAllNumbers(FirstString) then
+  if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
+  if SecondString = '' then
   begin
-    RXData.QTHString := FirstString;
-
+  ProcessRSTAndDomesticQTHExchange(Exchange, RXData);  // n4af 4.40.5
+  Result := True;
+      exit;
+  end;
     if ThirdString <> '' then
       NumberString := SecondString + ' ' + ThirdString
     else
       NumberString := SecondString;
-  end
-  else
+   
+
     if not StringIsAllNumbers(SecondString) then
     begin
       RXData.QTHString := SecondString;
@@ -3851,6 +3854,14 @@ begin
   begin
     RXData.QTHString := FirstString;
     NumberString := SecondString;
+  end
+  else
+  if (not StringIsAllNumbers(FirstString)) then
+  if SecondString = '' then
+  begin
+  RXData.QTHString := FirstString;
+  NumberString := '';
+  Result := False;
   end
   else
     if not StringIsAllNumbers(SecondString) then
@@ -4120,7 +4131,7 @@ begin
   end;
 end;
 
-function ProcessRSTAndQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTAndQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
 label
   1;
 var
@@ -7375,6 +7386,9 @@ begin
     RSTQSONumberAndGridSquareExchange:
       ProcessExchange := ProcessRSTQSONumberAndGridSquareExchange(ExchangeString, RData);
 
+    RSTQSONumberOrDomesticQTHExchange:
+    ProcessExchange := ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
+    
     RSTQSONumberAndPossibleDomesticQTHExchange:
       ProcessExchange := ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
 

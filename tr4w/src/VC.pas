@@ -177,11 +177,11 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.40.4' ; // n4af
+  TR4W_CURRENTVERSION_NUMBER            = '4.40.6' ; // n4af
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'August 29, 2015';   
+  TR4W_CURRENTVERSIONDATE               = 'August 31, 2015';   
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -2696,8 +2696,8 @@ type
     RSTQSONumberAndDomesticQTHExchange,
     RSTQSONumberAndGridSquareExchange,
     RSTQSONumberAndPossibleDomesticQTHExchange,
-    RSTQSONumberOrDomesticQTHExchange,  //n4af 4.36
     RSTQSONumberAndRandomCharactersExchange,
+    RSTQSONumberOrDomesticQTHExchange,  //n4af 4.36
     RSTQTHNameAndFistsNumberOrPowerExchange,
     RSTQTHExchange,
     RSTZoneAndPossibleDomesticQTHExchange,

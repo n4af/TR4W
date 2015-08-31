@@ -172,13 +172,13 @@ var
   PreviewFileIsCabrillo                 : boolean;
 
   CountryMultTotals                     : CountryMultiplierArrayPointer;
-
+  P                                     : Pchar;
   TotalLogQSOs                          : Cardinal;
   ReportsFilename                       : ShortString;
 
   ReportFileWrite                       : Text;
-  LOGDATFileWrite                       : Text;
-
+  LOGDATFileWrite                       : ShortString;
+  SStr                                   : Pchar;
   Precedence, Check, Section, Power, NameInFile, QTH: Str40;
   Overlay                               : Str20;
   NameFileDirectory                     : Str40;
@@ -2599,13 +2599,15 @@ if TempRXData.DomMultQTH = '' then
 
             asm
                 push csQTHString
-                push nrReceived
+                 push nrReceived
                 push RSTReceived
             end;
             wsprintf(CABRILLO_HISEX, '%-3s %-4u %-7s');
             asm add esp,20
             end;
           end;
+
+       
 
         RSTPrefectureExchange:
           begin
