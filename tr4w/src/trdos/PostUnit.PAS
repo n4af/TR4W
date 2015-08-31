@@ -2607,7 +2607,20 @@ if TempRXData.DomMultQTH = '' then
             end;
           end;
 
-       
+                    RSTQSONumberOrDomesticQTHExchange:      //n4af 4.40.6
+          begin
+          p  := (IntTopchar(nrReceived)) ;
+          if nrReceived <  1 then
+          p := nil;
+            asm
+                push cMyState
+                push nrSent
+                push RSTSent
+            end;
+            wsprintf(CABRILLO_MYEX, '%-3s %-4d %-7s');
+            asm add esp,20
+            end;
+
 
         RSTPrefectureExchange:
           begin
