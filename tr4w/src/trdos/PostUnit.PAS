@@ -172,7 +172,8 @@ var
   PreviewFileIsCabrillo                 : boolean;
 
   CountryMultTotals                     : CountryMultiplierArrayPointer;
-  P                                     : Pchar;
+  P                                     : pchar;
+  P1                                     : pchar;
   TotalLogQSOs                          : Cardinal;
   ReportsFilename                       : ShortString;
 
@@ -2609,26 +2610,54 @@ if TempRXData.DomMultQTH = '' then
 
        RSTQSONumberOrDomesticQTHExchange:      //n4af 4.40.6
           begin
-          p  := (IntTopchar(nrReceived)) ;
+         p  := (IntToPchar(nrReceived)) ;
+
           if nrReceived <  1 then
           p := nil;
+
+ if cMystate[1] <> '' then
+ begin
             asm
-          //      push cMyState
-                push nrSent
-                push RSTSent
+               push cMyState
+               push RSTSent
+             end ;
+              wsprintf(CABRILLO_MYEX, '%-3s  %-6s') ;
+ end ;
+
+ if cMystate[1] = '' then
+   begin
+            asm
+               push nrSent
+               push RSTSent
             end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-6d') ;
+    wsprintf(CABRILLO_MYEX, '%-3s  %-6d') ;
+   end;
+
             asm add esp,16
-            end;
+            end ;
+
+   if p  <> nil then
+    begin
              asm
                 push csQTHString
-                 push p
+                 push nrReceived
                 push RSTReceived
             end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-6s %-11s');
+            wsprintf(CABRILLO_HISEX, '%-3s %6d %-6s');
             asm add esp,20
             end;
-          
+     end;
+     if p = nil then
+     begin
+             asm
+                push csQTHString
+
+                push RSTReceived
+            end;
+            wsprintf(CABRILLO_HISEX, '%-3s   %9s');
+            asm add esp,16
+            end;
+     end;
             end;
 
         RSTPrefectureExchange:
