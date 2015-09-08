@@ -776,6 +776,7 @@ begin
   ActiveBand := BandChangeArray[TempInteger].bcBand;
 
   if (CONTEST <> GeneralQSO) and (BandChangeArray[TempInteger].bcWARC) then goto NextBand;  //n4af 04.37.11
+  if (not WarcBandsEnabled) and (BandChangeArray[TempInteger].bcWARC) then goto NextBand;   // n4af 04.40.7
   if (not VHFBandsEnabled) and (BandChangeArray[TempInteger].bcVHF) then goto NextBand;
 
   if VHFBandsEnabled then
