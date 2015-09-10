@@ -1049,7 +1049,7 @@ procedure UpdateK1EAStationInfo(Field: K1EAStationInfoFieldType;
   StationIDChar: Char;
   MessageString: ShortString {Str20});
 
-procedure UpdateTenMinuteDate;
+procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);
 
 procedure UpdateTimeAndRateDisplays(ShowTime: boolean; DoRadios: boolean);
 procedure WindInit;
@@ -4312,15 +4312,14 @@ begin
   DisplayBandMap;
 end;
 
-procedure UpdateTenMinuteDate;       //n4af 4.38.6
+procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);       //n4af 4.40.9 remove 4.30.6
 
 begin
-  if (Band <> BandSave) {or (Mode <> TenMinuteTime.Mode)} then
+  if (Band <> BandSave)  or (Mode <> TenMinuteTime.Mode)  then
   begin
     TenMinuteTime.Band := Band;
-
+    TenMinuteTime.Mode := Mode;
     TenMinuteTime.Time := GetTickCount;
-    BandSave := ActiveBand;
   end;
 end;
 
