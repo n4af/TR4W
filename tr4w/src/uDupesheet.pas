@@ -39,17 +39,17 @@ procedure ClearAltD;
 const
   VDColorsArray                         : array[Ord('0')..Ord('9') + 1] of tr4wColors =
     (
-    trBlue, //0
-    trRed, //1
+    trLightGray, //0        // n4af 4.40.8
+    trLightRed, //1
     trGreen, //2
     trMagenta, //3
-    trBrown, //4
-    trBlue, //5
-    trRed, //6
+    trYellow, //4
+    trLightGray, //5
+    trLightRed, //6
     trGreen, //7
     trMagenta, //8
-    trBrown, ///9
-    trBlue ///10
+    trYellow, ///9
+    trLightGray ///10
     );
 
 implementation
@@ -91,9 +91,9 @@ begin
     //n4af 4.33.7 reactivate columndupesheetenable
     begin
        if ColumnDupeSheetEnable then
-       Result := BOOL(tr4wBrushArray[trCyan])
+       Result := BOOL(tr4wBrushArray[trLightGray])  // n4af 4.40.8
      else
-     Result := BOOL(tr4wBrushArray[trBlack]);
+     Result := BOOL(tr4wBrushArray[trDarkGray]);
 
 
         Windows.GetClientRect(HWND(lParam), temprect);
@@ -121,7 +121,7 @@ begin
  if Not ColumnDupeSheetEnable then   // n4af 4.36.12
   bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
   else
-     bgColor := 11;
+     bgColor := 58; // n4af 4.40.8
         if Left <> 0 then
         GradientRect(
           VDDRAWITEMSTRUCT^.HDC,
