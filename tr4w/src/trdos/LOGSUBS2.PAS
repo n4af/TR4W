@@ -447,7 +447,7 @@ var
   k1ea_comp_id                          : Char;
 
 begin
-  //надо подумать зачем нужен этот код
+  //Г­Г Г¤Г® ГЇГ®Г¤ГіГ¬Г ГІГј Г§Г Г·ГҐГ¬ Г­ГіГ¦ГҐГ­ ГЅГІГ®ГІ ГЄГ®Г¤
   //   if not K1EANetworkEnable then CheckForLostMultiMessages;
 
   MultiString := GetMultiPortCommand;
@@ -920,7 +920,7 @@ begin
 
       tCleareExchangeWindow;
           {
-          видимо нужно переделать
+          ГўГЁГ¤ГЁГ¬Г® Г­ГіГ¦Г­Г® ГЇГҐГ°ГҐГ¤ГҐГ«Г ГІГј
                    repeat
                       if ActiveMultiPort <> NoPort then CheckMultiState;
                       UpdateTimeAndRateDisplays(true, true);
@@ -4531,7 +4531,7 @@ begin
 
   //  LastQSOLogged := RXData;
 
-  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate;
+  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate(RXData.Band, RXData.Mode); // 4.40.9
 
   //  if not DDX(VerifyContact) then RXData.QSOPoints := 0;
 
@@ -4760,7 +4760,7 @@ begin
 //wli  LogBadQSOString := '';
   CQRITEnabled := False;
   ClearAutoSendDisplay;
-  //нужно???   FRM.ExchangeWindow.Color := clyellow;
+  //Г­ГіГ¦Г­Г®???   FRM.ExchangeWindow.Color := clyellow;
      //  FRM.CallWindow . SetFocus;
   tCallWindowSetFocus;
   //{WLI}    PutUpExchangeWindow;
@@ -5896,7 +5896,7 @@ begin
       DualingCQState := DualSendingExchange;
     end;
 
-    {начиная отсюда  скопировано в returnCQopMode}
+    {Г­Г Г·ГЁГ­Г Гї Г®ГІГ±ГѕГ¤Г   Г±ГЄГ®ГЇГЁГ°Г®ГўГ Г­Г® Гў returnCQopMode}
 
     if AutoDupeEnableCQ and
       VisibleLog.CallIsADupe(CallsignICameBackTo, ActiveBand, ActiveMode) then
