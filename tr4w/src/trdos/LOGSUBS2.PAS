@@ -4531,7 +4531,7 @@ begin
 
   //  LastQSOLogged := RXData;
 
-  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate;
+  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate(RXData.Band, RXData.Mode); // 4.40.9
 
   //  if not DDX(VerifyContact) then RXData.QSOPoints := 0;
 
