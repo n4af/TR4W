@@ -1049,16 +1049,16 @@ begin
 //        if PWORD(@MyState[1])^ = $4157 {WA} then
         if FoundMyStateInDomFile then
         begin
-//          DomesticQTHDataFileName := 'SALMONWA';
+   //        DomesticQTHDataFileName := 'SALMONWA';
           ActiveExchange := RSTDomesticOrDXQTHExchange;
           ActiveDXMult := ARRLDXCCWithNoUSAOrCanada;
         end
         else
         begin
-//          DomesticQTHDataFileName := 'SALMON';
+ //          DomesticQTHDataFileName := 'SALMON';
           ActiveExchange := RSTDomesticQTHExchange;
         end;
-//        ContestName := 'Washington State Salmon Run';
+         ContestName := 'Washington State Salmon Run';
 //        Add_KVEKH6KL;
 
       end;

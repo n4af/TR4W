@@ -4312,6 +4312,7 @@ begin
   DisplayBandMap;
 end;
 
+
 procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);   //n4af 4.40.9
 
 begin

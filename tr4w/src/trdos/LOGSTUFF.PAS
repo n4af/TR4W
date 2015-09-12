@@ -6247,8 +6247,8 @@ begin
 
     SalmonRunQSOPointMethod:
       begin
-        if RXData.Mode = CW then
-          RXData.QSOPoints := 4
+         if RXData.Mode = CW then
+          RXData.QSOPoints := 3
         else
           RXData.QSOPoints := 2;
       end;
