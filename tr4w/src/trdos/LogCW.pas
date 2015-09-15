@@ -1942,6 +1942,7 @@ begin
           {ActiveMode := ModeMemory [RadioTwo]; {KK1L: 6.71 for split mode SO2R}
       SendingOnRadioOne := False;
       SendingOnRadioTwo := True;
+
     end;
   end
 

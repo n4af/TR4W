@@ -433,7 +433,7 @@ var
   ForcedEntry                           : boolean; {KK1L: 6.70 switch used in JCTRL2 to add comments to LOGCFG}
 
   GridMapCenter                         : GridString;
-
+  InactiveSwapRadio                     : boolean;
   InactiveRigCallingCQ                  : boolean;
   InitialExchangePutUp                  : boolean;
   InitialExchangeOverwrite              : boolean; {KK1L: 6.70}
@@ -6593,7 +6593,7 @@ begin
         if RXCty = MyCountry then  RXData.QSOPoints := 1
         else
         RXData.QSOPoints := 3;
-        
+
 
         end;
       
