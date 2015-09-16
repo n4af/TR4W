@@ -156,8 +156,8 @@ begin
     SetUpToSendOnActiveRadio;
 
   {---------------------------------------------------}
-
-  while (Copy(Message, 1, 1) = ControlA) or (Copy(Message, 1, 1) = ControlB) do
+   // n4af 4.41.3
+  while (Copy(Message, 1, 1) = ControlA) or (Copy(Message, 1, 1) = ControlB) or (Copy(Message, 1, 1) = ControlE) do
   begin
     TempChar := Message[1];
 
@@ -167,11 +167,11 @@ begin
         if ActiveRadio = RadioOne then
         begin
           if not SendingOnRadioTwo then
-            ActiveMode := Radio2.ModeMemory {ModeMemory[RadioTwo]};
+            ActiveMode := Radio2.ModeMemory ;
         end
         else // Radio Two
           if not SendingOnRadioOne then
-            ActiveMode := Radio1.ModeMemory {ModeMemory[RadioOne]};
+            ActiveMode := Radio1.ModeMemory;
 
         SetUpToSendOnInactiveRadio;
 
@@ -181,6 +181,12 @@ begin
     if TempChar = ControlB then
       if not SingleRadioMode then InactiveRigCallingCQ := True;
 
+    if TempChar = ControlE then           // n4af 4.41.3
+      if not SingleRadioMode then
+      begin
+      InactiveSwapRadio := True;
+      InactiveRigCallingCQ := True;
+      end;
     Delete(Message, 1, 1);
   end;
 
@@ -658,7 +664,7 @@ begin
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
  
-  ShowInformation; // n4af 04.40.02
+
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
@@ -681,7 +687,7 @@ begin
   BandMapMode := ActiveMode; {KK1L: 6.69}
   {DisplayBandMap;}{KK1L: 6.71 Removed because UpdateTimeAndRateDisplays in LOGWIND covers it.}
   VisibleDupeSheetChanged := True;
-
+  ShowInformation; // n4af 04.40.02
 end;
 
 procedure ExchangeRadios; {KK1L: 6.71}

@@ -1048,8 +1048,8 @@ begin
               '3', '6': Result := 29;
 
               '4': case GetFirstSuffixLetter(Call) of
-                  'A', 'C', 'F', 'L', 'Q', 'S', 'U', 'Y': Result := 29;
-                  'H', 'N', 'P', 'W': Result := 30;
+                  'A', 'C', 'F', 'L', 'N', 'Q', 'S', 'U', 'Y': Result := 29;   // n4af 4.41.4
+                  'H', 'P', 'W': Result := 30;
                 end;
 {
             end;

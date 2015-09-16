@@ -690,7 +690,7 @@ var
   HourDisplay                           : HourDisplayType {= ThisHour};
 
   tHandLogMode                          : boolean;
-
+  InActiveSwapRadio                     : boolean;  //n4af 4.41.3
   IncrementTimeEnable                   : boolean;
   InEditBandMap                         : boolean; {KK1L 6.65}
   InitialExchangeCursorPos              : InitialExchangeCursorPosType { = AtEnd};
