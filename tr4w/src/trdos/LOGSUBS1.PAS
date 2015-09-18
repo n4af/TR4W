@@ -567,14 +567,14 @@ begin
   end;
 
   { Does this really ever work? }
-{
+  {
   if StringHas(CallWindowString, ',') then
     begin
       TailEndCallString := PostcedingString(CallWindowString, ',');
       TailEnding := True;
       AddStringToBuffer(TailEndMessage + ' ' + TailEndCallString, CWTone);
     end;
-}
+  } 
 end;
 
 procedure SwapRadios;

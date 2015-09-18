@@ -865,13 +865,14 @@ begin
 end;
 
 procedure ReturnInCQOpMode;
-begin
- if InactiveRigCallingCQ and (length(ExchangeWindowString)=0) then
+ begin
+ // n4af removed 4.40.2
+     if InactiveRigCallingCQ and (length(ExchangeWindowString)=0) then
    begin
     CheckInactiveRigCallingCQ;
-    exit;
+     exit;
    end;
-     
+   
   if length(CallWindowString) = 0 then
     if length(ExchangeWindowString) = 0 then
     begin
@@ -985,10 +986,10 @@ begin
 
       BeSilent := False;
 
-      if not TailEnding then
+ //     if not TailEnding then
       begin
               //        ReceivedData.ceSearchAndPounce := False;
-        TryLogContact;
+         TryLogContact;
         ShowStationInformation(@ReceivedData.Callsign);
         UpdateTotals2;
 
@@ -3751,7 +3752,7 @@ begin
     Windows.SetTextColor(PCDRAWITEMSTRUCT^.HDC, tr4wColorsArray[TWindows[mwePossibleCall].mweColor] { $ 00000000});
   end;
 
-  GradientRect(PCDRAWITEMSTRUCT^.HDC, PCDRAWITEMSTRUCT^.rcItem, TempColor, TempColor {tr4wColorsArray[TWindows[mwePossibleCall].mweBackG]}, gdHorizontal);
+  GradientRect(PCDRAWITEMSTRUCT^.HDC, PCDRAWITEMSTRUCT^.rcItem, TempColor, TempColor {tr4wColorsArray[TWindows[mwePossibleCall].mweBackG]]}, gdHorizontal);
 
   SetBkMode(PCDRAWITEMSTRUCT^.HDC, TRANSPARENT);
   Windows.DrawText(PCDRAWITEMSTRUCT^.HDC, @PossibleCallList.List[PCDRAWITEMSTRUCT^.ItemID].Call[1], length(PossibleCallList.List[PCDRAWITEMSTRUCT^.ItemID].Call), PCDRAWITEMSTRUCT^.rcItem, DT_END_ELLIPSIS + DT_SINGLELINE + DT_CENTER + DT_VCENTER);
@@ -5808,12 +5809,24 @@ end;
 
 procedure CheckInactiveRigCallingCQ;
 begin
-  if InactiveRigCallingCQ then //n4af 4.30.1
-  begin                        //n4af 4.30.1
-    SetUpToSendOnInactiveRadio;
+
+   if InactiveRigCallingCQ then
+   begin
+   if (CallWindowString <> '') then
+
+   begin
    SwapRadios;
-  ReturnInCQOpMode;    //n4af 4.40.2 Redrive dupe check
+   ReturnInCQOpMode;    //n4af 4.40.2 Redrive dupe check
+   end
+  else
+ if InactiveSwapRadio  then       // n4af 4.41.3
+  begin
+  SwapRadios;
+  ReturnInCQOpMode;
   end;
+  end;   
+  InactiveRigCallingCQ := False;
+  InactiveSwapRadio := False;
 end;
 
 function CheckWindowAndColor(Window: HWND; var Brush: HBRUSH; var Color: integer): boolean;

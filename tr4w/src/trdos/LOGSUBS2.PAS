@@ -37,7 +37,7 @@ uses
   uCTYDAT,
 //  uMultsFrequencies,
 //  uStack,
-    uStations,
+  uStations,
   uCallsigns,
   uCommctrl,
   //  uMMTTY,
@@ -447,7 +447,7 @@ var
   k1ea_comp_id                          : Char;
 
 begin
-  //надо подумать зачем нужен этот код
+  //???? ???????? ????? ????? ???? ???
   //   if not K1EANetworkEnable then CheckForLostMultiMessages;
 
   MultiString := GetMultiPortCommand;
@@ -920,7 +920,7 @@ begin
 
       tCleareExchangeWindow;
           {
-          видимо нужно переделать
+          ?????? ????? ??????????
                    repeat
                       if ActiveMultiPort <> NoPort then CheckMultiState;
                       UpdateTimeAndRateDisplays(true, true);
@@ -1048,7 +1048,6 @@ begin
         ShowStationInformation(@CallWindowString);
       DisplayGridSquareStatus(CallWindowString);
       GoodCallPutUp := True;
-
     end;
 end;
 
@@ -4531,7 +4530,7 @@ begin
 
   //  LastQSOLogged := RXData;
 
-  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate(RXData.Band, RXData.Mode); // 4.40.9
+  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate(rxData.band,rxData.Mode);
 
   //  if not DDX(VerifyContact) then RXData.QSOPoints := 0;
 
@@ -4760,7 +4759,7 @@ begin
 //wli  LogBadQSOString := '';
   CQRITEnabled := False;
   ClearAutoSendDisplay;
-  //нужно???   FRM.ExchangeWindow.Color := clyellow;
+  //????????   FRM.ExchangeWindow.Color := clyellow;
      //  FRM.CallWindow . SetFocus;
   tCallWindowSetFocus;
   //{WLI}    PutUpExchangeWindow;
@@ -4967,7 +4966,7 @@ nop
 
                           AltG: SwapMultDisplay;
                           AltK: ToggleCW(true);
-                           AltM:
+                          AltM:
                             begin
                               ToggleModes;
                               DisplayAutoSendCharacterCount;
@@ -5896,7 +5895,7 @@ begin
       DualingCQState := DualSendingExchange;
     end;
 
-    {начиная отсюда  скопировано в returnCQopMode}
+    {??????? ??????  ??????????? ? returnCQopMode}
 
     if AutoDupeEnableCQ and
       VisibleLog.CallIsADupe(CallsignICameBackTo, ActiveBand, ActiveMode) then
@@ -6028,7 +6027,7 @@ begin
         begin
           TailEndCallString := '';
                 //wli                    SendCorrectCallIfNeeded;
-          if MessageEnable then AddStringToBuffer(TailEndMessage + ' ', CWTone);
+      //    if MessageEnable then AddStringToBuffer(TailEndMessage + ' ', CWTone);
 
           repeat
             repeat until NewKeyPressed;
