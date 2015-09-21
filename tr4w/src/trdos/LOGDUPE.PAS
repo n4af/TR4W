@@ -1926,6 +1926,8 @@ begin
     RXData.PrefixMult := mo.IsPxMult(RXData.Prefix, MultBand, MultMode);
 
   if (RXData.Zone <> DUMMYZONE) and DoingZoneMults then
+  if RXData.Zone <> StrToInt(MyZone) then     // n4af 4.41.6
+  if RXData.Zone <>  00  then                  // n4af 4.41.6
     RXData.ZoneMult := mo.IsZnMult(RXData.Zone, MultBand, MultMode);
 end;
 
