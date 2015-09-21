@@ -29,6 +29,7 @@ uses
   uIO,
   MMSystem,
   utils_net,
+  utils_text,
   utils_file,
 //  uTrayBalloon,
   uMP3Recorder,
@@ -4537,7 +4538,9 @@ begin
      //  if not TailEnding then RemoveWindow(PossibleCallWindow);
 
   //  if Trace then Write('@');
-
+  if RoverCall(RXData.Callsign) and (ActiveDomesticMult = DomesticFile) then    // n4af 4.41.7 Add Q.P. Rover
+  RXData.Callsign := PrecedingString(RXData.Callsign,'/')  + '/' + RXData.DomesticQTH;  // n4af 4.41.7
+ 
   if VisibleLog.CallIsADupe(RXData.Callsign, RXData.Band, RXData.Mode) or
     ((ActiveDomesticMult = GridSquares) and RoverCall(RXData.Callsign) and (NumberGridSquaresInList > 0)) then
     if not (ActiveQSOPointMethod = AlwaysOnePointPerQSO) then
