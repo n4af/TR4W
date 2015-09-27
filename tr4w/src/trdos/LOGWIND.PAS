@@ -690,7 +690,7 @@ var
   HourDisplay                           : HourDisplayType {= ThisHour};
 
   tHandLogMode                          : boolean;
-
+  InactiveSwapRadio                     : boolean;  // n4af 4.41.3
   IncrementTimeEnable                   : boolean;
   InEditBandMap                         : boolean; {KK1L 6.65}
   InitialExchangeCursorPos              : InitialExchangeCursorPosType { = AtEnd};
@@ -1049,7 +1049,7 @@ procedure UpdateK1EAStationInfo(Field: K1EAStationInfoFieldType;
   StationIDChar: Char;
   MessageString: ShortString {Str20});
 
-procedure UpdateTenMinuteDate;
+procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);
 
 procedure UpdateTimeAndRateDisplays(ShowTime: boolean; DoRadios: boolean);
 procedure WindInit;
@@ -3101,7 +3101,10 @@ begin
     case RateDisplay of
       QSOs: TotalThisHour := TotalThisHour + NumberContactsThisMinute;
       Points: TotalThisHour := TotalThisHour + NumberQSOPointsThisMinute;
-      BandQSOs: if ActiveBand in [Band160..Band10] then TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand];
+      if tworadiomode then
+      BandQSOs: if ActiveBand in [Band160..Band10] then TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand] + NumberBandQSOsThisMinute[InActiveBand]  // n4af 4.41.2
+      else
+     BandQSOs: if ActiveBand in [Band160..Band10] then TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand] ;
     end;
 
 //       Zero out minute totals
@@ -3175,7 +3178,7 @@ begin
     case RateDisplay of
       QSOs: Rate := Rate + RateMinuteArray[RateMinute].TotalQSOs;
       Points: Rate := Rate + RateMinuteArray[RateMinute].TotalPoints;
-      BandQSOs: if ActiveBand in [Band160..Band10] then Rate := Rate + RateMinuteArray[RateMinute].BandQSOs[ActiveBand];
+      BandQSOs: if ActiveBand in [Band160..Band10] then Rate := Rate + RateMinuteArray[RateMinute].BandQSOs[ActiveBand] + RateMinuteArray[RateMinute].BandQSOs[ActiveBand];  // n4af 4.41.2
     end;
 
 //       Compute last sixty minute totals
@@ -4312,17 +4315,18 @@ begin
   DisplayBandMap;
 end;
 
-procedure UpdateTenMinuteDate;       //n4af 4.38.6
+
+procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);   //n4af 4.40.9
 
 begin
-  if (Band <> BandSave) {or (Mode <> TenMinuteTime.Mode)} then
+  if (Band <> TenMinuteTime.Band) or (Mode <> TenMinuteTime.Mode) then
   begin
     TenMinuteTime.Band := Band;
-
+    TenMinuteTime.Mode := Mode;
     TenMinuteTime.Time := GetTickCount;
-    BandSave := ActiveBand;
   end;
 end;
+
 
 procedure CalculateNumberVisibleBandMapEntries(var NumberVisibleBandMapEntries: integer;
   var CursorEntryNumber: integer;
