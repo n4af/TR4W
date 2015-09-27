@@ -29,6 +29,7 @@ uses
   uIO,
   MMSystem,
   utils_net,
+  utils_text,
   utils_file,
 //  uTrayBalloon,
   uMP3Recorder,
@@ -37,7 +38,7 @@ uses
   uCTYDAT,
 //  uMultsFrequencies,
 //  uStack,
-    uStations,
+  uStations,
   uCallsigns,
   uCommctrl,
   //  uMMTTY,
@@ -1048,7 +1049,6 @@ begin
         ShowStationInformation(@CallWindowString);
       DisplayGridSquareStatus(CallWindowString);
       GoodCallPutUp := True;
-
     end;
 end;
 
@@ -4531,14 +4531,16 @@ begin
 
   //  LastQSOLogged := RXData;
 
-  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate(RXData.Band, RXData.Mode); // 4.40.9
+  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate(rxData.band,rxData.Mode);
 
   //  if not DDX(VerifyContact) then RXData.QSOPoints := 0;
 
      //  if not TailEnding then RemoveWindow(PossibleCallWindow);
 
   //  if Trace then Write('@');
-
+  if MobileCall(RXData.Callsign) and (ActiveDomesticMult = DomesticFile) then    // n4af 4.41.8 Add Q.P. Rover
+  RXData.Callsign := PrecedingString(RXData.Callsign,'/')  + '/' + RXData.DomesticQTH;  // n4af 4.41.7
+ 
   if VisibleLog.CallIsADupe(RXData.Callsign, RXData.Band, RXData.Mode) or
     ((ActiveDomesticMult = GridSquares) and RoverCall(RXData.Callsign) and (NumberGridSquaresInList > 0)) then
     if not (ActiveQSOPointMethod = AlwaysOnePointPerQSO) then
@@ -4967,7 +4969,7 @@ nop
 
                           AltG: SwapMultDisplay;
                           AltK: ToggleCW(true);
-                           AltM:
+                          AltM:
                             begin
                               ToggleModes;
                               DisplayAutoSendCharacterCount;
@@ -6028,7 +6030,7 @@ begin
         begin
           TailEndCallString := '';
                 //wli                    SendCorrectCallIfNeeded;
-          if MessageEnable then AddStringToBuffer(TailEndMessage + ' ', CWTone);
+      //    if MessageEnable then AddStringToBuffer(TailEndMessage + ' ', CWTone);
 
           repeat
             repeat until NewKeyPressed;

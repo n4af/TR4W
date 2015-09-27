@@ -27,7 +27,7 @@ interface
 uses
   TF,
   uRussiaOblasts,
-//  Tree,
+  // Tree,
   utils_text,
   VC,
   Windows;
@@ -57,7 +57,7 @@ function SpanishStation(ID: ShortString): boolean;
 function OKOMStation(ID: ShortString): boolean;
 function GetPrefix(Call: CallString): PrefixString;
 function GetOblast(Call: CallString): Str2;
-
+function MobileCall(Call: CallString): boolean;  //n4af 4.41.8
 //function IsUA1AStation(Call: CallString): boolean;
 function StandardCallFormat(Call: CallString; Complete: boolean): CallString;
 function GetRussiaOblastID(Call: CallString): Str2; //
@@ -118,7 +118,7 @@ begin
     begin
       GetNumber := Call[CharPtr];
       Exit;
-    end;
+    end ;
   GetNumber := CHR(0);
 end;
 
@@ -147,7 +147,8 @@ begin
         GetFirstSuffixLetter := Call[CharPtr + 1];
         Exit;
       end;
-    GetFirstSuffixLetter := CHR(0);
+  GetFirstSuffixLetter := CHR(0);
+
   end;
 end;
 
@@ -365,7 +366,7 @@ begin
         end
         else
         begin
-          GetPrefix := GetPrefix(FirstPart);
+ //         GetPrefix := GetPrefix(FirstPart);
           Exit;
         end;
 
@@ -532,6 +533,12 @@ function RoverCall(Call: CallString): boolean;
 
 begin
   RoverCall := UpperCase(Copy(Call, length(Call) - 1, 2)) = '/R';
+end;
+
+function MobileCall(Call: CallString): boolean;      //n4af 4.41.8
+
+begin
+  MobileCall := UpperCase(Copy(Call, length(Call) - 1, 2)) = '/M';
 end;
 
 function SimilarCall(Call1: CallString; Call2: CallString): boolean;
