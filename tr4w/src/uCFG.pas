@@ -311,7 +311,7 @@ var
 
 const
 
-  CommandsArraySize                     = 407 ; //n4af bump array for clean compile
+  CommandsArraySize                     = 404 ; //n4af bump array for clean compile
 
   CFGCA                                 : array[1..CommandsArraySize] of CFGRecord =
     (
@@ -692,10 +692,10 @@ const
  (crCommand: 'SWAP PADDLES';                  crAddress: @SwapPaddles;                    crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'SWAP RADIO RELAY SENSE';        crAddress: @SwapRadioRelaySense;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'TAB MODE';                      crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctOther),
-// (crCommand: 'TAIL END CW MESSAGE';           crAddress: @TailEndMessage;                 crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),
- (crCommand: 'TAIL END KEY';                  crAddress: @TailEndKey;                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctChar),
- (crCommand: 'TAIL END MESSAGE';              crAddress: @TailEndMessage;                 crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),
- (crCommand: 'TAIL END SSB MESSAGE';          crAddress: @TailEndPhoneMessage;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),
+ // (crCommand: 'TAIL END CW MESSAGE';           crAddress: @TailEndMessage;                 crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),     //n4af 4.41.5
+// (crCommand: 'TAIL END KEY';                  crAddress: @TailEndKey;                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctChar),         // n4af 4.41.5
+ //(crCommand: 'TAIL END MESSAGE';              crAddress: @TailEndMessage;                 crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),
+// (crCommand: 'TAIL END SSB MESSAGE';          crAddress: @TailEndPhoneMessage;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),
  (crCommand: 'TELNET SERVER';                 crAddress: @TelnetServer;                   crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctString),
  (crCommand: 'TEN MINUTE RULE';               crAddress: pointer(18);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckList; cfFunc: cfAll; crType: ctOther),
  (crCommand: 'TOTAL OFF TIME';                crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
@@ -1477,7 +1477,7 @@ type
     isPcharString: PChar;
   end;
 const
-  SAS                                   = 17;
+  SAS                                   = 16;
   SA                                    : array[1..SAS] of IniStringRecord =
     (
     (isString: @CQPhoneExchange; isPcharString: 'CQEXCHNG.WAV'),
@@ -1488,7 +1488,7 @@ const
     (isString: @QSLPhoneMessage; isPcharString: 'QSL.WAV'),
     (isString: @RepeatSearchAndPouncePhoneExchange; isPcharString: 'RPTSPEX.WAV'),
     (isString: @SearchAndPouncePhoneExchange; isPcharString: 'SAPEXCHG.WAV'),
-    (isString: @TailEndPhoneMessage; isPcharString: 'TAILEND.WAV'),
+ //   (isString: @TailEndPhoneMessage; isPcharString: 'TAILEND.WAV'),
 {
     (isString: @GetScoresSeverPostingAddress; isPcharString: 'http://www.getscores.org/postscore.aspx'),
     (isString: @GetScoresSeverReadingAddress; isPcharString: 'http://www.getscores.org/'),
