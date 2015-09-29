@@ -1925,10 +1925,12 @@ begin
   if (RXData.Prefix <> '') and DoingPrefixMults then
     RXData.PrefixMult := mo.IsPxMult(RXData.Prefix, MultBand, MultMode);
 
-  if (RXData.Zone <> DUMMYZONE) and DoingZoneMults then
-//  if RXData.Zone <> StrToInt(MyZone) then     // n4af 4.42.1
-  if RXData.Zone <>  00  then                  // n4af 4.41.6
-    RXData.ZoneMult := mo.IsZnMult(RXData.Zone, MultBand, MultMode);
+    if (Contest = NZFIELDDAY) then
+    if (RXData.Zone = StrToInt(MyZone)) or (RXData.Zone = 00) then   exit;  //n4af 4.41.6
+
+
+  if (RXData.Zone <> DUMMYZONE) and DoingZoneMults then              // n4af 4.42.1
+     RXData.ZoneMult := mo.IsZnMult(RXData.Zone, MultBand, MultMode);
 end;
 
 procedure DupeAndMultSheet.SaveRestartFile;
