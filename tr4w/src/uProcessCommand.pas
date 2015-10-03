@@ -77,6 +77,7 @@ procedure scCWMONITORON;
 procedure scCWMONITOROFF;
 procedure scWINEXEC;
 procedure scDISABLECW;
+//procedure CheckNumber;
 procedure scENABLECW;
 procedure scSAPMODE;
 procedure scCQMODE;
@@ -104,7 +105,7 @@ const
 
 
 
-  sCommands                             = 61
+  sCommands                             = 64
 
 
                                           {$IF MMTYMODE} + 5 {$IFEND}
@@ -122,7 +123,7 @@ const
     (caCommand: 'MM_GRABLASTCALL'; caAddress: @csMMTTY_GRABLASTCALL),
 {$IFEND}
 
-//{$IF CWMODE}     //20
+//{$IF CWMODE}     //23
 
 (caCommand: '  # = QSO Number '; caAddress: @scEXCHANGERADIOS),     //n4af 04.33.2    DUMMY @ entries
 (caCommand: '  @ = HisCall '; caAddress: @scEXCHANGERADIOS),          // really done by LOGSEND.PAS
@@ -144,8 +145,10 @@ const
 (caCommand: ' ! = SN'; caAddress: @tClearMultSheet),
 (caCommand: ' & = AS'; caAddress: @scDUPECHECK),
 (caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
-
+(caCommand: ' ALT-D = Dupe Check R2'; caAddress:  @CheckNumber),
+(caCommand: ' CN = Check Entered Number'; caAddress:  @CheckNumber),    // n4af 4.42.2
 //{$IFEND}
+     (caCommand: 'CN' ; caAddress:  @CheckNumber),                      // n4af 4.42.2
       (caCommand: 'ALT-D'; caAddress: @scDupeCheck),
       (caCommand: 'WK_SWAPTUNE'; caAddress: @scWK_SWAPTUNE),
     (caCommand: 'WK_RESET'; caAddress: @scWK_RESET),
@@ -671,7 +674,15 @@ procedure scSENDTOCLUSTER;
 begin
   uTelnet.SendViaTelnetSocket(@scFileName[1]);
 end;
+{
+procedure CheckNumber;
+begin
+if StringIsAllNumbers(CallWindowString) then
+          if  CallsignsList.FindNumber(CallWindowString) then
+      PutCallToCallWindow(CallWindowString);
 
+   end;
+ }
 procedure scDUPECHECK;
 begin
   DupeCheckOnInactiveRadio(False);

@@ -30,7 +30,6 @@ uses
   Messages,
   Tree,
   LogRadio,
-
   LogSCP;
 
 const
@@ -89,8 +88,9 @@ type
     procedure ClearDupes;
     procedure DisplayDupeSheet(Radio: RadioPtr {dBand: BandType; dMode: ModeType});
     function CreatePartialsList(Call: CallString): integer;
-
     function FindCallsign(const s: CallString; var Index: integer): boolean; virtual;
+    function FindNumber(s: CallString): boolean; virtual;  // n4af 4.42.2
+
     property Count: integer read FCount;
   end;
 
@@ -260,7 +260,8 @@ end;
 function TCallsignsList.FindCallsign(const s: CallString; var Index: integer): boolean;
 var
   l, h, i, c                            : integer;
-begin
+
+  begin
   Result := False;
   l := 0;
   h := FCount - 1;
@@ -282,6 +283,31 @@ begin
   end;
   Index := l;
 end;
+
+
+function TCallsignsList.FindNumber( s: CallString): boolean;         // n4af 4.42.2 reverse lookup member #
+var
+  l, h, i, c                             : integer;
+ lstr                                    : string;
+begin
+  Result := False;
+  i := 0;
+  h := FCount - 1;
+  while i <= h do
+  begin
+    i := (i + 1);
+  lstr := laststring(Flist[i].Finexchange);
+   c := CompareStrings(lstr, s);
+    if c = 0 then
+    begin
+    Result := True;
+    CallWindowString :=  flist^[i].FCall;
+    
+    exit; 
+      end;
+    end;
+  end;
+
 
 function TCallsignsList.Get(Index: integer): CallString;
 begin

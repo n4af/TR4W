@@ -144,6 +144,7 @@ function DeviceIoControlHandler
   ULONG; pOutputLength: PULONG
   ): Cardinal;
 
+procedure CheckNumber;
 procedure RunPlugin(PluginNumber: integer);
 procedure LoadInPlugins();
 procedure OpenListOfMessages;
@@ -912,7 +913,6 @@ begin
   end
   else
   begin
-
     if CallAlreadySent = False then
     begin
       if ActiveMode in [CW, Digital] then
@@ -1038,12 +1038,11 @@ begin
 
     begin
 //      ExchangeHasBeenSent := False;
-      if GoodCallSyntax(CallWindowString) then
+        if GoodCallSyntax(CallWindowString) then
       begin
         if not Send_DE then Exit;
         tExchangeWindowSetFocus;
       end;
-
     end;
 
   if QTCsEnabled then DisplayQTCNumber(NumberQTCsThisStation(CallWindowString));
@@ -2608,20 +2607,14 @@ begin
         UpdateTotals2;
 //        FrmSetFocus;
         tCallWindowSetFocus;
-//        tDialogBox(62, @QTCReceivingDlgProc); Exit;
-//        if QTCNote <> '' then
-//        begin
-    //          PushLogStringIntoEditableLogAndLogPopedQSO('; ' + QTCNote, True);
-//          QTCNote := '';
-//        end;
-//        tCleareCallWindow;
-      end;
 
-    menu_ctrl_recalllastentry:
-      begin
-        if EscapeDeletedCallEntry <> '' then
-          PutCallToCallWindow(EscapeDeletedCallEntry);
       end;
+ 
+    menu_ctrl_recalllastentry:
+
+        if EscapeDeletedCallEntry <> '' then
+        PutCallToCallWindow(EscapeDeletedCallEntry);
+       
 
     menu_ctrl_refreshbandmap:
       UpdateBlinkingBandMapCall;
@@ -2852,7 +2845,11 @@ begin
     menu_qsobycountry: {ShowReport(rtQSOsByCountryByBand);//} QSOsByCountryByBand;
     menu_adif: ExportToADIF;
 
-//    menu_trlog: ExportToTRLogFormat;
+     menu_trlog:
+     begin
+        if EscapeDeletedCallEntry <> '' then
+           PutCallToCallWindow(EscapeDeletedCallEntry);
+     end;
 
     menu_initial_ex_list:
       begin
@@ -3071,6 +3068,9 @@ end;
 procedure ProcessReturn;
 var
   TempHWND                              : HWND;
+  First                                 : String[12];
+  label
+   SetFreq;
 begin
   TempHWND := Windows.GetFocus;
 //  if TempHWND = 0 then sm;
@@ -3102,9 +3102,21 @@ begin
       Exit;
     end;
 
-  //set freq
+ {   // check if membership # entered
+    // n4af 4.42.2 check for reverse lookup of membership #
+    //First = GetFirstString
+   if (GetFirstString(CallWindowString) = 'R') then
+   if StringIsAllNumbers(GetLastString(CallWindowString)) then
+   Begin
+   CallWindowString := GetLastString(CallWindowString);
+    if not  CallsignsList.FindNumber(CallWindowString) then exit;
+      PutCallToCallWindow(CallWindowString);
+      exit;
+      end;
+ }
+   SetFreq:
   if TuneOnFreqFromCallWindow then Exit;
-  
+
   if OpMode = CQOpMode then
 
   begin
@@ -3371,6 +3383,14 @@ begin
 
   FrmSetFocus;
 end;
+
+procedure CheckNumber;
+begin
+if StringIsAllNumbers(CallWindowString) then
+          if  CallsignsList.FindNumber(CallWindowString) then
+      PutCallToCallWindow(CallWindowString);
+
+   end;
 
 procedure CloseTR4WWindow(ID: WindowsType);
 begin
