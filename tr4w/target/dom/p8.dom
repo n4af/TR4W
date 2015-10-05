@@ -4,5 +4,5 @@ Mb = VE4,MB,MAN,^Manitoba
 Sk = VE5,SK,SAS,SASK,^Saskatchewan
 Ab = VE6,AB,ALB,ALT,^Alberta
 Bc = VE7,BC,^British Columbia
-Mr - MR,VE9,NB,VO1,VO2,NL,NF,LA,VE1,NS,VY2,PE,PEI,^Maritime
+Mr = MR,VE9,NB,VO1,VO2,NL,NF,LA,VE1,NS,VY2,PE,PEI,^Maritime
 Nt = VE8,NT,NW,NWT,VY0,NU,VY1,YT,YK,YU,^N. Territories
