@@ -50,7 +50,7 @@ uses {Dos, Printer,} Tree,
   LogNet,
   LogRadio,
   Messages,
-  Windows
+   Windows
   ;
 
 const
@@ -3142,13 +3142,24 @@ begin
 end;
 
 function ProcessAgeAndQSONumberExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;
+var firststring,secondstring,thirdstring : str10;
+
 begin
+ParseExchange(exchange,FirstString,SecondString,ThirdString);    //n4af 04.42.4
   Result := False;
   if length(Exchange) < 3 then Exit;
-  //  if length(Exchange) > 5 then Exit;
-  if not StringIsAllNumbers(Exchange) then Exit;
-  RXData.Age := StrToInt(Copy(Exchange, 1, 2));
-  RXData.NumberReceived := StrToInt(Copy(Exchange, 3, 10));
+  if not StringIsAllNumbers(FirstString) then Exit;
+  RXData.Age := StrToInt(FirstString);
+  if ThirdString <> '' then
+  begin
+RXData.DomesticQTH := SecondString;
+RXData.NumberReceived := StrToInt(ThirdString)
+end
+else
+begin
+RXData.NumberReceived := StrToInt(SecondString);
+RXData.DomesticQTH := '';
+end;
   Result := True;
 end;
 

@@ -2388,7 +2388,8 @@ var
   crFOCNr                               : PChar;
   cMyGrid                               : PChar;
   csPower                               : PChar;
-
+  hisAge                                : Integer;
+  hisQTH                                : PChar;
   csQTHString                           : PChar;
   HisZone                               : integer;
 
@@ -2818,12 +2819,17 @@ if TempRXData.DomMultQTH = '' then
             asm
                 push nrReceived
             end;
-            nrReceived := TempRXData.Age;
+
+            hisAge := TempRXData.Age ;
+            hisQTH := @TempRXData.DomesticQTH[1];          // n4af 04.42.4
             asm
-                push nrReceived
+            push  hisQTH
             end;
-            wsprintf(CABRILLO_HISEX, '%-2u%03u');
-            asm add esp,16
+            asm
+            push hisAge
+            end;
+            wsprintf(CABRILLO_HISEX, '%-2d %3s %04u');       // n4af 4.42.4
+            asm add esp,20
             end;
           end;
           {
