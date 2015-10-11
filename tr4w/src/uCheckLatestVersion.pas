@@ -50,8 +50,8 @@ const
   checkVersionRequest                   : PChar =
     'GET /include_pages/version.txt HTTP/1.1'#13#10 +
     'User-Agent: ' + TR4W_CURRENTVERSION + '_%s_%s_%s_%s' + #13#10 +
-    'Host: www.tr4w.com'#13#10 +
-    #13#10;
+    'Host: www.tr4w.net'#13#10 +
+    #13#10;                      // n4af 04.42.5
 begin
   if not GetConnection(TempSocket, 'tr4w.com', 80, SOCK_STREAM) then
   begin
