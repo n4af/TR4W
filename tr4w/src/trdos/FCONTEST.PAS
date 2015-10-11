@@ -1157,7 +1157,7 @@ begin
 
    //     AddDomesticCountry('KL');
       end;
-
+  
 
     ARRLSSCW, ARRLSSSSB:
       begin
@@ -1384,11 +1384,12 @@ begin
 
     YOUTHCHAMPIONSHIPRF:
       begin
-//        ActiveDomesticMult := DomesticFile;
+     
         TourDuration := 60;
 //        Sheet.tAutoReset := True;
 //        CountDomesticCountries := True;
-        ActiveBand := Band40;
+        CTY.ctyR150SMode := True;
+        ActiveBand := Band40, Band80;
         ActiveMode := Phone;
         ContestName := 'Молодежное первенство РФ';
         SprintQSYRule := True;
