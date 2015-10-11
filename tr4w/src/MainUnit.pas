@@ -2895,7 +2895,7 @@ begin
       OpenUrl('http://www.tr4w.com/wiki/');
 
     menu_home_page:
-      OpenUrl('http://www.tr4w.com/');
+      OpenUrl('http://www.tr4w.net/'); // n4af 04.42.5
 
 {$IF LANG = 'RUS'}
     menu_contents:

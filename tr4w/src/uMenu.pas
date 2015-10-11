@@ -129,7 +129,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
   
-    T_MENU_ARRAY_SIZE                     = 168{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 169{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -367,7 +367,7 @@ const
     (mrText: RC_NET_CLMULT; mrId: menu_clear_multsheet_in_network),
  //}
 
-//    (mrText: HELP_WORD; mrId: MAXWORD),
+     (mrText: HELP_WORD; mrId: MAXWORD),
  //{
 {$IF LANG = 'RUS'}
     (mrText: RC_CONTENTS + RC_CONTENTS_HK; mrId: menu_contents),
