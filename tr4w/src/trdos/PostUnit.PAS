@@ -2812,7 +2812,7 @@ if TempRXData.DomMultQTH = '' then
                 push nrSent
                 push cMyState
             end;
-            wsprintf(CABRILLO_MYEX, '%-2s%03d      ');
+            wsprintf(CABRILLO_MYEX, '%-2s %03d      ');
             asm add esp,16
             end;
 
