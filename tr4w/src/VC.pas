@@ -177,7 +177,7 @@ const
 
 
   OZCR2008                              = False;
-  TR4W_CURRENTVERSION_NUMBER            = '4.42.5'; // n4af
+  TR4W_CURRENTVERSION_NUMBER            = '4.42.6'; // n4af
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
@@ -194,7 +194,7 @@ const
   LATEST_CONFIG_FILE                    : PChar = 'LATEST CONFIG FILE';
   MAIN_CALLSIGN                         : PChar = 'MAIN CALLSIGN';
 
-  //TR4W_DOWNLOAD_LINK_WITH_VER           = 'http://n4af.net/TR4W';
+ // ' TR4W_DOWNLOAD_LINK_WITH_VER           = 'http://tr4w.net/4.42/tr4w_setup_4_42.1.exe';
 
   { ====== LISTVIEW CONTROL ====================== }
 
@@ -2956,7 +2956,7 @@ QSOPartiesCount = 12;
  ({Name: 'WW PMC';                     }Email: nil;                      DF: 'pmc';               WA7BNM:  471; {SK3BG: nil;          } QRZRUID: 229 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; {AIE: ZoneInitialExchange;} DM: DomesticFile;    P: 0; AE: RSTZoneOrSocietyExchange;                    XM:NoDXMults; QP:WWPMCQSOPointMethod),
  ({Name: 'XMAS';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 100 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndRandomCharactersExchange;     XM:NoDXMults; QP:TwoPointsPerQSO),
  ({Name: 'YO DX';                      }Email: nil;                      DF: 'romania';           WA7BNM:   98; {SK3BG: 'yodxc';      } QRZRUID: 328 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:ARRLDXCC;  QP:YODXQSOPointMethod),
- ({Name: 'SRR-JR';                     }Email: nil;                      DF: nil;           WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 331 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults;    P: 0; AE: AgeAndQSONumberExchange;                           XM:CQDXCC; QP:AlwaysOnePointPerQSO),      // n4af 04.42.4
+ ({Name: 'SRR-JR';                     }Email: nil;                      DF: 'russian';           WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 331 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: AgeAndQSONumberExchange;                           XM:ARRLDXCC; QP:AlwaysOnePointPerQSO),      // n4af 04.42.6
  ({Name: 'YUDX';                       }Email: nil;                      DF: nil;                 WA7BNM:  322; {SK3BG: 'yudx';       } QRZRUID: 147 ; Pxm: YUPrefixes;    ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:YUDXQSOPointMethod),
  ({Name: 'RADIO-160';                  }Email: nil;                      DF: 'russian';           WA7BNM:  202; {SK3BG: 'russ160';    } QRZRUID: 90  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC;  QP:RussianDXQSOPointMethod),
  ({Name: 'RADIO-YOC';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 119 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndPreviousQSONumber;               XM:ARRLDXCC;  QP:ThreePointsPerQSO),
