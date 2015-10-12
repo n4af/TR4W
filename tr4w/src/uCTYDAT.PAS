@@ -43,7 +43,7 @@ type
 }
 
 const
-  MaxCountries                          = {510} 380;
+  MaxCountries                          = 1000 {380};    // n4af 4.42.6
 const
 {(*}
   RussianGrids                          : array['A'..'Z'] of array['0'..'9'] of  FourChar =
@@ -208,20 +208,21 @@ type
   CTYInterface = record
     ctyVersion: array[0..15] of Char;
     ctyTable: CountryInfoArrayType;
-    ctyNumberCountries: integer;
+    ctyNumberCountries: longint;   // 4.42.6
     ctyPrefixesTable: HDSA;
     ctyPrefixesTableRecords: longword;
     ctyZoneMode: ZoneModeType;
     ctyTempQTHRecord: QTHRecord;
     ctyCountryMode: CountryModeType;
 //    ctyLastCountryCall: CallString;
-    ctyNumberRemainingCountries: integer;
+    ctyNumberRemainingCountries: longint; // 4.42.6
     ctyCustomRemainingCountryListFound: boolean;
     ctyIndexArray: array[Char] of Smallint;
     ctyMaxLengthIndexArray: array[Char] of Byte;
     ctyLastLocatedCall: CallString;
     ctyLastLocatedRecord: QTHRecord;
     ctyLastIndex: integer;
+    ctyrfOblMode: boolean;    // n4af 4.42.6
     ctyR150SMode: boolean;
 //    ctyUA3Country: Word;
 //    ctyUA9Country: Word;
@@ -260,6 +261,7 @@ function ctyGetCountryID(Call: CallString): DXMultiplierString;
 procedure ctyShellSort;
 procedure ctyAddNewPrefixRecord(pr: PrefixRecPtr; CheckDupe: boolean);
 procedure ctyMakeDefaultRemainingCountryList;
+procedure ctyLoadInRFOblList;   // n4af 4.42.6
 procedure ctyLoadInRemainingMults(p: PChar);
 procedure ctyLoadInR150SList;
 
@@ -285,9 +287,9 @@ begin
       if pr.Prefix[1] in ['B'..'E', 'G'..'I'] then Exit;
 
   end;
-
-  if CheckDupe then
+   if CheckDupe then
   begin
+
     for TempIndex := 0 to CTY.CTYPrefixesTableRecords - 1 do
       if StrComp(PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Prefix, pr.Prefix) = 0 then
       begin
@@ -325,7 +327,6 @@ begin
   if Index2 = MAXWORD then Exit;
 
   CTY.ctyTable[Index1].VisibleInRM := 1;
-
   for c := 0 to CTY.CTYPrefixesTableRecords - 1 do
   begin
     if PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, c))^.Country = Index1 then
@@ -355,7 +356,7 @@ var
   b                                     : array[0..31] of Char;
   rmbuffer                              : array[0..4096 - 1] of Char;
   c                                     : ctyColumns;
-
+  x                                     : Cardinal;
   l                                     : Cardinal;
   Lat, Lon                              : REAL;
   code                                  : integer;
@@ -402,9 +403,6 @@ begin
 
   for i := 0 to Size - 1 do
   begin
-   //   if i = 71469 then
-   //   e := e;
-
            case p[i] of
       ':':
         begin
@@ -496,18 +494,16 @@ begin
                   if CountryInfoTable^[NumberCountriesIndex].ID = '' then Break;
                 end;
 }
-
                 CTY.CTYTable[CTY.CTYNumberCountries] := r;
                 inc(CTY.CTYNumberCountries);
 
               end;
           end;
-
           inc(c);
-
         end;
       ' ', #9: if c <> cpCountryName then s := i + 1;
       #13, #10: s := i + 1;
+   
       '[', '(': begin z := i + 1;
           if e = 0 then e := i + 1;
         end;
@@ -546,23 +542,6 @@ begin
             oITU := 0;
           end {else pr.ITUZone := r.DefaultITUZone};
           ctyAddNewPrefixRecord(@pr, CheckDupe);
-//          if pr.FullCallsigns then
-//            if PInteger(@pr.Prefix[0])^ = 1397900630 then //844252502 then
-//            if pr.Prefix[0] = 'V' then
-//              if pr.Prefix[1] = 'E' then
-//                if pr.Prefix[2] = 'R' then
-//                  if pr.Prefix[3] = 'S' then
-          begin
-
-//              Windows.lstrcat(cty.ctyVersion, pr.Prefix);
-//              ShowMessage(pr.Prefix);
-//                    pppp := Pinteger(@pr.Prefix[0])^;
-//                    844252502
-//              cty.ctyVersionIndex := CTY.CTYPrefixesTableRecords;
-                //                   cty.ctyVersion := CTY.CTYNumberCountries - 1;
-//              MessageBox(0, pr.Prefix, pr.Prefix, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
-          end;
-
           if pr.Prefix[0] = 'V' then
             if pr.Prefix[1] = 'E' then
               if pr.Prefix[2] = 'R' then
@@ -761,19 +740,6 @@ begin
         end;
 
 //  MainUnit.showint(PInteger(@QTH.StandardCall)^);
-{
-1, ?????????? ??????????? ?????? ? ????????? KG4.
-???????? ????????????? ?????????? - KG4 ? ????????????? ?????????.
-KG4 ? ????- ? ????- ????????? ????????? ??????????? ???.
-???? ???? ?????????? ?? ????? ???????, ??? ????? ????????? ? ??????? cty.dat.
-
-????? ????, ?????? ? ?????????? ?? ????????.
-??? ???? ??????????.
-??? ??? ?????? ????: "KC4AAA-AAF for Byrd, McMurdo, Palmer ITU CQ zones 12-13, 30; KC4USA-KC4USZ for US Naval bases."
-? ?? ????? ???? KC4AAB, KC4USA ? ?.?. ???????????? ??? ???.
-??? ???? ?? ??? ????????? ??? KG4, ?????? ??? ? ???? ???????? ??????? ????? ?????? ? ????? ??? ? ???????? ??? ?? ???????????.
-73, ????? - K7GK/6
-}
 
   if ctyFindCallsign(@TempPrefix, TempIndex) then
   begin
@@ -1303,23 +1269,21 @@ begin
   cty.ctyR150SMode := True;
 
   Format(TR4W_R150S_FILENAME, '%sr150s.dat', TR4W_PATH_NAME);
-//  CTY.CTYTable[CTY.CTYNumberCountries] := CTY.CTYTable[CTY.CTYNumberCountries];
   ctyLoadInCountryFile(TR4W_R150S_FILENAME, True, False);
-{
-  ctyLocateCall('UA3', CTY.ctyTempQTHRecord);
-  CTY.ctyUA3Country := CTY.ctyTempQTHRecord.Country;
 
-  ctyLocateCall('UA9', CTY.ctyTempQTHRecord);
-  CTY.ctyUA9Country := CTY.ctyTempQTHRecord.Country;
-}
-{
-  for TempIndex := 0 to CTY.CTYPrefixesTableRecords - 1 do
-  begin
-    TempRec := PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex));
-    if TempRec.Country = CTY.ctyUA9Country then
-      TempRec.Country := CTY.ctyUA3Country;
-  end;
-}
+end;
+
+procedure ctyLoadInRFOblList;
+var
+  TempIndex                             : integer;
+  TempRec                               : PrefixRecPtr;
+begin
+
+  cty.ctyRFOblMode := True;
+
+  Format(TR4W_rfobl_FILENAME, '%srfobl.dat', TR4W_PATH_NAME);
+  ctyLoadInCountryFile(TR4W_rfobl_FILENAME, True, False);
+
 end;
 
 end.

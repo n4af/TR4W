@@ -502,8 +502,8 @@ begin
 
   LoadTR4WPOSFILE;
 
+ 
   if not ctyLoadInCountryFile(TR4W_CTY_FILENAME, False, True) then
-//    if not CTY.ctyLoadInCountryFile then
   begin
     UnableToFindFileMessage(TR4W_CTY_FILENAME);
     halt;
@@ -518,8 +518,11 @@ begin
 
   ReadInConfigFile(cfgCFG);          //n4af 4.31.5
   ReadInConfigFile(cfgCommMes);      //common messages gets precedence - n4af
-  
 
+  if CTY.CtyRFOblMode then       // n4af 4.42.6
+     ctyLoadInRFOblList;
+  
+  
 
   if CTY.ctyR150SMode then
   begin
