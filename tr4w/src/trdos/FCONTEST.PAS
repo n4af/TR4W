@@ -1386,14 +1386,10 @@ begin
       begin
      
         TourDuration := 60;
-//        Sheet.tAutoReset := True;
-//        CountDomesticCountries := True;
-        CTY.ctyR150SMode := True;
-        ActiveBand := Band40, Band80;
+        CTY.CtyRFOblMode := True; // n4af 4.42.7
         ActiveMode := Phone;
         ContestName := 'Молодежное первенство РФ';
-        SprintQSYRule := True;
-      end;
+        end;
 
     RFASCHAMPIONSHIPCW {, RFASCHAMPIONSHIPSSB}:
       begin
