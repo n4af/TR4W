@@ -2292,7 +2292,7 @@ var
 //  TR4W_HLP_FILENAME                     : FileNameType;
   TR4W_INI_FILENAME                     : FileNameType;
   TR4W_CTY_FILENAME                     : FileNameType;
-  TR4W_RFOBL_FILENAME                  : FileNameTYpe; // n4af 04.42.7
+  TR4W_RFOBL_FILENAME                  : FileNameTYpe; // n4af 04.42.6
   TR4W_R150S_FILENAME                   : FileNameType;
   TR4W_INPUT_CFG_FILENAME               : FileNameType;
 
