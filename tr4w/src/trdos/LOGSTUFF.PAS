@@ -928,7 +928,7 @@ begin
   //{WLI}
   DisplayBandMode(ActiveBand, ActiveMode, True);
 
-  //ТО ЧТО НИЖЕ УБРАНО В ИСХОДНИКЕ
+  //?? ??? ???? ?????? ? ?????????
   {
       IF ((ActiveRadio = RadioOne) AND (Radio1Type <> NoInterfacedRadio)) OR
          ((ActiveRadio = RadioTwo) AND (Radio2Type <> NoInterfacedRadio)) THEN
@@ -1248,7 +1248,7 @@ end;
 procedure DVKStamp;
 
 begin
-  //пока не знаю что тут надо сделать или изменить
+  //???? ?? ???? ??? ??? ???? ??????? ??? ????????
   {
     DVKPlaying := True;
 
@@ -3802,17 +3802,25 @@ begin
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
   if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
-  if SecondString = '' then
+   if SecondString = '' then
   begin
   ProcessRSTAndDomesticQTHExchange(Exchange, RXData);  // n4af 4.40.5
   Result := True;
       exit;
+  end;  
+  if not StringIsAllNumbers(FirstString) and StringIsAllNumbers(SecondString) then   // n4af 4.42.7
+  begin
+  RXData.QTHString := FirstString;
+  RXData.NumberReceived := StrToInt(SecondString);
+  ProcessRSTQSONumberAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData);
+  Result := True;
+    exit;
   end;
-    if ThirdString <> '' then
+     if ThirdString <> '' then
       NumberString := SecondString + ' ' + ThirdString
     else
       NumberString := SecondString;
-   
+    
 
     if not StringIsAllNumbers(SecondString) then
     begin
@@ -3821,21 +3829,21 @@ begin
         NumberString := FirstString + ' ' + ThirdString
       else
         NumberString := FirstString;
-    end
-    else
+    end 
+     else
     begin
       RXData.QTHString := ThirdString;
       NumberString := FirstString + ' ' + SecondString;
     end;
-
+  
   if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
   begin
     if RXData.QTHString = '' then
       ProcessRSTQSONumberAndPossibleDomesticQTHExchange := True
     else
       ProcessRSTQSONumberAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)
-  end
-  else
+  end 
+   else
     ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
 end;
 
@@ -4906,7 +4914,7 @@ var
   CharPointer                           : integer;
 
 begin
-  //WLI ВРЕМЕННО
+  //WLI ????????
 //  Result := TR4W_MULTIMESSAGE_STRING;
   Exit;
 
@@ -6531,9 +6539,9 @@ begin
 
       end;
     {2007
-    Очки за связи начисляются по таблице (см. "комментарий").
-    За каждую новую зону на каждом диапазоне, независимо от периода, начисляется 50 очков.
-    За каждую новую область, независимо от диапазона и периода, начисляется 50 очков.
+    ???? ?? ????? ??????????? ?? ??????? (??. "???????????").
+    ?? ?????? ????? ???? ?? ?????? ?????????, ?????????? ?? ???????, ??????????? 50 ?????.
+    ?? ?????? ????? ???????, ?????????? ?? ????????? ? ???????, ??????????? 50 ?????.
     }
     ChampionshipRFMethod:
       begin

@@ -3467,7 +3467,10 @@ end;
 procedure CheckAndSetInitialExchangeCursorPos;
 begin
   if InitialExchangeCursorPos = AtEnd then PlaceCaretToTheEnd(wh[mweExchange]);
-  if InitialExchangeCursorPos = AtStart then SendMessage(wh[mweExchange], EM_SETSEL, 1, 1);
+  if InitialExchangeCursorPos = AtStart then
+  SetCursorPos(0,1); // n4af 4.42.7
+  // SendMessage(wh[mweExchange], EM_SETSEL, 1, 1);
+
   if InitialExchangeOverwrite then Windows.SendMessage(wh[mweExchange], EM_SETSEL, 0, -1);
 end;
 
