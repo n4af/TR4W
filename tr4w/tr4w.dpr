@@ -540,8 +540,12 @@ begin
 
   tSetupExchangeNumbers;
 
-  if (HFBandEnable = False) and (VHFBandsEnabled = True) then ActiveBand := Band6;
-
+  if (HFBandEnable = False) and (VHFBandsEnabled = True) then
+  begin
+  ActiveBand := Band6;
+  BandMapDisplayGhz := True;    // n4af 4.42.8
+  end;
+  if HFBandEnable then  BandMapDisplayGhz := False;    // n4af 4.42.8
   SetWindowSize;
   CreateFonts;
 
@@ -791,11 +795,11 @@ begin
           begin
             if Msg.wParam = VK_DELETE then DeleteSpotFromBandmap;
 { $ I F  O L DCTRLJ}
-            if Msg.wParam in [66, 77, 68] then
+            if Msg.wParam in [66, 77, 68, 80] then
             begin
               if Msg.wParam = 66 then InvertBoolean(BandMapAllBands);
               DisplayBandMap; //ProcessInput(BAB);
-              if Msg.wParam = 77 then InvertBoolean(BandMapAllModes);
+             if Msg.wParam = 77 then InvertBoolean(BandMapAllModes) ;
               DisplayBandMap; //ProcessInput(BAM);
               if Msg.wParam = 68 then InvertBoolean(BandMapDupeDisplay);
               DisplayBandMap; //ProcessInput(BDD);

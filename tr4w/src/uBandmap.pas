@@ -105,7 +105,8 @@ var
   BandMapItemHeight                     : integer = CheckRectWidth;
   BandMapItemWidth                      : integer = 150;
   BandMapFreqWidthCalculated            : boolean;
-
+  BandMapDisplayGhz                     : boolean;
+  
 implementation
 uses MainUnit;
 
@@ -127,6 +128,8 @@ var
   Size                                  : TSIZE;
   TempHDC                               : HDC;
 const
+  BMWIDE                                = 10; // n4af 4.42.8
+  GHZ                                   = 10; // n4af 4.42.8
   Shift                                 = 1;
   button_style                          = BS_PUSHLIKE + BS_AUTOCHECKBOX + WS_CHILD + WS_VISIBLE + WS_TABSTOP;
   button_width                          = 70;
@@ -155,7 +158,7 @@ begin
     WM_MEASUREITEM:
       begin
 
-//        BandMapItemWidth := FreqRectWidth + 1 + CheckRectWidth + 1 + 65;
+     //   BandMapItemWidth := FreqRectWidth + 1 + CheckRectWidth + 1 + 65;  
 
         PMeasureItemStruct(lParam).itemHeight := BandMapItemHeight;
         PMeasureItemStruct(lParam).itemWidth := BandMapItemWidth;
@@ -180,7 +183,10 @@ begin
           begin
 
             GetTextExtentPoint32(memDC, '28888.8', 7, Size);
-            FreqRectWidth := Size.cx + 10;
+            if not BandMapDisplayGhz then                            // n4af 4.42.8
+            FreqRectWidth := Size.cx + BMWide
+            else
+            FreqRectWidth := Size.cx + BMWide + Ghz;
             BandMapFreqWidthCalculated := True;
           end;
 
@@ -403,7 +409,6 @@ begin
           69: InvertBooleanCommand(@BandMapMultsOnly);
           77: InvertBooleanCommand(@BandMapAllModes);
           202: InvertBooleanCommand(@BandMapDisplayCQ);
-
           203: DeleteSpotFromBandmap;
           204:
             begin
@@ -440,13 +445,12 @@ begin
               if QSYInactiveRadio and TwoRadioMode then                                   //Gav 4.37.12
                begin
                 TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio);
-                Windows.SetFocus(wh[mweCall]); // N4AF 4.38.2 add
                end
               else
               begin
                 TuneRadioToSpot(SpotsList.Get(TempInt), ActiveRadio);
-                Windows.SetFocus(wh[mweCall]);    // n4af 4.38.2 add
                 end;
+                Windows.SetFocus(wh[mweCall]);    // n4af 4.38.2 add
             end;
           //            TuneOnSpotFromBandmap;
 
