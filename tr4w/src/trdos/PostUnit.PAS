@@ -3008,7 +3008,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
             push nrReceived
             push RSTReceived
             end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-4u %-6s');
+            wsprintf(CABRILLO_HISEX, '%-3s %4d %8s');
             asm add esp,20
             end;
           end;

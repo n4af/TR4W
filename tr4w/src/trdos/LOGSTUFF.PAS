@@ -3179,13 +3179,16 @@ begin
   ProcessRSTAndDomesticQTHExchange := False;
   GetRidOfPrecedingSpaces(Exchange);
   GetRidOfPostcedingSpaces(Exchange);
-
   if not StringHas(Exchange, ' ') and not StringIsAllNumbers(Exchange) then
   begin
     RXData.RSTReceived := DefaultRST;
     RXData.QTHString := Exchange;
-    ProcessRSTAndDomesticQTHExchange := FoundDomesticQTH(RXData);
-    if Result = False then ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+    if length(Exchange)< 6 then
+    ProcessRSTAndDomesticQTHExchange := FoundDomesticQTH(RXData)
+    else
+    Result := False;
+    if Result = False  then
+    ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
       {WLI}
 //    if ActiveExchange = RSTZoneOrSocietyExchange then
 //      if CONTEST <> IARU then RXData.Zone := CountryTable.GetITUZone(RXData.Callsign);
@@ -3800,6 +3803,13 @@ begin
   if Exchange = '' then Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
+  if not stringisallnumbers(FirstString) then   //   n4af 4.42.9
+   if not stringisallnumbers(SecondString) then
+    if not stringisallnumbers(ThirdString) then
+     begin
+      ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
+      exit;
+     end;                                             
 
   if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
    if SecondString = '' then
@@ -3817,9 +3827,9 @@ begin
     exit;
   end;
      if ThirdString <> '' then
-      NumberString := SecondString + ' ' + ThirdString
-    else
-      NumberString := SecondString;
+      NumberString := SecondString + ' ' + ThirdString ;
+  //  else                                           // N4AF 4.42.9
+  //    NumberString := SecondString;
     
 
     if not StringIsAllNumbers(SecondString) then
