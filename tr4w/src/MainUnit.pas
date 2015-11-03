@@ -900,12 +900,12 @@ begin
   end;
   if AutoDupeEnableCQ and tCallWindowStringIsDupe then
   begin
-
+   ShowFMessages(0);
 //    FlashCallWindow;
 //    EscapeDeletedCallEntry := CallWindowString;
 
 //    if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
-    if tAutoSendMode = True then CallAlreadySent := True;
+     if tAutoSendMode = True then CallAlreadySent := True;
     tAutoSendMode := False;
     SendB4;
     DispalayDupe;
@@ -919,7 +919,7 @@ begin
       begin
         OpMode2 := SearchAndPounceOpMode;
         ShowFMessages(0);
-      end;
+       end;
       if ActiveMode = Digital then SendMessageToMixW('<TX>');
        if not tAutoSendMode then
         if MessageEnable then
@@ -1001,7 +1001,7 @@ begin
               //        sendmessage(CallWindowHandle,wm_setfocus,0,0);
                                    //        CallWindow . SetFocus;
         Exit;
-      end;
+       end;
     end;
   end;
 end;
@@ -1929,7 +1929,7 @@ SetMainWindowText(mweUserInfo, '');
   end;
 
   Windows.ShowWindow(wh[mweMasterStatus], nCmdShow);
-// if not InactiveRigCallingCQ then //n4af 04.40.2
+ // if not InactiveRigCallingCQ then //n4af 04.40.2
   ShowInformation;
 
   if tShowTypedCallsign then SendStationStatus(sstCallsign);
@@ -5834,8 +5834,10 @@ begin
   if InactiveRigCallingCQ then //n4af 4.30.1
   begin                        //n4af 4.30.1
     SetUpToSendOnInactiveRadio;
-   SwapRadios;
-  ReturnInCQOpMode;    //n4af 4.40.2 Redrive dupe check
+    ShowInformation;
+    SwapRadios;
+    if not autosendenable then    //n4af 4.42.10  Redrive dupe check
+       ReturnInCQOpMode;    
   end;
 end;
 
