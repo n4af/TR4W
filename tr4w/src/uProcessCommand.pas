@@ -105,7 +105,7 @@ const
 
 
 
-  sCommands                             = 64
+  sCommands                             = 66
 
 
                                           {$IF MMTYMODE} + 5 {$IFEND}
@@ -124,7 +124,9 @@ const
 {$IFEND}
 
 //{$IF CWMODE}     //23
-
+(caCommand: ' <01>   =  Send on other radio- focus d/n change';caaddress:@scexchangeradios),      // n4af 4.42.11
+(caCommand: ' <02>   =  Send on other radio,switch radio if called';caaddress:@scexchangeradios), // n4af 4.42.11
+(caCommand: ' <05>   =  Same as <02> but subsequent enter triggers cq on other radio';caaddress:@scexchangeradios), // n4af 4.42.11
 (caCommand: '  # = QSO Number '; caAddress: @scEXCHANGERADIOS),     //n4af 04.33.2    DUMMY @ entries
 (caCommand: '  @ = HisCall '; caAddress: @scEXCHANGERADIOS),          // really done by LOGSEND.PAS
 (caCommand: '  $ = Salutation/Name '; caAddress: @scEXCHANGERADIOS),
@@ -148,7 +150,7 @@ const
 (caCommand: ' ALT-D = Dupe Check R2'; caAddress:  @CheckNumber),
 (caCommand: ' CN = Check Entered Number'; caAddress:  @CheckNumber),    // n4af 4.42.2
 //{$IFEND}
-     (caCommand: 'CN' ; caAddress:  @CheckNumber),                      // n4af 4.42.2
+  // (caCommand: 'CN' ; caAddress:  @CheckNumber),                      // n4af 4.42.2
       (caCommand: 'ALT-D'; caAddress: @scDupeCheck),
       (caCommand: 'WK_SWAPTUNE'; caAddress: @scWK_SWAPTUNE),
     (caCommand: 'WK_RESET'; caAddress: @scWK_RESET),
