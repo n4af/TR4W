@@ -2709,8 +2709,7 @@ if TempRXData.DomMultQTH = '' then
             CID_TWO_BYTES[0] := TempRXData.Precedence;
             csName := CID_TWO_BYTES;
 
-            cMyName := @MyPrec[1];
-
+            cMyName := @MyPrec[1] ;
             csCheck := {inttopchar}(TempRXData.Check);
             cMyCheck := @MyCheck[1];
             cMyState := @MySection[1];
@@ -2724,14 +2723,15 @@ if TempRXData.DomMultQTH = '' then
             wsprintf(CABRILLO_MYEX, '%-4d %s %s %-3s ');
             asm add esp,24
             end;
-
+            if nrReceived = -1 then
+            nrReceived := 0;
             asm
                 push csQTHString
                 push csCheck
                 push csName
                 push nrReceived
             end;
-            wsprintf(CABRILLO_HISEX, '%-4u %s %02u %-3s');
+            wsprintf(CABRILLO_HISEX, '%-4d %s %02u %-3s');
             asm add esp,24
             end;
           end;
