@@ -157,21 +157,22 @@ begin
 
   {---------------------------------------------------}
 
-  while (Copy(Message, 1, 1) = ControlA) or (Copy(Message, 1, 1) = ControlB) do
+   // n4af 4.41.3
+  while (Copy(Message, 1, 1) = ControlA) or (Copy(Message, 1, 1) = ControlB) or (Copy(Message, 1, 1) = ControlE) do
   begin
     TempChar := Message[1];
 
     if TempChar = ControlA then
-      if not SingleRadioMode then
+       if not SingleRadioMode then
       begin
         if ActiveRadio = RadioOne then
         begin
           if not SendingOnRadioTwo then
-            ActiveMode := Radio2.ModeMemory {ModeMemory[RadioTwo]};
+            ActiveMode := Radio2.ModeMemory ;
         end
         else // Radio Two
           if not SendingOnRadioOne then
-            ActiveMode := Radio1.ModeMemory {ModeMemory[RadioOne]};
+            ActiveMode := Radio1.ModeMemory;
 
         SetUpToSendOnInactiveRadio;
 
@@ -179,8 +180,27 @@ begin
       end;
 
     if TempChar = ControlB then
-      if not SingleRadioMode then InactiveRigCallingCQ := True;
+      if not SingleRadioMode then
+<<<<<<< Updated upstream
+        InactiveSwapRadio := True;   // n4af 4.42.11
+    if TempChar = ControlE then           // n4af 4.41.3
+      if not SingleRadioMode then
+      begin
+      InactiveRigCallingCQ := True;        // n4af 4.42.11
+=======
+      begin
+      if autosendenable then
+      CallWindowKeyUpProc;  // n4af 4.42.10
+      InactiveRigCallingCQ := True;
+      end;
+      if TempChar = ControlE then           // n4af 4.41.3
+      if not SingleRadioMode then
+      begin
+        InactiveRigCallingCQ := True;
+         Switch := True;                   // n4af 4.42.11
 
+>>>>>>> Stashed changes
+      end;
     Delete(Message, 1, 1);
   end;
 
@@ -657,8 +677,13 @@ begin
     SetSpeed(CodeSpeed);
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
-    ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
+<<<<<<< Updated upstream
+  //   ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
   ShowInformation; // n4af 04.40.02
+=======
+  {  ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
+  ShowInformation; // n4af 04.40.02    }
+>>>>>>> Stashed changes
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
@@ -681,7 +706,7 @@ begin
   BandMapMode := ActiveMode; {KK1L: 6.69}
   {DisplayBandMap;}{KK1L: 6.71 Removed because UpdateTimeAndRateDisplays in LOGWIND covers it.}
   VisibleDupeSheetChanged := True;
-
+  ShowInformation // n4af 4.40.2
 end;
 
 procedure ExchangeRadios; {KK1L: 6.71}
@@ -1207,8 +1232,8 @@ begin
 
   CalculateBandMode(PacketFrequency, ActiveBand, ActiveMode);
 
-//временно  BandMemory[Radio] := ActiveBand;
-//временно  ModeMemory[Radio] := ActiveMode;
+//????????  BandMemory[Radio] := ActiveBand;
+//????????  ModeMemory[Radio] := ActiveMode;
 
   if Radio <> ActiveRadio then
     SwapRadios

@@ -511,6 +511,7 @@ begin
           begin
             while BufferStart <> BufferEnd do
             begin
+              InactiveRigCallingCQ := False; // n4af 4.42.11
               CPUKeyer.AddCharacterToCWBuffer(Buffer[BufferStart]);
               inc(BufferStart);
               if BufferStart = 256 then BufferStart := 0;

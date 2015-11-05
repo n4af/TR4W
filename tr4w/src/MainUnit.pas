@@ -867,12 +867,12 @@ end;
 
 procedure ReturnInCQOpMode;
 begin
- if InactiveRigCallingCQ and (length(ExchangeWindowString)=0) then
+  if InactiveRigCallingCQ and (length(ExchangeWindowString)=0) then
    begin
     CheckInactiveRigCallingCQ;
     exit;
    end;
-     
+
   if length(CallWindowString) = 0 then
     if length(ExchangeWindowString) = 0 then
     begin
@@ -900,12 +900,13 @@ begin
   end;
   if AutoDupeEnableCQ and tCallWindowStringIsDupe then
   begin
-   ShowFMessages(0);
+
+//   ShowFMessages(0);
 //    FlashCallWindow;
 //    EscapeDeletedCallEntry := CallWindowString;
-
+    if tAutoSendMode = True then CallAlreadySent := True;
 //    if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
-     if tAutoSendMode = True then CallAlreadySent := True;
+    if tAutoSendMode = True then CallAlreadySent := True;
     tAutoSendMode := False;
     SendB4;
     DispalayDupe;
@@ -921,6 +922,7 @@ begin
         ShowFMessages(0);
        end;
       if ActiveMode = Digital then SendMessageToMixW('<TX>');
+       CheckInactiveRigCallingCQ;
        if not tAutoSendMode then
         if MessageEnable then
           if not SendCrypticMessage(CallWindowString) then Exit;
@@ -1929,7 +1931,7 @@ SetMainWindowText(mweUserInfo, '');
   end;
 
   Windows.ShowWindow(wh[mweMasterStatus], nCmdShow);
- // if not InactiveRigCallingCQ then //n4af 04.40.2
+ //  if not InactiveRigCallingCQ then //n4af 04.40.2
   ShowInformation;
 
   if tShowTypedCallsign then SendStationStatus(sstCallsign);
@@ -3101,8 +3103,8 @@ begin
       EditableLogWindowDblClick;
       Exit;
     end;
-
- {   // check if membership # entered
+ {
+     // check if membership # entered
     // n4af 4.42.2 check for reverse lookup of membership #
     //First = GetFirstString
    if (GetFirstString(CallWindowString) = 'R') then
@@ -3113,13 +3115,17 @@ begin
       PutCallToCallWindow(CallWindowString);
       exit;
       end;
- }
+   }
    SetFreq:
   if TuneOnFreqFromCallWindow then Exit;
 
   if OpMode = CQOpMode then
 
   begin
+  if switch = False then
+      InactiveRigCallingCQ := False   // n4af 4.42.11
+      else    
+     Switch := False;
     ReturnInCQOpMode;
     Exit;
   end;
@@ -4371,7 +4377,7 @@ end;
 
 procedure tAddContestExchangeToLog(RXData: ContestExchange; ListViewHandle: HWND; var Index: integer);
 label
-  setitem,Domestic; //n4af
+  SetItem,Domestic; //n4af
 var
   elvi                                  : TLVItem;
   Mults                                 : Cardinal;
@@ -5833,11 +5839,14 @@ procedure CheckInactiveRigCallingCQ;
 begin
   if InactiveRigCallingCQ then //n4af 4.30.1
   begin                        //n4af 4.30.1
-    SetUpToSendOnInactiveRadio;
-    ShowInformation;
+     SetUpToSendOnInactiveRadio;
+ //     ShowInformation;    // n4af 4.40.2
     SwapRadios;
-    if not autosendenable then    //n4af 4.42.10  Redrive dupe check
-       ReturnInCQOpMode;    
+
+       if  not autosendenable then     //n4af 4.42.10  Redrive dupe check
+           ReturninCQopmode;
+      ShowInformation;
+
   end;
 end;
 
