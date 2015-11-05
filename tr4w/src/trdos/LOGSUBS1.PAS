@@ -181,11 +181,25 @@ begin
 
     if TempChar = ControlB then
       if not SingleRadioMode then
+<<<<<<< Updated upstream
         InactiveSwapRadio := True;   // n4af 4.42.11
     if TempChar = ControlE then           // n4af 4.41.3
       if not SingleRadioMode then
       begin
       InactiveRigCallingCQ := True;        // n4af 4.42.11
+=======
+      begin
+      if autosendenable then
+      CallWindowKeyUpProc;  // n4af 4.42.10
+      InactiveRigCallingCQ := True;
+      end;
+      if TempChar = ControlE then           // n4af 4.41.3
+      if not SingleRadioMode then
+      begin
+        InactiveRigCallingCQ := True;
+         Switch := True;                   // n4af 4.42.11
+
+>>>>>>> Stashed changes
       end;
     Delete(Message, 1, 1);
   end;
@@ -663,8 +677,13 @@ begin
     SetSpeed(CodeSpeed);
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
+<<<<<<< Updated upstream
   //   ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
   ShowInformation; // n4af 04.40.02
+=======
+  {  ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
+  ShowInformation; // n4af 04.40.02    }
+>>>>>>> Stashed changes
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
@@ -1213,8 +1232,8 @@ begin
 
   CalculateBandMode(PacketFrequency, ActiveBand, ActiveMode);
 
-//временно  BandMemory[Radio] := ActiveBand;
-//временно  ModeMemory[Radio] := ActiveMode;
+//????????  BandMemory[Radio] := ActiveBand;
+//????????  ModeMemory[Radio] := ActiveMode;
 
   if Radio <> ActiveRadio then
     SwapRadios
