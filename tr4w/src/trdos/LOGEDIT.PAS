@@ -2929,6 +2929,10 @@ begin
     if ActiveExchange = RSTZoneOrDomesticQTH then
       if DomesticCountryCall(Call) then
         TempString := RemoveLastString(TempString);
+    if ActiveExchange = QSONumberPrecedenceCheckDomesticQTHEXchange then    // n4af 4.43.2
+    if length(GetFirstString(TempString)) = 1 then                          // 4.43.2
+        if StringIsAllNumbers(GetFirstString(TempString)) then               // 4.43.2
+        TempString := '0' + TempString;                                      // 4.43.2
 
       {KK1L: 6.68 For IARU there was a problem with intial exchanges read from the log.}
       {           Both the zone and country are log entries, but only the zone is in the}
