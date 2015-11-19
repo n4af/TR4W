@@ -1701,7 +1701,11 @@ begin
         CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
         CommandsTempBuffer[5] := ICOM_SET_MODE;
         CommandsTempBuffer[6] := TempChar;
-        CommandsTempBuffer[7] := CHR(tIcomFilterWidth); //#02; //noraml width filter
+        if Mode = Phone then  CommandsTempBuffer[7] := CHR(tIcomFilterWidth);  //n4af 4.43.3
+        if (RadioModel = IC746Pro) and (Mode = CW) then
+        CommandsTempBuffer[7] := Chr(3)
+        else
+        CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;  // n4af 4.43.3
         CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
 
         if (Mode <> CW) or (tIcomFilterWidth = 0) then
@@ -1738,7 +1742,8 @@ begin
               else
                 TempChar := #1;
         ICOM_COMMAND_SET_MODE[6] := TempChar;
-}
+ g1704
+ }
 //        WriteToSerialCATPort(ICOM_COMMAND_SET_MODE, tCATPortHandle);
 
                     { Send the frequency information }
@@ -1821,7 +1826,7 @@ begin
     JST245:
       begin
 
-//         Put radio in remote
+//         Put radio in remote                                           3
         WriteBufferToCATPort('H');
         CPUKeyer.AddSerialPortString(tCATPortType, '1');
         CPUKeyer.AddSerialPortString(tCATPortType, CarriageReturn);
