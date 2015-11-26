@@ -40,7 +40,7 @@ uses
   LogStuff,
   LogK1EA,
   Windows;
-
+ 
 type
   DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
 
@@ -94,7 +94,7 @@ procedure PTTStatusChanged;
 const
   POLLINGDEBUG                          = False;
   ICOM_DEBUG                            = False;
-
+ 
 implementation
 
 {
@@ -1109,6 +1109,7 @@ var
   i                                     : integer;
   FDPos                                 : integer;
   DummyMode                             : ModeType;
+  p                                     : pchar;
 const
   FD_NOT_FOUND                          = 12;
   ICOM_MAX_IN_BUFFER                    = 256;
@@ -1148,7 +1149,7 @@ begin
       if stat.cbInQue < ICOM_MAX_IN_BUFFER then
         goto NextShortCheck;
   end;
-
+  
   if Errs = 0 then
   begin
     ReadFromSerialPort(stat.cbInQue, rig);
@@ -1190,9 +1191,13 @@ begin
                     4, 8: rig.CurrentStatus.Mode := Digital;
                   else rig.CurrentStatus.Mode := Phone;
                   end;
+
+                  if (Ord(rig.tBuf[i+6]) > 0) then         // n4af 4.43.4
+                  Icom_Filter_Width := Ord(rig.tBuf[i + 6]);      // 4.43.4
                   UpdateStatus(rig);
-                end;
-            end
+             
+             end;
+            end;
           end;
     Windows.ZeroMemory(@rig.tBuf, stat.cbInQue);
     if stat.cbInQue >= ICOM_MAX_IN_BUFFER then goto NewCheck;
@@ -1219,7 +1224,7 @@ begin
     begin
       rig.WritePollRequest(rig.CommandsBuffer[i][1], Ord(rig.CommandsBuffer[i][0]) - 1);
       rig.CommandsBuffer[i][0] := #0;
-      icomCheckBuffer(rig);
+      icomCheckBuffer(ActiveRadioPtr);
     end;
 
 //  sleep(200);
@@ -1382,7 +1387,6 @@ begin
       else rig.CurrentStatus.Mode := Phone;
       end;
 
-    {длина ответа = длина запроса+6 байт}
     1:
 
 //    if rig.ICOM_COMMAND_B1 <> '' then {7 bytes $FE $FE RA $E0 $07 $01 $FD}

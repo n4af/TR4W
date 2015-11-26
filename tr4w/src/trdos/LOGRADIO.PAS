@@ -35,6 +35,8 @@ uses
   Tree,
 
   Windows;
+var
+Icom_Filter_Width                       : integer;     // n4af 4.43.4
 
 const
 
@@ -63,6 +65,7 @@ type
   tr4w_RTSDTRType = (RtsDtr_Nothing, RtsDtr_OFF, RtsDtr_ON, RtsDtr_CW, RtsDtr_PTT);
 
 const
+
   tr4w_RTSDTRTypeSA                     : array[tr4w_RTSDTRType] of PChar =
     (
     'NONE',
@@ -74,7 +77,6 @@ const
 
 type
   ActiveVFOStatusType = (vfoUnknown, VFOA, VFOB, vfoMem);
-
   TXRXType = (VFODisabled, RXOnly, TXOnly, Transceive, UnknownTXRX);
 
   //  SplitType = (NoSplit, SplitOn);
@@ -1512,6 +1514,7 @@ var
   TempChar                              : Char;
   lpNumberOfBytesWritten                : Cardinal;
   VFOByte                               : Byte;
+  p                                     : pchar;
 const
   FT847ModeString                       = CHR(0) + CHR(0) + CHR(0) + CHR(7);
 
@@ -1701,14 +1704,19 @@ begin
         CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
         CommandsTempBuffer[5] := ICOM_SET_MODE;
         CommandsTempBuffer[6] := TempChar;
-        if Mode = Phone then  CommandsTempBuffer[7] := CHR(tIcomFilterWidth);  //n4af 4.43.3
-        if (RadioModel = IC746Pro) and (Mode = CW) then
-        CommandsTempBuffer[7] := Chr(3)
+   //     if Mode = Phone then  CommandsTempBuffer[7] := CHR(tIcomFilterWidth);
+         if (RadioModel = OMNI6) and (Mode = CW) then      // n4af 4.43.3
+       CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE   // n4af 4.43.3
         else
-        CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;  // n4af 4.43.3
+         begin
+        IcomCheckBuffer(ActiveRadioPtr);  // n4af 4.34.4 get icom pb filter setting
+        if Icom_Filter_Width > 0 then
+        tIcomFilterWidth := Icom_Filter_Width;  // n4af 4.43.4
+        CommandsTempBuffer[7] := CHR(tIcomFilterWidth);  // n4af 4.43.4  set icom filter
         CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
+         end;
 
-        if (Mode <> CW) or (tIcomFilterWidth = 0) then
+         if (Mode <> CW) or (tIcomFilterWidth = 0) then
         begin
           CommandsTempBuffer[0] := CHR(8);
           CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
@@ -2026,12 +2034,12 @@ begin
   RadioTwoLastDisplayedCurrentStatus := '';
   RadioTwoLastDisplayedPreviousStatus := '';
   RadioTwoLastDisplayedFilteredStatus := '';
-  {
-      GoToXY (1, 6);
-      Write ('Latest Radio One Status');
-      GoToXY (1, 9);
-      Write ('Previous Radio One Previous Status');
-      GoToXY (1, 12);
+
+  {    GoToXY (1, 6);
+      Writeln ('Latest Radio One Status');
+     GoToXY (1, 9);
+      Writeln ('Previous Radio One Previous Status');
+     GoToXY (1, 12);
       Write ('Filtered Radio One Status (gets updated when Previous = Latest)');
       GoToXY (1, 15);
       Write ('Latest Radio Two Status');
@@ -2039,16 +2047,18 @@ begin
       Write ('Previous Radio Two Status');
       GoToXY (1, 21);
       Write ('Filtered Radio Two Status (gets updated when Previous = Latest)');
-  }
+
   repeat
+
     Radio1.CheckRadioStatus;
 
     TempStatusString := GenerateStatusString(Radio1.CurrentStatus);
 
     if TempStatusString <> RadioOneLastDisplayedCurrentStatus then
     begin
-        //{WLI}            GoToXY (1, 7);
-        //{WLI}            Write (TempStatusString);
+         //             GoToXY (1, 7);
+        //
+        
 
       RadioOneLastDisplayedCurrentStatus := TempStatusString;
     end;
@@ -2057,8 +2067,8 @@ begin
 
     if TempStatusString <> RadioOneLastDisplayedPreviousStatus then
     begin
-        //{WLI}            GoToXY (1, 10);
-        //{WLI}            Write (TempStatusString);
+        //            GoToXY (1, 10);
+        //            Write (TempStatusString);
 
       RadioOneLastDisplayedPreviousStatus := TempStatusString;
     end;
@@ -2067,8 +2077,9 @@ begin
 
     if TempStatusString <> RadioOneLastDisplayedFilteredStatus then
     begin
-        //{WLI}            GoToXY (1, 13);
-        //{WLI}            Write (TempStatusString);
+        //        GoToXY (1, 13);
+        //
+
 
       RadioOneLastDisplayedFilteredStatus := TempStatusString;
     end;
@@ -2079,8 +2090,8 @@ begin
 
     if TempStatusString <> RadioTwoLastDisplayedCurrentStatus then
     begin
-        //{WLI}            GoToXY (1, 16);
-        //{WLI}            Write (TempStatusString);
+        //           GoToXY (1, 16);
+        //            Write (TempStatusString);
 
       RadioTwoLastDisplayedCurrentStatus := TempStatusString;
     end;
@@ -2089,9 +2100,9 @@ begin
 
     if TempStatusString <> RadioTwoLastDisplayedPreviousStatus then
     begin
-        //{WLI}            GoToXY (1, 19);
-        //{WLI}            Write (TempStatusString);
-
+        //             GoToXY (1, 19);
+        //            Write (TempStatusString);
+      ShowMessage (TempStatusString);
       RadioTwoLastDisplayedPreviousStatus := TempStatusString;
     end;
 
@@ -2099,20 +2110,22 @@ begin
 
     if TempStatusString <> RadioTwoLastDisplayedFilteredStatus then
     begin
-        //{WLI}            GoToXY (1, 22);
-        //{WLI}            Write (TempStatusString);
+        //             GoToXY (1, 22);
+        // 
+        ShowMessage (TempStatusString);
 
       RadioTwoLastDisplayedFilteredStatus := TempStatusString;
     end;
+     
 
   until OperatorEscape;
-
+  {
   CPUKeyer.UnInitializeKeyer; { Fix interrupts and close debug files }
 
   //{WLI}    GoToXY (1, 24);
   //{WLI}    ClrEol;
   //{WLI}    BigCursor;
-  halt;
+ // halt;
 end;
 
 function OpenCATDebugFile(port: PortType): boolean;
