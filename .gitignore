@@ -36,3 +36,6 @@ __history/
 
 # Castalia statistics file
 *.stat.gitignore
+
+target/
+*.ini

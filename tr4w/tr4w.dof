@@ -90,11 +90,11 @@ MaxStackSize=1048576
 ImageBase=4194304
 ExeDescription=
 [Directories]
-OutputDir=D:\newsrc\tr4w\target
+OutputDir=target
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=D:\newsrc\include;D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\src\trdos;D:\newsrc\tr4w\src\\utils;D:\newsrc\tr4w\src
+SearchPath=include;src\lang;src\trdos;src\utils;src
 Packages=vcl;rtl;vclx;VclSmp;vclshlctrls
 Conditionals=
 DebugSourceDirs=
