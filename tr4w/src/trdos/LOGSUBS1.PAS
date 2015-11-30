@@ -156,7 +156,7 @@ begin
     SetUpToSendOnActiveRadio;
 
   {---------------------------------------------------}
-{
+
    // n4af 4.41.3
   while (Copy(Message, 1, 1) = ControlA) or (Copy(Message, 1, 1) = ControlB) or (Copy(Message, 1, 1) = ControlE) do
   begin
@@ -203,7 +203,7 @@ begin
       end;
     Delete(Message, 1, 1);
   end;
-}
+
   {---------------------------------------------------}
 
   if pos('>', Message) > 0 then
@@ -677,13 +677,13 @@ begin
     SetSpeed(CodeSpeed);
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
-//<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   //   ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
   ShowInformation; // n4af 04.40.02
-// =======
+=======
   {  ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
   ShowInformation; // n4af 04.40.02    }
-// >>>>>>> Stashed changes
+>>>>>>> Stashed changes
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
