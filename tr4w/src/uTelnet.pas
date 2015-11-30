@@ -896,9 +896,9 @@ begin
   end;
 
   {Note}
-  if TelnetBuffer[DX + 39 + Offset] <> ' ' then
+  if TelnetBuffer[DX + 39 + Offset] <> '                              ' then  // This is not right as the extensions can be at the end so check if th ewhole comment (30 bytes) is blank // ny4i
   begin
-    Windows.lstrcpyn(@TempSpot.FNotes[0], @TelnetBuffer[DX + 39 + Offset], 30);
+    Windows.lstrcpyn(@TempSpot.FNotes[0], @TelnetBuffer[DX + 39 + Offset], 31); //was 31 but allow for null ny4i
     StrUpper(@TelnetBuffer[DX + 39 + Offset]);
     for i := DX + 39 to DX + 65 do
     begin

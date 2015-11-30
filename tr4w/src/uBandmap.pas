@@ -84,7 +84,8 @@ function NEWBMLBPROC(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): 
 const
 
   CheckRectWidth                        = 17;
-  BMPanelWidth                          : array[0..5] of integer = (80, 130, 240, 350, 510, 580);
+                                            //      Below line was (80, 130, 240, 350, 510, 580); ny4i
+  BMPanelWidth                          : array[0..5] of integer = (80, 130, 240, 350, 580, 650); //ny4i added 70 to last two to extend the comment section
 var
   FreqRectWidth                         : integer; // = 55 - 20;
   BandmapDRAWITEMSTRUCT                 : PDrawItemStruct;
