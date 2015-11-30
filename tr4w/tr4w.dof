@@ -90,11 +90,11 @@ MaxStackSize=1048576
 ImageBase=4194304
 ExeDescription=
 [Directories]
-OutputDir=target
+OutputDir=D:\newsrc\tr4w\target
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=include;src\lang;src\trdos;src\utils;src
+SearchPath=D:\newsrc\include;D:\newsrc\tr4w\src\lang;D:\newsrc\tr4w\src\trdos;D:\newsrc\tr4w\src\\utils;D:\newsrc\tr4w\src
 Packages=vcl;rtl;vclx;VclSmp;vclshlctrls
 Conditionals=
 DebugSourceDirs=
@@ -130,12 +130,3 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlSearchPath]
-Count=1
-Item0=include;src\lang;src\trdos;src\utils;src
-[HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=target
