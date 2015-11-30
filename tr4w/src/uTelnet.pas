@@ -372,6 +372,7 @@ begin
         AppendTelnetPopupMenu('SHOW/USERS');
         AppendTelnetPopupMenu('SHOW/WWV');
         AppendTelnetPopupMenu('SHOW/FILTER');
+        AppendTelnetPopupMenu('SHOW/DX/100');
 
         EnumerateLinesInFile('CLUSTER_COMMANDS.TXT', EnumCLUSTERCOMMANDSTXT, True);
 {
@@ -562,10 +563,15 @@ begin
   while i <> 0 do
   begin
     if TempBuffer1[i] = ':' then
-    begin
+      begin
       port := pchartoint(@TempBuffer1[i + 1]);
       TempBuffer1[i] := #0;
-    end;
+      end;
+    if TempBuffer1[i] = ' ' then    // ny4i
+      begin                              // ny4i
+      TempBuffer1[i] := #0;              // ny4i
+      end;                               // ny4i
+
     dec(i);
   end;
 
@@ -1262,6 +1268,7 @@ end;
 
 procedure EmunTRCLUSTERDAT(FileString: PShortString);
 begin
+  GetRidOfPostcedingSpaces(FileString^);
   tCB_ADDSTRING_PCHAR(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, 102, @FileString^[1]);
 end;
 
