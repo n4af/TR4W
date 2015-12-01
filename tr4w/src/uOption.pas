@@ -220,7 +220,7 @@ begin
 
 end;
 
-procedure CommandsToListView2(f: CFGFunc);
+procedure CommandsToListView2(f:cfgfunc  );
 
 var
   i                                     : integer;
@@ -303,7 +303,7 @@ begin
 
   for Command := 1 to CommandsArraySize do
     if not (CFGCA[Command].crS in [csRem]) then
-      if CFGCA[Command].crType in [ctFreqList, ctURL, ctPortLPT, ctDirectory, ctFileName, ctAlphaChar, ctChar, ctBand, ctReal, ctByte, ctInteger, ctWord, ctString, ctBoolean, ctOther, ctMultiplier] then
+      if CFGCA[Command].crType in [ctFreqList, ctURL, ctPortLPT, ctDirectory, ctFileName, ctAlphaChar, ctChar, ctBand, ctReal, ctByte, ctInteger, ctMessage, ctWord, ctString, ctBoolean, ctOther, ctMultiplier] then
       begin
 
 //        if CommandsFilter <> cfAll then

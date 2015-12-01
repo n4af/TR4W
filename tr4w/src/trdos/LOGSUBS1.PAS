@@ -1,18 +1,14 @@
 {
  Copyright Larry Tyree, N6TR, 2011,2012,2013,2014,2015.
-
  This file is part of TR4W    (TRDOS)
-
  TR4W is free software: you can redistribute it and/or
  modify it under the terms of the GNU General Public License as
  published by the Free Software Foundation, either version 2 of the
  License, or (at your option) any later version.
-
  TR4W is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
-
  You should have received a copy of the GNU General
      Public License along with TR4W.  If not, see
  <http: www.gnu.org/licenses/>.
@@ -132,9 +128,7 @@ begin
      if (ActiveMode = Phone) and DVPEnable and DVPMessagePlaying then
         begin
            TimeOut := 0;
-
            //    DVPStopPlayback;
-
            //    repeat
            //      Wait(5);
            //      inc(TimeOut);
@@ -181,25 +175,12 @@ begin
 
     if TempChar = ControlB then
       if not SingleRadioMode then
-<<<<<<< Updated upstream
-        InactiveSwapRadio := True;   // n4af 4.42.11
-    if TempChar = ControlE then           // n4af 4.41.3
-      if not SingleRadioMode then
-      begin
-      InactiveRigCallingCQ := True;        // n4af 4.42.11
-=======
-      begin
-      if autosendenable then
-      CallWindowKeyUpProc;  // n4af 4.42.10
-      InactiveRigCallingCQ := True;
-      end;
+        InactiveRigCallingCQ := True;   // n4af 4.42.11
       if TempChar = ControlE then           // n4af 4.41.3
       if not SingleRadioMode then
       begin
         InactiveRigCallingCQ := True;
          Switch := True;                   // n4af 4.42.11
-
->>>>>>> Stashed changes
       end;
     Delete(Message, 1, 1);
   end;
@@ -297,9 +278,7 @@ begin
     if (ActiveMode = Phone) and DVPEnable and DVPMessagePlaying then
     begin
       TimeOut := 0;
-
         //      DVPStopPlayback;
-
         //      repeat
         //        Wait(5);
         //        inc(TimeOut);
@@ -334,10 +313,8 @@ begin
       if OpMode = CQOpMode then
       begin
         FileName := GetCQMemoryString(ActiveMode, CHR(Ord(Key) - 35)); //KK1L: 6.73 Added mode
-
         while Copy(FileName, 1, 1) < ControlZ do
           Delete(FileName, 1, 1);
-
         QuickDisplay(TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP);
         DVPRecordMessage(FileName, True)
       end
@@ -345,14 +322,11 @@ begin
       begin
             //KK1L: 6.73 Added mode to GetEXMemoryString
         FileName := GetEXMemoryString(ActiveMode, CHR(Ord(Key) - 35));
-
         while Copy(FileName, 1, 1) < ControlZ do
           Delete(FileName, 1, 1);
-
         QuickDisplay(TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP);
         DVPRecordMessage(FileName, True);
       end;
-
       Exit;
     end;
 }
@@ -385,7 +359,6 @@ begin
 {
       if ActiveMode = Digital then
       begin
-
         if pos('<', Message) = 0 then
         begin
           SendMessageToMixW('<TX>');
@@ -394,7 +367,6 @@ begin
         end
         else
           SendMessageToMixW(Message);
-
       end
       else
        }IncrementCounter := SendCrypticMessage(Message);
@@ -431,7 +403,6 @@ begin
               LastCQMode := ActiveMode;
             end;
           end
-
           else // Radio two
             if Radio2.LastDisplayedFreq <> 0 then
             begin
@@ -608,22 +579,17 @@ begin
      if (ActiveMode = Phone) and DVPMessagePlaying then
         begin
            DVPStopPlayback;
-
            TimeOut := 0;
-
            repeat
               Wait(5);
               inc(TimeOut)
            until (not DVPMessagePlaying) or (TimeOut > 30);
         end
-
      else
         if (ActiveMode = Phone) and DVKMessagePlaying then
            begin
               //            SendDVKMessage('DVK0');
-
               TimeOut := 0;
-
               repeat
                  Wait(5);
                  inc(TimeOut)
@@ -677,13 +643,10 @@ begin
     SetSpeed(CodeSpeed);
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
-<<<<<<< Updated upstream
   //   ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
   ShowInformation; // n4af 04.40.02
-=======
-  {  ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
+{  ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
   ShowInformation; // n4af 04.40.02    }
->>>>>>> Stashed changes
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
@@ -727,18 +690,14 @@ begin
 end;
 
 { PROCEDURE SelectBVFO;
-
 VAR IntRadioType: InterfacedRadioType;
-
     BEGIN
     CASE ActiveRadio OF
         RadioOne:
             IntRadioType := Radio1Type;
-
         RadioTwo:
             IntRadioType := Radio2Type;
         END;
-
     CASE IntRadioType OF
         TS850:
             BEGIN
@@ -746,10 +705,8 @@ VAR IntRadioType: InterfacedRadioType;
             AddRadioCommandCharacter (ActiveRadio, 'R');
             AddRadioCommandCharacter (ActiveRadio, '1');
             AddRadioCommandCharacter (ActiveRadio, ';');
-
             AddRadioCommandCharacter (ActiveRadio, 'M');
             AddRadioCommandCharacter (ActiveRadio, 'D');
-
             IF ActiveMode = CW THEN
                 AddRadioCommandCharacter (ActiveRadio, '3')
             ELSE
@@ -757,10 +714,8 @@ VAR IntRadioType: InterfacedRadioType;
                     AddRadioCommandCharacter (ActiveRadio, '1')
                 ELSE
                     AddRadioCommandCharacter (ActiveRadio, '2');
-
             AddRadioCommandCharacter (ActiveRadio, ';');
             END;
-
         FT1000:
             BEGIN
             AddRadioCommandCharacter (ActiveRadio, Chr (0));
@@ -769,10 +724,8 @@ VAR IntRadioType: InterfacedRadioType;
             AddRadioCommandCharacter (ActiveRadio, Chr (1));
             AddRadioCommandCharacter (ActiveRadio, Chr (5));
             END;
-
         END;
     END;
-
 }
 
 procedure RememberFrequency;
@@ -786,11 +739,9 @@ begin
   if (Band = ActiveBand) and (Mode in [CW..Phone]) then
     FreqMemory[ActiveBand, ActiveMode] := ActiveRadioPtr.FilteredStatus.Freq;
 {
-
   if ActiveRadio = RadioOne then
   begin
     CalculateBandMode(Radio1.FilteredStatus.Freq, Band, Mode);
-
     if (Band = ActiveBand) and (Mode = ActiveMode) then
     begin
       FreqMemory[ActiveBand, ActiveMode] := Radio1.FilteredStatus.Freq;
@@ -800,7 +751,6 @@ begin
   else
   begin
     CalculateBandMode(Radio2.FilteredStatus.Freq, Band, Mode);
-
     if (Band = ActiveBand) and (Mode = ActiveMode) then
     begin
       FreqMemory[ActiveBand, ActiveMode] := Radio2.FilteredStatus.Freq;
@@ -885,21 +835,16 @@ begin
                 if KeyPressed then
                 begin
                   Key := ReadKey;
-
                   if Key = EscapeKey then
                   begin
                     FlushCWBufferAndClearPTT;
                     DVPStopPlayback;
-
                     SwapRadios; // Goes back to original display
-
                                       //SendCrypticMessage (GetCQMemoryString (F1));
                                       //KK1L: 6.73
                     if CalledFromCQMode then SendCrypticMessage(GetCQMemoryString(ActiveMode, F1));
-
   //We have a problem... the callsign is
   //still up and we are in S&P mode
-
                     TwoRadioState := CallReady; // Should fix it
                     Exit;
                   end
@@ -910,19 +855,15 @@ begin
                             RememberFrequency;
                             BandUp;
                           end;
-
                         AltV: begin
                             RememberFrequency;
                             BandDown;
                           end;
-
                         PageUpKey: SpeedUp;
                         PageDownKey: SlowDown;
                       end;
                 end;
-
                 if ActiveMode = Phone then Wait(10);
-
               until (((ActiveMode = CW) and not CWStillBeingSent) or
                 ((ActiveMode = Phone) and not (DVPMessagePlaying or DVKMessagePlaying)));
 }
@@ -1030,19 +971,15 @@ begin
                             RememberFrequency;
                             BandUp;
                           end;
-
                         AltV: begin
                             RememberFrequency;
                             BandDown;
                           end;
-
                         PageUpKey: SpeedUp;
                         PageDownKey: SlowDown;
                       end;
                 end;
-
                 if ActiveMode = Phone then Wait(20);
-
               until (((ActiveMode = CW) and not CWStillBeingSent) or
                 ((ActiveMode = Phone) and not (DVPMessagePlaying or DVKMessagePlaying)));
 }
@@ -1117,11 +1054,9 @@ begin
               ActiveRadio := RadioTwo;
               InactiveRadio := RadioOne;
             end;
-
             CallWindowString := '';
 //            ResetSavedWindowListAndPutUpCallWindow;
 //            RemoveWindow(ExchangeWindow);
-
             Radio1.LastDisplayedFreq := 0;
             Radio2.LastDisplayedFreq := 0;
             DisplayRadio(ActiveRadio);
@@ -1149,32 +1084,26 @@ begin
             if KeyPressed then
             begin
               Key := UpCase(ReadKey);
-
               case Key of
-
                 EscapeKey:
                   begin
                     if CalledFromCQMode then SendCrypticMessage(GetCQMemoryString(ActiveMode, F1));
                     TwoRadioState := Idle;
                     Exit;
                   end;
-
                 NullKey:
                   case ReadKey of
                     AltB: begin
                         RememberFrequency;
                         BandUp;
                       end;
-
                     AltV: begin
                         RememberFrequency;
                         BandDown;
                       end;
-
                     PageUpKey: SpeedUp;
                     PageDownKey: SlowDown;
                   end;
-
               else
                 if ActiveWindow = CallWindow then
                   if ValidCallCharacter(Key) then
@@ -1183,11 +1112,8 @@ begin
                     Write(Key);
                   end;
               end;
-
             end;
-
             if ActiveMode = Phone then Wait(20);
-
           until (((ActiveMode = CW) and not CWStillBeingSent) or
             ((ActiveMode = Phone) and not (DVPMessagePlaying or DVKMessagePlaying)));
 }
@@ -1510,3 +1436,5 @@ end;
 
 end.
 
+Status API Training Shop Blog About Pricing
+© 2015 GitHub, Inc. Terms Privacy Security Contact Help

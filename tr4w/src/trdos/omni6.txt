@@ -1,0 +1,37 @@
+
+D:\newsrc\tr4w\src\trdos\CfgCmd.pas
+   3766	Radio1.RadioModel := OMNI6;
+   4032	Radio2.RadioModel := OMNI6;
+   5256	RadioPointer^.RadioModel := OMNI6;
+
+D:\newsrc\tr4w\src\trdos\LOGRADIO.PAS
+    454	({Name: 'OMNI6';      } BR:BR9600;  P: 1; C: 1; S: 1; T:0; RA: $04; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    524	'OMNI6',
+    578	'OMNI6',
+    673	IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    722	IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    760	IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    815	IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    874	IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+   1181	IC706..IC7800, OMNI6: { KK1L: 6.73 Added OMNI6 }
+   1227	IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+   1663	IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+   2239	//      IC706..IC7800, OMNI6: Exit;
+
+D:\newsrc\tr4w\src\uProcessCommand.pas
+    270	if ActiveRadioPtr.RadioModel in [IC706..IC7800, OMNI6] then
+    278	if InActiveRadioPtr.RadioModel in [IC706..IC7800, OMNI6] then
+    286	if Radio1.RadioModel in [IC706..IC7800, OMNI6] then
+    294	if Radio2.RadioModel in [IC706..IC7800, OMNI6] then
+    566	if ActiveRadioPtr.RadioModel in [IC706..IC7800, OMNI6] then
+    581	if InActiveRadioPtr.RadioModel in [IC706..IC7800, OMNI6] then
+    595	if Radio1.RadioModel in [IC706..IC7800, OMNI6] then
+    609	if Radio2.RadioModel in [IC706..IC7800, OMNI6] then
+
+D:\newsrc\tr4w\src\uRadioPolling.pas
+   2278	if rig^.RadioModel in [IC706..OMNI6] then
+   2335	if rig^.RadioModel in [IC706..OMNI6] then
+   2379	IC706..IC7800, OMNI6:
+
+D:\newsrc\tr4w\src\VC.pas
+    983	OMNI6,

@@ -405,7 +405,7 @@ begin
           TempString := '; Break started at ' + GetFullTimeString;
           PushLogStringIntoEditableLogAndLogPopedQSO (TempString, True);
           END;
-  }
+ }
 end;
 {
 procedure MoveEditableLogIntoLogFile;
@@ -3609,13 +3609,14 @@ begin
                     WindowString := '';
                     ClrScr;
                     END
-                ELSE
+                ELSE  }
                     IF (Copy (WindowString, 1, 1) = '\') AND (ActiveWindow = CallWindow) THEN
                         BEGIN
                         ProcessCallWindowCommand (WindowString);
-                        ClrScr;
+                   //     ClrScr;
                         WindowString := '';
                         END
+                        {
                     ELSE
                         Exit;
                 END;
