@@ -566,6 +566,10 @@ begin
       port := pchartoint(@TempBuffer1[i + 1]);
       TempBuffer1[i] := #0;
     end;
+    if TempBuffer1[i] = ' ' then //ny4i 4.43.5 plus this bug fix.
+       begin
+       TempBuffer1[i] := #0;
+       end;
     dec(i);
   end;
 
