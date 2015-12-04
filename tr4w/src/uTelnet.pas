@@ -14,8 +14,8 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+     Public License along with TR4W in  GPL_License.TXT.
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit uTelnet;
@@ -68,7 +68,9 @@ type
     dwData: LONGINT;
     iString: integer;
   end;
-
+{$IFDEF AUTOSPOT}
+  var first : boolean;
+{$ENDIF}
 procedure SendClientStatus;
 function TelnetWndDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 procedure ConnectToTelnetCluster;
@@ -295,7 +297,13 @@ begin
           end;
 }
         TelnetBuffer[i] := #0;
-        ProcessTelnetString(i);
+        //Try
+           ProcessTelnetString(i);
+        //Except on E : Exception do
+       //    begin
+           //TLogger.GetInstance.Debug(Format('ProcessTelnet Exception, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
+       //    end;
+        //end;
 
       end;
 
@@ -720,11 +728,13 @@ var
   AddedSpot                             : boolean;
   pr                                    : integer;
   StringType                            : TelnetStringType;
+
 begin
 //  Windows.CharUpperBuff(TelnetBuffer, ByteReceived);
   AddedSpot := False;
   pr := -1;
-  for c := 0 to ByteReceived do
+  // TLogger.GetInstance.Debug('In ProcessTelnetString: ' + TelnetBuffer);
+   for c := 0 to ByteReceived do
   begin
     if pr = -1 then
       if TelnetBuffer[c] > #13 then pr := c;
@@ -735,15 +745,47 @@ begin
         TelnetBuffer[c] := #0;
         StringType := tstReceived;
         if (PInteger(@TelnetBuffer[pr])^ = $64205844) {DX D} and (PInteger(@TelnetBuffer[pr + 2])^ = $20656420) { DE } then
+          begin
+          //TLogger.GetInstance.Debug('      Calling ProcessDX');
           AddedSpot := ProcessDX(pr, False, StringType);
-
+          //TLogger.GetInstance.Debug('      Back from ProcessDX');
+          end;
         AddStringToTelnetConsole(@TelnetBuffer[pr], StringType);
+
+
     //     SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);   // remove hh
         pr := -1;
       end;
   end;
 
-  if AddedSpot then SpotsList.Display;
+  if AddedSpot then
+     begin
+     SpotsList.Display;
+{$IFDEF AUTOSPOT}
+     if TwoRadioMode then
+        begin
+        if first then
+           begin
+           //TLogger.GetInstance.Debug(Format('Writing to Radio One: %s',[TempSpot.FFreqString]));
+           TuneRadioToSpot(TempSpot, RadioOne);   // ny4i test code to exercise radio
+           first := false;
+           end
+        else
+           begin
+           first := true;
+           //TLogger.GetInstance.Debug(Format('Writing to Radio Two: %s',[TempSpot.FFreqString]));
+           TuneRadioToSpot(TempSpot, RadioTwo);
+           end;
+        end
+     else
+        begin
+         //TLogger.GetInstance.Debug(Format('Writing to Radio One: %s',[TempSpot.FFreqString]));
+         TuneRadioToSpot(TempSpot, RadioOne);
+        //Writeln('Radio One');
+        end;
+     sleep(200); // So we do not drive the serial port and radio too fast.
+{$ENDIF}
+     end;
 {
   Exit;
 

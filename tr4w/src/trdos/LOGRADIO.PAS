@@ -33,10 +33,10 @@ uses
   TF,
   VC,
   Tree,
-
   Windows;
 var
 Icom_Filter_Width                       : integer;     // n4af 4.43.4
+TimeoutBuffer: PCOMMTIMEOUTS;
 
 const
 
@@ -442,6 +442,8 @@ const
     ({Name: 'IC781';      } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $26; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'IC910';      } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $60; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC9100';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $7C; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+
     ({Name: 'IC970D';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $2E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'IC7000';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $70; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
@@ -514,6 +516,7 @@ const
     'IC781',
 
     'IC910H',
+    'IC9100',
     'IC970D',
 
     'IC7000',
@@ -644,6 +647,13 @@ uses
   LogWind,
   uRadioPolling,
   MainUnit;
+
+function BufToStr(var buf; bufSize: integer) : string;
+begin
+  SetLength(result, bufSize);
+  Move(buf, pointer(result)^, bufSize);
+end;
+
 
 procedure RITClear;
 
@@ -1000,13 +1010,17 @@ begin
  { if NoPollDuringPTT then
   if tPTTStatus = PTT_ON then
   Sleep(500);   }
-  Result := WriteToCATPort(Buffer, nNumberOfBytesToWrite);
+  try
+    Result := WriteToCATPort(Buffer, nNumberOfBytesToWrite);
+  except //on E : Exception do
+    ; // TLogger.GetInstance.Debug(Format('In WritePollRequest, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
+  end;
   if not Result then Sleep(200);
 end;
 
 function RadioObject.AddToOutputBuffer(Buffer: PChar; nNumberOfBytesToWrite: DWORD): LongBool;
 begin
-
+  //  TLogger.GetInstance.Debug('In AddToOutputBuffer');
 //  sleep(100);
 //  Windows.lstrcat(CommandsBuffer[0], Buffer);
 {$IF MASKEVENT}
@@ -1015,11 +1029,13 @@ begin
 {$ELSE}
   WriteToCATPort(Buffer^, nNumberOfBytesToWrite);
 {$IFEND}
+   //TLogger.GetInstance.Debug('Exiting AddToOutputBuffer');
 end;
 
 function RadioObject.WriteToCATPort(const Buffer; nNumberOfBytesToWrite: DWORD): LongBool;
 var
   lpNumberOfBytesWritten                : DWORD;
+  s: string;
 begin
 {
   if not DVKEnable then
@@ -1034,7 +1050,15 @@ begin
                 Exit;
               end;
 }
-  Windows.WriteFile(tCATPortHandle, Buffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, nil);
+  try
+    // TLogger.GetInstance.Debug('In WriteToCATPort');
+     //SetString(s,PChar(@Buffer),nNumberOfBytesToWrite);
+     //TLogger.GetInstance.Debug(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,s]));
+     Windows.WriteFile(tCATPortHandle, Buffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, nil);
+    // TLogger.GetInstance.Debug(Format('After WriteFile: %u bytes written',[lpNumberOfBytesWritten]));
+  except // on E : Exception do
+    ; // TLogger.GetInstance.Debug(Format('In WriteToCATPort..WriteFile, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
+  end;
 {
   if not Windows.WriteFile(tCATPortHandle, Buffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, pOver) then
     if pOver <> nil then
@@ -1045,6 +1069,7 @@ begin
       end;
 }
   Result := nNumberOfBytesToWrite = lpNumberOfBytesWritten;
+  // TLogger.GetInstance.Debug('[Exit WriteToCATPort');
 end;
 
 procedure RadioObject.CheckAndInitializeSerialPorts_ForThisRadio;
@@ -1152,19 +1177,24 @@ begin
 end;
 
 procedure RadioObject.SendIcomCommand(Command: Byte);
+var s: String;
 begin
+
   tIcom6Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
   tIcom6Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
   tIcom6Bytes[2] := ReceiverAddress;
   tIcom6Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
   tIcom6Bytes[4] := Command;
   tIcom6Bytes[5] := Ord(ICOM_END_OF_MESSAGE_CODE);
+
+  //TLogger.GetInstance.Debug(Format('In SendIcomCommand, Sending command %s',[Chr(Command)]));
   WriteToCATPort(tIcom6Bytes, 6);
 end;
 
 procedure RadioObject.PutRadioIntoSplit;
 
 begin
+  //TLogger.GetInstance.Debug(Format('      In PutRadioIntoSplit: %s',[RadioName]));
   case RadioModel of
     TS850, K2, K3:
       begin
@@ -1212,11 +1242,13 @@ begin
       ActiveRadioPtr.WriteBufferToCATPort('*KVABB' + CarriageReturn);
 
   end;
+  // TLogger.GetInstance.Debug(Format('      Leaving PutRadioIntoSplit: %s',[RadioName]));
 end;
 
 procedure RadioObject.PutRadioOutOfSplit;
 
 begin
+  //TLogger.GetInstance.Debug(Format('      In PutRadioOutOfSplit: %s',[RadioName]));
   case RadioModel of
     TS850, K2, K3:
       begin
@@ -1228,7 +1260,7 @@ begin
 
     IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
       begin
-
+       // TLogger.GetInstance.Debug('Sending commands to take Icom out of Split');
         CommandsTempBuffer[0] := CHR(8);
         CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
         CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
@@ -1257,6 +1289,7 @@ begin
       ActiveRadioPtr.WriteBufferToCATPort('*KVABA' + CarriageReturn);
 
   end;
+  //TLogger.GetInstance.Debug(Format('      Leaving PutRadioOutOfSplit: %s',[RadioName]));
 end;
 {
 function RadioObject.TimeToGiveUp: boolean;
@@ -1315,16 +1348,21 @@ end;
 
 procedure RadioObject.AddCommandToBuffer;
 begin
+  // TLogger.GetInstance.Debug('Entering AddCommandToBuffer');
   if not PollingEnable then
   begin
     WriteToCATPort(PChar(@CommandsTempBuffer[1])^, Ord(CommandsTempBuffer[0]) - 1);
+   // TLogger.GetInstance.Debug('Entering sleep(250)');
     Sleep(250);
+   // TLogger.GetInstance.Debug('Returning from sleep(250)');
+   // TLogger.GetInstance.Debug('Leaving AddCommandToBuffer via Exit');
     Exit;
   end;
 
   if CommandsBufferPointer = 8 then CommandsBufferPointer := 0;
   Windows.CopyMemory(@CommandsBuffer[CommandsBufferPointer], @CommandsTempBuffer, Ord(CommandsTempBuffer[0]));
   inc(CommandsBufferPointer);
+  //TLogger.GetInstance.Debug('Leaving AddCommandToBuffer');
 end;
 
 procedure RadioObject.CheckRadioStatus;
@@ -1444,7 +1482,17 @@ begin
     hand := CPUKeyer.SerialPortConfigured_Handle[tCATPortType];
     if hand = INVALID_HANDLE_VALUE then
       hand := InitializeSerialPort(tCATPortType, RadioBaudRate, RadioNumberBits, RadioParity, RadioStopBits, dwFlagsAndAttributes, EvtChar);
+    GetMem(TimeoutBuffer, sizeof(COMMTIMEOUTS));
 
+    GetCommTimeouts (hand, TimeoutBuffer^);
+    TimeoutBuffer.ReadIntervalTimeout        := 3;
+    TimeoutBuffer.ReadTotalTimeoutMultiplier := 3;
+    TimeoutBuffer.ReadTotalTimeoutConstant   := 2;
+    TimeoutBuffer.WriteTotalTimeoutMultiplier := 3;
+    TimeoutBuffer.WriteTotalTimeoutConstant := 2;
+    SetCommTimeouts (hand, TimeoutBuffer^);
+
+  FreeMem(TimeoutBuffer, sizeof(COMMTIMEOUTS));
 {$IF MASKEVENT}
 
     if RadioModel in [TS850, K2, K3, Orion] then
@@ -1515,11 +1563,14 @@ var
   lpNumberOfBytesWritten                : Cardinal;
   VFOByte                               : Byte;
   p                                     : pchar;
+  tempFilterWidth                       : integer;
 const
   FT847ModeString                       = CHR(0) + CHR(0) + CHR(0) + CHR(7);
 
 begin
-  case RadioParametersArray[RadioModel].rt of
+ // TLogger.GetInstance.Debug(SysUtils.Format('[Enter SetRadioFreq] %s - set frequency to %u',[RadioName,freq]));
+  try
+    case RadioParametersArray[RadioModel].rt of
     rtYaesu1:
       begin
 
@@ -1634,6 +1685,7 @@ begin
 
     rtKenwood:
       begin
+       // TLogger.GetInstance.Debug('In Kenwood code');
         Format(@tKenwood14Bytes, 'FA%011u;', Freq);
         tKenwood14Bytes[1] := VFO;
         AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 14);
@@ -1658,6 +1710,7 @@ begin
         AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 4);
 
         if (VFO = 'B') then AddToOutputBuffer {WriteToCATPort}('FR0;FT0;', 8); //back to vfo a
+       // TLogger.GetInstance.Debug('Leaving Kenwood code');
       end;
   end;
 
@@ -1665,6 +1718,7 @@ begin
 
     IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
       begin
+       // TLogger.GetInstance.Debug('In Icom radio code');
         if VFO = 'B' then
         begin
           CommandsTempBuffer[0] := CHR(8);
@@ -1689,41 +1743,72 @@ begin
         end;
 
        { Send the mode information }
-
-        if Mode = FM then TempChar := #5 else
-          if Mode = CW then TempChar := #3 else
+     // TLogger.GetInstance.Debug('Sending Icom mode information');
+      if Mode = FM then TempChar := #5 else
+         if Mode = CW then TempChar := #3 else
             if Mode = Digital then TempChar := #4 else
             //must be phone
-              if Freq < 10000000 then TempChar := #0 else
-                TempChar := #1;
+               if Freq < 10000000 then TempChar := #0 else
+                  TempChar := #1;
+     // TLogger.GetInstance.Debug(Format('Sending Icom mode information - %u',[Ord(Mode)]));
+      CommandsTempBuffer[0] := CHR(9);
+      CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+      CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+      CommandsTempBuffer[3] := CHR(ReceiverAddress);
+      CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+      CommandsTempBuffer[5] := ICOM_SET_MODE;
+      CommandsTempBuffer[6] := TempChar;
 
-        CommandsTempBuffer[0] := CHR(9);
-        CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
-        CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
-        CommandsTempBuffer[3] := CHR(ReceiverAddress);
-        CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
-        CommandsTempBuffer[5] := ICOM_SET_MODE;
-        CommandsTempBuffer[6] := TempChar;
+      // ny4i: I'm trying to understand this logic
+      // The way Dave indicated this is supposed to work is that
+      // if the CFG option of ICOM_FILTER_BYTE is set to 0, then we want to send
+      // whatever the filter setting the rig had.
+      // If the value is 1, 2 or 3, then we want to send that when we change
+      // mode.
+      // tIcomFilterWidth is the value from the CFG file
    //     if Mode = Phone then  CommandsTempBuffer[7] := CHR(tIcomFilterWidth);
-         if (RadioModel = OMNI6) and (Mode = CW) then      // n4af 4.43.3
-       CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE   // n4af 4.43.3
-        else
+      if (RadioModel = OMNI6) and (Mode = CW) then      // n4af 4.43.3
          begin
-        IcomCheckBuffer(ActiveRadioPtr);  // n4af 4.34.4 get icom pb filter setting
-        if Icom_Filter_Width > 0 then
-        tIcomFilterWidth := Icom_Filter_Width;  // n4af 4.43.4
-        CommandsTempBuffer[7] := CHR(tIcomFilterWidth);  // n4af 4.43.4  set icom filter
-        CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
+         CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;   // n4af 4.43.3
+         end
+      else
+         begin //
+         case tIcomFilterWidth of             // Not set in CFG so send current value
+         0:
+            begin
+            //IcomCheckBuffer(ActiveRadioPtr);  // n4af 4.34.4 get icom pb filter setting
+            if Icom_Filter_Width > 0 then       // this is the module global stored fromthe rig message in uRadioPolling
+               begin
+               tempFilterWidth  := Icom_Filter_Width;  // n4af 4.43.4    tIcomFilterWidth
+               end
+            else
+               begin
+               tempFilterWidth := 1; // Default to 1 if no CFG set and we do not have a value from the radio. We cannot send 0 to some radios as they reject the command. Others handle the zero though.
+               end;
+            end;
+         1..3:
+            begin
+            tempFilterWidth := tIcomFilterWidth;
+            end
+         else
+            begin
+            tempFilterWIdth := 0;
+            end;
+         end; // case
+         CommandsTempBuffer[7] := CHR(tempFilterWidth);  // ny4i // n4af 4.43.4  set icom filter
+         CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
          end;
 
-         if (Mode <> CW) or (tIcomFilterWidth = 0) then
-        begin
+         {if (Mode <> CW) or (tIcomFilterWidth = 0) then  // This rejects all of the above - comment for now and test
+          begin
           CommandsTempBuffer[0] := CHR(8);
           CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
-        end;
 
-        AddCommandToBuffer;
-{
+         end;
+         }
+
+      AddCommandToBuffer;
+      {
         ICOM_COMMAND_SET_MODE :=
           ICOM_PREAMBLE_CODE +
           ICOM_PREAMBLE_CODE +
@@ -1785,9 +1870,9 @@ begin
         CommandsTempBuffer[5] := ICOM_SET_FREQ;
         CommandsTempBuffer[11] := ICOM_END_OF_MESSAGE_CODE;
 
-        Format(wsprintfBuffer, '%08u', Freq);
+        Format(wsprintfBuffer, '%10.10u', Freq);
         i := 5;
-        for CharPointer := 7 downto 0 do
+        for CharPointer := 9 downto 0 do
           if not Odd(CharPointer) then
           begin
             inc(i);
@@ -1922,6 +2007,10 @@ begin
 }
       end;
   end;
+  except //on E : Exception do
+    ; // TLogger.GetInstance.Debug(Format('In SetRadioFreq, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
+  end;
+   //TLogger.GetInstance.Debug(SysUtils.Format('[Exit SetRadioFreq] %s',[RadioName]));
 end;
 
 procedure RadioObject.UpdateBandOutputInfo(Band: BandType; Mode: ModeType);
