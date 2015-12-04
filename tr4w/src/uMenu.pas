@@ -92,7 +92,7 @@ const
   RC_QTCFUNCTIONS_HK                    = #9'Ctrl+Q';
   RC_RECALLLASTENT_HK                   = #9'Ctrl+R';
   RC_VIEWPAKSPOTS_HK                    = #9'Ctrl+U';
-  RC_EXECONFIGFILE_HK                   = #9'Ctrl+V';
+  RC_EXECONFIGFILE_HK                   = #9'Ctrl+V' ; 
   RC_REFRESHBM_HK                       = #9'Ctrl+Y';
   RC_DUALINGCQ_HK                       = #9'Ctrl+-';
   RC_CURSORINBM_HK                      = #9'Ctrl+End';
@@ -295,6 +295,7 @@ const
     (mrText: RC_RECALLLASTENT + RC_RECALLLASTENT_HK; mrId: menu_ctrl_recalllastentry),
     (mrText: RC_SHDX_CALLSIGN + RC_SHDX_CALLSIGN_HK; mrId: menu_ctrl_shdxcallsign),
 //    (mrText: RC_VIEWPAKSPOTS + RC_VIEWPAKSPOTS_HK; mrId: menu_ctrl_viewpacketspots),
+
     (mrText: RC_EXECONFIGFILE + RC_EXECONFIGFILE_HK; mrId: menu_ctrl_execute_config),
     (mrText: RC_REFRESHBM + RC_REFRESHBM_HK; mrId: menu_ctrl_refreshbandmap),
     (mrText: RC_CURSORINBM + RC_CURSORINBM_HK; mrId: menu_ctrl_cursorinbandmap),

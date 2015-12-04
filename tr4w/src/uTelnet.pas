@@ -24,6 +24,7 @@ unit uTelnet;
 interface
 
 uses
+  ClipBrd,
   uCTYDAT,
   uGradient,
   PostUnit,
