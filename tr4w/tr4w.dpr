@@ -2,7 +2,6 @@ program tr4w;
 {$IMPORTEDDATA OFF}
 //https://groups.google.com/group/tr4w/feeds?hl=ru
 uses
-
   Messages,
   MMSystem,
   Windows,
@@ -26,13 +25,11 @@ uses
   LogStuff in 'src\trdos\LOGSTUFF.PAS',
   LOGWAE in 'src\trdos\LOGWAE.PAS',
   LogWind in 'src\trdos\LOGWIND.PAS',
-  //MySU in 'src\MySU.pas',
   Tree in 'src\trdos\tree.pas',
   ZoneCont in 'src\trdos\ZONECONT.PAS',
   LOGSUBS2 in 'src\trdos\LOGSUBS2.PAS',
   LOGSUBS1 in 'src\trdos\LOGSUBS1.PAS',
   LOGSend in 'src\trdos\LogSend.pas',
-  //SysUtils in '..\utils\SysUtils.pas',
   uCT1BOH in 'src\uCT1BOH.pas',
   PostUnit in 'src\trdos\PostUnit.PAS',
   uInputQuery in 'src\uInputQuery.pas',
@@ -423,6 +420,7 @@ var
 {$IF not tDebugMode}
   s                                     : string;
 {$IFEND}
+  logBuffer                             : string;
 begin
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
@@ -561,6 +559,9 @@ begin
   //tr4w_main_menu := LoadMenu(hInstance, 'T');
   tr4w_main_menu := CreateTR4WMenu(@T_MENU_ARRAY, T_MENU_ARRAY_SIZE, False);
 
+{$IFDEF AUTOSPOT}
+   ShowMessage('AUTOSPOT is enabled - Test Mode Only');
+{$ENDIF}
   tr4w_accelerators := LoadAccelerators(hInstance, 'T');
   RegisterClass(tr4w_WinClass);
 
@@ -573,7 +574,6 @@ begin
   CreateQSONeedWindows;
 
   SetUpGlobalsAndInitialize;
-
   if SayHiEnable then DisplayNamePercentage;
   SetStereoPin(StereoControlPin, StereoPinState);
   DisplayRadio(ActiveRadio);
