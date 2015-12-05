@@ -181,7 +181,7 @@ const
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'Dec 1, 2015' ;
+  TR4W_CURRENTVERSIONDATE               = 'Dec 4, 2015' ;
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';

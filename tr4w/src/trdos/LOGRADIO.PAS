@@ -1772,7 +1772,7 @@ begin
          CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;   // n4af 4.43.3
          end
       else
-         begin //
+         begin // ny4i 4.43.6
          case tIcomFilterWidth of             // Not set in CFG so send current value
          0:
             begin

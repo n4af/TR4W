@@ -462,6 +462,7 @@ label
 var
   SetTransmittersId                     : boolean;
 begin
+
   SetTransmittersId := False;
   Format(tReportsFilename, '%s%s.LOG', TR4W_LOG_PATH_NAME, @MyCall[1]);
   DeleteSlashes(tReportsFilename);
@@ -2986,6 +2987,9 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
             push nrSent
             push RSTSent
             end;
+            if Contest = DARC10M then
+            wsprintf(CABRILLO_MYEX, '%-4s %-5d %-6s ')
+            else
             wsprintf(CABRILLO_MYEX, '%-3s %-4d %-6s ');
             asm add esp,20
             end;
@@ -3008,6 +3012,9 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
             push nrReceived
             push RSTReceived
             end;
+            if Contest = DARC10M then     // n4af 4.43.7
+            wsprintf(CABRILLO_HISEX, '%-3s %-3d %3s')
+            else
             wsprintf(CABRILLO_HISEX, '%-3s %4d %8s');
             asm add esp,20
             end;
