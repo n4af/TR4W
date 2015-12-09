@@ -126,6 +126,7 @@ uses
   LOGWAE,
   LogWind,
   Tree,
+  SysUtils,
   ZoneCont
   ;
 
@@ -502,11 +503,11 @@ begin
 
 
   if (ActiveMode = CW)        and
-      ActiveRadioPtr^.CWByCAT and ActiveRadioPtr^.SendingCW then
+      ActiveRadioPtr^.CWByCAT then
      begin
      ActiveRadioPtr^.StopSendingCW;
      PTTOff;
-     Exit;
+    // Exit;
      end;
 
   if ((ActiveMode = CW) and ((CWThreadID <> 0) or (wkBUSY = True))) or
@@ -1348,7 +1349,8 @@ end;
 
 procedure ShowSyserror(ErrorCode: Cardinal);
 begin
-  MessageBox(0, SysErrorMessage(ErrorCode), tr4w_ClassName, MB_OK or MB_ICONERROR or MB_TASKMODAL);
+{TODO remove comment}
+//  MessageBox(0, SysErrorMessage(ErrorCode), tr4w_ClassName, MB_OK or MB_ICONERROR or MB_TASKMODAL);
 end;
 
 function YesOrNo(h: HWND; Text: PChar): integer;
@@ -3163,6 +3165,7 @@ var
   itempos                               : integer;
   p                                     : HWND;
   c                                     : HWND;
+  localMsg                              : string;
 begin
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
@@ -3225,10 +3228,18 @@ begin
     begin
       if Key <> StartSendingNowKey then
       begin
-        if wkActive then
+        if ActiveRadioPtr.CWByCAT then
+           begin // Send the character now - No buffering
+           ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
+           end
+        else if wkActive then
           wkSendByte(Ord(UpCase(Key)))
         else
-          CPUKeyer.AddCharacterToCWBuffer(Key);
+          begin
+          localMsg := Format('After AutoChar - key = %s;', [key]);
+          AddStringToTelnetConsole(PChar(localMsg),tstAlert);
+          CPUKeyer.AddCharacterToCWBuffer(Key);  //
+          end;
       end;
       EditingCallsignSent := False;
     end;
@@ -3274,7 +3285,7 @@ procedure CallWindowKeyUpProc;
 begin
   if AutoSendEnable then
     if AutoSendCharacterCount = length(CallWindowString) then
-      StartSendingNow(False);
+       StartSendingNow(False);
 end;
 
 procedure OpenTR4WWindow(ID: WindowsType);
@@ -5511,7 +5522,8 @@ begin
   RunningConfigFile := True;
   ClearDupeSheetCommandGiven := False;
   FirstCommand := False;
-  if FileExists(@f[1]) then
+{TODO emove these comments}
+//  if FileExists(@f[1]) then
   LoadInSeparateConfigFile(f, FirstCommand, MyCall);
   if ClearDupeSheetCommandGiven then tClearDupesheet;
   RunningConfigFile := False;
@@ -6841,7 +6853,8 @@ begin
     FreeLibrary(module);
     goto Next;
   end;
-  FindClose(hFindFile);
+{TODO remove comment}
+ // FindClose(hFindFile);
   if LoadedPlugins > 0 then
     Windows.InsertMenu(tr4w_main_menu, menu_exit, MF_BYCOMMAND or MF_SEPARATOR, 0, nil);
 

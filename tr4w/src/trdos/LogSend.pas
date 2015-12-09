@@ -129,7 +129,7 @@ begin
 
   if CWEnabled = False then Exit;
   if length(SendString) = 0 then Exit;
-  //SetSpeed(DisplayedCodeSpeed); //ny4i This seems superflous. The speed should be set already
+  SetSpeed(DisplayedCodeSpeed); //ny4i This seems superflous. The speed should be set already
 
 
   //SetPTT;
@@ -455,11 +455,13 @@ begin
   //   message_to_send := '';
 
 //  ClearPTTForceOn;
-//<<<<<<< e0586f35299cbf6b45212a11ba3717c796c273ab
+
 InactiveRigCallingCQ := False;
-//=======
+
   AddStringToBuffer(Chr(0),CWTone); // Flushes the buffer when the $0 is passed to SendCW - by only By CAT
-//>>>>>>> This is an interim commit.
+
+//  AddStringToBuffer(Chr(0),CWTone); // Flushes the buffer when the $0 is passed to SendCW - by only By CAT
+
 end;
 
 procedure SendCrypticDigitalString(SendString: Str160);

@@ -36,7 +36,8 @@ utils_text,
   Windows,
   LogWind, {Dos,}
   LogRadio,
-  LogK1EA
+  LogK1EA,
+  SysUtils
   ;
 
 type
@@ -201,7 +202,10 @@ end;
 procedure AddStringToBuffer(Msg: Str160; Tone: integer);
 var
   i                                     : integer;
+  localMsg                              : string;
 begin
+   localMsg := Format('Adding %s to CW Buffer', [Msg]);
+   AddStringToTelnetConsole(PChar(localMsg),tstAlert);
    if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT))) then
       begin
       ActiveRadioPtr.SendCW(Msg);
