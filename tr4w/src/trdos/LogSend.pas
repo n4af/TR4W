@@ -119,11 +119,18 @@ var
   TempString                            : Str80;
   i                                     : integer;
   TempReceivedData                      : ContestExchange;
+  pendingCWBuffer                       : Str50;
 begin
+// For CQ TEST NY4I , this sends the C, then the Q, then T, then E, then S, then T, then NY4I
+
+// Why doesn't it send the whole thing.  I know..it is because it processed each character. The call is a single character  (\)
+// So, it's more efficient to use \ than NY4I
+// I wonder if this could be improved to buffer the characters?
 
   if CWEnabled = False then Exit;
   if length(SendString) = 0 then Exit;
-  SetSpeed(DisplayedCodeSpeed);
+  //SetSpeed(DisplayedCodeSpeed); //ny4i This seems superflous. The speed should be set already
+
 
   //SetPTT;
 
@@ -448,7 +455,11 @@ begin
   //   message_to_send := '';
 
 //  ClearPTTForceOn;
+//<<<<<<< e0586f35299cbf6b45212a11ba3717c796c273ab
 InactiveRigCallingCQ := False;
+//=======
+  AddStringToBuffer(Chr(0),CWTone); // Flushes the buffer when the $0 is passed to SendCW - by only By CAT
+//>>>>>>> This is an interim commit.
 end;
 
 procedure SendCrypticDigitalString(SendString: Str160);

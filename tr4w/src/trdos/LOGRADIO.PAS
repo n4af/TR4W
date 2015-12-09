@@ -33,6 +33,7 @@ uses
   TF,
   VC,
   Tree,
+  SysUtils,
   Windows;
 var
 Icom_Filter_Width                       : integer;     // n4af 4.43.4
@@ -51,6 +52,11 @@ const
   ICOM_SET_VFO_COMMAND                  = #$07;
 
   ICOM_SET_SPLIT_MODE                   = #$0F;
+
+  ICOM_SET_SLIDERS                      = #$14;  // Things like CW speed, and rotating knobs
+     ICOM_SET_CW_SPEED                  = #$0C;
+
+  ICOM_SEND_CW                          = #$17;
 
   ICOM_SET_VFO_A_COMMAND                = #$00;
   ICOM_SET_VFO_B_COMMAND                = #$01;
@@ -140,9 +146,9 @@ type
 //    lpOverlapped: TOverlapped;
 //    pOver: POverlapped;
 
-    CommandsBuffer: array[0..7] of array[0..19] of Char;
+    CommandsBuffer: array[0..7] of array[0..{19}40] of Char;
     CommandsBufferPointer: Cardinal;
-    CommandsTempBuffer: array[0..19] of Char;
+    CommandsTempBuffer: array[0..{19}40] of Char; // ny4i extended for icom cw
 
 //    ICOM_COMMAND_B1: Str80;
 //    ICOM_COMMAND_SET_MODE: string[8];
@@ -177,9 +183,12 @@ type
     CommandPauseTimeStamp: TimeRecord;
     FrequencyAdder: LONGINT;
     FT1000MPCWReverse: boolean;
+    CWByCAT: boolean;
+    CWSpeedSync: boolean;
     WideCWFilter: boolean;
     IcomFilterByte: Byte;
     IDCharacter: Char;
+    CWByCATBuffer: string;
 //    PartialRadioResponse: string;
     PollingEnable: boolean;
     PollDelay: integer;
@@ -236,9 +245,12 @@ type
     procedure PutRadioOutOfSplit;
     procedure SendIcomCommand(Command: Byte);
 //    function SendFiveBytes: boolean;
+    procedure SetRadioCWSpeed(speed: LONGINT);
     procedure SetRadioFreq(Freq: LONGINT; Mode: ModeType; VFO: Char);
 //    procedure _SetRadioFreq(Freq: LONGINT; Mode: ModeType; VFO: Char);
+    procedure SendCW(Msg: Str160);
     procedure SetUpRadioInterface;
+    procedure StopSendingCW;
 //    procedure StartNextPoll;
     //    function TimeToGiveUp: boolean;
     procedure UpdateBandOutputInfo(Band: BandType; Mode: ModeType);
@@ -585,6 +597,8 @@ const
     'ORION');
 }
 
+
+function IntegerToBCD(Value: DWORD): Integer; // ny4i
 procedure InitRadios;
 function OpenCATDebugFile(port: PortType): boolean;
 //procedure CloseCATDebugFile(port: PortType);
@@ -620,6 +634,7 @@ procedure RITBumpUp;
 
 procedure VFOBumpDown;
 procedure VFOBumpUp;
+
 const
 
 //FT767PollString = NullKey + NullKey + NullKey + CHR($01) + NullKey;
@@ -646,13 +661,41 @@ uses
   LogK1EA,
   LogWind,
   uRadioPolling,
+   uTelnet,
   MainUnit;
+
+function IntegerToBCD(Value: DWORD): Integer;
+const Dividers:array[1..8] of Integer=(1, 10, 100, 1000, 10000, 100000, 1000000, 10000000);
+var j:Integer;
+begin
+ Result:=0;
+ for j:=8 downto 1 do //8 digits
+ Result:=(Result shl 4) or ((Value div Dividers[j]) mod 10);
+end;//IntegerToBCD
+
 
 function BufToStr(var buf; bufSize: integer) : string;
 begin
   SetLength(result, bufSize);
   Move(buf, pointer(result)^, bufSize);
 end;
+//------------------------------------------------------------------------------
+procedure LinkToActiveRadio( IntRadioType : InterfacedRadioType;
+                             SerialPort : PortType
+                            );
+begin
+  if ActiveRadio = RadioOne then
+    begin
+    IntRadioType := Radio1.RadioModel;
+    SerialPort := Radio1.tCATPortType;
+    end
+  else
+    begin
+    IntRadioType := Radio2.RadioModel;
+    SerialPort := Radio2.tCATPortType;
+    end;
+end;
+
 
 
 procedure RITClear;
@@ -1449,7 +1492,138 @@ begin
   //UpdateRadioStatus;
 
 end;
+//------------------------------------------------------------------------------
+procedure FlushCWByCATBuffer;
+begin
+end;
+//------------------------------------------------------------------------------
+procedure RadioObject.SendCW(Msg: Str160);
+var
+   localMsg : string;
+   i : integer;
+   msgLen : integer;
+begin
+  localMsg := Msg;
+  case RadioParametersArray[RadioModel].rt of
+    rtKenwood:
+      begin
+      localMsg := Format('KY %s;', [Msg]);
+     // AddStringToTelnetConsole(PChar('Sending to K3='+localMsg),tstAlert);
 
+     // AddToOutputBuffer (tKenwood14Bytes, 6);
+        AddToOutputBuffer(addr(localMsg[1]), 4 + length(Msg));
+      end;
+    rtYaesu1:
+       if RadioModel in [FT100, FT920, FT1000, FT1000MP] then
+          begin
+          ;
+          end;
+
+   rtIcom:
+      if RadioModel in [IC9100, IC7800, IC7600, IC7700] then
+         begin
+         if ord(Msg[1]) = 0 then // Flush if Msg = #00
+            begin
+            Msg := CWByCATBuffer;
+            msgLen := length(CWByCATBuffer);    //length(Msg);
+            localMsg := Format('%s', [Msg]);
+            AddStringToTelnetConsole(PChar('Sending to Icom='+localMsg),tstAlert);
+            CommandsTempBuffer[0] := Chr(8 + msgLen);
+            CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+            CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+            CommandsTempBuffer[3] := CHR(ReceiverAddress);
+            CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+            CommandsTempBuffer[5] := ICOM_SEND_CW;
+            CommandsTempBuffer[6] := Chr(0); // No sub command
+            // Up to 30 characters, add the text to send as ASCII
+            // I may need to batch up all the cw for the whole message and then send
+            // it. The Icom interface seems to be losing messages. Do something like
+            // radioObject.SendingCATCW to true and collect the characters in a buffer.
+            // then possible flushCWBuffer like the thread.
+
+            //Maybe turn interrogate off when sending?
+            for i := 1 to msgLen do
+               begin
+               CommandsTempBuffer[6+i] := Chr(Ord(Msg[i]));
+               end;
+
+            CommandsTempBuffer[7 + msgLen] := ICOM_END_OF_MESSAGE_CODE;
+            AddCommandToBuffer;
+            CWByCATBuffer := '';
+            end
+         else
+            begin // Add to CWBYCATBuffer
+            CWByCATBuffer := CWByCATBuffer + Msg;
+            end;
+         end;
+    rtOrion:
+      begin
+        //i := Format(tOrionFreq, '*CS%02u'#13, speed);
+        //WriteToCATPort(tOrionFreq, i);
+      end;
+    else
+      begin
+      end;
+    end;
+end;
+//------------------------------------------------------------------------------
+procedure RadioObject.StopSendingCW;
+var localMsg : string;
+begin
+  case RadioParametersArray[RadioModel].rt of
+    rtKenwood:
+      begin
+     // localMsg := Format('KY %s;', [Msg]);
+      AddToOutputBuffer ('KY ' + Chr(4) + ';' + 'RX;', 8);
+      //  AddToOutputBuffer(addr(localMsg[1]), 4 + length(Msg));
+    //  PTTOff;
+      end;
+    rtYaesu1:
+       if RadioModel in [FT100, FT920, FT1000, FT1000MP] then
+          begin
+          ;
+          end;
+
+    rtIcom:
+      if RadioModel in [IC9100, IC7800, IC7600, IC7700] then
+        begin
+        // Calculate Icom speed of WPM to 000-255.
+        //001 = 6wpm, 254 = 48 wpm. Each extra wpm is 6 decimal higher
+        //Speed (in icom decimal) = ((speed(wpm) - 6) * 6) + 1
+        {
+        i := ((speed - 6) * 6) + 1;
+        // I think speed is in BCD
+        CommandsTempBuffer[0] := CHR(10);
+        CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+        CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+        CommandsTempBuffer[3] := CHR(ReceiverAddress);
+        CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+        CommandsTempBuffer[5] := ICOM_SET_SLIDERS;
+        CommandsTempBuffer[6] := ICOM_SET_CW_SPEED ;
+
+        TempByte := i div 100;
+        CommandsTempBuffer[7] := Chr(TempByte);
+        TempByte := (i mod 100) + 48;
+
+        CommandsTempBuffer[8] := Chr(TempByte);  //Chr makes this hex. I need the actual decimal number here. 69 is the remainder and I need 69 to be sent, not th ehex 45 (which is what Chr does)
+
+        CommandsTempBuffer[9] := ICOM_END_OF_MESSAGE_CODE;
+        AddCommandToBuffer;
+        //  Chr((Ord(ch1) and $F) or ((Ord(ch2) and $F) shl 4))
+
+        } // Figuring out the right value to send and then convert to BCD is challenging. K3 and Orion only for now :) ny4i
+        end;
+    rtOrion:
+      begin
+        //i := Format(tOrionFreq, '*CS%02u'#13, speed);
+        //WriteToCATPort(tOrionFreq, i);
+      end;
+    else
+      begin
+      end;
+    end;
+end;
+//------------------------------------------------------------------------------
 procedure RadioObject.SetUpRadioInterface;
 var
   hand                                  : HWND;
@@ -1552,6 +1726,63 @@ begin
 //  PollingEnable := True;
 end;
 
+//------------------------------------------------------------------------------
+procedure RadioObject.SetRadioCWSpeed(speed: LONGINT);
+var
+  i : integer;
+begin
+ case RadioParametersArray[RadioModel].rt of
+    rtKenwood:
+      begin
+     // Format(@tKenwood14Bytes, 'KS%003u;', speed);
+     // AddToOutputBuffer (tKenwood14Bytes, 6);
+        Format(@tKenwood14Bytes, 'KS%003u;', speed);
+        AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 6);
+      end;
+    rtYaesu1:
+       if RadioModel in [FT100, FT920, FT1000, FT1000MP] then
+          begin
+          ;
+          end;
+
+    rtIcom:
+      if RadioModel in [IC9100, IC7800, IC7600, IC7700] then
+        begin
+        // Calculate Icom speed of WPM to 000-255.
+        //001 = 6wpm, 254 = 48 wpm. Each extra wpm is 6 decimal higher
+        //Speed (in icom decimal) = ((speed(wpm) * (42/255)) + 6)
+
+        //speed := ((icom_dec_value * (42/255) + 6)
+        // icom_dec_value = (speed - 6) * 255/42);
+
+        CommandsTempBuffer[0] := CHR(10);
+        CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+        CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+        CommandsTempBuffer[3] := CHR(ReceiverAddress);
+        CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+        CommandsTempBuffer[5] := ICOM_SET_SLIDERS;
+        CommandsTempBuffer[6] := ICOM_SET_CW_SPEED ;
+        i := Round((speed - 6) * (255/42));
+        CommandsTempBuffer[7] := Chr(i div 100);  // Puts 00,01 or 02 into first byte
+        i := i mod 100; // remove the hundreds part and BCD the remainder
+        //AddStringToTelnetConsole(PChar('dec='+IntToStr(i) + ', bcd = ' + IntToStr(IntegerToBCD(i))),tstAlert);
+        //AddStringToTelnetConsole(PChar('bcd='+IntToStr(n)),tstAlert);
+        CommandsTempBuffer[8] := CHR(IntegerToBCD(i));  // 20 wpm returns 85 which in BCD makes 131 which makes hex 85 when used with Chr()
+        CommandsTempBuffer[9] := ICOM_END_OF_MESSAGE_CODE;
+
+        AddCommandToBuffer;
+        end;
+    rtOrion:
+      begin
+        i := Format(tOrionFreq, '*CS%02u'#13, speed);
+        WriteToCATPort(tOrionFreq, i);
+      end;
+    else
+      begin
+      end;
+    end;
+end;
+//------------------------------------------------------------------------------
 procedure RadioObject.SetRadioFreq(Freq: LONGINT; Mode: ModeType; VFO: Char);
 
 var

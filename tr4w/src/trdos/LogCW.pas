@@ -202,6 +202,11 @@ procedure AddStringToBuffer(Msg: Str160; Tone: integer);
 var
   i                                     : integer;
 begin
+   if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT))) then
+      begin
+      ActiveRadioPtr.SendCW(Msg);
+      Exit;
+      end;
 {$IF MMTTYMODE}
   if ActiveMode = Digital then
   begin
@@ -230,6 +235,12 @@ begin
 {$IF OZCR2008}
     CWMessageToNetwork := CWMessageToNetwork + Msg;
 {$IFEND}
+  // if ActiveRadioPtr.CWByCAT then
+   //    begin
+   //    ActiveRadioPtr.SendCW(Msg); // Now just adds to a buffer
+   //    Exit;
+   //    end;
+
     if wkActive then
     begin
 
@@ -238,8 +249,16 @@ begin
       Exit;
     end;
 
-    if ActiveRadioPtr.tPTTStatus = PTT_OFF then PTTOn;
-
+   // if ActiveRadioPtr.tPTTStatus = PTT_OFF then PTTOn;
+   // if ActiveRadioPtr.CWByCAT then
+    //   begin
+    //   ActiveRadioPtr.SendCW(Msg); // Now just adds to a buffer
+    //   Exit;
+    //   end   // Not crazy about the Exit. Maybe fix this...
+  //  else
+    //   begin
+       if ActiveRadioPtr.tPTTStatus = PTT_OFF then PTTOn;
+      // end;
     CPUKeyer.AddStringToCWBuffer(Msg, Tone);
 //    CountsSinceLastCW := 0;
 
@@ -385,11 +404,16 @@ procedure SetSpeed(Speed: integer {byte});
 
 begin
   DisplayedCodeSpeed := Speed;
-
+  //
+  
   if Speed > 0 then
   begin
     CodeSpeed := Speed;
     CPUKeyer.SetSpeed(Speed);
+    if ActiveRadioPtr.CWSpeedSync then
+       begin
+       ActiveRadioPtr.SetRadioCWSpeed(Speed);
+       end;
     tSetPaddleElementLength;
     wkSetSpeed(Speed);
   end;

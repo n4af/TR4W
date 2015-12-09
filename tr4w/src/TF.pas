@@ -178,7 +178,7 @@ function ExtractBigIcon(IconIndex: integer): HICON;
 function MillisecondsToFormattedString(msecs: Cardinal; WithMsec: boolean): PChar;
 
 //function Pos(Substr: string; S: string): Integer;
-
+function ArrayToString(const a: array of Char): string;
 procedure InvertBoolean(var b: boolean);
 function inttopchar(i: integer): PChar;
 function inttopcharHEX(i: integer): PChar;
@@ -360,6 +360,14 @@ begin
   asm add esp,12
   end;
   Result := FreqToPCharBuffer;
+end;
+
+function ArrayToString(const a: array of Char): string;
+begin
+  if Length(a)>0 then
+    SetString(Result, PChar(@a[0]), Length(a))
+  else
+    Result := '';
 end;
 
 {

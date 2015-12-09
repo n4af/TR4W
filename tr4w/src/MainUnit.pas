@@ -500,6 +500,15 @@ begin
     end;
 {$IFEND}
 
+
+  if (ActiveMode = CW)        and
+      ActiveRadioPtr^.CWByCAT and ActiveRadioPtr^.SendingCW then
+     begin
+     ActiveRadioPtr^.StopSendingCW;
+     PTTOff;
+     Exit;
+     end;
+
   if ((ActiveMode = CW) and ((CWThreadID <> 0) or (wkBUSY = True))) or
     ((ActiveMode in [Phone, FM]) and (DVPOn = True)) then
   begin

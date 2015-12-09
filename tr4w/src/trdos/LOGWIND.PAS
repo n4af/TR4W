@@ -623,6 +623,7 @@ var
   CustomInitialExchangeString           : Str40; {KK1L: 6.67 was Str80;}
   CustomUserString                      : Str40; {KK1L: 6.68 shortened from Str80}
   CWEnabled                             : boolean  = True;
+  CWByCAT                               : boolean  = False;
 
   DigitalModeEnable                     : boolean;
 
