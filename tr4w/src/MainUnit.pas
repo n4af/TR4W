@@ -3163,7 +3163,7 @@ var
   itempos                               : integer;
   p                                     : HWND;
   c                                     : HWND;
-  localMsg                              : string;
+  //localMsg                              : string;
 begin
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
@@ -3234,8 +3234,10 @@ begin
           wkSendByte(Ord(UpCase(Key)))
         else
           begin
-         // localMsg := Format('After AutoChar - key = %s;', [key]);
-         // AddStringToTelnetConsole(PChar(localMsg),tstAlert);
+
+          //localMsg := Format('After AutoChar - key = %s;', [key]);
+          //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
+
           CPUKeyer.AddCharacterToCWBuffer(Key);  //
           end;
       end;
