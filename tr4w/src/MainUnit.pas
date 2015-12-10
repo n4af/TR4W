@@ -126,7 +126,6 @@ uses
   LOGWAE,
   LogWind,
   Tree,
-  SysUtils,
   ZoneCont
   ;
 
@@ -1349,8 +1348,7 @@ end;
 
 procedure ShowSyserror(ErrorCode: Cardinal);
 begin
-{TODO remove comment}
-//  MessageBox(0, SysErrorMessage(ErrorCode), tr4w_ClassName, MB_OK or MB_ICONERROR or MB_TASKMODAL);
+  MessageBox(0, SysErrorMessage(ErrorCode), tr4w_ClassName, MB_OK or MB_ICONERROR or MB_TASKMODAL);
 end;
 
 function YesOrNo(h: HWND; Text: PChar): integer;
@@ -3236,8 +3234,8 @@ begin
           wkSendByte(Ord(UpCase(Key)))
         else
           begin
-          localMsg := Format('After AutoChar - key = %s;', [key]);
-          AddStringToTelnetConsole(PChar(localMsg),tstAlert);
+         // localMsg := Format('After AutoChar - key = %s;', [key]);
+         // AddStringToTelnetConsole(PChar(localMsg),tstAlert);
           CPUKeyer.AddCharacterToCWBuffer(Key);  //
           end;
       end;
@@ -5522,8 +5520,7 @@ begin
   RunningConfigFile := True;
   ClearDupeSheetCommandGiven := False;
   FirstCommand := False;
-{TODO emove these comments}
-//  if FileExists(@f[1]) then
+  if FileExists(@f[1]) then
   LoadInSeparateConfigFile(f, FirstCommand, MyCall);
   if ClearDupeSheetCommandGiven then tClearDupesheet;
   RunningConfigFile := False;
@@ -6853,8 +6850,7 @@ begin
     FreeLibrary(module);
     goto Next;
   end;
-{TODO remove comment}
- // FindClose(hFindFile);
+  FindClose(hFindFile);
   if LoadedPlugins > 0 then
     Windows.InsertMenu(tr4w_main_menu, menu_exit, MF_BYCOMMAND or MF_SEPARATOR, 0, nil);
 

@@ -202,10 +202,10 @@ end;
 procedure AddStringToBuffer(Msg: Str160; Tone: integer);
 var
   i                                     : integer;
-  localMsg                              : string;
+  //localMsg                              : string;
 begin
-   localMsg := Format('Adding %s to CW Buffer', [Msg]);
-   AddStringToTelnetConsole(PChar(localMsg),tstAlert);
+   //localMsg := Format('Adding %s to CW Buffer', [Msg]);
+   //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
    if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT))) then
       begin
       ActiveRadioPtr.SendCW(Msg);
