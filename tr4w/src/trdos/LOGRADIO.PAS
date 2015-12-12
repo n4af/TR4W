@@ -1386,6 +1386,11 @@ begin
   //   if CurrentStatus.VFOB.TXRX = PreviousStatus.VFOB.TXRX then
   //      FilteredStatus.VFOB.TXRX := CurrentStatus.VFOB.TXRX;
 
+  if CurrentStatus.TXOn = PreviousStatus.TXOn then        // ny4i
+     begin
+     FilteredStatus.TXOn := CurrentStatus.TXOn;
+     end;
+
   PreviousStatus := CurrentStatus;
 end;
 

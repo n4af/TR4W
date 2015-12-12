@@ -309,6 +309,7 @@ begin
                         rig^.CurrentStatus.RIT := rig^.tBuf[i - 14] = '1';
                         rig^.CurrentStatus.XIT := rig^.tBuf[i - 13] = '1';
 
+                        rig^.CurrentStatus.TXOn := rig^.tBuf[i-9] = '1';
                       end;
                   end;
                 end;
@@ -2068,7 +2069,7 @@ begin
 
   if StatusChanged = True then
   begin
-    DisplayCurrentStatus(rig);
+    DisplayCurrentStatus(rig);  // Updte the Radio Window only
     rig.FilteredStatusChanged := True;
   end
   else
@@ -2096,6 +2097,14 @@ begin
           if AutoSAPEnable then
             if OpMode = CQOpMode then
               SetOpMode(SearchAndPounceOpMode);
+     if rig.FilteredStatus.TxOn then
+        begin
+        rig.tPTTStatus := PTT_ON;
+        end
+     else
+        begin
+        rig.tPTTStatus := PTT_OFF;
+        end;
      pTTStatusChanged;
     if rig.FilteredStatus.Freq = 0 then Exit;
 
@@ -2177,6 +2186,15 @@ begin
   if h = 0 then Exit;
   SetDlgItemText(h, 102, FreqToPChar(rig.CurrentStatus.VFO[VFOA].Frequency));
   SetDlgItemText(h, 104, FreqToPChar(rig.CurrentStatus.VFO[VFOB].Frequency));
+ // ActiveRadioPtr.tPTTStatus :=
+  if rig.CurrentStatus.TXOn then
+     begin
+     ActiveRadioPtr.tPTTStatus := PTT_ON;
+     end
+  else
+     begin
+     ActiveRadioPtr.tPTTStatus := PTT_OFF;
+     end;
 
   if rig.CurrentStatus.PrevRITFreq <> rig.CurrentStatus.RITFreq then
   begin
@@ -2550,12 +2568,20 @@ end;
 procedure PTTStatusChanged;
 begin
   if ActiveRadioPtr.tPTTStatus = PTT_ON then
-    tr4w_PTTStartTime := GetTickCount
-   else      //n4af 04.30.3
-
-    if tr4w_PTTStartTime <> 0 then
-      tRestartInfo.riPTTOnTotalTime := tRestartInfo.riPTTOnTotalTime + GetTickCount - tr4w_PTTStartTime;
-    
+     begin
+     tr4w_PTTStartTime := GetTickCount
+     end
+  else      //n4af 04.30.3
+     begin
+     if ActiveRadioPtr.CWByCAT then
+        begin
+        tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
+        end;
+     if tr4w_PTTStartTime <> 0 then
+        begin
+        tRestartInfo.riPTTOnTotalTime := tRestartInfo.riPTTOnTotalTime + GetTickCount - tr4w_PTTStartTime;
+        end;
+     end;
 
   tDispalyOnAirTime;
   SetMainWindowText(mwePTTStatus, PTTStatusString[ActiveRadioPtr.tPTTStatus]);

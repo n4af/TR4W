@@ -1334,7 +1334,7 @@ begin
 }
 
 {$IF tDebugMode}
-//  AddStringToTelnetConsole('AddCharacterToCWBuffer');
+  AddStringToTelnetConsole('AddCharacterToCWBuffer',tstReceived);
 {$IFEND}
 
   case UpCase(Character) of
@@ -2765,7 +2765,7 @@ begin
 
 //  ExitFromCWThread := False;
 
-  tStartAutoCQ;
+  tStartAutoCQ;  // It appears we go here everytime we finish a CW buffer no matter if we just CQ'ed or not ny4i
 {$IF OZCR2008}
   CWMessageToNetwork := '';
 {$IFEND}
@@ -2800,6 +2800,9 @@ end;
 
 procedure tStartAutoCQ;
 begin
+{$IF tDebugMode}
+  AddStringToTelnetConsole('In tStartAutoCQ', tstReceived);
+{$IFEND}
   if tAutoCQMode = True then
     tAutoCQTimerID := SetTimer(tr4whandle, AUTOCQ_TIMER_HANDLE, AutoCQDelayTime, @tAutoCQTimerProc);
 end;

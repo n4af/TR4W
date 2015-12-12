@@ -209,6 +209,18 @@ begin
    if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT))) then
       begin
       ActiveRadioPtr.SendCW(Msg);
+   //   tStartAutoCQ;   This was a test but it cannot work like this in CWBYCAT.
+   { In CWByCat, we need to know when the radio actually stops sending so we can start the timer then.
+    The radio has to support a way to interrogate if it is transmitting after we send a cw string.
+    We can poll the TX status of the radio  or use the TB command in the K3 which is the number of characters remaining
+    to be sent. If we poll with a TB;, then we wuill get back TB<t><rr><s>, where t (0-9) is the count of characters
+    from the KY command remaining to be sent.<rr> is the count of characters remaining in the buffer 00-40  and I think s
+    is a variable length string of the characters that remain. This would only work with a K3 or radio that has a similar feature.
+    - The real issue is this is received long after we have issued the command so in the regular poling
+    of the radio we would need some flags to indicate we are transmitting a CWBYCAT sent buffer, and then when it is done,
+    set autocq and other things we do when we are done with transmitting.
+     - 12-12-2005 ny4i }
+     { First question is how do we poll the radio}
       Exit;
       end;
 {$IF MMTTYMODE}

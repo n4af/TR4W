@@ -453,7 +453,7 @@ begin
 
 {$IF tDebugMode}
   //uHistory.MakeRevisionHistory;
-  TR4W_CFG_FILENAME := 'D:\TR4W_WinAPI\out\TEST\TEST.cfg';
+  TR4W_CFG_FILENAME := 'c:\TR4W\debug.cfg';
 {$ELSE}
 
   s := ParamStr(1);
