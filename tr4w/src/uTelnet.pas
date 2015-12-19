@@ -279,7 +279,7 @@ begin
       begin
 
         i := recv(TelnetSock, TelnetBuffer, SizeOf(TelnetBuffer) - 1, 0);
-        if i < 1 then
+        if i < 1  then
           if WindowsOSversion = VER_PLATFORM_WIN32_NT then
           begin
             TelnetConnectionError;
@@ -287,18 +287,17 @@ begin
             Exit;
           end;
 
-//          showmessage(@TelnetBuffer);
-{
-        if i > 50 then
+       //   showmessage(@TelnetBuffer);
+
+    {    if i > 50 then
           if TelnetBuffer[i - 1] <> #10 then
           begin
             NextFirstChar := NextFirstChar + i;
             if NextFirstChar < 10000 then Exit;
           end;
-}
+    }
         TelnetBuffer[i] := #0;
-        //Try
-           ProcessTelnetString(i);
+         ProcessTelnetString(i);
         //Except on E : Exception do
        //    begin
            //TLogger.GetInstance.Debug(Format('ProcessTelnet Exception, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
@@ -407,12 +406,12 @@ begin
 
       end;
     //    WM_HELP: tWinHelp(7);
+{
+     WM_MENUSELECT:      if lParam = 0 then        DestroyMenu(TelPopMemu);
 
-//    WM_MENUSELECT:      if lParam = 0 then        DestroyMenu(TelPopMemu);
-
-  //     if HiWord(wParam) = MF_CHECKED then     //n4af
-    //    GetMenuString(TelPopMemu, 1000, wsprintfBuffer, 100, MF_BYCOMMAND);      
-
+        if HiWord(wParam) = MF_CHECKED then     //n4af
+         GetMenuString(TelPopMemu, 200, wsprintfBuffer, 1024, MF_BYCOMMAND);
+}
     WM_COMMAND:
       begin
         if HiWord(wParam) = LBN_SELCHANGE then DlgDirSelectEx(hwnddlg, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);     //n4af
@@ -441,8 +440,8 @@ begin
                 }
         end;
 
-        if (wParam >= 1000) then if
-          (wParam <= 1000 + MAXITEMSINTELNETPOPUPMENU) then
+        if (wParam >= 1000) then
+          if  (wParam <= 1000 + MAXITEMSINTELNETPOPUPMENU) then     
           begin
             GetMenuString(TelPopMemu, wParam, wsprintfBuffer, 200, MF_BYCOMMAND);    //n4af
             SendViaTelnetSocket(wsprintfBuffer);
@@ -468,13 +467,13 @@ begin
 {$IF LANG = 'RUS'}
           207: ShowHelp('ru_dxcluster');
 {$IFEND}
-{
+ {
           208:
             begin
               if tClusterType = ctARCluster then tDialogBox(44, @ARSpotsFilterDlgProc);
               if tClusterType = ctDXSpider then tDialogBox(65, @DXSSpotsFilterDlgProc);
             end;
- 
+
  }
           //          DialogBox(hInstance, MAKEINTRESOURCE(44), hwnddlg, @SpotsFilterDlgProc);
           200: if TelThreadID = 0 then
@@ -495,7 +494,8 @@ begin
               //  SendMessage(TelnetCommandWindow, CB_FINDSTRINGEXACT, -1, integer(PChar(@TempBuffer1))) = CB_ERR then
                 tCB_ADDSTRING_PCHAR(hwnddlg, 106, TempBuffer1);
 
-            end;
+            end
+
         end;
         {
                 if HiWord(wParam) = LBN_KILLFOCUS then TelnetFreezeMode := OldTelnetFreezeMode;
@@ -651,12 +651,12 @@ var
   Handle                                : HWND;
 begin
   Handle := TelnetListBox;
-
   SendMessage(Handle, LB_SETITEMDATA, SendMessage(Handle, LB_ADDSTRING, 0, integer(p)), integer(c));
 
   if TelnetFreezeMode then Exit;
-  SendMessage(Handle, WM_VSCROLL, SB_BOTTOM, 0);
-end;
+   SendMessage(Handle, WM_HSCROLL, SB_BOTTOM, 0);
+   SendMessage(Handle, WM_VSCROLL, SB_BOTTOM, 0);
+ end;
 
 procedure SaveTelnetWindowSpots;
 var
@@ -725,37 +725,39 @@ label
 var
  BandMapEntryRecord, EntryToBeDisposed, PreviousBandMapEntryRecord: BandMapEntryPointer;
   c                                     : integer;
+  d                                     : integer;
   AddedSpot                             : boolean;
   pr                                    : integer;
   StringType                            : TelnetStringType;
 
 begin
 //  Windows.CharUpperBuff(TelnetBuffer, ByteReceived);
+start:
   AddedSpot := False;
+  d := 0;
   pr := -1;
   // TLogger.GetInstance.Debug('In ProcessTelnetString: ' + TelnetBuffer);
    for c := 0 to ByteReceived do
   begin
+    d := d + 1;
     if pr = -1 then
-      if TelnetBuffer[c] > #13 then pr := c;
+      if TelnetBuffer[c] >= #13 then pr := c;
 
-    if pr <> -1 then
-      if TelnetBuffer[c] <= #13 then
+     if pr <> -1 then
+
+      if (TelnetBuffer[c] <= #13)   or (d > 120)  then   //n4af 4.43.9
       begin
-        TelnetBuffer[c] := #0;
+       d := 0;
+       TelnetBuffer[c] := #0;
         StringType := tstReceived;
-        if (PInteger(@TelnetBuffer[pr])^ = $64205844) {DX D} and (PInteger(@TelnetBuffer[pr + 2])^ = $20656420) { DE } then
-          begin
-          //TLogger.GetInstance.Debug('      Calling ProcessDX');
-          AddedSpot := ProcessDX(pr, False, StringType);
-          //TLogger.GetInstance.Debug('      Back from ProcessDX');
-          end;
-        AddStringToTelnetConsole(@TelnetBuffer[pr], StringType);
+          if (PInteger(@TelnetBuffer[pr])^ = $64205844){DE D}  and (PInteger(@TelnetBuffer[pr + 2])^ = $20656420) {DX}    then
+              AddedSpot := ProcessDX(pr, False, StringType);
+                if pr > -1 then
+                if pr < ByteReceived then
+                AddStringToTelnetConsole(@TelnetBuffer[pr], StringType);
 
-
-    //     SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);   // remove hh
         pr := -1;
-      end;
+       end;
   end;
 
   if AddedSpot then
