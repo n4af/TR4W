@@ -43,7 +43,6 @@ type
 
   PSpotsListBuffer = ^TSpotsListBuffer;
   TSpotsListBuffer = array[0..1000] of TSpotRecord;
-
   TDXSpotsList = object {class}
 
   private
@@ -91,7 +90,7 @@ type
 var
   SpotsList                             : TDXSpotsList;
   SpotsDisplayed                        : integer;
-
+  starttimer                            : cardinal;   // n4af 4.43.10
 
 implementation
 uses
@@ -125,12 +124,12 @@ label
 var
   i                                     : integer;
 begin
-   sleep(20);   // n4af 4.43.10
   if BandMapPreventRefresh then                     // Gav 4.37.12
     begin
        InsertSpotBuffer(Bcount , Spot);             // Gav 4.37.12
     end
   else
+    if GetTickCount - StartTimer > 1000 then  // n4af 4.43.10
     begin
       SetCursor;
 
@@ -309,6 +308,7 @@ end;
 procedure TDXSpotsList.SendAndClearBuffer;         // Gav 4.37
 var
   i                            : integer;
+
 begin
   if BCount <> 0 then
   begin
@@ -318,6 +318,7 @@ begin
          AddSpot(BList^[i],False)
       end;
   end;
+  starttimer := GetTickCount;   // n4af 4.43.10
   BCount := 0;
 end;
 
