@@ -2471,7 +2471,7 @@ begin
  //  tDialogBox(47, @LogSearchDlgProc);
  CreateModalDialog(387, 150, tr4whandle, @LogSearchDlgProc, 0);     
 
-    menu_alt_transmitfreq: tr4w_alt_n_transmit_frequency;
+    menu_alt_transfreq: tr4w_alt_n_transmit_frequency;
 
     menu_alt_x:  ExitProgram(True);
     
@@ -2653,14 +2653,14 @@ begin
 
       end;
 
-    menu_ctrl_incAQSLinterval:
+ {   menu_ctrl_incAQSLinterval:
       if AutoQSLInterval < 6 then
       begin
         inc(AutoQSLInterval);
         AutoQSLCount := AutoQSLInterval;
         DisplayAutoQSLInterval;
       end;
-
+ }
     menu_ctrl_decAQSLinterval:
       if AutoQSLInterval > 0 then
       begin
@@ -3146,7 +3146,7 @@ var
   c                                     : HWND;
 begin
   CallsignIsTypedByOperator := True;
-  Key := Char(wParam);
+//  Key := Char(wParam);
 
   if tAutoCQMode then if TryKillAutoCQ then Escape_proc;
 
@@ -5200,7 +5200,7 @@ begin
           end;
       end;
   end;
-  //  if Msg = WM_KEYDOWN then showint(wParam);
+    if Msg = WM_KEYDOWN then showint(wParam);
   //  if Msg = WM_KEYUP then showint(wParam);
   //  if Msg = WM_char then showint(wParam);
   Result := CallWindowProc(NCWP, hwnddlg, Msg, wParam, lParam);

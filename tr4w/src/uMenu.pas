@@ -64,8 +64,8 @@ const
   RC_TOOGLEMB_HK                        = #9'Alt+J';
   RC_KILLCW_HK                          = #9'Alt+K';
   RC_SEARCHLOG_HK                       = #9'Alt+L';
-  RC_TRANSFREQ_HK                       = #9'Alt+N';
-//  RC_REMINDER_HK                        = #9'Alt+O';
+
+//  RC_REMINDER_HK                      = #9'Alt+O';
   RC_ALTP_HK                            = #9'Alt+P';
   RC_AUTOCQ_HK                          = #9'Alt+Q';
   RC_TOOGLERIGS_HK                      = #9'Alt+R';
@@ -83,6 +83,7 @@ const
   RC_SSBCWMODE_HK                       = #9'Alt+M';
   RC_SENDKEYBOARD_HK                    = #9'Ctrl+A';
   RC_COMMWITHPP_HK                      = #9'Ctrl+B';
+  RC_TRANSFREQ_HK                       = #9'Alt+O';
   RC_CTRLJ_HK                           = #9'Ctrl+J';
   RC_CLEARDUPES_HK                      = #9'Ctrl+K';
   RC_VIEWEDITLOG_HK                     = #9'Ctrl+L';
@@ -91,8 +92,9 @@ const
   RC_REDOPOSSCALLS_HK                   = #9'Ctrl+P';
   RC_QTCFUNCTIONS_HK                    = #9'Ctrl+Q';
   RC_RECALLLASTENT_HK                   = #9'Ctrl+R';
+ // RC_TRANSFREQ_HK                       = #9'Ctrl+T';
   RC_VIEWPAKSPOTS_HK                    = #9'Ctrl+U';
-  RC_EXECONFIGFILE_HK                   = #9'Ctrl+V' ; 
+  RC_EXECONFIGFILE_HK                   = #9'Ctrl+V' ;
   RC_REFRESHBM_HK                       = #9'Ctrl+Y';
   RC_DUALINGCQ_HK                       = #9'Ctrl+-';
   RC_CURSORINBM_HK                      = #9'Ctrl+End';
@@ -259,8 +261,9 @@ const
     (mrText: RC_TOOGLEMB + RC_TOOGLEMB_HK; mrId: menu_alt_multbell),
     (mrText: RC_SEARCHLOG + RC_SEARCHLOG_HK; mrId: menu_alt_searchlog),
     (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
-    (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transmitfreq),
+
 //    (mrText: RC_REMINDER + RC_REMINDER_HK; mrId: menu_alt_reminder),
+    (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transfreq),
     (mrText: RC_ALTP + RC_ALTP_HK; mrId: menu_alt_p),
     (mrText: RC_AUTOCQ + RC_AUTOCQ_HK; mrId: menu_alt_autocq),
     (mrText: RC_TOOGLERIGS + RC_TOOGLERIGS_HK; mrId: menu_alt_tooglerigs),
@@ -295,7 +298,6 @@ const
     (mrText: RC_RECALLLASTENT + RC_RECALLLASTENT_HK; mrId: menu_ctrl_recalllastentry),
     (mrText: RC_SHDX_CALLSIGN + RC_SHDX_CALLSIGN_HK; mrId: menu_ctrl_shdxcallsign),
 //    (mrText: RC_VIEWPAKSPOTS + RC_VIEWPAKSPOTS_HK; mrId: menu_ctrl_viewpacketspots),
-
     (mrText: RC_EXECONFIGFILE + RC_EXECONFIGFILE_HK; mrId: menu_ctrl_execute_config),
     (mrText: RC_REFRESHBM + RC_REFRESHBM_HK; mrId: menu_ctrl_refreshbandmap),
     (mrText: RC_CURSORINBM + RC_CURSORINBM_HK; mrId: menu_ctrl_cursorinbandmap),

@@ -124,7 +124,8 @@ var
 
 label
   DontCheckPTT;
-begin
+
+begin   // 1
   Result := False;
   if FoundCommand(Message) and (Message = '') then Exit;
 
@@ -155,22 +156,22 @@ begin
   if not (Copy(Message, 1, 1) = ControlA) then
     SetUpToSendOnActiveRadio;
 
-  {---------------------------------------------------}
+
 
    // n4af 4.41.3
-{
+
   while (Copy(Message, 1, 1) = ControlA) or (Copy(Message, 1, 1) = ControlB) or (Copy(Message, 1, 1) = ControlE) do
-  begin
+  begin      // 2
     TempChar := Message[1];
 
     if TempChar = ControlA then
        if not SingleRadioMode then
-      begin
+      begin      // 3
         if ActiveRadio = RadioOne then
-        begin
+        begin      // 4
           if not SendingOnRadioTwo then
             ActiveMode := Radio2.ModeMemory ;
-        end
+        end        // 3
         else // Radio Two
           if not SendingOnRadioOne then
             ActiveMode := Radio1.ModeMemory;
@@ -178,46 +179,42 @@ begin
         SetUpToSendOnInactiveRadio;
 
     //    Sleep(5); // Added to get rid of relay flicking on old radio
-      end;
+      end;   // 2
 
     if TempChar = ControlB then
       if not SingleRadioMode then
-//<<<<<<< Updated upstream
         InactiveSwapRadio := True;   // n4af 4.42.11
     if TempChar = ControlE then           // n4af 4.41.3
       if not SingleRadioMode then
-      begin
+      begin    // 3
       InactiveRigCallingCQ := True;        // n4af 4.42.11
-//=======
       begin
       if autosendenable then
       CallWindowKeyUpProc;  // n4af 4.42.10
       InactiveRigCallingCQ := True;
-      end;
+      end;   // 2
       if TempChar = ControlE then           // n4af 4.41.3
       if not SingleRadioMode then
-      begin
+      begin    // 3
         InactiveRigCallingCQ := True;
          Switch := True;                   // n4af 4.42.11
-
-//>>>>>>> Stashed changes
-      end;
+       end;
+      end;  // 2
     Delete(Message, 1, 1);
-  end;
-} //ny4i to fix issue #9
-  {---------------------------------------------------}
+  end;     // 1
+  //ny4i to fix issue #9
 
   if pos('>', Message) > 0 then
-  begin
+  begin  // 2
     if ActiveMode <> Digital then
-    begin
+    begin    // 3
       RITClear;
       Delete(Message, pos('>', Message), 1);
-    end
+    end   // 2
     else
       SendMessageToMixW(Message);
 
-  end;
+  end;     // 1
 
   case ActiveMode of
     FM, Phone:
@@ -277,7 +274,7 @@ begin
          ((Key >= AltF1)      AND (Key <= AltF10)) OR
          ((Key >= AltF11)     AND (Key <= AltF12)) THEN
             }
-  begin
+    begin
     MessageKey := Key;
 
     //wli      if (ActiveMode = Phone) and (DVPEnable or (ActiveDVKPort <> NoPort)) then

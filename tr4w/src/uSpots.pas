@@ -125,7 +125,7 @@ label
 var
   i                                     : integer;
 begin
-
+   sleep(20);   // n4af 4.43.10
   if BandMapPreventRefresh then                     // Gav 4.37.12
     begin
        InsertSpotBuffer(Bcount , Spot);             // Gav 4.37.12
