@@ -320,7 +320,6 @@ begin
          AddSpot(BList^[i],False)
       end;
   end;
-starttimer := GetTickCount;   // n4af 4.43.10
   BCount := 0;
 end;
 
