@@ -1961,7 +1961,7 @@ begin
 
     Write('Repeating ', KeyId(AutoCQMemory), '  Listen time = ',
       (AutoCQDelayTime / 2): 2: 1, ' - PgUp/Dn to adjust or ESCAPE     ');
-    WkClearBuffer;   //n4af 4.36.13
+    FlushCWBuffer;   //n4af 4.36.13
     CQMemory := AutoCQMemory;
 
     repeat

@@ -152,7 +152,7 @@ procedure OpenStationInformationWindow(dwInitParam: lParam);
 procedure RenameCommands();
 procedure RichEditOperation(Load: boolean);
 function GetAddMultBand(Mult: TAdditionalMultByBand; Band: BandType): BandType;
-
+procedure scWK_RESET;  // n4af 4.43.10
 procedure SetCommand(c: PChar);
 procedure ChangeFocus(Text: PChar);
 procedure ImportFromADIF;
@@ -696,6 +696,7 @@ begin
 end;
 
 procedure SpaceBarProc;
+ 
 var
   SpecialRadioSwap                      : boolean;
 begin
@@ -779,10 +780,10 @@ begin
 
   else
     if ((OpMode <> SearchAndPounceOpMode) and ((CallWindowString = '') or not SpaceBarDupeCheckEnable)) then
+  begin
 
-    begin
-      if CWStillBeingSent then FlushCWBufferAndClearPTT; { Clear CW sent on Inactive Radio}
-
+     FlushCWBufferAndClearPTT; { Clear CW sent on Inactive Radio}
+      
       SetUpToSendOnActiveRadio;
 
       InactiveRigCallingCQ := False;
@@ -1280,6 +1281,12 @@ begin
 
 end;
 
+procedure scWK_RESET;            // n4af 4.43.10
+begin
+  wkSendAdminCommand(wkRESET);
+end;
+
+
 procedure OneSecTimerProc(uTimerID, uMessage: UINT; dwUser, dw1, dw2: DWORD) stdcall;
 begin
   UpdateTimeAndRateDisplays(True, True);
@@ -1486,6 +1493,7 @@ begin
     SetOpMode(CQOpMode);
     tAutoCQMode := True;
     SetMainWindowText(mweOpMode, 'AutoCQ');
+    wkClearBuffer;
     SendFunctionKeyMessage(AutoCQMemory, OpMode);
     tDisplayAutoCQStatus;
   end;
