@@ -731,7 +731,7 @@ var
   StringType                            : TelnetStringType;
 
 begin
- StartTimer := GetTickCount; //n4af 4.43.10
+
 start:
   AddedSpot := False;
   d := 0;
