@@ -1493,7 +1493,6 @@ begin
     SetOpMode(CQOpMode);
     tAutoCQMode := True;
     SetMainWindowText(mweOpMode, 'AutoCQ');
-    wkClearBuffer;
     SendFunctionKeyMessage(AutoCQMemory, OpMode);
     tDisplayAutoCQStatus;
   end;

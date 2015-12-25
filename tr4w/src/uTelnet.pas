@@ -731,7 +731,7 @@ var
   StringType                            : TelnetStringType;
 
 begin
-//  Windows.CharUpperBuff(TelnetBuffer, ByteReceived);
+ StartTimer := GetTickCount; //n4af 4.43.10
 start:
   AddedSpot := False;
   d := 0;
@@ -761,8 +761,9 @@ start:
   end;
 
   if AddedSpot then
-     begin
-     SpotsList.Display;
+  begin
+
+      SpotsList.Display;
 {$IFDEF AUTOSPOT}
      if TwoRadioMode then
         begin

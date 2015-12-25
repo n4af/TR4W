@@ -127,6 +127,7 @@ begin
   if BandMapPreventRefresh then                     // Gav 4.37.12
   if GetTickCount - StartTimer > 1000 then    //  n4af 4.43.10
     begin
+       StartTimer := GetTickCount; //n4af 4.43.10
        InsertSpotBuffer(Bcount , Spot);             // Gav 4.37.12
     end
   else
@@ -174,15 +175,13 @@ var
   CurrentCursorPos                         : integer;
 //    CurCursorPosData                     : integer;
   NumberEntriesDisplayed                   : integer;
-
-
 begin
 
 //  inc(SpotsDisplayed);
 //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then Exit;
   if  BandMapPreventRefresh then  Exit;                // GAV  4.37.12
-   starttimer := GetTickCount;   // n4af 4.43.10
+ //  starttimer := GetTickCount;   // n4af 4.43.10
   TDXSpotsList.UpdateSpotsMultiplierStatus;
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
@@ -320,6 +319,7 @@ begin
          AddSpot(BList^[i],False)
       end;
   end;
+
   BCount := 0;
 end;
 

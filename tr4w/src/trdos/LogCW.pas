@@ -31,6 +31,7 @@ utils_text,
   VC,
   LogNet,
   LOGDVP, {SlowTree, }
+  Sysutils,
   Tree,
   Windows,
   LogWind, {Dos,}
@@ -1750,17 +1751,14 @@ begin
   {Mode := ActiveMode;}{KK1L: 6.73 Removed}
 
   if Mode = Digital then Mode := CW;
-  {
-    if CQMemory[Mode, Key] <> nil then
-      GetCQMemoryString := CQMemory[Mode, Key]^
-    else
-      GetCQMemoryString := '';
-  }
+
   GetCQMemoryString := '';
   if Mode < Both then
     if CQMemory[Mode, Key] <> nil then
+    begin
       GetCQMemoryString := CQMemory[Mode, Key]^;
-
+   //   sleep(5);    //n4af 4.43.10
+    end;
 end;
 
 function GetEXMemoryString(Mode: ModeType; Key: Char): ShortString; {KK1L: 6.73 Added Mode to do split mode}
