@@ -120,19 +120,22 @@ end;
 
 function TDXSpotsList.AddSpot(var Spot: TSpotRecord; SendToNetwork: boolean): integer;
 label
-  Add;
+add;
 var
   i                                     : integer;
 begin
-  if BandMapPreventRefresh then                     // Gav 4.37.12
-  if GetTickCount - StartTimer > 1000 then    //  n4af 4.43.10
-    begin
-       StartTimer := GetTickCount; //n4af 4.43.10
-       InsertSpotBuffer(Bcount , Spot);             // Gav 4.37.12
-    end
+
+       if BandMapPreventRefresh { or (GetTickCount - StartTimer < 1000)}  then
+       begin
+       InsertSpotBuffer(Bcount , Spot);     // Gav 4.37.12
+     //   BandMapPreventRefresh := True;
+     //   sleep(20);
+       end
   else
-   
+    //    if GetTickCount - StartTimer >= 1000 then
     begin
+          //     StartTimer := Windows.GetTickCount;  // n4af 4.43.10
+      Sleep(50);
       SetCursor;
 
       for i := 0 to FCount - 1 do
@@ -143,6 +146,7 @@ begin
               Delete(i);
               Break;
             end;
+
       end;
       if Spot.FBand in [Band30, Band17, Band12] then Spot.FWARCBand := True;
 
@@ -181,12 +185,11 @@ begin
 //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then Exit;
   if  BandMapPreventRefresh then  Exit;                // GAV  4.37.12
- //  starttimer := GetTickCount;   // n4af 4.43.10
   TDXSpotsList.UpdateSpotsMultiplierStatus;
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
   NumberEntriesDisplayed := 0;
-  k := 0;
+  k := 0;                                                      
   i := 0;
 
 
@@ -319,8 +322,8 @@ begin
          AddSpot(BList^[i],False)
       end;
   end;
-
   BCount := 0;
+ // StartTimer := GetTickCount;
 end;
 
 

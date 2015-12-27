@@ -564,7 +564,7 @@ label
   processed;
 begin
   StackTelHandle := tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle;
-
+//   StartTimer := Windows.GetTickCount;    // n4af 4.43.10
   port := 23;
   i := Windows.GetDlgItemText(StackTelHandle, 102, TempBuffer1, SizeOf(TempBuffer1));
 
@@ -791,21 +791,16 @@ start:
      end;
 {
   Exit;
-
   FirstChar := 0;
   c := 0;
   AddedSpot := False;
-
   CheckClusterType(ByteReceived);
-
   Start:
-
   if (PInteger(@TelnetBuffer[c])^ = 1142970436) and (PInteger(@TelnetBuffer[c + 2])^ = 541410336) then
   begin
     if (ByteReceived - c) > DXSpotLength then AddedSpot := ProcessDX(c, False);
     c := c + 74;
   end;
-
   if (TelnetBuffer[c] in [#13]) or (c = ByteReceived - 1) then
   begin
     TelnetBuffer[c] := #0;
@@ -815,7 +810,6 @@ start:
 //    if not TelnetFreezeMode then SendMessage(TelnetListBox, WM_VSCROLL, SB_BOTTOM, 0);
     FirstChar := c + 2;
   end;
-
   inc(c);
   //  Windows.SetWindowText(tr4whandle, inttopchar(c));
   //  Windows.SetWindowText(TotalScoreWindowHandle, inttopchar(ByteReceived));

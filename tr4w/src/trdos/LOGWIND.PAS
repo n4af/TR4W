@@ -5266,7 +5266,7 @@ end;
  begin
  if not BandMapEnable then exit;
    BandMapPreventRefresh := True;
-// SpotsList.Display;
+  // SpotsList.Display;
 
  i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
  //if i = -1 then
