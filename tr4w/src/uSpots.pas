@@ -125,17 +125,11 @@ var
   i                                     : integer;
 begin
 
-       if BandMapPreventRefresh { or (GetTickCount - StartTimer < 1000)}  then
-       begin
-       InsertSpotBuffer(Bcount , Spot);     // Gav 4.37.12
-     //   BandMapPreventRefresh := True;
-     //   sleep(20);
-       end
+       if BandMapPreventRefresh   then
+          insertSpotBuffer(Bcount , Spot)     // Gav 4.37.11
   else
-    //    if GetTickCount - StartTimer >= 1000 then
     begin
-          //     StartTimer := Windows.GetTickCount;  // n4af 4.43.10
-      Sleep(50);
+       Sleep(50);  // n4af 4.37.10
       SetCursor;
 
       for i := 0 to FCount - 1 do

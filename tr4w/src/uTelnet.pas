@@ -564,7 +564,6 @@ label
   processed;
 begin
   StackTelHandle := tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle;
-//   StartTimer := Windows.GetTickCount;    // n4af 4.43.10
   port := 23;
   i := Windows.GetDlgItemText(StackTelHandle, 102, TempBuffer1, SizeOf(TempBuffer1));
 
