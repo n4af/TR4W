@@ -1754,11 +1754,10 @@ begin
 
   GetCQMemoryString := '';
   if Mode < Both then
-    if CQMemory[Mode, Key] <> nil then
-    begin
+     if CQMemory[Mode, Key] <> nil then
       GetCQMemoryString := CQMemory[Mode, Key]^;
-   //   sleep(5);    //n4af 4.43.10
-    end;
+
+    
 end;
 
 function GetEXMemoryString(Mode: ModeType; Key: Char): ShortString; {KK1L: 6.73 Added Mode to do split mode}
