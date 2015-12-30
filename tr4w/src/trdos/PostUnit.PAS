@@ -2433,8 +2433,6 @@ begin
   if ReadLogFile then
   begin
     inc(contacts);
-//    if TempRXData.Band <> Band20 then goto 1;
-//    if not TempRXData.DXMult then goto 1;
 
     HisCallsign := @TempRXData.Callsign[1];
 
@@ -2469,8 +2467,6 @@ begin
     end;
 
     ModeString := tCabrilloModeString[TempRXData.Mode];
-
-//    if ActiveExchange in [RSTALLJAPrefectureAndPrecedenceExchange, RSTPrefectureExchange] then      TempRXData.QTHString := Copy(TempRXData.QTHString, 2, 2);
 
     if DoingDomesticMults then
     begin
@@ -2833,32 +2829,7 @@ if TempRXData.DomMultQTH = '' then
             asm add esp,20
             end;
           end;
-          {
-          if Contest = FOCMARATHON then      //n4af 4.32.5
 
-        begin
-        cMyFOCNumber :=  @MyFOCNumber[1];
-            asm
-                        push cMyFOCNumber
-                        push RSTSent
-            end;
-
-            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-
-             nrReceived := StrToInt(TempRXData.FOCNumber);
-            asm
-                        push nrReceived
-                        push RSTReceived
-            end;
-
-            wsprintf(CABRILLO_HISEX, '%-3s %-7d');
-            asm add esp,16
-            end;
-
-             end;
-         }
         RSTPowerExchange:
         begin
          csPower := @TempRXData.Power[1];
@@ -2953,26 +2924,7 @@ if TempRXData.DomMultQTH = '' then
             asm add esp,16
             end;
           end;
-            {
-                        QSONumberAndGridSquare://CUPRF
-                          begin
-                            asm
-                              push cMyState
-                              push nrSentd
-                            end;
-                            wsprintf(csMyExchange, '%03u %-6s');
-                            asm add esp,16
-                            end;
 
-                            asm
-                              push csQTHString
-                              push nrReceived
-                            end;
-                            wsprintf(csHisExchange, '%03u %-6s');
-                            asm add esp,16
-                            end;
-                          end;
-            }
         QSONumberAndPossibleDomesticQTHExchange, RSTQSONumberAndDomesticQTHExchange, RSTQSONumberAndPossibleDomesticQTHExchange:
           begin
 {
@@ -2981,19 +2933,15 @@ QSO: 21000 CW 2002-07-27 1726 G3XTT         599 0014 EU-005 OH9A          599 08
 QSO: 21000 CW 2002-07-27 1728 G3XTT         599 0015 EU-005 9V1YC         599 0331 AS-019
 QSO: 21000 CW 2002-07-27 1732 G3XTT         599 0016 EU-005 S53EO         599 0402 ------
 QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  0362 AF-030
- 
-             if Contest = DARC10M then
-               if mystate[1]= #0 then
-               cMystate := '---';       }
+
+                 }
             asm
             push cMyState
             push nrSent
             push RSTSent
             end;
 
-         {   if Contest = DARC10M then
-            wsprintf(CABRILLO_MYEX, '%-3s %3d %-3s ')
-            else }
+
             wsprintf(CABRILLO_MYEX, '%-3s %-4d %-6s ');
              
             asm add esp,20
@@ -3316,7 +3264,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
               push nrSent
               push RSTSent
               end;
-              wsprintf(CABRILLO_MYEX, '%-3s %-7d');
+              wsprintf(CABRILLO_MYEX, '%-8s %-7d');  // n4af 4.43.12
               asm add esp,16
               end;
             end;
@@ -3344,26 +3292,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
           end;
       end;
 //----------------------------
-{
-      nrReceived := strtoint(TempRXData.QTHString);
-      cMyState := '7';
-      asm
-                push nrSent
-                push cMyState
-      end;
-      wsprintf(CABRILLO_MYEX, ' %s%03u      ');
-      asm add esp,16
-      end;
 
-      asm
-          push nrReceived
-          push csName
-      end;
-      wsprintf(CABRILLO_HISEX, '  %s%03u');
-      asm add esp,16
-      end;
-}
-//----------------------------
       StrUpper(CABRILLO_HISEX);
 
       T1 := CABRILLO_FIRST_PART;
@@ -3375,9 +3304,9 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
       push t2
       push t1
       end;
-    {  If Contest = DARC10M then     
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%9s%-17s'#13#10)
-      else  }
+      if Contest = ARKTIKA_SPRING then
+      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-14s%-17s'#13#10)
+      else
       nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-14s%-17s'#13#10);
       asm add esp,24
       end;

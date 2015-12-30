@@ -3183,7 +3183,7 @@ begin
   begin
     RXData.RSTReceived := DefaultRST;
     RXData.QTHString := Exchange;
-    if length(Exchange)< 8 then      // n4af 4.43.11
+    if length(Exchange)< 9 then      // n4af 4.43.12
     ProcessRSTAndDomesticQTHExchange := FoundDomesticQTH(RXData)
     else
     Result := False;
