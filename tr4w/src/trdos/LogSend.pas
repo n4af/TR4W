@@ -448,6 +448,7 @@ begin
   //   message_to_send := '';
 
 //  ClearPTTForceOn;
+InactiveRigCallingCQ := False;
 end;
 
 procedure SendCrypticDigitalString(SendString: Str160);

@@ -183,23 +183,23 @@ begin   // 1
 
     if TempChar = ControlB then
       if not SingleRadioMode then
-        InactiveSwapRadio := True;   // n4af 4.42.11
+      begin
+      if autosendenable then
+      CallWindowKeyUpProc;  // n4af 4.44.2
+        InactiveRigCallingCQ := True;
+        Switch := True;
+       end;
+
     if TempChar = ControlE then           // n4af 4.41.3
       if not SingleRadioMode then
       begin    // 3
-      InactiveRigCallingCQ := True;        // n4af 4.42.11
-      begin
       if autosendenable then
-      CallWindowKeyUpProc;  // n4af 4.42.10
+      CallWindowKeyUpProc;  // n4af 4.44.2
       InactiveRigCallingCQ := True;
+      InactiveSwapRadio := True;
+      Switch := True;                       
       end;   // 2
-      if TempChar = ControlE then           // n4af 4.41.3
-      if not SingleRadioMode then
-      begin    // 3
-        InactiveRigCallingCQ := True;
-         Switch := True;                   // n4af 4.42.11
-       end;
-      end;  // 2
+   
     Delete(Message, 1, 1);
   end;     // 1
   //ny4i to fix issue #9
@@ -230,7 +230,6 @@ begin   // 1
 
       begin
         SendCrypticCWString(Message);
-
       end;
 {$IF MMTTYMODE}
     Digital:
