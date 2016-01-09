@@ -779,6 +779,7 @@ begin
       { Still a SpaceBar, but not doing DupeInfoCall }
 
   else
+
     if ((OpMode <> SearchAndPounceOpMode) and ((CallWindowString = '') or not SpaceBarDupeCheckEnable)) then
   begin
 
@@ -870,8 +871,9 @@ procedure ReturnInCQOpMode;
 begin
   if InactiveRigCallingCQ and (length(ExchangeWindowString)=0) then
    begin
-    CheckInactiveRigCallingCQ;
-    exit;
+    CheckInactiveRigCallingCQ;     // swapradios
+    InactiveRigCallingCQ := False;      // n4af 4.44.3
+        if (length(CallWindowString) > 0) then exit; // n4af 4.44.2
    end;
 
   if length(CallWindowString) = 0 then
@@ -881,6 +883,7 @@ begin
       begin
         TryKillAutoCQ;
         SendFunctionKeyMessage(F1, CQOpMode);
+        InactiveRigCallingCQ := False;      // n4af 4.44.3
       end;
       Exit;
     end;
@@ -923,7 +926,7 @@ begin
         ShowFMessages(0);
        end;
       if ActiveMode = Digital then SendMessageToMixW('<TX>');
-       CheckInactiveRigCallingCQ;
+//       CheckInactiveRigCallingCQ;
        if not tAutoSendMode then
         if MessageEnable then
           if not SendCrypticMessage(CallWindowString) then Exit;
@@ -3110,7 +3113,7 @@ begin
       EditableLogWindowDblClick;
       Exit;
     end;
- {
+  
      // check if membership # entered
     // n4af 4.42.2 check for reverse lookup of membership #
     //First = GetFirstString
@@ -3122,7 +3125,7 @@ begin
       PutCallToCallWindow(CallWindowString);
       exit;
       end;
-   }
+
    SetFreq:
   if TuneOnFreqFromCallWindow then Exit;
 
@@ -3131,11 +3134,11 @@ begin
   begin
   if switch = False then
       InactiveRigCallingCQ := False   // n4af 4.42.11
-      else    
-     Switch := False;
+      else
+      Switch := False;
     ReturnInCQOpMode;
-    Exit;
-  end;
+      Exit;
+      end;
  
   if OpMode = SearchAndPounceOpMode then
   begin
@@ -3659,15 +3662,7 @@ begin
     if DoingDXMults then GetDXQTH(RData);
 
     if DoingPrefixMults then SetPrefix(RData);
-      {
-              case ActivePrefixMult of
-                BelgiumPrefixes: if RData.QTH.CountryID = 'ON' then RData.Prefix := RData.QTH.Prefix;
-                SACDistricts: RData.Prefix := SACDistrict(RData.QTH);
-                Prefix: RData.Prefix := RData.QTH.Prefix;
-                SouthAmericanPrefixes: if RData.QTH.Continent = SouthAmerica then RData.Prefix := RData.QTH.Prefix;
-                NonSouthAmericanPrefixes: if RData.QTH.Continent <> SouthAmerica then RData.Prefix := RData.QTH.Prefix;
-              end;
-      }
+     
     GetRidOfPrecedingSpaces(ExchangeString);
     GetRidOfPostcedingSpaces(ExchangeString);
 
@@ -5845,16 +5840,15 @@ end;
 procedure CheckInactiveRigCallingCQ;
 begin
   if InactiveRigCallingCQ then //n4af 4.30.1
-  begin                        //n4af 4.30.1
-     SetUpToSendOnInactiveRadio;
- //     ShowInformation;    // n4af 4.40.2
-    SwapRadios;
-
+  if (length(CallWindowString) > 0) or (InactiveSwapRadio) then   // n4af 4.44.2
+  begin
+     SwapRadios;
+        inactiverigcallingcq := False; // n4af 4.44.3
        if  not autosendenable then     //n4af 4.42.10  Redrive dupe check
-           ReturninCQopmode;
-      ShowInformation;
-
-  end;
+            ReturninCQopmode;
+       ShowInformation;
+    end;
+    exit;
 end;
 
 function CheckWindowAndColor(Window: HWND; var Brush: HBRUSH; var Color: integer): boolean;

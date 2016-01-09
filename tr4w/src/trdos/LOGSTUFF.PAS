@@ -7381,9 +7381,9 @@ begin
     RSTDomesticOrDXQTHExchange:
       ProcessExchange := ProcessRSTAndDomesticOrDXQTHExchange(ExchangeString, RData);
 
-
-       RSTDomesticQTHOrQSONumberExchange:
-      if DomesticCountryCall(RData.Callsign) then
+  
+     RSTDomesticQTHOrQSONumberExchange:
+      if DomesticCountryCall(RData.Callsign) and (StringHasLetters(ExchangeString)) then   //n4af 4.44.4 HADX
         ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData)
       else
         ProcessExchange := ProcessRSTAndQSONumberExchange(ExchangeString, RData);

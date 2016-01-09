@@ -18,7 +18,7 @@
 If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
-unit uTelnet;
+unit uTelnet ;
 {$IMPORTEDDATA OFF}
 
 interface
@@ -428,17 +428,7 @@ begin
             if ProcessDX(0, True, StringType) then
               TuneRadioToSpot(TempSpot, RadioOne);
               
-                  {
-                        if FoundDXSpot(ListBox_GetSelectedItem(TelnetListBox), TelnetDXspot) then
-                          begin
-                            BigCompressFormat(TelnetDXspot.Call, CompressedCall);
-                            BandMapEntryRecord.Call := CompressedCall;
-                            BandMapEntryRecord.Frequency := TelnetDXspot.Frequency;
-                            BandMapEntryRecord.QSXOffset := TelnetDXspot.QSXFrequency;
-                            SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);
-                          end;
-                }
-        end;
+                       end;
 
         if (wParam >= 1000) then
           if  (wParam <= 1000 + MAXITEMSINTELNETPOPUPMENU) then     
@@ -866,20 +856,7 @@ begin
     if TelnetBuffer[i] = ' ' then if TelnetBuffer[i + 1] <> ' ' then
       begin
         Windows.lstrcpyn(@TempSpot.FFreqString[0], @TelnetBuffer[i + 1], DX + 24 - i + Offset);
-{
-        TempSpot.FFreqString[0] := '1';
-        TempSpot.FFreqString[1] := '1';
-        TempSpot.FFreqString[2] := '1';
-        TempSpot.FFreqString[3] := '1';
-        TempSpot.FFreqString[4] := '1';
-        TempSpot.FFreqString[5] := '1';
-        TempSpot.FFreqString[6] := '1';
-        TempSpot.FFreqString[7] := '1';
-        TempSpot.FFreqString[8] := '1';
-        TempSpot.FFreqString[9] := '1';
-        TempSpot.FFreqString[10] := '.';
-        TempSpot.FFreqString[11] := '1';
-}
+
         TempFrequency := 0;
 
         for f := 0 to 12 do
