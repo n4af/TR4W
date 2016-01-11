@@ -36,8 +36,7 @@ utils_text,
   Windows,
   LogWind, {Dos,}
   LogRadio,
-  LogK1EA,
-  SysUtils
+  LogK1EA
   ;
 
 type

@@ -46,6 +46,7 @@ const
 
   ICOM_GET_FREQ                         = #$03;
   ICOM_GET_MODE                         = #$04;
+  ICOM_XMIT_SETTINGS                    = #$1C;
 
   ICOM_SET_FREQ                         = #$05;
   ICOM_SET_MODE                         = #$06;
@@ -221,6 +222,7 @@ type
     tYaesuSendMode: boolean;
 
     tIcom6Bytes: array[0..5] of Byte;
+    tIcom7Bytes: array[0..6] of Byte; //ny4i
 
     tIcomFilterWidth: integer;
 
@@ -244,6 +246,7 @@ type
     procedure PutRadioIntoSplit;
     procedure PutRadioOutOfSplit;
     procedure SendIcomCommand(Command: Byte);
+    procedure SendXMITStatusCommand;
 //    function SendFiveBytes: boolean;
     procedure SetRadioCWSpeed(speed: LONGINT);
     procedure SetRadioFreq(Freq: LONGINT; Mode: ModeType; VFO: Char);
@@ -1233,6 +1236,19 @@ begin
   //TLogger.GetInstance.Debug(Format('In SendIcomCommand, Sending command %s',[Chr(Command)]));
   WriteToCATPort(tIcom6Bytes, 6);
 end;
+//------------------------------------------------------------------------------
+procedure RadioObject.SendXMITStatusCommand;
+begin
+  tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+  tIcom7Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+  tIcom7Bytes[2] := ReceiverAddress;
+  tIcom7Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+  tIcom7Bytes[4] := Ord(ICOM_XMIT_SETTINGS);
+  tIcom7Bytes[5] := (Ord(Chr(0)));
+  tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+  WriteToCATPort(tIcom7Bytes, 7);
+end; // SendXMITStatusCommand;
+//------------------------------------------------------------------------------
 
 procedure RadioObject.PutRadioIntoSplit;
 

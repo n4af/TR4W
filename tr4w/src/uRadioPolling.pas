@@ -1196,8 +1196,13 @@ begin
                   if (Ord(rig.tBuf[i+6]) > 0) then         // n4af 4.43.4
                   Icom_Filter_Width := Ord(rig.tBuf[i + 6]);      // 4.43.4
                   UpdateStatus(rig);
-             
-             end;
+                end;
+              ICOM_XMIT_SETTINGS:
+                  if Ord(rig.tBuf[i+4+1]) = 0 then
+                     begin
+                     rig.CurrentStatus.TXOn := Boolean(Ord(rig.tBuf[i+4+2])); //ny4i
+                     UpdateStatus(rig);
+                     end;
             end;
           end;
     Windows.ZeroMemory(@rig.tBuf, stat.cbInQue);
@@ -1205,7 +1210,7 @@ begin
   end;
 end;
 
-procedure pIcomNew(rig: RadioPtr);
+procedure pIcomNew(rig: RadioPtr);   // This is now called for all ICOM radios
 label
   NextPoll;
 var
@@ -1248,6 +1253,15 @@ begin
     Sleep(1000);
     goto NextPoll;
   end;
+
+  rig.SendXMITStatusCommand;
+  if not icomCheckBuffer(rig) then
+     begin
+     ClearRadioStatus(rig);
+     UpdateStatus(rig);
+     Sleep(1000);
+     goto NextPoll; // Argh....a damn GoTo...what the hell?!? // ny4i
+     end;
 
   goto NextPoll;
 end;

@@ -456,13 +456,13 @@ begin
 
 //  ClearPTTForceOn;
 
+
 InactiveRigCallingCQ := False;
 
   AddStringToBuffer(Chr(0),CWTone); // Flushes the buffer when the $0 is passed to SendCW - by only By CAT
 
-//  AddStringToBuffer(Chr(0),CWTone); // Flushes the buffer when the $0 is passed to SendCW - by only By CAT
-
 end;
+
 
 procedure SendCrypticDigitalString(SendString: Str160);
 
