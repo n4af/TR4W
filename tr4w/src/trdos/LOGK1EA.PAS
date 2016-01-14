@@ -2765,7 +2765,7 @@ begin
 
 //  ExitFromCWThread := False;
 
-  tStartAutoCQ;  // It appears we go here everytime we finish a CW buffer no matter if we just CQ'ed or not ny4i
+  tStartAutoCQ;  // It appears we go here everytime we finish a CW buffer no matter if we just CQ'ed or not ny4i  4.44.5
 {$IF OZCR2008}
   CWMessageToNetwork := '';
 {$IFEND}

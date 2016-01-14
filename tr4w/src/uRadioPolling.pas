@@ -1200,7 +1200,7 @@ begin
               ICOM_XMIT_SETTINGS:
                   if Ord(rig.tBuf[i+4+1]) = 0 then
                      begin
-                     rig.CurrentStatus.TXOn := Boolean(Ord(rig.tBuf[i+4+2])); //ny4i
+                     rig.CurrentStatus.TXOn := Boolean(Ord(rig.tBuf[i+4+2])); //ny4i  // 4.44.5
                      UpdateStatus(rig);
                      end;
             end;
@@ -1260,7 +1260,7 @@ begin
      ClearRadioStatus(rig);
      UpdateStatus(rig);
      Sleep(1000);
-     goto NextPoll; // Argh....a damn GoTo...what the hell?!? // ny4i
+     goto NextPoll; // Argh....a damn GoTo...what the hell?!? // ny4i // 4.44.5
      end;
 
   goto NextPoll;
@@ -2587,7 +2587,7 @@ begin
      end
   else      //n4af 04.30.3
      begin
-     if ActiveRadioPtr.CWByCAT then
+     if ActiveRadioPtr.CWByCAT then     // ny4i 4.44.5
         begin
         tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
         end;

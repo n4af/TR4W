@@ -125,7 +125,7 @@ begin
 
 // Why doesn't it send the whole thing.  I know..it is because it processed each character. The call is a single character  (\)
 // So, it's more efficient to use \ than NY4I
-// I wonder if this could be improved to buffer the characters?
+// I wonder if this could be improved to buffer the characters? // 4.44.5
 
   if CWEnabled = False then Exit;
   if length(SendString) = 0 then Exit;

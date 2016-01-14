@@ -205,7 +205,7 @@ var
 begin
    //localMsg := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
-   if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT))) then
+   if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT))) then   // ny4i 4.44.5
       begin
       ActiveRadioPtr.SendCW(Msg);
    //   tStartAutoCQ;   This was a test but it cannot work like this in CWBYCAT.
@@ -218,7 +218,8 @@ begin
     - The real issue is this is received long after we have issued the command so in the regular poling
     of the radio we would need some flags to indicate we are transmitting a CWBYCAT sent buffer, and then when it is done,
     set autocq and other things we do when we are done with transmitting.
-     - 12-12-2005 ny4i }
+     - 12-12-2005 ny4i } //4.44.5
+    // The above was just a theory and notes if there are any future issues // 4.44.5
      { First question is how do we poll the radio}
       Exit;
       end;

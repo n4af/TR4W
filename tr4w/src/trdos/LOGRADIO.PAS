@@ -149,7 +149,7 @@ type
 
     CommandsBuffer: array[0..7] of array[0..{19}40] of Char;
     CommandsBufferPointer: Cardinal;
-    CommandsTempBuffer: array[0..{19}40] of Char; // ny4i extended for icom cw
+    CommandsTempBuffer: array[0..{19}40] of Char; // ny4i extended for icom cw  // 4.44.5
 
 //    ICOM_COMMAND_B1: Str80;
 //    ICOM_COMMAND_SET_MODE: string[8];
@@ -184,12 +184,12 @@ type
     CommandPauseTimeStamp: TimeRecord;
     FrequencyAdder: LONGINT;
     FT1000MPCWReverse: boolean;
-    CWByCAT: boolean;
+    CWByCAT: boolean;                    // ny4i 4.44.5
     CWSpeedSync: boolean;
     WideCWFilter: boolean;
     IcomFilterByte: Byte;
     IDCharacter: Char;
-    CWByCATBuffer: string;
+    CWByCATBuffer: string;                  // ny4i 4.44.5
 //    PartialRadioResponse: string;
     PollingEnable: boolean;
     PollDelay: integer;
@@ -222,7 +222,7 @@ type
     tYaesuSendMode: boolean;
 
     tIcom6Bytes: array[0..5] of Byte;
-    tIcom7Bytes: array[0..6] of Byte; //ny4i
+    tIcom7Bytes: array[0..6] of Byte; //ny4i  // 4.44.5
 
     tIcomFilterWidth: integer;
 
@@ -601,7 +601,7 @@ const
 }
 
 
-function IntegerToBCD(Value: DWORD): Integer; // ny4i
+function IntegerToBCD(Value: DWORD): Integer; // ny4i  // 4.44.5
 procedure InitRadios;
 function OpenCATDebugFile(port: PortType): boolean;
 //procedure CloseCATDebugFile(port: PortType);
@@ -1402,7 +1402,7 @@ begin
   //   if CurrentStatus.VFOB.TXRX = PreviousStatus.VFOB.TXRX then
   //      FilteredStatus.VFOB.TXRX := CurrentStatus.VFOB.TXRX;
 
-  if CurrentStatus.TXOn = PreviousStatus.TXOn then        // ny4i
+  if CurrentStatus.TXOn = PreviousStatus.TXOn then        // ny4i  // 4.44.5
      begin
      FilteredStatus.TXOn := CurrentStatus.TXOn;
      end;
@@ -1514,7 +1514,7 @@ begin
 
 end;
 //------------------------------------------------------------------------------
-procedure FlushCWByCATBuffer;
+procedure FlushCWByCATBuffer;      // ny4i 4.44.5
 begin
 end;
 //------------------------------------------------------------------------------
@@ -1545,7 +1545,7 @@ begin
          begin
          if ord(Msg[1]) = 0 then // Flush if Msg = #00
             begin
-            Msg := CWByCATBuffer;
+            Msg := CWByCATBuffer;              // ny4i 4.44.5
             msgLen := length(CWByCATBuffer);    //length(Msg);
             localMsg := Format('%s', [Msg]);
             AddStringToTelnetConsole(PChar('Sending to Icom='+localMsg),tstAlert);
@@ -1574,7 +1574,7 @@ begin
             end
          else
             begin // Add to CWBYCATBuffer
-            CWByCATBuffer := CWByCATBuffer + Msg;
+            CWByCATBuffer := CWByCATBuffer + Msg;    // ny4i 4.44.5
             end;
          end;
     rtOrion:
@@ -1608,32 +1608,7 @@ begin
     rtIcom:
       if RadioModel in [IC9100, IC7800, IC7600, IC7700] then
         begin
-        // Calculate Icom speed of WPM to 000-255.
-        //001 = 6wpm, 254 = 48 wpm. Each extra wpm is 6 decimal higher
-        //Speed (in icom decimal) = ((speed(wpm) - 6) * 6) + 1
-        {
-        i := ((speed - 6) * 6) + 1;
-        // I think speed is in BCD
-        CommandsTempBuffer[0] := CHR(10);
-        CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
-        CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
-        CommandsTempBuffer[3] := CHR(ReceiverAddress);
-        CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
-        CommandsTempBuffer[5] := ICOM_SET_SLIDERS;
-        CommandsTempBuffer[6] := ICOM_SET_CW_SPEED ;
-
-        TempByte := i div 100;
-        CommandsTempBuffer[7] := Chr(TempByte);
-        TempByte := (i mod 100) + 48;
-
-        CommandsTempBuffer[8] := Chr(TempByte);  //Chr makes this hex. I need the actual decimal number here. 69 is the remainder and I need 69 to be sent, not th ehex 45 (which is what Chr does)
-
-        CommandsTempBuffer[9] := ICOM_END_OF_MESSAGE_CODE;
-        AddCommandToBuffer;
-        //  Chr((Ord(ch1) and $F) or ((Ord(ch2) and $F) shl 4))
-
-        } // Figuring out the right value to send and then convert to BCD is challenging. K3 and Orion only for now :) ny4i
-        end;
+                end;
     rtOrion:
       begin
         //i := Format(tOrionFreq, '*CS%02u'#13, speed);
@@ -2011,7 +1986,7 @@ begin
       CommandsTempBuffer[5] := ICOM_SET_MODE;
       CommandsTempBuffer[6] := TempChar;
 
-      // ny4i: I'm trying to understand this logic
+      // ny4i: I'm trying to understand this logic   // 4.43.4
       // The way Dave indicated this is supposed to work is that
       // if the CFG option of ICOM_FILTER_BYTE is set to 0, then we want to send
       // whatever the filter setting the rig had.
