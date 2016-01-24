@@ -430,6 +430,7 @@ begin
           LBN_KILLFOCUS:
             begin
               BandMapPreventRefresh := False;         // Gav     4.37.12
+              DisplayBandMap;
             end;
           LBN_SELCHANGE:
             begin
