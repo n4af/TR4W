@@ -414,7 +414,7 @@ begin
           204:
             begin
               SpotsList.Clear;
-              SpotsList.Display;
+              DisplayBandMap;                       //Gav 4.44.6
             end;
           205: If TwoRadioMode then InvertBooleanCommand(@QSYInactiveRadio);   // Gav     4.37.12
 
@@ -430,8 +430,6 @@ begin
           LBN_KILLFOCUS:
             begin
               BandMapPreventRefresh := False;         // Gav     4.37.12
-              SpotsList.SendAndClearBuffer;
-              SpotsList.Display;
             end;
           LBN_SELCHANGE:
             begin
@@ -639,7 +637,7 @@ begin
   i := SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
   if i = LB_ERR then Exit;
   SpotsList.Delete(SendMessage(BandMapListBox, LB_GETITEMDATA, i, 0));
-  SpotsList.Display;
+  DisplayBandMap;                       //Gav 4.44.6
   if tLB_SETCURSEL(BandMapListBox, i) = LB_ERR then tLB_SETCURSEL(BandMapListBox, i - 1);
   ShowSpotInfo;
 end;

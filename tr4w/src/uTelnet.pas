@@ -75,7 +75,7 @@ procedure SendClientStatus;
 function TelnetWndDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 procedure ConnectToTelnetCluster;
 procedure Disconnect;
-
+function TestSocketBuffer: Integer;                // Gav 4.44.6
 procedure TelnetConnectionError;
 function SendViaTelnetSocket(p: PChar): integer;
 procedure AddStringToTelnetConsole(p: PChar; c: TelnetStringType);
@@ -750,9 +750,9 @@ start:
   end;
 
   if AddedSpot then
-  begin
+    begin
+      if TestSocketBuffer < 1 then DisplayBandMap;             //Gav 4.44.6
 
-      SpotsList.Display;
 {$IFDEF AUTOSPOT}
      if TwoRadioMode then
         begin
@@ -777,7 +777,7 @@ start:
         end;
      sleep(200); // So we do not drive the serial port and radio too fast.
 {$ENDIF}
-     end;
+   end;
 {
   Exit;
   FirstChar := 0;
@@ -807,6 +807,18 @@ start:
   if AddedSpot then SpotsList.Display;
 }
 end;
+
+
+
+function TestSocketBuffer: Integer;        // Gav 4.44.6
+begin
+   ioctlsocket(TelnetSock,FIONREAD,u_long(Result));
+   if TelnetSock<>SOCKET_ERROR then
+   ioctlsocket(TelnetSock,FIONREAD,u_long(Result))
+   else result:=1;
+end;
+
+
 
 function ProcessDX(DX: integer; InListBox: boolean; var Stringtype: TelnetStringType): boolean;
 label

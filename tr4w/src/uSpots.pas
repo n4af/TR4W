@@ -41,8 +41,6 @@ type
   PSpotsList = ^TSpotsList;
   TSpotsList = array[0..1000] of TSpotRecord;
 
-  PSpotsListBuffer = ^TSpotsListBuffer;
-  TSpotsListBuffer = array[0..1000] of TSpotRecord;
   TDXSpotsList = object {class}
 
   private
@@ -50,19 +48,13 @@ type
     FCount: integer;
     FCurrentCursorFreq: integer;
     FCapacity: integer;
-    BList: PSpotsListBuffer;
-    BCount: integer;
-    BCapacity: integer;
     procedure Grow;
-    procedure GrowBuffer;
 
   protected
     function GetCapacity: integer;
     procedure SetCapacity(NewCapacity: integer);
-    procedure SetCapacityBuffer(NewCapacity: integer);
     function CompareStrings(const s1, s2: CallString): integer;
     procedure InsertSpot(Index: integer; const Spot: TSpotRecord); virtual;
-    procedure InsertSpotBuffer(Index: integer; const Spot: TSpotRecord); virtual;
 
   public
 //    destructor Destroy; override;
@@ -70,7 +62,6 @@ type
     function Get(Index: integer): TSpotRecord;
     function AddSpot(var Spot: TSpotRecord; SendToNetwork: boolean): integer;
     procedure Clear;
-    procedure SendAndClearBuffer;
     procedure SetCursor;
     procedure DecrementSpotsTimes;
     procedure UpdateSpotsMultiplierStatus;
@@ -106,7 +97,6 @@ uses
 constructor TDXSpotsList.Init;
 begin
   Grow;
-  GrowBuffer;
 end;
 {
 destructor TDXSpotsList.Destroy;
@@ -125,11 +115,6 @@ var
   i                                     : integer;
 begin
 
-       if BandMapPreventRefresh   then
-          insertSpotBuffer(Bcount , Spot)     // Gav 4.37.11
-  else
-    begin
-       Sleep(50);  // n4af 4.37.10
       SetCursor;
 
       for i := 0 to FCount - 1 do
@@ -148,15 +133,17 @@ begin
       InsertSpot(Result, Spot);
       Add:
       FList^[Result] := Spot;
-    end;
+
 
       if SendToNetwork then
-      if PInteger(@Spot.FCall[1])^ <> tCQAsInteger then
-      if NetSocket <> 0 then
-      begin
-        NetDXSpot.dsSpot := Spot;
-        SendToNet(NetDXSpot, SizeOf(NetDXSpot));
-      end;
+        begin
+          if PInteger(@Spot.FCall[1])^ <> tCQAsInteger then
+              if NetSocket <> 0 then
+                    begin
+                       NetDXSpot.dsSpot := Spot;
+                       SendToNet(NetDXSpot, SizeOf(NetDXSpot));
+                    end;   
+        end;
 
 end;
 
@@ -178,7 +165,6 @@ begin
 //  inc(SpotsDisplayed);
 //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then Exit;
-  if  BandMapPreventRefresh then  Exit;                // GAV  4.37.12
   TDXSpotsList.UpdateSpotsMultiplierStatus;
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
@@ -301,26 +287,6 @@ begin
     SetCapacity(0);
   end;
 end;
-
-
-procedure TDXSpotsList.SendAndClearBuffer;         // Gav 4.37
-var
-  i                            : integer;
-
-begin
-  if BCount <> 0 then
-  begin
-    i := BCount;
-    for i := 0 to i - 1 do
-      begin
-         AddSpot(BList^[i],False)
-      end;
-  end;
-  BCount := 0;
- // StartTimer := GetTickCount;
-end;
-
-
 
 procedure TDXSpotsList.Delete(Index: integer);
 begin
@@ -455,15 +421,6 @@ begin
 end;
 
 
-procedure TDXSpotsList.GrowBuffer;           // Gav 4.37.12
-var
-  delta                                 : integer;
-begin
-  if BCapacity > 64 then delta := BCapacity div 4 else
-    if BCapacity > 8 then delta := 16 else
-      delta := 4;
-  SetCapacityBuffer(BCapacity + delta);
-end;
 
 
 procedure TDXSpotsList.InsertSpot(Index: integer; const Spot: TSpotRecord);
@@ -477,29 +434,12 @@ begin
 end;
 
 
-procedure TDXSpotsList.InsertSpotBuffer(Index: integer; const Spot: TSpotRecord);          // Gav 4.37.12
-begin
-  if BCount = BCapacity then GrowBuffer;
-  if Index < BCount then
-    System.Move(BList^[Index], BList^[Index + 1],
-      (BCount - Index) * SizeOf(TSpotRecord));
-  BList^[Index] := Spot;
-  inc(BCount);
-end;
-
-
-
 procedure TDXSpotsList.SetCapacity(NewCapacity: integer);
 begin
   ReallocMem(FList, NewCapacity * SizeOf(TSpotRecord));
   FCapacity := NewCapacity;
 end;
 
-procedure TDXSpotsList.SetCapacityBuffer(NewCapacity: integer);          // Gav 4.37.12
-begin
-  ReallocMem(BList, NewCapacity * SizeOf(TSpotRecord));
-  BCapacity := NewCapacity;
-end;
 
 
 function TDXSpotsList.CompareStrings(const s1, s2: CallString): integer;
