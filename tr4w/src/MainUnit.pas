@@ -879,14 +879,13 @@ end;
 procedure ReturnInCQOpMode;
 begin
   if InactiveRigCallingCQ and (length(ExchangeWindowString)=0) then
-   begin
-    CheckInactiveRigCallingCQ;     // swapradios
+     begin
+     CheckInactiveRigCallingCQ;     // swapradios
     InactiveRigCallingCQ := False;      // n4af 4.44.3
-        if (length(CallWindowString) > 0) then exit; // n4af 4.44.2
-   end;
-
-  if length(CallWindowString) = 0 then
-    if length(ExchangeWindowString) = 0 then
+         if (length(CallWindowString) > 0) then exit; // n4af 4.44.2
+    end;
+     
+  if (length(CallWindowString) = 0) and (length(ExchangeWindowString) = 0) then
     begin
       if MessageEnable then
       begin
@@ -3139,12 +3138,21 @@ begin
   if TuneOnFreqFromCallWindow then Exit;
 
   if OpMode = CQOpMode then
-
   begin
-  if switch = False then
+  if switch = False  then    // n4af 4.44.7
       InactiveRigCallingCQ := False   // n4af 4.42.11
       else
+      begin
+      if autosendenable then       // n4af 4.44.7
+      begin                      // do not swap yet if autosend
+      switch := False;
+      ReturnInCQOpMode;
+      exit;
+      end;
+      checkinactiverigcallingcq;
       Switch := False;
+      exit;
+      end;
     ReturnInCQOpMode;
       Exit;
       end;
@@ -3703,11 +3711,12 @@ begin
   end;
 
  
-   if not Switch then
+ {  if not Switch then
    begin
-   Switch := True;
+   Switch := True;    // n4af 4.44.7
    FirstQSO := Windows.GetTickCount;
    end;
+   }
   RData.Band := Band;
   RData.Mode := Mode;
   RData.NumberSent := TotalContacts + 1;
@@ -5859,7 +5868,7 @@ end;
 
 procedure CheckInactiveRigCallingCQ;
 begin
-  if InactiveRigCallingCQ then //n4af 4.30.1
+  if Switch then //n4af 4.30.1
   if (length(CallWindowString) > 0) or (InactiveSwapRadio) then   // n4af 4.44.2
   begin
      SwapRadios;
