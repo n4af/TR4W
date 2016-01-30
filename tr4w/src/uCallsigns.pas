@@ -127,7 +127,7 @@ begin
   Result := FList^[Index].FInExchange
 end;
 
-function TCallsignsList.GetIniitialExchange(const Call: CallString): Str14;
+function TCallsignsList.GetIniitialExchange(const Call: CallString): Str14;                     
 var
   Index                                 : integer;
 begin
