@@ -7594,7 +7594,7 @@ begin
 end;
 
 
-function DomStringParse(InputString:  Str14): Str14;                          //Gav 4.44.8     Formats DOM from Initial Exchange to be used for Mult Needed display. Most DOM pass through untouched
+function DomStringParse(InputString:  Str14): Str14;             //Gav 4.44.8     Formats DOM from Initial Exchange to be used for Mult Needed display. Most DOM pass through untouched
 
 var
   Index                                : integer;

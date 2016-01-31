@@ -2239,7 +2239,7 @@ begin
   if length(WindowString^) < 3 then DispalayNewMult(SW_HIDE);
 
   if DoingDomesticMults then
-  begin                                                                            // Gav 4.44.8      Uncommented this section
+   begin                                           // Gav 4.44.8      Uncommented this section
     TempString := WindowString^;
     while TempString <> '' do
     begin

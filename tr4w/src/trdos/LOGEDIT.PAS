@@ -117,7 +117,7 @@ type
     procedure PutLogEntryIntoSheet(var LogEntry: string {Str80});
 
     //    procedure SetUpEditableLog;
-    procedure ShowDomesticMultiplierStatus(DomesticQTH: Str10);                     // Gav 4.44.8
+    procedure ShowDomesticMultiplierStatus(DomesticQTH: Str10);         // Gav 4.44.8
     procedure ShowMissingMultiplierReport(h: HWND);
     procedure ShowMultiplierStatus(Call: CallPtr {CallString});
     procedure ShowRemainingMultipliers;
