@@ -321,7 +321,7 @@ begin
   {IF (DoingDomesticMults)AND                                                          }
   {   ((DomesticQTHDataFileName <> '') OR (ActiveDomesticMult = WYSIWYGDomestic)) THEN }
 
-  if (DoingDomesticMults) then
+  if DoingDomesticMults then                                // Gav 4.44.8      Display remaining domestic Mults
   begin
     if RemainingMultDisplay = rmNoRemMultDisplay then
       RemainingMultDisplay := rmDomestic;

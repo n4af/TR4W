@@ -904,12 +904,11 @@ begin
   DisplayGridSquareStatus(CallWindowString);
 
   if Contest <> GENERALQSO then
-  begin
+    begin
+     ShowStationInformation(@CallWindowString);                                          //gav 4.44.8
+     VisibleLog.DoPossibleCalls(CallWindowString);
+    end;
 
-     VisibleLog.ShowMultiplierStatus(@CallWindowString);
-    VisibleLog.ShowQSOStatus(@CallWindowString);
-   VisibleLog.DoPossibleCalls(CallWindowString);
-  end;
   if AutoDupeEnableCQ and tCallWindowStringIsDupe then
   begin
 
