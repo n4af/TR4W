@@ -50,7 +50,9 @@ uses {Dos, Printer,} Tree,
   LogNet,
   LogRadio,
   Messages,
-   Windows
+  idUDPClient,       // ny4i 4.44.9
+  idGlobal,          // ny4i 4.44.9
+  Windows
   ;
 
 const
@@ -565,6 +567,14 @@ var
 
   UpdateRestartFileEnable               : boolean;
 
+  UDPBroadcastAppInfo                   : boolean;               // ny4i 4.44.8
+  UDPBroadcastContact                   : boolean;               // ny4i 4.44.8
+  UDPBroadcastRadio                     : boolean;               // ny4i 4.44.8
+  UDPBroadcastRotor                     : boolean;               // ny4i 4.44.8
+  UDPBroadcastPort                      : integer = 12060;       // ny4i 4.44.9
+  UDPBroadcastAddress                   : string[255] = '127.0.0.1';   // ny4i 4.44.9
+  UDPBroadcastRotorPort                 : integer = 12040;       // ny4i 4.44.9
+
   WaitForStrength                       : boolean = True;
 
   WindowDupeCheckCall                   : CallString;
@@ -572,7 +582,7 @@ var
   tPreviousDupeQSOsShowed               : boolean;
   tPreviousDupeQSOsWndHandle            : HWND;
   //const  tr4w_StartSendingNowKey                    : ;
-
+  udp                                   : TIdUDPClient;          // ny4i 4.44.9 Uses to broadcast info
 //procedure AgeReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 //procedure AgeReceivedHeader(var LogString: Str80; var Underline: Str80);
 

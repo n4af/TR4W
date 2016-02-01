@@ -74,12 +74,16 @@ function Send73Message: boolean;
 procedure AddOnCQExchange;
 procedure SwapRadios;
 
+
 implementation
 
 uses
   uRadioPolling,
   LOGSUBS2,
   MainUnit;
+
+
+
 
 procedure PutUpExchangeMenu;
 

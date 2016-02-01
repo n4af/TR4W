@@ -28,6 +28,8 @@ uses
   VC,
   uIO,
   utils_text,
+  idUDPClient,
+  idGlobal,
   LogStuff,
   Windows,
   PostUnit,
@@ -405,6 +407,7 @@ begin
 //  K5KA.AltDString := '';
 //  K5KA.State := KAIdle;
 //  MarkTime(RITCommandTimeStamp);
+    udp := TIdUDPClient.Create(nil); // ny4i 4.44.9 This is global so init here. Free at end.
 end;
 
 function LoadInSeparateConfigFile(FileName: ShortString; var FirstCommand: boolean; Call: CallString): boolean;

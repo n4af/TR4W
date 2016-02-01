@@ -36,9 +36,12 @@ uses
   utils_file,
   MainUnit,
   Messages,
+  SysUtils,
   LogWind,
   LogStuff,
   LogK1EA,
+  idUDPClient, // ny4i 4.44.9
+  idGlobal, // ny4i 4.44.9
   Windows;
  
 type
@@ -90,6 +93,7 @@ procedure SetVFOA(rig: RadioPtr);
 procedure SetVFOB(rig: RadioPtr);
 function getIcomResponceSpeed(rig: RadioPtr): boolean;
 procedure PTTStatusChanged;
+procedure SendRadioInfoToUDP(rig: RadioPtr);
 
 const
   POLLINGDEBUG                          = False;
@@ -2195,6 +2199,10 @@ var
   h                                     : HWND;
 begin
   if rig = ActiveRadioPtr then SendStationStatus(sstBandModeFreq);
+  if UDPBroadcastRadio then
+     begin
+     SendRadioInfoToUDP(rig); // ny4i 4.44.9 // Broadcast Radio Info if set
+     end;
   Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
   h := rig.tRadioInterfaceWndHandle;
   if h = 0 then Exit;
@@ -2613,6 +2621,77 @@ begin
     Result := Ord(a[c]) mod 16 + (Result * 10);
   end;
 end;
+
+procedure SendRadioInfoToUDP(rig: RadioPtr);
+var
+   sBuf  : AnsiString;
+   sMode : AnsiString;
+   msg   : TIdBytes;
+   freq  : integer;
+   txFreq: integer;
+begin
+
+{ Example of message from N1MM
+<RadioInfo>
+        <RadioNr>1</RadioNr>
+        <Freq>1809738</Freq>
+        <TXFreq>1809738</TXFreq>
+        <Mode>USB</Mode>
+        <OpCall>NY4I</OpCall>
+        <IsRunning>False</IsRunning>
+        <FocusEntry>1389988</FocusEntry>
+        <Antenna>-1</Antenna>
+        <Rotors>-1</Rotors>
+        <FocusRadioNr>1</FocusRadioNr>
+</RadioInfo>
+}
+   if rig.CurrentStatus.Split then
+      begin
+      txFreq := rig.CurrentStatus.VFO[VFOB].Frequency;
+      freq := rig.CurrentStatus.Freq;
+      end
+   else
+      begin
+      txFreq := rig.CurrentStatus.Freq;
+      freq := rig.CurrentStatus.Freq;
+      end;
+
+   case rig.CurrentStatus.Mode of
+       CW: sMode := 'CW';
+       Phone:
+         if freq < 10000000 then               // It seems like this should be in the radio object instead of us guessing // ny4i
+            begin
+            sMode := 'LSB';
+            if (freq > 5300000) and (freq < 5400000) then
+               begin
+               sMode := 'USB';
+               end;
+            end
+         else
+            begin
+            sMode := 'USB';
+            end;
+       Digital: sMode := 'RTTY';
+       else sMode := ' ';
+    end; // of case
+   sBuf := '<?xml version="1.0"?>' +
+           '<RadioInfo>' +
+           '<RadioNr>' + '1' + '</RadioNr>' +
+           '<Freq>' + Format('%d',[freq div 10]) + '</Freq>' +
+           '<TXFreq>' + Format('%d',[txFreq div 10]) + '</TXFreq>' +
+           '<Mode>' + sMode + '</Mode>' +
+           '<OpCall>' + '' + '</OpCall>' +
+           '<IsRunning>' + 'False' + '</IsRunning>' +
+           '<FocusEntry>0</FocusEntry>' +
+           '<Antenna>-1</Antenna>' +
+           '<Rotors>-1</Rotors>' +
+           '<FocusRadioNr>1</FocusRadioNr>' +
+           '</RadioInfo>';
+
+   SetLength(msg,Length(sBuf));
+   msg := RawToBytes(sBuf[1], Length(sBuf));
+   udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
+end; // SendRadioInfoToUDP;
 
 end.
 

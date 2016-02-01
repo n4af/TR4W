@@ -52,6 +52,8 @@ uses
   uSpots,
   Windows,
   Messages,
+  idUDPClient,
+  idGlobal,
   WinSock2,
   PostUnit,
   uTotal,
@@ -60,6 +62,7 @@ uses
   LOGSUBS1,
   //Country9,
   FCONTEST,
+  Math,  // ny4i 4.44.9
   {JCtrl1,}
   {JCtrl2,}
   CFGCMD,
@@ -87,10 +90,12 @@ uses
   {Printer,}
   {Crt,
   SlowTree,}
+  SysUtils,
   Tree,
   ZoneCont
   ;
 
+procedure LogContactToUDP(RXData: ContestExchange); // ny4i
 procedure ToggleModes;
 procedure ToggleStereoPin; {KK1L: 6.71}
 procedure LogContact(var RXData: ContestExchange; MyComputer: boolean);
@@ -673,7 +678,7 @@ begin
           if (Year <> NewYear) or (Month <> NewMonth) or (Day <> NewDay) then
               //{WLI}                     SetDate (NewYear, NewMonth, NewDay);
 
-            GetTime(Hour, Minute, Second, Sec100);
+            TF.GetTime(Hour, Minute, Second, Sec100);
 
           if (Hour <> NewHour) or (Minute <> NewMinute) or (Abs(Second - NewSecond) > 3) then
               //{WLI}                     SetTime (NewHour, NewMinute, NewSecond, 0);
@@ -1435,6 +1440,7 @@ begin
 {$IFEND}
 
 //  if TrayBallonDisplayed then Balloon_DeleteTrayIcon;
+  FreeAndNil(udp); // ny4i 4.44.9 Destroy the udp object
   tr4w_ShutDown;
 end;
 
@@ -4598,6 +4604,11 @@ begin
     if not SendRecordToServer(NET_QSOINFO_ID, RXData) then inc(tUSQ);
   end;
 
+  // Add code here to send UDP message with contact info
+  if UDPBroadcastContact then
+     begin
+     LogContactToUDP(RXData);
+     end;
   if not tAddQSOToLog(RXData) then Exit;
 
   //if RXData.Band in [Band160..Band10] then
@@ -6156,5 +6167,113 @@ begin
 //  SendStationStatus;
 end;
 
+procedure LogContactToUDP(RXData: ContestExchange);
+var
+   msg: TIdBytes;
+   sBuf: AnsiString;
+   sMode : AnsiString;
+   nNumberReceived : integer;
+   sComputerID : AnsiString;
+   sPrecedence : Char;
+   freq : integer;
+   txFreq : integer;
+begin
+
+   if ActiveRadioPtr.CurrentStatus.Split then
+      begin
+      freq := ActiveRadioPtr.CurrentStatus.Freq;
+      txFreq := ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency;
+      end
+   else
+      begin
+      freq := ActiveRadioPtr.CurrentStatus.Freq;
+      txFreq := freq;
+      end;
+   case RXData.Mode of
+       CW: sMode := 'CW';
+       Phone: sMode := 'SSB';
+       Digital: sMode := 'RTTY';
+       else sMode := ' ';
+    end; // of case
+
+    if RxData.ceComputerID = #0 then
+       begin
+       sComputerID := ' ';
+       end
+    else
+       begin
+       sComputerID := RxData.ceComputerID;
+       end;
+
+    if RxData.Precedence = #0 then
+       begin
+       sPrecedence := #20;
+       end
+    else
+       begin
+       sPrecedence := RxData.Precedence;
+       end;
+
+    nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
+    sBuf := '<?xml version="1.0"?>' +
+            '<contactinfo>' +
+
+            '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' +
+            '<contestnr>3</contestnr>' +
+            '<timestamp>' +                      // 2008-01-01 07:04:00
+               SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
+                      RxData.tSysTime.qtYear,
+                      RxData.tSysTime.qtMonth,
+                      RxData.tSysTime.qtDay,
+                      RxData.tSysTime.qtHour,
+                      RxData.tSysTime.qtMinute,
+                      RxData.tSysTime.qtSecond]) +
+
+            '</timestamp>' +
+            '<mycall>' + MyCall + '</mycall>' +
+            '<band>' + BandStringsArrayWithOutSpaces[RxData.Band] + '</band>' +
+            '<rxfreq>' + Format('%d',[freq div 10]) + '</rxfreq>' + // 1420100
+            '<txfreq>' + Format('%d',[txFreq div 10]) + '</txfreq>' +
+            '<operator>' + RxData.ceOperator + '</operator>' +
+            '<mode>' + sMode + '</mode>' +
+            '<call>' + RXData.Callsign + '</call>' +
+            '<countryprefix>' + RxData.QTH.CountryID + '</countryprefix>' +
+            '<wpxprefix>' + RxData.QTH.Prefix + '</wpxprefix>' +
+            '<stationprefix>' + RXData.QTH.Prefix + '</stationprefix>' +
+            '<continent>' + GetContinentName(RXData.QTH.Continent) + '</continent>' +
+            '<snt>' + Format('%d',[RxData.RSTSent]) + '</snt>' +
+            '<sntnr>' + Format('%d',[RxData.NumberSent]) + '</sntnr>' +
+            '<rcv>' + Format('%d',[RxData.RSTReceived]) + '</rcv>' +
+            '<rcvnr>' + Format('%d',[nNumberReceived]) + '</rcvnr>' +
+            '<gridsquare></gridsquare>' +
+            '<exchange1></exchange1>' +
+            '<section>' + '</section>' +
+            '<comment></comment>' +
+            '<qth>' + RxData.QTHString + '</qth>' +
+            '<name>' + RxData.Name + '</name>' +
+            '<power>' + RxData.Power + '</power>' +
+            '<misctext></misctext>' +
+            '<zone>' + Format('%d',[RxData.QTH.Zone]) + '</zone>' +
+            '<prec>' + {sPrecedence +} '</prec>' +
+            '<ck>' + Format('%d',[RxData.Check]) + '</ck>' +                // TODO
+            '<ismultiplier1>0</ismultiplier1>' +
+            '<ismultiplier2>0</ismultiplier2>' +
+            '<ismultiplier3>0</ismultiplier3>' +
+            '<points>0</points>' +
+            '<radionr>' + Format('%d',[Ord(RxData.ceRadio)]) + '</radionr>' +
+            '<RoverLocation></RoverLocation>' +
+            '<RadioInterfaced>1</RadioInterfaced>' +
+            '<NetworkedCompNr>0</NetworkedCompNr>' + // TODO
+            '<IsOriginal>True</IsOriginal>' + // TODO what is this field?
+            '<NetBiosName>' + sComputerID + '</NetBiosName>' +
+            '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' +
+      '</contactinfo>';
+
+
+   SetLength(msg,Length(sBuf));
+   msg := RawToBytes(sBuf[1], Length(sBuf));
+   udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
+
+end;
 end.
 
