@@ -6171,7 +6171,6 @@ begin
 //  SendStationStatus;
 end;
 
-<<<<<<< HEAD
 procedure LogContactToUDP(RXData: ContestExchange);
 var
    msg: TIdBytes;
@@ -6280,9 +6279,6 @@ begin
    udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
 
 end;
-=======
 
-
->>>>>>> origin/master
-end.
+end.
 

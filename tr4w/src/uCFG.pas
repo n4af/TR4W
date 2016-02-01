@@ -315,7 +315,7 @@ const
 
   CommandsArraySize                     = 406 + 1{RadioOneCWSpeedSync} + 1{RadioTwoCWSpeedSync}
                                               + 1{RadioOneCWByCAT}     + 1{RadioTwoCWByCAT} //ny4i // 4.44.5
-                                              + 7{UDPBroadcast Variables} //ny4i 4.44.8
+                                              + 6{UDPBroadcast Variables} //ny4i 4.44.9
                                               ;
   CFGCA                                 : array[1..CommandsArraySize] of CFGRecord =
     (
@@ -713,7 +713,7 @@ const
  (crCommand: 'TUNE ALT-D ENABLE';             crAddress: @TuneDupeCheckEnable;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'TUNE WITH DITS';                crAddress: @TuneWithDits;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'TWO RADIO MODE';                crAddress: @TwoRadioMode;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'UDP BROADCAST APP INFO';        crAddress: @UDPBroadcastAppInfo;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i 4.44.9
+// Not needed as N1MM doesn't send this either... (crCommand: 'UDP BROADCAST APP INFO';        crAddress: @UDPBroadcastAppInfo;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i 4.44.9
  (crCommand: 'UDP BROADCAST CONTACT INFO';    crAddress: @UDPBroadcastContact;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i 4.44.9
  (crCommand: 'UDP BROADCAST RADIO INFO';      crAddress: @UDPBroadcastRadio;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i 4.44.9
  (crCommand: 'UDP BROADCAST ROTOR';           crAddress: @UDPBroadcastRotor;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i 4.44.9

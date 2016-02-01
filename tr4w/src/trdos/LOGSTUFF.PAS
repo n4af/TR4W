@@ -52,6 +52,7 @@ uses {Dos, Printer,} Tree,
   Messages,
   idUDPClient,       // ny4i 4.44.9
   idGlobal,          // ny4i 4.44.9
+  SysUtils,          // ny4i 4.44.9
   Windows
   ;
 
@@ -671,7 +672,7 @@ procedure SlowDown;
 procedure SpeedUp;
 
 procedure StuffInit;
-
+procedure SendUDPRotorCommand(Heading: integer);
 { Header and Stamp routines - used when generating a log string }
 
 //procedure BandModeDateTimeNumberCallNameSentStamp(Exchange: ContestExchange; var LogString: Str80);
@@ -6895,6 +6896,10 @@ var
   nNumberOfBytesToWrite                 : Cardinal;
   TempPchar                             : PChar;
 begin
+  if UDPBroadcastRotor then    // Even if there is no rotator set, if the UDP option is requested, send the command // ny4i 4.44.9
+     begin
+     SendUDPRotorCommand(Heading);
+     end;
   if ActiveRotatorPort = NoPort then Exit;
   case ActiveRotatorType of
     OrionRotator: TempPchar := '#%03u'#$D;
@@ -7846,6 +7851,44 @@ begin
   result := True;
 end;
 
+procedure SendUDPRotorCommand(Heading: integer);     // ny4i 4.44.9
+var
+   msg: TIdBytes;
+   sBuf: AnsiString;
+   freq : integer;
+   sFreqBand : AnsiString;
+begin
+   case ActiveRadio of
+      radioone: freq := Radio1.FilteredStatus.Freq;
+      RadioTwo: freq := Radio2.FilteredStatus.Freq;
+      else freq := 0;
+   end; // case
+
+   case freq of
+      1800000..1899999: sFreqBand := '1.8';
+      3500000..3999999: sFreqBand := '3.5';
+      7000000..7999999: sFreqBand := '7';
+      10000000..10100000: sFreqBand := '10';
+      14201000..14999999: sFreqBand := '14';
+      18000000..18999999: sFreqBand := '18';
+      21000000..21999999: sFreqBand := '21';
+      24000000..24999999: sFreqBand := '24';
+      28000000..29999999: sFreqBand := '28';
+      else sFreqBand := ' ';
+   end; // case
+   sBuf := '<N1MMRotor>' +
+            '<rotor>rotor name</rotor>' +
+            '<goazi>' + SysUtils.Format('%0.0d',[Heading]) + '</goazi>' +
+            '<offset>0.0</offset>' +
+            '<bidirectional>0</bidirectional>' +
+            '<freqband>' + sFreqBand + '<freqband>' +
+            '</N1MMRotor>';
+   SetLength(msg,Length(sBuf));
+   msg := RawToBytes(sBuf[1], Length(sBuf));
+   udp.Broadcast(msg, UDPBroadcastRotorPort);     // ny4i 4.44.9
+
+
+end; // SendUDPRotatorCommand
 begin
   CD.CellBuffer.MaximumMemoryToUse := 40000 * ua4wliscpconst {*4 - ua4wli};
   StuffInit;
