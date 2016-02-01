@@ -154,7 +154,7 @@ begin   // 1
   DontCheckPTT:
 
   Result := True;
-  InactiveRigCallingCQ := False;
+   InactiveRigCallingCQ := False;   
   tWaitForNextChar := True;
 
   if not (Copy(Message, 1, 1) = ControlA) then
@@ -285,7 +285,7 @@ begin
 
     TempMode := ActiveMode;
     if ActiveMode = FM then TempMode := Phone;
-
+    if not inactiverigcallingcq then Switch := False;   // n4af 4.44.7
     if OpMode = CQOpMode then
       Message := GetCQMemoryString(TempMode, MessageKey) {KK1L: 6.73 Added mode}
     else
@@ -307,7 +307,7 @@ begin
         //      until (not DVPMessagePlaying) or (TimeOut > 30);
     end;
 }
-    InactiveRigCallingCQ := False;
+     InactiveRigCallingCQ := False;  
 //    SetUpToSendOnActiveRadio;
 
     if ActiveMode = CW then

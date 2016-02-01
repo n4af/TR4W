@@ -119,6 +119,7 @@ procedure GoToNextDisplayedBandMapFrequency;
 procedure GoToNextMultDisplayedBandMapFrequency;
 function tAddQSOToLog(RXData: ContestExchange): boolean;
 
+
 implementation
 
 uses
@@ -1152,6 +1153,7 @@ var
   Mult                                  : boolean;
   isDupe                                : boolean;
   a                                     : array[0..2] of Pointer;
+
 begin
   if SingleRadioMode then
   begin
@@ -1198,10 +1200,12 @@ begin
   { Put the band map on the band/mode of the inactive radio }
 
   if (DupeInfoCall <> '') {and (DupeInfoCall <> EscapeKey)} then
-  begin
+begin
     DisplayGridSquareStatus(CallWindowString);
-    VisibleLog.ShowQSOStatus(@DupeInfoCall);
-//    VisibleLog.ShowMultiplierStatus(@DupeInfoCall);
+
+    ShowStationInformation(@DupeInfoCall);                                          //gav 4.44.8
+
+
     isDupe := VisibleLog.CallIsADupe(DupeInfoCall, InActiveRadioPtr.BandMemory, InActiveRadioPtr.ModeMemory);
     if not Tune then tCreateAndAddNewSpot(DupeInfoCall, isDupe, InActiveRadioPtr);
     if isDupe then
@@ -1235,6 +1239,7 @@ begin
       else
         tSetWindowText(wh[mweDupeInfoCall], DupeInfoCall + ' OK!!'#13#10'Space bar for ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory] + ' QSO');
 }
+
 
       Format(wsprintfBuffer, '%s OK!!'#13#10'Space bar for %s%s', @DupeInfoCall[1], BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
       SetMainWindowText(mweDupeInfoCall, wsprintfBuffer {DupeInfoCall + ' DUPE!! on ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory]});
@@ -2234,13 +2239,13 @@ var
 
 begin
 //  if not PartialCallMultsEnable then Exit;
-  if ActiveMainWindow <> awCallWindow then if ActiveDomesticMult <> GridSquares then Exit;
+  if ActiveMainWindow <> awCallWindow then if ActiveDomesticMult <> GridSquares then Exit;          
 
   if length(WindowString^) < 2 then Exit;
   if length(WindowString^) < 3 then DispalayNewMult(SW_HIDE);
-{
+
   if DoingDomesticMults then
-  begin
+   begin                                           // Gav 4.44.8      Uncommented this section
     TempString := WindowString^;
     while TempString <> '' do
     begin
@@ -2253,9 +2258,8 @@ begin
           Exit;
         end;
     end;
-  end;
-}
-  VisibleLog.ShowMultiplierStatus(WindowString);
+  end
+ else VisibleLog.ShowMultiplierStatus(WindowString);
 end;
 
 procedure CheckEverything(var KeyChar: Char; var WindowString: Str80);
@@ -4648,12 +4652,12 @@ begin
 //      ShowStationInformation(@RXData.Callsign);
       UpdateStationStatus(RXData.Callsign, -1);
     end;
-{
-  if DoingDomesticMults and
+
+  if DoingDomesticMults and                                         // Gav 4.44.8   uncommented section
     (MultByBand or MultByMode) and
     (RXData.DomesticQTH <> '') then
     VisibleLog.ShowDomesticMultiplierStatus(RXData.DomMultQTH);
-}
+
   {Increment rate data}
   inc(NumberContactsThisMinute);
   NumberQSOPointsThisMinute := NumberQSOPointsThisMinute + RXData.QSOPoints;
@@ -6167,6 +6171,7 @@ begin
 //  SendStationStatus;
 end;
 
+<<<<<<< HEAD
 procedure LogContactToUDP(RXData: ContestExchange);
 var
    msg: TIdBytes;
@@ -6275,5 +6280,9 @@ begin
    udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
 
 end;
+=======
+
+
+>>>>>>> origin/master
 end.
 

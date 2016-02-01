@@ -598,6 +598,7 @@ procedure CreateAndSendSAPMultiInfoMessage;
 
 procedure DisplayGridSquareStatus(Call: CallString);
 procedure DisplayMultiMessageBuffer;
+function DomStringParse(InputString:  Str14): Str14;                                  //Gav 4.44.8
 
 function DVKRecentlyStarted(MaxElaspedSec100: LONGINT): boolean;
 procedure DVKStamp;
@@ -7601,6 +7602,109 @@ begin
     SendMultiInfoMessage(ActiveBand, ActiveMode, TempString);
   }
 end;
+
+
+function DomStringParse(InputString:  Str14): Str14;             //Gav 4.44.8     Formats DOM from Initial Exchange to be used for Mult Needed display. Most DOM pass through untouched
+
+var
+  Index                                : integer;
+  TempMultiplier, NumberString         : Str14;
+
+begin
+
+  strU(InputString);
+
+  result := InputString;
+
+  if ActiveDomesticMult = RDADistrict then
+  begin
+    result := '';
+    if length(InputString) = 4 then
+      if InputString[1] in ['A'..'Z'] then
+        if InputString[2] in ['A'..'Z'] then
+          if InputString[3] in ['0'..'9'] then
+            if InputString[4] in ['0'..'9'] then
+            begin
+             result := InputString;
+            end;
+    Exit;
+  end;
+
+
+  if ActiveDomesticMult = DOKCodes then
+  begin
+    result := '';
+    for Index := 1 to length(InputString) do
+    begin
+      if InputString[Index] in ['A'..'Z'] then
+      begin
+        TempMultiplier := Copy(InputString, Index, 1);
+        Break;
+      end;
+    end;
+    result := TempMultiplier;
+    Exit;
+  end;
+
+  if ActiveDomesticMult = IOTADomestic then
+  begin
+    result := '';
+    if (length(InputString) < 3) or (length(InputString) > 5) then Exit;
+
+    ContinentString := UpperCase(Copy(InputString, 1, 2));
+    if GetContinentFromString(ContinentString) <> UnknownContinent then
+    begin
+      NumberString := Copy(InputString, 3, length(InputString) - 2);
+
+      if not StringIsAllNumbers(NumberString) then Exit;
+
+      while length(NumberString) < 3 do
+        NumberString := '0' + NumberString;
+
+      TempMultiplier := ContinentString + '-' + NumberString;
+      result := TempMultiplier;
+    end;
+  end;
+
+  if ActiveDomesticMult = GridSquares then
+  begin
+    result := '';
+    if (length(InputString) <> 4) and (length(InputString) <> 6) then
+      Exit;
+
+    if (InputString[1] < 'A') or (InputString[1] > 'R') or
+      (InputString[2] < 'A') or (InputString[2] > 'R') or
+      (InputString[3] > '9') or (InputString[3] < '0') or
+      (InputString[4] > '9') or (InputString[4] < '0') then
+      Exit;
+
+    if length(InputString) = 6 then
+      if (InputString[5] < 'A') or (InputString[5] > 'Z') or
+        (InputString[6] < 'A') or (InputString[6] > 'Z') then
+        Exit;
+
+    TempMultiplier := Copy(InputString, 1, 4);
+    result := TempMultiplier;
+    Exit;
+  end;
+
+  if ActiveDomesticMult = GridFields then
+  begin
+    result := '';
+    if (length(InputString) <> 4) or (InputString[1] < 'A') or (InputString[1] > 'R') or
+      (InputString[2] < 'A') or (InputString[2] > 'R') or
+      (InputString[3] > '9') or (InputString[3] < '0') or
+      (InputString[4] > '9') or (InputString[4] < '0') then
+      Exit;
+
+    TempMultiplier := Copy(InputString, 1, 2);
+    result := TempMultiplier;
+    Exit;
+  end;
+
+
+end;
+
 
 function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}): Word;
 

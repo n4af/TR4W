@@ -1937,7 +1937,7 @@ begin
   wkSetKeyerOutput(ActiveRadioPtr);
 
   KeyersSwapped := False;
-  InactiveRigCallingCQ := False; // n4af 4.44.3
+ // InactiveRigCallingCQ := False; // n4af 4.44.7
 end;
 
 procedure SetUpToSendOnInactiveRadio;

@@ -96,7 +96,7 @@ type
     procedure EditLog;
     function EditableLogIsEmpty: boolean;
 
-    //    function GetInitialExchangeFromEditableLog(Call: CallString): Str40;
+//  function GetInitialExchangeFromEditableLog(Call: CallString): Str40;
 
     procedure SetMultStatus(Call: CallString; TempMult: Str10);
 
@@ -117,7 +117,7 @@ type
     procedure PutLogEntryIntoSheet(var LogEntry: string {Str80});
 
     //    procedure SetUpEditableLog;
-//    procedure ShowDomesticMultiplierStatus(DomesticQTH: Str10);
+    procedure ShowDomesticMultiplierStatus(DomesticQTH: Str10);         // Gav 4.44.8
     procedure ShowMissingMultiplierReport(h: HWND);
     procedure ShowMultiplierStatus(Call: CallPtr {CallString});
     procedure ShowRemainingMultipliers;
@@ -1161,49 +1161,25 @@ begin
     end;
   end;
 end;
-{
-procedure EditableLog.ShowDomesticMultiplierStatus(DomesticQTH: Str10);
 
+
+
+procedure EditableLog.ShowDomesticMultiplierStatus(DomesticQTH: Str10);              //Gav 4.44.8  New procedure to display Domestic Mult Status
 var
-  OutputString                          : integer;
-  Band                                  : BandType;
-  Mode                                  : ModeType;
+  DomesticQTHtemp       : string;
 begin
-  if MultByMode and (not MultByBand) and (not MultipleModesEnabled) then Exit;
-  if MultByBand and (not MultByMode) and (not MultipleBandsEnabled) then Exit;
-  if MultByBand and MultByMode and (not MultipleModesEnabled) and (not MultipleBandsEnabled) then Exit;
 
-  if length(DomesticQTH) < SizeOf(DomesticQTH) - 1 then DomesticQTH[length(DomesticQTH) + 1] := #0;
-  asm
-    lea eax, DomesticQTH[1]
-    push eax
-  end;
-  wsprintf(wsprintfBuffer, TC_MULTNEEDSFOR);
-  asm add esp,12 end;
+  if length(DomesticQTH) < 2 then Exit;
+  DomesticQTHtemp :=  DomesticQTH;
+
+  Format(wsprintfBuffer, TC_MULTNEEDSFOR, PChar(DomesticQTHtemp));
+
   SetMainWindowText(mweMultNeedsHeader, wsprintfBuffer);
-
-//  tSetWindowText(MIHeaderWindowHandle, TC_MULTNEEDSFOR + DomesticQTH + ':');
-
-  if MultByMode then
-  begin
-    CreateModeSpecificDomesticMultiplierInfo(DomesticQTH, CW, OutputString);
-    for Band := Band160 to Band10 do
-      Windows.ShowWindow(MultsWindowsHandles1[Band], integer((OutputString and (1 shl integer(Band))) <> 0));
-
-    CreateModeSpecificDomesticMultiplierInfo(DomesticQTH, Phone, OutputString);
-    for Band := Band160 to Band10 do
-      Windows.ShowWindow(MultsWindowsHandles2[Band], integer((OutputString and (1 shl integer(Band))) <> 0))
-
-  end
-  else
-  begin
-    CreateModeSpecificDomesticMultiplierInfo(DomesticQTH, Both, OutputString);
-    for Band := Band160 to Band10 do
-      Windows.ShowWindow(MultsWindowsHandles1[Band], integer((OutputString and (1 shl integer(Band))) <> 0))
-
-  end;
+  SetMultStatus( '', DomesticQTH);
 end;
-}
+
+
+
 
 procedure EditableLog.ShowMultiplierStatus(Call: CallPtr {CallString});
 begin
@@ -1217,6 +1193,7 @@ begin
   end;
 }
   Format(wsprintfBuffer, TC_MULTNEEDSFOR, PChar(integer(Call) + 1));
+
 
   SetMainWindowText(mweMultNeedsHeader, wsprintfBuffer);
   SetMultStatus(Call^, '');
@@ -1379,7 +1356,7 @@ begin
         Exit;
       end;
 end;
-}
+ }
 
 procedure EditableLog.SetMultStatus(Call: CallString; TempMult: Str10);
 var
@@ -2364,10 +2341,16 @@ begin
   UpdateTimeAndRateDisplays(True, False);
 end;
 
-procedure ShowStationInformation(Call: CallPtr {CallString});
 
+
+procedure ShowStationInformation(Call: CallPtr {CallString});
 var
   Name                                  : Str80;
+  TestString                            : ShortString;
+  TempString                            : ShortString;
+  TempExchange                          : Str14;
+  ParsedTempExchange                    : Str14;
+  test1                                 : string;
 
 begin
   { Took next line out in 6.27.  What if you are working the same guy
@@ -2384,23 +2367,44 @@ begin
 
   if QTCsEnabled then DisplayQTCNumber(NumberQTCsThisStation(StandardCallFormat(Call^, False)));
 
-  if Contest <> GENERALQSO then
-  begin
-    VisibleLog.ShowMultiplierStatus(Call);
-    VisibleLog.ShowQSOStatus(Call);
-  end;
 
-  if ActiveDomesticMult <> GridSquares then
-  begin
-    DisplayBeamHeading(Call^, '');
-    DisplayCountryName(Call^);
-  end;
 
-  DisplayUserInfo(Call^);
+if Contest <> GENERALQSO then                                                        // Gav 4.44.8   Uses intiial exchange & previous qso DOM to display Domestic mults, if it exists
+ begin
+   if DoingDomesticMults then
+     begin
+       TempString := Call^;
+       if TempString <> '' then
+         begin
+              TempExchange := CallsignsList.GetIniitialExchange(TempString);
+              if TempExchange <> '' then
+                      begin
+                        ParsedTempExchange := DomStringParse(TempExchange);
+                        if ParsedTempExchange <> '' then
+                                VisibleLog.ShowDomesticMultiplierStatus(ParsedTempExchange);
+                      end
+              else
+                      begin
+                        VisibleLog.ShowMultiplierStatus(Call);
+                      end;
+              VisibleLog.ShowQSOStatus(Call);
+         end;
+    end
+   else
+     begin
+       VisibleLog.ShowMultiplierStatus(Call);
+       VisibleLog.ShowQSOStatus(Call);
+      end;
+ end;
 
-//  if CountryInformationFile <> '' then
-//    LogWind.DisplayCountryInformation(CountryInformationFile, Call^);
+DisplayUserInfo(Call^);
+DisplayBeamHeading(Call^, '');
+DisplayCountryName(Call^);
+
 end;
+
+
+
 
 function DetermineQTCNumberAndQuanity(InputString: Str80;
   var QTCNumber: integer;
@@ -3004,8 +3008,8 @@ begin
                          //      RestorePreviousWindow;
 
     end;
-{
-    if DoingDomesticMults then
+
+    if DoingDomesticMults then                                                      // Gav 4.44.8    Uncommented this section
       if not StringIsAllNumbersOrSpaces(TestString) then
       begin
         TempExchange.QTHString := TestString;
@@ -3025,7 +3029,7 @@ begin
             VisibleLog.ShowDomesticMultiplierStatus(TempExchange.DomesticQTH);
           Exit;
         end;
-}
+
   end;
 
   //{WLI}
