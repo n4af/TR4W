@@ -4825,7 +4825,7 @@ begin
     Exit;
   end;
 
-  if (Section = 'NF') or (Section = 'SF') then
+  if (Section = 'NF') or (Section = 'SF') or (Section = 'WCF') then // ny4i 4.44.9...unrelated but I happened to notice this
   begin
     GetStateFromSection := 'FL';
     Exit;

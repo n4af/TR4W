@@ -6181,8 +6181,12 @@ var
    sPrecedence : Char;
    freq : integer;
    txFreq : integer;
+   sOperator : AnsiString;
 begin
 
+   // if operator is blank, use mycall
+   // Add CR to output
+   // Band is in Mhz, not meters.
    if ActiveRadioPtr.CurrentStatus.Split then
       begin
       freq := ActiveRadioPtr.CurrentStatus.Freq;
@@ -6218,13 +6222,22 @@ begin
        sPrecedence := RxData.Precedence;
        end;
 
-    nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
-    sBuf := '<?xml version="1.0"?>' +
-            '<contactinfo>' +
+    if CurrentOperator[0] = #0 then
+       begin
+       sOperator := MyCall;
+       end
+    else
+       begin
+       sOperator := CurrentOperator;
+       end;
 
-            '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' +
-            '<contestnr>3</contestnr>' +
-            '<timestamp>' +                      // 2008-01-01 07:04:00
+    nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
+    sBuf := '<?xml version="1.0"?>' + sLineBreak +
+            '<contactinfo>' +  sLineBreak +
+
+            #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
+            #9 + '<contestnr>3</contestnr>' + sLineBreak +
+            #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
                SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
                       RxData.tSysTime.qtYear,
                       RxData.tSysTime.qtMonth,
@@ -6233,50 +6246,53 @@ begin
                       RxData.tSysTime.qtMinute,
                       RxData.tSysTime.qtSecond]) +
 
-            '</timestamp>' +
-            '<mycall>' + MyCall + '</mycall>' +
-            '<band>' + BandStringsArrayWithOutSpaces[RxData.Band] + '</band>' +
-            '<rxfreq>' + Format('%d',[freq div 10]) + '</rxfreq>' + // 1420100
-            '<txfreq>' + Format('%d',[txFreq div 10]) + '</txfreq>' +
-            '<operator>' + RxData.ceOperator + '</operator>' +
-            '<mode>' + sMode + '</mode>' +
-            '<call>' + RXData.Callsign + '</call>' +
-            '<countryprefix>' + RxData.QTH.CountryID + '</countryprefix>' +
-            '<wpxprefix>' + RxData.QTH.Prefix + '</wpxprefix>' +
-            '<stationprefix>' + RXData.QTH.Prefix + '</stationprefix>' +
-            '<continent>' + GetContinentName(RXData.QTH.Continent) + '</continent>' +
-            '<snt>' + Format('%d',[RxData.RSTSent]) + '</snt>' +
-            '<sntnr>' + Format('%d',[RxData.NumberSent]) + '</sntnr>' +
-            '<rcv>' + Format('%d',[RxData.RSTReceived]) + '</rcv>' +
-            '<rcvnr>' + Format('%d',[nNumberReceived]) + '</rcvnr>' +
-            '<gridsquare></gridsquare>' +
-            '<exchange1></exchange1>' +
-            '<section>' + '</section>' +
-            '<comment></comment>' +
-            '<qth>' + RxData.QTHString + '</qth>' +
-            '<name>' + RxData.Name + '</name>' +
-            '<power>' + RxData.Power + '</power>' +
-            '<misctext></misctext>' +
-            '<zone>' + Format('%d',[RxData.QTH.Zone]) + '</zone>' +
-            '<prec>' + {sPrecedence +} '</prec>' +
-            '<ck>' + Format('%d',[RxData.Check]) + '</ck>' +                // TODO
-            '<ismultiplier1>0</ismultiplier1>' +
-            '<ismultiplier2>0</ismultiplier2>' +
-            '<ismultiplier3>0</ismultiplier3>' +
-            '<points>0</points>' +
-            '<radionr>' + Format('%d',[Ord(RxData.ceRadio)]) + '</radionr>' +
-            '<RoverLocation></RoverLocation>' +
-            '<RadioInterfaced>1</RadioInterfaced>' +
-            '<NetworkedCompNr>0</NetworkedCompNr>' + // TODO
-            '<IsOriginal>True</IsOriginal>' + // TODO what is this field?
-            '<NetBiosName>' + sComputerID + '</NetBiosName>' +
-            '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' +
-      '</contactinfo>';
+            '</timestamp>' + sLineBreak +
+            #9 + '<mycall>' + MyCall + '</mycall>' + sLineBreak +
+            #9 + '<band>' + Format('%d',[freq div 1000000]) + '</band>' + sLineBreak +     // Not 20M but 14 -- Odd.
+         // #9 +   '<band>' + BandStringsArrayWithOutSpaces[RxData.Band] + '</band>' + sLineBreak +
+            #9 + '<rxfreq>' + Format('%d',[freq div 10]) + '</rxfreq>' + sLineBreak + // 1420100
+            #9 + '<txfreq>' + Format('%d',[txFreq div 10]) + '</txfreq>' + sLineBreak +
+            #9 + '<operator>' + sOperator + '</operator>' + sLineBreak +
+            #9 + '<mode>' + sMode + '</mode>' + sLineBreak +
+            #9 + '<call>' + RXData.Callsign + '</call>' + sLineBreak +
+            #9 + '<countryprefix>' + RxData.QTH.CountryID + '</countryprefix>' + sLineBreak +
+            #9 + '<wpxprefix>' + RxData.QTH.Prefix + '</wpxprefix>' + sLineBreak +
+            #9 + '<stationprefix>' + RXData.QTH.Prefix + '</stationprefix>' + sLineBreak +
+            #9 + '<continent>' + GetContinentName(RXData.QTH.Continent) + '</continent>' + sLineBreak  +
+            #9 + '<snt>' + Format('%d',[RxData.RSTSent]) + '</snt>' + sLineBreak +
+            #9 + '<sntnr>' + Format('%d',[RxData.NumberSent]) + '</sntnr>' + sLineBreak +
+            #9 + '<rcv>' + Format('%d',[RxData.RSTReceived]) + '</rcv>' + sLineBreak +
+            #9 + '<rcvnr>' + Format('%d',[nNumberReceived]) + '</rcvnr>' + sLineBreak +
+            #9 + '<gridsquare></gridsquare>' + sLineBreak +
+            #9 + '<exchange1>' + ExchangeWindowString + '</exchange1>' + sLineBreak +
+            #9 + '<section>' + '</section>' + sLineBreak +
+            #9 + '<comment></comment>' + sLineBreak +
+            #9 + '<qth>' + RxData.QTHString + '</qth>' + sLineBreak +
+            #9 + '<name>' + RxData.Name + '</name>' + sLineBreak +
+            #9 + '<power>' + RxData.Power + '</power>' + sLineBreak +
+            #9 + '<misctext></misctext>' + sLineBreak +
+            #9 + '<zone>' + Format('%d',[RxData.QTH.Zone]) + '</zone>' + sLineBreak +
+            #9 + '<prec>' + {sPrecedence +} '</prec>' + sLineBreak +
+            #9 + '<ck>' + Format('%d',[RxData.Check]) + '</ck>' + sLineBreak +                // TODO
+            #9 + '<ismultiplier1>0</ismultiplier1>' + sLineBreak +
+            #9 + '<ismultiplier2>0</ismultiplier2>' + sLineBreak +
+            #9 + '<ismultiplier3>0</ismultiplier3>' + sLineBreak +
+            #9 + '<points>' + Format('%d',[RXData.QSOPoints]) + '</points>' + sLineBreak +
+            #9 + '<radionr>' + Format('%d',[Ord(RxData.ceRadio)]) + '</radionr>' + sLineBreak +
+            #9 + '<RoverLocation></RoverLocation>' + sLineBreak +
+            #9 + '<RadioInterfaced>1</RadioInterfaced>' + sLineBreak +
+            #9 + '<NetworkedCompNr>0</NetworkedCompNr>' + sLineBreak + // TODO
+            #9 + '<IsOriginal>True</IsOriginal>' + sLineBreak +
+            #9 + '<NetBiosName>' + GetLocalComputerName + '</NetBiosName>' + sLineBreak +
+            #9 + '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' + sLineBreak +
+      '</contactinfo>'+ sLineBreak ;
 
 
    SetLength(msg,Length(sBuf));
    msg := RawToBytes(sBuf[1], Length(sBuf));
-   udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
+   udp.BroadcastEnabled := true;
+   udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+   //udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
 
 end;
 

@@ -144,6 +144,7 @@ function DeviceIoControlHandler
   ULONG; pOutputLength: PULONG
   ): Cardinal;
 
+function GetLocalComputerName : string;
 procedure CheckNumber;
 procedure RunPlugin(PluginNumber: integer);
 procedure LoadInPlugins();
@@ -422,6 +423,18 @@ mov dword ptr result,eax
 mov dword ptr result[4],edx
   end;
   Result := Result;
+end;
+
+function GetLocalComputerName : string;
+    var c1    : dword;
+    arrCh : array [0..MAX_PATH] of char;
+begin
+  c1 := MAX_PATH;
+  GetComputerName(arrCh, c1);
+  if c1 > 0 then
+    result := arrCh
+  else
+    result := '';
 end;
 
 function TryLogContact: boolean;
