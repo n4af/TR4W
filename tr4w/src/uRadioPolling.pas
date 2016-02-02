@@ -2626,7 +2626,7 @@ procedure SendRadioInfoToUDP(rig: RadioPtr);
 var
    sBuf  : AnsiString;
    sMode : AnsiString;
-   msg   : TIdBytes;
+  // msg   : TIdBytes;
    freq  : integer;
    txFreq: integer;
 begin
@@ -2688,9 +2688,10 @@ begin
            '<FocusRadioNr>1</FocusRadioNr>' +
            '</RadioInfo>';
 
-   SetLength(msg,Length(sBuf));
-   msg := RawToBytes(sBuf[1], Length(sBuf));
-   udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
+   //SetLength(msg,Length(sBuf));
+   //msg := RawToBytes(sBuf[1], Length(sBuf));
+   udp.BroadcastEnabled := true;
+   udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf); // ny4i 4.44.9
 end; // SendRadioInfoToUDP;
 
 end.

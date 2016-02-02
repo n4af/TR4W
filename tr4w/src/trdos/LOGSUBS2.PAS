@@ -6173,7 +6173,7 @@ end;
 
 procedure LogContactToUDP(RXData: ContestExchange);
 var
-   msg: TIdBytes;
+  // msg: TIdBytes;
    sBuf: AnsiString;
    sMode : AnsiString;
    nNumberReceived : integer;
@@ -6288,8 +6288,8 @@ begin
       '</contactinfo>'+ sLineBreak ;
 
 
-   SetLength(msg,Length(sBuf));
-   msg := RawToBytes(sBuf[1], Length(sBuf));
+  // SetLength(msg,Length(sBuf));
+   //msg := RawToBytes(sBuf[1], Length(sBuf));
    udp.BroadcastEnabled := true;
    udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
    //udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9

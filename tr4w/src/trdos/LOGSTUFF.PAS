@@ -7853,7 +7853,7 @@ end;
 
 procedure SendUDPRotorCommand(Heading: integer);     // ny4i 4.44.9
 var
-   msg: TIdBytes;
+  // msg: TIdBytes;
    sBuf: AnsiString;
    freq : integer;
    sFreqBand : AnsiString;
@@ -7883,9 +7883,11 @@ begin
             '<bidirectional>0</bidirectional>' +
             '<freqband>' + sFreqBand + '<freqband>' +
             '</N1MMRotor>';
-   SetLength(msg,Length(sBuf));
-   msg := RawToBytes(sBuf[1], Length(sBuf));
-   udp.Broadcast(msg, UDPBroadcastRotorPort);     // ny4i 4.44.9
+   //SetLength(msg,Length(sBuf));
+   //msg := RawToBytes(sBuf[1], Length(sBuf));
+   //udp.Broadcast(msg, UDPBroadcastRotorPort);     // ny4i 4.44.9
+   udp.BroadcastEnabled := true;
+   udp.Send(UDPBroadcastAddress,UDPBroadcastRotorPort,sBuf);
 
 
 end; // SendUDPRotatorCommand
