@@ -776,4 +776,10 @@ const
   RC_WA7BNM_CALENDAR                    = 'Kalendáø závodù podle WA7BNM';
   RC_SEND_BUG                           = 'vyšli seznam chyb';
   RC_HOMEPAGE                           = 'Domácí stránky TR4W';
-
+ TC_ENTERYOURFOCNUMBER                 = 'Enter your FOC number:';
+  TC_IMPROPERCONTINENT                  = 'Improper continent!!';
+  TC_C9_ANTARTICA                     ='Antartica';
+  RC_DVKVOLCONTROL                      = 'DVK volume control';
+  RC_ALTP                               = 'Open Fkeys';
+  RC_ALTX                               = 'Exit Program';
+  RC_CTRLJ                             = 'Open Configuration commands';

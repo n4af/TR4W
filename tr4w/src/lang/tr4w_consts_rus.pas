@@ -42,7 +42,7 @@ const
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" для очистки всех логов в сети';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" для очистки листов повторов на всех компьютерах';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" для очистки листов множителей на всех компьютерах';
-
+  TC_ENTERYOURFOCNUMBER                 = 'Введите ваш членский номер FOC ';
   TC_REALLYWANTTOCLEARTHELOG            = 'Вы уверены, что хотите очистить текущий лог?';
   TC_MESSAGETOSENDVIANETWORK            = 'сообщение для отправки по сети';
   TC_SENDTIMETOCOMPUTERSONTHENETWORK    = 'Вы на действительно хотите послать время по сети?';
@@ -61,13 +61,13 @@ const
   TC_LOG_NOTE                           = 'Заметка';
   TC_LOG_DELETED                        = 'Удалена';
 
-  TC_SUN                                = 'Вос';
-  TC_MON                                = 'Пон';
+  TC_SUN                                = 'Вск';
+  TC_MON                                = 'Пнд';
   TC_TUE                                = 'Втр';
   TC_WED                                = 'Срд';
   TC_THU                                = 'Чтв';
-  TC_FRI                                = 'Пят';
-  TC_SAT                                = 'Суб';
+  TC_FRI                                = 'Птн';
+  TC_SAT                                = 'Сбт';
 
   {uMP3Recorder}
 
@@ -117,7 +117,7 @@ const
   TC_ENTERYOURMEMBERSHIPNUMBER          = 'Введите ваш членский номер:';
   TC_ENTERYOURCONTINENT                 = 'Введите ваш континент (и возможный доп. идентификатор, например SAYL или NAQRP)';
   TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Введите ваш каунти если вы находитесь в штате %s. Введите ваш штат, провинцию или "DX" если вы находитесь вне штата %s:';
-  TC_PREFECTURE                         = 'Введите вашу префиктуру:';
+  TC_PREFECTURE                         = 'Введите вашу префектуру:';
   TC_STATIONCLASS                       = 'Введите вашу категорию:';
   TC_AGECALLSIGNAGE                     = 'Введите ваш возраст (а также позывной SK  и возраст):';
   TC_DEPARTMENT                         = 'Введите ваш департамент:';
@@ -221,7 +221,7 @@ const
 
   {LOGEDIT}
 
-  TC_QSONEEDSFOR                        = ' QSO с %s :';
+  TC_QSONEEDSFOR                        = ' Связь с %s :';
   TC_MULTNEEDSFOR                       = ' Множители для %s :';
   TC_MISSINGMULTSREPORT                 = 'Информация по множителям: %u стран на %u, но не на всех диапазонах.';
 
@@ -252,6 +252,7 @@ const
   TC_C9_EUROPE                          = 'Европа';
   TC_C9_AFRICA                          = 'Африка';
   TC_C9_OCEANIA                         = 'Океания';
+  TC_C9_ANTARTICA                 		= 'Антарктида';
   TC_C9_ASIA                            = 'Азия';
   TC_C9_UNKNOWN                         = 'Неизвестный континент';
 
@@ -357,7 +358,7 @@ const
   TC_COMPUTERIDAZRETURNNONE             = 'идентификатор компьютера (A-Z или RETURN если нет)';
   TC_NEWCOUNTRYINFORMATIONFILENAME      = 'новое название файла с информацией о новых странах';
 
-  TC_NEWCWINCREMENT                     = 'новое значение инкрементирования CW скорости (от 1 до 10 WPM)';
+  TC_NEWCWINCREMENT                     = 'новое значение шага изменения CW скорости (от 1 до 10 WPM)';
   TC_NEWCWMONITORTONE                   = 'новое значение тона звучания самопрослушивания CW (0 - нет звука)';
   TC_NEWFARNSWORTHSPEEDCUTINVALUE       = 'новое значение скорости замедления передачи';
   TC_NEWFLOPPYFILESAVEFREQUENCY         = 'новое значение частоты записи файла';
@@ -386,7 +387,7 @@ const
   TC_NETWORKSERVERPORT                  = 'сетевой порт сервера';
   TC_KEYBOARDCHARACTERTOUSEFORSLASH     = 'клавиатурный символ для знака /';
   TC_NEWOFFTIMEVALUEMINUTES             = 'новое значение времени отдыха (в минутах)';
-  TC_NEWVALUEFORWAKEUPTIMEOUT           = 'новое значение new времени задержки будильника';
+  TC_NEWVALUEFORWAKEUPTIMEOUT           = 'новое значение  времени задержки будильника';
   TC_NEWWEIGHTVALUE                     = 'значение веса передаваемого знака (.5 - 1.5)';
   TC_NEWVALUE                           = 'новое значение';
 
@@ -396,31 +397,31 @@ const
 
   {UWINKEY}
 
-  TC_WINKEYERENABLE                     = '&Winkeyer enable';
-  TC_AUTOSPACE                          = '&Autospace';
-  TC_CTSPACING                          = 'C&T spacing';
-  TC_SIDETONE                           = '&Sidetone';
-  TC_PADDLESWAP                         = 'Paddle swa&p';
-  TC_IGNORESPEEDPOT                     = '&Ignore speed pot';
-  TC_PADDLEONLYSIDETONE                 = 'Paddle &only sidetone';
+  TC_WINKEYERENABLE                     = 'Включен Winkeyer';
+  TC_AUTOSPACE                          = 'Длительность паузы';
+  TC_CTSPACING                          = 'CT интервал';
+  TC_SIDETONE                           = 'Самопрослушивание';
+  TC_PADDLESWAP                         = 'Работа на манипуляторе правой или левой рукой';
+  TC_IGNORESPEEDPOT                     = 'Игнорировать скорость установленную потенциометром';
+  TC_PADDLEONLYSIDETONE                 = 'Манипулятор в режиме самопрослушивания';
 
-  TC_WINKEYERPORT                       = 'Winkeyer port';
-  TC_KEYERMODE                          = 'Keyer mode';
-  TC_SIDETONEFREQ                       = 'Sidetone freq.';
-  TC_HANGTIME                           = 'Hang time';
+  TC_WINKEYERPORT                       = 'Порт подключения Winkeyer';
+  TC_KEYERMODE                          = 'Режим работы ключа';
+  TC_SIDETONEFREQ                       = 'Разница тона';
+  TC_HANGTIME                           = 'Задержка времени';
 
-  TC_IAMBICB                            = 'Iambic B';
-  TC_IAMBICA                            = 'Iambic A';
-  TC_ULTIMATIC                          = 'Ultimatic';
-  TC_BUGMODE                            = 'Bug mode';
+  TC_IAMBICB                            = 'РежимIambic B';
+  TC_IAMBICA                            = 'Режим Iambic A';
+  TC_ULTIMATIC                          = 'Режим Ultimatic';
+  TC_BUGMODE                            = 'Режим Bug mode';
 
-  TC_WEIGHTING                          = 'Weighting';
-  TC_DITDAHRATIO                        = 'Dit/Dah ratio';
-  TC_LEADIN                             = 'Lead-in time (*10 ms)';
-  TC_TAIL                               = 'Tail time (*10 ms)';
-  TC_FIRSTEXTENSION                     = 'First extension';
-  TC_KEYCOMP                            = 'Keyer compensation';
-  TC_PADDLESWITCHPOINT                  = 'Paddle switchpoint';
+  TC_WEIGHTING                          = 'Изменение соотношение точки к тире';
+  TC_DITDAHRATIO                        = 'Изменнение соотношение точки и тире ';
+  TC_LEADIN                             = 'Время между сигналом PTT и началом манипуляции (*10 ms)';
+  TC_TAIL                               = 'Время между окончанием манипуляции и отключением PTT(*10 ms)';
+  TC_FIRSTEXTENSION                     = 'Увеличение первого элемента';
+  TC_KEYCOMP                            = 'Корректировка работы манипулятора';
+  TC_PADDLESWITCHPOINT                  = 'Переключенеие манипулятора';
 
   {UTOTAL}
 
@@ -564,7 +565,7 @@ const
   RC_TELNET                             = 'DX Кластер';
   RC_NETWORK                            = 'Сеть';
   RC_INTERCOM                           = 'Внутренняя связь';
-  RC_GETSCORES                          = 'RC_POSTSCORETOGS""';
+  RC_GETSCORES                          = 'Отправка результата онлайн на WEB сервер';
   RC_STATIONS                           = 'Станции';
   RC_MP3REC                             = 'MP3 рекордер';
   RC_MULTSFREQ                          = 'Частоты для взятия множителей';
@@ -676,12 +677,12 @@ const
   RC_REMOVEALLSP                        = 'Удалить все споты';
   RC_SENDINRIG                          = 'Настроить неактивное радио на эту частоту';
   RC_COAX                               = 'Расчет длины коаксиала';
-  RC_ENTERTNHINIK                       = 'Enter the next highest impedance null in kHz:';
-  RC_ENTERALIFIK                        = 'Enter a low impedance frequency in kHz:';
+  RC_ENTERTNHINIK                       = 'Введите высшее значение частоты в кГц для расчета сопротивления:';
+  RC_ENTERALIFIK                        = 'Введите нижнюю частоту в кГц для расчета сопротивления:';
   RC_DISTANCEBTGS                       = 'Расстояние между двумя квадратами';
   RC_SECONDGRID                         = 'Второй квадрат';
   RC_FIRSTGRID                          = 'Первый квадрат';
-  RC_EURVHFDIST                         = 'European VHF Distance:';
+  RC_EURVHFDIST                         = 'Квадраты в Европейском УКВ контесте:';
   RC_GRIDOFAGLL                         = 'Определить квадрат по широте/долготе';
   RC_LONGMIE                            = 'Долгота (минус для востока)';
   RC_LATMIS                             = 'Широта (минус для юга)';
@@ -769,3 +770,8 @@ const
   RC_DVKVOLCONTROL                      = 'Контроль уровня воспроизведения DVK';
   TC_IMPROPERCONTINENT                  = 'Неверно указан континент!!';
   TC_IRELAND                            = 'Ирландии';
+  RC_QUICKMEM                           = 'Оперативная память';
+  RC_ALTP                               = 'Открыть окно программирования макросов';
+  RC_ALTX                               = 'Выйти из программы';
+  RC_CTRLJ                              = 'Окно конфигурирования команд Ctrl-J';
+ 
