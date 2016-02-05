@@ -5,7 +5,7 @@ const
   { %u =	An unsigned integer argument.}
 
   TC_TRANSLATION_LANGUAGE               = 'ROMANIAN';
-  TC_TRANSLATION_AUTHOR                 = 'Suli Iulius YO2IS';
+  TC_TRANSLATION_AUTHOR                 = 'Suli I.Iulius YO2IS';
 
   TC_CALLSIGN                           = 'Indicativ';
   TC_BAND                               = 'Banda';
@@ -17,8 +17,8 @@ const
 
   TC_CHECKCALLSIGN                      = 'Verifica indicativ';
 
-  TC_FREQUENCYFORCALLINKHZ              = 'frecventa ptr %s in kHz';
-  TC_DIFVERSION                         = '%s este dela o versiune diferita.'#13'TR4W necesita versiunea %s.'#13'Fisierul actual este din versiunea %s.';
+  TC_FREQUENCYFORCALLINKHZ              = 'frecventa ptr %s in KHz';
+  TC_DIFVERSION                         = '%s este de la o alta versiune';
   TC_FILE                               = 'Fisier';
 
   TC_M                                  = 'm'; //minute
@@ -27,42 +27,42 @@ const
   TC_RADIO1                             = 'Statia 1';
   TC_RADIO2                             = 'Statia 2';
 
-  TC_DISBALE_CIV                        = 'Anulati modul "CI-V Transceive" din statia ICOM. Vedeti manualul de utilizare al statiei.';
+  TC_DISBALE_CIV                        = 'Anulez modul "CI-V Transceive" din statia ICOM. Vezi manualul de operare al statiei.';
 
   {MAIN}
-  TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Utilizati cea mai recenta versiune';
-  TC_SET_VALUE_OF_SET_NOW               = 'Setati valoarea lui %s. Setati acum?';
-  TC_CONFIGURATION_FILE                 = 'Fisierul de configurare';
-  TC_CURRENT_OPERATOR_CALLSIGN          = 'Indicativul operatorului actual';
-  TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'Concatenez QSO-uri importate la logul actual?';
+  TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Utilizeaza ultima versiune';
+  TC_SET_VALUE_OF_SET_NOW               = 'Inscrie valoarea lui %s. Inscriu acum?';
+  TC_CONFIGURATION_FILE                 = 'Fisier de configurare';
+  TC_CURRENT_OPERATOR_CALLSIGN          = 'Indicativ operator actual';
+  TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'Pot concatena QSO-uri importate la logul actual?';
   TC_QSO_IMPORTED                       = 'QSO-uri importate.';
-  TC_ISADUPE                            = '%s este o dublura!!';
+  TC_ISADUPE                            = '%s este dublura!!';
   TC_ERRORINLOGFILE                     = 'Eroare in fisierul de log!';
   TC_HASIMPROPERSYNTAX                  = '%s sintaxa incorecta!!';
-  TC_SORRYNOLOG                         = 'Regret!! NO LOG = TRUE care interzice logarea QSO-urilor pe acest calculator';
-  TC_SETCOMPUTERIDVALUE                 = 'Setati valoarea COMPUTER ID.';
+  TC_SORRYNOLOG                         = 'Regret!! NO LOG = TRUE nu permite logarea QSO-urilor pe acest calculator';
+  TC_SETCOMPUTERIDVALUE                 = 'Inscrie valoarea COMPUTER ID.';
 
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" Sterge toate logurile din retea';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" Sterge toate filele cu duble din retea';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" Sterge toate filele cu multipl din retea';
 
-  TC_REALLYWANTTOCLEARTHELOG            = 'Sunteti sigur ca doriti sa stergeti logul actual?';
+  TC_REALLYWANTTOCLEARTHELOG            = 'Esti sigur ca doresti sa stergi logul actual?';
   TC_MESSAGETOSENDVIANETWORK            = 'Mesaj de trimis in retea';
-  TC_SENDTIMETOCOMPUTERSONTHENETWORK    = 'Doriti sa transmiteti ora la calculatoarele din retea?';
-  TC_RULESONSM3CER                      = 'Rules for %s contest on WA7BNM Contest Calendar';
-  TC_RULESONQRZRU                       = 'Regulamentul ptr concursul %s este la -QRZ.RU-';
+  TC_SENDTIMETOCOMPUTERSONTHENETWORK    = 'Doresti sa transmiti ora la calculatoarele din retea?';
+  TC_RULESONSM3CER                      = 'Rules for %s contest from WA7BNM Contest Calendar';
+  TC_RULESONQRZRU                       = 'Regulamentul concursului %s este si la -QRZ.RU-';
   TC_NOTE                               = 'Nota';
-  TC_DUPESHEETCLEARED                   = 'Fila de duble anulata!';
-  TC_MULTSHEETCLEARED                   = 'Fila de multipl anulata!';
-  TC_YESTOCLEARTHEDUPESHEET             = '"YES" ptr anulat fila de duble';
-  TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" ptr anulat fila de multip';
+  TC_DUPESHEETCLEARED                   = 'Fisier de duble anulat!';
+  TC_MULTSHEETCLEARED                   = 'Fisier de multipl anulat!';
+  TC_YESTOCLEARTHEDUPESHEET             = '"YES" ptr anulat fisier de duble';
+  TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" ptr anulat fisier de multip';
 
-  TC_TRANSMITFREQUENCYKILOHERTZ         = 'Frecventa de emisie (kiloHertz): ';
+  TC_TRANSMITFREQUENCYKILOHERTZ         = 'FRECVENTA DE EMISIE KHz: ';
   TC_SPRINTQSYRULE                      = 'REGULA de la -SPRINT QSY-!!!';
-  TC_PADDLE                             = 'Cheie bug';
-  TC_FOOTSW                             = 'Pedala';
+  TC_PADDLE                             = 'CHEIA CW';
+  TC_FOOTSW                             = 'PEDALA';
   TC_LOG_NOTE                           = 'NOTA';
-  TC_LOG_DELETED                        = 'ANULAT';
+  TC_LOG_DELETED                        = 'STERS';
 
   TC_SUN                                = 'Dum';
   TC_MON                                = 'Lun';
@@ -74,59 +74,60 @@ const
 
   {uMP3Recorder}
 
-  TC_LAME_ERROR                         = 'O puteti descarca de la';
+  TC_LAME_ERROR                         = 'Poti descarca de la';
 
   {This version TR4W v.4.009 beta was build in 2 December 2008. Do you want to check the latest version ?}
+
   TC_THISVERSION                        = 'Ati ';
   TC_WASBUILDIN                         = ' instalat (data realizarii ';
-  TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Doriti sa gasiti o probabila versione mai recenta a TR4W ?';
+  TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Doresti o versiune mai noua a TR4W ?';
 
   {NEW CONTEST}
-  TC_LATEST_CONFIG_FILE                 = 'Cel mai recent fisier de configurare';
-  TC_OPENCONFIGURATIONFILE              = ' - Deschideti fisierul de configurare sau incepeti un nou concurs';
+  TC_LATEST_CONFIG_FILE                 = 'Ultimul fisier de configurare';
+  TC_OPENCONFIGURATIONFILE              = ' - Deschid fisier configurare sau - Incep un nou concurs';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Directorul "%s" exista deja.'#13'Suprascriem ?';
   TC_IAMIN                              = '& sunt in %s';
 
-  TC_NEWENGLANDSTATEABREVIATION         = 'Introduceti abrevierea statului din New England'#13'(ME, NH, VT, MA, CT, RI):';
-  TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Introduceti QTH-ul de unde doriti sa transmiteti:';
-  TC_ENTERSTATEFORUSPROVINCEFORCANADA   = 'Introduceti statul din U.S., provincia din Canada:';
-  TC_ENTERYOUROBLASTID                  = 'Introduceti ID de la oblast-ul propriu:';
-  TC_ENTERYOURPROVINCEID                = 'Introduceti ID de la provincia proprie';
-  TC_ENTERYOURCOUNTYCODE                = 'Introduceti codul judetului propriu:';
-  TC_ENTERYOURDOK                       = 'Introduceti DOK-ul propriu:';
-  TC_ENTERYOURDISTRICTABBREVIATION      = 'Introduceti abrevierea districtului propriu:';
-  TC_ENTERYOURRDAID                     = 'Introduceti RDA ID propriu:';
-  TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Introduceti IOTA Reference Designator:';
-  TC_ENTERYOURCITYIDENTIFIER            = 'Introduceti identificatorul orasului:';
-  TC_ENTERYOURNAME                      = 'Introduceti numele:';
-  TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Introduceti ultimii doi digiti ai anului primei Dvs autorizari in emisie:';
-  TC_ENTERYOURZONE                      = 'Introduceti zona proprie:';
-  TC_ENTERYOURGEOGRAPHICALCOORDINATES   = 'Introduceti propriile coordonate geografice '#13'(ex: 55N37O ptr Moscova):';
-  TC_ENTERSUMOFYOURAGEANDAMOUNT         = 'Introduceti suma dintre varsta Dvs si numarul anilor de la primul QSO (ex: 28+14=42):';
-  TC_OZCR                               = 'Introduceti un numar din trei cifre:';
-  TC_ENTERYOURSTATECODE                 = 'Introduceti codul tarii Dvs.:';
-  TC_ENTERYOURFOURDIGITGRIDSQUARE       = 'Introduceti primi patru digiti din QTH locatorul propriu:';
-  TC_RFAS                               = 'Introduceti propriile coordonate geografice:';
-  TC_ENTERYOURSIXDIGITGRIDSQUARE        = 'Introduceti QTH locatorul complect cu 6 digiti:';
-  TC_ENTERYOURNAMEANDSTATE              = 'Introduceti numele (si statul daca traiti in America de Nord):';
-  TC_ENTERYOURNAMEANDQTH                = 'Introduceti numele si QTH-ul(statul US, Provincia canadiana sau entitatea DX) sau un numar de membru:';
-  TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Introduceti prioritatea, cecul'#13'( ultimi doi digiti al anului de autorizare) si sectiunea ARRL:';
-  TC_ENTERYOURQTHANDTHENAME             = 'Introduceti QTH-ul pe care doriti sa-l transmiteti'#13'si numele folosit:';
-  TC_ENTERFIRSTTWODIGITSOFYOURQTH       = 'Introduceti primi doi digiti ai QTH-ului Dvs.:';
-  TC_ENTERYOURAGEINMYSTATEFIELD         = 'Introduceti varsta la rubrica -MY STATE:';
-  TC_ENTERYOURQTHORPOWER                = 'Introduceti QTH-ul pe care il transmiteti daca locuiti in America de Nord sau puterea la entitati DXin rubrica -MY STATE:';
-  TC_ENTERFIRSTTWOLETTERSOFYOURGRID     = 'Introduceti primele doua litere ale locatorului propriu:';
-  TC_ENTERYOURSQUAREID                  = 'Introduceti ID caroului Dvs.:';
-  TC_ENTERYOURMEMBERSHIPNUMBER          = 'Introduceti numarul Dvs de membru:';
-  TC_ENTERYOURCONTINENT                 = 'Introduceti continentul Dvs (si eventual informatii noi, ID, i.e. SA sau NA/QRP)';
-  TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Introduceti county daca sunteti in %s stat. Introduceti statul, Provincia canadiana  sau "DX" daca locuiti afara din %s:';
-  TC_PREFECTURE                         = 'Introduceti prefectura Dvs:';
-  TC_STATIONCLASS                       = 'Introduceti categoria statiei Dvs:';
-  TC_AGECALLSIGNAGE                     = 'Introduceti varsta (sau indicativul de la Silent Key cu varsta):';
-  TC_DEPARTMENT                         = 'Introduceti departmentul Dvs.:';
-  TC_ENTERYOURRDAIDORGRID               = 'Introduceti RDA ID (ptr statii UA1A) si locatorul cu patru digiti:';
+  TC_NEWENGLANDSTATEABREVIATION         = 'Inscrie abrevierea statului din New England'#13'(ME, NH, VT, MA, CT, RI):';
+  TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Inscrie QTH-ul de unde doresti sa transmiti:';
+  TC_ENTERSTATEFORUSPROVINCEFORCANADA   = 'Inscrie statul din U.S., provincia din Canada:';
+  TC_ENTERYOUROBLASTID                  = 'Inscrie ID de la oblast-ul propriu:';
+  TC_ENTERYOURPROVINCEID                = 'Inscrie ID de la provincia proprie';
+  TC_ENTERYOURCOUNTYCODE                = 'Inscrie codul judetului tau:';
+  TC_ENTERYOURDOK                       = 'Inscrie DOK-ul propriu:';
+  TC_ENTERYOURDISTRICTABBREVIATION      = 'Inscrie abrevierea districtului propriu:';
+  TC_ENTERYOURRDAID                     = 'Inscrie RDA ID propriu:';
+  TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Inscrie IOTA Reference Designator:';
+  TC_ENTERYOURCITYIDENTIFIER            = 'Inscrie identificatorul orasului:';
+  TC_ENTERYOURNAME                      = 'Inscrie numele:';
+  TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Inscrie ultimii doi digiti ai anului primei tale autorizari in emisie:';
+  TC_ENTERYOURZONE                      = 'Inscrie zona proprie:';
+  TC_ENTERYOURGEOGRAPHICALCOORDINATES   = 'Inscrie propriile coordonate geografice '#13'(ex: 55N37O ptr Moscova):';
+  TC_ENTERSUMOFYOURAGEANDAMOUNT         = 'Inscrie suma dintre varsta ta si numarul anilor de la primul QSO (ex: 28+14=42):';
+  TC_OZCR                               = 'Inscrie un numar din trei cifre:';
+  TC_ENTERYOURSTATECODE                 = 'Inscrie codul tarii tale.:';
+  TC_ENTERYOURFOURDIGITGRIDSQUARE       = 'Inscrie primi patru digiti din QTH locatorul propriu:';
+  TC_RFAS                               = 'Inscrie propriile coordonate geografice:';
+  TC_ENTERYOURSIXDIGITGRIDSQUARE        = 'Inscrie QTH locatorul complect cu 6 digiti:';
+  TC_ENTERYOURNAMEANDSTATE              = 'Inscrie numele (si statul daca traiti in America de Nord):';
+  TC_ENTERYOURNAMEANDQTH                = 'Inscrie numele si QTH-ul(statul US, Provincia canadiana sau entitatea DX) sau un numar de membru:';
+  TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Inscrie prioritatea, cecul'#13'( ultimi doi digiti al anului de autorizare) si sectiunea ARRL:';
+  TC_ENTERYOURQTHANDTHENAME             = 'Inscrie QTH-ul pe care doriti sa-l transmiteti'#13'si numele folosit:';
+  TC_ENTERFIRSTTWODIGITSOFYOURQTH       = 'Inscrie primi doi digiti ai QTH-ului tau.:';
+  TC_ENTERYOURAGEINMYSTATEFIELD         = 'Inscrie varsta la rubrica -MY STATE:';
+  TC_ENTERYOURQTHORPOWER                = 'Inscrie QTH-ul pe care il transmiti daca locuiesti in America de Nord sau puterea la entitati DX in rubrica -MY STATE:';
+  TC_ENTERFIRSTTWOLETTERSOFYOURGRID     = 'Inscrie primele doua litere ale locatorului propriu:';
+  TC_ENTERYOURSQUAREID                  = 'Inscrie ID caroului tau.:';
+  TC_ENTERYOURMEMBERSHIPNUMBER          = 'Inscrie numarul tau de membru:';
+  TC_ENTERYOURCONTINENT                 = 'Inscrie continentul tau (si eventual informatii noi, ID, i.e. SA sau NA/QRP)';
+  TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Inscrie county daca sunteti in %s stat. Inscrie statul, Provincia canadiana  sau "DX" daca locuiti afara din %s:';
+  TC_PREFECTURE                         = 'Inscrie prefectura ta:';
+  TC_STATIONCLASS                       = 'Inscrie categoria statiei tale:';
+  TC_AGECALLSIGNAGE                     = 'Inscrie varsta (sau indicativul de la Silent Key cu varsta):';
+  TC_DEPARTMENT                         = 'Inscrie departmentul tau:';
+  TC_ENTERYOURRDAIDORGRID               = 'Inscrie RDA ID (ptr statii UA1A) si locatorul cu patru digiti:';
 
-  TC_ISLANDSTATION                      = 'Island station';
+  TC_ISLANDSTATION                      = 'Statie insulara';
   TC_NEWENGLAND                         = 'New England';
   TC_CALIFORNIA                         = 'California';
   TC_FLORIDA                            = 'Florida';
@@ -136,10 +137,10 @@ const
   TC_WASHINGTON                         = 'Washington';
   TC_WISCONSIN                          = 'Wisconsin';
   TC_TEXAS                              = 'Texas';
-  TC_NORTHAMERICA                       = 'North America';
+  TC_NORTHAMERICA                       = 'America de Nord';
   TC_RUSSIA                             = 'Rusia';
   TC_UKRAINE                            = 'Ucraina';
-  TC_CZECHREPUBLICORINSLOVAKIA          = 'Republica Ceha sau in Slovakia';
+  TC_CZECHREPUBLICORINSLOVAKIA          = 'Republica Ceha sau Slovacia';
   TC_BULGARIA                           = 'Bulgaria';
   TC_ROMANIA                            = 'Romania';
   TC_HUNGARY                            = 'Ungaria';
@@ -147,8 +148,8 @@ const
   TC_NETHERLANDS                        = 'Tarile de Jos';
   TC_STPETERSBURGOBLAST                 = 'St.Petersburg / oblast';
   TC_GERMANY                            = 'Germania';
-  TC_UK                                 = 'UK';
-  TC_ARKTIKACLUB                        = 'club';
+  TC_UK                                 = 'Regatul Unit';
+  TC_ARKTIKACLUB                        = 'Clubul Artica';
   TC_POLAND                             = 'Polonia';
   TC_KAZAKHSTAN                         = 'Kazahstan';
   TC_ITALY                              = 'Italia';
@@ -164,20 +165,20 @@ const
   {UTELNET}
 
   TC_TELNET                             = 'Conectat'#0'Deconectat'#0'Comenzi'#0'Opreste'#0'Sterge'#0'100'#0#0;
-  TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'NU SUNTETI CONECTAT LA INTERNET!';
-  TC_GETHOST                            = 'CAUTA HOST..';
+  TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'NU ESTI CONECTAT LA INTERNET!';
+  TC_GETHOST                            = 'CAUT HOST..';
   TC_SERVER                             = 'SERVER: %s';
   TC_HOST                               = 'HOST  : %s';
   TC_CONNECT                            = 'CONECTEAZA..';
   TC_CONNECTED                          = 'CONECTAT';
-  TC_YOUARESPOTTEDBYANOTHERSTATION      = 'Sunteti postat de o alta statie.';
+  TC_YOUARESPOTTEDBYANOTHERSTATION      = 'Sunteti POSTAT de o alta statie.';
 
   {UNET}
 
-  TC_CONNECTIONTOTR4WSERVERLOST         = 'Conectiune catre TR4WSERVER %s:%d esuata.';
+  TC_CONNECTIONTOTR4WSERVERLOST         = 'Conectarea catre TR4WSERVER %s:%d esuata.';
   TC_COMPUTERCLOCKISSYNCHRONIZED        = 'Ceasul calculatorului este sincronizat.';
   TC_CONNECTINGTO                       = 'Conectez pe ';
-  TC_CONNECTTOTR4WSERVERFAILED          = 'Conectiunea spre TR4WSERVER esuata. Verificati valoarea la SERVER PASSWORD!!';
+  TC_CONNECTTOTR4WSERVERFAILED          = 'Conectarea spre TR4WSERVER esuata. Verifica valoarea la SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'Conectat la ';
   TC_FAILEDTOCONNECTTO                  = 'Conectare esuata la ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Logul local si cel de la Server sunt identice.';
@@ -200,9 +201,9 @@ const
   {LOGWIND}
 
   TC_CQTOTAL                            = 'CQ total: %u';
-  TC_REPEATING                          = 'Repetari %s  Timp de receptie= %u msec - PgUp/Dn ptr ajustare sau ESCAPE';
+  TC_REPEATING                          = 'Repetari %s  Timp de receptie= %u msec  cu - PgUp/Dn -  reglare  gata cu -ESCAPE-';
   TC_NEWTOUR                            = 'Nou tur %d/%d';
-  TC_ENTER                              = 'Introduceti %s :';
+  TC_ENTER                              = 'Inscrie %s :';
   TC_PTS                                = '%d Pct';
   TC_RATE                               = 'Rata = %u';
   TC_LAST60                             = 'Ultim 60 = %d';
@@ -216,22 +217,22 @@ const
 
   {UCALLSIGNS}
 
-  TC_DUPESHEET                          = 'Fila cu duble - %sm-%s';
+  TC_DUPESHEET                          = 'Fisier duble - %sm-%s';
 
   {LOGEDIT}
 
   TC_QSONEEDSFOR                        = ' QSO necesare ptr %s :';
   TC_MULTNEEDSFOR                       = ' Mult necesare ptr %s :';
-  TC_MISSINGMULTSREPORT                 = ' Lista cu mult lipsa: %u entitati in ultima ora %u dar nu pe toate benzile.';
+  TC_MISSINGMULTSREPORT                 = ' Nu avem lista cu multip lipsa: %u entitati in ultima ora %u dar nu pe toate benzile.';
 
   {LOGDUPE}
 
-  TC_THEREWERECALLS                     = 'Sunt acolo %u indicative gasite in fisierul -initial exchange-.'#13'+%u duble';
-  TC_RESTARTBINISFORADIFFERENTCONTEST   = 'RESTART.BIN este pentru un alt concurs.';
+  TC_THEREWERECALLS                     = 'Avem acolo %u indicative care se afla in fisierul -initial exchange-.'#13'+%u duble';
+  TC_RESTARTBINISFORADIFFERENTCONTEST   = 'RESTART.BIN este de la un alt concurs.';
 
   {LOGSTUFF}
 
-  TC_NOTENOUGHINFOINEXCHANGE            = 'Insuficiente informatii in control!!';
+  TC_NOTENOUGHINFOINEXCHANGE            = 'Informatii incomplecte in control!!';
   TC_IMPROPERDOMESITCQTH                = 'Domestic QTH incorect!!';
   TC_IMPROPERDOMESITCQTHORMISSINGNAME   = 'Domestic QTH incorect sau lipsa nume!!';
   TC_MISSINGQTHANDORNAME                = 'Lipsa QTH si/sau nume!!';
@@ -265,29 +266,29 @@ const
 
   {uSendKeyboard}
 
-  TC_SENDINGSSBWAVFILENAME              = 'Transmit fisier SSB .wav cu numele. Enter-executie, Escape/F10-iesire.';
+  TC_SENDINGSSBWAVFILENAME              = 'Transmit fisier SSB .wav -nume-. Enter-ok, Escape/F10-iesire.';
 
   {QTC}
 
   TC_WASMESSAGENUMBERCONFIRMED          = 'Mesajul cu numarul %u a fost confirmat?';
-  TC_DOYOUREALLYWANTSTOPNOW             = 'Doriti intradevar sa oprim acum?';
+  TC_DOYOUREALLYWANTSTOPNOW             = 'Doresti SIGUR sa terminam acum?';
   TC_QTCABORTEDBYOPERATOR               = 'QTC intrerupt de operator.';
-  TC_DOYOUREALLYWANTTOABORTTHISQTC      = 'Doriti intradevar sa renuntati la acest QTC?';
+  TC_DOYOUREALLYWANTTOABORTTHISQTC      = 'Doresti SIGUR sa renunti la acest QTC?';
   TC_NEXT                               = '< Urmatorul';
   TC_QTC_FOR                            = '%s ptr %s';
   TC_QTC_CALLSIGN                       = 'Indicativ :';
-  TC_ENTERQTCMAXOF                      = 'Introduceti QTC #/# (max din %d) :';
-  TC_DOYOUREALLYWANTTOSAVETHISQTC       = 'Doriti intradevar sa salvati acest QTC?';
-  TC_EDITQTCPRESSYESTOEDITQTCORNOTOLOG  = 'Editati QTC? Apasati Yes ptr editarea QTC sau No ptr logare ';
-  TC_CHECKQTCNUMBER                     = 'Verificati numarul QTC';
-  TC_CHECKTIME                          = 'Verificati ora';
+  TC_ENTERQTCMAXOF                      = 'Inscrie QTC #/# (max din %d) :';
+  TC_DOYOUREALLYWANTTOSAVETHISQTC       = 'Doresti SIGUR sa salvezi acest QTC?';
+  TC_EDITQTCPRESSYESTOEDITQTCORNOTOLOG  = 'Editeaza QTC? Apasa YES la editarea QTC sau NO la logare ';
+  TC_CHECKQTCNUMBER                     = 'Verifica numarul QTC';
+  TC_CHECKTIME                          = 'Verifica ora';
 
   {UOPTION}
 
   TC_COMMAND                            = 'Comanda';
   TC_VALUE                              = 'Valoarea';
   TC_INFO                               = 'Info';
-  TC_YOUCANCHANGETHISINYOURCONFIGFILE   = 'Puteti schimba asta numai in fisierul de configurare.';
+ TC_YOUCANCHANGETHISINYOURCONFIGFILE    = 'Asta se poate schimba numai prin fisierul de configurare.';
 
   {UEDITQSO}
 
@@ -297,43 +298,42 @@ const
   {LOGCW}
 
   TC_WPMCODESPEED                       = 'Viteza CW in WPM';
-  TC_CQFUNCTIONKEYMEMORYSTATUS          = 'Statutul mesajelor din memorii de la grupa CQ';
-  TC_EXCHANGEFUNCTIONKEYMEMORYSTATUS    = 'Statutul mesajelor din memorii de la grupa EX';
-  TC_OTHERCWMESSAGEMEMORYSTATUS         = 'Statutul altor mesaje CW din memorii';
-  TC_OTHERSSBMESSAGEMEMORYSTATUS        = 'Statutul altor mesaje SSB din memorii';
-  TC_PRESSCQFUNCTIONKEYTOPROGRAM        = 'Apasati -CQ function key- ptr a programa (F1, AltF1, CtrlF1), sau ESCAPE-iesire : ';
-  TC_PRESSEXFUNCTIONKEYTOPROGRAM        = 'Apasati -EX function key- ptr a programa (F3-F12, Alt/Ctrl F1-F12) sau ESCAPE-iesire:';
-  TC_NUMBERORLETTEROFMESSAGETOBEPROGRAM = 'Numarul sau litera mesajului care doriti sa-l  programati (1-9, A-C) sau ESCAPE-iesire:';
-  TC_CWDISABLEDWITHALTK                 = 'CW-ul se dezactiveaza cu Alt-K!! si tot cu Alt-K se reactiveaza';
-  TC_VOICEKEYERDISABLEDWITHALTK         = 'Voice keyer se dezactiveaza cu Alt-K!! si tot cu Alt-K se reactiveaza.';
-
+  TC_CQFUNCTIONKEYMEMORYSTATUS          = 'Statut mesaje din memorii de la grupa CQ';
+  TC_EXCHANGEFUNCTIONKEYMEMORYSTATUS    = 'Statut mesaje din memorii de la grupa EX';
+  TC_OTHERCWMESSAGEMEMORYSTATUS         = 'Statut mesaje div CW din memorii';
+  TC_OTHERSSBMESSAGEMEMORYSTATUS        = 'Statut mesaje div SSB din memorii';
+  TC_PRESSCQFUNCTIONKEYTOPROGRAM        = 'Apasa -CQ function key- programare (F1,AltF1,CtrlF1),- ESCAPE-iesire : ';
+  TC_PRESSEXFUNCTIONKEYTOPROGRAM        = 'Apasa -EX function key- programare (F3-F12, Alt/Ctrl F1-F12),-ESCAPE-iesire:';
+  TC_NUMBERORLETTEROFMESSAGETOBEPROGRAM = 'Numarul / litera mesaj programare(1-9, A-C)- ESCAPE-iesire:';
+  TC_CWDISABLEDWITHALTK                 = 'CW dezactivat/reactivat cu Alt-K !! ';
+  TC_VOICEKEYERDISABLEDWITHALTK         = 'Voice key dezactivat/reactivat cu Alt-K !! ';
+ 
   {LOGCFG}
 
   TC_NOCALLSIGNSPECIFIED                = 'Lipsa indicativ !!';
-  TC_NOFLOPPYFILESAVENAMESPECIFIED      = 'Lipsa nume fisier pentru salvare pe floppy !!';
+  TC_NOFLOPPYFILESAVENAMESPECIFIED      = 'Lipsa nume fisier la salvare pe floppy !!';
   TC_UNABLETOFIND                       = 'Nu gasesc %s !!';
   TC_INVALIDSTATEMENTIN                 = 'COMANDA INVALIDA IN %s !!'#13#13'Linia %u'#13'%s';
-  TC_UNABLETOFINDCTYDAT                 = 'Nu gasesc fisierul cu entitati CTY.DAT !!'#13'Verificati daca fisierul este in acelasi director cu programul.';
+  TC_UNABLETOFINDCTYDAT                 = 'Lipsa fisierul cu entitati CTY.DAT !!'#13'Verifica daca fisierul este in directorul programului.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'COMANDA INVALIDA IN FISIERUL DE CONFIGURARE !!'#13#13' in linia %u'#13'%s';
 
   {LOGSUBS1}
 
-  TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Inregistrare DVP. Apasati ESCAPE sau RETURN ptr oprire.';
-  TC_ALTRCOMMANDDISABLED                = 'Comanda Alt-R dezactivata de declaratia -Single Radio Mode = True';
-  TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'Nu exista mesaj CQ programat in memoria CQ activata cu AltF1.';
-  TC_THIS_FILE_DOES_NOT_EXIST           = 'Acest fisier nu exista. Sa creez un fisier nou ptr editare?';
+  TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Inregistrare DVP. Apasa ESCAPE sau RETURN la oprire.';
+  TC_ALTRCOMMANDDISABLED                = 'Comanda Alt-R dezactivata prin -SINGLE RADIO MODE = TRUE';
+  TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'Nu exista mesaj programat in memoria CQ activata cu AltF1.';
+  TC_THIS_FILE_DOES_NOT_EXIST           = 'Acest fisier nu exista. Facem un fisier nou ptr editare?';
 
   {LOGSUBS2}
 
   TC_WASADUPE                           = '%s a fost o dubla.';
-  TC_ALTDCOMMANDDISABLED                = 'Comanda Alt-D dezactivata de declaratia -SINGLE RADIO MODE = TRUE';
-  TC_YOUHAVERESTOREDTHELASTDELETED      = 'Ati refacut ultimul QSO inscris in log !!';
-  TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Ati sters ultimul QSO inscris in log !!  Folositi Alt-Y ptr a-l reface.';
-  TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Doriti sigur sa parasiti programul ?';
-  TC_YOUARENOWTALKINGTOYOURPACKETPORT   = 'Dvs dialogati cu portul de packet.  Folositi Control-B ptr iesire.';
-  TC_YOUALREADYWORKEDIN                 = 'Ati lucrat deja cu %s in %s!!';
-  TC_ISADUPEANDWILLBELOGGEDWITHZERO     = '%s este o dubla si va fi trecut in log cu zero puncte/QSO.';
-  TC_LOGFILESIZECHECKFAILED             = 'VERIFICAREA MARIMII FISIERULUI DE LOG A ESUAT !!!!';
+  TC_ALTDCOMMANDDISABLED                = 'Comanda Alt-D este dezactivata prin -SINGLE RADIO MODE = TRUE';
+  TC_YOUHAVERESTOREDTHELASTDELETED      = 'Ai refacut ultimul QSO inscris in log !!';
+  TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Ai sters ultimul QSO inscris in log !! Cu Alt-Y il poti readuce !'; 
+  TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Doresti SIGUR sa parasesti programul ?';
+  TC_YOUARENOWTALKINGTOYOURPACKETPORT   = 'tau dialog cu portul de packet.  Prin Control-B poti renunta';   TC_YOUALREADYWORKEDIN                 = 'Ati lucrat deja cu %s in %s!!';
+  TC_ISADUPEANDWILLBELOGGEDWITHZERO     = '%s este o dubla iar in log are zero puncte/QSO.';
+  TC_LOGFILESIZECHECKFAILED             = 'Verificarea fisierului de LOG a ESUAT !!!!';
 
   {JCTRL2}
   TC_NEWVALUE                           = 'valoare noua';
@@ -386,7 +386,7 @@ const
 
   {UALTD}
 
-  TC_ENTERCALLTOBECHECKEDON             = 'Introduceti indicativul ptr verificare pe %s%s:';
+  TC_ENTERCALLTOBECHECKEDON             = 'Inscrie indicativul ptr verificare pe %s%s:';
 
   {LOGGRID}
 
@@ -401,13 +401,13 @@ const
   {LOGWAE}
 
   TC_INVALIDCALLSIGNINCALLWINDOW        = 'Indicativ incorect in fereastra call !!';
-  TC_SORRYYOUALREADYHAVE10QTCSWITH      = 'Regret, aveti deja 10 QTC-uri cu %s';
+  TC_SORRYYOUALREADYHAVE10QTCSWITH      = 'Regret, ai deja 10 QTC-uri cu %s';
   TC_NOQTCSPENDINGQRU                   = 'Fara QTC-uri in curs, QRU.';
   TC_ISQRVFOR                           = 'Este %s QRV ptr %s?';
 
   {UREMMULTS}
 
-  TC_CLEANSWEEPCONGRATULATIONS          = 'FELICITARI !! O REUSITA MERITATA !!';
+  TC_CLEANSWEEPCONGRATULATIONS          = 'FELICITARI !! o reusita meritata !!';
 
   {CFGCMD}
 
@@ -416,7 +416,7 @@ const
   TC_INVALIDREMINDERTIME                = 'Ora de atentionare invalida!!';
   TC_INVALIDREMINDERDATE                = 'Data de atentionare invalida!!';
   TC_TOOMANYTOTALSCOREMESSAGES          = 'Prea multe mesaje TOTAL SCORE!!';
-  TC_THEFIRSTCOMMANDINCONFIGFILEMUSTBE  = 'Prima comanda in fisierul de configurare trebuie sa fie MY CALL!!';
+  TC_THEFIRSTCOMMANDINCONFIGFILEMUSTBE  = 'Prima linie in fisierul de configurare trebuie sa fie MY CALL!!';
 
   {USYNTIME}
   TC_MS                                 = ' ms'; //millisecunde
@@ -472,7 +472,7 @@ const
   TC_SEND_CHARACTERS_FROM_KEYBOARD      = 'Transmite caractere din tastatura';
   TC_CALL_IN_CALL_WINDOW                = 'Indicaticul in fereastra Call';
   TC_RST_PROMPT                         = 'RST prompt';
-  TC_SEND_CALLASSETBYMYCALLCOMMAND      = 'Transmite indicativul setat in comanada MY CALL';
+  TC_SEND_CALLASSETBYMYCALLCOMMAND      = 'Transmite indicativul inscris in comanda MY CALL';
   TC_REPEATRSTSENT                      = 'Repeta RST-ul transmis';
 
   TC_HALFSPACE                          = 'Jumatate de spatiu';
@@ -493,7 +493,7 @@ const
   TC_WORKSAMEASESCONKEYBOARD            = 'Executa o comanda identica cu "ESCAPE" din tastatura';
   TC_EXCHANGESTHEFREQUENCIES            = 'Schimba frecventele la statiile active si inactive';
   TC_EXECUTEACONFIGURATIONFILE          = 'Ruleaza un fisier de configurare';
-  TC_MOVESTHERIGTOLASTCQFREQUENCY       = 'Muta statia pe ultima frecventa unde ati chemat CQ';
+  TC_MOVESTHERIGTOLASTCQFREQUENCY       = 'Muta statia pe ultima frecventa unde ai chemat CQ';
   TC_LOGSTHELASTCALL                    = 'Scrie in log ultimul indicativ aparut in fereastra Call';
   TC_FORCESTOENTERMODE                  = 'Forteaza trecerea in modul S&P';
   TC_CHANGESCWSPEEDTOXX                 = 'Schimba viteza CW la xx';
@@ -509,7 +509,7 @@ const
   {UCHECKLATESTVERSION}
   TC_VERSIONONSERVER                    = 'Ultima versiune de pe server';
   TC_THISVERSION2                       = 'Aceasta versiune';
-  TC_DOWNLOADIT                         = 'Doriti sa descarcati ultima versiune?';
+  TC_DOWNLOADIT                         = 'Doresti sa descarci ultima versiune?';
 
   CLOSE_WORD                            = 'Inchide';
   CANCEL_WORD                           = 'Sterge';
@@ -558,7 +558,7 @@ const
   RC_RADIOTWO                           = 'Statia 2';
   RC_WINDOWS                            = 'Fereastra';
   RC_BANDMAP                            = 'Harta benzi';
-  RC_DUPESHEET                          = 'Fila ptr duble';
+  RC_DUPESHEET                          = 'Fisier ptr duble';
   RC_FKEYS                              = 'Taste ptr functii';
   RC_TRMASTER                           = 'Baza de date-SCP';
   RC_REMMULTS                           = 'Multipl restante';
@@ -639,7 +639,7 @@ const
   RC_RECCONTROL                         = 'Control inregistrare';
   RC_SOUNDRECORDER                      = 'Inregistrare sunet';
   RC_DISTANCE                           = 'Distanta';
-  RC_GRID                               = 'Carou';
+  RC_GRID                               = 'Locator';
   RC_CALCULATOR                         = 'Calculator';
   RC_LC                                 = 'LC';
   RC_NET                                = 'Retea';
@@ -667,29 +667,29 @@ const
   RC_CONTESTNAMEIC                      = 'Nume concurs in comentar';
   RC_SEND                               = '&Trimite';
   RC_COMMENT                            = 'Comentar';
-  RC_SENDINGCW                          = 'Transmit CW din tastatura. Folositi ENTER/Escape/F10 ptr iesire.';
+  RC_SENDINGCW                          = 'Transmit CW cu taste. Cu ENTER/Escape/F10 iesire.';
   RC_RETURNTOMOD                        = 'Modifica';
-  RC_ARROWTOSELIT                       = 'Selectati cu tastele sageti/pageup/pagedn sau prima litera.';
+  RC_ARROWTOSELIT                       = 'Selecteaza cu tastele sageti/pageup/pagedn sau prima litera.';
   RC_ALTW                               = 'Salveaza (Alt-&W)';
   RC_ALTN                               = 'La &retea';
   RC_ALTG                               = 'Salveaza tot (Alt-&G)';
   RC_BANDMAP2                           = 'Harta benzi';
   RC_AUTOCQ2                            = 'CQ-automat';
-  RC_PRESSMKYWTR                        = 'Apasati tasta de memorie pe care doriti sa o repetati:';
-  RC_NUMBEROSOLT                        = 'Numarul de millisecunde ptr timp receptie:';
+  RC_PRESSMKYWTR                        = 'Apasa tasta de memorie pe care doresti sa o repeti:';
+  RC_NUMBEROSOLT                        = 'Numarul de millisecunde timp de receptie:';
   RC_DELETESELSPOT                      = 'Sterge spotul selectat';
   RC_REMOVEALLSP                        = 'Anuleaza toate spoturile';
   RC_SENDINRIG                          = 'Trimite statia inactiva pe frecventa';
   RC_COAX                               = 'Calculator ptr lungimea COAXIAL';
-  RC_ENTERTNHINIK                       = 'Introduceti impedanta nula de frecventa superioara in kHz:';
-  RC_ENTERALIFIK                        = 'Introduceti o impedanta de frecventa inferioara in kHz:';
-  RC_DISTANCEBTGS                       = 'Distanta intre doua carouri';
-  RC_SECONDGRID                         = 'Al doilea carou';
-  RC_FIRSTGRID                          = 'Primul carou';
-  RC_EURVHFDIST                         = 'Distanta VHF in Europa:';
-  RC_GRIDOFAGLL                         = 'Carou cu lat/lon cunoscute';
+  RC_ENTERTNHINIK                       = 'Inscrie impedanta nula la frecventa superioara in kHz:';
+  RC_ENTERALIFIK                        = 'Inscrie o impedanta la frecventa inferioara in kHz:';
+  RC_DISTANCEBTGS                       = 'Distanta intre doua locatoare';
+  RC_SECONDGRID                         = 'Al doilea locator';
+  RC_FIRSTGRID                          = 'Primul locator';
+  RC_EURVHFDIST                         = 'Distanta US in Europa:';
+  RC_GRIDOFAGLL                         = 'Locator cu lat/lon cunoscute';
   RC_LONGMIE                            = 'Longitudine (minus spre Est)';
-  RC_LATMIS                             = 'Latitudime (minus spre Sud)';
+  RC_LATMIS                             = 'Latitudine (minus spre Sud)';
   RC_CALCOFCORI                         = 'Calcularea capacitatii sau inductantei';
   RC_INDUCANCE                          = 'Inductanta, uH';
   RC_CAPACITANCE                        = 'Capacitatea, pF';
@@ -700,9 +700,9 @@ const
   RC_MIXWINTERFACE                      = 'MixW Interfata';
   RC_CONNECTTOMIXW                      = 'Conecteaza la MixW';
   RC_MEMPROGFUNC                        = 'Functii ale memoriilor programabile';
-  RC_PRESS_C                            = 'Apasa  &C\n  ptr a programa un mesaj la o tasta functie de la CQ.';
-  RC_PRESS_E                            = 'Apasa  &E\n  ptr a programa un mesaj la o tatsa functie de la S/P.';
-  RC_PRESS_O                            = 'Apasa  &O\n  ptr a programa un mesaj la o tasta fara functie.';
+  RC_PRESS_C                            = 'Apasa  &C\n programare mesaj la o tasta functie de la CQ.';
+  RC_PRESS_E                            = 'Apasa  &E\n programare mesaj la o tasta functie de la S/P.';
+  RC_PRESS_O                            = 'Apasa  &O\n programare mesaj la o tasta fara functie.';
   RC_SYNLOG2                            = 'Sincronizeaza logul';
   RC_GETSERVLOG                         = '&Aduce logul server';
   RC_RECVRECORDS                        = 'Inregistrari primite:';
@@ -747,10 +747,10 @@ const
   RC_AI_CALLSIGN                        = 'Indicativ';
   RC_AI_CWSPEED                         = 'Viteza CW';
   RC_AI_BAND                            = 'Banda';
-  RC_CLEARMSHEET                        = 'Sterge fila multipl';
+  RC_CLEARMSHEET                        = 'Sterge fisier multipl';
   RC_WIKI                               = 'Documetatie On-line (in Rusa)';
-  RC_NET_CLDUPE                         = 'Sterge fila de duble din toate logurile';
-  RC_NET_CLMULT                         = 'Sterge fila de multipl din toate logurile';
+  RC_NET_CLDUPE                         = 'Sterge fisier duble din toate logurile';
+  RC_NET_CLMULT                         = 'Sterge fisier multipl din toate logurile';
   RC_INC_TIME                           = 'Incrementeaza timpul';
   RC_NOTES                              = 'Notes';
   RC_DEFAULT                            = 'Prestabilit:';
@@ -771,8 +771,20 @@ const
   RC_SEND_BUG                           = 'Trimite o nota daca ai probleme';
   RC_HOMEPAGE                           = 'TR4W Home Page';
 
-  RC_OPERATOR                           = 'Operator';
-  TC_LIST_OF_COMMAND                    = '&List of commands';
-  TC_ENTERYOURBRANCHNUMBER              = 'Enter your Branch number:';
-  TC_ENTERYOURPOSTCODE                  = 'Enter your postcode:';
 
+  RC_OPERATOR                           = 'Operator';
+  TC_LIST_OF_COMMAND                    = '&Lista comenzilor';
+  TC_ENTERYOURBRANCHNUMBER              = 'Inscrie numarul filialei:';
+  TC_ENTERYOURPOSTCODE                  = 'Inscrie codul postal:';
+  // SZIGY--- START
+  TC_TRANSLATOR_EMAIL                   = 'szigy@upcmail.ro';
+  TC_ENTERYOURFOCNUMBER                 = 'Inscrie numarul de membru FOC:';
+  TC_IRELAND                            = 'Irlanda';
+  TC_IMPROPERCONTINENT                  = 'Continent gresit !!';
+  TC_C9_ANTARTICA                       = 'Antartica';
+  RC_DVKVOLCONTROL                      = 'DVK reglaj Volum';
+  RC_ALTP                               = 'Acces la Fkeys';
+  RC_ALTX                               = 'Terminare Program';
+  RC_CTRLJ                              = 'Acces la comenzile de Configurare';
+
+  

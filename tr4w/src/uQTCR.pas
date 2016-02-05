@@ -86,13 +86,13 @@ const
   QTCLEFT                               = 5;
 //  QTCHEIGHT                        = 22;
 //  QTCROWSDIS                       = 2;
-  
-      QTCWIDTHARRAY                         : array[1..4] of integer = (20, 80, 60, 120);
-   QTCLEFTARRAY                          : array[1..4] of integer = (5, 27, 89, 251);
 
-//  LeftArray                        : array[1..3] of integer = (30, 95 - 3, 95 + 170 - 1);
+  //    QTCWIDTHARRAY                         : array[1..4] of integer = (20, 80, 60, 120);
+  QTCWIDTHARRAY                         : array[1..4] of integer = (20, 80, 160, 100);    // n4af 4.45.1
+  QTCLEFTARRAY                          : array[1..4] of integer = (5, 25, 105, 265);    // n4af 4.45.1
+
   NumberStyle                           = WS_DISABLED or WS_CHILD or WS_VISIBLE or WS_TABSTOP or ES_UPPERCASE or ES_NUMBER;
-  CallsignStyle                         = WS_DISABLED or WS_CHILD or WS_VISIBLE or WS_TABSTOP or ES_UPPERCASE;
+  CallsignStyle                         =  WS_DISABLED or  WS_CHILD or WS_VISIBLE or WS_TABSTOP or ES_UPPERCASE;
 var
   TempString                            : string;
   r                                     : integer;
@@ -107,7 +107,8 @@ begin
       begin
         Windows.SetWindowText(hwnddlg, RC_RECVQTC);
   //      CreateStatic(nil, 5, 285, 325, hwnddlg, 106);
-   CreateStatic(nil, 5, 325, 325, hwnddlg, 106);
+ //  CreateStatic(nil, 5, 325, 325, hwnddlg, 106);
+ CreateStatic(nil, 5, 325, 325, hwnddlg, 106);
         QTCRWindow := hwnddlg;
         SendStringAndStop('QTC?');
         tCreateStaticWindow(TC_QTC_CALLSIGN, WS_CHILD or SS_SUNKEN or SS_NOTIFY or SS_CENTER or WS_VISIBLE, QTCLEFT, 5, QTCWIDTHARRAY[1] + QTCROWSDIS + QTCWIDTHARRAY[2], 18, hwnddlg, 10);
@@ -276,7 +277,7 @@ var
   QTCRXData                             : ContestExchange;
   lpTranslated                          : BOOL;
 begin
-  if QTCsReceived = 0 then Exit;
+   if QTCsReceived = 0 then Exit;
   if QTCsInCurrentGroup <> QTCsReceived then
     if YesOrNo(QTCRWindow, TC_DOYOUREALLYWANTTOSAVETHISQTC) = IDno then Exit;
   if YesOrNo(QTCRWindow, TC_EDITQTCPRESSYESTOEDITQTCORNOTOLOG) = IDYES then Exit;
