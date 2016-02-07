@@ -353,6 +353,8 @@ var
 //  RITCommandTimeStamp              : Cardinal {TimeRecord};
   ActiveRadioPtr                        : RadioPtr = @Radio1;
   InActiveRadioPtr                      : RadioPtr = @Radio2;
+  RadioSupportsCWByCAT: InterfacedRadioTypeSet;
+  ICOMRadios: ICOMRadioTypes;
 
 const
   RTS_DTR_Values_Array                  : array[1..4] of PChar = ('OFF', 'ON', 'CW', 'PTT');
@@ -457,18 +459,22 @@ const
     ({Name: 'IC781';      } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $26; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'IC910';      } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $60; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
-    ({Name: 'IC9100';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $7C; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'IC970D';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $2E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'IC7000';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $70; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC7100';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $88; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC7200';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $76; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC7300';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $94; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'IC7410';     } BR:BR19200;  P: 1; C: 0; S: 0; T:0; RA: $80; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'IC7600';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $7A; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC7700';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $74; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC7800';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $6A; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC7850';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC7851';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC9100';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $7C; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'OMNI6';      } BR:BR9600;  P: 1; C: 1; S: 1; T:0; RA: $04; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
@@ -531,16 +537,20 @@ const
     'IC781',
 
     'IC910H',
-    'IC9100',
+
     'IC970D',
 
     'IC7000',
+    'IC7100',
     'IC7200',
+    'IC7300',
     'IC7410',
     'IC7600',
     'IC7700',
     'IC7800',
-
+    'IC7850',
+    'IC7851',
+    'IC9100',
     'OMNI6',
     'ORION'
 
@@ -728,7 +738,7 @@ begin
         ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR($FF) + CHR($09), 5);
       end;
 
-    IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
       Exit;
 
     Orion:
@@ -777,7 +787,7 @@ begin
     FT890, FT920, FT990, FT1000, FT1000MP:
       Exit;
 
-    IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
       Exit;
 
     Orion:
@@ -815,7 +825,7 @@ begin
     FT890, FT920, FT990, FT1000, FT1000MP:
       Exit;
 
-    IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
       Exit;
 
     Orion:
@@ -870,7 +880,7 @@ begin
         CHR(0) +
         CHR($02));
 
-    IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
       begin
         if ActiveRadioPtr.CurrentStatus.Freq = 0 then Exit;
         ActiveRadioPtr.SetRadioFreq(ActiveRadioPtr.CurrentStatus.Freq + 20, ActiveRadioPtr.CurrentStatus.Mode, 'A');
@@ -929,7 +939,7 @@ begin
         CHR(0) +
         CHR($03));
 
-    IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
       begin
         if ActiveRadioPtr.CurrentStatus.Freq = 0 then Exit;
         ActiveRadioPtr.SetRadioFreq(ActiveRadioPtr.CurrentStatus.Freq - 20, ActiveRadioPtr.CurrentStatus.Mode, 'A');
@@ -1121,7 +1131,7 @@ end;
 procedure RadioObject.CheckAndInitializeSerialPorts_ForThisRadio;
 begin
   if RadioModel = NoInterfacedRadio then Exit;
-  if RadioModel in [IC706..IC7800, FT100, Orion] then
+  if RadioModel in [IC78..IC9100, FT100, Orion] then
     RadioStopBits := 1
   else
     RadioStopBits := 2;
@@ -1269,7 +1279,7 @@ begin
 //        ActiveRadioPtr.WriteBufferToCATPort('FT1;');//vfo b = tx
       end;
 
-    IC706..IC7800, OMNI6: { KK1L: 6.73 Added OMNI6 }
+    IC78..IC9100, OMNI6: { KK1L: 6.73 Added OMNI6 }
       begin
 
         CommandsTempBuffer[0] := CHR(8);
@@ -1317,7 +1327,7 @@ begin
 //        ActiveRadioPtr.WriteBufferToCATPort('FT0;');
       end;
 
-    IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
       begin
        // TLogger.GetInstance.Debug('Sending commands to take Icom out of Split');
         CommandsTempBuffer[0] := CHR(8);
@@ -1541,7 +1551,7 @@ begin
           end;
 
    rtIcom:
-      if RadioModel in [IC9100, IC7800, IC7600, IC7700] then
+      if RadioModel in [IC7100, IC7300, IC7600, IC7700, IC7800, IC7850, IC7851, IC9100] then
          begin
          if ord(Msg[1]) = 0 then // Flush if Msg = #00
             begin
@@ -1742,7 +1752,7 @@ begin
           end;
 
     rtIcom:
-      if RadioModel in [IC9100, IC7800, IC7600, IC7700] then
+      if (TRUE) or (RadioModel in [IC7800, IC7850, IC7851]) then // ny4i 4.45.2. This looks odd because the 7800..7851 calculate speed differently but I have not added this yet. When added, just remove this if so we try this for all Icom radios.
         begin
         // Calculate Icom speed of WPM to 000-255.
         //001 = 6wpm, 254 = 48 wpm. Each extra wpm is 6 decimal higher
@@ -1943,7 +1953,7 @@ begin
 
   case RadioModel of
 
-    IC706..IC7800, OMNI6: {KK1L: 6.73 Added OMNI6}
+    IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
       begin
        // TLogger.GetInstance.Debug('In Icom radio code');
         if VFO = 'B' then
@@ -2570,7 +2580,7 @@ begin
           WaitAnswer := 14;
        end;
 }
-    //      IC706..IC7800, OMNI6: Exit;
+    //      IC78..IC9100, OMNI6: Exit;
 {
     IC7800, IC746..IC756PROIII, IC7000:
       begin
@@ -2602,6 +2612,8 @@ var
 const
   ra                                    : array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
+  RadioSupportsCWByCAT := [K2,K3,TS850,IC7100,IC7300,IC7600,IC7700,IC7800,IC7850,IC7851,IC9100,Orion];  // ny4i 4.45.2
+  ICOMRadios := [IC78..IC9100];
   for i := 1 to 2 do
   begin
     TempRadio := ra[i];

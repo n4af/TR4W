@@ -514,8 +514,9 @@ begin
 {$IFEND}
 
 
-  if (ActiveMode = CW)        and          // ny4i 4.44.5
-      ActiveRadioPtr^.CWByCAT then
+  if (ActiveMode = CW)                                      and          // ny4i 4.44.5
+       ((ActiveRadioPtr^.CWByCAT and
+       (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT))) then     // ny4i 4.45.2 then
      begin
      ActiveRadioPtr^.StopSendingCW;
      PTTOff;
@@ -3248,7 +3249,8 @@ begin
     begin
       if Key <> StartSendingNowKey then
       begin
-        if ActiveRadioPtr.CWByCAT then          // ny4i 4.44.5
+        if (ActiveRadioPtr.CWByCAT) and           // ny4i 4.44.5
+           (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2
            begin // Send the character now - No buffering
            ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
            end
