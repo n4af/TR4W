@@ -3159,7 +3159,7 @@ var firststring,secondstring,thirdstring : str10;
 begin
 ParseExchange(exchange,FirstString,SecondString,ThirdString);    //n4af 04.42.4
   Result := False;
-  if (SecondString = '') and (ThirdString = '') then exit  ; // n4af 4.45.2
+  if (SecondString = '') and (ThirdString = '') then exit  ; // n4af 4.45.7
   if length(Exchange) < 3 then Exit;
   if not StringIsAllNumbers(FirstString) then Exit;
   RXData.Age := StrToInt(FirstString);
