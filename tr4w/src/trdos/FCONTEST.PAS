@@ -439,13 +439,22 @@ begin
       begin
 //        DigitalModeEnable := True;
 //        VHFBandsEnabled := True;
-        WARCBandsEnabled := True;
+        WARCBandsEnabled := False;         // WARC is not allowed during FD ny4i 4.45.3
         SetCQMemoryString(CW, F1, 'CQ^FD \ \ FD');
         SetCQMemoryString(CW, F2, 'CQ^FD CQ^FD \ \ FD');
         CQExchange := ' ' + MyFDClass + ' ' + MySection;
         SearchAndPounceExchange := MyFDClass + ' ' + MySection;
         QSLMessage := '73 \ FD';
+        ActiveDXMult := ARRLDXCCWithNoARRLSections;
         AddARRLSectionDomesticCountries;
+        {AddDomesticCountry('VP2E'); // Anguilla
+        AddDomesticCountry('V2'); // Antigua
+        AddDomesticCountry('LU'); // Argentina
+        AddDomesticCountry('P4'); // Aruba
+        AddDomesticCountry('C6'); // Bahamas
+
+        AddDomesticCountry('XE');
+        }
       end;
 
     JIDXSSB, JIDXCW:

@@ -520,6 +520,7 @@ begin
      begin
      ActiveRadioPtr^.StopSendingCW;
      PTTOff;
+     if tAutoSendMode then EditingCallsignSent := True; // ny4i CWByCat AutoSend issue
     // Exit;
      end;
 

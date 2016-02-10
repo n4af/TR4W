@@ -2691,8 +2691,13 @@ begin
 
    //SetLength(msg,Length(sBuf));
    //msg := RawToBytes(sBuf[1], Length(sBuf));
-   udp.BroadcastEnabled := true;
-   udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf); // ny4i 4.44.9
+   try
+      udp.BroadcastEnabled := true;
+      udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf); // ny4i 4.44.9
+   except
+      on E : Exception do
+        // ShowMessage(PChar('Exception in SendRadioInfoToUDP. Message = '));
+   end;
 end; // SendRadioInfoToUDP;
 
 end.
