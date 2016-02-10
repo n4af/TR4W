@@ -236,6 +236,8 @@ const
   TC_SAVINGTO                           = 'Zapisywanie %s do %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Plik zapisano na dyskietce';
   TC_FILESAVEDTOSUCCESSFULLY            = 'Plik zapisano do %s poprawnie';
+  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
 
   {LOGSEND}
 

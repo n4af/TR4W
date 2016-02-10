@@ -239,6 +239,8 @@ const
   TC_SAVINGTO                           = 'Ukládá se %s do %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Soubor byl úspìšnì uložen na disketu';
   TC_FILESAVEDTOSUCCESSFULLY            = 'Soubor byl úspìšnì uložen do %s';
+  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
 
   {LOGSEND}
 

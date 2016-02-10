@@ -238,6 +238,8 @@ const
   TC_SAVINGTO                           = 'Snimanje %s u %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Fajl snimljen na flopi uspesno';
   TC_FILESAVEDTOSUCCESSFULLY            = 'Fajl snimljen na %s uspesno';
+  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
 
   {LOGSEND}
 

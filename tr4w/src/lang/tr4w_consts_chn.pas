@@ -241,6 +241,8 @@ const
   TC_SAVINGTO                           = 'Saving %s to %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'File saved to floppy successfully.';
   TC_FILESAVEDTOSUCCESSFULLY            = 'File saved to %s successfully.';
+  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
 
   {LOGSEND}
 
