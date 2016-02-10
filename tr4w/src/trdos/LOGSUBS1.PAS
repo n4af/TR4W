@@ -233,6 +233,9 @@ begin   // 1
     CW:
 
       begin
+ {     if ActiveRadioPtr^.CWByCAT then
+      ActiveRadioPtr.SendCW(Message)
+      else   }
         SendCrypticCWString(Message);
       end;
 {$IF MMTTYMODE}
@@ -637,7 +640,7 @@ begin
 
 //  LastDisplayedFreq[RadioOne] := 0; {KK1L: 6.73 Forces new display for highlight}
 //  LastDisplayedFreq[RadioTwo] := 0; {KK1L: 6.73 Forces new display for highlight}
-
+  if InActiveRadioptr^.CWByCAT then ActiveRadioPtr^.StopSendingCW;  // n4af cwbycat so2r
   InactiveRigCallingCQ := False;
 
   if ActiveRadio = RadioOne then
