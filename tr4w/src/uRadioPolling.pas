@@ -2420,7 +2420,7 @@ begin
     FT1000MP: pFT1000MP(rig);
     FT100: pFT100(rig);
     FT450, FT950, FT2000, FTDX9000: pFTDX9000(rig);
-    IC706..IC7800, OMNI6:
+    IC78..IC9100, OMNI6:
       pIcomNew(rig);
 //    pIcom(rig);
 
@@ -2595,7 +2595,8 @@ begin
      end
   else      //n4af 04.30.3
      begin
-     if ActiveRadioPtr.CWByCAT then     // ny4i 4.44.5
+     if (ActiveRadioPtr.CWByCAT) and   // ny4i 4.44.5
+        (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2
         begin
         tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
         end;

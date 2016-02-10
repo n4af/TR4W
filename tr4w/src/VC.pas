@@ -14,8 +14,8 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+     Public License along with TR4W in  GPL_License.TXT.
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit VC;
@@ -175,11 +175,19 @@ const
 
 
   OZCR2008                              = False;
+<<<<<<< HEAD
   TR4W_CURRENTVERSION_NUMBER            = '4.45.8'; // N4AF
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
   TR4W_CURRENTVERSIONDATE               = 'Feb 9, 2016' ;
+=======
+  TR4W_CURRENTVERSION_NUMBER            = '4.45.2';   // ny4i 4.45.2
+
+  TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
+
+  TR4W_CURRENTVERSIONDATE               = 'Feb 7, 2016' ;
+>>>>>>> origin/4.45.2
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -969,18 +977,25 @@ type
     IC781,
 
     IC910,
-    IC9100,
     IC970D,
 
     IC7000,
+    IC7100,
     IC7200,
+    IC7300,
     IC7410,
     IC7600,
     IC7700,
     IC7800,
+    IC7850,
+    IC7851,
+    IC9100,
 
     OMNI6,
     Orion);
+
+  ICOMRadioTypes = set of InterfacedRadioType;
+  InterfacedRadioTypeSet = set of InterfacedRadioType;
 
   BandType = (
     Band160,

@@ -205,7 +205,7 @@ var
 begin
    //localMsg := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
-   if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT))) then   // ny4i 4.44.5
+   if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT and (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT)    ))) then   // ny4i 4.44.5
       begin
       ActiveRadioPtr.SendCW(Msg);
    //   tStartAutoCQ;   This was a test but it cannot work like this in CWBYCAT.
