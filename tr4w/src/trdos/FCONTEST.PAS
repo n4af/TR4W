@@ -447,14 +447,6 @@ begin
         QSLMessage := '73 \ FD';
         ActiveDXMult := ARRLDXCCWithNoARRLSections;
         AddARRLSectionDomesticCountries;
-        {AddDomesticCountry('VP2E'); // Anguilla
-        AddDomesticCountry('V2'); // Antigua
-        AddDomesticCountry('LU'); // Argentina
-        AddDomesticCountry('P4'); // Aruba
-        AddDomesticCountry('C6'); // Bahamas
-
-        AddDomesticCountry('XE');
-        }
       end;
 
     JIDXSSB, JIDXCW:
