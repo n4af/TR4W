@@ -488,7 +488,7 @@ end;
 procedure Escape_proc;
 
 begin
-  //   if TryKillCW then Exit;
+  InitializeQSO; // n4af 4.45.8
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
   begin
