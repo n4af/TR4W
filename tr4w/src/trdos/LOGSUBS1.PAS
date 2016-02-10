@@ -640,7 +640,7 @@ begin
 
 //  LastDisplayedFreq[RadioOne] := 0; {KK1L: 6.73 Forces new display for highlight}
 //  LastDisplayedFreq[RadioTwo] := 0; {KK1L: 6.73 Forces new display for highlight}
-  if InActiveRadioptr^.CWByCAT then ActiveRadioPtr^.StopSendingCW;  // n4af cwbycat so2r
+  if InActiveRadioptr^.CWByCAT then ActiveRadioPtr^.StopSendingCW;  // n4af 4.45.9
   InactiveRigCallingCQ := False;
 
   if ActiveRadio = RadioOne then
