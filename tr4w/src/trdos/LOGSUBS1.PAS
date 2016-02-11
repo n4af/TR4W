@@ -132,20 +132,6 @@ label
 begin   // 1
   Result := False;
   if FoundCommand(Message) and (Message = '') then Exit;
-
-  {
-     if (ActiveMode = Phone) and DVPEnable and DVPMessagePlaying then
-        begin
-           TimeOut := 0;
-
-           //    DVPStopPlayback;
-
-           //    repeat
-           //      Wait(5);
-           //      inc(TimeOut);
-           //    until (not DVPMessagePlaying) or (TimeOut > 30);
-        end;
-  }
   if (ActiveMode in [Phone, FM]) and (DVKEnable = False) then goto DontCheckPTT;
   if (ActiveMode = CW) and (CWEnable = False) then goto DontCheckPTT;
 
@@ -233,7 +219,7 @@ begin   // 1
     CW:
 
       begin
- {     if ActiveRadioPtr^.CWByCAT then
+     {  if ActiveRadioPtr^.CWByCAT then
       ActiveRadioPtr.SendCW(Message)
       else   }
         SendCrypticCWString(Message);
@@ -331,77 +317,7 @@ begin
         end;
     end;
 
-    { Special short cut way to program DVP }
-{
-    if (ActiveMode = Phone) and DVPEnable and (Key >= ControlF1) and (Key <= ControlF10) then
-    begin
-      if OpMode = CQOpMode then
-      begin
-        FileName := GetCQMemoryString(ActiveMode, CHR(Ord(Key) - 35)); //KK1L: 6.73 Added mode
-
-        while Copy(FileName, 1, 1) < ControlZ do
-          Delete(FileName, 1, 1);
-
-        QuickDisplay(TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP);
-        DVPRecordMessage(FileName, True)
-      end
-      else
-      begin
-            //KK1L: 6.73 Added mode to GetEXMemoryString
-        FileName := GetEXMemoryString(ActiveMode, CHR(Ord(Key) - 35));
-
-        while Copy(FileName, 1, 1) < ControlZ do
-          Delete(FileName, 1, 1);
-
-        QuickDisplay(TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP);
-        DVPRecordMessage(FileName, True);
-      end;
-
-      Exit;
-    end;
-}
-    {
-        if (ActiveMode = Phone) and (ActiveDVKPort <> NoPort) and (Key >= ControlF1) and (Key <= ControlF10) then
-        begin
-          if StringHas(UpperCase(GetCQMemoryString(ActiveMode, CHR(ord(Key) - 35))), 'DVK') then
-          begin
-            if opmode = CQOpMode then
-            begin
-              QuickDisplay('Recording DVK.  Press ESCAPE or RETURN to stop.');
-                            KK1L: 6.73 Added mode
-              DVKRecordMessage(GetCQMemoryString(ActiveMode, CHR(ord(Key) - 35)));
-            end
-            else
-            begin
-              QuickDisplay('Recording DVK.  Press ESCAPE or RETURN to stop.');
-                            KK1L: 6.73 Added mode to GetEXMemoryString
-              DVKRecordMessage(GetEXMemoryString(ActiveMode, CHR(ord(Key) - 35)));
-            end;
-          end;
-          Exit;
-        end;
-    }
-          { Finally we are ready to send the message }
-
-//    if ((Key >= F1) and (Key <= AltF10)) or ((Key >= F11) and (Key <= AltF11)) then
-    if (Key >= F1) and (Key <= AltF12) then
-    begin
-{
-      if ActiveMode = Digital then
-      begin
-
-        if pos('<', Message) = 0 then
-        begin
-          SendMessageToMixW('<TX>');
-          SendCrypticMessage(Message);
-          SendMessageToMixW('<RXANDCLEAR>');
-        end
-        else
-          SendMessageToMixW(Message);
-
-      end
-      else
-       }IncrementCounter := SendCrypticMessage(Message);
+IncrementCounter := SendCrypticMessage(Message);
 
       if (OpMode = CQOpMode) and (Key >= F1) and (Key <= F4) then
       begin
@@ -452,7 +368,7 @@ begin
       end;
     end;
   end;
-end;
+ 
 
 procedure AddOnCQExchange;
 
@@ -1146,58 +1062,7 @@ begin
 
         if ActiveMode = Phone then Sleep(50);
 
-        if (ActiveMode = CW) or DVKEnable or (ActiveDVKPort <> NoPort) then
-        begin
-{
-          repeat
-            if KeyPressed then
-            begin
-              Key := UpCase(ReadKey);
-
-              case Key of
-
-                EscapeKey:
-                  begin
-                    if CalledFromCQMode then SendCrypticMessage(GetCQMemoryString(ActiveMode, F1));
-                    TwoRadioState := Idle;
-                    Exit;
-                  end;
-
-                NullKey:
-                  case ReadKey of
-                    AltB: begin
-                        RememberFrequency;
-                        BandUp;
-                      end;
-
-                    AltV: begin
-                        RememberFrequency;
-                        BandDown;
-                      end;
-
-                    PageUpKey: SpeedUp;
-                    PageDownKey: SlowDown;
-                  end;
-
-              else
-                if ActiveWindow = CallWindow then
-                  if ValidCallCharacter(Key) then
-                  begin
-                    ControlBMemory := ControlBMemory + Key;
-                    Write(Key);
-                  end;
-              end;
-
-            end;
-
-            if ActiveMode = Phone then Wait(20);
-
-          until (((ActiveMode = CW) and not CWStillBeingSent) or
-            ((ActiveMode = Phone) and not (DVPMessagePlaying or DVKMessagePlaying)));
-}
-        end;
-
-        SwapRadios;
+               SwapRadios;
         SetOpMode(CQOpMode);
         if (ControlBMemory = '') and (OnDeckCall = '') and (CalledFromCQMode) then SendCrypticMessage(GetCQMemoryString(ActiveMode, F1));
 

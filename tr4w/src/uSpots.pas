@@ -549,6 +549,7 @@ begin
   if d <= BandMapGuardBand then
   begin
     if FList^[Index2].FCall <> MyCall then
+    if OpMode = SearchAndPounceOpMode then     // n4af 4.45.10
     begin
       PutCallToCallWindow(FList^[Index2].FCall);
       SendMessage(wh[mweCall], EM_SETSEL, 0, -1);

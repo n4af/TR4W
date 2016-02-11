@@ -459,7 +459,7 @@ begin
   AddStringToBuffer(Chr(0),CWTone); // Flushes the buffer when the $0 is passed to SendCW - by only By CAT
 
   InactiveRigCallingCQ := False;
-
+//if if ActiveRadioPtr^.CWByCAT then backtoinactiveradioafterqso;
 end;
 
 

@@ -1172,19 +1172,7 @@ begin
 
   DisplayBandMap; { Do we always want to do this?  What if already up? }
 
-  {KK1L: 6.73 Check for DupeInfoCall coming from bandmap and prompt added to procedure}
-  {KK1L: 6.73 changed CheckMode to ModeMemory[InactiveRadio]}
-
-{
-  if K5KA.AltDString = '' then
-  begin
-    TempString := UpperCase(QuickEditResponse//QuickEditResponseWithPartials
-    (PChar('call to be checked on ' + BandStringsArray[InactiveRadioPtr.BandMemory] + ModeString[InactiveRadioPtr.ModeMemory]), 12));
-    if (TempString <> EscapeKey) and (TempString <> '') then DupeInfoCall := TempString;
-  end
-  else
-    DupeInfoCall := K5KA.AltDString;
-}
+  
   if K5KA.AltDString <> '' then
   begin
     tClearDupeInfoCall;
@@ -1213,13 +1201,6 @@ begin
       DupeInfoCallWindowState := diDupe;
       Format(wsprintfBuffer, '%s DUPE!! on %s%s', @DupeInfoCall[1], BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
       SetMainWindowText(mweDupeInfoCall, wsprintfBuffer {DupeInfoCall + ' DUPE!! on ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory]});
-{
-      a[0] := BandStringsArray[InActiveRadioPtr.BandMemory];
-      a[1] := ModeString[InActiveRadioPtr.ModeMemory];
-      a[2] := pointer(InActiveRadioPtr.SpeedMemory);
-      Windows.wvsprintf(TempBuffer1, 'bandmode is %s%s  on %d wpm', @a);
-      ShowMessage(TempBuffer1);
-}
       if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
       tClearDupeInfoCall;
     end
@@ -1233,12 +1214,6 @@ begin
         if DupeCheckSound = DupeCheckGratsIfMult then DoABeep(BeepCongrats);
         DupeInfoCallWindowState := diNotDupeMult;
       end;
-{
-      if InActiveRadioPtr.ModeMemory = CW then
-        tSetWindowText(wh[mweDupeInfoCall], DupeInfoCall + ' OK!! at ' + SpeedString + ' WPM'#13'Space bar for ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory] + ' QSO')
-      else
-        tSetWindowText(wh[mweDupeInfoCall], DupeInfoCall + ' OK!!'#13#10'Space bar for ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory] + ' QSO');
-}
 
 
       Format(wsprintfBuffer, '%s OK!!'#13#10'Space bar for %s%s', @DupeInfoCall[1], BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
@@ -1247,21 +1222,8 @@ begin
       if TwoRadioState <> TwoRadiosDisabled then TwoRadioState := CallReady;
 
     end;
-
-//    if SendAltDSpotsToPacket and (Frequency <> -1) then CreateAndSendPacketSpot(DupeInfoCall, Frequency);
-
-  end
-  else
-    if BandMapBlinkingCall <> '' then
-    begin
-        {KK1L: 6.73 changed CheckMode to ModeMemory[InactiveRadio]}
-{?
-      VisibleLog.DetermineIfNewMult(BandMapBlinkingCall, InactiveRadioPtr.BandMemory, InactiveRadioPtr.ModeMemory, MultString);
-      Mult := MultString <> '';
-      NewBandMapEntry(BandMapBlinkingCall, BandMapCursorFrequency, 0, ModeMemory[InactiveRadio], False, Mult, BandMapDecayTime, True, MyCall);
-      if SendAltDSpotsToPacket then CreateAndSendPacketSpot(BandMapBlinkingCall, BandMapCursorFrequency);
-}
-    end;
+  end;
+ 
 
   RITEnable := True;
 end;
@@ -4969,49 +4931,6 @@ nop
                   begin
                     CallAlreadySent := True;
                     CallsignICameBackTo := CallWindowString;
-
-                        {case NewReadKey of
-                          AltB:
-                            begin
-
-                              BandUp;
-                            end;
-
-                          AltD:
-                            if K1EANetworkEnable then
-                              PassStationToCTNetwork
-                            else
-                              DupeCheckOnInactiveRadio;
-
-                          AltG: SwapMultDisplay;
-                          AltK: ToggleCW(true);
-                          AltM:
-                            begin
-                              ToggleModes;
-                              DisplayAutoSendCharacterCount;
-                            end;
-
-                          AltR:
-                            begin
-                              if not SingleRadioMode then
-                              begin
-                                                       //wli                                          SwapRadios;
-                                DisplayAutoSendCharacterCount;
-                                Str(SpeedMemory[InactiveRadio], SpeedString);
-                              end;
-                            end;
-
-                          AltV:
-                            begin
-
-                              BandDown;
-                            end;
-
-                          AltY: DeleteLastContact;
-                          PageUpKey: SpeedUp;
-                          PageDownKey: SlowDown;
-                        end;
-                        }
                   end;
 
                 CarriageReturn:
