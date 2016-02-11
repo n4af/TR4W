@@ -248,7 +248,7 @@ end;
 procedure SetUpGlobalsAndInitialize;
 
 begin
-  udp := TIdUDPClient.Create(nil); // ny4i 4.44.9 This is global so init here. Free at end.
+  udp := TIdUDPClient.Create(nil); // ny4i Issue #99
   if QTCsEnabled then New(QTCDataArray); //LoadQTCDataFile;
 
 //  if TempDomesticQTHDataFileName <> nil then
