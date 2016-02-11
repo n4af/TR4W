@@ -248,7 +248,7 @@ end;
 procedure SetUpGlobalsAndInitialize;
 
 begin
-
+  udp := TIdUDPClient.Create(nil); // ny4i 4.44.9 This is global so init here. Free at end.
   if QTCsEnabled then New(QTCDataArray); //LoadQTCDataFile;
 
 //  if TempDomesticQTHDataFileName <> nil then
@@ -407,7 +407,6 @@ begin
 //  K5KA.AltDString := '';
 //  K5KA.State := KAIdle;
 //  MarkTime(RITCommandTimeStamp);
-    udp := TIdUDPClient.Create(nil); // ny4i 4.44.9 This is global so init here. Free at end.
 end;
 
 function LoadInSeparateConfigFile(FileName: ShortString; var FirstCommand: boolean; Call: CallString): boolean;
