@@ -1933,7 +1933,7 @@ begin
       SendingOnRadioTwo := True;
       SetRelayForActiveRadio(ActiveRadio);
     end;
-
+if cwbycat then ActiveRadioPtr.SendCW(F1);
   wkSetKeyerOutput(ActiveRadioPtr);
 
   KeyersSwapped := False;

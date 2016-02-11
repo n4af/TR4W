@@ -726,6 +726,7 @@ begin
             if Msg.wParam = VK_SPACE {32} then if Msg.HWND = wh[mweCall] then
               begin
                 SpaceBarProc2;
+                if ActiveRadioPtr^.CWByCAT then BackToInactiveRadioAfterQSO;
                 goto NoTransMess;
               end;
 

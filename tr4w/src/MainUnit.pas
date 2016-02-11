@@ -559,17 +559,7 @@ begin
     if OpMode = SearchAndPounceOpMode then SetOpMode(CQOpMode);
     Exit;
   end;
-{
-  if (TwoRadioState = StationCalled) then
-  begin
-    tCleareCallWindow;
-    tCleareExchangeWindow;
-    CheckTwoRadioState(EscapePressed);
-    NameCallsignPutUp := '';
-    SetOpMode(CQOpMode);
-    Exit;
-  end;
-}
+
 //  if tr4w_ExchangeWindowActive then
   if ActiveMainWindow = awExchangeWindow then
     if ExchangeWindowString <> '' then
@@ -658,11 +648,8 @@ begin
         CheckAndSetInitialExchangeCursorPos;
       end;
     end;
-
     ShowStationInformation(@CallWindowString);
     DisplayGridSquareStatus(CallWindowString);
-//    VisibleLog.DoPossibleCalls(CallWindowString);
-
   end
   else
   begin
@@ -719,7 +706,7 @@ begin
 end;
 
 procedure SpaceBarProc;
- 
+
 var
   SpecialRadioSwap                      : boolean;
 begin
@@ -773,29 +760,7 @@ begin
       end
       else
         CQRITEnabled := Radio2.RadioModel = TS850;
-{
-      if (TwoRadioState = SendingExchange) then
-        CheckTwoRadioState(ContactDone)
-      else
-        if SpecialRadioSwap then
-        begin
-          SwapRadios;
-          SpecialRadioSwap := False;
-        end;
-}
       DisplayAutoSendCharacterCount;
-
-          {      if SearchAndPounceStatus then
-                begin
-                  DupeInfoCall := '';
-                                                 //                    RemoveWindow(DupeInfoWindow);
-
-                  EscapeDeletedCallEntry := CallWindowString;
-                  CallWindowString := '';
-                                                 //                    RemoveWindow(ExchangeWindow);
-                  ResetSavedWindowListAndPutUpCallWindow;
-                end;
-              }
     end;
   end
 
@@ -862,17 +827,6 @@ begin
         //                  RestorePreviousWindow;
 
     end;
-
-  {
-    if SpaceBarDupeCheckEnable then
-      if WindowDupeCheck then
-      begin
-
-        SetTR4WWindowText(ExchangeWindowHandle, '');
-              //GotExchange := False;
-        LookingForCQExchange := False;
-      end;
-  }
 end;
 
 procedure SetOpMode(OperationMode: OpModeType);

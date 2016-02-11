@@ -803,7 +803,6 @@ var
 begin
   wkActive := True;
   wkDispayState;
-
   while wkActive = True do
   begin
     if not wkSendNextByteFromHostBuffer then
