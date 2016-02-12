@@ -488,7 +488,12 @@ end;
 procedure Escape_proc;
 
 begin
- activeradioptr^.stopsendingcw; // n4af 4.45.8
+
+ if activeradioptr^.cwbycat then
+ begin
+ activeradioptr^.stopsendingcw; // n4af 4.45.5
+ exit;
+ end;
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
   begin
