@@ -1617,8 +1617,8 @@ begin
           end;
 
     rtIcom:
-      begin   // This was missing for Icom ny4i Issue 100
-         CommandsTempBuffer[0] := CHR(8);  // Number of items used in this array for command ny4i Issue 100
+      begin   // This was missing for Icom ny4i Issue 100 4.45.4
+         CommandsTempBuffer[0] := CHR(8);  // Number of items used in this array for command ny4i Issue 100 4.45.4
          CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
          CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
          CommandsTempBuffer[3] := CHR(ReceiverAddress);
