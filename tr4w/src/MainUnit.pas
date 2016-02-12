@@ -488,7 +488,7 @@ end;
 procedure Escape_proc;
 
 begin
-  InitializeQSO; // n4af 4.45.8
+ activeradioptr^.stopsendingcw; // n4af 4.45.8
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
   begin
@@ -518,7 +518,7 @@ begin
        ((ActiveRadioPtr^.CWByCAT and
        (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT))) then     // ny4i 4.45.2 then
      begin
-     ActiveRadioPtr^.StopSendingCW;
+     ActiveRadioPtr^.StopSendingCW; 
      PTTOff;
     // Exit;
      end;
@@ -1059,6 +1059,7 @@ begin
     if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
     if ActiveMode in [Phone, FM] then SendCrypticMessage(SearchAndPouncePhoneExchange);
     ExchangeHasBeenSent := True;
+if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
   end;
 
   if TryLogContact then
@@ -3129,7 +3130,7 @@ begin
   if OpMode = SearchAndPounceOpMode then
   begin
     ReturnInSAPOpMode;
-    Exit;
+ //   Exit;
   end;
 
 end;
