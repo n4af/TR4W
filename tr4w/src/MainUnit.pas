@@ -475,6 +475,16 @@ end;
 procedure Escape_proc;
 
 begin
+If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then        // n4af 4.45.5   proposed to allow
+     If (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT) then    // first esc stops sending
+       If (Second) then                                           // second esc clears call
+       initializeqso
+       else
+         begin
+         activeradioptr^.stopsendingcw;
+         Second := True;
+         exit;
+         end;
   //   if TryKillCW then Exit;
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
