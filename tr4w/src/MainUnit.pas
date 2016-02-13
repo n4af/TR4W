@@ -1,4 +1,4 @@
-{
+ {
  Copyright Dmitriy Gulyaev UA4WLI 2015.
 
  This file is part of TR4W  (SRC)
@@ -133,6 +133,7 @@ uses
   Switch                                : boolean = False;
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
+  Second                                : Boolean = False;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 function DeviceIoControlHandler
@@ -488,7 +489,18 @@ end;
 procedure Escape_proc;
 
 begin
- activeradioptr^.stopsendingcw; // n4af 4.45.8
+
+If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then        // n4af 4.45.5   proposed to allow
+     If (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT) then    // first esc stops sending
+       If (Second) then                                           // second esc clears call
+       initializeqso
+       else
+         begin
+         activeradioptr^.stopsendingcw;
+         Second := True;
+         exit;
+         end;
+  //   if TryKillCW then Exit;
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
   begin
