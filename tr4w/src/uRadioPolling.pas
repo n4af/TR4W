@@ -2145,7 +2145,7 @@ begin
     if ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or
       (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0) then
     begin
-      SpotsList.DisplayCallsignOnThisFreq(rig.FilteredStatus.Freq);
+      SpotsList.DisplayCallsignOnThisFreq(rig.FilteredStatus.Freq);             
       BandMapCursorFrequency := rig.FilteredStatus.Freq;
       BandMapBand := ActiveBand;
       BandMapMode := ActiveMode;
