@@ -375,6 +375,7 @@ var
   ReallocMemCount                       : integer;
   OldMemMgr                             : TMemoryManager;
   PreviousProcAddress                   : integer;
+  pRadio                                : RadioPtr; // ny4i used to make code cleaner Issue 94
 
 const
   PCharDayTags                          : array[0..6] of PChar = (TC_SUN, TC_MON, TC_TUE, TC_WED, TC_THU, TC_FRI, TC_SAT);
@@ -489,11 +490,12 @@ procedure Escape_proc;
 
 begin
 
- if activeradioptr^.cwbycat then
- begin
- activeradioptr^.stopsendingcw; // n4af 4.45.5
- exit;
- end;
+ {if activeradioptr^.cwbycat then
+    begin
+    activeradioptr^.stopsendingcw; // n4af 4.45.5
+    exit;
+    end;
+    }
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
   begin
@@ -518,14 +520,23 @@ begin
     end;
 {$IFEND}
 
-
-  if (ActiveMode = CW)                                      and          // ny4i 4.44.5
-       ((ActiveRadioPtr^.CWByCAT and
-       (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT))) then     // ny4i 4.45.2 then
+  pRadio := ActiveRadioPtr;
+  if (ActiveMode = CW) then
      begin
-     ActiveRadioPtr^.StopSendingCW; 
-     PTTOff;
-    // Exit;
+     if KeyersSwapped then // ny4i Issue 94
+        begin
+        pRadio := InactiveRadioPtr;
+        end
+     else
+        begin
+        pRadio := ActiveRadioPtr;
+        end;
+     if pRadio^.CWByCAT and (pRadio^.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2 then
+        begin
+        pRadio^.StopSendingCW;
+        PTTOff;
+        // Exit;
+        end;
      end;
 
   if ((ActiveMode = CW) and ((CWThreadID <> 0) or (wkBUSY = True))) or
