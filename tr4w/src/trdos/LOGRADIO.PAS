@@ -1618,15 +1618,18 @@ begin
 
     rtIcom:
       begin   // This was missing for Icom ny4i Issue 100 4.45.4
-         CommandsTempBuffer[0] := CHR(8);  // Number of items used in this array for command ny4i Issue 100 4.45.4
-         CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
-         CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
-         CommandsTempBuffer[3] := CHR(ReceiverAddress);
-         CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
-         CommandsTempBuffer[5] := ICOM_SEND_CW;
-         CommandsTempBuffer[6] := CHR(255);   // Sorta documented in Icom manuals. FF in the subcode terminates CW (trial and error) ny4i
-         CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
-         AddCommandToBuffer;
+         if RadioModel in RadioSupportsCWByCAT then     // ny4i
+            begin
+            CommandsTempBuffer[0] := CHR(8);  // Number of items used in this array for command ny4i Issue 100 4.45.4
+            CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+            CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+            CommandsTempBuffer[3] := CHR(ReceiverAddress);
+            CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+            CommandsTempBuffer[5] := ICOM_SEND_CW;
+            CommandsTempBuffer[6] := CHR(255);   // Sorta documented in Icom manuals. FF in the subcode terminates CW (trial and error) ny4i
+            CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
+            AddCommandToBuffer;
+            end;
       end;
     rtOrion:
       begin

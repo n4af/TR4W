@@ -207,7 +207,15 @@ begin
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
    if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT and (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT)    ))) then   // ny4i 4.44.5
       begin
-      ActiveRadioPtr.SendCW(Msg);
+      // We have to see if the KeyersSwapped is set and if so, SendCW on the INACTIVE radio!
+      if KeyersSwapped then                         // ny4i 4.
+         begin
+         InactiveRadioPtr.SendCW(Msg);
+         end
+      else
+         begin
+         ActiveRadioPtr.SendCW(Msg);
+         end;
    //   tStartAutoCQ;   This was a test but it cannot work like this in CWBYCAT.
    { In CWByCat, we need to know when the radio actually stops sending so we can start the timer then.
     The radio has to support a way to interrogate if it is transmitting after we send a cw string.

@@ -714,39 +714,31 @@ label
 var
  BandMapEntryRecord, EntryToBeDisposed, PreviousBandMapEntryRecord: BandMapEntryPointer;
   c                                     : integer;
-  d                                     : integer;
   AddedSpot                             : boolean;
   pr                                    : integer;
   StringType                            : TelnetStringType;
 
-begin
-
-start:
+ begin
+//  Windows.CharUpperBuff(TelnetBuffer, ByteReceived);
   AddedSpot := False;
-  d := 0;
   pr := -1;
-  // TLogger.GetInstance.Debug('In ProcessTelnetString: ' + TelnetBuffer);
-   for c := 0 to ByteReceived do
+  for c := 0 to ByteReceived do
   begin
-    d := d + 1;
     if pr = -1 then
-      if TelnetBuffer[c] >= #13 then pr := c;
+      if TelnetBuffer[c] > #13 then pr := c;
 
-     if pr <> -1 then
-
-      if (TelnetBuffer[c] <= #13)   or (d > 120)  then   //n4af 4.43.9
+    if pr <> -1 then
+      if TelnetBuffer[c] <= #13 then
       begin
-       d := 0;
-       TelnetBuffer[c] := #0;
+        TelnetBuffer[c] := #0;
         StringType := tstReceived;
-          if (PInteger(@TelnetBuffer[pr])^ = $64205844){DE D}  and (PInteger(@TelnetBuffer[pr + 2])^ = $20656420) {DX}    then
-              AddedSpot := ProcessDX(pr, False, StringType);
-                if pr > -1 then
-                if pr < ByteReceived then
-                AddStringToTelnetConsole(@TelnetBuffer[pr], StringType);
+        if (PInteger(@TelnetBuffer[pr])^ = $64205844) {DX D} and (PInteger(@TelnetBuffer[pr + 2])^ = $20656420) { DE } then
+          AddedSpot := ProcessDX(pr, False, StringType);
 
+        AddStringToTelnetConsole(@TelnetBuffer[pr], StringType);
+    //     SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);   // remove hh
         pr := -1;
-       end;
+      end;
   end;
 
   if AddedSpot then

@@ -144,7 +144,9 @@ begin   // 1
   tWaitForNextChar := True;
 
   if not (Copy(Message, 1, 1) = ControlA) then
-    SetUpToSendOnActiveRadio;
+     begin // I think we want to make sure we swap radios once. I tried caling SwapRadios here but it got called again.
+     SetUpToSendOnActiveRadio;
+     end;
 
 
 
@@ -184,7 +186,7 @@ begin   // 1
       if not SingleRadioMode then
       begin    // 3
       if autosendenable then
-      CallWindowKeyUpProc;  // n4af 4.44.2
+         CallWindowKeyUpProc;  // n4af 4.44.2
       InactiveRigCallingCQ := True;
       InactiveSwapRadio := True;
       Switch := True;                       
