@@ -1,4 +1,4 @@
-{
+﻿{
  Copyright Dmitriy Gulyaev UA4WLI 2015.
 
  This file is part of TR4W  (SRC)
@@ -492,15 +492,20 @@ begin
 
 If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then        // n4af 4.45.5   proposed to allow
      If (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT) then    // first esc stops sending
-       If (Second) then                                           // second esc clears call
-       initializeqso
-       else
-         begin
-         activeradioptr^.stopsendingcw;
+       If (Not Second) then
+       begin                                          // second esc clears call
+        activeradioptr^.stopsendingcw;
          Second := True;
          exit;
+         end
+       else
+         begin
+         InitializeQSO;
+         Second := False;
          end;
+
   //   if TryKillCW then Exit;
+
 
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
