@@ -414,7 +414,6 @@ begin
           204:
             begin
               SpotsList.Clear;
-              DisplayBandMap;                       //Gav 4.44.6
             end;
           205: If TwoRadioMode then InvertBooleanCommand(@QSYInactiveRadio);   // Gav     4.37.12
 
@@ -430,6 +429,7 @@ begin
           LBN_KILLFOCUS:
             begin
               BandMapPreventRefresh := False;         // Gav     4.37.12
+              SpotsList.SendAndClearBuffer;
               DisplayBandMap;
             end;
           LBN_SELCHANGE:
@@ -449,8 +449,11 @@ begin
               else
               begin
                 TuneRadioToSpot(SpotsList.Get(TempInt), ActiveRadio);
-                end;
-                Windows.SetFocus(wh[mweCall]);    // n4af 4.38.2 add
+              end;
+              BandMapPreventRefresh := False;          //Gav 4.45.6
+              SpotsList.SendAndClearBuffer;             //Gav 4.45.6
+              DisplayBandMap;                       //Gav 4.45.6
+              Windows.SetFocus(wh[mweCall]);    // n4af 4.38.2
             end;
           //            TuneOnSpotFromBandmap;
 
