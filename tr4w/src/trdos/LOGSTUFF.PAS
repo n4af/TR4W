@@ -1388,13 +1388,29 @@ begin
      else
         begin
         Result := length(RXData.ceClass) in [2,3]; // If it is non-Region 2 DX, just make sure it is two or three characters.
+        if not Result then
+           begin
+           ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
+           end;
         end;
-     if TempString = '' then
+     if Result then // If class passes, check QTH is DX
         begin
-        // Set this to DX
-        TempString := 'DX';
+        if TempString = 'DX' then
+           begin
+           RXData.QTHString := 'DX';
+           end
+        else if TempString = '' then
+           begin
+           // Set this to DX
+           RXData.QTHString := 'DX';
+           end
+        else
+           begin
+           Result := False;
+           ExchangeErrorMessage := TC_ARRLFIELDDAYIMPROPERDXEXCHANGE;
+           end;
         end;
-     if TempString <> '' then RXData.QTHString := TempString;
+     //if TempString <> '' then RXData.QTHString := TempString;
      end;
 
 // Result is set in one of two patchs above...
