@@ -439,7 +439,7 @@ begin
       begin
 //        DigitalModeEnable := True;
 //        VHFBandsEnabled := True;
-        WARCBandsEn abled := False;         // WARC is not allowed during FD ny4i 4.45.3
+        WARCBandsEnabled := False;         // WARC is not allowed during FD ny4i 4.45.3
         SetCQMemoryString(CW, F1, 'CQ^FD \ \ FD');
         SetCQMemoryString(CW, F2, 'CQ^FD CQ^FD \ \ FD');
         CQExchange := ' ' + MyFDClass + ' ' + MySection;
