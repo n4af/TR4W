@@ -176,11 +176,11 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.45.6' ;     // N4AF
+  TR4W_CURRENTVERSION_NUMBER            = '4.46.2' ;     // N4AF
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'Feb 15, 2016' ;
+  TR4W_CURRENTVERSIONDATE               = 'Feb 17, 2016' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -365,7 +365,7 @@ const
 
 {$IF tDebugMode}
 var
-
+   
   cw_tick_array                         : array[0..500] of Cardinal;
   cw_tick                               : integer;
 {$IFEND}

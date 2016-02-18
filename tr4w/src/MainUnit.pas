@@ -1,4 +1,4 @@
-﻿{
+{
  Copyright Dmitriy Gulyaev UA4WLI 2015.
 
  This file is part of TR4W  (SRC)
@@ -241,6 +241,7 @@ procedure ReturnInCQOpMode;
 procedure ReturnInSAPOpMode;
 function Send_DE: boolean;
 procedure SendB4;
+// procedure ProcessKeyDownTerm; // 4.46.2
 function TryLogContact: boolean;
 procedure SpaceBarProc;
 procedure SpaceBarProc2;
@@ -314,7 +315,7 @@ function ParametersOkay(Call: CallString;
   Mode: ModeType;
   Freq: LONGINT;
   var RData: ContestExchange): boolean;
-
+ 
 procedure PossibleCallsProc(PCDRAWITEMSTRUCT: PDrawItemStruct);
 
 procedure CreateTotalWindow;
@@ -491,22 +492,24 @@ procedure Escape_proc;
 
 begin
 
-If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then        // n4af 4.45.5   proposed to allow
+If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then      // n4af 4.45.5   proposed to allow
+  begin
      If (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT) then    // first esc stops sending
        If (Not Second) then
        begin                                          // second esc clears call
         activeradioptr^.stopsendingcw;
          Second := True;
-         exit;
+          exit;
          end
        else
          begin
          InitializeQSO;
          Second := False;
          end;
-
+         end;
   //   if TryKillCW then Exit;
 
+  scWK_reset; // n4af 4.46.2
 
 
 {$IF MORSERUNNER}
@@ -559,7 +562,7 @@ If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then        // n4af 4.45.5  
     if ActiveMode = CW then
     begin
       if tAutoSendMode then EditingCallsignSent := True;
-//      tAutoSendMode := False;
+      tAutoSendMode := False;
 //      FlushCWBuffer;
      FlushCWBufferAndClearPTT; //n4af 4.33.3
 
@@ -3084,6 +3087,18 @@ begin
 }
 end;
 
+{procedure ProcessKeyDownTerm;        // 4.46.2
+ begin
+ if activeradioptr^.cwbycat and autosendenable and autocallterminate then
+ if length(CallWindowString) = AutoSendCharacterCount then
+ begin
+   tExchangeWindowSetFocus;
+        tSetExchWindInitExchangeEntry;
+        CheckAndSetInitialExchangeCursorPos;
+   processreturn;
+ end;
+ end;  }
+
 procedure ProcessReturn;
 var
   TempHWND                              : HWND;
@@ -3236,7 +3251,10 @@ begin
         if (ActiveRadioPtr.CWByCAT) and           // ny4i 4.44.5
            (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2
            begin // Send the character now - No buffering
-           ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
+      //     if Autocallterminate then
+                      ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
+           if (length(CallWindowString) > AutosendCharacterCount) and autocallterminate then
+           processreturn;
            end
         else if wkActive then
           wkSendByte(Ord(UpCase(Key)))

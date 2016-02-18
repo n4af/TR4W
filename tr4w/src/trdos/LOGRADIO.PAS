@@ -1535,6 +1535,7 @@ var
    i : integer;
    msgLen : integer;
 begin
+// scWK_Reset;    // n4af 4.46.3
   localMsg := Msg;
   case RadioParametersArray[RadioModel].rt of
     rtKenwood:

@@ -378,7 +378,7 @@ end;
 
 function TDXSpotsList.Get(Index: integer): TSpotRecord;
 begin
-  //  if (Index < 0) or (Index >= FCount) then Exit; //ERROR(@SListIndexError, Index);
+    if (Index < 0) or (Index >= FCount) then Exit; //ERROR(@SListIndexError, Index);
   Result := FList^[Index];
 end;
 
