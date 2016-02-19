@@ -2077,7 +2077,7 @@ var
 begin
   StatusChanged := False;
 //  CompareString(LOCALE_SYSTEM_DEFAULT, 0, @rig.CurrentStatus, SizeOf(RadioStatusRecord), @rig.PreviousStatus, SizeOf(RadioStatusRecord)) <> 2;
-  for TempInteger := 0 to SizeOf(RadioStatusRecord) - 1 do
+  for TempInteger := 0 to SizeOf(RadioStatusRecord) - 2 do                                              // Gav issue #105  changed -1 to -2 to mask off TXOn 
   begin
     if PChar(@rig.CurrentStatus)[TempInteger] <> PChar(@rig.PreviousStatus)[TempInteger] then
     begin
