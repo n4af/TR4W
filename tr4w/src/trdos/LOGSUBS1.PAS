@@ -221,8 +221,8 @@ begin   // 1
     CW:
 
       begin
-      if WKactive and (not WKbusy) then       // n4af 4.46.3
-     flushcwbuffer; 
+      //if WKactive and (not WKbusy) then       // n4af 4.46.3
+     //    flushcwbuffer; 
      SendCrypticCWstring(Message);
      end;
 {$IF MMTTYMODE}

@@ -260,31 +260,20 @@ begin
 {$IF OZCR2008}
     CWMessageToNetwork := CWMessageToNetwork + Msg;
 {$IFEND}
-  // if ActiveRadioPtr.CWByCAT then
-   //    begin
-   //    ActiveRadioPtr.SendCW(Msg); // Now just adds to a buffer
-   //    Exit;
-   //    end;
 
     if wkActive then
     begin
-     if not WKbusy then flushcwbuffer;
+   //  if not WKbusy then flushcwbuffer;  // ny4i winkeyer
       wkAddCWMessageToInternalBuffer(Msg);
 //      wkBUSY := True;
       Exit;
     end;
 
-   // if ActiveRadioPtr.tPTTStatus = PTT_OFF then PTTOn;
-   // if ActiveRadioPtr.CWByCAT then
-    //   begin
-    //   ActiveRadioPtr.SendCW(Msg); // Now just adds to a buffer
-    //   Exit;
-    //   end   // Not crazy about the Exit. Maybe fix this...
-  //  else
-    //   begin
-       if ActiveRadioPtr.tPTTStatus = PTT_OFF then PTTOn;
-      // end;
-    CPUKeyer.AddStringToCWBuffer(Msg, Tone);
+   if ActiveRadioPtr.tPTTStatus = PTT_OFF then
+      begin
+      PTTOn;
+      end;
+   CPUKeyer.AddStringToCWBuffer(Msg, Tone);
 //    CountsSinceLastCW := 0;
 
     if CWThreadID = 0 then

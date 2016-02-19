@@ -43,7 +43,8 @@ utils_text,
 //  Help,
   LogGrid, {Crt,}
   LogSCP,
-  BeepUnit
+  BeepUnit,
+  uWinKey
   ;
 
 procedure SendCrypticDVPString(SendString: ShortString);
@@ -455,9 +456,11 @@ begin
   //   message_to_send := '';
 
 //  ClearPTTForceOn;
-if wkactive and not wkbusy then
-flushcwbuffer;
-
+ { if (wkActive) and (not wkBusy) then
+     begin
+     flushcwbuffer;
+     end;
+  }
   AddStringToBuffer(Chr(5),CWTone); // Flushes the buffer when the $5 is passed to SendCW - by only By CAT
 
   InactiveRigCallingCQ := False;
