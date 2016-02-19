@@ -308,6 +308,7 @@ procedure ClearInfoWindows;
 procedure CPUButtonProc;
 procedure TREscapeCommFunction(hFile: THandle; dwFunc: Byte);
 function Get_Ctl_Code(nr: integer): Cardinal;
+procedure DebugMsg(s: string);
 
 function ParametersOkay(Call: CallString;
   ExchangeString: Str40 {CallString};
@@ -7050,6 +7051,13 @@ begin
     PTTStatusChanged;
 
   end;
+end;
+
+procedure DebugMsg(s: string);
+begin
+{$IF NEWER_DEBUG}
+   AddStringToTelnetConsole(PChar(s),tstAlert);
+{$IFEND}
 end;
 
 {

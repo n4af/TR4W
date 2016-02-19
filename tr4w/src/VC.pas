@@ -32,6 +32,7 @@ uses
 
 const
   tDebugMode                            = False;
+  NEWER_DEBUG                           = True;
   MMTTYMODE                             = False;
 
 type

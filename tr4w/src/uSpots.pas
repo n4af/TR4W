@@ -523,16 +523,26 @@ procedure TDXSpotsList.ResetSpotsTimes;
 var
   Index                                 : integer;
 begin
-  for Index := 0 to FCount - 1 do
-    FList^[Index].FMinutesLeft := 0;
+  if Assigned(FList) then
+     begin
+     for Index := 0 to FCount - 1 do
+        begin
+        FList^[Index].FMinutesLeft := 0;
+        end;
+     end;
 end;
 
 procedure TDXSpotsList.ResetSpotsDupes;
 var
   Index                                 : integer;
 begin
-  for Index := 0 to FCount - 1 do
-    FList^[Index].FDupe := False;
+  if Assigned(FList) then
+     begin
+     for Index := 0 to FCount - 1 do
+        begin
+        FList^[Index].FDupe := False;
+        end;
+     end;
 end;
 
 procedure TDXSpotsList.SetCursor;
@@ -541,7 +551,16 @@ begin
   begin
     FCurrentCursorFreq := GetBMSelItemData;
     if FCurrentCursorFreq <> LB_ERR then
-      FCurrentCursorFreq := FList^[FCurrentCursorFreq].FFrequency;
+       begin
+       if Assigned(FList) then
+          begin
+          FCurrentCursorFreq := FList^[FCurrentCursorFreq].FFrequency;
+          end
+       else
+          begin
+          DebugMsg('FList was nil in SetCursor');
+          end;
+       end;
   end;
 end;
 
@@ -553,6 +572,10 @@ var
   a                                     : integer;
 begin
   if not BandMapEnable then Exit;
+  if not Assigned(FList) then
+     begin
+     exit;
+     end;
 
   d := MAXLONG;
 

@@ -1535,7 +1535,7 @@ var
    i : integer;
    msgLen : integer;
 begin
-// scWK_Reset;    // n4af 4.46.3
+// scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
   localMsg := Msg;
   case RadioParametersArray[RadioModel].rt of
     rtKenwood:
@@ -1560,7 +1560,8 @@ begin
             Msg := CWByCATBuffer;              // ny4i 4.44.5
             msgLen := length(CWByCATBuffer);    //length(Msg);
             localMsg := Format('%s', [Msg]);
-            AddStringToTelnetConsole(PChar('Sending to Icom='+localMsg),tstAlert);
+            DebugMsg('Sending to Icom='+localMsg);
+            //AddStringToTelnetConsole(PChar('Sending to Icom='+localMsg),tstAlert);
             CommandsTempBuffer[0] := Chr(8 + msgLen);
             CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
             CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
