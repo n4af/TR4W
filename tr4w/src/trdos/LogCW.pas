@@ -203,6 +203,7 @@ var
   i                                     : integer;
   //localMsg                              : string;
 begin
+
    //localMsg := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
    if ((Msg = Chr(5)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT and (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT)    ))) then   // ny4i 4.44.5
@@ -267,7 +268,7 @@ begin
 
     if wkActive then
     begin
-
+     if not WKbusy then flushcwbuffer;
       wkAddCWMessageToInternalBuffer(Msg);
 //      wkBUSY := True;
       Exit;

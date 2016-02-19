@@ -455,6 +455,8 @@ begin
   //   message_to_send := '';
 
 //  ClearPTTForceOn;
+if wkactive and not wkbusy then
+flushcwbuffer;
 
   AddStringToBuffer(Chr(5),CWTone); // Flushes the buffer when the $5 is passed to SendCW - by only By CAT
 
