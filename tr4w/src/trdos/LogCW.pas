@@ -206,7 +206,7 @@ begin
 
    //localMsg := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
-   if ((Msg = Chr(5)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT and (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT)    ))) then   // ny4i 4.44.5
+   if ((Msg = Chr(242)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT and (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT)    ))) then   // ny4i 4.44.5
       begin
       // We have to see if the KeyersSwapped is set and if so, SendCW on the INACTIVE radio!
       if KeyersSwapped then                         // ny4i 4.

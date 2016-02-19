@@ -32,6 +32,7 @@ interface
 uses
   TF,
   VC,
+  Math,
   Tree,
   SysUtils,
   Windows;
@@ -1534,6 +1535,7 @@ var
    localMsg : string;
    i : integer;
    msgLen : integer;
+   len : integer;
 begin
 // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
   localMsg := Msg;
@@ -1555,14 +1557,14 @@ begin
    rtIcom:
       if RadioModel in [IC7100, IC7300, IC7600, IC7700, IC7800, IC7850, IC7851, IC9100] then
          begin
-         if ord(Msg[1]) = 0 then // Flush if Msg = #00
+         if ord(Msg[1]) = 242 then // Flush if Msg = #242
             begin
             Msg := CWByCATBuffer;              // ny4i 4.44.5
             msgLen := length(CWByCATBuffer);    //length(Msg);
+            len := Min(msgLen,28);             // Max for Icom radio. TODO Optimally, this should be sent in multiple batches
             localMsg := Format('%s', [Msg]);
             DebugMsg('Sending to Icom='+localMsg);
-            //AddStringToTelnetConsole(PChar('Sending to Icom='+localMsg),tstAlert);
-            CommandsTempBuffer[0] := Chr(8 + msgLen);
+            CommandsTempBuffer[0] := Chr(8 + len);
             CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
             CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
             CommandsTempBuffer[3] := CHR(ReceiverAddress);
@@ -1576,12 +1578,12 @@ begin
             // then possible flushCWBuffer like the thread.
 
             //Maybe turn interrogate off when sending?
-            for i := 1 to msgLen do
+            for i := 1 to len do
                begin
                CommandsTempBuffer[6+i] := Chr(Ord(Msg[i]));
                end;
 
-            CommandsTempBuffer[7 + msgLen] := ICOM_END_OF_MESSAGE_CODE;
+            CommandsTempBuffer[7 + len] := ICOM_END_OF_MESSAGE_CODE;
             AddCommandToBuffer;
             CWByCATBuffer := '';
             end
