@@ -329,7 +329,7 @@ IncrementCounter := SendCrypticMessage(Message);
             tDisplayCQTotal;
           end;
 
-        if BandMapEnable and BandMapDisplayCQ then
+   //     if BandMapEnable and BandMapDisplayCQ then  //n4af 4.46.5
         begin
           if ActiveRadioPtr^.LastDisplayedFreq <> 0 then
           begin
