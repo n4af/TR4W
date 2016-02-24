@@ -308,7 +308,10 @@ procedure ClearInfoWindows;
 procedure CPUButtonProc;
 procedure TREscapeCommFunction(hFile: THandle; dwFunc: Byte);
 function Get_Ctl_Code(nr: integer): Cardinal;
-procedure DebugMsg(s: string);
+procedure DebugMsg(s: string); // ny4i
+function IsCWByCATActive(theRadio: RadioPtr): boolean; overload;  // ny4i Issue # 111
+function IsCWByCATActive: boolean; overload;  // ny4i Issue # 111
+
 
 function ParametersOkay(Call: CallString;
   ExchangeString: Str40 {CallString};
@@ -378,7 +381,6 @@ var
   ReallocMemCount                       : integer;
   OldMemMgr                             : TMemoryManager;
   PreviousProcAddress                   : integer;
-  pRadio                                : RadioPtr; // ny4i used to make code cleaner Issue 94
 
 const
   PCharDayTags                          : array[0..6] of PChar = (TC_SUN, TC_MON, TC_TUE, TC_WED, TC_THU, TC_FRI, TC_SAT);
@@ -490,24 +492,24 @@ begin
 end;
 
 procedure Escape_proc;
-
+var
+   pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
 
-If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then      // n4af 4.45.5   proposed to allow
-  begin
-     If (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT) then    // first esc stops sending
-       If (Not Second) then
+If (ActiveMode = CW) and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
+    begin
+    If (Not Second) then                           // first esc stops sending
        begin                                          // second esc clears call
-        activeradioptr^.stopsendingcw;
-         Second := True;
-          exit;
-         end
-       else
-         begin
-         InitializeQSO;
-         Second := False;
-         end;
-         end;
+       ActiveRadioPtr^.stopsendingcw;
+       Second := True;
+       exit;
+       end
+    else
+      begin
+      InitializeQSO;
+      Second := False;
+      end;                                          // ny4i Issue #111 - Just a bit of code formatting for readability
+    end;
   //   if TryKillCW then Exit;
 
   scWK_reset; // n4af 4.46.2
@@ -548,7 +550,7 @@ If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then      // n4af 4.45.5   p
         begin
         pRadio := ActiveRadioPtr;
         end;
-     if pRadio^.CWByCAT and (pRadio^.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2 then
+     if IsCWByCATActive(pRadio) then {pRadio^.CWByCAT and (pRadio^.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2 } // commented Issue 111 ny4i
         begin
         pRadio^.StopSendingCW;
         PTTOff;
@@ -3249,8 +3251,9 @@ begin
     begin
       if Key <> StartSendingNowKey then
       begin
-        if (ActiveRadioPtr.CWByCAT) and           // ny4i 4.44.5
-           (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2
+        {if (ActiveRadioPtr.CWByCAT) and           // ny4i 4.44.5
+           (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2 }
+        if IsCWByCATActive then
            begin // Send the character now - No buffering
       //     if Autocallterminate then
                       ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
@@ -7058,6 +7061,31 @@ begin
 {$IF NEWER_DEBUG}
    AddStringToTelnetConsole(PChar(s),tstAlert);
 {$IFEND}
+end;
+
+// These two functions are overloaded so on can call without any parameters to
+// test the active radio. Or pass a ptr to the radio of one's choosing. If the
+// radio pointer is nil, then it just uses the active radio.
+
+function IsCWByCATActive(theRadio: RadioPtr): boolean;  // ny4i Issue # 111
+var ptr: RadioPtr;
+begin
+   if not Assigned(theRadio) then
+      begin
+      ptr := ActiveRadioPtr;
+      end
+   else
+      begin
+      ptr := theRadio;
+      end;
+   Result := (ptr.CWByCAT) and
+             (ptr.RadioModel in RadioSupportsCWByCAT);
+end;
+
+function IsCWByCATActive: boolean;  // ny4i Issue # 111
+begin
+   Result := (ActiveRadioPtr.CWByCAT) and
+             (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT);
 end;
 
 {

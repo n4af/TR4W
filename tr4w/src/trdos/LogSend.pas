@@ -461,8 +461,10 @@ begin
      flushcwbuffer;
      end;
   }
-  AddStringToBuffer(Chr(242),CWTone); // Flushes the buffer when the $242 is passed to SendCW - by only By CAT
-
+  if IsCWByCATActive then
+     begin
+     AddStringToBuffer(Chr(242),CWTone); // Flushes the buffer when the $242 is passed to SendCW - by only By CAT
+     end;
   InactiveRigCallingCQ := False;
 //if if ActiveRadioPtr^.CWByCAT then backtoinactiveradioafterqso;
 end;

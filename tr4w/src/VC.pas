@@ -32,7 +32,7 @@ uses
 
 const
   tDebugMode                            = False;
-  NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
+  NEWER_DEBUG                           = True; // ny4i added this as tDebugMode changes too much.
   MMTTYMODE                             = False;
 
 type

@@ -2595,8 +2595,9 @@ begin
      end
   else      //n4af 04.30.3
      begin
-     if (ActiveRadioPtr.CWByCAT) and   // ny4i 4.44.5
-        (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2
+     {if (ActiveRadioPtr.CWByCAT) and   // ny4i 4.44.5
+        (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT) then}     // ny4i 4.45.2
+     if IsCWByCATActive then
         begin
         tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
         end;
