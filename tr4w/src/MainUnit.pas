@@ -492,8 +492,8 @@ end;
 procedure Escape_proc;
 
 begin
-
-If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then      // n4af 4.45.5   proposed to allow
+  if WKActive then scWK_reset; // n4af 4.46.2
+If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then      // n4af 4.46.2   proposed to allow
   begin
      If (ActiveRadioPtr^.RadioModel in RadioSupportsCWByCAT) then    // first esc stops sending
        If (Not Second) then
@@ -509,8 +509,6 @@ If (ActiveMode = CW)  and (ActiveRadioPtr^.CWByCAT) then      // n4af 4.45.5   p
          end;
          end;
   //   if TryKillCW then Exit;
-
-  scWK_reset; // n4af 4.46.2
 
 
 {$IF MORSERUNNER}
