@@ -564,6 +564,7 @@ begin
   //windows.GetDlgItemText(eq_handle,FLD_POSTALCODE,EditableQSORXData.PostalCode,sizeof(PostalCodeString));
 
   {Power}
+  ZeroMemory(@EditableQSORXData.Power, SizeOf(EditableQSORXData.Power));
   EditableQSORXData.Power := {Windows.GetDlgItemInt(eq_handle, FLD_POWER, lpTranslated, True);} GetDialogItemText(eq_handle, FLD_POWER);
 
   {Precedence}
