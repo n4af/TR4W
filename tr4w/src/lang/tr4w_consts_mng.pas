@@ -4,8 +4,8 @@ const
   { %d =	A signed decimal integer argument.}
   { %u =	An unsigned integer argument.}
   TC_TRANSLATION_LANGUAGE               = 'MONGOLIAN';
-  TC_TRANSLATION_AUTHOR                 = 'N.Khosbayar JT1CD';
-  TC_TRANSLATOR_EMAIL                   = 'jt1cd@mail.mn';
+  TC_TRANSLATION_AUTHOR                 = 'Khosbayar.N JT1CD';
+  TC_TRANSLATOR_EMAIL                   = 'jt1cd.khos@gmail.com';
   TC_CALLSIGN                           = 'Дуудлага';
   TC_CHECKCALLSIGN                      = 'Дуудлагаа шалга';
   TC_FREQUENCYFORCALLINKHZ              = 'Давтамж КГц-ээр %s';
@@ -15,41 +15,41 @@ const
   TC_FREQ                               = 'Давтамж';
   TC_DATE                               = 'Огноо';
   TC_POINTS                             = 'Оноо';
-  TC_OP                                 = 'Оператор';
+  TC_OP                                 = 'Oператор';
   TC_NAME                               = 'Нэр';
-  TC_M                                  = 'm'; //минут
-  TC_S                                  = 's'; //секунд
-  TC_RADIO1                             = 'Трансивер 1';
-  TC_RADIO2                             = 'Трансивер 2';
-  TC_DISBALE_CIV                        = 'Таны ICOM станцын "CI-V Transceive" горимыг идэвхгvй болгов.';
+  TC_M                                  = 'm'; 
+  TC_S                                  = 's'; 
+  TC_RADIO1                             = '1-р трансивер';
+  TC_RADIO2                             = '2-р трансивер';
+  TC_DISBALE_CIV                        = 'ICOM-ын Ci-V (CAT)-г салгах';
   {MAIN}
-  TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Та сvvлчийн хувилбарыг ашиглаж байна';
-  TC_SET_VALUE_OF_SET_NOW               = '-г тохируулах %s. Одоо тохируулах уу?';
+  TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Та TR4W-ийн шинэ хувилбарыг хэрэглэж байна';
+  TC_SET_VALUE_OF_SET_NOW               = '%s байна. Одоо тохируулах уу?';
   TC_CONFIGURATION_FILE                 = 'Тохируулгын файл';
   TC_CURRENT_OPERATOR_CALLSIGN          = 'Операторын дуудлага';
   TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'Импортлосон логийг энэ лог руу оруулах уу?';
-  TC_QSO_IMPORTED                       = 'Qs импортлов.'; // - '345 Qs импортлов'
+  TC_QSO_IMPORTED                       = 'QSO-г импортлов'; 
   TC_ISADUPE                            = '%s бол ДАВТАГДСАН ХОЛБОО байна шvv!!';
   TC_ERRORINLOGFILE                     = 'log file-д алдаа байна!';
-  TC_HASIMPROPERSYNTAX                  = '%s Синтакс алдаа!!';
+  TC_HASIMPROPERSYNTAX                  = '%s СИНТАКС алдаа!!';
   TC_SORRYNOLOG                         = 'Уучлаарай!! NO LOG = TRUE холбоог компьютер луу оруулах боломжгvй';
-  TC_SETCOMPUTERIDVALUE                 = 'Компьютерийн ID -г тохируулна уу.';
-  TC_CLEARALLLOGS                       = '"CLEARALLLOGS" Бvх логийг устгана';
-  TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" Бvх давтагдсан холбоог устгана';
-  TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" Бvх vржvvлэгчийг устгана';
-  TC_REALLYWANTTOCLEARTHELOG            = 'Та vнэхээр энэ логоо устгах гэж vv?';
+  TC_SETCOMPUTERIDVALUE                 = 'Компьютерийн ID -г тохируулна уу';
+  TC_CLEARALLLOGS                       = '"CLEARALLLOGS" сvлжээний бvх логийг арилгана';
+  TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" сvлжээний бvх давтагдсан холбооны логийг арилгана';
+  TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" сvлжээний бvх vржvvлэгчийн логийг арилгана';
+  TC_REALLYWANTTOCLEARTHELOG            = 'Та vнэхээр энэ логоо УСТГАХ гэж vv!!!';
   TC_MESSAGETOSENDVIANETWORK            = 'Мессэжийг сvлжээгээр явуулах уу';
-  TC_SENDTIMETOCOMPUTERSONTHENETWORK    = 'Та сvлжээ руу хугацаагаа явуулахыг хусч байна уу?';
-  TC_RULESONSM3CER                      = 'SM3CER-ийн тэмцээний хуанли';
+  TC_SENDTIMETOCOMPUTERSONTHENETWORK    = 'Та сvлжээ руу хугацаагаа явуулахыг хvсч байна уу?';
+  TC_RULESONSM3CER                      = 'WA7BNM тэмцээний хуанли дээрх %s тэмцээний заавар';
   TC_RULESONQRZRU                       = '%s тэмцээний зааврыг QRZ.RU дээрээс харна уу';
   TC_NOTE                               = 'Тэмдэглэл';
-  TC_DUPESHEETCLEARED                   = 'Давтагдсан холбоог устгав!';
-  TC_MULTSHEETCLEARED                   = 'Yржvvлэгчдийг устгав!';
-  TC_YESTOCLEARTHEDUPESHEET             = '"YES" гэвэл давтагдсан холбоог устгана';
-  TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" бол vржvvлэгчдийг устгана';
+  TC_DUPESHEETCLEARED                   = 'Давтагдсан холбооны логийг арилгав!';
+  TC_MULTSHEETCLEARED                   = 'Vржvvлэгчийн логийг арилгав!';
+  TC_YESTOCLEARTHEDUPESHEET             = '"YES" гэвэл давтагдсан холбооны логийг арилгана';
+  TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" бол vржvvлэгчийн логийг арилгана';
   TC_TRANSMITFREQUENCYKILOHERTZ         = 'Нэвтрvvлэх давтамж (Килогерц): ';
   TC_SPRINTQSYRULE                      = 'SPRINT QSY RULE!!!';
-  TC_PADDLE                             = 'Ямбик тvлхvvр';
+  TC_PADDLE                             = 'Салаа тvлхvvр';
   TC_FOOTSW                             = 'Хол педаль.';
   TC_LOG_NOTE                           = 'Тэмдэглэл';
   TC_LOG_DELETED                        = 'Устгасан';
@@ -61,53 +61,53 @@ const
   TC_FRI                                = 'Баасан';
   TC_SAT                                = 'Бямба';
   {uMP3Recorder}
-  TC_LAME_ERROR                         = 'Эндээс татаж болно';
-  {TR4W v.4.009 beta хувилбар нь 2 December 2008 гарсан байна. Та шинэ хувилбар гарсан эсэхийг шалгах уу ?}
-  TC_THISVERSION                        = 'Таны програмын хувилбар ';
-  TC_WASBUILDIN                         = 'суулгалаа (суулгасан огноо ';
+  TC_LAME_ERROR                         = 'Энэ хаягаар файлыг татаж болно';
+  {Энэхvv TR4W v.4.243 beta хувилбар нь 4 January 2012-нд гарсан байна. Та шинэ хувилбар гарсан эсэхийг шалгах уу?}
+  TC_THISVERSION                        = 'Таны програмын хувилбар';
+  TC_WASBUILDIN                         = 'суулгалаа (суулгасан огноо';
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'TR4W-ийн шинэ хувилбар гарсан эсэхийг шалгах уу?';
   {NEW CONTEST}
-  TC_LATEST_CONFIG_FILE                 = 'Сvvлчийн config file';
-  TC_OPENCONFIGURATIONFILE              = ' - Тохируулгын (configuration file) шинэ файл нээх буюу шинэ тэмцээн сонгоно уу';
-  TC_FOLDERALREADYEXISTSOVERWRITE       = '"%s" -ийн хавтас байсан байнаa. '#13'Дээрээс нь дараад биччих уу?';
+  TC_LATEST_CONFIG_FILE                 = 'Сvvлчийн Config File';
+  TC_OPENCONFIGURATIONFILE              = ' Тохируулгын (config.file) файл шинээр нээх,шинэ тэмцээн сонгоно уу';
+  TC_FOLDERALREADYEXISTSOVERWRITE       = '"%s" хавтас байсан байнаa. '#13'Дээрээс нь дараад биччих уу?';
   TC_IAMIN                              = 'Та & %s станц бол тэмдэглэнэ vv';
   TC_NEWENGLANDSTATEABREVIATION         = 'Шинэ Ингланд штатын товчлол'#13'(ME, NH, VT, MA, CT, RI):';
   TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Явуулах QTH-ээ оруулна уу:';
   TC_ENTERSTATEFORUSPROVINCEFORCANADA   = 'АНУ-ын штат буюу Канадын провинцийг оруулна уу:';
   TC_ENTERYOUROBLASTID                  = 'Областын товчилсон нэрээ оруулна уу:';
   TC_ENTERYOURPROVINCEID                = 'Оорийн провинцийн ID -г оруулна уу:';
-  TC_ENTERYOURCOUNTYCODE                = 'Каунти кодоо оруулна уу:';
+  TC_ENTERYOURCOUNTYCODE                = 'County кодоо оруулна уу:';
   TC_ENTERYOURDOK                       = 'DOK -оо оруулна уу:';
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Дистриктийнхээ товчлолыг оруулна уу:';
   TC_ENTERYOURRDAID                     = 'RDA -ийн ID -г оруулна уу:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'IOTA Reference Designator-ийг оруулна уу:';
   TC_ENTERYOURCITYIDENTIFIER            = 'Танай хотын товчилсон нэр:';
   TC_ENTERYOURNAME                      = 'Нэрээ оруулна уу:';
-  TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Анх лиценз авсан оныхоо сvvлийн хоёр тоог оруулна уу:';
-  TC_ENTERYOURZONE                      = 'Оорийн QTH-ийн зоноо оруулна уу:';
+  TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Анх лиценз авсан оныхоо сvvлийн хоёр оронг оруулна уу:';
+  TC_ENTERYOURZONE                      = 'Оорийн зоноо оруулна уу:';
   TC_ENTERYOURGEOGRAPHICALCOORDINATES   = 'Оорийн QTH-ийн газар зvйн координатыг оруулна уу'#13'(Улаанбаатар 47N 106E):';
   TC_ENTERSUMOFYOURAGEANDAMOUNT         = 'Оорийн нас ба анхны холбоо барьсанаас хойшхи жилийн нийлбэрийг оруулна уу(жишээ нь 53+38=91):';
-  TC_OZCR                               = 'Гурван усэг бvхий дугаараа оруулна уу:';
+  TC_OZCR                               = 'Гурван vсэг бvхий дугаараа оруулна уу:';
   TC_ENTERYOURSTATECODE                 = 'Оорийн штатын товчилсон нэрээ оруулна уу:';
   TC_ENTERYOURFOURDIGITGRIDSQUARE       = 'Грид локаторын 4 оронтой дугаараа оруулна уу:';
   TC_RFAS                               = 'Та оорийн байгаа газрын газар зуйн координатаа оруулна уу:';
   TC_ENTERYOURSIXDIGITGRIDSQUARE        = 'Грид Локаторын 6 оронтой дугаараа оруулна уу:';
-  TC_ISLANDSTATION                      = 'Та арал байгаа станц бол тэмдэглэнэ vv';
-  TC_ENTERYOURNAMEANDSTATE              = 'Нэрээ оруулна уу (Та Хойд Америкт байгаа бол штатаа оруулна уу):';
-  TC_ENTERYOURNAMEANDQTH                = 'Та оорийн нэр, QTH-ээ оруулна уу (US state, Canadian Province or DX country):';
-  TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Урьд оруулсан мэдээллээ шалгана уу'#13'(Лиценз авсан оны сvvлийн хоёр орон) ба ARRL section:';
+  TC_ISLANDSTATION                      = 'Та арал дээр байгаа станц бол тэмдэглэнэ vv';
+  TC_ENTERYOURNAMEANDSTATE              = 'Нэрээ оруулна уу (Хойд Америкт бол штатаа оруулна):';
+  TC_ENTERYOURNAMEANDQTH                = 'Та оорийн нэр, QTH-ээ оруулна уу (АНУ-ыг штат, Канадын провинц, DX улс):';
+  TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Урьд оруулсан мэдээллээ шалгана уу'#13'(Лиценз авсан оны сvvлийн хоёр орон) ба ARRL-ын бvс:';
   TC_ENTERYOURQTHANDTHENAME             = 'Оорийн нэвтрvvлэх QTH '#13'ба нэрээ оруулна уу:';
-  TC_ENTERFIRSTTWODIGITSOFYOURQTH       = 'Оорийн QTH -ийн эхний хоёр усгийг оруулна уу:';
+  TC_ENTERFIRSTTWODIGITSOFYOURQTH       = 'Оорийн QTH -ийн эхний хоёр vсгийг оруулна уу:';
   TC_ENTERYOURAGEINMYSTATEFIELD         = 'Оорийн насаа MY STATE талбарт оруулна уу:';
   TC_ENTERYOURQTHORPOWER                = 'Хэрэв та Хойд Америкт байвал QTH-ээ, оор газар байвал гаралтын чадлаа MY STATE талбарт оруулна уу:';
-  TC_ENTERFIRSTTWOLETTERSOFYOURGRID     = 'Грид локаторын эхний хоёр усгээ оруулна уу:';
-  TC_ENTERYOURSQUAREID                  = 'Таны грид локатор:';
+  TC_ENTERFIRSTTWOLETTERSOFYOURGRID     = 'Грид локаторын эхний хоёр vсгээ оруулна уу:';
+  TC_ENTERYOURSQUAREID                  = 'Таны Грид Локатор:';
   TC_ENTERYOURMEMBERSHIPNUMBER          = 'Гишvvнчлэлийн дугаараа оруулна уу:';
   TC_ENTERYOURCONTINENT                 = 'Оорийн байгаа тивээ боломжтой мэдээллийн хамт оруулна уу? Жишээ нь ASYL, NAQRP гэх мэт)';
   TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = '%s -ийн гадна байгаа бол DX гэж бичнэ:';
   TC_PREFECTURE                         = 'Оорийн префектурээ оруулна уу:';
-  TC_STATIONCLASS                       = 'Станцын зэрэглэлээ оруулна уу:';
-  TC_ENTERYOURRDAIDORGRID               = 'RDA ID-аа оруулах (for UA1A stations) эсвэл Грид Локаторын 4 оронтой тоо:';
+  TC_STATIONCLASS                       = 'Таны станцын зэрэглэл:';
+  TC_ENTERYOURRDAIDORGRID               = 'Таны RDA ID (for UA1A stations) эсвэл Грид локаторын 4 эхний орон:';
 
   TC_NEWENGLAND                         = 'ШИнэ Ингланд мужийн';
   TC_CALIFORNIA                         = 'Калифорни мужийн';
@@ -130,7 +130,7 @@ const
   TC_STPETERSBURGOBLAST                 = 'Санкт Петербург/ Областийн';
   TC_GERMANY                            = 'Германы';
   TC_UK                                 = 'Их Британийн';
-  TC_ARKTIKACLUB                        = 'клуб';
+  TC_ARKTIKACLUB                        = 'Хойд туйлын клуб';
   TC_POLAND                             = 'Польшийн';
   TC_KAZAKHSTAN                         = 'Казахстаны';
   TC_ITALY                              = 'Италийн';
@@ -144,39 +144,38 @@ const
   TC_HQ_OR_MEMBER                       = 'HQ станц буюу гишvvн';
   TC_AGECALLSIGNAGE                     = 'Насаа оруулна уу (and Silent Key callsign and age):';
   TC_DEPARTMENT                         = 'Департментаа оруулна уу:';
-  TC_IRELAND                            = 'Ireland';
-  
+
   {UTELNET}
-  TC_TELNET                             = 'Холбогдох'#0'Салгагдах'#0'Команд'#0'Freeze'#0'Цэвэрлэх'#0'100'#0#0;
+  TC_TELNET                             = 'Холбогдох'#0'Салгах'#0'Команд'#0'Зогсоох'#0'Арилгах'#0'100'#0#0;
   TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'Та интернэтэд холбогдсонгvй!';
-  TC_GETHOST                            = 'Хост авах..';
+  TC_GETHOST                            = 'Хост авах';
   TC_SERVER                             = 'Сервер: %s';
   TC_HOST                               = 'Хост  : %s';
   TC_CONNECT                            = '...тэй холбогдох';
   TC_CONNECTED                          = 'Холбогдлоо';
-  TC_YOUARESPOTTEDBYANOTHERSTATION      = 'Таныг оор станц споттоллоо.';
+  TC_YOUARESPOTTEDBYANOTHERSTATION      = 'Таныг оор станц споттоллоо';
   {UNET}
   TC_CONNECTIONTOTR4WSERVERLOST         = 'TR4WSERVER %s:%d -ийн холболт тасарлаа.';
-  TC_COMPUTERCLOCKISSYNCHRONIZED        = 'Компьютерийн цагийг тохируулав.';
-  TC_CONNECTINGTO                       = 'Холбогдож байна ';
+  TC_COMPUTERCLOCKISSYNCHRONIZED        = 'Компьютерийн цагийг тохируулав';
+  TC_CONNECTINGTO                       = 'Холбогдож байна';
   TC_CONNECTTOTR4WSERVERFAILED          = 'TR4WSERVER сервер лvv холбогдсонгvй. SERVER PASSWORDаа шалгана уу!!';
-  TC_CONNECTEDTO                        = 'Холбогдлоо ';
+  TC_CONNECTEDTO                        = 'Холбогдлоо';
   TC_FAILEDTOCONNECTTO                  = 'Холболт амжилтгvй боллоо';
-  TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Серверийн ба локал логууд зов байна.';
+  TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Серверийн ба локал логууд зов байна';
   TC_NETWORK                            = 'Сvлжээ : %s %s:%d';
   TC_SERVER_LOG_CHANGED                 = 'Серверийн лог оорчлогдлоо. %u QSO(s) шинэчлэгдэв. Логуудаа синхрончлах уу (Ctrl+Alt+S).';
-  TC_ALL_LOGS_NETWORK_CLEARED           = 'TR4W сvлжээний бvх бvртгэлийг арилгалаа.';
+  TC_ALL_LOGS_NETWORK_CLEARED           = 'TR4W сvлжээний бvх логийг арилгалаа';
   {UGETSCORES}
   TC_FAILEDTOCONNECTTOGETSCORESORG      = 'getscores.org сайт руу холбогдож чадсангуй';
   TC_NOANSWERFROMSERVER                 = 'Серверээс ямар ч хариу алга даа';
-  TC_UPLOADEDSUCCESSFULLY               = 'Амжилттай илгээлээ.';
-  TC_FAILEDTOLOAD                       = 'Ачаалал амжилтгvй боллоо. getscoresanswer.html дээр харах уу.';
+  TC_UPLOADEDSUCCESSFULLY               = 'Амжилттай илгээлээ';
+  TC_FAILEDTOLOAD                       = 'Ачаалал амжилтгvй боллоо. getscoresanswer.html дээр харах уу?';
   {UBANDMAP}
   TC_SOURCE                             = 'Эх vvсвэр: %s';
-  TC_MIN                                = '%u мин.';
+  TC_MIN                                = '%u мин';
   {LOGWIND}
   TC_CQTOTAL                            = 'CQ дуудсан тоо: %u';
-  TC_REPEATING                          = '%s-ээр давтана.  Сонсох хугацаа = %u мсек. - PgUp/Dn -аар хугацааг тохируулах ба ESC -ээр гарна';
+  TC_REPEATING                          = 'Давталт %s  Сонсох хугацаа = %u миллисекунд - PgUp/Dn -аар тохируулах ба ESCAPE -ээр гарна';
   TC_NEWTOUR                            = 'Шинэ тур %d/%d';
   TC_ENTER                              = ' %s :';
   TC_PTS                                = '%d оноо';
@@ -189,10 +188,10 @@ const
   TC_OVERRIDE                           = 'Солих';
   TC_UNKNOWNCOUNTRY                     = 'Ямар улс нь мэдэгдэхгvй байна';
   {UCALLSIGNS}
-  TC_DUPESHEET                          = 'Давтагдсан холбооны бvртгэл - %sm-%s';
+  TC_DUPESHEET                          = 'Давтагдсан холбооны лог - %sm-%s';
   {LOGEDIT}
-  TC_QSONEEDSFOR                        = ' %s-ийн QSO хэрэгтэй диапазон:';
-  TC_MULTNEEDSFOR                       = ' %s vржvvлэгч болох диапазон:';
+  TC_QSONEEDSFOR                        = ' %s-д QSO хэрэгтэй диапазон:';
+  TC_MULTNEEDSFOR                       = ' %s энэ диапазонд ?рж??лэгч болно:';
   TC_MISSINGMULTSREPORT                 = 'Хэрэгтэй vржvvлэгчдийн тайлан: %u улс хамгийн багаар %u боловч бvх долгионд биш.';
   {LOGDUPE}
   TC_THEREWERECALLS                     = '%u дуудлагуудыг эхний анхны солилцооны файлаас оллоо.'#13'+%u давтагдсан холбоо(s)';
@@ -210,39 +209,40 @@ const
   TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
   TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
   {LOGSEND}
-  TC_WAITINGFORYOUENTERSTRENGTHOFRST    = 'RST-ийн сигналын хэмжээг оруулна уу (Нэг оронтой шvv)!!';
+  TC_WAITINGFORYOUENTERSTRENGTHOFRST    = 'RST-ийн сигналын (S) хэмжээг оруулна уу (Нэг оронтой шvv)!!';
   {COUNTRY9}
+  TC_C9_UNKNOWN = 'Unknown';
   TC_C9_NORTHAMERICA                    = 'Хойд Америк';
-  TC_C9_SOUTHAMERICA                    = 'Омнод Америк';
+  TC_C9_SOUTHAMERICA                    = '?мн?д Америк';
   TC_C9_EUROPE                          = 'Европ';
   TC_C9_AFRICA                          = 'Африк';
   TC_C9_OCEANIA                         = 'Далайн орнууд';
   TC_C9_ASIA                            = 'Ази';
-  TC_C9_UNKNOWN                         = 'Тив нь тодорхой биш';
+  TC_C9_ANTARTICA                       = 'Антарктид';
   {USTATIONS}
   TC_STATIONSINMODE                     = 'Станцууд %s горим дээр байна';
   {USPOTS}
   TC_SPOTS                              = '%d спот';
   {uSendKeyboard}
-  TC_SENDINGSSBWAVFILENAME              = 'SSB .wav файлыг явуулна. ENTER дарвал ажиллана, Escape/F10 дарвал зогсоно.';
+  TC_SENDINGSSBWAVFILENAME              = 'SSB.wav файлыг уншуулах. ENTER дарвал ажиллана, Escape/F10 дарвал зогсоно';
   {QTC}
   TC_WASMESSAGENUMBERCONFIRMED          = '%u -ийн дугаар батлагдсан уу?';
   TC_DOYOUREALLYWANTSTOPNOW             = 'Та яг одоо зогсоохыг хvсч байна уу?';
-  TC_QTCABORTEDBYOPERATOR               = 'QTC-г оператор зогсоолоо.';
+  TC_QTCABORTEDBYOPERATOR               = 'QTC-г оператор зогсоолоо';
   TC_DOYOUREALLYWANTTOABORTTHISQTC      = 'Та энэ QTC -ийг хvчингvй болгохыг хvсч байна уу?';
   TC_NEXT                               = '< дараагийн';
   TC_QTC_FOR                            = '%s бол %s -д зориулагдсан';
   TC_QTC_CALLSIGN                       = 'Дуудлага :';
   TC_ENTERQTCMAXOF                      = 'QTC-ээ оруулна уу #/# (max of %d) :';
   TC_DOYOUREALLYWANTTOSAVETHISQTC       = 'Та энэ QTC-г бичихэд итгэлтэй байна уу?';
-  TC_EDITQTCPRESSYESTOEDITQTCORNOTOLOG  = 'QTC-ээ засварлах уу? Yes гэвэл QTC -ээ засварлана. No гэвэл бvртгэл рvv шууд орно ';
+  TC_EDITQTCPRESSYESTOEDITQTCORNOTOLOG  = 'QTC-ээ засварлах уу? Yes гэвэл QTC -ээ засварлана. No гэвэл лог руу орно ';
   TC_CHECKQTCNUMBER                     = 'QTC-ийн дугаараа шалгана уу';
   TC_CHECKTIME                          = 'Цагаа шалгана уу';
   {UOPTION}
   TC_COMMAND                            = 'Команд';
   TC_VALUE                              = 'Хэмжээ';
   TC_INFO                               = 'Мэдээлэл';
-  TC_YOUCANCHANGETHISINYOURCONFIGFILE   = 'Тохируулгын файл дотроос зовхон vvнийг оорчилж болно.';
+  TC_YOUCANCHANGETHISINYOURCONFIGFILE   = 'Тохируулгын файл дотроос зовхон vvнийг оорчилж болно';
   {UEDITQSO}
   TC_CHECKDATETIME                      = 'Огноо, цагаа шалгана уу !!';
   TC_SAVECHANGES                        = 'Оорчлолтийг хадгалах уу?';
@@ -255,31 +255,31 @@ const
   TC_PRESSCQFUNCTIONKEYTOPROGRAM        = 'CQ функцийн товчийг дарж програмчилна (F1, AltF1, CtrlF1), or ESCAPE to exit) : ';
   TC_PRESSEXFUNCTIONKEYTOPROGRAM        = 'ex функцийн товчийг дарж програмчилна (F3-F12, Alt/Ctrl F1-F12) or ESCAPE to exit:';
   TC_NUMBERORLETTEROFMESSAGETOBEPROGRAM = 'Дараах тоо ба vсэг бухий товчоор програмчлав (1-9, A-C, or ESCAPE to exit):';
-  TC_CWDISABLEDWITHALTK                 = 'CW-ийн дууг Alt-K-ээр зогсооно!!  Alt-K -г ахин дарахад CW дуу гарна.';
-  TC_VOICEKEYERDISABLEDWITHALTK         = 'Alt-K -аар нэвтрvvлгийг зогсооно!!  Alt-K ахин дарахад ажиллана.';
+  TC_CWDISABLEDWITHALTK                 = 'CW-ийн дууг Alt-K-ээр зогсооно!!  Alt-K -г ахин дарахад CW дуу гарна';
+  TC_VOICEKEYERDISABLEDWITHALTK         = 'Alt-K -аар нэвтрvvлгийг зогсооно!!  Alt-K ахин дарахад дахин нэвтрvvлнэ';
   {LOGCFG}
   TC_NOCALLSIGNSPECIFIED                = 'Дуудлага огогдоогvй байна!!';
   TC_NOFLOPPYFILESAVENAMESPECIFIED      = 'Флоппи дискний нэр огогдоогvй байна!!';
   TC_UNABLETOFIND                       = '%s олдохгvй байна !!';
-  TC_INVALIDSTATEMENTIN                 = 'INVALID STATEMENT IN %s !!'#13#13'Line %u'#13'%s';
+  TC_INVALIDSTATEMENTIN                 = 'Синтакс алдаатай команд %s !!'#13#13'м?р %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'CTY.DAT файл олдохгvй байна!!'#13'Энэ файл програмын хавтасанд байгаа юм уу?';
-  TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'INVALID STATEMENT IN CONFIG FILE!!'#13#13'Line %u'#13'%s';
-  TC_THIS_FILE_DOES_NOT_EXIST           = 'This file does not exist. Create an empty file for editing?';
+  TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Config файлийн синтакс алдаатай команд!!'#13#13'Мор %u'#13'%s';
+  TC_THIS_FILE_DOES_NOT_EXIST           = 'Энэ файл байхгvй байна. Шинэ файл нээх vv?';
 
   {LOGSUBS1}
-  TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'DVP бичиж байна.ESC буюу ENTER дарвал зогсоно.';
-  TC_ALTRCOMMANDDISABLED                = 'Alt-R команд нэг станцын горимыг зогсооно = True';
-  TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'CQ MEMORY AltF1 -д CQ кодыг програмчлаагvй байна.';
+  TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'DVP бичиж байна.ESCAPE буюу ENTER дарвал зогсоно';
+  TC_ALTRCOMMANDDISABLED                = 'Alt-R команд Single Radio Mode горимыг зогсооно = True';
+  TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'CQ MEMORY AltF1 -д CQ кодыг програмчлаагvй байна';
   {LOGSUBS2}
-  TC_WASADUPE                           = '%s давтагдсан холбоо байна.';
+  TC_WASADUPE                           = '%s давтагдсан холбоо байна';
   TC_ALTDCOMMANDDISABLED                = 'Alt-D команд SINGLE RADIO MODE горимыг хvчингvй болгоно = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Хамгийн сvvлд устгасан холбоогоо сэргээлээ!!';
-  TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Та сvvлчийн холбоогоо устгалаа!!  Alt-Y дарвал буцаж орно.';
+  TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Та сvvлчийн холбоогоо устгалаа!!  Alt-Y ахин дарвал лог руу буцаж орно';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Та програмаас гармаар байна уу?';
-  TC_YOUARENOWTALKINGTOYOURPACKETPORT   = 'Та одоо пакетийн портоор харьцаж байна.  Control-B дарвал дуусгана.';
+  TC_YOUARENOWTALKINGTOYOURPACKETPORT   = 'Та одоо пакетийн портоор харьцаж байна.  Control-B дарвал дуусгана';
   TC_YOUALREADYWORKEDIN                 = 'Та %s-тай урьд нь холбоо барьсан байна!!';
-  TC_ISADUPEANDWILLBELOGGEDWITHZERO     = '%s -тай урьд холбоо барьсан тул оноо огохгvй.';
-  TC_LOGFILESIZECHECKFAILED             = 'Бvртгэлийн файлын хэмжээг шалгах явц амжилтгvй боллоо!!!!';
+  TC_ISADUPEANDWILLBELOGGEDWITHZERO     = '%s -тай урьд холбоо барьсан тул оноо огохгvй';
+  TC_LOGFILESIZECHECKFAILED             = 'Логийн хэмжээг шалгах явц амжилтгvй боллоо!!!!';
   {JCTRL2}
   TC_NEWVALUE                           = 'шинэ хэмжээ';
   {TREE}
@@ -288,16 +288,16 @@ const
   TC_WINKEYERENABLE                     = '&Winkeyer';
   TC_AUTOSPACE                          = '&Автоматаар зай авах';
   TC_CTSPACING                          = 'C&T зай авч байна';
-  TC_SIDETONE                           = '&Дууны онго';
+  TC_SIDETONE                           = '&Дууны давтамж';
   TC_PADDLESWAP                         = 'Цэг, зураасны байрлалыг солих';
   TC_IGNORESPEEDPOT                     = '&Сануулсан хурдыг цуцлах';
-  TC_PADDLEONLYSIDETONE                 = 'Ямбик тvлхvvр &зовхон дууны сигнал';
+  TC_PADDLEONLYSIDETONE                 = 'Салаа тvлхvvр &зовхон дууны сигнал';
   TC_WINKEYERPORT                       = 'Winkeyer-ийн порт';
   TC_KEYERMODE                          = 'Тvлхvvрийн горим';
-  TC_SIDETONEFREQ                       = 'Телеграфын сигналын онго.';
+  TC_SIDETONEFREQ                       = 'Телеграфын сигналын давтамж';
   TC_HANGTIME                           = 'Хугацаа дуусах';
-  TC_IAMBICB                            = 'Ямбик B';
-  TC_IAMBICA                            = 'Ямбик A';
+  TC_IAMBICB                            = 'Салаа тvлхvvр B';
+  TC_IAMBICA                            = 'Салаа тvлхvvр A';
   TC_ULTIMATIC                          = 'Дээд зэргийн';
   TC_BUGMODE                            = 'Жирийн тvлхvvийн горим';
   TC_WEIGHTING                          = 'Цэг зураасын харьцаа';
@@ -305,8 +305,8 @@ const
   TC_LEADIN                             = 'Тvрvvлэх (*10 ms)';
   TC_TAIL                               = 'Хоцрох (*10 ms)';
   TC_FIRSTEXTENSION                     = 'Анхны орготгол';
-  TC_KEYCOMP                            = 'Тvлхvvрийн компенсац';
-  TC_PADDLESWITCHPOINT                  = 'Ямбик тvлхvvрээ залгах цэг';
+  TC_KEYCOMP                            = 'Тvлхvvрийн харьцааг тохируулах';
+  TC_PADDLESWITCHPOINT                  = 'Салаа тvлхvvрээ залгах цэг';
   {UTOTAL}
   TC_QTCPENDING                         = 'QTC хvлээгдэж байна';
   TC_ZONE                               = 'Зон';
@@ -315,10 +315,10 @@ const
   TC_OBLASTS                            = 'Область';
   TC_HQMULTS                            = 'HQ vржvvлэгч';
   TC_DOMMULTS                           = 'Орон нутгийн vржvvлэгч';
-  TC_QSOS                               = 'QSOs';
-  TC_CWQSOS                             = 'CW QSOs';
-  TC_SSBQSOS                            = 'SSB QSOs';
-  TC_DIGQSOS                            = 'DIG QSOs';
+  TC_QSOS                               = 'Холбоо';
+  TC_CWQSOS                             = 'CW холбоо';
+  TC_SSBQSOS                            = 'SSB холбоо';
+  TC_DIGQSOS                            = 'DIGITAL холбоо';
   {UALTD}
   TC_ENTERCALLTOBECHECKEDON             = '%s%s шалгахын тулд дуудлагаа оруулна уу:';
   {LOGGRID}
@@ -342,44 +342,44 @@ const
   TC_TOOMANYTOTALSCOREMESSAGES          = 'TOTAL SCORE MESSAGEs хэтэрхий их байна!!';
   TC_THEFIRSTCOMMANDINCONFIGFILEMUSTBE  = 'Тохируулгын файлын эхэнд MY CALL байх ёстой!!';
   {USYNTIME}
-  TC_MS                                 = ' ms'; //миллисекунд
+  TC_MS                                 = ' ms'; //milliseconds
   {ULOGSEARCH}
   TC_ENTRIESPERMS                       = '%u бvрт орох %u ms';
   {ULOGCOMPARE}
   TC_SIZEBYTES                          = 'Хэмжээ, bytes';
   TC_RECORDS                            = 'Бичлэгvvд';
   TC_MODIFIED                           = 'Оорчилсон';
-  TC_TIMEDIFF                           = 'Цагийн зорvv.';
+  TC_TIMEDIFF                           = 'Цагийн зорvv';
   {POSTUNIT}
   TC_MORETHAN50DIFFERENTHOURSINTHISLOG  = 'Энэ лог-д 50 илvv торлийн цаг байна шvv!!';
-  TC_TOOMANYCONTESTDATES                = 'Хэтэрхий олон огогдол байна шvv!!';
+  TC_TOOMANYCONTESTDATES                = 'Хэтэрхий олон огогдол байна!!';
   {UGETSERVERLOG}
-  TC_FAILEDTORECEIVESERVERLOG           = 'Серверийн бvртгэлийг хvлээн авч чадсангvй.';
+  TC_FAILEDTORECEIVESERVERLOG           = 'Серверийн логийг хvлээн авч чадсангvй';
   {DLPORTIO}
-  TC_DLPORTIODRIVERISNOTINSTALLED       = 'DLPortIO error';
+  TC_DLPORTIODRIVERISNOTINSTALLED       = 'DLPortIO буруу байна';
   {UCT1BOH}
-  TC_TIMEON                             = 'Цаг';
+  TC_TIMEON                             = 'Эфирт ажилласан цаг';
   {ULOGCOMPARE}
-  TC_SERVERLOG                          = 'СЕРВЕРИЙН БVРТГЭЛ';
-  TC_LOCALLOG                           = 'ЛОКАЛ БVРТГЭЛ';
+  TC_SERVERLOG                          = 'СЕРВЕР ЛОГ';
+  TC_LOCALLOG                           = 'ЛОКАЛ ЛОГ';
   {UEDITMESSAGE}
   TC_CTRL_A                             = 'Энэ зурвасыг идэвхгvй трансиверээс илгээх';
   TC_CTRL_B                             = 'ctrl-A CQ -тэй адил';
   TC_CTRL_C                             = 'Тусгай командаар эхлvvлэх';
   TC_CTRL_D                             = 'Зогсоож болохгуй';
-  TC_CTRL_E                             = 'Зураас ердийнхоо 73% тэнцэнэ';
+  TC_CTRL_E                             = 'Стандарт зураасны 73%-тай тэнцэнэ';
   TC_CTRL_F                             = 'Хурдыг 6%-аар ихэсгэх';
-  TC_CTRL_K                             = 'Ердийн зураас';
-  TC_CTRL_L                             = 'Цэг ердийнхоо 140% тэнцэнэ';
-  TC_CTRL_N                             = 'Цэг ердийнхоо 113% тэнцэнэ';
-  TC_CTRL_O                             = 'Цэг ердийнхоо 127% тэнцэнэ';
-  TC_CTRL_P                             = 'Цэг ердийнхоо 60% тэнцэнэ';
-  TC_CTRL_Q                             = 'Цэг ердийнхоо 80% тэнцэнэ';
+  TC_CTRL_K                             = 'Стандарт зураас';
+  TC_CTRL_L                             = 'Стандарт цэгний 140%-тай тэнцэнэ';
+  TC_CTRL_N                             = 'Стандарт цэгний 113%-тай тэнцэнэ';
+  TC_CTRL_O                             = 'Стандарт цэгний 127%-тай тэнцэнэ';
+  TC_CTRL_P                             = 'Стандарт цэгний 60%-тай тэнцэнэ';
+  TC_CTRL_Q                             = 'Стандарт цэгний 80%-тай тэнцэнэ';
   TC_CTRL_S                             = 'Хурдыг 6%-аар багасгах';
-  TC_CTRL_V                             = 'Цэг ердийнхоо 120% тэнцэнэ';
+  TC_CTRL_V                             = 'Стандарт цэгний 120%-тай тэнцэнэ';
   TC_CTRL_X                             = 'Цэг зураасны харьцааг 0.03-аар багасгах';
   TC_CTRL_Y                             = 'Цэг зураасны харьцааг 0.03-аар ихэсгэх';
-  TC_CTRL_SL                            = 'Нормал цэг';
+  TC_CTRL_SL                            = 'Стандарт цэг';
   TC_QSO_NUMBER                         = 'Холбооны тоо';
   TC_SALUTATION_AND_NAME_IF_KNOWN       = 'Нэрийг нь мэдэж байвал мэндчилгээ илгээх';
   TC_NAME_FROM_NAME_DATABASE            = 'Огодлийн сангаас нэрийг нь авах';
@@ -397,7 +397,7 @@ const
   TC_GOTONEXTBANDHIGHERINFREQUENCY      = 'Дараагийн удаа дээд диапазон луу шилжих';
   TC_COMPLETECALLSIGN                   = 'Дуудлагыг бvрэн авлаа';
   TC_FORCESTOENTERCQMODE                = 'CQ горим руу хvчээр орох';
-  TC_TOGGLECWENABLE                     = 'CW ENABLE -рvv шилжvvлэх';
+  TC_TOGGLECWENABLE                     = 'CW-г ажиллуулах';
   TC_TURNSOFFMONITORING                 = 'PC-ийн чанга яригчийн дууг зогсоох.';
   TC_TURNSONMONITORING                  = 'PC-ийн чанга яригчаар дууг явуулах';
   TC_CWENABLETRUE                       = 'CW ажиллуулах = TRUE';
@@ -423,7 +423,7 @@ const
   TC_THISVERSION2                       = 'Энэ хувилбар';
   TC_DOWNLOADIT                         = 'Сvvлийн хувилбарыг татах уу?';
 
-  TC_IMPROPERZONENUMBER                 = 'Зоны дугаар буруу!!';
+  TC_IMPROPERZONENUMBER                 = 'Зоны дугаар буруу байна шvv!!';
 
   CLOSE_WORD                            = 'Хаах';
   CANCEL_WORD                           = 'Цуцлах';
@@ -441,23 +441,23 @@ const
   RC_SAVE                               = 'Хадгал';
   RC_CREATE                             = 'Vvсгэх';
   RC_EDIT_WORD                          = 'Засварлах';
-  RC_POSTSCORETOGS                      = 'Дvнгээ руу илгээх';
+  RC_POSTSCORETOGS                      = 'Дvнгээ илгээх';
   RC_POSTNOW                            = 'Одоо илгээх vv';
   RC_GOTOGS                             = 'Харах';
   RC_FILE                               = 'Файл';
   RC_NEWCONTEST                         = 'Шинэ тэмцээн';
-  RC_CLEARLOG                           = 'Логоо устгах!!!';
+  RC_CLEARLOG                           = 'Логоо УСТГАХ!!!';
   RC_OPENLOGDIR                         = 'Логийн хавтасыг нээх';
   RC_EXPORT                             = 'Экспортлох';
-  RC_INIEXLIST                          = 'Анхны холбооны бvртгэл';
+  RC_INIEXLIST                          = 'Анхны холбооны лог';
   RC_TRLOGFORM                          = 'N6TR лог формат';
   RC_REPORTS                            = 'Тайлан';
   RC_IMPORT                             = 'Импортлох';
   RC_ALLCALLS                           = 'Бvх дуудлагууд';
   RC_BANDCHANGES                        = 'Шилжсэн диапазонууд';
-  RC_CONTLIST                           = 'Холбоог тивээр ангилсан тайлан';
-  RC_FCC                                = 'Улс бvрийн анхны холбооны бvртгэл';
-  RC_FCZ                                = 'Зон бvрийн анхны холбооны бvртгэл';
+  RC_CONTLIST                           = 'Холбоог тивээр ангилсан лог';
+  RC_FCC                                = 'Улс бvрийн анхны холбооны лог';
+  RC_FCZ                                = 'Зон бvрийн анхны холбооны лог';
   RC_POSSBADZONE                        = 'Буруу зон байж ч магадгvй шvv';
   RC_QSOBYCOUNTRY                       = 'Улс ба диапазон тус бvрээр ангилсан холбоонууд';
   RC_SCOREBYHOUR                        = 'Цаг тутмын оноо';
@@ -471,10 +471,10 @@ const
   RC_RADIOONE                           = 'Трансивер 1';
   RC_RADIOTWO                           = 'Трансивер 2';
   RC_WINDOWS                            = 'Цонх';
-  RC_BANDMAP                            = 'Диапазоны цонх';
-  RC_DUPESHEET                          = 'Давтагдсан холбооны бvртгэл';
+  RC_BANDMAP                            = 'Долгионы цонх';
+  RC_DUPESHEET                          = 'Давтагдсан холбооны лог';
   RC_FKEYS                              = 'Функцийн товчнууд';
-  RC_TRMASTER                           = 'SCP';
+  RC_TRMASTER                           = 'Будаа идэх';
   RC_REMMULTS                           = 'Хvлээгдэж буй vржvvлэгчvvд';
   RC_RM_DEFAULT                         = 'Анхны тохиргоо';
   RC_RADIO1                             = 'Трансивер 1';
@@ -482,7 +482,7 @@ const
   RC_TELNET                             = 'DX Cluster';
   RC_NETWORK                            = 'Сvлжээ';
   RC_INTERCOM                           = 'Дотоод холбоо';
-  RC_GETSCORES                          = RC_POSTSCORETOGS;
+  RC_GETSCORES                          = 'Дvнг авах';
   RC_STATIONS                           = 'Станцууд';
   RC_MP3REC                             = 'MP3 Бичигч';
   RC_QUICKMEM                           = 'Гялс сануулах';
@@ -492,29 +492,29 @@ const
   RC_DUPECHECK                          = 'Давтагдсан холбоог шалгах';
   RC_EDIT                               = 'Засварлах';
   RC_SAVETOFLOPPY                       = 'Флоппи руу хуулах';
-  RC_SWAPMULTVIEW                       = 'Vржvvлэгчvvдийг ээлжилж харах';
+  RC_SWAPMULTVIEW                       = 'Vржvvлэгчvvдийг ээлжлэн харах';
   RC_INCNUMBER                          = 'Дугаарыг ахиулан илгээх';
   RC_TOOGLEMB                           = 'Шинэ vржvvлэгч гарвал хонх дуугаргах';
   RC_KILLCW                             = 'CW-ийн дууг зогсоох';
-  RC_SEARCHLOG                          = 'Лог дотроос дуудлага хайх';
+  RC_SEARCHLOG                          = 'Логоос хайх';
   RC_TRANSFREQ                          = 'Нэвтруулэх давтамжаа оруул';
   RC_REMINDER                           = 'Сануулагч';
-  RC_AUTOCQ                             = 'Авто-CQ';
+  RC_AUTOCQ                             = 'Авто CQ';
   RC_TOOGLERIGS                         = 'Трансивертэй холбох';
-  RC_CWSPEED                            = 'CW-ийн хурд';
+  RC_CWSPEED                            = 'Телеграфын хурд';
   RC_SETSYSDT                           = 'Системийн огноо,цагийг тохируулах';
-  RC_INITIALIZE                         = 'Холбооны мэдээллийг цэвэрлэх';
+  RC_INITIALIZE                         = 'Холбооны мэдээллийг арилгах';
   RC_RESETWAKEUP                        = 'Сэрvvлгээ зогсоох';
-  RC_DELETELASTQSO                      = 'Хамгийн сvvлчийн холбоог устгах';
-  RC_INITIALEX                          = 'Солилцсон дугаар';
+  RC_DELETELASTQSO                      = 'Сvvлчийн холбоог устгах';
+  RC_INITIALEX                          = 'Солилцсон дугаарыг оруулах';
   RC_TOOGLEST                           = 'РС-ын дууг зогсоох';
-  RC_TOOGLEAS                           = 'Автомат нэвтрvvлэгчийг салгах/зал';
-  RC_BANDUP                             = 'Диапазоноо дээшлvvлэх';
-  RC_BANDDOWN                           = 'Диапазоноо доошлуулах';
-  RC_SSBCWMODE                          = 'CW/SSB горимыг солих';
+  RC_TOOGLEAS                           = 'Автомат нэвтрvvлэгчийг зал/салгах';
+  RC_BANDUP                             = 'Диапазон дээшлvvлэх';
+  RC_BANDDOWN                           = 'Диапазон доошлуулах';
+  RC_SSBCWMODE                          = 'Модуляцийг солих';
   RC_SENDKEYBOARD                       = 'РС-ын гарнаас нэвтрvvлэх';
   RC_COMMWITHPP                         = 'Пакет портоор холбогдох';
-  RC_CLEARDUPES                         = 'Давтагдсан холбооны бvртгэлийг арилгах';
+  RC_CLEARDUPES                         = 'Давтагдсан холбооны логийг арилгах';
   RC_VIEWEDITLOG                        = 'Логийг шалгах ба засварлах';
   RC_NOTE                               = 'Тэмдэглэл';
   RC_MISSMULTSREP                       = 'Шаардлагатай vржvvлэгчvvд';
@@ -524,12 +524,12 @@ const
   RC_VIEWPAKSPOTS                       = 'Пакет спотыг харах';
   RC_EXECONFIGFILE                      = 'Тохируулгын файл дээр очих';
   RC_REFRESHBM                          = 'Диапазоны цонхыг сэргээх';
-  RC_DUALINGCQ                          = 'Хослуулсан CQ';
+  RC_DUALINGCQ                          = 'Хоёр станцаар ээлжлэн CQ дуудах';
   RC_CURSORINBM                         = 'Курсорыг диапазоны цонх руу зоох';
   RC_CURSORTELNET                       = 'DX Cluster дээр курсороо аваачих';
-  RC_QSOWITHNOCW                        = 'CW-аас бусад холбоо';
+  RC_QSOWITHNOCW                        = 'Телеграфын бус холбоо';
   RC_CT1BOHIS                           = 'CT1BOH формат';
-  RC_ADDBANDMAPPH                       = 'Диапазоны цонх нэмэх';
+  RC_ADDBANDMAPPH                       = 'Долгионы цонх нэмэх';
   RC_COMMANDS                           = 'Командууд';
   RC_FOCUSINMW                          = 'Еронхий цонхны фокус';
   RC_TOGGLEINSERT                       = 'Орох горим руу шилжих';
@@ -553,22 +553,22 @@ const
   RC_RECCONTROL                         = 'Бичлэгээ тохируулах';
   RC_SOUNDRECORDER                      = 'Дуу бичигч';
   RC_DISTANCE                           = 'Хоёр гридлокаторын зайг тооцоолох';
-  RC_GRID                               = 'Градусыг гридлокатор болгох';
+  RC_GRID                               = 'Гридлокатор';
   RC_CALCULATOR                         = 'Тооны машин';
   RC_LC                                 = 'LC-г тооцоолох';
   RC_NET                                = 'Сvлжээ';
   RC_TIMESYN                            = 'Цаг тохируулж байна';
   RC_SENDMESSAGE                        = 'Мессэж явуулах';
   RC_SYNLOG                             = 'Логийг харьцуулах ба тохируулах';
-  RC_CLEARALLLOGS                       = 'Сvлжээний бvх логийг цэвэрлэх';
+  RC_CLEARALLLOGS                       = 'Сvлжээний бvх логийг арилгах';
   RC_DOWNLOAD                           = 'Шинэ хувилбарыг шалгах';
   RC_CONTENTS                           = 'Гарчиг';
   RC_ABOUT                              = 'TR4W програмын тухай';
-//RC_SAVEINFOLDER  =  '&Хавтас нээж хадгалах уу '(огноо,тэмцээн, дуудлага)'';
+  RC_SAVEINFOLDER  			 			= 'Хавтас нээж хадгалах уу  (огноо,тэмцээн, дуудлага)';
   RC_CONFFILE                           = 'Тохируулгын файл';
-  RC_EDITQSO                            = 'QSO-г засварлах';
+  RC_EDITQSO                            = 'Холбоогоо засварлах';
   RC_DELETED                            = '&Устгасан';
-  RC_DUPE                               = 'Давтагдсан холбоо';
+  RC_DUPE                               = 'Давтагдсан ХОЛБОО!!!';
   RC_LOGSEARCH                          = 'Дуудлага хайх';
   RC_SEARCH                             = '&Хайх';
   RC_GETOFFSET                          = 'Цагийн зорvvг тохируулах';
@@ -578,67 +578,64 @@ const
   RC_SYNCLOCK                           = 'Цагаа тохируулах';
   RC_LOCALTIME                          = 'Орон нутгийн цаг';
   RC_DUPESHEET2                         = 'Давтагдсан холбооны буртгэл';
-  RC_SENDSPOT2                          = 'Спот явуулах';
+  RC_SENDSPOT2                          = 'Спотлох';
   RC_CONTESTNAMEIC                      = 'Тэмцээний нэрийн тайлбар';
   RC_SEND                               = '&илгээх';
   RC_COMMENT                            = 'Санал';
-  RC_SENDINGCW                          = 'РС-ын гараас нэвтрvvлэг хийх. Use ENTER/Escape/F10 to exit.';
+  RC_SENDINGCW                          = 'РС-ын гараас нэвтрvvлэх. ENTER/Escape/F10 товчоор цуцлах';
   RC_RETURNTOMOD                        = 'Оорчлох';
-  RC_ARROWTOSELIT                       = 'Arrow/pageup/pagedn товч буюу сонголтын нэг дэх vсэг.';
+  RC_ARROWTOSELIT                       = 'Дээшээ/Доошоо товч/pageup/pagedn буюу командын эхний vсэг.';
   RC_ALTW                               = 'Хадгал (Alt-&W)';
   RC_ALTN                               = '& сvлжээ рvv';
   RC_ALTG                               = 'Бvгд.хадгал(Alt-&G)';
-  RC_BANDMAP2                           = 'Диапазоны цонх';
+  RC_BANDMAP2                           = 'Долгионы цонх';
   RC_AUTOCQ2                            = 'Авто CQ';
   RC_PRESSMKYWTR                        = 'Давтахыг хvсвэл сануулсан товчоо дарна уу:';
-  RC_NUMBEROSOLT                        = 'Сонсох хугацаа (мсек-ээр):';
-  RC_DELETESELSPOT                      = 'Сонгосон спотыг авч хаях';
-  RC_REMOVEALLSP                        = 'Бvх спотыг авч хаях';
+  RC_NUMBEROSOLT                        = 'Сонсох хугацаа (миллисекундээр):';
+  RC_DELETESELSPOT                      = 'Сонгосон спотыг устгах';
+  RC_REMOVEALLSP                        = 'Бvх спотыг арилгах';
   RC_SENDINRIG                          = 'Идэвхгvй трансиверийн давтамж руу илгээх';
-  RC_COAX                               = 'Коаксоль кабель тооцоолох';
-  RC_ENTERTNHINIK                       = 'Enter the next highest impedance null in kHz:';
-  RC_ENTERALIFIK                        = 'Enter a low impedance frequency in kHz:';
+  RC_COAX                               = 'Коаксоль кабелийн уртыг тооцоолох';
+  RC_ENTERTNHINIK                       = 'Ондор Impedance-ийн давтамжийг kHz-ээр оруулах:';
+  RC_ENTERALIFIK                        = 'Нам Impedance-ийн давтамжийг kHz-ээр оруулах:';
   RC_DISTANCEBTGS                       = 'Хоорондын зай';
   RC_SECONDGRID                         = 'Хоёр дахь гридлокатор';
   RC_FIRSTGRID                          = 'Эхний гридлокатор';
   RC_EURVHFDIST                         = 'Хоёр VHF станцын зай:';
   RC_GRIDOFAGLL                         = 'Координатыг Гридлокатор болгох';
-  RC_LONGMIE                            = 'Уртраг (- бол зvvн)';
-  RC_LATMIS                             = 'Оргорог (- бол омнод)';
+  RC_LONGMIE                            = 'Уртраг (- тэмдэгтэй бол зvvн)';
+  RC_LATMIS                             = 'Оргорог (- тэмдэгтэй бол омнод)';
   RC_CALCOFCORI                         = 'Багтаамж, индукцийг тооцоолох';
   RC_INDUCANCE                          = 'Индукц, uH';
   RC_CAPACITANCE                        = 'Багтаамж, pf';
   RC_FREQOFRES                          = 'Резонансын давтамж, kHz';
   RC_WINCONTROL2                        = 'Дэлгэцийн удирдлага';
-  RC_SHOWMENU                           = '&Цэсийг харах';
+  RC_SHOWMENU                           = 'Цэсийг харах';
   RC_RECVQTC                            = 'Хvлээгдэж байгаа QTC';
   RC_MIXWINTERFACE                      = 'MixW интерфэйс';
   RC_CONNECTTOMIXW                      = 'MixW програм руу холбогдох';
   RC_MEMPROGFUNC                        = 'Санах ойн програмын функц';
-  RC_PRESS_C                            = '&C\n-г дарвал CQ функцийн товчийг програмчлана.';
-  RC_PRESS_E                            = '&E\n-г дарвал солилцоо,хайлт, дайралтын товчийг програмчлана.';
-  RC_PRESS_O                            = '&O\n-г дарвал бусад функцийн биш товчийг програмчилна.';
+  RC_PRESS_C                            = '&C-г дарж CQ функцийн товчийг програмчилна';
+  RC_PRESS_E                            = '&E-г дарж солилцоо,хайлт-дайралтын товчийг програмчилна';
+  RC_PRESS_O                            = '&O-г дарж бусад функцийн биш товчийг програмчилна';
   RC_SYNLOG2                            = 'Логийг синхрончлох';
   RC_GETSERVLOG                         = '&Серверийн логийг авах';
   RC_RECVRECORDS                        = 'Хvлээн авсан бичлэгvvд:';
   RC_SENDRECORDS                        = 'Нэвтрvvлсэн бичлэгvvд:';
   RC_CREATEAUNL                         = '&Шинэ лог vvсгэх';
   RC_RECVBYTES                          = 'Хvлээн авсан битvvд:';
-  RC_RECVQSOS                           = 'Хvлээсэн QSO:';
+  RC_RECVQSOS                           = 'Хvлээж авсан холбоо:';
   RC_SHOWSERVLOGC                       = 'Сервер логийн гарчигийг харах';
   RC_VIEWEDITLOG2                       = 'Логийг харах, засварлах';
   RC_INTERCOM2                          = 'Дотоод холбоо';
-  RC_DIFFINLOG                          = 'Логуудыг ялгах';
+  RC_DIFFINLOG                          = 'Логуудыг торолж??лэх';
   RC_SYNCHRONIZE                        = '&Синхрончлох';
-//RC_POSTSCORETOGS  =  'Дvнгээ GETSCORES.ORG сайт руу илгээх';
-//RC_POSTNOW  =  'Одоо илгээх vv';
-//RC_GOTOGS  =  'www.getscores.org сайт руу очих';
-  RC_ARCFILTER                          = 'ARC Spots band-mode filter';
-  RC_DXSFILTER                          = 'DXSpider Spots band-mode filter';
+  RC_ARCFILTER                          = 'Спотыг Долгион-Модуляцаар ARC дээр филтердэх';
+  RC_DXSFILTER                          = 'Спотыг Долгион-Модуляцаар DXSpider дээр филтердэх';
   RC_CLEARFILTER                        = 'Филтерийг цэвэрлэх';
   RC_STATIONS2                          = 'Ажилласан станцууд';
-  RC_C_EDITQSO                          = 'QSO-г засварлах';
-  RC_C_DELETEQSO                        = 'QSO-г устгах';
+  RC_C_EDITQSO                          = 'Холбоогоо засварлах';
+  RC_C_DELETEQSO                        = 'Холбоогоо устгах';
   RC_COPYTOCLIP                         = 'Санах ой руу хуулах';
   RC_DUPECHECKOAR                       = 'Идэвхгvй радиогийн давтагдсан холбоог шалгах';
   RC_WINKEYSET                          = 'Winkeyer-ийн тохиргоо';
@@ -648,7 +645,7 @@ const
   RC_NUMBERRCVD                         = 'Хvл.дугаар';
   RC_RSTSENT                            = 'Нэвт.RST';
   RC_RSTRECEIVED                        = 'Хvл. RST';
-  RC_QSOPOINTS                          = 'QSO оноо';
+  RC_QSOPOINTS                          = 'Холбооны оноо';
   RC_AGE                                = 'Нас';
   RC_FREQUENCYHZ                        = 'Давтамж, Hz';
   RC_PREFIX                             = 'Префикс';
@@ -662,14 +659,14 @@ const
   RC_IAQSLINT                           = 'Авто QSL Интервал (Нэмэгдэх)';
   RC_DAQSLINT                           = 'Авто QSL Интервал (Багасах)';
   RC_ADDINFO                            = 'Нэмэлт мэдээлэл';
-  RC_AI_QSONUMBER                       = 'QSO-ийн дугаар';
+  RC_AI_QSONUMBER                       = 'Холбооны дугаар';
   RC_AI_CALLSIGN                        = 'Дуудлага';
-  RC_AI_CWSPEED                         = 'CW-ийн хурд';
+  RC_AI_CWSPEED                         = 'Телеграфын хурд';
   RC_AI_BAND                            = 'Долгион';
-  RC_CLEARMSHEET                        = 'Vржvvлэгчийн бvртгэлийн цэвэрлэх';
-  RC_WIKI                               = 'Онлайн зааврууд';
-  RC_NET_CLDUPE                         = 'Логийн давтагдсан холбоог устгах';
-  RC_NET_CLMULT                         = 'Логийн vржvvлэгчvvдийг устгах';
+  RC_CLEARMSHEET                        = 'Vржvvлэгчvvдийг арилгах';
+  RC_WIKI                               = 'Онлайн заавар';
+  RC_NET_CLDUPE                         = 'Бvх логийн давтагдсан холбооны логийг арилгах';
+  RC_NET_CLMULT                         = 'Бvх логийн vржvvлэгчийн логийг арилгах';
   RC_INC_TIME                           = 'Хугацаа ахиулах интервал';
   RC_NOTES                              = 'Тэмдэглэл';
   RC_DEFAULT                            = 'Анхны тохиргоо:';
@@ -677,21 +674,25 @@ const
   RC_DEVICEMANAGER                      = 'Тохооромжvvдийг удирдах';
   RC_SHDX_CALLSIGN                      = 'SH/DX [дуудлага]';
   RC_STATIONINFO                        = 'Станцын мэдээлэл';
-  RC_MP3_RECENABLE                      = 'Боломжтой';
-  RC_PLAY                               = '&Тоглох';
-  RC_LISTOFMESS                         = 'Мессэжийн бvртгэл';
-  RC_LOGIN                              = 'Лог руу орох';
-//RC_SYNCHRONIZE  =  'Synchronize';
-  RC_GET_OFFSET                         = 'Зорvvг авах';
+  RC_MP3_RECENABLE                      = 'Залгах';
+  RC_PLAY                               = '&Тоглуулах';
+  RC_LISTOFMESS                         = 'Мессэжvvд';
+  RC_LOGIN                              = 'Ажиллах операторын дуудлага';
+  RC_GET_OFFSET                         = 'Цагийн зорvvг авах';
   RC_COLORS                             = 'Онго';
-  RC_APPEARANCE                         = 'Дэлгэц';
-  RC_BANDPLAN                           = 'Band plan';
-  RC_WA7BNM_CALENDAR                    = 'WA7BNM-ийн тэмцээний хуанли';
-  RC_SEND_BUG                           = 'Send bug report';
-  RC_HOMEPAGE                           = 'TR4W-ийн сайт Home Page';
+  RC_APPEARANCE                         = 'Дэлгэц, фонтийн тохируулга';
+  RC_BANDPLAN                           = 'Долгион';
+  RC_WA7BNM_CALENDAR                    = 'WA7BNM''тэмцээний хуанли';
+  RC_SEND_BUG                           = 'Алдааны тайланг илгээх';
+  RC_HOMEPAGE                           = 'TR4W-ийн сайт';
 
   RC_OPERATOR                           = 'Оператор';
-  TC_LIST_OF_COMMAND                    = '&Командуудын бvртгэл';
-  TC_ENTERYOURBRANCHNUMBER              = 'Салбарын дугаараа оруулна уу:';
-  TC_ENTERYOURPOSTCODE                  = 'Шуудангийн кодоо оруулна уу?:';
- 
+  TC_LIST_OF_COMMAND                    = '&Командын жагсаалт';
+  TC_ENTERYOURBRANCHNUMBER              = 'Таны салбарын дугаар:';
+  TC_ENTERYOURPOSTCODE                  = 'Таны шуудангийн зипкод:';
+  TC_ENTERYOURFOCNUMBER                 = 'Та FOC дугаараа оруулна уу:';
+  TC_IMPROPERCONTINENT                  = 'Тивийн нэр буруу байна!!';
+  RC_DVKVOLCONTROL                      = 'DVK-ийн дууны тохируулагч';
+  RC_ALTP                               = 'Функцийн товчнуудыг програмчлах';
+  RC_ALTX                               = 'Програмаас гарах';
+  TC_IRELAND                            = 'Ирланд';

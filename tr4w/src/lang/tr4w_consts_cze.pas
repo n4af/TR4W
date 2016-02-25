@@ -5,8 +5,8 @@ const
   { %u =	»Ìslo (prostÈ vyj·d¯enÌ)}
 
   TC_TRANSLATION_LANGUAGE               = '»ESKY';
-  TC_TRANSLATION_AUTHOR                 = 'OK1HX';
-  TC_TRANSLATOR_EMAIL                   = 'tr4w@qrz.ru';
+  TC_TRANSLATION_AUTHOR                 = 'OK1RR';
+  TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
 
   TC_CALLSIGN                           = 'ZnaËka';
   TC_CHECKCALLSIGN                      = 'Kontroluj znaËku';
@@ -35,11 +35,11 @@ const
   TC_CONFIGURATION_FILE                 = 'KonfiguraËnÌ soubor';
   TC_CURRENT_OPERATOR_CALLSIGN          = 'souËasn˝ oper·tor m· znaËku ';
   TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'P¯ipojit importovan· QSO k aktu·lnÌmu denÌku?';
-  TC_QSO_IMPORTED                       = 'QSO omportov·na'; // - 'importov·no 345 QSO.'
-  TC_ISADUPE                            = '%s je dvoj·k!!';
+  TC_QSO_IMPORTED                       = 'QSO importov·na';
+  TC_ISADUPE                            = '%s je duplicitnÌ!';
   TC_ERRORINLOGFILE                     = 'Chyba v souboru .TRW!';
-  TC_HASIMPROPERSYNTAX                  = '%s m· nespr·vnou syntaxi!!';
-  TC_SORRYNOLOG                         = 'Sorry!! NO LOG = TRUE blokuje z·pis QSO na tomto poËÌtaËi';
+  TC_HASIMPROPERSYNTAX                  = '%s m· nespr·vnou syntaxi!';
+  TC_SORRYNOLOG                         = 'Lituji! NO LOG = TRUE blokuje z·pis QSO na tomto poËÌtaËi';
   TC_SETCOMPUTERIDVALUE                 = 'Nastav ˙daj COMPUTER ID.';
 
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" pro vymaz·nÌ vöech denÌk˘ v sÌti';
@@ -49,7 +49,7 @@ const
   TC_REALLYWANTTOCLEARTHELOG            = 'Opravdu chceö smazat aktu·lnÌ denÌk?';
   TC_MESSAGETOSENDVIANETWORK            = 'Zpr·va pro sÌù';
   TC_SENDTIMETOCOMPUTERSONTHENETWORK    = 'Opravdu chceö poslat Ëasov˝ ˙daj vöem poËÌtaË˘m v sÌti?';
-  TC_RULESONSM3CER                      = 'Pravidla pro z·vod %s na "WA7BNM Contest Calendar"';
+  TC_RULESONSM3CER                      = 'Pravidla z·vodu %s na "WA7BNM Contest Calendar"';
   TC_RULESONQRZRU                       = 'PodmÌnky z·vodu %s viz QRZ.RU';
   TC_NOTE                               = 'pozn·mka';
   TC_DUPESHEETCLEARED                   = 'Seznam QSO byl vymaz·n!';
@@ -58,7 +58,7 @@ const
   TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" pro vymaz·nÌ seznamu n·sobiË˘';
 
   TC_TRANSMITFREQUENCYKILOHERTZ         = 'vysÌlacÌ kmitoËet (kHz): ';
-  TC_SPRINTQSYRULE                      = 'PRAVIDLO SPRINT QSY!!!';
+  TC_SPRINTQSYRULE                      = 'PRAVIDLO SPRINT QSY!!';
   TC_PADDLE                             = 'PastiËka';
   TC_FOOTSW                             = 'älapka';
   TC_LOG_NOTE                           = 'POZN¡MKA';
@@ -100,12 +100,12 @@ const
   TC_ENTERYOURNAME                      = 'Zadej svÈ jmÈno:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Zadej poslednÌ dvÏ ËÌslice roku vyd·nÌ svÈ prvnÌ ofici·lnÌ radioamatÈrskÈ licence:';
   TC_ENTERYOURZONE                      = 'Zadej svou zÛnu:';
-  TC_ENTERYOURGEOGRAPHICALCOORDINATES   = 'Zadej svÈ zemÏpisnÈ koordin·ty'#13'(nap¯. 55N37O pro Moskvu):';
+  TC_ENTERYOURGEOGRAPHICALCOORDINATES   = 'Zadej svÈ zemÏpisnÈ sou¯adnice'#13'(nap¯. 50N14E pro Prahu):';
   TC_ENTERSUMOFYOURAGEANDAMOUNT         = 'Zadej souËet svÈho vÏku a poËtu let od svÈho prvnÌho radioamatÈrskÈho QSO (map¯ 28+14=42):';
   TC_OZCR                               = 'Zadej t¯ÌmÌstn˝ kÛd, sloûen˝ z libovoln˝ch pÌsmen (nap¯. XYZ):';
   TC_ENTERYOURSTATECODE                 = 'Zadej kÛd svÈ zemÏ (CZ pro »esko):';
   TC_ENTERYOURFOURDIGITGRIDSQUARE       = 'Zadej sv˘j Ëty¯mÌstn˝ WW lok·tor (nap¯. JO70):';
-  TC_RFAS                               = 'Zadej svÈ zemÏpisnÈ koordin·ty:';
+  TC_RFAS                               = 'Zadej svÈ zemÏpisnÈ sou¯adnice:';
   TC_ENTERYOURSIXDIGITGRIDSQUARE        = 'Zadej sv˘j öestimÌstn˝ WW lok·tor (nap¯. JO70ND):';
   TC_ISLANDSTATION                      = 'Stanice na ostrovÏ (IOTA)';
   TC_ENTERYOURNAMEANDSTATE              = 'Zadej svÈ jmÈno (a st·t, pokud jsi v USA):';
@@ -146,21 +146,21 @@ const
   TC_NETHERLANDS                        = 'Holandsko';
   TC_STPETERSBURGOBLAST                 = 'St.Petersburg / oblast';
   TC_GERMANY                            = 'NÏmecko';
-  TC_UK                                 = 'UK';
-  TC_ARKTIKACLUB                        = 'club';
+  TC_UK                                 = 'V. Brit·nie';
+  TC_ARKTIKACLUB                        = 'Arktika klub';
   TC_POLAND                             = 'Polsko';
-  TC_KAZAKHSTAN                         = 'Kazachstan';
+  TC_KAZAKHSTAN                         = 'Kazachst·n';
   TC_ITALY                              = 'It·lie';
   TC_SWITZERLAND                        = 'äv˝carsko';
   TC_HQ                                 = 'HQ (HQ stanice)';
   TC_CIS                                = 'CIS';
   TC_SPAIN                              = 'äpanÏlsko';
   TC_JAPAN                              = 'Japonsko';
-  TC_CANADA                             = 'Canada';
-  TC_FRANCE                             = 'France';
-  TC_HQ_OR_MEMBER                       = 'HQ or member';
-  TC_IRELAND                            = 'Ireland';
-  
+  TC_CANADA                             = 'Kanada';
+  TC_FRANCE                             = 'Francie';
+  TC_HQ_OR_MEMBER                       = 'HQ nebo Ëlen';
+  TC_IRELAND                            = 'Irsko';
+
   {UTELNET}
 
   TC_TELNET                             = 'Spojit'#0'Odpojit'#0'P¯Ìkazy'#0'Zastavit'#0'Vymazat'#0'100'#0#0;
@@ -177,7 +177,7 @@ const
   TC_CONNECTIONTOTR4WSERVERLOST         = 'P¯ipojenÌ k serveru TR4W %s:%d bylo p¯eruöeno.';
   TC_COMPUTERCLOCKISSYNCHRONIZED        = 'Hodiny PC jsou synchronizov·ny.';
   TC_CONNECTINGTO                       = 'P¯ipojuje se k ';
-  TC_CONNECTTOTR4WSERVERFAILED          = 'P¯ipojenÌ k serveru TR4W ne˙spÏönÈ. OvÏ¯ heslo!!';
+  TC_CONNECTTOTR4WSERVERFAILED          = 'P¯ipojenÌ k serveru TR4W ne˙spÏönÈ. OvÏ¯ heslo!';
   TC_CONNECTEDTO                        = 'P¯ipojen k ';
   TC_FAILEDTOCONNECTTO                  = 'Porucha spojenÌ s ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'DenÌky na serveru a aktu·lnÌ denÌky jsou identickÈ.';
@@ -231,11 +231,11 @@ const
 
   {LOGSTUFF}
 
-  TC_NOTENOUGHINFOINEXCHANGE            = 'KÛd je ne˙pln˝!!';
-  TC_IMPROPERDOMESITCQTH                = 'Nespr·vnÈ domestic QTH!!';
-  TC_IMPROPERDOMESITCQTHORMISSINGNAME   = 'Nespr·vnÈ domestic QTH nebo chybÌ jmÈno!!';
-  TC_MISSINGQTHANDORNAME                = 'Sch·zÌ QTH a/nebo jmÈno!!';
-  TC_NOQSONUMBERFOUND                   = 'Nebylo nalezeno ËÌslo QSO!!';
+  TC_NOTENOUGHINFOINEXCHANGE            = 'KÛd je ne˙pln˝!';
+  TC_IMPROPERDOMESITCQTH                = 'Nespr·vnÈ domovskÈ QTH!';
+  TC_IMPROPERDOMESITCQTHORMISSINGNAME   = 'Nespr·vnÈ domovskÈ QTH nebo chybÌ jmÈno!';
+  TC_MISSINGQTHANDORNAME                = 'Sch·zÌ QTH a/nebo jmÈno!';
+  TC_NOQSONUMBERFOUND                   = 'Nebylo nalezeno ËÌslo QSO!';
   TC_SAVINGTO                           = 'Ukl·d· se %s do %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Soubor byl ˙spÏönÏ uloûen na disketu';
   TC_FILESAVEDTOSUCCESSFULLY            = 'Soubor byl ˙spÏönÏ uloûen do %s';
@@ -245,7 +245,7 @@ const
 
   {LOGSEND}
 
-  TC_WAITINGFORYOUENTERSTRENGTHOFRST    = ' S (jedinou ËÌslici)!!';
+  TC_WAITINGFORYOUENTERSTRENGTHOFRST    = ' S (jedinou ËÌslici)!';
 
   {COUNTRY9}
 
@@ -253,7 +253,7 @@ const
   TC_C9_SOUTHAMERICA                    = 'JiûnÌ Amerika';
   TC_C9_EUROPE                          = 'Evropa';
   TC_C9_AFRICA                          = 'Afrika';
-  TC_C9_OCEANIA                         = 'Oceanie';
+  TC_C9_OCEANIA                         = 'Oce·nie';
   TC_C9_ASIA                            = 'Asie';
   TC_C9_UNKNOWN                         = 'Nezn·m˝';
 
@@ -293,7 +293,7 @@ const
 
   {UEDITQSO}
 
-  TC_CHECKDATETIME                      = 'Kontroluj datum/Ëas !!';
+  TC_CHECKDATETIME                      = 'Kontroluj datum/Ëas!';
   TC_SAVECHANGES                        = 'Uloûit zmÏny?';
 
   {LOGCW}
@@ -306,17 +306,17 @@ const
   TC_PRESSCQFUNCTIONKEYTOPROGRAM        = 'Stiskni kl·vesu programov·nÌ CQ (F1, AltF1, CtrlF1), nebo ESC pro odchod) : ';
   TC_PRESSEXFUNCTIONKEYTOPROGRAM        = 'Stiskni kl·vesu programov·nÌ EX(change) (F3-F12, Alt/Ctrl F1-F12) nebo ESC pro odchod:';
   TC_NUMBERORLETTEROFMESSAGETOBEPROGRAM = 'Zadej ËÌslo nebo pÌsmeno MSG, kter· m· b˝t programov·na (1-9, A-C, nebo ESC pro odchod):';
-  TC_CWDISABLEDWITHALTK                 = 'CW je blokov·no stiskem Alt-K!!  Stiskni znovu Alt-K pro obnovenÌ CW.';
-  TC_VOICEKEYERDISABLEDWITHALTK         = 'Hlasov˝ automat blokov·n stiskem  Alt-K!! Stiskni znovu Alt-K pro obnovenÌ funkce.';
+  TC_CWDISABLEDWITHALTK                 = 'CW je blokov·no stiskem Alt-K!  Stiskni znovu Alt-K pro obnovenÌ CW.';
+  TC_VOICEKEYERDISABLEDWITHALTK         = 'Hlasov˝ automat blokov·n stiskem  Alt-K! Stiskni znovu Alt-K pro obnovenÌ funkce.';
 
   {LOGCFG}
 
-  TC_NOCALLSIGNSPECIFIED                = 'Nebyla zad·na volacÌ znaËka!!';
-  TC_NOFLOPPYFILESAVENAMESPECIFIED      = 'Nebyl zad·n n·zev souboru pro uloûenÌ na disketu!!';
-  TC_UNABLETOFIND                       = 'Nelze nalÈzt %s !!';
-  TC_INVALIDSTATEMENTIN                 = 'NESPR¡VN› PÿÕKAZ V %s !!'#13#13'ÿ·dek %u'#13'%s';
-  TC_UNABLETOFINDCTYDAT                 = 'Nelze nalÈzt soubor CTY.DAT (seznam zemÌ)!!'#13'Tento soubor musÌ b˝t ve stejnÈm adres·¯i, jako program TR4W.';
-  TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'NESPR¡VN› PÿÕKAZ V KONFIGURA»NÕM SOUBORU!!'#13#13'ÿ·dek %u'#13'%s';
+  TC_NOCALLSIGNSPECIFIED                = 'Nebyla zad·na volacÌ znaËka!';
+  TC_NOFLOPPYFILESAVENAMESPECIFIED      = 'Nebyl zad·n n·zev souboru pro uloûenÌ na disketu!';
+  TC_UNABLETOFIND                       = 'Nelze nalÈzt %s!';
+  TC_INVALIDSTATEMENTIN                 = 'NESPR¡VN› PÿÕKAZ V %s!'#13#13'ÿ·dek %u'#13'%s';
+  TC_UNABLETOFINDCTYDAT                 = 'Nelze nalÈzt soubor CTY.DAT (seznam zemÌ)!'#13'Tento soubor musÌ b˝t ve stejnÈm adres·¯i, jako program TR4W.';
+  TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'NESPR¡VN› PÿÕKAZ V KONFIGURA»NÕM SOUBORU!'#13#13'ÿ·dek %u'#13'%s';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Tento soubor neexistuje. Vytvo¯it soubor pro editaci?';
 
   {LOGSUBS1}
@@ -327,15 +327,15 @@ const
 
   {LOGSUBS2}
 
-  TC_WASADUPE                           = '%s byl dvoj·k.';
+  TC_WASADUPE                           = '%s bylo duplicitnÌ.';
   TC_ALTDCOMMANDDISABLED                = 'P¯Ìkaz Alt-D je blokov·n volbou SINGLE RADIO MODE = TRUE';
-  TC_YOUHAVERESTOREDTHELASTDELETED      = 'Obnovil jsi poslednÌ smazan˝ z·znam v denÌku!!';
-  TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Smazal jsi poslednÌ z·znam v denÌku!!  Stiskni ALT-Y k jeho obnovenÌ.';
+  TC_YOUHAVERESTOREDTHELASTDELETED      = 'PoslednÌ smazan˝ z·znam v denÌku byl obnoven!';
+  TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Smazal jsi poslednÌ z·znam v denÌku!  Stiskni ALT-Y k jeho obnovenÌ.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Chceö skuteËnÏ ukonËit program?';
   TC_YOUARENOWTALKINGTOYOURPACKETPORT   = 'NynÌ pracujeö p¯es rozhranÌ packet radio. Stiskni CTRL-B pro ukonËenÌ.';
-  TC_YOUALREADYWORKEDIN                 = 'Jiû jsi pracoval s %s na %s!!';
-  TC_ISADUPEANDWILLBELOGGEDWITHZERO     = '%s je dvoj·k a bude zaps·n v denÌku s hodnotou 0 bod˘.';
-  TC_LOGFILESIZECHECKFAILED             = 'Kontrola velikosti souboru .TRW selhala!!!!';
+  TC_YOUALREADYWORKEDIN                 = 'Jiû jsi pracoval s %s na %s!';
+  TC_ISADUPEANDWILLBELOGGEDWITHZERO     = '%s je duplicitnÌ a bude zaps·no v denÌku s hodnotou 0 bod˘.';
+  TC_LOGFILESIZECHECKFAILED             = 'Kontrola velikosti souboru .TRW selhala!!';
 
   {JCTRL2}
   TC_NEWVALUE                           = 'nov· hodnota';
@@ -359,9 +359,9 @@ const
   TC_SIDETONEFREQ                       = 'KmitoËet p¯Ìposlechu';
   TC_HANGTIME                           = 'Prodleva';
 
-  TC_IAMBICB                            = 'Iambic B';
-  TC_IAMBICA                            = 'Iambic A';
-  TC_ULTIMATIC                          = 'Ultimatic';
+  TC_IAMBICB                            = 'Jambick˝ mÛd B';
+  TC_IAMBICA                            = 'Jambick˝ mÛd A';
+  TC_ULTIMATIC                          = 'MÛd Ultimatic';
   TC_BUGMODE                            = 'Bug';
 
   TC_WEIGHTING                          = 'PomÏr teËka/mezera';
@@ -369,8 +369,8 @@ const
   TC_LEADIN                             = 'N·bÏh PTT (*10 ms)';
   TC_TAIL                               = 'DobÏh PTT (*10 ms)';
   TC_FIRSTEXTENSION                     = 'ProdlouûenÌ 1.elementu';
-  TC_KEYCOMP                            = 'Kompenzace klÌË.relÈ';
-  TC_PADDLESWITCHPOINT                  = 'Prodleva p·dla';
+  TC_KEYCOMP                            = 'Kompenzace klÌËov·nÌ';
+  TC_PADDLESWITCHPOINT                  = 'Prodleva pastiËky';
 
   {UTOTAL}
 
@@ -402,23 +402,23 @@ const
 
   {LOGWAE}
 
-  TC_INVALIDCALLSIGNINCALLWINDOW        = 'Neplatn· znaËka v oknÏ QSO!!';
-  TC_SORRYYOUALREADYHAVE10QTCSWITH      = 'Sorry, jiû m·ö 10 QTC od %s';
+  TC_INVALIDCALLSIGNINCALLWINDOW        = 'Neplatn· znaËka v oknÏ QSO!';
+  TC_SORRYYOUALREADYHAVE10QTCSWITH      = 'Lituji, jiû m·ö 10 QTC od %s';
   TC_NOQTCSPENDINGQRU                   = 'é·dnÈ QTC, QRU.';
   TC_ISQRVFOR                           = 'Je %s QRV pro %s?';
 
   {UREMMULTS}
 
-  TC_CLEANSWEEPCONGRATULATIONS          = 'ZAMETENO!! BLAHOPÿEJEME!!';
+  TC_CLEANSWEEPCONGRATULATIONS          = 'UKLIZENO! BLAHOPÿEJEME!';
 
   {CFGCMD}
 
   TC_NETWORKTEST                        = 'Kontrola sÌtÏ';
-  TC_MAXIMUMNUMBEROFREMINDERSEXCEEDED   = 'P¯ekroËen maxim·lnÌ poËet p¯ipomÌnek!!';
-  TC_INVALIDREMINDERTIME                = 'Neplatn˝ Ëas p¯ipomÌnky!!';
-  TC_INVALIDREMINDERDATE                = 'NeplatnÈ datum p¯ipomÌnky!!';
-  TC_TOOMANYTOTALSCOREMESSAGES          = 'P¯Ìliö mnoho TOTAL SCORE MSG!!';
-  TC_THEFIRSTCOMMANDINCONFIGFILEMUSTBE  = 'PrvnÌ ˙daj v konfiguraËnÌm souboru musÌ b˝t zad·nÌ vlastnÌ znaËky (MY CALL)!!';
+  TC_MAXIMUMNUMBEROFREMINDERSEXCEEDED   = 'P¯ekroËen maxim·lnÌ poËet p¯ipomÌnek!';
+  TC_INVALIDREMINDERTIME                = 'Neplatn˝ Ëas p¯ipomÌnky!';
+  TC_INVALIDREMINDERDATE                = 'NeplatnÈ datum p¯ipomÌnky!';
+  TC_TOOMANYTOTALSCOREMESSAGES          = 'P¯Ìliö mnoho TOTAL SCORE MSG!';
+  TC_THEFIRSTCOMMANDINCONFIGFILEMUSTBE  = 'PrvnÌ ˙daj v konfiguraËnÌm souboru musÌ b˝t zad·nÌ vlastnÌ znaËky (MY CALL)!';
 
   {USYNTIME}
   TC_MS                                 = ' ms'; //milisekund
@@ -430,11 +430,11 @@ const
   TC_SIZEBYTES                          = 'Velikost, byt˘';
   TC_RECORDS                            = 'Z·pisy';
   TC_MODIFIED                           = 'Upraveno';
-  TC_TIMEDIFF                           = '»asov· diference';
+  TC_TIMEDIFF                           = '»asov˝ rozdÌl';
 
   {POSTUNIT}
-  TC_MORETHAN50DIFFERENTHOURSINTHISLOG  = 'VÌce neû 50 r˘zn˝ch hodinov˝ch ˙daj˘ v tomto denÌku!!';
-  TC_TOOMANYCONTESTDATES                = 'P¯Ìliö mnoho dat z·vodu!!';
+  TC_MORETHAN50DIFFERENTHOURSINTHISLOG  = 'VÌce neû 50 r˘zn˝ch hodinov˝ch ˙daj˘ v tomto denÌku!';
+  TC_TOOMANYCONTESTDATES                = 'P¯Ìliö mnoho dat z·vodu!';
 
   {UGETSERVERLOG}
   TC_FAILEDTORECEIVESERVERLOG           = 'P¯Ìjem denÌku ze serveru se nezda¯il.';
@@ -469,7 +469,7 @@ const
   TC_CTRL_Y                             = 'Zvyö pomÏr teËka/mezera o 0.03';
   TC_CTRL_SL                            = 'Norm·lnÌ teËka';
   TC_QSO_NUMBER                         = '»Ìslo QSO';
-  TC_SALUTATION_AND_NAME_IF_KNOWN       = 'Pozdrav a jmÈno (pokud je zn·mo)';
+  TC_SALUTATION_AND_NAME_IF_KNOWN       = 'Pozdrav a jmÈno (je-li zn·mo)';
   TC_NAME_FROM_NAME_DATABASE            = 'JmÈno z datab·ze';
   TC_SEND_CHARACTERS_FROM_KEYBOARD      = 'VysÌlej znaky z kl·vesnice';
   TC_CALL_IN_CALL_WINDOW                = 'ZnaËku do okna znaËky';
@@ -504,7 +504,7 @@ const
   TC_SENDSXXTOTHERADIO2                 = 'Vyöle xx na RIG 2';
   TC_SENDSXXTOTHEINACTIVERADIO          = 'Vyöle xx na neaktivnÌ RIG';
   TC_SWAPSTHEACTIVEANDINACTIVERIGS      = 'ZamÏnÌ aktivnÌ a neaktivnÌ RIG';
-  TC_TOGGLESSENDINGSENDING              = 'P¯epne vysÌl·nÌ ó vysÌl·nÌ bez monitorov·nÌ - CW';
+  TC_TOGGLESSENDINGSENDING              = 'P¯epne vysÌl·nÌ ó vysÌl·nÌ bez p¯Ìposlechu - CW';
   TC_TOGGLESMODEBETWEENCWANDSSB         = 'ZamÏnÌ mÛdy CW a SSB';
   TC_RUNXXAPPLICATION                   = 'Spusù aplikaci xx';
 
@@ -513,11 +513,11 @@ const
   TC_THISVERSION2                       = 'AktivnÌ verze je ';
   TC_DOWNLOADIT                         = 'M· se st·hnout poslednÌ verze?';
 
-  TC_IMPROPERZONENUMBER                 = 'nespr·vn· zÛna !!';
+  TC_IMPROPERZONENUMBER                 = 'nespr·vn· zÛna!';
 
   RC_OPERATOR                           = 'Oper·tor';
   TC_LIST_OF_COMMAND                    = '&Seznam p¯Ìkaz˘';
-  TC_ENTERYOURBRANCHNUMBER              = 'Zadej sv˘j Branch number:';
+  TC_ENTERYOURBRANCHNUMBER              = 'Zadej svÈ ËÌslo odboËky:';
   TC_ENTERYOURPOSTCODE                  = 'Zadej svoje PS»:';
 
   CLOSE_WORD                            = 'Zav¯i';
@@ -544,7 +544,7 @@ const
   RC_CLEARLOG                           = 'Vymaû denÌk';
   RC_OPENLOGDIR                         = 'Otev¯i adres·¯ denÌku';
   RC_EXPORT                             = 'Export';
-  RC_INIEXLIST                          = 'Seznam Initial exchanges';
+  RC_INIEXLIST                          = 'Seznam v˝chozÌch sout.kÛd˘';
   RC_TRLOGFORM                          = 'Form·t TR Log';
   RC_REPORTS                            = 'Reporty';
   RC_IMPORT                             = 'Import';
@@ -556,7 +556,7 @@ const
   RC_POSSBADZONE                        = 'Moûn· chybn· zÛna';
   RC_QSOBYCOUNTRY                       = 'QSO podle zemÌ a p·sem';
   RC_SCOREBYHOUR                        = 'SkÛre po hodin·ch';
-  RC_SUMMARY                            = 'Z·hlavÌ denÌku (Cabrillo)';
+  RC_SUMMARY                            = 'HlaviËka denÌku (Cabrillo)';
   RC_EXIT                               = 'Konec';
   RC_SETTINGS                           = 'NastavenÌ';
   RC_OPTIONS                            = 'Volba konfiguraËnÌch p¯Ìkaz˘';
@@ -566,12 +566,12 @@ const
   RC_RADIOONE                           = 'RIG 1';
   RC_RADIOTWO                           = 'RIG 2';
   RC_WINDOWS                            = 'Okna';
-  RC_BANDMAP                            = 'Bandmap';
+  RC_BANDMAP                            = 'Bandmapa';
   RC_DUPESHEET                          = 'ZapsanÈ znaËky';
   RC_FKEYS                              = 'Kl·vesy pamÏtÌ';
   RC_TRMASTER                           = 'SCP';
   RC_REMMULTS                           = 'Zb˝vajÌcÌ n·sobiËe';
-  RC_RM_DEFAULT                         = 'Default';
+  RC_RM_DEFAULT                         = 'V˝chozÌ';
   RC_RADIO1                             = 'RIG 1';
   RC_RADIO2                             = 'RIG 2';
   RC_TELNET                             = 'DX Cluster';
@@ -601,9 +601,9 @@ const
   RC_INITIALIZE                         = 'NovÈ zad·nÌ QSO';
   RC_RESETWAKEUP                        = 'Resetuj budÌk';
   RC_DELETELASTQSO                      = 'Smaû poslednÌ QSO';
-  RC_INITIALEX                          = 'Initial exchange';
-  RC_TOOGLEST                           = 'OvladaË p¯Ìposlechu';
-  RC_TOOGLEAS                           = 'OvladaË automatu vysÌl·nÌ';
+  RC_INITIALEX                          = 'V˝chozÌ sout.kÛd';
+  RC_TOOGLEST                           = 'P¯Ìposlech zap./vyp.';
+  RC_TOOGLEAS                           = 'AutoSend zap./vyp.';
   RC_BANDUP                             = 'VyööÌ p·smo';
   RC_BANDDOWN                           = 'NiûöÌ p·smo';
   RC_SSBCWMODE                          = 'P¯epÌnaË mÛdu SSB/CW';
@@ -617,17 +617,17 @@ const
   RC_QTCFUNCTIONS                       = 'Funkce QTC';
   RC_RECALLLASTENT                      = 'Obnovit poslednÌ vstup';
   RC_VIEWPAKSPOTS                       = 'Zobrazit spoty z paket radia';
-  RC_EXECONFIGFILE                      = 'Execute configuration file';
-  RC_REFRESHBM                          = 'Obnovit bandmap';
+  RC_EXECONFIGFILE                      = 'Spustit konfiguraËnÌ soubor';
+  RC_REFRESHBM                          = 'Obnovit bandmapu';
   RC_DUALINGCQ                          = 'Dvoup·smovÈ CQ (M2T)';
-  RC_CURSORINBM                         = 'P¯esunout kurzor do okna bandmap';
+  RC_CURSORINBM                         = 'P¯esunout kurzor do okna bandmapy';
   RC_CURSORTELNET                       = 'Kurzor v oknÏ DXClusteru';
-  RC_QSOWITHNOCW                        = 'QSO s NOCW';
+  RC_QSOWITHNOCW                        = 'QSO bez vysÌl·nÌ CW';
   RC_CT1BOHIS                           = 'ZobrazenÌ CT1BOH info';
-  RC_ADDBANDMAPPH                       = 'Vytvo¯ volnÈ mÌsto v oknÏ bandmap';
+  RC_ADDBANDMAPPH                       = 'Vytvo¯ volnÈ mÌsto v oknÏ bandmapy';
   RC_COMMANDS                           = 'P¯Ìkazy';
   RC_FOCUSINMW                          = 'N·vrat do hlavnÌho okna';
-  RC_TOGGLEINSERT                       = 'OvladaË mÛdu INSERT';
+  RC_TOGGLEINSERT                       = 'P¯epÌnaË mÛdu INSERT';
   RC_ESCAPE                             = 'ESC';
   RC_CWSPEEDUP                          = 'Zv˝öit rychlost CW';
   RC_CWSPEEDDOWN                        = 'SnÌûit rychlost CW';
@@ -662,7 +662,7 @@ const
   RC_CONFFILE                           = 'KonfiguraËnÌ soubor';
   RC_EDITQSO                            = 'Edituj QSO';
   RC_DELETED                            = '&Smaz·no';
-  RC_DUPE                               = 'Dvoj·k';
+  RC_DUPE                               = 'duplicitnÌ';
   RC_LOGSEARCH                          = 'Prohledat denÌk';
   RC_SEARCH                             = '&Hled·nÌ';
   RC_GETOFFSET                          = 'Udej rozdÌl';
@@ -682,7 +682,7 @@ const
   RC_ALTW                               = 'Uloû (Alt-&W)';
   RC_ALTN                               = 'Do &sÌtÏ';
   RC_ALTG                               = 'Uloû vöe (Alt-&G)';
-  RC_BANDMAP2                           = 'Bandmap';
+  RC_BANDMAP2                           = 'Bandmapa';
   RC_AUTOCQ2                            = 'Auto-CQ';
   RC_PRESSMKYWTR                        = 'Stiskni kl·vesu pamÏti, kterou chceö opakovat:';
   RC_NUMBEROSOLT                        = '»as poslechu v milisekund·ch:';
@@ -702,7 +702,7 @@ const
   RC_CALCOFCORI                         = 'V˝poËet kapacity nebo indukËnosti';
   RC_INDUCANCE                          = 'IndukËnost, uH';
   RC_CAPACITANCE                        = 'Kapacita, pf';
-  RC_FREQOFRES                          = 'RezonanËnÌ kmitoËet, khz';
+  RC_FREQOFRES                          = 'RezonanËnÌ kmitoËet, kHz';
   RC_WINCONTROL2                        = 'P¯epÌn·nÌ oken';
   RC_SHOWMENU                           = '&Zobraz menu';
   RC_RECVQTC                            = 'P¯Ìjem QTC';
@@ -762,7 +762,7 @@ const
   RC_NET_CLMULT                         = 'Smaû seznamy n·sobiË˘ ve vöech denÌcÌch';
   RC_INC_TIME                           = 'Upravit Ëas (p¯idat):';
   RC_NOTES                              = 'Pozn·mky';
-  RC_DEFAULT                            = 'Default:';
+  RC_DEFAULT                            = 'V˝chozÌ:';
   RC_DESCRIPTION                        = 'Popis:';
   RC_DEVICEMANAGER                      = 'Spr·vce za¯ÌzenÌ (PC)';
   RC_SHDX_CALLSIGN                      = 'SH/DX [znaËka]';
@@ -776,13 +776,13 @@ const
   RC_COLORS                             = 'Barvy';
   RC_APPEARANCE                         = 'Podrobnosti';
   RC_BANDPLAN                           = 'RozdÏlenÌ p·sma';
-  RC_WA7BNM_CALENDAR                    = 'Kalend·¯ z·vod˘ podle WA7BNM';
+  RC_WA7BNM_CALENDAR                    = 'Kalend·¯ z·vod˘ WA7BNM';
   RC_SEND_BUG                           = 'vyöli seznam chyb';
   RC_HOMEPAGE                           = 'Dom·cÌ str·nky TR4W';
- TC_ENTERYOURFOCNUMBER                 = 'Enter your FOC number:';
-  TC_IMPROPERCONTINENT                  = 'Improper continent!!';
-  TC_C9_ANTARTICA                     ='Antartica';
-  RC_DVKVOLCONTROL                      = 'DVK volume control';
-  RC_ALTP                               = 'Open Fkeys';
-  RC_ALTX                               = 'Exit Program';
-  RC_CTRLJ                             = 'Open Configuration commands';
+  TC_ENTERYOURFOCNUMBER                 = 'Zadej svÈ ËÌslo FOC:';
+  TC_IMPROPERCONTINENT                  = 'Nespr·vn˝ kontinent!';
+  TC_C9_ANTARTICA                       = 'Antarktida';
+  RC_DVKVOLCONTROL                      = 'NastavenÌ hlasitosti DVK';
+  RC_ALTP                               = 'Otev¯Ìt F-kl·vesy';
+  RC_ALTX                               = 'Opustit program';
+  RC_CTRLJ                              = 'Otev¯Ìt konfiguraËnÌ p¯Ìkazy';

@@ -203,9 +203,11 @@ var
   i                                     : integer;
   //localMsg                              : string;
 begin
+
    //localMsg := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
-   if ((Msg = Chr(0)) or ((CWEnable and CWEnabled and ActiveRadioPtr.CWByCAT and (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT)    ))) then   // ny4i 4.44.5
+   if ( (Msg = Chr(242)) or
+        ((CWEnable and CWEnabled and IsCWByCATActive )) ) then   // ny4i 4.44.5    + Issue 111
       begin
       // We have to see if the KeyersSwapped is set and if so, SendCW on the INACTIVE radio!
       if KeyersSwapped then                         // ny4i 4.
@@ -259,31 +261,20 @@ begin
 {$IF OZCR2008}
     CWMessageToNetwork := CWMessageToNetwork + Msg;
 {$IFEND}
-  // if ActiveRadioPtr.CWByCAT then
-   //    begin
-   //    ActiveRadioPtr.SendCW(Msg); // Now just adds to a buffer
-   //    Exit;
-   //    end;
 
     if wkActive then
     begin
-
+   //  if not WKbusy then flushcwbuffer;  // ny4i winkeyer
       wkAddCWMessageToInternalBuffer(Msg);
 //      wkBUSY := True;
       Exit;
     end;
 
-   // if ActiveRadioPtr.tPTTStatus = PTT_OFF then PTTOn;
-   // if ActiveRadioPtr.CWByCAT then
-    //   begin
-    //   ActiveRadioPtr.SendCW(Msg); // Now just adds to a buffer
-    //   Exit;
-    //   end   // Not crazy about the Exit. Maybe fix this...
-  //  else
-    //   begin
-       if ActiveRadioPtr.tPTTStatus = PTT_OFF then PTTOn;
-      // end;
-    CPUKeyer.AddStringToCWBuffer(Msg, Tone);
+   if ActiveRadioPtr.tPTTStatus = PTT_OFF then
+      begin
+      PTTOn;
+      end;
+   CPUKeyer.AddStringToCWBuffer(Msg, Tone);
 //    CountsSinceLastCW := 0;
 
     if CWThreadID = 0 then
