@@ -221,8 +221,7 @@ begin   // 1
     CW:
 
       begin
-      //if WKactive and (not WKbusy) then       // n4af 4.46.3
-     //    flushcwbuffer; 
+   
      SendCrypticCWstring(Message);
      end;
 {$IF MMTTYMODE}
@@ -329,7 +328,7 @@ IncrementCounter := SendCrypticMessage(Message);
             tDisplayCQTotal;
           end;
 
-        if BandMapEnable and BandMapDisplayCQ then
+   //     if BandMapEnable and BandMapDisplayCQ then  //n4af 4.46.3
         begin
           if ActiveRadioPtr^.LastDisplayedFreq <> 0 then
           begin

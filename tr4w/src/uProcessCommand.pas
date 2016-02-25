@@ -756,7 +756,7 @@ begin
 
   Radio1.SetRadioFreq(R1VFO.Frequency, R1VFO.Mode, 'A');
   Radio2.SetRadioFreq(R2VFO.Frequency, R2VFO.Mode, 'A');
-}
+} 
 
   if Radio1.FilteredStatus.Freq = 0 then Exit;
   if Radio2.FilteredStatus.Freq = 0 then Exit;
