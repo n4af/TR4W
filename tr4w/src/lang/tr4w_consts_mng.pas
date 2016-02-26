@@ -205,6 +205,9 @@ const
   TC_SAVINGTO                           = '%s-ийг %s руу хуулж байна';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Файлыг флоппи руу амжилттай бичлээ';
   TC_FILESAVEDTOSUCCESSFULLY            = '%s руу файлыг амжилттай бичлээ';
+  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
+  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
   {LOGSEND}
   TC_WAITINGFORYOUENTERSTRENGTHOFRST    = 'RST-ийн сигналын (S) хэмжээг оруулна уу (Нэг оронтой шvv)!!';
   {COUNTRY9}

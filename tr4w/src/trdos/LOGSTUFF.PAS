@@ -673,6 +673,7 @@ procedure SpeedUp;
 
 procedure StuffInit;
 procedure SendUDPRotorCommand(Heading: integer);
+function ValidClass(sClass: Str10): boolean;
 { Header and Stamp routines - used when generating a log string }
 
 //procedure BandModeDateTimeNumberCallNameSentStamp(Exchange: ContestExchange; var LogString: Str80);
@@ -1340,39 +1341,84 @@ function ProcessClassAndDomesticOrDXQTHExchange(Exchange: string {Str80}; var RX
 
 var
   TempString, TempString2               : Str10 {Str20};
-
+  sTemp1, sTemp2 : string;
+  isClassValid : boolean;
+  dx : boolean;
 begin
   ProcessClassAndDomesticOrDXQTHExchange := False;
 
   if DomesticCountryCall(RXData.Callsign) then
-  begin
-    ParseExchange(Exchange, Str10(RXData.ceClass), RXData.QTHString, TempString);
-    if not FoundDomesticQTH(RXData) then Exit;
+     begin
+     dx := false;
+     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i 
+     Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
+     ParseExchange(Exchange, Str10(RXData.ceClass), RXData.QTHString, TempString);
 
-    if RXData.QTHString[1] in ['0'..'9'] then
-    begin
-      Windows.ZeroMemory(@TempString, SizeOf(TempString));
-      Windows.ZeroMemory(@TempString2, SizeOf(TempString2));
+     if RXData.QTHString[1] in ['0'..'9'] then   // This is the code that flips it around if given in section class order // ny4i
+        begin
+        Windows.ZeroMemory(@TempString, SizeOf(TempString));
+        Windows.ZeroMemory(@TempString2, SizeOf(TempString2));
 
-      TempString := RXData.ceClass;
-      TempString2 := RXData.QTHString;
+        TempString := RXData.ceClass;
+        TempString2 := RXData.QTHString;
 
-      Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));
-      Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
+        Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));
+        Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
 
-      RXData.ceClass := TempString2;
-      RXData.QTHString := TempString;
-    end;
-
-  end
+        RXData.ceClass := TempString2;
+        RXData.QTHString := TempString;
+        end;
+     // if I enter 999D wtx, then correct it to 99d wtx, then length is of class is still 4. Fix that.
+     if not FoundDomesticQTH(RXData) then
+        begin
+        ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;   // misspelled in the constants file //ny4i 4.45.3
+        Exit; // This was before the above code that flips the values. // ny4i 4.45.3
+        end;
+     isClassValid := ValidClass(RXData.ceClass);
+     Result := IsClassValid;
+     end
   else
-  begin
+     begin
+     dx := true;
       {ParseExchange (Exchange, RXData.Class, RXData.QTHString, TempString);}{pre 6.68 statement}
-    ParseExchange(Exchange, Str10(RXData.ceClass), TempString, TempString2);
-    if TempString <> '' then RXData.QTHString := TempString;
-  end;
+     ParseExchange(Exchange, Str10(RXData.ceClass), TempString, TempString2);
+     if RxData.QTH.Continent in [NorthAmerica,SouthAmerica] then // If IARU Region 2 then we get class (most likely 1D if they are home).
+        begin
+        isClassValid := ValidClass(RxData.ceClass);
+        Result := isClassValid;
+        end
+     else
+        begin
+        Result := length(RXData.ceClass) in [2,3]; // If it is non-Region 2 DX, just make sure it is two or three characters.
+        if not Result then
+           begin
+           ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
+           end;
+        end;
+     if Result then // If class passes, check QTH is DX
+        begin
+        if TempString = 'DX' then
+           begin
+           RXData.QTHString := 'DX';
+           end
+        else if TempString = '' then
+           begin
+           // Set this to DX
+           RXData.QTHString := 'DX';
+           end
+        else
+           begin
+           Result := False;
+           ExchangeErrorMessage := TC_ARRLFIELDDAYIMPROPERDXEXCHANGE;
+           end;
+        end;
+     //if TempString <> '' then RXData.QTHString := TempString;
+     end;
 
-  ProcessClassAndDomesticOrDXQTHExchange := (length(RXData.ceClass) in [2, 3]);
+// Result is set in one of two patchs above...
+
+//  ProcessClassAndDomesticOrDXQTHExchange :=
+ // ProcessClassAndDomesticOrDXQTHExchange := (length(RXData.ceClass) in [2, 3]) and ((RxData.ceClass = 'A') or (RxData.ceClass = 'B') or (RxData.ceClass = 'C') or (RxData.ceClass = 'D') or (RxData.ceClass = 'E') or (RxData.ceClass = 'F'));
 end;
 
 function ProcessRSTAgeAndPossibleSK(Exchange: ShortString; var RXData: ContestExchange): boolean;
@@ -7892,6 +7938,39 @@ begin
 
 
 end; // SendUDPRotatorCommand
+
+
+function ValidClass(sClass: Str10): boolean;   // ny4i 4.45.3
+var
+   i : integer;
+   sXmit : string;
+   sCategory : string;
+begin
+   for i := 1 to length(sClass) do
+      begin
+      if sClass[i] in ['0'..'9'] then
+         begin
+         sXmit := sXmit + sClass[i];
+         end
+      else if sClass[i] in ['A'..'F'] then
+         begin
+         sCategory := sCategory + sClass[i];
+         end;
+      end;
+   if (not (StrToInt(sXmit) in [1..99])) then
+      begin
+      ExchangeErrorMessage := TC_IMPROPERTRANSMITTERCOUNT;
+      end
+   else if length(sCategory) <> 1 then
+      begin
+      ExchangeErrorMessage := TC_IMPROPERARRLFIELDDAYCLASS;
+      end
+   else
+      begin
+      Result := true;
+      end;
+  // Result := (StrToInt(sXmit) in [1..99]) and (length(sCategory) = 1);
+end;
 begin
   CD.CellBuffer.MaximumMemoryToUse := 40000 * ua4wliscpconst {*4 - ua4wli};
   StuffInit;

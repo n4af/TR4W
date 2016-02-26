@@ -409,6 +409,14 @@ begin
   end;
 end;
 
+{
+One notable thing missing from this code below is validation. A few items such as
+CALLSIGN are checked but not items like QTH. I can edit a record to make the
+state WC or the ARRl section WSX (both invalid). Considering we are editing
+the current contest, it seems reasonable to add code to validate the edit
+just like when the contact was first entered.
+I will make this a seperate Issue to track it.
+} // ny4i 25 Feb 2016
 function SaveQSOToEditableLog: boolean;
 label
   1, 2;
@@ -486,7 +494,11 @@ begin
 
   //  LocateCall(EditableQSORXData.Callsign, EditableQSORXData.QTH, true);
   if ActiveDXMult <> NoDXMults then
-    EditableQSORXData.DXQTH := EditableQSORXData.QTH.CountryID;
+     begin
+     ZeroMemory(@EditableQSORXData.DXQTH, SizeOf(EditableQSORXData.DXQTH));
+     EditableQSORXData.DXQTH := EditableQSORXData.QTH.CountryID;
+     end;
+
   //   Sheet.SetMultFlags(EditableQSORXData);
   CalculateQSOPoints(EditableQSORXData);
 
@@ -507,6 +519,7 @@ begin
     {Frequency}
   lpNumberOfBytesWritten := Windows.GetDlgItemInt(eq_handle, FLD_FREQUENCY, lpTranslated, False);
   //if lpNumberOfBytesWritten < MAXDWORD then
+  ZeroMemory(@EditableQSORXData.Frequency, SizeOf(EditableQSORXData.Frequency));
   EditableQSORXData.Frequency := lpNumberOfBytesWritten;
 
   {ComputerID}
@@ -516,42 +529,66 @@ begin
 
   {Age}
   lpNumberOfBytesWritten := Windows.GetDlgItemInt(eq_handle, FLD_AGE, lpTranslated, False);
-  if lpNumberOfBytesWritten < MAXBYTE then EditableQSORXData.Age := lpNumberOfBytesWritten;
+  if lpNumberOfBytesWritten < MAXBYTE then
+     begin
+     ZeroMemory(@EditableQSORXData.Age, SizeOf(EditableQSORXData.Age));
+     EditableQSORXData.Age := lpNumberOfBytesWritten;
+     end;
 
   {Chapter}
+  ZeroMemory(@EditableQSORXData.Chapter, SizeOf(EditableQSORXData.Chapter));
   EditableQSORXData.Chapter := GetDialogItemText(eq_handle, FLD_CHAPTER);
   {Check}
+  ZeroMemory(@EditableQSORXData.Check, SizeOf(EditableQSORXData.Check));
   EditableQSORXData.Check := Windows.GetDlgItemInt(eq_handle, FLD_CHECK, lpTranslated, False);
   {ClassCE}
+  ZeroMemory(@EditableQSORXData.ceClass, SizeOf(EditableQSORXData.ceClass));
   EditableQSORXData.ceClass := GetDialogItemText(eq_handle, FLD_CLASS);
 
   {NumberSent}
+  ZeroMemory(@EditableQSORXData.NumberSent, SizeOf(EditableQSORXData.NumberSent));
   EditableQSORXData.NumberSent := Windows.GetDlgItemInt(eq_handle, FLD_NUMBERSEND, lpTranslated, True);
 
   {NumberReceived}
   TempInteger := integer(Windows.GetDlgItemInt(eq_handle, FLD_NUMBERRECEIVED, lpTranslated, True));
-  if lpTranslated then EditableQSORXData.NumberReceived := TempInteger;
+  if lpTranslated then
+     begin
+     ZeroMemory(@EditableQSORXData.NumberReceived, SizeOf(EditableQSORXData.NumberReceived));
+     EditableQSORXData.NumberReceived := TempInteger;
+     end;
 
   {DomMultQTH}
 //  EditableQSORXData.DomMultQTH := GetDialogItemText(eq_handle, FLD_DOMMULTQTH);
 //  EditableQSORXData.DomMultQTH[0] := Char(Windows.GetDlgItemText(eq_handle, FLD_DOMMULTQTH, @EditableQSORXData.DomMultQTH[1], SizeOf(EditableQSORXData.DomMultQTH) - 1));
 
   {Prefix}
+  ZeroMemory(@EditableQSORXData.Prefix, SizeOf(EditableQSORXData.Prefix));
   EditableQSORXData.Prefix := GetDialogItemText(eq_handle, FLD_PREFIX);
 
   {Zone}
 
   TempByte := Byte(Windows.GetDlgItemInt(eq_handle, FLD_ZONE, lpTranslated, True));
-  if lpTranslated then EditableQSORXData.Zone := TempByte
+  if lpTranslated then
+     begin
+     ZeroMemory(@EditableQSORXData.Zone, SizeOf(EditableQSORXData.Zone));
+     EditableQSORXData.Zone := TempByte
+     end
   else
-    if TempByte = 0 then EditableQSORXData.Zone := DUMMYZONE;
+     begin
+     if TempByte = 0 then
+        begin
+        ZeroMemory(@EditableQSORXData.Zone, SizeOf(EditableQSORXData.Zone));
+        EditableQSORXData.Zone := DUMMYZONE;
+        end;
+     end;
 
   {Name}
-
+  ZeroMemory(@EditableQSORXData.Name, SizeOf(EditableQSORXData.Name));
   EditableQSORXData.Name[0] := Char(Windows.GetDlgItemText(eq_handle, FLD_NAME, @EditableQSORXData.Name[1], SizeOf(EditableQSORXData.Name) - 1));
 
   {QTHString}
-//  Windows.ZeroMemory(@EditableQSORXData.QTHString, SizeOf(EditableQSORXData.QTHString));
+  // The next line was commented out - so test this well ny4i Issue112
+  Windows.ZeroMemory(@EditableQSORXData.QTHString, SizeOf(EditableQSORXData.QTHString));
   EditableQSORXData.QTHString[0] := Char(Windows.GetDlgItemText(eq_handle, FLD_QTHSTRING, @EditableQSORXData.QTHString[1], SizeOf(EditableQSORXData.QTHString) - 1));
   if DoingDomesticMults then
   begin
@@ -564,27 +601,45 @@ begin
   //windows.GetDlgItemText(eq_handle,FLD_POSTALCODE,EditableQSORXData.PostalCode,sizeof(PostalCodeString));
 
   {Power}
+  ZeroMemory(@EditableQSORXData.Power, SizeOf(EditableQSORXData.Power));
   EditableQSORXData.Power := {Windows.GetDlgItemInt(eq_handle, FLD_POWER, lpTranslated, True);} GetDialogItemText(eq_handle, FLD_POWER);
 
   {Precedence}
   Windows.GetDlgItemText(eq_handle, FLD_PRECEDENCE, CID_TWO_BYTES, 2);
+  ZeroMemory(@EditableQSORXData.Precedence, SizeOf(EditableQSORXData.Precedence));
   EditableQSORXData.Precedence := CID_TWO_BYTES[0];
 
   {Prefecture}
   TempByte := Byte(Windows.GetDlgItemInt(eq_handle, FLD_PREFECTURE, lpTranslated, True));
-  if lpTranslated then EditableQSORXData.Prefecture := TempByte;
+  if lpTranslated then
+     begin
+     ZeroMemory(@EditableQSORXData.Prefecture, SizeOf(EditableQSORXData.Prefecture));
+     EditableQSORXData.Prefecture := TempByte;
+     end;
 
   {TenTenNum}
   TempWord := Word(Windows.GetDlgItemInt(eq_handle, FLD_TENTENNUM, lpTranslated, True));
-  if lpTranslated then EditableQSORXData.TenTenNum := TempWord;
+  if lpTranslated then
+     begin
+     ZeroMemory(@EditableQSORXData.TenTenNum, SizeOf(EditableQSORXData.TenTenNum));
+     EditableQSORXData.TenTenNum := TempWord;
+     end;
 
   {RSTSent}
   TempWord := Word(Windows.GetDlgItemInt(eq_handle, FLD_RSTSEND, lpTranslated, True));
-  if lpTranslated then EditableQSORXData.RSTSent := TempWord;
+  if lpTranslated then
+     begin
+     ZeroMemory(@EditableQSORXData.RSTSent, SizeOf(EditableQSORXData.RSTSent));
+     EditableQSORXData.RSTSent := TempWord;
+     end;
 
   {RSTReceived}
   TempWord := Word(Windows.GetDlgItemInt(eq_handle, FLD_RSTRECEIVED, lpTranslated, True));
-  if lpTranslated then EditableQSORXData.RSTReceived := TempWord;
+  if lpTranslated then
+     begin
+     ZeroMemory(@EditableQSORXData.RSTReceived, SizeOf(EditableQSORXData.RSTReceived));
+     EditableQSORXData.RSTReceived := TempWord;
+     end;
 
   IndexInMap := IndexOfItemInLogForEdit;
   {SAP}

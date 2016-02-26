@@ -1086,6 +1086,7 @@ begin
   inc(CommandsBufferPointer, nNumberOfBytesToWrite);
 {$ELSE}
   WriteToCATPort(Buffer^, nNumberOfBytesToWrite);
+  DebugMsg(Buffer);
 {$IFEND}
    //TLogger.GetInstance.Debug('Exiting AddToOutputBuffer');
 end;
@@ -1542,11 +1543,29 @@ begin
   case RadioParametersArray[RadioModel].rt of
     rtKenwood:
       begin
-      localMsg := Format('KY %s;', [Msg]);
-     // AddStringToTelnetConsole(PChar('Sending to K3='+localMsg),tstAlert);
+      // This is all commented out until Elecraft fixes a bug with the
+      // speed change being processed out of order. ny4i
+      // For now, we do not want to send these to the radio
+      if Msg = #06 then // increase speed
+         begin
+         //CodeSpeed := CodeSpeed + Round(CodeSpeed * 0.06); // increase 6 %
+         //SetRadioCWSpeed(CodeSpeed);
+         end
+      else if Msg = #$13 then
+         begin       // Speed down by 6 %
+         //CodeSpeed := CodeSpeed - Round(CodeSpeed * 0.06); // increase 6 %
+         //SetRadioCWSpeed(CodeSpeed);
+         end
+      else if Msg = Chr(242) then // Do nothing
+         begin
+         end
+      else
+         begin
+         localMsg := Format('KY %s;', [Msg]);
+         //DebugMsg('Sending to K3='+localMsg);
 
-     // AddToOutputBuffer (tKenwood14Bytes, 6);
-        AddToOutputBuffer(addr(localMsg[1]), 4 + length(Msg));
+         AddToOutputBuffer(addr(localMsg[1]), 4 + length(Msg));
+         end;
       end;
     rtYaesu1:
        if RadioModel in [FT100, FT920, FT1000, FT1000MP] then
@@ -1555,7 +1574,7 @@ begin
           end;
 
    rtIcom:
-      if RadioModel in [IC7100, IC7300, IC7600, IC7700, IC7800, IC7850, IC7851, IC9100] then
+      if RadioModel in RadioSupportsCWByCAT then
          begin
          if ord(Msg[1]) = 242 then // Flush if Msg = #242
             begin
@@ -1610,7 +1629,8 @@ begin
     rtKenwood:
       begin
      // localMsg := Format('KY %s;', [Msg]);
-      AddToOutputBuffer ('KY ' + Chr(4) + ';' + 'RX;', 8);
+     AddToOutputBuffer('RX;',3);
+      //AddToOutputBuffer ('KY ' + Chr(4) + ';' + 'RX;', 8);
       //  AddToOutputBuffer(addr(localMsg[1]), 4 + length(Msg));
     //  PTTOff;
       end;
@@ -2620,6 +2640,7 @@ begin
   if WaitAnswer <> 0 then ReadFromCOMPort(WaitAnswer, @Radio1);
   Result := True;
 end;
+
 
 procedure InitRadios;
 var
