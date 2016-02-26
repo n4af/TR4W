@@ -378,7 +378,7 @@ end;
 
 function TDXSpotsList.Get(Index: integer): TSpotRecord;
 begin
-  FillChar(Result,SizeOf(Result),0); // ny4i Test to return null
+  FillChar(Result,SizeOf(Result),0); // ny4i Test to return null Issue #115
   if (Index < 0) or (Index >= FCount) then Exit; //ERROR(@SListIndexError, Index);
   Result := FList^[Index];
 end;
