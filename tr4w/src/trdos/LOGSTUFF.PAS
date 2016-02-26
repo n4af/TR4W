@@ -1350,6 +1350,8 @@ begin
   if DomesticCountryCall(RXData.Callsign) then
      begin
      dx := false;
+     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i 
+     Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
      ParseExchange(Exchange, Str10(RXData.ceClass), RXData.QTHString, TempString);
 
      if RXData.QTHString[1] in ['0'..'9'] then   // This is the code that flips it around if given in section class order // ny4i

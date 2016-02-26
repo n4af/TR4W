@@ -3745,10 +3745,17 @@ begin
   RData.Frequency := Freq;
 
   if RData.RSTSent = 0 then
-    if ActiveMode in [Phone, FM] then
-      RData.RSTSent := LogRSSent
+     begin
+     Windows.ZeroMemory(@RData.RSTSent, SizeOf(RData.RSTSent));
+     if ActiveMode in [Phone, FM] then
+        begin
+        RData.RSTSent := LogRSSent;
+        end
     else
-      RData.RSTSent := LogRSTSent;
+       begin
+       RData.RSTSent := LogRSTSent;
+       end;
+    end;
 
   if ActiveMode in [Phone, FM] then DefaultRST := 59 else DefaultRST := 599;
 
@@ -3756,7 +3763,7 @@ begin
 
   if DoingDXMults then GetDXQTH(RData);
 
-  if DoingPrefixMults then SetPrefix(RData);
+   if DoingPrefixMults then SetPrefix(RData);
   {
       case ActivePrefixMult of
         BelgiumPrefixes: if RData.QTH.CountryID = 'ON' then RData.Prefix := RData.QTH.Prefix;
