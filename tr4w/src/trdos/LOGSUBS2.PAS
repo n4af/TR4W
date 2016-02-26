@@ -1689,6 +1689,7 @@ var
   Key                                   : Char;
 
 begin
+   Result := #0; // ny4i Issue 116 to ensure an initialized value of returned.
   {
     if NewKeyPressed then
     begin

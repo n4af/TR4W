@@ -5096,6 +5096,7 @@ end;
 
 function tSetFilePointer(lDistanceToMove: LONGINT; dwMoveMethod: DWORD): Cardinal;
 begin
+  result := Low(cardinal); // Initialize as it was not previously // ny4i Isssue 116
   SetFilePointer(LogHandle, lDistanceToMove, nil, dwMoveMethod);
 end;
 
@@ -5241,6 +5242,7 @@ end;
 
 function NewCallWindowProcedure(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): UINT; stdcall;
 begin
+  Result := 0; // Initialize as it it possible to not be initialized // ny4i Issue 116
   case Msg of
 
     WM_CHAR:
@@ -7094,8 +7096,7 @@ end;
 
 function IsCWByCATActive: boolean;  // ny4i Issue # 111
 begin
-   Result := (ActiveRadioPtr.CWByCAT) and
-             (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT);
+   Result := IsCWByCatActive(ActiveRadioPtr);  // Call base function with active radio // ny4i Issue 111
 end;
 
 {
