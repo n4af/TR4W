@@ -506,7 +506,7 @@ If (ActiveMode = CW) and (IsCWByCATActive) then      // n4af 4.45.5   proposed t
        end
     else
       begin
-      InitializeQSO;
+      tCleareCallWindow;      // n4af 4.46.7
       Second := False;
       end;                                          // ny4i Issue #111 - Just a bit of code formatting for readability
     end;

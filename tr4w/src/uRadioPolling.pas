@@ -2114,7 +2114,10 @@ begin
         if dif <= 10000 then
           if AutoSAPEnable {and (Not Switch) }then   // n4af 4.44.10
             if OpMode = CQOpMode then
+            begin
               SetOpMode(SearchAndPounceOpMode);
+              Second := False;    // n4af 4.46.7  first esc d/n clear call
+            end;
      if rig.FilteredStatus.TxOn then
         begin
         rig.tPTTStatus := PTT_ON;
