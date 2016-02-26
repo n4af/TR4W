@@ -791,6 +791,7 @@ const
   RC_SEND_BUG                           = 'Send bug report';
   RC_HOMEPAGE                           = 'TR4W Home Page';
   RC_FREQUENCY                          = 'Frequency';
+  TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
 {FD Additions NY4I}
 {
 TC_IMPROPERTRANSMITTERCOUNT = 'FD transmitters must be between 1 and 99.';

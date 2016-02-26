@@ -1896,8 +1896,8 @@ var
   nCmdShow                              : integer;
 begin
 
- if    ActiveRadioPtr.CurrentStatus.Split Then QuickDisplay('Warning: SPLIT MODE...')      //N4AF  4.31.3
-else                                                                                     //N4AF
+ if    ActiveRadioPtr.CurrentStatus.Split Then QuickDisplay(TC_Split_Warn)      //N4AF  4.31.3
+else                                                                                     //N4AF   4.31.3
  QuickDisplay(nil);
 //  SetMainWindowText(mweName, nil);
 // CallDataBase.ClearDataEntry;
