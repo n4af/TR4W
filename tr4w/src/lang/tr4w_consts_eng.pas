@@ -242,9 +242,7 @@ const
   TC_SAVINGTO                           = 'Saving %s to %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'File saved to floppy successfully.';
   TC_FILESAVEDTOSUCCESSFULLY            = 'File saved to %s successfully.';
-  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
-  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
+ 
 
   {LOGSEND}
 
@@ -796,8 +794,8 @@ const
   RC_FREQUENCY                          = 'Frequency';
   TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
 {FD Additions NY4I}
-{
+ 
 TC_IMPROPERTRANSMITTERCOUNT = 'FD transmitters must be between 1 and 99.';
 TC_IMPROPERARRLFIELDDAYCLASS = 'Field Day class must be A, B, C, D, E or F.';
 TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'DX Station exchange must be "DX".';
-}
+RC_SPLITOFF                       = 'Force Split Mode OFF';

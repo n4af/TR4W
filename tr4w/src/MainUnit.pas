@@ -2762,6 +2762,8 @@ begin
 
     menu_insertmode: InvertBooleanCommand(@InsertMode);
 
+    menu_ctrl_SplitOff: PutRadioOutOfSplit(ActiveRadio);  // n4af 4.46.8
+
     menu_escape:
       Escape_proc;
     menu_csv:

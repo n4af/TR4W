@@ -96,7 +96,7 @@ const
   RC_VIEWPAKSPOTS_HK                    = #9'Ctrl+U';
   RC_EXECONFIGFILE_HK                   = #9'Ctrl+V' ;
   RC_REFRESHBM_HK                       = #9'Ctrl+Y';
-  RC_DUALINGCQ_HK                       = #9'Ctrl+-';
+  RC_SPLITOFF_HK                        = #9'Ctrl+-';
   RC_CURSORINBM_HK                      = #9'Ctrl+End';
   RC_CURSORTELNET_HK                    = #9'Ctrl+Home';
   RC_QSOWITHNOCW_HK                     = #9'Ctrl+Enter';
@@ -130,8 +130,8 @@ const
   RC_SHDX_CALLSIGN_HK                   = #9'Ctrl+S';
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
-  
-    T_MENU_ARRAY_SIZE                     = 169{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+
+    T_MENU_ARRAY_SIZE                     = 170{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -304,7 +304,7 @@ const
     (mrText: RC_QSOWITHNOCW + RC_QSOWITHNOCW_HK; mrId: menu_ctrl_logqsowithoutcw),
     (mrText: RC_CURSORTELNET + RC_CURSORTELNET_HK; mrId: menu_ctrl_cursorintelnet),
     (mrText: RC_ADDBANDMAPPH + RC_ADDBANDMAPPH_HK; mrId: menu_ctrl_PlaceHolder),
-//    (mrText: RC_DUALINGCQ + RC_DUALINGCQ_HK; mrId: menu_ctrl_dualingcq),
+    (mrText: RC_SPLITOFF + RC_SPLITOFF_HK; mrId: menu_ctrl_SplitOff),      // n4af 4.46.8
     (mrText: RC_CT1BOHIS + RC_CT1BOHIS_HK; mrId: menu_ctrl_ct1bohscreen),
     (mrText: RC_ADDINFO; mrId: MAXWORD - 1),
   //{
