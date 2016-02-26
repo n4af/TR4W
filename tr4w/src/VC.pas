@@ -177,7 +177,7 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.46.6' ;     // NY4I
+  TR4W_CURRENTVERSION_NUMBER            = '4.46.8' ;     // NY4I
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
   TR4W_CURRENTVERSIONDATE               = 'Feb 25, 2016' ;
@@ -1999,7 +1999,7 @@ const
   menu_ctrl_recalllastentry             = 10408;
   menu_ctrl_viewpacketspots             = 10409;
   menu_ctrl_refreshbandmap              = 10410;
-  menu_ctrl_dualingcq                   = 10411;
+  menu_ctrl_SplitOff                    = 10411;
   menu_ctrl_lookup                     = 10412;
   menu_ctrl_cursorinbandmap             = 10413;
   menu_ctrl_logqsowithoutcw             = 10414;
