@@ -56,7 +56,8 @@ uses
 //  LOGMENU,
   LogNet,
   LogRadio,
-  CFGDEF 
+  CFGDEF,
+  SysUtils 
   ;
 
 type
@@ -371,6 +372,11 @@ begin
   Sheet.SheetInitAndLoad;
   LoadBandMap;
   DisplayContestTitle;
+
+  if CurrentOperator[0] = #0 then  // ny4i Issue #97
+     begin
+     StrPLCopy(CurrentOperator, MyCall, High(CurrentOperator)); // This copies the string MyCall to char array CurrentOperator (I love mixed types :) ) // ny4i
+     end;
 
   CheckAndInitializeSerialPorts;
   InitializeKeyer;
