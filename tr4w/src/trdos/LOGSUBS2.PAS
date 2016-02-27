@@ -6107,22 +6107,33 @@ begin
    // if operator is blank, use mycall
    // Add CR to output
    // Band is in Mhz, not meters.
-   if ActiveRadioPtr.CurrentStatus.Split then
+   // ny4i Issue 82 - Added code to check if there is a radio interfaced and if not,
+   // generate the base frequency from the band. This uses an array that was used for Cabrillo files.
+   if ActiveRadioPtr.RadioModel <> NoInterfacedRadio then
       begin
-      freq := ActiveRadioPtr.CurrentStatus.Freq;
-      txFreq := ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency;
+      if ActiveRadioPtr.CurrentStatus.Split then
+         begin
+         freq := ActiveRadioPtr.CurrentStatus.Freq;
+         txFreq := ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency;
+         end
+      else
+         begin
+         freq := ActiveRadioPtr.CurrentStatus.Freq;
+         txFreq := freq;
+         end;
       end
    else
-      begin
-      freq := ActiveRadioPtr.CurrentStatus.Freq;
+      begin // ny4i Issue 82 The Cabrillo reference is just because this array was declared in Cabrillo.
+      freq := StrToInt(tCabrilloFreqString[RxData.Band]) * 1000; //14000 in array but needs to be 14000000
       txFreq := freq;
       end;
-   case RXData.Mode of
-       CW: sMode := 'CW';
-       Phone: sMode := 'SSB';
-       Digital: sMode := 'RTTY';
-       else sMode := ' ';
-    end; // of case
+
+    case RXData.Mode of
+         CW: sMode := 'CW';
+         Phone: sMode := 'SSB';
+         Digital: sMode := 'RTTY';
+         else sMode := ' ';
+       end; // of case
 
     if RxData.ceComputerID = #0 then
        begin
@@ -6200,7 +6211,7 @@ begin
             #9 + '<points>' + Format('%d',[RXData.QSOPoints]) + '</points>' + sLineBreak +
             #9 + '<radionr>' + Format('%d',[Ord(RxData.ceRadio)]) + '</radionr>' + sLineBreak +
             #9 + '<RoverLocation></RoverLocation>' + sLineBreak +
-            #9 + '<RadioInterfaced>1</RadioInterfaced>' + sLineBreak +
+            #9 + '<RadioInterfaced>' + Format('%d',[IfThen(ActiveRadioPtr.RadioModel <> NoInterfacedRadio,1,0)]) + '</RadioInterfaced>' + sLineBreak +  // ny4i Issue 82
             #9 + '<NetworkedCompNr>0</NetworkedCompNr>' + sLineBreak + // TODO
             #9 + '<IsOriginal>True</IsOriginal>' + sLineBreak +
             #9 + '<NetBiosName>' + GetLocalComputerName + '</NetBiosName>' + sLineBreak +
