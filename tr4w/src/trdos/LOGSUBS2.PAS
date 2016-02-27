@@ -4556,7 +4556,7 @@ begin
   VisibleLog.ProcessMultipliers(RXData);
 
   if MyComputer then
-  begin
+    begin
     RXData.Radio := ActiveRadioPtr^.RadioModel;
     RXData.ceRadio := ActiveRadio;
     tGetQSOSystemTime(RXData.tSysTime);
@@ -4569,13 +4569,18 @@ begin
         RXData.MP3Record := True;
 
     if not SendRecordToServer(NET_QSOINFO_ID, RXData) then inc(tUSQ);
-  end;
-
-  // Add code here to send UDP message with contact info
-  if UDPBroadcastContact then
-     begin
-     LogContactToUDP(RXData);
-     end;
+    if UDPBroadcastContact then
+       begin
+       LogContactToUDP(RXData);
+       end;
+    end
+  else
+    begin     // ny4i issue 82 - If the option is set, broadcast contacts received from the Network
+    if UDPBroadcastAllQSOs then
+       begin
+       LogContactToUDP(RXData);
+       end;
+    end;
   if not tAddQSOToLog(RXData) then Exit;
 
   //if RXData.Band in [Band160..Band10] then
@@ -5603,7 +5608,7 @@ begin
                                                  ActiveBand,
                                                  ActiveMode,
                                                  LastDisplayedFreq [ActiveRadio],
-                                                 ReceivedData) THEN
+                                                  ReceivedData) THEN
                                   BEGIN
                                   GotExchange := True;
                                   RemoveWindow (ExchangeWindow);
