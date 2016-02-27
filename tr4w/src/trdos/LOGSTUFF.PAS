@@ -575,6 +575,7 @@ var
   UDPBroadcastPort                      : integer = 12060;       // ny4i 4.44.9
   UDPBroadcastAddress                   : string[255] = '127.0.0.1';   // ny4i 4.44.9
   UDPBroadcastRotorPort                 : integer = 12040;       // ny4i 4.44.9
+  UDPBroadcastAllQSOs                   : boolean;               // ny4i Issue 82
 
   WaitForStrength                       : boolean = True;
 
