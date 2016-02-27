@@ -675,7 +675,7 @@ label
   DontPollSecondVfos, NextPoll;
 
 begin
-
+  PollSecVFO := 0; // Initialize ny4i Issue 116
   repeat
     NextPoll:
     Sleep(FreqPollRate);
@@ -1807,6 +1807,7 @@ begin
     rig.CurrentStatus.VFO[VFOB].Frequency := GetFrequencyFromBCD(4, @rig.tBuf[82 - 19]) * 10;
     CalculateBandMode(rig.CurrentStatus.Freq, rig.CurrentStatus.Band, rig.CurrentStatus.Mode);
 
+    TempMode := NoMode;
     case Ord(rig.tBuf[86]) mod 8 of
       0: TempMode := Phone;
       1: TempMode := Phone;
@@ -2492,6 +2493,7 @@ procedure GetVFOInfoForFT2000(buf: PChar; var VFO: VFOStatusType; FrequencyAdder
 var
   TempMode                              : ModeType;
 begin
+  TempMode := NoMode;  // Issue 116
   VFO.Frequency := BufferToInt(buf, 6, 8) + FrequencyAdder;
   CalculateBandMode(VFO.Frequency, VFO.Band, VFO.Mode);
   VFO.RITFreq := BufferToInt(buf, 14, 5);

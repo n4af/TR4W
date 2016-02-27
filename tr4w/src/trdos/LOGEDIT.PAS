@@ -276,12 +276,12 @@ begin
   begin
     if CommandUseInactiveRadio then //KK1L: 6.73 Band change on inactive radio via command
     begin
-    PutRadioOutOfSplit(InactiveRadio);
+    PutRadioOutOfSplit(InactiveRadio);  // n4af 4.46.5
       BandChange(InActiveRadioPtr.BandMemory {BandMemory[InactiveRadio]}, Direction);
     end
     else
     begin
-      PutRadioOutOfSplit(ActiveRadio);
+      PutRadioOutOfSplit(ActiveRadio);      // n4af 4.46.5
       BandChange(ActiveBand, Direction);
       if QSOByBand then CallsignsList.DisplayDupeSheet(ActiveRadioPtr);
       if MultByBand then VisibleLog.ShowRemainingMultipliers;
