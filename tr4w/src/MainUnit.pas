@@ -551,7 +551,7 @@ If (ActiveMode = CW) and (IsCWByCATActive) then      // n4af 4.45.5   proposed t
         begin
         pRadio := ActiveRadioPtr;
         end;
-     if IsCWByCATActive(pRadio) then {pRadio^.CWByCAT and (pRadio^.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2 } // commented Issue 111 ny4i
+     if IsCWByCATActive(pRadio) then
         begin
         pRadio^.StopSendingCW;
         PTTOff;
@@ -3254,8 +3254,6 @@ begin
     begin
       if Key <> StartSendingNowKey then
       begin
-        {if (ActiveRadioPtr.CWByCAT) and           // ny4i 4.44.5
-           (ActiveRadioPtr.RadioModel in RadioSupportsCWByCAT) then     // ny4i 4.45.2 }
         if IsCWByCATActive then
            begin // Send the character now - No buffering
       //     if Autocallterminate then

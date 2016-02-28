@@ -921,8 +921,22 @@ type
     NoInterfacedRadio,
     K2,
     K3,
-//    TS570,
+
+    TS140,
+    TS440,
+    TS450,
+    TS480,
+    TS570,
+    TS590,
+    TS690,
     TS850,
+    TS870,
+    TS940,
+    TS950,
+    TS990,
+    TS2000,
+    FLEX,
+
     FT100,
     FT450,
     FT736R,
@@ -938,11 +952,13 @@ type
     FT920,
     FT950,
     FT990,
+    FT991,
     FT1000, {& 1000D}
     FT1000MP, { Also for the Mark V }
-
+    FT1200,
     FT2000,
     FTDX3000,
+    FTDX5000,
     FTDX9000,
 
     IC78,
@@ -969,10 +985,8 @@ type
     IC765,
     IC775,
     IC781,
-
     IC910,
     IC970D,
-
     IC7000,
     IC7100,
     IC7200,
