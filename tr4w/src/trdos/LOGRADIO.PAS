@@ -356,6 +356,7 @@ var
   ActiveRadioPtr                        : RadioPtr = @Radio1;
   InActiveRadioPtr                      : RadioPtr = @Radio2;
   RadioSupportsCWByCAT: InterfacedRadioTypeSet;
+  RadioSupportsCWSpeedSync: InterfacedRadioTypeSet;
   ICOMRadios: ICOMRadioTypes;
 
 const
@@ -414,7 +415,7 @@ const
 {(*}
     ({Name: 'NONE';       } BR:BR4800;  P: 1; C: 0; S: 0; T:0; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00),
     ({Name: 'K2';         } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
-    ({Name: 'K3';         } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
+    ({Name: 'K3';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS140';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS440';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS450';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
@@ -1798,6 +1799,12 @@ procedure RadioObject.SetRadioCWSpeed(speed: LONGINT);
 var
   i : integer;
 begin
+ if not (RadioModel in RadioSupportsCWSpeedSync) then
+    begin
+    DebugMsg('Current radio model does not support CWSpeedSync');
+    exit;
+    end;
+
  case RadioParametersArray[RadioModel].rt of
     rtKenwood:
       begin
@@ -1806,12 +1813,11 @@ begin
         Format(@tKenwood14Bytes, 'KS%003u;', speed);
         AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 6);
       end;
-    rtYaesu1:
-       if RadioModel in [FT100, FT920, FT1000, FT1000MP] then
-          begin
-          ;
-          end;
-
+    rtYaesu2:  // Yaesu1 does not support this command
+       begin
+       Format(@tKenwood14Bytes, 'KS%003u;', speed);
+       AddToOutputBuffer (tKenwood14Bytes, 6);
+       end;
     rtIcom:
       if (TRUE) or (RadioModel in [IC7800, IC7850, IC7851]) then // ny4i 4.45.2. This looks odd because the 7800..7851 calculate speed differently but I have not added this yet. When added, just remove this if so we try this for all Icom radios.
         begin
@@ -2674,7 +2680,8 @@ var
 const
   ra                                    : array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
-  RadioSupportsCWByCAT := [K2,K3,TS480,TS570,TS590,TS990,TS2000,FLEX,IC7100,IC7300,IC7600,IC7700,IC7800,IC7850,IC7851,IC9100,Orion];  // ny4i Issue 119
+  RadioSupportsCWByCAT := [K2,K3,TS480,TS570,TS590,TS990,TS2000,FLEX,IC7100,IC7300,IC7410,IC7600,IC7700,IC7800,IC7850,IC7851,IC9100,Orion];  // ny4i Issue 119
+  RadioSupportsCWSpeedSync := [K2,K3,TS480,TS570,TS590,TS990,TS2000,FLEX,FT450,FT950,FT991,FT1200,FT2000,FTDX3000,FTDX5000,FTDX9000,IC718,IC746,IC746PRO,IC756PROII,IC756PROIII,IC910,IC7100,IC7200,IC7300,IC7410,IC7600,IC7700,IC7800,IC7850,IC7851,IC9100,Orion];  // ny4i Issue 120
   ICOMRadios := [IC78..IC9100];
   for i := 1 to 2 do
   begin
