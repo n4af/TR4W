@@ -1003,6 +1003,7 @@ type
     Orion);
 
   ICOMRadioTypes = set of InterfacedRadioType;
+  KenwoodRadioTypes = set of InterfacedRadioType;
   InterfacedRadioTypeSet = set of InterfacedRadioType;
 
   BandType = (
