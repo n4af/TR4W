@@ -1294,10 +1294,9 @@ procedure RadioObject.PutRadioIntoSplit;
 begin
   //TLogger.GetInstance.Debug(Format('      In PutRadioIntoSplit: %s',[RadioName]));
   case RadioModel of
-    TS850, K2, K3:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,TS950,TS990,
+    TS2000,FLEX,K2,K3:
       begin
-        //            CPUKeyer.AddSerialPortString(tr4w_CATPort, 'FR0;FA;FT1;');
-//        ActiveRadioPtr.WriteBufferToCATPort('FR0;FT1;'); //vfo a = rx, vfo b = tx
         AddToOutputBuffer('FR0;FT1;', 8);
 
         {KK1L: 6.71 For some reason needed this to get the FT1; }
@@ -1320,22 +1319,14 @@ begin
         CommandsTempBuffer[6] := CHR(1);
         CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
         AddCommandToBuffer;
-//{?}        ActiveRadioPtr.WriteBufferToCATPort(CHR($FE) + CHR($FE) + CHR(ReceiverAddress) + CHR($E0) + CHR($0F) + CHR($01) + CHR($FD));
-        {
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($FE));
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($FE));
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR(ReceiverAddress));
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($E0));
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($0F)); // $0F cmd
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($01)); // $01 put in split
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($FD));
-        }
 
       end;
 
     FT747GX, FT100, FT890, FT900, FT920, FT990, FT1000, FT1000MP:
       ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR(1) + CHR(1), 5);
 
+    FT450,FT950,FT991,FT1200,FT2000,FTDX3000,FTDX5000,FTDX9000:
+      ActiveRadioPtr.WriteToCATPort('FR0;FT1;', 8);
     Orion:
       ActiveRadioPtr.WriteBufferToCATPort('*KVABB' + CarriageReturn);
 
@@ -1348,7 +1339,8 @@ procedure RadioObject.PutRadioOutOfSplit;
 begin
   //TLogger.GetInstance.Debug(Format('      In PutRadioOutOfSplit: %s',[RadioName]));
   case RadioModel of
-    TS850, K2, K3:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,TS950,TS990,
+    TS2000,FLEX,K2,K3:
       begin
         //ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('FR0;FT0;', 8);
         AddToOutputBuffer('FR0;FT0;', 8);
@@ -1368,20 +1360,13 @@ begin
         CommandsTempBuffer[6] := CHR(0);
         CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
         AddCommandToBuffer;
-//{?}        CPUKeyer.AddSerialPortString(tCATPortType, CHR($FE) + CHR($FE) + CHR(ReceiverAddress) + CHR($E0) + CHR($0F) + CHR($00) + CHR($FD));
-        {
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($FE));
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($FE));
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR(ReceiverAddress));
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($E0));
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($0F));  $0F cmd
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($00)); //KK1L: 6.64 This is the cancel split code
-                CPUKeyer.AddSerialPortCharacter(tr4w_CATPort, CHR($FD));
-        }
       end;
 
     FT747GX, FT100, FT890, FT900, FT920, FT990, FT1000, FT1000MP: { QSL }
       ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR(1), 5);
+
+    FT450,FT950,FT991,FT1200,FT2000,FTDX3000,FTDX5000,FTDX9000:
+      ActiveRadioPtr.WriteToCATPort('FR0;FT0;', 8);
 
     Orion:
       ActiveRadioPtr.WriteBufferToCATPort('*KVABA' + CarriageReturn);
@@ -1587,17 +1572,23 @@ begin
          end
       else
          begin
-         localMsg := Format('KY %s;', [Msg]);
+          case RadioModel of
+            TS480,TS570,TS590,TS950,TS990,TS2000,FLEX:
+               localMsg := Format('KY %-25s;',[Msg]);
+            K2, K3:
+               localMsg := Format('KY %s;', [Msg]);
+            end; // case
+
+         //localMsg := Format('KY %s;', [Msg]);
          //DebugMsg('Sending to K3='+localMsg);
 
-         AddToOutputBuffer(addr(localMsg[1]), 4 + length(Msg));
+         AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
          end;
       end;
     rtYaesu1:
-       if RadioModel in [FT100, FT920, FT1000, FT1000MP] then
-          begin
-          ;
-          end;
+       begin    // Yaesu does not support sending free-form text via CAT.
+          ;     // You can send memories that are previously programmed though.
+       end;     // This is not applicable to this program however.
 
    rtIcom:
       if RadioModel in RadioSupportsCWByCAT then
@@ -1639,8 +1630,8 @@ begin
          end;
     rtOrion:
       begin
-        //i := Format(tOrionFreq, '*CS%02u'#13, speed);
-        //WriteToCATPort(tOrionFreq, i);
+        localMsg := Format('/%s#13', [Msg]);   // ny4i Issue 112
+        WriteToCATPort(localMsg, length(localMsg));
       end;
     else
       begin
@@ -1655,10 +1646,17 @@ begin
     rtKenwood:
       begin
      // localMsg := Format('KY %s;', [Msg]);
-     AddToOutputBuffer('RX;',3);
-      //AddToOutputBuffer ('KY ' + Chr(4) + ';' + 'RX;', 8);
-      //  AddToOutputBuffer(addr(localMsg[1]), 4 + length(Msg));
-    //  PTTOff;
+      case RadioModel of
+         K2,K3:
+            AddToOutputBuffer('RX;',3);
+         TS480,TS570,TS590,TS950,TS990,TS2000:
+            begin
+            AddToOutputBuffer('KY0;',4);
+            AddToOutputBuffer('RX;',3);
+            end;
+         FLEX:
+            AddToOutputBuffer('ZZSS;',5); // PowerSDR command-no Kenwood equivilent
+         end; // case RadioModel
       end;
     rtYaesu1:
        if RadioModel in [FT100, FT920, FT1000, FT1000MP] then
@@ -2613,10 +2611,11 @@ begin
   end;
 
   case IntRadioType of
-    TS850, K2, K3:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,TS950,TS990,
+    TS2000,FLEX,K2,K3:
       if PTTOn then TempString := 'TX;' else TempString := 'RX;';
 
-    FT450, FT950, FT2000, FTDX9000:
+    FT450,FT950,FT991,FT1200,FT2000,FTDX3000,FTDX5000,FTDX9000:
       if PTTOn then TempString := 'TX1;' else TempString := 'TX0;';
 
     FT747GX, FT100, FT840, FT890, FT900, FT990, FT1000, FT1000MP:

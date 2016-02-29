@@ -2405,7 +2405,8 @@ begin
   Windows.ZeroMemory(@rig.tBuf, SizeOf(rig.tBuf));
 
   case rig^.RadioModel of
-    TS850, K2, K3:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,TS950,TS990,
+    TS2000,FLEX,K2,K3:
       begin
 {$IF MASKEVENT}
         pKenwoodNew(rig);
@@ -2414,16 +2415,26 @@ begin
 {$IFEND}
 
       end;
-    FT767: pFT767(rig);
-    FT736R: pFT736R(rig);
-    FT747GX: pFT747GX(rig);
-    FT817, FT847, FT857, FT897: pFT817_FT847_FT857_FT897(rig);
-    FT840, FT890, FT900: pFT840_FT890_FT900(rig);
-    FT920: pFT920(rig);
-    FT990, FT1000: pFT990_FT1000(rig);
-    FT1000MP: pFT1000MP(rig);
-    FT100: pFT100(rig);
-    FT450, FT950, FT2000, FTDX9000: pFTDX9000(rig);
+    FT767:
+      pFT767(rig);
+    FT736R:
+      pFT736R(rig);
+    FT747GX:
+      pFT747GX(rig);
+    FT817, FT847, FT857, FT897:
+      pFT817_FT847_FT857_FT897(rig);
+    FT840, FT890, FT900:
+      pFT840_FT890_FT900(rig);
+    FT920:
+      pFT920(rig);
+    FT990, FT1000:
+      pFT990_FT1000(rig);
+    FT1000MP:
+      pFT1000MP(rig);
+    FT100:
+      pFT100(rig);
+    FT450, FT950, FT991, FT1200,FT2000, FTDX3000,FTDX5000,FTDX9000:
+      pFTDX9000(rig);
     IC78..IC9100, OMNI6:
       pIcomNew(rig);
 //    pIcom(rig);
