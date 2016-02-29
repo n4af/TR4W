@@ -502,12 +502,14 @@ If (ActiveMode = CW) and (IsCWByCATActive) then      // n4af 4.45.5   proposed t
        begin                                          // second esc clears call
        ActiveRadioPtr^.stopsendingcw;
        Second := True;
-       exit;
+    //    exit;
        end
     else
       begin
-      tCleareCallWindow;      // n4af 4.46.7
+      tCleareCallWindow;      // n4af 4.46.11
+  // initializeqso;              // n4af switch back to full initialize from just clearing window
       Second := False;
+       exit;
       end;                                          // ny4i Issue #111 - Just a bit of code formatting for readability
     end;
 
@@ -723,10 +725,10 @@ begin
 
       if ActiveRadio = RadioOne then
       begin
-        CQRITEnabled := Radio1.RadioModel = TS850;
+        CQRITEnabled := Radio1.RadioModel in KenwoodRadios;
       end
       else
-        CQRITEnabled := Radio2.RadioModel = TS850;
+        CQRITEnabled := Radio2.RadioModel in KenwoodRadios;
       DisplayAutoSendCharacterCount;
       EscapeDeletedCallEntry := CallWindowString;
     end
@@ -792,10 +794,10 @@ begin
 //mults showing up in next QSO
       if ActiveRadio = RadioOne then
       begin
-        CQRITEnabled := Radio1.RadioModel = TS850;
+        CQRITEnabled := Radio1.RadioModel in KenwoodRadios;
       end
       else
-        CQRITEnabled := Radio2.RadioModel = TS850;
+        CQRITEnabled := Radio2.RadioModel in KenwoodRadios;
       DisplayAutoSendCharacterCount;
     end;
   end
@@ -842,10 +844,10 @@ begin
 
       if ActiveRadio = RadioOne then
       begin
-        CQRITEnabled := Radio1.RadioModel = TS850;
+        CQRITEnabled := Radio1.RadioModel in KenwoodRadios;
       end
       else
-        CQRITEnabled := Radio2.RadioModel = TS850;
+        CQRITEnabled := Radio2.RadioModel in KenwoodRadios;
 
         //                  RemoveWindow(ExchangeWindow);
 

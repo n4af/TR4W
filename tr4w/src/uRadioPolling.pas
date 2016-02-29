@@ -2311,7 +2311,7 @@ var
   SleepMs                               : Cardinal;
 begin
 {$IF MASKEVENT}
-  if rig^.RadioModel = TS850 then
+  if rig^.RadioModel in KenwoodRadios then
   begin
     Result := ReadFromCOMPortOnEvent(b, rig);
     Exit;
@@ -2323,7 +2323,7 @@ begin
   c := 0;
   stat.cbInQue := 0;
 
-  if rig^.RadioModel in [IC706..OMNI6] then
+  if rig^.RadioModel in [IC78..IC9100,OMNI6] then
     SleepMs := IcomResponseTimeout
   else
   begin
@@ -2378,7 +2378,7 @@ begin
     if rig.tBuf[b] <> #$0D then goto 1;
   end;
 
-  if rig^.RadioModel in [TS850] then if rig.tBuf[b] <> ';' then goto 1;
+  if rig^.RadioModel in KenwoodRadios then if rig.tBuf[b] <> ';' then goto 1;
 
   if rig^.RadioModel in [IC706..OMNI6] then
   begin
