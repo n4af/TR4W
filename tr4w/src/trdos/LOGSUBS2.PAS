@@ -5126,10 +5126,10 @@ nop
                       mults showing up in next QSO }
                   if ActiveRadio = RadioOne then
                   begin
-                    CQRITEnabled := Radio1.RadioModel = TS850;
+                    CQRITEnabled := Radio1.RadioModel in KenwoodRadios;
                   end
                   else
-                    CQRITEnabled := Radio2.RadioModel = TS850;
+                    CQRITEnabled := Radio2.RadioModel in KenwoodRadios;
 
                   if (TwoRadioState = SendingExchange) then
                         //wli                            CheckTwoRadioState (ContactDone)
@@ -5195,10 +5195,10 @@ nop
 
                   if ActiveRadio = RadioOne then
                   begin
-                    CQRITEnabled := Radio1.RadioModel = TS850;
+                    CQRITEnabled := Radio1.RadioModel in KenwoodRadios;
                   end
                   else
-                    CQRITEnabled := Radio2.RadioModel = TS850;
+                    CQRITEnabled := Radio2.RadioModel in KenwoodRadios;
 
                     //                  RemoveWindow(ExchangeWindow);
 
@@ -5227,10 +5227,10 @@ nop
 
                 if ActiveRadio = RadioOne then
                 begin
-                  CQRITEnabled := Radio1.RadioModel = TS850;
+                  CQRITEnabled := Radio1.RadioModel in KenwoodRadios;
                 end
                 else
-                  CQRITEnabled := Radio2.RadioModel = TS850;
+                  CQRITEnabled := Radio2.RadioModel in KenwoodRadios;
 
                 DisplayAutoSendCharacterCount;
                 {

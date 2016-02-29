@@ -358,6 +358,7 @@ var
   RadioSupportsCWByCAT: InterfacedRadioTypeSet;
   RadioSupportsCWSpeedSync: InterfacedRadioTypeSet;
   ICOMRadios: ICOMRadioTypes;
+  KenwoodRadios: KenwoodRadioTypes;
 
 const
   RTS_DTR_Values_Array                  : array[1..4] of PChar = ('OFF', 'ON', 'CW', 'PTT');
@@ -758,7 +759,9 @@ begin
   end;
 
   case IntRadioType of
-    TS850, K2, K3, FT450, FT950, FT2000, FTDX9000:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,
+    TS950,TS990,TS2000,FLEX,K2,K3,FT450,FT950,FT991,FT1200,FT2000,FTDX3000,
+    FTDX5000,FTDX9000:
       ActiveRadioPtr.WriteBufferToCATPort('RC;');
 
     FT747GX, FT890, FT920, FT990, FT1000, FT1000MP:
@@ -809,7 +812,8 @@ begin
   end;
 
   case IntRadioType of
-    TS850, K2, K3 {, FTDX9000}:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,
+    TS950,TS990,TS2000, K2, K3 {, FTDX9000}:
       ActiveRadioPtr.WriteBufferToCATPort('RU;');
 
     FT890, FT920, FT990, FT1000, FT1000MP:
@@ -847,7 +851,8 @@ begin
   end;
 
   case IntRadioType of
-    TS850, K2, K3 {, FTDX9000}:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,
+    TS950,TS990,TS2000, K2, K3 {, FTDX9000}:
       ActiveRadioPtr.WriteBufferToCATPort('RD;');
 
     FT890, FT920, FT990, FT1000, FT1000MP:
@@ -886,7 +891,8 @@ begin
 
   case IntRadioType of
 
-    TS850:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,
+    TS950,TS990,TS2000,FLEX:
       ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('UP;', 3);
 
     FT450, FT950, FT2000, FTDX9000, K2, K3:
@@ -945,7 +951,8 @@ begin
 
   case IntRadioType of
 
-    TS850:
+    TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,
+    TS950,TS990,TS2000,FLEX:
       ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('DN;', 3);
 
     FT450, FT950, FT2000, FTDX9000, K2, K3:
@@ -1574,8 +1581,13 @@ begin
          begin
           case RadioModel of
             TS480,TS570,TS590,TS950,TS990,TS2000,FLEX:
-               localMsg := Format('KY %-25s;',[Msg]);
-            K2, K3:
+               begin
+               repeat
+                  Msg := Msg + ' ';
+               until length(Msg) = 24;
+               localMsg := Format('KY %s;',[Msg]);
+               end;
+            K2, K3, TS850:                        // TS850 is just here for compatibility--it really does not support CWBYCAT.
                localMsg := Format('KY %s;', [Msg]);
             end; // case
 
@@ -1649,7 +1661,7 @@ begin
       case RadioModel of
          K2,K3:
             AddToOutputBuffer('RX;',3);
-         TS480,TS570,TS590,TS950,TS990,TS2000:
+         TS480,TS570,TS590,TS950,TS990,TS2000,TS850:
             begin
             AddToOutputBuffer('KY0;',4);
             AddToOutputBuffer('RX;',3);
@@ -1711,8 +1723,7 @@ begin
       dwFlagsAndAttributes := FILE_FLAG_OVERLAPPED;
       EvtChar := #13;
     end;
-
-    if RadioModel in [TS850, K2, K3] then
+    if RadioModel in [KenwoodRadios, K2, K3] then
     begin
       dwFlagsAndAttributes := FILE_FLAG_OVERLAPPED;
       EvtChar := ';';
@@ -1735,7 +1746,7 @@ begin
   FreeMem(TimeoutBuffer, sizeof(COMMTIMEOUTS));
 {$IF MASKEVENT}
 
-    if RadioModel in [TS850, K2, K3, Orion] then
+    if RadioModel in [KenwoodRadios, K2, K3, Orion] then
     begin
       if SetCommMask(hand, EV_RXFLAG) then
       begin
@@ -2679,9 +2690,10 @@ var
 const
   ra                                    : array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
-  RadioSupportsCWByCAT := [K2,K3,TS480,TS570,TS590,TS990,TS2000,FLEX,IC7100,IC7300,IC7410,IC7600,IC7700,IC7800,IC7850,IC7851,IC9100,Orion];  // ny4i Issue 119
-  RadioSupportsCWSpeedSync := [K2,K3,TS480,TS570,TS590,TS990,TS2000,FLEX,FT450,FT950,FT991,FT1200,FT2000,FTDX3000,FTDX5000,FTDX9000,IC718,IC746,IC746PRO,IC756PROII,IC756PROIII,IC910,IC7100,IC7200,IC7300,IC7410,IC7600,IC7700,IC7800,IC7850,IC7851,IC9100,Orion];  // ny4i Issue 120
+  RadioSupportsCWByCAT := [TS850,K2,K3,TS480,TS570,TS590,TS990,TS2000,FLEX,IC7100,IC7300,IC7410,IC7600,IC7700,IC7800,IC7850,IC7851,IC9100,Orion];  // ny4i Issue 119
+  RadioSupportsCWSpeedSync := [TS850,K2,K3,TS480,TS570,TS590,TS990,TS2000,FLEX,FT450,FT950,FT991,FT1200,FT2000,FTDX3000,FTDX5000,FTDX9000,IC718,IC746,IC746PRO,IC756PROII,IC756PROIII,IC910,IC7100,IC7200,IC7300,IC7410,IC7600,IC7700,IC7800,IC7850,IC7851,IC9100,Orion];  // ny4i Issue 120
   ICOMRadios := [IC78..IC9100];
+  KenwoodRadios := [TS140,TS440,TS450,TS480,TS570,TS590,TS690,TS850,TS870,TS940,TS950,TS990,TS2000,FLEX];
   for i := 1 to 2 do
   begin
     TempRadio := ra[i];
