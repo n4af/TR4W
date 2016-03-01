@@ -133,7 +133,9 @@ uses
   Switch                                : boolean = False;
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
+  First                                 : boolean = True;
   Second                                : Boolean = False;
+  Third                                 : Boolean = False;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 function DeviceIoControlHandler
@@ -498,21 +500,29 @@ begin
 
 If (ActiveMode = CW) and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
-    If (Not Second) then                           // first esc stops sending
+    If First then                           // first esc stops sending
        begin                                          // second esc clears call
+       First := False;
        ActiveRadioPtr^.stopsendingcw;
        Second := True;
-    //    exit;
+       Exit;
        end
-    else
+     else
+   If Second   then //    tCleareCallWindow;      // n4af 4.46.11
       begin
-      tCleareCallWindow;      // n4af 4.46.11
-  // initializeqso;              // n4af switch back to full initialize from just clearing window
+      initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
       Second := False;
-       exit;
-      end;                                          // ny4i Issue #111 - Just a bit of code formatting for readability
+      Third := True;
+      exit;
+      end
+      else
+    if Third then
+    begin
+    Third := False;
+    Opmode := CQOpMode;  // n4af 4.46.12
+    exit;
     end;
-
+    end;
   //   if TryKillCW then Exit;
 
   scWK_reset; // n4af 4.46.2
@@ -2764,12 +2774,20 @@ begin
 
     menu_insertmode: InvertBooleanCommand(@InsertMode);
 
-    menu_ctrl_SplitOff: PutRadioOutOfSplit(ActiveRadio);  // n4af 4.46.8
-
+    menu_ctrl_SplitOff:
+    begin
+    if not ActiveRadioPtr.CurrentStatus.Split then
+    PutRadioIntoSplit(ActiveRadio)
+    else
+    PutRadioOutOfSplit(ActiveRadio)  // n4af 4.46.13
+    end;
+    
     menu_escape:
       Escape_proc;
     menu_csv:
+    
     ExportToCSV;
+
     menu_inactiveradio_cwspeedup:
       if InActiveRadioPtr.SpeedMemory < (99 - CodeSpeedIncrement) then inc(InActiveRadioPtr.SpeedMemory, CodeSpeedIncrement);
 
@@ -3200,16 +3218,7 @@ begin
 
   if tAutoCQMode then if TryKillAutoCQ then Escape_proc;
 
-{
-  if ActiveMode = CW then
-  begin
-    if TryKillAutoCQ then FlushCWBufferAndClearPTT;
-  end
-  else
-    if ActiveMode = CW then TryKillAutoCQ;
-
-}
-
+// start sending now code
   if Key = StartSendingNowKey then
     if tAutoSendMode = False then
       if OpMode = CQOpMode then
@@ -3217,17 +3226,15 @@ begin
           if CallWindowString <> '' then
 //            if (not StringHas(CallWindowString, '/')) then
           begin
-
             if MessageEnable then
             begin
               CheckInactiveRigCallingCQ;
               AddStringToBuffer(CallWindowString, CWTone);
 //              PTTForceOn;
               tAutoSendMode := True;
-
             end;
           end;
-
+   // autosend code here
   if (tAutoSendMode = True) then
   begin
     if Key = BackSpace then
@@ -3235,9 +3242,9 @@ begin
       if EditingCallsignSent then
       begin
               //        if length(CallWindowString) > 0 then
-        begin
+  {      begin
                 //          Delete(CallWindowString, length(CallWindowString), 1);
-        end
+        end      }
       end
 
       else
@@ -3258,13 +3265,15 @@ begin
       begin
         if IsCWByCATActive then
            begin // Send the character now - No buffering
-      //     if Autocallterminate then
-                      ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
-           if (length(CallWindowString) > AutosendCharacterCount) and autocallterminate then
+       //    if Autocallterminate then   // n4af 4.46.12
+          //            ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
+           if (length(CallWindowString) = AutosendCharacterCount) {and autocallterminate} then //n4af 4.46.12
+          ActiveRadioPtr.SendCW(Key);
+           if autocallterminate then
            processreturn;
            end
         else if wkActive then
-          wkSendByte(Ord(UpCase(Key)))
+   //       wkSendByte(Ord(UpCase(Key)))
         else
           begin
 
@@ -3276,25 +3285,6 @@ begin
       end;
       EditingCallsignSent := False;
     end;
-
-      {
-        if Char(Msg.wParam) = #8 then
-        begin
-          if EditingCallsignSent = False then
-
-          begin
-            //AddStringToBuffer('!', CWTone);
-            CPUKeyer.AddCharacterToCWBuffer('!');
-            //Delete(CallWindowString, length(CallWindowString), 1);
-            EditingCallsignSent := True;
-          end;
-        end
-        else
-        begin
-          CPUKeyer.AddCharacterToCWBuffer(Key);
-          EditingCallsignSent := False;
-        end;
-    }
   end;
   //  CallsignsList.CreatePartialsList(CallWindowString);
   p := wh[mwePossibleCall];
