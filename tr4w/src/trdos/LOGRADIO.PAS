@@ -1584,7 +1584,7 @@ begin
                begin
 
               repeat
-                  Msg := ' ' + msg ;
+                  Msg := ' ' + msg ;  // n4af change buffer order on spaces
                until length(Msg) = 24;
                localMsg := Format('KY %s;',[Msg]);
                end;
