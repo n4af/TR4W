@@ -133,7 +133,7 @@ uses
   Switch                                : boolean = False;
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
-  First                                 : boolean = True;
+  Esc_Counter                           : integer = 0;
   Second                                : Boolean = False;
   Third                                 : Boolean = False;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
@@ -500,29 +500,23 @@ begin
 
 If (ActiveMode = CW) and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
-    If First then                           // first esc stops sending
-       begin                                          // second esc clears call
-       First := False;
-       ActiveRadioPtr^.stopsendingcw;
-       Second := True;
-       Exit;
-       end
-     else
-   If Second   then //    tCleareCallWindow;      // n4af 4.46.11
+                            // Esc always stops sending
+
+       ActiveRadioPtr^.StopSendingCW;
+       InactiveRadioPtr^.StopSendingCW;
+       inc(Esc_counter);
+      end;
+        if Esc_counter > 1 then
       begin
-      initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
-      Second := False;
-      Third := True;
-      exit;
-      end
-      else
-    if Third then
-    begin
-    Third := False;
-    Opmode := CQOpMode;  // n4af 4.46.12
-    exit;
+  //    tCleareCallWindow;      // n4af 4.46.11
+  initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
+      inc(Esc_Counter);
+      Opmode := CQOpMode;  // n4af 4.46.12
+                                   // ny4i Issue #111 - Just a bit of code formatting for readability>>>>>>> a31747af888fbd546de46cd7f4ead476bcc8e842
     end;
-    end;
+      if (Esc_counter > 3) then
+    OpMode := CQOpMode;
+    Esc_counter := 0;
   //   if TryKillCW then Exit;
 
   scWK_reset; // n4af 4.46.2
@@ -1107,8 +1101,8 @@ begin
     if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
     if ActiveMode in [Phone, FM] then SendCrypticMessage(SearchAndPouncePhoneExchange);
     ExchangeHasBeenSent := True;
-if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
-  end;
+ if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
+end;
 
   if TryLogContact then
   begin
@@ -3267,13 +3261,17 @@ begin
            begin // Send the character now - No buffering
        //    if Autocallterminate then   // n4af 4.46.12
           //            ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
-           if (length(CallWindowString) = AutosendCharacterCount) {and autocallterminate} then //n4af 4.46.12
+           if (length(CallWindowString) > AutosendCharacterCount) {and autocallterminate} then //n4af 4.46.12
+          begin
+        { key := CallWindowString;
+          CallWindowString := Key;    }
           ActiveRadioPtr.SendCW(Key);
            if autocallterminate then
            processreturn;
+           end;
            end
         else if wkActive then
-   //       wkSendByte(Ord(UpCase(Key)))
+        wkSendByte(Ord(UpCase(Key)))
         else
           begin
 

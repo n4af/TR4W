@@ -1109,6 +1109,7 @@ begin
   if not Result then Sleep(200);
 end;
 
+
 function RadioObject.AddToOutputBuffer(Buffer: PChar; nNumberOfBytesToWrite: DWORD): LongBool;
 begin
   //  TLogger.GetInstance.Debug('In AddToOutputBuffer');

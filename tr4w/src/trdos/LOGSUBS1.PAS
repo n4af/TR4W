@@ -221,7 +221,6 @@ begin   // 1
     CW:
 
       begin
-   
      SendCrypticCWstring(Message);
      end;
 {$IF MMTTYMODE}
