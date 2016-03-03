@@ -1,25 +1,22 @@
-const
+
   { %s =	ÿetÏzec [string.]}
   { %c =	Znak (v progr.prost¯edÌ)}
   { %d =	»Ìslo (dek.vyj·d¯enÌ}
   { %u =	»Ìslo (prostÈ vyj·d¯enÌ)}
-
+const
   TC_TRANSLATION_LANGUAGE               = '»ESKY';
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
 
-  TC_CALLSIGN                           = 'ZnaËka';
-  TC_CHECKCALLSIGN                      = 'Kontroluj znaËku';
-  TC_FREQUENCYFORCALLINKHZ              = 'KmitoËet pro %s v kHz';
-  TC_DIFVERSION                         = '%s poch·zÌ z jinÈ programovÈ verze.'#13'TR4W oËek·v· programovou verzi %s.'#13'PokouöÌö se ËÌst soubor ve verzi %s.';
-  TC_FILE                               = 'Soubor';
-
-  TC_BAND                               = 'p·smo';
   TC_FREQ                               = 'frekv';
-  TC_DATE                               = 'datum';
   TC_POINTS                             = 'body';
   TC_OP                                 = 'Op';
-  TC_NAME                               = 'jmÈno';
+
+  TC_CHECKCALLSIGN                      = 'Kontroluj znaËku';
+
+  TC_FREQUENCYFORCALLINKHZ              = 'KmitoËet pro %s v kHz';
+  TC_DIFVERSION                         = '%s poch·zÌ z jinÈ programovÈ verze.'#13'TR4W oËek·v· programovou verzi %s.'#13'PokouöÌö se ËÌst soubor ve verzi %s.';
+
 
   TC_M                                  = 'm'; //minuta
   TC_S                                  = 's'; //sekunda
@@ -61,8 +58,8 @@ const
   TC_SPRINTQSYRULE                      = 'PRAVIDLO SPRINT QSY!!';
   TC_PADDLE                             = 'PastiËka';
   TC_FOOTSW                             = 'älapka';
-  TC_LOG_NOTE                           = 'POZN¡MKA';
-  TC_LOG_DELETED                        = 'SMAZ¡NO';
+//  TC_LOG_NOTE                           = 'POZN¡MKA';
+//  TC_LOG_DELETED                        = 'SMAZ¡NO';
 
   TC_SUN                                = 'Ne';
   TC_MON                                = 'Po';
@@ -86,6 +83,7 @@ const
   TC_OPENCONFIGURATIONFILE              = ' - Otev¯e konfiguraËnÌ soubor nebo denÌk z·vodu';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Adres·¯ "%s" jiû existuje.'#13'P¯epsat ?';
   TC_IAMIN                              = '&Moje QTH je %s';
+
   TC_NEWENGLANDSTATEABREVIATION         = 'Zadej zkratku svÈho st·tu pro NEQP'#13'(ME, NH, VT, MA, CT, RI):';
   TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Zadej QTH, kterÈ budeö vysÌlat:';
   TC_ENTERSTATEFORUSPROVINCEFORCANADA   = 'Zadej st·t v USA, nebo provincii v KanadÏ:';
@@ -94,6 +92,7 @@ const
   TC_ENTERYOURCOUNTYCODE                = 'Zadej kÛd svÈho kraje:';
   TC_ENTERYOURDOK                       = 'Zadej sv˘j DOK:';
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Zadej zkratku svÈho okresu (distriktu):';
+  TC_ENTERYOURFOCNUMBER                 = 'Zadej svÈ ËÌslo FOC:';
   TC_ENTERYOURRDAID                     = 'Zadej sv˘j RDA ID:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Zadej svÈ referenËnÌ ËÌslo IOTA:';
   TC_ENTERYOURCITYIDENTIFIER            = 'Zadej identifik·tor svÈho mÏsta:';
@@ -107,7 +106,6 @@ const
   TC_ENTERYOURFOURDIGITGRIDSQUARE       = 'Zadej sv˘j Ëty¯mÌstn˝ WW lok·tor (nap¯. JO70):';
   TC_RFAS                               = 'Zadej svÈ zemÏpisnÈ sou¯adnice:';
   TC_ENTERYOURSIXDIGITGRIDSQUARE        = 'Zadej sv˘j öestimÌstn˝ WW lok·tor (nap¯. JO70ND):';
-  TC_ISLANDSTATION                      = 'Stanice na ostrovÏ (IOTA)';
   TC_ENTERYOURNAMEANDSTATE              = 'Zadej svÈ jmÈno (a st·t, pokud jsi v USA):';
   TC_ENTERYOURNAMEANDQTH                = 'Zadej svÈ jmÈno a QTH (st·t USA, provincii v KanadÏ nebo zemi DXCC):';
   TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Zadej svÈ za¯azenÌ (precedence), sv˘j check'#13'(poslednÌ dvojËÌslÌ roku vyd·nÌ svÈ licence) a sekci ARRL (nap¯. CT):';
@@ -125,7 +123,10 @@ const
   TC_AGECALLSIGNAGE                     = 'zadej sv˘j vÏk (a zaniklou znaËku a vÏk):';
   TC_DEPARTMENT                         = 'zadej sv˘j department:';
   TC_ENTERYOURRDAIDORGRID               = 'zadej svÈ RDA ID (pro stanice UA1A) nebo Ëty¯mÌstn˝ QTH lok·tor:';
+  TC_ENTERYOURBRANCHNUMBER              = 'Zadej svÈ ËÌslo odboËky:';
+  TC_ENTERYOURPOSTCODE                  = 'Zadej svoje PS»:';
 
+  TC_ISLANDSTATION                      = 'Stanice na ostrovÏ (IOTA)';
   TC_NEWENGLAND                         = 'New England';
   TC_CALIFORNIA                         = 'California';
   TC_FLORIDA                            = 'Florida';
@@ -236,12 +237,12 @@ const
   TC_IMPROPERDOMESITCQTHORMISSINGNAME   = 'Nespr·vnÈ domovskÈ QTH nebo chybÌ jmÈno!';
   TC_MISSINGQTHANDORNAME                = 'Sch·zÌ QTH a/nebo jmÈno!';
   TC_NOQSONUMBERFOUND                   = 'Nebylo nalezeno ËÌslo QSO!';
+  TC_IMPROPERZONENUMBER                 = 'Nespr·vn· zÛna!';
+  TC_IMPROPERCONTINENT                  = 'Nespr·vn˝ kontinent!';
   TC_SAVINGTO                           = 'Ukl·d· se %s do %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Soubor byl ˙spÏönÏ uloûen na disketu';
   TC_FILESAVEDTOSUCCESSFULLY            = 'Soubor byl ˙spÏönÏ uloûen do %s';
-  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
-  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
+
 
   {LOGSEND}
 
@@ -254,6 +255,7 @@ const
   TC_C9_EUROPE                          = 'Evropa';
   TC_C9_AFRICA                          = 'Afrika';
   TC_C9_OCEANIA                         = 'Oce·nie';
+  TC_C9_ANTARTICA                       = 'Antarktida';
   TC_C9_ASIA                            = 'Asie';
   TC_C9_UNKNOWN                         = 'Nezn·m˝';
 
@@ -327,7 +329,7 @@ const
 
   {LOGSUBS2}
 
-  TC_WASADUPE                           = '%s bylo duplicitnÌ.';
+//  TC_WASADUPE                           = '%s bylo duplicitnÌ.';
   TC_ALTDCOMMANDDISABLED                = 'P¯Ìkaz Alt-D je blokov·n volbou SINGLE RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'PoslednÌ smazan˝ z·znam v denÌku byl obnoven!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Smazal jsi poslednÌ z·znam v denÌku!  Stiskni ALT-Y k jeho obnovenÌ.';
@@ -476,7 +478,7 @@ const
   TC_RST_PROMPT                         = 'NabÌdka RST';
   TC_SEND_CALLASSETBYMYCALLCOMMAND      = 'VysÌlej znaËku podle p¯Ìkazu MY CALL';
   TC_REPEATRSTSENT                      = 'Opakuj vyslanÈ RST';
-
+ {
   TC_HALFSPACE                          = 'PoloviËnÌ mezera';
   TC_LASTQSOSCALL                       = 'ZnaËka z poslednÌho QSO';
   TC_RECEIVEDNAME                       = 'P¯ijatÈ jmÈno';
@@ -507,28 +509,77 @@ const
   TC_TOGGLESSENDINGSENDING              = 'P¯epne vysÌl·nÌ ó vysÌl·nÌ bez p¯Ìposlechu - CW';
   TC_TOGGLESMODEBETWEENCWANDSSB         = 'ZamÏnÌ mÛdy CW a SSB';
   TC_RUNXXAPPLICATION                   = 'Spusù aplikaci xx';
-
+ }
   {UCHECKLATESTVERSION}
   TC_VERSIONONSERVER                    = 'PoslednÌ verze na serveru je ';
   TC_THISVERSION2                       = 'AktivnÌ verze je ';
   TC_DOWNLOADIT                         = 'M· se st·hnout poslednÌ verze?';
 
-  TC_IMPROPERZONENUMBER                 = 'nespr·vn· zÛna!';
-
-  RC_OPERATOR                           = 'Oper·tor';
   TC_LIST_OF_COMMAND                    = '&Seznam p¯Ìkaz˘';
-  TC_ENTERYOURBRANCHNUMBER              = 'Zadej svÈ ËÌslo odboËky:';
-  TC_ENTERYOURPOSTCODE                  = 'Zadej svoje PS»:';
 
+  RC_VIEWEDITLOG2                       = 'Zobraz / edituj denÌk';
+  RC_CT1BOHIS2                          = 'ZobrazenÌ info CT1BOH';
+  RC_BANDPLAN                           = 'RozdÏlenÌ p·sem';
   CLOSE_WORD                            = 'Zav¯i';
   CANCEL_WORD                           = 'Zruö';
   HELP_WORD                             = 'N·povÏda';
   OK_WORD                               = 'OK';
   EXIT_WORD                             = 'Konec';
+  RC_LISTOFMESS                         = 'seznam zpr·v';
+  RC_STATIONINFO                        = '⁄daje pro z·hlavÌ denÌku';
+  RC_DUPECHECKOAR                       = 'Kontrola spojenÌ na neaktivnÌm RIGu';
+
+  RC_MEMPROGFUNC                        = 'Funkce programov·nÌ pamÏtÌ';
+  RC_PRESS_C                            = 'Stiskni &C\n pro programov·nÌ pamÏtÌ v mÛdu CQ.';
+  RC_PRESS_E                            = 'Stiskni &E\n pro programov·nÌ pamÏtÌ v mÛdech EX(change) a S&P.';
+  RC_PRESS_O                            = 'Stiskni &O\n pro programov·nÌ ostatnÌch pamÏtÌ.';
+
+  RC_SENDINGCW                          = 'VysÌl· se CW z kl·vesnice. ENTER/ESC/F10 pro ukonËenÌ.';
+
+  RC_AUTOCQ2                            = 'Auto-CQ';
+  RC_PRESSMKYWTR                        = 'Stiskni kl·vesu pamÏti, kterou chceö opakovat:';
+  RC_NUMBEROSOLT                        = '»as poslechu v milisekund·ch:';
+  RC_WINCONTROL2                        = 'P¯epÌn·nÌ oken';
+
+  RC_TOOLS                              = 'N·stroje';
+  RC_SYNPCTIME                          = 'Synchronizuj Ëas PC';
+  RC_BEACONSM                           = 'Monitor maj·k˘';
+  RC_WINCONTROL                         = 'P¯epÌn·nÌ oken';
+  RC_SETTIMEZONE                        = 'Nastav Ëasovou zÛnu';
+  RC_PING                               = 'Ping [ADRESA SERVERU]';
+  RC_RUNSERVER                          = 'Spusù TR4WSERVER';
+  RC_DVKVOLCONTROL                      = 'NastavenÌ hlasitosti DVK';
+  RC_RECCONTROL                         = 'NastavenÌ z·znamu';
+  RC_SOUNDRECORDER                      = 'Z·znam zvuku';
+  RC_DISTANCE                           = 'Vzd·lenost';
+  RC_GRID                               = '»tverec (lok·tor)';
+  RC_CALCULATOR                         = 'KalkulaËka';
+  RC_LC                                 = 'V˝poËet LC';
+
+  RC_GETOFFSET                          = 'Udej rozdÌl';
+  RC_LOCALOFFSET                        = 'Chyba mÌstnÌch hodin';
+  RC_NTPSERVER                          = 'NTP Server';
+  RC_SERVERANSWER                       = 'OdpovÏÔ serveru';
+  RC_SYNCLOCK                           = 'Synchronizuj hodiny';
+  RC_LOCALTIME                          = 'MÌstnÌ Ëas';
+  RC_TIMESYN                            = 'Synchronizace Ëasu';
+  RC_SEND                               = '&Vyslat';
+  RC_POSTNOW                            = 'Poöli teÔ';
+  RC_GOTOGS                             = 'Ukaû skÛre';
+  RC_MP3_RECENABLE                      = 'spusù';
+
+  RC_DELETESELSPOT                      = 'Smaû vybran˝ spot';
+  RC_REMOVEALLSP                        = 'Smaû vöechny spoty';
+  RC_SENDINRIG                          = 'Nastav neaktivnÌ RIG na kmitoËet';
+  RC_FILE                               = 'Soubor';
+
+  RC_CLEARLOG                           = 'Vymaû denÌk';
+  RC_OPENLOGDIR                         = 'Otev¯i adres·¯ denÌku';
+
+  RC_OPERATOR                           = 'Oper·tor';
   RC_CALLSIGN                           = 'ZnaËka';
   RC_MODE                               = 'MÛd';
   RC_BAND                               = 'P·smo';
-  RC_FREQUENCY                          = 'KmitoËet';
   RC_APPLY                              = '&Pouûij';
   RC_RESET                              = '&Obnov';
   RC_START                              = 'Start';
@@ -537,17 +588,13 @@ const
   RC_CREATE                             = 'Vytvo¯';
   RC_EDIT_WORD                          = 'Edit';
   RC_POSTSCORETOGS                      = 'Poslat skÛre';
-  RC_POSTNOW                            = 'Poöli';
-  RC_GOTOGS                             = 'Ukaû';
-  RC_FILE                               = 'Soubor';
+
   RC_NEWCONTEST                         = 'Nov˝ z·vod';
-  RC_CLEARLOG                           = 'Vymaû denÌk';
-  RC_OPENLOGDIR                         = 'Otev¯i adres·¯ denÌku';
+
   RC_EXPORT                             = 'Export';
   RC_INIEXLIST                          = 'Seznam v˝chozÌch sout.kÛd˘';
   RC_TRLOGFORM                          = 'Form·t TR Log';
   RC_REPORTS                            = 'Reporty';
-  RC_IMPORT                             = 'Import';
   RC_ALLCALLS                           = 'Vöechny znaËky';
   RC_BANDCHANGES                        = 'ZmÏny p·sma';
   RC_CONTLIST                           = 'QSO podle kontinent˘';
@@ -559,12 +606,10 @@ const
   RC_SUMMARY                            = 'HlaviËka denÌku (Cabrillo)';
   RC_EXIT                               = 'Konec';
   RC_SETTINGS                           = 'NastavenÌ';
+//  RC_CFG_COMMANDS                       = 'KonfiguraËnÌ p¯Ìkazy';
   RC_OPTIONS                            = 'Volba konfiguraËnÌch p¯Ìkaz˘';
-  RC_CFG_COMMANDS                       = 'KonfiguraËnÌ p¯Ìkazy';
   RC_PROGRAMMES                         = 'Programov·nÌ MSG';
   RC_CATANDCW                           = 'NastavenÌ RIG, CAT a port˘ pro CW';
-  RC_RADIOONE                           = 'RIG 1';
-  RC_RADIOTWO                           = 'RIG 2';
   RC_WINDOWS                            = 'Okna';
   RC_BANDMAP                            = 'Bandmapa';
   RC_DUPESHEET                          = 'ZapsanÈ znaËky';
@@ -572,17 +617,18 @@ const
   RC_TRMASTER                           = 'SCP';
   RC_REMMULTS                           = 'Zb˝vajÌcÌ n·sobiËe';
   RC_RM_DEFAULT                         = 'V˝chozÌ';
-  RC_RADIO1                             = 'RIG 1';
-  RC_RADIO2                             = 'RIG 2';
   RC_TELNET                             = 'DX Cluster';
   RC_NETWORK                            = 'SÌù';
   RC_INTERCOM                           = 'Interkom';
-  RC_GETSCORES                          = 'RC_POSTSCORETOGS""';
+//  RC_GETSCORES                          = 'RC_POSTSCORETOGS""';
   RC_STATIONS                           = 'P¯ehled stanic';
   RC_MP3REC                             = 'MP3 rekordÈr';
   RC_QUICKMEM                           = 'Quick Memory';
   RC_MULTSFREQ                          = 'KmitoËty pro n·sobiËe';
   RC_ALARM                              = 'Alarm';
+  RC_ALTP                               = 'Otev¯Ìt F-kl·vesy';
+  RC_ALTX                               = 'Opustit program';
+  RC_CTRLJ                              = 'Otev¯Ìt konfiguraËnÌ p¯Ìkazy';
   RC_AUTOCQRESUME                       = 'NastavenÌ Auto-CQ';
   RC_DUPECHECK                          = 'Kontrola opakovan˝ch QSO';
   RC_EDIT                               = 'Editace v oknÏ QSO';
@@ -637,22 +683,9 @@ const
   RC_SEARCHPOUNCE                       = 'MÛd SP';
   RC_SENDSPOT                           = 'Vyslat spot';
   RC_RESCORE                            = 'P¯epoËÌtat';
-  RC_TOOLS                              = 'N·stroje';
-  RC_SYNPCTIME                          = 'Synchronizuj Ëas PC';
-  RC_BEACONSM                           = 'Monitor maj·k˘';
-  RC_WINCONTROL                         = 'P¯epÌn·nÌ oken';
-  RC_SETTIMEZONE                        = 'Nastav Ëasovou zÛnu';
-  RC_PING                               = 'Ping [ADRESA SERVERU]';
-  RC_RUNSERVER                          = 'Spusù TR4WSERVER';
-  RC_DVPVOLCONTROL                      = 'ÿÌzenÌ hlasitosti DVP';
-  RC_RECCONTROL                         = 'NastavenÌ z·znamu';
-  RC_SOUNDRECORDER                      = 'Z·znam zvuku';
-  RC_DISTANCE                           = 'Vzd·lenost';
-  RC_GRID                               = '»tverec (lok·tor)';
-  RC_CALCULATOR                         = 'KalkulaËka';
-  RC_LC                                 = 'V˝poËet LC';
+
   RC_NET                                = 'SÌù';
-  RC_TIMESYN                            = 'Synchronizace Ëasu';
+
   RC_SENDMESSAGE                        = 'Vyöli MSG';
   RC_SYNLOG                             = 'Porovnej a synchronizuj denÌky';
   RC_CLEARALLLOGS                       = 'Vymaû vöechny denÌky v sÌti';
@@ -663,32 +696,18 @@ const
   RC_EDITQSO                            = 'Edituj QSO';
   RC_DELETED                            = '&Smaz·no';
   RC_DUPE                               = 'duplicitnÌ';
-  RC_LOGSEARCH                          = 'Prohledat denÌk';
+//  RC_LOGSEARCH                          = 'Prohledat denÌk';
   RC_SEARCH                             = '&Hled·nÌ';
-  RC_GETOFFSET                          = 'Udej rozdÌl';
-  RC_LOCALOFFSET                        = 'Chyba mÌstnÌch hodin';
-  RC_NTPSERVER                          = 'NTP Server';
-  RC_SERVERANSWER                       = 'OdpovÏÔ serveru';
-  RC_SYNCLOCK                           = 'Synchronizuj hodiny';
-  RC_LOCALTIME                          = 'MÌstnÌ Ëas';
-  RC_DUPESHEET2                         = 'Seznam QSO';
-  RC_SENDSPOT2                          = 'Vyöli spot';
+
+//  RC_DUPESHEET2                         = 'Seznam QSO';
+//  RC_SENDSPOT2                          = 'Vyöli spot';
   RC_CONTESTNAMEIC                      = 'N·zev Z&·vodu';
-  RC_SEND                               = '&Vyslat';
   RC_COMMENT                            = 'Koment·¯';
-  RC_SENDINGCW                          = 'VysÌl· se CW z kl·vesnice. ENTER/ESC/F10 pro ukonËenÌ.';
   RC_RETURNTOMOD                        = 'Uprav';
   RC_ARROWTOSELIT                       = 'Vyber akci pomocÌ prvnÌho pÌsmena, öipkami nebo kl·vesou PageUp/PageDwn.';
   RC_ALTW                               = 'Uloû (Alt-&W)';
   RC_ALTN                               = 'Do &sÌtÏ';
   RC_ALTG                               = 'Uloû vöe (Alt-&G)';
-  RC_BANDMAP2                           = 'Bandmapa';
-  RC_AUTOCQ2                            = 'Auto-CQ';
-  RC_PRESSMKYWTR                        = 'Stiskni kl·vesu pamÏti, kterou chceö opakovat:';
-  RC_NUMBEROSOLT                        = '»as poslechu v milisekund·ch:';
-  RC_DELETESELSPOT                      = 'Smaû vybran˝ spot';
-  RC_REMOVEALLSP                        = 'Smaû vöechny spoty';
-  RC_SENDINRIG                          = 'Nastav neaktivnÌ RIG na kmitoËet';
   RC_COAX                               = 'V˝poËet dÈlky koax. kabelu';
   RC_ENTERTNHINIK                       = 'Zadej p¯ÌötÌ pr˘chod nejvyööÌ impedance nulou v kHz:';
   RC_ENTERALIFIK                        = 'Zadej kmitoËet nejniûöÌ impedance v kHz:';
@@ -703,16 +722,13 @@ const
   RC_INDUCANCE                          = 'IndukËnost, uH';
   RC_CAPACITANCE                        = 'Kapacita, pf';
   RC_FREQOFRES                          = 'RezonanËnÌ kmitoËet, kHz';
-  RC_WINCONTROL2                        = 'P¯epÌn·nÌ oken';
+
   RC_SHOWMENU                           = '&Zobraz menu';
   RC_RECVQTC                            = 'P¯Ìjem QTC';
   RC_MIXWINTERFACE                      = 'RozhranÌ MixW';
   RC_CONNECTTOMIXW                      = 'P¯ipoj k MixW';
-  RC_MEMPROGFUNC                        = 'Funkce programov·nÌ pamÏtÌ';
-  RC_PRESS_C                            = 'Stiskni &C\n pro programov·nÌ pamÏtÌ v mÛdu CQ.';
-  RC_PRESS_E                            = 'Stiskni &E\n pro programov·nÌ pamÏtÌ v mÛdech EX(change) a S&P.';
-  RC_PRESS_O                            = 'Stiskni &O\n pro programov·nÌ ostatnÌch pamÏtÌ.';
-  RC_SYNLOG2                            = 'Synchronizuj denÌk';
+
+//  RC_SYNLOG2                            = 'Synchronizuj denÌk';
   RC_GETSERVLOG                         = '&Otev¯i denÌk na serveru';
   RC_RECVRECORDS                        = 'P¯ijatÈ z·znamy:';
   RC_SENDRECORDS                        = 'OdeslanÈ z·znamy:';
@@ -720,19 +736,18 @@ const
   RC_RECVBYTES                          = 'P¯ijato (Byt˘):';
   RC_RECVQSOS                           = 'P¯ijato QSO:';
   RC_SHOWSERVLOGC                       = 'Zobraz obsah denÌku ze serveru';
-  RC_VIEWEDITLOG2                       = 'Zobraz / edituj denÌk';
-  RC_INTERCOM2                          = 'Interkom';
+
+//  RC_INTERCOM2                          = 'Interkom';
   RC_DIFFINLOG                          = 'RozdÌly v denÌcÌch';
   RC_ARCFILTER                          = 'Filtr p·smo-mÛd ARC spot˘';
   RC_DXSFILTER                          = 'Filtr p·smo-mÛd DXSpideru';
-  RC_CLEARFILTER                        = 'Vypni filtr';
+  RC_CLEARFILTER                        = 'Vynuluj filtr';
   RC_STATIONS2                          = 'Stanice';
   RC_C_EDITQSO                          = 'Edituj QSO ';
   RC_C_DELETEQSO                        = 'Smaû QSO';
-  RC_COPYTOCLIP                         = 'KopÌruj na monitor';
-  RC_DUPECHECKOAR                       = 'Kontrola spojenÌ na neaktivnÌm RIGu';
-  RC_WINKEYSET                          = 'NastavenÌ pro Winkeyer';
-  RC_CT1BOHIS2                          = 'ZobrazenÌ info CT1BOH';
+  RC_COPYTOCLIP                         = 'KopÌruj do schr·nky';
+
+//  RC_WINKEYSET                          = 'NastavenÌ pro Winkeyer';
   RC_DATE                               = 'Datum';
   RC_NUMBERSENT                         = 'VyslanÈ ËÌslo';
   RC_NUMBERRCVD                         = 'P¯ijatÈ ËÌslo';
@@ -753,9 +768,7 @@ const
   RC_DAQSLINT                           = 'Zmenöit interval pro aut.potvrzenÌ';
   RC_ADDINFO                            = 'DalöÌ info';
   RC_AI_QSONUMBER                       = '»Ìslo QSO';
-  RC_AI_CALLSIGN                        = 'ZnaËka';
   RC_AI_CWSPEED                         = 'Rychlost CW';
-  RC_AI_BAND                            = 'P·smo';
   RC_CLEARMSHEET                        = 'Smaû seznam n·sobiË˘';
   RC_WIKI                               = 'On-line dokumentace (rusky)';
   RC_NET_CLDUPE                         = 'Smaû seznamy QSO ve vöech denÌcÌch';
@@ -766,23 +779,23 @@ const
   RC_DESCRIPTION                        = 'Popis:';
   RC_DEVICEMANAGER                      = 'Spr·vce za¯ÌzenÌ (PC)';
   RC_SHDX_CALLSIGN                      = 'SH/DX [znaËka]';
-  RC_STATIONINFO                        = '⁄daje pro z·hlavÌ denÌku';
-  RC_MP3_RECENABLE                      = 'spusù';
+
   RC_PLAY                               = '&p¯ehr·vat';
-  RC_LISTOFMESS                         = 'seznam zpr·v';
-  RC_LOGIN                              = 'z·pis';
+
+  RC_LOGIN                              = 'p¯ihl·sit';
   RC_SYNCHRONIZE                        = 'Synchronizovat';
   RC_GET_OFFSET                         = 'zadej offset';
   RC_COLORS                             = 'Barvy';
   RC_APPEARANCE                         = 'Podrobnosti';
-  RC_BANDPLAN                           = 'RozdÏlenÌ p·sma';
+
   RC_WA7BNM_CALENDAR                    = 'Kalend·¯ z·vod˘ WA7BNM';
-  RC_SEND_BUG                           = 'vyöli seznam chyb';
+  RC_SEND_BUG                           = 'odeslat seznam chyb';
   RC_HOMEPAGE                           = 'Dom·cÌ str·nky TR4W';
-  TC_ENTERYOURFOCNUMBER                 = 'Zadej svÈ ËÌslo FOC:';
-  TC_IMPROPERCONTINENT                  = 'Nespr·vn˝ kontinent!';
-  TC_C9_ANTARTICA                       = 'Antarktida';
-  RC_DVKVOLCONTROL                      = 'NastavenÌ hlasitosti DVK';
-  RC_ALTP                               = 'Otev¯Ìt F-kl·vesy';
-  RC_ALTX                               = 'Opustit program';
-  RC_CTRLJ                              = 'Otev¯Ìt konfiguraËnÌ p¯Ìkazy';
+  RC_FREQUENCY                          = 'KmitoËet';
+  TC_SPLIT_WARN                       = 'POZOR: Pracujete v reûimu SPLIT!';
+{FD Additions NY4I}
+
+TC_IMPROPERTRANSMITTERCOUNT = 'vysÌlaËe p¯i Field Day musÌ b˝t mezi 1 aû 99.';
+TC_IMPROPERARRLFIELDDAYCLASS = 'kategorie p¯i Field Day musÌ b˝t A, B, C, D, E nebo F.';
+TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'sout. kÛd DX stanice musÌ b˝t "DX".';
+RC_SPLITOFF                       = 'Vynucen˝ reûim Split VYPNUT';
