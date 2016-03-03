@@ -625,7 +625,9 @@ begin
   BandMapMode := ActiveMode; {KK1L: 6.69}
   {DisplayBandMap;}{KK1L: 6.71 Removed because UpdateTimeAndRateDisplays in LOGWIND covers it.}
   VisibleDupeSheetChanged := True;
-  ShowInformation // n4af 4.40.2
+  ShowInformation; // n4af 4.40.2
+  ActiveRadioPtr.active := true;
+  InactiveRadioPtr.active := false;
 end;
 
 procedure ExchangeRadios; {KK1L: 6.71}

@@ -222,7 +222,7 @@ begin
    { In CWByCat, we need to know when the radio actually stops sending so we can start the timer then.
     The radio has to support a way to interrogate if it is transmitting after we send a cw string.
     We can poll the TX status of the radio  or use the TB command in the K3 which is the number of characters remaining
-    to be sent. If we poll with a TB;, then we wuill get back TB<t><rr><s>, where t (0-9) is the count of characters
+    to be sent. If we poll with a TB;, then we will get back TB<t><rr><s>, where t (0-9) is the count of characters
     from the KY command remaining to be sent.<rr> is the count of characters remaining in the buffer 00-40  and I think s
     is a variable length string of the characters that remain. This would only work with a K3 or radio that has a similar feature.
     - The real issue is this is received long after we have issued the command so in the regular poling
@@ -304,7 +304,11 @@ end;
 
 function CWStillBeingSent: boolean;
 begin
-  if wkActive then
+  if ISCWByCATActive then
+     begin
+     Result := ActiveRadioPtr.CWByCAT_Sending;
+     end
+  else if wkActive then
   begin
     Result := wkBUSY;
     Exit;
@@ -326,6 +330,12 @@ procedure FlushCWBuffer;
 
 begin
 //  CPUKeyer.PTTUnForce;
+  if IsCWByCATActive then
+     begin
+     DebugMsg('Flushing CWBuffer - Stop Sending on ActiveRadio CWBC');
+     ActiveRadioPtr.StopSendingCW;
+     end;
+
   tAutoSendMode := False;
   CPUKeyer.FlushCWBuffer;
 //  if wkActive then wkClearBuffer;    // Gav    remove

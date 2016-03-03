@@ -2157,7 +2157,17 @@ begin
     end;
   end
   else
-  begin
+  begin   // Inactive Radio Processing
+
+    if IsCWByCATActive(rig) then
+       begin
+       if not rig.FilteredStatus.TXOn then
+          begin
+          DebugMsg('rig.CWByCAT_Sending set to FALSE - Inactive radio');
+          rig.CWByCAT_Sending := false;
+          end;
+       end;
+       
     if TuneDupeCheckEnable then
     begin
       SpotsList.TuneDupeCheck(rig.FilteredStatus.Freq);
@@ -2613,6 +2623,8 @@ begin
      begin
      if IsCWByCATActive then
         begin
+        ActiveRadioPtr.CWByCAT_Sending := false; // If we were sending but the PTT goes off, now reset this.
+        DebugMsg('ActiveRadioPtr.CWByCAT_Sending set to FALSE');
         tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
         end;
      if tr4w_PTTStartTime <> 0 then
