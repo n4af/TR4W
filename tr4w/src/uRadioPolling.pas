@@ -2107,6 +2107,14 @@ procedure ProcessFilteredStatus(rig: RadioPtr);
 var
   dif                                   : integer;
 begin
+   if IsCWByCATActive(rig) then
+       begin
+       if not rig.FilteredStatus.TXOn then
+          begin
+          DebugMsg('rig.CWByCAT_Sending set to FALSE - ' + rig.RadioName);
+          rig.CWByCAT_Sending := false;
+          end;
+       end;
   if rig = ActiveRadioPtr then
   begin
     dif := Abs(rig.FilteredStatus.Freq - rig.LastDisplayedFreq);
@@ -2159,7 +2167,7 @@ begin
   else
   begin   // Inactive Radio Processing
 
-    if IsCWByCATActive(rig) then
+   { if IsCWByCATActive(rig) then
        begin
        if not rig.FilteredStatus.TXOn then
           begin
@@ -2167,7 +2175,7 @@ begin
           rig.CWByCAT_Sending := false;
           end;
        end;
-       
+    }
     if TuneDupeCheckEnable then
     begin
       SpotsList.TuneDupeCheck(rig.FilteredStatus.Freq);
