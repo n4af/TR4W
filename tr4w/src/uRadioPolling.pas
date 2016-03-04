@@ -2111,7 +2111,7 @@ begin
        begin
        if not rig.FilteredStatus.TXOn then
           begin
-          DebugMsg('rig.CWByCAT_Sending set to FALSE - ' + rig.RadioName);
+          DebugMsg('rig.CWByCAT_Sending set to FALSE - ' + rig.RadioName + ' (' + InterfacedRadioTypeSA[rig.RadioModel] + ')');
           rig.CWByCAT_Sending := false;
           end;
        end;

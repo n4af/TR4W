@@ -138,7 +138,7 @@ begin
   NumberCharsBeingSent := 0;
 
   CommandMode := False;
-
+  DebugMsg('CrypticCWString = [' + SendString + ']');
   //    FOR CharacterCount := 1 TO Length (SendString) DO
   CharacterCount := 1;
   repeat

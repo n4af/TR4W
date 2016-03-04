@@ -1715,7 +1715,8 @@ begin
                         begin
 
                         repeat
-                           Msg := ' ' + msg;  // n4af change buffer order on spaces
+                             Msg := msg + ' '; // ny4i put back to test
+                          // Msg := ' ' + msg;  // n4af change buffer order on spaces
                         until length(Msg) = 24;
                         localMsg := Format('KY %s;', [Msg]);
                         end;
@@ -1730,21 +1731,25 @@ begin
                   //DebugMsg('Sending to K3='+localMsg);
                   if Self.active then
                      begin
+                     DebugMsg('Sending on ACTIVE radio ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
                      if InactiveRadioPtr.CWByCAT_Sending then
                         begin
+                        DebugMsg('Stopping sending CW on INACTIVE ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
                         InactiveRadioPtr.StopSendingCW;
                         end;
                      end
                   else // Inactive
                      begin
+                     DebugMsg('Sending on INACTIVE radio ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
                      if ActiveRadioPtr.CWByCAT_Sending then
                         begin
+                        DebugMsg('Stopping sending CW on ACTIVE ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
                         ActiveRadioPtr.StopSendingCW;
                         end;
                      end;
                   AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
                   Self.CWByCAT_Sending := true;
-                  DebugMsg('Self.CWByCAT_Sending set to TRUE - Kenwood, et. al.');
+                  DebugMsg('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
                   end;
          end;
       rtYaesu1:

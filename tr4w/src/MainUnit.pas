@@ -126,6 +126,7 @@ uses
   LOGWAE,
   LogWind,
   Tree,
+  SysUtils,
   ZoneCont
   ;
 
@@ -1363,7 +1364,7 @@ end;
 
 procedure ShowSyserror(ErrorCode: Cardinal);
 begin
-  MessageBox(0, SysErrorMessage(ErrorCode), tr4w_ClassName, MB_OK or MB_ICONERROR or MB_TASKMODAL);
+  MessageBox(0, TF.SysErrorMessage(ErrorCode), tr4w_ClassName, MB_OK or MB_ICONERROR or MB_TASKMODAL);
 end;
 
 function YesOrNo(h: HWND; Text: PChar): integer;
@@ -5557,7 +5558,7 @@ begin
   RunningConfigFile := True;
   ClearDupeSheetCommandGiven := False;
   FirstCommand := False;
-  if FileExists(@f[1]) then
+  if utils_file.FileExists(@f[1]) then
   LoadInSeparateConfigFile(f, FirstCommand, MyCall);
   if ClearDupeSheetCommandGiven then tClearDupesheet;
   RunningConfigFile := False;
@@ -6887,7 +6888,7 @@ begin
     FreeLibrary(module);
     goto Next;
   end;
-  FindClose(hFindFile);
+  Windows.FindClose(hFindFile);
   if LoadedPlugins > 0 then
     Windows.InsertMenu(tr4w_main_menu, menu_exit, MF_BYCOMMAND or MF_SEPARATOR, 0, nil);
 
@@ -7061,9 +7062,14 @@ begin
 end;
 
 procedure DebugMsg(s: string);
+{$IF NEWER_DEBUG}
+var formattedDate: string;
+{$IFEND}
 begin
 {$IF NEWER_DEBUG}
-   AddStringToTelnetConsole(PChar(s),tstAlert);
+   LongTimeFormat := 'hh nn ss (zzz)';
+   DateTimeToString(formattedDate, 'tt', Now);
+   AddStringToTelnetConsole(PChar('[' + formattedDate + '] ' + s),tstSend);
 {$IFEND}
 end;
 
