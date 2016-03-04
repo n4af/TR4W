@@ -799,3 +799,4 @@ TC_IMPROPERTRANSMITTERCOUNT = 'vysílaèe pøi Field Day musí být mezi 1 až 99.';
 TC_IMPROPERARRLFIELDDAYCLASS = 'kategorie pøi Field Day musí být A, B, C, D, E nebo F.';
 TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'sout. kód DX stanice musí být "DX".';
 RC_SPLITOFF                       = 'Vynucený režim Split VYPNUT';
+RC_IMPORT                             = 'Import';

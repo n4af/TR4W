@@ -800,3 +800,5 @@ const
   RC_FREQUENCY                          = 'Frekvencija';
   RC_DVKVOLCONTROL                      = 'Regulacija nivoa DVK';
   TC_ISLANDSTATION                      = 'Ostrvska stanica';
+  RC_SPLITOFF                       = 'Toggle Split ON/OFF';
+   TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
