@@ -2632,7 +2632,7 @@ begin
      if IsCWByCATActive then
         begin
         ActiveRadioPtr.CWByCAT_Sending := false; // If we were sending but the PTT goes off, now reset this.
-        DebugMsg('ActiveRadioPtr.CWByCAT_Sending set to FALSE');
+        DebugMsg('[Active] CWByCAT_Sending set to FALSE - ' + ActiveRadioPtr.RadioName + ' (' + InterfacedRadioTypeSA[ActiveRadioPtr.RadioModel] + ')');
         tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
         end;
      if tr4w_PTTStartTime <> 0 then

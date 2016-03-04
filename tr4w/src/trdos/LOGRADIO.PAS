@@ -1736,6 +1736,7 @@ begin
                         begin
                         DebugMsg('Stopping sending CW on INACTIVE ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
                         InactiveRadioPtr.StopSendingCW;
+                        sleep(500); // Give command chance to complete
                         end;
                      end
                   else // Inactive
