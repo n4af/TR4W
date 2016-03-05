@@ -1715,8 +1715,8 @@ begin
                         begin
 
                         repeat
-                             Msg := msg + ' '; // ny4i put back to test
-                          // Msg := ' ' + msg;  // n4af change buffer order on spaces
+                          //   Msg := msg + ' '; // ny4i put back to test
+                           Msg := ' ' + msg;  // n4af change buffer order on spaces
                         until length(Msg) = 24;
                         localMsg := Format('KY %s;', [Msg]);
                         end;

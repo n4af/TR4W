@@ -205,9 +205,6 @@ const
   TC_SAVINGTO                           = '%s-ийг %s руу хуулж байна';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Файлыг флоппи руу амжилттай бичлээ';
   TC_FILESAVEDTOSUCCESSFULLY            = '%s руу файлыг амжилттай бичлээ';
-  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
-  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
   {LOGSEND}
   TC_WAITINGFORYOUENTERSTRENGTHOFRST    = 'RST-ийн сигналын (S) хэмжээг оруулна уу (Нэг оронтой шvv)!!';
   {COUNTRY9}
@@ -567,7 +564,7 @@ const
   RC_SAVEINFOLDER  			 			= 'Хавтас нээж хадгалах уу  (огноо,тэмцээн, дуудлага)';
   RC_CONFFILE                           = 'Тохируулгын файл';
   RC_EDITQSO                            = 'Холбоогоо засварлах';
-  RC_DELETED                            = '&Устгасан';
+  RC_DELETED                            = '&Устгах';
   RC_DUPE                               = 'Давтагдсан ХОЛБОО!!!';
   RC_LOGSEARCH                          = 'Дуудлага хайх';
   RC_SEARCH                             = '&Хайх';
@@ -603,8 +600,8 @@ const
   RC_FIRSTGRID                          = 'Эхний гридлокатор';
   RC_EURVHFDIST                         = 'Хоёр VHF станцын зай:';
   RC_GRIDOFAGLL                         = 'Координатыг Гридлокатор болгох';
-  RC_LONGMIE                            = 'Уртраг (- тэмдэгтэй бол зvvн)';
-  RC_LATMIS                             = 'Оргорог (- тэмдэгтэй бол омнод)';
+  RC_LONGMIE                            = 'Уртраг (- тэмдэгтэй бол ЗYYH)';
+  RC_LATMIS                             = 'Оргорог (- тэмдэгтэй бол OMHOД)';
   RC_CALCOFCORI                         = 'Багтаамж, индукцийг тооцоолох';
   RC_INDUCANCE                          = 'Индукц, uH';
   RC_CAPACITANCE                        = 'Багтаамж, pf';
@@ -696,5 +693,10 @@ const
   RC_ALTP                               = 'Функцийн товчнуудыг програмчлах';
   RC_ALTX                               = 'Програмаас гарах';
   TC_IRELAND                            = 'Ирланд';
-TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
- RC_SPLITOFF                       = 'Toggle Split ON/OFF';
+  TC_SPLIT_WARN                         = 'Анхаар!: Та SPLIT MODE дээр байна ш??!';
+{FD Additions NY4I}
+ 
+  TC_IMPROPERTRANSMITTERCOUNT           = 'FD нэвтрvvлэгчvvд 1-ээс 99-ийн хооронд байна';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day-ын ангилал A, B, C, D, E, F байна';
+  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX станц "DX" гэж нэвтрvvлнэ';
+  RC_SPLITOFF                           = 'SPLIT-ийг залгах ба салгах ON/OFF';

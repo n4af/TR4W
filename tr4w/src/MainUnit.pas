@@ -1102,11 +1102,12 @@ begin
   if MessageEnable and (not ExchangeHasBeenSent) and (not BeSilent) and MessageEnable then
   begin
     if ActiveMode = Digital then SendMessageToMixW('<TX>');
-    if ActiveMode in [CW, Digital] then if not SendCrypticMessage(SearchAndPounceExchange) then Exit;
+    if ActiveMode in [CW, Digital] then if (not SendCrypticMessage(SearchAndPounceExchange)) then Exit;
     if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
     if ActiveMode in [Phone, FM] then SendCrypticMessage(SearchAndPouncePhoneExchange);
     ExchangeHasBeenSent := True;
- if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
+    sleep(2000);
+ if (activeradioptr^.cwbycat) and (not activeradioptr.CWBYCAT_Sending) then backtoinactiveradioafterqso;
 end;
 
   if TryLogContact then
@@ -1659,6 +1660,7 @@ var
   RadioToSet                            : RadioPtr {RadioType};
 begin
   begin
+  Freq := 0;
     Freq := QuickEditFreq(TC_TRANSMITFREQUENCYKILOHERTZ, 10);
 
     RadioToSet := ActiveRadioPtr {ActiveRadio};
@@ -1669,6 +1671,8 @@ begin
       RadioToSet := InActiveRadioPtr {InactiveRadio};
     end;
 
+    if (Freq = 0) then PutRadioOutOfSplit(ActiveRadio);
+    
     if (Freq > 1000) and (Freq < 1000000) then
       case RadioToSet.BandMemory {BandMemory[RadioToSet]} of
         Band80: Freq := Freq + 3000000;
@@ -2775,10 +2779,14 @@ begin
 
     menu_ctrl_SplitOff:
     begin
+   { QuickDisplay('Enter frequency in khz: ');
     if not ActiveRadioPtr.CurrentStatus.Split then
     PutRadioIntoSplit(ActiveRadio)
     else
     PutRadioOutOfSplit(ActiveRadio)  // n4af 4.46.13
+   }
+
+    tr4w_alt_n_transmit_frequency ;
     end;
     
     menu_escape:
@@ -3210,8 +3218,11 @@ var
   itempos                               : integer;
   p                                     : HWND;
   c                                     : HWND;
-  //localMsg                              : string;
+  i                                     : integer;
+label
+wait;
 begin
+i := 0;
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
 
@@ -3262,19 +3273,30 @@ begin
     begin
       if Key <> StartSendingNowKey then
       begin
-        if IsCWByCATActive then
+         if IsCWByCATActive then
            begin // Send the character now - No buffering
-       //    if Autocallterminate then   // n4af 4.46.12
-          //            ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
-           if (length(CallWindowString) > AutosendCharacterCount) {and autocallterminate} then //n4af 4.46.12
-          begin
-        { key := CallWindowString;
-          CallWindowString := Key;    }
+           if (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
+          ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
+          if (length(CallWindowString) = AutosendCharacterCount)  then
+          processreturn;
+
+          if (length(CallWindowString) = (AutosendCharacterCount+1)) then  // hit additional key(s)
+           begin
           ActiveRadioPtr.SendCW(Key);
-           if autocallterminate then
-           processreturn;
+          if (length(CallWindowString) = AutosendCharacterCount+1) then
+           exit;
+         //  processreturn       // autosend switch from call to exch window when sending donecw
+
+           if (length(CallWindowString) = (AutosendCharacterCount+2)) then  // hit additional key(s)
+           begin
+          ActiveRadioPtr.SendCW(Key);
+          if (length(CallWindowString) = AutosendCharacterCount+2) then
+
+           processreturn       // autosend switch from call to exch window when sending donecw
            end;
-           end
+
+            end;
+          end
         else if wkActive then
         wkSendByte(Ord(UpCase(Key)))
         else
@@ -3290,7 +3312,7 @@ begin
     end;
   end;
   //  CallsignsList.CreatePartialsList(CallWindowString);
-  p := wh[mwePossibleCall];
+  p  := wh[mwePossibleCall];
   c := wh[mweCall];
   if not InsertMode then EditSetSelLength(c, 1);
 

@@ -3176,7 +3176,7 @@ end;
 
 procedure BackToInactiveRadioAfterQSO;
 begin
-  if (ActiveRadioPtr^.tTwoRadioMode = TR3){ or (ActiveRadioPtr^.tTwoRadioMode = TR2)} then
+  if (ActiveRadioPtr^.tTwoRadioMode = TR3) or (ActiveRadioPtr^.tTwoRadioMode = TR2) then
   begin
     tClearDupeInfoCall;
     ActiveRadioPtr^.tTwoRadioMode := TR0;
