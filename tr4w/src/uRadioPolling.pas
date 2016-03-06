@@ -101,91 +101,6 @@ const
  
 implementation
 
-{
-procedure pOrionNew(rig: RadioPtr);
-label
-  1;
-var
-  TempMode                         : ModeType;
-begin
-  repeat
-    inc(rig^.tPollCount);
-
-    if rig.OutPutBufferPoiner <> 0 then
-    begin
-      rig.WritePollRequest(rig.OutPutBuffer, rig.OutPutBufferPoiner);
-      Sleep(rig.OutPutBufferPoiner * 10);
-      rig.OutPutBufferPoiner := 0;
-    end;
-
-    if rig.tOrionFreq[0] <> #0 then
-    begin
-      rig.WriteBufferToCATPort(rig.tOrionFreq);
-      Windows.ZeroMemory(@rig.tOrionFreq, SizeOf(rig.tOrionFreq));
-      Sleep(200);
-    end;
-
-    if rig.tOrionMode[0] <> #0 then
-    begin
-      rig.WriteBufferToCATPort(rig.tOrionMode);
-      Windows.ZeroMemory(@rig.tOrionMode, SizeOf(rig.tOrionMode));
-      Sleep(200);
-    end;
-
-    rig.WritePollRequest('?AF'#13, 4);
-    if not ReadFromCOMPortOnEvent(12, rig) then begin ClearRadioStatus(rig); goto 1; end;
-
-//?
-    if rig.tBuf[2] <> 'A' then
-    begin
-      Sleep(500);
-      PurgeComm(rig^.tCATPortHandle, PURGE_RXCLEAR or PURGE_RXABORT);
-      ClearRadioStatus(rig);
-      goto 1;
-    end;
-
-//    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@AF03526900');
-    rig^.CurrentStatus.VFO[VFOA].Frequency := BufferToInt(@rig^.tBuf, 4, 8);
-
-    rig.WritePollRequest('?BF'#13, 4);
-    if not ReadFromCOMPortOnEvent(12, rig) or (rig.tBuf[2] <> 'B') then begin ClearRadioStatus(rig); goto 1; end;
-//    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@BF14173490');
-    rig^.CurrentStatus.VFO[VFOB].Frequency := BufferToInt(@rig^.tBuf, 4, 8);
-
-    rig.WritePollRequest('?KV'#13, 4);
-    if not ReadFromCOMPortOnEvent(7, rig) or (rig.tBuf[2] <> 'K') then begin ClearRadioStatus(rig); goto 1; end;
-//    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@KVAAA');
-
-    if rig.tBuf[4] = 'A' then
-    begin
-      rig^.CurrentStatus.Freq := rig^.CurrentStatus.VFO[VFOA].Frequency;
-      rig^.CurrentStatus.VFOStatus := VFOA;
-    end
-    else
-    begin
-      rig^.CurrentStatus.Freq := rig^.CurrentStatus.VFO[VFOB].Frequency;
-      rig^.CurrentStatus.VFOStatus := VFOB;
-    end;
-    CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, TempMode);
-
-    rig.WritePollRequest('?RMM'#13, 5);
-    if not ReadFromCOMPortOnEvent(6, rig) or (rig.tBuf[2] <> 'R') then begin ClearRadioStatus(rig); goto 1; end;
-//    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@RMM2');
-
-    case rig.tBuf[5] of
-      '0', '1', '4': TempMode := Phone;
-      '2', '3': TempMode := CW;
-      '5': TempMode := FM;
-      '6': TempMode := Digital;
-    end;
-    rig^.CurrentStatus.Mode := TempMode;
-
-    1:
-    UpdateStatus(rig);
-  until rig^.tPollCount < 0;
-end;
-}
-
 procedure pKenwood2(rig: RadioPtr);
 label
   NextWait;
@@ -207,21 +122,7 @@ const
 begin
   repeat
     inc(rig^.tPollCount);
-{
-    if rig.tOrionFreq[0] <> #0 then
-    begin
-      rig.WriteBufferToCATPort(rig.tOrionFreq);
-      Windows.ZeroMemory(@rig.tOrionFreq, SizeOf(rig.tOrionFreq));
-      Sleep(200);
-    end;
 
-    if rig.tOrionMode[0] <> #0 then
-    begin
-      rig.WriteBufferToCATPort(rig.tOrionMode);
-      Windows.ZeroMemory(@rig.tOrionMode, SizeOf(rig.tOrionMode));
-      Sleep(200);
-    end;
-}
     NumberOfSucceffulPolls := 0;
 
     for PollNumber := Low(tKenwoodCommands) to High(tKenwoodCommands) do

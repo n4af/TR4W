@@ -1106,7 +1106,7 @@ begin
     if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
     if ActiveMode in [Phone, FM] then SendCrypticMessage(SearchAndPouncePhoneExchange);
     ExchangeHasBeenSent := True;
- if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
+ //if activeradioptr^.cwbycat then backtoinactiveradioafterqso; // ny4i Issue130 Moving this to after LogContact
 end;
 
   if TryLogContact then
@@ -1122,6 +1122,11 @@ end;
       if OpMode = SearchAndPounceOpMode then SetOpMode(CQOpMode);
     end;
   end;
+
+  if IsCWByCATActive then
+     begin
+     BackToInactiveRadioAfterQSO;
+     end;
 end;
 
 function Send_DE: boolean;
