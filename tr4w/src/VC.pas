@@ -32,7 +32,7 @@ uses
 
 const
   tDebugMode                            = False;
-  NEWER_DEBUG                           = true; // ny4i added this as tDebugMode changes too much.
+  NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
   MMTTYMODE                             = False;
 
 type
@@ -177,7 +177,7 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.47.1' ;     // NY4I
+  TR4W_CURRENTVERSION_NUMBER            = '4.47.3' ;     // NY4I
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
   TR4W_CURRENTVERSIONDATE               = 'Mar  4, 2016' ;

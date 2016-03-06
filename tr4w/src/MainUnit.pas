@@ -131,6 +131,7 @@ uses
   ;
 
   var
+  InSplit                               : boolean = False;
   Switch                                : boolean = False;
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
@@ -1660,6 +1661,12 @@ var
   RadioToSet                            : RadioPtr {RadioType};
 begin
   begin
+  if InSplit then begin
+  PutRadioOutOfSplit(ActiveRadio);
+  PutRadioOutOfSplit(InActiveRadio);
+  InSplit := False;
+  exit;
+  end;
   Freq := 0;
     Freq := QuickEditFreq(TC_TRANSMITFREQUENCYKILOHERTZ, 10);
 
@@ -1672,7 +1679,7 @@ begin
     end;
 
     if (Freq = 0) then PutRadioOutOfSplit(ActiveRadio);
-    
+    if (Freq = -0) then PutRadioOutOfSplit(InactiveRadio);
     if (Freq > 1000) and (Freq < 1000000) then
       case RadioToSet.BandMemory {BandMemory[RadioToSet]} of
         Band80: Freq := Freq + 3000000;
@@ -1690,6 +1697,7 @@ begin
 //      PutRadioIntoSplit(RadioToSet); {KK1L: 6.73}
       RadioToSet.PutRadioIntoSplit;
       SplitFreq := Freq;
+      InSplit := True;
     end;
     BandMapCursorFrequency := Freq; {KK1L: 6.68 Band map tracks transmit freq}
     DisplayBandMap;
@@ -2778,17 +2786,8 @@ begin
     menu_insertmode: InvertBooleanCommand(@InsertMode);
 
     menu_ctrl_SplitOff:
-    begin
-   { QuickDisplay('Enter frequency in khz: ');
-    if not ActiveRadioPtr.CurrentStatus.Split then
-    PutRadioIntoSplit(ActiveRadio)
-    else
-    PutRadioOutOfSplit(ActiveRadio)  // n4af 4.46.13
-   }
-
     tr4w_alt_n_transmit_frequency ;
-    end;
-    
+
     menu_escape:
       Escape_proc;
     menu_csv:
