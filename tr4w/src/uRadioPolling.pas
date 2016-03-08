@@ -2154,16 +2154,15 @@ begin
       ShowFMessages(0);
     end;
 
-    if ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or
-      (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0) then
-    begin
-      SpotsList.DisplayCallsignOnThisFreq(rig.FilteredStatus.Freq);             
-      BandMapCursorFrequency := rig.FilteredStatus.Freq;
-      BandMapBand := ActiveBand;
-      BandMapMode := ActiveMode;
-      DisplayBandMap;
-    end;
-  end
+    if ((dif > 0)  and ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0)) then              // Gav 4.47.4 #015
+          begin
+             SpotsList.DisplayCallsignOnThisFreq(rig.FilteredStatus.Freq);
+             BandMapCursorFrequency := rig.FilteredStatus.Freq;
+             BandMapBand := ActiveBand;
+             BandMapMode := ActiveMode;
+             DisplayBandMap;
+          end;
+    end
   else
   begin   // Inactive Radio Processing
 
@@ -2188,8 +2187,7 @@ begin
 
 //GAV added this section. Changes BandmapBand & Bandmap Mode to follow inactive radio when inactive radio is tuned
 
-    if ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or
-      (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0) then
+    if ((dif > 0)  and ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0)) then       // Gav 4.47.4 #015
     begin
       BandmapBand := rig.FilteredStatus.Band;
       BandMapMode := rig.FilteredStatus.Mode;

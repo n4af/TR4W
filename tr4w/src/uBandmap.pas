@@ -76,6 +76,7 @@ procedure TuneRadioToSpot(Spot: TSpotRecord; Radio: RadioType);
 procedure DeleteSpotFromBandmap;
 procedure ShowSpotInfo;
 procedure ClearSpotInfo;
+procedure KillFocus;                                         // Gav 4.47.4 #141
 procedure SetTextInBMSB(Index: integer; Text: PChar);
 function GetBMSelItemData: integer;
 function NEWBMLBPROC(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): integer; stdcall;
@@ -414,6 +415,7 @@ begin
           204:
             begin
               SpotsList.Clear;
+              KillFocus;                                         // Gav 4.47.4 #141
             end;
           205: If TwoRadioMode then InvertBooleanCommand(@QSYInactiveRadio);   // Gav     4.37.12
 
@@ -428,9 +430,7 @@ begin
             end;
           LBN_KILLFOCUS:
             begin
-              BandMapPreventRefresh := False;         // Gav     4.37.12
-              SpotsList.SendAndClearBuffer;
-              DisplayBandMap;
+              KillFocus;                                         // Gav 4.47.4 #141
             end;
           LBN_SELCHANGE:
             begin
@@ -450,13 +450,8 @@ begin
               begin
                 TuneRadioToSpot(SpotsList.Get(TempInt), ActiveRadio);
               end;
-              BandMapPreventRefresh := False;          //Gav 4.45.6
-              SpotsList.SendAndClearBuffer;             //Gav 4.45.6
-              DisplayBandMap;                       //Gav 4.45.6
-              Windows.SetFocus(wh[mweCall]);    // n4af 4.38.2
+              KillFocus;                                  // Gav 4.47.4 #141
             end;
-          //            TuneOnSpotFromBandmap;
-
         end;
       end;
     WM_CLOSE: 1: CloseTR4WWindow(tw_BANDMAPWINDOW_INDEX);
@@ -641,7 +636,6 @@ begin
   i := SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
   if i = LB_ERR then Exit;
   SpotsList.Delete(SendMessage(BandMapListBox, LB_GETITEMDATA, i, 0));
-  DisplayBandMap;                       //Gav 4.44.6
   if tLB_SETCURSEL(BandMapListBox, i) = LB_ERR then tLB_SETCURSEL(BandMapListBox, i - 1);
   ShowSpotInfo;
 end;
@@ -687,6 +681,15 @@ var
   i                                     : integer;
 begin
   for i := 0 to 4 do SetTextInBMSB(i, nil);
+end;
+
+
+procedure KillFocus;                                         // Gav 4.47.4 #141
+begin
+  BandMapPreventRefresh := False;
+  SpotsList.SendAndClearBuffer;
+  DisplayBandMap;
+  Windows.SetFocus(wh[mweCall]);
 end;
 
 
