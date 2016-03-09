@@ -839,7 +839,7 @@ begin
 
     rig.WritePollRequest(FT1000MPPoll3String, length(FT1000MPPoll3String));
 //    WriteToSerialCATPort(FT1000MPPoll3String, rig.tCATPortHandle);
-    //первые 3 байта - полезная информация, последние два - Model ID
+    //?????? 3 ????? - ???????? ??????????, ????????? ??? - Model ID
     if ReadFromCOMPort(5, rig) then
 
       with rig.CurrentStatus do
@@ -1999,13 +1999,13 @@ end;
 }
 
 function GetFrequencyForYaesu3(p: PChar): Cardinal;
-{p указывает на первый значащий байт}
+{p ????????? ?? ?????? ???????? ????}
 begin
   Result := (Ord(p[0]) * 65536 + Ord(p[1]) * 256 + Ord(p[2])) * 10;
 end;
 
 function GetFrequencyForYaesu4(p: PChar): Cardinal;
-{p указывает на первый значащий байт}
+{p ????????? ?? ?????? ???????? ????}
 begin
 
   Result :=
@@ -2107,6 +2107,14 @@ procedure ProcessFilteredStatus(rig: RadioPtr);
 var
   dif                                   : integer;
 begin
+   if IsCWByCATActive(rig) then
+       begin
+       if not rig.FilteredStatus.TXOn then
+          begin
+          DebugMsg('rig.CWByCAT_Sending set to FALSE - ' + rig.RadioName + ' (' + InterfacedRadioTypeSA[rig.RadioModel] + ')');
+          rig.CWByCAT_Sending := false;
+          end;
+       end;
   if rig = ActiveRadioPtr then
   begin
     dif := Abs(rig.FilteredStatus.Freq - rig.LastDisplayedFreq);
@@ -2146,18 +2154,27 @@ begin
       ShowFMessages(0);
     end;
 
-    if ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or
-      (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0) then
-    begin
-      SpotsList.DisplayCallsignOnThisFreq(rig.FilteredStatus.Freq);             
-      BandMapCursorFrequency := rig.FilteredStatus.Freq;
-      BandMapBand := ActiveBand;
-      BandMapMode := ActiveMode;
-      DisplayBandMap;
-    end;
-  end
+    if ((dif > 0)  and ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0)) then              // Gav 4.47.4 #015
+          begin
+             SpotsList.DisplayCallsignOnThisFreq(rig.FilteredStatus.Freq);
+             BandMapCursorFrequency := rig.FilteredStatus.Freq;
+             BandMapBand := ActiveBand;
+             BandMapMode := ActiveMode;
+             DisplayBandMap;
+          end;
+    end
   else
-  begin
+  begin   // Inactive Radio Processing
+
+   { if IsCWByCATActive(rig) then
+       begin
+       if not rig.FilteredStatus.TXOn then
+          begin
+          DebugMsg('rig.CWByCAT_Sending set to FALSE - Inactive radio');
+          rig.CWByCAT_Sending := false;
+          end;
+       end;
+    }
     if TuneDupeCheckEnable then
     begin
       SpotsList.TuneDupeCheck(rig.FilteredStatus.Freq);
@@ -2170,8 +2187,7 @@ begin
 
 //GAV added this section. Changes BandmapBand & Bandmap Mode to follow inactive radio when inactive radio is tuned
 
-    if ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or
-      (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0) then
+    if ((dif > 0)  and ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0)) then       // Gav 4.47.4 #015
     begin
       BandmapBand := rig.FilteredStatus.Band;
       BandMapMode := rig.FilteredStatus.Mode;
@@ -2613,6 +2629,8 @@ begin
      begin
      if IsCWByCATActive then
         begin
+        ActiveRadioPtr.CWByCAT_Sending := false; // If we were sending but the PTT goes off, now reset this.
+        DebugMsg('[Active] CWByCAT_Sending set to FALSE - ' + ActiveRadioPtr.RadioName + ' (' + InterfacedRadioTypeSA[ActiveRadioPtr.RadioModel] + ')');
         tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
         end;
      if tr4w_PTTStartTime <> 0 then
