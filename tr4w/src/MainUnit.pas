@@ -130,10 +130,11 @@ uses
   ;
 
   var
+  InSplit                               : boolean = False;
   Switch                                : boolean = False;
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
-  First                                 : boolean = True;
+  Esc_Counter                           : integer = 0;
   Second                                : Boolean = False;
   Third                                 : Boolean = False;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
@@ -497,32 +498,30 @@ procedure Escape_proc;
 var
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
-
-If (ActiveMode = CW) and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
+// *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
+ If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
-    If First then                           // first esc stops sending
-       begin                                          // second esc clears call
-       First := False;
-       ActiveRadioPtr^.stopsendingcw;
-       Second := True;
-       Exit;
+    if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
+       begin
+       ActiveRadioPtr^.StopSendingCW;
        end
-     else
-   If Second   then //    tCleareCallWindow;      // n4af 4.46.11
+    else if ISCWByCATActive(InactiveRadioPtr) then
+       begin
+       InactiveRadioPtr^.StopSendingCW;
+       end;
+       inc(Esc_counter);
+      end;
+        if Esc_counter > 1 then
       begin
-      initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
-      Second := False;
-      Third := True;
-      exit;
-      end
-      else
-    if Third then
-    begin
-    Third := False;
-    Opmode := CQOpMode;  // n4af 4.46.12
-    exit;
+  //    tCleareCallWindow;      // n4af 4.46.11
+  initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
+      inc(Esc_Counter);
+      Opmode := CQOpMode;  // n4af 4.46.12
+                                   // ny4i Issue #111 - Just a bit of code formatting for readability>>>>>>> a31747af888fbd546de46cd7f4ead476bcc8e842
     end;
-    end;
+      if (Esc_counter > 3) then
+    OpMode := CQOpMode;
+    Esc_counter := 0;
   //   if TryKillCW then Exit;
 
   scWK_reset; // n4af 4.46.2
@@ -1107,8 +1106,8 @@ begin
     if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
     if ActiveMode in [Phone, FM] then SendCrypticMessage(SearchAndPouncePhoneExchange);
     ExchangeHasBeenSent := True;
-if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
-  end;
+ if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
+end;
 
   if TryLogContact then
   begin
@@ -1660,6 +1659,13 @@ var
   RadioToSet                            : RadioPtr {RadioType};
 begin
   begin
+   if InSplit then begin
+     PutRadioOutOfSplit(ActiveRadio);
+      PutRadioOutOfSplit(InActiveRadio);
+      InSplit := False;
+     exit;
+   end;
+    Freq := 0;
     Freq := QuickEditFreq(TC_TRANSMITFREQUENCYKILOHERTZ, 10);
 
     RadioToSet := ActiveRadioPtr {ActiveRadio};
@@ -1678,7 +1684,7 @@ begin
         Band15: Freq := Freq + 21000000;
         Band10: Freq := Freq + 28000000;
       end;
-
+     InSplit := True;
     if Freq > 1000000 then
     begin
 //      SetRadioFreq(ActiveRadio, Freq, ActiveMode, 'B');
@@ -3211,8 +3217,11 @@ var
   itempos                               : integer;
   p                                     : HWND;
   c                                     : HWND;
-  //localMsg                              : string;
+  i                                     : integer;
+  label
+  wait;
 begin
+  i := 0;
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
 
@@ -3249,7 +3258,7 @@ begin
 
       else
 
-        if (CWEnabled and DeleteLastCharacter)  or not CWEnabled then  
+        if (CWEnabled and DeleteLastCharacter)  or not CWEnabled then
         begin
         end
         else
@@ -3265,15 +3274,25 @@ begin
       begin
         if IsCWByCATActive then
            begin // Send the character now - No buffering
-       //    if Autocallterminate then   // n4af 4.46.12
-          //            ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
-           if (length(CallWindowString) = AutosendCharacterCount) {and autocallterminate} then //n4af 4.46.12
+           if (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
+          ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
+          if (length(CallWindowString) > AutosendCharacterCount) then  // hit additional key(s)
+           begin
           ActiveRadioPtr.SendCW(Key);
-           if autocallterminate then
-           processreturn;
-           end
+      {    wait:
+          if i > 5 then exit;    // half second limit on loop
+           if autocallterminate and not activeradioptr.CWByCAT_Sending then
+           processreturn       // autosend switch from call to exch window when sending donecw
+           else
+           begin
+           inc(i);
+           sleep(100);   // wait on sending completion
+           goto wait;  }
+          //  end;
+           end;
+          end
         else if wkActive then
-   //       wkSendByte(Ord(UpCase(Key)))
+        wkSendByte(Ord(UpCase(Key)))
         else
           begin
 
