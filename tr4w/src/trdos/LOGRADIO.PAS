@@ -1685,7 +1685,18 @@ var
    i: integer;
    msgLen: integer;
    len: integer;
+   maxLen: integer;
+   pad: boolean;
+   tempLen: integer;
+   sLen: integer;
+   sMsg: string;
+   sendNow : boolean;
+   formatStr: string;
 begin
+   if not ( Self.CWByCAT and (Self.RadioModel in RadioSupportsCWByCAT) ) then
+      begin
+      exit;   // No need to be here if radio does not support CWBYCAT and not active
+      end;
    // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
    case RadioParametersArray[RadioModel].rt of
@@ -1696,63 +1707,93 @@ begin
          // For now, we do not want to send these to the radio
          if Msg = #06 then // increase speed
             begin
-            //CodeSpeed := CodeSpeed + Round(CodeSpeed * 0.06); // increase 6 %
+            CodeSpeed := CodeSpeed + Round(CodeSpeed * 0.06); // increase 6 %
             //SetRadioCWSpeed(CodeSpeed);
+            sendNow := true;
             end
          else if Msg = #$13 then
-               begin       // Speed down by 6 %
-               //CodeSpeed := CodeSpeed - Round(CodeSpeed * 0.06); // increase 6 %
-               //SetRadioCWSpeed(CodeSpeed);
-               end
-            else
-               if Msg = Chr(242) then // Do nothing
+            begin       // Speed down by 6 %
+            CodeSpeed := CodeSpeed - Round(CodeSpeed * 0.06); // increase 6 %
+            //SetRadioCWSpeed(CodeSpeed);
+            sendNow := true;
+            end;
+         if (Msg = Chr(242)) or sendNow then // Do nothing
+            begin
+            Msg := CWByCATBuffer;               // ny4i 4.44.5
+            msgLen := length(Msg);              //length(Msg);
+            //len := Min(msgLen, 24);             // 24 max for Kenwood
+            case RadioModel of
+               TS480, TS570, TS590, TS950, TS990, TS2000, FLEX:
                   begin
+                  maxLen := 24;
+                  pad := true;
+                  end;
+               K2, K3:
+                  begin
+                  maxLen := 22; //28;
+                  pad := false;
+                  end;
+               end; // case
+            Msg := CWByCATBuffer;
+            tempLen := length(Msg);
+            while tempLen > 0 do
+               begin  // Loop around to to process the message in maxLen chunks;
+               sLen := min(tempLen,maxLen);
+               sMsg := Copy(msg,1,sLen); // Move sLen chars into sMsg;
+               Delete(Msg,1,sLen); // Delete sLen characters from start of Msg
+               if pad then
+                  begin
+                  while length(sMsg) < maxLen do
+                     begin
+                     sMsg := sMsg + ' ';
+                     end;
+                  end;
+               if Self.active then
+                  begin
+                  DebugMsg('Sending on ACTIVE radio ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
+                  if InactiveRadioPtr.CWByCAT_Sending then
+                     begin
+                     DebugMsg('Stopping sending CW on INACTIVE ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
+                     InactiveRadioPtr.StopSendingCW;
+                     sleep(500); // Give command chance to complete
+                     end;
+                  end
+               else // Inactive
+                  begin
+                  DebugMsg('Sending on INACTIVE radio ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
+                  if ActiveRadioPtr.CWByCAT_Sending then
+                     begin
+                     DebugMsg('Stopping sending CW on ACTIVE ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
+                     ActiveRadioPtr.StopSendingCW;
+                     end;
+                  end;
+               if sendNow then
+                  begin
+                  formatStr := 'KYW%s;'
                   end
                else
                   begin
-                  case RadioModel of
-                     TS480, TS570, TS590, TS950, TS990, TS2000, FLEX:
-                        begin
-
-                        repeat
-                             Msg := msg + ' '; // ny4i put back to test
-                          // Msg := ' ' + msg;  // n4af change buffer order on spaces
-                        until length(Msg) = 24;
-                        localMsg := Format('KY %s;', [Msg]);
-                        end;
-                     K2, K3, TS850:
-                        // TS850 is just here for compatibility--it really does not support CWBYCAT.
-                        begin
-                        localMsg := Format('KY %s;', [Msg]);
-                        end;
-                     end; // case
-
-                  //localMsg := Format('KY %s;', [Msg]);
-                  //DebugMsg('Sending to K3='+localMsg);
-                  if Self.active then
-                     begin
-                     DebugMsg('Sending on ACTIVE radio ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
-                     if InactiveRadioPtr.CWByCAT_Sending then
-                        begin
-                        DebugMsg('Stopping sending CW on INACTIVE ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
-                        InactiveRadioPtr.StopSendingCW;
-                        sleep(500); // Give command chance to complete
-                        end;
-                     end
-                  else // Inactive
-                     begin
-                     DebugMsg('Sending on INACTIVE radio ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
-                     if ActiveRadioPtr.CWByCAT_Sending then
-                        begin
-                        DebugMsg('Stopping sending CW on ACTIVE ' + Self.RadioName + ' (' + InterfacedRadioTypeSA[Self.RadioModel] + ')');
-                        ActiveRadioPtr.StopSendingCW;
-                        end;
-                     end;
-                  AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
-                  Self.CWByCAT_Sending := true;
-                  DebugMsg('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
+                  formatStr := 'KY %s;';
                   end;
-         end;
+               localMsg := Format(formatStr, [sMsg]);
+
+               AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
+               Self.CWByCAT_Sending := true;
+               DebugMsg('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
+               tempLen := length(Msg);
+               end;
+            CWByCATBuffer := ''; // Clear the buffer
+            if sendNow then
+               begin
+               sendNow := false;
+               SetRadioCWSpeed(CodeSpeed);
+               end;
+            end
+         else
+            begin
+            Self.CWByCATBuffer := Self.CWByCATBuffer + Msg; // Just add Msg to the buffer - Issue 131 ny4i
+            end;
+         end; // case Kenwood...
       rtYaesu1:
          begin    // Yaesu does not support sending free-form text via CAT.
          ;     // You can send memories that are previously programmed though.
@@ -1778,10 +1819,6 @@ begin
                CommandsTempBuffer[5] := ICOM_SEND_CW;
                CommandsTempBuffer[6] := Chr(0); // No sub command
                // Up to 30 characters, add the text to send as ASCII
-               // I may need to batch up all the cw for the whole message and then send
-               // it. The Icom interface seems to be losing messages. Do something like
-               // radioObject.SendingCATCW to true and collect the characters in a buffer.
-               // then possible flushCWBuffer like the thread.
 
                //Maybe turn interrogate off when sending?
                for i := 1 to len do

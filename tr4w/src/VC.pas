@@ -177,7 +177,8 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.47.0' ;     // NY4I
+
+  TR4W_CURRENTVERSION_NUMBER            = '4.47.4' ;     // GM0GAV
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
   TR4W_CURRENTVERSIONDATE               = 'Mar  4, 2016' ;
@@ -1972,7 +1973,7 @@ const
   menu_alt_multbell                     = 10307;
   menu_alt_killcw                       = 10308;
   menu_alt_searchlog                    = 10309;
-//  menu_alt_transfreq                    = 10310;
+  menu_alt_transfreq                    = 10310;
   menu_alt_reminder                     = 10311;
   menu_alt_autocq                       = 10312;
   menu_alt_tooglerigs                   = 10313;
@@ -2053,7 +2054,7 @@ const
   menu_inactiveradio_cwspeedup          = 10513;
   menu_inactiveradio_cwspeeddown        = 10514;
   //  menu_dupecheck_or_sp                  = 10507;
-  menu_alt_transfreq                    = 10311;
+//  menu_alt_transfreq                    = 10311;
   menu_home_page                        = 10606;
 //  menu_send_bug                         = 10605;
   menu_wiki_rus                         = 10604;

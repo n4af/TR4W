@@ -131,6 +131,7 @@ uses
   ;
 
   var
+  InSplit                               : boolean = False;
   Switch                                : boolean = False;
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
@@ -1106,7 +1107,11 @@ begin
     if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
     if ActiveMode in [Phone, FM] then SendCrypticMessage(SearchAndPouncePhoneExchange);
     ExchangeHasBeenSent := True;
+
  //if activeradioptr^.cwbycat then backtoinactiveradioafterqso; // ny4i Issue130 Moving this to after LogContact
+ {TODO } // Uncomment above and comment below to check for CWBC_AutoSend ny4i 9-mar-2016
+ if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
+
 end;
 
   if TryLogContact then
@@ -1664,6 +1669,13 @@ var
   RadioToSet                            : RadioPtr {RadioType};
 begin
   begin
+   if InSplit then begin
+     PutRadioOutOfSplit(ActiveRadio);
+      PutRadioOutOfSplit(InActiveRadio);
+      InSplit := False;
+     exit;
+   end;
+    Freq := 0;
     Freq := QuickEditFreq(TC_TRANSMITFREQUENCYKILOHERTZ, 10);
 
     RadioToSet := ActiveRadioPtr {ActiveRadio};
@@ -1682,7 +1694,7 @@ begin
         Band15: Freq := Freq + 21000000;
         Band10: Freq := Freq + 28000000;
       end;
-
+     InSplit := True;
     if Freq > 1000000 then
     begin
 //      SetRadioFreq(ActiveRadio, Freq, ActiveMode, 'B');
@@ -3215,8 +3227,11 @@ var
   itempos                               : integer;
   p                                     : HWND;
   c                                     : HWND;
-  //localMsg                              : string;
+  i                                     : integer;
+  label
+  wait;
 begin
+  i := 0;
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
 
@@ -3253,7 +3268,7 @@ begin
 
       else
 
-        if (CWEnabled and DeleteLastCharacter)  or not CWEnabled then  
+        if (CWEnabled and DeleteLastCharacter)  or not CWEnabled then
         begin
         end
         else
@@ -3269,17 +3284,37 @@ begin
       begin
         if IsCWByCATActive then
            begin // Send the character now - No buffering
-       //    if Autocallterminate then   // n4af 4.46.12
-          //            ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
-           if (length(CallWindowString) > AutosendCharacterCount) {and autocallterminate} then //n4af 4.46.12
-          begin
-        { key := CallWindowString;
-          CallWindowString := Key;    }
+//<<<<<<< HEAD
+//       //    if Autocallterminate then   // n4af 4.46.12
+//          //            ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
+//           if (length(CallWindowString) > AutosendCharacterCount) {and autocallterminate} then //n4af 4.46.12
+//          begin
+//       // key := CallWindowString;
+//        //  CallWindowString := Key;
+//          ActiveRadioPtr.SendCW(Key);
+//           if autocallterminate then
+//           processreturn;
+//           end;
+//           end
+//======= }
+           if (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
+          ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
+          if (length(CallWindowString) > AutosendCharacterCount) then  // hit additional key(s)
+           begin
           ActiveRadioPtr.SendCW(Key);
-           if autocallterminate then
-           processreturn;
+      {    wait:
+          if i > 5 then exit;    // half second limit on loop
+           if autocallterminate and not activeradioptr.CWByCAT_Sending then
+           processreturn       // autosend switch from call to exch window when sending donecw
+           else
+           begin
+           inc(i);
+           sleep(100);   // wait on sending completion
+           goto wait;  }
+          //  end;
            end;
-           end
+          end
+// >>>>>>> origin/master
         else if wkActive then
         wkSendByte(Ord(UpCase(Key)))
         else
