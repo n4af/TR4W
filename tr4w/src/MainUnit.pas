@@ -500,6 +500,7 @@ var
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
+{
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
@@ -510,8 +511,8 @@ begin
        begin
        InactiveRadioPtr^.StopSendingCW;
        end;
-       inc(Esc_counter);
-      end;
+    inc(Esc_counter);
+    end;
         if Esc_counter > 1 then
       begin
   //    tCleareCallWindow;      // n4af 4.46.11
@@ -524,7 +525,7 @@ begin
     OpMode := CQOpMode;
     Esc_counter := 0;
   //   if TryKillCW then Exit;
-
+}
   scWK_reset; // n4af 4.46.2
 
 
