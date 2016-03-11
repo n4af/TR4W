@@ -3223,7 +3223,6 @@ begin
   end;
 
 end;
- 
 procedure CallWindowKeyDownProc(wParam: integer);
 var
   Key                                   : Char;
@@ -3252,7 +3251,11 @@ begin
             begin
               CheckInactiveRigCallingCQ;
               AddStringToBuffer(CallWindowString, CWTone);
-//              PTTForceOn;
+              if IsCWByCATActive then
+                 begin
+                 AddStringToBuffer(Chr(242),CWTone);
+                 end;
+//            PTTForceOn;
               tAutoSendMode := True;
             end;
           end;
@@ -3287,24 +3290,15 @@ begin
       begin
         if IsCWByCATActive then
            begin // Send the character now - No buffering
-//<<<<<<< HEAD
-//       //    if Autocallterminate then   // n4af 4.46.12
-//          //            ActiveRadioPtr.SendCW(Key);  // How does the cw thread know when this is done?
-//           if (length(CallWindowString) > AutosendCharacterCount) {and autocallterminate} then //n4af 4.46.12
-//          begin
-//       // key := CallWindowString;
-//        //  CallWindowString := Key;
-//          ActiveRadioPtr.SendCW(Key);
-//           if autocallterminate then
-//           processreturn;
-//           end;
-//           end
-//======= }
            if (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
-          ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
+              begin
+              ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
+              ActiveRadioPtr.SendCW(Chr(242));
+              end;
           if (length(CallWindowString) > AutosendCharacterCount) then  // hit additional key(s)
            begin
           ActiveRadioPtr.SendCW(Key);
+          ActiveRadioPtr.SendCW(Chr(242));
       {    wait:
           if i > 5 then exit;    // half second limit on loop
            if autocallterminate and not activeradioptr.CWByCAT_Sending then
@@ -3317,7 +3311,6 @@ begin
           //  end;
            end;
           end
-// >>>>>>> origin/master
         else if wkActive then
         wkSendByte(Ord(UpCase(Key)))
         else
@@ -3349,6 +3342,8 @@ begin
   if Key = PossibleCallAcceptKey then
     if SendMessage(p, LB_GETCOUNT, 0, 0) > 0 then PutCallToCallWindow(LogSCP.PossibleCallList.List[itempos].Call);
 end;
+//-------------------
+
 
 procedure CallWindowKeyUpProc;
 begin
@@ -4204,12 +4199,33 @@ begin
 end;
 
 procedure tExchangeWindowSetFocus;
+var
+   h: hWnd;
 begin
 //  if ActiveMainWindow <> awExchangeWindow then
 //  if not tr4w_ExchangeWindowActive then
 //  ChangeFocus('exchange');
+{ ny4i  Issue 131
+For some reason, SetFocus would return an Access Denied error when using CWBC.
+The error was documented in various postings and it was suggested that
+SetForegroundWindow should now be used. I changed this and it appears to work
+now for CWBC but this also needs to be checked in earlier versions of
+Windows. The MSDN docs state Windows 2000 is the first version so that should
+cover most. As this can get dicey with threads, this needs through testing with
+WinKey and K1EA keyer because of the threading used there.
+Note that I left the call to SetFocus first so the code works as it did.
+If that call fails, then I try SetForegroundWindow.
+}
   begin
-    Windows.SetFocus(wh[mweExchange]);
+   h := Windows.SetFocus(wh[mweExchange]);
+    if h = 0 then
+       begin
+       if not Windows.SetForegroundWindow(wh[mweExchange]) then
+          begin
+          DebugMsg('SetForegroundWindow Failed');
+          end;
+       end;
+
 {$IF MORSERUNNER}
 //    Windows.SendMessage(MorseRunner_Number, WM_SETFOCUS, 0, 0);
 {$IFEND}

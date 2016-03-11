@@ -250,6 +250,7 @@ type
       //    PollTimeout: LONGINT; { 100th of seconds for timeout }
       procedure AddCommandToBuffer;
       procedure CheckRadioStatus;
+      function  CheckAutoCallTerminate: boolean;
       procedure PutRadioIntoSplit;
       procedure PutRadioOutOfSplit;
       procedure SendIcomCommand(Command: byte);
@@ -710,7 +711,9 @@ uses
    LogK1EA,
    LogWind,
    MainUnit, uRadioPolling,
-   uTelnet;
+   uTelnet,
+   LogStuff,
+   LogSUBS2;
 
 function IntegerToBCD(Value: DWORD): integer;
 const
@@ -2922,6 +2925,20 @@ begin
    // halt;
 end;
 
+function RadioObject.CheckAutoCallTerminate: boolean;
+begin
+  Result := False;
+  if AutoCallTerminate then
+     begin
+     if not ExchangeHasBeenSent then
+        if tAutoSendMode then
+           if not ControlAMode then
+              begin
+              //ReturnInCQOpMode;
+              Result := True;
+              end;
+     end;
+end;
 function OpenCATDebugFile(port: PortType): boolean;
 var
    stored: integer;

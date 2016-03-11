@@ -2014,6 +2014,11 @@ begin
           begin
           DebugMsg('rig.CWByCAT_Sending set to FALSE - ' + rig.RadioName + ' (' + InterfacedRadioTypeSA[rig.RadioModel] + ')');
           rig.CWByCAT_Sending := false;
+          if rig.CheckAutoCallTerminate then
+             begin
+             DEBUGMsg('rig.CheckAutoCallTerminate is true - Enter ReturnInCQMode');
+             ReturnInCQOpMode;
+             end;
           end;
        end;
   if rig = ActiveRadioPtr then
