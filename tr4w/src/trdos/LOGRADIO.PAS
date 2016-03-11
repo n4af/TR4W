@@ -30,12 +30,14 @@ unit LogRadio;
 interface
 
 uses
+   Classes,
    Math,
    SysUtils,
    TF,
    Tree,
    VC,
-   Windows;
+   Windows,
+   utils_text;
 
 var
    Icom_Filter_Width: integer;     // n4af 4.43.4
@@ -1584,6 +1586,7 @@ begin
       begin
       CommandsBufferPointer := 0;
       end;
+      DebugMsg(pChar(@CommandsTempBuffer));
    Windows.CopyMemory(@CommandsBuffer[CommandsBufferPointer],
       @CommandsTempBuffer, Ord(CommandsTempBuffer[0]));
    Inc(CommandsBufferPointer);
@@ -1692,6 +1695,7 @@ var
    sMsg: string;
    sendNow : boolean;
    formatStr: string;
+   debugStr: string;
 begin
    if not ( Self.CWByCAT and (Self.RadioModel in RadioSupportsCWByCAT) ) then
       begin
@@ -1810,7 +1814,7 @@ begin
                len := Min(msgLen, 28);
                // Max for Icom radio. TODO Optimally, this should be sent in multiple batches
                localMsg := Format('%s', [Msg]);
-               DebugMsg('Sending to Icom=' + localMsg);
+               DebugMsg('Sending to Icom[' + IntToStr(len) + ' bytes]=' + localMsg);
                CommandsTempBuffer[0] := Chr(8 + len);
                CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
                CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
@@ -1832,6 +1836,7 @@ begin
                   if InactiveRadioPtr.CWByCAT_Sending then
                      begin
                      InactiveRadioPtr.StopSendingCW;
+                     DEBUGMSG('Stopping Sending in SendCW - Inactive');
                      end;
                   end
                else // Inactive
@@ -1839,8 +1844,10 @@ begin
                   if ActiveRadioPtr.CWByCAT_Sending then
                      begin
                      ActiveRadioPtr.StopSendingCW;
+                     DEBUGMSG('Stopping Sending in SendCW - ACTIVE');
                      end;
                   end;
+               DebugMsg('SendCW for Icom, len = ' + IntToStr(len));
                AddCommandToBuffer;
                Self.CWByCAT_Sending := true;
                DebugMsg('Self.CWByCAT_Sending set to TRUE - Icom');
