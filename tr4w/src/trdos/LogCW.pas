@@ -333,6 +333,7 @@ begin
   if IsCWByCATActive then
      begin
      DebugMsg('Flushing CWBuffer - Stop Sending on ActiveRadio CWBC');
+     ActiveRadioPtr.CWByCATBuffer := '';
      ActiveRadioPtr.StopSendingCW;
      end;
 

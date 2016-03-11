@@ -526,7 +526,8 @@ begin
     Esc_counter := 0;
   //   if TryKillCW then Exit;
 }
-  scWK_reset; // n4af 4.46.2
+  //scWK_reset; // n4af 4.46.2   // ny4i removed as thecode in PTTOff seems to get this. Maybe reset there?
+
 
 
 {$IF MORSERUNNER}
@@ -564,15 +565,16 @@ begin
         begin
         pRadio := ActiveRadioPtr;
         end;
-     if IsCWByCATActive(pRadio) then
+     {if IsCWByCATActive(pRadio) then
         begin
         pRadio^.StopSendingCW;
         PTTOff;
         // Exit;
-        end;
+        end;}
      end;
 
-  if ((ActiveMode = CW) and ((CWThreadID <> 0) or (wkBUSY = True))) or
+  if ((ActiveMode = CW) and
+     ((CWThreadID <> 0) or wkBUSY or pRadio.CWByCAT_Sending)) or
     ((ActiveMode in [Phone, FM]) and (DVPOn = True)) then
   begin
 
@@ -7053,7 +7055,7 @@ var
   TempPortInterface                     : PortInterface;
   TempByte                              : Byte;
 begin
-
+  DebugMsg('Enter MainUnit.PTTOff');
   if not PTTEnable then
   begin
     if ActiveRadioPtr.tKeyerPort in [Parallel1..Parallel3] then
@@ -7067,7 +7069,12 @@ begin
     Exit;
 
   end;
-
+  if IsCWByCATActive(ActiveRadioPtr) then    // ny4i Issue 131
+     begin
+     DEBUGMsg('Stopping CW from PTTOff');
+     ActiveRadioPtr^.StopSendingCW;
+     goto DrawPTTLabel; // Fix this goto...Put the code below in an IF... TODO
+     end;
   if wkTurnPTT(False) then goto DrawPTTLabel;
   if tPTTVIACAT(False) then goto DrawPTTLabel;
   TempPortInterface := tGetPortType(ActiveRadioPtr.tKeyerPort);
