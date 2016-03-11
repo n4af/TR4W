@@ -1660,7 +1660,7 @@ var
 begin
   begin
    if InSplit then begin
-     PutRadioOutOfSplit(ActiveRadio);
+     PutRadioOutOfSplit(ActiveRadio);    // n4af 4.47.5
       PutRadioOutOfSplit(InActiveRadio);
       InSplit := False;
      exit;
@@ -2773,25 +2773,20 @@ begin
     menu_ctrl_ct1bohscreen:
 //      tDialogBox(40, @ct1bohDlgProc);
       CreateModalDialog(330 + 10, 68 + 10, tr4whandle, @ct1bohDlgProc, 0);
-
+  
     menu_ctrl_PlaceHolder: AddBandMapPlaceHolder;
 
     menu_mainwindow_setfocus: FrmSetFocus;
 
     menu_insertmode: InvertBooleanCommand(@InsertMode);
 
-    menu_ctrl_SplitOff:
-    begin
-    if not ActiveRadioPtr.CurrentStatus.Split then
-    PutRadioIntoSplit(ActiveRadio)
-    else
-    PutRadioOutOfSplit(ActiveRadio)  // n4af 4.46.13
-    end;
+    menu_ctrl_SplitOff:               // n4af 4.47.5
+     tr4w_alt_n_transmit_frequency ;
     
     menu_escape:
       Escape_proc;
+
     menu_csv:
-    
     ExportToCSV;
 
     menu_inactiveradio_cwspeedup:
@@ -3321,8 +3316,12 @@ begin
 
   if Key = PossibleCallAcceptKey then
     if SendMessage(p, LB_GETCOUNT, 0, 0) > 0 then PutCallToCallWindow(LogSCP.PossibleCallList.List[itempos].Call);
-end;
-
+    if activeradioptr.CWByCAT_Sending then
+    begin
+    Sleep(1500);
+    BackToInactiveRadioAfterQSO;
+    end;
+  end;
 procedure CallWindowKeyUpProc;
 begin
   if AutoSendEnable then
