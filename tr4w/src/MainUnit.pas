@@ -126,6 +126,7 @@ uses
   LOGWAE,
   LogWind,
   Tree,
+  SysUtils,
   ZoneCont
   ;
 
@@ -499,6 +500,7 @@ var
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
+{
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
@@ -509,8 +511,8 @@ begin
        begin
        InactiveRadioPtr^.StopSendingCW;
        end;
-       inc(Esc_counter);
-      end;
+    inc(Esc_counter);
+    end;
         if Esc_counter > 1 then
       begin
   //    tCleareCallWindow;      // n4af 4.46.11
@@ -523,8 +525,9 @@ begin
     OpMode := CQOpMode;
     Esc_counter := 0;
   //   if TryKillCW then Exit;
+}
+  //scWK_reset; // n4af 4.46.2   // ny4i removed as thecode in PTTOff seems to get this. Maybe reset there?
 
-  scWK_reset; // n4af 4.46.2
 
 
 {$IF MORSERUNNER}
@@ -562,15 +565,16 @@ begin
         begin
         pRadio := ActiveRadioPtr;
         end;
-     if IsCWByCATActive(pRadio) then
+     {if IsCWByCATActive(pRadio) then
         begin
         pRadio^.StopSendingCW;
         PTTOff;
         // Exit;
-        end;
+        end;}
      end;
 
-  if ((ActiveMode = CW) and ((CWThreadID <> 0) or (wkBUSY = True))) or
+  if ((ActiveMode = CW) and
+     ((CWThreadID <> 0) or wkBUSY or pRadio.CWByCAT_Sending)) or
     ((ActiveMode in [Phone, FM]) and (DVPOn = True)) then
   begin
 
@@ -1106,7 +1110,11 @@ begin
     if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
     if ActiveMode in [Phone, FM] then SendCrypticMessage(SearchAndPouncePhoneExchange);
     ExchangeHasBeenSent := True;
+
+ //if activeradioptr^.cwbycat then backtoinactiveradioafterqso; // ny4i Issue130 Moving this to after LogContact
+ {TODO } // Uncomment above and comment below to check for CWBC_AutoSend ny4i 9-mar-2016
  if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
+
 end;
 
   if TryLogContact then
@@ -1122,6 +1130,11 @@ end;
       if OpMode = SearchAndPounceOpMode then SetOpMode(CQOpMode);
     end;
   end;
+
+  if IsCWByCATActive then
+     begin
+     BackToInactiveRadioAfterQSO;
+     end;
 end;
 
 function Send_DE: boolean;
@@ -1364,7 +1377,7 @@ end;
 
 procedure ShowSyserror(ErrorCode: Cardinal);
 begin
-  MessageBox(0, SysErrorMessage(ErrorCode), tr4w_ClassName, MB_OK or MB_ICONERROR or MB_TASKMODAL);
+  MessageBox(0, TF.SysErrorMessage(ErrorCode), tr4w_ClassName, MB_OK or MB_ICONERROR or MB_TASKMODAL);
 end;
 
 function YesOrNo(h: HWND; Text: PChar): integer;
@@ -3205,7 +3218,6 @@ begin
   end;
 
 end;
- 
 procedure CallWindowKeyDownProc(wParam: integer);
 var
   Key                                   : Char;
@@ -3234,7 +3246,11 @@ begin
             begin
               CheckInactiveRigCallingCQ;
               AddStringToBuffer(CallWindowString, CWTone);
-//              PTTForceOn;
+              if IsCWByCATActive then
+                 begin
+                 AddStringToBuffer(Chr(242),CWTone);
+                 end;
+//            PTTForceOn;
               tAutoSendMode := True;
             end;
           end;
@@ -3270,10 +3286,14 @@ begin
         if IsCWByCATActive then
            begin // Send the character now - No buffering
            if (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
-          ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
+              begin
+              ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
+              ActiveRadioPtr.SendCW(Chr(242));
+              end;
           if (length(CallWindowString) > AutosendCharacterCount) then  // hit additional key(s)
            begin
           ActiveRadioPtr.SendCW(Key);
+          ActiveRadioPtr.SendCW(Chr(242));
       {    wait:
           if i > 5 then exit;    // half second limit on loop
            if autocallterminate and not activeradioptr.CWByCAT_Sending then
@@ -3316,12 +3336,11 @@ begin
 
   if Key = PossibleCallAcceptKey then
     if SendMessage(p, LB_GETCOUNT, 0, 0) > 0 then PutCallToCallWindow(LogSCP.PossibleCallList.List[itempos].Call);
-    if activeradioptr.CWByCAT_Sending then
-    begin
-    Sleep(1500);
-    BackToInactiveRadioAfterQSO;
-    end;
-  end;
+
+end;
+//-------------------
+
+
 procedure CallWindowKeyUpProc;
 begin
   if AutoSendEnable then
@@ -4176,12 +4195,33 @@ begin
 end;
 
 procedure tExchangeWindowSetFocus;
+var
+   h: hWnd;
 begin
 //  if ActiveMainWindow <> awExchangeWindow then
 //  if not tr4w_ExchangeWindowActive then
 //  ChangeFocus('exchange');
+{ ny4i  Issue 131
+For some reason, SetFocus would return an Access Denied error when using CWBC.
+The error was documented in various postings and it was suggested that
+SetForegroundWindow should now be used. I changed this and it appears to work
+now for CWBC but this also needs to be checked in earlier versions of
+Windows. The MSDN docs state Windows 2000 is the first version so that should
+cover most. As this can get dicey with threads, this needs through testing with
+WinKey and K1EA keyer because of the threading used there.
+Note that I left the call to SetFocus first so the code works as it did.
+If that call fails, then I try SetForegroundWindow.
+}
   begin
-    Windows.SetFocus(wh[mweExchange]);
+   h := Windows.SetFocus(wh[mweExchange]);
+    if h = 0 then
+       begin
+       if not Windows.SetForegroundWindow(wh[mweExchange]) then
+          begin
+          DebugMsg('SetForegroundWindow Failed');
+          end;
+       end;
+
 {$IF MORSERUNNER}
 //    Windows.SendMessage(MorseRunner_Number, WM_SETFOCUS, 0, 0);
 {$IFEND}
@@ -5573,7 +5613,7 @@ begin
   RunningConfigFile := True;
   ClearDupeSheetCommandGiven := False;
   FirstCommand := False;
-  if FileExists(@f[1]) then
+  if utils_file.FileExists(@f[1]) then
   LoadInSeparateConfigFile(f, FirstCommand, MyCall);
   if ClearDupeSheetCommandGiven then tClearDupesheet;
   RunningConfigFile := False;
@@ -6903,7 +6943,7 @@ begin
     FreeLibrary(module);
     goto Next;
   end;
-  FindClose(hFindFile);
+  Windows.FindClose(hFindFile);
   if LoadedPlugins > 0 then
     Windows.InsertMenu(tr4w_main_menu, menu_exit, MF_BYCOMMAND or MF_SEPARATOR, 0, nil);
 
@@ -7027,7 +7067,7 @@ var
   TempPortInterface                     : PortInterface;
   TempByte                              : Byte;
 begin
-
+  DebugMsg('Enter MainUnit.PTTOff');
   if not PTTEnable then
   begin
     if ActiveRadioPtr.tKeyerPort in [Parallel1..Parallel3] then
@@ -7041,7 +7081,12 @@ begin
     Exit;
 
   end;
-
+  if IsCWByCATActive(ActiveRadioPtr) then    // ny4i Issue 131
+     begin
+     DEBUGMsg('Stopping CW from PTTOff');
+     ActiveRadioPtr^.StopSendingCW;
+     goto DrawPTTLabel; // Fix this goto...Put the code below in an IF... TODO
+     end;
   if wkTurnPTT(False) then goto DrawPTTLabel;
   if tPTTVIACAT(False) then goto DrawPTTLabel;
   TempPortInterface := tGetPortType(ActiveRadioPtr.tKeyerPort);
@@ -7077,9 +7122,14 @@ begin
 end;
 
 procedure DebugMsg(s: string);
+{$IF NEWER_DEBUG}
+var formattedDate: string;
+{$IFEND}
 begin
 {$IF NEWER_DEBUG}
-   AddStringToTelnetConsole(PChar(s),tstAlert);
+   LongTimeFormat := 'hh nn ss (zzz)';
+   DateTimeToString(formattedDate, 'tt', Now);
+   AddStringToTelnetConsole(PChar('[' + formattedDate + '] ' + s),tstSend);
 {$IFEND}
 end;
 

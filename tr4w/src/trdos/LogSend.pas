@@ -138,7 +138,7 @@ begin
   NumberCharsBeingSent := 0;
 
   CommandMode := False;
-
+  DebugMsg('CrypticCWString = [' + SendString + ']');
   //    FOR CharacterCount := 1 TO Length (SendString) DO
   CharacterCount := 1;
   repeat
@@ -461,11 +461,12 @@ begin
      flushcwbuffer;
      end;
   }
+  InactiveRigCallingCQ := False;
   if IsCWByCATActive then
      begin
      AddStringToBuffer(Chr(242),CWTone); // Flushes the buffer when the $242 is passed to SendCW - by only By CAT
      end;
-  InactiveRigCallingCQ := False;
+
 //if if ActiveRadioPtr^.CWByCAT then backtoinactiveradioafterqso;
 end;
 

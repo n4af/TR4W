@@ -696,3 +696,5 @@ const
   RC_ALTP                               = 'Функцийн товчнуудыг програмчлах';
   RC_ALTX                               = 'Програмаас гарах';
   TC_IRELAND                            = 'Ирланд';
+TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
+ RC_SPLITOFF                       = 'Toggle Split ON/OFF';

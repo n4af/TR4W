@@ -4877,6 +4877,10 @@ nop
             if MessageEnable then
             begin
               AddStringToBuffer(CallWindowString, CWTone);
+              if IsCWByCATActive then
+                 begin
+                 AddStringToBuffer(Chr(242),CWTone);
+                 end;
 //              PTTForceOn;
             end;
 

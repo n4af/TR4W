@@ -777,4 +777,5 @@ const
   RC_ALTP                               = 'Открыть окно программирования макросов';
   RC_ALTX                               = 'Выйти из программы';
   RC_CTRLJ                              = 'Окно конфигурирования команд Ctrl-J';
- 
+ RC_SPLITOFF                       = 'Toggle Split ON/OFF';
+ TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
