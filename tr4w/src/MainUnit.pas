@@ -1113,7 +1113,7 @@ begin
 
  //if activeradioptr^.cwbycat then backtoinactiveradioafterqso; // ny4i Issue130 Moving this to after LogContact
  {TODO } // Uncomment above and comment below to check for CWBC_AutoSend ny4i 9-mar-2016
- if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
+ //if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
 
 end;
 

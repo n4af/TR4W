@@ -3174,9 +3174,12 @@ begin
     if port in [Parallel1..Parallel3] then Result := ParallelInterface;
 end;
 
+{ NY4I To make this work with CWBYCAT, we have to call this next procedure when
+       CWBYCAT_SENDING is turned off. The check of tTwoRadioMode - TR3 will control it
+}
 procedure BackToInactiveRadioAfterQSO;
 begin
-  if (ActiveRadioPtr^.tTwoRadioMode = TR3) or (activeradioptr.cwbycat) then
+  if (ActiveRadioPtr^.tTwoRadioMode = TR3) {or (activeradioptr.cwbycat)} then   // ny4i Issue 131
   begin
     tClearDupeInfoCall;
     ActiveRadioPtr^.tTwoRadioMode := TR0;
