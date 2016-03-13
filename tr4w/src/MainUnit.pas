@@ -3288,21 +3288,7 @@ begin
            if (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
               begin
               ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
-              ActiveRadioPtr.SendCW(Chr(242));
-              end;
-          if (length(CallWindowString) > AutosendCharacterCount) then  // hit additional key(s)
-           begin
-          ActiveRadioPtr.SendCW(Key);
-          ActiveRadioPtr.SendCW(Chr(242));
-      {    wait:
-          if i > 5 then exit;    // half second limit on loop
-           if autocallterminate and not activeradioptr.CWByCAT_Sending then
-           processreturn       // autosend switch from call to exch window when sending donecw
-           else
-           begin
-           inc(i);
-           sleep(100);   // wait on sending completion
-           goto wait;  }
+       
           //  end;
            end;
           end
@@ -3335,26 +3321,15 @@ begin
   itempos := SendMessage(p, LB_GETCURSEL, 0, 0);
 
   if Key = PossibleCallAcceptKey then
-<<<<<<< HEAD
-    if SendMessage(p, LB_GETCOUNT, 0, 0) > 0 then PutCallToCallWindow(LogSCP.PossibleCallList.List[itempos].Call);
 
-end;
-//-------------------
-
-
-=======
     if SendMessage(p, LB_GETCOUNT, 0, 0) > 0 then
        begin
        PutCallToCallWindow(LogSCP.PossibleCallList.List[itempos].Call);
        end;
-    if activeradioptr.CWByCAT_Sending then
-       begin
-       Sleep(1500);
-       BackToInactiveRadioAfterQSO;
-       end;
+
   end;
 
->>>>>>> FETCH_HEAD
+
 procedure CallWindowKeyUpProc;
 begin
   if AutoSendEnable then
