@@ -1699,6 +1699,7 @@ var
    sendNow : boolean;
    formatStr: string;
    debugStr: string;
+   charProcessed: boolean;
 begin
    if not ( Self.CWByCAT and (Self.RadioModel in RadioSupportsCWByCAT) ) then
       begin
@@ -1709,21 +1710,82 @@ begin
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
-         // This is all commented out until Elecraft fixes a bug with the
-         // speed change being processed out of order. ny4i
-         // For now, we do not want to send these to the radio
-         if Msg = #06 then // increase speed
+         if Msg = ControlF then// increase speed
             begin
             CodeSpeed := CodeSpeed + Round(CodeSpeed * 0.06); // increase 6 %
             //SetRadioCWSpeed(CodeSpeed);
             sendNow := true;
+            charProcessed := true;
             end
-         else if Msg = #$13 then
+         else if Msg = ControlS then
             begin       // Speed down by 6 %
             CodeSpeed := CodeSpeed - Round(CodeSpeed * 0.06); // increase 6 %
             //SetRadioCWSpeed(CodeSpeed);
             sendNow := true;
+            charProcessed := true;
+            end
+         else if Msg = '^' then
+            begin // There is no half space in Kenwood/Elecraft CW strings
+            Self.CWByCATBuffer := Self.CWByCATBuffer + ' '; // Use a whole space
+            charProcessed := true;
+            end
+         else if Msg = '!' then   // SN
+            begin
+            if not (RadioModel in [K2, K3]) then   // No SN on Elecraft
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '%';
+               end;
+            charProcessed := true;
+            end
+         {else if Msg = '&' then // AS      // & is really MYSTATE but documented as AS
+            begin
+            if RadioModel in [K2, K3] then
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '%'; //Elecraft AS
+               end
+            else
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '<'; //Kenwood AS
+               end;
+            charProcessed := true;
+            end}
+         else if Msg = '+' then // AR
+            begin
+            if RadioModel in [K2, K3] then
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '+'; //Elecraft AR
+               end
+            else
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '_'; //Kenwood AR
+               end;
+            charProcessed := true;
+            end
+         else if Msg = '<' then // SK
+            begin
+            if RadioModel in [K2, K3] then
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '*'; //Elecraft SK
+               end
+            else
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '>'; //Kenwood SK
+               end;
+            charProcessed := true;
+            end
+         else if Msg = '=' then // BT
+            begin
+            if RadioModel in [K2, K3] then
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '='; //Elecraft BT
+               end
+            else
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + '['; //Kenwood BT
+               end;
+            charProcessed := true;
             end;
+         // Now process the string is not already processed   
          if (Msg = Chr(242)) or sendNow then // Do nothing
             begin
             Msg := CWByCATBuffer;               // ny4i 4.44.5
@@ -1798,7 +1860,10 @@ begin
             end
          else
             begin
-            Self.CWByCATBuffer := Self.CWByCATBuffer + Msg; // Just add Msg to the buffer - Issue 131 ny4i
+            if not charProcessed then    // ny4i Do not add if we handled this above
+               begin
+               Self.CWByCATBuffer := Self.CWByCATBuffer + Msg; // Just add Msg to the buffer - Issue 131 ny4i
+               end;
             end;
          end; // case Kenwood...
       rtYaesu1:
@@ -1858,7 +1923,54 @@ begin
                end
             else
                begin // Add to CWBYCATBuffer
-               CWByCATBuffer := CWByCATBuffer + Msg;    // ny4i 4.44.5
+               if Msg = ControlF then// increase speed
+                  begin
+                  //CodeSpeed := CodeSpeed + Round(CodeSpeed * 0.06); // increase 6 %
+                  //SetRadioCWSpeed(CodeSpeed);
+                  //sendNow := true;
+                  charProcessed := true;
+                  end
+               else if Msg = ControlS then
+                  begin       // Speed down by 6 %
+                  //CodeSpeed := CodeSpeed - Round(CodeSpeed * 0.06); // increase 6 %
+                  //SetRadioCWSpeed(CodeSpeed);
+                  //sendNow := true;
+                  charProcessed := true;
+                  end
+               else if Msg = '^' then           // ny4i Issue131 Added Special CW Characters
+                  begin // There is no half space in Icom CW strings
+                  Self.CWByCATBuffer := Self.CWByCATBuffer + ' '; // Use a whole space
+                  charProcessed := true;
+                  end
+               else if Msg = '!' then   // SN
+                  begin
+                  Self.CWByCATBuffer := Self.CWByCATBuffer + '^SN';
+                  charProcessed := true;
+                  end
+               {else if Msg = '&' then // AS      // & is really MYSTATE but documented as AS
+                  begin
+                  Self.CWByCATBuffer := Self.CWByCATBuffer + '^AS';
+                  charProcessed := true;
+                  end}
+               else if Msg = '+' then // AR
+                  begin
+                  Self.CWByCATBuffer := Self.CWByCATBuffer + '^AR';
+                  charProcessed := true;
+                  end
+               else if Msg = '<' then // SK
+                  begin
+                  Self.CWByCATBuffer := Self.CWByCATBuffer + '^SK';
+                  charProcessed := true;
+                  end
+               else if Msg = '=' then // BT
+                  begin
+                  Self.CWByCATBuffer := Self.CWByCATBuffer + '^BT';
+                  charProcessed := true;
+                  end
+               else
+                  begin
+                  CWByCATBuffer := CWByCATBuffer + Msg;    // ny4i 4.44.5
+                  end;
                end;
             end;
          end;
