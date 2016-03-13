@@ -3339,11 +3339,11 @@ begin
        begin
        PutCallToCallWindow(LogSCP.PossibleCallList.List[itempos].Call);
        end;
-    if activeradioptr.CWByCAT_Sending then
+    {if activeradioptr.CWByCAT_Sending then  // ny4i Issue 131. COmmented out because with AutoSend, a CQ would be sent on the other radio when we hit the auto character count
        begin
        Sleep(1500);
        BackToInactiveRadioAfterQSO;
-       end;
+       end;}
   end;
 
 procedure CallWindowKeyUpProc;

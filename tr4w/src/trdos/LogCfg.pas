@@ -250,6 +250,9 @@ procedure SetUpGlobalsAndInitialize;
 
 begin
 
+{$IF NEWER_DEBUG}
+   ShowMessage('Debug mode is enabled - Reset NEWER_DEBUG before production build');
+{$IFEND}
   udp := TIdUDPClient.Create(nil); // ny4i Issue #99
   if QTCsEnabled then New(QTCDataArray); //LoadQTCDataFile;
 

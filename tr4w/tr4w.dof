@@ -130,13 +130,17 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
+[Excluded Packages]
+C:\projects\Indy10_5335\D7\dclIndyCore70.bpl=Indy 10 Core Design Time
+C:\projects\Indy10_5335\D7\dclIndyProtocols70.bpl=Indy 10 Protocols Design Time
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=2
+Count=3
 Item0=src\lang;src\trdos;src\utils;src;src\include\D7
-Item1=$(DELPHI)\Lib\Debug;include;src\lang;src\trdos;src\utils;src;include\D7
+Item1=src\lang;src\trdos;src\utils;src;src\include\D7;src\include\log4d
+Item2=$(DELPHI)\Lib\Debug;include;src\lang;src\trdos;src\utils;src;include\D7
 [HistoryLists\hlOutputDirectorry]
 Count=1
 Item0=target
