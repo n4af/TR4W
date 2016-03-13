@@ -146,7 +146,7 @@ begin   // 1
   if not (Copy(Message, 1, 1) = ControlA) then
      begin // I think we want to make sure we swap radios once. I tried caling SwapRadios here but it got called again.
      SetUpToSendOnActiveRadio;
-     end;
+     end;      
 
 
 

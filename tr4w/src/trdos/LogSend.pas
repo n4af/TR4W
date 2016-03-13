@@ -158,7 +158,12 @@ begin
         Continue;
       end;
 
-        case SendChar of
+
+
+       case SendChar of
+           '^':
+            AddStringTOBuffer('',CWTone);
+
            '.':
           begin
           AddStringToBuffer('.', CWTone);     // n4af 04.35.2
@@ -227,7 +232,7 @@ begin
 
             AddStringToBuffer(TempString, CWTone);
           end;
-         
+
         '_': AddStringToBuffer(' ', CWTone);
 
         ControlD:
