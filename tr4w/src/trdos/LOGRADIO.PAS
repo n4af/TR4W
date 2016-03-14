@@ -1221,12 +1221,16 @@ begin
               end;
 }
       try
-      // TLogger.GetInstance.Debug('In WriteToCATPort');
-      //SetString(s,PChar(@Buffer),nNumberOfBytesToWrite);
-      //TLogger.GetInstance.Debug(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,s]));
+{$IF NEWER_DEBUG}
+      if nNumberOfBytesToWrite > 10 then
+         begin
+         DebugMsg('>>>>Enter WriteToCATPort');
+         SetString(debugStr,PChar(@Buffer),nNumberOfBytesToWrite);
+         DebugMsg(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,debugStr]));
+         end;
+{$IFEND}
       Windows.WriteFile(tCATPortHandle, Buffer, nNumberOfBytesToWrite,
          lpNumberOfBytesWritten, nil);
-      // TLogger.GetInstance.Debug(Format('After WriteFile: %u bytes written',[lpNumberOfBytesWritten]));
       except // on E : Exception do
       ; // TLogger.GetInstance.Debug(Format('In WriteToCATPort..WriteFile, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
       end;
@@ -1240,7 +1244,12 @@ begin
       end;
 }
    Result := nNumberOfBytesToWrite = lpNumberOfBytesWritten;
-   // TLogger.GetInstance.Debug('[Exit WriteToCATPort');
+{$IF NEWER_DEBUG}
+   if nNumberOfBytesToWrite > 10 then
+      begin
+      DebugMsg('<<<<Exit WriteToCATPort');
+      end;
+{$IFEND}
 end;
 
 procedure RadioObject.CheckAndInitializeSerialPorts_ForThisRadio;
@@ -1589,7 +1598,7 @@ begin
       begin
       CommandsBufferPointer := 0;
       end;
-      DebugMsg(pChar(@CommandsTempBuffer));
+   DebugRadioTempBuffer('AddCommandToBuffer',CommandsTempBuffer); // ny4i Issue 145 - Decorator string, pointer, length
    Windows.CopyMemory(@CommandsBuffer[CommandsBufferPointer],
       @CommandsTempBuffer, Ord(CommandsTempBuffer[0]));
    Inc(CommandsBufferPointer);
@@ -1788,6 +1797,7 @@ begin
          // Now process the string is not already processed   
          if (Msg = Chr(242)) or sendNow then // Do nothing
             begin
+            DebugMsg('Assembling CW message to send');
             Msg := CWByCATBuffer;               // ny4i 4.44.5
             msgLen := length(Msg);              //length(Msg);
             //len := Min(msgLen, 24);             // 24 max for Kenwood
@@ -1847,6 +1857,7 @@ begin
                localMsg := Format(formatStr, [sMsg]);
 
                AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
+               DebugMsg('Adding K/E/F radio CW string to buffer');
                Self.CWByCAT_Sending := true;
                DebugMsg('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
                tempLen := length(Msg);
@@ -1883,22 +1894,22 @@ begin
                // Max for Icom radio. TODO Optimally, this should be sent in multiple batches
                localMsg := Format('%s', [Msg]);
                DebugMsg('Sending to Icom[' + IntToStr(len) + ' bytes]=' + localMsg);
-               CommandsTempBuffer[0] := Chr(8 + len);
+               CommandsTempBuffer[0] := Chr(7 + len);
                CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
                CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
                CommandsTempBuffer[3] := CHR(ReceiverAddress);
                CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
                CommandsTempBuffer[5] := ICOM_SEND_CW;
-               CommandsTempBuffer[6] := Chr(0); // No sub command
+               //CommandsTempBuffer[6] := Chr(0); // No sub command   ny4i Issue 145
                // Up to 30 characters, add the text to send as ASCII
 
                //Maybe turn interrogate off when sending?
                for i := 1 to len do
                   begin
-                  CommandsTempBuffer[6 + i] := Chr(Ord(Msg[i]));
+                  CommandsTempBuffer[5 + i] := Chr(Ord(Msg[i]));
                   end;
 
-               CommandsTempBuffer[7 + len] := ICOM_END_OF_MESSAGE_CODE;
+               CommandsTempBuffer[6 + len] := ICOM_END_OF_MESSAGE_CODE;
                if Self.active then
                   begin
                   if InactiveRadioPtr.CWByCAT_Sending then
@@ -1974,7 +1985,7 @@ begin
                end;
             end;
          end;
-      rtOrion:
+      rtOrion:     // Add special character processing to Orion routines.
          begin
          localMsg := Format('/%s#13', [Msg]);   // ny4i Issue 112
          WriteToCATPort(localMsg, length(localMsg));
@@ -2031,7 +2042,7 @@ begin
             CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
             CommandsTempBuffer[5] := ICOM_SEND_CW;
             CommandsTempBuffer[6] := CHR(255);
-            // Sorta documented in Icom manuals. FF in the subcode terminates CW (trial and error) ny4i
+            // Documented in Icom manuals. FF in the subcode terminates CW  ny4i
             CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
             AddCommandToBuffer;
             end;

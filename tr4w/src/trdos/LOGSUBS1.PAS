@@ -312,7 +312,11 @@ begin
         if pos(ControlD, Message) = 0 then
         begin
 //          wkWaitForChainablemessage := True;
-          FlushCWBuffer;
+          if not (IsCWByCATActive and
+                 (ActiveRadioPtr^.RadioModel in ICOMRadios)) then
+             begin
+             FlushCWBuffer;         // ny4i Issue 145 - Don;t dothis for Icom radios. It messes up the times of CW Messages
+             end;
         end;
     end;
 
@@ -555,7 +559,11 @@ begin
 
 //  LastDisplayedFreq[RadioOne] := 0; {KK1L: 6.73 Forces new display for highlight}
 //  LastDisplayedFreq[RadioTwo] := 0; {KK1L: 6.73 Forces new display for highlight}
-  if InActiveRadioptr^.CWByCAT then ActiveRadioPtr^.StopSendingCW;  // n4af 4.45.9
+  if IsCWByCATActive(InActiveRadioptr) then  // ny4i Issue 145 - Noticed this so I fixed it. IsCWByCATActive checks if radioObject CWBYCAT is set plus if the radio model is capable of CWByCAT.
+     begin
+     ActiveRadioPtr^.StopSendingCW;  // n4af 4.45.9
+     end;
+ // if InActiveRadioptr^.CWByCAT then ActiveRadioPtr^.StopSendingCW;
   InactiveRigCallingCQ := False;
 
   if ActiveRadio = RadioOne then
