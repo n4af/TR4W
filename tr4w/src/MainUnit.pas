@@ -127,7 +127,8 @@ uses
   LogWind,
   Tree,
   SysUtils,
-  ZoneCont
+  ZoneCont,
+  classes
   ;
 
   var
@@ -313,6 +314,7 @@ procedure CPUButtonProc;
 procedure TREscapeCommFunction(hFile: THandle; dwFunc: Byte);
 function Get_Ctl_Code(nr: integer): Cardinal;
 procedure DebugMsg(s: string); // ny4i
+procedure DebugRadioTempBuffer(sDecorator: string; var bRay: array of char); // ny4i Issue 145
 function IsCWByCATActive(theRadio: RadioPtr): boolean; overload;  // ny4i Issue # 111
 function IsCWByCATActive: boolean; overload;  // ny4i Issue # 111
 
@@ -385,6 +387,7 @@ var
   ReallocMemCount                       : integer;
   OldMemMgr                             : TMemoryManager;
   PreviousProcAddress                   : integer;
+  debugstr                              : string;
 
 const
   PCharDayTags                          : array[0..6] of PChar = (TC_SUN, TC_MON, TC_TUE, TC_WED, TC_THU, TC_FRI, TC_SAT);
@@ -1798,7 +1801,7 @@ end;
 
 procedure tr4w_ShutDown;
 begin
-  UnregisterClass(tr4w_ClassName, hInstance);
+  Windows.UnregisterClass(tr4w_ClassName, hInstance);   // ny4i Issue 145. UnregisterClass was not qualifies and it conflicted with classes.UnregisterClass
   ExitProcess(hInstance);
 end;
 
@@ -7108,6 +7111,24 @@ begin
     PTTStatusChanged;
 
   end;
+end;
+
+procedure DebugRadioTempBuffer(sDecorator: string; var bRay: array of char);   // ny4i Added in Issue 145
+{$IF NEWER_DEBUG}
+var
+   i: integer;
+   s: string;
+   Buf: array[0..100 * 2] of Char;
+   nLen: integer;
+{$IFEND}
+begin
+{$IF NEWER_DEBUG}
+   // Only do this stuff if the log level is set right (future change) ny4i
+   nLen := Ord(bRay[0]);
+   BinToHex(@bRay[1],Buf,nLen);
+   Buf[(nLen*2) - 2] := #0;
+   DebugMsg(sDecorator + ': ' + Buf);
+{$IFEND}
 end;
 
 procedure DebugMsg(s: string);
