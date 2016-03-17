@@ -4879,7 +4879,7 @@ nop
               AddStringToBuffer(CallWindowString, CWTone);
               if IsCWByCATActive then
                  begin
-                 AddStringToBuffer(Chr(242),CWTone);
+                 AddStringToBuffer(CWByCATBufferTerminator,CWTone);
                  end;
 //              PTTForceOn;
             end;

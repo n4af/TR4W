@@ -3176,7 +3176,7 @@ end;
 
 procedure BackToInactiveRadioAfterQSO;
 begin
-  if (ActiveRadioPtr^.tTwoRadioMode = TR3) or (activeradioptr.cwbycat) then
+  if (ActiveRadioPtr^.tTwoRadioMode = TR3) then // ny4i Issue 149 This activeradioptr.cwbycat would cause the rigs to swap all the time for CWBC or (activeradioptr.cwbycat) then
   begin
     tClearDupeInfoCall;
     ActiveRadioPtr^.tTwoRadioMode := TR0;

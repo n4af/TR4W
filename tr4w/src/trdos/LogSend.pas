@@ -469,7 +469,7 @@ begin
   InactiveRigCallingCQ := False;
   if IsCWByCATActive then
      begin
-     AddStringToBuffer(Chr(242),CWTone); // Flushes the buffer when the $242 is passed to SendCW - by only By CAT
+     AddStringToBuffer(CWByCATBufferTerminator,CWTone); // Flushes the buffer when the $242 is passed to SendCW - by only By CAT
      end;
 
 //if if ActiveRadioPtr^.CWByCAT then backtoinactiveradioafterqso;

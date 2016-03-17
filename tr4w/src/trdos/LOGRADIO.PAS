@@ -251,6 +251,8 @@ type
       procedure AddCommandToBuffer;
       procedure CheckRadioStatus;
       function  CheckAutoCallTerminate: boolean;
+      function DeleteLastCWCharacter: boolean;
+      procedure FlushCWByCATBuffer;
       procedure PutRadioIntoSplit;
       procedure PutRadioOutOfSplit;
       procedure SendIcomCommand(Command: byte);
@@ -1690,8 +1692,27 @@ begin
 
 end;
 //------------------------------------------------------------------------------
-procedure FlushCWByCATBuffer;      // ny4i 4.44.5
+function RadioObject.DeleteLastCWCharacter: boolean;  // ny4i Procedure added Issue149
 begin
+   Result := false;
+   if length(Self.CWByCATBuffer) > 1 then
+      begin
+      SetLength(Self.CWByCATBuffer,length(Self.CWByCATBuffer)-1); // Remove one byte from end of string
+      Result := true;
+      end
+   else if length(Self.CWByCATBuffer) = 1 then
+      begin
+      if Copy(Self.CWByCATBuffer,1,1) <> CWByCATBufferTerminator then
+         begin
+         SetLength(Self.CWByCATBuffer,length(Self.CWByCATBuffer)-1); // Remove one byte from end of string
+         Result := true;
+         end;
+      end;
+end;
+//------------------------------------------------------------------------------
+procedure RadioObject.FlushCWByCATBuffer;      // ny4i 4.44.5
+begin
+   SetLength(Self.CWByCATBuffer,0);    // ny4i Issue 149 Added (general cleanup)
 end;
 //------------------------------------------------------------------------------
 procedure RadioObject.SendCW(Msg: Str160);
@@ -1795,7 +1816,7 @@ begin
             charProcessed := true;
             end;
          // Now process the string is not already processed   
-         if (Msg = Chr(242)) or sendNow then // Do nothing
+         if (Msg = CWByCATBufferTerminator) or sendNow then // Do nothing
             begin
             DebugMsg('Assembling CW message to send');
             Msg := CWByCATBuffer;               // ny4i 4.44.5

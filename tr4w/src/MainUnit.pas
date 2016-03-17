@@ -391,7 +391,7 @@ var
 
 const
   PCharDayTags                          : array[0..6] of PChar = (TC_SUN, TC_MON, TC_TUE, TC_WED, TC_THU, TC_FRI, TC_SAT);
-
+  CWByCATBufferTerminator               = Chr(242);
   tAboutText                            =
     TR4W_CURRENTVERSION +
     ' - ' +
@@ -1045,6 +1045,7 @@ end;
 
 procedure ReturnInSAPOpMode;
 begin
+  DebugMsg('>>>>Entering   ReturnInSAPOpMode');
   if (ExchangeWindowString = '') and (CallWindowString = '') then
     if AutoReturnToCQMode then
     begin
@@ -1138,6 +1139,7 @@ end;
      begin
      BackToInactiveRadioAfterQSO;
      end;
+  DebugMsg('>>>>Exiting   ReturnInSAPOpMode');
 end;
 
 function Send_DE: boolean;
@@ -3251,7 +3253,7 @@ begin
               AddStringToBuffer(CallWindowString, CWTone);
               if IsCWByCATActive then
                  begin
-                 AddStringToBuffer(Chr(242),CWTone);
+                 AddStringToBuffer(CWByCATBufferTerminator,CWTone);
                  end;
 //            PTTForceOn;
               tAutoSendMode := True;

@@ -206,7 +206,7 @@ begin
 
    //localMsg := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
-   if ( (Msg = Chr(242)) or
+   if ( (Msg = CWByCATBufferTerminator) or
         ((CWEnable and CWEnabled and IsCWByCATActive )) ) then   // ny4i 4.44.5    + Issue 111
       begin
       // We have to see if the KeyersSwapped is set and if so, SendCW on the INACTIVE radio!
@@ -309,18 +309,24 @@ begin
      Result := ActiveRadioPtr.CWByCAT_Sending;
      end
   else if wkActive then
-  begin
-    Result := wkBUSY;
-    Exit;
-  end;
-  CWStillBeingSent := CPUKeyer.CWStillBeingSent;
+     begin
+     Result := wkBUSY;
+     end
+  else
+     begin
+     Result := CPUKeyer.CWStillBeingSent;   // ny4i Issue 149 With CWBC, it was possible to miss we were still sending
+     end;
 end;
 
 function DeleteLastCharacter: boolean;
 begin
-  if wkActive then
+  if ISCWByCATActive then
+     begin
+     Result := ActiveRadioPtr.DeleteLastCWCharacter; // ny4i Added Issue 149 (general stability of CWBC)
+     end
+  else if wkActive then
   begin
-    wkSendByte(wkCMD_BACKSPACE);
+    wkSendByte(wkCMD_BACKSPACE);   // ny4i Just a note...Result is not set here...
     Exit;
   end;
   DeleteLastCharacter := CPUKeyer.DeleteLastCharacter;
@@ -386,6 +392,10 @@ begin
     begin
           //            CPUKeyer.AddStringToCWBuffer (MSG, CWTone);
       AddStringToBuffer(Msg, CWTone);
+      if IsCWByCATActive then
+         begin
+         ActiveRadioPtr.SendCW(CWByCATBufferTerminator); // ny4i Issue 149 This closes and sends the buffer
+         end;
     end;
     Exit;
   end;
