@@ -2013,6 +2013,7 @@ begin
        if not rig.FilteredStatus.TXOn then
           begin
           DebugMsg('rig.CWByCAT_Sending set to FALSE - ' + rig.RadioName + ' (' + InterfacedRadioTypeSA[rig.RadioModel] + ')');
+          BackToInactiveRadioAfterQSO; // ny4i Ussue 153 We have to try here as WK and Serial do it in their threads when not busy
           rig.CWByCAT_Sending := false;
           if rig.CheckAutoCallTerminate then
              begin
@@ -2536,6 +2537,7 @@ begin
      if IsCWByCATActive then
         begin
         ActiveRadioPtr.CWByCAT_Sending := false; // If we were sending but the PTT goes off, now reset this.
+        BackToInactiveRadioAfterQSO; // ny4i Issue 153 We have to try here as WK and Serial do it in their threads when not busy
         DebugMsg('[Active] CWByCAT_Sending set to FALSE - ' + ActiveRadioPtr.RadioName + ' (' + InterfacedRadioTypeSA[ActiveRadioPtr.RadioModel] + ')');
         tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
         end;

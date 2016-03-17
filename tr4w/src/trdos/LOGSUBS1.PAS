@@ -520,7 +520,7 @@ var
   TimeOut                               : integer;
 
 begin
-
+  DebugMsg('>>>>Entering SWAPRADIOS');
   if SingleRadioMode then
   begin
     QuickDisplay(TC_ALTRCOMMANDDISABLED);
@@ -636,6 +636,7 @@ begin
   ShowInformation; // n4af 4.40.2
   ActiveRadioPtr.active := true;
   InactiveRadioPtr.active := false;
+  DebugMsg('<<<<Exiting  SWAPRADIOS');
 end;
 
 procedure ExchangeRadios; {KK1L: 6.71}
