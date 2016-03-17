@@ -1137,7 +1137,7 @@ end;
 
   if IsCWByCATActive then
      begin
-     BackToInactiveRadioAfterQSO;
+ //    BackToInactiveRadioAfterQSO;
      end;
   DebugMsg('>>>>Exiting   ReturnInSAPOpMode');
 end;
@@ -4048,9 +4048,8 @@ var
   ie                                    : Str80;
 begin
   Windows.ZeroMemory(@ie, SizeOf(ie));
-  ie := InitialExchangeEntry(CallWindowString);
-//  if ActiveExchange = RSTZoneOrSocietyExchange then ie := ie + ' ';
-//  SetWindowText(ExchangeWindowHandle, @ie[1]);
+  ie := '';     // issue 151 issue151
+ // ie := InitialExchangeEntry(CallWindowString); // issue151 caused cursor to stay in call window
   SetMainWindowText(mweExchange, @ie[1]);
 //  if (ie <> '') and (ie <> ' ') then
   if LeaveCursorInCallWindow then tCallWindowSetFocus;
