@@ -1108,18 +1108,35 @@ begin
 //  if TwoRadioState = StationCalled then CheckTwoRadioState(ReturnPressed)
 //  else
   if MessageEnable and (not ExchangeHasBeenSent) and (not BeSilent) and MessageEnable then
-  begin
-    if ActiveMode = Digital then SendMessageToMixW('<TX>');
-    if ActiveMode in [CW, Digital] then if not SendCrypticMessage(SearchAndPounceExchange) then Exit;
-    if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
-    if ActiveMode in [Phone, FM] then SendCrypticMessage(SearchAndPouncePhoneExchange);
+    begin
+    if ActiveMode = Digital then         // ny4i Issue153 Just reformatted these few 'IFs' for readability
+       begin
+       SendMessageToMixW('<TX>');
+       end;
+
+    if ActiveMode in [CW, Digital] then
+       if not SendCrypticMessage(SearchAndPounceExchange) then
+          begin
+          Exit;
+          end;
+
+    if ActiveMode = Digital then
+       begin
+       SendMessageToMixW('<RXANDCLEAR>');
+       end;
+
+    if ActiveMode in [Phone, FM] then
+       begin
+       SendCrypticMessage(SearchAndPouncePhoneExchange);
+       end;
+
     ExchangeHasBeenSent := True;
 
  //if activeradioptr^.cwbycat then backtoinactiveradioafterqso; // ny4i Issue130 Moving this to after LogContact
  {TODO } // Uncomment above and comment below to check for CWBC_AutoSend ny4i 9-mar-2016
- if activeradioptr^.cwbycat then backtoinactiveradioafterqso;
+ //if activeradioptr^.cwbycat then backtoinactiveradioafterqso; // ny4i Issue153 commented out
 
-end;
+    end;
 
   if TryLogContact then
   begin
@@ -1135,10 +1152,11 @@ end;
     end;
   end;
 
-  if IsCWByCATActive then
+ { if IsCWByCATActive then
      begin
-     BackToInactiveRadioAfterQSO;
+     BackToInactiveRadioAfterQSO;  // ny4i Issue153 Commented all
      end;
+     }
   DebugMsg('>>>>Exiting   ReturnInSAPOpMode');
 end;
 
@@ -4048,9 +4066,8 @@ var
   ie                                    : Str80;
 begin
   Windows.ZeroMemory(@ie, SizeOf(ie));
-  ie := InitialExchangeEntry(CallWindowString);
-//  if ActiveExchange = RSTZoneOrSocietyExchange then ie := ie + ' ';
-//  SetWindowText(ExchangeWindowHandle, @ie[1]);
+  ie := '';     // issue 151 issue151
+ // ie := InitialExchangeEntry(CallWindowString); // issue151 caused cursor to stay in call window
   SetMainWindowText(mweExchange, @ie[1]);
 //  if (ie <> '') and (ie <> ' ') then
   if LeaveCursorInCallWindow then tCallWindowSetFocus;

@@ -2715,7 +2715,7 @@ begin
 
           end;
 
-          InitialExchangeEntry := ' ' + Exchange; {KK1L: 6.73 Added ' '. K9PG forgets to add it when cursor at start.}
+          InitialExchangeEntry := '' + Exchange; // Issue151
 
           CheckAndSetInitialExchangeCursorPos;
             //          if InitialExchangeOverwrite then Windows.SendMessage(ExchangeWindowHandle, EM_SETSEL, 0, -1);
