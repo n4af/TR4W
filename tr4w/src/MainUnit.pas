@@ -476,7 +476,7 @@ begin
     SeventyThreeMessageSent := False;
     EscapeDeletedCallEntry := CallWindowString;
 
-    if CallWindowString = DupeInfoCall then
+    if (CallWindowString = DupeInfoCall) then
     begin
       DupeInfoCallWindowState := diNone;
       SetMainWindowText(mweDupeInfoCall, nil);
@@ -1067,8 +1067,10 @@ begin
 
 //  if tr4w_CallWindowActive then
   if (length(CallWindowString) >= 3) then
+  begin
     tCreateAndAddNewSpot(CallWindowString, tCallWindowStringIsDupe, ActiveRadioPtr);
-
+    tExchangeWindowSetFocus;   // n4af issue155 4.47.12
+  end;
   if ExchangeWindowString = '' then
     if (length(CallWindowString) >= 3) and
       ((not tCallWindowStringIsDupe) or
@@ -4066,10 +4068,8 @@ var
   ie                                    : Str80;
 begin
   Windows.ZeroMemory(@ie, SizeOf(ie));
-  ie := '';     // issue 151 issue151
- // ie := InitialExchangeEntry(CallWindowString); // issue151 caused cursor to stay in call window
+  ie := InitialExchangeEntry(CallWindowString); // issue151 caused cursor to stay in call window
   SetMainWindowText(mweExchange, @ie[1]);
-//  if (ie <> '') and (ie <> ' ') then
   if LeaveCursorInCallWindow then tCallWindowSetFocus;
 end;
 
