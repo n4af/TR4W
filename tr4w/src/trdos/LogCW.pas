@@ -36,7 +36,8 @@ utils_text,
   Windows,
   LogWind, {Dos,}
   LogRadio,
-  LogK1EA
+  LogK1EA,
+  classes
   ;
 
 type
@@ -118,19 +119,20 @@ var
 
 procedure AddStringToBuffer(Msg: Str160; Tone: integer);
 procedure AppendConfigFile(AddedLine: Str160);
-
+function CalculateElements(sMsg: string): integer;
 //procedure ClearPTTForceOn;
 procedure CWInit;
 function CWStillBeingSent: boolean;
 
 function DeleteLastCharacter: boolean;
 procedure DVKRecordMessage(MemoryString: Str20);
-
+function ElementLength(dots: integer; dashes: integer): integer;
 procedure FinishRTTYTransmission(Msg: Str160);
 procedure FlushCWBuffer;
 procedure FlushCWBufferAndClearPTT;
 
 procedure InitializeKeyer;
+procedure LoadElements(sl: TStringList);
 procedure SendStringAndStop(Msg: Str160);
 procedure SetSpeed(Speed: integer {byte});
 procedure SetPTT;
@@ -166,6 +168,7 @@ procedure DisplayCrypticSSBMenu;
 
 var
   KeyStatus                             : KeyStatusType;
+  slElements                            : TStringList;
 implementation
 
 uses
@@ -302,6 +305,45 @@ begin
   end;
 end;
 
+function CalculateElements(sMsg: string): integer;
+var
+   i: integer;
+   inx: integer;
+   s: string;
+   v: integer;
+   s1: string;
+begin
+   Result := 0;
+   if not assigned(slElements) then
+      begin
+      exit;
+      end;
+   DebugMsg('Calculating elements for ' + sMsg);
+   for i := 1 to (length(sMsg)) do
+      begin
+      s := Copy(sMsg,i,1);
+      if s = ' ' then
+         begin
+         Result := Result + 7;
+         end
+      else
+         begin
+         s1 := slElements.Values[s];
+         if length(s1) > 0 then
+            begin
+            Result := Result + StrToInt(s1);
+            DebugMsg('CW Element ' + s + ' = ' + s1 + ' elements');
+            end
+         else
+            begin
+            DebugMsg('Missing CW element for ' + s);
+            Result := Result + 5; // average 5
+            end;
+         end;
+      end;
+
+end;
+//------------------------------------------------------------------------------
 function CWStillBeingSent: boolean;
 begin
   if ISCWByCATActive then
@@ -385,7 +427,65 @@ begin
     RTTYTransmissionStarted := False;
    }
 end;
+function ElementLength(dots: integer; dashes: integer): integer;
+begin
+   Result := (dots * 1) + (dashes*3) +
+             ((dots + dashes) - 1)   + // Internel element space
+             3; //space ater character
+end;
+{------------------------------------------------------------------------------}
+procedure LoadElements(sl: TStringList);
+begin
+   if Assigned(sl) then
+      begin
+      sl.Sorted := false;
+      sl.CommaText := 'A=' + IntToStr(ElementLength(1,1)) +
+                     ',B=' + IntToStr(ElementLength(3,1)) +
+                     ',C=' + IntToStr(ElementLength(2,2)) +
+                     ',D=' + IntToStr(ElementLength(2,1)) +
+                     ',E=' + IntToStr(ElementLength(1,0)) +
+                     ',F=' + IntToStr(ElementLength(3,1)) +
+                     ',G=' + IntToStr(ElementLength(1,2)) +
+                     ',H=' + IntToStr(ElementLength(4,0)) +
+                     ',I=' + IntToStr(ElementLength(2,0)) +
+                     ',J=' + IntToStr(ElementLength(1,3)) +
+                     ',K=' + IntToStr(ElementLength(1,2)) +
+                     ',L=' + IntToStr(ElementLength(3,1)) +
+                     ',M=' + IntToStr(ElementLength(0,2)) +
+                     ',N=' + IntToStr(ElementLength(1,1)) +
+                     ',O=' + IntToStr(ElementLength(0,3)) +
+                     ',P=' + IntToStr(ElementLength(2,2)) +
+                     ',Q=' + IntToStr(ElementLength(1,3)) +
+                     ',S=' + IntToStr(ElementLength(3,0)) +
+                     ',T=' + IntToStr(ElementLength(0,1)) +
+                     ',U=' + IntToStr(ElementLength(2,1)) +
+                     ',V=' + IntToStr(ElementLength(3,1)) +
+                     ',W=' + IntToStr(ElementLength(1,2)) +
+                     ',X=' + IntToStr(ElementLength(2,2)) +
+                     ',Y=' + IntToStr(ElementLength(1,3)) +
+                     ',Z=' + IntToStr(ElementLength(2,2)) +
+                     ',1=' + IntToStr(ElementLength(1,4)) +
+                     ',2=' + IntToStr(ElementLength(2,3)) +
+                     ',3=' + IntToStr(ElementLength(3,2)) +
+                     ',4=' + IntToStr(ElementLength(4,1)) +
+                     ',5=' + IntToStr(ElementLength(5,0)) +
+                     ',6=' + IntToStr(ElementLength(4,1)) +
+                     ',7=' + IntToStr(ElementLength(3,2)) +
+                     ',8=' + IntToStr(ElementLength(2,3)) +
+                     ',9=' + IntToStr(ElementLength(1,4)) +
+                     ',0=' + IntToStr(ElementLength(0,5)) +
+                     ',?=' + IntToStr(ElementLength(4,2))
+                   + ',+=' + IntToStr(ElementLength(3,2)) // AR
+                   + ',^=' + '-3' // Icom special character so remove the interspace
+                   + ',%=' + IntToStr(ElementLength(4,1)) // K3 AS
+                   + ',%=' + IntToStr(ElementLength(4,1)) // K3 AS
+                   + ',*=' + IntToStr(ElementLength(4,2)) // K3 SK
+                     ;
+      sl.Sorted := true;
+      end;
 
+end;
+{------------------------------------------------------------------------------}
 procedure SendStringAndStop(Msg: Str160);
 
 var
@@ -2077,10 +2177,12 @@ begin
 
 //  SetEXCaptionMemoryString(Digital, F1, 'DE+Cl');
 //  SetEXCaptionMemoryString(Digital, F2, 'S&P EXCHANGE');
-
+    slElements := TStringList.Create;
+    LoadElements(slElements);
 end;
 
-//begin
-//  CWInit;
+begin
+  CWInit;
+  DebugMsg('foo');
 end.
 

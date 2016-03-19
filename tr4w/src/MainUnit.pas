@@ -476,7 +476,7 @@ begin
     SeventyThreeMessageSent := False;
     EscapeDeletedCallEntry := CallWindowString;
 
-    if (CallWindowString = DupeInfoCall) then
+    if (CallWindowString = DupeInfoCall) and (CallWindowString <> MyCall) then   // n4af issue 158
     begin
       DupeInfoCallWindowState := diNone;
       SetMainWindowText(mweDupeInfoCall, nil);
@@ -503,7 +503,7 @@ var
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
-{
+
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
@@ -519,7 +519,7 @@ begin
         if Esc_counter > 1 then
       begin
   //    tCleareCallWindow;      // n4af 4.46.11
-  initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
+//  initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
       inc(Esc_Counter);
       Opmode := CQOpMode;  // n4af 4.46.12
                                    // ny4i Issue #111 - Just a bit of code formatting for readability>>>>>>> a31747af888fbd546de46cd7f4ead476bcc8e842
@@ -528,10 +528,10 @@ begin
     OpMode := CQOpMode;
     Esc_counter := 0;
   //   if TryKillCW then Exit;
-}
+
   //scWK_reset; // n4af 4.46.2   // ny4i removed as thecode in PTTOff seems to get this. Maybe reset there?
 
-
+// InitializeQSO;
 
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
@@ -5563,6 +5563,7 @@ end;
 procedure PutCallToCallWindow(Call: CallString);
 begin
   Call[Ord(Call[0]) + 1] := #0;
+  if call = MyCall then exit;   // n4af issue 158
   Windows.SetWindowText(wh[mweCall], @Call[1]);
   PlaceCaretToTheEnd(wh[mweCall]);
 end;

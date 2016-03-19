@@ -1186,7 +1186,7 @@ begin
   end;
 
   { Put the band map on the band/mode of the inactive radio }
-
+  if (DupeInfoCall = MyCall) then exit;    // issue 158
   if (DupeInfoCall <> '') {and (DupeInfoCall <> EscapeKey)} then
 begin
     DisplayGridSquareStatus(CallWindowString);
@@ -1196,7 +1196,7 @@ begin
 
     isDupe := VisibleLog.CallIsADupe(DupeInfoCall, InActiveRadioPtr.BandMemory, InActiveRadioPtr.ModeMemory);
     if not Tune then tCreateAndAddNewSpot(DupeInfoCall, isDupe, InActiveRadioPtr);
-    if isDupe then
+    if isDupe and (DupeInfoCall <> MyCall) then   // n4af issue158
     begin
       DupeInfoCallWindowState := diDupe;
       Format(wsprintfBuffer, '%s DUPE!! on %s%s', @DupeInfoCall[1], BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
@@ -1408,6 +1408,7 @@ begin
 
 //  if TrayBallonDisplayed then Balloon_DeleteTrayIcon;
   FreeAndNil(udp); // ny4i 4.44.9 Destroy the udp object
+  FreeAndNil(slElements); // ny4i
   tr4w_ShutDown;
 end;
 
