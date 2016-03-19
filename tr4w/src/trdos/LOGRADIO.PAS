@@ -37,7 +37,8 @@ uses
    Tree,
    VC,
    Windows,
-   utils_text;
+   utils_text,
+   ExtCtrls;
 
 var
    Icom_Filter_Width: integer;     // n4af 4.43.4
@@ -76,7 +77,11 @@ const
 
 type
    tr4w_RTSDTRType = (RtsDtr_Nothing, RtsDtr_OFF, RtsDtr_ON, RtsDtr_CW, RtsDtr_PTT);
+   TEventHandlers = class
+      procedure OnTimerTick(Sender : TObject);
+   end;
 
+// var EventHandlers : TEventHandlers;
 const
 
    tr4w_RTSDTRTypeSA: array[tr4w_RTSDTRType] of PChar =
@@ -242,6 +247,8 @@ type
       //    tEnablePolling: boolean;
       //    tDebugBuf: array[0..511] of Char;
       CommandPause: integer;
+      tmrCWByCAT: TTimer;
+      EventHandlers : TEventHandlers;
       //    ControlDelay: integer;
       //      FilterRadioMessageLength: boolean;
       //    TrackingEnable: boolean;
@@ -275,6 +282,8 @@ type
       function WritePollRequest(const Buffer; nNumberOfBytesToWrite: DWORD): longbool;
       function AddToOutputBuffer(Buffer: PChar; nNumberOfBytesToWrite: DWORD): longbool;
       procedure WriteBufferToCATPort(const Buffer);
+      procedure OnCWByCATTimeEvent(Sender :TObject);
+      procedure EnableCWBYCATTimer(ms: integer);
       //    property fddd;
    end;
    RadioPtr = ^RadioObject;
@@ -687,6 +696,9 @@ procedure RITBumpUp;
 procedure VFOBumpDown;
 procedure VFOBumpUp;
 
+
+
+
 const
 
    //FT767PollString = NullKey + NullKey + NullKey + CHR($01) + NullKey;
@@ -715,7 +727,39 @@ uses
    MainUnit, uRadioPolling,
    uTelnet,
    LogStuff,
-   LogSUBS2;
+   LogSUBS2,
+   LogCW;
+
+
+
+procedure TEventHandlers.OnTimerTick(Sender : TObject);
+var callInactive: boolean;
+begin
+  DebugMsg('TimerTick event fired');
+  TTimer(Sender).Enabled := false;
+  if IsCWByCATActive(ActiveRadioPtr) then
+     begin
+     if ActiveRadioPtr.CWByCAT_Sending then
+        begin
+        ActiveRadioPtr.CWByCAT_Sending := false;
+        callInactive := true;
+        end;
+     end;
+
+  if IsCWByCATActive(InActiveRadioPtr) then
+  begin
+  if InActiveRadioPtr.CWByCAT_Sending then
+     begin
+     InActiveRadioPtr.CWByCAT_Sending := false;
+     callInactive := true;
+     end;
+  end;
+
+  if callInactive then
+     begin
+     BackToInactiveRadioAfterQSO;
+     end;
+end;
 
 function IntegerToBCD(Value: DWORD): integer;
 const
@@ -1043,6 +1087,8 @@ begin
          end;
       end;
 end;
+
+
 
 {
 procedure CheckRITKeys;
@@ -1583,6 +1629,24 @@ begin
    PreviousStatus := CurrentStatus;
 end;
 
+procedure RadioObject.OnCWByCATTimeEvent(Sender :TObject);
+begin
+   if Self.CWByCAT and (Self.RadioModel in RadioSupportsCWByCAT) then
+      begin
+      if Self.CWBYCAT_Sending then
+         begin
+         QuickDisplay('CW Timer fired');
+         Self.tmrCWByCat.enabled := false;
+         end;
+      end;
+end;
+
+procedure RadioObject.EnableCWBYCATTimer(ms: integer);
+begin
+   DebugMsg('Setting tmrCWByCAT timer to ' + IntToStr(ms) + ' mS.');
+   Self.tmrCWByCAT.interval := ms;
+   Self.tmrCWByCat.enabled := true; 
+end;
 procedure RadioObject.AddCommandToBuffer;
 begin
    // TLogger.GetInstance.Debug('Entering AddCommandToBuffer');
@@ -1730,6 +1794,7 @@ var
    formatStr: string;
    debugStr: string;
    charProcessed: boolean;
+   elements: integer;
 begin
    if not ( Self.CWByCAT and (Self.RadioModel in RadioSupportsCWByCAT) ) then
       begin
@@ -1875,8 +1940,10 @@ begin
                   begin
                   formatStr := 'KY %s;';
                   end;
+               elements := CalculateElements(sMsg);
+               DebugMsg('Total CW Elements for ' + sMsg + ' = ' + IntToStr(elements));
                localMsg := Format(formatStr, [sMsg]);
-
+               Self.EnableCWBYCATTimer( Round(1200 / DisplayedCodeSpeed) * elements);
                AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
                DebugMsg('Adding K/E/F radio CW string to buffer');
                Self.CWByCAT_Sending := true;
@@ -2164,6 +2231,11 @@ begin
       end;
 
    { Initialize the radio variables }
+
+   Self.tmrCWByCAT := TTimer.Create(nil);
+   Self.tmrCWByCAT.Enabled := false;
+   Self.EventHandlers := EventHandlers;
+   Self.tmrCWByCAT.OnTimer := Self.EventHandlers.OnTimerTick;
 
    PollStatus := NoPollStatus;
 
@@ -3333,6 +3405,9 @@ begin
    Radio2.RadioName := TC_RADIO2;
    Radio1.active := true;
    Radio2.active := false;
+
+   // Create CWByCATTimer
+
 end;
 
 {
