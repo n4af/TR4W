@@ -1408,6 +1408,7 @@ begin
 
 //  if TrayBallonDisplayed then Balloon_DeleteTrayIcon;
   FreeAndNil(udp); // ny4i 4.44.9 Destroy the udp object
+  FreeAndNil(slElements); // ny4i
   tr4w_ShutDown;
 end;
 
