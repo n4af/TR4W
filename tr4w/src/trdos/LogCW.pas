@@ -305,6 +305,10 @@ begin
   end;
 end;
 
+{------------------------------------------------------------------------------
+ny4i Issue 153
+This adds up the element lengths to use in a calculation to determine how long it will take to send.
+}
 function CalculateElements(sMsg: string): integer;
 var
    i: integer;
@@ -427,13 +431,19 @@ begin
     RTTYTransmissionStarted := False;
    }
 end;
+{-------------------------------------------------------------------------------
+ny4i Issie 153
+Helper function to easily refer to the number of dot and dashes in a character
+}
 function ElementLength(dots: integer; dashes: integer): integer;
 begin
    Result := (dots * 1) + (dashes*3) +
              ((dots + dashes) - 1)   + // Internel element space
              3; //space ater character
 end;
-{------------------------------------------------------------------------------}
+{------------------------------------------------------------------------------
+This procedure is called only at the start of the program to build the StringList name/value pairs
+// NY4I Issue154}
 procedure LoadElements(sl: TStringList);
 begin
    if Assigned(sl) then
@@ -2059,7 +2069,10 @@ begin
       SendingOnRadioTwo := True;
       SetRelayForActiveRadio(ActiveRadio);
     end;
-if cwbycat then ActiveRadioPtr.SendCW(F1);
+    // If this line really wantsa to send F1 upon if CWByCat, it would beed to call IsActiveCWByCAT
+    // but as this code is called in other places, I do not believe this is the right thing to do.
+    // ny4i
+//if cwbycat then ActiveRadioPtr.SendCW(F1);  // ny4i - This does not do anything. This is not the right variable to check.
   wkSetKeyerOutput(ActiveRadioPtr);
 
   KeyersSwapped := False;
@@ -2077,6 +2090,7 @@ var
 begin
 
   if KeyersSwapped then Exit; { Already swapped to inactive rig }
+  DebugMsg('>>>>>ENTER SetUpToSendOnInactiveRadio');
 {
   if (ActiveMode = Phone) and DVKEnable and DVPActive and DVPMessagePlaying then
   begin
@@ -2131,6 +2145,7 @@ begin
   wkSetKeyerOutput(InActiveRadioPtr);
 
   KeyersSwapped := True;
+  DebugMsg('<<<<< EXIT SetUpToSendOnInactiveRadio');
 end;
 
 procedure ToggleCW(DisplayPrompt: boolean);

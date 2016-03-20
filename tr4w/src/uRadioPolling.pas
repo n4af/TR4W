@@ -2013,7 +2013,8 @@ begin
        if not rig.FilteredStatus.TXOn then
           begin
           DebugMsg('rig.CWByCAT_Sending set to FALSE - ' + rig.RadioName + ' (' + InterfacedRadioTypeSA[rig.RadioModel] + ')');
-          BackToInactiveRadioAfterQSO; // ny4i Ussue 153 We have to try here as WK and Serial do it in their threads when not busy
+          rig.tmrCWByCAT.Enabled := false; // ny4i Issue 153 Disable timer so we do not fire if we get the this event here
+          //BackToInactiveRadioAfterQSO; // Moved to Timer event // ny4i Ussue 153 We have to try here as WK and Serial do it in their threads when not busy
           rig.CWByCAT_Sending := false;
           if rig.CheckAutoCallTerminate then
              begin

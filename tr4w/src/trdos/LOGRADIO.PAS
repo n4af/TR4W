@@ -1253,7 +1253,12 @@ function RadioObject.WriteToCATPort(const Buffer;
    nNumberOfBytesToWrite: DWORD): longbool;
 var
    lpNumberOfBytesWritten: DWORD;
+{$IF NEWER_DEBUG}
+   i: integer;
    s: string;
+   Buf: array[0..100 * 2] of Char;
+   nLen: integer;
+{$IFEND}
 begin
 {
   if not DVKEnable then
@@ -1270,11 +1275,14 @@ begin
 }
       try
 {$IF NEWER_DEBUG}
-      if nNumberOfBytesToWrite > 10 then
+      if not (nNumberOfBytesToWrite in [3,6,7]) then
          begin
          DebugMsg('>>>>Enter WriteToCATPort');
          SetString(debugStr,PChar(@Buffer),nNumberOfBytesToWrite);
-         DebugMsg(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,debugStr]));
+         nLen := nNumberOfBytesToWrite; //Ord(Buffer[0]);
+         BinToHex(@Buffer,Buf,nLen);
+         Buf[(nLen*2) - 2] := #0;
+         DebugMsg(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,Buf]));
          end;
 {$IFEND}
       Windows.WriteFile(tCATPortHandle, Buffer, nNumberOfBytesToWrite,
@@ -1293,7 +1301,7 @@ begin
 }
    Result := nNumberOfBytesToWrite = lpNumberOfBytesWritten;
 {$IF NEWER_DEBUG}
-   if nNumberOfBytesToWrite > 10 then
+   if not (nNumberOfBytesToWrite in [3,6,7]) then
       begin
       DebugMsg('<<<<Exit WriteToCATPort');
       end;
@@ -1940,10 +1948,10 @@ begin
                   begin
                   formatStr := 'KY %s;';
                   end;
-               elements := CalculateElements(sMsg);
+               elements := CalculateElements(sMsg);  // ny4i Issue 153
                DebugMsg('Total CW Elements for ' + sMsg + ' = ' + IntToStr(elements));
                localMsg := Format(formatStr, [sMsg]);
-               Self.EnableCWBYCATTimer( Round(1200 / DisplayedCodeSpeed) * elements);
+               Self.EnableCWBYCATTimer( Round(1200 / DisplayedCodeSpeed) * elements); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
                AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
                DebugMsg('Adding K/E/F radio CW string to buffer');
                Self.CWByCAT_Sending := true;
@@ -1974,7 +1982,7 @@ begin
          begin
          if RadioModel in RadioSupportsCWByCAT then
             begin
-            if Ord(Msg[1]) = 242 then // Flush if Msg = #242
+            if Msg[1] = CWByCATBufferTerminator then // Flush if Msg = CWByCATBufferTerminator
                begin
                Msg := CWByCATBuffer;               // ny4i 4.44.5
                msgLen := length(CWByCATBuffer);    //length(Msg);
@@ -2015,6 +2023,9 @@ begin
                      end;
                   end;
                DebugMsg('SendCW for Icom, len = ' + IntToStr(len));
+               elements := CalculateElements(Msg);  // ny4i Issue 153
+               DebugMsg('Total CW Elements for ' + Msg + ' = ' + IntToStr(elements));
+               Self.EnableCWBYCATTimer(Round(( (1200 / DisplayedCodeSpeed) * elements) * 1.25)); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
                AddCommandToBuffer;
                Self.CWByCAT_Sending := true;
                DebugMsg('Self.CWByCAT_Sending set to TRUE - Icom');

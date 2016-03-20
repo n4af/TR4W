@@ -130,7 +130,7 @@ begin
 
   if CWEnabled = False then Exit;
   if length(SendString) = 0 then Exit;
-  SetSpeed(DisplayedCodeSpeed); //ny4i This seems superflous. The speed should be set already
+  //SetSpeed(DisplayedCodeSpeed); //ny4i This seems superflous. The speed should be set already
 
 
   //SetPTT;
