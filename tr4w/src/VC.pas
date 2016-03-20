@@ -2348,6 +2348,7 @@ var
   tFontsColorsArray                     : array[0..1] of TColorsFontsEntry;
 
   tr4w_osverinfo                        : OSVERSIONINFO {= (dwOSVersionInfoSize: SizeOf(OSVERSIONINFO))};
+  StickyKeysAtStartup                   : STICKYKEYS; // ny4i Issue 126
   Msg                                   : TMsg;
   EditingCallsignSent                   : boolean; //???????????? ??? autosend, ????? ?????????? backspace
   ControlAMode                          : boolean; //????? Ctrl+A

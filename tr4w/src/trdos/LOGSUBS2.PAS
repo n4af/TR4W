@@ -1408,7 +1408,10 @@ begin
 
 //  if TrayBallonDisplayed then Balloon_DeleteTrayIcon;
   FreeAndNil(udp); // ny4i 4.44.9 Destroy the udp object
-  FreeAndNil(slElements); // ny4i
+
+  // Restore StickyKeys settings // ny4i Issue 126
+  SystemParametersInfo( SPI_SETSTICKYKEYS, SizeOf(StickyKeysAtStartup), @StickyKeysAtStartup, 0 );
+
   tr4w_ShutDown;
 end;
 
