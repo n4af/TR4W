@@ -82,7 +82,7 @@ const
   TC_LATEST_CONFIG_FILE                 = 'Poslednja konfiguraciona datoteka';
   TC_OPENCONFIGURATIONFILE              = ' - Otvori konfiguracionu datoteku ili kreiraj konfiguraciju za novo takmicenje';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Direktorijum "%s" vec postoji.'#13' Presnimiti ga?';
-  TC_IAMIN                              = '&Ja sam u %s';
+  TC_IAMIN                              = '&Ja sam u %s'';
 
   TC_NEWENGLANDSTATEABREVIATION         = 'Upisi skracenicu za drzave Nove Engleske(New England)'#13'(ME, NH, VT, MA, CT, RI):';
   TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Upisi QTH koji ce se emitovati:';
@@ -126,6 +126,7 @@ const
   TC_ENTERYOURBRANCHNUMBER              = 'Upisi broj svoje filijale:';
   TC_ENTERYOURPOSTCODE                  = 'Upisi svoj postanski broj:';
 
+  TC_HQ_OR_MEMBER                       = 'HQ or member';
   
 
   TC_NEWENGLAND                         = 'Nova Engleska';
@@ -243,9 +244,6 @@ const
   TC_SAVINGTO                           = 'Snimanje %s u %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Fajl snimljen na flopi uspesno';
   TC_FILESAVEDTOSUCCESSFULLY            = 'Fajl snimljen na %s uspesno';
-  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
-  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';   
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
 
   {LOGSEND}
 
@@ -374,6 +372,10 @@ const
   TC_LEADIN                             = 'Ispred (*10 ms)';
   TC_TAIL                               = 'Iza (*10 ms)';
   
+  TC_WEIGHTING                          = 'Weighting';
+  TC_DITDAHRATIO                        = 'Dit/Dah ratio';
+  TC_LEADIN                             = 'Lead-in time (*10 ms)';
+  TC_TAIL                               = 'Tail time (*10 ms)';
   TC_FIRSTEXTENSION                     = 'Prva ekstenzija';
   TC_KEYCOMP                            = 'Taster kompenzacija';
   TC_PADDLESWITCHPOINT                  = 'Prikljucna tacka rucica';
@@ -798,7 +800,10 @@ const
   RC_SEND_BUG                           = 'Posalji raport o gresci';
   RC_HOMEPAGE                           = 'TR4W Home Page';
   RC_FREQUENCY                          = 'Frekvencija';
-  RC_DVKVOLCONTROL                      = 'Regulacija nivoa DVK';
-  TC_ISLANDSTATION                      = 'Ostrvska stanica';
-  RC_SPLITOFF                       = 'Toggle Split ON/OFF';
-   TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
+  TC_SPLIT_WARN                       	= 'Paznja: u SPLIT MODU si!!!';
+{FD Additions NY4I}
+ 
+TC_IMPROPERTRANSMITTERCOUNT 			= 'FD predajnici moraju biti izmedju 1 i 99.';
+TC_IMPROPERARRLFIELDDAYCLASS 			= 'Field Day klasa mora biti A, B, C, D, E ili F.';
+TC_ARRLFIELDDAYIMPROPERDXEXCHANGE 		= 'DX Station razmena mora biti "DX".';
+RC_SPLITOFF                       		= 'Split ukljucen ON/OFF';
