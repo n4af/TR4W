@@ -582,7 +582,7 @@ begin
     ActiveRadio := RadioTwo;
     InactiveRadio := RadioOne; {KK1L: 6.73}
     CodeSpeed := Radio2.SpeedMemory; {KK1L: 6.73}
-    SetSpeed(CodeSpeed);
+    //SetSpeed(CodeSpeed); // ny4i Issue 153 This is done in SetUpToSendOnActiveRadio so no need to do it here.
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end
   else
@@ -601,7 +601,7 @@ begin
     ActiveRadio := RadioOne;
     InactiveRadio := RadioTwo; {KK1L: 6.73}
     CodeSpeed := Radio1.SpeedMemory; {KK1L: 6.73}
-    SetSpeed(CodeSpeed);
+    //SetSpeed(CodeSpeed); // ny4i Issue 153 This is done in SetUpToSendOnActiveRadio so no need to do it here.
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
 //<<<<<<< Updated upstream

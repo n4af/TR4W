@@ -117,29 +117,6 @@ uses
 {$IF LANG = 'ROM'}{$R res\tr4w_rom.res}{$IFEND}
 {$IF LANG = 'CHN'}{$R res\tr4w_chn.res}{$IFEND}
 
-type
-    // Extended NONCLIENTMETRICS structure not defined in Delphi 7's Windows.pas
-    tagNONCLIENTMETRICSXA = packed record
-        cbSize: UINT;
-        iBorderWidth: Integer;
-        iScrollWidth: Integer;
-        iScrollHeight: Integer;
-        iCaptionWidth: Integer;
-        iCaptionHeight: Integer;
-        lfCaptionFont: TLogFontA;
-        iSmCaptionWidth: Integer;
-        iSmCaptionHeight: Integer;
-        lfSmCaptionFont: TLogFontA;
-        iMenuWidth: Integer;
-        iMenuHeight: Integer;
-        lfMenuFont: TLogFontA;
-        lfStatusFont: TLogFontA;
-        lfMessageFont: TLogFontA;
-        // This member not supported for Windows Server 2003 and Windows XP/2000
-        iPaddedBorderWidth: Integer;
-    end;
-    NONCLIENTMETRICSX = tagNONCLIENTMETRICSXA;
-    
 function WindowProc(TRHWND: HWND; Msg: UINT; wParam: wParam; lParam: lParam): longword; stdcall;
 
 label
@@ -511,10 +488,6 @@ begin
 
   WindowsOSversion := tr4w_osverinfo.dwPlatformId;
 
-  if (tr4w_osverinfo.dwMajorVersion < 6) then
-    begin
-       // IsStickyKeysAtStartup.cbSize := IsStickyKeysAtStartup.cbSize - SizeOf(ncm.iPaddedBorderWidth);
-    end;
   StickyKeysAtStartup.cbSize := sizeof(STICKYKEYS);
   Windows.SystemParametersInfo(SPI_GETSTICKYKEYS, sizeof(STICKYKEYS), @StickyKeysAtStartup, 0);
   tempStickyKey.cbSize := StickyKeysAtStartup.cbSize;
