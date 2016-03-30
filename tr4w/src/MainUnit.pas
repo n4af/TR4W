@@ -3256,7 +3256,7 @@ begin
   i := 0;
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
-
+  DebugMsg('[CallWindowKeyDownProc] Key pressed = ' + key); 
   if tAutoCQMode then if TryKillAutoCQ then Escape_proc;
 
 // start sending now code
@@ -3270,9 +3270,11 @@ begin
             if MessageEnable then
             begin
               CheckInactiveRigCallingCQ;
+              DebugMsg('[CallWindowKeyDownProc] Call AddStringToBuffer with ' + CallWindowString);
               AddStringToBuffer(CallWindowString, CWTone);
               if IsCWByCATActive then
                  begin
+                 DebugMsg('[CallWindowKeyDownProc] Calling AddStringToBuffer with CWByCATBufferTerminator');
                  AddStringToBuffer(CWByCATBufferTerminator,CWTone);
                  end;
 //            PTTForceOn;
@@ -3299,6 +3301,7 @@ begin
         end
         else
         begin
+          DebugMsg('[CallWindowKeyDownProc] Calling AddStringToBuffer with !');
           AddStringToBuffer('!', CWTone);
           EditingCallsignSent := True;
         end;
@@ -3310,15 +3313,22 @@ begin
       begin
         if IsCWByCATActive then
            begin // Send the character now - No buffering
-           if (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
+           if true then // (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
               begin
+              DebugMsg('[CallWindowKeyDownProc] Call RadioObject.SendCW with ' + Key);
+              //ActiveRadioPtr.AddTimeToCWByCATTimer(Round(1200 / DisplayedCodeSpeed) * 5); // Give us more time but this does not work yet.
               ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
+              ActiveRadioPtr.SendCW(CWByCATBufferTerminator);
+              // ny4i If we are sending (timer is enabled), add this element time to the timer. ny4i. That is a bit scary if it works :)
        
           //  end;
            end;
           end
         else if wkActive then
-        wkSendByte(Ord(UpCase(Key)))
+           begin
+           DebugMsg('[CallWindowKeyDownProc] Calling wsSendByte with ' + key);
+           wkSendByte(Ord(UpCase(Key)));
+           end
         else
           begin
 
@@ -3357,9 +3367,14 @@ begin
 
 procedure CallWindowKeyUpProc;
 begin
-  if AutoSendEnable then
-    if AutoSendCharacterCount = length(CallWindowString) then
-       StartSendingNow(False);
+   if AutoSendEnable then
+      begin
+      if AutoSendCharacterCount = length(CallWindowString) then
+         begin
+         DebugMsg('[CallWindowKeyUpProc] Calling StartSendingNow with False');
+         StartSendingNow(False);
+         end;
+      end;
 end;
 
 procedure OpenTR4WWindow(ID: WindowsType);

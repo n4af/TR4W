@@ -284,6 +284,7 @@ type
       procedure WriteBufferToCATPort(const Buffer);
       procedure OnCWByCATTimeEvent(Sender :TObject);
       procedure EnableCWBYCATTimer(ms: integer);
+      procedure AddTimeToCWByCATTimer(ms: integer);
       //    property fddd;
    end;
    RadioPtr = ^RadioObject;
@@ -1651,10 +1652,33 @@ end;
 
 procedure RadioObject.EnableCWBYCATTimer(ms: integer);
 begin
-   DebugMsg('Setting tmrCWByCAT timer to ' + IntToStr(ms) + ' mS.');
-   Self.tmrCWByCAT.interval := ms;
-   Self.tmrCWByCat.enabled := true; 
+{ Updating the time in a timer does not work properly. Need to come up up with a better way for that. NY4I
+   if Self.tmrCWBYCAT.enabled then
+      begin
+      // Add the time
+      DebugMsg('Adding ' + IntToStr(ms) + ' mS to tmrCWByCAT timer - Interval now = to ' + IntToStr(Self.tmrCWByCAT.interval) + ' mS.');
+      Self.tmrCWByCAT.interval := Self.tmrCWByCAT.interval + ms;
+      end
+   else }
+      begin
+      DebugMsg('Setting tmrCWByCAT timer to ' + IntToStr(ms) + ' mS.');
+      Self.tmrCWByCAT.interval := ms;
+      Self.tmrCWByCat.enabled := true;
+      end;
 end;
+{-------------------------------------------------------------------------------}
+procedure RadioObject.AddTimeToCWByCATTimer(ms: integer);    // ny4i Issue 159 - Added procedure
+begin
+   if Self.tmrCWBYCAT.enabled then
+      begin
+      Self.tmrCWByCAT.interval := Self.tmrCWByCAT.interval + ms;
+      end
+   else
+      begin
+      DebugMsg('[AddTimerToCWByCATTimer] Trying to add ' + IntToStr(ms) + ' ms but timer is disabled');
+      end;
+end;
+{------------------------------------------------------------------------------}
 procedure RadioObject.AddCommandToBuffer;
 begin
    // TLogger.GetInstance.Debug('Entering AddCommandToBuffer');
