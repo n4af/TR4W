@@ -280,7 +280,7 @@ const
 
 
 
- //}
+ //
 
     (mrText: 'Ctrl-'; mrId: MAXWORD),
  //{
@@ -304,6 +304,7 @@ const
     (mrText: RC_QSOWITHNOCW + RC_QSOWITHNOCW_HK; mrId: menu_ctrl_logqsowithoutcw),
     (mrText: RC_CURSORTELNET + RC_CURSORTELNET_HK; mrId: menu_ctrl_cursorintelnet),
     (mrText: RC_ADDBANDMAPPH + RC_ADDBANDMAPPH_HK; mrId: menu_ctrl_PlaceHolder),
+
     (mrText: RC_CT1BOHIS + RC_CT1BOHIS_HK; mrId: menu_ctrl_ct1bohscreen),
     (mrText: RC_ADDINFO; mrId: MAXWORD - 1),
   //{
@@ -317,7 +318,9 @@ const
 
     (mrText: RC_COMMANDS; mrId: MAXWORD),
  //{
+
     (mrText: RC_SPLITOFF + RC_SPLITOFF_HK; mrId: menu_ctrl_SplitOff),      // n4af 4.47.3
+
     (mrText: RC_FOCUSINMW + RC_FOCUSINMW_HK; mrId: menu_mainwindow_setfocus),
     (mrText: RC_TOGGLEINSERT + RC_TOGGLEINSERT_HK; mrId: menu_insertmode),
     (mrText: RC_ESCAPE + RC_ESCAPE_HK; mrId: menu_escape),

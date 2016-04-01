@@ -1927,6 +1927,7 @@ begin
                   end;
                K2, K3:
                   begin
+<<<<<<< HEAD
                   maxLen := 22; //28;
                   pad := false;
                   end;
@@ -1941,6 +1942,28 @@ begin
                if pad then
                   begin
                   while length(sMsg) < maxLen do
+=======
+                  case RadioModel of
+                     TS480, TS570, TS590, TS950, TS990, TS2000, FLEX:
+                        begin
+
+                        repeat
+                          //   Msg := msg + ' '; // ny4i put back to test
+                           Msg := ' ' + msg;  // n4af change buffer order on spaces
+                        until length(Msg) = 24;
+                        localMsg := Format('KY %s;', [Msg]);
+                        end;
+                     K2, K3, TS850:
+                        // TS850 is just here for compatibility--it really does not support CWBYCAT.
+                        begin
+                        localMsg := Format('KY %s;', [Msg]);
+                        end;
+                     end; // case
+
+                  //localMsg := Format('KY %s;', [Msg]);
+                  //DebugMsg('Sending to K3='+localMsg);
+                  if Self.active then
+>>>>>>> b739bc366b13ffea2016330312813d1e326f0b5d
                      begin
                      sMsg := sMsg + ' ';
                      end;

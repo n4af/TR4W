@@ -1110,6 +1110,7 @@ begin
 //  if TwoRadioState = StationCalled then CheckTwoRadioState(ReturnPressed)
 //  else
   if MessageEnable and (not ExchangeHasBeenSent) and (not BeSilent) and MessageEnable then
+
     begin
     if ActiveMode = Digital then         // ny4i Issue153 Just reformatted these few 'IFs' for readability
        begin
@@ -1697,6 +1698,7 @@ var
   RadioToSet                            : RadioPtr {RadioType};
 begin
   begin
+
    if InSplit then begin
      PutRadioOutOfSplit(ActiveRadio);    // n4af 4.47.5
       PutRadioOutOfSplit(InActiveRadio);
@@ -1704,6 +1706,7 @@ begin
      exit;
    end;
     Freq := 0;
+
     Freq := QuickEditFreq(TC_TRANSMITFREQUENCYKILOHERTZ, 10);
 
     RadioToSet := ActiveRadioPtr {ActiveRadio};
@@ -1714,6 +1717,8 @@ begin
       RadioToSet := InActiveRadioPtr {InactiveRadio};
     end;
 
+    if (Freq = 0) then PutRadioOutOfSplit(ActiveRadio);
+    if (Freq = -0) then PutRadioOutOfSplit(InactiveRadio);
     if (Freq > 1000) and (Freq < 1000000) then
       case RadioToSet.BandMemory {BandMemory[RadioToSet]} of
         Band80: Freq := Freq + 3000000;
@@ -1731,6 +1736,7 @@ begin
 //      PutRadioIntoSplit(RadioToSet); {KK1L: 6.73}
       RadioToSet.PutRadioIntoSplit;
       SplitFreq := Freq;
+      InSplit := True;
     end;
     BandMapCursorFrequency := Freq; {KK1L: 6.68 Band map tracks transmit freq}
     DisplayBandMap;
@@ -2818,9 +2824,11 @@ begin
 
     menu_insertmode: InvertBooleanCommand(@InsertMode);
 
+
     menu_ctrl_SplitOff:               // n4af 4.47.5
      tr4w_alt_n_transmit_frequency ;
-    
+
+
     menu_escape:
       Escape_proc;
 
@@ -3311,8 +3319,9 @@ begin
     begin
       if Key <> StartSendingNowKey then
       begin
-        if IsCWByCATActive then
+         if IsCWByCATActive then
            begin // Send the character now - No buffering
+<<<<<<< HEAD
            if true then // (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
               begin
               DebugMsg('[CallWindowKeyDownProc] Call RadioObject.SendCW with ' + Key);
@@ -3323,6 +3332,7 @@ begin
        
           //  end;
            end;
+
           end
         else if wkActive then
            begin
@@ -3342,7 +3352,7 @@ begin
     end;
   end;
   //  CallsignsList.CreatePartialsList(CallWindowString);
-  p := wh[mwePossibleCall];
+  p  := wh[mwePossibleCall];
   c := wh[mweCall];
   if not InsertMode then EditSetSelLength(c, 1);
 
