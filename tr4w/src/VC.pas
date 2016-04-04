@@ -174,12 +174,9 @@ const
 {$IFEND}
 
   OZCR2008                              = False;
-<<<<<<< HEAD
-  TR4W_CURRENTVERSION_NUMBER            = '4.48.0'  ; // n4af
-=======
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.47.3' ;     // NY4I
->>>>>>> b739bc366b13ffea2016330312813d1e326f0b5d
+  TR4W_CURRENTVERSION_NUMBER            = '4.48.1' ;     // N4af
+
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
   TR4W_CURRENTVERSIONDATE               = 'Mar  30, 2016' ;

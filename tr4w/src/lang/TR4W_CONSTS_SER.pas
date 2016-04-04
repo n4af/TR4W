@@ -82,7 +82,7 @@ const
   TC_LATEST_CONFIG_FILE                 = 'Poslednja konfiguraciona datoteka';
   TC_OPENCONFIGURATIONFILE              = ' - Otvori konfiguracionu datoteku ili kreiraj konfiguraciju za novo takmicenje';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Direktorijum "%s" vec postoji.'#13' Presnimiti ga?';
-  TC_IAMIN                              = '&Ja sam u %s'';
+  TC_IAMIN                              = '&Ja sam u %s';
 
   TC_NEWENGLANDSTATEABREVIATION         = 'Upisi skracenicu za drzave Nove Engleske(New England)'#13'(ME, NH, VT, MA, CT, RI):';
   TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Upisi QTH koji ce se emitovati:';
@@ -807,3 +807,4 @@ TC_IMPROPERTRANSMITTERCOUNT 			= 'FD predajnici moraju biti izmedju 1 i 99.';
 TC_IMPROPERARRLFIELDDAYCLASS 			= 'Field Day klasa mora biti A, B, C, D, E ili F.';
 TC_ARRLFIELDDAYIMPROPERDXEXCHANGE 		= 'DX Station razmena mora biti "DX".';
 RC_SPLITOFF                       		= 'Split ukljucen ON/OFF';
+TC_ISLANDSTATION                        = 'Island station';
