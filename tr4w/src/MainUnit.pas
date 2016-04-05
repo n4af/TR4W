@@ -3321,7 +3321,6 @@ begin
       begin
          if IsCWByCATActive then
            begin // Send the character now - No buffering
-<<<<<<< HEAD
            if true then // (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
               begin
               DebugMsg('[CallWindowKeyDownProc] Call RadioObject.SendCW with ' + Key);

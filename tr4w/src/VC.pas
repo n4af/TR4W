@@ -1971,11 +1971,7 @@ const
   menu_alt_multbell                     = 10307;
   menu_alt_killcw                       = 10308;
   menu_alt_searchlog                    = 10309;
-<<<<<<< HEAD
-  menu_alt_transfreq                    = 10310;
-=======
   menu_alt_transfreq                    = 10310;     //  4.47.3 restore menuid
->>>>>>> b739bc366b13ffea2016330312813d1e326f0b5d
   menu_alt_reminder                     = 10311;
   menu_alt_autocq                       = 10312;
   menu_alt_tooglerigs                   = 10313;
@@ -2056,11 +2052,7 @@ const
   menu_inactiveradio_cwspeedup          = 10513;
   menu_inactiveradio_cwspeeddown        = 10514;
   //  menu_dupecheck_or_sp                  = 10507;
-<<<<<<< HEAD
-//  menu_alt_transfreq                    = 10311;
-=======
  // menu_alt_transfreq                    = 10311;   // 4.47.3 remove
->>>>>>> b739bc366b13ffea2016330312813d1e326f0b5d
   menu_home_page                        = 10606;
 //  menu_send_bug                         = 10605;
   menu_wiki_rus                         = 10604;
