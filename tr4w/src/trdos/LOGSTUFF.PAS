@@ -1382,6 +1382,9 @@ begin
      begin
      dx := true;
       {ParseExchange (Exchange, RXData.Class, RXData.QTHString, TempString);}{pre 6.68 statement}
+     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i 
+     Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
+
      ParseExchange(Exchange, Str10(RXData.ceClass), TempString, TempString2);
      if RxData.QTH.Continent in [NorthAmerica,SouthAmerica] then // If IARU Region 2 then we get class (most likely 1D if they are home).
         begin
@@ -7946,7 +7949,9 @@ var
    i : integer;
    sXmit : string;
    sCategory : string;
+   classSet : boolean;
 begin
+   classSet := false;
    for i := 1 to length(sClass) do
       begin
       if sClass[i] in ['0'..'9'] then
@@ -7955,14 +7960,29 @@ begin
          end
       else if sClass[i] in ['A'..'F'] then
          begin
-         sCategory := sCategory + sClass[i];
+         if classSet then
+            begin
+            sCategory := '';
+            break;
+            end
+         else
+            begin
+            classSet := true;
+            sCategory := sCategory + sClass[i];
+            end;
+         end
+      else
+         begin                         // ny4i Issue163 There is something else here - Error
+         sCategory := ''; // Used to force an TC_IMPROPERARRLFIELDDAYCLASS error later
+         break; // jump to next part to evaluate error
          end;
       end;
-   if (not (StrToInt(sXmit) in [1..99])) then
+   if (length(sXmit) = 0) or
+       (not (StrToInt(sXmit) in [1..99])) then
       begin
       ExchangeErrorMessage := TC_IMPROPERTRANSMITTERCOUNT;
       end
-   else if length(sCategory) <> 1 then
+   else if length(sCategory) <> 1 then   
       begin
       ExchangeErrorMessage := TC_IMPROPERARRLFIELDDAYCLASS;
       end
