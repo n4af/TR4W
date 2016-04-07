@@ -699,8 +699,18 @@ begin
           if (Char(Msg.wParam) = QuickQSLKey1) or (Char(Msg.wParam) = QuickQSLKey2) then QuickQSLProcedure(Char(Msg.wParam));
           if (Msg.HWND = wh[mweCall]) or (Msg.HWND = wh[mweExchange]) then
           begin
-            if (Msg.HWND = wh[mweCall]) then CallWindowKeyDownProc(Msg.wParam);
-            if KeyboardCallsignChar(Msg.wParam, boolean(ActiveMainWindow) {tr4w_ExchangeWindowActive}) = False then goto NoTransMess;
+            if (Msg.HWND = wh[mweCall]) then
+               begin
+               CallWindowKeyDownProc(Msg.wParam);
+               end
+            else if Msg.HWND = wh[mweExchange] then       // ny4i Issue 87
+               begin
+               //ExchangeWindowKeyDownProc(Msg.wParam);     // ny4i Issue 87 Uncomment when ready
+               end;
+            if KeyboardCallsignChar(Msg.wParam, boolean(ActiveMainWindow) {tr4w_ExchangeWindowActive}) = False then
+               begin
+               goto NoTransMess;
+               end;
           end;
         end;
 

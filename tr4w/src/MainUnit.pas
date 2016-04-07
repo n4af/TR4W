@@ -297,6 +297,7 @@ procedure CreateMultsWindows;
 procedure CreateQSONeedWindows;
 procedure CallWindowKeyDownProc(wParam: integer);
 procedure CallWindowKeyUpProc;
+procedure ExchangeWindowKeyDownProc(wParam: integer);
 procedure OpenTR4WWindow(ID: WindowsType);
 procedure OpenOtherWindows;
 procedure CloseTR4WWindow(ID: WindowsType);
@@ -3386,6 +3387,15 @@ begin
       end;
 end;
 
+{------------------------------------------------------------------------------}
+procedure ExchangeWindowKeyDownProc(wParam: integer);
+begin
+// If the contest type uses sections and we see a section starting to be typed,
+// start pre-filling the fields where the cals are placed for SCP
+// This code is a shell at the moment for implementation of Issue 87
+// Uncomment call in MsgLoop to call this when the window is mweExchange
+end;
+{------------------------------------------------------------------------------}
 procedure OpenTR4WWindow(ID: WindowsType);
 const
   NORESIZEEDWINDOW                      = SWP_SHOWWINDOW or SWP_NOSIZE;
