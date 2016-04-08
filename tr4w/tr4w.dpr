@@ -431,10 +431,7 @@ begin
   end;
   if GetLastError = ERROR_ALREADY_EXISTS then
   begin
-    asm
-    push eax
-    call ShowSyserror
-    end;
+  MessageBox(0, Pchar(TC_RUNWARN), tr4w_ClassName, MB_OK or MB_ICONWARNING or MB_SYSTEMMODAL or MB_TOPMOST);   // n4af 4.48.4
     Exit;
   end;
 
