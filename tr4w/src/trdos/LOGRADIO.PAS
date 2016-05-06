@@ -1500,7 +1500,7 @@ begin
 
       FT450, FT950, FT991, FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000:
          begin
-         ActiveRadioPtr.WriteToCATPort('FR0;FT1;', 8);
+         ActiveRadioPtr.WriteToCATPort('FR0;FT3;', 8);  // ny4i Was 'FR0;FT1;. Changed for Issue166
          end;
       Orion:
          begin
@@ -1546,7 +1546,7 @@ begin
 
       FT450, FT950, FT991, FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000:
          begin
-         ActiveRadioPtr.WriteToCATPort('FR0;FT0;', 8);
+         ActiveRadioPtr.WriteToCATPort('FR0;FT2;', 8);       // ny4i Issue 166 Was FR0;FT0;
          end;
 
       Orion:
