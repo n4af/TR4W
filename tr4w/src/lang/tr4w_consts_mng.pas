@@ -700,3 +700,4 @@ const
   TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day-ын ангилал A, B, C, D, E, F байна';
   TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX станц "DX" гэж нэвтрvvлнэ';
   RC_SPLITOFF                           = 'SPLIT-ийг залгах ба салгах ON/OFF';
+  TC_RUNWARN                    = 'Another instance of TR4W is already running';

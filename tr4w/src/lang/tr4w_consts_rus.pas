@@ -779,3 +779,4 @@ const
   RC_CTRLJ                              = 'Окно конфигурирования команд Ctrl-J';
  RC_SPLITOFF                       = 'Toggle Split ON/OFF';
  TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
+ TC_RUNWARN                    = 'Another instance of TR4W is already running';

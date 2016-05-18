@@ -800,3 +800,4 @@ TC_IMPROPERARRLFIELDDAYCLASS = 'kategorie pøi Field Day musí být A, B, C, D, E n
 TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'sout. kód DX stanice musí být "DX".';
 RC_SPLITOFF                       = 'Vynucený režim Split VYPNUT';
 RC_IMPORT                             = 'Import';
+TC_RUNWARN                    = 'Another instance of TR4W is already running';

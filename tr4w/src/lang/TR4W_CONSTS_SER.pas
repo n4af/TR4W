@@ -161,7 +161,6 @@ const
   TC_JAPAN                              = 'Japanu';
   TC_CANADA                             = 'Kanadi';
   TC_FRANCE                             = 'Francuskoj';
-  TC_HQ_OR_MEMBER                       = 'Clan HQ tima';
   TC_IRELAND                            = 'Irskoj';
 
   {UTELNET}
@@ -366,16 +365,11 @@ const
   TC_IAMBICA                            = 'Iambic A';
   TC_ULTIMATIC                          = 'Ultimatic';
   TC_BUGMODE                            = 'Bug mod';
-  
-  TC_WEIGHTING                          = 'Uravnjivanje';
   TC_DITDAHRATIO                        = 'Odnos Tacka/Crta';
   TC_LEADIN                             = 'Ispred (*10 ms)';
   TC_TAIL                               = 'Iza (*10 ms)';
   
   TC_WEIGHTING                          = 'Weighting';
-  TC_DITDAHRATIO                        = 'Dit/Dah ratio';
-  TC_LEADIN                             = 'Lead-in time (*10 ms)';
-  TC_TAIL                               = 'Tail time (*10 ms)';
   TC_FIRSTEXTENSION                     = 'Prva ekstenzija';
   TC_KEYCOMP                            = 'Taster kompenzacija';
   TC_PADDLESWITCHPOINT                  = 'Prikljucna tacka rucica';
@@ -808,3 +802,6 @@ TC_IMPROPERARRLFIELDDAYCLASS 			= 'Field Day klasa mora biti A, B, C, D, E ili F
 TC_ARRLFIELDDAYIMPROPERDXEXCHANGE 		= 'DX Station razmena mora biti "DX".';
 RC_SPLITOFF                       		= 'Split ukljucen ON/OFF';
 TC_ISLANDSTATION                        = 'Island station';
+RC_DVKVOLCONTROL                        = 'DVK volume control';
+TC_RUNWARN                    = 'Another instance of TR4W is already running';
+
