@@ -503,9 +503,9 @@ procedure Escape_proc;
 var
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
+SetSpeed(DisplayedCodeSpeed);   // 4.49.3
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
-
- If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
+ If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
        begin
@@ -513,8 +513,9 @@ begin
        end
     else if ISCWByCATActive(InactiveRadioPtr) then
        begin
-       InactiveRadioPtr^.StopSendingCW;
+        InactiveRadioPtr^.StopSendingCW;
        end;
+
     inc(Esc_counter);
     end;
         if Esc_counter > 1 then
@@ -1554,7 +1555,7 @@ end;
 procedure RunAutoCQ;
 
 begin
-//  if ActiveMode = CW then
+ SetSpeed(DisplayedCodeSpeed);   // 4.49.beta2
   if tAutoCQMode = False then
   begin
     SetUpToSendOnActiveRadio;
