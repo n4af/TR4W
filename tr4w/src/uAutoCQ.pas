@@ -186,6 +186,7 @@ begin
             AutoCQMemory := Char(TempByte);
             AutoCQDelayTime := GetDlgItemInt(hwnddlg, 106, lpTranslated, False) {* 1000};
             Windows.WritePrivateProfileString(_COMMANDS, 'AUTO-CQ DELAY TIME', inttopchar(AutoCQDelayTime), TR4W_INI_FILENAME);
+            SetSpeed(DisplayedCodeSpeed);  // 4.49.beta2
             RunAutoCQ;
             goto 1;
           end;
