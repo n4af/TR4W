@@ -789,6 +789,7 @@ const
   RC_ALTP                               = 'Acces la Fkeys';
   RC_ALTX                               = 'Terminare Program';
   RC_CTRLJ                              = 'Acces la comenzile de Configurare';
-RC_SPLITOFF                       = 'Force Split Mode OFF';
- TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
- TC_RUNWARN                    = 'Another instance of TR4W is already running';
+  RC_SPLITOFF = 'Forteaza Split Mode in starea OFF';  
+  TC_SPLIT_WARN = 'Atentie: esti in SPLIT MODE !!!';  
+  TC_RUNWARN = 'Un alt program TR4W functioneaza deja'; 
+  
