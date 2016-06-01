@@ -1555,7 +1555,6 @@ end;
 procedure RunAutoCQ;
 
 begin
- SetSpeed(DisplayedCodeSpeed);   // 4.49.beta2
   if tAutoCQMode = False then
   begin
     SetUpToSendOnActiveRadio;

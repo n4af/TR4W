@@ -1936,8 +1936,7 @@ begin
 
   if AutoCQDelayTime > 0 then
   begin
-      //    SaveSetAndClearActiveWindow(QuickCommandWindow);
-
+           SetSpeed(DisplayedCodeSpeed);   // 4.49.3
     Write('Repeating ', KeyId(AutoCQMemory), '  Listen time = ',
       (AutoCQDelayTime / 2): 2: 1, ' - PgUp/Dn to adjust or ESCAPE     ');
     FlushCWBuffer;   //n4af 4.36.13
@@ -1965,7 +1964,6 @@ begin
             2: CQMemory := F3;
             3: CQMemory := F4;
           end;
-
         until (GetCQMemoryString(ActiveMode, CQMemory) <> '') or (Count > 1000); {KK1L: 6.73 Added mode}
       end;
 
