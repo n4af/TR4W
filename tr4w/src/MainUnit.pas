@@ -1071,6 +1071,7 @@ begin
   if (length(CallWindowString) >= 3) then
   begin
     tCreateAndAddNewSpot(CallWindowString, tCallWindowStringIsDupe, ActiveRadioPtr);
+    if AutoDupeEnableSandP then     // n4af 4.49.5
     tExchangeWindowSetFocus;   // n4af issue155 4.47.12
   end;
   if ExchangeWindowString = '' then

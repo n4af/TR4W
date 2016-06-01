@@ -161,7 +161,7 @@ begin
 
 
        case SendChar of
-      {     '^':                               // n4af 4.49.3 issue 174
+      {     '^':                               // n4af 4.49.2 issue 174
             AddStringTOBuffer('',CWTone);
       }
            '.':

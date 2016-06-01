@@ -2804,7 +2804,10 @@ begin
   AddStringToTelnetConsole('In tStartAutoCQ', tstReceived);
 {$IFEND}
   if tAutoCQMode = True then
+   begin
     tAutoCQTimerID := SetTimer(tr4whandle, AUTOCQ_TIMER_HANDLE, AutoCQDelayTime, @tAutoCQTimerProc);
+    SetSpeed(DisplayedCodeSpeed);   // 4.49.3 issue 173
+   end;
 end;
 
 procedure tDoABeep;
