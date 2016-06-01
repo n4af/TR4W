@@ -575,7 +575,7 @@ begin
   if not BandMapEnable then Exit;
   if not Assigned(FList) then
      begin
-     exit;
+      exit;
      end;
 
   d := MAXLONG;
@@ -585,17 +585,22 @@ begin
     a := Abs(FList^[Index].FFrequency - Freq);
     if (a < BandMapGuardBand) and (PInteger(@FList^[Index].FCall[1])^ <> tCQAsInteger) then
     begin
-      if a < d then begin d := a; Index2 := Index; end;
-    end;
+      if (a < d) then
+      begin
+       d := a;
+       Index2 := Index; end;
+     end;
   end;
 
   if d <= BandMapGuardBand then
   begin
-    tClearDupeInfoCall;
+  //  tClearDupeInfoCall;         // n4af 4.49.4 issue 171
     DupeInfoCall := FList^[Index2].FCall;
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
   end
+ {  else
+    if d = BandMapGuardBand then exit // n4af 4.49.4 issue 171    }
   else
   begin
     DupeInfoCallWindowState := diNone;
