@@ -2764,7 +2764,7 @@ begin
   if not PaddlePTTOn then PTTOff;
 
 //  ExitFromCWThread := False;
-
+   SetSpeed(DisplayedCodeSpeed);   // 4.50.1
   tStartAutoCQ;  // It appears we go here everytime we finish a CW buffer no matter if we just CQ'ed or not ny4i  4.44.5
 {$IF OZCR2008}
   CWMessageToNetwork := '';
@@ -2804,10 +2804,8 @@ begin
   AddStringToTelnetConsole('In tStartAutoCQ', tstReceived);
 {$IFEND}
   if tAutoCQMode = True then
-   begin
     tAutoCQTimerID := SetTimer(tr4whandle, AUTOCQ_TIMER_HANDLE, AutoCQDelayTime, @tAutoCQTimerProc);
-    SetSpeed(DisplayedCodeSpeed);   // 4.49.3 issue 173
-   end;
+
 end;
 
 procedure tDoABeep;
@@ -2913,7 +2911,6 @@ begin
     TryKillAutoCQ;
     Exit;
   end;
-
   TempChar := AutoCQMemory;
   if (AutoCQMemory = F1) and RandomCQMode then TempChar := Char(Random(4) + 112);
   if GetCQMemoryString(ActiveMode, TempChar) = '' then TempChar := AutoCQMemory;

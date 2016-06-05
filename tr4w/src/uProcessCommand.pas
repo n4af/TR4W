@@ -305,9 +305,9 @@ begin
     begin
       CompleteCallsign;
     end;
-}
 
-    if CommandString = 'ENTER' then ProcessReturn;
+
+    if CommandString = 'ENTER' then ProcessReturn;  }     // n4af 4.50.2
     if CommandString = 'ESCAPE' then Escape_proc;
  
 

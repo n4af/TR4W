@@ -801,7 +801,7 @@ TC_IMPROPERTRANSMITTERCOUNT 			= 'FD predajnici moraju biti izmedju 1 i 99.';
 TC_IMPROPERARRLFIELDDAYCLASS 			= 'Field Day klasa mora biti A, B, C, D, E ili F.';
 TC_ARRLFIELDDAYIMPROPERDXEXCHANGE 		= 'DX Station razmena mora biti "DX".';
 RC_SPLITOFF                       		= 'Split ukljucen ON/OFF';
-TC_ISLANDSTATION                        = 'Island station';
-RC_DVKVOLCONTROL                        = 'DVK volume control';
-TC_RUNWARN                    = 'Another instance of TR4W is already running';
+TC_ISLANDSTATION                        = 'Ostrvska stanica';
+RC_DVKVOLCONTROL                        = 'DVK kontrola nivoa';
+TC_RUNWARN                    = 'Program TR4W je vec startvan';
 

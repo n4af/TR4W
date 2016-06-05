@@ -777,6 +777,7 @@ const
   RC_ALTP                               = 'Открыть окно программирования макросов';
   RC_ALTX                               = 'Выйти из программы';
   RC_CTRLJ                              = 'Окно конфигурирования команд Ctrl-J';
- RC_SPLITOFF                       = 'Toggle Split ON/OFF';
- TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
- TC_RUNWARN                    = 'Another instance of TR4W is already running';
+  RC_SPLITOFF                           = 'Режим работы на разнесенных частотах ВКЛ/ВЫКЛ';
+ TC_SPLIT_WARN                          = 'ПРЕДУПРЕЖДЕНИЕ: Вы работаете в режиме РАБОТА НА РАЗНЕСЕННЫХ ЧАСТОТАХ!!!';
+ TC_RUNWARN                             = 'Программа TR4W на вашем компьютере уже работает ';
+ 

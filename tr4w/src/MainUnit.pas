@@ -503,7 +503,7 @@ procedure Escape_proc;
 var
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
-SetSpeed(DisplayedCodeSpeed);   // 4.49.3
+
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
@@ -515,7 +515,7 @@ SetSpeed(DisplayedCodeSpeed);   // 4.49.3
        begin
         InactiveRadioPtr^.StopSendingCW;
        end;
-
+    SetSpeed(DisplayedCodeSpeed);   // 4.49.3
     inc(Esc_counter);
     end;
         if Esc_counter > 1 then
@@ -1071,7 +1071,7 @@ begin
   if (length(CallWindowString) >= 3) then
   begin
     tCreateAndAddNewSpot(CallWindowString, tCallWindowStringIsDupe, ActiveRadioPtr);
-    if AutoDupeEnableSandP then     // n4af 4.49.5
+    if not AutoDupeEnableSandP then     // n4af 4.49.5
     tExchangeWindowSetFocus;   // n4af issue155 4.47.12
   end;
   if ExchangeWindowString = '' then

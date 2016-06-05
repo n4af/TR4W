@@ -594,7 +594,7 @@ begin
 
   if d <= BandMapGuardBand then
   begin
-  //  tClearDupeInfoCall;         // n4af 4.49.4 issue 171
+  //  tClearDupeInfoCall;         // n4af 4.49.4 issue 172
     DupeInfoCall := FList^[Index2].FCall;
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
@@ -607,7 +607,7 @@ begin
     if not DupeInfoCallWindowCleared then
       SetMainWindowText(mweDupeInfoCall, nil);
     DupeInfoCallWindowCleared := True;
-    tClearDupeInfoCall;
+//    tClearDupeInfoCall;       // issue 172
   end;
 
 end;
