@@ -508,9 +508,7 @@ begin
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
-       begin
        ActiveRadioPtr^.StopSendingCW;
-       end
     else if ISCWByCATActive(InactiveRadioPtr) then
        begin
         InactiveRadioPtr^.StopSendingCW;
@@ -678,14 +676,13 @@ procedure SpaceBarProc2;
 begin
   if (DupeInfoCall <> '') and (CallWindowString = '') then
   begin
-  
+  ActiveRadioPtr^.StopSendingCW;
+  inActiveRadioPtr^.StopSendingCW;
  //   FlushCWBufferAndClearPTT;
-
     if TwoRadioMode then
       InActiveRadioPtr^.tTwoRadioMode := TR2
-    else
+     else
       InActiveRadioPtr^.tTwoRadioMode := TR1;
-
     SwapRadios;
 
     SetOpMode(SearchAndPounceOpMode);

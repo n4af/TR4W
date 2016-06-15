@@ -956,7 +956,11 @@ begin
         if tr4w_PTTStartTime <> 0 then tRestartInfo.riPTTOnTotalTime := tRestartInfo.riPTTOnTotalTime + GetTickCount - tr4w_PTTStartTime;
         tDispalyOnAirTime;
         wkPTTOn := False;
-        if tAutoCQMode = True then tAutoCQTimerID := SetTimer(tr4whandle, AUTOCQ_TIMER_HANDLE, AutoCQDelayTime, @tAutoCQTimerProc);
+        if tAutoCQMode = True then
+         begin
+            
+          tAutoCQTimerID := SetTimer(tr4whandle, AUTOCQ_TIMER_HANDLE, AutoCQDelayTime, @tAutoCQTimerProc);
+         end;
       end;
 
       if (wkThreadReadBuffer[i] = 196) then
