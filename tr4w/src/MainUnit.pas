@@ -406,7 +406,7 @@ const
 //    'Compiler directives: ['{$IFOPT I+} + 'I'{$ENDIF}{$IFOPT R+} + 'R'{$ENDIF}{$IFOPT Q+} + 'Q'{$ENDIF} + ']'
 {$IF LANG <> 'ENG'} + #13'Language: ' + TC_TRANSLATION_LANGUAGE + ' (by ' + TC_TRANSLATION_AUTHOR + ')'{$IFEND} + #13#10 +
   'On basis of the source code of the TRLog v.6.80 UA4WLI + Larry Tyree N6TR' + #13 +     //n4af 4.30.0
-  'Current development team = GM0GAV, K0TO, LU5DX, N4AF, NY4I, UR7QM ';              //n4af 4.30.0
+  'Current development team = GM0GAV, K0TO,N4AF, NY4I, UR7QM ';              //n4af 4.30.0
 //  Radio1AsPchar                         : PChar = TC_RADIO1;
 //  Radio2AsPchar                         : PChar = TC_RADIO2;
 
@@ -508,7 +508,7 @@ begin
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
-       ActiveRadioPtr^.StopSendingCW;
+       ActiveRadioPtr^.StopSendingCW
     else if ISCWByCATActive(InactiveRadioPtr) then
        begin
         InactiveRadioPtr^.StopSendingCW;
@@ -680,7 +680,10 @@ begin
   inActiveRadioPtr^.StopSendingCW;
  //   FlushCWBufferAndClearPTT;
     if TwoRadioMode then
-      InActiveRadioPtr^.tTwoRadioMode := TR2
+    begin
+    
+      InActiveRadioPtr^.tTwoRadioMode := TR2;
+    end
      else
       InActiveRadioPtr^.tTwoRadioMode := TR1;
     SwapRadios;
@@ -3839,8 +3842,7 @@ begin
 
   if DoingDXMults then GetDXQTH(RData);
 
-   if DoingPrefixMults then SetPrefix(RData);
-  {
+    if DoingPrefixMults then SetPrefix(RData);
       case ActivePrefixMult of
         BelgiumPrefixes: if RData.QTH.CountryID = 'ON' then RData.Prefix := RData.QTH.Prefix;
         SACDistricts: RData.Prefix := SACDistrict(RData.QTH);
@@ -3848,7 +3850,7 @@ begin
         SouthAmericanPrefixes: if RData.QTH.Continent = SouthAmerica then RData.Prefix := RData.QTH.Prefix;
         NonSouthAmericanPrefixes: if RData.QTH.Continent <> SouthAmerica then RData.Prefix := RData.QTH.Prefix;
       end;
-  }
+
   GetRidOfPrecedingSpaces(ExchangeString);
   GetRidOfPostcedingSpaces(ExchangeString);
 

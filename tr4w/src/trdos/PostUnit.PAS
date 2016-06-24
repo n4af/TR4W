@@ -2372,7 +2372,7 @@ function tGenerateLogPortionOfCabrilloFile: boolean;
 label
   1;
 var
-
+  i                                     : integer;
   nNumberOfBytesToWrite                 : Cardinal;
   HisCallsign                           : PChar;
   RSTSent                               : PChar;
@@ -3078,23 +3078,26 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
 
         RSTQSONumberExchange:
           begin
-            asm
+
+       {     asm
             push nrSent
             push RSTSent
             end;
             wsprintf(CABRILLO_MYEX, '%-3s %-7d');
             asm add esp,16
-            end;
+            end;    }
+             Format(CABRILLO_MYEX, '%-3s %04d ', RSTSent, nrSent);      // issue 177
 
-            asm
+           { asm
             push nrReceived
             push RSTReceived
             end;
             wsprintf(CABRILLO_HISEX, '%-3s %-7u');
             asm add esp,16
             end;
+          end;   }
+          Format(Cabrillo_HISEX, '%-3s %04u',RSTReceived, nrReceived);   // issue 177
           end;
-
         RSTAndContinentExchange:
           begin
             csQTHString := @TempRXData.QTHString[1];
@@ -3325,7 +3328,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
 
     if TempRXData.ceRecordKind in [rkQTCR, rkQTCS] then
     begin
-//QTC: 14234 PH 2001-09-11 2138 DL8WPX(who receive)        123/10     C4A(who send)           2114 HA6KNX         232
+
       cKids := @TempRXData.Kids[1];
       cRandomCharsReceived := @TempRXData.RandomCharsReceived[1];
       asm

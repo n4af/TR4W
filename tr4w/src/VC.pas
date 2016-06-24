@@ -33,7 +33,7 @@ uses
 const
   tDebugMode                            = False;
   NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
-  MMTTYMODE                             = False;
+  MMTTYMODE                             = True;
 
 type
 
@@ -175,11 +175,11 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.50.2' ;     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.50.5' ;     // N4af     New Release
 
 
-  TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER;//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'June 4, 2016' ;
+  TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
+  TR4W_CURRENTVERSIONDATE               = 'June 22, 2016' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -900,6 +900,7 @@ type
     REFSSB,
     BSCI,
     CQMM,
+    SASPRINT,
     CWOPS,
     OZHCRVHF,
     RAC_CANADA_DAY,
@@ -2669,6 +2670,7 @@ const
     'RADIO-MEMORY',
     'BSCI',
     'CQMM',
+   // 'SASPRINT',
     'OZHCR-VHF',
     'MAKROTHEN',
     'ALRS-UA1DZ-CUP'
@@ -3001,6 +3003,7 @@ QSOPartiesCount = 12;
  ({Name: 'REF-SSB';                    }Email: nil;                      DF: 'ref';               WA7BNM:  260; {SK3BG: 'refc';       } QRZRUID: 67  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrFrenchDepartmentExchange;   XM:NoDXMults; QP:REFQSOPointMethod),
  ({Name: 'BSCI';                       }Email: nil;                      DF: nil;                 WA7BNM:  470; {SK3BG: nil;          } QRZRUID: 232 ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTZoneOrSocietyExchange;                    XM:BlackSeaCountries; QP:BSCIQSOPointMethod),
  ({Name: 'CQMM';                       }Email: nil;                      DF: nil;                 WA7BNM:   21; {SK3BG: nil;          } QRZRUID: 34  ; Pxm: SouthAmericanPrefixes; ZnM: NoZoneMults; AIE: NoInitialExchange;      DM: NoDomesticMults; P: 0; AE: RSTAndContinentExchange;                    XM:CQDXCC; QP:CQMMQSOPointMethod),
+ ({Name: 'SA-SPRINT';                  }Email: 'sa-sprint.com/enviar-log/';  DF: nil;             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: SouthAmericanPrefixes; ZnM: NoZoneMults; AIE: NoInitialExchange;      DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                    XM:NoDXMults; QP:OnePointPerQSO), // 4.50.5 issue 177
  ({Name: 'CWOPS';                      }Email: nil;                      DF: nil;                 WA7BNM:  498; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix;        ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: NoDomesticMults; P: 0; AE: NameAndDomesticOrDXQTHExchange;             XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'OZHCR-VHF';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 203 ; Pxm: NoPrefixMults;         ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares; P: 0; AE: RSTQSONumberAndGridSquareExchange;             XM:NoDXMults; QP:OZHCRVHFQSOPointMethod),
  ({Name: 'RAC_CANADA_DAY';             }Email: nil;                      DF: 'p13';               WA7BNM:   60; {SK3BG: 'canday';     } QRZRUID: 101 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:NoDXMults; QP:RACQSOPointMethod),
@@ -3164,6 +3167,7 @@ QSOPartiesCount = 12;
       'REF-SSB',
       'BLACK SEA CUP',
       'CQMM',
+      'SA-SPRINT',
       'CWOPS',
       'OZHCR-VHF',
       'RAC CANADA DAY',
@@ -3366,6 +3370,7 @@ QSOPartiesCount = 12;
       ({Name: 'REF-SSB';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'BSCI';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'CQMM';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
+      ({Name: 'SA-SPRINT';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),   // 4.50.5 issue 177
       ({Name: 'CWOPS';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'OZHCR-VHF';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RAC CANADA WINTER';          }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),

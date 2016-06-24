@@ -469,7 +469,7 @@ begin
 //        CountryTable.ZoneMode := CQZoneMode;
       end;
 
-    SOUTHAMERICANWW:
+    SOUTHAMERICANWW: //, SA-SSPRINT: // issue 177
       begin
         if MyContinent = SouthAmerica then
           ActivePrefixMult := NonSouthAmericanPrefixes
@@ -1496,35 +1496,9 @@ begin
 
 //    TAC:      ActivePrefixMult := Prefix;
 
-{
-    MMAA:
-      begin
-        if MyContinent = SouthAmerica then
-          ActivePrefixMult := SouthAndNorthAmericanPrefixes
-        else
-          ActivePrefixMult := SouthAmericanPrefixes;
-      end;
-}
-{
-    REFCW:
-      begin
-        AddDomesticCountry('F');
-      end;
-    {
-        OZCR_Z:
-          begin
 
-            ActiveDomesticMult := WYSIWYGDomestic;
-            ContestName := 'Очно-заочный чемпионат России - заочные участники';
-            DomesticQTHDataFileName := 'OZCR';
-            tr4w_R150SMode := True;
-            ActiveZoneMult := ITUZones;
-            ActiveExchange := RSTZoneOrSocietyExchange;
-            ActiveInitialExchange := ZoneInitialExchange;
-            ActiveQSOPointMethod := IARUQSOPointMethod;
 
-          end;
-    }
+
   end;
 
   {

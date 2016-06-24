@@ -105,25 +105,21 @@ const
 
 
 
-  sCommands                             = 66
-
-
-                                          {$IF MMTYMODE} + 5 {$IFEND}
-                                          + 1 // ny4i 4.39.4 LOGIN  recommit3
-                                          ;  //n4af
+ // sCommands                             =  67  {$IF MMTYMODE} + 5  {$IFEND};
+  sCommands                             =  72;
 
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
 
-{$IF MMTTYMODE}    //5
-    (caCommand: 'MM_CLEAR_THE_TX_BUFFER'; caAddress: @csMMTTY_CLEAR_THE_TX_BUFFER),
-    (caCommand: 'MM_SWITCH_TO_TX'; caAddress: @csMMTTY_SWITCH_TO_TX),
-    (caCommand: 'MM_SWITCH_TO_RX_IMMEDIATELY'; caAddress: @csMMTTY_SWITCH_TO_RX_IMMEDIATELY),
-    (caCommand: 'MM_SWITCH_TO_RX_AFTER_THE_TRANSMISSION_IS_COMPLETED'; caAddress: @csMMTTY_SWITCH_TO_RX_AFTER_THE_TRANSMISSION_IS_COMPLETED),
-    (caCommand: 'MM_GRABLASTCALL'; caAddress: @csMMTTY_GRABLASTCALL),
-{$IFEND}
+//{$IF MMTTYMODE}    //5
+      (caCommand: 'MM_CLEAR_THE_TX_BUFFER'; caAddress: @csMMTTY_CLEAR_THE_TX_BUFFER),
+      (caCommand: 'MM_SWITCH_TO_TX'; caAddress: @csMMTTY_SWITCH_TO_TX),
+      (caCommand: 'MM_SWITCH_TO_RX_IMMEDIATELY'; caAddress: @csMMTTY_SWITCH_TO_RX_IMMEDIATELY),
+      (caCommand: 'MM_SWITCH_TO_RX_AFTER_THE_TRANSMISSION_IS_COMPLETED'; caAddress: @csMMTTY_SWITCH_TO_RX_AFTER_THE_TRANSMISSION_IS_COMPLETED),
+      (caCommand: 'MM_GRABLASTCALL'; caAddress: @csMMTTY_GRABLASTCALL),
+//{$IFEND}
 
-//{$IF CWMODE}     //23
+   //24
 (caCommand: ' <01>   =  Send on other radio- focus d/n change';caaddress:@scexchangeradios),      // n4af 4.42.11
 (caCommand: ' <02>   =  Send on other radio,switch radio if called';caaddress:@scexchangeradios), // n4af 4.42.11
 (caCommand: ' <05>   =  Same as <02> but subsequent enter triggers cq on other radio';caaddress:@scexchangeradios), // n4af 4.42.11
@@ -149,13 +145,12 @@ const
 (caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
 (caCommand: ' ALT-D = Dupe Check R2'; caAddress:  @CheckNumber),
 (caCommand: ' CN = Check Entered Number'; caAddress:  @CheckNumber),    // n4af 4.42.2
-//{$IFEND}
   // (caCommand: 'CN' ; caAddress:  @CheckNumber),                      // n4af 4.42.2
-      (caCommand: 'ALT-D'; caAddress: @scDupeCheck),
-      (caCommand: 'WK_SWAPTUNE'; caAddress: @scWK_SWAPTUNE),
+    (caCommand: 'ALT-D'; caAddress: @scDupeCheck),
+    (caCommand: 'WK_SWAPTUNE'; caAddress: @scWK_SWAPTUNE),
     (caCommand: 'WK_RESET'; caAddress: @scWK_RESET),
     (caCommand: 'NEXTBANDMAP'; caAddress: @NEXTBANDMAPENTRY),
-     (caCommand: 'BMFIRST'; caAddress: @BMFIRST),
+    (caCommand: 'BMFIRST'; caAddress: @BMFIRST),
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),
@@ -192,7 +187,7 @@ const
     (caCommand: 'FLUSHINITIALEX'; caAddress: @scFLUSHINITIALEX),
     (caCommand: 'SNLOCKOUT'; caAddress: @scSNLOCKOUT),
     (caCommand: 'CLEARDUPESHEET'; caAddress: @tClearDupeSheet)  ,
-    (caCommand: 'CLEARMULTSHEET'; caAddress: @tClearMultSheet) 
+    (caCommand: 'CLEARMULTSHEET'; caAddress: @tClearMultSheet)
     )
     ;
 
