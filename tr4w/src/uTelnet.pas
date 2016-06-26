@@ -433,7 +433,7 @@ begin
         if (wParam >= 1000) then
           if  (wParam <= 1000 + MAXITEMSINTELNETPOPUPMENU) then     
           begin
-            GetMenuString(TelPopMemu, wParam, wsprintfBuffer, 200, MF_BYCOMMAND);    //n4af
+            GetMenuString(TelPopMemu, wParam, wsprintfBuffer, 200, MF_BYCOMMAND);    //n4af    4.50.7
             SendViaTelnetSocket(wsprintfBuffer);
           end;
 
@@ -717,19 +717,23 @@ var
   AddedSpot                             : boolean;
   pr                                    : integer;
   StringType                            : TelnetStringType;
+  d                                     : integer;
 
  begin
 //  Windows.CharUpperBuff(TelnetBuffer, ByteReceived);
   AddedSpot := False;
   pr := -1;
+  d := 0;
   for c := 0 to ByteReceived do
   begin
+  d := d + 1 ;
     if pr = -1 then
       if TelnetBuffer[c] > #13 then pr := c;
 
     if pr <> -1 then
-      if TelnetBuffer[c] <= #13 then
+      if (TelnetBuffer[c] <= #13) or (d > 120) then     // n4af 4.50.7   issue # 179
       begin
+      d := 0;
         TelnetBuffer[c] := #0;
         StringType := tstReceived;
         if (PInteger(@TelnetBuffer[pr])^ = $64205844) {DX D} and (PInteger(@TelnetBuffer[pr + 2])^ = $20656420) { DE } then
