@@ -433,7 +433,7 @@ begin
         if (wParam >= 1000) then
           if  (wParam <= 1000 + MAXITEMSINTELNETPOPUPMENU) then     
           begin
-            GetMenuString(TelPopMemu, wParam, wsprintfBuffer, 200, MF_BYCOMMAND);    //n4af    4.50.7
+            GetMenuString(TelPopMemu, wParam, wsprintfBuffer, 256, MF_BYCOMMAND);    //n4af    4.51.1
             SendViaTelnetSocket(wsprintfBuffer);
           end;
 

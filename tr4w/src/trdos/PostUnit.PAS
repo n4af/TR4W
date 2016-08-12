@@ -3213,12 +3213,11 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
         RSTZoneExchange:
           begin
             if Contest in [JIDXSSB, JIDXCW] then cMyZone := StrToInt(MyState);
-
             asm
                 push HisZone
                 push RSTReceived
             end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7d');
+            wsprintf(CABRILLO_HISEX, '%-3s %-7.2d');       // 4.51.1 issue185
             asm add esp,16
             end;
 
@@ -3226,7 +3225,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
                 push cMyZone
                 push RSTSent
             end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7d');
+            wsprintf(CABRILLO_MYEX, '%-3s %-7.2d');   // 4.51.1   issue#185
             asm add esp,16
             end;
           end;
