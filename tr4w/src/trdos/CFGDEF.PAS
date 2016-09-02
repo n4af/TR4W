@@ -63,7 +63,7 @@ begin
   //  ActiveInitialExchange := NoInitialExchange;
   //  ActiveKeyerPort := NoPort;
       //  не нужно ActiveModemPort := NoPort;
-  //  ActiveMode := CW;
+    ActiveMode := CW;        // 4.51.3
   //  ActivePaddlePort := NoPort;
   //  ActivePrefixMult := NoPrefixMults;
   //  ActiveQSOPointMethod := NoQSOPointMethod;

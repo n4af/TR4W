@@ -3840,6 +3840,63 @@ begin
       ProcessRSTQSONumberAndGridSquareExchange := FoundDomesticQTH(RXData);
 end;
 
+function ProcessRSTQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+
+var
+  NumberString, FirstString, SecondString, ThirdString: Str10;
+
+begin
+  ProcessRSTQSONumberOrDomesticQTHExchange := False;
+  if Exchange = '' then Exit;
+
+  ParseExchange(Exchange, FirstString, SecondString, ThirdString);
+   if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
+   if SecondString = '' then
+  begin
+  ProcessRSTQSONumberOrDomesticQTHExchange(Exchange, RXData);  // n4af 4.40.5
+  Result := True;
+      exit;
+  end;
+  if not StringIsAllNumbers(FirstString) and StringIsAllNumbers(SecondString) then   // n4af 4.42.7
+  begin
+  RXData.QTHString := FirstString;
+  RXData.NumberReceived := StrToInt(SecondString);
+  ProcessRSTQSONumberOrDomesticQTHExchange := FoundDomesticQTH(RXData);
+  Result := True;
+    exit;
+  end;
+     if ThirdString <> '' then
+      NumberString := SecondString + ' ' + ThirdString ;
+  //  else                                           // N4AF 4.42.9
+  //    NumberString := SecondString;
+
+
+    if not StringIsAllNumbers(SecondString) then
+    begin
+      RXData.QTHString := SecondString;
+      if ThirdString <> '' then
+        NumberString := FirstString + ' ' + ThirdString
+      else
+        NumberString := FirstString;
+    end
+     else
+    begin
+      RXData.QTHString := ThirdString;
+      NumberString := FirstString + ' ' + SecondString;
+    end;
+
+  if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
+  begin
+    if RXData.QTHString = '' then
+      ProcessRSTQSONumberOrDomesticQTHExchange := True
+    else
+      ProcessRSTQSONumberOrDomesticQTHExchange := FoundDomesticQTH(RXData)
+  end
+   else
+    ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
+end;
+
+
 function ProcessRSTQSONumberAndPossibleDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
@@ -3872,7 +3929,7 @@ begin
      begin
       ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
       exit;
-     end;                                             
+     end;
 
   if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
    if SecondString = '' then
@@ -3880,7 +3937,7 @@ begin
   ProcessRSTAndDomesticQTHExchange(Exchange, RXData);  // n4af 4.40.5
   Result := True;
       exit;
-  end;  
+  end;
   if not StringIsAllNumbers(FirstString) and StringIsAllNumbers(SecondString) then   // n4af 4.42.7
   begin
   RXData.QTHString := FirstString;
@@ -3893,7 +3950,7 @@ begin
       NumberString := SecondString + ' ' + ThirdString ;
   //  else                                           // N4AF 4.42.9
   //    NumberString := SecondString;
-    
+
 
     if not StringIsAllNumbers(SecondString) then
     begin
@@ -3902,20 +3959,20 @@ begin
         NumberString := FirstString + ' ' + ThirdString
       else
         NumberString := FirstString;
-    end 
+    end
      else
     begin
       RXData.QTHString := ThirdString;
       NumberString := FirstString + ' ' + SecondString;
     end;
-  
+
   if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
   begin
     if RXData.QTHString = '' then
       ProcessRSTQSONumberAndPossibleDomesticQTHExchange := True
     else
       ProcessRSTQSONumberAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)
-  end 
+  end
    else
     ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
 end;
@@ -7484,7 +7541,7 @@ begin
       ProcessExchange := ProcessRSTQSONumberAndGridSquareExchange(ExchangeString, RData);
 
     RSTQSONumberOrDomesticQTHExchange:
-    ProcessExchange := ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
+    ProcessExchange := ProcessRSTQSONumberorDomesticQTHExchange(ExchangeString, RData);
     
     RSTQSONumberAndPossibleDomesticQTHExchange:
       ProcessExchange := ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
