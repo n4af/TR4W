@@ -445,9 +445,9 @@ begin
   SetCQMemoryString(CW, F1, 'CQ CQ \  \ TEST');
   SetCQMemoryString(CW, F2, 'CQ CQ CQ CQ CQ CQ \  \ TEST');
 
-  SetCQMemoryString(CW, F9, '???');
+  SetCQMemoryString(CW, F9, '?');       // n4af 4.51.5 issue #185
 
-  SetEXMemoryString(CW, F9, '???');
+  SetEXMemoryString(CW, F9, '?');        // n4af 4.5.5
 
   SetCQMemoryString(CW, F11, '<03>MM_GRABLASTCALL<04>');
   SetCQCaptionMemoryString(CW, F11, 'GRAB');
