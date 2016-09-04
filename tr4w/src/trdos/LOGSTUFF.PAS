@@ -3839,7 +3839,7 @@ begin
     if GoodLookingGrid(RXData.QTHString) then
       ProcessRSTQSONumberAndGridSquareExchange := FoundDomesticQTH(RXData);
 end;
-
+ // n4af 4.51.2
 function ProcessRSTQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
 
 var
@@ -3853,7 +3853,7 @@ begin
    if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
    if SecondString = '' then
   begin
-  ProcessRSTQSONumberOrDomesticQTHExchange(Exchange, RXData);  // n4af 4.40.5
+  ProcessRSTAndDomesticQTHExchange(Exchange, RXData);  // n4af 4.40.5
   Result := True;
       exit;
   end;
@@ -7541,7 +7541,7 @@ begin
       ProcessExchange := ProcessRSTQSONumberAndGridSquareExchange(ExchangeString, RData);
 
     RSTQSONumberOrDomesticQTHExchange:
-    ProcessExchange := ProcessRSTQSONumberorDomesticQTHExchange(ExchangeString, RData);
+    ProcessExchange := ProcessRSTQSONumberorDomesticQTHExchange(ExchangeString, RData);      // 4.53.2
     
     RSTQSONumberAndPossibleDomesticQTHExchange:
       ProcessExchange := ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);

@@ -175,11 +175,11 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.51.3' ;     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.51.4' ;     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Sept 1, 2016' ;
+  TR4W_CURRENTVERSIONDATE               = 'Sept 4, 2016' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -2993,7 +2993,7 @@ QSOPartiesCount = 12;
  ({Name: 'KING-OF-SPAIN-CW';           }Email: nil;                      DF: 'ea';                WA7BNM:   23; {SK3BG: 'kingofsp';   } QRZRUID: 308 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:CQDXCC;    QP:KingOfSpainQSOPointMethod),
  ({Name: 'KING-OF-SPAIN-SSB';          }Email: nil;                      DF: 'ea';                WA7BNM:   59; {SK3BG: 'kingofsp';   } QRZRUID: 308 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:CQDXCC;    QP:KingOfSpainQSOPointMethod),
  ({Name: 'WRTC';                       }Email: nil;                      DF: 'iaruhq';            WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTZoneOrSocietyExchange;                  XM:ARRLDXCC;  QP:WRTCQSOPointMethod),  //n4af 4.31.2
- ({Name: 'TENNESSEE QSO PARTY';        }Email: nil;                      DF: 'tennessee_cty';                 WA7BNM:  115; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 9;AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:TwoPhoneThreeCW),
+ ({Name: 'TENNESSEE QSO PARTY';        }Email: nil;                      DF: 'tennessee_cty';                 WA7BNM:  115; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 8;AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:TwoPhoneThreeCW),         // n4af 4.51.4
  ({Name: 'COLORADO QSO PARTY';         }Email: 'colorado_cty';                      DF: nil;                 WA7BNM:  431; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 12;AE: NameAndDomesticOrDXQTHExchange;              XM:NoDXMults; QP:OnePhoneTwoCW),
  ({Name: 'R9W-UW9WK-MEMORIAL';         }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 41  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P:  0;AE: QSONumberAndZone;                            XM:NoDXMults; QP:R9WUW9WKMemorialQSOPointMethod),
  ({Name: 'TAC';                        }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 35  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTQSONumberAndPossibleDomesticQTHExchange;  XM:NoDXMults; QP:TACQSOPointMethod),
