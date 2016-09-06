@@ -1595,14 +1595,33 @@ function ProcessNameAndDomesticOrDXQTHExchange(Exchange: Str80; var RXData: Cont
 { Two entries with space, name is first. IF DX, then no QTH. }
 
 var
-  ThirdString                           : Str10 {Str20};
+  FirstString                           : Str10;
+  SecondString                           : Str10;
+  ThirdString                           : Str10;
 
-begin
+  begin
   ProcessNameAndDomesticOrDXQTHExchange := False;
   if Exchange = '' then Exit;
-
-  ParseExchange(Exchange, RXData.Name, RXData.QTHString, ThirdString);
-
+ // ParseExchange(Exchange, RXData.Name, RXData.QTHString, ThirdString);   // old parse
+  ParseExchange(Exchange,FirstString,SecondString,ThirdString);        //4.51.7
+  // check for a corrected number
+  if StringIsAllNumbers(ThirdString) then    // n4af 4.51.7
+   begin
+    RXData.Name := FirstString;
+    RXData.QTHString := ThirdString ;
+   end
+  else
+  // check for a corrected name
+ if IsAlpha(ThirdString) then       // 4.51.7
+   begin
+    RXData.Name := ThirdString;
+    RXData.QTHString := SecondString;
+   end
+   else
+   begin
+    RXData.Name := FirstString;
+    RXData.QTHString := SecondString;
+   end;
   if not DomesticCountryCall(RXData.Callsign) then
     ProcessNameAndDomesticOrDXQTHExchange := True
   else
@@ -2516,7 +2535,7 @@ begin
             Val(EntryList[4], RXData.NumberReceived, Result1);
             RXData.Name := EntryList[2];
             RXData.QTHString := EntryList[3];
-          end;
+
 
     end
     else
@@ -2528,8 +2547,16 @@ begin
         Val(EntryList[NumberEntries - 2], RXData.NumberReceived, Result1);
         RXData.Name := EntryList[NumberEntries - 1];
         RXData.QTHString := EntryList[NumberEntries];
+      end
+      else
+      If (NumberEntries = 4) then    // n4af 4.51.6 allow name correction
+      if ((IsAlpha(EntryList[4])) and (StringIsAllNumbers(EntryList[1]))) then
+      begin
+       Val(EntryList[1], RXData.NumberReceived, Result1);
+       RXData.Name := EntryList[4];
+       RXData.QTHString := EntryList[3];
       end;
-
+      end;
   if (RXData.Name = '') or ((RXData.QTHString = '') and not DX) then
   begin
     ExchangeErrorMessage := TC_MISSINGQTHANDORNAME;
