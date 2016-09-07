@@ -3088,6 +3088,9 @@ begin
     menu_wa7bnm_calendar:
       OpenUrl('http://www.hornucopia.com/contestcal/weeklycont.php');
 
+   menu_3830_scores_posting:             // 4.51.8
+   OpenUrl('http://www.3830scores.com/');
+
     menu_qrzru_calendar:
       begin
         Format(TempBuffer1, 'http://www.qrz.ru/contest/detail/%d.html', ContestsArray[Contest].QRZRUID);

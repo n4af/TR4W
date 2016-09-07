@@ -175,11 +175,11 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.51.7' ;     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.51.8' ;     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Sept 6, 2016' ;
+  TR4W_CURRENTVERSIONDATE               = 'Sept 7, 2016' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -1899,8 +1899,8 @@ const
   menu_run_devicemanager                = 10566;
   menu_get_offset                       = 10567;
   menu_wa7bnm_calendar                  = 10568;
-
-  //  menu_addonlinerdxcresults        = 10564;
+  menu_3830_scores_posting              = 10569;     //4.51.8
+  //  menu_addonlinerdxcresults         = 10564;
 
   menu_escape                           = 10502;
 

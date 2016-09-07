@@ -131,7 +131,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 170{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 173{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -356,11 +356,13 @@ const
     (mrText: '-'; mrId: 0),
     (mrText: ''; mrId: menu_sk3bg_calendar),
     (mrText: ''; mrId: menu_qrzru_calendar),
-    (mrText: RC_WA7BNM_CALENDAR; mrId: menu_wa7bnm_calendar),
+    (mrText: RC_WA7BNM_CALENDAR; mrId: menu_wa7bnm_calendar),     // 4.51.8
     (mrText: '-'; mrId: 0),
     (mrText: RC_CALCULATOR; mrId: item_calculator),
  //}
-
+    (mrText: '-'; mrId: 0),
+    (mrText: RC_3830; mrId: menu_3830_scores_posting),
+    (mrText: '-'; mrId: 0),
     (mrText: RC_NET; mrId: MAXWORD),
  //{
     (mrText: RC_TIMESYN + RC_TIMESYN_HK; mrId: menu_alt_setnettime),
