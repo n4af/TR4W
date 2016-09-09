@@ -517,6 +517,7 @@ const
 
   TC_LIST_OF_COMMAND                    = 'List of commands';
 
+  RC_3830                               =  '3830 Score posting';
   RC_VIEWEDITLOG2                       = 'View / Edit log';
   RC_CT1BOHIS2                          = 'CT1BOH info screen';
   RC_BANDPLAN                           = 'Band plan';
