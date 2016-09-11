@@ -179,7 +179,8 @@ begin   // 1
       if autosendenable then
       CallWindowKeyUpProc;  // n4af 4.44.2
         InactiveRigCallingCQ := True;
-        Switch := True;
+        if ExchangeWindowString = ''   then // 4.52.1
+         Switch := True;
        end;
 
     if TempChar = ControlE then           // n4af 4.41.3
@@ -273,7 +274,7 @@ begin
 
     TempMode := ActiveMode;
     if ActiveMode = FM then TempMode := Phone;
-    if not inactiverigcallingcq then Switch := False;   // n4af 4.44.7
+     Switch := False;   // n4af 4.44.7
     if OpMode = CQOpMode then
       Message := GetCQMemoryString(TempMode, MessageKey) {KK1L: 6.73 Added mode}
     else
@@ -595,22 +596,16 @@ begin
     InActiveRadioPtr := @Radio2;
     ActiveBand := Radio1.BandMemory {BandMemory[RadioOne]};
     ActiveMode := Radio1.ModeMemory {ModeMemory[RadioOne]};
-//    ActiveKeyerPort := Radio1.tKeyerPort;
-//    tActiveKeyerHandle := Radio1.tKeyerPortHandle;
     SerialInvert := Radio1SerialInvert;
     ActiveRadio := RadioOne;
     InactiveRadio := RadioTwo; {KK1L: 6.73}
     CodeSpeed := Radio1.SpeedMemory; {KK1L: 6.73}
-    //SetSpeed(CodeSpeed); // ny4i Issue 153 This is done in SetUpToSendOnActiveRadio so no need to do it here.
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
-//<<<<<<< Updated upstream
-  //   ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
-  ShowInformation;  // n4af 04.40.02
-//=======
-  {  ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
-  ShowInformation; // n4af 04.40.02    }
-// >>>>>>> Stashed changes
+
+     ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
+     ShowInformation;  // n4af 04.40.02
+
   SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);

@@ -5,7 +5,7 @@
 const
   TC_TRANSLATION_LANGUAGE               = 'RUSSIAN';
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
-
+  RC_3830                               = 'Отправить Score на 3830';
   TC_CALLSIGN                           = 'Позывной';
   TC_BAND                               = 'Диапазон';
   TC_FREQ                               = 'Частота';

@@ -902,8 +902,10 @@ end;
 
 procedure ReturnInCQOpMode;
 begin
- //if InactiveRigCallingCQ and (length(ExchangeWindowString)=0) then
- if InactiveRigCallingCQ and Switch then     // n4af 4.44.10
+ if InactiveRigCallingCQ and ExchangeWindowString = '' then
+  begin
+   Switch = True;
+  if InactiveRigCallingCQ and Switch then     // n4af 4.44.10
      begin
      Switch := False;
      CheckInactiveRigCallingCQ;     // swapradios
@@ -2019,7 +2021,7 @@ SetMainWindowText(mweUserInfo, '');
   end;
 
   Windows.ShowWindow(wh[mweMasterStatus], nCmdShow);
- //  if not InactiveRigCallingCQ then //n4af 04.40.2
+    if not InactiveRigCallingCQ then //n4af 04.40.2
   ShowInformation;
 
   if tShowTypedCallsign then SendStationStatus(sstCallsign);
