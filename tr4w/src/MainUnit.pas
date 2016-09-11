@@ -902,16 +902,14 @@ end;
 
 procedure ReturnInCQOpMode;
 begin
- if InactiveRigCallingCQ and ExchangeWindowString = '' then
-  begin
-   Switch = True;
+
   if InactiveRigCallingCQ and Switch then     // n4af 4.44.10
      begin
-     Switch := False;
-     CheckInactiveRigCallingCQ;     // swapradios
-    InactiveRigCallingCQ := False;      // n4af 4.44.3
-         if (length(CallWindowString) > 0) then exit; // n4af 4.44.2
-    end;
+      Switch := False;
+      CheckInactiveRigCallingCQ;     // swapradios
+      InactiveRigCallingCQ := False;      // n4af 4.44.3
+        if (length(CallWindowString) > 0) then exit; // n4af 4.44.2
+     end;
      
   if (length(CallWindowString) = 0) and (length(ExchangeWindowString) = 0) then
     begin

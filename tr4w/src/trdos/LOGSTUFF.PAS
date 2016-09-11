@@ -4392,7 +4392,7 @@ begin
         RXData.RSTReceived := DefaultRST;
         RXData.Zone := StrToInt(FirstString);
         RXData.QTHString := SecondString;
-      end
+       end
       else
       begin
         if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then Exit;
@@ -4400,15 +4400,21 @@ begin
       end;
     end
     else
+      if ((length(FirstString) > 2) or (isalpha(Firststring))) then
+    begin
+     QuickDisplay(TC_INVALID);
+     exit;
+    end
+    else
     begin
       RXData.RSTReceived := DefaultRST;
       RXData.Zone := StrToInt(Exchange);
     end;
-
+{
   //  if not StringIsAllNumbers(RXData.Zone) then Exit;
 
   //  if length(RXData.Zone) = 1 then RXData.Zone := '0' + RXData.Zone;
-
+}
   if RXData.QTHString <> '' then
     ProcessRSTZoneAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)
   else

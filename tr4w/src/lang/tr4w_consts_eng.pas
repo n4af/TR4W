@@ -11,7 +11,7 @@ const
   TC_FREQ                               = 'Freq';
   TC_POINTS                             = 'Pts';
   TC_OP                                 = 'Op';
-
+  TC_INVALID                            = 'Invalid Entry';
   TC_CHECKCALLSIGN                      = 'Check callsign';
 
   TC_FREQUENCYFORCALLINKHZ              = 'frequency for %s in kHz';
