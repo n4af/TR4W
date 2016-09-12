@@ -134,6 +134,7 @@ uses
   var
   InSplit                               : boolean = False;
   Switch                                : boolean = False;
+  SwitchNext                            : boolean = False; // 4.52.3
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
   Esc_Counter                           : integer = 0;
@@ -3231,6 +3232,16 @@ begin
 
   if OpMode = CQOpMode then
   begin
+  if SwitchNext then                              //4.52.3
+   begin
+    if ((CallWindowString <> '') and (ExchangeWindowString = '')) then
+     begin
+       SwitchNext := False;
+       Switch     := False;
+       SwapRadios;
+        InactiveRigCallingCQ := False;
+     end;
+    end;
   if switch = False  then    // n4af 4.44.7
       InactiveRigCallingCQ := False   // n4af 4.42.11
       else
@@ -3243,12 +3254,14 @@ begin
       end;
       checkinactiverigcallingcq;
       Switch := False;
-      exit;
+      if CallWindowString = '' then  // 4.52.3
+      SwitchNext := False;
+    //  exit;
       end;
     ReturnInCQOpMode;
       Exit;
       end;
- 
+
   if OpMode = SearchAndPounceOpMode then
   begin
     ReturnInSAPOpMode;

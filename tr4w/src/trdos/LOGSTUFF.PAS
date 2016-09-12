@@ -4376,6 +4376,14 @@ begin
   RXData.QTHString := '';
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
+  if (IsAlpha(FirstString) and (StringIsAllNumbers(SecondString))) then      // n4af 4.52.2
+   begin
+    RXData.RSTReceived := DefaultRST;
+    RXData.QTHString   := FirstString;
+    RXData.Zone        := StrtoInt(SecondString);
+    ProcessRSTZoneAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)  ;
+    exit;
+   end;
 
   if ThirdString <> '' then
   begin
@@ -4387,7 +4395,7 @@ begin
   else
     if SecondString <> '' then
     begin
-      if not StringIsAllNumbers(SecondString) then
+      if IsAlpha(SecondString) then
       begin
         RXData.RSTReceived := DefaultRST;
         RXData.Zone := StrToInt(FirstString);
@@ -4398,23 +4406,19 @@ begin
         if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then Exit;
         RXData.Zone := StrToInt(SecondString);
       end;
-    end
-    else
+    end;
+
       if ((length(FirstString) > 2) or (isalpha(Firststring))) then
     begin
      QuickDisplay(TC_INVALID);
      exit;
-    end
-    else
+    end;
+  {  else
     begin
       RXData.RSTReceived := DefaultRST;
-      RXData.Zone := StrToInt(Exchange);
+      RXData.Zone := StrToInt(Exchange);     
     end;
-{
-  //  if not StringIsAllNumbers(RXData.Zone) then Exit;
-
-  //  if length(RXData.Zone) = 1 then RXData.Zone := '0' + RXData.Zone;
-}
+  }
   if RXData.QTHString <> '' then
     ProcessRSTZoneAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)
   else
