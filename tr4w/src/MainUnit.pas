@@ -903,7 +903,6 @@ end;
 
 procedure ReturnInCQOpMode;
 begin
-
   if InactiveRigCallingCQ and Switch then     // n4af 4.44.10
      begin
       Switch := False;
@@ -911,7 +910,7 @@ begin
       InactiveRigCallingCQ := False;      // n4af 4.44.3
         if (length(CallWindowString) > 0) then exit; // n4af 4.44.2
      end;
-     
+
   if (length(CallWindowString) = 0) and (length(ExchangeWindowString) = 0) then
     begin
       if MessageEnable then
@@ -3238,6 +3237,12 @@ begin
      begin
        SwitchNext := False;
        Switch     := False;
+       if (CWStillBeingSent) then     // 4.52.4 issue 192
+       begin
+        FlushCWBuffer;
+        ReturnInCQOpMode;
+        exit;
+       end;                              // end 4.52.4
        SwapRadios;
         InactiveRigCallingCQ := False;
      end;
