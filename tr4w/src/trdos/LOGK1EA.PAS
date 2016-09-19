@@ -2640,7 +2640,7 @@ end;
 
 procedure SendCWBufferStart;
 begin
-
+  CallWinKeyDown := False;  //4.52.4
   if CWBuffer^[CWBufferStart].length = 0 then // Bump speed command
   begin
     if CWBuffer^[CWBufferStart].Key then

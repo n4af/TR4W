@@ -135,6 +135,7 @@ uses
   InSplit                               : boolean = False;
   Switch                                : boolean = False;
   SwitchNext                            : boolean = False; // 4.52.3
+  CallWinKeyDown                        : boolean = False; // 4.52.4
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
   Esc_Counter                           : integer = 0;
@@ -508,6 +509,13 @@ begin
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
+    if AutoSendEnable and Switch then        // 4.52.6 issue 193
+    begin
+      Switch := False;
+      FlushCWBufferAndClearPTT;
+    //          SwapRadios;
+      Exit;
+   end;
     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
        ActiveRadioPtr^.StopSendingCW
     else if ISCWByCATActive(InactiveRadioPtr) then
@@ -3181,6 +3189,7 @@ procedure ProcessReturn;
 var
   TempHWND                              : HWND;
   First                                 : String[12];
+  Parm                                  : Integer;
   label
    SetFreq;
 begin
@@ -3213,7 +3222,7 @@ begin
       EditableLogWindowDblClick;
       Exit;
     end;
-  
+
      // check if membership # entered
     // n4af 4.42.2 check for reverse lookup of membership #
     //First = GetFirstString
@@ -3231,32 +3240,42 @@ begin
 
   if OpMode = CQOpMode then
   begin
-  if SwitchNext then                              //4.52.3
+
+   if SwitchNext then                              //4.52.3
    begin
     if ((CallWindowString <> '') and (ExchangeWindowString = '')) then
      begin
        SwitchNext := False;
        Switch     := False;
-       if (CWStillBeingSent) then     // 4.52.4 issue 192
+       if (WKBusy) then     // 4.52.4 issue 192
        begin
         FlushCWBuffer;
         ReturnInCQOpMode;
         exit;
-       end;                              // end 4.52.4
-       SwapRadios;
-        InactiveRigCallingCQ := False;
+       end;
+       if not AutoSendEnable then
+       begin                             // end 4.52.4
+         SwapRadios;
+         InactiveRigCallingCQ := False;
+       end;
+         if (AutoSendEnable) and (AutoSendCharacterCount>0) then
+        begin                             // end 4.52.4
+         SwapRadios;
+         InactiveRigCallingCQ := False;
+       end;     
      end;
     end;
+
   if switch = False  then    // n4af 4.44.7
       InactiveRigCallingCQ := False   // n4af 4.42.11
       else
       begin
       if autosendenable then       // n4af 4.44.7
-      begin                      // do not swap yet if autosend
-      switch := False;
-      ReturnInCQOpMode;
-      exit;
-      end;
+       begin                      // do not swap yet if autosend
+        switch := False;
+        ReturnInCQOpMode;
+        exit;
+       end;
       checkinactiverigcallingcq;
       Switch := False;
       if CallWindowString = '' then  // 4.52.3
@@ -3284,10 +3303,11 @@ var
   label
   wait;
 begin
+  CallWinKeyDown  := True; // 4.52.4
   i := 0;
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
-  DebugMsg('[CallWindowKeyDownProc] Key pressed = ' + key); 
+  DebugMsg('[CallWindowKeyDownProc] Key pressed = ' + key);
   if tAutoCQMode then if TryKillAutoCQ then Escape_proc;
 
 // start sending now code
@@ -6016,17 +6036,30 @@ begin
 end;
 
 procedure CheckInactiveRigCallingCQ;
+var
+pRadio : RadioPtr;
 begin
   if Switch then //n4af 4.30.1
-  if (length(CallWindowString) > 0) or (InactiveSwapRadio) then   // n4af 4.44.2
+  if ((length(CallWindowString) > 0) {or (InactiveSwapRadio)}) and (not WKBusy) then   // n4af 4.52.6
   begin
+   scWk_Reset;
      SwapRadios;
         inactiverigcallingcq := False; // n4af 4.44.3
        if  not autosendenable then     //n4af 4.42.10  Redrive dupe check
             ReturninCQopmode;
        ShowInformation;
+
     end;
-    exit;
+ //  pRadio := ActiveRadioPtr;
+ //   if ((ActiveMode = CW) and   autosendenable and (not WKBusy)) then
+    // {((CWThreadID <> 0) or wkBUSY or pRadio.CWByCAT_Sending))} then
+//  begin
+ //  SwapRadios;
+ //  inactiverigcallingcq := False;
+//  end
+
+
+
 end;
 
 function CheckWindowAndColor(Window: HWND; var Brush: HBRUSH; var Color: integer): boolean;

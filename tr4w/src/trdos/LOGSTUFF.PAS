@@ -4402,23 +4402,24 @@ begin
         RXData.QTHString := SecondString;
        end
       else
-      begin
+       begin
         if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then Exit;
         RXData.Zone := StrToInt(SecondString);
+       end;
       end;
-    end;
 
       if ((length(FirstString) > 2) or (isalpha(Firststring))) then
     begin
      QuickDisplay(TC_INVALID);
-     exit;
-    end;
-  {  else
+     exit
+    end
+     else
+     if (SecondString='') and (ThirdString='') then     // 4.52.5
     begin
       RXData.RSTReceived := DefaultRST;
-      RXData.Zone := StrToInt(Exchange);     
+      RXData.Zone := StrToInt(Exchange);
     end;
-  }
+
   if RXData.QTHString <> '' then
     ProcessRSTZoneAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)
   else
@@ -5928,7 +5929,9 @@ begin
         if RXCty <> MyCountry then
           RXData.QSOPoints := 2
         else
-          RXData.QSOPoints := 1;
+         RXData.QSOPoints := 1;
+
+
 
     CroatianQSOPointMethod:
       if RXCty = '9A' then
