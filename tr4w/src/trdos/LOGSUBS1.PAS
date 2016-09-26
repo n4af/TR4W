@@ -180,7 +180,7 @@ begin   // 1
         InactiveRigCallingCQ := True;
         InactiveSwapRadio    := True;
         if ExchangeWindowString = ''   then          // 4.52.1
-        Switch := True;
+       Switch := True;
        SwitchNext := True;    // 4.52.3
         end;
 

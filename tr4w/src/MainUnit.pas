@@ -509,9 +509,11 @@ begin
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
-    if AutoSendEnable and Switch then        // 4.52.6 issue 193
+    if tAutoSendMode and Switch then        // 4.52.6 issue 193
     begin
       Switch := False;
+      SwitchNext := False;
+      InactiveSwapRadio    := False;
       FlushCWBufferAndClearPTT;
     //          SwapRadios;
       Exit;
@@ -929,6 +931,14 @@ begin
       end;
       Exit;
     end;
+    if (length(CallWindowString) <> 0) and (length(ExchangeWindowString) = 0) and SwitchNext then  // 4.52.8
+    if tAutoSendMode and (AutoSendCharacterCount > 0) then
+     begin
+      SwitchNext := False;
+      InactiveRigCallingCQ := False;
+      CallAlreadySent := True;
+      SwapRadios;
+     end;
 
   if SCPMinimumLetters > 0 then
   begin
@@ -3399,6 +3409,22 @@ begin
   if not InsertMode then EditSetSelLength(c, 1);
 
   itempos := SendMessage(p, LB_GETCURSEL, 0, 0);
+ // if ((CWThreadID <> 0) or wkBUSY or ActiveRadioPtr.CWByCAT_Sending) then
+  // FlushCWBuffer;
+    {((CallWindowString<>'')   and (exchangewindowstring<>'') and  }
+  if ((CWThreadID <> 0) or wkBUSY or ActiveRadioPtr.CWByCAT_Sending) then
+   begin
+   sleep(1500);
+   callalreadysent := True;
+    FlushCWBuffer;
+    Switch := False;
+    SwitchNext := False;
+    InactiveRigCallingCQ := False;
+    InactiveSwapRadio := False;
+   end;
+  
+
+
 
   if Key = PossibleCallLeftKey then dec(itempos);
   if Key = PossibleCallRightKey then inc(itempos);
@@ -6039,16 +6065,17 @@ procedure CheckInactiveRigCallingCQ;
 var
 pRadio : RadioPtr;
 begin
-  if Switch then //n4af 4.30.1
+  if SwitchNext then //n4af 4.30.1
   if ((length(CallWindowString) > 0) {or (InactiveSwapRadio)}) and (not WKBusy) then   // n4af 4.52.6
   begin
    scWk_Reset;
      SwapRadios;
+        SwitchNext := False;       // 4.52.8
         inactiverigcallingcq := False; // n4af 4.44.3
-       if  not autosendenable then     //n4af 4.42.10  Redrive dupe check
+        InactiveRigCallingCQ := False;
+       if  (not AutoSendEnable) or (not AutoSendCharacterCount > 0) then     //n4af 4.42.10  Redrive dupe check
             ReturninCQopmode;
-       ShowInformation;
-
+        ShowInformation;
     end;
  //  pRadio := ActiveRadioPtr;
  //   if ((ActiveMode = CW) and   autosendenable and (not WKBusy)) then
