@@ -313,7 +313,7 @@ var
 
 const
 
-  CommandsArraySize                     = 406 + 1{RadioOneCWSpeedSync} + 1{RadioTwoCWSpeedSync}
+  CommandsArraySize                     = 407+ 1{RadioOneCWSpeedSync} + 1{RadioTwoCWSpeedSync}
                                               + 1{RadioOneCWByCAT}     + 1{RadioTwoCWByCAT} //ny4i // 4.44.5
                                               + 7{UDPBroadcast Variables} //ny4i 4.44.9  - Issue 82 added one more UDP variable
                                               ;
@@ -508,6 +508,7 @@ const
  (crCommand: 'MULTI UPDATE MULT DISPLAY';     crAddress: @MultiUpdateMultDisplay;         crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'MULTIPLE BANDS';                crAddress: @MultipleBandsEnabled;           crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'MULTIPLE MODES';                crAddress: @MultipleModesEnabled;           crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'MULT SHEET AUTO RESET';         crAddress: @MultReset   ;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'MY CALL';                       crAddress: @MyCall;                         crMin:0;  crMax:13;      crS: csOld; crA: 14;crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'MY CHECK';                      crAddress: @MyCheck;                        crMin:0;  crMax:10;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'MY CONTINENT';                  crAddress: pointer(21);                     crMin:0;  crMax:0;       crS: csOld; crA: 22;crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctOther),

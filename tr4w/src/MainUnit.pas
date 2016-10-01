@@ -509,7 +509,7 @@ begin
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
-    if tAutoSendMode and Switch then        // 4.52.6 issue 193
+    if  SwitchNext then        // 4.52.6 issue 193   // 4.52.10
     begin
       Switch := False;
       SwitchNext := False;
@@ -3403,28 +3403,26 @@ begin
       EditingCallsignSent := False;
     end;
   end;
+   if (SwitchNext  {and  (CallWindowString<>'')} and
+   ((CWThreadID <> 0) or wkBUSY or ActiveRadioPtr.CWByCAT_Sending)) then      // 4.52.10
+    begin
+     FlushCWBuffer;
+      SwapRadios;
+     exit;
+    end;
   //  CallsignsList.CreatePartialsList(CallWindowString);
   p  := wh[mwePossibleCall];
   c := wh[mweCall];
   if not InsertMode then EditSetSelLength(c, 1);
-
-  itempos := SendMessage(p, LB_GETCURSEL, 0, 0);
- // if ((CWThreadID <> 0) or wkBUSY or ActiveRadioPtr.CWByCAT_Sending) then
-  // FlushCWBuffer;
-    {((CallWindowString<>'')   and (exchangewindowstring<>'') and  }
-  if ((CWThreadID <> 0) or wkBUSY or ActiveRadioPtr.CWByCAT_Sending) then
+  if ((CWThreadID <> 0) or wkBUSY or ActiveRadioPtr.CWByCAT_Sending) then   //4.52.10
    begin
-   sleep(1500);
-   callalreadysent := True;
-    FlushCWBuffer;
     Switch := False;
     SwitchNext := False;
     InactiveRigCallingCQ := False;
     InactiveSwapRadio := False;
    end;
-  
 
-
+  itempos := SendMessage(p, LB_GETCURSEL, 0, 0);
 
   if Key = PossibleCallLeftKey then dec(itempos);
   if Key = PossibleCallRightKey then inc(itempos);
@@ -6068,11 +6066,10 @@ begin
   if SwitchNext then //n4af 4.30.1
   if ((length(CallWindowString) > 0) {or (InactiveSwapRadio)}) and (not WKBusy) then   // n4af 4.52.6
   begin
+   InactiveRigCallingCQ := False;
    scWk_Reset;
      SwapRadios;
-        SwitchNext := False;       // 4.52.8
-        inactiverigcallingcq := False; // n4af 4.44.3
-        InactiveRigCallingCQ := False;
+      SwitchNext := False;       // 4.52.8
        if  (not AutoSendEnable) or (not AutoSendCharacterCount > 0) then     //n4af 4.42.10  Redrive dupe check
             ReturninCQopmode;
         ShowInformation;

@@ -274,6 +274,7 @@ var
 
   MultByBand                            : boolean;
   MultByMode                            : boolean;
+  MultReset                             : boolean = False;
   MultiplierAlarm                       : boolean;
 
   NumberDifferentMults                  : Byte {= 0};

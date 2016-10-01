@@ -5931,6 +5931,7 @@ begin
   if IntegerTime = 0 then
   begin
     if Sheet.tAutoReset then tClearDupesheet;
+    if (Sheet.tAutoReset and MultReset) then tClearMultsheet; // 4.52.11
     SendMessage(TorDurationPrBarWindow, PBM_SETMARQUEE, wParam(True), 40);
     Windows.SetWindowLong(TorDurationPrBarWindow {GetDlgItem(ReminderDlgHandle, 101)}, GWL_STYLE, $50000009);
   end;
