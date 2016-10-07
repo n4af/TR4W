@@ -194,6 +194,7 @@ begin   // 1
          if ExchangeWindowString = ''   then          // 4.52.1
           Switch     := True;
          SwitchNext := True;
+         swapradios;
       end;   // 2
 
 

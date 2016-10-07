@@ -5,7 +5,8 @@
 const
   TC_TRANSLATION_LANGUAGE               = 'RUSSIAN';
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
-  RC_3830                               = 'Отправить Score на 3830';
+  TC_INVALID                            = 'Неверный ввод';
+  RC_3830                               = 'Отправить результат на 3830';
   TC_CALLSIGN                           = 'Позывной';
   TC_BAND                               = 'Диапазон';
   TC_FREQ                               = 'Частота';
@@ -31,7 +32,7 @@ const
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Вы используете последнюю версию';
   TC_SET_VALUE_OF_SET_NOW               = 'Необходимо установить значение команды %s. Установить сейчас?';
   TC_CONFIGURATION_FILE                 = 'Файл конфигурации';
-  TC_CURRENT_OPERATOR_CALLSIGN          = 'позывной текущего оператора';
+  TC_CURRENT_OPERATOR_CALLSIGN          = 'Позывной текущего оператора';
   TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'Добавить импортированные связи к текущему логу?';
   TC_QSO_IMPORTED                       = 'связи(ей) импортированно.'; // - '345 Qs imported.'
   TC_ISADUPE                            = 'Связь с %s уже была!!';
@@ -48,7 +49,7 @@ const
   TC_SENDTIMETOCOMPUTERSONTHENETWORK    = 'Вы на действительно хотите послать время по сети?';
   TC_RULESONSM3CER                      = 'Положение %s на сайте WA7BNM Contest Calendar';
   TC_RULESONQRZRU                       = 'Положение %s на сайте QRZ.RU';
-  TC_NOTE                               = 'заметку';
+  TC_NOTE                               = 'Заметка';
   TC_DUPESHEETCLEARED                   = 'Таблица повторов очищена!';
   TC_MULTSHEETCLEARED                   = 'Таблица множителей очищена!';
   TC_YESTOCLEARTHEDUPESHEET             = 'слово "YES" для очистки таблицы повторов';
@@ -56,9 +57,9 @@ const
 
   TC_TRANSMITFREQUENCYKILOHERTZ         = 'передаваемую частоту (в кГц):';
   TC_SPRINTQSYRULE                      = 'Правило SPRINT QSY!!!';
-  TC_PADDLE                             = 'Манип.';
+  TC_PADDLE                             = 'Манипулятор';
   TC_FOOTSW                             = 'Педаль';
-  TC_LOG_NOTE                           = 'Заметка';
+  TC_LOG_NOTE                           = 'заметку';
   TC_LOG_DELETED                        = 'Удалена';
 
   TC_SUN                                = 'Вск';
@@ -165,7 +166,7 @@ const
   {UTELNET}
 
   TC_TELNET                             = 'Соединение'#0'Отключение'#0'Команды'#0'Заморозить'#0'Очистить'#0'100'#0;
-  TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'ВЫ НЕ ПОДКЛЮЧЕНЫ К ИНТЕРНЕТ!';
+  TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'ВЫ НЕ ПОДКЛЮЧЕНЫ К ИНТЕРНЕТУ!';
   TC_GETHOST                            = 'ОПРЕДЕЛЕНИЕ ХОСТА..';
   TC_SERVER                             = 'СЕРВЕР: %s';
   TC_HOST                               = 'ХОСТ  : %s';
@@ -240,9 +241,9 @@ const
   TC_SAVINGTO                           = 'Копирование %s в %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Файл успешно сохранен на флоппи диске';
   TC_FILESAVEDTOSUCCESSFULLY            = 'Файл %s успешно сохранен';
-  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
-  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
+  TC_IMPROPERTRANSMITTERCOUNT           = 'FD передатчики должны быть между 1 and 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day класс должен быть A, B, C, D, E или F.';
+  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'Обмен DX станции должен быть "DX".';
 
   {LOGSEND}
 
@@ -674,7 +675,7 @@ const
   RC_ALTG                               = 'Сохр. все (Alt-&G)';
   RC_BANDMAP2                           = 'Карта диапазона';
   RC_AUTOCQ2                            = 'Авто-CQ';
-  RC_PRESSMKYWTR                        = 'Функ.клавиша, которую нужно повторять';
+  RC_PRESSMKYWTR                        = 'Функц. клавиша, которую нужно повторять';
   RC_NUMBEROSOLT                        = 'Пауза, мс.';
   RC_DELETESELSPOT                      = 'Удалить выделенный спот';
   RC_REMOVEALLSP                        = 'Удалить все споты';

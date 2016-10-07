@@ -6,6 +6,9 @@ const
   TC_TRANSLATION_LANGUAGE               = 'MONGOLIAN';
   TC_TRANSLATION_AUTHOR                 = 'Khosbayar.N JT1CD';
   TC_TRANSLATOR_EMAIL                   = 'jt1cd.khos@gmail.com';
+
+  RC_3830                               =  '3830 Score posting';
+  TC_INVALID                            = 'Invalid Entry';
   TC_CALLSIGN                           = 'Дуудлага';
   TC_CHECKCALLSIGN                      = 'Дуудлагаа шалга';
   TC_FREQUENCYFORCALLINKHZ              = 'Давтамж КГц-ээр %s';

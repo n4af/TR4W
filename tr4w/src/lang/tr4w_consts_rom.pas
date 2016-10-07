@@ -7,6 +7,8 @@ const
   TC_TRANSLATION_LANGUAGE               = 'ROMANIAN';
   TC_TRANSLATION_AUTHOR                 = 'Suli I.Iulius YO2IS';
 
+  TC_INVALID                            = 'Invalid Entry';
+  RC_3830                               =  '3830 Score posting';
   TC_CALLSIGN                           = 'Indicativ';
   TC_BAND                               = 'Banda';
   TC_FREQ                               = 'Frecv';

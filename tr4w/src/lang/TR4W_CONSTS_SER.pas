@@ -8,6 +8,8 @@ const
   TC_TRANSLATION_AUTHOR                 = 'Dragan Acimovic YT3W';
   TC_TRANSLATOR_EMAIL                   = 'dragan.acimovic@gmail.com';
 
+  TC_INVALID                            = 'Invalid Entry';
+  RC_3830                               =  '3830 Score posting';
   TC_FREQ                               = 'Freq';
   TC_POINTS                             = 'Pts';
   TC_OP                                 = 'Op';
