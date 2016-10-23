@@ -505,8 +505,7 @@ procedure Escape_proc;
 var
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
- ClearAltD;
- tClearDupeInfoCall; 
+
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
@@ -522,14 +521,15 @@ begin
     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
        ActiveRadioPtr^.StopSendingCW
     else if ISCWByCATActive(InactiveRadioPtr) then
-       begin
         InactiveRadioPtr^.StopSendingCW;
-       end;
+
     SetSpeed(DisplayedCodeSpeed);   // 4.49.3
     inc(Esc_counter);
     end;
         if Esc_counter > 1 then
       begin
+       ClearAltD;
+       tClearDupeInfoCall;
   //    tCleareCallWindow;      // n4af 4.46.11
 //  initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
       inc(Esc_Counter);
@@ -3110,6 +3110,9 @@ begin
    menu_3830_scores_posting:             // 4.51.8
    OpenUrl('http://www.3830scores.com/');
 
+   menu_arrl_submit:             // 4.53.3
+   OpenUrl('http://contest-log-submission.arrl.org/');
+
     menu_qrzru_calendar:
       begin
         Format(TempBuffer1, 'http://www.qrz.ru/contest/detail/%d.html', ContestsArray[Contest].QRZRUID);
@@ -4400,6 +4403,8 @@ var
   CurrentRecord, FirstRecord            : integer;
   TempMode                              : ModeType;
   T1                                    : Cardinal;
+  s                                     : Str10;
+ 
 begin
 
 {$IF tDebugMode}
@@ -4529,6 +4534,11 @@ begin
   QuickDisplay(inttopchar(Windows.GetTickCount - T1));
 //  showint(m);
 {$IFEND}
+   if contest = RADIOYOC then    // 4.53.2
+   begin
+    PrevNr := copy(IntToStr(TempRXData.NumberReceived),1,3);    // 4.53.2
+    ColumnsArray[logColNumberReceive].Enable := True;
+   end; 
 end;
 
 function CreateEditableLog(Parent: HWND; X, Y, Width, Height: integer; DefaultSize: boolean): HWND;
@@ -4701,10 +4711,10 @@ begin
   asm call setitem  end;
 
   if ColumnsArray[logColNumberReceive].Enable then
-    if RXData.NumberReceived <> -1 then
+    if tempRXData.NumberReceived <> -1 then
     begin
       elvi.iSubItem := ColumnsArray[logColNumberReceive].pos; //Ord(logColNumberReceive);
-      elvi.pszText := inttopchar(RXData.NumberReceived);
+      elvi.pszText := inttopchar(tempRXData.NumberReceived);
       asm call setitem
       end;
     end;
@@ -5721,6 +5731,7 @@ end;
 procedure ExecuteConfigurationFile(f: ShortString);
 var
   FirstCommand                          : boolean;
+
 begin
   RunningConfigFile := True;
   ClearDupeSheetCommandGiven := False;
@@ -5729,6 +5740,7 @@ begin
   LoadInSeparateConfigFile(f, FirstCommand, MyCall);
   if ClearDupeSheetCommandGiven then tClearDupesheet;
   RunningConfigFile := False;
+
 end;
 
 function NewGetMem(Size: integer): Pointer;

@@ -66,7 +66,7 @@ var
   RepeatSearchAndPounceExchange         : Str40;
   SearchAndPounceExchange               : Str40;
   TailEndMessage                        : Str40 { = 'R'};
-
+  PrevNr                                : Str10;   // 4.53.2
   CorrectedCallPhoneMessage             : ShortString {= 'CORCALL.WAV'};
   CQPhoneExchange                       : ShortString {= 'CQEXCHNG.WAV'};
   CQPhoneExchangeNameKnown              : ShortString {= 'CQEXNAME.WAV'};

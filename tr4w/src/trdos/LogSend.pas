@@ -44,7 +44,8 @@ utils_text,
   LogGrid, {Crt,}
   LogSCP,
   BeepUnit,
-  uWinKey
+  uWinKey,
+  SysUtils
   ;
 
 procedure SendCrypticDVPString(SendString: ShortString);
@@ -121,6 +122,7 @@ var
   i                                     : integer;
   TempReceivedData                      : ContestExchange;
   pendingCWBuffer                       : Str50;
+  p                                     : shortstring;
 begin
 // For CQ TEST NY4I , this sends the C, then the Q, then T, then E, then S, then T, then NY4I
 
@@ -161,9 +163,12 @@ begin
 
 
        case SendChar of
-      {     '^':                               // n4af 4.49.2 issue 174
-            AddStringTOBuffer('',CWTone);
-      }
+            '+':
+            begin                              // n4af 4.53.2
+              if PrevNr = '' then PrevNr := '000';
+              AddStringToBuffer(PrevNr,CWTone);
+            end;
+
            '.':
           begin
           AddStringToBuffer('.', CWTone);     // n4af 04.35.2

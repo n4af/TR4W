@@ -356,12 +356,12 @@ const
     (mrText: '-'; mrId: 0),
     (mrText: ''; mrId: menu_sk3bg_calendar),
     (mrText: ''; mrId: menu_qrzru_calendar),
-    (mrText: RC_WA7BNM_CALENDAR; mrId: menu_wa7bnm_calendar),     // 4.51.8
     (mrText: '-'; mrId: 0),
     (mrText: RC_CALCULATOR; mrId: item_calculator),
  //}
     (mrText: '-'; mrId: 0),
     (mrText: RC_3830; mrId: menu_3830_scores_posting),
+    (mrText: RC_3830_arrl; mrId: menu_arrl_submit),    // 4.53.3
     (mrText: '-'; mrId: 0),
     (mrText: RC_NET; mrId: MAXWORD),
  //{

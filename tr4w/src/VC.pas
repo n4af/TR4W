@@ -175,7 +175,7 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.53.1';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.53.3';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
@@ -1900,6 +1900,7 @@ const
   menu_get_offset                       = 10567;
   menu_wa7bnm_calendar                  = 10568;
   menu_3830_scores_posting              = 10569;     //4.51.8
+  menu_arrl_submit                      = 10570;     //4.53.3
   //  menu_addonlinerdxcresults         = 10564;
 
   menu_escape                           = 10502;

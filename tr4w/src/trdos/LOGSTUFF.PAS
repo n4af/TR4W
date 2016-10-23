@@ -79,7 +79,7 @@ const
 
   ProcessedMultiMessageBufferLength     = 256;
 
- 
+
 
   ChampionshipRFPointsArray             : array[1..49] of Byte =
     (
@@ -400,7 +400,7 @@ var
 
   CallsignICameBackTo                   : CallString;
   CheckLogFileSize                      : boolean;
-  ColumnDupeSheetColor                  : boolean;      
+  ColumnDupeSheetColor                  : boolean;
   ColumnDupeSheetEnable                 : boolean;
   ComputerID                            : Char { = CHR(0)};
   ComputerName                          : Str10 = 'New';
@@ -587,7 +587,6 @@ var
   udp                                   : TIdUDPClient;          // ny4i 4.44.9 Uses to broadcast info
 //procedure AgeReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 //procedure AgeReceivedHeader(var LogString: Str80; var Underline: Str80);
-
 procedure BandChange(var ActiveBand: BandType; Direction: DirectionType);
 
 procedure CalculateQSOPoints(var RXData: ContestExchange);
@@ -1098,7 +1097,7 @@ begin
       Exit;
     end;
 
-  
+
   end;
 
   Hours := GetIntegerTime div 100;
@@ -1351,7 +1350,7 @@ begin
   if DomesticCountryCall(RXData.Callsign) then
      begin
      dx := false;
-     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i 
+     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
      Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
      ParseExchange(Exchange, Str10(RXData.ceClass), RXData.QTHString, TempString);
 
@@ -1382,7 +1381,7 @@ begin
      begin
      dx := true;
       {ParseExchange (Exchange, RXData.Class, RXData.QTHString, TempString);}{pre 6.68 statement}
-     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i 
+     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
      Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
 
      ParseExchange(Exchange, Str10(RXData.ceClass), TempString, TempString2);
@@ -3454,7 +3453,7 @@ var
    end;
    RXData.FOCNumber := Exchange;
  ProcessRSTAndFOCNumberExchange := RXData.FOCNumber <> '';
- 
+
    ProcessRSTAndFOCNumberExchange := True;
    end;
 
@@ -3467,24 +3466,24 @@ var
     SecondString := RXData.Name;
   if StringIsAllNumbers(ThirdString)  then
      ThirdString := StrToInt(ThirdString);
-	 
+
     if ThirdString <> '' then
     begin
       if StringIsAllNumbers(ThirdString) then
       RXData.NumberReceived := StrToInt(ThirdString);
-    end 
+    end
     else
       RXData.NumberReceived := ' ';
     Exit;      }
-  
-  
 
-  
 
-  
- 
-  
-  
+
+
+
+
+
+
+
 function ProcessRSTAndDomesticOrDXQTHExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
 
 begin
@@ -3745,18 +3744,26 @@ end;
 function ProcessQSONumberAndPreviousQSONumber(Exchange: Str80; var RXData: ContestExchange): boolean;
 var
   l                                     : integer;
+  j                                     : integer;
+  k                                     : integer;
+  strng                                 : str10;
+  f                                     : extended;
 begin
   Result := False;
   l := length(Exchange);
   if not (l in [4..6]) then
   begin
-//    ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
+     ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
     Exit;
   end;
   if not StringIsAllNumbers(Exchange) then Exit;
-//  RXData.Kids := Copy(Exchange, l - 3, 3);
-//  RXData.NumberReceived := StrToInt(Copy(Exchange, 1, l - 3));
-  RXData.NumberReceived := StrToInt(Exchange);
+//   Val(Exchange, LeadingZeros, j);
+   temprxdata.NumberReceived := StrToInt(Exchange);
+   rxdata.NumberReceived := StrToInt(Exchange);
+
+ // RXData.NumberReceived := SysUtils.Format('%.*d', [3, k]);    // 4.53.2
+  PrevNr := Copy(Exchange, 1, 3);                 // 4.53.2
+
   Result := True;
 end;
 
@@ -5772,12 +5779,12 @@ begin
 	  BWQPQSOPointMethod:
 
  	  if StringIsAllNumbers(RXData.QTHString) then
-	  RXData.QSOPoints := 1 
+	  RXData.QSOPoints := 1
 	  else
 	  RXData.QSOPoints := 0;
 
 
-    
+
     CISQSOPointMethod:
       begin
         RXData.QSOPoints := 1;
@@ -6782,13 +6789,13 @@ begin
         if RXCty = MyCountry then  RXData.QSOPoints := 1
         else
         RXData.QSOPoints := 3;
-        
+
 
         end;
-      
+
       LZDXQSOPointMethod:
       begin
-        
+
           if RXCty = 'LZ' then
           begin
             if MyCountry = 'LZ' then RXData.QSOPoints := 1 else RXData.QSOPoints := 10;
@@ -6801,7 +6808,7 @@ begin
               RXData.QSOPoints := 1;
           end;
         end;
-     
+
 
 
     OldNewYearQSOPointMethod:
@@ -7545,14 +7552,14 @@ begin
     RSTDomesticOrDXQTHExchange:
       ProcessExchange := ProcessRSTAndDomesticOrDXQTHExchange(ExchangeString, RData);
 
-  
+
      RSTDomesticQTHOrQSONumberExchange:
       if DomesticCountryCall(RData.Callsign) and (StringHasLetters(ExchangeString)) then   //n4af 4.44.4 HADX
         ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData)
       else
         ProcessExchange := ProcessRSTAndQSONumberExchange(ExchangeString, RData);
 
-    
+
     RSTNameAndQTHExchange:
       ProcessExchange := ProcessRSTNameAndQTHExchange(ExchangeString, RData);
 
@@ -7582,14 +7589,14 @@ begin
 
     RSTQSONumberOrDomesticQTHExchange:
     ProcessExchange := ProcessRSTQSONumberorDomesticQTHExchange(ExchangeString, RData);      // 4.53.2
-    
+
     RSTQSONumberAndPossibleDomesticQTHExchange:
       ProcessExchange := ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
 
     QSONumberAndPossibleDomesticQTHExchange:
       ProcessExchange := ProcessQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData); {KK1L: 6.73}
 
-    
+
 
     RSTQSONumberAndRandomCharactersExchange:
       ProcessExchange := ProcessRSTQSONumberAndRandomCharactersExchange(ExchangeString, RData);
@@ -8079,7 +8086,7 @@ begin
       begin
       ExchangeErrorMessage := TC_IMPROPERTRANSMITTERCOUNT;
       end
-   else if length(sCategory) <> 1 then   
+   else if length(sCategory) <> 1 then
       begin
       ExchangeErrorMessage := TC_IMPROPERARRLFIELDDAYCLASS;
       end
