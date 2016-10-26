@@ -2036,6 +2036,8 @@ begin
             if OpMode = CQOpMode then
             begin
               SetOpMode(SearchAndPounceOpMode);
+               tClearDupeInfoCall;
+              initializeQSO;   // 4.53.5
               Second := False;    // n4af 4.46.7  first esc d/n clear call
             end;
      if rig.FilteredStatus.TxOn then

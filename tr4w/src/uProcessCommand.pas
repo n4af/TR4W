@@ -136,7 +136,7 @@ const
 (caCommand: '  ^ = Half space'; caAddress: @scEXCHANGERADIOS),
 (caCommand: '  CTRL-P CTRL-F = Faster'; caAddress: @scEXCHANGERADIOS),
 (caCommand: '  CTRL-P CTRL-S = Slower'; caAddress: @scWK_SWAPTUNE),
-(caCommand: ' + = AR'; caAddress: @scWK_RESET),
+(caCommand: ' + = Previous #'; caAddress: @scWK_RESET),       //4.53.2
 (caCommand: '  > = Reset RIT'; caAddress: @scSENDMESSAGE),
 (caCommand: ' < = SK'; caAddress: @scBOOLSWAP),
 (caCommand: ' = = BT'; caAddress: @tClearDupesheet),

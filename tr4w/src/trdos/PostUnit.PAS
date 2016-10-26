@@ -32,6 +32,7 @@ uses
   LogK1EA,
   utils_text,
   utils_file,
+  sysutils,
   Tree,
   VC,
 //  Help,
@@ -45,6 +46,7 @@ uses
   LogGrid,
   ZoneCont,
   Messages,
+  LogCW, // 4.53.2
   Windows
   ;
 
@@ -2407,9 +2409,13 @@ var
   TransmitterIDPos                      : integer;
   contacts                              : integer;
   PreviousQTHString                     : Str10;
+  pnr                                   : integer;
+  hisnr                                 : integer;
+  rxnr                                  : integer;
+
 begin
   TransmitterIDPos := 80;
-
+  pnr := 0;
   if Contest = IOTA then TransmitterIDPos := 90;
   contacts := 0;
   Result := False;
@@ -3230,22 +3236,27 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
             end;
           end;
 
-        QSONumberAndPreviousQSONumber:
+          QSONumberAndPreviousQSONumber:
           begin
             asm
-            push nrSent
-            push previousqsonr
+             push nrSent            // 4.53.2
+             push pnr     // 4.53.2
             end;
-            wsprintf(CABRILLO_MYEX, '%03u%03d     ');
+            wsprintf(CABRILLO_MYEX, '%-5.3u%-5.3d');
             asm add esp,16
             end;
+           
+          hisnr := (nrreceived div 1000);    // 4.53.2
+           rxnr := (nrreceived mod 1000);    // 4.53.2
 
             asm
-              push nrReceived
+              push hisnr     // 4.53.4
+              push rxnr      //4.53.4
             end;
-            wsprintf(CABRILLO_HISEX, '%06u');
-            asm add esp,12
-            end;
+            pnr := temprxdata.numberreceived div  1000;      // 4.53.2
+             wsprintf(CABRILLO_HISEX, '%-5.3d%-5.3d');    // 4.53.4
+             asm add esp,16
+             end;
           end;
 
         RSTAndQSONumberOrFrenchDepartmentExchange, RSTAndQSONumberOrDomesticQTHExchange, RSTDomesticQTHOrQSONumberExchange:

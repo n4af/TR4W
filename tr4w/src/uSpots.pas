@@ -607,7 +607,7 @@ begin
     if not DupeInfoCallWindowCleared then
       SetMainWindowText(mweDupeInfoCall, nil);
     DupeInfoCallWindowCleared := True;
-//    tClearDupeInfoCall;       // issue 172
+    tClearDupeInfoCall;       // issue 172       // 4.53.5
   end;
 
 end;

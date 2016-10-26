@@ -5490,9 +5490,11 @@ begin
           if dif <= 10000 then
             if AutoSAPEnable then
               if OpMode = CQOpMode then
+               begin
                 SetOpMode(SearchAndPounceOpMode);
-
-//      if tStatusEqualityCounter = StatusEquality then
+                tClearDupeInfoCall;
+               end;
+                //      if tStatusEqualityCounter = StatusEquality then
 //        if FilteredStatus.Freq <> 0 then
 //          if (FilteredStatus.Band <> BandMemory[ActiveRadio {RadioOne}])
 //            or (FilteredStatus.Mode <> ModeMemory[ActiveRadio {RadioOne}])
@@ -5523,7 +5525,12 @@ begin
         if dif > AutoSAPEnableRate then
           if dif <= 10000 then
           begin
-            if AutoSAPEnable and (OpMode = CQOpMode) then SetOpMode(SearchAndPounceOpMode);
+            if AutoSAPEnable and (OpMode = CQOpMode) then
+             begin
+              SetOpMode(SearchAndPounceOpMode);
+              tClearDupeInfoCall;
+              initializeQSO;   // 4.53.5
+             end; 
           end;
 
 //      if tStatusEqualityCounter = StatusEquality then

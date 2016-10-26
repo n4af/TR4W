@@ -347,7 +347,7 @@ begin
 
               COLORADOQSOPARTY, MINNQSOPARTY:
                 begin
-                  DisplayInitialCommand(icmyName);
+                   DisplayInitialCommand(icmyName);
                 end;
 
               ALRS_UA1DZ_CUP:
@@ -436,7 +436,7 @@ begin
           //    DisplayInitialCommand(icmyFOC);
              SetCommentAndEnableEditControl(TC_ENTERYOURFOCNUMBER,icmyFOC);
              end;
-             
+
               ARRLFIELDDAY:
                 begin
                   DisplayInitialCommand(icmyFDClass);
@@ -455,6 +455,8 @@ begin
                   SetCommentAndEnableEditControl(TC_ENTERYOURQTHANDTHENAME, icmyState);
                   DisplayInitialCommand(icmyName);
                 end;
+
+
 
               UA4WCHAMPIONSHIP:
                 SetCommentAndEnableEditControl('Enter your RDA (for Russian stations) or four digit grid square:', icMyQTH);
@@ -601,6 +603,7 @@ begin
   Windows.SetWindowText(NewContestCommentWndHandle, comment);
 end;
 
+
 procedure EnterCountyOrState(State: PChar);
 begin
   DisplayInitialCommand(icmyState);
@@ -654,4 +657,5 @@ begin
 end;
 
 end.
+
 
