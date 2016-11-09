@@ -1455,12 +1455,12 @@ begin
         AddDomesticCountry('GW');
       end;
 
-    {RADIO160,}RADIOYOC:
+    {RADIO160, RADIOYOC:
       begin
         TourDuration := 60;
 //        Sheet.tAutoReset := True;
         ColumnsArray[logColNumberReceive].Width := 4;
-      end;
+      end;  }
 
     CQIR:
       begin

@@ -36,7 +36,7 @@ uses
   uWinKey,
   uAltD,
   uCTYDAT,
-//  uMultsFrequencies,
+  uDupeSheet,  // 4.53.7
 //  uStack,
   uStations,
   uCallsigns,
@@ -5069,7 +5069,7 @@ nop
                       //                    RemoveWindow(DupeInfoWindow);
                     NameCallsignPutUp := '';
                     tClearDupeInfoCall;
-
+                    ClearAltD;  // 4.53.7
                       { This is new for 5.88 }
 
                     if TwoRadioState = CallReady then

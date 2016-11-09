@@ -32,6 +32,7 @@ uses
   Tree,
   LogRadio,
   LogEdit,
+  uDupeSheet, // 4.53.7
   uFunctionKeys,
   utils_file,
   MainUnit,
@@ -2037,6 +2038,7 @@ begin
             begin
               SetOpMode(SearchAndPounceOpMode);
                tClearDupeInfoCall;
+               ClearAltD;      // 4.53.7
               initializeQSO;   // 4.53.5
               Second := False;    // n4af 4.46.7  first esc d/n clear call
             end;

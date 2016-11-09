@@ -15,7 +15,7 @@
 
  You should have received a copy of the GNU General
      Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit uSpots;
@@ -26,6 +26,7 @@ interface
 uses
   VC,
   TF,
+  uDupesheet,
   LogStuff,
   WinSock2,
   Windows,
@@ -595,6 +596,7 @@ begin
   if d <= BandMapGuardBand then
   begin
     tClearDupeInfoCall; // 4.50.4
+    ClearAltD;  // 4.53.7
     DupeInfoCall := FList^[Index2].FCall;
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
@@ -605,7 +607,7 @@ begin
   begin
     DupeInfoCallWindowState := diNone;
     if not DupeInfoCallWindowCleared then
-      SetMainWindowText(mweDupeInfoCall, nil);
+    ClearAltD; // 4.53.7
     DupeInfoCallWindowCleared := True;
     tClearDupeInfoCall;       // issue 172       // 4.53.5
   end;

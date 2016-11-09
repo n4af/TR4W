@@ -505,44 +505,51 @@ procedure Escape_proc;
 var
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
-
+ tClearDupeInfoCall;  
 // *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
  If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
+    opMode := CQOpMode;
     if  SwitchNext then        // 4.52.6 issue 193   // 4.52.10
-    begin
+     begin
       Switch := False;
       SwitchNext := False;
       InactiveSwapRadio    := False;
       FlushCWBufferAndClearPTT;
-    //          SwapRadios;
       Exit;
-   end;
-    if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
+     end;
+     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
        ActiveRadioPtr^.StopSendingCW
-    else if ISCWByCATActive(InactiveRadioPtr) then
+     else if ISCWByCATActive(InactiveRadioPtr) then
         InactiveRadioPtr^.StopSendingCW;
-
+   if Esc_Counter = 0 then
+   begin
     SetSpeed(DisplayedCodeSpeed);   // 4.49.3
     inc(Esc_counter);
-    end;
-    if Esc_counter > 1 then
-      begin
-       ClearAltD;
-       tClearDupeInfoCall;
-       dupeinfocall := '';
-  //    tCleareCallWindow;      // n4af 4.46.11
-//  initializeqso;              // n4af 4.46.12 switch back to full initialize from just clearing window
-      inc(Esc_Counter);
-      Opmode := CQOpMode;  // n4af 4.46.12
-                                   // ny4i Issue #111 - Just a bit of code formatting for readability>>>>>>> a31747af888fbd546de46cd7f4ead476bcc8e842
-    end;
-      if (Esc_counter > 3) then
-    OpMode := CQOpMode;
-    Esc_counter := 0;
-  //   if TryKillCW then Exit;
+    flushCWBufferAndClearPTT;
+    scWk_Reset; // 4.53.7
+    exit;
+   end;
 
-  //scWK_reset; // n4af 4.46.2   // ny4i removed as thecode in PTTOff seems to get this. Maybe reset there?
+    if Esc_counter = 1 then       // 4.53.7
+      begin
+         if twoRadioMode and (CallWindowString <> '') then SwapRadios;
+         inc(Esc_counter);
+         tCleareCallWindow;
+         tCallWindowSetFocus;
+         exit;
+      end;
+
+      if (Esc_counter = 2) then      // 4.53.7
+      begin
+         Esc_counter := 0;
+         tClearDupeInfoCall;
+         ClearAltD;
+         tCallWindowsetFocus;
+         inc(Esc_counter);
+         exit;
+       end;
+   If Esc_Counter = 3 then SetOpMode(SearchAndPounceOpMode);
 
 // InitializeQSO;
 
@@ -673,9 +680,9 @@ begin
   if tPreviousDupeQSOsShowed then ShowPreviousDupeQSOsWnd(False); //DestroyPreviousDupeQSOsWnd;
   //  DisplayEditableLog(VisibleLog.LogEntries);
   ClearMasterListBox;
-    ClearAltD;       // n4af 4.39.3
+ // ClearAltD;       // n4af 4.53.6
 //  NameCallsignPutUp := '';
-    tClearDupeInfoCall;      //n4af 4.53.5
+//  tClearDupeInfoCall;      //n4af 4.53.5
   if TwoRadioState = CallReady then TwoRadioState := Idle;
 
   tCallWindowSetFocus;
@@ -684,7 +691,7 @@ begin
     if (EscapeExitsSearchAndPounce) then SetOpMode(CQOpMode);
 
 end;
-
+end;
 procedure SpaceBarProc2;
 begin
   if (DupeInfoCall <> '') and (CallWindowString = '') then
@@ -3210,7 +3217,7 @@ var
 begin
   TempHWND := Windows.GetFocus;
 //  if TempHWND = 0 then sm;
-
+  Esc_Counter := 0;  // 4.53.7
   if {TempHWND} Windows.GetParent(TempHWND) = TelnetCommandWindow then
   begin
     if TelnetSock <> 0 then
@@ -4535,10 +4542,10 @@ begin
   QuickDisplay(inttopchar(Windows.GetTickCount - T1));
 //  showint(m);
 {$IFEND}
-   if contest = RADIOYOC then    // 4.53.2
+{   if contest = RADIOYOC then    // 4.53.2
    begin
     PrevNr := copy(IntToStr(TempRXData.NumberReceived),1,3);    // 4.53.2
-   end; 
+   end;   }
 end;
 
 function CreateEditableLog(Parent: HWND; X, Y, Width, Height: integer; DefaultSize: boolean): HWND;
@@ -4713,14 +4720,36 @@ begin
   if ColumnsArray[logColNumberReceive].Enable then
     if tempRXData.NumberReceived <> -1 then
     begin
-      elvi.iSubItem := ColumnsArray[logColNumberReceive].pos; //Ord(logColNumberReceive);
+   {  if contest = RADIOYOC then    // 4.53.2
+       begin
+        PrevNr := copy(IntToStr(TempRXData.NumberReceived),1,3);    // 4.53.2
+        ColumnsArray[logColNumberReceive].Enable := True;
+        end
+     else  }
+     elvi.iSubItem := ColumnsArray[logColNumberReceive].pos; //Ord(logColNumberReceive);
       format(LogDisplayBuffer,'%06d',temprxdata.numberreceived);   // 4.53.2
- //     elvi.pszText := inttopchar(tempRXData.NumberReceived);
-     elvi.pszText := LogDisplayBuffer;
-      asm call setitem
-      end;
-    end;
+     elvi.pszText := inttopchar(tempRXData.NumberReceived);
+ //    elvi.pszText := LogDisplayBuffer;
+      asm call setitem  end;
 
+     end;
+ {   if contest <> RadioYOC then
+      begin
+      elvi.iSubItem := ColumnsArray[logColNumberReceive].pos; //Ord(logColNumberReceive);
+      elvi.pszText := inttopchar(RXData.NumberReceived);
+      asm call setitem  end;
+      end ;
+    if contest = RadioYOC then
+      begin
+       format(LogDisplayBuffer,'%06d',temprxdata.numberreceived);    // 4.53.2
+       elvi.pszText := LogDisplayBuffer;
+       asm call setitem end;
+   //   end ;
+
+
+      end;
+  //  end;
+  }
   if RXData.ceRecordKind in [rkQTCR, rkQTCS] then
   begin
     elvi.iSubItem := ColumnsArray[logColQTC].pos; //Ord(logColQTC);

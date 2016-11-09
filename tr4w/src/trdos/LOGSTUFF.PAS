@@ -3760,7 +3760,9 @@ begin
    temprxdata.NumberReceived := StrToInt(Exchange);
    rxdata.NumberReceived := StrToInt(Exchange);
   PrevNr := Copy(Exchange, 1, 3);                 // 4.53.2
+ { if contest = RadioYOC then
   ColumnsArray[logColNumberReceive].Enable := True;   // ensure qsr is filled 4.53.2
+  }
   Result := True;
 end;
 

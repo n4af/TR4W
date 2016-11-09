@@ -29,6 +29,7 @@ uses
   Windows,
   Tree,
   uCallsigns,
+  uDupeSheet,   // 4.53.7
   uMaster,
   LogEdit,
   LogStuff,
@@ -115,7 +116,10 @@ begin
           1, 2:
             begin
               if wParam = 2 then
+              begin
                 tClearDupeInfoCall;
+                ClearAltD; // 4.53.7
+             end;
               goto 1;
             end;
         end;

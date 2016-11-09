@@ -3189,7 +3189,7 @@ begin
   end;
 
 //  if ActiveQSOPointMethod = ChampionshipUkrMethod then
-  if Contest in [UKRAINECHAMPIONSHIP, RADIOYOC] then
+  if Contest in [UKRAINECHAMPIONSHIP{, RADIOYOC}] then
   begin
     TotalScore := QPoints + (10 * TotalMults);
     Exit;

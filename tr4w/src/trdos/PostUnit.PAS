@@ -991,7 +991,7 @@ var
   TempBand                              : BandType;
   ShowScore                             : boolean;
 begin
-  ShowScore := not (Contest in [CUPRFCW, CUPRFSSB, RADIO160, CUPURAL, UKRAINECHAMPIONSHIP, RADIOYOC, RFCHAMPIONSHIPCW, RFCHAMPIONSHIPSSB]);
+  ShowScore := not (Contest in [CUPRFCW, CUPRFSSB, RADIO160, CUPURAL, UKRAINECHAMPIONSHIP, {RADIOYOC,} RFCHAMPIONSHIPCW, RFCHAMPIONSHIPSSB]);
   OpenFileForWrite(FileWrite, ReportsFilename);
 
   //  if Header = '' then
@@ -3250,8 +3250,9 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
            rxnr := (nrreceived mod 1000);    // 4.53.2
 
             asm
-              push hisnr     // 4.53.4
+               push hisnr     // 4.53.4
               push rxnr      //4.53.4
+
             end;
             pnr := temprxdata.numberreceived div  1000;      // 4.53.2
              wsprintf(CABRILLO_HISEX, '%-5.3d%-5.3d');    // 4.53.4
