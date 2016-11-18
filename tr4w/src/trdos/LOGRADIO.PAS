@@ -1091,7 +1091,7 @@ end;
 
 
 
-{
+ {
 procedure CheckRITKeys;
 
 var
@@ -1129,7 +1129,7 @@ begin
   end;
 
 end;
-}
+} 
 
 function GetRadioParameters(Radio: RadioType; RadioInfoString: string;
    var Freq: longint; var Band: BandType; var Mode: ModeType;

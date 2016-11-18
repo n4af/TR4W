@@ -307,7 +307,7 @@ begin
 
     if ActiveMode = CW then
     begin
-    Esc_Counter := 0; // 4.53.7 reset if function key pressed
+  //  Esc_Counter := 0; // 4.53.7 reset if function key pressed
       DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
 
       if AllCWMessagesChainable then

@@ -132,6 +132,7 @@ uses
   ;
 
   var
+  PTT_SET                               : boolean = False; //4.53.9
   InSplit                               : boolean = False;
   Switch                                : boolean = False;
   SwitchNext                            : boolean = False; // 4.52.3
@@ -139,6 +140,7 @@ uses
   FirstQSO                              : Cardinal;
   T1                                    : Cardinal;
   Esc_Counter                           : integer = 0;
+  Call_Found                            : Boolean = False;
   Second                                : Boolean = False;
   Third                                 : Boolean = False;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
@@ -503,61 +505,34 @@ end;
 
 procedure Escape_proc;
 var
-   pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
+
+   pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
- tClearDupeInfoCall;  
-// *** Just a thought that IsCWByCATActive tests against ActiveRadioPtr. What about if the InactiveRadio is sending?
- If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
+  
+   if CallWindowString <> '' then
+    Call_Found := True
+   else
+    Call_Found := False;
+    
+ If (ActiveMode = CW) then // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
     begin
-    opMode := CQOpMode;
-    if  SwitchNext then        // 4.52.6 issue 193   // 4.52.10
-     begin
-      Switch := False;
-      SwitchNext := False;
-      InactiveSwapRadio    := False;
-      FlushCWBufferAndClearPTT;
-      Exit;
-     end;
-     if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
+    if IsCWByCatActive(ActiveRadioPtr) then                        // Esc always stops sending
        ActiveRadioPtr^.StopSendingCW
-     else if ISCWByCATActive(InactiveRadioPtr) then
+    else if ISCWByCATActive(InactiveRadioPtr) then
+       begin
         InactiveRadioPtr^.StopSendingCW;
-   if Esc_Counter = 0 then
-   begin
-    SetSpeed(DisplayedCodeSpeed);   // 4.49.3
-    inc(Esc_counter);
-    flushCWBufferAndClearPTT;
-    scWk_Reset; // 4.53.7
-    exit;
-   end;
+       end;
+      SetSpeed(DisplayedCodeSpeed);   // 4.49.3
 
-    if Esc_counter = 1 then       // 4.53.7
-      begin
-         if twoRadioMode and (CallWindowString <> '') then SwapRadios;
-         inc(Esc_counter);
-         tCleareCallWindow;
-         tCallWindowSetFocus;
-         exit;
-      end;
+    end;
 
-      if (Esc_counter = 2) then      // 4.53.7
-      begin
-         Esc_counter := 0;
-         tClearDupeInfoCall;
-         ClearAltD;
-         tCallWindowsetFocus;
-         inc(Esc_counter);
-         exit;
-       end;
-   If Esc_Counter = 3 then SetOpMode(SearchAndPounceOpMode);
+   //   SetOpMode(CQOpMode);  // n4af 4.46.12
 
-// InitializeQSO;
+
 
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
   begin
-//    Windows.SendMessage(MorseRunner_Callsign, WM_KEYDOWN, VK_ESCAPE, 0);
-//    Windows.SendMessage(MorseRunner_Callsign, WM_APP + 15616, $1B, $10001);
     Windows.SendMessage(MorseRunnerWindow, WM_COMMAND, 0, 0);
   end;
   Exit;
@@ -571,9 +546,6 @@ begin
     begin
       PostMmttyMessage(RXM_PTT, RXM_PTT_SWITCH_TO_RX_IMMEDIATELY);
       Exit;
-//    SendMessageToMixW('<CLEARTXWINDOW>');
-//    Sleep(20);
-//    SendMessageToMixW('<ESCAPE>');
     end;
 {$IFEND}
 
@@ -604,10 +576,9 @@ begin
     if ActiveMode = CW then
     begin
       if tAutoSendMode then EditingCallsignSent := True;
-      tAutoSendMode := False;
-//      FlushCWBuffer;
-     FlushCWBufferAndClearPTT; //n4af 4.33.3
-
+       tAutoSendMode := False;
+      FlushCWBufferAndClearPTT; //n4af 4.33.3
+  //    opmode := CQOpMode;
     end
     else
       if DVPOn then
@@ -627,10 +598,11 @@ begin
   begin
     tCleareCallWindow;
     tCleareExchangeWindow;
+    tCallWindowSetFocus;
     ActiveRadioPtr^.tTwoRadioMode := TR0;
     InActiveRadioPtr^.tTwoRadioMode := TR0;
     SwapRadios;
-    if OpMode = SearchAndPounceOpMode then SetOpMode(CQOpMode);
+    SetOpMode(CQOpMode);
     Exit;
   end;
 
@@ -643,7 +615,7 @@ begin
       Exit;
     end;
 
-  if CallWindowString <> '' then
+  if Call_Found = True then
   begin
     EscapeDeletedCallEntry := CallWindowString;
     tCleareCallWindow;
@@ -660,7 +632,6 @@ begin
         ShowFMessages(0);
       end;
     end;
-    Exit;
   end;
 
   if ExchangeWindowString <> '' then
@@ -678,11 +649,13 @@ begin
   end;
 
   if tPreviousDupeQSOsShowed then ShowPreviousDupeQSOsWnd(False); //DestroyPreviousDupeQSOsWnd;
-  //  DisplayEditableLog(VisibleLog.LogEntries);
-  ClearMasterListBox;
- // ClearAltD;       // n4af 4.53.6
-//  NameCallsignPutUp := '';
-//  tClearDupeInfoCall;      //n4af 4.53.5
+
+  if Call_Found = False then
+  begin
+   ClearMasterListBox;
+   ClearAltD;       // n4af 4.39.3
+   tClearDupeInfoCall;      //n4af 4.57.8
+  end;
   if TwoRadioState = CallReady then TwoRadioState := Idle;
 
   tCallWindowSetFocus;
@@ -691,14 +664,14 @@ begin
     if (EscapeExitsSearchAndPounce) then SetOpMode(CQOpMode);
 
 end;
-end;
+
 procedure SpaceBarProc2;
 begin
   if (DupeInfoCall <> '') and (CallWindowString = '') then
   begin
-  ActiveRadioPtr^.StopSendingCW;
-  inActiveRadioPtr^.StopSendingCW;
- //   FlushCWBufferAndClearPTT;
+    ActiveRadioPtr^.StopSendingCW;
+    inActiveRadioPtr^.StopSendingCW;
+
     if TwoRadioMode then
     begin
     
@@ -706,12 +679,11 @@ begin
     end
      else
       InActiveRadioPtr^.tTwoRadioMode := TR1;
+     
     SwapRadios;
 
     SetOpMode(SearchAndPounceOpMode);
     PutCallToCallWindow(DupeInfoCall);
-//    tSetWindowText(CallWindowHandle, DupeInfoCall);
-//    PlaceCaretToTheEnd(CallWindowHandle);
 
     if TwoRadioMode then
     begin
@@ -759,7 +731,6 @@ begin
       ClearContestExchange(ReceivedData);
       ExchangeHasBeenSent := False;
       SetOpMode(SearchAndPounceOpMode);
-      ClearContestExchange(ReceivedData);
 
       if ActiveRadio = RadioOne then
       begin
@@ -772,8 +743,6 @@ begin
     end
     else
     begin
-//?
-
       if (StartSendingNowKey = ' ') and (OpMode = CQOpMode) then StartSendingNow(True)
       else
         WindowDupeCheck;
@@ -802,12 +771,7 @@ begin
 
     if TwoRadioState <> CallReady then
     begin
-//      CallWindowString := DupeInfoCall;       {KK1L: 6.73 NOTE Why are these three lines here?. I know}
-//      ResetSavedWindowListAndPutUpCallWindow; {                it puts a call in the window. Does it  }
-//      Write(CallWindowString);                {                cover the on deck call case???         }
       SetOpMode(SearchAndPounceOpMode);
-      //{temp}tSetWindowText(wh[mweCall], DupeInfoCall);
-
       ShowStationInformation(@CallWindowString);
       DisplayGridSquareStatus(CallWindowString);
       VisibleLog.DoPossibleCalls(CallWindowString);
@@ -819,17 +783,10 @@ begin
         CheckAndSetInitialExchangeCursorPos;
       end;
 
-          //      repeat
-
       DisplayNextQSONumber;
       ClearContestExchange(ReceivedData);
       ExchangeHasBeenSent := False;
-          //        SearchAndPounceStatus := SearchAndPounce;
-          //      until (not SearchAndPounceStatus) or (TwoRadioState = SendingExchange);
-
-//To try and fix a problem
-//with Two Radio mode and DX
-//mults showing up in next QSO
+         
       if ActiveRadio = RadioOne then
       begin
         CQRITEnabled := Radio1.RadioModel in KenwoodRadios;
@@ -2666,6 +2623,20 @@ begin
         ShowFMessages(0);
       end;
 
+    menu_ctrl_ptt:         // 4.53.9
+      begin
+       if PTT_Set then
+        begin
+          PTTOFF;
+          PTT_Set := False;
+        end
+       else
+        begin
+          PTTON;
+          PTT_Set := True;
+        end;
+       end;
+       
     menu_ctrl_sendkeyboardinput:
       //         if (ActiveMode = CW) or (ActiveMode = Digital) then
       begin
@@ -2696,7 +2667,7 @@ begin
         tDialogBox(74 {45}, @MissingMultsReportProc);
       end;
 
-    menu_ctrl_redoposscalls:
+     menu_ctrl_redoposscalls:
       begin
         ShowStationInformation(@CallWindowString);
         DisplayGridSquareStatus(CallWindowString);
@@ -2715,7 +2686,7 @@ begin
         else
           RotorControl(LastHeadingShown);
       end;
-
+    
     menu_ctrl_qtcfunctions:
       begin
 
@@ -3217,7 +3188,7 @@ var
 begin
   TempHWND := Windows.GetFocus;
 //  if TempHWND = 0 then sm;
-  Esc_Counter := 0;  // 4.53.7
+//  Esc_Counter := 0;  // 4.53.7
   if {TempHWND} Windows.GetParent(TempHWND) = TelnetCommandWindow then
   begin
     if TelnetSock <> 0 then
@@ -4718,37 +4689,19 @@ begin
   asm call setitem  end;
 
   if ColumnsArray[logColNumberReceive].Enable then
-    if tempRXData.NumberReceived <> -1 then
+    if RXData.NumberReceived <> -1 then
     begin
-   {  if contest = RADIOYOC then    // 4.53.2
-       begin
-        PrevNr := copy(IntToStr(TempRXData.NumberReceived),1,3);    // 4.53.2
-        ColumnsArray[logColNumberReceive].Enable := True;
-        end
-     else  }
-     elvi.iSubItem := ColumnsArray[logColNumberReceive].pos; //Ord(logColNumberReceive);
-      format(LogDisplayBuffer,'%06d',temprxdata.numberreceived);   // 4.53.2
-     elvi.pszText := inttopchar(tempRXData.NumberReceived);
- //    elvi.pszText := LogDisplayBuffer;
-      asm call setitem  end;
-
-     end;
- {   if contest <> RadioYOC then
+      elvi.iSubItem := ColumnsArray[logColNumberReceive].pos; //Ord(logColNumberReceive);
+      elvi.pszText := inttopchar(RXData.NumberReceived);
+      asm call setitem
+      end;
+    end;
+ {   if contest <> RadioYOC then        // 4.53.8
       begin
       elvi.iSubItem := ColumnsArray[logColNumberReceive].pos; //Ord(logColNumberReceive);
       elvi.pszText := inttopchar(RXData.NumberReceived);
       asm call setitem  end;
       end ;
-    if contest = RadioYOC then
-      begin
-       format(LogDisplayBuffer,'%06d',temprxdata.numberreceived);    // 4.53.2
-       elvi.pszText := LogDisplayBuffer;
-       asm call setitem end;
-   //   end ;
-
-
-      end;
-  //  end;
   }
   if RXData.ceRecordKind in [rkQTCR, rkQTCS] then
   begin

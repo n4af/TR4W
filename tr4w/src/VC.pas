@@ -175,11 +175,11 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.53.8';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.53.11';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'November 9, 2016' ;
+  TR4W_CURRENTVERSIONDATE               = 'November 16, 2016' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -2003,14 +2003,14 @@ const
   menu_alt_increment_time_0             = 10336;
   menu_alt_x                            = 10337;
   menu_ctrl_j                           = 10338;
-  
+
   menu_ctrl_sendkeyboardinput           = 10400;
   menu_ctrl_commtopacket                = 10401;
   menu_ctrl_cleardupesheet              = 10402;
   menu_ctrl_viewlogdat                  = 10403;
   menu_ctrl_note                        = 10404;
   menu_ctrl_missmultsreport             = 10405;
-  menu_ctrl_redoposscalls               = 10406;
+  menu_ctrl_ptt                         = 10406;    // 4.53.9
   menu_ctrl_qtcfunctions                = 10407;
   menu_ctrl_recalllastentry             = 10408;
   menu_ctrl_viewpacketspots             = 10409;
@@ -2033,6 +2033,7 @@ const
   menu_ctrl_clearmultsheet              = 10424;
   menu_ctrl_shdxcallsign                = 10425;
   menu_ctrl_execute_config              = 10426;
+  menu_ctrl_redoposscalls               = 10427; // 4.53.9
 
   menu_mainwindow_setfocus              = 10500;
   menu_insertmode                       = 10501;

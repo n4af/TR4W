@@ -83,7 +83,6 @@ var
   CWMessageCommand                      : CWMessageCommandType {= NoCWCommand};
   CWSpeedFromDataBase                   : boolean;
   CWTone                                : integer = 700;
-
   CQMemory                              : FunctionKeyMemoryArray;
   EXMemory                              : FunctionKeyMemoryArray;
 

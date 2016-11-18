@@ -24,7 +24,6 @@ unit LogK1EA;
 interface
 
 uses {Dos, Crt, SlowTree,} Tree,
-
   uWinKey,
   TF,
   VC,

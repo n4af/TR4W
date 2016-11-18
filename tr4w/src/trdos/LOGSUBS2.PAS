@@ -1203,6 +1203,7 @@ begin
       SetMainWindowText(mweDupeInfoCall, wsprintfBuffer {DupeInfoCall + ' DUPE!! on ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory]});
       if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
       tClearDupeInfoCall;
+      clearaltd; // 4.53.11
     end
     else
     begin
@@ -5069,7 +5070,7 @@ nop
                       //                    RemoveWindow(DupeInfoWindow);
                     NameCallsignPutUp := '';
                     tClearDupeInfoCall;
-                    ClearAltD;  // 4.53.7
+                    
                       { This is new for 5.88 }
 
                     if TwoRadioState = CallReady then
