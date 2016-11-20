@@ -5070,7 +5070,7 @@ nop
                       //                    RemoveWindow(DupeInfoWindow);
                     NameCallsignPutUp := '';
                     tClearDupeInfoCall;
-                    
+                     clearaltd; // 4.53.11
                       { This is new for 5.88 }
 
                     if TwoRadioState = CallReady then

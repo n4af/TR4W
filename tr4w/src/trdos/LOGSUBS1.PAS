@@ -527,7 +527,7 @@ var
   TimeOut                               : integer;
 
 begin
-  DebugMsg('>>>>Entering SWAPRADIOS');
+   DebugMsg('>>>>Entering SWAPRADIOS');
   if SingleRadioMode then
   begin
     QuickDisplay(TC_ALTRCOMMANDDISABLED);
@@ -572,33 +572,33 @@ begin
      end;
  // if InActiveRadioptr^.CWByCAT then ActiveRadioPtr^.StopSendingCW;
   InactiveRigCallingCQ := False;
-
+ 
   if ActiveRadio = RadioOne then
   begin
-    Windows.EnableWindow(wh[mweRadioOne], False);
+     Windows.EnableWindow(wh[mweRadioOne], False);
     Windows.EnableWindow(Radio1.FreqWindowHandle, False);
     Windows.EnableWindow(wh[mweRadioTwo], True);
     Windows.EnableWindow(Radio2.FreqWindowHandle, True);
-    ActiveRadioPtr := @Radio2;
-    InActiveRadioPtr := @Radio1;
+     ActiveRadioPtr := @Radio2;
+     InActiveRadioPtr := @Radio1;
     ActiveBand := Radio2.BandMemory {BandMemory[RadioTwo]};
     ActiveMode := Radio2.ModeMemory {ModeMemory[RadioTwo]};
 //    ActiveKeyerPort := Radio2.tKeyerPort;
 //    tActiveKeyerHandle := Radio2.tKeyerPortHandle;
     SerialInvert := Radio2SerialInvert;
-    ActiveRadio := RadioTwo;
-    InactiveRadio := RadioOne; {KK1L: 6.73}
-    CodeSpeed := Radio2.SpeedMemory; {KK1L: 6.73}
+     ActiveRadio := RadioTwo;
+    InactiveRadio := RadioOne;    
+    CodeSpeed := Radio2.SpeedMemory; 
     //SetSpeed(CodeSpeed); // ny4i Issue 153 This is done in SetUpToSendOnActiveRadio so no need to do it here.
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end
   else
   begin
-    Windows.EnableWindow(wh[mweRadioOne], True);
+      Windows.EnableWindow(wh[mweRadioOne], True);
     Windows.EnableWindow(Radio1.FreqWindowHandle, True);
-    Windows.EnableWindow(wh[mweRadioTwo], False);
-    Windows.EnableWindow(Radio2.FreqWindowHandle, False);
-    ActiveRadioPtr := @Radio1;
+     Windows.EnableWindow(wh[mweRadioTwo], False);
+    Windows.EnableWindow(Radio2.FreqWindowHandle, False);     
+     ActiveRadioPtr := @Radio1;
     InActiveRadioPtr := @Radio2;
     ActiveBand := Radio1.BandMemory {BandMemory[RadioOne]};
     ActiveMode := Radio1.ModeMemory {ModeMemory[RadioOne]};
@@ -631,8 +631,7 @@ begin
   end;
 
   BandMapBand := ActiveBand;
-  BandMapMode := ActiveMode; {KK1L: 6.69}
-  {DisplayBandMap;}{KK1L: 6.71 Removed because UpdateTimeAndRateDisplays in LOGWIND covers it.}
+  BandMapMode := ActiveMode;
   VisibleDupeSheetChanged := True;
   ShowInformation; // n4af 4.40.2
   ActiveRadioPtr.active := true;

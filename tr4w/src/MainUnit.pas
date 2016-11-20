@@ -594,7 +594,8 @@ begin
     Exit;
   end;
 
-  if ActiveRadioPtr^.tTwoRadioMode = TR2 then
+  if ActiveRadioPtr^.tTwoRadioMode = TR2  then
+  if (not Call_Found) then
   begin
     tCleareCallWindow;
     tCleareExchangeWindow;
@@ -627,6 +628,7 @@ begin
     if OpMode = CQOpMode then
     begin
       if OpMode2 = SearchAndPounceOpMode then
+      if (not Call_Found) then
       begin
         OpMode2 := CQOpMode;
         ShowFMessages(0);
@@ -645,7 +647,9 @@ begin
     ActiveRadioPtr^.tTwoRadioMode := TR0;
     InActiveRadioPtr^.tTwoRadioMode := TR0;
     SwapRadios;
-    if OpMode = SearchAndPounceOpMode then SetOpMode(CQOpMode);
+    if OpMode = SearchAndPounceOpMode then
+    if (not Call_Found) then
+    SetOpMode(CQOpMode);
   end;
 
   if tPreviousDupeQSOsShowed then ShowPreviousDupeQSOsWnd(False); //DestroyPreviousDupeQSOsWnd;
@@ -660,7 +664,8 @@ begin
 
   tCallWindowSetFocus;
 
-  if OpMode = SearchAndPounceOpMode then
+   if OpMode = SearchAndPounceOpMode then
+   if not Call_Found then
     if (EscapeExitsSearchAndPounce) then SetOpMode(CQOpMode);
 
 end;
