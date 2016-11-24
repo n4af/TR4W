@@ -142,11 +142,11 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
-   LANG                                  = 'ENG';
-//    LANG                                = 'RUS';
+     LANG                                  = 'ENG';
+//     LANG                                = 'RUS';
 //    LANG                                  = 'SER';
 //  LANG                                  = 'ESP';
-//    LANG                                  = 'MNG';
+//   LANG                                  = 'MNG';
 //   LANG                                  = 'POL';
 //     LANG                                  = 'CZE';
  //    LANG                                  = 'ROM';
@@ -175,11 +175,11 @@ const
 
   OZCR2008                              = False;
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.53.11';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.54.1';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'November 16, 2016' ;
+  TR4W_CURRENTVERSIONDATE               = 'November 23, 2016' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 

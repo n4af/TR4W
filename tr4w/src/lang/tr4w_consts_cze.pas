@@ -8,6 +8,7 @@ const
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
   RC_3830                               =  '3830 Score posting';
+  RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_INVALID                            =  'Neplatný záznam';
   TC_FREQ                               = 'frekv';
   TC_POINTS                             = 'body';

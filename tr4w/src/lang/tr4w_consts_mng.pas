@@ -8,6 +8,7 @@ const
   TC_TRANSLATOR_EMAIL                   = 'jt1cd.khos@gmail.com';
 
   RC_3830                               =  '3830 Score posting';
+  RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_INVALID                            = 'Invalid Entry';
   TC_CALLSIGN                           = 'Дуудлага';
   TC_CHECKCALLSIGN                      = 'Дуудлагаа шалга';

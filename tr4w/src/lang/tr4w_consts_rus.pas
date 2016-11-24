@@ -7,6 +7,7 @@ const
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
   TC_INVALID                            = 'Неверный ввод';
   RC_3830                               = 'Отправить результат на 3830';
+  RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_CALLSIGN                           = 'Позывной';
   TC_BAND                               = 'Диапазон';
   TC_FREQ                               = 'Частота';

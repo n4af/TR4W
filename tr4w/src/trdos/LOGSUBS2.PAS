@@ -1203,7 +1203,7 @@ begin
       SetMainWindowText(mweDupeInfoCall, wsprintfBuffer {DupeInfoCall + ' DUPE!! on ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory]});
       if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
       tClearDupeInfoCall;
-      clearaltd; // 4.53.11
+   //   clearaltd; // 4.53.11
     end
     else
     begin

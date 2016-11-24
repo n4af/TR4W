@@ -9,6 +9,7 @@ const
 
   TC_INVALID                            = 'Invalid Entry';
   RC_3830                               =  '3830 Score posting';
+  RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_CALLSIGN                           = 'Indicativ';
   TC_BAND                               = 'Banda';
   TC_FREQ                               = 'Frecv';
