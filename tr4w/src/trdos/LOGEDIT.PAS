@@ -2799,6 +2799,7 @@ begin
           //ctyLocateCall(Call, TempQTH);
           //if TempQTH.Zone > 0 then Str(TempQTH.Zone, TempString);
           TempZone := ctyGetZone(Call);
+          if call = 'R0R' then tempzone := 18;
           if TempZone {TempQTH.Zone} <> DUMMYZONE then Str(TempZone {TempQTH.Zone}, TempString);
           GetRidOfPrecedingSpaces(TempString);
           if Debug and (TempString = '') then TempString := '40';

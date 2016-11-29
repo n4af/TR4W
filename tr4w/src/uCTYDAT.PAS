@@ -1072,11 +1072,11 @@ begin
       CQZoneMode:
         begin
 
-          if TempPrefixRec^.CQZone <> 0 then
+         if TempPrefixRec^.CQZone <> 0 then
           begin
             Result := TempPrefixRec^.CQZone;
             Exit;
-          end;
+          end;        
 
           if CTY.ctyTempQTHRecord.CountryID = 'K' then
             case GetNumber(Call) of
@@ -1105,7 +1105,7 @@ begin
                 end;
 
               '0': case GetFirstSuffixLetter(Call) of
-                  'A', 'B', 'H', 'O', 'S', 'U', 'W': Result := 18;
+                  'A', 'B', 'H', 'O', 'R', 'S', 'U', 'W': Result := 18;  // 4.54.3 issue 213
                   'C', 'D', 'E', 'F', 'I', 'J', 'K', 'L': Result := 19;
                   'Q', 'X', 'Z': Result := 19;
                   'Y': Result := 23;
