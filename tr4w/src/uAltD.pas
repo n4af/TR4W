@@ -118,7 +118,7 @@ begin
               if wParam = 2 then
               begin
                 tClearDupeInfoCall;
-            //    ClearAltD; // 4.53.7
+                ClearAltD; // 4.53.7
              end;
               goto 1;
             end;

@@ -6119,7 +6119,7 @@ end;
 
 procedure ImportFromADIF;
 label
-  1, 2, 3, 4, Increment;
+  1, 2, 3, 4, Increment, again;
 var
   MapFin                                : Cardinal;
   MapBase                               : Pointer;
@@ -6132,6 +6132,7 @@ var
   FieldLength                           : integer;
 //  delta                                 : integer;
   lpNumberOfBytesWritten                : Cardinal;
+  Switch                                : Boolean;
   TempBand                              : BandType;
   TempMode                              : ModeType;
   TempBuffer                            : array[0..8] of Char;
@@ -6199,6 +6200,7 @@ begin
   if CurrentPos[0] = '<' then
   begin
     StartPos := CurrentPos;
+    Switch := False;
     while (StartPos[0] <> '>') and (StartPos - CurrentPos < 15) do inc(StartPos);
 //    asm nop end;
 
@@ -6323,14 +6325,25 @@ begin
         DomQTHTable.GetDomQTH(TempRXData.QTHString, TempRXData.DomMultQTH, TempRXData.DomesticQTH);
       end;
 
-    if PInteger(@TempBuffer)^ = ADIF_FREQ then
+    if (PInteger(@TempBuffer)^ = ADIF_FREQ) then
     begin
       FieldLength := GetNumberFromCharBuffer(@CurrentPos[5]);
+      again:
       for TempInteger := 0 to FieldLength - 1 do
-        if StartPos[TempInteger] in ['0'..'9'] then
         begin
-          TempRXData.Frequency := Ord(StartPos[TempInteger]) - Ord('0') + TempRXData.Frequency * 10
-        end;
+         if StartPos[TempInteger] = '.' then
+         if Switch = False then
+          begin
+            FieldLength :=   FieldLength + 1;
+        Switch := True;
+       //    goto again;
+          end;
+         if StartPos[TempInteger] in ['0'..'9'] then
+           TempRXData.Frequency := Ord(StartPos[TempInteger]) - Ord('0') + TempRXData.Frequency * 10
+           else
+            if StartPos[TempInteger] = '' then
+             TempRXData.Frequency := TempRXData.Frequency * 10;
+         end;
       if TempRXData.Frequency < 30000 then
         TempRXData.Frequency := TempRXData.Frequency * 1000;
 

@@ -1068,7 +1068,7 @@ begin
   if r = @Radio1 then TempByte := WK_RADIO_ONE else TempByte := WK_RADIO_TWO;
   if r.ModeMemory <> Phone then TempByte := TempByte + WK_CW_MODE;
 
-//  if r = RadioOne then TempByte := 4 {+ 1} else TempByte := 8 {+ 1};
+ // if r = RadioOne then TempByte := 4 {+ 1} else TempByte := 8 {+ 1};
   TempByte := TempByte + Byte(WinKeySettings.wksSideTEnable) * 2;
   wkSendTwoBytes(wkCMD_SETPINCONFIG, TempByte);
 end;

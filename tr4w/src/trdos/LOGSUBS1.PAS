@@ -612,14 +612,14 @@ begin
      ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
      ShowInformation;  // n4af 04.40.02
 
-  SetUpToSendOnActiveRadio;
+  // SetUpToSendOnActiveRadio;
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
   UpdateTotals2;
   if Radio1.tRadioInterfaceWndHandle <> 0 then InvalidateRect(Radio1.tRadioInterfaceWndHandle, nil, True);
   if Radio2.tRadioInterfaceWndHandle <> 0 then InvalidateRect(Radio2.tRadioInterfaceWndHandle, nil, True);
 
-  wkSetKeyerOutput(ActiveRadioPtr);
+   wkSetKeyerOutput(ActiveRadioPtr);
 
   if QSONumberByBand then
     DisplayNextQSONumber;

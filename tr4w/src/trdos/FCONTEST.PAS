@@ -133,7 +133,7 @@ begin
 
   if not FileExists(TR4W_CTY_FILENAME) then
   begin
-    Format(TR4W_CTY_FILENAME, '%sCTY.DAT', TR4W_PATH_NAME);
+    Format(TR4W_CTY_FILENAME, '%sCTY_WT.DAT', TR4W_PATH_NAME);
   end;
 
   Format(CD.ActiveFilename, '%sTRMASTER.DTA', TR4W_LOG_PATH_NAME);
