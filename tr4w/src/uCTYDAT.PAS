@@ -946,7 +946,7 @@ begin
     TempPrefixRec := DSA_GetItemPtr(CTY.CTYPrefixesTable, CTY.ctyLastIndex);
 
     Result := 0;
-//    Result := CTY.ctyTempQTHRecord.Zone;
+//     Result := CTY.ctyTempQTHRecord.Zone;
 //    if Result <> 0 then Exit;
 
     case CTY.ctyZoneMode of
@@ -1004,7 +1004,7 @@ begin
             else Result := 30;
             end;
 
-          if (CTY.ctyTempQTHRecord.CountryID = 'UA') or (CTY.ctyTempQTHRecord.CountryID = 'UA9') then
+       if (CTY.ctyTempQTHRecord.CountryID = 'UA') or (CTY.ctyTempQTHRecord.CountryID = 'UA9') then
             case GetNumber(Call) of
               '1': case GetFirstSuffixLetter(Call) of
                   'N', 'Z', 'O': Result := 19;
@@ -1043,7 +1043,7 @@ begin
                   'I': Result := 24;
                   'X': Result := 25;
                   'K': Result := 26;
-                  'A', 'O', 'S', 'W', 'Y': Result := 32;
+                  'A', 'O', 'R', 'S', 'W', 'Y': Result := 32; // n4af 4.54.3 issue 213
                   'D', 'J', 'U': Result := 33;
                   'C', 'F', 'L': Result := 34;
                   'Z': Result := 35;
@@ -1066,7 +1066,7 @@ begin
               '6': Result := 58;
             else Result := 59;
             end;
-          if Result = 0 then Result := CTY.ctyTable[CTY.ctyTempQTHRecord.Country].DefaultITUZone;
+           if Result = 0 then  Result := CTY.ctyTable[CTY.ctyTempQTHRecord.Country].DefaultITUZone;    // 4.54.4
         end;
 
       CQZoneMode:
@@ -1141,7 +1141,7 @@ begin
               '6', '8': Result := 29;
             else Result := 30;
             end;
-
+        
           if Result = 0 then Result := CTY.ctyTable[CTY.ctyTempQTHRecord.Country].DefaultCQZone;
         end;
     end;

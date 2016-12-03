@@ -623,7 +623,7 @@ var
   TotalLine                             : boolean;
 const
   h                                     = #13#10'  BAND   Raw QSOs   Valid QSOs   Points';
-  mn                                    : array[RemainingMultiplierType] of PChar = (nil, 'Mults', 'Countries', 'Zones', 'Prefixes');
+  mn                                    :array[RemainingMultiplierType] of PChar = ('','Mults', 'Countries', 'Zones', 'Prefixes');
   breakline                             = #13#10' __________________________________________________________';
 begin
   TotalLine := False;
