@@ -93,7 +93,7 @@ const
   RC_QTCFUNCTIONS_HK                    = #9'Ctrl+Q';
   RC_RECALLLASTENT_HK                   = #9'Ctrl+R';
   RC_Redoposscalls_HK                   = #9'CTRL+ALT+R'; // 4.53.9
- // RC_TRANSFREQ_HK                       = #9'Ctrl+T';
+//  RC_TRANSFREQ_HK                       = #9'Ctrl+T';
   RC_VIEWPAKSPOTS_HK                    = #9'Ctrl+U';
   RC_EXECONFIGFILE_HK                   = #9'Ctrl+V' ;
   RC_REFRESHBM_HK                       = #9'Ctrl+Y';
@@ -295,7 +295,7 @@ const
     (mrText: RC_NOTE + RC_NOTE_HK; mrId: menu_ctrl_note),
 //    (mrText: RC_MISSMULTSREP + RC_MISSMULTSREP_HK; mrId: menu_ctrl_missmultsreport),  //n4af 04/37.10
     (mrText:  'PTT' + RC_PTT_HK ; mrId: menu_ctrl_ptt),
-    (mrText:  'REDO Possible Calls' + RC_redoposscalls_HK ; mrId: menu_ctrl_ptt),
+    (mrText:  'REDO Possible Calls' + RC_redoposscalls_HK ; mrId: menu_ctrl_redoposscalls),  // 4.54.5
     (mrText: RC_QTCFUNCTIONS + RC_QTCFUNCTIONS_HK; mrId: menu_ctrl_qtcfunctions),
     (mrText: RC_RECALLLASTENT + RC_RECALLLASTENT_HK; mrId: menu_ctrl_recalllastentry),
     (mrText: RC_SHDX_CALLSIGN + RC_SHDX_CALLSIGN_HK; mrId: menu_ctrl_shdxcallsign),
