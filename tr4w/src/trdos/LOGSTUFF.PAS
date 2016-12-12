@@ -6164,19 +6164,16 @@ begin
         else
           RXData.QSOPoints := 1;
 
-    HelvetiaQSOPointMethod:
-      if MyCountry <> 'HB' then
-      begin
+    HelvetiaQSOPointMethod:               // issue 214
         if RXCty = 'HB' then
-          RXData.QSOPoints := 3
-        else
-          RXData.QSOPoints := 0;
-      end
-      else
-        if RXData.QTH.Continent = Europe then
-          RXData.QSOPoints := 1
+          RXData.QSOPoints := 10
+       else
+      if RXData.QTH.Continent = MyContinent then
+            RXData.QSOPoints := 1
         else
           RXData.QSOPoints := 3;
+      
+
 
     BSCIQSOPointMethod:
       begin
