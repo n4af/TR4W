@@ -6127,7 +6127,7 @@ var
   h                                     : HWND;
   CurrentPos                            : PChar;
   StartPos                              : PChar;
-//  PosCounter                            : integer;
+  PosDecimal                            : integer; // 4.55.1
   QSOCounter                            : integer;
   FieldLength                           : integer;
 //  delta                                 : integer;
@@ -6139,7 +6139,7 @@ var
   TempInteger                           : integer;
 const
   ADIF_CALL                             = Ord('L') * $1000000 + Ord('L') * $10000 + Ord('A') * $100 + Ord('C');
-  ADIF_FREQ                             = Ord('Q') * $1000000 + Ord('E') * $10000 + Ord('R') * $100 + Ord('F');
+  ADIF_FREQ                           = Ord('Q') * $1000000 + Ord('E') * $10000 + Ord('R') * $100 + Ord('F');
   ADIF_NAME                             = Ord('E') * $1000000 + Ord('M') * $10000 + Ord('A') * $100 + Ord('N');
 
   ADIF_QTH                              = Ord(':') * $1000000 + Ord('H') * $10000 + Ord('T') * $100 + Ord('Q');
@@ -6329,21 +6329,33 @@ begin
     begin
       FieldLength := GetNumberFromCharBuffer(@CurrentPos[5]);
       again:
-      for TempInteger := 0 to FieldLength - 1 do
+      for TempInteger := 0 to FieldLength-1  do
         begin
          if StartPos[TempInteger] = '.' then
-         if Switch = False then
           begin
-            FieldLength :=   FieldLength + 1;
-        Switch := True;
-       //    goto again;
-          end;
+          PosDecimal := TempInteger;
+            if Switch = False  then
+              begin
+               FieldLength :=   FieldLength + 1;
+               Switch := True;
+                  //    goto again;
+              end;
+           end;
          if StartPos[TempInteger] in ['0'..'9'] then
            TempRXData.Frequency := Ord(StartPos[TempInteger]) - Ord('0') + TempRXData.Frequency * 10
            else
             if StartPos[TempInteger] = '' then
              TempRXData.Frequency := TempRXData.Frequency * 10;
          end;
+         if PosDecimal >0 then
+         begin
+          while FieldLength - PosDecimal < 8 do          // 4.55.1
+           begin
+            TempRXData.Frequency := TempRXData.Frequency * 10;
+            FieldLength := FieldLength + 1 ;
+           end;
+          end;
+           
       if TempRXData.Frequency < 30000 then
         TempRXData.Frequency := TempRXData.Frequency * 1000;
 
