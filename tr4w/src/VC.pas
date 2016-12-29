@@ -946,7 +946,8 @@ type
     FT840,
     FT847,
     FT857, {UA3DPX}
-    FT890 {RD4WA},
+    FT890, {RD4WA}
+    FT891, // ny4i Issue218
     FT897, { Behaves like FT847 }
     FT900, { Behaves like FT890 }
     FT920,

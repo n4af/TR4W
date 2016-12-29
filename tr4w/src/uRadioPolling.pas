@@ -69,6 +69,7 @@ procedure pIcomNew(rig: RadioPtr);
 function icomCheckBuffer(rig: RadioPtr): boolean;
 
 procedure pFTDX9000(rig: RadioPtr);
+procedure pFT891(rig: RadioPtr);
 procedure pOrion(rig: RadioPtr);
 procedure pOrion3(rig: RadioPtr);
 //procedure pOrionNew(rig: RadioPtr);
@@ -82,6 +83,7 @@ function GetFrequencyForYaesu3(p: PChar): Cardinal;
 function GetFrequencyForYaesu4(p: PChar): Cardinal;
 function GetFrequencyFromBCD(Count: Cardinal; Addr: PChar): Cardinal;
 function GetFrequencyForYaesuFT747(a: PChar): Cardinal;
+procedure GetVFOInfoForYaesuType3(buf: PChar; var VFO: VFOStatusType; FrequencyAdder: integer);
 procedure BeginPolling(rig: RadioPtr); stdcall;
 procedure SetDCBForIcom(port: HWND);
 function ReadICOM(b: Cardinal; rig: RadioPtr): boolean;
@@ -1808,6 +1810,93 @@ FT9000 - RECEIVER STATUS
     UpdateStatus(rig);
   until rig.tPollCount < 0;
 end;
+//-----
+procedure pFT891(rig: RadioPtr);  // Stopped here. Just copied this from DX9000. Change frequency bytes and check the rest.
+label
+  1;
+var
+  TempVFO                               : VFOStatusType;
+begin
+  repeat
+    inc(rig.tPollCount);
+
+//    WriteToSerialCATPort('IF;', rig.tCATPortHandle); {information}
+    rig.WritePollRequest('IF;', 3);
+{$IF NOT POLLINGDEBUG}
+    if ((not ReadFromCOMPort(28, rig)) or (PWORD(@rig.tBuf)^ <> $4649)) then begin ClearRadioStatus(rig);
+      goto 1;
+    end;
+{$IFEND}
+
+{$IF POLLINGDEBUG}
+    SetVFOA(rig);
+{$IFEND}
+    GetVFOInfoForYaesuType3(@rig.tBuf, rig.CurrentStatus.VFO[VFOA], rig.FrequencyAdder);
+
+    {opposite band information}
+    //WriteToSerialCATPort('OI;', rig.tCATPortHandle);
+    rig.WritePollRequest('OI;', 3);
+
+{$IF NOT POLLINGDEBUG}
+    if ((not ReadFromCOMPort(28, rig)) or (PWORD(@rig.tBuf)^ <> $494F)) then begin ClearRadioStatus(rig);
+      goto 1;
+    end;
+{$IFEND}
+
+{$IF POLLINGDEBUG}
+    SetVFOB(rig);
+{$IFEND}
+    GetVFOInfoForYaesuType3(@rig.tBuf, rig.CurrentStatus.VFO[VFOB], rig.FrequencyAdder);
+{
+FR
+FT450  - NO
+FT950  - FUNCTION RX
+FT2000 - FUNCTION RX
+FT9000 - RECEIVER STATUS
+}
+    TempVFO := rig.CurrentStatus.VFO[VFOA];
+    rig^.CurrentStatus.VFOStatus := VFOA;
+
+    if rig.RadioModel in [FT950, FT2000, FTDX9000] then
+    begin
+      {function rx}
+//      WriteToSerialCATPort('FR;', rig.tCATPortHandle);
+      rig.WritePollRequest('FR;', 3);
+{$IF NOT POLLINGDEBUG}
+      if ((not ReadFromCOMPort(4, rig)) or (PWORD(@rig.tBuf)^ <> $5246)) then begin ClearRadioStatus(rig);
+        goto 1;
+      end;
+{$IFEND}
+
+{$IF POLLINGDEBUG}
+      rig.tBuf[3] := '1';
+{$IFEND}
+      if rig.tBuf[3] = '4' then
+      begin
+        TempVFO := rig.CurrentStatus.VFO[VFOB];
+        rig^.CurrentStatus.VFOStatus := VFOB;
+      end
+      else
+      begin
+//        TempVFO := rig.CurrentStatus.VFOA;
+//        rig^.CurrentStatus.VFOStatus := vfoA;
+      end;
+    end;
+
+    rig.CurrentStatus.Freq := TempVFO.Frequency;
+    rig.CurrentStatus.Band := TempVFO.Band;
+    rig.CurrentStatus.Mode := TempVFO.Mode;
+//    Windows.SetWindowText(tr4whandle, inttopchar(integer(rig.CurrentStatus.Mode)));
+    rig.CurrentStatus.RITFreq := TempVFO.RITFreq;
+    rig.CurrentStatus.RIT := TempVFO.RIT;
+    rig.CurrentStatus.XIT := TempVFO.XIT;
+    1:
+    UpdateStatus(rig);
+  until rig.tPollCount < 0;
+end;
+
+
+//-----
 
 function ReadFromSerialPort(BytesToRead: Cardinal; rig: RadioPtr): boolean;
 var
@@ -2364,8 +2453,10 @@ begin
       pFT1000MP(rig);
     FT100:
       pFT100(rig);
-    FT450, FT950, FT991, FT1200,FT2000, FTDX3000,FTDX5000,FTDX9000:
+    FT450, FT950, FT1200,FT2000, FTDX3000,FTDX5000,FTDX9000:
       pFTDX9000(rig);
+    FT891, FT991:
+       pFT891(rig); // ny4i Issue218 9 byte frequency
     IC78..IC9100, OMNI6:
       pIcomNew(rig);
 //    pIcom(rig);
@@ -2457,7 +2548,39 @@ begin
   VFO.Mode := TempMode;
 
 end;
+//-----
+// Issue 218 added this procedure NY4I
+procedure GetVFOInfoForYaesuType3(buf: PChar; var VFO: VFOStatusType; FrequencyAdder: integer);
+var
+  TempMode                              : ModeType;
+begin
+  TempMode := NoMode;
+  VFO.Frequency := BufferToInt(buf, 6, 9) + FrequencyAdder;   // 9 bytes on this radio
+  CalculateBandMode(VFO.Frequency, VFO.Band, VFO.Mode);
+  VFO.RITFreq := BufferToInt(buf, 15, 5);
+  VFO.RIT := buf[20 - 1] = '1';
+  VFO.XIT := buf[21 - 1] = '1';
+  case buf[22 - 1] of
+    '1': TempMode := Phone;
+    '2': TempMode := Phone;
+    '3': TempMode := CW;
+    '4': TempMode := FM;
+    '5': TempMode := Phone;
+    '6': TempMode := Digital;
+    '7': TempMode := CW;
+    '8': TempMode := Digital;
+    '9': TempMode := Digital;
+    'A': TempMode := Digital;
+    'B': TempMode := FM;
+    'C': TempMode := Digital;
+    'D': TempMode := Phone;
+    'E': TempMode := Phone;
 
+  end;
+  VFO.Mode := TempMode;
+
+end;
+//------
 procedure SetVFOA(rig: RadioPtr);
 begin
 {$IF POLLINGDEBUG}
