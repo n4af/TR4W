@@ -983,7 +983,7 @@ begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('UP;', 3);
          end;
 
-      FT450, FT950, FT2000, FTDX9000, K2, K3:
+      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('UP;');
          end;
@@ -1050,7 +1050,7 @@ begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('DN;', 3);
          end;
 
-      FT450, FT950, FT2000, FTDX9000, K2, K3:
+      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('DN;');
          end;
