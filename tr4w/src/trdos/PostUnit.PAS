@@ -2809,29 +2809,36 @@ if TempRXData.DomMultQTH = '' then
             end;
           end;
 
-        AgeAndQSONumberExchange:
+        AgeAndQSONumberExchange:      // 4.55.4
           begin
             asm
                 push nrSent
                 push cMyState
-            end;
-            wsprintf(CABRILLO_MYEX, '%-2s %03d      ');
-            asm add esp,16
+                 
+
+            xor eax,eax
+           mov ax, word ptr TempRXData.RSTSent
+            
+           push eax
+           end;
+            wsprintf(CABRILLO_MYEX, '%-3d %-2s %03d      ');
+            asm add esp,20
             end;
 
-            asm
-                push nrReceived
-            end;
 
             hisAge := TempRXData.Age ;
-            hisQTH := @TempRXData.DomesticQTH[1];          // n4af 04.42.4
+            nrreceived := TempRXData.NumberReceived;          // n4af 04.42.4
             asm
-            push  hisQTH
+            push  nrReceived
             end;
             asm
             push hisAge
+            xor eax,eax
+            mov ax, word ptr TempRXData.RSTSent
+            push eax
             end;
-            wsprintf(CABRILLO_HISEX, '%-2d %3s %04u');       // n4af 4.42.4
+
+            wsprintf(CABRILLO_HISEX, ' %-3d %-3d %04d');       // n4af 4.42.4
             asm add esp,20
             end;
           end;
