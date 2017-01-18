@@ -4218,7 +4218,7 @@ begin
   UpdateTotals2;
   VisibleLog.ShowRemainingMultipliers;
   VisibleLog.DisplayGridMap(ActiveBand, ActiveMode);
-  DisplayTotalScore {(TotalScore)};
+   DisplayTotalScore {(TotalScore)};    
 //  DisplayInsertMode;
   DisplayNextQSONumber;
   SpotsList.UpdateSpotsMultiplierStatus;
@@ -4518,10 +4518,6 @@ begin
   QuickDisplay(inttopchar(Windows.GetTickCount - T1));
 //  showint(m);
 {$IFEND}
-{   if contest = RADIOYOC then    // 4.53.2
-   begin
-    PrevNr := copy(IntToStr(TempRXData.NumberReceived),1,3);    // 4.53.2
-   end;   }
 end;
 
 function CreateEditableLog(Parent: HWND; X, Y, Width, Height: integer; DefaultSize: boolean): HWND;
@@ -5144,7 +5140,7 @@ begin
       if RescoredRXData^.ceQSO_Deleted = False then
         if RescoredRXData^.ceQSO_Skiped = False then
         begin
-//        RescoredRXData^.ceOperator := 'K6VVA';
+
 {
           if DoingDomesticMults then
           begin
@@ -5194,7 +5190,7 @@ nop
 {rk4wwq}
 
           Sheet.SetMultFlags(RescoredRXData^);
-          CalculateQSOPoints(RescoredRXData^);
+    //       CalculateQSOPoints(RescoredRXData^);
           if (not tAllowDupeQSOs) and (RescoredRXData^.ceClearDupeSheet = False) and (VisibleLog.CallIsADupe(RescoredRXData^.Callsign, RescoredRXData^.Band, RescoredRXData^.Mode)) then
           begin
             RescoredRXData^.QSOPoints := 0;

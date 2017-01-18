@@ -595,8 +595,8 @@ begin
 
   if d <= BandMapGuardBand then
   begin
- //   tClearDupeInfoCall; // 4.50.4
- //   ClearAltD;  // 4.53.7
+     tClearDupeInfoCall; // 4.55.6
+     ClearAltD;  // 4.55.6
     DupeInfoCall := FList^[Index2].FCall;
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
