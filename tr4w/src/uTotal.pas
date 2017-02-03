@@ -294,7 +294,7 @@ begin
     end
     else
       WriteLeftColumnText(TC_PREFIX);
-  end;                                                                       
+  end;
 
   if DoingZoneMults then
   begin
@@ -385,9 +385,9 @@ procedure ClearTotals(StartColumn: integer);
 var
   c, r                             : integer;
 begin
-  for c := StartColumn to 7 do
-    for r := 0 to 3 do
-      TotalTextOut(nil, c, r);
+   for c := StartColumn to 7 do
+     for r := 0 to 3 do
+      TotalTextOut(nil, c , r);
 end;
 
 end.

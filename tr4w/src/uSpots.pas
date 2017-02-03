@@ -597,8 +597,6 @@ begin
   begin
     switch := False;    // n4af 4.56.1
     switchnext := False;
-    InactiveRigCallingCQ := True;
-         InactiveSwapRadio := True;
     tClearDupeInfoCall; // 4.55.6
     ClearAltD;  // 4.55.6
     DupeInfoCall := FList^[Index2].FCall;

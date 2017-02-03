@@ -3229,7 +3229,45 @@ begin
   end; { of case Length (Exchange) }
 end;
 
-function ProcessAgeAndQSONumberExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;
+function ProcessRSTAgeAndQSONumberExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;   // 4.55.4
+var firststring,secondstring,thirdstring : str10;
+begin
+  ColumnsArray[logColNumberSent].Enable := True;
+  ColumnsArray[logColNumberReceive].Enable := True;
+  ColumnsArray[logColCheck].Enable := True;  
+ ParseExchange(exchange,FirstString,SecondString,ThirdString);
+ if SecondString = '' then exit;
+ if thirdstring <> '' then
+ begin
+    if ActiveMode = CW then
+    if (length(FirstString) <> 3) then exit;
+    if ActiveMode = Phone then
+    if length(FirstString) <>  2 then exit;
+   case ActiveMode of
+        CW:  RXData.RSTReceived := StrToInt(Copy(Exchange,1,3));
+      Phone: Rxdata.RSTReceived := StrToInt(Copy(Exchange,1,2));
+  end;   end;
+  if thirdstring = '' then
+   begin
+
+    case ActiveMode of
+        CW:  RXData.RSTReceived := 599;
+     Phone:  RXData.RSTReceived := 59;
+    end;
+    RXData.Age := StrToInt(FirstString);
+     RXData.NumberReceived := StrToInt(SecondString);
+     end
+  else
+   begin
+      RXData.Age := StrToInt(SecondString);
+    RXData.NumberReceived := StrToInt(ThirdString);
+   end;
+
+  
+    Result := True;
+   
+ end;
+ function ProcessAgeAndQSONumberExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;
 var firststring,secondstring,thirdstring : str10;
 
 begin
@@ -3249,6 +3287,16 @@ begin
 RXData.NumberReceived := StrToInt(SecondString);
 RXData.DomesticQTH := '';
 end;
+if (ActiveMode = CW) or (ActiveMode = Digital) then
+ begin
+  RXData.RSTReceived := 599;
+  RXData.RSTSent := 599;
+ end
+ else
+  begin
+     RXData.RSTReceived := 59;
+     RXData.RSTSent := 59;
+  end;
   Result := True;
 end;
 
@@ -3760,9 +3808,8 @@ begin
    temprxdata.NumberReceived := StrToInt(Exchange);
    rxdata.NumberReceived := StrToInt(Exchange);
   PrevNr := Copy(Exchange, 1, 3);                 // 4.53.2
- { if contest = RadioYOC then
-  ColumnsArray[logColNumberReceive].Enable := True;   // ensure qsr is filled 4.53.2
-  }
+ 
+
   Result := True;
 end;
 
@@ -6632,6 +6679,16 @@ begin
     ThreePointsPerQSO: RXData.QSOPoints := 3;
     TenPointsPerQSO: RXData.QSOPoints := 10;
 
+    ThreePhoneFiveCWFourRTTY:       // 4.55.4
+     Case RXData.Mode of
+      CW:  RXData.QSOPoints := 5;
+      Phone: RXData.QSOPoints := 3 ;
+       else  RXData.QSOPoints := 4;
+      end;
+
+
+
+
     TwoPhoneFourCW:
       if RXData.Mode = CW then RXData.QSOPoints := 4
       else RXData.QSOPoints := 2;
@@ -6656,6 +6713,7 @@ begin
           RXData.QSOPoints := 1
         else
           RXData.QSOPoints := 2;
+
 
     CupRFMethod:
       begin
@@ -6823,6 +6881,10 @@ begin
 
         end;
       end;
+
+    {   YOKQSOPointMethod:             // 4.55.4
+         RXData.QSOPoints:= 3;  }
+
 
     ChampionshipRFASMethod:
       if (MyState <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
@@ -7513,8 +7575,10 @@ begin
     RSTAndFOCNumberExchange:     //n4af
       ProcessExchange := ProcessRSTAndPowerExchange(ExchangeString, RData);   //n4af
 
+
     AgeAndQSONumberExchange: ProcessExchange := ProcessAgeAndQSONumberExchange(ExchangeString, RData);
 
+    
     RSTAgeAndPossibleSK:
       ProcessExchange := ProcessRSTAgeAndPossibleSK(ExchangeString, RData);
 

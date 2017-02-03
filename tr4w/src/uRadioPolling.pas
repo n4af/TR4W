@@ -2128,12 +2128,9 @@ begin
               SetOpMode(SearchAndPounceOpMode);
                tClearDupeInfoCall;
                ClearAltD;      // 4.53.7
-              initializeQSO;   // 4.53.5
-              Second := False;    // n4af 4.46.7  first esc d/n clear call
-             //  switch := False;    // n4af 4.56.1
-               switchnext := False;
-          //     InactiveRigCallingCQ := True;
-           //    InactiveSwapRadio := True;
+               initializeQSO;   // 4.53.5
+               Second := False;    // n4af 4.46.7  first esc d/n clear call
+               switchnext := False;   // n4af issue
             end;
      if rig.FilteredStatus.TxOn then
         begin
