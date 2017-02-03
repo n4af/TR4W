@@ -595,8 +595,12 @@ begin
 
   if d <= BandMapGuardBand then
   begin
- //   tClearDupeInfoCall; // 4.50.4
- //   ClearAltD;  // 4.53.7
+    switch := False;    // n4af 4.56.1
+    switchnext := False;
+    InactiveRigCallingCQ := True;
+         InactiveSwapRadio := True;
+    tClearDupeInfoCall; // 4.55.6
+    ClearAltD;  // 4.55.6
     DupeInfoCall := FList^[Index2].FCall;
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
@@ -641,6 +645,7 @@ begin
     if FList^[Index2].FCall <> MyCall then
     if OpMode = SearchAndPounceOpMode then     // n4af 4.45.10
     begin
+    tClearDupeInfoCall; // 4.55.6
       PutCallToCallWindow(FList^[Index2].FCall);
       SendMessage(wh[mweCall], EM_SETSEL, 0, -1);
       CallsignIsPastedFromBandMap := True;

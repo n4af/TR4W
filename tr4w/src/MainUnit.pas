@@ -1040,9 +1040,12 @@ begin
   if (ExchangeWindowString = '') and (CallWindowString = '') then
     if AutoReturnToCQMode then
     begin
+       switch := False;    // n4af 4.56.1
+    InactiveRigCallingCQ := True;
+         InactiveSwapRadio := True;
+    tClearDupeInfoCall; // 4.55.6
       NameCallsignPutUp := '';
       CleanUpDisplay;
-
       if ActiveRadioPtr^.tTwoRadioMode = TR1 then
       begin
         ActiveRadioPtr^.tTwoRadioMode := TR0;
