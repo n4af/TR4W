@@ -384,6 +384,7 @@ var
   CommandMode, WarningSounded           : boolean;
   TempCall                              : CallString;
   TempString                            : Str80;
+  tempp                                 : pchar;
   i                                     : integer;
   TempReceivedData                      : ContestExchange;
   pendingCWBuffer                       : Str50;
@@ -438,7 +439,7 @@ begin
 
            '.':
           begin
-          AddStringToBuffer('.', CWTone);     // n4af 04.35.2
+          AddStringToBuffer('/', CWTone);     // n4af 04.35.2
  {            case SendString[CharacterCount + 1] of
               'T':
                 begin
@@ -510,6 +511,12 @@ begin
         ControlD:
           if CWStillBeingSent then AddStringToBuffer(' ', CWTone);
 
+        ',':      // n4af 4.56.4 issue # 233
+        begin
+         TempString := copy(gettimestring,1,2) + copy(gettimestring,4,2);
+          AddStringToBuffer(TempString , CWTone);
+        end;
+        
         '*':
           begin //KK1L: 6.72 New character to send Alt-D dupe checked call or call in call window
             if (DupeInfoCall <> '') and (DupeInfoCall <> EscapeKey) then

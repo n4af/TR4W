@@ -767,8 +767,8 @@ begin
     HELVETIA:
       begin
         if MyCountry = 'HB' then
-          ActiveDXMult := ARRLDXCC
-        else
+          ActiveDXMult := ARRLDXCC  ;
+      //  else          // 4.56.3 issue 232
           AddDomesticCountry('HB');
       end;
 

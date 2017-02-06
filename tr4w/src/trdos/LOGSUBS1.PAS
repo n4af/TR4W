@@ -125,7 +125,7 @@ function SendCrypticMessage(Message: Str160): boolean;
 var
   TimeOut                               : Byte;
   TempChar                              : Char;
-
+  TempString                            : String;
 label
   DontCheckPTT;
 
@@ -226,7 +226,6 @@ begin   // 1
       end;
 
     CW:
-
       begin
      SendCrypticCWstring(Message);
      end;
