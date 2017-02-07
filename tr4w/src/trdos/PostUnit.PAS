@@ -1922,7 +1922,7 @@ begin
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
 
-            ARRLFIELDDAY, ARRLSSCW, ARRLSSSSB:
+            ARRLFIELDDAY, ARRLSSCW, ARRLSSSSB, WINTERFIELDDAY:
               begin
                 nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s', tCallStringLength, p);
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
