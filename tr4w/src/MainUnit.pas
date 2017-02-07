@@ -134,6 +134,7 @@ uses
   var
   PTT_SET                               : boolean = False; //4.53.9
   InSplit                               : boolean = False;
+  STString                              : Str10;
   Switch                                : boolean = False;
   SwitchNext                            : boolean = False; // 4.52.3
   CallWinKeyDown                        : boolean = False; // 4.52.4

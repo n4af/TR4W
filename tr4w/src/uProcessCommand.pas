@@ -106,7 +106,7 @@ const
 
 
  // sCommands                             =  67  {$IF MMTYMODE} + 5  {$IFEND};
-  sCommands                             =  72;
+  sCommands                             =  74;  // 4.56.6
 
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
@@ -143,6 +143,8 @@ const
 (caCommand: ' ! = SN'; caAddress: @tClearMultSheet),
 (caCommand: ' & = AS'; caAddress: @scDUPECHECK),
 (caCommand: ' ) = Last QSOs Call'; caAddress: @scDUPECHECK),
+(caCommand: ' , = Send GMT time'; caAddress: @scDUPECHECK),       // 4.56.5
+(caCommand: '. , = Repeat previous GMT time'; caAddress: @scDUPECHECK),       // 4.56.6
 (caCommand: ' ALT-D = Dupe Check R2'; caAddress:  @CheckNumber),
 (caCommand: ' CN = Check Entered Number'; caAddress:  @CheckNumber),    // n4af 4.42.2
   // (caCommand: 'CN' ; caAddress:  @CheckNumber),                      // n4af 4.42.2
