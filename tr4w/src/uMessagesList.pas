@@ -59,7 +59,7 @@ begin
 
         for i := 0 to sCommands - 1 do
         begin
-          Format(wsprintfBuffer, '<03>%s<04>', sCommandsArray[i].caCommand);
+          Format(wsprintfBuffer, '%s', sCommandsArray[i].caCommand);
           tLB_ADDSTRING(TempHWND, wsprintfBuffer);
         end;
 
