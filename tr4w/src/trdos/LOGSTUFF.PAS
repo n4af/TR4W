@@ -674,6 +674,7 @@ procedure SpeedUp;
 procedure StuffInit;
 procedure SendUDPRotorCommand(Heading: integer);
 function ValidClass(sClass: Str10): boolean;
+
 { Header and Stamp routines - used when generating a log string }
 
 //procedure BandModeDateTimeNumberCallNameSentStamp(Exchange: ContestExchange; var LogString: Str80);
@@ -8122,7 +8123,9 @@ begin
          begin
          sXmit := sXmit + sClass[i];
          end
-      else if sClass[i] in ['A'..'F'] then
+      else if (((contest = ARRLFIELDDAY) and (sClass[i] in ['A'..'F']))      OR
+              ((contest = WINTERFIELDDAY) and (sClass[i] in ['I','O','H']))) then
+
          begin
          if classSet then
             begin
@@ -8148,7 +8151,15 @@ begin
       end
    else if length(sCategory) <> 1 then
       begin
-      ExchangeErrorMessage := TC_IMPROPERARRLFIELDDAYCLASS;
+      if contest = ARRLFIELDDAY then
+         begin
+         ExchangeErrorMessage := TC_IMPROPERARRLFIELDDAYCLASS;
+         end
+      else if contest = WINTERFIELDDAY then
+         begin
+         ExchangeErrorMessage := TC_IMPROPERWINTERFIELDDAYCLASS;
+         end;
+
       end
    else
       begin
@@ -8156,6 +8167,8 @@ begin
       end;
   // Result := (StrToInt(sXmit) in [1..99]) and (length(sCategory) = 1);
 end;
+
+
 begin
   CD.CellBuffer.MaximumMemoryToUse := 40000 * ua4wliscpconst {*4 - ua4wli};
   StuffInit;

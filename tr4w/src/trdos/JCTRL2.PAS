@@ -585,6 +585,7 @@ begin
           MyGrid := tMakeGridFromString(TempString);
       end;
 
+
     MIO:
       begin
         TempString := QuickEditResponse(TC_NEWVALUEFORMYIOTA, 6);

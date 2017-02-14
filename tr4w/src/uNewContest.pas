@@ -438,6 +438,12 @@ begin
              SetCommentAndEnableEditControl(TC_ENTERYOURFOCNUMBER,icmyFOC);
              end;
 
+             WINTERFIELDDAY:
+                begin
+                  DisplayInitialCommand(icmyFDClass);
+                  DisplayInitialCommand(icmySection);
+                end;
+
               ARRLFIELDDAY:
                 begin
                   DisplayInitialCommand(icmyFDClass);

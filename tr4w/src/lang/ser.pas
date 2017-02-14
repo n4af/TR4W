@@ -805,6 +805,7 @@ const
  
 TC_IMPROPERTRANSMITTERCOUNT 			= 'FD predajnici moraju biti izmedju 1 i 99.';
 TC_IMPROPERARRLFIELDDAYCLASS 			= 'Field Day klasa mora biti A, B, C, D, E ili F.';
+TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day klasa mora biti H, I ili O.';
 TC_ARRLFIELDDAYIMPROPERDXEXCHANGE 		= 'DX Station razmena mora biti "DX".';
 RC_SPLITOFF                       		= 'Split ukljucen ON/OFF';
 TC_ISLANDSTATION                        = 'Island station';

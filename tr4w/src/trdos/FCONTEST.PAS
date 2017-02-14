@@ -435,6 +435,18 @@ begin
   }
   case Contest of
 
+    WINTERFIELDDAY:
+      begin
+        WARCBandsEnabled := False;
+        SetCQMemoryString(CW, F1, 'CQ^WFD \ \ WFD');
+        SetCQMemoryString(CW, F2, 'CQ^WFD CQ^WFD \ \ WFD');
+        CQExchange := ' ' + MyFDClass + ' ' + MySection;
+        SearchAndPounceExchange := MyFDClass + ' ' + MySection;
+        QSLMessage := '73 \ WFD';
+        ActiveDXMult := ARRLDXCCWithNoARRLSections;
+        AddARRLSectionDomesticCountries;
+      end;
+
     ARRLFIELDDAY:
       begin
 //        DigitalModeEnable := True;
