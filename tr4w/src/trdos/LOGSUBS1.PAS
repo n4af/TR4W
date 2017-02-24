@@ -184,19 +184,19 @@ begin   // 1
        SwitchNext := True;    // 4.52.3
         end;
 
-     if TempChar = ControlE then           // n4af 4.41.3
+  {   if TempChar = ControlE then           // n4af 4.41.3
       if not SingleRadioMode then
       begin    // 3
        if autosendenable then
          CallWindowKeyUpProc;  // n4af 4.44.2
          InactiveRigCallingCQ := True;
          InactiveSwapRadio := True;
-         if ExchangeWindowString = ''   then          // 4.52.1
-          Switch     := True;
-         SwitchNext := True;
-         swapradios;
+  //       if ExchangeWindowString = ''   then          // 4.52.1
+           Switch     := True;
+          SwitchNext := True;      //4.56.9
+  //       swapradios;
       end;   // 2
-
+   }
 
 
     Delete(Message, 1, 1);
@@ -272,6 +272,8 @@ begin
          ((Key >= AltF11)     AND (Key <= AltF12)) THEN
             }
     begin
+    SwitchNext := False;
+    Switch := False;
     MessageKey := Key;
 
     //wli      if (ActiveMode = Phone) and (DVPEnable or (ActiveDVKPort <> NoPort)) then

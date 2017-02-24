@@ -590,6 +590,7 @@ begin
       begin
        d := a;
        Index2 := Index; end;
+       DupeInfoCall := FList^[Index2].FCall;
      end;
   end;
 
@@ -599,7 +600,7 @@ begin
     switchnext := False;
     tClearDupeInfoCall; // 4.55.6
     ClearAltD;  // 4.55.6
-    DupeInfoCall := FList^[Index2].FCall;
+ //   DupeInfoCall := FList^[Index2].FCall;
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
   end ;

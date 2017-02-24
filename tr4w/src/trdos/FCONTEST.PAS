@@ -335,12 +335,12 @@ begin
     CTY.ctyZoneMode := ZoneModeType(ContestsBooleanArray[Contest] and (1 shl CQ_ZONE_MODE_BIT) = 0);
 
     CountDomesticCountries := ContestsBooleanArray[Contest] and (1 shl CDC_BIT) <> 0;
-{
+   {
     QSOByMode := ContestsArray[Contest].ciQM;
     QSOByBand := ContestsArray[Contest].ciQB;
     MultByMode := ContestsArray[Contest].ciMM;
     MultByBand := ContestsArray[Contest].ciMB;
-}
+   }
 
     ActiveQSOPointMethod := ContestsArray[Contest].QP;
     ActiveExchange := ContestsArray[Contest].AE;
