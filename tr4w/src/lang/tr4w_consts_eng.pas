@@ -240,7 +240,7 @@ const
   TC_IMPROPERZONENUMBER                 = 'Improper zone number!!';
   TC_IMPROPERCONTINENT                  = 'Improper continent!!';
   TC_SAVINGTO                           = 'Saving %s to %s';
-  TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'File saved to floppy successfully.';
+  TC_FILESAVEDTOFILESUCCESSFULLY      = 'File saved to file successfully.';
   TC_FILESAVEDTOSUCCESSFULLY            = 'File saved to %s successfully.';
 
 
@@ -634,7 +634,7 @@ const
   RC_AUTOCQRESUME                       = 'Auto-CQ resume';
   RC_DUPECHECK                          = 'Dupe check';
   RC_EDIT                               = 'Edit';
-  RC_SAVETOFLOPPY                       = 'Save to floppy';
+  RC_SAVETOFLOPPY                       = 'Save to file';
   RC_SWAPMULTVIEW                       = 'Swap mult view';
   RC_INCNUMBER                          = 'Increment number';
   RC_TOOGLEMB                           = 'Toogle multiplier bell';

@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.56.10';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.56.11';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Feb 23, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'Feb 24, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -1971,7 +1971,7 @@ const
   menu_alt_autocqresume                 = 10301;
   menu_alt_dupecheck                    = 10302;
   menu_alt_edit                         = 10303;
-  menu_alt_savetofloppy                 = 10304;
+  menu_alt_savetofloppy                   = 10304;
   menu_alt_swapmults                    = 10305;
   menu_alt_incnumber                    = 10306;
   menu_alt_multbell                     = 10307;
