@@ -7,6 +7,8 @@ const
   TC_TRANSLATION_AUTHOR                 = 'Khosbayar.N JT1CD';
   TC_TRANSLATOR_EMAIL                   = 'jt1cd.khos@gmail.com';
 
+  RC_BACKUPLOG                         = 'Backup Log';
+  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   RC_3830                               =  '3830 Score posting';
   RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_INVALID                            = 'Invalid Entry';

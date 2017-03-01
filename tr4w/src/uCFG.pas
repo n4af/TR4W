@@ -342,6 +342,8 @@ const
  (crCommand: 'AUTO TIME INCREMENT';           crAddress: @AutoTimeIncrementQSOs;          crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'AUTO-CQ DELAY TIME';            crAddress: @AutoCQDelayTime;                crMin:500;crMax:10000;    crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'BACKCOPY ENABLE';               crAddress: @BackCopyEnable;                 crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'BACKUP LOG FILE NAME';          crAddress: @TR4W_FLOPPY_FILENAME;           crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctFileName),   // 4.56.11
+ (crCommand: 'BACKUP LOG FREQUENCY';          crAddress: @FloppyFileSaveFrequency;        crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),   // 4.56.11
  (crCommand: 'BAND';                          crAddress: pointer(24);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctBand),
  (crCommand: 'BAND MAP ALL BANDS';            crAddress: @BandMapAllBands;                crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'BAND MAP ALL MODES';            crAddress: @BandMapAllModes;                crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
@@ -433,8 +435,6 @@ const
  (crCommand: 'FARNSWORTH ENABLE';             crAddress: @FarnsworthEnable;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'FARNSWORTH SPEED';              crAddress: @FarnsworthSpeed;                crMin:0;  crMax:99;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
 // (crCommand: 'FILTER BANDMAP';              crAddress: @FilterBandmap;                  crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'FILE SAVE FREQUENCY';    crAddress: @FloppyFileSaveFrequency;        crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),   // 4.56.11
- (crCommand: 'FILE SAVE NAME';         crAddress: @TR4W_FLOPPY_FILENAME;           crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctFileName),   // 4.56.11
  (crCommand: 'FOOT SWITCH MODE';              crAddress: pointer(9);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList; cfFunc: cfAll; crType: ctOther),
  (crCommand: 'FOOT SWITCH PORT';              crAddress: @ActiveFootSwitchPort;           crMin:0;  crMax:0;       crS: csOld; crA:0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctPortLPT),
  (crCommand: 'FREQUENCY ADDER RADIO ONE';     crAddress: @Radio1.FrequencyAdder;          crMin:0;  crMax:MAXWORD-1; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
@@ -1529,14 +1529,15 @@ const
     );
 var
   i                                     : integer;
+  p                                     : pchar;
 begin
   for i := 1 to SAS do
   begin
     Windows.lstrcat(PChar(integer(SA[i].isString) + 1), SA[i].isPcharString);
     SA[i].isString^[0] := Char(lstrlen(SA[i].isPcharString));
   end;
-
-  Windows.lstrcat(TR4W_FLOPPY_FILENAME, 'C:\LOGBACK.TRW');
+  p := 'logback.tr4w';
+  Windows.lstrcat(TR4W_FLOPPY_FILENAME,p);  // 4.56.13
   Windows.lstrcat(TR4W_INITIALEX_FILENAME, 'INITIAL.EX');
   Windows.lstrcat(TR4W_MP3PATH, 'MP3');
   Windows.lstrcat(TR4W_DVKPATH, 'DVK');

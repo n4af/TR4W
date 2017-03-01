@@ -5,6 +5,8 @@
 const
   TC_TRANSLATION_LANGUAGE               = 'RUSSIAN';
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
+  RC_BACKUPLOG                         = 'Backup Log';
+  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   TC_INVALID                            = 'Неверный ввод';
   RC_3830                               = 'Отправить результат на 3830';
   RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3

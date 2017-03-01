@@ -7,6 +7,9 @@ const
   TC_TRANSLATION_LANGUAGE               = 'ÈESKY';
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
+  RC_BACKUPLOG                          = 'Backup Log';
+  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I or O.';
+  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'DX Station exchange must be "DX".';
   RC_3830                               =  '3830 Score posting';
   RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_INVALID                            =  'Neplatný záznam';
@@ -799,8 +802,6 @@ const
 
   TC_IMPROPERTRANSMITTERCOUNT           = 'vysílaèe pøi Field Day musí být mezi 1 až 99.';
   TC_IMPROPERARRLFIELDDAYCLASS          = 'kategorie pøi Field Day musí být A, B, C, D, E nebo F.';
-  TC_IMPROPERWINTERFIELDDAYCLASS        = 'kategorie pøi Field Day musí být H, I nebo O.';
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'sout. kód DX stanice musí být "DX".';
   RC_SPLITOFF                           = 'Vynucený režim Split VYPNUT';
   RC_IMPORT                             = 'Import';
   TC_RUNWARN                            = 'jiná instance TR4W je již spuštìna';

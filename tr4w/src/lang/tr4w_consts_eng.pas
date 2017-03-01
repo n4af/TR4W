@@ -3,7 +3,7 @@
   { %c =	A single character.}
   { %d =	A signed decimal integer argument.}
   { %u =	An unsigned integer argument.}
-const
+ const
   TC_TRANSLATION_LANGUAGE               = 'ENGLISH';
   TC_TRANSLATION_AUTHOR                 = 'Dmitriy Gulyaev UA4WLI';
   TC_TRANSLATOR_EMAIL                   = 'tr4w@qrz.ru';
@@ -634,7 +634,7 @@ const
   RC_AUTOCQRESUME                       = 'Auto-CQ resume';
   RC_DUPECHECK                          = 'Dupe check';
   RC_EDIT                               = 'Edit';
-  RC_SAVETOFLOPPY                       = 'Save to file';
+  RC_BACKUPLOG                         = 'Backup Log';
   RC_SWAPMULTVIEW                       = 'Swap mult view';
   RC_INCNUMBER                          = 'Increment number';
   RC_TOOGLEMB                           = 'Toogle multiplier bell';

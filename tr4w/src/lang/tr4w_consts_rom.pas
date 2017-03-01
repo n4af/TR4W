@@ -7,6 +7,8 @@ const
   TC_TRANSLATION_LANGUAGE               = 'ROMANIAN';
   TC_TRANSLATION_AUTHOR                 = 'Suli I.Iulius YO2IS';
 
+  RC_BACKUPLOG                         = 'Backup Log';
+  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   TC_INVALID                            = 'Invalid Entry';
   RC_3830                               =  '3830 Score posting';
   RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
