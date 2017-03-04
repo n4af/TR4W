@@ -578,7 +578,7 @@ const
  (crCommand: 'QSO BY BAND';                   crAddress: @QSOByBand;                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'QSO BY MODE';                   crAddress: @QSOByMode;                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'QSO NUMBER BY BAND';            crAddress: @QSONumberByBand;                crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'QSO POINT METHOD';              crAddress: pointer(1);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctOther),
+ (crCommand: 'QSO POINT METHOD';              crAddress: pointer(1);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
  (crCommand: 'QSO POINTS DOMESTIC CW';        crAddress: @QSOPointsDomesticCW;            crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'QSO POINTS DOMESTIC PHONE';     crAddress: @QSOPointsDomesticPhone;         crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'QSO POINTS DX CW';              crAddress: @QSOPointsDXCW;                  crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
@@ -801,7 +801,8 @@ begin
 
   Command[Ord(Command[0]) + 1] := #0;
   Result := False;
-
+ { if pshortstring(Command)^ = 'QSO POINT METHOD' then
+   result := false;  }
   if length(pshortstring(Command)^) > 5 then
 
     if pshortstring(Command)^[1] in ['C', 'E'] then
@@ -855,11 +856,12 @@ begin
   end;
 
   for i := 1 to CommandsArraySize do
-//    if (CFGCA[i].crCommand[0] = 'L') then
-    if (StrComp(@Command[1], CFGCA[i].crCommand) = 0) then
+
+   if (StrComp(@Command[1], CFGCA[i].crCommand) = 0) then
+
     begin
-//      if pshortstring(Command)^ = 'MY ZONE' then
-//        MyZone := MyZone;
+{if (CFGCA[i].crCommand[0] = 'Q') then
+      Result := False;   }
 
       if CFGCA[i].crS = csRem then
       begin
@@ -891,6 +893,8 @@ begin
         TempByte := GetValueFromArray(ListParamArray[TempInteger].lpArray, ListParamArray[TempInteger].lpLength, @CustomCMD);
         if TempByte <> UNKNOWNTYPE then
         begin
+       //   if tempinteger = 1 then    // if QSOPOINTMETHOD then decrement tempbyte 4.57.1
+       //   tempbyte := tempbyte -1;
           ListParamArray[TempInteger].lpVar^ := TempByte;
           Result := True;
           goto AdditionalProc;

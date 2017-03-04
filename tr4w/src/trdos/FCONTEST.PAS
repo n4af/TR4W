@@ -494,6 +494,7 @@ begin
         ContestName := 'STEW PERRY TOPBAND CHALLENGE';
         CQExchange := ' ' + MyGrid;
         SearchAndPounceExchange := MyGrid;
+        ActiveBand := Band160;
       end;
 
     ALLASIANCW, ALLASIANSSB:
