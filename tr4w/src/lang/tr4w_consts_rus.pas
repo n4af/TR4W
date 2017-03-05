@@ -5,7 +5,7 @@
 const
   TC_TRANSLATION_LANGUAGE               = 'RUSSIAN';
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
-  RC_BACKUPLOG                         = 'Backup Log';
+  RC_BACKUPLOG                         = 'Резервное копирование лога';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   TC_INVALID                            = 'Неверный ввод';
   RC_3830                               = 'Отправить результат на 3830';
@@ -784,4 +784,3 @@ const
   RC_SPLITOFF                           = 'Режим работы на разнесенных частотах ВКЛ/ВЫКЛ';
  TC_SPLIT_WARN                          = 'ПРЕДУПРЕЖДЕНИЕ: Вы работаете в режиме РАБОТА НА РАЗНЕСЕННЫХ ЧАСТОТАХ!!!';
  TC_RUNWARN                             = 'Программа TR4W на вашем компьютере уже работает ';
- 
