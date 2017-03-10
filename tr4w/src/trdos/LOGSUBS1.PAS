@@ -613,7 +613,7 @@ begin
      ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
      ShowInformation;  // n4af 04.40.02
 
-  // SetUpToSendOnActiveRadio;
+  SetUpToSendOnActiveRadio; // 4.57.3
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
   UpdateTotals2;

@@ -2130,7 +2130,7 @@ begin
                ClearAltD;      // 4.53.7
                initializeQSO;   // 4.53.5
                Second := False;    // n4af 4.46.7  first esc d/n clear call
-               switchnext := False;   // n4af issue  230 4.56.1
+               switchnext := False;   // n4af issue  230 
             end;
      if rig.FilteredStatus.TxOn then
         begin
