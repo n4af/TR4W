@@ -725,7 +725,7 @@ begin
 //        VHFBandsEnabled := True;
       end;
 
-    EUROPEANVHF:
+    TESLA:
       begin
         ActiveBand := Band6;
 //        ContestName := 'EUROPEAN VHF CONTEST';
@@ -775,6 +775,16 @@ begin
     HADX:
       begin
         AddDomesticCountry('HA');
+      end;
+
+    YUDX:                                // 4.57.5
+      begin
+      AddDomesticCountry('YU');
+      if MyCountry = 'YU' then
+       begin
+         ActiveDomesticMult :=  NoDomesticMults  ;       // 4.57.7
+         ActiveDXMult := ARRLDXCC;
+       end
       end;
 
     HELVETIA:

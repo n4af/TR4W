@@ -593,14 +593,19 @@ begin
        DupeInfoCall := FList^[Index2].FCall;
      end;
   end;
-
+ if d >= BandMapGuardBand then       // 4.57.8
+  begin
+   ClearAltD;
+   tClearDupeInfoCall;
+  end;
+  
   if d <= BandMapGuardBand then
   begin
     switch := False;    // n4af 4.56.1
     switchnext := False;
     tClearDupeInfoCall; // 4.55.6
     ClearAltD;  // 4.55.6
- //   DupeInfoCall := FList^[Index2].FCall;
+    DupeInfoCall := FList^[Index2].FCall;        // 4.57.8
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
   end ;
@@ -611,7 +616,7 @@ begin
     DupeInfoCallWindowState := diNone;
     if not DupeInfoCallWindowCleared then
  //   ClearAltD; // 4.53.8
- //   DupeInfoCallWindowCleared := True;      // 4.53.8
+ // DupeInfoCallWindowCleared := True;      // 4.53.8
     tClearDupeInfoCall;       // issue 172       // 4.53.5
   end;   }
 

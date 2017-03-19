@@ -6181,20 +6181,22 @@ begin
         if RXData.Band > Band1296 then RXData.QSOPoints := Points * 6;
       end;
 
-    EuropeanVHFQSOPointMethod:
+    TeslaQSOPointMethod:
 //      if MyGrid <> '' then
 //        if RXData.DomesticQTH <> '' then
       begin
     //  RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
         RXData.QSOPoints :=  GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);    //n4af 4.36.11
-        if MyCountry = '9A' then
+        if RXData.DomesticQTH = MyGrid then
+        RXData.QSOPoints := 90;
+    {    if MyCountry = '9A' then
         begin
-          if RXData.Band = Band432 then RXData.QSOPoints := RXData.QSOPoints * 5;
+           if RXData.Band = Band432 then RXData.QSOPoints := RXData.QSOPoints * 5;
           if RXData.Band = Band1296 then RXData.QSOPoints := RXData.QSOPoints * 10;
           if RXData.Band = Band2304 then RXData.QSOPoints := RXData.QSOPoints * 20;
           if RXData.Band in [Band3456, Band5760, Band10G] then RXData.QSOPoints := RXData.QSOPoints * 30;
           if RXData.Band = Band24G then RXData.QSOPoints := RXData.QSOPoints * 100;
-        end;
+        end;  }
       end;
 
     FistsQSOPointMethod:
@@ -6210,6 +6212,22 @@ begin
         if RXData.QTH.Continent <> MyContinent then
           RXData.QSOPoints := 3
         else
+          RXData.QSOPoints := 1;
+
+    YUDXQSOPointMethod:             // 4.57.5
+   { if MyCountry = 'YU' then
+      if RXCty = MyCountry then
+        RXData.QSOPoints := 1
+       else   }
+       if (MyCountry <> 'YU') and (RXCty = 'YU') then
+        RXData.QSOPoints := 10 
+         else
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 4
+       else
+        if RXCty <> MyCountry then
+          RXData.QSOPoints := 2
+      else
           RXData.QSOPoints := 1;
 
     HelvetiaQSOPointMethod:               // issue 214
@@ -6899,19 +6917,8 @@ begin
           RXData.QSOPoints := Abs(la1 - la2) + Abs(lo1 - lo2) + 5;
           if RXData.Mode = CW then RXData.QSOPoints := RXData.QSOPoints + 5;
         end;
-    YUDXQSOPointMethod:
-      begin
-        if (RXCty = 'YU') and (MyCountry = 'YU') then
-        begin
-          RXData.QSOPoints := 1;
-          Exit;
-        end;
-
-        if MyContinent = RXData.QTH.Continent then
-          RXData.QSOPoints := 2
-        else
-          RXData.QSOPoints := 4;
-      end;
+        
+   
 
     RegionOneFieldDayRCCQSOPointMethod:
       begin

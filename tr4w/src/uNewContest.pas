@@ -303,7 +303,7 @@ begin
               KINGOFSPAINCW, KINGOFSPAINSSB, UBACW, UBASSB, PACC, ARI_DX, HELVETIA:
                 SetCommentAndEnableEditControl(TC_ENTERYOURPROVINCEID, icmyState);
 
-              CQIR, HADX: SetCommentAndEnableEditControl(TC_ENTERYOURCOUNTYCODE, icmyState);
+              CQIR, HADX, YUDX: SetCommentAndEnableEditControl(TC_ENTERYOURCOUNTYCODE, icmyState);
 
               DARC10M, WAG, DARCXMAS: SetCommentAndEnableEditControl(TC_ENTERYOURDOK, icmyState);
 
@@ -378,7 +378,11 @@ begin
               RFASCHAMPIONSHIPCW: SetCommentAndEnableEditControl(TC_RFAS, icMyQTH);
               MAKROTHEN, CQVHF, ARRLVHFSS, STEWPERRY: SetCommentAndEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE, icmyGrid);
 
-              OZHCRVHF, EUROPEANVHF, RADIOVHFFD: SetCommentAndEnableEditControl(TC_ENTERYOURSIXDIGITGRIDSQUARE, icmyGrid);
+              OZHCRVHF, RADIOVHFFD: SetCommentAndEnableEditControl(TC_ENTERYOURSIXDIGITGRIDSQUARE, icmyGrid);
+
+              TESLA:
+               SetCommentandEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE,icmyGrid);
+         
 
               NEWENGLANDQSO: DisplayCheckBox(TC_NEWENGLAND);
 
@@ -399,6 +403,7 @@ begin
               LZDX: DisplayCheckBox(TC_BULGARIA);
               YODX: DisplayCheckBox(TC_ROMANIA);
               HADX: DisplayCheckBox(TC_HUNGARY);
+              YUDX: DisplayCheckBox(TC_YUGOSLAVIA);
               UBACW, UBASSB: DisplayCheckBox(TC_BELGIUM);
               PACC: DisplayCheckBox(TC_NETHERLANDS);
               DARC10M, WAG, DARCXMAS: DisplayCheckBox(TC_GERMANY);

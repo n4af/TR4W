@@ -184,7 +184,7 @@ begin   // 1
        SwitchNext := True;    // 4.52.3
         end;
 
-  {   if TempChar = ControlE then           // n4af 4.41.3
+ {   if TempChar = ControlE then           // n4af 4.41.3
       if not SingleRadioMode then
       begin    // 3
        if autosendenable then
@@ -196,7 +196,7 @@ begin   // 1
           SwitchNext := True;      //4.56.9
   //       swapradios;
       end;   // 2
-   }
+ }  
 
 
     Delete(Message, 1, 1);
@@ -613,7 +613,8 @@ begin
      ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
      ShowInformation;  // n4af 04.40.02
 
-  SetUpToSendOnActiveRadio; // 4.57.3
+  
+ // SetUpToSendOnActiveRadio; // 4.57.8
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
   UpdateTotals2;

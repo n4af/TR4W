@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.57.3';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.57.8';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Mar 4, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'Mar 19, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -796,7 +796,7 @@ type
     CUPURAL,
     EUSPRINT_SPRING_CW,
     EUROPEANHFC,
-    EUROPEANVHF,
+    TESLA,
     ARRLFIELDDAY,
     FISTS,
     FOCMARATHON,     //n4af
@@ -806,6 +806,7 @@ type
     GENERALQSO,
     GRIDLOC,
     HADX,
+    YUDX, //4.57.5
     HELVETIA,
     IARU,
     INTERNETSPRINT,
@@ -882,7 +883,6 @@ type
     XMAS,
     YODX,
     YOUTHCHAMPIONSHIPRF,
-    YUDX,
     RADIO160,
     RADIOYOK,
     LQP,
@@ -2417,7 +2417,6 @@ type
     SACDistricts,
     SouthAmericanPrefixes,
     SouthAndNorthAmericanPrefixes,
-    YUPrefixes,
     GCStation,
     CQNonEuropeanCountriesAndWAECallRegions
     );
@@ -2447,7 +2446,6 @@ const
     'SAC DISTRICTS',
     'SOUTH AMERICAN PREFIXES',
     'SOUTH AND NORTH AMERICAN PREFIXES',
-    'YU PREFIXES',
     'GC STATION',
     'CQ NON EUROPEAN COUNTRIES AND WAE'
     );
@@ -2491,10 +2489,11 @@ type
     CroatianQSOPointMethod,
     EuropeanFieldDayQSOPointMethod,
     EuropeanSprintQSOPointMethod,
-    EuropeanVHFQSOPointMethod,
+    TeslaQSOPointMethod,
     FistsQSOPointMethod,
     FOCMarathonQSOPointMethod,
     HADXQSOPointMethod,
+    YUDXQSOPointMethod,     // 4.57.5
     HelvetiaQSOPointMethod,
     IARUQSOPointMethod,
     InternetSixQSOPointMethod,
@@ -2545,7 +2544,6 @@ type
     OldNewYearQSOPointMethod,
     ChampionshipRFASMethod,
     YouthChampionshipRFMethod,
-    YUDXQSOPointMethod,
     RegionOneFieldDayRCCQSOPointMethod,
     GACWWWSACWQSOPointMethod,
     WWPMCQSOPointMethod,
@@ -2607,10 +2605,11 @@ const
     'CROATIAN', //    CroatianQSOPointMethod,
     'EUROPEAN FIELD DAY', //    EuropeanFieldDayQSOPointMethod,
     'EUROPEAN SPRINT', //    EuropeanSprintQSOPointMethod,
-    'EUROPEAN VHF', //    EuropeanVHFQSOPointMethod,
+    'TESLA', //    TeslaQSOPointMethod,
     'FISTS', //    FistsQSOPointMethod,
     'FOC MARATHON' , // FOCMarathonPointMethod,
     'HA DX', //    HADXQSOPointMethod,
+    'YUDX', //     YUDXQSOPointMethod,        // 4.57.5
     'HELVETIA', //    HelvetiaQSOPointMethod,
     'IARU', //    IARUQSOPointMethod,
     'INTERNET SIX', //    InternetSixQSOPointMethod,
@@ -2661,7 +2660,6 @@ const
     'ONY', //    OldNewYearQSOPointMethod,
     'RF AS CHAMP', //    ChampionshipRFASMethod,
     'SRR JR', //    YouthChampionshipRFMethod,
-    'YU', //    YUDXQSOPointMethod,
     'REG 1 RCC', //    RegionOneFieldDayRCCQSOPointMethod,
     'GACWWWSA', //    GACWWWSACWQSOPointMethod,
     'WW PMC', //    WWPMCQSOPointMethod,
@@ -2909,7 +2907,7 @@ QSOPartiesCount = 12;
  ({Name: 'URAL-CUP';                   }Email: nil;                      DF: 'grids';             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 112 ; Pxm: CallSignPrefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberDomesticQTHExchange;                XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'EU-SPRINT-SPRING-CW';        }Email: nil;                      DF: nil;                 WA7BNM:  317;                         QRZRUID: 216 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndNameExchange;                    XM:NoDXMults; QP:EuropeanSprintQSOPointMethod),
  ({Name: 'EUROPEAN HFC';               }Email: nil;                      DF: nil;                 WA7BNM:   82; {SK3BG: 'euhfcs';     } QRZRUID: 31  ; Pxm: NoPrefixMults; ZnM: EUHFCYear; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:OnePointPerQSO),
- ({Name: 'EUROPEAN VHF';               }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:EuropeanVHFQSOPointMethod),
+ ({Name: 'TESLA      ';               }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:TeslaQSOPointMethod),
  ({Name: 'ARRL FIELD DAY';             }Email: 'fieldday@arrl.org';      DF: 'arrlsect';          WA7BNM:   57; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod),   //ny4i Issue 222
  ({Name: 'FISTS';                      }Email: nil;                      DF: 's49p8';             WA7BNM:  251; {SK3BG: 'fistsspr';   } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQTHNameAndFistsNumberOrPowerExchange;     XM:NoDXMults; QP:FistsQSOPointMethod),
  ({Name: 'FOC MARATHON';               }Email: nil;                      DF: nil;                 WA7BNM:  0000; {SK3BG: nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTPowerExchange;                  XM:CQDXCC; QP:FOCMarathonQSOPointMethod),            //n4af
@@ -2919,6 +2917,7 @@ QSOPartiesCount = 12;
  ({Name: 'GENERAL QSO';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTNameAndQTHExchange;                       XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'GRID LOC';                   }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: NameAndPossibleGridSquareExchange;           XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'HA DX';                      }Email: nil;                      DF: 'hungary';           WA7BNM:  228; {SK3BG: 'hadxc';      } QRZRUID: 116 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:NoDXMults; QP:HADXQSOPointMethod),
+ ({Name: 'YUDX ';                      }Email: nil;                      DF: 'yu';                WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:CQDXCC; QP:YUDXQSOPointMethod),     // 4.57.5
  ({Name: 'HELVETIA';                   }Email: nil;                      DF: 'swiss';             WA7BNM:  326; {SK3BG: 'helvc';      } QRZRUID: 157 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;  XM:ARRLDXCC; QP:HelvetiaQSOPointMethod),          // 4.54.6 issue 214
  ({Name: 'IARU-HF';                    }Email: 'iaruhf@iaru.org';        DF: 'iaruhq';            WA7BNM:   67; {SK3BG: 'iaruhfc';    } QRZRUID: 33  ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTZoneOrSocietyExchange;                    XM:NoDXMults; QP:IARUQSOPointMethod),
  ({Name: 'INTERNET SPRINT';            }Email: nil;                      DF: 's49p13';            WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberNameDomesticOrDXQTHExchange;        XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:AlwaysOnePointPerQSO),
@@ -2995,7 +2994,6 @@ QSOPartiesCount = 12;
  ({Name: 'XMAS';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 100 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndRandomCharactersExchange;     XM:NoDXMults; QP:TwoPointsPerQSO),
  ({Name: 'YO DX';                      }Email: nil;                      DF: 'romania';           WA7BNM:   98; {SK3BG: 'yodxc';      } QRZRUID: 328 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:ARRLDXCC;  QP:YODXQSOPointMethod),
  ({Name: 'SRR-JR';                     }Email: nil;                      DF: 'russian';           WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 331 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: AgeAndQSONumberExchange;                           XM:ARRLDXCC; QP:AlwaysOnePointPerQSO),      // n4af 04.42.6
- ({Name: 'YUDX';                       }Email: nil;                      DF: nil;                 WA7BNM:  322; {SK3BG: 'yudx';       } QRZRUID: 147 ; Pxm: YUPrefixes;    ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:YUDXQSOPointMethod),
  ({Name: 'RADIO-160';                  }Email: nil;                      DF: 'russian';           WA7BNM:  202; {SK3BG: 'russ160';    } QRZRUID: 90  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC;  QP:RussianDXQSOPointMethod),
  ({Name: 'RADIO-YOK';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: AgeandQSONumberExchange;               XM:NoDXMults;  QP:ThreePhoneFiveCWFourRTTY),            // 4.55.4
  ({Name: 'LOCUST QP';                  }Email: nil;                      DF: 'naqp';              WA7BNM:  446; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange{QSONumberNameDomesticOrDXQTHExchange};        XM:NoDXMults; QP:LQPQSOPointMethod),
@@ -3074,7 +3072,7 @@ QSOPartiesCount = 12;
       'URAL-CUP',
       'EU-SPRINT-SPRING-CW',
       'EUROPEAN HFC',
-      'EUROPEAN VHF',
+      'TESLA',
       'ARRL-FD',
       'FISTS',
       'FOC MARATHON',  //n4af
@@ -3084,6 +3082,7 @@ QSOPartiesCount = 12;
       'GENERAL QSO',
       'GRID LOC',
       'HA DX',
+      'YUDX',    // 4.57.5
       'HELVETIA',
       'IARU-HF',
       'INTERNET SPRINT',
@@ -3160,7 +3159,6 @@ QSOPartiesCount = 12;
       'XMAS',
       'YO DX',
       'SRR-JR',
-      'YUDX',
       'RADIO-160',
       'RADIO-YOK',
       'LOCUST QSO PARTY',
@@ -3278,7 +3276,7 @@ QSOPartiesCount = 12;
       ({Name: 'URAL-CUP';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'EU-SPRINT-SPRING-CW';        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'EUROPEAN HFC';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
-      ({Name: 'EUROPEAN VHF';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
+      ({Name: 'TESLA       ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),      // 4.57.4
       ({Name: 'ARRL-FIELD DAY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'FISTS';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'FOC MARATHON';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),    //n4af
@@ -3288,6 +3286,7 @@ QSOPartiesCount = 12;
       ({Name: 'GENERAL QSO';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'GRID LOC';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'HA DX';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
+      ({Name: 'YUDX';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),    // 4.57.5
       ({Name: 'HELVETIA';                   }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),    // 4.54.6 issue 214    // 4.56.8
       ({Name: 'IARU-HF';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'INTERNET SPRINT';            }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
@@ -3364,7 +3363,6 @@ QSOPartiesCount = 12;
       ({Name: 'XMAS';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'YO DX';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'SRR-JR';                     }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
-      ({Name: 'YUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'RADIO-160';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB0 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'RADIO-YOK';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'LQP';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),

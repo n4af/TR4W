@@ -143,6 +143,7 @@
   TC_BULGARIA                           = 'Bulgaria';
   TC_ROMANIA                            = 'Romania';
   TC_HUNGARY                            = 'Hungary';
+  TC_YUGOSLAVIA                         = 'Yugoslavia';
   TC_BELGIUM                            = 'Belgium';
   TC_NETHERLANDS                        = 'Netherlands';
   TC_STPETERSBURGOBLAST                 = 'St.Petersburg / oblast';
