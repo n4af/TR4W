@@ -7,6 +7,7 @@ const
   TC_TRANSLATION_LANGUAGE               = 'ROMANIAN';
   TC_TRANSLATION_AUTHOR                 = 'Suli I.Iulius YO2IS';
 
+  TC_YUGOSLAVIA                         = 'Yugoslavia';
   RC_BACKUPLOG                         = 'Backup Log';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   TC_INVALID                            = 'Invalid Entry';

@@ -8,6 +8,7 @@ const
   TC_TRANSLATION_AUTHOR                 = 'Dragan Acimovic YT3W';
   TC_TRANSLATOR_EMAIL                   = 'dragan.acimovic@gmail.com';
 
+  TC_YUGOSLAVIA                         = 'Yugoslavia';
   RC_BACKUPLOG                         = 'Backup Log';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   TC_INVALID                            = 'Invalid Entry';

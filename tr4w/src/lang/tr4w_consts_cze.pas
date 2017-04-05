@@ -7,6 +7,7 @@ const
   TC_TRANSLATION_LANGUAGE               = 'ÈESKY';
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
+  TC_YUGOSLAVIA                         = 'Yugoslavia';
   RC_BACKUPLOG                          = 'Backup Log';
   TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I or O.';
   TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'DX Station exchange must be "DX".';

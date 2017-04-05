@@ -17,7 +17,7 @@ const
   TC_POINTS                             = 'Оч.';
   TC_OP                                 = 'Оператор';
   TC_NAME                               = 'Имя';
-
+  TC_YUGOSLAVIA                         = 'Yugoslavia';
   TC_CHECKCALLSIGN                      = 'Проверить позывной';
   TC_FREQUENCYFORCALLINKHZ              = 'частоту в кГц для %s';
   TC_DIFVERSION                         = '%s из другой версии программы.'#13'TR4W ожидает версию %s.'#13'Файл, который вы пытаетесь открыть имеет версию %s.';
