@@ -305,6 +305,8 @@ begin
 
               CQIR, HADX, YUDX: SetCommentAndEnableEditControl(TC_ENTERYOURCOUNTYCODE, icmyState);
 
+              UKEI: SetCommentAndEnableEditControl(TC_EnterYourDistrictCode, icmyState);
+
               DARC10M, WAG, DARCXMAS: SetCommentAndEnableEditControl(TC_ENTERYOURDOK, icmyState);
 
               SPDX, OKDX, YODX, RSGB18, LZDX:
@@ -404,6 +406,8 @@ begin
               YODX: DisplayCheckBox(TC_ROMANIA);
               HADX: DisplayCheckBox(TC_HUNGARY);
               YUDX: DisplayCheckBox(TC_YUGOSLAVIA);
+              UKEI: DisplayCheckBox(TC_UKEI);
+            //  UKEI: SetCommentAndEnableEditControl(TC_EnterYourDistrictCode, icmyState);
               UBACW, UBASSB: DisplayCheckBox(TC_BELGIUM);
               PACC: DisplayCheckBox(TC_NETHERLANDS);
               DARC10M, WAG, DARCXMAS: DisplayCheckBox(TC_GERMANY);

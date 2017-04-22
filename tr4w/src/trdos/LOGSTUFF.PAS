@@ -3922,12 +3922,12 @@ begin
 end;
  // n4af 4.51.2
 function ProcessRSTQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
-
 var
   NumberString, FirstString, SecondString, ThirdString: Str10;
 
 begin
   ProcessRSTQSONumberOrDomesticQTHExchange := False;
+
   if Exchange = '' then Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
@@ -4000,10 +4000,21 @@ var
   NumberString, FirstString, SecondString, ThirdString: Str10;
 
 begin
+
   ProcessRSTQSONumberAndPossibleDomesticQTHExchange := False;
   if Exchange = '' then Exit;
 
+
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
+   if Contest = UKEI then
+    begin
+      if (UKEIStation(RXData.Callsign)) then
+       if  (SecondString = '') then
+       begin
+         ExchangeErrorMessage := TC_INVALID;
+          exit;
+        end;
+     end;
   if not stringisallnumbers(FirstString) then   //   n4af 4.42.9
    if not stringisallnumbers(SecondString) then
     if not stringisallnumbers(ThirdString) then
@@ -4047,17 +4058,15 @@ begin
       NumberString := FirstString + ' ' + SecondString;
     end;
 
-  if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
+   if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
   begin
     if RXData.QTHString = '' then
       ProcessRSTQSONumberAndPossibleDomesticQTHExchange := True
     else
       ProcessRSTQSONumberAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)
-  end
-   else
-    ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
-end;
+  end ;
 
+end;
 {KK1L: 6.73 For Michigan QSO Party NOT WORKING!!!!!!}
 
 function ProcessQSONumberAndPossibleDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
@@ -5549,6 +5558,8 @@ var
   la1, la2, lo1, lo2                    : integer;
   Grid1, Grid2                          : GridString;
   russianRegion1, russianRegion2        : RussianRegionType;
+  temphour                              : byte;      // 4.58.2
+  tempmin                               : byte;
 begin
   RXData.QSOPoints := 0;
 
@@ -6215,11 +6226,7 @@ begin
           RXData.QSOPoints := 1;
 
     YUDXQSOPointMethod:             // 4.57.5
-   { if MyCountry = 'YU' then
-      if RXCty = MyCountry then
-        RXData.QSOPoints := 1
-       else   }
-       if (MyCountry <> 'YU') and (RXCty = 'YU') then
+        if (MyCountry <> 'YU') and (RXCty = 'YU') then
         RXData.QSOPoints := 10 
          else
         if RXData.QTH.Continent <> MyContinent then
@@ -6229,6 +6236,46 @@ begin
           RXData.QSOPoints := 2
       else
           RXData.QSOPoints := 1;
+
+     UKEIQSOPointMethod:             // 4.58.2
+       begin
+       if (MyContinent <> Europe) then        // if OOUTSIDE EUROPE
+        begin
+        if UKEIStation(RXData.Callsign) then
+          RXData.QSOPoints := 4
+         else
+          if RxData.QTH.Continent = Europe  then
+           RXData.QSOPoints := 2
+          else
+           RXData.QSOPoints := 1;
+        end;
+
+        if ((MyContinent = Europe) and (not UKEIStation(MyCountry))) then            // if IN Europe
+         begin
+          if (RxData.QTH.Continent = Europe) and (not UKEIStation(RxData.CallSign))then
+          RXData.QSOPoints := 1
+           else
+            RXData.QSOPoints := 2;
+          end;
+
+        if  UKEIStation(MyCountry) then            // if IN UK/EI
+         begin
+          if RxData.QTH.Continent = Europe then
+             RXData.QSOPoints := 2
+          else
+          RXData.QSOPoints := 4 ;
+          tGetSystemTime;
+                 TempHour := UTC.wHour;
+                 if (TempHour >= 01) and (TempHour < 05) then
+                  RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;    // double points if gmthours
+         end;
+
+           
+          Case RxData.Band of
+          Band80,Band40: RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+          end ;
+      
+      end;
 
     HelvetiaQSOPointMethod:               // issue 214
         if RXCty = 'HB' then

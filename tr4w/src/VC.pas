@@ -142,9 +142,9 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
-//     LANG                                  = 'ENG';
+     LANG                                  = 'ENG';
 //  LANG                                  = 'RUS';
-  LANG                                   = 'SER';
+//  LANG                                   = 'SER';
 //  LANG                                   = 'ESP';
 //    LANG                                  = 'MNG';
 //   LANG                                  = 'POL';
@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.58.1';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.58.beta';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'April 5, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'April 20, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -807,6 +807,7 @@ type
     GRIDLOC,
     HADX,
     YUDX, //4.57.5
+    UKEI, // 4.58.2
     HELVETIA,
     IARU,
     INTERNETSPRINT,
@@ -2494,6 +2495,7 @@ type
     FOCMarathonQSOPointMethod,
     HADXQSOPointMethod,
     YUDXQSOPointMethod,     // 4.57.5
+    UKEIQSOPointMethod,    // 4.58.2
     HelvetiaQSOPointMethod,
     IARUQSOPointMethod,
     InternetSixQSOPointMethod,
@@ -2610,6 +2612,7 @@ const
     'FOC MARATHON' , // FOCMarathonPointMethod,
     'HA DX', //    HADXQSOPointMethod,
     'YUDX', //     YUDXQSOPointMethod,        // 4.57.5
+    'UKEI', //    UK-EIQSOPointMethod,       // 4.58.2
     'HELVETIA', //    HelvetiaQSOPointMethod,
     'IARU', //    IARUQSOPointMethod,
     'INTERNET SIX', //    InternetSixQSOPointMethod,
@@ -2918,6 +2921,7 @@ QSOPartiesCount = 12;
  ({Name: 'GRID LOC';                   }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: NameAndPossibleGridSquareExchange;           XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'HA DX';                      }Email: nil;                      DF: 'hungary';           WA7BNM:  228; {SK3BG: 'hadxc';      } QRZRUID: 116 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:NoDXMults; QP:HADXQSOPointMethod),
  ({Name: 'YUDX ';                      }Email: nil;                      DF: 'yu';                WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:CQDXCC; QP:YUDXQSOPointMethod),     // 4.57.5
+ ({Name: 'UKEI ';                      }Email: nil;                      DF: 'uk-ei';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQSONUMBERAndPossibleDomesticQTHExchange;           XM:CQDXCC; QP:UKEIQSOPointMethod),     // 4.58.2
  ({Name: 'HELVETIA';                   }Email: nil;                      DF: 'swiss';             WA7BNM:  326; {SK3BG: 'helvc';      } QRZRUID: 157 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;  XM:ARRLDXCC; QP:HelvetiaQSOPointMethod),          // 4.54.6 issue 214
  ({Name: 'IARU-HF';                    }Email: 'iaruhf@iaru.org';        DF: 'iaruhq';            WA7BNM:   67; {SK3BG: 'iaruhfc';    } QRZRUID: 33  ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTZoneOrSocietyExchange;                    XM:NoDXMults; QP:IARUQSOPointMethod),
  ({Name: 'INTERNET SPRINT';            }Email: nil;                      DF: 's49p13';            WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberNameDomesticOrDXQTHExchange;        XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:AlwaysOnePointPerQSO),
@@ -3083,6 +3087,7 @@ QSOPartiesCount = 12;
       'GRID LOC',
       'HA DX',
       'YUDX',    // 4.57.5
+      'UKEI',   // 4.58.2
       'HELVETIA',
       'IARU-HF',
       'INTERNET SPRINT',
@@ -3287,6 +3292,7 @@ QSOPartiesCount = 12;
       ({Name: 'GRID LOC';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'HA DX';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'YUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),    // 4.57.5    // 4.58.1
+      ({Name: 'UKEI';                       }ciCDC0+ ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),    // 4.58.2
       ({Name: 'HELVETIA';                   }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),    // 4.54.6 issue 214    // 4.56.8
       ({Name: 'IARU-HF';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'INTERNET SPRINT';            }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),

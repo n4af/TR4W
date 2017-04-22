@@ -236,7 +236,7 @@ begin
 
   Windows.ZeroMemory(@Multiplier, SizeOf(Multiplier)); //  Multiplier := '';
   Windows.ZeroMemory(@QTH, SizeOf(QTH)); //    QTH := '';
-  GetDomQTH := False;
+   GetDomQTH := False;
 
   strU(InputString);
 

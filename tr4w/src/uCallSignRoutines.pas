@@ -55,6 +55,7 @@ function RussianID(ID: ShortString): boolean;
 function FrenchID(ID: ShortString): boolean;
 function SpanishStation(ID: ShortString): boolean;
 function OKOMStation(ID: ShortString): boolean;
+function UKEIStation(ID: ShortString): boolean;
 function GetPrefix(Call: CallString): PrefixString;
 function GetOblast(Call: CallString): Str2;
 function MobileCall(Call: CallString): boolean;  //n4af 4.41.8
@@ -159,6 +160,15 @@ begin
     if ID[1] = 'O' then if
       ID[2] in ['K', 'M'] then Result := True;
 end;
+
+function UKEIStation(ID: ShortString): boolean;  // 4.58.2
+begin
+  Result := False;
+//  if length(ID) > 1 then
+    if ((ID[1] = 'G') or (ID[1] = 'M') or ((ID[1] = 'E') and (ID[2] = 'I')) or (ID[1] = '2')) then
+     Result := True;
+end;
+
 
 function SpanishStation(ID: ShortString): boolean;
 begin

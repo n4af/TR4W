@@ -2960,6 +2960,9 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
             asm add esp,20
             end;
 
+            if Contest = UKEI then           // 4.58.2
+            if TempRXData.QTHString = '' then
+               csQTHString := '--';
 
             if Contest = IOTA then
             begin

@@ -787,6 +787,21 @@ begin
        end
       end;
 
+    UKEI:     // 4.58.2
+      begin
+       AddDomesticCountry('G');
+       AddDomesticCountry('GD');
+       AddDomesticCountry('GI');
+       AddDomesticCountry('GJ');
+       AddDomesticCountry('GM');
+       AddDomesticCountry('GM');
+       AddDomesticCountry('GW');
+       AddDomesticCountry('GU');
+       AddDomesticCountry('EI');
+      
+
+      end;
+
     HELVETIA:
       begin
         if MyCountry = 'HB' then

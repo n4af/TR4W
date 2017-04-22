@@ -472,7 +472,7 @@ var
 begin
   FoundDomesticQTH := False;
 
-  if RXData.QTHString = '' then Exit;
+   if RXData.QTHString = '' then Exit;
 
   QTHString := UpperCase(RXData.QTHString);
 

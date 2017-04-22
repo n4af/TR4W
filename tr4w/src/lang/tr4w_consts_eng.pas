@@ -125,7 +125,7 @@
   TC_ENTERYOURRDAIDORGRID               = 'Enter your RDA ID (for UA1A stations) or four digit grid square:';
   TC_ENTERYOURBRANCHNUMBER              = 'Enter your Branch number:';
   TC_ENTERYOURPOSTCODE                  = 'Enter your postcode:';
-
+  TC_ENTERYOURDISTRICTCODE              = 'If in UK/EI, enter your 2 digit district code';
   TC_ISLANDSTATION                      = 'Island station';
   TC_NEWENGLAND                         = 'New England';
   TC_CALIFORNIA                         = 'California';
@@ -144,6 +144,7 @@
   TC_ROMANIA                            = 'Romania';
   TC_HUNGARY                            = 'Hungary';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
+  TC_UKEI                              = 'If in Uk/EI enter your 2 digit district code';
   TC_BELGIUM                            = 'Belgium';
   TC_NETHERLANDS                        = 'Netherlands';
   TC_STPETERSBURGOBLAST                 = 'St.Petersburg / oblast';
@@ -472,6 +473,7 @@
   TC_CTRL_Y                             = 'Increase weight by 0.03';
   TC_CTRL_SL                            = 'Normal dit';
   TC_QSO_NUMBER                         = 'QSO Number';
+  
   TC_SALUTATION_AND_NAME_IF_KNOWN       = 'Salutation and name if known';
   TC_NAME_FROM_NAME_DATABASE            = 'Name from name database';
   TC_SEND_CHARACTERS_FROM_KEYBOARD      = 'Send characters from keyboard';
