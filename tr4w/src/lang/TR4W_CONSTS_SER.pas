@@ -7,7 +7,8 @@ const
   TC_TRANSLATION_LANGUAGE               = 'SERBIAN';
   TC_TRANSLATION_AUTHOR                 = 'Dragan Acimovic YT3W';
   TC_TRANSLATOR_EMAIL                   = 'dragan.acimovic@gmail.com';
-
+  TC_EnterYourDistrictCode              = 'IF in UK/EI, enter your district code';
+  TC_UKEI                               = 'Check IF you are within UK/EI';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
   RC_BACKUPLOG                         = 'Backup Log';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';

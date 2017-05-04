@@ -5,7 +5,7 @@
   { %u =	An unsigned integer argument.}
  const
   TC_TRANSLATION_LANGUAGE               = 'ENGLISH';
-  TC_TRANSLATION_AUTHOR                 = 'Dmitriy Gulyaev UA4WLI';
+  TC_TRANSLATION_AUTHOR                 = 'N4AF';
   TC_TRANSLATOR_EMAIL                   = 'tr4w@qrz.ru';
 
   TC_FREQ                               = 'Freq';

@@ -143,13 +143,13 @@ const
 
 const
      LANG                                  = 'ENG';
-//  LANG                                  = 'RUS';
-//  LANG                                   = 'SER';
+//     LANG                                  = 'RUS';
+//   LANG                                   = 'SER';
 //  LANG                                   = 'ESP';
 //    LANG                                  = 'MNG';
 //   LANG                                  = 'POL';
-//    LANG                                  = 'CZE';
-//   LANG                                  = 'ROM';
+//   LANG                                  = 'CZE';
+//     LANG                                  = 'ROM';
 //   LANG                                  = 'CHN';
 
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.58.beta';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.59.1';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'April 20, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'May 4, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';

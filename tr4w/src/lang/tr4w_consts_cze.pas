@@ -7,6 +7,9 @@ const
   TC_TRANSLATION_LANGUAGE               = 'ÈESKY';
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
+
+  TC_UKEI                               = 'Check here if within UK/EI';
+  TC_EnterYourDistrictCode              = 'If within UK/EI enter District Code';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
   RC_BACKUPLOG                          = 'Backup Log';
   TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I or O.';
@@ -17,9 +20,7 @@ const
   TC_FREQ                               = 'frekv';
   TC_POINTS                             = 'body';
   TC_OP                                 = 'Op';
-
   TC_CHECKCALLSIGN                      = 'Kontroluj znaèku';
-
   TC_FREQUENCYFORCALLINKHZ              = 'Kmitoèet pro %s v kHz';
   TC_DIFVERSION                         = '%s pochází z jiné programové verze.'#13'TR4W oèekává programovou verzi %s.'#13'Pokoušíš se èíst soubor ve verzi %s.';
 

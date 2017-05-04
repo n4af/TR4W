@@ -5,6 +5,9 @@
 const
   TC_TRANSLATION_LANGUAGE               = 'RUSSIAN';
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
+  
+  TC_EnterYourDistrictCode              = 'Если в UK/EI введите код района';
+  TC_UKEI                               = 'Я нахожусь в UK/EI';
   RC_BACKUPLOG                         = 'Резервное копирование лога';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   TC_INVALID                            = 'Неверный ввод';

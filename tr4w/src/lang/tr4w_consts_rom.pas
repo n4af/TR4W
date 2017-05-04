@@ -7,6 +7,8 @@ const
   TC_TRANSLATION_LANGUAGE               = 'ROMANIAN';
   TC_TRANSLATION_AUTHOR                 = 'Suli I.Iulius YO2IS';
 
+  TC_UKEI                               = 'If within UK/EI, check here';
+  TC_EnterYourDistrictCode              = 'If within UK/EI, enter your district code';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
   RC_BACKUPLOG                         = 'Backup Log';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
@@ -26,7 +28,6 @@ const
   TC_FREQUENCYFORCALLINKHZ              = 'frecventa ptr %s in KHz';
   TC_DIFVERSION                         = '%s este de la o alta versiune';
   TC_FILE                               = 'Fisier';
-
   TC_M                                  = 'm'; //minute
   TC_S                                  = 's'; //secunde
 
