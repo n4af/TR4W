@@ -39,17 +39,17 @@ procedure ClearAltD;
 const
   VDColorsArray                         : array[Ord('0')..Ord('9') + 1] of tr4wColors =
     (
-    trBlue, //0
+    trWhite, //0 //issue 256
     trRed, //1
     trGreen, //2
     trMagenta, //3
     trBrown, //4
-    trBlue, //5
+    trWhite, //5      // issue 256
     trRed, //6
     trGreen, //7
     trMagenta, //8
     trBrown, ///9
-    trBlue ///10
+    trWhite ///10           // issue 256
     );
 
 implementation

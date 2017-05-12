@@ -40,9 +40,9 @@ type
   PrefixRecPtr = ^PrefixRec;
 
   PrefixRec = record
-    Prefix: string[6];
-    DomQTH: string[6];
-    Multiplier: string[6];
+    Prefix: string[10];
+    DomQTH: string[10];
+    Multiplier: string[10];
     NextRecord: PrefixRecPtr;
   end;
 

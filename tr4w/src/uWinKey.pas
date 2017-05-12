@@ -661,18 +661,18 @@ begin
         tCB_SETCURSEL(hwnddlg, HANG_CB, WinKeySettings.wksValueList.vlSidetoneFrequency - 1);
 }
 
-        for c := 1 to wkBool do
+ {       for c := 1 to wkBool do
           Windows.SendDlgItemMessage(hwnddlg, 100 + c, BM_SETCHECK, integer(WK2BoolValue[c]^), 0);
 
-{
+
         Windows.SendDlgItemMessage(hwnddlg, 101, BM_SETCHECK, integer(WinKeySettings.wksWinKey2Enable), 0);
         Windows.SendDlgItemMessage(hwnddlg, 102, BM_SETCHECK, integer(WinKeySettings.wksAutospace), 0);
         Windows.SendDlgItemMessage(hwnddlg, 103, BM_SETCHECK, integer(WinKeySettings.wksCTSpacing), 0);
         Windows.SendDlgItemMessage(hwnddlg, 104, BM_SETCHECK, integer(WinKeySettings.wksSidetone), 0);
         Windows.SendDlgItemMessage(hwnddlg, 105, BM_SETCHECK, integer(WinKeySettings.wksPaddleSwap), 0);
-        Windows.SendDlgItemMessage(hwnddlg, 106, BM_SETCHECK, integer(WinKeySettings.wkIgnoreSpeedSpot), 0);
-}
-{
+         Windows.SendDlgItemMessage(hwnddlg, 106, BM_SETCHECK, integer(WinKeySettings.wkIgnoreSpeedSpot), 0);
+
+
         Windows.SendDlgItemMessage(hwnddlg, WEIGHTING_SLIDER, TBM_SETRANGE, 1, MakeLong(10, 90));
         Windows.SendDlgItemMessage(hwnddlg, WEIGHTING_SLIDER, TBM_SETPOS, 1, WinKeySettings.wkWeighting);
 

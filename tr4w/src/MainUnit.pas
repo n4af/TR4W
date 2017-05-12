@@ -5984,10 +5984,10 @@ begin
   else
     DomWidth := BASECOLUMNWIDTH;
 
-  if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
-
+ //  if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
+   DomWidth := 65;      // issue 255  allow 8 char dom
   case RemainingMultDisplay of
-    rmDomestic: Width := DomWidth;
+    rmDomestic: Width :=  DomWidth;    
     rmPrefix: Width := PREFIXCOLUMNWIDTH;
   else
     Width := BASECOLUMNWIDTH;
