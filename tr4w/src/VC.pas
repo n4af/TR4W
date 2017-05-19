@@ -143,7 +143,7 @@ const
 
 const
      LANG                                  = 'ENG';
-//     LANG                                  = 'RUS';
+//    LANG                                  = 'RUS';
 //   LANG                                   = 'SER';
 //  LANG                                   = 'ESP';
 //    LANG                                  = 'MNG';
@@ -153,7 +153,7 @@ const
 //   LANG                                  = 'CHN';
 
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
-{$IF LANG = 'RUS'}{$INCLUDE lang\tr4w_consts_rus.pas}{$IFEND}
+{$IF LANG = 'RUS'}{$INCLUDE lang\tr4w_consts_rus.pas} {$IFEND}
 {$IF LANG = 'SER'}{$INCLUDE lang\tr4w_consts_ser.pas}{$IFEND}
 {$IF LANG = 'ESP'}{$INCLUDE lang\tr4w_consts_esp.pas}{$IFEND}
 {$IF LANG = 'MNG'}{$INCLUDE lang\tr4w_consts_mng.pas}{$IFEND}
@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.59.3';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.59.4';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'May 11, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'May 19, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -796,6 +796,7 @@ type
     CUPURAL,
     EUSPRINT_SPRING_CW,
     EUROPEANHFC,
+    EUROPEANVHF,
     TESLA,
     ARRLFIELDDAY,
     FISTS,
@@ -2490,6 +2491,7 @@ type
     CroatianQSOPointMethod,
     EuropeanFieldDayQSOPointMethod,
     EuropeanSprintQSOPointMethod,
+    EuropeanVHFQSOPointMethod,
     TeslaQSOPointMethod,
     FistsQSOPointMethod,
     FOCMarathonQSOPointMethod,
@@ -2607,6 +2609,7 @@ const
     'CROATIAN', //    CroatianQSOPointMethod,
     'EUROPEAN FIELD DAY', //    EuropeanFieldDayQSOPointMethod,
     'EUROPEAN SPRINT', //    EuropeanSprintQSOPointMethod,
+    'EUROPEAN VHF', //    EuropeanVHFQSOPointMethod,
     'TESLA', //    TeslaQSOPointMethod,
     'FISTS', //    FistsQSOPointMethod,
     'FOC MARATHON' , // FOCMarathonPointMethod,
@@ -2910,7 +2913,8 @@ QSOPartiesCount = 12;
  ({Name: 'URAL-CUP';                   }Email: nil;                      DF: 'grids';             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 112 ; Pxm: CallSignPrefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberDomesticQTHExchange;                XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'EU-SPRINT-SPRING-CW';        }Email: nil;                      DF: nil;                 WA7BNM:  317;                         QRZRUID: 216 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndNameExchange;                    XM:NoDXMults; QP:EuropeanSprintQSOPointMethod),
  ({Name: 'EUROPEAN HFC';               }Email: nil;                      DF: nil;                 WA7BNM:   82; {SK3BG: 'euhfcs';     } QRZRUID: 31  ; Pxm: NoPrefixMults; ZnM: EUHFCYear; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:OnePointPerQSO),
- ({Name: 'TESLA      ';               }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:TeslaQSOPointMethod),
+ ({Name: 'EUROPEAN VHF';               }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:EuropeanVHFQSOPointMethod),
+ ({Name: 'TESLA      ';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:TeslaQSOPointMethod),
  ({Name: 'ARRL FIELD DAY';             }Email: 'fieldday@arrl.org';      DF: 'arrlsect';          WA7BNM:   57; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod),   //ny4i Issue 222
  ({Name: 'FISTS';                      }Email: nil;                      DF: 's49p8';             WA7BNM:  251; {SK3BG: 'fistsspr';   } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQTHNameAndFistsNumberOrPowerExchange;     XM:NoDXMults; QP:FistsQSOPointMethod),
  ({Name: 'FOC MARATHON';               }Email: nil;                      DF: nil;                 WA7BNM:  0000; {SK3BG: nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTPowerExchange;                  XM:CQDXCC; QP:FOCMarathonQSOPointMethod),            //n4af
@@ -3076,6 +3080,7 @@ QSOPartiesCount = 12;
       'URAL-CUP',
       'EU-SPRINT-SPRING-CW',
       'EUROPEAN HFC',
+      'EUROPEAN VHF',
       'TESLA',
       'ARRL-FD',
       'FISTS',
@@ -3281,6 +3286,7 @@ QSOPartiesCount = 12;
       ({Name: 'URAL-CUP';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'EU-SPRINT-SPRING-CW';        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'EUROPEAN HFC';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
+      ({Name: 'EUROPEAN VHF';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'TESLA       ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),      // 4.57.4
       ({Name: 'ARRL-FIELD DAY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'FISTS';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),

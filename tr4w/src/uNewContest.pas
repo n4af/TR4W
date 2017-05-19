@@ -380,7 +380,7 @@ begin
               RFASCHAMPIONSHIPCW: SetCommentAndEnableEditControl(TC_RFAS, icMyQTH);
               MAKROTHEN, CQVHF, ARRLVHFSS, STEWPERRY: SetCommentAndEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE, icmyGrid);
 
-              OZHCRVHF, RADIOVHFFD: SetCommentAndEnableEditControl(TC_ENTERYOURSIXDIGITGRIDSQUARE, icmyGrid);
+              OZHCRVHF, EUROPEANVHF, RADIOVHFFD: SetCommentAndEnableEditControl(TC_ENTERYOURSIXDIGITGRIDSQUARE, icmyGrid);
 
               TESLA:
                SetCommentandEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE,icmyGrid);
