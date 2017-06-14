@@ -725,7 +725,7 @@ begin
 //        VHFBandsEnabled := True;
       end;
 
-    TESLA:
+   EUROPEANVHF, TESLA:
       begin
         ActiveBand := Band6;
 //        ContestName := 'EUROPEAN VHF CONTEST';

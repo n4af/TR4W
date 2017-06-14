@@ -54,7 +54,7 @@ const
   RC_GETSCORES_HK                       = #9'Shift+Ctrl+8';
   RC_STATIONS_HK                        = #9'Shift+Ctrl+9';
   RC_MP3REC_HK                          = #9'Shift+Ctrl+0';
-  RC_ALARM_HK                           = #9'Alt+A';
+  RC_WKmode_HK                          = #9'Alt+A';   // 4.60.1
   RC_AUTOCQRESUME_HK                    = #9'Alt+C';
   RC_DUPECHECK_HK                       = #9'Alt+D';
   RC_EDIT_HK                            = #9'Alt+E';
@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 174{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 175{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -251,7 +251,7 @@ const
   //}
 
     (mrText: '-'; mrId: MAXWORD - 2),
-//    (mrText: RC_ALARM + RC_ALARM_HK; mrId: menu_alt_alarm),    //n4af 04.37.10
+    (mrText: RC_wkMode + RC_WKMode_HK; mrId: menu_alt_wkmode),    // 4.60.1
     (mrText: RC_BANDUP + RC_BANDUP_HK; mrId: menu_alt_bandup),
     (mrText: RC_AUTOCQRESUME + RC_AUTOCQRESUME_HK; mrId: menu_alt_autocqresume),
     (mrText: RC_DUPECHECK + RC_DUPECHECK_HK; mrId: menu_alt_dupecheck),

@@ -234,7 +234,7 @@ begin
 
     CommandString[Ord(CommandString[0]) + 1] := #0;
     scFileName[length(scFileName) + 1] := #0;
-
+   
     for i := 0 to sCommands - 1 do
     begin
       if StrComp(sCommandsArray[i].caCommand, @CommandString[1]) = 0 then
@@ -249,7 +249,7 @@ begin
         wsprintf(QuickDisplayBuffer, '"%s" command is executed.');
         asm add esp,12 end;
         QuickDisplay(QuickDisplayBuffer);
- 
+
         Break;
 
       end;

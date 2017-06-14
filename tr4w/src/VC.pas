@@ -148,7 +148,7 @@ const
 //  LANG                                   = 'ESP';
 //    LANG                                  = 'MNG';
 //   LANG                                  = 'POL';
-//   LANG                                  = 'CZE';
+//     LANG                                  = 'CZE';
 //     LANG                                  = 'ROM';
 //   LANG                                  = 'CHN';
 
@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.59.4';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.60.1';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'May 19, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'June 10, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -1969,7 +1969,7 @@ const
   menu_windows_mp3recorder              = 10216;
   menu_windows_dupesheet2               = 10218;
 
-  menu_alt_alarm                        = 10300;
+  menu_alt_wkmode                       = 10300;
   menu_alt_autocqresume                 = 10301;
   menu_alt_dupecheck                    = 10302;
   menu_alt_edit                         = 10303;

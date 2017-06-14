@@ -2511,6 +2511,12 @@ begin
 //    menu_winkeyer2: tDialogBox(67, @WinKeyer2SettingsDlgProc);
     menu_winkeyer2: RunOptionsDialog(cfWK);
 
+    menu_alt_WkMode:     // 4.60.1
+          begin
+            wkClose;
+            wkOpen;
+          end;
+
     //alt
     menu_alt_dupecheck: DupeCheckOnInactiveRadio(False);
 
@@ -3192,6 +3198,8 @@ var
   label
    SetFreq;
 begin
+//   if (ActiveMode = CW) and (CallWindowString = '') then
+ //    RememberCWSpeed := CodeSpeed;       // 4.60.1
   TempHWND := Windows.GetFocus;
 //  if TempHWND = 0 then sm;
 //  Esc_Counter := 0;  // 4.53.7
@@ -3261,7 +3269,7 @@ begin
         begin                             // end 4.52.4
          SwapRadios;
          InactiveRigCallingCQ := False;
-       end;     
+       end;
      end;
     end;
 
