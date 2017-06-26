@@ -707,7 +707,7 @@ var
   StandardCall                          : CallString;
   GuantanamoBayCallsign                 : boolean;
 begin
-
+  TempIndex := 0;
   if Call = CTY.ctyLastLocatedCall then
   begin
     QTH := cty.ctyLastLocatedRecord;

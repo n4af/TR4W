@@ -6157,9 +6157,10 @@ begin
         if MyGrid <> '' then
         begin
           Points := GetDistanceBetweenGrids {GetEuropeanDistanceBetweenGrids}(MyGrid, RXData.DomesticQTH);
-          if RXData.Band = Band2 then RXData.QSOPoints := Points * 2;
-          if RXData.Band = Band432 then RXData.QSOPoints := Points * 8;
-          if RXData.Band = Band1296 then RXData.QSOPoints := Points * 20;
+          if RXData.Band = Band2 then RXData.QSOPoints := Points * 1;   // 4.60.4
+          if RXData.Band = Band432 then RXData.QSOPoints := Points * 2;  // 4.60.4
+          if RXData.Band = Band1296 then RXData.QSOPoints := Points * 4;  // 4.60.4
+          if RXData.Band > Band1296 then RXData.QSOPoints := Points * 6; // 4.60.4
         end;
       end;
 

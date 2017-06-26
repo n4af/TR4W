@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.60.1';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.60.4';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'June 10, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'June 25, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -2964,7 +2964,7 @@ QSOPartiesCount = 12;
  ({Name: 'QCWA';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberNameChapterAndQTHExchange;          XM:NoDXMults; QP:OnePhoneTwoCW),
  ({Name: 'QCWA GOLDEN';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberNameChapterAndQTHExchange;          XM:NoDXMults; QP:OnePhoneTwoCW),
  ({Name: 'RAC_CANADA_WINTER';          }Email: nil;                      DF: 'p13';               WA7BNM:  205; {SK3BG: 'canday';     } QRZRUID: 101 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:NoDXMults; QP:RACQSOPointMethod),
- ({Name: 'RADIO-VHF-FD';               }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 180 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:RadioVHFFDQSOPointMethod),
+ ({Name: 'RF-VHF-FD   ';               }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 180 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:RadioVHFFDQSOPointMethod),
  ({Name: 'RAEM';                       }Email: nil;                      DF: nil;                 WA7BNM:  209; {SK3BG: 'raem';       } QRZRUID: 88  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndGeoCoordinates;                  XM:NoDXMults; QP:RAEMQSOPointMethod),
  ({Name: 'RDAC';                       }Email: nil;                      DF: nil;                 WA7BNM:   94; {SK3BG: 'rdac';       } QRZRUID: 386 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: RDADistrict;     P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:RDAQSOPointMethod),
  ({Name: 'REGION 1 FIELD DAY';         }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:CQDXCC; QP:EuropeanFieldDayQSOPointMethod),
@@ -3131,7 +3131,7 @@ QSOPartiesCount = 12;
       'QCWA',
       'QCWA GOLDEN',
       'RAC CANADA WINTER',
-      'RADIO-VHF-FD',
+      'RF-VHF-FD',
       'RAEM',
       'RDAC',
       'REGION 1 FIELD DAY',
@@ -3337,7 +3337,7 @@ QSOPartiesCount = 12;
       ({Name: 'QCWA';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'QCWA GOLDEN';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RAC CANADA WINTER';          }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),
-      ({Name: 'RADIO-VHF-FD';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak1 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
+      ({Name: 'RF-VHF-FD';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RAEM';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RDAC';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'REGION 1 FIELD DAY';         }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),

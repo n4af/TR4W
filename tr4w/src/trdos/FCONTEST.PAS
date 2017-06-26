@@ -719,11 +719,19 @@ begin
 //        ActiveInitialExchange := NameInitialExchange;
       end;
 
-    {CZECH_ACTIVITY_VHF,}RADIOVHFFD:
+    RADIOVHFFD:
       begin
         HFBandEnable := False;
-//        VHFBandsEnabled := True;
+        ActiveBand := Band2;
+        DigitalModeEnable := False;
+        ContestName := 'RF-VHF-FD';
+        QSOByMode := False;
+        QSOByBand := True;
+        QSONumberbyBand := True;
       end;
+      
+
+
 
    EUROPEANVHF, TESLA:
       begin
