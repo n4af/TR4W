@@ -619,6 +619,7 @@ var
   BString                               : PChar;
   MString                               : PChar;
   TempInteger                           : integer;
+  SumInteger                            : integer;
   m                                     : RemainingMultiplierType;
   TotalLine                             : boolean;
 const
@@ -658,9 +659,9 @@ begin
           MString := nil;
         end;
 
-        TempInteger := QSOPointTotals[Band, TempMode];
+        SumInteger := QSOPointTotals[Band, TempMode];
         asm
-        push TempInteger
+        push SumInteger
         end;
 
         TempInteger := PostQSOTotals[Band, TempMode];
@@ -703,8 +704,10 @@ begin
     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    There were %d QTC points.', TotalNumberQTCsProcessed);
     sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
   end;
-
-  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Final Score = %d points.', TotalScore);
+  if Contest <> ARRLFIELDDAY then
+  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Final Score = %d points.', TotalScore)
+  else
+  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Final Score = %d points.', SumInteger);
   sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
 end;
 

@@ -2477,6 +2477,9 @@ var
   i                                     : integer;
   Score                                 : integer;
 begin
+  if Contest <>ARRLFIELDDAY then       // 4.60.5
+  Score := TotalScore
+  else
   Score := TotalScore;
   asm
   push eax
@@ -2498,7 +2501,7 @@ begin
 //          if WindowsOSversion = 2 then
 //            ShowTrayTips(TotalScoreMessages[i].MessageString)
 //          else
-          QuickDisplay(@TotalScoreMessages[i].MessageString[1]);
+         QuickDisplay(@TotalScoreMessages[i].MessageString[1]);
             //          ShowAlarmWakeUpWindow(TotalScoreMessages[message].MessageString);
           DoABeep(Congrats);
 
