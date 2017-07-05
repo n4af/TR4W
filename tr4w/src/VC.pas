@@ -176,7 +176,7 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.60.5';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.60.6';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
@@ -1066,7 +1066,7 @@ type
     frMode: ModeType;
   end;
 const
-  FreqModeArraySize                     = 25;
+  FreqModeArraySize                     = 26;
   FreqModeArray                         : array[1..FreqModeArraySize] of FreqRecord =
 {(*}
     (
@@ -1108,7 +1108,8 @@ const
     (frMin: 400000000;  frMax: 500000000;  frBand:Band432;  frMode: Phone),
 
     (frMin: 900000000;  frMax: 1000000000; frBand:Band902;  frMode: Phone),
-    (frMin: 1000000000; frMax: 1500000000; frBand:Band1296; frMode: Phone)
+    (frMin: 1000000000; frMax: 1500000000; frBand:Band1296; frMode: Phone),
+    (frMin: 2300000000; frMax: 2400000000; frBand:Band2304; frMode: Phone)
     );
 {*)}
 
@@ -1232,11 +1233,11 @@ const
     '12M',
     '6M',
     '2M',
-    '70CM',
-    '23CM',
-    nil,
-    nil,
-    nil,
+    '222',       // 4.60.6
+    '432',         // 4.60.6
+    '902',         // 4.60.6
+    '1GH',         // 4.60.6
+    '2GH',         // 460.6
     nil,
     nil,
     nil,
@@ -1260,9 +1261,9 @@ const
     '50 MHz', {edi}
     '145 MHz', {edi}
     '222 MHz',
-    '435 MHz', {edi}
+    '432 Mhz', {edi}
     '902 MHz',
-    '1,3 GHz', {edi}
+    '1296 Mhz', {edi}
     '2,3 GHz', {edi}
     '3,4 GHz', {edi}
     '5,7 GHz', {edi}
