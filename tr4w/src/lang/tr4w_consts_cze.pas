@@ -8,14 +8,14 @@ const
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
 
-  TC_UKEI                               = 'Check here if within UK/EI';
-  TC_EnterYourDistrictCode              = 'If within UK/EI enter District Code';
-  TC_YUGOSLAVIA                         = 'Yugoslavia';
-  RC_BACKUPLOG                          = 'Backup Log';
-  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I or O.';
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'DX Station exchange must be "DX".';
-  RC_3830                               =  '3830 Score posting';
-  RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
+  TC_UKEI                               = 'Zkontrolovat, je-li UK/EI';
+  TC_EnterYourDistrictCode              = 'Je-li UK/EI, zadej kód distriktu';
+  TC_YUGOSLAVIA                         = 'Jugoslávie';
+  RC_BACKUPLOG                          = 'záložní deník';
+  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class musí být H, I nebo O.';
+  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'soutìž. kód DX stanic musí být "DX".';
+  RC_3830                               =  'zaslání skóre na 3830';
+  RC_3830_ARRL                          =  'odeslat deník ARRL';  // 4.53.3
   TC_INVALID                            =  'Neplatný záznam';
   TC_FREQ                               = 'frekv';
   TC_POINTS                             = 'body';
@@ -807,3 +807,4 @@ const
   RC_SPLITOFF                           = 'Vynucený režim Split VYPNUT';
   RC_IMPORT                             = 'Import';
   TC_RUNWARN                            = 'jiná instance TR4W je již spuštìna';
+  RC_wkMode                             = 'znovu inicializovat WinKeyer';      // 4.60.1

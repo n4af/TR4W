@@ -133,7 +133,7 @@ const
   TC_ENTERYOURBRANCHNUMBER              = 'Upisi broj svoje filijale:';
   TC_ENTERYOURPOSTCODE                  = 'Upisi svoj postanski broj:';
 
-  TC_HQ_OR_MEMBER                       = 'HQ or member';
+  TC_HQ_OR_MEMBER                       = 'HQ ili clan';
   
 
   TC_NEWENGLAND                         = 'Nova Engleska';
@@ -811,4 +811,5 @@ RC_SPLITOFF                       		= 'Split ukljucen ON/OFF';
 TC_ISLANDSTATION                        = 'Ostrvska stanica';
 RC_DVKVOLCONTROL                        = 'DVK kontrola nivoa';
 TC_RUNWARN                    = 'Program TR4W je vec startvan';
+RC_wkMode                     = 'Reinicijalizuj WinKeyer';      // 4.60.1
 

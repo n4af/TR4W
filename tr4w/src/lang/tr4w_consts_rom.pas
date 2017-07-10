@@ -798,5 +798,6 @@ const
   RC_CTRLJ                              = 'Acces la comenzile de Configurare';
   RC_SPLITOFF = 'Forteaza Split Mode in starea OFF';  
   TC_SPLIT_WARN = 'Atentie: esti in SPLIT MODE !!!';  
-  TC_RUNWARN = 'Un alt program TR4W functioneaza deja'; 
+  TC_RUNWARN = 'Un alt program TR4W functioneaza deja';
+  RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1
   

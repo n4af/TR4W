@@ -1797,6 +1797,19 @@ begin
 
       tBandString := ADIFBANDSTRINGSARRAY[TempRXData.Band];
       tBandStringLength := Windows.lstrlen(tBandString);
+    //   if contest =  RADIOVHFFD  then       // added 4.61.1
+        begin                              // 4.61.1
+        if tBandString = '432' then
+         begin
+           tBandString := '70CM';
+           tBandStringLength := 4;
+         end;
+        if tBandString = '1GH' then
+         begin
+           tBandString := '23CM';
+           tBandStringLength := 4;
+         end;
+        end;
 
           //          if TempRXData.ceFMMode then TempMode := FM else TempMode := TempRXData.Mode;
       tModeString := ADIFModeString[TempRXData.Mode];
@@ -2147,7 +2160,7 @@ begin
 
       tBandString := ADIFBANDSTRINGSARRAY[TempRXData.Band];
       tBandStringLength := Windows.lstrlen(tBandString);
-
+     
           //          if TempRXData.ceFMMode then TempMode := FM else TempMode := TempRXData.Mode;
       tModeString := ADIFModeString[TempRXData.Mode];
       tModeStringLength := Windows.lstrlen(tModeString);
