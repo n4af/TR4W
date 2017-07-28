@@ -114,7 +114,7 @@ begin
   //  не нужно BigRemainingList := False;
   //  BandMapSplitMode := ByCutoffFrequency; {KK1L: 6.64}
 
-  //  CallsignUpdateEnable := False;
+    CallsignUpdateEnable := True; // 4.61.2
   //  CallWindowPosition := NormalCallWindowPosition;
   //  CallWindowShowAllSpots := False;
   //  CfgDvpPath := '';

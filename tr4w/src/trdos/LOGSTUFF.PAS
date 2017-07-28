@@ -5560,6 +5560,8 @@ var
   russianRegion1, russianRegion2        : RussianRegionType;
   temphour                              : byte;      // 4.58.2
   tempmin                               : byte;
+  iotastate                             : string[10];
+  posdash                               : integer;
 begin
   RXData.QSOPoints := 0;
 
@@ -6381,12 +6383,24 @@ begin
       end;
 
     IOTAQSOPointMethod:
-      if (RXData.DomesticQTH <> '') and
-        (UpperCase(RXData.DomesticQTH) <> UpperCase(MyIOTA)) then
+      begin
+       if MyState = ''  then
+        begin
+         if RXData.domesticQTH <> '' then
+          RXData.QSOpoints := 15
+           else
+            RXData.QSOpoints := 2;
+            exit;
+             end;
+       IOTASTATE := RXDATA.DomesticQTH;
+         if pos('-',rxdata.domesticqth) > 0 then
+           delete(iotastate,(pos('-',rxdata.domesticqth)),1);
+         if ((RXData.DomesticQTH <> '') and   (MyState <> IOTAState)) then
         RXData.QSOPoints := 15
-      else
-        RXData.QSOPoints := 3;
+           else
+            RXData.QSOPoints := 5;
 
+   end;
     JapanInternationalDXQSOPointMethod:
       begin
         case RXData.Band of
