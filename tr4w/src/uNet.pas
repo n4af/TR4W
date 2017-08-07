@@ -74,7 +74,7 @@ const
     (Width: 25; Text: 'Id'; fmt: LVCFMT_CENTER),
     (Width: 60; Text: RC_BAND; fmt: LVCFMT_CENTER),
 //    (Width: 47; Text: 'Mode'; fmt: LVCFMT_CENTER),
-    (Width: 50; Text: TC_FREQ; fmt: LVCFMT_CENTER),
+    (Width: 60; Text: TC_FREQ; fmt: LVCFMT_CENTER),
     (Width: 30; Text: 'St.'; fmt: LVCFMT_CENTER),
     (Width: 37; Text: 'PTT'; fmt: LVCFMT_CENTER),
     (Width: 40; Text: 'Qs'; fmt: LVCFMT_CENTER),
@@ -720,7 +720,7 @@ begin
 
         ListView_SetItemText(h, i, 2, TempBuffer);
 
-        ListView_SetItemText(h, i, 3, FreqToPCharWithoutHZ(StatusArray[Index].ssFreq));
+        ListView_SetItemText(h, i, 3, FreqToPChar{WithoutHZ}(StatusArray[Index].ssFreq));        // 4.61.7
 {
         ListView_SetItemText(h, i, 2, BandStringsArray[StatusArray[Index].ssCurrentBand]);
         ListView_SetItemText(h, i, 3, ModeString[StatusArray[Index].ssCurrentMode]);

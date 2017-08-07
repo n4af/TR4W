@@ -6384,7 +6384,7 @@ begin
 
     IOTAQSOPointMethod:
       begin
-       if MyState = ''  then
+       if MyState = ''  then             // 4.61.3 change points
         begin
          if RXData.domesticQTH <> '' then
           RXData.QSOpoints := 15
@@ -6392,11 +6392,11 @@ begin
             RXData.QSOpoints := 2;
             exit;
              end;
-       IOTASTATE := RXDATA.DomesticQTH;
-         if pos('-',rxdata.domesticqth) > 0 then
-           delete(iotastate,(pos('-',rxdata.domesticqth)),1);
+        IOTASTATE := RXDATA.DomesticQTH;
+      {   if pos('-',rxdata.domesticqth) > 0 then     // 4.61.4 assumes dash delineates continent from #
+           delete(iotastate,(pos('-',rxdata.domesticqth)),1);       }
          if ((RXData.DomesticQTH <> '') and   (MyState <> IOTAState)) then
-        RXData.QSOPoints := 15
+          RXData.QSOPoints := 15
            else
             RXData.QSOPoints := 5;
 

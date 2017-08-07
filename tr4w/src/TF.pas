@@ -1,5 +1,4 @@
-{
- Copyright Dmitriy Gulyaev UA4WLI 2015.
+{ Copyright Dmitriy Gulyaev UA4WLI 2015.
 
  This file is part of TR4W  (SRC)
 
