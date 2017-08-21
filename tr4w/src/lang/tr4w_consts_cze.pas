@@ -101,13 +101,13 @@ const
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Zadej zkratku svého okresu (distriktu):';
   TC_ENTERYOURFOCNUMBER                 = 'Zadej své èíslo FOC:';
   TC_ENTERYOURRDAID                     = 'Zadej svùj RDA ID:';
-  TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Zadej své referenèní èíslo IOTA:';
+  TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Zadej své referenèní èíslo IOTA (vèetnì oddìlovací pomlèky, napø. EU-123):';
   TC_ENTERYOURCITYIDENTIFIER            = 'Zadej identifikátor svého mìsta:';
   TC_ENTERYOURNAME                      = 'Zadej své jméno:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Zadej poslední dvì èíslice roku vydání své první oficiální radioamatérské licence:';
   TC_ENTERYOURZONE                      = 'Zadej svou zónu:';
   TC_ENTERYOURGEOGRAPHICALCOORDINATES   = 'Zadej své zemìpisné souøadnice'#13'(napø. 50N14E pro Prahu):';
-  TC_ENTERSUMOFYOURAGEANDAMOUNT         = 'Zadej souèet svého vìku a poètu let od svého prvního radioamatérského QSO (mapø 28+14=42):';
+  TC_ENTERSUMOFYOURAGEANDAMOUNT         = 'Zadej souèet svého vìku a poètu let od svého prvního radioamatérského QSO (napø. 28+14=42):';
   TC_OZCR                               = 'Zadej tøímístný kód, složený z libovolných písmen (napø. XYZ):';
   TC_ENTERYOURSTATECODE                 = 'Zadej kód své zemì (CZ pro Èesko):';
   TC_ENTERYOURFOURDIGITGRIDSQUARE       = 'Zadej svùj ètyømístný WW lokátor (napø. JO70):';

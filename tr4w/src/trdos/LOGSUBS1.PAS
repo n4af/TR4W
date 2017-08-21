@@ -584,8 +584,8 @@ begin
      InActiveRadioPtr := @Radio1;
     ActiveBand := Radio2.BandMemory {BandMemory[RadioTwo]};
     ActiveMode := Radio2.ModeMemory {ModeMemory[RadioTwo]};
-//    ActiveKeyerPort := Radio2.tKeyerPort;
-//    tActiveKeyerHandle := Radio2.tKeyerPortHandle;
+ //   ActiveKeyerPort := Radio2.tKeyerPort;
+ //   tActiveKeyerHandle := Radio2.tKeyerPortHandle;
     SerialInvert := Radio2SerialInvert;
      ActiveRadio := RadioTwo;
     InactiveRadio := RadioOne;    
@@ -614,7 +614,7 @@ begin
      ShowInformation;  // n4af 04.40.02
 
   
- // SetUpToSendOnActiveRadio; // 4.57.8
+  SetUpToSendOnActiveRadio;       // 4.62.1  issue 278 remove 4.54.2 comment on this line
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
   UpdateTotals2;

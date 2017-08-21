@@ -601,8 +601,11 @@ begin
   
   if d <= BandMapGuardBand then
   begin
-    switch := False;    // n4af 4.56.1
-    switchnext := False;
+ {  if not SprintQSYRule then
+    begin
+     switch := False;    // n4af 4.56.1
+     switchnext := False;
+    end;   }
 //    tClearDupeInfoCall; // 4.57.10
 //    ClearAltD;  // 4.57.10
     DupeInfoCall := FList^[Index2].FCall;        // 4.57.8
