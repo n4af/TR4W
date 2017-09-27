@@ -43,13 +43,13 @@ const
     trRed, //1
     trGreen, //2
     trMagenta, //3
-    trBrown, //4
+    trLightGray, //4
     trWhite, //5      // issue 256
     trRed, //6
     trGreen, //7
     trMagenta, //8
-    trBrown, ///9
-    trWhite ///10           // issue 256
+    trLightGray, ///9
+    trWhite  ///10           // issue 256
     );
 
 implementation
@@ -91,7 +91,7 @@ begin
     //n4af 4.33.7 reactivate columndupesheetenable
     begin
        if ColumnDupeSheetEnable then
-       Result := BOOL(tr4wBrushArray[trCyan])
+       Result := BOOL(tr4wBrushArray[trBlack])
      else
      Result := BOOL(tr4wBrushArray[trBlack]);
 
@@ -121,7 +121,7 @@ begin
  if Not ColumnDupeSheetEnable then   // n4af 4.36.12
   bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
   else
-     bgColor := 11;
+      bgColor := -11;
         if Left <> 0 then
         GradientRect(
           VDDRAWITEMSTRUCT^.HDC,
@@ -129,14 +129,14 @@ begin
           tr4wColorsArray[VDColorsArray[bgColor]],
           tr4wColorsArray[VDColorsArray[bgColor]],
           gdHorizontal
-          ) 
-        else
+          )  
+      else
          begin
-           GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict]], tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict + 1]], gdVertical);
+      //     GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict]], tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict + 1]], gdVertical);
            GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, clWhite, clwhite, gdVertical);
-          inc(VDCurrentCallDistrict);
+          inc(VDCurrentCallDistrict);     
           if VDCurrentCallDistrict = Ord('9') + 1 then VDCurrentCallDistrict := Ord('0');
-         end;
+          end ;
 
      SetBkMode(VDDRAWITEMSTRUCT^.HDC, TRANSPARENT);
             {
