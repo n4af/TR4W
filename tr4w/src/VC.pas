@@ -142,9 +142,15 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
+<<<<<<< HEAD
       LANG                                  = 'ENG';
 //       LANG                                  = 'RUS';
 //      LANG                                   = 'SER';
+=======
+     LANG                                  = 'ENG';
+//     LANG                                  = 'RUS';
+//     LANG                                   = 'SER';
+>>>>>>> 0e7e9fdf6a2a46b778a1e02e7b1e02270da6ecc4
 //    LANG                                   = 'ESP';
 //   LANG                                  = 'MNG';
 //     LANG                                  = 'POL';
@@ -176,11 +182,19 @@ const
   OZCR2008                              = False;
 
 
+<<<<<<< HEAD
   TR4W_CURRENTVERSION_NUMBER            = '4.64.0';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
   TR4W_CURRENTVERSIONDATE               = 'Octobber 2, 2017' ;
+=======
+  TR4W_CURRENTVERSION_NUMBER            = '4.63.0';     // N4af     New Release
+
+
+  TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
+  TR4W_CURRENTVERSIONDATE               = 'September 1, 2017' ;
+>>>>>>> 0e7e9fdf6a2a46b778a1e02e7b1e02270da6ecc4
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';

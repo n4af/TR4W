@@ -97,7 +97,11 @@ const
   TC_ENTERYOURDOK                       = '¬ведите ваш DOK:';
   TC_ENTERYOURDISTRICTABBREVIATION      = '¬ведите сокращение вашего района:';
   TC_ENTERYOURRDAID                     = '¬ведите ¬аш номер RDA:';
+<<<<<<< HEAD
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = '¬ведите номер острова IOTA:';
+=======
+  TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = '¬ведите номер острова IOTA (с тире перед номером, например, EU-123):';
+>>>>>>> 0e7e9fdf6a2a46b778a1e02e7b1e02270da6ecc4
   TC_ENTERYOURCITYIDENTIFIER            = '¬ведите идентификатор вашего города:';
   TC_ENTERYOURNAME                      = '¬введите ¬аше им€:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = '¬ведите последние 2 знака года, когда вы впервые получили радиолюбительскую лицензию:';
