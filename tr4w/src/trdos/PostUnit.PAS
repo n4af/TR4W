@@ -2970,9 +2970,11 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
             push RSTSent
             end;
 
+          if cMyState = 'TRC' then      // 4.63.3
+           wsprintf(CABRILLO_MYEX, '%-3s %d%-6s')
+           else
+          wsprintf(CABRILLO_MYEX, '%-3s %-4d %-6s ');
 
-            wsprintf(CABRILLO_MYEX, '%-3s %-4d %-6s ');
-             
             asm add esp,20
             end;
 
@@ -2993,6 +2995,8 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
               }
             end;
 
+
+
             asm
             push csQTHString
             push nrReceived
@@ -3001,7 +3005,10 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
             if Contest = DARC10M then     // n4af 4.43.7
             wsprintf(CABRILLO_HISEX, '%-3s %4d %3s')
             else
-            wsprintf(CABRILLO_HISEX, '%-3s %4d %8s');
+            if csQTHString = 'TRC' then      // 4.63.3
+              wsprintf(CABRILLO_HISEX, '%-3s%5d%-8s')
+              else
+               wsprintf(CABRILLO_HISEX, '%-3s %4d %8s');
             asm add esp,20
             end;
           end;

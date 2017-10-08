@@ -251,6 +251,7 @@ const
   TC_C9_EUROPE                          = 'Europa';
   TC_C9_AFRICA                          = 'Afryka';
   TC_C9_OCEANIA                         = 'Oceania';
+  TC_C9_ANTARTICA                       ='Antartica';
   TC_C9_ASIA                            = 'Azja';
   TC_C9_UNKNOWN                         = 'Nieznany';
 
