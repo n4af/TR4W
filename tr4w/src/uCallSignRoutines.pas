@@ -43,11 +43,14 @@ const
 
   ScandinavianCountries                 = ' LA JW JX OH OH0 OJ0 OX OY OZ SM TF ';
 
+  IndonesianCountries                   = ' YB YC YD YE YF ';           // 4.64.1
+
 function ARRLSectionCountry(CountryID: Str20): boolean;
 function BlackSeaRegionCountry(CountryID: Str20): boolean;
 function CISCountry(CountryID: Str20): boolean;
 function UBACountry(CountryID: Str20): boolean;
 function ScandinavianCountry(CountryID: Str20): boolean;
+function IndonesianCountry(CountryID: Str20): boolean;
 function GetNumber(Call: CallString): Char;
 function GetFirstSuffixLetter(Call: CallString): Char;
 
@@ -102,6 +105,12 @@ function ScandinavianCountry(CountryID: Str20): boolean;
 begin
   Result := False;
   if pos(' ' + CountryID + ' ', ScandinavianCountries) <> 0 then Result := True;
+end;
+
+function IndonesianCountry(CountryID: Str20): boolean;         // 4.64.1
+begin
+  Result := False;
+  if pos(' ' + CountryID + ' ', IndonesianCountries) <> 0 then Result := True;
 end;
 
 function GetNumber(Call: CallString): Char;

@@ -3908,6 +3908,9 @@ begin
       case ActivePrefixMult of
         BelgiumPrefixes: if RData.QTH.CountryID = 'ON' then RData.Prefix := RData.QTH.Prefix;
         SACDistricts: RData.Prefix := SACDistrict(RData.QTH);
+        IndonesianDistricts: RData.Prefix := IndonesianDistrict(Rdata.QTH);        // 4.64.1
+        if (Contest = YBDX) and (IndonesianCountry(MyCountry)) then
+              SetPrefix(RData);
         Prefix: RData.Prefix := RData.QTH.Prefix;
         SouthAmericanPrefixes: if RData.QTH.Continent = SouthAmerica then RData.Prefix := RData.QTH.Prefix;
         NonSouthAmericanPrefixes: if RData.QTH.Continent <> SouthAmerica then RData.Prefix := RData.QTH.Prefix;

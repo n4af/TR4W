@@ -63,6 +63,7 @@ function GetVEInitialExchange(Call: CallString): Str20;
 function GetContinentName(Cont: ContinentType): Str20;
 function GetContinentFromString(Cont: ShortString): ContinentType;
 function SACDistrict(QTH: QTHRecord): Str20;
+function IndonesianDistrict(QTH: QTHRecord): Str20;
 function EuropeanCountriesAndWAECallRegions(QTH: QTHRecord): Str20;
 
 implementation
@@ -268,6 +269,22 @@ begin
     if length(Oblast) = 0 then Oblast := '0';
     SACDistrict := QTH.CountryID + Oblast[1];
     if (QTH.CountryID = 'OH0') or (QTH.CountryID = 'OJ0') then SACDistrict := QTH.CountryID;
+  end;
+end;
+
+function IndonesianDistrict(QTH: QTHRecord): Str20;        // 4.64.1
+var
+  tempstring                                : Str10;
+  l                                         : Integer;
+begin
+  IndonesianDistrict := '';
+  if (IndonesianCountry(QTH.CountryID) or (IndonesianCountry(MyCountry))) then
+  begin
+  //   tempstring := GetPrefix(QTH.StandardCall);
+  //    l := length(tempstring);
+    IndonesianDistrict := GetPrefix(QTH.StandardCall); ;
+
+ //   if (QTH.CountryID = 'OH0') or (QTH.CountryID = 'OJ0') then SACDistrict := QTH.CountryID;
   end;
 end;
 

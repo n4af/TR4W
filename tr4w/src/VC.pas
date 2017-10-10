@@ -142,15 +142,9 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
-<<<<<<< HEAD
       LANG                                  = 'ENG';
 //       LANG                                  = 'RUS';
 //      LANG                                   = 'SER';
-=======
-     LANG                                  = 'ENG';
-//     LANG                                  = 'RUS';
-//     LANG                                   = 'SER';
->>>>>>> 0e7e9fdf6a2a46b778a1e02e7b1e02270da6ecc4
 //    LANG                                   = 'ESP';
 //   LANG                                  = 'MNG';
 //     LANG                                  = 'POL';
@@ -182,19 +176,11 @@ const
   OZCR2008                              = False;
 
 
-<<<<<<< HEAD
-  TR4W_CURRENTVERSION_NUMBER            = '4.64.0';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.64.1';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Octobber 2, 2017' ;
-=======
-  TR4W_CURRENTVERSION_NUMBER            = '4.63.0';     // N4af     New Release
-
-
-  TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'September 1, 2017' ;
->>>>>>> 0e7e9fdf6a2a46b778a1e02e7b1e02270da6ecc4
+  TR4W_CURRENTVERSIONDATE               = 'Octobber 9, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -875,6 +861,7 @@ type
     RSGB18,
     RUSSIANDX,
     SACCW,
+    YBDX,            // 4.64.1
     SACSSB,
     SALMONRUN,
     SOUTHAMERICANWW,
@@ -2432,6 +2419,7 @@ type
     NorthAmericanPrefixes,
     Prefix,
     SACDistricts,
+    IndonesianDistricts,       // 4.64.1
     SouthAmericanPrefixes,
     SouthAndNorthAmericanPrefixes,
     GCStation,
@@ -2456,6 +2444,7 @@ const
     'ASIAN PREFIXES',
     'BELGIUM PREFIXES',
     'CALLSIGN',
+    'Indonesian Districts',     // 4.64.1
     'MONGOLIAN CALLSIGN PREFIX',
     'NON SOUTH AMERICAN PREFIXES',
     'NORTH AMERICAN PREFIXES',
@@ -2531,6 +2520,7 @@ type
     RDAQSOPointMethod,
     SalmonRunQSOPointMethod,
     ScandinavianQSOPointMethod,
+    IndonesianQSOPointMethod,
     SouthAmericanQSOPointMethod,
     SouthAmericanWWQSOPointMethod,
     SLFivePointQSOMethod,
@@ -2649,6 +2639,7 @@ const
     'RDA', //    RDAQSOPointMethod,
     'SALMON RUN', //    SalmonRunQSOPointMethod,
     'SCANDINAVIAN', //    ScandinavianQSOPointMethod,
+    'INDONESIAN', // IndonesianQSOPointMethod,        // 4.64.1
     'SOUTH AMERICAN', //    SouthAmericanQSOPointMethod,
     'SOUTH AMERICAN WW', //    SouthAmericanWWQSOPointMethod,
     'SL FIVE POINT', //    SLFivePointQSOMethod,
@@ -2993,6 +2984,7 @@ QSOPartiesCount = 12;
  ({Name: 'RSGB 1.8';                   }Email: nil;                      DF: 'rsgb';              WA7BNM: 0000; {SK3BG: 'rsgb1-8';    } QRZRUID: 44  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:NoDXMults; QP:ThreePointsPerQSO),
  ({Name: 'RDXC';                       }Email: 'logs@rdxc.org';          DF: 'russian';           WA7BNM:  310; {SK3BG: 'russdxc';    } QRZRUID: 7   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:RussianDXQSOPointMethod),
  ({Name: 'SAC-CW';                     }Email: nil;                      DF: nil;                 WA7BNM:  121; {SK3BG: 'sacnsc';     } QRZRUID: 175 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:ScandinavianQSOPointMethod),
+ ({Name: 'YBDX';                       }Email: nil;                      DF: nil;                 WA7BNM:  121; {SK3BG: 'sacnsc';     } QRZRUID: 175 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:IndonesianQSOPointMethod),          // 4.64.1
  ({Name: 'SAC-SSB';                    }Email: nil;                      DF: nil;                 WA7BNM:  131; {SK3BG: 'sacnsc';     } QRZRUID: 175 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:ScandinavianQSOPointMethod),
  ({Name: 'SALMON RUN';                 }Email: nil;                      DF: 'washington_cty';                 WA7BNM:  126; {SK3BG: 'washsr';     } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 9; AE: RSTDomesticOrDXQTHExchange;                  XM:NoDXMults; QP:SalmonRunQSOPointMethod),    // n4af 4.41.1
  ({Name: 'SOUTH AMERICAN WW';          }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAndContinentExchange;                     XM:NoDXMults; QP:SouthAmericanWWQSOPointMethod),
@@ -3160,6 +3152,7 @@ QSOPartiesCount = 12;
       'RSGB-160',
       'RDXC',
       'SAC-CW',
+      'YBDX',      // 4.64.1
       'SAC-SSB',
       'SALMON RUN',
       'SOUTH AMERICAN WW',
@@ -3366,6 +3359,7 @@ QSOPartiesCount = 12;
       ({Name: 'RSGB 1.8';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RDXC';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'SAC-CW';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
+      ({Name: 'YBDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),       // 4.64.1
       ({Name: 'SAC-SSB';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'SALMON RUN';                 }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'SOUTH AMERICAN WW';          }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),

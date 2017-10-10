@@ -6615,6 +6615,39 @@ begin
         if RXData.Band = Band160 then RXData.QSOPoints := 0;
       end;
 
+   
+    
+
+    IndonesianQSOPointMethod:               // 4.64.1
+      begin
+        if IndonesianCountry(MyCountry) then
+        begin
+          if IndonesianCountry(RXCty) then
+            RXData.QSOPoints := 0
+          else
+            if RXData.QTH.Continent <> MyContinent then
+              RXData.QSOPoints := 10
+            else
+              RXData.QSOPoints := 5;
+        end
+        else
+        begin
+          if IndonesianCountry(RXCty) then
+            RXData.QSOPoints := 10
+          else
+          if RXData.QTH.Continent <> MyContinent then
+            RXData.QSOPoints := 3
+            else
+           if RXCty <> MyCountry then
+             RXData.QSOPoints := 2
+             else
+              RXData.QSOPoints := 1;
+         end;
+
+      end;
+
+
+
     SLFivePointQSOMethod:
       if Copy(RXData.Callsign, 1, 2) = 'SL' then
         RXData.QSOPoints := 5

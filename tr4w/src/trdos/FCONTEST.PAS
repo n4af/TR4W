@@ -1117,6 +1117,13 @@ begin
         ActiveBand := Band80;
       end;
 
+      YBDX:                   // 4.64.1
+       begin
+          ActiveMode := Phone;
+          ActiveDXMult := ARRLDXCC ;
+          ActivePrefixMult := IndonesianDistricts;
+      end;
+
     SPDX:
       begin
 //        ContestName := 'SP-DX Contest';
