@@ -290,6 +290,7 @@ begin
 
               CQWWRTTY, CQ160CW, CQ160SSB:
                 SetCommentAndEnableEditControl(TC_ENTERSTATEFORUSPROVINCEFORCANADA, icmyState);
+             
 
               RAC_CANADA_DAY, RAC_CANADA_WINTER:
                 SetCommentAndEnableEditControl(TC_ENTERYOURPROVINCEID, icmyState);
@@ -360,6 +361,9 @@ begin
               NZFIELDDAY: SetCommentAndEnableEditControl(TC_ENTERYOURBRANCHNUMBER, icmyZone);
 
               EUROPEANHFC: SetCommentAndEnableEditControl(TC_ENTERTHELASTTWODIGITSOFTHEYEAR, icmyZone);
+
+              KVP: SetCommentAndEnableEditControl(TC_ENTERTHELASTTWODIGITSOFTHEYEAR, icmyZone);      // 4.65.3
+
               RFCHAMPIONSHIPCW, RFCHAMPIONSHIPSSB: SetCommentAndEnableEditControl(TC_ENTERYOURZONE, icmyState);
               RAEM: SetCommentAndEnableEditControl(TC_ENTERYOURGEOGRAPHICALCOORDINATES, icmyQTH);
 

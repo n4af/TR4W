@@ -573,15 +573,12 @@ begin
      ((CWThreadID <> 0) or wkBUSY or pRadio.CWByCAT_Sending)) or
     ((ActiveMode in [Phone, FM]) and (DVPOn = True)) then
   begin
-
-    if ActiveMode = CW then
-    begin
       if tAutoSendMode then EditingCallsignSent := True;
        tAutoSendMode := False;
       FlushCWBufferAndClearPTT; //n4af 4.33.3
   //    opmode := CQOpMode;
-    end
-    else
+
+  //  else
       if DVPOn then
       begin
         tExitFromDVPThread := True;
@@ -658,8 +655,8 @@ begin
   if Call_Found = False then
   begin
    ClearMasterListBox;
-   ClearAltD;       // n4af 4.39.3
-   tClearDupeInfoCall;      //n4af 4.57.8
+  // ClearAltD;       // n4af 4.65.2
+  // tClearDupeInfoCall;      //n4af 4.65.2
   end;
   if TwoRadioState = CallReady then TwoRadioState := Idle;
 
@@ -3908,9 +3905,12 @@ begin
       case ActivePrefixMult of
         BelgiumPrefixes: if RData.QTH.CountryID = 'ON' then RData.Prefix := RData.QTH.Prefix;
         SACDistricts: RData.Prefix := SACDistrict(RData.QTH);
-        IndonesianDistricts: RData.Prefix := IndonesianDistrict(Rdata.QTH);        // 4.64.1
-        if (Contest = YBDX) and (IndonesianCountry(MyCountry)) then
+        IndonesianDistricts:
+        begin
+         RData.Prefix := IndonesianDistrict(Rdata.QTH);        // 4.64.1
+          if (Contest = YBDX) and (IndonesianCountry(MyCountry)) then
               SetPrefix(RData);
+        end;
         Prefix: RData.Prefix := RData.QTH.Prefix;
         SouthAmericanPrefixes: if RData.QTH.Continent = SouthAmerica then RData.Prefix := RData.QTH.Prefix;
         NonSouthAmericanPrefixes: if RData.QTH.Continent <> SouthAmerica then RData.Prefix := RData.QTH.Prefix;
@@ -4365,7 +4365,8 @@ begin
   tCleareCallWindow;
   tCleareExchangeWindow;
   tCallWindowSetFocus;
- // ClearAltD;
+  ClearAltD;       // 4.65.2
+  tClearDupeInfoCall;      // 4.65.2
   if OpMode = CQOpMode then
   begin
     OpMode2 := CQOpMode;

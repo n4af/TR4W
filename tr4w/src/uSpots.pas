@@ -606,9 +606,9 @@ begin
      switch := False;    // n4af 4.56.1
      switchnext := False;
     end;   }
-//    tClearDupeInfoCall; // 4.57.10
-//    ClearAltD;  // 4.57.10
-    DupeInfoCall := FList^[Index2].FCall;        // 4.57.8
+     tClearDupeInfoCall; // 4.57.10
+     ClearAltD;  // 4.65.2
+    DupeInfoCall := FList^[Index2].FCall;        // 4.65.2
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
   end ;

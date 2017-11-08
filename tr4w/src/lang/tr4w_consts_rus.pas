@@ -97,11 +97,7 @@ const
   TC_ENTERYOURDOK                       = 'Введите ваш DOK:';
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Введите сокращение вашего района:';
   TC_ENTERYOURRDAID                     = 'Введите Ваш номер RDA:';
-<<<<<<< HEAD
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Введите номер острова IOTA:';
-=======
-  TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Введите номер острова IOTA (с тире перед номером, например, EU-123):';
->>>>>>> 0e7e9fdf6a2a46b778a1e02e7b1e02270da6ecc4
   TC_ENTERYOURCITYIDENTIFIER            = 'Введите идентификатор вашего города:';
   TC_ENTERYOURNAME                      = 'Ввведите Ваше имя:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Введите последние 2 знака года, когда вы впервые получили радиолюбительскую лицензию:';
@@ -790,4 +786,4 @@ const
   RC_SPLITOFF                           = 'Режим работы на разнесенных частотах ВКЛ/ВЫКЛ';
  TC_SPLIT_WARN                          = 'ПРЕДУПРЕЖДЕНИЕ: Вы работаете в режиме РАБОТА НА РАЗНЕСЕННЫХ ЧАСТОТАХ!!!';
  TC_RUNWARN                             = 'Программа TR4W на вашем компьютере уже работает ';
- RC_wkMode                              = 'Реинициализировать WinKeyer';      // 4.60.1
+ RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1

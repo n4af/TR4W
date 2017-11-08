@@ -273,19 +273,11 @@ begin
 end;
 
 function IndonesianDistrict(QTH: QTHRecord): Str20;        // 4.64.1
-var
-  tempstring                                : Str10;
-  l                                         : Integer;
+
 begin
   IndonesianDistrict := '';
   if (IndonesianCountry(QTH.CountryID) or (IndonesianCountry(MyCountry))) then
-  begin
-  //   tempstring := GetPrefix(QTH.StandardCall);
-  //    l := length(tempstring);
     IndonesianDistrict := GetPrefix(QTH.StandardCall); ;
-
- //   if (QTH.CountryID = 'OH0') or (QTH.CountryID = 'OJ0') then SACDistrict := QTH.CountryID;
-  end;
 end;
 
 function ClubCall(Call: CallString): boolean;
