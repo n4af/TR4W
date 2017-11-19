@@ -2899,7 +2899,7 @@ begin
     end; { if case }
 
     if TempString = '' then
-      if Contest in [RUSSIANDX, RDA, RADIO160] then
+      if Contest in [RUSSIANDX, RDA, RUSSIAN160] then
       begin
         ctyLocateCall(Call, TempQTH);
         if RussianID(TempQTH.CountryID) then
@@ -3158,7 +3158,7 @@ begin
       if Contest = CUPURAL then TotalMults := TotalMults - mo.MTotals[All, Both, rmPrefix];
     end;
 
-  if Contest = RADIO160 then
+  if Contest = RUSSIAN160 then
   begin
     TotalScore := QPoints;
     Exit;
@@ -3235,5 +3235,4 @@ begin
 end;
 
 end.
-
 

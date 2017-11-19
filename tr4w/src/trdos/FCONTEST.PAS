@@ -1081,7 +1081,7 @@ begin
         DomesticMultByBand := dmbbAllBand;
       end;
 
-    RUSSIANDX, RADIO160:
+    RUSSIANDX, RUSSIAN160:
       begin
         AddRussianDomesticCountrys;
         AddDomesticCountry('CE9');
@@ -1506,7 +1506,7 @@ begin
         AddDomesticCountry('GW');
       end;
 
-    {RADIO160, RADIOYOC:
+    {RUSSIAN160, RADIOYOC:
       begin
         TourDuration := 60;
 //        Sheet.tAutoReset := True;
@@ -1720,4 +1720,3 @@ begin
 // Result := True;
 end;
 end.
-

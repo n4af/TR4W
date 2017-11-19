@@ -994,7 +994,7 @@ var
   TempBand                              : BandType;
   ShowScore                             : boolean;
 begin
-  ShowScore := not (Contest in [CUPRFCW, CUPRFSSB, RADIO160, CUPURAL, UKRAINECHAMPIONSHIP, {RADIOYOC,} RFCHAMPIONSHIPCW, RFCHAMPIONSHIPSSB]);
+  ShowScore := not (Contest in [CUPRFCW, CUPRFSSB, RUSSIAN160, CUPURAL, UKRAINECHAMPIONSHIP, {RADIOYOC,} RFCHAMPIONSHIPCW, RFCHAMPIONSHIPSSB]);
   OpenFileForWrite(FileWrite, ReportsFilename);
 
   //  if Header = '' then
@@ -4107,4 +4107,3 @@ begin
 end;
 }
 end.
-

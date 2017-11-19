@@ -298,7 +298,7 @@ begin
               REFSSB, REFCW:
                 SetCommentAndEnableEditControl(TC_DEPARTMENT, icmyState);
 
-              UKRAINIAN, RUSSIANDX, UNDX, CIS, RADIO160:
+              UKRAINIAN, RUSSIANDX, UNDX, CIS, RUSSIAN160:
                 SetCommentAndEnableEditControl(TC_ENTERYOUROBLASTID, icmyState);
 
               KINGOFSPAINCW, KINGOFSPAINSSB, UBACW, UBASSB, PACC, ARI_DX, HELVETIA:
@@ -377,7 +377,7 @@ begin
               NRAUBALTICCW, NRAUBALTICSSB: SetCommentAndEnableEditControl(TC_ENTERYOURPROVINCEID, icmyState);
               OZCR_O: SetCommentAndEnableEditControl(TC_OZCR, icmyState);
 
-              //RADIO160: SetCommentAndEnableEditControl(TC_ENTERYOURSQUAREID, icmyState);
+              //RUSSIAN160: SetCommentAndEnableEditControl(TC_ENTERYOURSQUAREID, icmyState);
               R9W_UW9WK_MEMORIAL: SetCommentAndEnableEditControl(TC_STATIONCLASS, icmyState);
 
               CUPRFCW, CUPRFSSB, CUPRFDIG: SetCommentAndEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE, icmyGrid);
@@ -394,7 +394,7 @@ begin
 
               CQWWRTTY, CQ160CW, CQ160SSB, ARRL10, ARRL160, ARRL_RTTY_ROUNDUP: DisplayCheckBox(TC_NORTHAMERICA);
 
-              RDA, RUSSIANDX, RADIO160: DisplayCheckBox(TC_RUSSIA);
+              RDA, RUSSIANDX, RUSSIAN160: DisplayCheckBox(TC_RUSSIA);
               CQIR: DisplayCheckBox(TC_IRELAND);
               RAC_CANADA_DAY, RAC_CANADA_WINTER: DisplayCheckBox(TC_CANADA);
               REFSSB, REFCW: DisplayCheckBox(TC_FRANCE);
@@ -677,5 +677,4 @@ begin
 end;
 
 end.
-
 
