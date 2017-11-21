@@ -3158,12 +3158,12 @@ begin
       if Contest = CUPURAL then TotalMults := TotalMults - mo.MTotals[All, Both, rmPrefix];
     end;
 
-  if Contest = RUSSIAN160 then
+{  if Contest = RUSSIAN160 then      // 4.65.5 remove zero mults
   begin
     TotalScore := QPoints;
     Exit;
   end;
-
+ }
   if Contest = RSGB18 then
   begin
     TotalScore := QPoints + (5 * TotalMults);
