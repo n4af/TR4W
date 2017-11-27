@@ -4600,14 +4600,22 @@ begin
 end;
 
 procedure SaveLogFileToFloppy;
+var
+ h                                :HWND;
 begin
-  if TR4W_FLOPPY_FILENAME[0] = #0 then Exit;
+
+ if TR4W_FLOPPY_FILENAME[0] = #0 then  exit;
+  Windows.lstrcat(TR4W_FLOPPY_FILENAME,p); 
   asm
   lea  eax,TR4W_FLOPPY_FILENAME
   push eax
   lea  eax,TR4W_LOG_FILENAME
   push eax
   end;
+
+{ h := CreateFile(@TR4W_Floppy_Filename, GENERIC_WRITE or GENERIC_READ, FILE_SHARE_WRITE or FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+  SetFilePointer(h, 0, nil, FILE_END);
+ tOpenFileForWrite(h,@TR4W_Floppy_Filename); }
   wsprintf(QuickDisplayBuffer, TC_SAVINGTO);
   asm add esp,16  end;
   QuickDisplay(QuickDisplayBuffer);

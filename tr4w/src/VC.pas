@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.65.5';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.65.7';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Nov 19, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'Nov 27, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -1000,6 +1000,7 @@ type
     IC7300,
     IC7410,
     IC7600,
+    IC7610,     // 4.65.7 issue 282
     IC7700,
     IC7800,
     IC7850,
