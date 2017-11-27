@@ -406,6 +406,7 @@ var
   TempReal                              : REAL;
   p                                     : Pointer;
   c                                     : integer;
+  h                                     :HWND;
   TempColor                             : Ptr4wColors;
 
 begin
@@ -584,9 +585,17 @@ begin
 
       ctFileName:
         begin
+  {      if CFGCA[index].crCommand = 'BACKUP LOG FILE NAME' then
+           SaveFileDlg(nil, settingswindowhandle, nil, FileNameType(CFGCA[Index].crAddress^), 0)
+        else
+          h := CreateFile(TR4W_Floppy_FILENAME, GENERIC_WRITE, FILE_SHARE_WRITE, nil, CREATE_ALWAYS, FILE_ATTRIBUTE_ARCHIVE, 0);
+           h := CreateFile(@TR4W_Floppy_Filename, GENERIC_WRITE or GENERIC_READ, FILE_SHARE_WRITE or FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+           SetFilePointer(h, 0, nil, FILE_END);
+           tOpenFileForWrite(h,@TR4W_Floppy_Filename);
+         end; }
           //SelectFileOfFolder(settingswindowhandle, FileNameType(CFGCA[Index].crAddress^), nil, CFGCA[Index].crType);
           //Windows.SetFocus(settingswindowhandle);
-          if not OpenFileDlg(nil, settingswindowhandle, nil, FileNameType(CFGCA[Index].crAddress^), 0) then Exit;
+           if not OpenFileDlg(nil, settingswindowhandle, nil, FileNameType(CFGCA[Index].crAddress^), 0) then Exit;
           ListView_SetItemText(SettingshLV, Row, 1, PChar(CFGCA[Index].crAddress));
         end;
 
