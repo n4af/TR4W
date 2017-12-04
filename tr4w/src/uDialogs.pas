@@ -889,7 +889,7 @@ begin
   ofn.lpstrFile := fname;
   //ofn.nMaxFile := MAXSIZE;
   //ofn.lpstrInitialDir := nil;//@TR4W_PATH_NAME;
-  ofn.Flags := Flags or OFN_FILEMUSTEXIST;
+  ofn.Flags := Flags{ or OFN_FILEMUSTEXIST} ;   // issue 289
 
   ofn.lpstrTitle := Title;
 //  ofn.lpfnHook := @TR4W_OFNHookProc;

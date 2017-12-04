@@ -2474,7 +2474,7 @@ begin
     menu_import_adif:
       begin
         Windows.ZeroMemory(@TR4W_ADIF_FILENAME, SizeOf(TR4W_ADIF_FILENAME));
-        if OpenFileDlg(nil, tr4whandle, 'ADIF (*.adi)'#0'*.adi', TR4W_ADIF_FILENAME, OFN_HIDEREADONLY or OFN_ENABLESIZING) then
+        if OpenFileDlg(nil, tr4whandle, 'ADIF (*.adi)'#0'*.adi', TR4W_ADIF_FILENAME, OFN_HIDEREADONLY or OFN_ENABLESIZING or OFN_FILEMUSTEXIST) then
         begin
           if QSOTotals[All, Both] > 0 then
             if YesOrNo(tr4whandle, TC_APPENDIMPORTEDQSOSTOCURRENTLOG) = IDno then Exit;
@@ -4814,6 +4814,12 @@ Domestic:
 
   if RXData.DomesticMult then
   begin
+{ if Contest = NCQSOParty then      // 4.66.1
+  begin
+   if MyCall[length(MyCall)-1] = '/' then
+    if MyCall[length(MyCall)] = '4' then
+      RXData.QSOPoints := RXData.QSOPoints + 100;
+  end;   }
     MultString[Mults] := 'd';
     inc(Mults);
   end;

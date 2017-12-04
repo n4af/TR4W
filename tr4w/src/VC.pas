@@ -142,14 +142,14 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
-      LANG                                  = 'ENG';
-//    LANG                                  = 'RUS';
-//    LANG                                  = 'SER';
-//    LANG                                  = 'ESP';
-//    LANG                                  = 'MNG';
-//    LANG                                  = 'POL';
-//    LANG                                  = 'CZE';
-//    LANG                                  = 'ROM';
+       LANG                                  = 'ENG';
+//     LANG                                  = 'RUS';
+//     LANG                                  = 'SER';
+//     LANG                                  = 'ESP';
+//     LANG                                  = 'MNG';
+//     LANG                                  = 'POL';
+//     LANG                                  = 'CZE';
+//     LANG                                  = 'ROM';
 //    LANG                                  = 'CHN';
 
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.65.7';     // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.66.1';     // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Nov 27, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'Dec 1, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -833,6 +833,7 @@ type
     NASPRINTRTTY,
     NCCCSPRINT,
     NEWENGLANDQSO,
+    NCQSOPARTY,
     NRAUBALTICCW,
     NRAUBALTICSSB,
     NZFIELDDAY,
@@ -2511,6 +2512,7 @@ type
     KCJQSOPointMethod,
     LQPQSOPointMethod,
     MMCQSOPOINTMETHOD,
+    NCQSOPointMethod,
     NZFieldDayQSOPointMethod,
     OKDXQSOPointMethod,
     RAEMQSOPointMethod,
@@ -2692,6 +2694,7 @@ const
    // 'SASPRINT',
     'OZHCR-VHF',
     'MAKROTHEN',
+    'NC QSO Party',
     'ALRS-UA1DZ-CUP'
     );
 
@@ -2826,7 +2829,7 @@ type
   end;
 
 const
-QSOPartiesCount = 12;
+QSOPartiesCount = 13;
 
   QSOParties                         : array[1..QSOPartiesCount] of TUSQSOPartyRecord =
   (
@@ -2842,7 +2845,8 @@ QSOPartiesCount = 12;
   (InsideStateDOMFile:'washington'; {OutsideStateDOMFile:'WASHINGTON'; }StateName:'WA'),  //n4af 4.41.1
   (InsideStateDOMFile:'seven';      {OutsideStateDOMFile:'SEVEN';      }StateName:'7th area'),
   (InsideStateDOMFile:'florida';    {OutsideStateDOMFile:'FLORIDA';    }StateName:'FL'),
-  (InsideStateDOMFile:'colorado';   {OutsideStateDOMFile:'COLORADO';   }StateName:'CO')
+  (InsideStateDOMFile:'colorado';   {OutsideStateDOMFile:'COLORADO';   }StateName:'CO'),
+  (InsideStateDOMFile:'nc';         {OutsideStateDOMFile:'NC';         }StateName:'NC')
   );
 {*)}
 
@@ -2957,12 +2961,13 @@ QSOPartiesCount = 12;
  ({Name: 'NA-SPRINT-RTTY';             }Email: 'rttysprint@ncjweb.com';  DF: 's49p8';             WA7BNM:  155; {SK3BG: 'nasprint';   } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberNameDomesticOrDXQTHExchange;        XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO),
  ({Name: 'NCCC-SPRINT';                }Email: nil;                      DF: 'naqp';              WA7BNM:   44; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberNameDomesticOrDXQTHExchange;        XM:NoDXMults; QP:AlwaysOnePointPerQSO),
  ({Name: 'NEQP';                       }Email: nil;                      DF: nil;                 WA7BNM:   10; {SK3BG: 'newengqp';   } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticOrDXQTHExchange;                  XM:NoDXMults; QP:OnePhoneTwoCW),
+ ({Name: 'NC QSO PARTY';               }Email: nil;                      DF: 'nc_cty';            WA7BNM: 0000; {SK3BG:  nil ;       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 13; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:NCQSOPointMethod),
  ({Name: 'NRAU-BALTIC-CW';             }Email: nil;                      DF: 'nrau';              WA7BNM: 0000; {SK3BG: 'nrau';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQSONumberAndDomesticQTHExchange;          XM:NoDXMults; QP:TwoPointsPerQSO),
  ({Name: 'NRAU-BALTIC-SSB';            }Email: nil;                      DF: 'nrau';              WA7BNM:  220; {SK3BG: 'nrau';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQSONumberAndDomesticQTHExchange;          XM:NoDXMults; QP:TwoPointsPerQSO),
  ({Name: 'NZ FIELD DAY';               }Email: nil;                      DF: nil;                 WA7BNM:  222; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: BranchZones; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: NZFieldDayExchange;                          XM:NoDXMults; QP:NZFieldDayQSOPointMethod),
  ({Name: 'OCEANIA-DX-CW';              }Email: nil;                      DF: nil;                 WA7BNM:  151; {SK3BG: 'ocdxc';      } QRZRUID: 72  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:VKZLQSOPointMethod),
  ({Name: 'OCEANIA-DX-SSB';             }Email: nil;                      DF: nil;                 WA7BNM:  142; {SK3BG: 'ocdxc';      } QRZRUID: 73  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:VKZLQSOPointMethod),
- ({Name: 'OHIO QSO PARTY';             }Email: nil;                      DF: 'ohio_cty';                 WA7BNM:  100; {SK3BG: 'ohqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 5; AE: RSTQSONumberAndDomesticQTHExchange;          XM:NoDXMults; QP:OnePhoneTwoCW),
+ ({Name: 'OHIO QSO PARTY';             }Email: nil;                      DF: 'ohio_cty';          WA7BNM:  100; {SK3BG: 'ohqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 5; AE: RSTQSONumberAndDomesticQTHExchange;          XM:NoDXMults; QP:OnePhoneTwoCW),
  ({Name: 'OK-OM DX';                   }Email: nil;                      DF: 'okom';              WA7BNM:  185; {SK3BG: 'okomdxc';    } QRZRUID: 12  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:NoDXMults; QP:OKDXQSOPointMethod),
  ({Name: 'RADIO-ONY';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 12  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:OldNewYearQSOPointMethod),
  ({Name: 'OZCR-O';                     }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 182 ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneOrSocietyExchange;                    XM:CQDXCC{ARRLDXCC}; QP:OnePointPerQSO),
@@ -3125,6 +3130,7 @@ QSOPartiesCount = 12;
       'NA-SPRINT-RTTY',
       'NCCC-SPRINT',
       'NEQP',
+      'NC QSO PARTY',
       'NRAU-BALTIC-CW',
       'NRAU-BALTIC-SSB',
       'NZ FIELD DAY',
@@ -3332,6 +3338,7 @@ QSOPartiesCount = 12;
       ({Name: 'NA-SPRINT-RTTY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'NCCC-SPRINT';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'NEQP';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
+      ({Name: 'NC QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'NRAU-BALTIC-CW';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'NRAU-BALTIC-SSB';            }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'NZ FIELD DAY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),
@@ -3360,7 +3367,7 @@ QSOPartiesCount = 12;
       ({Name: 'RSGB 1.8';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RDXC';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'SAC-CW';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'YBDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),       // 4.64.1
+      ({Name: 'YBDX';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),       // 4.64.1   // add issue 291
       ({Name: 'SAC-SSB';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'SALMON RUN';                 }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'SOUTH AMERICAN WW';          }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),

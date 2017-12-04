@@ -6193,7 +6193,21 @@ begin
         end;
       end;
 
-    OZHCRVHFQSOPointMethod:
+      NCQSOPointMethod:
+       begin
+          
+        if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
+           else
+             RXDATA.QSOPoints := 3;
+        if RXData.Callsign = 'NI4BK' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+        if RXData.Callsign = 'W4DW' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+        if RXData.Callsign = 'W1VOA' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+        if RXData.Callsign = 'NC4QP' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+         if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+       end;
+
+
+      OZHCRVHFQSOPointMethod:
       if MyGrid <> '' then
       begin
         Points := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
