@@ -331,8 +331,8 @@ type
     prStrings: array[0..3] of array[0..31] of Char;
   end;
 
-//  ParserArrayStatusType = array[0..3] of Byte;
-
+ // PaserArrayStatusType = array[0..3] of Byte;
+ 
   ParserArrayType = record
     paCount: integer;
     paStatus: array[0..3] of ExchangeElementType;
@@ -644,6 +644,7 @@ procedure PassStationToCTNetwork;
 
 function ProcessExchange(ExchangeString: Str80; var RData: ContestExchange): boolean;
 function ParseArray(e: Str80): boolean;
+function ParseArray2(ExchangeString: Str80): boolean;
 function SetRST(Ex: integer; var RST: Word): boolean;
 
 procedure ProcessPartialCallAndInitialExchange(RXData: ContestExchange);
@@ -1432,7 +1433,7 @@ const
   exNNMN                                : array[0..3] of ExchangeElementType = (eetNumber, eetNumber, eetMixed, eetNumber);
 begin
   Result := False;
-
+  if ParseArray2(Exchange) then        // 4.66.2
   case ParserArray.paCount of
     1:
       if ParserArray.paElements[0].prType = eetNumber then
@@ -6193,7 +6194,7 @@ begin
         end;
       end;
 
-      NCQSOPointMethod:
+      NCQSOPointMethod:               // 4.66.1 
        begin
           
         if RXData.Mode = PHONE then RXDATA.QSOPoints := 2

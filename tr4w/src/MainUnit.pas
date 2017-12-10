@@ -4814,7 +4814,7 @@ Domestic:
 
   if RXData.DomesticMult then
   begin
-{ if Contest = NCQSOParty then      // 4.66.1
+{ if Contest = NCQSOParty then     
   begin
    if MyCall[length(MyCall)-1] = '/' then
     if MyCall[length(MyCall)] = '4' then
