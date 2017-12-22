@@ -1947,15 +1947,14 @@ begin
     ProcessConfigInstructions1 := True;
     Exit;
   end;
-}
-{
+
   if ID = 'EXCHANGE MEMORY ENABLE' then
   begin
     ExchangeMemoryEnable := StackBool;
     ProcessConfigInstructions1 := True;
     Exit;
   end;
-}
+} 
 end;
 
 function ProcessConfigInstructions2(ID: Str80; CMD: ShortString): boolean;

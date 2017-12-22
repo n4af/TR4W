@@ -6194,7 +6194,7 @@ begin
         end;
       end;
 
-      NCQSOPointMethod:               // 4.66.1 
+   {  NCQSOPointMethod:               // 4.66.1
        begin
           
         if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
@@ -6206,7 +6206,7 @@ begin
         if RXData.Callsign = 'NC4QP' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
          if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then rxdata.QSOPoints:= rxdata.qsopoints + 50;
        end;
-
+  }
 
       OZHCRVHFQSOPointMethod:
       if MyGrid <> '' then
@@ -7066,14 +7066,38 @@ begin
         if Result = length(RXData.Callsign) - 1 then RXData.QSOPoints := 4;
       end;
 
+    YL_ARCK_YL:       // 4.66.3 YL-ARCK-YL
+    begin
+       if (RXData.NumberReceived = 88)  then      // YL # rcvd
+       begin
+         RXData.QSOPoints := 5;
+         exit;                  // now exit points processing
+       end;
+       RXData.Prefix := '';         // if <> yl # then clear the multiplier
+       if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 1
+     end;
+
     GACWWWSACWQSOPointMethod:
       begin
-        if RXData.QTH.Continent <> MyContinent then
+   {   if (RXData.NumberReceived = 88) and (Contest = Arktika_Spring) then     // 4.66.3 YL-ARCK-YL hooks
+       begin
+         RXData.QSOPoints := 5 ;
+         exit;
+       end;
+
+         if (RXData.NumberReceived <> 88) and (Contest = Arktika_Spring) then
+         RXData.Prefix := '';
+
+    }
+     if RXData.QTH.Continent <> MyContinent then
           RXData.QSOPoints := 3
         else
           if RXCty <> MyCountry then
             RXData.QSOPoints := 1
-          else RXData.QSOPoints := 0;
+          else RXData.QSOPoints := 0;                                                                           // end YL-ARCK-YL hooks
         if RXData.QTH.Continent = SouthAmerica then RXData.QSOPoints := 5;
       end;
 

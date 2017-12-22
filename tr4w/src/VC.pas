@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.66.2'  ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.66.3'  ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Dec 1, 2017' ;
+  TR4W_CURRENTVERSIONDATE               = 'Dec 18, 2017' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -2512,7 +2512,6 @@ type
     KCJQSOPointMethod,
     LQPQSOPointMethod,
     MMCQSOPOINTMETHOD,
-    NCQSOPointMethod,
     NZFieldDayQSOPointMethod,
     OKDXQSOPointMethod,
     RAEMQSOPointMethod,
@@ -2536,6 +2535,7 @@ type
     WAEQSOPointMethod,
     WAGQSOPointMethod,
     WWLQSOPointMethod,
+    YL_ARCK_YL,
     YODXQSOPointMethod,
     AlwaysOnePointPerQSO, //{ Ignores dupes }
     OnePointPerQSO,
@@ -2574,6 +2574,7 @@ type
     CQMMQSOPointMethod,
     OZHCRVHFQSOPointMethod,
     MakrothenQSOPointMethod,
+    NCQSOPointMethod,
     ALRSUA1DZCupQSOPointMethod
     );
 
@@ -2655,6 +2656,7 @@ const
     'WAE', //    WAEQSOPointMethod,
     'WAG', //    WAGQSOPointMethod,
     'WWL', //    WWLQSOPointMethod,
+    'YL_ARCK_YL',
     'YO DX', //    YODXQSOPointMethod,
     'ALWAYS ONE', //    AlwaysOnePointPerQSO, { Ignores dupes }
     'ONE POINT PER QSO', //    OnePointPerQSO,

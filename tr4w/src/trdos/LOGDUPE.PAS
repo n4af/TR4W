@@ -756,7 +756,7 @@ var
   Index, BlockNumber, BlockAddress      : integer;
 
 begin
-  {
+ {
     ProperAddress := FindProperPartialCallAddress(Call);
 
     if GetPartialCall(ProperAddress) = Call then
@@ -771,7 +771,7 @@ begin
       end;
 
     SqueezeInPartialCall(Call, InitialExchange, ProperAddress);
-  }
+   }
 end;
 {
 function GetInitialExchange(Call: CallString): CallString;
