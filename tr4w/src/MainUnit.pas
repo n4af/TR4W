@@ -33,6 +33,7 @@ uses
   utils_net,
   utils_text,
   uCallSignRoutines,
+  uCallSigns,
   uCTYDAT,
   uBMCF,
   uIO,
@@ -66,7 +67,6 @@ uses
   uStations,
   uGetScores,
   uSpots,
-  uCallsigns,
   uIntercom,
   uLogEdit,
   uGetServerLog,
@@ -132,6 +132,7 @@ uses
   ;
 
   var
+  
   PTT_SET                               : boolean = False; //4.53.9
   InSplit                               : boolean = False;
   STString                              : Str10;           // 4.56.7
@@ -3191,6 +3192,7 @@ procedure ProcessReturn;
 var
   TempHWND                              : HWND;
   First                                 : String[12];
+  revnr                                 : String[6];
   Parm                                  : Integer;
   label
    SetFreq;
@@ -3228,17 +3230,18 @@ begin
     end;
 
      // check if membership # entered
-    // n4af 4.42.2 check for reverse lookup of membership #
-    //First = GetFirstString
-   if (GetFirstString(CallWindowString) = 'R') then
-   if StringIsAllNumbers(GetLastString(CallWindowString)) then
-   Begin
-   CallWindowString := GetLastString(CallWindowString);
-    if not  CallsignsList.FindNumber(CallWindowString) then exit;
-      PutCallToCallWindow(CallWindowString);
-      exit;
-      end;
-
+    // n4af 4.67.2 check for reverse lookup of membership #
+    // 4.67.3 look for member # in trmaster.asc
+   if (CallWindowString[1]) = 'R' then
+   begin
+    RevNr :=  copy(CallWindowString,2,length(callwindowstring)-1);
+    if StringIsAllNumbers(RevNr) then
+    begin
+      if not  CallsignsList.FindNumber(RevNr) then exit;
+       PutCallToCallWindow(CallWindowString);
+       exit;
+    end;
+   end;
    SetFreq:
   if TuneOnFreqFromCallWindow then Exit;
 

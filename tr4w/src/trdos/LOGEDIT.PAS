@@ -3164,12 +3164,13 @@ begin
     Exit;
   end;
  }
-  if Contest = RSGB18 then
+  
+   if Contest = RSGB18 then
   begin
-    TotalScore := QPoints + (5 * TotalMults);
-    Exit;
+  TotalMults := 1;
+    TotalScore := QPoints ;
   end;
-
+   
   if ActiveQSOPointMethod = CupRFMethod then
   begin
     TotalScore := QPoints + (100 * TotalMults);

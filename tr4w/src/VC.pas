@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.67.0'  ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.67.4'  ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Jan 1, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'Jan 8, 2018' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -2518,6 +2518,7 @@ type
     RACQSOPointMethod,
     ThreePhoneFiveCWFourRTTY,   // 4.57.1 issue  242
     RSGBQSOPointMethod,
+    RSGB160Method,
     RussianDXQSOPointMethod,
     RDAQSOPointMethod,
     SalmonRunQSOPointMethod,
@@ -2639,6 +2640,7 @@ const
     'RAC CANADA WINTER', //    RACQSOPointMethod,
     'YOK', // Youth of Kazakstan
     'RSGB', //    RSGBQSOPointMethod,
+    'RSGB 160', // rsgb160method,
     'RUSSIAN DX', //    RussianDXQSOPointMethod,
     'RDA', //    RDAQSOPointMethod,
     'SALMON RUN', //    SalmonRunQSOPointMethod,
@@ -2989,7 +2991,7 @@ QSOPartiesCount = 13;
  ({Name: 'AS-CHAMP-CW';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 64  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndCoordinatesSum;                  XM:NoDXMults; QP:ChampionshipRFASMethod),
  ({Name: 'RSGB-ROPOCO-CW';             }Email: nil;                      DF: nil;                 WA7BNM:   77; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAndPostalCodeExchange;                    XM:NoDXMults; QP:TenPointsPerQSO),
  ({Name: 'RSGB-ROPOCO-SSB';            }Email: nil;                      DF: nil;                 WA7BNM:  361; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAndPostalCodeExchange;                    XM:NoDXMults; QP:TenPointsPerQSO),
- ({Name: 'RSGB 1.8';                   }Email: nil;                      DF: 'rsgb';              WA7BNM: 0000; {SK3BG: 'rsgb1-8';    } QRZRUID: 44  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:NoDXMults; QP:ThreePointsPerQSO),
+ ({Name: 'RSGB 1.8';                   }Email: nil;                      DF: 'rsgb';              WA7BNM: 0000; {SK3BG: 'rsgb1-8';    } QRZRUID: 44  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQSONumberAndPossibleDomesticQTHExchange;  XM:CQDXCC; QP:RSGB160Method),               // issue 296
  ({Name: 'RDXC';                       }Email: 'logs@rdxc.org';          DF: 'russian';           WA7BNM:  310; {SK3BG: 'russdxc';    } QRZRUID: 7   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:RussianDXQSOPointMethod),
  ({Name: 'SAC-CW';                     }Email: nil;                      DF: nil;                 WA7BNM:  121; {SK3BG: 'sacnsc';     } QRZRUID: 175 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:ScandinavianQSOPointMethod),
  ({Name: 'YBDX';                       }Email: nil;                      DF: nil;                 WA7BNM:  121; {SK3BG: 'sacnsc';     } QRZRUID: 175 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:IndonesianQSOPointMethod),          // 4.64.1
@@ -3366,7 +3368,7 @@ QSOPartiesCount = 13;
       ({Name: 'AS-CHAMP-CW';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'RSGB-ROPOCO-CW';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RSGB-ROPOCO-SSB';            }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
-      ({Name: 'RSGB 1.8';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
+      ({Name: 'RSGB 1.8';                   }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),        // issue 296
       ({Name: 'RDXC';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'SAC-CW';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'YBDX';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),       // 4.64.1   // add issue 291

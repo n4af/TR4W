@@ -1497,15 +1497,7 @@ begin
 //       ActivePrefixMult := MongolianCallSignPrefix;
       end;
 
-    RSGB18:
-      begin
-        AddDomesticCountry('G');
-        AddDomesticCountry('GD');
-        AddDomesticCountry('GM');
-        AddDomesticCountry('GU');
-        AddDomesticCountry('GW');
-      end;
-
+ 
     {RUSSIAN160, RADIOYOC:
       begin
         TourDuration := 60;

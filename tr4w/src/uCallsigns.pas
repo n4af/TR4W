@@ -291,7 +291,7 @@ var
  lstr                                    : string;
 begin
   Result := False;
-  i := 0;
+  i := -1; //4.67.3
   h := FCount - 1;
   while i <= h do
   begin

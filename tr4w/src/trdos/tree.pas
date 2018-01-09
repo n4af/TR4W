@@ -851,7 +851,6 @@ function KeyId(Key: Char): Str10;
 
 function LastLetter(InputString: Str160): Char;
 function LastString(InputString: ShortString {Str160} {WLI}): Str160;
-
 function LineInput(Prompt: Str160;
   InitialString: Str160;
   OverwriteEnable: boolean;
@@ -3049,6 +3048,7 @@ begin
 
   LastString := InputString;
 end;
+
 
 {PROCEDURE}
 

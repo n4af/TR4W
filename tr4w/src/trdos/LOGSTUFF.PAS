@@ -53,6 +53,7 @@ uses {Dos, Printer,} Tree,
   idUDPClient,       // ny4i 4.44.9
   idGlobal,          // ny4i 4.44.9
   SysUtils,          // ny4i 4.44.9
+  uMults,
   Windows
   ;
 
@@ -5597,9 +5598,13 @@ begin
     RXData.QSOPoints := QSOPointsDXPhone;
     Exit;
   end;
+ {  if contest = RSGB18 then
+   if RXData.QTH.CountryID[1] = 'G' then
+    RXCty := ''
+     else
 
-  RXCty := RXData.QTH.CountryID;
-
+  RXData.QTH.CountryID := '';
+ }
   case ActiveQSOPointMethod of
 
     AllAsianQSOPointMethod:
@@ -6552,6 +6557,19 @@ begin
         else RXData.QSOPoints := 15;
         end;
 
+     RSGB160Method:                   // 4.67.1
+     begin
+      if (RXData.DomMultQTH <> '') and (mo.isdmmult(rxdata.dommultqth,all,both) = TRUE) then
+       rxdata.qsopoints := 7
+        else
+         if mo.isdxmult(RXData.QTH.Country,all,both) = TRUE then
+           rxdata.qsopoints := 7
+         else
+           rxdata.qsopoints := 2;
+            exit;
+             end;
+
+
     RDAQSOPointMethod:
       begin
         RXData.QSOPoints := 0;
@@ -7090,7 +7108,6 @@ begin
 
          if (RXData.NumberReceived <> 88) and (Contest = Arktika_Spring) then
          RXData.Prefix := '';
-
     }
      if RXData.QTH.Continent <> MyContinent then
           RXData.QSOPoints := 3
@@ -7248,6 +7265,7 @@ begin
             RXData.QSOPoints := 5;
         if RXData.DomesticQTH <> '' then
           RXData.QSOPoints := 2;
+          exit;
       end;
 
   end; { of case }

@@ -34,6 +34,7 @@ uses
   Windows,
   uCallsigns;
 
+
 const
   ZoneMultArraySize                     = 100;
 
@@ -69,7 +70,7 @@ type
 
 var
   mo                                    : MultsObject;
-
+  
 implementation
 uses
   LogDupe;
@@ -143,9 +144,9 @@ end;
 function MultsObject.IsDXMult(Country: Word; Band: BandType; Mode: ModeType): boolean;
 begin
   if Country < MaxCountries then
-    Result := (DXMultsArray[Country][Mode] and (1 shl Ord(Band))) = 0
-  else
-    Result := False;
+     Result := (DXMultsArray[Country][Mode] and (1 shl Ord(Band))) = 0
+    else
+       Result := False;
 end;
 
 function MultsObject.IsPxMult(Prfx: CallString; Band: BandType; Mode: ModeType): boolean;
@@ -163,7 +164,9 @@ var
 begin
   Dom[Ord(Dom[0]) + 1] := #0;
   Result := not DomList.StringIsDupe(Dom, Band, Mode, Index);
-  if Index = -1 then Result := True;
+  if Index = -1 then
+    Result := True ;
+
 end;
 
 procedure MultsObject.FillRemMultsBytes(rm: RemainingMultiplierType);
