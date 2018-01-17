@@ -3050,7 +3050,7 @@ QSOPartiesCount = 13;
  ({Name: 'CQIR';                    }   Email: nil;                      DF: 'ireland';           WA7BNM:  434;                         QRZRUID:   0 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  DM: DomesticFile; P: 0; AE: QSONumberAndPossibleDomesticQTHExchange;           XM:NoDXMults; QP:TwoPhoneThreeCW),
  ({Name: 'WWIH';                    }   Email: nil;                      DF: nil;                 WA7BNM:  552;                         QRZRUID:   0 ; Pxm: NoPrefixMults; ZnM: CQZones;  AIE:ZoneInitialExchange;DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;           XM:CQDXCC; QP:CQWWRTTYQSOPointMethod),
  ({Name: 'ALRS_UA1DZ_CUP';          }   Email: nil;                      DF: 'russian';           WA7BNM: 0000;                         QRZRUID: 543 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  AIE:NoInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTDomesticQTHExchange;           XM:CQDXCC; QP:ALRSUA1DZCupQSOPointMethod),
- ({Name: 'WINTER FIELD DAY';        }   Email: nil;                      DF: 'arrlsect';          WA7BNM:   421; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod)
+ ({Name: 'WINTER FIELD DAY';        }   Email: 'wfda@winterfieldday.com';DF: 'arrlsect';          WA7BNM:   421; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod)
  
  {*)}
       );

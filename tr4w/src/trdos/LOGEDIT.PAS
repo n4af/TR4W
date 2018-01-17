@@ -3088,6 +3088,7 @@ function TotalScore: LONGINT;
 var
   QPoints, TotalMults                   : LONGINT;
   m                                     : RemainingMultiplierType;
+  b                                     : BandType;
 begin
   QPoints := TotalQSOPoints;
 
@@ -3110,6 +3111,28 @@ begin
     TotalScore := QPoints;
     Exit;
   end;
+
+  if Contest = WINTERFIELDDAY then           // Issue 301 NY4I
+     begin
+     TotalMults := 0;
+     for b := Low(BandType) to Band1296 do
+        begin
+        if QTotals[b,Digital] > 0 then
+           begin
+           inc(TotalMults);
+           end;
+        if QTotals[b,CW] > 0 then
+           begin
+           inc(TotalMults);
+           end;
+        if QTotals[b,Phone] > 0 then
+           begin
+           inc(TotalMults);
+           end;
+        end;
+     TotalScore := TotalMults * QPoints;
+     Exit;
+     end;
 
 //  Sheet.MultSheetTotals(MTotals);
   //  VisibleLog.IncrementMultTotalsWithContentsOfEditableWindow(MTotals);
