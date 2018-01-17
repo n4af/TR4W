@@ -6209,7 +6209,7 @@ begin
             #9 + '<rcvnr>' + Format('%d',[nNumberReceived]) + '</rcvnr>' + sLineBreak +
             #9 + '<gridsquare></gridsquare>' + sLineBreak +
             #9 + '<exchange1>' + ExchangeWindowString + '</exchange1>' + sLineBreak +
-            #9 + '<section>' + '</section>' + sLineBreak +
+            #9 + '<section>' + RxData.QTHString + '</section>' + sLineBreak +    // Issue 262
             #9 + '<comment></comment>' + sLineBreak +
             #9 + '<qth>' + RxData.QTHString + '</qth>' + sLineBreak +
             #9 + '<name>' + RxData.Name + '</name>' + sLineBreak +
