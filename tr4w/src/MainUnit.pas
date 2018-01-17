@@ -3119,12 +3119,12 @@ begin
       WinExec('rundll32.exe devmgr.dll, DeviceManager_Execute', SW_SHOWNORMAL);
       
    
-  {   menu_ctrl_execute_config:
+      menu_ctrl_execute_config:         // 4.67.5
       begin
         if OpenFileDlg(nil, tr4whandle, TC_CONFIGURATION_FILE + ' (*.cfg)'#0'*.cfg'#0#0, TR4W_EXECONFIGFILE_FILENAME, OFN_HIDEREADONLY or OFN_ENABLESIZING) then
           ExecuteConfigurationFile(ShortString(TR4W_EXECONFIGFILE_FILENAME));
       end;
-  }
+   
     menu_ctrl_shdxcallsign:
       begin
         Windows.ZeroMemory(@TempCallstring, SizeOf(TempCallstring));
