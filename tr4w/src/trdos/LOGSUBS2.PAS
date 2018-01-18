@@ -6229,6 +6229,7 @@ begin
             #9 + '<IsOriginal>True</IsOriginal>' + sLineBreak +
             #9 + '<NetBiosName>' + GetLocalComputerName + '</NetBiosName>' + sLineBreak +
             #9 + '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' + sLineBreak +
+            #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
       '</contactinfo>'+ sLineBreak ;
 
 
