@@ -3236,7 +3236,6 @@ procedure SetPrefix(var RData: ContestExchange {Ptr});
 begin
   case ActivePrefixMult of
     CQNonEuropeanCountriesAndWAECallRegions: RData.Prefix := EuropeanCountriesAndWAECallRegions(RData.QTH);
-//    YUPrefixes: if RData.QTH.CountryID = 'YU' then RData.Prefix := RData.QTH.Prefix;
     BelgiumPrefixes: if RData.QTH.CountryID = 'ON' then RData.Prefix := RData.QTH.Prefix;
     SACDistricts: RData.Prefix := SACDistrict(RData.QTH);
     IndonesianDistricts: RData.Prefix := IndonesianDistrict(RData.QTH);       // 4.64.1

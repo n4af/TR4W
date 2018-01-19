@@ -1946,7 +1946,6 @@ begin
                   end;
                K2, K3:
                   begin
-//<<<<<<< HEAD
                   maxLen := 22; //28;
                   pad := false;
                   end;
@@ -2156,7 +2155,7 @@ begin
                end;
             K3:
                begin
-               AddToOutputBuffer('KY ' + Chr(4) + ';RX;', 8); // Chr(4) stops the K3 // ny4i Issue 157
+              AddToOutputBuffer('KY ' + Chr(4) + ';RX;', 8); // Chr(4) stops the K3 // ny4i Issue 157
                end;
             TS480, TS570, TS590, TS950, TS990, TS2000, TS850:
                begin

@@ -2418,6 +2418,7 @@ var
   T1                                    : PChar;
   T2                                    : PChar;
   T3                                    : PChar;
+  T4                                    : PChar;
   cRandomCharsReceived                  : PChar;
   cKids                                 : PChar;
   TempGrid                              : Str20;
@@ -2432,7 +2433,8 @@ var
 begin
   TransmitterIDPos := 80;
   pnr := 0;
-  if Contest = IOTA then TransmitterIDPos := 90;
+  if (Contest = NAQSOCW) or (Contest = NAQSOSSB) or (Contest = NAQSORTTY) then TransmitterIDPos := 92;        // 4.67.7
+  //if Contest =  NAQPCW  then TransmitterIDPos := 92;
   contacts := 0;
   Result := False;
 
@@ -2705,7 +2707,7 @@ if TempRXData.DomMultQTH = '' then
         NameAndDomesticOrDXQTHExchange:
           begin
 //            csName := PChar(string(TempRXData.Name));
-//            cMyName := PChar(string(MyName));
+            cMyName := PChar(string(MyName));
             asm
                 push cMyState
                 push cMyName
@@ -3342,9 +3344,12 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
 
       StrUpper(CABRILLO_HISEX);
 
+
+
       T1 := CABRILLO_FIRST_PART;
       T2 := CABRILLO_MYEX;
       T3 := CABRILLO_HISEX;
+
       asm
       push t3
       push HisCallsign
@@ -3352,15 +3357,15 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
       push t1
       end;
       if Contest = ARKTIKA_SPRING then
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-14s%-17s'#13#10)
+      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-14s%-10s'#13#10)
       else
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-14s%-17s'#13#10);
+      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-14s%-10s'#13#10);
       asm add esp,24
       end;
-      if Radio1IDs <> '' then
+       if Radio1IDs <> '' then
       begin
         if tPos(Radio1IDs, TempRXData.ceComputerID) <> 0 then CABRILLO_BUFFER[TransmitterIDPos] := '1' else CABRILLO_BUFFER[TransmitterIDPos] := '0';
-      end;
+      end;       
 //      if Radio2ID <> #0 then if TempRXData.ceComputerID = Radio2ID then CABRILLO_BUFFER[80] := '1';
       sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
 

@@ -152,14 +152,7 @@ begin
 
   Format(TR4W_MP3PATH, '%sMP3', TR4W_LOG_PATH_NAME);
 
-{
-  asm
-  lea  eax,TR4W_PATH_NAME
-  push eax
-  end;
-  wsprintf(TR4W_DVPPATH, '%sDVP');
-  asm add esp,12  end;
-}
+
 
 {$IFEND}
 
@@ -184,24 +177,7 @@ begin
   Format(TR4W_INTERCOM_FILENAME, '%sINTERCOM.TXT', TR4W_LOG_PATH_NAME);
   Format(TR4W_DEFMESSAGES_FILENAME, '%sCOMMONMESSAGES.INI', TR4W_PATH_NAME);
 
-{
-  asm
-  lea  eax,TempFoldername+1
-  push eax
-  end;
-  wsprintf(TR4W_SYN_FILENAME, '%sSERVERLOG.TMP');
-  asm add esp,12
-  end;
 
-  asm
-  lea  eax,FileRoot+1
-  push eax
-  lea  eax,TempFoldername+1
-  push eax
-  end;
-  wsprintf(TR4W_LOG_FILENAME, '%s%s.TRW');
-  asm add esp,16  end;
-}
 end;
 
 procedure SetUpRSTMyZoneExchange;
@@ -1491,10 +1467,10 @@ begin
 
 //    UA4N: TourDuration := 15;
 
-    JTDX:
+    JTDX:          // 4.67.9
       begin
-//        ActiveInitialExchange := ZoneInitialExchange;
-//       ActivePrefixMult := MongolianCallSignPrefix;
+      ActiveInitialExchange := ZoneInitialExchange;
+       ActivePrefixMult := MongolianCallSignPrefix;
       end;
 
  

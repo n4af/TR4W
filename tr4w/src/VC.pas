@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.67.6'  ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.67.8'  ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Jan 17, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'Jan 18, 2018' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -2410,18 +2410,18 @@ type
     BlackSeaCountries
     );
 
-  PrefixMultType =
+  PrefixMultType =          // NOTE: ORDER MUST MATCH PREFIXMULTSTRING ARRAY BELOW 4.67.9
     (
     NoPrefixMults,
     AsianPrefixes,
     BelgiumPrefixes,
     CallSignPrefix,
+    IndonesianDistricts,       // 4.64.1
     MongolianCallSignPrefix,
     NonSouthAmericanPrefixes,
     NorthAmericanPrefixes,
     Prefix,
     SACDistricts,
-    IndonesianDistricts,       // 4.64.1
     SouthAmericanPrefixes,
     SouthAndNorthAmericanPrefixes,
     GCStation,
@@ -2438,7 +2438,7 @@ type
     EUHFCYear,
     RFChampionchipZones
     );
-
+   // 4.67.9 NOTE: ORDER MUST MATCH PREFIXMULTTYPE (ABOVE)
 const
   PrefixMultStringArray                 : array[PrefixMultType] of PChar =
     (

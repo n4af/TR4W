@@ -157,8 +157,8 @@ begin   // 1
     TempChar := Message[1];
 
     if TempChar = ControlA then
-       if not SingleRadioMode then
-      begin      // 3
+        if not SingleRadioMode then
+       begin      // 3
         if ActiveRadio = RadioOne then
         begin      // 4
           if not SendingOnRadioTwo then
@@ -171,7 +171,7 @@ begin   // 1
         SetUpToSendOnInactiveRadio;
 
     //    Sleep(5); // Added to get rid of relay flicking on old radio
-      end;   // 2
+     end;   // 2
 
     if TempChar = ControlB then
       if not SingleRadioMode then

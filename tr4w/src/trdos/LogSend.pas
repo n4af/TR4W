@@ -145,7 +145,7 @@ begin
   CharacterCount := 1;
   repeat
     begin
-      SendChar := SendString[CharacterCount];
+       SendChar := SendString[CharacterCount];
 
       if CommandMode then
       begin
@@ -463,22 +463,14 @@ begin
 
     end;
   until CharacterCount = length(SendString) + 1;
-  //   Frm.SendCW(CWTone, message_to_send);
-  //   message_to_send := '';
 
-//  ClearPTTForceOn;
- { if (wkActive) and (not wkBusy) then
-     begin
-     flushcwbuffer;
-     end;
-  }
   InactiveRigCallingCQ := False;
-  if IsCWByCATActive then
+   if (IsCWByCATActive)  then
      begin
      AddStringToBuffer(CWByCATBufferTerminator,CWTone); // Flushes the buffer when the $242 is passed to SendCW - by only By CAT
      end;
 
-//if if ActiveRadioPtr^.CWByCAT then backtoinactiveradioafterqso;
+// if IsCWByCATActive then backtoinactiveradioafterqso;
 end;
 
 

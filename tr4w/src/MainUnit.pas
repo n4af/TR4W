@@ -3197,11 +3197,8 @@ var
   label
    SetFreq;
 begin
-//   if (ActiveMode = CW) and (CallWindowString = '') then
- //    RememberCWSpeed := CodeSpeed;       // 4.60.1
+
   TempHWND := Windows.GetFocus;
-//  if TempHWND = 0 then sm;
-//  Esc_Counter := 0;  // 4.53.7
   if {TempHWND} Windows.GetParent(TempHWND) = TelnetCommandWindow then
   begin
     if TelnetSock <> 0 then
@@ -3236,11 +3233,11 @@ begin
    begin
     RevNr :=  copy(CallWindowString,2,length(callwindowstring)-1);
     if StringIsAllNumbers(RevNr) then
-    begin
-      if not  CallsignsList.FindNumber(RevNr) then exit;
+      begin
+       if not  CallsignsList.FindNumber(RevNr) then exit;
        PutCallToCallWindow(CallWindowString);
        exit;
-    end;
+      end;
    end;
    SetFreq:
   if TuneOnFreqFromCallWindow then Exit;
