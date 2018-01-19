@@ -41,6 +41,7 @@ uses
   uTotal,
   Tree,
   LOGSUBS1,
+  LOGSUBS2,
   LogDupe,
   LogStuff,
   uCommctrl,
@@ -647,6 +648,14 @@ begin
 
   {DELETED}
   EditableQSORXData.ceQSO_Deleted := boolean(TF.SendDlgItemMessage(eq_handle, FLD_DELETED, BM_GETCHECK));
+
+  // The way UDP handles an edited QSO is to delete it first and then add it again.  Issue 165 ny4i
+  // In the case of an actual delete, we do NOT send the subsequent record to re-add the QSO.
+ SendDeletedContactToUDP(EditableQSORXData);
+ if not EditableQSORXData.ceQSO_Deleted then
+     begin
+     LogContactToUDP(EditableQSORXData);
+     end;
 
   if not OpenLogFile then Exit;
 //2560
