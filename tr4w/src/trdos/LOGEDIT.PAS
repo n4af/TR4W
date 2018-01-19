@@ -180,6 +180,7 @@ uses
   PostUnit,
 //  LOGMENU,
   uTotal,
+  LOGSUBS2,
   uRemMults,
   uBandmap,
   MainUnit; {KK1L: 6.71 attempt to get POST to compile. Moved here from INTERFACE section. Was not there in original}
