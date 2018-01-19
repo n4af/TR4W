@@ -42,7 +42,7 @@ uses
   uCallsigns,
   uCommctrl,
   //  uMMTTY,
-  uEditQSO,
+  //uEditQSO,  // Issue 165 NY4I Removed this fromhere as there was a circular reference. It did not appear tobe needed.
   uTelnet,
   TF,
 //  DLPortIO,
@@ -96,6 +96,7 @@ uses
   ;
 
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
+procedure SendDeletedContactToUDP(RXData: ContestExchange);
 procedure ToggleModes;
 procedure ToggleStereoPin; {KK1L: 6.71}
 procedure LogContact(var RXData: ContestExchange; MyComputer: boolean);
@@ -1291,6 +1292,7 @@ var
   TempRXData                            : ContestExchange;
   lpNumberOfBytesRead                   : Cardinal;
   p                                     : PChar;
+  sBuf                                  : AnsiString;
 begin
   if not OpenLogFile then Exit;
   tSetFilePointer(-1 * SizeOf(ContestExchange), FILE_END);
@@ -1311,17 +1313,21 @@ begin
      
     TempRXData.ceQSO_Skiped := False;
     p := TC_YOUHAVERESTOREDTHELASTDELETED;
+    LogContactToUDP(TempRXData);
   end
   else
   begin
 
     TempRXData.ceQSO_Skiped := True;
     p := TC_YOUHAVEDELETEDTHELASTLOGENTRY;
+    SendDeletedContactToUDP(TempRXData);
   end;
   InvertBoolean(tLastLogEntryIsDeleted);
   tSetFilePointer(-1 * SizeOf(ContestExchange), FILE_END);
   sWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange));
   SendRecordToServer(NET_EDITEDQSO_ID, TempRXData);
+
+
   CloseLogFile;
   LoadinLog;
   ShowMessage(p);
@@ -6104,6 +6110,34 @@ begin
 //  SendStationStatus;
 end;
 
+procedure SendDeletedContactToUDP(RXData: ContestExchange);
+var
+    sBuf: AnsiString;
+begin
+
+   if UDPBroadcastContact then                // Issue 165 NY4I
+     begin
+     sBuf := '<?xml version="1.0"?>' + sLineBreak +
+            '<contactdelete>' +  sLineBreak +
+            #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
+               SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
+                      RxData.tSysTime.qtYear,
+                      RxData.tSysTime.qtMonth,
+                      RxData.tSysTime.qtDay,
+                      RxData.tSysTime.qtHour,
+                      RxData.tSysTime.qtMinute,
+                      RxData.tSysTime.qtSecond]) +
+            '</timestamp>' + sLineBreak +
+            #9 + '<call>' + RXData.Callsign + '</call>' + sLineBreak +
+            #9 + '<<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
+            #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
+      '</contactdelete>'+ sLineBreak ;
+
+      udp.BroadcastEnabled := true;
+      udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+      end;
+end;
+
 procedure LogContactToUDP(RXData: ContestExchange);
 var
   // msg: TIdBytes;
@@ -6180,7 +6214,7 @@ begin
             '<contactinfo>' +  sLineBreak +
 
             #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
-            #9 + '<contestnr>3</contestnr>' + sLineBreak +
+            #9 + '<<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
                SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
                       RxData.tSysTime.qtYear,
@@ -6209,7 +6243,7 @@ begin
             #9 + '<rcvnr>' + Format('%d',[nNumberReceived]) + '</rcvnr>' + sLineBreak +
             #9 + '<gridsquare></gridsquare>' + sLineBreak +
             #9 + '<exchange1>' + ExchangeWindowString + '</exchange1>' + sLineBreak +
-            #9 + '<section>' + '</section>' + sLineBreak +
+            #9 + '<section>' + RxData.QTHString + '</section>' + sLineBreak +    // Issue 262
             #9 + '<comment></comment>' + sLineBreak +
             #9 + '<qth>' + RxData.QTHString + '</qth>' + sLineBreak +
             #9 + '<name>' + RxData.Name + '</name>' + sLineBreak +
@@ -6229,6 +6263,7 @@ begin
             #9 + '<IsOriginal>True</IsOriginal>' + sLineBreak +
             #9 + '<NetBiosName>' + GetLocalComputerName + '</NetBiosName>' + sLineBreak +
             #9 + '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' + sLineBreak +
+            #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
       '</contactinfo>'+ sLineBreak ;
 
 
