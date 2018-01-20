@@ -95,6 +95,7 @@ uses
   ZoneCont
   ;
 
+procedure SendScoreToUDP(RXData: ContestExchange);  
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
 procedure ToggleModes;
@@ -4695,7 +4696,10 @@ begin
 //      UpdateBandMapDupeStatus(RXData.Callsign, RXData.Band, RXData.Mode, True);
     SpotsList.UpdateSpotsDupeStatus(RXData.Callsign, RXData.Band, TempMode {RXData.Mode});
   end;
-
+  if UDPBroadcastScore then
+     begin
+     SendScoreToUDP(RXData);
+     end;
 end;
 
 procedure loglastcall;
@@ -6110,6 +6114,71 @@ begin
 //  SendStationStatus;
 end;
 
+procedure SendScoreToUDP(RXData: ContestExchange);
+var
+    sBuf: AnsiString;
+begin
+
+// Score formatted for WRTC Score Computer
+{
+<?xml version="1.0"?>
+<dynamicresults>
+	<soft>TR4W</soft>
+	<version>4.68</version>
+	<contest>IARU-HF</contest>
+	<call>NY4I</call>
+	<club>Florida Contest Club</club>
+	<class ops="SINGLE-OP" mode="MIXED" power="HIGH" bands="ALL"  transmitter="ONE"  assisted = "ASSISTED"></class>
+
+	<breakdown>
+		<qso band="80" mode="PH">2</qso>
+		<mult band="80" mode="PH" type="CTY">1</mult>
+		<mult band="80" mode="PH" type="HQ">0</mult>
+		<point band="80" mode="PH">4</point>
+		<qso band="total" mode="ALL">2</qso>
+		<mult band="total" mode="ALL" type="CTY">1</mult>
+		<mult band="total" mode="ALL" type="HQ">0</mult>
+		<point band="total" mode="ALL">4</point>
+	</breakdown>
+	<score>4</score>
+	<timestamp>2018-01-19 17:23:51</timestamp>
+</dynamicresults>
+}
+
+   if UDPBroadcastScore then                // Issue 304 NY4I
+     begin
+     sBuf := '<?xml version="1.0"?>' + sLineBreak +
+            '<dynamicresults>' +  sLineBreak +
+            #9 + '<soft>TR4W</soft>' + sLineBreak +
+            #9 + '<version>' + TR4W_CURRENTVERSION_NUMBER + '</version>' + sLineBreak +
+            #9 + '<contest>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
+            #9 + '<call>' + MyCall + '</call>' + sLineBreak +
+            #9 + '<club>' + ' ' + '</club>' + sLineBreak +
+            #9 + '<class ops="SINGLE-OP" mode="MIXED" power="HIGH" bands="ALL"  transmitter="ONE"  assisted = "ASSISTED">' + '</class>' + sLineBreak +
+            #9 + '<breakdown>' + sLineBreak +
+            #9#9 + '<qso>' + '</qso>' + sLineBreak +
+            { Loop through bands printing only ones that have contacts
+            #9#9 + '<mult band="80" mode="PH" type="CTY">1</mult>
+		<mult band="80" mode="PH" type="HQ">0</mult>
+		<point band="80" mode="PH">4</point>
+		<qso band="total" mode="ALL">2</qso>
+    }  // This seems to be custom to the contest type HQ check if N1MM has another name for HQ multiplier in non-IARC/WRTC
+    #9#9 + '<mult band="total" mode="ALL" type="CTY">' + '</mult>' + sLineBreak +
+    #9#9 + '<mult band="total" mode="ALL" type="HQ">' + '</mult>' + sLineBreak +
+    #9#9 + '<point band="total" mode="ALL">' + '</point>' + sLineBreak +
+            #9 + '</breakdown>' + sLineBreak +
+            #9 + '<score>' + IntToStr(TotalScore) + '</score>' + sLineBreak +
+            #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
+                  SysUtils.FormatDateTime('yyyy-mm-dd hh:mm:ss',Now) +
+            '</timestamp>' + sLineBreak +
+            '</dynamicresults>' + sLineBreak;
+
+
+
+      udp.BroadcastEnabled := true;
+      udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+      end;
+end;
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
 var
     sBuf: AnsiString;

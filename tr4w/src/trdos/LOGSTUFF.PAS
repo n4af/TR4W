@@ -570,6 +570,7 @@ var
 
   UDPBroadcastAppInfo                   : boolean;               // ny4i 4.44.8
   UDPBroadcastContact                   : boolean;               // ny4i 4.44.8
+  UDPBroadcastScore                     : boolean;               // ny4i Issue 304
   UDPBroadcastRadio                     : boolean;               // ny4i 4.44.8
   UDPBroadcastRotor                     : boolean;               // ny4i 4.44.8
   UDPBroadcastPort                      : integer = 12060;       // ny4i 4.44.9
