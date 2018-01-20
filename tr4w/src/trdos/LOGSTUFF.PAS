@@ -6266,11 +6266,9 @@ begin
     HADXQSOPointMethod:
      begin
 
-       if (rxdata.callsign[1] =  'H')  then
-           begin
-                  if (rxdata.callsign[2] = 'A') or (RXData.Callsign[2] = 'G')  then
-                   RXData.QSOPoints := 6 ;
-           end
+    If RXData.Callsign[1] = 'H' then
+      if ((RXData.Callsign[2]='A') or (RXData.Callsign[2] = 'G')) then
+      RXData.QSOPoints := 6
 
       else
         if RXData.QTH.Continent <> MyContinent then
