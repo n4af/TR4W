@@ -6264,18 +6264,22 @@ begin
         RXData.QSOPoints := 2;
 
     HADXQSOPointMethod:
-     begin
+   begin
 
-    If RXData.Callsign[1] = 'H' then
-      if ((RXData.Callsign[2]='A') or (RXData.Callsign[2] = 'G')) then
-      RXData.QSOPoints := 6
+    If RXData.QTH.CountryID = 'HA' then
+      begin
+       if (RXData.NumberReceived > 0) then
+       RXData.DomesticQTH := InttoStr(RXData.NumberReceived);
+        RXData.DomesticMult := True;
+          RXData.QSOPoints := 6;
+          exit;
+      end;
 
-      else
         if RXData.QTH.Continent <> MyContinent then
           RXData.QSOPoints := 3
         else
           RXData.QSOPoints := 1;
-     end;
+      end;
 
     YUDXQSOPointMethod:             // 4.57.5
         if (MyCountry <> 'YU') and (RXCty = 'YU') then
@@ -7145,6 +7149,8 @@ begin
         if Result <> 0 then
         begin
           TheirID := Copy(RXData.QTHString, Result + 1, 3);
+
+
           if StringIsAllNumbers(TheirID) then
             inc(RXData.QSOPoints, StrToInt(TheirID));
         end;
