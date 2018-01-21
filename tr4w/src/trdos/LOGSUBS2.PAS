@@ -99,7 +99,7 @@ uses
 
   var TimeLastScoreBroadcast : TDateTime;
 
-procedure SendScoreToUDP(RXData: ContestExchange);  
+procedure SendScoreToUDP;
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
 procedure ToggleModes;
@@ -1400,6 +1400,11 @@ begin
     Close(NetDebugBinaryOutput);
     Close(NetDebugBinaryInput);
   end;
+
+  if UDPBroadcastScore then
+     begin
+     SendScoreToUDP;
+     end;
 
   if DVKEnable then DVPUnInit;
   {if BandMapEnable then }SaveBandMap;
@@ -4705,7 +4710,7 @@ begin
      if SecondsBetween(TimeLastScoreBroadcast,Now) > 250 then
         begin
         TimeLastScoreBroadcast := Now;
-        SendScoreToUDP(RXData);
+        SendScoreToUDP;
         end;
      end;
 end;
@@ -6122,7 +6127,7 @@ begin
 //  SendStationStatus;
 end;
 
-procedure SendScoreToUDP(RXData: ContestExchange);
+procedure SendScoreToUDP;
 var
     sBuf: AnsiString;
     b: BandType;
