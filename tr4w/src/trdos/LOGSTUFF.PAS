@@ -6266,15 +6266,19 @@ begin
     HADXQSOPointMethod:
    begin
 
-    If RXData.QTH.CountryID = 'HA' then
+    If RXData.QTH.CountryID = 'HA' then        // 4.67.11
       begin
-       if (RXData.NumberReceived > 0) then
-       RXData.DomesticQTH := InttoStr(RXData.NumberReceived);
-        RXData.DomesticMult := True;
+       if   (RXData.NumberReceived > 0) then
+        begin
+         RXData.DomesticQTH := InttoStr(RXData.NumberReceived);
+         RXData.DomesticMult := True;
           RXData.QSOPoints := 6;
           exit;
-      end;
-
+        end;
+          RXData.QSOPoints := 6;
+          exit;
+        end;
+      
         if RXData.QTH.Continent <> MyContinent then
           RXData.QSOPoints := 3
         else
