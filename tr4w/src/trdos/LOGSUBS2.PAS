@@ -6117,7 +6117,7 @@ end;
 
 procedure SendScoreToUDP(RXData: ContestExchange);
 var
-    sBuf: AnsiString;
+    sBuf: string;
     b: BandType;
     TempBand                              : BandType;
     TempMode                              : ModeType;
@@ -6126,7 +6126,7 @@ var
 const
   GetScoresMults                        : array[RemainingMultiplierType] of PChar = (nil, 'state', 'country', 'zone', 'prefix');
   GetScoresMultsIARU                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'country', 'zone', 'prefix');
-  GetScoresMultsWRTC                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'CTY', 'zone', 'prefix');
+  GetScoresMultsWRTC                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'country', 'zone', 'prefix');
   GetScoresModesArray                   : array[ModeType] of PChar = ('CW', 'DIG', 'PH', 'ALL', nil, nil);
 begin
 
@@ -6158,7 +6158,7 @@ begin
 
    if UDPBroadcastScore then                // Issue 304 NY4I
      begin
-     CalculateTotals;
+     CalculateTotals;    // This reads the log so be careful how often it is done.
      sBuf := '<?xml version="1.0"?>' + sLineBreak +
             '<dynamicresults>' +  sLineBreak +
             #9 + '<soft>TR4W</soft>' + sLineBreak +
@@ -6183,17 +6183,48 @@ begin
            begin
            BandPchar := 'total';
            end;
+        if GetScoresModesArray[TempMode] <> 'ALL' then
+           begin
 
            sBuf := sBuf + #9#9 + '<qso band="' + BandPChar +
                               '" mode="' + GetScoresModesArray[TempMode] +
                               '">' + IntToStr(QSOTotals[TempBand, TempMode]) + '</qso>' + sLineBreak;
+           end;
+        if Contest <> WRTC then
+           begin
+           for m := Succ(Low(RemainingMultiplierType)) to High(RemainingMultiplierType) do
+              begin
+              sBuf := sBuf + #9#9 + '<mult band="' + BandPChar + '" mode="' + GetScoresModesArray[TempMode] +
+                                        '" type="' +  GetScoresMults[m] + '">' + IntToStr(mo.MTotals[TempBand, TempMode, m]) +
+                                        '</mult>' + sLineBreak;
+              end;
+           end
+        else
+           begin // WRTC
+           if GetScoresModesArray[TempMode] = 'ALL' then
+              begin
+              for m := Succ(Low(RemainingMultiplierType)) to Succ(Succ(Low(RemainingMultiplierType))) do  // odd bit of code to select rmDomestic and rmDX
+                 begin
+                 sBuf := sBuf + #9#9 + '<mult band="' + BandPChar + '" mode="' + GetScoresModesArray[TempMode] +
+                                           '" type="' + GetScoresMultsWRTC[m] + '">' +
+                                            IntToStr(mo.MTotals[TempBand, TempMode, m]) + '</mult>' + sLineBreak;
+                 end;
+              end;
+           end;
+
+        if GetScoresModesArray[TempMode] = 'ALL' then
+           begin
            sBuf := sBuf + #9#9 + '<point band="' + BandPChar + '" mode="' + GetScoresModesArray[TempMode] + '">' +
                         IntToStr(QSOPointTotals[TempBand, TempMode]) + '</point>' + sLineBreak;
-
+           sBuf := sBuf + sLineBreak;
+           end;
         end;
+        // After mode loop...
+
+
      end;
 
-  for TempBand := Band160 to All do
+ { for TempBand := Band160 to All do
     for TempMode := CW to Phone do //Both do
       for m := Succ(Low(RemainingMultiplierType)) to High(RemainingMultiplierType) do
       begin
@@ -6217,6 +6248,7 @@ begin
 
 
       end;
+ }
 
   sBuf := sBuf + #9 + '</breakdown>' + sLineBreak +
                  #9 + '<score>' + IntToStr(TotalScore) + '</score>' + sLineBreak +
