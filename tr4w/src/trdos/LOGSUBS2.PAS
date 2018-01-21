@@ -85,6 +85,7 @@ uses
   LOGSend,
   LogSCP,
   LogStuff,
+  uMults,
   LOGWAE,
   LogWind,
   {Printer,}
@@ -6117,6 +6118,16 @@ end;
 procedure SendScoreToUDP(RXData: ContestExchange);
 var
     sBuf: AnsiString;
+    b: BandType;
+    TempBand                              : BandType;
+    TempMode                              : ModeType;
+    m                                     : RemainingMultiplierType;
+    BandPchar                             : PChar;
+const
+  GetScoresMults                        : array[RemainingMultiplierType] of PChar = (nil, 'state', 'country', 'zone', 'prefix');
+  GetScoresMultsIARU                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'country', 'zone', 'prefix');
+  GetScoresMultsWRTC                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'CTY', 'zone', 'prefix');
+  GetScoresModesArray                   : array[ModeType] of PChar = ('CW', 'DIG', 'PH', 'ALL', nil, nil);
 begin
 
 // Score formatted for WRTC Score Computer
@@ -6147,6 +6158,72 @@ begin
 
    if UDPBroadcastScore then                // Issue 304 NY4I
      begin
+     CalculateTotals;
+     sBuf := '<?xml version="1.0"?>' + sLineBreak +
+            '<dynamicresults>' +  sLineBreak +
+            #9 + '<soft>TR4W</soft>' + sLineBreak +
+            #9 + '<version>' + TR4W_CURRENTVERSION_NUMBER + '</version>' + sLineBreak +
+            #9 + '<contest>' + ContestTypeSA[Contest] + '</contest>' +   sLineBreak +
+            #9 + '<call>' + MyCall + '</call>' + sLineBreak +
+            #9 + '<club>' + ' ' + '</club>' + sLineBreak +
+            #9 + '<class ops="' + tCategoryOperatorSA[CategoryOperator] + '" mode="' + tCategoryModeSA[CategoryMode] +
+                 '" power="' + tCategoryPowerSA[CategoryPower] + '" bands="' + tCategoryBandSA[CategoryBand] +
+                 '" transmitter="' + tCategoryTransmitterSA[CategoryTransmitter] +
+                 '" assisted="' + tCategoryAssistedSA[CategoryAssisted] + '"></class>' + sLineBreak +
+            #9 + '<breakdown>' + sLineBreak;
+
+  for TempBand := Band160 to All do
+     begin
+     for TempMode := CW to Both do // Was Phone for a test do
+        begin
+        if QSOTotals[TempBand, TempMode] = 0 then Continue;
+
+        BandPchar := BandStringsArrayWithOutSpaces[TempBand];
+        if TempBand = All then
+           begin
+           BandPchar := 'total';
+           end;
+
+           sBuf := sBuf + #9#9 + '<qso band="' + BandPChar +
+                              '" mode="' + GetScoresModesArray[TempMode] +
+                              '">' + IntToStr(QSOTotals[TempBand, TempMode]) + '</qso>' + sLineBreak;
+           sBuf := sBuf + #9#9 + '<point band="' + BandPChar + '" mode="' + GetScoresModesArray[TempMode] + '">' +
+                        IntToStr(QSOPointTotals[TempBand, TempMode]) + '</point>' + sLineBreak;
+
+        end;
+     end;
+
+  for TempBand := Band160 to All do
+    for TempMode := CW to Phone do //Both do
+      for m := Succ(Low(RemainingMultiplierType)) to High(RemainingMultiplierType) do
+      begin
+        if mo.MTotals[TempBand, TempMode, m] = 0 then Continue;
+
+        BandPchar := BandStringsArrayWithOutSpaces[TempBand];
+        if TempBand = All then
+          BandPchar := 'total';
+
+        sBuf := sBuf + #9#9 + '<mult band="' + BandPChar + '" mode="' + GetScoresModesArray[TempMode] + '" type="';
+
+        if  Contest = WRTC then
+           begin
+           sBuf := sBuf + GetScoresMultsWRTC[m];
+           end
+        else
+           begin
+           sBuf := sBuf + GetScoresMults[m];
+           end;
+        sBuf := sBuf + '">' + IntToStr(mo.MTotals[TempBand, TempMode, m]) + '</mult>' + sLineBreak;
+
+
+      end;
+
+  sBuf := sBuf + #9 + '</breakdown>' + sLineBreak +
+                 #9 + '<score>' + IntToStr(TotalScore) + '</score>' + sLineBreak +
+                 #9 + '<timestamp>' + SystemTimeToString(UTC) + '</timestamp>' + sLineBreak +
+                 '</dynamicresults>' + sLineBreak;
+
+ {
      sBuf := '<?xml version="1.0"?>' + sLineBreak +
             '<dynamicresults>' +  sLineBreak +
             #9 + '<soft>TR4W</soft>' + sLineBreak +
@@ -6156,23 +6233,37 @@ begin
             #9 + '<club>' + ' ' + '</club>' + sLineBreak +
             #9 + '<class ops="SINGLE-OP" mode="MIXED" power="HIGH" bands="ALL"  transmitter="ONE"  assisted = "ASSISTED">' + '</class>' + sLineBreak +
             #9 + '<breakdown>' + sLineBreak +
-            #9#9 + '<qso>' + '</qso>' + sLineBreak +
-            { Loop through bands printing only ones that have contacts
+            #9#9 + '<qso>' + '</qso>' + sLineBreak;
+   //Loop through bands printing only ones that have contacts
+     for b := Low(BandType) to High(BandType) do
+        begin
+        if QTotals[b,Phone] > 0 then
+           begin
+           sBuf := sBuf + #9#9 + '<point band="' + BandStringsArray[b] + '" mode="PH">' + IntToStr(QTotals[b,Phone]) + '</point>' + sLineBreak;
+           end;
+        if QTotals[b,CW] > 0 then
+           begin
+           sBuf := sBuf + #9#9 + '<point band="' + BandStringsArray[b] + '" mode="CW">' + IntToStr(QTotals[b,CW]) + '</point>' + sLineBreak;
+           end;
+        end;
             #9#9 + '<mult band="80" mode="PH" type="CTY">1</mult>
 		<mult band="80" mode="PH" type="HQ">0</mult>
 		<point band="80" mode="PH">4</point>
 		<qso band="total" mode="ALL">2</qso>
-    }  // This seems to be custom to the contest type HQ check if N1MM has another name for HQ multiplier in non-IARC/WRTC
+      // This seems to be custom to the contest type HQ check if N1MM has another name for HQ multiplier in non-IARC/WRTC
+    //sBuf := sBuf + #9#9 + '<point band="' + 'BB"' + ' mode="PH">' + IntToStr(QTotals[b,Phone]) + '</point>' + sLineBreak;
+
     #9#9 + '<mult band="total" mode="ALL" type="CTY">' + '</mult>' + sLineBreak +
     #9#9 + '<mult band="total" mode="ALL" type="HQ">' + '</mult>' + sLineBreak +
     #9#9 + '<point band="total" mode="ALL">' + '</point>' + sLineBreak +
-            #9 + '</breakdown>' + sLineBreak +
+
+    sBuf := sBuf + #9 + '</breakdown>' + sLineBreak +
             #9 + '<score>' + IntToStr(TotalScore) + '</score>' + sLineBreak +
             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
                   SysUtils.FormatDateTime('yyyy-mm-dd hh:mm:ss',Now) +
             '</timestamp>' + sLineBreak +
             '</dynamicresults>' + sLineBreak;
-
+    }
 
 
       udp.BroadcastEnabled := true;
