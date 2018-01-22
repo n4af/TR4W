@@ -85,16 +85,21 @@ uses
   LOGSend,
   LogSCP,
   LogStuff,
+  uMults,
   LOGWAE,
   LogWind,
   {Printer,}
   {Crt,
   SlowTree,}
   SysUtils,
+  DateUtils,
   Tree,
   ZoneCont
   ;
 
+  var TimeLastScoreBroadcast : TDateTime;
+
+procedure SendScoreToUDP;
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
 procedure ToggleModes;
@@ -1395,6 +1400,11 @@ begin
     Close(NetDebugBinaryOutput);
     Close(NetDebugBinaryInput);
   end;
+
+  if UDPBroadcastScore then
+     begin
+     SendScoreToUDP;
+     end;
 
   if DVKEnable then DVPUnInit;
   {if BandMapEnable then }SaveBandMap;
@@ -4695,7 +4705,14 @@ begin
 //      UpdateBandMapDupeStatus(RXData.Callsign, RXData.Band, RXData.Mode, True);
     SpotsList.UpdateSpotsDupeStatus(RXData.Callsign, RXData.Band, TempMode {RXData.Mode});
   end;
-
+  if UDPBroadcastScore then
+     begin
+     if SecondsBetween(TimeLastScoreBroadcast,Now) > 250 then
+        begin
+        TimeLastScoreBroadcast := Now;
+        SendScoreToUDP;
+        end;
+     end;
 end;
 
 procedure loglastcall;
@@ -6110,6 +6127,126 @@ begin
 //  SendStationStatus;
 end;
 
+procedure SendScoreToUDP;
+var
+    sBuf: AnsiString;
+    b: BandType;
+    TempBand                              : BandType;
+    TempMode                              : ModeType;
+    m                                     : RemainingMultiplierType;
+    BandPchar                             : PChar;
+const
+  GetScoresMults                        : array[RemainingMultiplierType] of PChar = (nil, 'state', 'country', 'zone', 'prefix');
+  GetScoresMultsIARU                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'country', 'zone', 'prefix');
+  GetScoresMultsWRTC                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'country', 'zone', 'prefix');
+  GetScoresModesArray                   : array[ModeType] of PChar = ('CW', 'DIG', 'PH', 'ALL', nil, nil);
+begin
+
+// Score formatted for WRTC Score Computer
+{
+<?xml version="1.0"?>
+<dynamicresults>
+	<soft>TR4W</soft>
+	<version>4.68</version>
+	<contest>IARU-HF</contest>
+	<call>NY4I</call>
+	<club>Florida Contest Club</club>
+	<class ops="SINGLE-OP" mode="MIXED" power="HIGH" bands="ALL"  transmitter="ONE"  assisted = "ASSISTED"></class>
+
+	<breakdown>
+		<qso band="80" mode="PH">2</qso>
+		<mult band="80" mode="PH" type="CTY">1</mult>
+		<mult band="80" mode="PH" type="HQ">0</mult>
+		<point band="80" mode="PH">4</point>
+		<qso band="total" mode="ALL">2</qso>
+		<mult band="total" mode="ALL" type="CTY">1</mult>
+		<mult band="total" mode="ALL" type="HQ">0</mult>
+		<point band="total" mode="ALL">4</point>
+	</breakdown>
+	<score>4</score>
+	<timestamp>2018-01-19 17:23:51</timestamp>
+</dynamicresults>
+}
+
+   if UDPBroadcastScore then                // Issue 304 NY4I
+     begin
+     CalculateTotals;    // This reads the log so be careful how often it is done.
+     sBuf := '<?xml version="1.0"?>' + sLineBreak +
+            '<dynamicresults>' +  sLineBreak +
+            #9 + '<soft>TR4W</soft>' + sLineBreak +
+            #9 + '<version>' + TR4W_CURRENTVERSION_NUMBER + '</version>' + sLineBreak +
+            #9 + '<contest>' + ContestTypeSA[Contest] + '</contest>' +   sLineBreak +
+            #9 + '<call>' + MyCall + '</call>' + sLineBreak +
+            #9 + '<club>' + ' ' + '</club>' + sLineBreak +
+            #9 + '<class ops="' + tCategoryOperatorSA[CategoryOperator] + '" mode="' + tCategoryModeSA[CategoryMode] +
+                 '" power="' + tCategoryPowerSA[CategoryPower] + '" bands="' + tCategoryBandSA[CategoryBand] +
+                 '" transmitter="' + tCategoryTransmitterSA[CategoryTransmitter] +
+                 '" assisted="' + tCategoryAssistedSA[CategoryAssisted] + '"></class>' + sLineBreak +
+            #9 + '<breakdown>' + sLineBreak;
+
+  for TempBand := Band160 to All do
+     begin
+     for TempMode := CW to Both do // Was Phone for a test do
+        begin
+        if QSOTotals[TempBand, TempMode] = 0 then Continue;
+
+        BandPchar := BandStringsArrayWithOutSpaces[TempBand];
+        if TempBand = All then
+           begin
+           BandPchar := 'total';
+           end;
+        if GetScoresModesArray[TempMode] <> 'ALL' then
+           begin
+
+           sBuf := sBuf + #9#9 + '<qso band="' + BandPChar +
+                              '" mode="' + GetScoresModesArray[TempMode] +
+                              '">' + IntToStr(QSOTotals[TempBand, TempMode]) + '</qso>' + sLineBreak;
+           end;
+        if Contest <> WRTC then
+           begin
+           for m := Succ(Low(RemainingMultiplierType)) to High(RemainingMultiplierType) do
+              begin
+              sBuf := sBuf + #9#9 + '<mult band="' + BandPChar + '" mode="' + GetScoresModesArray[TempMode] +
+                                        '" type="' +  GetScoresMults[m] + '">' + IntToStr(mo.MTotals[TempBand, TempMode, m]) +
+                                        '</mult>' + sLineBreak;
+              end;
+           end
+        else
+           begin // WRTC
+           if GetScoresModesArray[TempMode] = 'ALL' then
+              begin
+              for m := Succ(Low(RemainingMultiplierType)) to Succ(Succ(Low(RemainingMultiplierType))) do  // odd bit of code to select rmDomestic and rmDX
+                 begin
+                 sBuf := sBuf + #9#9 + '<mult band="' + BandPChar + '" mode="' + GetScoresModesArray[TempMode] +
+                                           '" type="' + GetScoresMultsWRTC[m] + '">' +
+                                            IntToStr(mo.MTotals[TempBand, TempMode, m]) + '</mult>' + sLineBreak;
+                 end;
+              end;
+           end;
+
+        if GetScoresModesArray[TempMode] = 'ALL' then
+           begin
+           sBuf := sBuf + #9#9 + '<point band="' + BandPChar + '" mode="' + GetScoresModesArray[TempMode] + '">' +
+                        IntToStr(QSOPointTotals[TempBand, TempMode]) + '</point>' + sLineBreak;
+           sBuf := sBuf + sLineBreak;
+           end;
+        end;
+        // After mode loop...
+
+
+     end;
+
+  sBuf := sBuf + #9 + '</breakdown>' + sLineBreak +
+                 #9 + '<score>' + IntToStr(TotalScore) + '</score>' + sLineBreak +
+                 #9 + '<timestamp>' + SystemTimeToString(UTC) + '</timestamp>' + sLineBreak +
+                 '</dynamicresults>' + sLineBreak;
+
+
+  udp.BroadcastEnabled := true;
+  udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+  end;
+end;
+
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
 var
     sBuf: AnsiString;
@@ -6129,7 +6266,7 @@ begin
                       RxData.tSysTime.qtSecond]) +
             '</timestamp>' + sLineBreak +
             #9 + '<call>' + RXData.Callsign + '</call>' + sLineBreak +
-            #9 + '<<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
+            #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
       '</contactdelete>'+ sLineBreak ;
 
@@ -6214,7 +6351,7 @@ begin
             '<contactinfo>' +  sLineBreak +
 
             #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
-            #9 + '<<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
+            #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
                SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
                       RxData.tSysTime.qtYear,

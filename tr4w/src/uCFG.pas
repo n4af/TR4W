@@ -315,7 +315,7 @@ const
 
   CommandsArraySize                     = 407+ 1{RadioOneCWSpeedSync} + 1{RadioTwoCWSpeedSync}
                                               + 1{RadioOneCWByCAT}     + 1{RadioTwoCWByCAT} //ny4i // 4.44.5
-                                              + 7{UDPBroadcast Variables} //ny4i 4.44.9  - Issue 82 added one more UDP variable
+                                              + 8{UDPBroadcast Variables} //ny4i 4.44.9  - Issue 82 added one more UDP variable   Issue 304 Added UDPBroadcastScore
                                               ;
   CFGCA                                 : array[1..CommandsArraySize] of CFGRecord =
     (
@@ -718,11 +718,11 @@ const
  (crCommand: 'UDP BROADCAST CONTACT INFO';    crAddress: @UDPBroadcastContact;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i 4.44.9
  (crCommand: 'UDP BROADCAST RADIO INFO';      crAddress: @UDPBroadcastRadio;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i 4.44.9
  (crCommand: 'UDP BROADCAST ROTOR';           crAddress: @UDPBroadcastRotor;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i 4.44.9
+ (crCommand: 'UDP BROADCAST SCORE';           crAddress: @UDPBroadcastScore;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i Issue 304
  (crCommand: 'UDP BROADCAST PORT';            crAddress: @UDPBroadcastPort;               crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),   // ny4i 4.44.9
  (crCommand: 'UDP BROADCAST ROTOR PORT';      crAddress: @UDPBroadcastRotorPort;          crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),   // ny4i 4.44.9
  (crCommand: 'UDP BROADCAST ADDRESS';         crAddress: @UDPBroadcastAddress;            crMin:0;  crMax:255;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),  // ny4i 4.44.9
  (crCommand: 'UDP BROADCAST ALL QSOS';        crAddress: @UDPBroadcastAllQSOs;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // ny4i Issue 82
-
  (crCommand: 'UNKNOWN COUNTRY FILE ENABLE';   crAddress: @UnknownCountryFileEnable;       crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'UNKNOWN COUNTRY FILE NAME';     crAddress: @UnknownCountryFileName;         crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'UPDATE RESTART FILE ENABLE';    crAddress: @UpdateRestartFileEnable;        crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
