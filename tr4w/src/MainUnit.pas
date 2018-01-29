@@ -756,8 +756,6 @@ end;
 
 procedure SpaceBarProc;
 
-var
-  SpecialRadioSwap                      : boolean;
 begin
 
   if (DupeInfoCall <> '') and (CallWindowString = '') then
@@ -770,7 +768,6 @@ begin
     else
     begin
       SwapRadios; { Changes band/mode and display }
-      SpecialRadioSwap := True;
     end;
 
     if TwoRadioState <> CallReady then
@@ -1414,12 +1411,8 @@ var
   TempFreq                              : Cardinal;
   TempMode                              : ModeType;
   TempBand                              : BandType;
-  i                                     : integer;
-  f                                     : REAL;
-  code                                  : integer;
   TempVFO                               : Char;
   TempString                            : CallString;
-  fr                                    : integer;
 const
   QSYSHIFT                              = 20000;
 begin
@@ -1695,7 +1688,6 @@ begin
       InSplit := False;
      exit;
    end;
-    Freq := 0;
 
     Freq := QuickEditFreq(TC_TRANSMITFREQUENCYKILOHERTZ, 10);
 
@@ -2079,7 +2071,6 @@ var
   e                                     : TMainWindowElement;
   temprect                              : TRect;
 //  OffsetY                               : integer;
-  v1                                    : TInitCommonControlsEx;
 begin
   tr4whandle := CreateWindowEx($00010100, tr4w_ClassName, nil,
     WS_SYSMENU or WS_MINIMIZEBOX { or WS_THICKFRAME},
@@ -2353,15 +2344,14 @@ end;
 }
 
 function DrawWindows(lParam: lParam; wParam: wParam): Cardinal;
-label
-  DrawWindow;
+ label
+   DrawWindow;
 var
   TempBrush                             : HBRUSH;
   TempWindowColor                       : integer;
 const
   DupeInfoCallWindowColorArray          : array[DupeInfoState] of tr4wColors = (trBtnFace, trRed, trYellow, trLightBlue);
 begin
-  Result := 0;
   TempWindowColor := 0;
 
   TempBrush := tr4wBrushArray[TWindows[mweWholeScreen].mweBackG]; //tr4wBrushArray[trBtnFace];
@@ -2434,7 +2424,6 @@ var
   tCardinal                             : HWND;
   focus                                 : HWND;
   TempCallstring                        : CallString;
-  junk                                  : String;
 begin
   LowordWparam := LoWord(menuID);
 
@@ -3191,9 +3180,7 @@ end;
 procedure ProcessReturn;
 var
   TempHWND                              : HWND;
-  First                                 : String[12];
   revnr                                 : String[6];
-  Parm                                  : Integer;
   label
    SetFreq;
 begin
@@ -3303,12 +3290,10 @@ var
   itempos                               : integer;
   p                                     : HWND;
   c                                     : HWND;
-  i                                     : integer;
   label
   wait;
 begin
   CallWinKeyDown  := True; // 4.52.4
-  i := 0;
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
   DebugMsg('[CallWindowKeyDownProc] Key pressed = ' + key);

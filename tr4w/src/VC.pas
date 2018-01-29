@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.67.12'  ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.67.15' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Jan 22, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'Feb 1, 2018' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -2857,6 +2857,7 @@ QSOPartiesCount = 13;
   type
     TContestInfo = record
 {(*}
+    {01}Name    : Pchar;
     {04}Email   : PChar;
     {04}DF      : PChar;
     {02}WA7BNM  : WORD;
@@ -2890,11 +2891,12 @@ QSOPartiesCount = 13;
   const
     ContestsArray                       : array[ContestType] of TContestInfo =
       (
-{(*}
- ({Name: 'DUMMY CONTEST';              }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: UnknownExchange;                             XM:NoDXMults; QP:NoQSOPointMethod),
- ({Name: '7QP';                        }Email: nil;                      DF: 'seven_cty';                 WA7BNM:  404; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 10;AE: RSTDomesticOrDXQTHExchange;          XM:NoDXMults; QP:TwoPhoneThreeCW),
- ({Name: 'ALL ASIAN CW';               }Email: nil;                      DF: nil;                 WA7BNM:   47; {SK3BG: 'allasia';    } QRZRUID: 146 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:AllAsianQSOPointMethod),
- ({Name: 'ALL ASIAN SSB';              }Email: nil;                      DF: nil;                 WA7BNM:  102; {SK3BG: 'allasia';    } QRZRUID: 146 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:AllAsianQSOPointMethod),
+
+ (Name: 'DUMMY CONTEST';               Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: UnknownExchange;                             XM:NoDXMults; QP:NoQSOPointMethod),
+
+ (Name: '7QP';                         Email: nil;                      DF: 'seven_cty';                 WA7BNM:  404; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 10;AE: RSTDomesticOrDXQTHExchange;          XM:NoDXMults; QP:TwoPhoneThreeCW),
+ (Name: 'ALL ASIAN CW';                Email: nil;                      DF: nil;                 WA7BNM:   47; {SK3BG: 'allasia';    } QRZRUID: 146 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:AllAsianQSOPointMethod),
+ (Name: 'ALL ASIAN SSB';               Email: nil;                      DF: nil;                 WA7BNM:  102; {SK3BG: 'allasia';    } QRZRUID: 146 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:AllAsianQSOPointMethod),
  ({Name: 'ALL JA';                     }Email: nil;                      DF: 'allja';             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTALLJAPrefectureAndPrecedenceExchange;     XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'AP-SPRINT';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: 'asiapacs';   } QRZRUID: 77  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'ARCI';                       }Email: nil;                      DF: 's50p12';            WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTPossibleDomesticQTHAndPower;              XM:ARRLDXCCWithNoUSACanadaKH6OrKL7; QP:ARCIQSOPointMethod),

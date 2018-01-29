@@ -1,0 +1,5 @@
+unit stdctrls;
+
+Label1.Caption := 'First line' + #13#10 + 'SecondLine';
+
+end.

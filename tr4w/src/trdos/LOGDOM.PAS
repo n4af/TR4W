@@ -90,7 +90,7 @@ implementation
 uses
   ZoneCont,
   LogWind,
-  MainUnit; {KK1L: DEBUG}
+  MainUnit, LogSCP; {KK1L: DEBUG}
 
 procedure DomQTHTableObject.AddNewPrefixRecord(Prefix: Str20; DomQTH: Str20; Multiplier: Str20);
 

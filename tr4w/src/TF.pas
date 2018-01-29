@@ -390,7 +390,6 @@ begin
   winDC := GetDC(Handle);
   srcdc := CreateCompatibleDC(winDC);
   destdc := CreateCompatibleDC(winDC);
-  OldBitmap := SelectObject(destdc, iinfo.hbmColor);
   OldBitmap := SelectObject(srcdc, iinfo.hbmMask);
   BitBlt(destdc, 11, 1, 16, 16, srcdc, 0, 0, SRCPAINT);
   Result := SelectObject(destdc, OldBitmap);
@@ -401,7 +400,6 @@ end;
 
 function ExtractBigIcon(IconIndex: integer): HICON;
 var
-  SmallIcon                             : HICON;
   BigIcon                               : HICON;
 begin
   //     ExtractIconEx('shell32.dll', IconIndex, BigIcon, SmallIcon, 1);
@@ -1108,9 +1106,8 @@ begin
 end;
 
 function tGetDateFormat(DT: TQSOTime): PChar; //assembler;
-var
-  St                                    : SYSTEMTIME;
-  aMonthString                          : PChar;
+
+ 
 begin
 { $ I F LANG <> 'E1212NG'}
 
@@ -1775,8 +1772,7 @@ var
 //  tempDLGTEMPLATE                       : MYDLGTEMPLATE;
   tempDLGTEMPLATEex                     : TDLGTEMPLATEEX;
   p                                     : PDlgTemplate;
-  h                                     : HWND;
-  lpNumberOfBytesWritten                : DWORD;
+ 
 begin
   p := @ {tempDLGTEMPLATEex } tempDLGTEMPLATE;
 
