@@ -697,8 +697,10 @@ end;
 
 function ctyLocateCall(Call: CallString; var QTH: QTHRecord): boolean;
 label
-  FillRecord;
+  FillRecord, next;
+
 var
+  TempString                            : String;
   TempIndex                             : integer;
   TempPrefixRec                         : PrefixRecPtr;
   TempLength                            : integer;
@@ -740,16 +742,18 @@ begin
         end;
 
 //  MainUnit.showint(PInteger(@QTH.StandardCall)^);
-
+ next:
   if ctyFindCallsign(@TempPrefix, TempIndex) then
   begin
 //    asm nop end;
 
     if CTY.ctyCountryMode = ARRLCountryMode then
-    begin
-      if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '*' then goto FillRecord;
-    end else
-      goto FillRecord;
+     begin
+              if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '*' then goto FillRecord;
+    end
+    else
+
+       if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '' then goto next;
   end;
 
   if length(QTH.StandardCall) > 3 then
@@ -786,8 +790,13 @@ begin
 
       if CTY.ctyCountryMode = ARRLCountryMode then
       begin
-        if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] = '*' then Continue;
-      end;
+      if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] = '*' then Continue
+      else
+      goto FillRecord;
+
+     end;
+
+
 
       if not PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.FullCallsigns then
         goto FillRecord;

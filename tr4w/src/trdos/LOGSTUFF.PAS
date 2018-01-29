@@ -5575,7 +5575,7 @@ var
   posdash                               : integer;
 begin
   RXData.QSOPoints := 0;
-
+  RXCty := RXData.QTH.CountryID; // 4.67.15
   if (QSOPointsDomesticCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH <> '') then
   begin
     RXData.QSOPoints := QSOPointsDomesticCW;
