@@ -753,7 +753,7 @@ begin
     end
     else
 
-       if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '' then goto next;
+ //      if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '' then goto next;
   end;
 
   if length(QTH.StandardCall) > 3 then
