@@ -791,13 +791,13 @@ procedure LinkToActiveRadio(IntRadioType: InterfacedRadioType;
 begin
    if ActiveRadio = RadioOne then
       begin
-      IntRadioType := Radio1.RadioModel;
-      SerialPort := Radio1.tCATPortType;
+//      IntRadioType := Radio1.RadioModel;
+//      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
-      IntRadioType := Radio2.RadioModel;
-      SerialPort := Radio2.tCATPortType;
+//      IntRadioType := Radio2.RadioModel;
+//      SerialPort := Radio2.tCATPortType;
       end;
 end;
 
@@ -807,18 +807,18 @@ procedure RITClear;
 
 var
    IntRadioType: InterfacedRadioType;
-   SerialPort: PortType;
+//   SerialPort: PortType;
 
 begin
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
-      SerialPort := Radio1.tCATPortType;
+//      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
       IntRadioType := Radio2.RadioModel;
-      SerialPort := Radio2.tCATPortType;
+//      SerialPort := Radio2.tCATPortType;
       end;
 
    case IntRadioType of
@@ -867,18 +867,18 @@ procedure RITBumpUp;
 
 var
    IntRadioType: InterfacedRadioType;
-   SerialPort: PortType;
+//   SerialPort: PortType;
 
 begin
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
-      SerialPort := Radio1.tCATPortType;
+//      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
       IntRadioType := Radio2.RadioModel;
-      SerialPort := Radio2.tCATPortType;
+//      SerialPort := Radio2.tCATPortType;
       end;
 
    case IntRadioType of
@@ -915,18 +915,18 @@ procedure RITBumpDown;
 
 var
    IntRadioType: InterfacedRadioType;
-   SerialPort: PortType;
+//   SerialPort: PortType;
 
 begin
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
-      SerialPort := Radio1.tCATPortType;
+//      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
       IntRadioType := Radio2.RadioModel;
-      SerialPort := Radio2.tCATPortType;
+//      SerialPort := Radio2.tCATPortType;
       end;
 
    case IntRadioType of
@@ -963,18 +963,18 @@ procedure VFOBumpUp;
 
 var
    IntRadioType: InterfacedRadioType;
-   SerialPort: PortType;
+//   SerialPort: PortType;
 
 begin
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
-      SerialPort := Radio1.tCATPortType;
+//      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
       IntRadioType := Radio2.RadioModel;
-      SerialPort := Radio2.tCATPortType;
+//      SerialPort := Radio2.tCATPortType;
       end;
 
    case IntRadioType of
@@ -1030,18 +1030,18 @@ procedure VFOBumpDown;
 
 var
    IntRadioType: InterfacedRadioType;
-   SerialPort: PortType;
+//   SerialPort: PortType;
 
 begin
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
-      SerialPort := Radio1.tCATPortType;
+//      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
       IntRadioType := Radio2.RadioModel;
-      SerialPort := Radio2.tCATPortType;
+//      SerialPort := Radio2.tCATPortType;
       end;
 
    case IntRadioType of
@@ -1436,8 +1436,7 @@ begin
 end;
 
 procedure RadioObject.SendIcomCommand(Command: byte);
-var
-   s: string;
+
 begin
 
    tIcom6Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
@@ -1723,9 +1722,6 @@ begin
 end;
 
 procedure RadioObject.CheckRadioStatus;
-var
-   answer, FreqString, TestString: string;
-   TempMode: ModeType;
 
   { This is the procedure to call to make sure the radio status is as current
     as possible. It will look to see what the most recent request for data
@@ -1843,7 +1839,7 @@ var
    sMsg: string;
    sendNow : boolean;
    formatStr: string;
-   debugStr: string;
+//   debugStr: string;
    charProcessed: boolean;
    elements: integer;
 begin
@@ -1936,7 +1932,7 @@ begin
             begin
             DebugMsg('Assembling CW message to send');
             Msg := CWByCATBuffer;               // ny4i 4.44.5
-            msgLen := length(Msg);              //length(Msg);
+//            msgLen := length(Msg);              //length(Msg);
             //len := Min(msgLen, 24);             // 24 max for Kenwood
             case RadioModel of
                TS480, TS570, TS590, TS950, TS990, TS2000, FLEX:
@@ -2004,7 +2000,7 @@ begin
             CWByCATBuffer := ''; // Clear the buffer
             if sendNow then
                begin
-               sendNow := false;
+//               sendNow := false;
                SetRadioCWSpeed(CodeSpeed);
                end;
             end
@@ -2081,24 +2077,24 @@ begin
                   //CodeSpeed := CodeSpeed + Round(CodeSpeed * 0.06); // increase 6 %
                   //SetRadioCWSpeed(CodeSpeed);
                   //sendNow := true;
-                  charProcessed := true;
+//                  charProcessed := true;
                   end
                else if Msg = ControlS then
                   begin       // Speed down by 6 %
                   //CodeSpeed := CodeSpeed - Round(CodeSpeed * 0.06); // increase 6 %
                   //SetRadioCWSpeed(CodeSpeed);
                   //sendNow := true;
-                  charProcessed := true;
+//                  charProcessed := true;
                   end
                else if Msg = '^' then           // ny4i Issue131 Added Special CW Characters
                   begin // There is no half space in Icom CW strings
                   Self.CWByCATBuffer := Self.CWByCATBuffer + ' '; // Use a whole space
-                  charProcessed := true;
+//                  charProcessed := true;
                   end
                else if Msg = '!' then   // SN
                   begin
                   Self.CWByCATBuffer := Self.CWByCATBuffer + '^SN';
-                  charProcessed := true;
+//                  charProcessed := true;
                   end
                {else if Msg = '&' then // AS      // & is really MYSTATE but documented as AS
                   begin
@@ -2108,17 +2104,17 @@ begin
                else if Msg = '+' then // AR
                   begin
                   Self.CWByCATBuffer := Self.CWByCATBuffer + '^AR';
-                  charProcessed := true;
+//                  charProcessed := true;
                   end
                else if Msg = '<' then // SK
                   begin
                   Self.CWByCATBuffer := Self.CWByCATBuffer + '^SK';
-                  charProcessed := true;
+//                  charProcessed := true;
                   end
                else if Msg = '=' then // BT
                   begin
                   Self.CWByCATBuffer := Self.CWByCATBuffer + '^BT';
-                  charProcessed := true;
+//                  charProcessed := true;
                   end
                else
                   begin
@@ -2141,8 +2137,8 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure RadioObject.StopSendingCW;
-var
-   localMsg: string;
+
+//   localMsg: string;
 begin
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
@@ -2207,7 +2203,7 @@ end;
 procedure RadioObject.SetUpRadioInterface;
 var
    hand: HWND;
-   TempCardinal: cardinal;
+//   TempCardinal: cardinal;
    dwFlagsAndAttributes: DWORD;
    EvtChar: char;
 begin
@@ -2395,15 +2391,15 @@ end;
 procedure RadioObject.SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
 
 var
-   FreqStr: Str20;
+//   FreqStr: Str20;
    CharPointer: integer;
    nBytesToWrite: integer;
    i: integer;
    SendByte, TempByte: byte;
    TempChar: char;
-   lpNumberOfBytesWritten: cardinal;
-   VFOByte: byte;
-   p: PChar;
+//   lpNumberOfBytesWritten: cardinal;
+//   VFOByte: byte;
+//   p: PChar;
    tempFilterWidth: integer;
 const
    FT847ModeString = CHR(0) + CHR(0) + CHR(0) + CHR(7);
@@ -2863,16 +2859,7 @@ begin
 
             if VFO = 'B' then
                begin
-{
-          ICOM_COMMAND_B2 :=
-            ICOM_PREAMBLE_CODE +
-            ICOM_PREAMBLE_CODE +
-            CHR(ReceiverAddress) +
-            ICOM_CONTROLLER_ADDRESS +
-            ICOM_SET_VFO_COMMAND +
-            ICOM_SET_VFO_A_COMMAND +
-            ICOM_END_OF_MESSAGE_CODE;
-}
+
                CommandsTempBuffer[0] := CHR(8);
                CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
                CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
@@ -2885,47 +2872,7 @@ begin
 
                end;
             end;
-{
-    JST245:
-      begin
 
-//         Put radio in remote                                           3
-        WriteBufferToCATPort('H');
-        CPUKeyer.AddSerialPortString(tCATPortType, '1');
-        CPUKeyer.AddSerialPortString(tCATPortType, CarriageReturn);
-
-//         Frequency command
-        CPUKeyer.AddSerialPortString(tCATPortType, 'F');
-
-        Str(Freq, FreqStr);
-        while length(FreqStr) < 8 do FreqStr := '0' + FreqStr;
-
-        for CharPointer := 1 to length(FreqStr) do
-          CPUKeyer.AddSerialPortString(tCATPortType, FreqStr[CharPointer]);
-
-        CPUKeyer.AddSerialPortString(tCATPortType, VFO);
-        CPUKeyer.AddSerialPortString(tCATPortType, CarriageReturn);
-
-//         Send mode
-
-        CPUKeyer.AddSerialPortString(tCATPortType, 'D');
-
-        if Mode = CW then
-          CPUKeyer.AddSerialPortString(tCATPortType, '1')
-        else
-          if Freq < 10000000 then
-            CPUKeyer.AddSerialPortString(tCATPortType, '3')
-          else
-            CPUKeyer.AddSerialPortString(tCATPortType, '2');
-
-        CPUKeyer.AddSerialPortString(tCATPortType, CarriageReturn);
-
-        CPUKeyer.AddSerialPortString(tCATPortType, 'H'); // Put radio in remote
-        CPUKeyer.AddSerialPortString(tCATPortType, '0');
-        CPUKeyer.AddSerialPortString(tCATPortType, CarriageReturn);
-
-      end;
-}
          Orion:
             begin
             i := Format(tOrionFreq, '*AF%02u.%05u'#13, Freq div 1000000,
@@ -3095,8 +3042,8 @@ var
    RadioTwoLastDisplayedPreviousStatus: Str80;
    RadioTwoLastDisplayedFilteredStatus: Str80;
 
-   TempStatusString: Str80;
-   TempValue: real;
+//   TempStatusString: Str80;
+//   TempValue: real;
 
 begin
    //{WLI}    Window (1, 1, 80, 25);
@@ -3226,71 +3173,17 @@ begin
      end;
 end;
 function OpenCATDebugFile(port: PortType): boolean;
-var
-   stored: integer;
-   TempBaudRate: cardinal;
-   TempPchar: PChar;
-   Radio:  PChar;
-begin
-{
-  with CPUKeyer do
-    if SerialPortDebug then
-    begin
-      tr4w_PortDebug[port] := True;
-      asm
-      push eax
-      lea eax,TR4W_PATH_NAME
-      push eax
-      end;
-      wsprintf(wsprintfBuffer, '%sCOM%d_DEBUG.HTML');
-      asm add esp,16
-      end;
-      tDebugFile[port] := CreateFile(wsprintfBuffer, GENERIC_WRITE, FILE_SHARE_WRITE, nil, CREATE_ALWAYS, FILE_ATTRIBUTE_ARCHIVE, 0);
 
-      if port = Radio1.tCATPortType then
-      begin
-        TempPchar := InterfacedRadioTypeSA[Radio1.RadioModel];
-        Radio := Radio1AsPchar;
-        TempBaudRate := Radio1.RadioBaudRate;
-      end;
-      if port = Radio2.tCATPortType then
-      begin
-        TempPchar := InterfacedRadioTypeSA[Radio2.RadioModel];
-        Radio := Radio2AsPchar;
-        TempBaudRate := Radio2.RadioBaudRate;
-      end;
-      asm
-      push TempBaudRate
-      push Radio
-      push TempPChar
-      lea  eax,MyCall[1]
-      push eax
-      end;
-      stored := wsprintf(TempBuffer1,
-        '<HTML><HEAD><TITLE>TR4W SERIAL PORT DEBUG FILE</TITLE></HEAD><BODY>' +
-        '<H3>' + TR4W_CURRENTVERSION + ' SERIAL PORT DEBUG FILE</H3>' +
-        '<H3>%s - %s - %s - %u Baud Rate</H3>' +
-        '<TABLE BORDER=1 STYLE="FONT-FAMILY:COURIER"><TR><TH>Time</TH><TH WIDTH=60>In/Out</TH><TH>Data</TH><TH>Bytes</TH><TH>HEX</TH></TR>');
-      asm add esp,24
-      end;
-      sWriteFile(tDebugFile[port], TempBuffer1, stored);
-    end;
-}
+begin
+
 end;
 
-{
-procedure CloseCATDebugFile(port: PortType);
-begin
-  sWriteFile(CPUKeyer.tDebugFile[port], '</TABLE></BODY></HTML>', 22);
-  CloseHandle(CPUKeyer.tDebugFile[port]);
-end;
-}
 
 function tPTTVIACAT(PTTOn: boolean): boolean;
 
 var
    IntRadioType: InterfacedRadioType;
-   SerialPort: PortType;
+//   SerialPort: PortType;
    TempString: Str80;
    WaitAnswer: cardinal;
 const
@@ -3319,12 +3212,12 @@ begin
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
-      SerialPort := Radio1.tCATPortType;
+//      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
       IntRadioType := Radio2.RadioModel;
-      SerialPort := Radio2.tCATPortType;
+ //     SerialPort := Radio2.tCATPortType;
       end;
 
    case IntRadioType of

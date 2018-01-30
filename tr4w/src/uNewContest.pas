@@ -124,7 +124,7 @@ var
   TempCategoryOperator                  : tCategoryOperator;
   TempCategoryPower                     : tCategoryPower;
   TempCategoryTransmitter               : tCategoryTransmitter;
-  LatestCfgFile                         : Cardinal;
+  
 
 //  TempActiveExchange                    : ExchangeType;
 //  TempExchangeInformation               : ExchangeInformationRecord;

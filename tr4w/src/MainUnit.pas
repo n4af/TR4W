@@ -95,7 +95,7 @@ uses
   uSendSpot,
   uDupesheet,
   uRemMults,
-  uReminder,
+ // uReminder,
   uTotal,
   uMaster,
   uInputQuery,

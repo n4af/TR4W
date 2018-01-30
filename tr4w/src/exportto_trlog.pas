@@ -193,9 +193,7 @@ end;
 
 procedure WriteLogEntry(Entry: Str80);
 
-var
-  FileWrite                             : Text;
-  //  I, i2                           : Cardinal;
+
 begin
   //Assign(FileWrite, LogFileName);
   //{ $ I-}
@@ -266,7 +264,6 @@ procedure QSONumberReceivedStamp(Exchange: ContestExchange; var LogString: Str80
 
 var
   QSONumberString                       : Str80;
-  Result                                : integer;
 
 begin
   QSONumberString := '';
@@ -664,7 +661,7 @@ end;
 procedure BandModeDateTimeNumberCallNameSentStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  TimeString, CallString, QSONumberString: Str20;
+  TimeString, QSONumberString: Str20;
   TempChar                              : Char;
   MonthString                           : PChar;
   Year                                  : Word;

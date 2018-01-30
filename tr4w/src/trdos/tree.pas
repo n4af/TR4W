@@ -1019,15 +1019,15 @@ uses
 //{WLI}FUNCTION  BYTSTOCR (List: Pointer; Start: INTEGER): INTEGER; EXTERNAL;
 
 var
-  ActivityCounter                       : integer;
-  CharacterSpace                        : integer;
+//  ActivityCounter                       : integer;
+//  CharacterSpace                        : integer;
   CWPitch                               : integer;
   DahLength                             : integer;
   DitLength                             : integer;
-  ExtendedKey                           : Byte;
+//  ExtendedKey                           : Byte;
   //  MouseType                             : MouseTypeType;
-  ReadKeyAltState                       : boolean;
-  WordSpace                             : integer;
+//  ReadKeyAltState                       : boolean;
+//  WordSpace                             : integer;
 
   //{WLI}{$L dupe}
 
@@ -2723,8 +2723,7 @@ function GetTomorrowString: Str80;
 { This function will look at the DOS clock and generate a nice looking
   ASCII string showing the name of tomorrow (ie: Monday).  }
 //const  DayTags                               : array[0..6] of string[9] = ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
-var
-  UTC                                   : SYSTEMTIME;
+
 begin
 
 end;
@@ -2979,45 +2978,10 @@ end;
 
 procedure DisplayLineInputString(Str: Str160; Cursor: integer; EndOfPrompt: integer);
 
-var
-  DisplayArea, Offset                   : integer;
 
 begin
   //{WLI}
-  {    GoToXY (EndOfPrompt, WhereY);
-      ClrEol;
 
-      DisplayArea := Lo (WindMax) - EndOfPrompt - 2;
-
-      IF Length (Str) < DisplayArea THEN
-          BEGIN
-          Write (Str);
-          GoToXY (Cursor + EndOfPrompt - 1, WhereY);
-          END
-      ELSE
-          BEGIN
-          Offset := 0;
-
-          IF Cursor >= DisplayArea - 1 THEN
-              BEGIN
-              REPEAT
-                  Offset := Offset + 8
-              UNTIL Cursor - Offset < DisplayArea - 3;
-
-              IF Length (Str) - Offset > DisplayArea THEN
-                  Write ('+', Copy (Str, Offset, DisplayArea - 3), '+')
-              ELSE
-                  Write ('+', Copy (Str, Offset, DisplayArea - 2));
-              GoToXY (Cursor - Offset + EndOfPrompt + 1, WhereY);
-              END
-          ELSE
-              BEGIN
-              Write (Copy (Str, 1, DisplayArea - 2), '+');
-              GoToXY (Cursor - Offset + EndOfPrompt - 1, WhereY);
-              END;
-
-          END;
- }
 end;
 {
 function ControlKeyPressed: boolean;
@@ -3137,12 +3101,6 @@ function LineInput(Prompt: Str160;
   over as desired.  An escape with no entry will give a result of escape
   key.  If the input or initial entry goes beyond the right of the window,
   it will be handled nicely I hope. }
-
-var
-  Key                                   : Char;
-  InputString, TempString               : Str160;
-  CursorPosition, EndOfPrompt, InputArea, InputShift: integer;
-  VirginEntry, InsertMode, InputTooLong : boolean;
 
 begin
   //{WLI}
@@ -3392,9 +3350,6 @@ end;
 
 function Lpt1BaseAddress: Word;
 
-var
-  Address                               : Word;
-
 begin
   //{WLI}
   {    Address := MemW [ $40:8 ];
@@ -3408,8 +3363,7 @@ end;
 
 function Lpt2BaseAddress: Word;
 
-var
-  Address                               : Word;
+
 
 begin
   {    Address := MemW [ $40:$A ];
@@ -3423,8 +3377,6 @@ end;
 
 function Lpt3BaseAddress: Word;
 
-var
-  Address                               : Word;
 
 begin
   {    Address := MemW [ $40:$C ];
@@ -3542,8 +3494,7 @@ end;
 
 function OkayToProceed: boolean;
 
-var
-  Key                                   : Char;
+
 
 begin
   {    OkayToProceed := False;
@@ -3567,8 +3518,7 @@ function OpenDupeFileForRead(var FileHandle: Text; FileName: Str80): boolean;
     return FALSE.  If it does exist, the next line to be read will be the
     title.                                                                  }
 
-var
-  TempString                            : Str80;
+
 
 begin
 //  OpenDupeFileForRead := False;
@@ -3613,9 +3563,6 @@ begin
 end;
 
 function OperatorEscape: boolean;
-
-var
-  Key                                   : Char;
 
 begin
   {    OperatorEscape := False;
@@ -3663,8 +3610,7 @@ function ReadChar(SerialPort: PortType): Char;
 
 { This funtion will get the char that is waiting in the UART }
 
-var
-  PortAddress                           : Word;
+
   //{WLI}    Regs: REGISTERS;
 
 begin
@@ -3740,10 +3686,6 @@ end;
 
 function RemoveFirstChar(var LongString: string): Char;
 
-var
-  CharCount                             : integer;
-  FirstWordFound                        : boolean;
-  FirstWordCursor                       : integer;
 
 begin
   while (LongString <> '') and ((Copy(LongString, 1, 1) = ' ') or (Copy(LongString, 1, 1) = TabKey)) do
@@ -3935,8 +3877,7 @@ end;
 
 procedure PacketSendChar(SerialPort: PortType; CharToSend: Char);
 
-var
-  PortAddress                           : Word;
+
   //{WLI}    Regs: REGISTERS;
 
 begin
@@ -3968,8 +3909,7 @@ end;
 
 procedure SendChar(SerialPort: PortType; CharToSend: Char);
 
-var
-  PortAddress                           : Word;
+
   //{WLI}    Regs: REGISTERS;
 
 begin
@@ -4101,7 +4041,7 @@ end;
 function ValidRST(var Ex: ShortString; var RST: Word; Mode: ModeType): boolean;
 
 var
-  TempString, RSTString                 : Str20;
+
   DefaultRST                            : Word;
   Number                                : integer;
 begin
@@ -4530,10 +4470,7 @@ end;
 
 function NewReadKey: Char;
 
-var
-  MemByte                               : Byte;
-  Address                               : Byte;
-  Key                                   : Char;
+
 
 begin
   {    IF UseBIOSKeyCalls THEN
@@ -4875,8 +4812,6 @@ end;
 
 procedure WriteLnCenter(Prompt: Str80);
 
-var
-  ScreenWidth, CenterSpaces             : integer;
 
 begin
   {    ScreenWidth := Lo (WindMax);
@@ -4903,8 +4838,6 @@ end;
 
 procedure WriteLnLstCenter(Prompt: Str80);
 
-var
-  Space, CenterSpaces                   : integer;
 
 begin
   {    CenterSpaces := 40 - (Length (Prompt) DIV 2);
@@ -4919,7 +4852,7 @@ var
   TempString                            : Str80;
   //{WLI}
   s                                     : string;
-  CharPos                               : integer;
+//  CharPos                               : integer;
   find_data                             : WIN32_FIND_DATA;
 begin
   FoundDirectory := False;

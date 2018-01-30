@@ -282,9 +282,6 @@ end;
 
 function ClubCall(Call: CallString): boolean;
 
-var
-  ID, StandardCall                      : Str20;
-
 begin
 {
   ClubCall := False;
@@ -428,7 +425,6 @@ function GetNumber(Call: CallString): Char;
 
 var
   CharPtr                               : integer;
-  TempString                            : Str80;
 
 begin
   if StringHas(Call, '/') then

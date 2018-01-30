@@ -745,15 +745,16 @@ begin
  next:
   if ctyFindCallsign(@TempPrefix, TempIndex) then
   begin
-//    asm nop end;
+
 
     if CTY.ctyCountryMode = ARRLCountryMode then
      begin
+     // hack to handle *4u1v entities 4U1A, 4U2U, 4U0R, and C7A  4.68.2
+      if (tempindex = 112) or (TempIndex = 109) or (TempIndex = 1455) or (TempIndex = 122) then tempindex := 130;
               if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '*' then goto FillRecord;
     end
     else
-
- //      if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '' then goto next;
+  //     if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '' then goto next;
   end;
 
   if length(QTH.StandardCall) > 3 then

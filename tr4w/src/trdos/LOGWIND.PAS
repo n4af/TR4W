@@ -1093,7 +1093,7 @@ uses
   uStations,
   uSpots,
   uRemMults,
-  uReminder,
+ // uReminder,
   uFunctionKeys,
   LogPack,
   uTelnet,
