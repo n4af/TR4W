@@ -176,7 +176,7 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.68.0' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.68.1' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
@@ -2900,7 +2900,7 @@ QSOPartiesCount = 13;
  ({Name: 'ALL JA';                     }Email: nil;                      DF: 'allja';             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTALLJAPrefectureAndPrecedenceExchange;     XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'AP-SPRINT';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: 'asiapacs';   } QRZRUID: 77  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'ARCI';                       }Email: nil;                      DF: 's50p12';            WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTPossibleDomesticQTHAndPower;              XM:ARRLDXCCWithNoUSACanadaKH6OrKL7; QP:ARCIQSOPointMethod),
- ({Name: 'ARI-DX';                     }Email: nil;                      DF: 'ari';               WA7BNM:    9; {SK3BG: nil;          } QRZRUID: 85  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:ARRLDXCCWithNoIOrIS0; QP:ARIQSOPointMethod),
+ ({Name: 'ARI-DX';                     }Email: nil;                      DF: 'ari';               WA7BNM:    9; {SK3BG: nil;          } QRZRUID: 85  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:ARRLDXCCWithNoIOrIS0; QP:OnePointPerQSO),    // 4.68.1
  ({Name: 'ARRL-10';                    }Email: '10meter@arrl.org';       DF: 'arrl10';            WA7BNM:  199; {SK3BG: 'arrl10';     } QRZRUID: 14  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCCWithNoUSACanadaKH6OrKL7; QP:ARRL10QSOPointMethod),
  ({Name: 'ARRL-160';                   }Email: '160meter@arrl.org';      DF: 'arrlsect';          WA7BNM:  194; {SK3BG: 'arrl160';    } QRZRUID: 22  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticOrDXQTHExchange;                  XM:NoDXMults; QP:ARRL160QSOPointMethod),
  ({Name: 'ARRL-DX-CW';                 }Email: 'DXCW@arrl.org';          DF: nil;                 WA7BNM:  256; {SK3BG: 'arrlidx';    } QRZRUID: 335 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTPowerExchange;                            XM:NoDXMults; QP:ARRLDXQSOPointMethod),
