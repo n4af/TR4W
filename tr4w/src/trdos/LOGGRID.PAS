@@ -101,7 +101,7 @@ var
 
   G4, { R, M,} L4                       : REAL;
   m1, m2, m3, m4, m5, m6                : Char;
-  GR                                    : GridRec;
+//  GR                                    : GridRec;
 begin
   { First we do the longitude stuff - chars 1 3 and 5 }
 
@@ -218,8 +218,7 @@ begin
 
   TL := SDTM * SDTM + SDLMR * SDLMR * (CDTM * CDTM - STM * STM);
   CD := 1.0 - 2.0 * TL;
-  DL := ArcCos(CD);
-  SD := SIN(DL);
+
 
   KL := STM * CDTM;
   KK := SDTM * CTM;
@@ -389,9 +388,6 @@ end;
 
 procedure GetLatLon(Grid: GridString; var Lat, Lon: REAL);
 
-var
-  Lat1, Lat2, Lon1, Lon2                : REAL;
-  ShortHeading, LongHeading, Distance   : REAL;
 
 begin
 //  if length(Grid) <> 6 then Grid := Grid + 'LL';
@@ -428,7 +424,7 @@ function CalculateTime(Year: integer;
 var
   DOY                                   : Word;
   Doy1, UTC, UTCrad, T1, T2, T3, q, DECSol, Anm, RAsol, LONsol: REAL;
-  K1                                    : integer;
+
 
 begin
   Lat := Lat * PI / 180;
@@ -615,33 +611,17 @@ begin
 
   GetSunriseSunsetString := SunString;
 end;
-{
-function LooksLikeRadio160Square(Square: Str20): boolean;
-begin
-   Result := False;
-   if length(Square) < 2 then Exit;
-   if (Square[1] in ['A'..'Q']) or (Square[1] in ['W'..'Z']) then
-      if Square[2] in ['1'..'7'] then Result := True;
-end;
-}
+
 
 function LooksLikeAGeoCoordinates(Coordinates: Str40; var LatValue, LongValue: integer): boolean;
 var
 
   LatPos                                : Cardinal;
-  LatChar, LongChar                     : Char;
   CharPosition                          : Cardinal;
   ConvResult                            : integer;
   TempStr10                             : Str10;
   {
-  Контрольный номер состоит из следующих блоков:
-  1) Порядковый номер связи, начиная с 001;
-  2) абсолютное значение географической широты участника с точностью до 1 градуса;
-  3) идентификатор полушария (буквы N (нем.Nord) и S (нем.Sud) для северного и южного полушарий соответственно);
-  4) абсолютное значение географической долготы с точностью до 1 градуса;
-  5) идентификатор полушария (буквы O (нем.Ost) и W (нем.West) для восточного и западного полушарий соответственно).
-
-    Number = Lat LatChar Lon LonChar = 51n59o
+      Number = Lat LatChar Lon LonChar = 51n59o
   }
 
 begin
