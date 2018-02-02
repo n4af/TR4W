@@ -199,8 +199,8 @@ var
   ActiveMode                       : ModeType;
   CWi: real;
   PHi :  real;
-  CWR : integer;
-  PHR : integer;
+//  CWR : integer;
+//  PHR : integer;
   CWp  : pchar;
   PHp : pchar;
   s1 : string;

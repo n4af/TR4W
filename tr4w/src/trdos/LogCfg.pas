@@ -496,13 +496,6 @@ procedure ReadInConfigFile(ConfigFileName: TCFGType);
   initial values for several global variables.  This makes it easier to
   restart the program in case of a power failure. }
 
-var
-  FileString                            : ShortString;
-  FirstCommand                          : boolean;
-  LineNumber                            : integer;
-  //  ConfigRead                            : Text;
-  FileName                              : ShortString;
-
 begin
   if ConfigFileName = cfgCFG then ClearDomesticCountryList;
   LineNumberInConfigFile := 0;
@@ -855,13 +848,9 @@ end;
 
 procedure EnmuCFGFile(FileString: PShortString);
 var
-  FileName                              : ShortString;
-  FirstCommand                          : boolean;
   ID                                    : ShortString;
   CMD                                   : ShortString;
-  i                                     : integer;
-  StartPos                              : integer;
-begin
+ begin
 
   if FileString^[1] in [';', '[', '_'] then Exit;
 

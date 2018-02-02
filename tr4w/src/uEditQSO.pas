@@ -135,8 +135,8 @@ var
   mt                                    : ModeType;
   IndexInMap                            : integer;
   lpNumberOfBytesRead                   : Cardinal;
-  w                                     : Word;
-  TempInteger                           : integer;
+//  w                                     : Word;
+//  TempInteger                           : integer;
   TempSysTime                           : SYSTEMTIME;
 const
   f                                     = 'HH:mm dd-MM-yyyy';
@@ -422,14 +422,14 @@ function SaveQSOToEditableLog: boolean;
 label
   1, 2;
 var
-  TCE                                   : ContestExchange;
+//  TCE                                   : ContestExchange;
   IndexInMap                            : integer;
   lpNumberOfBytesWritten                : Cardinal;
   TempInteger                           : integer;
   lpTranslated                          : LongBool;
-  TempString                            : ShortString;
+//  TempString                            : ShortString;
   TempWord                              : Word;
-  TempPointer                           : PWORD;
+//  TempPointer                           : PWORD;
   TempByte                              : Byte;
   TempSysTime                           : SYSTEMTIME;
 begin
@@ -715,8 +715,7 @@ begin
 end;
 
 procedure MakeEditWindows;
-var
-  r                                     : integer;
+
 begin
   MakeEditWindow('Callsign', ctString, @EditableQSORXData.Callsign[1]);
   inc(CurrentEditRow, 1);

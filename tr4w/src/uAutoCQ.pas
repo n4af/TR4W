@@ -145,7 +145,7 @@ var
   lpTranslated                          : LongBool;
   code                                  : Word;
   TempByte                              : Byte;
-  VirtualKey                            : Byte;
+//  VirtualKey                            : Byte;
 begin
   Result := False;
   case Msg of
@@ -176,7 +176,7 @@ begin
         2: goto 1;
         1:
           begin
-            VirtualKey := 0;
+//            VirtualKey := 0;
             code := LoWord(SendDlgItemMessage(hwnddlg, 107, HKM_GETHOTKEY, 0, 0));
             if code = 0 then Exit;
             TempByte := lobyte(code);

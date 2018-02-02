@@ -73,7 +73,6 @@ begin
   Offset := (ARect.Bottom - ARect.Top) div 2;
   Vertex[0] := InitTriVertex(ARect.Left, ARect.Bottom - Offset, Color1);
   Vertex[1] := InitTriVertex(ARect.Right, ARect.Bottom, Color2);
-  Result := GradientFillFunction(canvashandle, Vertex[0], 2, @GRect, 1, 1);
   Vertex[0] := InitTriVertex(ARect.Left, ARect.Top, Color2);
   Vertex[1] := InitTriVertex(ARect.Right, ARect.Top + Offset, Color1);
   Result := GradientFillFunction(canvashandle, Vertex[0], 2, @GRect, 1, 1);

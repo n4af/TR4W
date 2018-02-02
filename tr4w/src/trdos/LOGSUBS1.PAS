@@ -123,10 +123,9 @@ end;
 function SendCrypticMessage(Message: Str160): boolean;
 
 var
-  TimeOut                               : Byte;
-  TempChar                              : Char;
-  TempString                            : String;
-label
+
+ TempChar                              : Char;
+ label
   DontCheckPTT;
 
 begin   // 1
@@ -246,14 +245,10 @@ end;
 procedure SendFunctionKeyMessage(Key: Char; OpMode: OpModeType);
 
 var
-  Frequency                             : LONGINT;
-  FileName, TempString, NumberString, QSONumberString: Str20;
-  Band                                  : BandType;
-  Mode                                  : ModeType;
+
+  QSONumberString: Str20;
   MessageKey                            : Char;
   Message                               : Str160;
-  Index                                 : integer;
-  TimeOut                               : Byte;
   IncrementCounter                      : boolean;
 
   TempMode                              : ModeType;
@@ -646,12 +641,6 @@ procedure ExchangeRadios; {KK1L: 6.71}
 { The original purpose was to make it easy to find a new run freq on the second radio }
 { (presumably not on the best antenna system) and swap it to the primary antenna setup.}
 
-var
-  TimeOut                               : integer;
-  ModeOne, ModeTwo, TempMode            : ModeType;
-  BandOne, BandTwo, TempBand            : BandType;
-  FreqOne, FreqTwo, TempFreq            : LONGINT;
-  RadioOneReadOkay, RadioTwoReadOkay    : boolean;
 
 begin
 

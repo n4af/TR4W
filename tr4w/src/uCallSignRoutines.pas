@@ -191,7 +191,7 @@ function StandardCallFormat(Call: CallString; Complete: boolean): CallString;
 label
   1;
 var
-  CallPointer, PrefixPointer, Count     : integer;
+
   FirstPart, SecondPart                 : Str80;
   TempPrefixString                      : PrefixString;
   l                                     : integer;
@@ -299,9 +299,8 @@ function GetPrefix(Call: CallString): PrefixString;
     a new and improved version that will handle calls as they are usaully
     sent on the air.                                                          }
 var
-  CallPointer, PrefixPointer, Count     : integer;
-  CallHasPortableSign                   : boolean;
-  FirstPart, SecondPart, TempString     : Str80;
+    FirstPart, SecondPart, TempString     : Str80;
+    CallPointer, Count                    : Integer;
 begin
   for CallPointer := 1 to length(Call) do
     if Call[CallPointer] = '/' then
@@ -412,7 +411,7 @@ begin
 end;
 function GetRussiaOblastID(Call: CallString): Str2; //
 var
-  i                                     : integer;
+
   Oblast                                : Str2;
   r                                     : PChar;
   reg                                   : RussianRegionType;

@@ -39,7 +39,7 @@ uses
 
 function RadioInterfaceWindowDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 var
-  p                                     : PChar;
+//  p                                     : PChar;
   i                                     : integer;
 const
   l                                     : array[0..3] of PChar = (nil, 'RIT', 'XIT', 'SPLIT');

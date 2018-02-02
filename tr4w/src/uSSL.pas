@@ -106,7 +106,7 @@ procedure TSSL.Clear;
 begin
   if FCount <> 0 then
   begin
-    Finalize(FList^[0], FCount);
+
     FCount := 0;
     Windows.ZeroMemory(@TotalMults, SizeOf(TotalMults));
 //    FTotalMults := 0;
@@ -117,7 +117,7 @@ end;
 procedure TSSL.Delete(Index: integer);
 begin
   if (Index < 0) or (Index >= FCount) then Exit; //Error(@SListIndexError, Index);
-  Finalize(FList^[Index]);
+ 
   dec(FCount);
   if Index < FCount then System.Move(FList^[Index + 1], FList^[Index], (FCount - Index) * SizeOf(TStringItem));
 end;

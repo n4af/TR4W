@@ -242,7 +242,7 @@ procedure pOrion3(rig: RadioPtr);
 label
   1, NextWait;
 var
-  TempMode                              : ModeType;
+//  TempMode                              : ModeType;
   PollNumber                            : integer;
   stat                                  : TComStat;
   Errs                                  : DWORD;
@@ -574,7 +574,7 @@ var
   PollSecVFO                            : Cardinal;
   ActiveVFO_is_A                        : boolean;
   TempCardinal                          : Cardinal;
-  TempMode                              : ModeType;
+//  TempMode                              : ModeType;
 label
   DontPollSecondVfos, NextPoll;
 
@@ -764,8 +764,8 @@ label
   1;
 var
   ActiveVFO_is_B                        : boolean;
-  c                                     : integer;
-  b                                     : Byte;
+//  c                                     : integer;
+//  b                                     : Byte;
 begin
   repeat
     inc(rig.tPollCount);
@@ -1018,7 +1018,7 @@ var
   i                                     : integer;
   FDPos                                 : integer;
   DummyMode                             : ModeType;
-  p                                     : pchar;
+//  p                                     : pchar;
 const
   FD_NOT_FOUND                          = 12;
   ICOM_MAX_IN_BUFFER                    = 256;
@@ -1379,31 +1379,15 @@ end;
 procedure pFT100(rig: RadioPtr);
 label
   1;
-var
-  TempFreq                              : integer;
-  TempBand                              : BandType;
-  TempMode                              : ModeType;
+
 begin
   repeat
     inc(rig.tPollCount);
     rig.WritePollRequest(FT100StatusUpdate, length(FT100StatusUpdate));
-//    WriteToSerialCATPort(FT100StatusUpdate, rig.tCATPortHandle);
     if not ReadFromCOMPort(32, rig) then begin ClearRadioStatus(rig);
       goto 1;
     end;
-{
-    rig.tBuf[1] := #$10;
-    rig.tBuf[2] := #$01;
-    rig.tBuf[3] := #$03;
-    rig.tBuf[4] := #$d9;
-    rig.tBuf[5] := #$40;
-    rig.tBuf[6] := #$11;
 
-    rig.tBuf[11] := #$1F;
-    rig.tBuf[12] := #$38;
-
-    Sleep(400);
-}
     with rig.CurrentStatus do
     begin
       Freq := round(GetFrequencyForYaesu4(@rig.tBuf[2]) * 1.25) + rig^.FrequencyAdder;
@@ -1526,36 +1510,7 @@ begin
       goto 1;
     end;
 
-{
-    rig.tBuf[1] := #$B;
-    rig.tBuf[2] := #$0;
-    rig.tBuf[3] := #$6B;
-    rig.tBuf[4] := #$27;
-    rig.tBuf[5] := #$90;
-    rig.tBuf[6] := #$0;
-    rig.tBuf[7] := #$0;
-    rig.tBuf[8] := #$81;
-    rig.tBuf[9] := #$10;
-    rig.tBuf[10] := #$20;
-    rig.tBuf[11] := #$0;
-    rig.tBuf[12] := #$0;
-    rig.tBuf[13] := #$0;
-    rig.tBuf[14] := #$4;
-    rig.tBuf[15] := #$B;
-    rig.tBuf[16] := #$0;
-    rig.tBuf[17] := #$6A;
-    rig.tBuf[18] := #$F0;
-    rig.tBuf[19] := #$7F;
-    rig.tBuf[20] := #$0;
-    rig.tBuf[21] := #$0;
-    rig.tBuf[22] := #$81;
-    rig.tBuf[23] := #$10;
-    rig.tBuf[24] := #$20;
-    rig.tBuf[25] := #$0;
-    rig.tBuf[26] := #$0;
-    rig.tBuf[27] := #$0;
-    rig.tBuf[28] := #$0;
-}
+
     with rig.CurrentStatus do
     begin
       Freq := GetFrequencyForYaesu4(@rig.tBuf[2]) + rig^.FrequencyAdder;
@@ -1608,50 +1563,7 @@ begin
     end;
 
     //3
-{
-    WriteToSerialCATPort(FT1000MPPoll3String, rig.tr4w_CATPortHandle);
-    if not ReadFromCOMPort(8) then
-       begin
-          ClearRadioStatus;
-          goto 1;
-       end;
 
-    with rig.CurrentStatus do
-       begin
-          case (Ord(rig.tBuf[1]) and $13) of
-
-             0:
-                begin // Transceive on VFO A
-                   Split := NoSplit;
-                   VFOA.TXRX := Transceive;
-                   VFOB.TXRX := VFODisabled;
-                end;
-
-             1:
-                begin // Split - VFOB on TX
-                   Split := SplitOn;
-                   VFOA.TXRX := RXOnly;
-                   VFOB.TXRX := TXOnly;
-                end;
-
-             2:
-                begin // Split - VFOB on RX
-                   Split := SplitOn;
-                   VFOA.TXRX := TXOnly;
-                   VFOB.TXRX := RXOnly;
-                end;
-
-             $10:
-                begin // Transceive on VFO B
-                   Split := NoSplit;
-                   VFOA.TXRX := VFODisabled;
-                   VFOB.TXRX := Transceive;
-                end;
-
-          end;
-
-       end;
-}
     1:
     UpdateStatus(rig);
   until rig.tPollCount < 0;
@@ -1689,23 +1601,7 @@ begin
       goto 1;
     end;
 
-    {
-    //    rig.tBuf[86] := #$82;
-        rig.tBuf[85] := #0;
-        rig.tBuf[84] := #$70;
-        rig.tBuf[83] := #$04;
-        rig.tBuf[82] := #$10;
-    //VFOA
-        rig.tBuf[85 - 7] := #0;
-        rig.tBuf[84 - 7] := #$70;
-        rig.tBuf[83 - 7] := #$04;
-        rig.tBuf[82 - 7] := #$10;
-    //VFOB
-        rig.tBuf[85 - 19] := #0;
-        rig.tBuf[84 - 19] := #$70;
-        rig.tBuf[83 - 19] := #$00;
-        rig.tBuf[82 - 19] := #$00;
-    }
+
     rig.CurrentStatus.Freq := GetFrequencyFromBCD(4, @rig.tBuf[82]) * 10 + rig^.FrequencyAdder;
     rig.CurrentStatus.VFO[VFOA].Frequency := GetFrequencyFromBCD(4, @rig.tBuf[82 - 7]) * 10;
     rig.CurrentStatus.VFO[VFOB].Frequency := GetFrequencyFromBCD(4, @rig.tBuf[82 - 19]) * 10;
@@ -2276,51 +2172,7 @@ begin
   Windows.EnableWindow(rig.SplitWndHandle, rig.CurrentStatus.Split);
 
 end;
-{
-function ReadFromCOMPortOnEvent(b: Cardinal; rig: RadioPtr): boolean;
-label
-  Start, Wait;
-var
-  lpEvtMask                             : DWORD;
-  lpErrors                              : DWORD;
-  lpStat                                : ComStat;
-  trial                                 : integer;
-begin
-//  WaitCommEvent(rig^.tCATPortHandle, lpEvtMask, rig^.pOver);
-  Start:
-  if not WaitCommEvent(rig^.tCATPortHandle, lpEvtMask, rig^.pOver) then
-    if GetLastError = ERROR_IO_PENDING then
-//      if SetCommMask(rig^.tCATPortHandle, EV_RXFLAG) then
-      if WaitForSingleObject(rig^.lpOverlapped.hEvent, 5000) = WAIT_OBJECT_0 then
-      begin
-        trial := 0;
-        Wait:
-        ClearCommError(rig^.tCATPortHandle, lpErrors, @lpStat);
-        if lpStat.cbInQue = b then
-        begin
-          Result := ReadFromSerialPort(b, rig);
-          Exit;
-        end
-        else
-          if trial < 5 then
-          begin
-            inc(trial);
-            Sleep(100);
-            goto Wait;
-          end;
-      end;
 
-  ClearCommError(rig^.tCATPortHandle, lpErrors, @lpStat);
-  if lpStat.cbInQue <> 0 then
-  begin
-    ReadFromSerialPort(lpStat.cbInQue, rig);
-    PurgeComm(rig^.tCATPortHandle, PURGE_RXCLEAR or PURGE_RXABORT);
-  end;
-  Sleep(1000);
-  Result := False;
-
-end;
-}
 
 function ReadFromCOMPort(b: Cardinal; rig: RadioPtr): boolean;
 label
@@ -2357,20 +2209,14 @@ begin
     Sleep(SleepMs);
     if rig^.tPollCount < 0 then Exit;
     if not ClearCommError(rig^.tCATPortHandle, Errs, @stat) then
-//      asm nop end;
+
       ShowSysErrorMessage('READ');
 
     inc(c);
     if c >= b then
     begin
       1:
-{
-      if CPUKeyer.SerialPortDebug then
-      begin
-        ReadFromSerialPort(rig^.tCATPortHandle, stat.cbInQue, rig);
-        WriteToDebugFile(rig.tCATPortType, dfmError, @rig.tBuf, stat.cbInQue);
-      end;
-}
+
 
       {To view data in Portmon}
       if Errs = 0 then
@@ -2477,30 +2323,14 @@ var
   TDCB                                  : _DCB;
 begin
   GetCommState(port, TDCB);
-//  tDCB.EofChar := #$FD;
-//  tdcb.XoffLim := 1;
-//  tdcb.XonLim := 1;
   SetCommState(port, TDCB);
   SetCommMask(port, EV_RXCHAR);
 end;
 
 function ReadICOM(b: Cardinal; rig: RadioPtr): boolean;
-//var
-//  Mask                        : Cardinal;
-//  stat                        : TComStat;
-//  Errs                        : DWORD;
+
 begin
   Result := ReadFromCOMPort(b, rig);
-{
-  exit;
-  result := false;
-  WaitCommEvent(rig.tr4w_CATPortHandle, mask, @rig.ICOM_OVERLAPPED);
-  if mask = EV_RXCHAR then
-  begin
-    rig.tBuf[b + 1] := #0;
-    Result := ReadFromSerialPort(rig^.tr4w_CATPortHandle, b, True, rig);
-  end;
-}
 end;
 
 function BufferToInt(buf: PChar; StartPos, EndPos: integer): integer;

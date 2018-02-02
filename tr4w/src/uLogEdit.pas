@@ -40,7 +40,7 @@ label
   1, 2;
 var
   i                                     : integer;
-  CurrentRecord                         : integer;
+//  CurrentRecord                         : integer;
 begin
   Result := False;
   case Msg of
@@ -52,13 +52,13 @@ begin
         i := 0;
         //        if not Tree.tOpenFileForRead(h, TR4W_LOG_FILENAME) then Exit;
         if not OpenLogFile then Exit;
-        CurrentRecord := 0;
+//        CurrentRecord := 0;
         ReadVersionBlock;
         2:
         if ReadLogFile then
         begin
           tAddContestExchangeToLog(TempRXData, LogEditListView, i);
-          inc(CurrentRecord);
+//          inc(CurrentRecord);
           goto 2;
         end;
         CloseLogFile;

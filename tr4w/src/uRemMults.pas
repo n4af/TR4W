@@ -51,8 +51,8 @@ uses MainUnit;
 
 var
   RemMultsBuf                           : array[0..7] of Char;
-  ShowToolTip                           : boolean;
-  PrevItem                              : integer;
+//  ShowToolTip                           : boolean;
+//  PrevItem                              : integer;
 
 function RemainingMultsDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 var
@@ -63,9 +63,9 @@ var
   TempCall                              : CallString;
   Gradient                              : boolean;
   rmt                                   : RemainingMultiplierType;
-  pnt                                   : TPoint;
-  Item                                  : integer;
-  temprect                              : TRect;
+//  pnt                                   : TPoint;
+//  Item                                  : integer;
+//  temprect                              : TRect;
 const
   WM_NCMOUSELEAVE                       = $02A2;
 begin
@@ -273,7 +273,7 @@ begin
 
           tw_STATIONS_RM_PREFIX:
             begin
-              p := 'Prefixes';
+//              p := 'Prefixes';
 //              if ActivePrefixMult = CallSignPrefix then
               tLB_SETCOLUMNWIDTH(hwnddlg, PREFIXCOLUMNWIDTH);
 //              else
@@ -282,17 +282,17 @@ begin
 
           tw_STATIONS_RM_DX:
             begin
-              p := 'DX';
+//              p := 'DX';
               tLB_SETCOLUMNWIDTH(hwnddlg, BASECOLUMNWIDTH);
             end;
 
-          tw_STATIONS_RM_DOM: p := 'Domestic';
+//          tw_STATIONS_RM_DOM: p := 'Domestic';
           tw_STATIONS_RM_ZONE:
             begin
-              p := 'Zones';
+//              p := 'Zones';
               tLB_SETCOLUMNWIDTH(hwnddlg, BASECOLUMNWIDTH);
             end;
-          tw_REMMULTSWINDOW_INDEX: p := 'Remaining mults';
+//          tw_REMMULTSWINDOW_INDEX: p := 'Remaining mults';
         end;
 //        Windows.SetWindowText(hwnddlg, p);
 

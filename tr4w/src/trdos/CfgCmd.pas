@@ -125,12 +125,6 @@ end;
 
 function ProcessConfigInstructions1(ID: Str80; CMD: ShortString): boolean;
 
-var
-  Result1, Speed, TempValue             : integer;
-  TempLongInt                           : LONGINT;
-  TempModeType                          : ModeType;
-  TempChar                              : Char;
-  StackBool                             : boolean;
 begin
   ProcessConfigInstructions1 := False;
 {   if ID = ALL_CW_MESSAGES_CHAINABLE then
@@ -1962,13 +1956,7 @@ label
   M_commands;
 var
   Result1                               : integer;
-  TimeString                            : string;
-  DateString, DayString                 : Str20;
-  TempFreq, TempLongInt                 : LONGINT;
-  TempBand                              : BandType;
-  TempMode                              : ModeType;
 
-  TempChar                              : Char;
 begin
 
   ProcessConfigInstructions2 := False;
@@ -4298,9 +4286,6 @@ end;
 
 function ProcessConfigInstructions3(ID: Str80; CMD: ShortString): boolean;
 
-var
-  Result1                               : integer;
-  i                                     : integer;
 begin
   ProcessConfigInstructions3 := False; //wli
 
@@ -4906,7 +4891,6 @@ end;
 
 function ProcessConfigInstruction(var FileString: ShortString; var FirstCommand: boolean): boolean;
 var
-  Count                                 : integer;
   ID                                    : ShortString;
   CMD                                   : ShortString;
 begin
@@ -4948,13 +4932,7 @@ begin
   GetRidOfPostcedingSpaces(CMD);
   if CMD = 'SPACE' then CMD[1] := ' ';
 
-  ProcessConfigInstruction := True;
-//  if StringHas(ID, 'OPERATORS') then Exit;
-//  if StringHas(ID, 'ERMAK') then Exit;
-//  if StringHas(ID, 'TRAINER') then Exit;
-//  if StringHas(ID, 'CABRILLO') then Exit;
-
-  ProcessConfigInstruction := False;
+   ProcessConfigInstruction := False;
 
   if FirstCommand then
     if ID <> '' then

@@ -41,7 +41,7 @@ var
   hLV                                   : HWND;
   lvi                                   : TLVItem;
   lvc                                   : tagLVCOLUMNA;
-  TotalTimeOn                           : integer;
+//  TotalTimeOn                           : integer;
   Percent                               : integer;
   BandTotals                            : array[Band160..Band10] of integer;
   counter                               : integer;
@@ -66,11 +66,10 @@ begin
         lvc.fmt := LVCFMT_CENTER;
         lvc.pszText := nil;
         ListView_InsertColumn(hLV, 0, lvc);
-        TotalTimeOn := 0;
         counter := 0;
         for Band := 1 to 7 do
         begin
-          TotalTimeOn := TotalTimeOn + TimeSpentByBand[ca[Band]];
+
           lvc.pszText := BandStringsArrayWithOutSpaces[ca[Band]];
           lvc.cx := 75;
           ListView_InsertColumn(hLV, counter + 1, lvc);

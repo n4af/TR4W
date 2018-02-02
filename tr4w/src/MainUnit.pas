@@ -3677,12 +3677,8 @@ label
 
 var
   Start, Stop                           : int64;
-  d                                     : DLGTEMPLATE;
-  Menu                                  : array[0..10] of Char;
-  DXP                                   : PDlgTemplate;
-  dx2                                   : DLGITEMTEMPLATE;
-  mb                                    : TMsgBoxParams;
-  hgbl                                  : HGLOBAL;
+
+
 begin
 
   Start := GetCPU;
@@ -4384,8 +4380,7 @@ var
   Size                                  : Cardinal;
   CurrentRecord, FirstRecord            : integer;
   TempMode                              : ModeType;
-  T1                                    : Cardinal;
-  s                                     : Str10;
+
  
 begin
 
@@ -5641,10 +5636,7 @@ begin
 end;
 
 procedure ProcessCommandLine;
-var
-  p                                     : PChar;
-  l                                     : integer;
-  i                                     : integer;
+
 begin
 {
   p := GetCommandLine;
@@ -5983,12 +5975,11 @@ begin
 //  windows.ZeroMemory(@RemMultsColumnWidthArray, sizeof(RemMultsColumnWidthArray));
 
   if tShowDomesticMultiplierName then
-    DomWidth := tRemMultsColumnWidth * 7
-  else
-    DomWidth := BASECOLUMNWIDTH;
 
- //  if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
-   DomWidth := 65;      // issue 255  allow 8 char dom
+
+
+   if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
+   DomWidth := 65;      // issue 255  allow longer char dom   4.68.5
   case RemainingMultDisplay of
     rmDomestic: Width :=  DomWidth;    
     rmPrefix: Width := PREFIXCOLUMNWIDTH;
@@ -6066,8 +6057,7 @@ begin
 end;
 
 procedure CheckInactiveRigCallingCQ;
-var
-pRadio : RadioPtr;
+
 begin
   if SwitchNext then //n4af 4.30.1
   if ((length(CallWindowString) > 0) {or (InactiveSwapRadio)}) and (not WKBusy) then   // n4af 4.52.6

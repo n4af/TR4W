@@ -56,7 +56,7 @@ var
   i, I2                                 : integer;
   BRT                                   : BaudRateType;
   TempKeyerPortType                     : PortType;
-  TempByte                              : Byte;
+//  TempByte                              : Byte;
   TempPchar                             : PChar;
   RadioType                             : InterfacedRadioType;
 

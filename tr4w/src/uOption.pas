@@ -228,7 +228,7 @@ var
   p                                     : Pointer;
   TempInteger                           : integer;
   TempWindowElement                     : TMainWindowElement;
-  TempPchar                             : PChar;
+//  TempPchar                             : PChar;
 begin
 
   ListView_SetExtendedListViewStyle(SettingshLV, LVS_EX_INFOTIP or LVS_EX_GRIDLINES or LVS_EX_FULLROWSELECT);
@@ -406,7 +406,7 @@ var
   TempReal                              : REAL;
   p                                     : Pointer;
   c                                     : integer;
-  h                                     :HWND;
+//  h                                     :HWND;
   TempColor                             : Ptr4wColors;
 
 begin

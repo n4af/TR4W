@@ -791,7 +791,7 @@ var
   code                                  : integer;
   Proc                                  : Pointer;
   TempByte                              : Byte;
-  TempString                            : Str10;
+//  TempString                            : Str10;
   TempElement                           : TMainWindowElement;
 begin
 {$IF MAKE_DEFAULT_VALUES = TRUE}
@@ -1140,8 +1140,7 @@ begin
 end;
 
 function F_MY_CALL: boolean;
-var
-  TempQTH                               : QTHRecord;
+
 begin
   DEPlusMyCall := 'DE ' + MyCall;
   RecalculateMyCountryContinentAndZoneNew(MyCall);

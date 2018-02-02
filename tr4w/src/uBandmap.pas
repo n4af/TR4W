@@ -128,7 +128,7 @@ var
   Spot                                  : TSpotRecord;
   p                                     : PChar;
   Size                                  : TSIZE;
-  TempHDC                               : HDC;
+//  TempHDC                               : HDC;
 const
   BMWIDE                                = 10; // n4af 4.42.8
   GHZ                                   = 10; // n4af 4.42.8
@@ -552,7 +552,7 @@ procedure TuneRadioToSpot(Spot: TSpotRecord; Radio: RadioType);
 var
   EntryBand                             : BandType;
   EntryMode                             : ModeType;
-  Index                                 : integer;
+//  Index                                 : integer;
   QZBOffset                             : integer;
 const
   MAX_QZB_OFFSET                        = 30;
@@ -649,7 +649,7 @@ procedure ShowSpotInfo;
 var
   i                                     : integer;
   Spot                                  : TSpotRecord;
-  TempString                            : ShortString;
+//  TempString                            : ShortString;
 begin
   ClearSpotInfo;
   i := GetBMSelItemData; //SendMessage(BandMapListBox, LB_GETITEMDATA, tLB_GETCURSEL(BandMapListBox), 0);
@@ -705,10 +705,7 @@ begin
 end;
 
 function NEWBMLBPROC(hwnddlg: HWND; Msg: UINT; wParam: LONGINT; lParam: LONGINT): integer; stdcall;
-var
-  i                                     : integer;
-  TempWord                              : Word;
-  zDelta                                : Smallint;
+
 begin
   //WM_ERASEBKGND WM_PAINT WM_SETREDRAW WM_NCPAINT
   Result := 0;

@@ -102,7 +102,7 @@ var
   FKDRAWITEMSTRUCT                      : PDrawItemStruct;
   TempCardinal                          : Cardinal;
   TempColor                             : tcolor;
-  b                                     : Byte;
+//  b                                     : Byte;
 const
 //  fkbstleft                             = 26;
   delta                                 = 2;
