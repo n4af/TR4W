@@ -49,12 +49,7 @@ uses MainUnit;
 function IntercomDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 label
   1;
-var
 
-  i                                : integer;
-  MessageBuf                       : array[0..79] of Char;
-  Color                            : integer;
-  TextColor                        : integer;
 begin
   Result := False;
   case Msg of
@@ -170,9 +165,7 @@ procedure FlashIntercomListBox;
 var
   counter                          : Cardinal;
   h                                : HWND;
-  r                                : TRect;
-  DC                               : HDC;
-begin
+ begin
   counter := 0;
   h := IntercomListBoxHandle;
   SendMessage(h, LB_SETSEL, 0, -1);

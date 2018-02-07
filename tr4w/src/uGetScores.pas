@@ -386,7 +386,6 @@ label
   1;
 var
   i                                     : integer;
-  TempInteger                           : integer;
   p                                     : PChar;
 begin
   p := nil;

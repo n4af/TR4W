@@ -1815,45 +1815,7 @@ begin
   tSetExchWindInitExchangeEntry;
   CheckAndSetInitialExchangeCursorPos;
   ShowStationInformation(@CallWindowString);
-  {
-  if FRM.ExchangeWindow.Focused then
-          BEGIN
-  //        ExchangeWindowString     := InitialExchangeEntry (CallWindowString);
-          FRM.ExchangeWindow.Text:= InitialExchangeEntry (CallWindowString);
-  //WLI         ClrScr;
-  //WLI         Write (ExchangeWindowString);
-  //        TR6.74 - because InitialExchangeEntry no longer does this
-          IF InitialExchangeOverwrite THEN
-              InitialExchangePutUp := FRM.ExchangeWindow.Text <> '';
-          IF InitialExchangeCursorPos = AtStart THEN
-  //WLI            GoToXY (1, 1)
-          ELSE
-  //WLI             GoToXY (1, Length (ExchangeWindowString) + 1);
-  //WLI         ExchangeWindowCursorPosition := WhereY;
-          ShowStationInformation (frm.CallWindow.Text);
-          END
-      ELSE
-          BEGIN
-  //        IF ActiveWindow = CallWindow THEN
-  if FRM.callWindow.Focused then
-              ExchangeWindowString := InitialExchangeEntry (WindowString)
-          ELSE
-              ExchangeWindowString := InitialExchangeEntry (CallWindowString);
-  //        TR6.74 - because InitialExchangeEntry no longer does this
-          IF InitialExchangeOverwrite THEN
-              InitialExchangePutUp := ExchangeWindowString <> '';
-          SaveSetAndClearActiveWindow (ExchangeWindow);
-          Write (ExchangeWindowString);
-          IF InitialExchangeCursorPos = AtStart THEN
-  //WLI             GoToXY (1, 1)
-          ELSE
-  //WLI             GoToXY (1, Length (ExchangeWindowString) + 1);
-  //WLI         ExchangeWindowCursorPosition := WhereY;
-          RestorePreviousWindow;
-          ShowStationInformation (WindowString);
-          KeyChar := ControlX;
-          END;
-     }
+
 end;
 procedure WindowEditor(var WindowString: string;
   var KeyChar: Char;

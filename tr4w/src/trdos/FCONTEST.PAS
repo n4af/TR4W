@@ -82,7 +82,6 @@ uses LogGrid,
 procedure SetUpFileNames;
 var
   i                                     : integer;
-  h                                     : HWND;
 begin
 
   Format(TR4W_POS_FILENAME, '%ssettings\tr4w.pos', TR4W_PATH_NAME);
@@ -283,9 +282,9 @@ end;
 function FoundContest(CMD: ShortString): boolean;
 
 var
-  TempQTH                               : VC.QTHRecord;
+
   TempWord                              : Word;
-  TempInt                               : integer;
+
   TempDomesticQTHDataFileName           : PChar;
   TmpBuf                                : array[0..255] of Char;
     TempOblast                       : Str2;
@@ -1675,8 +1674,8 @@ end;
 
 function FoundMyStateInDomFile: boolean;
 var
-  FileRead                              : Text;
-  TempString, FileString                : ShortString;
+
+
   TempFileName                          : FileNameType;
 begin
   Result := False;

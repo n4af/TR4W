@@ -2584,7 +2584,6 @@ begin
 
     menu_alt_initialexhange:
       begin
-//        s := CallWindowString;
         LOGSUBS2.DoAltZ();
       end;
 
@@ -5978,10 +5977,10 @@ begin
 
 
 
-   if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
-   DomWidth := 65;      // issue 255  allow longer char dom   4.68.5
+  if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
+    DomWidth := 45;      // issue 255  allow longer char dom   4.68.5
   case RemainingMultDisplay of
-    rmDomestic: Width :=  DomWidth;    
+    rmDomestic: Width :=  DomWidth;
     rmPrefix: Width := PREFIXCOLUMNWIDTH;
   else
     Width := BASECOLUMNWIDTH;

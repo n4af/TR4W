@@ -43,7 +43,7 @@ uses MainUnit;
 procedure CheckLatestVersion;
 label 1;
 var
-  b                                     : integer;
+ 
   p                                     : PChar;
   TempSocket                            : Cardinal;
 const

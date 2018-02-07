@@ -196,6 +196,7 @@ begin
                 TempCall := mo.DomList.Get(Index);
 
               p := @TempCall[1];
+              quickdisplay(p);
               Gradient := mo.DomList.StringIsDupeByIndex(Index, GetAddMultBand(DomesticMultByBand, MultBand), MultMode);
             end;
 

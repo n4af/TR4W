@@ -169,10 +169,7 @@ var
   TempPointer                           : Pointer;
   Top                                   : integer;
 //  ComboBoxStyle                         : integer;
-  TempCategoryBand                      : tCategoryBand;
-  TempCategoryMode                      : tCategoryMode;
-  TempCategoryOperator                  : tCategoryOperator;
-  TempCategoryPower                     : tCategoryPower;
+  
   TempTag                               : CabrilloTags;
   TempHWND                              : HWND;
 const

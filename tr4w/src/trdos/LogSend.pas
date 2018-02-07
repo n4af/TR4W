@@ -61,7 +61,6 @@ procedure SendCrypticDVPString(SendString: ShortString);
 
 var
   FileName                              : ShortString;
-  i                                     : integer;
   QSONumber                             : integer;
 begin
   if (not DVKEnable) or (not CWEnabled) then Exit;
@@ -114,15 +113,14 @@ procedure SendCrypticCWString(SendString: Str160);
 
 var
   CharPointer, NumberCharsBeingSent, CharacterCount, QSONumber: integer;
-  Result, Entry, Offset                 : integer;
+  Result, Offset                 : integer;
   Key, SendChar, TempChar               : Char;
   CommandMode, WarningSounded           : boolean;
   TempCall                              : CallString;
   TempString                            : Str80;
   i                                     : integer;
   TempReceivedData                      : ContestExchange;
-  pendingCWBuffer                       : Str50;
-  p                                     : shortstring;
+
 begin
 // For CQ TEST NY4I , this sends the C, then the Q, then T, then E, then S, then T, then NY4I
 

@@ -187,8 +187,6 @@ begin
   setlength(FiltSpotIndex, FCount);
   NumberEntriesDisplayed := 0;
   k := 0;                                                     
-  i := 0;
-
 
   for i := 0 to FCount - 1 do
   begin
@@ -299,7 +297,6 @@ procedure TDXSpotsList.Clear;
 begin
   if FCount <> 0 then
   begin
-    Finalize(FList^[0], FCount);
     FCount := 0;
     SetCapacity(0);
   end;
@@ -325,7 +322,6 @@ end;
 procedure TDXSpotsList.Delete(Index: integer);
 begin
   if (Index < 0) or (Index >= FCount) then Exit; //Error(@SListIndexError, Index);
-  Finalize(FList^[Index]);
   dec(FCount);
   if Index < FCount then System.Move(FList^[Index + 1], FList^[Index], (FCount - Index) * SizeOf(TSpotRecord));
 end;
@@ -391,8 +387,7 @@ end;
 
 procedure TDXSpotsList.UpdateSpotsMultiplierStatus;
 var
-  MultString                            : integer; //Str80 {20};
-  i                                     : integer;
+   i                                     : integer;
 begin
   for i := 0 to FCount - 1 do
   begin

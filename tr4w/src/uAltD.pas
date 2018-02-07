@@ -54,8 +54,6 @@ uses
 function AltDDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 label
   1;
-var
-  P1, P2                                : PChar;
 
 begin
   Result := False;

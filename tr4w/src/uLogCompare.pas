@@ -54,7 +54,7 @@ var
   s                                     : PLogFileInformation;
   elvi                                  : TLVItem;
   elvc                                  : tagLVCOLUMNA;
-  i                                     : integer;
+ 
 begin
   Result := False;
   case Msg of

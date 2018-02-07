@@ -528,7 +528,6 @@ CT2CVE    28614.5 OK1ARI      contest                       1030 31 Oct 1999
 }
 
 var
-  DateString                            : Str40;
   Result1                               : integer;
   TempFrequency                         : REAL;
 
@@ -610,7 +609,6 @@ function PacketFileInputSpot(InputString: ShortString; var DXSpot: DXSpotType): 
 }
 
 var
-  DateString                            : Str40;
   Result1                               : integer;
   TempFrequency                         : REAL;
 
@@ -918,8 +916,7 @@ function PacketObject.ProcessPacketSpot(DXSpot: DXSpotType): Char;
   it onto the packet spot buffer. }
 
 var
-  MultString                            : integer; //Str80 {Str20};
-  Dupe, Mult                            : boolean;
+  Mult                            : boolean;
 begin
   Result := ' ';
   with DXSpot do
@@ -967,8 +964,6 @@ procedure PacketObject.PushPacketSpot(DXSpot: DXSpotType);
 
 { Takes the spot information and saves it for Control-U. }
 
-var
-  TempString                            : Str80;
 
 begin
   with DXSpot do
@@ -986,9 +981,6 @@ begin
 end;
 
 procedure PacketObject.PushPacketMemory(DXSpot: DXSpotType);
-
-var
-  Address                               : integer;
 
 begin
   with DXSpot do
@@ -1155,10 +1147,6 @@ procedure PacketObject.CheckPacket;
 
 { This is the routine that needs to be called often by the program so
   the packet stuff all works.   }
-
-var
-  PacketInputString                     : string;
-  DXSpot                                : DXSpotType;
 
 begin
 {

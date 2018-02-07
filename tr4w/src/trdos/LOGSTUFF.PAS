@@ -1005,7 +1005,7 @@ function ProperSalutation(Call: CallString): Str80;
 
 var
   TempQTHData                           : QTHRecord;
-  Hours, Minutes, Seconds, ZeroZuluOffset: Word;
+  Hours, ZeroZuluOffset: Word;
   CurrentHelloRecord                    : HelloRecPtr;
   ID                                    : CallString;
 
@@ -1181,9 +1181,7 @@ begin
 end;
 
 procedure SendSalutation(Call: CallString);
-var
-  Country                               : integer;
-  ID                                    : CallString;
+
 begin
   if Call = '' then Exit;
   AddStringToBuffer(ProperSalutation(Call), CWTone);
@@ -1345,7 +1343,6 @@ function ProcessClassAndDomesticOrDXQTHExchange(Exchange: string {Str80}; var RX
 
 var
   TempString, TempString2               : Str10 {Str20};
-  sTemp1, sTemp2 : string;
   isClassValid : boolean;
   dx : boolean;
 begin
@@ -1641,11 +1638,7 @@ function ProcessQSONumberAndDomesticQTHExchange(Exchange: Str80; var RXData: Con
   and the QSO number will be one.  }
 
 var
-//  Result1                               : integer;
-  {NumberString,}Str1, Str2 {, Str3, Str4}: Str10 {Str20};
-//  Parsed                                : boolean;
-  sp                                    : integer;
-  c                                     : integer;
+  Str1, Str2 {, Str3, Str4}: Str10 {Str20};
   i                                     : integer;
 begin
   ProcessQSONumberAndDomesticQTHExchange := False;
@@ -2458,7 +2451,7 @@ function ProcessQSONumberNameAndDomesticOrDXQTHExchange(Exchange: Str80; var RXD
   changed.  }
 
 var
-  TempString, Call, Name                : Str20;
+  TempString                            : Str20;
   NumberEntries, Result1                : integer;
   DX                                    : boolean;
   EntryList                             : EntryArray;
@@ -2821,11 +2814,10 @@ function ProcessRSTAllJAPrefectureAndPrecedenceExchange(Exchange: ShortString {S
 { Updated for new rules.  Exchange now RS(T) + Prefixture # + Power (A/B/C) }
 
 var
-  RSTString, PowerString, PrefectureString, TempString: Str20;
   ExchangeString                        : ShortString; {STR20} {WLI}
   Entries                               : array[0..10] of ShortString {Str20}; {WLI}
   NumberEntries                         : integer;
-  Entry, Result1                        : integer;
+
 
 begin
   Exchange := UpperCase(Exchange);
@@ -3030,11 +3022,9 @@ function ProcessRSTAndAgeExchange(Exchange: Str80; var RXData: ContestExchange):
   the RS(T) information.                        }
 
 var
-  RSTString, AgeString, TempString      : Str20;
   ExchangeString                        : ShortString;
   Entries                               : array[0..10] of ShortString {Str20};
   NumberEntries                         : integer;
-  Entry, Result1                        : integer;
   TempInt                               : integer;
 begin
   RXData.RSTReceived := DefaultRST;
@@ -3129,11 +3119,9 @@ end;
 function ProcessRSTAndPrefectureExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
 
 var
-  RSTString, TempString                 : ShortString {Str20};
   ExchangeString                        : Str80;
   Entries                               : array[0..3] of Str80;
   NumberEntries                         : integer;
-  Entry, Result1                        : integer;
 
 begin
   RXData.RSTReceived := DefaultRST;
@@ -3796,10 +3784,7 @@ end;
 function ProcessQSONumberAndPreviousQSONumber(Exchange: Str80; var RXData: ContestExchange): boolean;
 var
   l                                     : integer;
-  j                                     : integer;
-  k                                     : integer;
-  strng                                 : str10;
-  f                                     : extended;
+
 begin
   Result := False;
   l := length(Exchange);
@@ -4149,7 +4134,7 @@ function ProcessNZFieldDayExchange(Exchange: ShortString {Str80}; var RXData: Co
     }
 
 var
-  NumberString, FirstString, SecondString, ThirdString: Str10;
+  FirstString, SecondString, ThirdString: Str10;
 
 begin
   ProcessNZFieldDayExchange := False;
@@ -4377,29 +4362,14 @@ end;
 function ProcessRSTAndQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
 label
   1;
-var
-  QTH                                   : QTHRecord;
+
 begin
   if (ActiveQSOPointMethod = RACQSOPointMethod) and (Copy(RXData.Callsign, 1, 3) = 'VE0') then
   begin
     ProcessRSTAndQSONumberOrDomesticQTHExchange := ProcessRSTAndQSONumberExchange(Exchange, RXData);
     Exit;
   end;
-{
-  if ActiveQSOPointMethod = CupUA1DZMethod then
-  begin
-    ctyLocateCall(RXData.Callsign, QTH);
-    if QTH.CountryID = 'UA' then
-    begin
-      if (GetRussiaOblastID(RXData.Callsign) = 'SP') or
-        (GetRussiaOblastID(RXData.Callsign) = 'LO')
-        or (pos('/1', RXData.Callsign) <> 0)
-        then goto 1;
-    end;
-    ProcessRSTAndQSONumberOrDomesticQTHExchange := ProcessRSTAndQSONumberExchange(Exchange, RXData);
-    Exit;
-  end;
-}
+
   if ActiveQSOPointMethod = ArktikaSpringQSOPointMethod then
   begin
     if StringIsAllNumbersOrSpaces(Exchange) then
@@ -4433,7 +4403,7 @@ function ProcessRSTZoneAndPossibleDomesticQTHExchange(Exchange: Str80; var RXDat
 var
 
   FirstString, SecondString, ThirdString: Str10;
-  FirstStringRST, SecondStringRST, ThirdStringRST: ShortString;
+  FirstStringRST : ShortString;
 
 begin
   ProcessRSTZoneAndPossibleDomesticQTHExchange := False;
@@ -4603,8 +4573,7 @@ begin
 end;
 
 procedure SaveLogFileToFloppy;
-var
- h                                :HWND;
+
 begin
 
  if TR4W_FLOPPY_FILENAME[0] = #0 then  exit;
@@ -4707,40 +4676,10 @@ end;
 
 procedure ReviewBackCopyFiles;
 
-var
-  FileNames                             : FileNameRecord;
-  LastFile                              : Str40;
-  Command                               : Str20;
 
 begin
   {WLI}
-  {    SaveSetAndClearActiveWindow (BigWindow);
-      LastFile := '';
 
-      REPEAT
-          QuickDisplay ('Use cursor to select the file you want to process and press RETURN');
-          ClrScr;
-          WriteLnCenter ('BACKCOPY FILE REVIEW');
-          WriteLn;
-          WriteLn ('Select backcopy file to review or delete : ');
-
-          LastFile := ShowDirectoryAndSelectFile ('*.bcp', '', False);
-
-          IF (LastFile = '') OR (LastFile = EscapeKey) THEN
-              BEGIN
-              //RestorePreviousWindow;
-              VisibleDupesheetRemoved := True;
-              Exit;
-              END;
-
-          REPEAT
-              Command := UpperCase (QuickEditResponse (LastFile + ': R to review   D to delete  ESCAPE to quit', 1));
-              IF Command = 'R' THEN DVPListenMessage (LastFile, False);
-              IF Command = 'D' THEN DeleteFile (LastFile);
-          UNTIL (Command = '') OR (Command = 'D') OR (Command = EscapeKey);
-
-      UNTIL False;
-     }
 end;
 
 function GetCorrectedCallFromExchangeString(var ExchangeString: ShortString {Str80}): Str80;
@@ -4782,9 +4721,6 @@ function ISentThisMultiMessage(MultMessage: string): boolean;
 
 { Works for both N6TR and K1EA network }
 
-var
-  LookAddress                           : integer;
-  s1                                    : string;
 
 begin
   ISentThisMultiMessage := False;
@@ -4794,79 +4730,11 @@ begin
       //    SaveSetAndClearActiveWindow(DupeSheetWindow);
 
     WriteLn('ISentThisMultiMessage called with : ');
-      {
-          if K1EANetworkEnable then
-            WriteLn(Copy(MultMessage, 1, length(MultMessage) - 1))
-          else
-            WriteLn(Copy(MultMessage, 10, ord(MultMessage[8])));
-      }
+
     WriteLn;
     WriteLn('The following messages are in the message list : ');
   end;
-  {
-    if K1EANetworkEnable then // K1EA network
-    begin
-      if MultMessage[2] = K1EAStationID then
-      begin
-        ISentThisMultiMessage := True;
 
-        if NetDebug then
-        begin
-          WriteLn('I found my station ID - found!');
-                       ////RestorePreviousWindow;
-          Exit;
-        end;
-
-      end
-      else
-        if NetDebug then
-          WriteLn('This is not my message');
-    end
-
-    else // N6TR Network
-
-    begin
-           // See if there is anything in the list to check
-
-      if FirstMultiMessage = LastMultiMessage then
-      begin
-        if NetDebug then
-        begin
-          WriteLn('Nothing in the remember list.');
-                       //RestorePreviousWindow;
-        end;
-        Exit;
-      end;
-
-      LookAddress := LastMultiMessage;
-
-      while LookAddress <> FirstMultiMessage do
-      begin
-        s1 := MultiRememberBuffer^[LookAddress].message;
-
-        if NetDebug and (not MultiRememberBuffer^[LookAddress].QSL) then
-          WriteLn(Copy(s1, 10, ord(s1[8])));
-
-        if (Copy(s1, 1, 5) = Copy(MultMessage, 1, 5)) and
-          (s1[8] = MultMessage[8]) and
-          (Copy(s1, 10, ord(s1[8])) = Copy(MultMessage, 10, ord(s1[8]))) then
-        begin
-          if NetDebug then
-          begin
-            WriteLn('Found it!!');
-                             //RestorePreviousWindow;
-          end;
-
-          MultiRememberBuffer^[LookAddress].QSL := True;
-
-          ISentThisMultiMessage := True;
-          Exit;
-        end;
-
-        LookAddress := (LookAddress + 1) mod MultiMessageBufferSize;
-      end;
-    end;
-  }
   if NetDebug then
   begin
     WriteLn('Entry not found.');
@@ -5021,12 +4889,10 @@ begin
 end;
 
 function ThisMessageIsForMe(Message: string): boolean;
-
+ var
+ Destination : Byte;
 { This function will return TRUE if the message is addressed to us or is
   a broadcast message. }
-
-var
-  Destination                           : Byte;
 
 begin
   if not 1 = 1 {K1EANetworkEnable} then { N6TR Network mode }
@@ -5153,7 +5019,6 @@ function GetMultiPortCommand: string;
 
 var
   TempString                            : string;
-  CharPointer                           : integer;
 
 begin
   //WLI ????????
@@ -5161,17 +5026,7 @@ begin
   Exit;
 
   GetMultiPortCommand := '';
-  {
-    if K1EANetworkEnable then
-    begin
-  //wli    if not CPUKeyer.SerialPortInputBuffer[ActiveMultiPort].GetNextLine(TempString) then      Exit;
-    end
-    else // TR Network
-    begin
-  //    if not CPUKeyer.SerialPortInputBuffer[ActiveMultiPort].GetSlippedString(TempString) then Exit;
-      asm nop end;
-    end;
-  }
+
   if TempString = '' then Exit;
 
   if NetDebug then
@@ -5206,14 +5061,7 @@ begin
   if TimeToDie(TempString) then Exit;
 
   { Okay, we have a valid message, and it isn't ours, pass it on. }
-{
- if K1EANetworkEnable then
-     // LineFeed Makes SendMultiMessage not add checksum or LF
 
-   SendMultiMessage(TempString + LineFeed)
- else
-   SendMultiMessage(TempString);
-}
   if not ThisMessageIsForMe(TempString) then Exit;
 
   { We have a message for me to act on (unless I have already seen it) }
@@ -5257,59 +5105,10 @@ end;
 
 procedure SendMultiCommand(Source: Byte; Destination: Byte; ControlByte: Byte; Message: string);
 
-{ This procedure will generate the multi command and pass it to the engine
-  in LOGK1EA that sends the bytes to the port.  The format for the message
-  is as follows:
 
-    Source:        BYTE;
-    Destination:   BYTE;
-    ControlByte:   BYTE;
-    SerialNumber:  WORD;
-    CheckSum:      WORD;
-    MessageLength: BYTE;
-    TimeToLive:    INTEGER;
-    Message:       A bunch of ASCII characters (MessageLength of them);
-
-}
-
-var
-  TempString                            : string;
-  CheckSum                              : Word;
-  CharPointer                           : integer;
 
 begin
-  {
-    TempString := Concat(CHR(Source),
-      CHR(Destination),
-      CHR(ControlByte),
 
-        //      CHR(Hi(MultiSerialNumber)),
-        //      CHR(Lo(MultiSerialNumber)),
-
-      CHR(Hi(MultiSerialNumber) + 1),
-      CHR(Lo(MultiSerialNumber) + 1),
-        //wli      CHR(0),
-        //wli      CHR(0),
-      CHR(1),
-      CHR(1),
-
-      CHR(length(message)),
-      CHR(DefaultTimeToLive),
-      message);
-
-    inc(MultiSerialNumber);
-
-    CheckSum := 0;
-
-    for CharPointer := 1 to length(TempString) do
-      CheckSum := CheckSum + ord(TempString[CharPointer]);
-
-    TempString[6] := CHR(Hi(CheckSum));
-    TempString[7] := CHR(Lo(CheckSum));
-
-    SendMultiMessage(TempString);
-    RememberSentMessage(TempString);
-  }
 end;
 
 procedure StuffInit;
@@ -5335,7 +5134,6 @@ label
     indicated. }
 
 var
-  pNumberOfBytesRead                    : Cardinal;
   TempIndex                             : integer;
   FirstTime                             : boolean;
 begin
@@ -5501,10 +5299,7 @@ function LogFileLooksOkay: boolean;
 { Returns TRUE if the LOG.DAT file looks about right for the number of
   QSOs the program thinks we have }
 
-var
-  NumberContacts                        : LONGINT;
-  ErrorPercent                          : REAL;
-  //  h                                : HWND;
+
 begin
   Result := False;
   if not OpenLogFile then Exit;
@@ -5539,16 +5334,9 @@ end;
 
 procedure NextPage;
 
-var
-  FileWrite                             : Text;
 
 begin
-{
-  Assign(FileWrite, LogFileName);
-  Append(FileWrite);
-  Write(FileWrite, ControlL);
-  Close(FileWrite);
-}
+
   //W_L_I  if PrinterEnabled then
   //W_L_I  begin
 {$I-}
@@ -5562,7 +5350,7 @@ end;
 procedure CalculateQSOPoints(var RXData: ContestExchange);
 
 var
-  PtsMult, Points, MyZoneValue, RXDataZoneValue, Result: integer;
+  PtsMult, Points, MyZoneValue, Result: integer;
   Distance                              : LONGINT;
   RXCty, TheirID, CountryID             : CallString;
   TempOblast                            : string[2];
@@ -5570,9 +5358,8 @@ var
   Grid1, Grid2                          : GridString;
   russianRegion1, russianRegion2        : RussianRegionType;
   temphour                              : byte;      // 4.58.2
-  tempmin                               : byte;
   iotastate                             : string[10];
-  posdash                               : integer;
+
 begin
   RXData.QSOPoints := 0;
   RXCty := RXData.QTH.CountryID; // 4.67.15
@@ -7344,7 +7131,7 @@ function MarineOrAirMobileStation(Call: CallString): boolean;
   or air mobile station. }
 
 var
-  TempString                            : Str20;
+
   l                                     : integer;
 begin
   MarineOrAirMobileStation := False;
@@ -7494,11 +7281,7 @@ end;
 
 function ParseArray(e: Str80): boolean;
 var
-  Element                               : integer;
-  i                                     : integer;
-  Alpha                                 : boolean;
-  Number                                : boolean;
-  PositionCounter                       : integer;
+   i                                     : integer;
   TmpBuf                                : array[0..31] of Char;
   St                                    : Cardinal;
   en                                    : Cardinal;
@@ -7513,10 +7296,6 @@ begin
     Exit;
   end;
 
-  Element := 0;
-  PositionCounter := 0;
-  Alpha := False;
-  Number := False;
 
   St := 0;
   en := 0;
@@ -7918,10 +7697,6 @@ end;
 
 procedure CreateAndSendSAPMultiInfoMessage;
 
-var
-  TempString                            : Str80;
-  NumberString                          : Str20;
-  Index                                 : integer;
 
 begin
   {
@@ -7952,11 +7727,6 @@ end;
 
 procedure CreateAndSendCQMultiInfoMessage;
 
-var
-  TempString, NumberString              : Str80;
-  Index                                 : integer;
-  Freq                                  : LONGINT;
-  FreqStr                               : Str20;
 
 begin
   {
@@ -8219,18 +7989,8 @@ end;
 
 procedure PassStationToCTNetwork;
 
-var
-  PassString                            : Str40;
-
 begin
-  {
-    if not K1EANetworkEnable then Exit;
 
-    PassString := QuickEditResponse('Enter pass info (i.e., KQ2M 14150.2) : ', 30);
-
-    if PassString <> '' then
-      SendMultiMessage('P' + K1EAStationID + ' ' + PassString + ' ');
-     }
 end;
 
 function GoodLookingRDA(rda: Str20): boolean;

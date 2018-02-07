@@ -870,7 +870,7 @@ function OpenFileDlg(Title: PChar; hOpenFileOwner: HWND; FilterString: PChar; va
 label
   1;
 var
-  l                                     : integer;
+
   CommDlgLibHandle                      : DWORD;
   OpenFileF                             : TGetOpenFileNameFunc;
 begin

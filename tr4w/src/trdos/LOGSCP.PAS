@@ -252,13 +252,7 @@ const
 var
   CD                                    : CallDatabase {=
 
-  (
-    ActiveASCIIFileName: ASCIIFileName;
-    CellBuffer: (MaximumMemoryToUse: 3 * BufferArraySize);
-    HitsOverwrite: True;
-    PossibleCallAction: OnlyCallsWithNames;
-
-    )
+  
  };
   CallsAlreadySaved                     : CallsAlreadySavedArrayPtr;
   NumberCallsAlreadySaved               : integer;

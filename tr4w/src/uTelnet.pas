@@ -226,7 +226,7 @@ label
 var
 
   temprect                              : TRect;
-  TempFile                              : Text;
+
   i                                     : integer;
   TempTextColor                         : Cardinal;
   TempPoint                             : TPoint;
@@ -544,12 +544,12 @@ end;
 
 procedure ConnectToTelnetCluster;
 var
-  TempHostent                           : Phostent;
+
   StackTelHandle                        : HWND;
-  p                                     : PChar;
+
   port                                  : Word;
   i                                     : integer;
-  TempBuffer                            : array[0..127] of Char;
+
 label
   processed;
 begin
@@ -712,7 +712,7 @@ procedure ProcessTelnetString(const ByteReceived: integer);
 label
   Start;
 var
- BandMapEntryRecord, EntryToBeDisposed, PreviousBandMapEntryRecord: BandMapEntryPointer;
+
   c                                     : integer;
   AddedSpot                             : boolean;
   pr                                    : integer;
@@ -822,7 +822,7 @@ label
 var
   i, i1                                 : integer;
   TempFrequency                         : integer;
-  MultString                            : integer;
+
   f                                     : integer;
   QSXPos                                : integer;
   TempChar                              : Char;
@@ -830,12 +830,10 @@ var
   DivHertz                              : boolean;
   QSXBand                               : BandType;
   QSXMode                               : ModeType;
-  CountryID                             : Word;
+
   Offset                                : integer;
   ct                                    : Cardinal;
-  AMode                                 : pChar;
-  Buffer                                : pChar;
-begin
+ begin
   Result := False;
   Stringtype := tstReceived;
   Windows.ZeroMemory(@TempSpot, SizeOf(TSpotRecord));
@@ -1142,7 +1140,6 @@ label
   1;
 var
   TempFrequency                         : LONGINT;
-  MultString                            : integer;
   Mult                                  : boolean;
 begin
 //  if not BandMapEnable then Exit;
@@ -1215,8 +1212,7 @@ begin
 end;
 
 procedure CheckClusterType(ByteReceived: integer);
-var
-  ii                                    : integer;
+
 begin
 {
   if ClusterTypeDetermined then Exit;

@@ -95,7 +95,7 @@ var
   Number                                : integer;
   p                                     : PChar;
   TempString                            : Str160;
-  P2                                    : PChar;
+
 begin
   RESULT := False;
   case Msg of
@@ -403,7 +403,7 @@ procedure SaveQTCS;
 var
   I                                     : integer;
   QTCRXData                             : ContestExchange;
-  lpTranslated                          : BOOL;
+
 begin
   for I := 1 to QTCWasSend do
   begin
@@ -440,7 +440,7 @@ label
   1, 2;
 var
   pNumberOfBytesRead                    : Cardinal;
-  I                                     : integer;
+ 
   SignedQSOs                            : integer;
 begin
   if not OpenLogFile then Exit;

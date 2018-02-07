@@ -35,7 +35,6 @@ label
 var
   temprect                              : TRect;
   Offset                                : integer;
-  i                                     : integer;
   Width                                 : integer;
   h                                     : HWND;
   TempColumn                            : LogColumnsType;

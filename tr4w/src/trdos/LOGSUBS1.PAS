@@ -17,7 +17,7 @@
      Public License along with TR4W.  If not, see
  <http: www.gnu.org/licenses/>.
  }
-  unit LOGSUBS1;
+unit LOGSUBS1;
 {$IMPORTEDDATA OFF}
 interface
 
@@ -44,13 +44,13 @@ uses
   LOGDVP,
   LogEdit,
   LogGrid,
-//  Help,
-//  LOGHP,
+  //  Help,
+  //  LOGHP,
   LogK1EA,
-//  LOGMENU,
+  //  LOGMENU,
   LogNet,
   LogPack,
-//  LOGPROM,
+  //  LOGPROM,
   LogRadio, { Currently not an overlay }
   LOGSend,
   LogSCP,
@@ -74,16 +74,12 @@ function Send73Message: boolean;
 procedure AddOnCQExchange;
 procedure SwapRadios;
 
-
 implementation
 
 uses
   uRadioPolling,
   LOGSUBS2,
   MainUnit;
-
-
-
 
 procedure PutUpExchangeMenu;
 
@@ -107,13 +103,13 @@ procedure CheckForRemovedDupeSheetWindow;
 begin
   if VisibleDupeSheetRemoved then
   begin
-      //    RemoveWindow(BigWindow);
+    //    RemoveWindow(BigWindow);
 //    VisibleLog.SetUpEditableLog;
     UpdateTotals2;
     VisibleLog.ShowRemainingMultipliers;
     VisibleLog.DisplayGridMap(ActiveBand, ActiveMode);
 
-      //         if VisibleDupesheetEnable then
+    //         if VisibleDupesheetEnable then
 //      CallsignsList.Display(ActiveBand, ActiveMode);
   end;
 
@@ -124,95 +120,97 @@ function SendCrypticMessage(Message: Str160): boolean;
 
 var
 
- TempChar                              : Char;
- label
+  TempChar: Char;
+label
   DontCheckPTT;
 
-begin   // 1
+begin // 1
   Result := False;
-  if FoundCommand(Message) and (Message = '') then Exit;
-  if (ActiveMode in [Phone, FM]) and (DVKEnable = False) then goto DontCheckPTT;
-  if (ActiveMode = CW) and (CWEnable = False) then goto DontCheckPTT;
+  if FoundCommand(Message) and (Message = '') then
+    Exit;
+  if (ActiveMode in [Phone, FM]) and (DVKEnable = False) then
+    goto DontCheckPTT;
+  if (ActiveMode = CW) and (CWEnable = False) then
+    goto DontCheckPTT;
 
-  if CheckPTTLockout then Exit;
+  if CheckPTTLockout then
+    Exit;
 
   DontCheckPTT:
 
   Result := True;
-   InactiveRigCallingCQ := False;   
+  InactiveRigCallingCQ := False;
   tWaitForNextChar := True;
 
   if not (Copy(Message, 1, 1) = ControlA) then
-     begin // I think we want to make sure we swap radios once. I tried caling SwapRadios here but it got called again.
-     SetUpToSendOnActiveRadio;
-     end;      
+  begin // I think we want to make sure we swap radios once. I tried caling SwapRadios here but it got called again.
+    SetUpToSendOnActiveRadio;
+  end;
 
+  // n4af 4.41.3
 
-
-   // n4af 4.41.3
-
-  while (Copy(Message, 1, 1) = ControlA) or (Copy(Message, 1, 1) = ControlB) or (Copy(Message, 1, 1) = ControlE) do
-  begin      // 2
+  while (Copy(Message, 1, 1) = ControlA) or (Copy(Message, 1, 1) = ControlB) or
+    (Copy(Message, 1, 1) = ControlE) do
+  begin // 2
     TempChar := Message[1];
 
     if TempChar = ControlA then
-        if not SingleRadioMode then
-       begin      // 3
+      if not SingleRadioMode then
+      begin // 3
         if ActiveRadio = RadioOne then
-        begin      // 4
+        begin // 4
           if not SendingOnRadioTwo then
-            ActiveMode := Radio2.ModeMemory ;
-        end        // 3
-        else // Radio Two
-          if not SendingOnRadioOne then
+            ActiveMode := Radio2.ModeMemory;
+        end // 3
+        else {// Radio Two} if not SendingOnRadioOne then
             ActiveMode := Radio1.ModeMemory;
 
         SetUpToSendOnInactiveRadio;
 
-    //    Sleep(5); // Added to get rid of relay flicking on old radio
-     end;   // 2
+        //    Sleep(5); // Added to get rid of relay flicking on old radio
+      end; // 2
 
     if TempChar = ControlB then
       if not SingleRadioMode then
       begin
-       if autosendenable then        CallWindowKeyUpProc;  // n4af 4.44.2
+        if autosendenable then
+          CallWindowKeyUpProc; // n4af 4.44.2
         InactiveRigCallingCQ := True;
-        InactiveSwapRadio    := True;
-        if ExchangeWindowString = ''   then          // 4.52.1
-       Switch := True;
-       SwitchNext := True;    // 4.52.3
-        end;
+        InactiveSwapRadio := True;
+        if ExchangeWindowString = '' then // 4.52.1
+          Switch := True;
+        SwitchNext := True; // 4.52.3
+      end;
 
- {   if TempChar = ControlE then           // n4af 4.41.3
-      if not SingleRadioMode then
-      begin    // 3
-       if autosendenable then
-         CallWindowKeyUpProc;  // n4af 4.44.2
-         InactiveRigCallingCQ := True;
-         InactiveSwapRadio := True;
-  //       if ExchangeWindowString = ''   then          // 4.52.1
-           Switch     := True;
-          SwitchNext := True;      //4.56.9
-  //       swapradios;
-      end;   // 2
- }  
-
+    {   if TempChar = ControlE then           // n4af 4.41.3
+         if not SingleRadioMode then
+         begin    // 3
+          if autosendenable then
+            CallWindowKeyUpProc;  // n4af 4.44.2
+            InactiveRigCallingCQ := True;
+            InactiveSwapRadio := True;
+     //       if ExchangeWindowString = ''   then          // 4.52.1
+              Switch     := True;
+             SwitchNext := True;      //4.56.9
+     //       swapradios;
+         end;   // 2
+    }
 
     Delete(Message, 1, 1);
-  end;     // 1
+  end; // 1
   //ny4i to fix issue #9
 
   if pos('>', Message) > 0 then
-  begin  // 2
+  begin // 2
     if ActiveMode <> Digital then
-    begin    // 3
+    begin // 3
       RITClear;
       Delete(Message, pos('>', Message), 1);
-    end   // 2
+    end // 2
     else
       SendMessageToMixW(Message);
 
-  end;     // 1
+  end; // 1
 
   case ActiveMode of
     FM, Phone:
@@ -226,13 +224,13 @@ begin   // 1
 
     CW:
       begin
-     SendCrypticCWstring(Message);
-     end;
+        SendCrypticCWstring(Message);
+      end;
 {$IF MMTTYMODE}
     Digital:
       begin
         SendCrypticCWString(Message);
-//        ProcessMMTTYMessage(TXM_CHAR, 10);
+        //        ProcessMMTTYMessage(TXM_CHAR, 10);
 
       end;
 {$IFEND}
@@ -247,26 +245,26 @@ procedure SendFunctionKeyMessage(Key: Char; OpMode: OpModeType);
 var
 
   QSONumberString: Str20;
-  MessageKey                            : Char;
-  Message                               : Str160;
-  IncrementCounter                      : boolean;
+  MessageKey: Char;
+  Message: Str160;
+  IncrementCounter: boolean;
 
-  TempMode                              : ModeType;
+  TempMode: ModeType;
 begin
 
-//  if K5KA.ModeEnabled and (Key = F1) and (OpMode = CQOpMode) then
-//    K5KA.State := KAMessageStarted;
-  {
-      IF ((Key >= F1)         AND (Key <= F10)) OR
-         ((Key >= F11)        AND (Key <= F12)) OR
-         ((Key >= ShiftF1)    AND (Key <= ShiftF10)) OR
-         ((Key >= ShiftF11)   AND (Key <= ShiftF12)) OR
-         ((Key >= ControlF1)  AND (Key <= ControlF10)) OR
-         ((Key >= ControlF11) AND (Key <= ControlF12)) OR
-         ((Key >= AltF1)      AND (Key <= AltF10)) OR
-         ((Key >= AltF11)     AND (Key <= AltF12)) THEN
-            }
-    begin
+  //  if K5KA.ModeEnabled and (Key = F1) and (OpMode = CQOpMode) then
+  //    K5KA.State := KAMessageStarted;
+    {
+        IF ((Key >= F1)         AND (Key <= F10)) OR
+           ((Key >= F11)        AND (Key <= F12)) OR
+           ((Key >= ShiftF1)    AND (Key <= ShiftF10)) OR
+           ((Key >= ShiftF11)   AND (Key <= ShiftF12)) OR
+           ((Key >= ControlF1)  AND (Key <= ControlF10)) OR
+           ((Key >= ControlF11) AND (Key <= ControlF12)) OR
+           ((Key >= AltF1)      AND (Key <= AltF10)) OR
+           ((Key >= AltF11)     AND (Key <= AltF12)) THEN
+              }
+  begin
     SwitchNext := False;
     Switch := False;
     MessageKey := Key;
@@ -275,8 +273,9 @@ begin
     //wli         if (Key >= ControlF1) and (Key <= ControlF10) then MessageKey := CHR(Ord(Key) - 35);
 
     TempMode := ActiveMode;
-    if ActiveMode = FM then TempMode := Phone;
-     Switch := False;   // n4af 4.44.7
+    if ActiveMode = FM then
+      TempMode := Phone;
+    Switch := False; // n4af 4.44.7
     if OpMode = CQOpMode then
       Message := GetCQMemoryString(TempMode, MessageKey) {KK1L: 6.73 Added mode}
     else
@@ -284,26 +283,27 @@ begin
 
     //{WLI}           FoundCommand (Message);
 
-    if Message = '' then Exit; { Nothing left }
-{
-    if (ActiveMode = Phone) and DVPEnable and DVPMessagePlaying then
-    begin
-      TimeOut := 0;
+    if Message = '' then
+      Exit; { Nothing left }
+    {
+        if (ActiveMode = Phone) and DVPEnable and DVPMessagePlaying then
+        begin
+          TimeOut := 0;
 
-        //      DVPStopPlayback;
+            //      DVPStopPlayback;
 
-        //      repeat
-        //        Wait(5);
-        //        inc(TimeOut);
-        //      until (not DVPMessagePlaying) or (TimeOut > 30);
-    end;
-}
-     InactiveRigCallingCQ := False;  
-//    SetUpToSendOnActiveRadio;
+            //      repeat
+            //        Wait(5);
+            //        inc(TimeOut);
+            //      until (not DVPMessagePlaying) or (TimeOut > 30);
+        end;
+    }
+    InactiveRigCallingCQ := False;
+    //    SetUpToSendOnActiveRadio;
 
     if ActiveMode = CW then
     begin
-  //  Esc_Counter := 0; // 4.53.7 reset if function key pressed
+      //  Esc_Counter := 0; // 4.53.7 reset if function key pressed
       DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
 
       if AllCWMessagesChainable then
@@ -311,79 +311,79 @@ begin
         if CWStillBeingSent then
           AddStringToBuffer(' ', CWTone);
       end
-      else
-        if pos(ControlD, Message) = 0 then
-        begin
-//          wkWaitForChainablemessage := True;
-          if not (IsCWByCATActive and
-                 (ActiveRadioPtr^.RadioModel in ICOMRadios)) then
-             begin
-             FlushCWBuffer;         // ny4i Issue 145 - Don;t dothis for Icom radios. It messes up the times of CW Messages
-             end;
-        end;
-    end;
-
-IncrementCounter := SendCrypticMessage(Message);
-
-      if (OpMode = CQOpMode) and (Key >= F1) and (Key <= F4) then
+      else if pos(ControlD, Message) = 0 then
       begin
-
-        if IncrementCounter then if Key = F1 then
-          begin
-            inc(tRestartInfo.riCQTotalCounter);
-            tDisplayCQTotal;
-          end;
-
-   //     if BandMapEnable and BandMapDisplayCQ then  //n4af 4.46.3
+        //          wkWaitForChainablemessage := True;
+        if not (IsCWByCATActive and
+          (ActiveRadioPtr^.RadioModel in ICOMRadios)) then
         begin
-          if ActiveRadioPtr^.LastDisplayedFreq <> 0 then
-          begin
-            Str(TotalContacts + 1, QSONumberString);
-       //   BandMapCursorFrequency := ActiveRadioPtr^.LastDisplayedFreq;      // GAV Removed, not required
-            tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, ActiveRadioPtr);
-            LastCQFrequency := ActiveRadioPtr^.LastDisplayedFreq;
-            LastCQMode := ActiveMode;
-          end;
-
-          {
-          if ActiveRadio = RadioOne then
-          begin
-            if Radio1.LastDisplayedFreq <> 0 then
-            begin
-              Str(TotalContacts + 1, QSONumberString);
-              BandMapCursorFrequency := Radio1.LastDisplayedFreq;
-              tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, @Radio1);
-              LastCQFrequency := Radio1.LastDisplayedFreq;
-              LastCQMode := ActiveMode;
-            end;
-          end
-
-          else // Radio two
-            if Radio2.LastDisplayedFreq <> 0 then
-            begin
-              Str(TotalContacts + 1, QSONumberString);
-              BandMapCursorFrequency := Frequency;
-              tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, @Radio2);
-              LastCQFrequency := Radio2.LastDisplayedFreq
-                LastCQMode := ActiveMode;
-            end;
-             }
+          FlushCWBuffer; // ny4i Issue 145 - Don;t dothis for Icom radios. It messes up the times of CW Messages
         end;
-
-            //        if (ActiveMultiPort <> NoPort) and          ((MultiInfoMessage <> '') or K1EANetworkEnable) then          CreateAndSendCQMultiInfoMessage;
       end;
     end;
+
+    IncrementCounter := SendCrypticMessage(Message);
+
+    if (OpMode = CQOpMode) and (Key >= F1) and (Key <= F4) then
+    begin
+
+      if IncrementCounter then
+        if Key = F1 then
+        begin
+          inc(tRestartInfo.riCQTotalCounter);
+          tDisplayCQTotal;
+        end;
+
+      //     if BandMapEnable and BandMapDisplayCQ then  //n4af 4.46.3
+      begin
+        if ActiveRadioPtr^.LastDisplayedFreq <> 0 then
+        begin
+          Str(TotalContacts + 1, QSONumberString);
+          //   BandMapCursorFrequency := ActiveRadioPtr^.LastDisplayedFreq;      // GAV Removed, not required
+          tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, ActiveRadioPtr);
+          LastCQFrequency := ActiveRadioPtr^.LastDisplayedFreq;
+          LastCQMode := ActiveMode;
+        end;
+
+        {
+        if ActiveRadio = RadioOne then
+        begin
+          if Radio1.LastDisplayedFreq <> 0 then
+          begin
+            Str(TotalContacts + 1, QSONumberString);
+            BandMapCursorFrequency := Radio1.LastDisplayedFreq;
+            tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, @Radio1);
+            LastCQFrequency := Radio1.LastDisplayedFreq;
+            LastCQMode := ActiveMode;
+          end;
+        end
+
+        else // Radio two
+          if Radio2.LastDisplayedFreq <> 0 then
+          begin
+            Str(TotalContacts + 1, QSONumberString);
+            BandMapCursorFrequency := Frequency;
+            tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, @Radio2);
+            LastCQFrequency := Radio2.LastDisplayedFreq
+              LastCQMode := ActiveMode;
+          end;
+           }
+      end;
+
+      //        if (ActiveMultiPort <> NoPort) and          ((MultiInfoMessage <> '') or K1EANetworkEnable) then          CreateAndSendCQMultiInfoMessage;
+    end;
   end;
- 
+end;
 
 procedure AddOnCQExchange;
 
 var
-  TempString, Name                      : Str20;
-  StationSpeed                          : integer;
+  Name: Str20;
+  StationSpeed: integer;
 
 begin
-  if K5KA.ModeEnabled then K5KA.State := KAMessageStarted;
+  if K5KA.ModeEnabled then
+    K5KA.State := KAMessageStarted;
 
   if ActiveMode in [Phone, FM] then
   begin
@@ -392,10 +392,10 @@ begin
       Name := UpperCase(CD.GetName(RootCall(CallsignICameBackTo)));
 
       if (Name = '') or (Name = 'CLUB') then
-//        SendCrypticMessage(CQPhoneExchangeNameKnown)
+        //        SendCrypticMessage(CQPhoneExchangeNameKnown)
         SendCrypticMessage(CQPhoneExchange)
       else
-//        SendCrypticMessage(CQPhoneExchange);
+        //        SendCrypticMessage(CQPhoneExchange);
         SendCrypticMessage(CQPhoneExchangeNameKnown);
     end
     else
@@ -420,30 +420,31 @@ begin
       Name := UpperCase(CD.GetName(RootCall(CallsignICameBackTo)));
       if (Name = '') or (Name = 'CLUB') then
         SendCrypticMessage(CQExchange)
-              //Additional_CW_Message.ADD_Message:=CQExchange
+          //Additional_CW_Message.ADD_Message:=CQExchange
       else
         SendCrypticMessage(CQExchangeNameKnown);
-          //Additional_CW_Message.ADD_Message:=CQExchangeNameKnown;
+      //Additional_CW_Message.ADD_Message:=CQExchangeNameKnown;
     end
     else
     begin
       SendCrypticMessage(CQExchange);
-          //Additional_CW_Message.ADD_Message:=CQExchange;
+      //Additional_CW_Message.ADD_Message:=CQExchange;
     end;
 
-      //   ClearPTTForceOn;
+    //   ClearPTTForceOn;
   end;
 
   tExchangeWindowSetFocus;
   ExchangeHasBeenSent := True;
-  if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
+  if ActiveMode = Digital then
+    SendMessageToMixW('<RXANDCLEAR>');
 
   SendSerialNumberChange(sntReserved);
 end;
 
 function Send73Message: boolean;
 var
-  s                                     : string[20];
+  s: string[20];
 begin
   Result := True;
   s := '';
@@ -454,13 +455,15 @@ begin
       s := CorrectedCallPhoneMessage + ' '
     else
       s := CorrectedCallMessage;
-      //    CallsignICameBackTo := ReceivedData.Callsign;
+    //    CallsignICameBackTo := ReceivedData.Callsign;
   end;
 
-  if SeventyThreeMessageSent or not MessageEnable then Exit;
-  if BeSilent then Exit;
+  if SeventyThreeMessageSent or not MessageEnable then
+    Exit;
+  if BeSilent then
+    Exit;
 
-//    if ActiveMode = Digital then SendMessageToMixW('<TX>');
+  //    if ActiveMode = Digital then SendMessageToMixW('<TX>');
   if AutoQSLCount > 0 then
   begin
     dec(AutoQSLCount);
@@ -490,7 +493,7 @@ begin
       Result := SendCrypticMessage(s + QSLMessage);
   end;
 
-//    if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
+  //    if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');
 
   SeventyThreeMessageSent := Result;
 end;
@@ -519,82 +522,55 @@ end;
 
 procedure SwapRadios;
 
-var
-  TimeOut                               : integer;
-
 begin
-   DebugMsg('>>>>Entering SWAPRADIOS');
+  DebugMsg('>>>>Entering SWAPRADIOS');
   if SingleRadioMode then
   begin
     QuickDisplay(TC_ALTRCOMMANDDISABLED);
-      //      Wait(3000); {KK1L: 6.71}
+    //      Wait(3000); {KK1L: 6.71}
     Exit;
   end;
-  {
-     if (ActiveMode = Phone) and DVPMessagePlaying then
-        begin
-           DVPStopPlayback;
-
-           TimeOut := 0;
-
-           repeat
-              Wait(5);
-              inc(TimeOut)
-           until (not DVPMessagePlaying) or (TimeOut > 30);
-        end
-
-     else
-        if (ActiveMode = Phone) and DVKMessagePlaying then
-           begin
-              //            SendDVKMessage('DVK0');
-
-              TimeOut := 0;
-
-              repeat
-                 Wait(5);
-                 inc(TimeOut)
-              until (not DVKMessagePlaying) or (TimeOut > 30);
-           end;
-  }
 
   TryKillAutoCQ;
-  if ActiveMode = CW then FlushCWBufferAndClearPTT;
+  if ActiveMode = CW then
+    FlushCWBufferAndClearPTT;
 
-//  LastDisplayedFreq[RadioOne] := 0; {KK1L: 6.73 Forces new display for highlight}
-//  LastDisplayedFreq[RadioTwo] := 0; {KK1L: 6.73 Forces new display for highlight}
-  if IsCWByCATActive(InActiveRadioptr) then  // ny4i Issue 145 - Noticed this so I fixed it. IsCWByCATActive checks if radioObject CWBYCAT is set plus if the radio model is capable of CWByCAT.
-     begin
-     ActiveRadioPtr^.StopSendingCW;  // n4af 4.45.9
-     end;
- // if InActiveRadioptr^.CWByCAT then ActiveRadioPtr^.StopSendingCW;
+  //  LastDisplayedFreq[RadioOne] := 0; {KK1L: 6.73 Forces new display for highlight}
+  //  LastDisplayedFreq[RadioTwo] := 0; {KK1L: 6.73 Forces new display for highlight}
+  if IsCWByCATActive(InActiveRadioptr) then
+    // ny4i Issue 145 - Noticed this so I fixed it. IsCWByCATActive checks if radioObject CWBYCAT is set plus if the radio model is capable of CWByCAT.
+  begin
+    ActiveRadioPtr^.StopSendingCW; // n4af 4.45.9
+  end;
+  // if InActiveRadioptr^.CWByCAT then ActiveRadioPtr^.StopSendingCW;
   InactiveRigCallingCQ := False;
- 
+
   if ActiveRadio = RadioOne then
   begin
-     Windows.EnableWindow(wh[mweRadioOne], False);
+    Windows.EnableWindow(wh[mweRadioOne], False);
     Windows.EnableWindow(Radio1.FreqWindowHandle, False);
     Windows.EnableWindow(wh[mweRadioTwo], True);
     Windows.EnableWindow(Radio2.FreqWindowHandle, True);
-     ActiveRadioPtr := @Radio2;
-     InActiveRadioPtr := @Radio1;
+    ActiveRadioPtr := @Radio2;
+    InActiveRadioPtr := @Radio1;
     ActiveBand := Radio2.BandMemory {BandMemory[RadioTwo]};
     ActiveMode := Radio2.ModeMemory {ModeMemory[RadioTwo]};
- //   ActiveKeyerPort := Radio2.tKeyerPort;
- //   tActiveKeyerHandle := Radio2.tKeyerPortHandle;
+    //   ActiveKeyerPort := Radio2.tKeyerPort;
+    //   tActiveKeyerHandle := Radio2.tKeyerPortHandle;
     SerialInvert := Radio2SerialInvert;
-     ActiveRadio := RadioTwo;
-    InactiveRadio := RadioOne;    
-    CodeSpeed := Radio2.SpeedMemory; 
+    ActiveRadio := RadioTwo;
+    InactiveRadio := RadioOne;
+    CodeSpeed := Radio2.SpeedMemory;
     //SetSpeed(CodeSpeed); // ny4i Issue 153 This is done in SetUpToSendOnActiveRadio so no need to do it here.
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end
   else
   begin
-      Windows.EnableWindow(wh[mweRadioOne], True);
+    Windows.EnableWindow(wh[mweRadioOne], True);
     Windows.EnableWindow(Radio1.FreqWindowHandle, True);
-     Windows.EnableWindow(wh[mweRadioTwo], False);
-    Windows.EnableWindow(Radio2.FreqWindowHandle, False);     
-     ActiveRadioPtr := @Radio1;
+    Windows.EnableWindow(wh[mweRadioTwo], False);
+    Windows.EnableWindow(Radio2.FreqWindowHandle, False);
+    ActiveRadioPtr := @Radio1;
     InActiveRadioPtr := @Radio2;
     ActiveBand := Radio1.BandMemory {BandMemory[RadioOne]};
     ActiveMode := Radio1.ModeMemory {ModeMemory[RadioOne]};
@@ -605,18 +581,19 @@ begin
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
 
-     ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
-     ShowInformation;  // n4af 04.40.02
+  ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
+  ShowInformation; // n4af 04.40.02
 
-  
-  SetUpToSendOnActiveRadio;       // 4.62.1  issue 278 remove 4.54.2 comment on this line
+  SetUpToSendOnActiveRadio; // 4.62.1  issue 278 remove 4.54.2 comment on this line
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
   UpdateTotals2;
-  if Radio1.tRadioInterfaceWndHandle <> 0 then InvalidateRect(Radio1.tRadioInterfaceWndHandle, nil, True);
-  if Radio2.tRadioInterfaceWndHandle <> 0 then InvalidateRect(Radio2.tRadioInterfaceWndHandle, nil, True);
+  if Radio1.tRadioInterfaceWndHandle <> 0 then
+    InvalidateRect(Radio1.tRadioInterfaceWndHandle, nil, True);
+  if Radio2.tRadioInterfaceWndHandle <> 0 then
+    InvalidateRect(Radio2.tRadioInterfaceWndHandle, nil, True);
 
-   wkSetKeyerOutput(ActiveRadioPtr);
+  wkSetKeyerOutput(ActiveRadioPtr);
 
   if QSONumberByBand then
     DisplayNextQSONumber;
@@ -641,101 +618,31 @@ procedure ExchangeRadios; {KK1L: 6.71}
 { The original purpose was to make it easy to find a new run freq on the second radio }
 { (presumably not on the best antenna system) and swap it to the primary antenna setup.}
 
-
 begin
 
   { Needs to be put back }
 end;
 
-{ PROCEDURE SelectBVFO;
 
-VAR IntRadioType: InterfacedRadioType;
-
-    BEGIN
-    CASE ActiveRadio OF
-        RadioOne:
-            IntRadioType := Radio1Type;
-
-        RadioTwo:
-            IntRadioType := Radio2Type;
-        END;
-
-    CASE IntRadioType OF
-        TS850:
-            BEGIN
-            AddRadioCommandCharacter (ActiveRadio, 'F');
-            AddRadioCommandCharacter (ActiveRadio, 'R');
-            AddRadioCommandCharacter (ActiveRadio, '1');
-            AddRadioCommandCharacter (ActiveRadio, ';');
-
-            AddRadioCommandCharacter (ActiveRadio, 'M');
-            AddRadioCommandCharacter (ActiveRadio, 'D');
-
-            IF ActiveMode = CW THEN
-                AddRadioCommandCharacter (ActiveRadio, '3')
-            ELSE
-                IF PacketFrequency < 10000000 THEN
-                    AddRadioCommandCharacter (ActiveRadio, '1')
-                ELSE
-                    AddRadioCommandCharacter (ActiveRadio, '2');
-
-            AddRadioCommandCharacter (ActiveRadio, ';');
-            END;
-
-        FT1000:
-            BEGIN
-            AddRadioCommandCharacter (ActiveRadio, Chr (0));
-            AddRadioCommandCharacter (ActiveRadio, Chr (0));
-            AddRadioCommandCharacter (ActiveRadio, Chr (0));
-            AddRadioCommandCharacter (ActiveRadio, Chr (1));
-            AddRadioCommandCharacter (ActiveRadio, Chr (5));
-            END;
-
-        END;
-    END;
-
-}
 
 procedure RememberFrequency;
 
 var
-  Band                                  : BandType;
-  Mode                                  : ModeType;
+  Band: BandType;
+  Mode: ModeType;
 begin
   CalculateBandMode(ActiveRadioPtr.FilteredStatus.Freq, Band, Mode);
   Mode := ActiveMode;
   if (Band = ActiveBand) and (Mode in [CW..Phone]) then
     FreqMemory[ActiveBand, ActiveMode] := ActiveRadioPtr.FilteredStatus.Freq;
-{
 
-  if ActiveRadio = RadioOne then
-  begin
-    CalculateBandMode(Radio1.FilteredStatus.Freq, Band, Mode);
-
-    if (Band = ActiveBand) and (Mode = ActiveMode) then
-    begin
-      FreqMemory[ActiveBand, ActiveMode] := Radio1.FilteredStatus.Freq;
-          //      BandMemory[RadioOne] := Band; //wli
-    end;
-  end
-  else
-  begin
-    CalculateBandMode(Radio2.FilteredStatus.Freq, Band, Mode);
-
-    if (Band = ActiveBand) and (Mode = ActiveMode) then
-    begin
-      FreqMemory[ActiveBand, ActiveMode] := Radio2.FilteredStatus.Freq;
-          //      BandMemory[RadioTwo] := Band; //wli
-    end;
-  end;
-}
 end;
 
 procedure CheckTwoRadioState(Action: TwoRadioAction);
 
 var
-  Key                                   : Char;
-  TimeOut                               : Byte;
+//  Key: Char;
+  TimeOut: Byte;
 
 begin
   if SingleRadioMode then
@@ -753,21 +660,22 @@ begin
         ExchangeHasBeenSent := False;
       end;
 
-// There is a callsign displayed and if someone presses the space
-// bar, we want to call that station NOW!
+    // There is a callsign displayed and if someone presses the space
+    // bar, we want to call that station NOW!
 
     CallReady:
       case Action of
         SpaceBarPressed:
           begin
-  {kk1l                   IF (ActiveMode = CW) AND CWStillBeingSent THEN
-                          FlushCWBufferAndClearPTT;
-  }
+            {kk1l                   IF (ActiveMode = CW) AND CWStillBeingSent THEN
+                                    FlushCWBufferAndClearPTT;
+            }
 
             if (OpMode = CQOpMode) then //KK1L: 6.73
               CalledFromCQMode := True
             else
-              CalledFromCQMode := False; // KK1L: 6.73 NOTE TRUE disables special called from SAPMode
+              CalledFromCQMode := False;
+                // KK1L: 6.73 NOTE TRUE disables special called from SAPMode
 
             SwapRadios; // Changes active band/mode and display
 
@@ -780,94 +688,46 @@ begin
               else
                 SendStringAndStop(MyCall);
             end
-            else
-              if ActiveMode = Digital then
-                SendStringAndStop(CallWindowString + ' DE ' + MyCall + ' KK ')
-              else
-                if DVKEnable then
-                begin
-                  SendCrypticMessage('MYCALL.WAV');
-                end
-                else
-                  if ActiveDVKPort <> NoPort then SendDVKMessage(GetEXMemoryString(ActiveMode, F1)); //KK1L: 6.73 Added mode to GetEXMemoryString
+            else if ActiveMode = Digital then
+              SendStringAndStop(CallWindowString + ' DE ' + MyCall + ' KK ')
+            else if DVKEnable then
+            begin
+              SendCrypticMessage('MYCALL.WAV');
+            end
+            else if ActiveDVKPort <> NoPort then
+              SendDVKMessage(GetEXMemoryString(ActiveMode, F1));
+                //KK1L: 6.73 Added mode to GetEXMemoryString
 
             TwoRadioState := StationCalled;
 
-  //                     If during the time we are calling an ESCAPE key
-  //                      is pressed, we will abort sending MyCall on the
-  //                      inactive radio and go back to CQing on the Active
-  //                      Radio
+            //                     If during the time we are calling an ESCAPE key
+            //                      is pressed, we will abort sending MyCall on the
+            //                      inactive radio and go back to CQing on the Active
+            //                      Radio
 
-  //KK1L: 6.71 Added DoingDVK so DVKDelay is used too!
+            //KK1L: 6.71 Added DoingDVK so DVKDelay is used too!
             if DVKEnable or (ActiveMode = CW) or (ActiveDVKPort <> NoPort) then
             begin
-{
-              repeat
-                if KeyPressed then
-                begin
-                  Key := ReadKey;
 
-                  if Key = EscapeKey then
-                  begin
-                    FlushCWBufferAndClearPTT;
-                    DVPStopPlayback;
+                //Now launch a CQ on the "inactive" rig (which was
+                //the one we were CQing on.
 
-                    SwapRadios; // Goes back to original display
-
-                                      //SendCrypticMessage (GetCQMemoryString (F1));
-                                      //KK1L: 6.73
-                    if CalledFromCQMode then SendCrypticMessage(GetCQMemoryString(ActiveMode, F1));
-
-  //We have a problem... the callsign is
-  //still up and we are in S&P mode
-
-                    TwoRadioState := CallReady; // Should fix it
-                    Exit;
-                  end
-                  else
-                    if Key = NullKey then
-                      case ReadKey of
-                        AltB: begin
-                            RememberFrequency;
-                            BandUp;
-                          end;
-
-                        AltV: begin
-                            RememberFrequency;
-                            BandDown;
-                          end;
-
-                        PageUpKey: SpeedUp;
-                        PageDownKey: SlowDown;
-                      end;
-                end;
-
-                if ActiveMode = Phone then Wait(10);
-
-              until (((ActiveMode = CW) and not CWStillBeingSent) or
-                ((ActiveMode = Phone) and not (DVPMessagePlaying or DVKMessagePlaying)));
-}
-  //Now launch a CQ on the "inactive" rig (which was
-  //the one we were CQing on.
-
-  //KK1L: 6.73 Added CalledFromCQMode
-  //KK1L: 6.73 Added mode to GetCQMemoryString
-              if (GetCQMemoryString(InActiveRadioPtr.ModeMemory, AltF3) <> '') and (CalledFromCQMode) then
+                //KK1L: 6.73 Added CalledFromCQMode
+                //KK1L: 6.73 Added mode to GetCQMemoryString
+              if (GetCQMemoryString(InActiveRadioPtr.ModeMemory, AltF3) <> '')
+                and (CalledFromCQMode) then
               begin
-                              {KK1L: 6.73 Added mode to GetCQMemoryString}
-                SendCrypticMessage(ControlA + GetCQMemoryString(InActiveRadioPtr.ModeMemory, AltF3));
+                {KK1L: 6.73 Added mode to GetCQMemoryString}
+                SendCrypticMessage(ControlA +
+                  GetCQMemoryString(InActiveRadioPtr.ModeMemory, AltF3));
 
-  //                            IF DVPEnable AND (ActiveMode = Phone) AND DVPActive THEN
-  //                            KK1L: 6.73 Need to check mode of the inactive radio!!
-                if DVKEnable and (InActiveRadioPtr.ModeMemory = Phone) and DVPActive then
+                //                            IF DVPEnable AND (ActiveMode = Phone) AND DVPActive THEN
+                //                            KK1L: 6.73 Need to check mode of the inactive radio!!
+                if DVKEnable and (InActiveRadioPtr.ModeMemory = Phone) and
+                  DVPActive then
                 begin
-                  TimeOut := 0;
-{
-                  repeat
-                    Wait(5);
-                    inc(TimeOut);
-                  until DVPMessagePlaying or (TimeOut > 30);
-}
+  //                TimeOut := 0;
+
                 end;
               end;
 
@@ -877,14 +737,14 @@ begin
           end;
       end;
 
-  //We have called a station on the second rig.  We were sending a CQ
-  //on the inactive radio using the ControlA feature which means that
-  //InactiveRigSendingCW is TRUE.
+    //We have called a station on the second rig.  We were sending a CQ
+    //on the inactive radio using the ControlA feature which means that
+    //InactiveRigSendingCW is TRUE.
 
     StationCalled:
       case Action of
         SpaceBarPressed, // Need to call the station again
-          F1Pressed:
+        F1Pressed:
           begin
             InactiveRigCallingCQ := False;
 
@@ -914,63 +774,28 @@ begin
               begin
                 SendCrypticMessage('MYCALL.WAV');
 
-                TimeOut := 0;
-{
-                repeat
-                  Wait(5);
-                  inc(TimeOut);
-                until DVPMessagePlaying or (TimeOut > 30);
-}
+//                TimeOut := 0;
+
               end;
 
               if ActiveDVKPort <> NoPort then
-                              //SendDVKMessage (GetEXMemoryString (F2)); //KK1L: 6.71 removed
-  //KK1L: 6.73 Added mode to GetEXMemoryString
-                SendDVKMessage(GetEXMemoryString(ActiveMode, F1)); //KK1L: 6.71 added to be consistent!
+                //SendDVKMessage (GetEXMemoryString (F2)); //KK1L: 6.71 removed
+//KK1L: 6.73 Added mode to GetEXMemoryString
+                SendDVKMessage(GetEXMemoryString(ActiveMode, F1));
+                  //KK1L: 6.71 added to be consistent!
 
             end;
 
-  //KK1L: 6.71 Added DoingDVK so DVKDelay is used too!
+            //KK1L: 6.71 Added DoingDVK so DVKDelay is used too!
             if (ActiveMode = CW) or DVKEnable or (ActiveDVKPort <> NoPort) then
             begin
- {
-              repeat
-                if KeyPressed then
-                begin
-                  Key := ReadKey;
-                  if Key = EscapeKey then
-                  begin
-                    if CalledFromCQMode then SendCrypticMessage(GetCQMemoryString(ActiveMode, F1));
-                    TwoRadioState := CallReady;
-                    Exit;
-                  end
-                  else
-                    if Key = NullKey then
-                      case ReadKey of
-                        AltB: begin
-                            RememberFrequency;
-                            BandUp;
-                          end;
 
-                        AltV: begin
-                            RememberFrequency;
-                            BandDown;
-                          end;
-
-                        PageUpKey: SpeedUp;
-                        PageDownKey: SlowDown;
-                      end;
-                end;
-
-                if ActiveMode = Phone then Wait(20);
-
-              until (((ActiveMode = CW) and not CWStillBeingSent) or
-                ((ActiveMode = Phone) and not (DVPMessagePlaying or DVKMessagePlaying)));
-}
-              if (GetCQMemoryString(InActiveRadioPtr.ModeMemory, AltF3) <> '') and (CalledFromCQMode) then
+              if (GetCQMemoryString(InActiveRadioPtr.ModeMemory, AltF3) <> '')
+                and (CalledFromCQMode) then
               begin
 
-                SendCrypticMessage(ControlA + GetCQMemoryString(InActiveRadioPtr.ModeMemory, AltF3));
+                SendCrypticMessage(ControlA +
+                  GetCQMemoryString(InActiveRadioPtr.ModeMemory, AltF3));
 
                 if (ActiveMode = Phone) and DVPActive then
                 begin
@@ -990,15 +815,16 @@ begin
         F2Pressed:
           begin
             if ActiveMode = CW then
-              if ExchangeHasBeenSent and (RepeatSearchAndPounceExchange <> '') then
+              if ExchangeHasBeenSent and (RepeatSearchAndPounceExchange <> '')
+                then
                 SendCrypticMessage(RepeatSearchAndPounceExchange)
               else
                 SendCrypticMessage(SearchAndPounceExchange)
+            else if ExchangeHasBeenSent and (RepeatSearchAndPouncePhoneExchange
+              <> '') then
+              SendCrypticMessage(RepeatSearchAndPouncePhoneExchange)
             else
-              if ExchangeHasBeenSent and (RepeatSearchAndPouncePhoneExchange <> '') then
-                SendCrypticMessage(RepeatSearchAndPouncePhoneExchange)
-              else
-                SendCrypticMessage(SearchAndPouncePhoneExchange);
+              SendCrypticMessage(SearchAndPouncePhoneExchange);
 
             ExchangeHasBeenSent := True;
             TwoRadioState := SendingExchange;
@@ -1023,32 +849,7 @@ begin
         EscapePressed:
           begin
             SwapRadios;
-{wli
-            if ActiveRadio = RadioTwo then
-            begin
-              ActiveBand := Radio1.BandMemory;
-              ActiveMode := Radio1.ModeMemory;
-              ActiveRadio := RadioOne;
-              InactiveRadio := RadioTwo;
-            end
-            else
-            begin
-              ActiveBand := Radio2.BandMemory;
-              ActiveMode := Radio2.ModeMemory;
-              ActiveRadio := RadioTwo;
-              InactiveRadio := RadioOne;
-            end;
 
-            CallWindowString := '';
-//            ResetSavedWindowListAndPutUpCallWindow;
-//            RemoveWindow(ExchangeWindow);
-
-            Radio1.LastDisplayedFreq := 0;
-            Radio2.LastDisplayedFreq := 0;
-            DisplayRadio(ActiveRadio);
-            DisplayBandMode(ActiveBand, ActiveMode, False);
-            UpdateTotals2;
-}
             TwoRadioState := CallReady;
           end;
 
@@ -1061,21 +862,19 @@ begin
       begin
         K5KA.AltDString := '';
 
-        if ActiveMode = Phone then Sleep(50);
+        if ActiveMode = Phone then
+          Sleep(50);
 
-               SwapRadios;
+        SwapRadios;
         SetOpMode(CQOpMode);
-        if (ControlBMemory = '') and (OnDeckCall = '') and (CalledFromCQMode) then SendCrypticMessage(GetCQMemoryString(ActiveMode, F1));
+        if (ControlBMemory = '') and (OnDeckCall = '') and (CalledFromCQMode)
+          then
+          SendCrypticMessage(GetCQMemoryString(ActiveMode, F1));
 
         if DVKEnable and (ActiveMode = Phone) and DVPActive then
         begin
-          TimeOut := 0;
-{
-          repeat
-            Wait(5);
-            inc(TimeOut);
-          until DVPMessagePlaying or (TimeOut > 30);
-}
+//          TimeOut := 0;
+
         end;
 
         TwoRadioState := Idle;
@@ -1094,7 +893,7 @@ procedure SetupPacketSpot(Address: integer; Radio: RadioType);
   of the program is ready to accept this data.    }
 
 var
-  QSXFrequency, PacketFrequency         : LONGINT;
+  QSXFrequency, PacketFrequency: LONGINT;
 
 begin
   PacketFrequency := Packet.PacketMemory[Address].Frequency;
@@ -1102,8 +901,6 @@ begin
 
   CalculateBandMode(PacketFrequency, ActiveBand, ActiveMode);
 
-//????????  BandMemory[Radio] := ActiveBand;
-//????????  ModeMemory[Radio] := ActiveMode;
 
   if Radio <> ActiveRadio then
     SwapRadios
@@ -1115,7 +912,7 @@ begin
 
   if QSXFrequency <> 0 then
   begin
-      {KK1L: 6.71 moved ahead of PutRadioIntoSplit because for TS850 need to make B active to change mode}
+    {KK1L: 6.71 moved ahead of PutRadioIntoSplit because for TS850 need to make B active to change mode}
     SetRadioFreq(ActiveRadio, QSXFrequency, ActiveMode, 'B');
     PutRadioIntoSplit(ActiveRadio);
   end
@@ -1124,7 +921,8 @@ begin
     PutRadioOutOfSplit(ActiveRadio);
   end;
 
-  SetRadioFreq(Radio, PacketFrequency, ActiveMode, 'A'); {KK1L: 6.71 Moved here from before IF for TS850 change}
+  SetRadioFreq(Radio, PacketFrequency, ActiveMode, 'A');
+    {KK1L: 6.71 Moved here from before IF for TS850 change}
 
   CallWindowString := Packet.PacketMemory[Address].Call;
 
@@ -1136,7 +934,7 @@ end;
 procedure DisplayPacketSpots(HighLightedSpot: integer);
 
 var
-  PacketAddress, Spot                   : integer;
+  PacketAddress, Spot: integer;
 
 begin
   //{WLI}    TextColor (ActiveColor);
@@ -1152,19 +950,20 @@ begin
     if PacketAddress > 10 then
       PacketAddress := PacketAddress - 11;
 
-    if PacketAddress = Packet.PacketMemoryEnd then Exit;
+    if PacketAddress = Packet.PacketMemoryEnd then
+      Exit;
 
-      //{WLI}        GoToXY (((Spot - 1) DIV 5) * 40 + 1, (Spot - 1) MOD 5 + 1);
+    //{WLI}        GoToXY (((Spot - 1) DIV 5) * 40 + 1, (Spot - 1) MOD 5 + 1);
 
     if Spot = HighLightedSpot then
     begin
-          //{WLI}            TextColor (ActiveBackground);
-          //{WLI}            TextBackground (ActiveColor);
+      //{WLI}            TextColor (ActiveBackground);
+      //{WLI}            TextBackground (ActiveColor);
     end
     else
     begin
-          //{WLI}            TextColor (ActiveColor);
-          //{WLI}            TextBackground (ActiveBackground);
+      //{WLI}            TextColor (ActiveColor);
+      //{WLI}            TextBackground (ActiveBackground);
     end;
 
     Write(Packet.PacketMemory[PacketAddress].Time, '  ',
@@ -1172,9 +971,10 @@ begin
       Packet.PacketMemory[PacketAddress].Call);
 
     if Packet.PacketMemory[PacketAddress].QSXFrequency <> 0 then
-      Write(' QSX ', Packet.PacketMemory[PacketAddress].QSXFrequency / 1000: 7: 1);
+      Write(' QSX ', Packet.PacketMemory[PacketAddress].QSXFrequency / 1000: 7:
+        1);
 
-      //    NoCursor;
+    //    NoCursor;
   end;
 
   QuickDisplay('Select spot.  RETURN, left or right arrow to select.  ESCAPE to exit.');
@@ -1201,10 +1001,9 @@ begin
       (PacketAddress < Packet.PacketMemoryEnd) then
       SetupPacketSpot(PacketAddress, Radio)
   end
-  else
-    if (PacketAddress >= Packet.PacketMemoryStart) or
-      (PacketAddress < Packet.PacketMemoryEnd) then
-      SetupPacketSpot(PacketAddress, Radio);
+  else if (PacketAddress >= Packet.PacketMemoryStart) or
+    (PacketAddress < Packet.PacketMemoryEnd) then
+    SetupPacketSpot(PacketAddress, Radio);
 end;
 
 function PacketMemoryRequest: boolean;
@@ -1213,17 +1012,18 @@ function PacketMemoryRequest: boolean;
   Spot address number is put into Global variable PacketAddress.     }
 
 var
-  Key                                   : Char;
-  PacketAddress, NumberSpots            : integer;
-  Spot                                  : integer;
-  Frequency                             : REAL;
+  Key: Char;
+  PacketAddress, NumberSpots: integer;
+  Spot: integer;
+//  Frequency: REAL;
 
 begin
   PacketMemoryRequest := False;
 
   //   if (Packet.PacketSerialPort = NoPort) and (ActiveMultiPort = NoPort) then      Exit;
 
-  if Packet.PacketMemoryStart = Packet.PacketMemoryEnd then Exit;
+  if Packet.PacketMemoryStart = Packet.PacketMemoryEnd then
+    Exit;
 
   //  SaveSetAndClearActiveWindow(EditableLogWindow);
    //{WLI}    ClrScr;
@@ -1243,7 +1043,10 @@ begin
 
     case Key of
       TabKey:
-        if (Spot > 5) then Spot := Spot - 5 else Spot := Spot + 5;
+        if (Spot > 5) then
+          Spot := Spot - 5
+        else
+          Spot := Spot + 5;
 
       EscapeKey:
         begin
@@ -1273,10 +1076,9 @@ begin
               (PacketAddress < Packet.PacketMemoryEnd) then
               SetupPacketSpot(PacketAddress, ActiveRadio)
           end
-          else
-            if (PacketAddress >= Packet.PacketMemoryStart) or
-              (PacketAddress < Packet.PacketMemoryEnd) then
-              SetupPacketSpot(PacketAddress, ActiveRadio);
+          else if (PacketAddress >= Packet.PacketMemoryStart) or
+            (PacketAddress < Packet.PacketMemoryEnd) then
+            SetupPacketSpot(PacketAddress, ActiveRadio);
 
           Exit;
         end;
@@ -1306,15 +1108,15 @@ begin
                     Exit;
                   end;
                 end
-                else
-                  if Radio2.tCATPortType <> NoPort then
-                  begin
-                    PacketMemoryRequest := True;
-                    SetUpRadioFromPacketSpot(RadioTwo, PacketAddress, Spot);
-                    Exit;
-                  end;
+                else if Radio2.tCATPortType <> NoPort then
+                begin
+                  PacketMemoryRequest := True;
+                  SetUpRadioFromPacketSpot(RadioTwo, PacketAddress, Spot);
+                  Exit;
+                end;
 
-                if Spot > 5 then Spot := Spot - 5;
+                if Spot > 5 then
+                  Spot := Spot - 5;
               end;
 
             RightArrow:
@@ -1328,16 +1130,16 @@ begin
                     Exit;
                   end;
                 end
-                else
-                  if Radio1.tCATPortType <> NoPort then
-                  begin
-                    PacketMemoryRequest := True;
-                    SetUpRadioFromPacketSpot(RadioOne, PacketAddress, Spot);
-                    Exit;
-                  end;
+                else if Radio1.tCATPortType <> NoPort then
+                begin
+                  PacketMemoryRequest := True;
+                  SetUpRadioFromPacketSpot(RadioOne, PacketAddress, Spot);
+                  Exit;
+                end;
 
                 if Spot <= NumberSpots - 5 then
-                  if (Spot < 6) then Spot := Spot + 5;
+                  if (Spot < 6) then
+                    Spot := Spot + 5;
               end;
           end;
         end;
@@ -1348,7 +1150,8 @@ end;
 procedure DualingCQs;
 
 begin
-  if SingleRadioMode then Exit;
+  if SingleRadioMode then
+    Exit;
 
   {KK1L: 6.73 Added mode to GetCQMemoryString}
   if GetCQMemoryString(ActiveMode, AltF1) = '' then
@@ -1367,13 +1170,7 @@ begin
     //{WLI}            Packet.CheckPacket;
     //{WLI}        UNTIL (KeyPressed) OR NOT CWStillBeingSent;
 
-    {        IF KeyPressed THEN
-                BEGIN
-                FlushCWBufferAndClearPTT;
-                SwapRadios;
-                Exit;
-                END;
-    }
+
     SwapRadios;
   until False;
 end;

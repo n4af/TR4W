@@ -43,13 +43,10 @@ function BMCFDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): 
 label
   ExitAndClose;
 var
-  r, c                                  : Byte;
-  Sec                                   : Byte;
-  delta                                 : integer;
-  TempBand                              : BandType;
   TempHWND                              : HWND;
   TempColumn                            : integer;
   TempFreq                              : integer;
+  TempBand                              : BandType;
   Top                                   : integer;
   pTranslated                           : LongBool;
   TempPos                               : integer;

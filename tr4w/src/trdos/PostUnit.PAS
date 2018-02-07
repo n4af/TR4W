@@ -522,7 +522,6 @@ end;
 procedure WriteTitleBlockToSummarySheet;
 var
   nNumberOfBytesToWrite                 : integer;
-  i                                     : integer;
   TempTag                               : CabrilloTags;
 begin
   asm
@@ -2124,8 +2123,6 @@ var
   tContestName                          : PChar;
   tContestNamelength                    : Cardinal;
   nNumberOfBytesToWrite                 : Cardinal;
-  p                                     : PChar;
-//  IOTAstring                            : Str10;
 
 begin
 
@@ -2240,39 +2237,9 @@ end;
 procedure ExportToTRLogFormat;
 label
   1;
-var
-  //  LogString                        : Str80;
-  QSOCounter                            : integer;
+
 begin
-{
-  lstrcpy(tReportsFilename, TR4W_LOG_FILENAME);
-  tReportsFilename[Windows.lstrlen(tReportsFilename) - 3] := #0;
-  lstrcat(tReportsFilename, 'DAT');
-  if not OpenFileForWrite(LOGDATFileWrite, tReportsFilename) then Exit;
 
-  if not OpenLogFile then Exit;
-  QSOCounter := 0;
-  ReadVersionBlock;
-  1:
-  if ReadLogFile then
-  begin
-    if GoodLookingQSO then
-    begin
-
-      if QSOCounter mod ContactsPerPage = 0 then PrintLogHeader;
-      if QSOCounter mod ContactsPerPage > 9 then if QSOCounter mod 10 = 0 then WriteLogEntry('');
-
-      inc(QSOCounter);
-      WriteLogEntry(MakeLogString(TempRXData));
-    end;
-
-    goto 1;
-  end;
-  Close(LOGDATFileWrite);
-  CloseLogFile;
-  PreviewFileNameAddress := tReportsFilename;
-  FilePreview;
-}
 end;
 
 function tGenerateSummaryPortionOfCabrilloFile: boolean;
@@ -2280,7 +2247,6 @@ var
   nNumberOfBytesToWrite                 : Cardinal;
   T2                                    : PChar;
   T3                                    : PChar;
-  t                                     : integer;
   TempTag                               : CabrilloTags;
   TempPchar                             : PChar;
   Operator                              : integer;
@@ -2390,7 +2356,6 @@ function tGenerateLogPortionOfCabrilloFile: boolean;
 label
   1;
 var
-  i                                     : integer;
   nNumberOfBytesToWrite                 : Cardinal;
   HisCallsign                           : PChar;
   RSTSent                               : PChar;
@@ -2408,7 +2373,6 @@ var
   cMyGrid                               : PChar;
   csPower                               : PChar;
   hisAge                                : Integer;
-  hisQTH                                : PChar;
   csQTHString                           : PChar;
   HisZone                               : integer;
 
@@ -2418,7 +2382,6 @@ var
   T1                                    : PChar;
   T2                                    : PChar;
   T3                                    : PChar;
-  T4                                    : PChar;
   cRandomCharsReceived                  : PChar;
   cKids                                 : PChar;
   TempGrid                              : Str20;
