@@ -1680,20 +1680,7 @@ begin
         to search around for it and come up with a complete path for
         it. }
     if not MasterFileExists then Exit;
-{
-    if not FileExists(@ActiveFilename[1]) then
-    begin
-      SysErrorMessage(GetLastError);
-      asm
-      push eax
-      end;
-      wsprintf(QuickDisplayBuffer, 'TRMASTER.DTA : %s');
-      asm add esp,12
-      end;
-      QuickDisplay(QuickDisplayBuffer);
-      Exit;
-    end;
-}
+
 
       //{WLI}
          {DosError := 0;}

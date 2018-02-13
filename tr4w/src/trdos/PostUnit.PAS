@@ -152,7 +152,7 @@ function GoodLookingQSO: boolean;
 //function CorrectContestExchange: boolean;
 
 var
-  tShowFrequencyinLog                   : boolean = True;
+  tShowFrequencyinLog                   : boolean = False;
   Radio1IDs                             : Str10;
 //  Radio2ID                              : Char = #0;
   RateSheet                             : RateSheetPointer;

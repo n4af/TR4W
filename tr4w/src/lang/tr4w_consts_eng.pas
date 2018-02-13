@@ -12,6 +12,8 @@
   TC_POINTS                             = 'Pts';
   TC_OP                                 = 'Op';
   TC_INVALID                            = 'Invalid Entry';
+  TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
+  TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';
   TC_CHECKCALLSIGN                      = 'Check callsign';
 
   TC_FREQUENCYFORCALLINKHZ              = 'frequency for %s in kHz';

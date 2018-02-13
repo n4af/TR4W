@@ -3763,7 +3763,6 @@ begin
   //    RData.QTHString:='';
   ParametersOkay := False;
 
-//  VP2VVA
   GetRidOfPostcedingSpaces(ExchangeString);
 
   LookForOnDeckCall(ExchangeString);
@@ -3771,12 +3770,22 @@ begin
   ExchangeErrorMessage := nil;
 
   if NoLog then
+   begin
+     ParametersOkay := False;
+     QuickDisplay(TC_SORRYNOLOG);
+     DoABeep(ThreeHarmonics);
+     Exit;
+   end;
+ if (freq = 0) and (tShowFrequencyInLog) then              // 4.68.7
   begin
-    ParametersOkay := False;
-    QuickDisplay(TC_SORRYNOLOG);
-    DoABeep(ThreeHarmonics);
-    Exit;
+    QuickDisplay(TC_FREQ_ZERO);
+    sleep (800);
   end;
+ if not tShowFrequencyInLog then             // 4.68.7
+   begin
+    QuickDisplay(TC_FREQ_OFF);
+     sleep (500);
+   end;
 
   LogBadQSOString := '';
 
@@ -3797,12 +3806,6 @@ begin
     RData.Callsign := Call
   else
   begin
-//    CallWindowString := RData.Callsign;
-    PutCallToCallWindow(RData.Callsign);
-      //{WLI}        SaveAndSetActiveWindow (CallWindow);
-      //{WLI}        ClrScr;
-      //{WLI}        Write (CallWindowString);
-      //{WLI}        RestorePreviousWindow;
   end;
 
   Windows.ZeroMemory(@RData.QTHString, SizeOf(RData.QTHString));
@@ -5973,14 +5976,11 @@ begin
 
 //  windows.ZeroMemory(@RemMultsColumnWidthArray, sizeof(RemMultsColumnWidthArray));
 
-  if tShowDomesticMultiplierName then
-
-
-
-  if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
+//  if tShowDomesticMultiplierName then
+//  if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
     DomWidth := 45;      // issue 255  allow longer char dom   4.68.5
   case RemainingMultDisplay of
-    rmDomestic: Width :=  DomWidth;
+    rmDomestic: Width :=  BaseColumnWidth;
     rmPrefix: Width := PREFIXCOLUMNWIDTH;
   else
     Width := BASECOLUMNWIDTH;

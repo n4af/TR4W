@@ -174,15 +174,8 @@ begin
   end;
 
   if (DoingZoneMults) and (MultByBand or (Band = All)) and MultDisplayEnable then
-  begin
-{
-    if MultByMode then
-      iTotalTextOut(MTotals[Band, ActiveMode].NumberZoneMults)
-    else
-      iTotalTextOut(MTotals[Band, Both].NumberZoneMults);
-}
     iTotalTextOut(mo.MTotals[Band, TempMode, rmZone]);
-  end;
+
 end;
 
 procedure UpdateTotals2;

@@ -114,20 +114,6 @@ begin
   Format(TR4W_SYN_FILENAME, '%sSERVERLOG.TMP', TR4W_LOG_PATH_NAME);
   Format(TR4W_REMAININGMULTS_FILENAME, '%sREMAININGMULTS.TXT', TR4W_LOG_PATH_NAME);
 
-{
-  asm
-  push offset TR4W_LOG_PATH_NAME
-  end;
-  wsprintf(TR4W_INTERCOM_FILENAME, '%sINTERCOM.TXT');
-  asm add esp,12  end;
-
-  asm
-  push offset TR4W_LOG_PATH_NAME
-  end;
-  wsprintf(TR4W_INITIALEX_FILENAME, '%sINITIAL.EX');
-  asm add esp,12  end;
-}
-
   Format(TR4W_CTY_FILENAME, '%sCTY.DAT', TR4W_LOG_PATH_NAME);
 
   if not FileExists(TR4W_CTY_FILENAME) then

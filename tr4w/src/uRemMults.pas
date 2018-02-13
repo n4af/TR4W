@@ -300,7 +300,7 @@ begin
         SetRemMultsColumnWidth;
 
 //        tWM_SETFONT(RemainingMultsWindowHandle, MainFixedFont);
-        // if DoingDomesticMults or DoingDXMults or DoingZoneMults then
+          if DoingDomesticMults or DoingDXMults or DoingZoneMults then    // 4.68.10
         VisibleLog.ShowRemainingMultipliers;
 
 //        if RemMultsColumnWidthArray[RemainingMultDisplay] > 0 then
