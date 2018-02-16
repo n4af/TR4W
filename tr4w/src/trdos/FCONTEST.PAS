@@ -141,11 +141,11 @@ begin
 
 {$IFEND}
 
-//  CD.ActiveFilename := TR4W_PATH_NAME + 'TRMASTER.DTA';
+//   CD.ActiveFilename := TR4W_PATH_NAME + 'TRMASTER.DTA';
 //  CTYDATFilename := TR4W_PATH_NAME + 'CTY.DAT';
 //  BandMapFileName := TR4W_PATH_NAME + 'BANDMAP.BIN';
-{
-  TR4W_LOG_PATH_NAME := TempFoldername;
+
+{ TR4W_LOG_PATH_NAME := TempFoldername;
   if TempFoldername = '' then
   begin
     TempFoldername := TR4W_PATH_NAME;

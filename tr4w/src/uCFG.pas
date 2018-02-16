@@ -62,24 +62,7 @@ utils_text,
   idUDPClient,
   idGlobal
   ;
-{
-const
-  WindowsColorArraySize                 = 8;
-var
-  WindowsColorArray                     : array[1..WindowsColorArraySize] of tWindowColorRecord =
-    (
 
-      (wcWindow: @wh[mweCountryName];   wcColor: @ColorColors.CountryNameWindowColor;   wcbackground: @ColorColors.CountryNameWindowBackground),
-      (wcWindow: @wh[mweBeamHeading];   wcColor: @ColorColors.BeamHeadingWindowColor;   wcbackground: @ColorColors.BeamHeadingWindowBackground),
-      (wcWindow: @wh[mweTotalScore];    wcColor: @ColorColors.TotalScoreWindowColor;    wcbackground: @ColorColors.TotalScoreWindowBackground),
-      (wcWindow: @wh[mweAutoSendCount]; wcColor: @ColorColors.AutoSendArrowWindowColor; wcbackground: @ColorColors.AutoSendArrowWindowBackground),
-      (wcWindow: @wh[mweQSONumber];     wcColor: @ColorColors.QSONumberWindowColor;     wcbackground: @ColorColors.QSONumberWindowBackground),
-      (wcWindow: @Radio1.FreqWindowHandle;   wcColor: @ColorColors.FrequencyOneWindowColor;  wcbackground: @ColorColors.FrequencyOneWindowBackground),
-      (wcWindow: @Radio2.FreqWindowHandle;   wcColor: @ColorColors.FrequencyTwoWindowColor;  wcbackground: @ColorColors.FrequencyTwoWindowBackground),
-      (wcWindow: @wh[mweBandMode];      wcColor: @ColorColors.BandModeWindowColor;  wcbackground: @ColorColors.BandModeWindowBackground)
-      );
-
-}
 
 type
   ArrayRecord = record

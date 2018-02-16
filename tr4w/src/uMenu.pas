@@ -83,7 +83,7 @@ const
   RC_SSBCWMODE_HK                       = #9'Alt+M';
   RC_SENDKEYBOARD_HK                    = #9'Ctrl+A';
   RC_COMMWITHPP_HK                      = #9'Ctrl+B';
-  RC_TRANSFREQ_HK                       = #9'Alt+O';
+  //RC_TRANSFREQ_HK                       = #9'Alt+O';
   RC_CTRLJ_HK                           = #9'Ctrl+J';
   RC_CLEARDUPES_HK                      = #9'Ctrl+K';
   RC_VIEWEDITLOG_HK                     = #9'Ctrl+L';
@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 175{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 174{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -264,7 +264,7 @@ const
     (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
 
 //    (mrText: RC_REMINDER + RC_REMINDER_HK; mrId: menu_alt_reminder),
-    (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transfreq),
+//    (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transfreq),     // 4.68.11
     (mrText: RC_ALTP + RC_ALTP_HK; mrId: menu_alt_p),
     (mrText: RC_AUTOCQ + RC_AUTOCQ_HK; mrId: menu_alt_autocq),
     (mrText: RC_TOOGLERIGS + RC_TOOGLERIGS_HK; mrId: menu_alt_tooglerigs),

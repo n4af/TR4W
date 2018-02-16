@@ -2325,7 +2325,7 @@ end;
 
 procedure DisplayNextQSONumber;
 const
-  QSONumberStringArray                  : array[boolean] of PChar = ('%d', '*%d');
+  QSONumberStringArray                  : array[boolean] of PChar = ('%d', '*%d');   
 begin
   Format(wsprintfBuffer, QSONumberStringArray[AutoQSONumberDecrement], TotalContacts + 1);
   if ServerSerialNumber <> 0 then

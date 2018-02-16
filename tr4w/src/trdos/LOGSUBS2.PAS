@@ -1543,8 +1543,8 @@ begin
       end;
 }
   {KK1L: 6.72 Moved ahead of UpdateTimeAndRateDisplays to boost reation time}
-  {IF (ActiveWindow = CallWindow) AND (SCPMinimumLetters > 0) AND (NOT NewKeyPressed) THEN }
-  {    VisibleLog.SuperCheckPartial (WindowString, True);                                  }
+{   IF (ActiveWindow = CallWindow) AND (SCPMinimumLetters > 0) AND (NOT NewKeyPressed) THEN
+       VisibleLog.SuperCheckPartial (WindowString, True);   }
   if (DualingCQState <> NoDualingCQs) and not (CWStillBeingSent or DVPMessagePlaying or DVKMessagePlaying) then
     case DualingCQState of
       DualSendingQSL, SendingDupeMessage:
