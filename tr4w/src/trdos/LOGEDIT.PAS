@@ -2388,7 +2388,7 @@ begin
     Exit;
 
   //  TempString := VisibleLog.GetInitialExchangeFromEditableLog(Call);
- StandardCall := StandardCallFormat(Call, True);  // 4.68.9
+   StandardCall := StandardCallFormat(Call, True);  // 4.68.13
     //if TempString = '' then
       if not CD.GetEntry(StandardCall, data) then
         TempString := CallsignsList.GetIniitialExchange(Call);
@@ -2502,9 +2502,9 @@ begin
               if CD.GetEntry(Call, data) and (data.TENTEN <> '') then
                 Exchange := Exchange + data.TENTEN + ' ';
 
-            if Not CD.GetEntry(Call,data) then      // 4.68.9
+               if Not CD.GetEntry(Call,data) then      // 4.68.9
             InitialExchangePutUp := True;
-
+          
           end;
 
           InitialExchangeEntry := '' + Exchange; // Issue151

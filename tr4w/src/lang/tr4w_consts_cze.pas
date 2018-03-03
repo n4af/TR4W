@@ -17,6 +17,8 @@ const
   RC_3830                               =  'zaslání skóre na 3830';
   RC_3830_ARRL                          =  'odeslat deník ARRL';  // 4.53.3
   TC_INVALID                            =  'Neplatný záznam';
+  TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
+  TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';
   TC_FREQ                               = 'frekv';
   TC_POINTS                             = 'body';
   TC_OP                                 = 'Op';

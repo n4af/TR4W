@@ -10,6 +10,8 @@ const
   RC_BACKUPLOG                         = 'Резервное копирование лога';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   TC_INVALID                            = 'Неверный ввод';
+  TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
+  TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';
   RC_3830                               = 'Отправить результат на 3830';
   RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_CALLSIGN                           = 'Позывной';

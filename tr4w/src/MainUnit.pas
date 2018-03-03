@@ -3776,17 +3776,17 @@ begin
      DoABeep(ThreeHarmonics);
      Exit;
    end;
- if (freq = 0) and (tShowFrequencyInLog) then              // 4.68.7
+ if (freq = 0) and (tShowFrequencyInLog) and (TwoRadioMode) then              // 4.68.7   // 4.68.15
   begin
     QuickDisplay(TC_FREQ_ZERO);
     sleep (800);
   end;
- if not tShowFrequencyInLog then             // 4.68.7
+{ if not tShowFrequencyInLog then             // 4.68.7     4.68.15
    begin
     QuickDisplay(TC_FREQ_OFF);
      sleep (500);
    end;
-
+                 }
   LogBadQSOString := '';
 
   { Need this in case we exit soon }

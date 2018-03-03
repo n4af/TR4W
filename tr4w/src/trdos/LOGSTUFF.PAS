@@ -7687,13 +7687,13 @@ begin
   ProcessExchange(ExchangeString, RXData);
 end;
 
-procedure ProcessPartialCallAndInitialExchange(RXData: ContestExchange);
+  procedure ProcessPartialCallAndInitialExchange(RXData: ContestExchange);
 
 begin
-  {   if PartialCallEnable or ExchangeMemoryEnable then         // n4af 40.40.1
+ {       if PartialCallEnable or ExchangeMemoryEnable then         // n4af 40.40.1
         AddCallToPartialList(RXData.Callsign, GetInitialExchangeStringFromContestExchange(RXData));
     GetInitialExchangeStringFromContestExchange(RXData); // n4af 40.40.1       }
-end;
+  end;
 
 procedure CreateAndSendSAPMultiInfoMessage;
 

@@ -13,6 +13,8 @@ const
   RC_BACKUPLOG                         = 'Backup Log';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
   TC_INVALID                            = 'Invalid Entry';
+  TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
+  TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';
   RC_3830                               =  '3830 Score posting';
   RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_CALLSIGN                           = 'Indicativ';
