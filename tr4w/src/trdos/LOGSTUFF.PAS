@@ -5733,6 +5733,19 @@ begin
 //        if (RXData.Mode = CW) and (RXData.QSOPoints > 0) then inc(RXData.QSOPoints);
       end;
 
+      HolyLand:
+      begin
+          case RXData.Band of
+            Band160: RXData.QSOPoints := 2;
+            Band80: RXData.QSOPoints := 2;
+            Band40: RXData.QSOPoints := 1;
+            Band20: RXData.QSOPoints := 1;
+            Band15: RXData.QSOPoints := 1;
+            Band10: RXData.QSOPoints := 1;
+          end;
+      end;
+
+
     CQWPXQSOPointMethod:
       if RXData.QTH.Continent = MyContinent then
       begin

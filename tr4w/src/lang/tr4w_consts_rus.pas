@@ -6,12 +6,12 @@ const
   TC_TRANSLATION_LANGUAGE               = 'RUSSIAN';
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
   TC_EnterYourDistrictCode              = 'Введите ваш код района';
-  TC_UKEI                               = ' UK/EI';
+  TC_UKEI                               = 'UK/EI';
   RC_BACKUPLOG                         = 'Резервное копирование лога';
-  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
+  TC_IMPROPERWINTERFIELDDAYCLASS = 'Классы в Winter Field Day должны быть H, I или O.';
   TC_INVALID                            = 'Неверный ввод';
-  TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
-  TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';
+  TC_FREQ_ZERO                          = 'ОШИБКА: недопустимое значение частоты для регистрации';
+  TC_FREQ_OFF                           = 'Запись значения частоты САТ в лог отключена';
   RC_3830                               = 'Отправить результат на 3830';
   RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_CALLSIGN                           = 'Позывной';
@@ -115,22 +115,22 @@ const
   TC_ENTERYOURNAMEANDSTATE              = 'Введите ваше имя (и штат если вы в Северной Америке):';
   TC_ENTERYOURNAMEANDQTH                = 'Введите ваше имя и QTH (штат США, Канадскую провинцию или страну DX):';
 
-  TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Введите  вашу  подгруппу (MY PREC: A, B, M, Q, S или U),  число - последние два цифры года выдачи вашей лицензии и ARRL секцию:';
+  TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Введите  вашу  подгруппу (MY PREC: A, B, M, Q, S или U),  число - последние две цифры года выдачи вашей лицензии и ARRL секцию:';
   TC_ENTERYOURQTHANDTHENAME             = 'Введите ваш QTH, который вы хотите передавать'#13'и Ваше имя:';
   TC_ENTERFIRSTTWODIGITSOFYOURQTH       = 'Введите первые две буквы вашего QTH:';
   TC_ENTERYOURAGEINMYSTATEFIELD         = 'Введите ваш возраст в поле MY STATE:';
-  TC_ENTERYOURQTHORPOWER                = 'Введите ваш QTH, который вы хотите передавать если вы находитесь в Северной Америке или вашу мощность как MY STATE, если вы вне:';
+  TC_ENTERYOURQTHORPOWER                = 'Введите ваш QTH, который вы хотите передавать если вы находитесь в Северной Америке или вашу мощность как MY STATE, если вы вне SA:';
   TC_ENTERFIRSTTWOLETTERSOFYOURGRID     = 'Введите две первые буквы вашего локатора:';
   TC_ENTERYOURSQUAREID                  = 'Введите идентификатор вашего квадрата:';
-  TC_ENTERYOURMEMBERSHIPNUMBER          = 'Введите ваш членский номер:';
+  TC_ENTERYOURMEMBERSHIPNUMBER          = 'Введите ваш членский номер';
   TC_ENTERYOURCONTINENT                 = 'Введите ваш континент (и возможный доп. идентификатор, например SAYL или NAQRP)';
-  TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Введите ваш каунти если вы находитесь в штате %s. Введите ваш штат, провинцию или "DX" если вы находитесь вне штата %s:';
+  TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Введите ваш COUNTY если вы находитесь в штате %s. Введите ваш штат, провинцию или "DX" если вы находитесь вне штата %s:';
   TC_PREFECTURE                         = 'Введите вашу префектуру:';
   TC_STATIONCLASS                       = 'Введите вашу категорию:';
-  TC_AGECALLSIGNAGE                     = 'Введите ваш возраст (а также позывной SK  и возраст):';
+  TC_AGECALLSIGNAGE                     = 'Введите ваш возраст (а также позывной и возраст SK):';
   TC_DEPARTMENT                         = 'Введите ваш департамент:';
   TC_ENTERYOURRDAIDORGRID               = 'Введите ваш номер RDA ID (для UA1A станций) или 4-х значный локатор:';
-  TC_ENTERYOURBRANCHNUMBER              = 'Введите ваш Branch number:';
+  TC_ENTERYOURBRANCHNUMBER              = 'Введите ваш Branch номер:';
   TC_ENTERYOURPOSTCODE                  = 'Введите ваш почтовый индекс:';
 
   TC_IAMIN                              = '&Я нахожусь в %s';
@@ -192,7 +192,7 @@ const
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Серверный и локальный логи одинаковы.';
   TC_NETWORK                            = 'Сеть : %s %s:%d';
   TC_SERVER_LOG_CHANGED                 = 'Серверный лог был изменен. Информация о %u связях была обновлена. Сделайте синхронизацию логов (Ctrl+Alt+S).';
-  TC_ALL_LOGS_NETWORK_CLEARED           = 'Логи на всех компьютерах в сети TR4W очищины';
+  TC_ALL_LOGS_NETWORK_CLEARED           = 'Логи на всех компьютерах в сети TR4W очищены';
 
   {UGETSCORES}
 
@@ -290,7 +290,7 @@ const
   TC_QTC_CALLSIGN                       = 'Позывной :';
   TC_ENTERQTCMAXOF                      = 'Введите QTC #/# (максимум из %d) :';
   TC_DOYOUREALLYWANTTOSAVETHISQTC       = 'Вы хотите сохранить этот QTC?';
-  TC_EDITQTCPRESSYESTOEDITQTCORNOTOLOG  = 'Редактировать QTC? Нажмите Yes для редактирования QTC или No для ввода ';
+  TC_EDITQTCPRESSYESTOEDITQTCORNOTOLOG  = 'Редактировать QTC? Нажмите Yes для редактирования QTC или NO для ввода ';
   TC_CHECKQTCNUMBER                     = 'Проверка номера QTC';
   TC_CHECKTIME                          = 'Проверка времени';
 
@@ -324,11 +324,11 @@ const
   TC_PRESSCQFUNCTIONKEYTOPROGRAM        = 'Нажми функциональную клавишу (F1, AltF1, CtrlF1) для программирования режима "CQ" или ESCAPE для выхода) : ';
   TC_PRESSEXFUNCTIONKEYTOPROGRAM        = 'Нажми функциональную клавишу (F3-F12, Alt/Ctrl F1-F12) для программирования обмена в режиме "S&&P" или ESCAPE для выхода:';
 
-  TC_NUMBERORLETTEROFMESSAGETOBEPROGRAM = 'Число или буква сообщения для программирования (1-9, A-C, или ESCAPE для выхода):';
-//  TC_F1SETBYTHEMYCALLSTATEMENTINCONFIG  = 'F1 - Уставновлено параметром MY CALL в конфигурационном файле';
-//  TC_F2SETBYSPEXCHANGEANDREPEATSP       = 'F2 - Установлено параметрами S&P EXCHANGE and REPEAT S&P EXCHANGE';
+  TC_NUMBERORLETTEROFMESSAGETOBEPROGRAM = 'Цифра или буква сообщения для программирования (1-9, A-C, или ESCAPE для выхода):';
+//  TC_F1SETBYTHEMYCALLSTATEMENTINCONFIG  = 'F1 - Установлено параметром MY CALL в конфигурационном файле';
+//  TC_F2SETBYSPEXCHANGEANDREPEATSP       = 'F2 - Установлено параметрами S&P EXCHANGE и REPEAT S&P EXCHANGE';
   TC_CWDISABLEDWITHALTK                 = 'CW-манипуляция отключена с помошью Alt-K!!  Для включения снова нажмите Alt-K.';
-  TC_VOICEKEYERDISABLEDWITHALTK         = 'Голосовой ключ отключен с помошью Alt-K!!  Для включения снова нажмите Alt-K.';
+  TC_VOICEKEYERDISABLEDWITHALTK         = 'Голосовой ключ отключен с помощью Alt-K!!  Для включения снова нажмите Alt-K.';
 
   {LOGCFG}
 
@@ -370,7 +370,7 @@ const
   TC_NEWCOUNTRYINFORMATIONFILENAME      = 'новое название файла с информацией о новых странах';
 
   TC_NEWCWINCREMENT                     = 'новое значение шага изменения CW скорости (от 1 до 10 WPM)';
-  TC_NEWCWMONITORTONE                   = 'новое значение тона звучания самопрослушивания CW (0 - нет звука)';
+  TC_NEWCWMONITORTONE                   = 'новое значение тона звучания самопрослушивания CW (0 – звука нет)';
   TC_NEWFARNSWORTHSPEEDCUTINVALUE       = 'новое значение скорости замедления передачи';
   TC_NEWFLOPPYFILESAVEFREQUENCY         = 'новое значение частоты записи файла';
   TC_SELECTNEWFLOPPYFILESAVENAME        = 'Выбрать новое имя файла автосохранения';
@@ -427,12 +427,12 @@ const
   TC_BUGMODE                            = 'Режим Bug mode';
 
   TC_WEIGHTING                          = 'Изменение соотношение точки к тире';
-  TC_DITDAHRATIO                        = 'Изменнение соотношение точки и тире ';
+  TC_DITDAHRATIO                        = 'Изменение соотношение точки и тире ';
   TC_LEADIN                             = 'Время между сигналом PTT и началом манипуляции (*10 ms)';
   TC_TAIL                               = 'Время между окончанием манипуляции и отключением PTT(*10 ms)';
   TC_FIRSTEXTENSION                     = 'Увеличение первого элемента';
   TC_KEYCOMP                            = 'Корректировка работы манипулятора';
-  TC_PADDLESWITCHPOINT                  = 'Переключенеие манипулятора';
+  TC_PADDLESWITCHPOINT                  = 'Переключение манипулятора';
 
   {UTOTAL}
 
@@ -553,7 +553,7 @@ const
   RC_FCC                                = 'Первый позывной в каждой стране';
   RC_FCZ                                = 'Первый позывной в каждой зоне';
   RC_POSSBADZONE                        = 'Возможные неправильные зоны';
-  RC_QSOBYCOUNTRY                       = 'Связи по странам и дианазонам';
+  RC_QSOBYCOUNTRY                       = 'Связи по странам и диапазонам';
   RC_SCOREBYHOUR                        = 'Очки по часам';
   RC_SUMMARY                            = 'Итоговый результат';
   RC_EXIT                               = 'Выход из программы';
@@ -606,7 +606,7 @@ const
   RC_BANDDOWN                           = 'Диапазон вниз';
   RC_SSBCWMODE                          = 'Переключить вид излучения';
   RC_SENDKEYBOARD                       = 'Передача с клавиатуры';
-  RC_COMMWITHPP                         = 'Соединенение с портом пакетной связи';
+  RC_COMMWITHPP                         = 'Соединение с портом пакетной связи';
   RC_CLEARDUPES                         = 'Очистить лист повторов';
   RC_VIEWEDITLOG                        = 'Просмотр - редактирование лога';
   RC_NOTE                               = 'Заметка';
@@ -734,9 +734,9 @@ const
   RC_CT1BOHIS2                          = 'Информационное окно CT1BOH';
   RC_DATE                               = 'Дата';
   RC_NUMBERSENT                         = 'Перед. номер';
-  RC_NUMBERRCVD                         = 'Прин. номер';
+  RC_NUMBERRCVD                         = 'Приним. номер';
   RC_RSTSENT                            = 'Перед. RST';
-  RC_RSTRECEIVED                        = 'Прин. RST';
+  RC_RSTRECEIVED                        = 'Приним. RST';
   RC_QSOPOINTS                          = 'Очков за QSO';
   RC_AGE                                = 'Возраст';
   RC_FREQUENCYHZ                        = 'Частота, Гц';
