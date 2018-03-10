@@ -692,7 +692,7 @@ begin
 
 
 
-   EUROPEANVHF, TESLA:
+   EUROPEANVHF:
       begin
         ActiveBand := Band6;
 //        ContestName := 'EUROPEAN VHF CONTEST';

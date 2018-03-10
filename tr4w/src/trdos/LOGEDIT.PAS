@@ -2993,6 +2993,12 @@ begin
     Exit;
   end;
 
+  if ActiveQSOPointMethod = TeslaQSOPointMethod then      // 4.69.2
+   begin
+     TotalScore := QPoints;
+     exit;
+   end;
+
   if ActiveQSOPointMethod = ChampionshipRFMethod then
   begin
     TotalScore := QPoints + (50 * TotalMults);

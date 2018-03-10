@@ -2477,9 +2477,7 @@ var
   i                                     : integer;
   Score                                 : integer;
 begin
-  if Contest <>ARRLFIELDDAY then       // 4.60.5
-  Score := TotalScore
-  else
+
   Score := TotalScore;
   asm
   push eax

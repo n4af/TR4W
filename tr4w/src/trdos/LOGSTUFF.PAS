@@ -5738,7 +5738,7 @@ begin
           case RXData.Band of
             Band160: RXData.QSOPoints := 2;
             Band80: RXData.QSOPoints := 2;
-            Band40: RXData.QSOPoints := 1;
+            Band40: RXData.QSOPoints := 2;
             Band20: RXData.QSOPoints := 1;
             Band15: RXData.QSOPoints := 1;
             Band10: RXData.QSOPoints := 1;
@@ -6043,19 +6043,11 @@ begin
     TeslaQSOPointMethod:
 //      if MyGrid <> '' then
 //        if RXData.DomesticQTH <> '' then
-      begin
-    //  RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+     begin
         RXData.QSOPoints :=  GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);    //n4af 4.36.11
         if RXData.DomesticQTH = MyGrid then
         RXData.QSOPoints := 90;
-    {    if MyCountry = '9A' then
-        begin
-           if RXData.Band = Band432 then RXData.QSOPoints := RXData.QSOPoints * 5;
-          if RXData.Band = Band1296 then RXData.QSOPoints := RXData.QSOPoints * 10;
-          if RXData.Band = Band2304 then RXData.QSOPoints := RXData.QSOPoints * 20;
-          if RXData.Band in [Band3456, Band5760, Band10G] then RXData.QSOPoints := RXData.QSOPoints * 30;
-          if RXData.Band = Band24G then RXData.QSOPoints := RXData.QSOPoints * 100;
-        end;  }
+        DisplayTotalScore;
       end;
 
     FistsQSOPointMethod:

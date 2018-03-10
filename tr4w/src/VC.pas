@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.69.1' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.69.2' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'March 1, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'March 10, 2018' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -2502,7 +2502,6 @@ type
     FistsQSOPointMethod,
     FOCMarathonQSOPointMethod,
     HADXQSOPointMethod,
-    HolyLand,               // 4.69.1
     YUDXQSOPointMethod,     // 4.57.5
     UKEIQSOPointMethod,    // 4.58.2
     HelvetiaQSOPointMethod,
@@ -2577,7 +2576,8 @@ type
     OZHCRVHFQSOPointMethod,
     MakrothenQSOPointMethod,
     NCQSOPointMethod,
-    ALRSUA1DZCupQSOPointMethod
+    ALRSUA1DZCupQSOPointMethod,
+     HolyLand               // 4.69.1
     );
 
 const
@@ -2628,7 +2628,6 @@ const
     'YUDX', //     YUDXQSOPointMethod,        // 4.57.5
     'UKEI', //    UK-EIQSOPointMethod,       // 4.58.2
     'HELVETIA', //    HelvetiaQSOPointMethod,
-    'HOLYLAND',  // 4.69.1
     'IARU', //    IARUQSOPointMethod,
     'INTERNET SIX', //    InternetSixQSOPointMethod,
     'IOTA', //    IOTAQSOPointMethod,
@@ -2701,7 +2700,8 @@ const
     'OZHCR-VHF',
     'MAKROTHEN',
     'NC QSO Party',
-    'ALRS-UA1DZ-CUP'
+    'ALRS-UA1DZ-CUP',
+     'HOLYLAND'  // 4.69.1
     );
 
 type
