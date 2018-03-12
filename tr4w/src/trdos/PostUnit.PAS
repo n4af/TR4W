@@ -2394,7 +2394,7 @@ var
   rxnr                                  : integer;
 
 begin
-  TransmitterIDPos := 80;
+  TransmitterIDPos := 83;
   pnr := 0;
   if (Contest = NAQSOCW) or (Contest = NAQSOSSB) or (Contest = NAQSORTTY) then TransmitterIDPos := 92;        // 4.67.7
   //if Contest =  NAQPCW  then TransmitterIDPos := 92;
@@ -2468,12 +2468,7 @@ begin
     if Contest in [CUPRFCW, CUPRFSSB] then
       csQTHString := @TempRXData.QTHString[1];
 
-{
-    if Contest in [NAQSOCW, NAQSOSSB, SEVENQP, CALQSOPARTY, SALMONRUN, FLORIDAQSOPARTY, ARI, NYQP, RAC, CUPUA1DZ, WAG, DARCXMAS, RAEM, CUPRFCW, CUPRFSSB, RFASCHAMPIONSHIPCW, RFASCHAMPIONSHIPSSB] then
-      csQTHString := @TempRXData.QTHString[1]
-    else
-      csQTHString := @TempRXData.DomMultQTH[1];
-}
+
  if Contest in [CALQSOPARTY]  then
   begin
 
