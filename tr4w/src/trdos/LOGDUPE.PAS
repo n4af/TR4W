@@ -1836,7 +1836,7 @@ begin
   if ExchangeMemoryEnable then
   begin
     Index := GetInitialExchangeIndex(InitialExchange);
-      //      PartialCallList[BlockNumber]^[BlockAddress].InitialExchangeIndex := Index;
+    //         PartialCallList[BlockNumber]^[BlockAddress].InitialExchangeIndex := Index;
   end
   else
     //    PartialCallList[BlockNumber]^[BlockAddress].InitialExchangeIndex := 0;

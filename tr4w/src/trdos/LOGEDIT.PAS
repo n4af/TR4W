@@ -2382,16 +2382,15 @@ begin
    routine.  It is up to whomever calls it to decide if they want to
    change the state of that variable. }
 
- //   InitialExchangePutUp := False;
-   InitialExchangeEntry := ' ';
+  { InitialExchangePutUp := False; }
+  InitialExchangeEntry := ' ';
   if not GoodCallSyntax(Call) then
     Exit;
 
   //  TempString := VisibleLog.GetInitialExchangeFromEditableLog(Call);
-   StandardCall := StandardCallFormat(Call, True);  // 4.68.13
+
     //if TempString = '' then
-      if not CD.GetEntry(StandardCall, data) then
-        TempString := CallsignsList.GetIniitialExchange(Call);
+  TempString := CallsignsList.GetIniitialExchange(Call);
     // GetInitialExchange(Call);
 
   //  if ActiveExchange = RSTPrefectureExchange then TempString := Copy(TempString, 2, 10);
@@ -2410,7 +2409,7 @@ begin
 
           while CustomString <> '' do
           begin
-             Command := RemoveFirstString(CustomString);
+            Command := RemoveFirstString(CustomString);
 
             if Command = 'CQZONE' then
               if CD.GetEntry(Call, data) and (data.CQZone <> '') then
@@ -2481,7 +2480,7 @@ begin
                 begin
                   //                  SaveSetAndClearActiveWindow(BeamHeadingWindow);
                   Heading := round(GetBeamHeading(MyGrid, data.Grid));
-                  //                  Write(data.Grid, ' at ', Heading, 'ø');
+                  //                  Write(data.Grid, ' at ', Heading, '?');
                                             //                  RestorePreviousWindow;
                 end;
               end;
@@ -2502,9 +2501,6 @@ begin
               if CD.GetEntry(Call, data) and (data.TENTEN <> '') then
                 Exchange := Exchange + data.TENTEN + ' ';
 
-               if Not CD.GetEntry(Call,data) then      // 4.68.9
-            InitialExchangePutUp := True;
-          
           end;
 
           InitialExchangeEntry := '' + Exchange; // Issue151
@@ -2666,7 +2662,7 @@ begin
           begin
             //            SaveSetAndClearActiveWindow(BeamHeadingWindow);
             Heading := round(GetBeamHeading(MyGrid, data.Grid));
-            //            Write(data.Grid, ' at ', Heading, 'ø');
+            //            Write(data.Grid, ' at ', Heading, '?');
                               //            RestorePreviousWindow;
           end;
         end;
@@ -2793,7 +2789,7 @@ begin
     begin
       //      SaveSetAndClearActiveWindow(BeamHeadingWindow);
       Heading := round(GetBeamHeading(MyGrid, TestString));
-      //               Write(TestString, ' ', Heading, 'ø');
+      //               Write(TestString, ' ', Heading, '?');
       TestString := TestString + ' ' + IntToStr(Heading) + '*';
       {               if DistanceMode <> NoDistanceDisplay then
                         begin
@@ -2893,12 +2889,21 @@ var
   b: BandType;
 begin
   QPoints := TotalQSOPoints;
-//  TotalMults := TotalMults + mo.MTotals[All, Both, m];
+
   //  VisibleLog.IncrementQSOPointsWithContentsOfEditableWindow(QPoints);
 
   if QTCsEnabled then
     QPoints := QPoints + TotalNumberQTCsProcessed;
 
+  if ((ActiveDomesticMult = NoDomesticMults) or (ActiveDomesticMult =
+    WYSIWYGDomestic)) and // 4.57.2
+  (ActiveDXMult = NoDXMults) and
+    (ActivePrefixMult = NoPrefixMults) and
+    (ActiveZoneMult = NoZoneMults) then
+  begin
+    TotalScore := QPoints;
+    Exit;
+  end;
 
   {KK1L: 6.70 Ugly fix for FISTS because mults don't work...too long an exchange}
   if ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange then
@@ -2993,12 +2998,6 @@ begin
     Exit;
   end;
 
-  if ActiveQSOPointMethod = TeslaQSOPointMethod then      // 4.69.2
-   begin
-     TotalScore := QPoints;
-     exit;
-   end;
-
   if ActiveQSOPointMethod = ChampionshipRFMethod then
   begin
     TotalScore := QPoints + (50 * TotalMults);
@@ -3018,18 +3017,7 @@ begin
     Exit;
   end;
 
-    if ((ActiveDomesticMult = NoDomesticMults) or (ActiveDomesticMult =      // 4.68.8
-    WYSIWYGDomestic)) and // 4.57.2
-  (ActiveDXMult = NoDXMults) and
-    (ActivePrefixMult = NoPrefixMults) and
-    (ActiveZoneMult = NoZoneMults) then
-  begin
-    TotalScore := QPoints  * TotalMults;
-    Exit;
-  end;
-
   TotalScore := QPoints * TotalMults;
-
 
   if Contest = CUPURAL then
     Result := Result + 10 * mo.MTotals[All, Both, rmPrefix];
