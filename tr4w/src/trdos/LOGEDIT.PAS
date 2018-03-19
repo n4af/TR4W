@@ -2888,6 +2888,7 @@ var
   m: RemainingMultiplierType;
   b: BandType;
 begin
+   TotalMults := 0;    // 4.69.5
   QPoints := TotalQSOPoints;
 
   //  VisibleLog.IncrementQSOPointsWithContentsOfEditableWindow(QPoints);
@@ -2895,12 +2896,11 @@ begin
   if QTCsEnabled then
     QPoints := QPoints + TotalNumberQTCsProcessed;
 
-  if ((ActiveDomesticMult = NoDomesticMults) or (ActiveDomesticMult =
-    WYSIWYGDomestic)) and // 4.57.2
-  (ActiveDXMult = NoDXMults) and
+   if ((ActiveDomesticMult = NoDomesticMults) or (ActiveDomesticMult <> WYSIWYGDomestic)) and        // 4.57.2    //4.69.5
+    (ActiveDXMult = NoDXMults) and
     (ActivePrefixMult = NoPrefixMults) and
     (ActiveZoneMult = NoZoneMults) then
-  begin
+    begin
     TotalScore := QPoints;
     Exit;
   end;
@@ -2936,11 +2936,11 @@ begin
 
   //  Sheet.MultSheetTotals(MTotals);
     //  VisibleLog.IncrementMultTotalsWithContentsOfEditableWindow(MTotals);
-  TotalMults := 0;
+//   TotalMults := 0;
 
   if SingleBand <> All then
   begin
-
+      
     for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
       TotalMults := TotalMults + mo.MTotals[SingleBand, Both, m];
 
@@ -3016,7 +3016,7 @@ begin
     TotalScore := QPoints + (1000 * TotalMults);
     Exit;
   end;
-
+  
   TotalScore := QPoints * TotalMults;
 
   if Contest = CUPURAL then
