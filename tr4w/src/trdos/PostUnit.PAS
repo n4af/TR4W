@@ -2268,7 +2268,8 @@ begin
   if not tOpenFileForWrite(tReportFileWrite, tReportsFilename) then Exit;
 //  T1 := TR4W_CURRENTVERSION;
   T2 := @MyCall[1];
-  T3 := ContestTypeSA[Contest];
+//  T3 := ContestTypeSA[Contest];
+T3 := @ContestTitle[1];        // 4.69.6
   asm
   call TotalScore
   push eax
