@@ -767,21 +767,21 @@ begin
                 end;
 }
             end;
-            if Msg.wParam = VK_SHIFT {16} then
-            begin
+            if ((Msg.wParam = VK_LEFT) or (Msg.wParam = VK_RIGHT))   then          // 4.70.2
+           begin
 
 //              if Msg.lParam = 2752513 then SendStringAndStop('E');
               if ShiftKeyEnable then
               begin
-                if lobyte(HiWord(Msg.lParam)) = 42 then if OpMode = CQOpMode then
+               if   (Msg.wParam = VK_LEFT)  then if OpMode = CQOpMode then  // 4.70.2
                 begin
                 RITBumpDown; VFOBumpDown;
                 end;
-                if lobyte(HiWord(Msg.lParam)) = 54 then if OpMode = CQOpMode then
+               if   (Msg.wParam = VK_RIGHT)  then if OpMode = CQOpMode then        // 4.70.2
                 begin
                 RITBumpUp; VFOBumpUp;
                 end;
-              end;
+               end;
             end;
           end;
         end;
