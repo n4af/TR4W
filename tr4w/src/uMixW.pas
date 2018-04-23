@@ -138,7 +138,7 @@ end;
 
 procedure SendMessageToMixW(mess: string);
 begin
-{$IF MIXWMODE}
+ {$IF MIXWMODE}
   try
     if MixWLoaded then MixW.ExecuteMacros(mess);
   except

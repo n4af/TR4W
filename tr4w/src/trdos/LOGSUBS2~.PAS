@@ -690,7 +690,11 @@ begin
       CW: if DigitalModeEnable then ActiveMode := Digital else ActiveMode := Phone;
       Phone: if ActiveBand >= Band6 then ActiveMode := FM else ActiveMode := CW;
       Digital: ActiveMode := Phone;
-    else ActiveMode := CW;
+    else
+     begin
+       ActiveMode := CW;
+  //     ReadInConfigFile(cfgCFG);      // 4.69.8
+     end;
     end;
       {      if (ActiveMode = Phone) and (ActiveBand >= Band6) and (not FMMode) then
               FMMode := True
@@ -1831,10 +1835,7 @@ begin
             else
               if ActiveMode = Digital then
               begin
-              if DEEnable then     // wli issue 277
-                SendCrypticMessage(CallWindowString + ' DE ' + MyCall + ' ' + MyCall)
-              else
-                SendCrypticMessage(CallWindowString + ' ' + MyCall + ' ' + MyCall);
+                SendCrypticMessage(CallWindowString + ' DE ' + MyCall + ' ' + MyCall {+ ' KK'});
               end
               else
                 SendFunctionKeyMessage(F1, SearchAndPounceOpMode);

@@ -824,7 +824,7 @@ begin
           if ActiveMode = Digital then
             SendStringAndStop(CallWindowString + ' DE ' + MyCall + ' KK')
           else
-                //wli                                    SendFunctionKeyMessage (F1, SearchAndPounceOpMode);
+                //wli                                    SendFunctionKeyMessage (F1, SearchAndPounceOpMode);  
       end;
 
       KeyStamp(F1);
@@ -938,7 +938,7 @@ begin
   begin
     if CallAlreadySent = False then
     begin
-      if ActiveMode in [CW, Digital] then
+      if ActiveMode in [CW, Digital] then  // WLI  
       begin
         OpMode2 := SearchAndPounceOpMode;
         ShowFMessages(0);
@@ -1193,7 +1193,7 @@ begin
 //    EditableLogDisplayed := True;
   end;
 
-  if ActiveMode = CW then
+  if ActiveMode in [CW, Digital] then  //wli  issue 276
   begin
     if QTCsEnabled then
     begin
@@ -1212,7 +1212,7 @@ begin
       end;
           //               else
           //                  if MessageEnable and not BeSilent then
-          //                     SendCrypticMessage(CallWindowString + ' ' + QSOBeforeMessage);
+          //                     SendCrypticMessage(CallWindowString + ' ' + QSOBeforeMessage);   
 
     end
     else
@@ -1224,11 +1224,9 @@ begin
     if DualingCQState <> NoDualingCQs then DualingCQState := SendingDupeMessage;
   end;
 
-  if ActiveMode = Digital then FinishRTTYTransmission(QSOBeforeMessage);
-
   if ActiveMode = Phone then
   begin
-      //wli
+      //wli  
     SendCrypticMessage(QSOBeforePhoneMessage);
 
    //                Write (' DUPE!!');

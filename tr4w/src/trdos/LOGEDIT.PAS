@@ -2896,7 +2896,7 @@ begin
   if QTCsEnabled then
     QPoints := QPoints + TotalNumberQTCsProcessed;
 
-   if ((ActiveDomesticMult = NoDomesticMults) or (ActiveDomesticMult <> WYSIWYGDomestic)) and        // 4.57.2    //4.69.5
+   if (ActiveDomesticMult = NoDomesticMults)  and        // 4.57.2    //4.69.5  // 4.70.2
     (ActiveDXMult = NoDXMults) and
     (ActivePrefixMult = NoPrefixMults) and
     (ActiveZoneMult = NoZoneMults) then
