@@ -768,6 +768,8 @@ procedure csMMTTY_GRABLASTCALL;
 begin
 {$IF MMTTYMODE}
   PutCallToCallWindow(MMTTY.mmttyLastCallsign);
+  if tAutoCQMode and (length(MMTTY.mmttyLastCallsign) > 0) then      // wli issue 84 4.70.6
+    if TryKillAutoCQ then Escape_proc;
 {$IFEND}
 end;
 
