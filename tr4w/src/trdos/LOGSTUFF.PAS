@@ -27,7 +27,7 @@ unit LogStuff;
 {$IMPORTEDDATA OFF}
 interface
 
-uses {Dos, Printer,} Tree,
+uses {Dos, Printer,}Tree,
   utils_text,
   uRussiaOblasts,
   uCallSignRoutines,
@@ -43,46 +43,44 @@ uses {Dos, Printer,} Tree,
   LogCW,
   LogDupe,
   LogGrid,
-//  Help,
+  //  Help,
   LogK1EA,
   LOGDVP,
   LogDom, {SlowTree,}
   LogNet,
   LogRadio,
   Messages,
-  idUDPClient,       // ny4i 4.44.9
-  idGlobal,          // ny4i 4.44.9
-  SysUtils,          // ny4i 4.44.9
+  idUDPClient, // ny4i 4.44.9
+  idGlobal, // ny4i 4.44.9
+  SysUtils, // ny4i 4.44.9
   uMults,
   Windows
   ;
 
 const
-  SSPrec                                : set of Char = ['A', 'B', 'Q', 'U', 'M', 'S'];
+  SSPrec: set of Char = ['A', 'B', 'Q', 'U', 'M', 'S'];
 
   { Control Byte Constants for Multi-Multi communications }
 
-  MultiMessageBufferSize                = 32;
+  MultiMessageBufferSize = 32;
 
-  MultiTalkMessage                      = 1; { TR6.75 - Supported by K1EANetwork }
-  MultiPacketReceivedSpot               = 2; { No longer used.  Uses 4 all the time }
-  MultiPacketMessageToSend              = 3;
-  MultiPacketReceivedMessage            = 4;
-  MultiQSOData                          = 5; { TR6.75 - Supported by CT Network }
-  MultiBandMapMessage                   = 6; { TR6.76 - Supported by CT Network }
-  MultiTimeMessage                      = 7; { TR6.75 - Reception only from CT Network }
-  MultiInformationMessage               = 8;
-  MultiConfigurationMessage             = 9; { Not supported on CT Network }
+  MultiTalkMessage = 1; { TR6.75 - Supported by K1EANetwork }
+  MultiPacketReceivedSpot = 2; { No longer used.  Uses 4 all the time }
+  MultiPacketMessageToSend = 3;
+  MultiPacketReceivedMessage = 4;
+  MultiQSOData = 5; { TR6.75 - Supported by CT Network }
+  MultiBandMapMessage = 6; { TR6.76 - Supported by CT Network }
+  MultiTimeMessage = 7; { TR6.75 - Reception only from CT Network }
+  MultiInformationMessage = 8;
+  MultiConfigurationMessage = 9; { Not supported on CT Network }
 
-  DefaultTimeToLive                     = 30;
-  LookForDupes                          = True;
-  DoNotLookForDupes                     = not LookForDupes;
+  DefaultTimeToLive = 30;
+  LookForDupes = True;
+  DoNotLookForDupes = not LookForDupes;
 
-  ProcessedMultiMessageBufferLength     = 256;
+  ProcessedMultiMessageBufferLength = 256;
 
-
-
-  ChampionshipRFPointsArray             : array[1..49] of Byte =
+  ChampionshipRFPointsArray: array[1..49] of Byte =
     (
 
     11, 12, 13, 14, 16, 20, 25,
@@ -95,7 +93,7 @@ const
 
     );
 
-  ZeroZuluOffsetCQZoneArray             : array[1..39] of Byte =
+  ZeroZuluOffsetCQZoneArray: array[1..39] of Byte =
     (
     14,
     19,
@@ -139,7 +137,7 @@ const
 
     );
 
-  ZeroZuluOffsetITUZoneArray            : array[1..66] of Byte =
+  ZeroZuluOffsetITUZoneArray: array[1..66] of Byte =
     (
     14,
     16,
@@ -215,7 +213,6 @@ const
     22
 
     );
-
 
 type
 
@@ -313,7 +310,8 @@ type
     Check: integer;
   end;
 
-  ProcessedMultiMessageBufferType = array[0..ProcessedMultiMessageBufferLength - 1] of
+  ProcessedMultiMessageBufferType = array[0..ProcessedMultiMessageBufferLength -
+    1] of
     ProcessedMultiMessageRecord;
 
   ExchangeElementType = (eetUnknown, eetAlpha, eetNumber, eetMixed);
@@ -332,8 +330,8 @@ type
     prStrings: array[0..3] of array[0..31] of Char;
   end;
 
- // PaserArrayStatusType = array[0..3] of Byte;
- 
+  // PaserArrayStatusType = array[0..3] of Byte;
+
   ParserArrayType = record
     paCount: integer;
     paStatus: array[0..3] of ExchangeElementType;
@@ -348,18 +346,19 @@ type
     Warnings: Byte;
   end;
 
-  MultiMessageListArrayType = array[0..MultiMessageBufferSize - 1] of MultiMessageMemoryRecord;
+  MultiMessageListArrayType = array[0..MultiMessageBufferSize - 1] of
+    MultiMessageMemoryRecord;
   MultiMessageListPointer = ^MultiMessageListArrayType;
 
 const
-  DupeCheckSoundTypeSA                  : array[DupeCheckSoundType] of PChar =
+  DupeCheckSoundTypeSA: array[DupeCheckSoundType] of PChar =
     (
     'NONE',
     'DUPE BEEP',
     'MULT FANFARE'
     );
 
-  ParameterOkayModeTypeStringArray      : array[ParameterOkayModeType] of PChar = (
+  ParameterOkayModeTypeStringArray: array[ParameterOkayModeType] of PChar = (
     'NONE',
     'STANDARD',
     'QSL BUT DO NOT LOG',
@@ -367,228 +366,229 @@ const
     );
 
 var
-  ParserArray                           : ParserArrayType;
-  ParsedRecord                          : ParsedRecordType;
+  ParserArray: ParserArrayType;
+  ParsedRecord: ParsedRecordType;
 
-  SSEx                                  : SSExchangeType;
+  SSEx: SSExchangeType;
 
-//  _showstarttime                        : boolean;
-//  _networktest                          : boolean;
+  //  _showstarttime                        : boolean;
+  //  _networktest                          : boolean;
 
-  AllCWMessagesChainable                : boolean;
-  AlwaysCallBlindCQ                     : boolean;
+  AllCWMessagesChainable: boolean;
+  AlwaysCallBlindCQ: boolean;
   //  AskIfContestOver                      : boolean = True;
-  AutoAltDWindowString                  : Str20;
-  AutoCallTerminate                     : boolean;
-  AutoAltDEnable                        : boolean;
-  AutoDisplayDupeQSO                    : boolean;
-  AutoQSLCount                          : Byte {= 0};
-  AutoQSLInterval                       : integer;
-  AutoQSONumberDecrement                : boolean;
-  AutoSAPEnable                         : boolean;
+  AutoAltDWindowString: Str20;
+  AutoCallTerminate: boolean;
+  AutoAltDEnable: boolean;
+  AutoDisplayDupeQSO: boolean;
+  AutoQSLCount: Byte {= 0};
+  AutoQSLInterval: integer;
+  AutoQSONumberDecrement: boolean;
+  AutoSAPEnable: boolean;
 
-  BandMapCallWindowEnable               : boolean = True;
-  BandMapInfoCall                       : CallString {= ''};
-  BeepEvery10QSOs                       : boolean;
-  BeSilent                              : boolean;
+  BandMapCallWindowEnable: boolean = True;
+  BandMapInfoCall: CallString {= ''};
+  BeepEvery10QSOs: boolean;
+  BeSilent: boolean;
 
-  CallAlreadySent                       : boolean;
-  CallWindowString                      : CallString {string};
-  tCallWindowStringIsDupe               : boolean;
-  CallWindowEmpty                       : boolean = True;
-  CallsignIsPastedFromBandMap           : boolean;
-  CallsignIsTypedByOperator             : boolean;
+  CallAlreadySent: boolean;
+  CallWindowString: CallString {string};
+  tCallWindowStringIsDupe: boolean;
+  CallWindowEmpty: boolean = True;
+  CallsignIsPastedFromBandMap: boolean;
+  CallsignIsTypedByOperator: boolean;
 
-  CallsignICameBackTo                   : CallString;
-  CheckLogFileSize                      : boolean;
-  ColumnDupeSheetColor                  : boolean;
-  ColumnDupeSheetEnable                 : boolean;
-  ComputerID                            : Char { = CHR(0)};
-  ComputerName                          : Str10 = 'New';
-  ControlBreakStatus                    : boolean;
-  CountryInformationFile                : ShortString;
+  CallsignICameBackTo: CallString;
+  CheckLogFileSize: boolean;
+  ColumnDupeSheetColor: boolean;
+  ColumnDupeSheetEnable: boolean;
+  ComputerID: Char { = CHR(0)};
+  ComputerName: Str10 = 'New';
+  ControlBreakStatus: boolean;
+  CountryInformationFile: ShortString;
 
-  Debug                                 : boolean;
-  DEEnable                              : boolean = True;
-  DefaultRST                            : Word;
+  Debug: boolean;
+  DEEnable: boolean = True;
+  DefaultRST: Word;
   //  DoingRescore                     : boolean; {KK1L: 6.71}
-  DualingCQState                        : DualingCQStates {= NoDualingCQs};
-  DupeCheckSound                        : DupeCheckSoundType = DupeCheckBeepIfDupe;
-  DupeInfoCall                          : CallString;
-  DupeInfoCallPrompt                    : CallString; {KK1L: 6.73}
-  DupeSheetFileEnable                   : boolean;
-  DVKPlaying                            : boolean;
-  DVKStartTime                          : Cardinal {TimeRecord};
+  DualingCQState: DualingCQStates {= NoDualingCQs};
+  DupeCheckSound: DupeCheckSoundType = DupeCheckBeepIfDupe;
+  DupeInfoCall: CallString;
+  DupeInfoCallPrompt: CallString; {KK1L: 6.73}
+  DupeSheetFileEnable: boolean;
+  DVKPlaying: boolean;
+  DVKStartTime: Cardinal {TimeRecord};
 
-  EscapeDeletedCallEntry                : CallString;
-  EscapeDeletedExchangeEntry            : Str40;
-  EscapeExitsSearchAndPounce            : boolean = True;
-  ExchangeHasBeenSent                   : boolean;
-  ExchangeErrorMessage                  : PChar;
-  ExchangeMemoryFileEnable              : boolean;
-  ExchangeWindowString                  : Str40;
+  EscapeDeletedCallEntry: CallString;
+  EscapeDeletedExchangeEntry: Str40;
+  EscapeExitsSearchAndPounce: boolean = True;
+  ExchangeHasBeenSent: boolean;
+  ExchangeErrorMessage: PChar;
+  ExchangeMemoryFileEnable: boolean;
+  ExchangeWindowString: Str40;
 
-  FakePacket                            : boolean;
-  FakeBandMap                           : boolean;
-  FirstHelloRecord                      : HelloRecPtr;
-  FirstMultiMessage                     : integer;
-  FloppyFileSaveFrequency               : integer;
-//  FloppyFileSaveName                    : ShortString = 'LOGBACK.TRW';
-  ForcedEntry                           : boolean; {KK1L: 6.70 switch used in JCTRL2 to add comments to LOGCFG}
+  FakePacket: boolean;
+  FakeBandMap: boolean;
+  FirstHelloRecord: HelloRecPtr;
+  FirstMultiMessage: integer;
+  FloppyFileSaveFrequency: integer;
+  //  FloppyFileSaveName                    : ShortString = 'LOGBACK.TRW';
+  ForcedEntry: boolean;
+    {KK1L: 6.70 switch used in JCTRL2 to add comments to LOGCFG}
 
-  GridMapCenter                         : GridString;
+  GridMapCenter: GridString;
 
-  InactiveRigCallingCQ                  : boolean;
-  InitialExchangePutUp                  : boolean;
-  InitialExchangeOverwrite              : boolean; {KK1L: 6.70}
-  InsertMode                            : boolean = True;
-  IntercomFileenable                    : boolean;
+  InactiveRigCallingCQ: boolean;
+  InitialExchangePutUp: boolean;
+  InitialExchangeOverwrite: boolean; {KK1L: 6.70}
+  InsertMode: boolean = True;
+  IntercomFileenable: boolean;
   //  IntercomFileOpen                 : boolean;
   //  IntercomFileWrite                : Text;
 
-  KeyHistory                            : KeyHistoryRecord;
-  KeypadCWMemories                      : boolean;
+  KeyHistory: KeyHistoryRecord;
+  KeypadCWMemories: boolean;
 
   //   LastDeletedLogEntry             : Str160;
-  tLastLogEntryIsDeleted                : boolean;
+  tLastLogEntryIsDeleted: boolean;
   //  LastDeletedContestExchange       : ContestExchange;
-  LastDisplayedBreakTime                : integer = -1;
-  LastHelloRecord                       : HelloRecPtr;
-  LastMultiMessage                      : integer;
-  LastMultiInfoMessageSum               : array[BandType, ModeType] of Byte;
+  LastDisplayedBreakTime: integer = -1;
+  LastHelloRecord: HelloRecPtr;
+  LastMultiMessage: integer;
+  LastMultiInfoMessageSum: array[BandType, ModeType] of Byte;
   //  LastQSOLogged                    : ContestExchange;
 
-  LeaveCursorInCallWindow               : boolean;
+  LeaveCursorInCallWindow: boolean;
 
-  LogFileRead                           : Text;
+  LogFileRead: Text;
 
-  LogRSSent                             : Word = 59;
-  LogRSTSent                            : Word = 599;
-  LogWithSingleEnter                    : boolean;
-  LookForRSTSent                        : boolean;
-  LookingForCQExchange                  : boolean;
+  LogRSSent: Word = 59;
+  LogRSTSent: Word = 599;
+  LogWithSingleEnter: boolean;
+  LookForRSTSent: boolean;
+  LookingForCQExchange: boolean;
 
-  MessageEnable                         : boolean = True;
+  MessageEnable: boolean = True;
   //   ModemPortBaudRate               : integer;
-  MultiInfoMessageTimeout               : TimeRecord;
-  MultiMultsOnly                        : boolean;
-  MultiplierFileEnable                  : boolean;
+  MultiInfoMessageTimeout: TimeRecord;
+  MultiMultsOnly: boolean;
+  MultiplierFileEnable: boolean;
   //  MultiMessageBuffer               : array[1..5] of Str80;
-  MultiRememberBuffer                   : MultiMessageListPointer;
-  MultiRetryTime                        : integer = 30;
-  MultiSerialNumber                     : integer;
-  MultiUpdateMultDisplay                : boolean = True;
-  MultReportMinimumBands                : integer = 4;
-  MyIOTA                                : Str20;
+  MultiRememberBuffer: MultiMessageListPointer;
+  MultiRetryTime: integer = 30;
+  MultiSerialNumber: integer;
+  MultiUpdateMultDisplay: boolean = True;
+  MultReportMinimumBands: integer = 4;
+  MyIOTA: Str20;
 
-  NameCallsignPutUp                     : CallString;
+  NameCallsignPutUp: CallString;
 
-  NoLog                                 : boolean;
+  NoLog: boolean;
 
-  OldCWTone                             : integer;
+  OldCWTone: integer;
 
-  PacketAutoCR                          : boolean;
-  PacketFile                            : boolean;
-  PacketFileRead                        : file;
-  PacketSpotDisable                     : boolean;
-  PacketSpotEditEnable                  : boolean;
-  ParameterOkayMode                     : ParameterOkayModeType = Standard;
-  PartialCallFileEnable                 : boolean;
-//  PartialCallMultsEnable                : boolean = True;
-  PossibleCallAcceptKey                 : Char = ';';
-  PossibleCallEnable                    : boolean = True;
-  PossibleCallLeftKey                   : Char = ',';
-  PossibleCallRightKey                  : Char = '.';
-  PreviousQSOReceivedData               : ContestExchange;
+  PacketAutoCR: boolean;
+  PacketFile: boolean;
+  PacketFileRead: file;
+  PacketSpotDisable: boolean;
+  PacketSpotEditEnable: boolean;
+  ParameterOkayMode: ParameterOkayModeType = Standard;
+  PartialCallFileEnable: boolean;
+  //  PartialCallMultsEnable                : boolean = True;
+  PossibleCallAcceptKey: Char = ';';
+  PossibleCallEnable: boolean = True;
+  PossibleCallLeftKey: Char = ',';
+  PossibleCallRightKey: Char = '.';
+  PreviousQSOReceivedData: ContestExchange;
   //W_L_I  PrinterEnabled: boolean;
-  ProcessedMultiMessages                : ProcessedMultiMessageBufferType;
+  ProcessedMultiMessages: ProcessedMultiMessageBufferType;
 
-  ProcessedMultiMessagesStart           : integer;
-  ProcessedMultiMessagesEnd             : integer;
+  ProcessedMultiMessagesStart: integer;
+  ProcessedMultiMessagesEnd: integer;
 
-  QSONumberByBand                       : boolean;
-  QSXEnable                             : boolean = True;
+  QSONumberByBand: boolean;
+  QSXEnable: boolean = True;
 
-  QuickQSL                              : QuickQSLKeyType; { to indicate a quick QSL is desired }
-  QuickQSLKey1                          : Char = '\';
-  QuickQSLKey2                          : Char = '=';
+  QuickQSL: QuickQSLKeyType; { to indicate a quick QSL is desired }
+  QuickQSLKey1: Char = '\';
+  QuickQSLKey2: Char = '=';
 
-  RadioSetFreq                          : LONGINT;
-  RandomCQMode                          : boolean;
-  RandomNameEnable                      : boolean;
-  ReadInCallsign                        : CallString;
-  ReadInLogComputerID                   : Char;
-//  ReadInLog                        : boolean;
-  ReadInLogBand                         : BandType;
-  ReadInLogDateString                   : Str10;
-  ReadInLogExchange                     : ShortString {Str40};
-  ReadInLogFileName                     : Str40;
-  ReadInLogFileOpen                     : boolean;
-  ReadInLogFileRead                     : Text;
-  ReadInLogMode                         : ModeType;
-  ReadInLogRST                          : Str10;
-  ReadinLogTimeString                   : Str10;
+  RadioSetFreq: LONGINT;
+  RandomCQMode: boolean;
+  RandomNameEnable: boolean;
+  ReadInCallsign: CallString;
+  ReadInLogComputerID: Char;
+  //  ReadInLog                        : boolean;
+  ReadInLogBand: BandType;
+  ReadInLogDateString: Str10;
+  ReadInLogExchange: ShortString {Str40};
+  ReadInLogFileName: Str40;
+  ReadInLogFileOpen: boolean;
+  ReadInLogFileRead: Text;
+  ReadInLogMode: ModeType;
+  ReadInLogRST: Str10;
+  ReadinLogTimeString: Str10;
 
-  ReceivedData                          : ContestExchange;
-  Remember                              : RememberRadioType;
-  RememberBand                          : BandType;
-  RememberMode                          : ModeType;
+  ReceivedData: ContestExchange;
+  Remember: RememberRadioType;
+  RememberBand: BandType;
+  RememberMode: ModeType;
   {
     RemoteTerminalBand                    : BandType;
     RemoteTerminalMode                    : ModeType;
     RemoteTerminalPort                    : PortType = NoPort;
   }
 
-  SayHiRateCutOff                       : integer = 200;
-  SendCompleteFourLetterCall            : boolean;
-  SendQSOImmediately                    : boolean = True;
-  SeventyThreeMessageSent               : boolean;
-  SCPMinimumLetters                     : integer;
+  SayHiRateCutOff: integer = 200;
+  SendCompleteFourLetterCall: boolean;
+  SendQSOImmediately: boolean = True;
+  SeventyThreeMessageSent: boolean;
+  SCPMinimumLetters: integer;
 
-  SendExchangeKeyWhenCWHasStopped       : Char = NullKey;
+  SendExchangeKeyWhenCWHasStopped: Char = NullKey;
 
-  Sheet                                 : DupeAndMultSheet = (tAutoReset: True);
-  ShortIntegers                         : boolean;
-  ShowQSOStatusCall                     : CallString;
+  Sheet: DupeAndMultSheet = (tAutoReset: True);
+  ShortIntegers: boolean;
+  ShowQSOStatusCall: CallString;
   //  ShowSearchAndPounce                   : boolean;
-  SingleRadioMode                       : boolean;
-  SkipActiveBand                        : boolean;
-  SpaceBarDupeCheckEnable               : boolean = True;
-  StartSendingNowKey                    : Char = '''';
+  SingleRadioMode: boolean;
+  SkipActiveBand: boolean;
+  SpaceBarDupeCheckEnable: boolean = True;
+  StartSendingNowKey: Char = '''';
 
-  StationInformationCall                : CallString;
-  SwitchRadioKey                        : Char;
+  StationInformationCall: CallString;
+  SwitchRadioKey: Char;
 
-  TailEnding                            : boolean;
-  TailEndKey                            : Char = ']';
-  TailEndCallString                     : CallString;
+  TailEnding: boolean;
+  TailEndKey: Char = ']';
+  TailEndCallString: CallString;
 
-  TotalDomesticContacts                 : integer;
-  TotalDXContacts                       : integer;
-  TotalIntermediateContacts             : integer;
+  TotalDomesticContacts: integer;
+  TotalDXContacts: integer;
+  TotalIntermediateContacts: integer;
 
-  UpdateRestartFileEnable               : boolean;
+  UpdateRestartFileEnable: boolean;
 
-  UDPBroadcastAppInfo                   : boolean;               // ny4i 4.44.8
-  UDPBroadcastContact                   : boolean;               // ny4i 4.44.8
-  UDPBroadcastScore                     : boolean;               // ny4i Issue 304
-  UDPBroadcastRadio                     : boolean;               // ny4i 4.44.8
-  UDPBroadcastRotor                     : boolean;               // ny4i 4.44.8
-  UDPBroadcastPort                      : integer = 12060;       // ny4i 4.44.9
-  UDPBroadcastAddress                   : string[255] = '127.0.0.1';   // ny4i 4.44.9
-  UDPBroadcastRotorPort                 : integer = 12040;       // ny4i 4.44.9
-  UDPBroadcastAllQSOs                   : boolean;               // ny4i Issue 82
+  UDPBroadcastAppInfo: boolean; // ny4i 4.44.8
+  UDPBroadcastContact: boolean; // ny4i 4.44.8
+  UDPBroadcastScore: boolean; // ny4i Issue 304
+  UDPBroadcastRadio: boolean; // ny4i 4.44.8
+  UDPBroadcastRotor: boolean; // ny4i 4.44.8
+  UDPBroadcastPort: integer = 12060; // ny4i 4.44.9
+  UDPBroadcastAddress: string[255] = '127.0.0.1'; // ny4i 4.44.9
+  UDPBroadcastRotorPort: integer = 12040; // ny4i 4.44.9
+  UDPBroadcastAllQSOs: boolean; // ny4i Issue 82
 
-  WaitForStrength                       : boolean = True;
+  WaitForStrength: boolean = True;
 
-  WindowDupeCheckCall                   : CallString;
+  WindowDupeCheckCall: CallString;
 
-  tPreviousDupeQSOsShowed               : boolean;
-  tPreviousDupeQSOsWndHandle            : HWND;
+  tPreviousDupeQSOsShowed: boolean;
+  tPreviousDupeQSOsWndHandle: HWND;
   //const  tr4w_StartSendingNowKey                    : ;
-  udp                                   : TIdUDPClient;          // ny4i 4.44.9 Uses to broadcast info
-//procedure AgeReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
-//procedure AgeReceivedHeader(var LogString: Str80; var Underline: Str80);
+  udp: TIdUDPClient; // ny4i 4.44.9 Uses to broadcast info
+  //procedure AgeReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
+  //procedure AgeReceivedHeader(var LogString: Str80; var Underline: Str80);
 procedure BandChange(var ActiveBand: BandType; Direction: DirectionType);
 
 procedure CalculateQSOPoints(var RXData: ContestExchange);
@@ -601,14 +601,16 @@ procedure CreateAndSendSAPMultiInfoMessage;
 
 procedure DisplayGridSquareStatus(Call: CallString);
 procedure DisplayMultiMessageBuffer;
-function DomStringParse(InputString:  Str14): Str14;                                  //Gav 4.44.8
+function DomStringParse(InputString: Str14): Str14; //Gav 4.44.8
 
 function DVKRecentlyStarted(MaxElaspedSec100: LONGINT): boolean;
 procedure DVKStamp;
 
-function GetCorrectedCallFromExchangeString(var ExchangeString: ShortString {Str80}): Str80;
+function GetCorrectedCallFromExchangeString(var ExchangeString: ShortString
+  {Str80}): Str80;
 function GetMultiPortCommand: string;
-function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}): Word;
+function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}):
+  Word;
 
 procedure IncrementQTCCount(Call: CallString);
 
@@ -622,7 +624,8 @@ function LogFileLooksOkay: boolean;
 procedure LogStringToRXData(LogString: Str80; var RXData: ContestExchange);
 function LooksLikeACallSign(Call: Str40): boolean;
 
-function MarineOrAirMobileStation(Call: CallString): boolean; {KK1L: 6.68 Used in WRTC 2002}
+function MarineOrAirMobileStation(Call: CallString): boolean;
+  {KK1L: 6.68 Used in WRTC 2002}
 
 procedure NextPage;
 {
@@ -644,7 +647,8 @@ procedure PassStationToCTNetwork;
 
 //procedure PrintLogHeader;
 
-function ProcessExchange(ExchangeString: Str80; var RData: ContestExchange): boolean;
+function ProcessExchange(ExchangeString: Str80; var RData: ContestExchange):
+  boolean;
 function ParseArray(e: Str80): boolean;
 function ParseArray2(ExchangeString: Str80): boolean;
 function SetRST(Ex: integer; var RST: Word): boolean;
@@ -663,7 +667,8 @@ procedure SaveLogFileToFloppy;
 procedure SayHello(Call: CallString);
 procedure SayName(Call: CallString);
 procedure SendMultiInfoMessage(Band: BandType; Mode: ModeType; Message: Str80);
-procedure SendMultiCommand(Source: Byte; Destination: Byte; ControlByte: Byte; Message: string);
+procedure SendMultiCommand(Source: Byte; Destination: Byte; ControlByte: Byte;
+  Message: string);
 
 procedure SendSalutation(Call: CallString);
 procedure ShowName(Call: CallString);
@@ -737,8 +742,8 @@ procedure BandChange(var ActiveBand: BandType; Direction: DirectionType);
 label
   NextBand;
 const
-  MAXBANDS                              = 21;
-  BandChangeArray                       : array[1..MAXBANDS] of BandChangeType =
+  MAXBANDS = 21;
+  BandChangeArray: array[1..MAXBANDS] of BandChangeType =
     (
 
     (bcBand: Band160; bcWARC: False; bcVHF: False),
@@ -765,181 +770,190 @@ const
     );
 
 var
-  TempInteger                           : integer;
+  TempInteger: integer;
 begin
 
   NextBand:
 
   for TempInteger := 1 to MAXBANDS do
-    if BandChangeArray[TempInteger].bcBand = ActiveBand then Break;
+    if BandChangeArray[TempInteger].bcBand = ActiveBand then
+      Break;
 
-  if ActiveBand = NoBand then TempInteger := MAXBANDS;
+  if ActiveBand = NoBand then
+    TempInteger := MAXBANDS;
 
   if Direction = DirectionDown then
   begin
     TempInteger := TempInteger - 1;
-    if TempInteger = 0 then TempInteger := MAXBANDS;
+    if TempInteger = 0 then
+      TempInteger := MAXBANDS;
   end;
 
   if Direction = DirectionUp then
   begin
 
-
-     TempInteger := TempInteger + 1  ;
-     if TempInteger >= MAXBANDS + 1 then TempInteger := 1;
+    TempInteger := TempInteger + 1;
+    if TempInteger >= MAXBANDS + 1 then
+      TempInteger := 1;
 
   end;
 
   ActiveBand := BandChangeArray[TempInteger].bcBand;
 
-  if (CONTEST <> GeneralQSO) and (BandChangeArray[TempInteger].bcWARC) then goto NextBand;  //n4af 04.37.11
-  if (not WarcBandsEnabled) and (BandChangeArray[TempInteger].bcWARC) then goto NextBand;   // n4af 04.40.7
-  if (not VHFBandsEnabled) and (BandChangeArray[TempInteger].bcVHF) then goto NextBand;
+  if (CONTEST <> GeneralQSO) and (BandChangeArray[TempInteger].bcWARC) then
+    goto NextBand; //n4af 04.37.11
+  if (not WarcBandsEnabled) and (BandChangeArray[TempInteger].bcWARC) then
+    goto NextBand; // n4af 04.40.7
+  if (not VHFBandsEnabled) and (BandChangeArray[TempInteger].bcVHF) then
+    goto NextBand;
 
   if VHFBandsEnabled then
-    if (not HFBandEnable) and (not BandChangeArray[TempInteger].bcVHF) then goto NextBand;
+    if (not HFBandEnable) and (not BandChangeArray[TempInteger].bcVHF) then
+      goto NextBand;
 
   if SkipActiveBand then
   begin
-    if (Radio1.BandMemory = ActiveBand) then goto NextBand;
-    if (Radio2.BandMemory = ActiveBand) then goto NextBand;
+    if (Radio1.BandMemory = ActiveBand) then
+      goto NextBand;
+    if (Radio2.BandMemory = ActiveBand) then
+      goto NextBand;
   end;
 
-{
-  if Direction = DirectionUp then
-  begin
-    case ActiveBand of
-      Band160: ActiveBand := Band80;
-      Band80: ActiveBand := Band40;
+  {
+    if Direction = DirectionUp then
+    begin
+      case ActiveBand of
+        Band160: ActiveBand := Band80;
+        Band80: ActiveBand := Band40;
 
-      Band40:
-        if WARCBandsEnabled then
-          ActiveBand := Band30
-        else
-          ActiveBand := Band20;
+        Band40:
+          if WARCBandsEnabled then
+            ActiveBand := Band30
+          else
+            ActiveBand := Band20;
 
-      Band30: ActiveBand := Band20;
+        Band30: ActiveBand := Band20;
 
-      Band20:
-        if WARCBandsEnabled then
-          ActiveBand := Band17
-        else
-          ActiveBand := Band15;
+        Band20:
+          if WARCBandsEnabled then
+            ActiveBand := Band17
+          else
+            ActiveBand := Band15;
 
-      Band17: ActiveBand := Band15;
+        Band17: ActiveBand := Band15;
 
-      Band15:
-        if WARCBandsEnabled then
-          ActiveBand := Band12
-        else
-          ActiveBand := Band10;
+        Band15:
+          if WARCBandsEnabled then
+            ActiveBand := Band12
+          else
+            ActiveBand := Band10;
 
-      Band12: ActiveBand := Band10;
+        Band12: ActiveBand := Band10;
 
-      Band10:
-        if VHFBandsEnabled then
-          ActiveBand := Band6
-        else
-          ActiveBand := Band160;
+        Band10:
+          if VHFBandsEnabled then
+            ActiveBand := Band6
+          else
+            ActiveBand := Band160;
 
-      Band6: ActiveBand := Band2;
-      Band2: ActiveBand := Band222;
-      Band222: ActiveBand := Band432;
-      Band432: ActiveBand := Band902;
-      Band902: ActiveBand := Band1296;
-      Band1296: ActiveBand := Band2304;
-      Band2304: ActiveBand := Band3456;
-      Band3456: ActiveBand := Band5760;
-      Band5760: ActiveBand := Band10G;
-      Band10G: ActiveBand := Band24G;
-      Band24G: ActiveBand := BandLight;
-      BandLight:
-        if HFBandEnable then
-          ActiveBand := Band160
-        else
-          ActiveBand := Band6;
+        Band6: ActiveBand := Band2;
+        Band2: ActiveBand := Band222;
+        Band222: ActiveBand := Band432;
+        Band432: ActiveBand := Band902;
+        Band902: ActiveBand := Band1296;
+        Band1296: ActiveBand := Band2304;
+        Band2304: ActiveBand := Band3456;
+        Band3456: ActiveBand := Band5760;
+        Band5760: ActiveBand := Band10G;
+        Band10G: ActiveBand := Band24G;
+        Band24G: ActiveBand := BandLight;
+        BandLight:
+          if HFBandEnable then
+            ActiveBand := Band160
+          else
+            ActiveBand := Band6;
 
-    else ActiveBand := Band160;
+      else ActiveBand := Band160;
 
-      BandChange(ActiveBand, Direction);
+        BandChange(ActiveBand, Direction);
+      end;
+
+      if SkipActiveBand and ((Radio1.BandMemory
+  //        BandMemory[RadioOne]
+        = ActiveBand) or
+        (Radio2.BandMemory
+  //          BandMemory[RadioTwo]
+        = ActiveBand)) then
+        BandChange(ActiveBand, Direction);
+    end
+
+    else
+  //      KK1l: 6.72 Note Direction = DirectionDown
+    begin
+      case ActiveBand of
+        Band160:
+          if VHFBandsEnabled then
+            ActiveBand := BandLight
+          else
+            ActiveBand := Band10;
+
+        Band80: ActiveBand := Band160;
+        Band40: ActiveBand := Band80;
+
+        Band30: ActiveBand := Band40;
+
+        Band20:
+          if WARCBandsEnabled then
+            ActiveBand := Band30
+          else
+            ActiveBand := Band40;
+
+        Band17: ActiveBand := Band20;
+
+        Band15:
+          if WARCBandsEnabled then
+            ActiveBand := Band17
+          else
+            ActiveBand := Band20;
+
+        Band12: ActiveBand := Band15;
+
+        Band10:
+          if WARCBandsEnabled then
+            ActiveBand := Band12
+          else
+            ActiveBand := Band15;
+
+        Band6:
+          if HFBandEnable then
+            ActiveBand := Band10
+          else
+            ActiveBand := BandLight;
+
+        Band2: ActiveBand := Band6;
+        Band222: ActiveBand := Band2;
+        Band432: ActiveBand := Band222;
+        Band902: ActiveBand := Band432;
+        Band1296: ActiveBand := Band902;
+        Band2304: ActiveBand := Band1296;
+        Band3456: ActiveBand := Band2304;
+        Band5760: ActiveBand := Band3456;
+        Band10G: ActiveBand := Band5760;
+        Band24G: ActiveBand := Band10G;
+        BandLight: ActiveBand := Band24G;
+
+      else ActiveBand := Band160;
+      end;
+
+      if SkipActiveBand and ((Radio1.BandMemory
+  //        BandMemory[RadioOne]
+        = ActiveBand) or
+        (Radio2.BandMemory
+  //          BandMemory[RadioTwo]
+        = ActiveBand)) then
+        BandChange(ActiveBand, Direction);
     end;
-
-    if SkipActiveBand and ((Radio1.BandMemory
-//        BandMemory[RadioOne]
-      = ActiveBand) or
-      (Radio2.BandMemory
-//          BandMemory[RadioTwo]
-      = ActiveBand)) then
-      BandChange(ActiveBand, Direction);
-  end
-
-  else
-//      KK1l: 6.72 Note Direction = DirectionDown
-  begin
-    case ActiveBand of
-      Band160:
-        if VHFBandsEnabled then
-          ActiveBand := BandLight
-        else
-          ActiveBand := Band10;
-
-      Band80: ActiveBand := Band160;
-      Band40: ActiveBand := Band80;
-
-      Band30: ActiveBand := Band40;
-
-      Band20:
-        if WARCBandsEnabled then
-          ActiveBand := Band30
-        else
-          ActiveBand := Band40;
-
-      Band17: ActiveBand := Band20;
-
-      Band15:
-        if WARCBandsEnabled then
-          ActiveBand := Band17
-        else
-          ActiveBand := Band20;
-
-      Band12: ActiveBand := Band15;
-
-      Band10:
-        if WARCBandsEnabled then
-          ActiveBand := Band12
-        else
-          ActiveBand := Band15;
-
-      Band6:
-        if HFBandEnable then
-          ActiveBand := Band10
-        else
-          ActiveBand := BandLight;
-
-      Band2: ActiveBand := Band6;
-      Band222: ActiveBand := Band2;
-      Band432: ActiveBand := Band222;
-      Band902: ActiveBand := Band432;
-      Band1296: ActiveBand := Band902;
-      Band2304: ActiveBand := Band1296;
-      Band3456: ActiveBand := Band2304;
-      Band5760: ActiveBand := Band3456;
-      Band10G: ActiveBand := Band5760;
-      Band24G: ActiveBand := Band10G;
-      BandLight: ActiveBand := Band24G;
-
-    else ActiveBand := Band160;
-    end;
-
-    if SkipActiveBand and ((Radio1.BandMemory
-//        BandMemory[RadioOne]
-      = ActiveBand) or
-      (Radio2.BandMemory
-//          BandMemory[RadioTwo]
-      = ActiveBand)) then
-      BandChange(ActiveBand, Direction);
-  end;
-}
+  }
   SendStationStatus(sstBandModeFreq);
 
   //{WLI}
@@ -959,10 +973,11 @@ end;
 function NumberQTCsThisStation(Call: CallString): integer;
 
 var
-  Station                               : integer;
+  Station: integer;
 begin
   NumberQTCsThisStation := 0;
-  if NumberQTCStations = 0 then Exit;
+  if NumberQTCStations = 0 then
+    Exit;
 
   for Station := 0 to NumberQTCStations - 1 do
     if QTCDataArray^[Station].Call = Call then
@@ -974,7 +989,7 @@ end;
 
 procedure IncrementQTCCount(Call: CallString);
 var
-  Station                               : integer;
+  Station: integer;
 begin
   inc(TotalNumberQTCsProcessed);
   if NumberQTCStations = 0 then
@@ -992,22 +1007,22 @@ begin
       Exit;
     end;
 
-//  if NumberQTCStations > 499 then showint(NumberQTCStations);
-//  if NumberQTCStations < 0 then showint(NumberQTCStations);
+  //  if NumberQTCStations > 499 then showint(NumberQTCStations);
+  //  if NumberQTCStations < 0 then showint(NumberQTCStations);
 
   QTCDataArray^[NumberQTCStations].Call := Call;
   QTCDataArray^[NumberQTCStations].NumberQTCs := 1;
   inc(NumberQTCStations);
-//  Windows.SetWindowText(tr4whandle, inttopchar(NumberQTCStations));
+  //  Windows.SetWindowText(tr4whandle, inttopchar(NumberQTCStations));
 end;
 
 function ProperSalutation(Call: CallString): Str80;
 
 var
-  TempQTHData                           : QTHRecord;
+  TempQTHData: QTHRecord;
   Hours, ZeroZuluOffset: Word;
-  CurrentHelloRecord                    : HelloRecPtr;
-  ID                                    : CallString;
+  CurrentHelloRecord: HelloRecPtr;
+  ID: CallString;
 
 begin
   ctyLocateCall(Call, TempQTHData);
@@ -1033,88 +1048,92 @@ begin
     if (TempQTHData.Zone >= 1) and (TempQTHData.Zone <= 39) then
       ZeroZuluOffset := ZeroZuluOffsetCQZoneArray[TempQTHData.Zone];
 
-    if TempQTHData.Zone = -1 then ZeroZuluOffset := 18;
+    if TempQTHData.Zone = -1 then
+      ZeroZuluOffset := 18;
     if TempQTHData.Zone = 40 then
     begin
       ProperSalutation := 'TU';
       Exit;
     end;
 
-      {
-          case TempQTHData.Zone of
-            -1: ZeroZuluOffset := 18; // These are US calls not in a proper zone
-            1: ZeroZuluOffset := 14;
-            2: ZeroZuluOffset := 19;
-            3: ZeroZuluOffset := 16;
-            4: ZeroZuluOffset := 18;
-            5: ZeroZuluOffset := 19;
-            6: ZeroZuluOffset := 17;
-            7: ZeroZuluOffset := 18;
-            8: ZeroZuluOffset := 19;
-            9: ZeroZuluOffset := 18;
-            10: ZeroZuluOffset := 19;
-            11: ZeroZuluOffset := 21;
-            12: ZeroZuluOffset := 19;
-            13: ZeroZuluOffset := 20;
-            14: ZeroZuluOffset := 0;
-            15: ZeroZuluOffset := 1;
-            16: ZeroZuluOffset := 2;
-            17: ZeroZuluOffset := 4;
-            18: ZeroZuluOffset := 6;
-            19: ZeroZuluOffset := 9;
-            20: ZeroZuluOffset := 2;
-            21: ZeroZuluOffset := 4;
-            22: ZeroZuluOffset := 5;
-            23: ZeroZuluOffset := 7;
-            24: ZeroZuluOffset := 8;
-            25: ZeroZuluOffset := 9;
-            26: ZeroZuluOffset := 7;
-            27: ZeroZuluOffset := 8;
-            28: ZeroZuluOffset := 7;
-            29: ZeroZuluOffset := 8;
-            30: ZeroZuluOffset := 10;
-            31: ZeroZuluOffset := 14;
-            32: ZeroZuluOffset := 12;
-            33: ZeroZuluOffset := 0;
-            34: ZeroZuluOffset := 2;
-            35: ZeroZuluOffset := 0;
-            36: ZeroZuluOffset := 0;
-            37: ZeroZuluOffset := 2;
-            38: ZeroZuluOffset := 1;
-            39: ZeroZuluOffset := 3;
-            40:
-              begin
-                ProperSalutation := 'TU';
-                Exit;
-              end;
+    {
+        case TempQTHData.Zone of
+          -1: ZeroZuluOffset := 18; // These are US calls not in a proper zone
+          1: ZeroZuluOffset := 14;
+          2: ZeroZuluOffset := 19;
+          3: ZeroZuluOffset := 16;
+          4: ZeroZuluOffset := 18;
+          5: ZeroZuluOffset := 19;
+          6: ZeroZuluOffset := 17;
+          7: ZeroZuluOffset := 18;
+          8: ZeroZuluOffset := 19;
+          9: ZeroZuluOffset := 18;
+          10: ZeroZuluOffset := 19;
+          11: ZeroZuluOffset := 21;
+          12: ZeroZuluOffset := 19;
+          13: ZeroZuluOffset := 20;
+          14: ZeroZuluOffset := 0;
+          15: ZeroZuluOffset := 1;
+          16: ZeroZuluOffset := 2;
+          17: ZeroZuluOffset := 4;
+          18: ZeroZuluOffset := 6;
+          19: ZeroZuluOffset := 9;
+          20: ZeroZuluOffset := 2;
+          21: ZeroZuluOffset := 4;
+          22: ZeroZuluOffset := 5;
+          23: ZeroZuluOffset := 7;
+          24: ZeroZuluOffset := 8;
+          25: ZeroZuluOffset := 9;
+          26: ZeroZuluOffset := 7;
+          27: ZeroZuluOffset := 8;
+          28: ZeroZuluOffset := 7;
+          29: ZeroZuluOffset := 8;
+          30: ZeroZuluOffset := 10;
+          31: ZeroZuluOffset := 14;
+          32: ZeroZuluOffset := 12;
+          33: ZeroZuluOffset := 0;
+          34: ZeroZuluOffset := 2;
+          35: ZeroZuluOffset := 0;
+          36: ZeroZuluOffset := 0;
+          37: ZeroZuluOffset := 2;
+          38: ZeroZuluOffset := 1;
+          39: ZeroZuluOffset := 3;
+          40:
+            begin
+              ProperSalutation := 'TU';
+              Exit;
+            end;
 
-          end;
-      }
+        end;
+    }
   end
   else
   begin
-    if (TempQTHData.Zone >= 1) and (TempQTHData.Zone <= 66) then ZeroZuluOffset :=
-      ZeroZuluOffsetITUZoneArray[TempQTHData.Zone]
+    if (TempQTHData.Zone >= 1) and (TempQTHData.Zone <= 66) then
+      ZeroZuluOffset :=
+        ZeroZuluOffsetITUZoneArray[TempQTHData.Zone]
     else
     begin
       ProperSalutation := 'TU';
       Exit;
     end;
 
-
   end;
 
   Hours := GetIntegerTime div 100;
   Hours := (Hours + ZeroZuluOffset) mod 24;
 
-  if (Hours >= 2) and (Hours <= 11) then ProperSalutation := 'GM';
-  if (Hours >= 12) and (Hours <= 17) then ProperSalutation := 'GA';
-  if (Hours >= 18) or (Hours <= 1) then ProperSalutation := 'GE';
+  if (Hours >= 2) and (Hours <= 11) then
+    ProperSalutation := 'GM';
+  if (Hours >= 12) and (Hours <= 17) then
+    ProperSalutation := 'GA';
+  if (Hours >= 18) or (Hours <= 1) then
+    ProperSalutation := 'GE';
 end;
 
 procedure EnumHelloDAT(FileString: PShortString);
 var
-  Greeting, ID                          : Str20;
+  Greeting, ID: Str20;
 begin
   GetRidOfPrecedingSpaces(FileString^);
   ID := RemoveFirstString(FileString^);
@@ -1143,55 +1162,57 @@ end;
 procedure LoadSpecialHelloFile;
 
 begin
-  if FirstHelloRecord <> nil then Exit;
+  if FirstHelloRecord <> nil then
+    Exit;
   EnumerateLinesInFile('HELLO.DAT', EnumHelloDAT, True);
-{
-  if OpenFileForRead(FileRead, 'HELLO.DAT') then
-  begin
-    while not Eof(FileRead) do
+  {
+    if OpenFileForRead(FileRead, 'HELLO.DAT') then
     begin
-      ReadLn(FileRead, FileString);
-      GetRidOfPrecedingSpaces(FileString);
-      ID := RemoveFirstString(FileString);
-      GetRidOfPrecedingSpaces(FileString);
-      GetRidOfPostcedingSpaces(FileString);
-      Greeting := FileString;
+      while not Eof(FileRead) do
+      begin
+        ReadLn(FileRead, FileString);
+        GetRidOfPrecedingSpaces(FileString);
+        ID := RemoveFirstString(FileString);
+        GetRidOfPrecedingSpaces(FileString);
+        GetRidOfPostcedingSpaces(FileString);
+        Greeting := FileString;
 
-      if FirstHelloRecord = nil then
-      begin
-        FirstHelloRecord := New(HelloRecPtr);
-        FirstHelloRecord^.ID := ID;
-        FirstHelloRecord^.Greeting := Greeting;
-        FirstHelloRecord^.NextRecord := nil;
-        LastHelloRecord := FirstHelloRecord;
-      end
-      else
-      begin
-        LastHelloRecord^.NextRecord := New(HelloRecPtr);
-        LastHelloRecord := LastHelloRecord^.NextRecord;
-        LastHelloRecord^.ID := ID;
-        LastHelloRecord^.Greeting := Greeting;
-        LastHelloRecord^.NextRecord := nil;
+        if FirstHelloRecord = nil then
+        begin
+          FirstHelloRecord := New(HelloRecPtr);
+          FirstHelloRecord^.ID := ID;
+          FirstHelloRecord^.Greeting := Greeting;
+          FirstHelloRecord^.NextRecord := nil;
+          LastHelloRecord := FirstHelloRecord;
+        end
+        else
+        begin
+          LastHelloRecord^.NextRecord := New(HelloRecPtr);
+          LastHelloRecord := LastHelloRecord^.NextRecord;
+          LastHelloRecord^.ID := ID;
+          LastHelloRecord^.Greeting := Greeting;
+          LastHelloRecord^.NextRecord := nil;
+        end;
       end;
-    end;
 
-    Close(FileRead);
-  end;
-}
+      Close(FileRead);
+    end;
+  }
 end;
 
 procedure SendSalutation(Call: CallString);
 
 begin
-  if Call = '' then Exit;
+  if Call = '' then
+    Exit;
   AddStringToBuffer(ProperSalutation(Call), CWTone);
 end;
 
 procedure SayHello(Call: CallString);
 
 var
-  Salutation, Name                      : Str20;
-  RandomNumber                          : integer;
+  Salutation, Name: Str20;
+  RandomNumber: integer;
 
 begin
   Call := RootCall(Call);
@@ -1200,9 +1221,11 @@ begin
   if (Name <> '') and (Name <> 'CLUB') then
   begin
     Salutation := ProperSalutation(Call);
-    if Salutation = 'TU' then Salutation := 'HI';
+    if Salutation = 'TU' then
+      Salutation := 'HI';
     RandomNumber := Random(10);
-    if RandomNumber >= 7 then Salutation := 'HI';
+    if RandomNumber >= 7 then
+      Salutation := 'HI';
     AddStringToBuffer(Salutation + ' ' + Name + ' ', CWTone);
     ReceivedData.NameSent := True;
   end
@@ -1213,8 +1236,8 @@ end;
 procedure ShowName(Call: CallString);
 
 var
-  Name                                  : CallString;
-  p                                     : PChar;
+  Name: CallString;
+  p: PChar;
 begin
   Call := RootCall(Call);
 
@@ -1233,7 +1256,7 @@ end;
 procedure SayName(Call: CallString);
 
 var
-  Name                                  : Str20;
+  Name: Str20;
 
 begin
   Call := RootCall(Call);
@@ -1278,7 +1301,8 @@ function KeyRecentlyPressed(Key: Char; MaxElaspedSec100: LONGINT): boolean;
 
 begin
   KeyRecentlyPressed := False;
-  if Key <> KeyHistory.Key then Exit;
+  if Key <> KeyHistory.Key then
+    Exit;
   KeyRecentlyPressed := MaxElaspedSec100 >= ElaspedSec100(KeyHistory.Time);
 end;
 
@@ -1294,14 +1318,16 @@ begin
   }
 end;
 
-procedure ParseExchange(Exchange: ShortString {Str80} {WLI}; var FirstString, SecondString, ThirdString: Str10 {Str20});
+procedure ParseExchange(Exchange: ShortString {Str80} {WLI}; var FirstString,
+  SecondString, ThirdString: Str10 {Str20});
 
 begin
   FirstString := '';
   SecondString := '';
   ThirdString := '';
 
-  if length(Exchange) = 0 then Exit;
+  if length(Exchange) = 0 then
+    Exit;
 
   if StringHas(Exchange, ' ') then
   begin
@@ -1323,14 +1349,16 @@ begin
     FirstString := Exchange;
 end;
 
-function ProcessKidsExchange(ExchangeString: Str80; var RData: ContestExchange): boolean;
+function ProcessKidsExchange(ExchangeString: Str80; var RData: ContestExchange):
+  boolean;
 
 begin
   RData.Kids := ExchangeString;
   ProcessKidsExchange := True;
 end;
 
-function ProcessClassAndDomesticOrDXQTHExchange(Exchange: string {Str80}; var RXData: ContestExchange): boolean;
+function ProcessClassAndDomesticOrDXQTHExchange(Exchange: string {Str80}; var
+  RXData: ContestExchange): boolean;
 
 { If the call is a domestic call, there must be a space with the Class
   before the space and the Domestic QTH after it.  If it is a not a domestic
@@ -1342,146 +1370,168 @@ function ProcessClassAndDomesticOrDXQTHExchange(Exchange: string {Str80}; var RX
 {           "let it slide" and assume the first string is class (likely "DX"). }
 
 var
-  TempString, TempString2               : Str10 {Str20};
-  isClassValid : boolean;
-  dx : boolean;
+  TempString, TempString2: Str10 {Str20};
+  isClassValid: boolean;
+  dx: boolean;
 begin
   ProcessClassAndDomesticOrDXQTHExchange := False;
 
   if DomesticCountryCall(RXData.Callsign) then
-     begin
-     dx := false;
-     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
-     Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
-     ParseExchange(Exchange, Str10(RXData.ceClass), RXData.QTHString, TempString);
+  begin
+    dx := false;
+    Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));
+      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
+    Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
+    ParseExchange(Exchange, Str10(RXData.ceClass), RXData.QTHString,
+      TempString);
 
-     if RXData.QTHString[1] in ['0'..'9'] then   // This is the code that flips it around if given in section class order // ny4i
-        begin
-        Windows.ZeroMemory(@TempString, SizeOf(TempString));
-        Windows.ZeroMemory(@TempString2, SizeOf(TempString2));
+    if RXData.QTHString[1] in ['0'..'9'] then
+      // This is the code that flips it around if given in section class order // ny4i
+    begin
+      Windows.ZeroMemory(@TempString, SizeOf(TempString));
+      Windows.ZeroMemory(@TempString2, SizeOf(TempString2));
 
-        TempString := RXData.ceClass;
-        TempString2 := RXData.QTHString;
+      TempString := RXData.ceClass;
+      TempString2 := RXData.QTHString;
 
-        Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));
-        Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
+      Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));
+      Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
 
-        RXData.ceClass := TempString2;
-        RXData.QTHString := TempString;
-        end;
-     // if I enter 999D wtx, then correct it to 99d wtx, then length is of class is still 4. Fix that.
-     if not FoundDomesticQTH(RXData) then
-        begin
-        ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;   // misspelled in the constants file //ny4i 4.45.3
-        Exit; // This was before the above code that flips the values. // ny4i 4.45.3
-        end;
-     isClassValid := ValidClass(RXData.ceClass);
-     Result := IsClassValid;
-     end
+      RXData.ceClass := TempString2;
+      RXData.QTHString := TempString;
+    end;
+    // if I enter 999D wtx, then correct it to 99d wtx, then length is of class is still 4. Fix that.
+    if not FoundDomesticQTH(RXData) then
+    begin
+      ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+        // misspelled in the constants file //ny4i 4.45.3
+      Exit; // This was before the above code that flips the values. // ny4i 4.45.3
+    end;
+    isClassValid := ValidClass(RXData.ceClass);
+    Result := IsClassValid;
+  end
   else
-     begin
-     dx := true;
-      {ParseExchange (Exchange, RXData.Class, RXData.QTHString, TempString);}{pre 6.68 statement}
-     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
-     Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
+  begin
+    dx := true;
+    {ParseExchange (Exchange, RXData.Class, RXData.QTHString, TempString);} {pre 6.68 statement}
+    Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));
+      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
+    Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
 
-     ParseExchange(Exchange, Str10(RXData.ceClass), TempString, TempString2);
-     if RxData.QTH.Continent in [NorthAmerica,SouthAmerica] then // If IARU Region 2 then we get class (most likely 1D if they are home).
-        begin
-        isClassValid := ValidClass(RxData.ceClass);
-        Result := isClassValid;
-        end
-     else
-        begin
-        Result := length(RXData.ceClass) in [2,3]; // If it is non-Region 2 DX, just make sure it is two or three characters.
-        if not Result then
-           begin
-           ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
-           end;
-        end;
-     if Result then // If class passes, check QTH is DX
-        begin
-        if TempString = 'DX' then
-           begin
-           RXData.QTHString := 'DX';
-           end
-        else if TempString = '' then
-           begin
-           // Set this to DX
-           RXData.QTHString := 'DX';
-           end
-        else
-           begin
-           Result := False;
-           ExchangeErrorMessage := TC_ARRLFIELDDAYIMPROPERDXEXCHANGE;
-           end;
-        end;
-     //if TempString <> '' then RXData.QTHString := TempString;
-     end;
+    ParseExchange(Exchange, Str10(RXData.ceClass), TempString, TempString2);
+    if RxData.QTH.Continent in [NorthAmerica, SouthAmerica] then
+      // If IARU Region 2 then we get class (most likely 1D if they are home).
+    begin
+      isClassValid := ValidClass(RxData.ceClass);
+      Result := isClassValid;
+    end
+    else
+    begin
+      Result := length(RXData.ceClass) in [2, 3];
+        // If it is non-Region 2 DX, just make sure it is two or three characters.
+      if not Result then
+      begin
+        ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
+      end;
+    end;
+    if Result then // If class passes, check QTH is DX
+    begin
+      if TempString = 'DX' then
+      begin
+        RXData.QTHString := 'DX';
+      end
+      else if TempString = '' then
+      begin
+        // Set this to DX
+        RXData.QTHString := 'DX';
+      end
+      else
+      begin
+        Result := False;
+        ExchangeErrorMessage := TC_ARRLFIELDDAYIMPROPERDXEXCHANGE;
+      end;
+    end;
+    //if TempString <> '' then RXData.QTHString := TempString;
+  end;
 
-// Result is set in one of two patchs above...
+  // Result is set in one of two patchs above...
 
-//  ProcessClassAndDomesticOrDXQTHExchange :=
- // ProcessClassAndDomesticOrDXQTHExchange := (length(RXData.ceClass) in [2, 3]) and ((RxData.ceClass = 'A') or (RxData.ceClass = 'B') or (RxData.ceClass = 'C') or (RxData.ceClass = 'D') or (RxData.ceClass = 'E') or (RxData.ceClass = 'F'));
+  //  ProcessClassAndDomesticOrDXQTHExchange :=
+   // ProcessClassAndDomesticOrDXQTHExchange := (length(RXData.ceClass) in [2, 3]) and ((RxData.ceClass = 'A') or (RxData.ceClass = 'B') or (RxData.ceClass = 'C') or (RxData.ceClass = 'D') or (RxData.ceClass = 'E') or (RxData.ceClass = 'F'));
 end;
 
-function ProcessRSTAgeAndPossibleSK(Exchange: ShortString; var RXData: ContestExchange): boolean;
+function ProcessRSTAgeAndPossibleSK(Exchange: ShortString; var RXData:
+  ContestExchange): boolean;
 const
-  exNNUU                                : array[0..3] of ExchangeElementType = (eetNumber, eetNumber, eetUnknown, eetUnknown);
-  exNMNU                                : array[0..3] of ExchangeElementType = (eetNumber, eetMixed, eetNumber, eetUnknown);
-  exNNMN                                : array[0..3] of ExchangeElementType = (eetNumber, eetNumber, eetMixed, eetNumber);
+  exNNUU: array[0..3] of ExchangeElementType = (eetNumber, eetNumber,
+    eetUnknown, eetUnknown);
+  exNMNU: array[0..3] of ExchangeElementType = (eetNumber, eetMixed, eetNumber,
+    eetUnknown);
+  exNNMN: array[0..3] of ExchangeElementType = (eetNumber, eetNumber, eetMixed,
+    eetNumber);
 begin
   Result := False;
-  if ParseArray2(Exchange) then        // 4.66.2
-  case ParserArray.paCount of
-    1:
-      if ParserArray.paElements[0].prType = eetNumber then
-      begin
-        RXData.Age := ParserArray.paElements[0].prInteger;
-        Result := True;
-      end;
+  if ParseArray2(Exchange) then // 4.66.2
+    case ParserArray.paCount of
+      1:
+        if ParserArray.paElements[0].prType = eetNumber then
+        begin
+          RXData.Age := ParserArray.paElements[0].prInteger;
+          Result := True;
+        end;
 
-    2:
-      if Cardinal(ParserArray.paStatus) = Cardinal(exNNUU) then
-      begin
-        if not SetRST(ParserArray.paElements[0].prInteger, RXData.RSTReceived) then Exit;
-        RXData.Age := ParserArray.paElements[1].prInteger;
-        Result := True;
-      end;
+      2:
+        if Cardinal(ParserArray.paStatus) = Cardinal(exNNUU) then
+        begin
+          if not SetRST(ParserArray.paElements[0].prInteger, RXData.RSTReceived)
+            then
+            Exit;
+          RXData.Age := ParserArray.paElements[1].prInteger;
+          Result := True;
+        end;
 
-    3:
-      if Cardinal(ParserArray.paStatus) = Cardinal(exNMNU) then
-      begin
-        RXData.Age := ParserArray.paElements[0].prInteger;
-        if not GoodCallSyntax(ParserArray.paElements[1].prString) then Exit;
-        if not (ParserArray.paElements[2].prInteger in [0..255]) then Exit;
-        RXData.QTHString := ParserArray.paElements[1].prString + ' ' + IntToStr(ParserArray.paElements[2].prInteger);
-        Result := True;
-      end;
+      3:
+        if Cardinal(ParserArray.paStatus) = Cardinal(exNMNU) then
+        begin
+          RXData.Age := ParserArray.paElements[0].prInteger;
+          if not GoodCallSyntax(ParserArray.paElements[1].prString) then
+            Exit;
+          if not (ParserArray.paElements[2].prInteger in [0..255]) then
+            Exit;
+          RXData.QTHString := ParserArray.paElements[1].prString + ' ' +
+            IntToStr(ParserArray.paElements[2].prInteger);
+          Result := True;
+        end;
 
-    4:
-      if Cardinal(ParserArray.paStatus) = Cardinal(exNNMN) then
-      begin
-        if not SetRST(ParserArray.paElements[0].prInteger, RXData.RSTReceived) then Exit;
-        RXData.Age := ParserArray.paElements[1].prInteger;
-        if not GoodCallSyntax(ParserArray.paElements[2].prString) then Exit;
-        if not (ParserArray.paElements[3].prInteger in [0..255]) then Exit;
-        RXData.QTHString := ParserArray.paElements[2].prString + ' ' + IntToStr(ParserArray.paElements[3].prInteger);
-        Result := True;
-      end;
-  end;
+      4:
+        if Cardinal(ParserArray.paStatus) = Cardinal(exNNMN) then
+        begin
+          if not SetRST(ParserArray.paElements[0].prInteger, RXData.RSTReceived)
+            then
+            Exit;
+          RXData.Age := ParserArray.paElements[1].prInteger;
+          if not GoodCallSyntax(ParserArray.paElements[2].prString) then
+            Exit;
+          if not (ParserArray.paElements[3].prInteger in [0..255]) then
+            Exit;
+          RXData.QTHString := ParserArray.paElements[2].prString + ' ' +
+            IntToStr(ParserArray.paElements[3].prInteger);
+          Result := True;
+        end;
+    end;
 end;
 
-function ProcessRSTAndContinentExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndContinentExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 
 { Any digits found at the start of the exchange will be used to determine
   the RS(T).  If the first character is not a digit, the default RS(T)
   will be used and the whole exchange will be used as the QTH. }
 
 var
-  TempString                            : Str80;
-  QTHFound                              : boolean;
-  ContPrefix                            : Str20;
+  TempString: Str80;
+  QTHFound: boolean;
+  ContPrefix: Str20;
 
 begin
   QTHFound := False;
@@ -1501,7 +1551,8 @@ begin
 
     Result := RXData.QTH.Continent <> UnknownContinent;
 
-    if not Result then ExchangeErrorMessage := TC_IMPROPERCONTINENT;
+    if not Result then
+      ExchangeErrorMessage := TC_IMPROPERCONTINENT;
 
     Exit;
   end;
@@ -1522,28 +1573,27 @@ begin
       else
         RXData.RSTReceived := StrToInt(TempString)
     end
-    else
-      if not QTHFound then
+    else if not QTHFound then
+    begin
+      ContPrefix := UpperCase(Copy(Exchange, 1, 2));
+      RXData.QTH.Continent := GetContinentFromString(ContPrefix);
+      {
+                  if ContPrefix = 'AF' then RXData.QTH.Continent := Africa;
+                  if ContPrefix = 'AS' then RXData.QTH.Continent := Asia;
+                  if ContPrefix = 'OC' then RXData.QTH.Continent := Oceania;
+                  if ContPrefix = 'EU' then RXData.QTH.Continent := Europe;
+
+                  if (ContPrefix = 'SO') or (ContPrefix = 'SA') then RXData.QTH.Continent := SouthAmerica;
+                  if (ContPrefix = 'NO') or (ContPrefix = 'NA') then RXData.QTH.Continent := NorthAmerica;
+      }
+      RXData.QTHString := Exchange;
+
+      if RXData.QTH.Continent <> UnknownContinent then
       begin
-        ContPrefix := UpperCase(Copy(Exchange, 1, 2));
-        RXData.QTH.Continent := GetContinentFromString(ContPrefix);
-            {
-                        if ContPrefix = 'AF' then RXData.QTH.Continent := Africa;
-                        if ContPrefix = 'AS' then RXData.QTH.Continent := Asia;
-                        if ContPrefix = 'OC' then RXData.QTH.Continent := Oceania;
-                        if ContPrefix = 'EU' then RXData.QTH.Continent := Europe;
-
-                        if (ContPrefix = 'SO') or (ContPrefix = 'SA') then RXData.QTH.Continent := SouthAmerica;
-                        if (ContPrefix = 'NO') or (ContPrefix = 'NA') then RXData.QTH.Continent := NorthAmerica;
-            }
-        RXData.QTHString := Exchange;
-
-        if RXData.QTH.Continent <> UnknownContinent then
-        begin
-          QTHFound := True;
-          RXData.QTHString := TempString;
-        end;
+        QTHFound := True;
+        RXData.QTHString := TempString;
       end;
+    end;
   end;
 
   if QTHFound then
@@ -1554,17 +1604,19 @@ begin
   end;
 end;
 
-function ProcessNameQTHAndPossibleTenTenNumberExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessNameQTHAndPossibleTenTenNumberExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 
 var
-  TempString                            : ShortString {Str80};
-  ThirdString, NumberString             : Str10 {Str20};
-  Result1                               : integer;
+  TempString: ShortString {Str80};
+  ThirdString, NumberString: Str10 {Str20};
+  Result1: integer;
   //   tempstr20                       : Str20;
 begin
   ProcessNameQTHAndPossibleTenTenNumberExchange := False;
 
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   TempString := Exchange;
   Exchange := '';
@@ -1590,38 +1642,39 @@ begin
 
 end;
 
-function ProcessNameAndDomesticOrDXQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessNameAndDomesticOrDXQTHExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 { Two entries with space, name is first. IF DX, then no QTH. }
 
 var
-  FirstString                           : Str10;
-  SecondString                           : Str10;
-  ThirdString                           : Str10;
+  FirstString: Str10;
+  SecondString: Str10;
+  ThirdString: Str10;
 
-  begin
+begin
   ProcessNameAndDomesticOrDXQTHExchange := False;
-  if Exchange = '' then Exit;
- // ParseExchange(Exchange, RXData.Name, RXData.QTHString, ThirdString);   // old parse
-  ParseExchange(Exchange,FirstString,SecondString,ThirdString);        //4.51.7
+  if Exchange = '' then
+    Exit;
+  // ParseExchange(Exchange, RXData.Name, RXData.QTHString, ThirdString);   // old parse
+  ParseExchange(Exchange, FirstString, SecondString, ThirdString); //4.51.7
   // check for a corrected number
-  if StringIsAllNumbers(ThirdString) then    // n4af 4.51.7
-   begin
+  if StringIsAllNumbers(ThirdString) then // n4af 4.51.7
+  begin
     RXData.Name := FirstString;
-    RXData.QTHString := ThirdString ;
-   end
+    RXData.QTHString := ThirdString;
+  end
   else
-  // check for a corrected name
- if IsAlpha(ThirdString) then       // 4.51.7
-   begin
-    RXData.Name := ThirdString;
-    RXData.QTHString := SecondString;
-   end
-   else
-   begin
-    RXData.Name := FirstString;
-    RXData.QTHString := SecondString;
-   end;
+    {// check for a corrected name} if IsAlpha(ThirdString) then // 4.51.7
+    begin
+      RXData.Name := ThirdString;
+      RXData.QTHString := SecondString;
+    end
+    else
+    begin
+      RXData.Name := FirstString;
+      RXData.QTHString := SecondString;
+    end;
   if not DomesticCountryCall(RXData.Callsign) then
     ProcessNameAndDomesticOrDXQTHExchange := True
   else
@@ -1631,7 +1684,8 @@ var
 
 end;
 
-function ProcessQSONumberAndDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndDomesticQTHExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 { If the the two entries are separated by a space, they may appear in either
   order.  If only one entry appears, it is assumed to be the Domestic QTH
@@ -1639,23 +1693,25 @@ function ProcessQSONumberAndDomesticQTHExchange(Exchange: Str80; var RXData: Con
 
 var
   Str1, Str2 {, Str3, Str4}: Str10 {Str20};
-  i                                     : integer;
+  i: integer;
 begin
   ProcessQSONumberAndDomesticQTHExchange := False;
-  if length(Exchange) = 0 then Exit;
+  if length(Exchange) = 0 then
+    Exit;
 
   Str1 := '';
   Str2 := '';
-//  Str3 := '';
-//  Str4 := '';
+  //  Str3 := '';
+  //  Str4 := '';
 
-//  NumberString := '';
+  //  NumberString := '';
 
   RXData.QTHString := '';
 
   for i := 1 to length(Exchange) - 1 do
   begin
-    if (tCharIsNumbers(Exchange[i]) <> tCharIsNumbers(Exchange[i + 1])) or (Exchange[i + 1] = ' ') then
+    if (tCharIsNumbers(Exchange[i]) <> tCharIsNumbers(Exchange[i + 1])) or
+      (Exchange[i + 1] = ' ') then
     begin
       Str1 := Copy(Exchange, 1, i);
       Break;
@@ -1664,7 +1720,8 @@ begin
 
   for i := length(Exchange) downto 2 do
   begin
-    if (tCharIsNumbers(Exchange[i]) <> tCharIsNumbers(Exchange[i - 1])) or (Exchange[i - 1] = ' ') then
+    if (tCharIsNumbers(Exchange[i]) <> tCharIsNumbers(Exchange[i - 1])) or
+      (Exchange[i - 1] = ' ') then
     begin
       Str2 := Copy(Exchange, i, 80);
 
@@ -1674,100 +1731,103 @@ begin
     end;
   end;
 
-  if Str1 = '' then Exit;
-  if Str2 = '' then Exit;
+  if Str1 = '' then
+    Exit;
+  if Str2 = '' then
+    Exit;
 
   if StringIsAllNumbers(Str1) then
   begin
     RXData.NumberReceived := StrToInt(Str1);
     RXData.QTHString := Str2;
   end
+  else if StringIsAllNumbers(Str2) then
+  begin
+    RXData.NumberReceived := StrToInt(Str2);
+    RXData.QTHString := Str1;
+  end
   else
-    if StringIsAllNumbers(Str2) then
-    begin
-      RXData.NumberReceived := StrToInt(Str2);
-      RXData.QTHString := Str1;
-    end
-    else Exit;
+    Exit;
   ProcessQSONumberAndDomesticQTHExchange := FoundDomesticQTH(RXData);
-  if not Result then ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
-{
-  Exit;
+  if not Result then
+    ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+  {
+    Exit;
 
-  ParseExchange(Exchange, Str1, Str2, Str3);
+    ParseExchange(Exchange, Str1, Str2, Str3);
 
-  if StringHas(Str3, ' ') then
-  begin
-    Str4 := PostcedingString(Str3, ' ');
-    Str3 := PrecedingString(Str3, ' ');
-  end;
-
-  // Do the number - it is easy
-
-  if StringIsAllNumbers(Str4) then
-    NumberString := Str4
-  else
-    if StringIsAllNumbers(Str3) then
-      NumberString := Str3
-    else
-      if StringIsAllNumbers(Str2) then
-        NumberString := Str2
-      else
-        if StringIsAllNumbers(Str1) then
-          NumberString := Str1;
-  //wli        else          NumberString := '1';
-
-    // Now the QTH - which isn't so hard either
-
-  if (not StringIsAllNumbers(Str4)) and (Str4 <> '') then
-    RXData.QTHString := Str4
-  else
-    if (not StringIsAllNumbers(Str3)) and (Str3 <> '') then
-      RXData.QTHString := Str3
-    else
-      if (not StringIsAllNumbers(Str2)) and (Str2 <> '') then
-        RXData.QTHString := Str2
-      else
-        if (not StringIsAllNumbers(Str1)) and (Str1 <> '') then
-          RXData.QTHString := Str1;
-
-  if RXData.QTHString = '' then Exit;
-  if NumberString = '' then
-  begin
-    Parsed := False;
-    for Result1 := 1 to length(RXData.QTHString) - 1 do
-      if (not tCharIsNumbers(RXData.QTHString[Result1])) and (tCharIsNumbers(RXData.QTHString[Result1 + 1])) then
-      begin
-        Parsed := True;
-        Break;
-      end;
-    if Parsed then
+    if StringHas(Str3, ' ') then
     begin
-      NumberString := Copy(RXData.QTHString, Result1 + 1, 10);
-      RXData.QTHString := Copy(RXData.QTHString, 1, Result1);
+      Str4 := PostcedingString(Str3, ' ');
+      Str3 := PrecedingString(Str3, ' ');
     end;
 
-    if Parsed = False then
+    // Do the number - it is easy
+
+    if StringIsAllNumbers(Str4) then
+      NumberString := Str4
+    else
+      if StringIsAllNumbers(Str3) then
+        NumberString := Str3
+      else
+        if StringIsAllNumbers(Str2) then
+          NumberString := Str2
+        else
+          if StringIsAllNumbers(Str1) then
+            NumberString := Str1;
+    //wli        else          NumberString := '1';
+
+      // Now the QTH - which isn't so hard either
+
+    if (not StringIsAllNumbers(Str4)) and (Str4 <> '') then
+      RXData.QTHString := Str4
+    else
+      if (not StringIsAllNumbers(Str3)) and (Str3 <> '') then
+        RXData.QTHString := Str3
+      else
+        if (not StringIsAllNumbers(Str2)) and (Str2 <> '') then
+          RXData.QTHString := Str2
+        else
+          if (not StringIsAllNumbers(Str1)) and (Str1 <> '') then
+            RXData.QTHString := Str1;
+
+    if RXData.QTHString = '' then Exit;
+    if NumberString = '' then
     begin
+      Parsed := False;
       for Result1 := 1 to length(RXData.QTHString) - 1 do
-        if (tCharIsNumbers(RXData.QTHString[Result1])) and (not tCharIsNumbers(RXData.QTHString[Result1 + 1])) then
+        if (not tCharIsNumbers(RXData.QTHString[Result1])) and (tCharIsNumbers(RXData.QTHString[Result1 + 1])) then
         begin
           Parsed := True;
           Break;
         end;
       if Parsed then
       begin
-        NumberString := Copy(RXData.QTHString, 1, Result1);
-        RXData.QTHString := Copy(RXData.QTHString, Result1 + 1, 10);
+        NumberString := Copy(RXData.QTHString, Result1 + 1, 10);
+        RXData.QTHString := Copy(RXData.QTHString, 1, Result1);
       end;
+
+      if Parsed = False then
+      begin
+        for Result1 := 1 to length(RXData.QTHString) - 1 do
+          if (tCharIsNumbers(RXData.QTHString[Result1])) and (not tCharIsNumbers(RXData.QTHString[Result1 + 1])) then
+          begin
+            Parsed := True;
+            Break;
+          end;
+        if Parsed then
+        begin
+          NumberString := Copy(RXData.QTHString, 1, Result1);
+          RXData.QTHString := Copy(RXData.QTHString, Result1 + 1, 10);
+        end;
+      end;
+
     end;
 
-  end;
-
-  Val(NumberString, RXData.NumberReceived, Result1);
-  if Result1 <> 0 then Exit;
-  ProcessQSONumberAndDomesticQTHExchange := FoundDomesticQTH(RXData);
-}
+    Val(NumberString, RXData.NumberReceived, Result1);
+    if Result1 <> 0 then Exit;
+    ProcessQSONumberAndDomesticQTHExchange := FoundDomesticQTH(RXData);
+  }
 end;
 {
 function ProcessQSONumberAndGridSquareExchange(Exchange: string; var RXData: ContestExchange): boolean;
@@ -1805,11 +1865,12 @@ begin
 end;
 }
 
-function ProcessQSONumberAndGridSquareExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndGridSquareExchange(Exchange: ShortString; var
+  RXData: ContestExchange): boolean;
 var
-  TempString, NumberString              : Str40;
-  GridString                            : Str20;
-  Result1                               : integer;
+  TempString, NumberString: Str40;
+  GridString: Str20;
+  Result1: integer;
 
 begin
   NumberString := '';
@@ -1828,29 +1889,34 @@ begin
 
   end;
 
-  if GridString = '' then Exit;
+  if GridString = '' then
+    Exit;
   if NumberString = '' then
   begin
     NumberString := Copy(GridString, 1, length(GridString) - 4);
-    if not StringIsAllNumbers(NumberString) then Exit;
+    if not StringIsAllNumbers(NumberString) then
+      Exit;
     GridString := Copy(GridString, length(GridString) - 3, 4);
   end;
 
-  if not GoodLookingGrid(GridString) then Exit;
+  if not GoodLookingGrid(GridString) then
+    Exit;
 
   RXData.QTHString := GridString;
 
   Val(NumberString, RXData.NumberReceived, Result1);
 
-  if Result1 <> 0 then Exit;
+  if Result1 <> 0 then
+    Exit;
   Result := FoundDomesticQTH(RXData);
 end;
 
-function ProcessQSONumberAndNameExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndNameExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 
 var
-  TempString, NumberString, NameString  : Str40;
-  Result1                               : integer;
+  TempString, NumberString, NameString: Str40;
+  Result1: integer;
 
 begin
   NumberString := '';
@@ -1869,7 +1935,8 @@ begin
 
   end;
 
-  if (NumberString = '') or (NameString = '') then Exit;
+  if (NumberString = '') or (NameString = '') then
+    Exit;
 
   RXData.Name := NameString;
 
@@ -1878,9 +1945,10 @@ begin
   ProcessQSONumberAndNameExchange := Result1 = 0;
 end;
 
-function ProcessQSONumberAndZoneExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndZoneExchange(Exchange: ShortString; var RXData:
+  ContestExchange): boolean;
 var
-  string1, string2, string3             : Str10;
+  string1, string2, string3: Str10;
 begin
 
   Result := False;
@@ -1903,31 +1971,33 @@ begin
     Exit;
   end;
 
-  if not StringIsAllNumbers(Exchange) then Exit;
+  if not StringIsAllNumbers(Exchange) then
+    Exit;
 
   RXData.Zone := Ord(Exchange[1]) - 48;
   RXData.NumberReceived := StrToInt(Copy(Exchange, 2, 4));
-{
-  if (Contest = UA4N) then
-  begin
-    if length(Exchange) > 4 then
+  {
+    if (Contest = UA4N) then
     begin
-      RXData.Zone := StrToInt(Copy(Exchange, 1, 2));
-      RXData.NumberReceived := StrToInt(Copy(Exchange, 3, 4));
-    end
-    else
-      Exit;
-  end;
-}
+      if length(Exchange) > 4 then
+      begin
+        RXData.Zone := StrToInt(Copy(Exchange, 1, 2));
+        RXData.NumberReceived := StrToInt(Copy(Exchange, 3, 4));
+      end
+      else
+        Exit;
+    end;
+  }
   Result := True;
 end;
 
-function ProcessQSONumberAndGeoCoordinatesExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndGeoCoordinatesExchange(Exchange: ShortString
+  {Str80}; var RXData: ContestExchange): boolean;
 
 var
-  TempString, NumberString, QTHString   : Str20;
-  Result1                               : integer;
-  Lat, Long                             : integer;
+  TempString, NumberString, QTHString: Str20;
+  Result1: integer;
+  Lat, Long: integer;
 begin
 
   NumberString := '';
@@ -1943,13 +2013,15 @@ begin
       NumberString := TempString
     else
     begin
-          //      if Contest = RUSSIAN160 then if LooksLikeRadio160Square(TempString) then QTHString := TempString;
-      if LooksLikeAGeoCoordinates(TempString, Lat, Long) then QTHString := TempString;
+      //      if Contest = RUSSIAN160 then if LooksLikeRadio160Square(TempString) then QTHString := TempString;
+      if LooksLikeAGeoCoordinates(TempString, Lat, Long) then
+        QTHString := TempString;
     end;
 
   end;
 
-  if (NumberString = '') or (QTHString = '') then Exit;
+  if (NumberString = '') or (QTHString = '') then
+    Exit;
 
   RXData.QTHString := QTHString;
 
@@ -1959,10 +2031,11 @@ begin
 
 end;
 
-function ProcessQSONumberAndCoordinatesSumExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndCoordinatesSumExchange(Exchange: ShortString; var
+  RXData: ContestExchange): boolean;
 var
-  NumberString, QTHString               : Str20;
-  Result1, i                            : integer;
+  NumberString, QTHString: Str20;
+  Result1, i: integer;
 
 begin
 
@@ -1973,10 +2046,12 @@ begin
 
   NumberString := RemoveLastString(Exchange);
   QTHString := RemoveLastString(Exchange);
-  if not StringIsAllNumbers(NumberString) then Exit;
+  if not StringIsAllNumbers(NumberString) then
+    Exit;
   if not StringIsAllNumbers(QTHString) then
   begin
-    if length(NumberString) < 3 then Exit;
+    if length(NumberString) < 3 then
+      Exit;
     if (NumberString[1] = '1') or (NumberString[2] = '1') then
       i := 3
     else
@@ -1984,11 +2059,14 @@ begin
 
     QTHString := Copy(NumberString, 1, i);
     NumberString := Copy(NumberString, i + 1, 10);
-    if QTHString = '' then Exit;
+    if QTHString = '' then
+      Exit;
   end;
 
-  if length(QTHString) = 1 then Exit;
-  if length(QTHString) > 3 then Exit;
+  if length(QTHString) = 1 then
+    Exit;
+  if length(QTHString) > 3 then
+    Exit;
 
   RXData.QTHString := QTHString;
   Val(NumberString, RXData.NumberReceived, Result1);
@@ -2020,17 +2098,19 @@ begin
 end;
 }
 
-function ProcessRSTAndOrGridSquareExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndOrGridSquareExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 
 var
-  TestString                            : Str20;
+  TestString: Str20;
 
 begin
   ProcessRSTAndOrGridSquareExchange := False;
   RXData.DomesticQTH := '';
   RXData.RSTReceived := 0;
 
-  if length(Exchange) = 0 then Exit;
+  if length(Exchange) = 0 then
+    Exit;
 
   while Exchange <> '' do
   begin
@@ -2045,22 +2125,21 @@ begin
         ProcessRSTAndOrGridSquareExchange := True;
       end;
     end
-    else
-      if (RXData.RSTReceived = 0) and StringIsAllNumbers(TestString) then
+    else if (RXData.RSTReceived = 0) and StringIsAllNumbers(TestString) then
+    begin
+      if length(TestString) = 1 then
       begin
-        if length(TestString) = 1 then
-        begin
 
-          case ActiveMode of
-            CW: RXData.RSTReceived := 509 + (Ord(TestString[1]) - 48) * 10;
-            Phone: RXData.RSTReceived := 50 + (Ord(TestString[1]) - 48);
-          end;
-        end
-        else
-          RXData.RSTReceived := StrToInt(TestString);
+        case ActiveMode of
+          CW: RXData.RSTReceived := 509 + (Ord(TestString[1]) - 48) * 10;
+          Phone: RXData.RSTReceived := 50 + (Ord(TestString[1]) - 48);
+        end;
+      end
+      else
+        RXData.RSTReceived := StrToInt(TestString);
 
-        ProcessRSTAndOrGridSquareExchange := True;
-      end;
+      ProcessRSTAndOrGridSquareExchange := True;
+    end;
   end;
 
   {ua4wli}
@@ -2068,18 +2147,21 @@ begin
   begin
     case ActiveMode of
       Phone: RXData.RSTReceived := 59;
-    else RXData.RSTReceived := 599;
+    else
+      RXData.RSTReceived := 599;
     end;
   end;
 
 end;
 
-function ProcessGridSquareExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessGridSquareExchange(Exchange: ShortString {Str80}; var RXData:
+  ContestExchange): boolean;
 begin
   Result := False;
   RXData.DomesticQTH := '';
 
-  if length(Exchange) = 0 then Exit;
+  if length(Exchange) = 0 then
+    Exit;
 
   if GoodLookingGrid(Exchange) then
   begin
@@ -2093,17 +2175,19 @@ begin
 
 end;
 
-function ProcessRSTAndGridSquareExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndGridSquareExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 
 var
-  TestString                            : Str20;
+  TestString: Str20;
 
 begin
   ProcessRSTAndGridSquareExchange := False;
   RXData.DomesticQTH := '';
   RXData.RSTReceived := 0;
 
-  if length(Exchange) = 0 then Exit;
+  if length(Exchange) = 0 then
+    Exit;
 
   while Exchange <> '' do
   begin
@@ -2114,44 +2198,46 @@ begin
       if RXData.QTHString = '' then
         RXData.QTHString := TestString;
     end
-    else
-      if (RXData.RSTReceived = 0) and StringIsAllNumbers(TestString) then
+    else if (RXData.RSTReceived = 0) and StringIsAllNumbers(TestString) then
+    begin
+      if length(TestString) = 1 then
       begin
-        if length(TestString) = 1 then
-        begin
-          case ActiveMode of
-            CW: RXData.RSTReceived := 509 + (Ord(TestString[1]) - 48) * 10;
-            Phone: RXData.RSTReceived := 50 + (Ord(TestString[1]) - 48);
-          end;
-        end
-        else
-          RXData.RSTReceived := StrToInt(TestString);
+        case ActiveMode of
+          CW: RXData.RSTReceived := 509 + (Ord(TestString[1]) - 48) * 10;
+          Phone: RXData.RSTReceived := 50 + (Ord(TestString[1]) - 48);
+        end;
+      end
+      else
+        RXData.RSTReceived := StrToInt(TestString);
 
-      end;
+    end;
   end;
 
   if (RXData.DomesticQTH <> '') and (RXData.RSTReceived = 0) then
   begin
     case ActiveMode of
       Phone: RXData.RSTReceived := 59;
-    else RXData.RSTReceived := 599;
+    else
+      RXData.RSTReceived := 599;
     end;
   end;
 
   ProcessRSTAndGridSquareExchange := FoundDomesticQTH(RXData);
 end;
 
-function ProcessNameAndPossibleGridSquareExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessNameAndPossibleGridSquareExchange(Exchange: ShortString {Str80};
+  var RXData: ContestExchange): boolean;
 
 var
-  TestString                            : Str80;
+  TestString: Str80;
 
 begin
   ProcessNameAndPossibleGridSquareExchange := False;
   RXData.DomesticQTH := '';
   RXData.Name := '';
 
-  if length(Exchange) = 0 then Exit;
+  if length(Exchange) = 0 then
+    Exit;
 
   while Exchange <> '' do
   begin
@@ -2165,22 +2251,24 @@ begin
         RXData.QTHString := TestString;
       end;
     end
-    else
-      if RXData.Name = '' then RXData.Name := TestString;
+    else if RXData.Name = '' then
+      RXData.Name := TestString;
   end;
 
   ProcessNameAndPossibleGridSquareExchange := RXData.Name <> '';
 end;
 
-function ProcessQSONumberAndDomesticOrDXQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndDomesticOrDXQTHExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 var
-  Result1                               : integer;
+  Result1: integer;
   FirstString, SecondString, ThirdString: Str10 {Str20};
 
 begin
   ProcessQSONumberAndDomesticOrDXQTHExchange := False;
-  if length(Exchange) = 0 then Exit;
+  if length(Exchange) = 0 then
+    Exit;
 
   if not DomesticCountryCall(RXData.Callsign) then
   begin
@@ -2193,12 +2281,11 @@ begin
       Val(FirstString, RXData.NumberReceived, Result1);
       ProcessQSONumberAndDomesticOrDXQTHExchange := Result1 = 0;
     end
-    else
-      if StringIsAllNumbers(SecondString) then
-      begin
-        Val(SecondString, RXData.NumberReceived, Result1);
-        ProcessQSONumberAndDomesticOrDXQTHExchange := Result1 = 0;
-      end;
+    else if StringIsAllNumbers(SecondString) then
+    begin
+      Val(SecondString, RXData.NumberReceived, Result1);
+      ProcessQSONumberAndDomesticOrDXQTHExchange := Result1 = 0;
+    end;
 
     RXData.QTHString := RXData.QTH.CountryID;
   end
@@ -2219,7 +2306,8 @@ begin
   begin
     inc(NumberEntries);
     Entries[NumberEntries] := RemoveFirstString(Exchange);
-    if NumberEntries = 10 then Exit;
+    if NumberEntries = 10 then
+      Exit;
   end;
 end;
 
@@ -2229,11 +2317,11 @@ type
   pSTRING = ^string;
 
 var
-  CharIndex, iDstPtrIndex               : integer;
-  bInField                              : boolean;
-  aps                                   : array[0..3] of pShortString;
-  ps                                    : pShortString;
-  c                                     : Char;
+  CharIndex, iDstPtrIndex: integer;
+  bInField: boolean;
+  aps: array[0..3] of pShortString;
+  ps: pShortString;
+  c: Char;
 
 begin
 
@@ -2266,12 +2354,11 @@ begin
       else
         ps^ := ps^ + c;
     end
-    else
-      if bInField then
-      begin
-        bInField := False;
-        inc(iDstPtrIndex);
-      end
+    else if bInField then
+    begin
+      bInField := False;
+      inc(iDstPtrIndex);
+    end
   end;
 
 end;
@@ -2282,8 +2369,8 @@ type
   GOT = (gotNIL, gotLETTER, gotNUMBER);
 
 var
-  CharIndex, nChanges                   : integer;
-  gotWhat                               : GOT;
+  CharIndex, nChanges: integer;
+  gotWhat: GOT;
 
 begin
   LooksLikeACallSign := False;
@@ -2294,7 +2381,8 @@ begin
     if Call[1] in ['S', 'N'] then
       if Call[2] = 'A' then
         if Call[3] = '/' then
-          if Call[4] in ['M', 'Y', 'Q', 'C'] then Exit;
+          if Call[4] in ['M', 'Y', 'Q', 'C'] then
+            Exit;
   end;
 
   gotWhat := gotNIL;
@@ -2304,36 +2392,39 @@ begin
   begin
     if (Call[CharIndex] >= 'A') and (Call[CharIndex] <= 'Z') then
     begin
-      if gotWhat = gotNUMBER then inc(nChanges);
+      if gotWhat = gotNUMBER then
+        inc(nChanges);
       gotWhat := gotLETTER;
     end
-    else
-      if (Call[CharIndex] >= '0') and (Call[CharIndex] <= '9') then
+    else if (Call[CharIndex] >= '0') and (Call[CharIndex] <= '9') then
+    begin
+      { Calls don't end with numbers unless already have '/' }
+
+      if CharIndex = length(Call) then
+        Exit;
+
+      { Calls don't start with two numbers }
+
+      if (gotWhat = gotNUMBER) and (CharIndex = 2) then
+        Exit;
+
+      if gotWhat = gotLETTER then
+        inc(nChanges);
+
+      gotWhat := gotNUMBER;
+    end
+    else if Call[CharIndex] = '/' then
+    begin
+      if ((CharIndex > 3) and (CharIndex <> length(Call)) or
+        ((CharIndex < length(Call)) and (CharIndex > 1))) then
       begin
-            { Calls don't end with numbers unless already have '/' }
+        LooksLikeACallSign := True;
+        Exit;
+      end;
+    end;
 
-        if CharIndex = length(Call) then Exit;
-
-            { Calls don't start with two numbers }
-
-        if (gotWhat = gotNUMBER) and (CharIndex = 2) then Exit;
-
-        if gotWhat = gotLETTER then inc(nChanges);
-
-        gotWhat := gotNUMBER;
-      end
-      else
-        if Call[CharIndex] = '/' then
-        begin
-          if ((CharIndex > 3) and (CharIndex <> length(Call)) or
-            ((CharIndex < length(Call)) and (CharIndex > 1))) then
-          begin
-            LooksLikeACallSign := True;
-            Exit;
-          end;
-        end;
-
-    if ((CharIndex = 1) or (CharIndex = length(Call))) and (Call[CharIndex] = '/') then
+    if ((CharIndex = 1) or (CharIndex = length(Call))) and (Call[CharIndex] =
+      '/') then
     begin
       LooksLikeACallSign := False;
       Exit;
@@ -2344,7 +2435,8 @@ begin
 
 end;
 
-function ProcessQSONumberNameChapterAndQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessQSONumberNameChapterAndQTHExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 { Used for the QCWA contest.  The Chapter might be 2 or 3 integers, of AL
   for At Large.
@@ -2356,18 +2448,22 @@ function ProcessQSONumberNameChapterAndQTHExchange(Exchange: Str80; var RXData: 
 
 var
   FirstString, SecondString, ThirdString, FourthString: Str20;
-  Result1                               : integer;
+  Result1: integer;
 
 begin
   ProcessQSONumberNameChapterAndQTHExchange := False;
 
-  if length(Exchange) < 9 then Exit;
+  if length(Exchange) < 9 then
+    Exit;
 
-  ParseFourFields(Exchange, FirstString, SecondString, ThirdString, FourthString);
+  ParseFourFields(Exchange, FirstString, SecondString, ThirdString,
+    FourthString);
 
   if StringIsAllNumbers(FirstString) then
   begin
-    if not (StringIsAllNumbers(ThirdString) or (UpperCase(ThirdString) = 'AL')) then Exit;
+    if not (StringIsAllNumbers(ThirdString) or (UpperCase(ThirdString) = 'AL'))
+      then
+      Exit;
 
     Val(FirstString, RXData.NumberReceived, Result1);
 
@@ -2379,8 +2475,11 @@ begin
   else { Number at end? }
 
   begin
-    if not StringIsAllNumbers(FourthString) then Exit;
-    if not (StringIsAllNumbers(SecondString) or (UpperCase(SecondString) = 'AL')) then Exit;
+    if not StringIsAllNumbers(FourthString) then
+      Exit;
+    if not (StringIsAllNumbers(SecondString) or (UpperCase(SecondString) = 'AL'))
+      then
+      Exit;
 
     Val(FourthString, RXData.NumberReceived, Result1);
 
@@ -2392,7 +2491,8 @@ begin
   ProcessQSONumberNameChapterAndQTHExchange := True;
 end;
 
-function ProcessCheckAndChapterOrQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessCheckAndChapterOrQTHExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 { Used for the QCWA Golden Anniversay contest.  The Chapter might be 2 or 3
   integers, or AL for At Large with QTH.  The CHECK is two numbers (year).
@@ -2409,9 +2509,11 @@ var
 begin
   ProcessCheckAndChapterOrQTHExchange := False;
 
-  if length(Exchange) < 4 then Exit;
+  if length(Exchange) < 4 then
+    Exit;
 
-  ParseFourFields(Exchange, FirstString, SecondString, ThirdString, FourthString);
+  ParseFourFields(Exchange, FirstString, SecondString, ThirdString,
+    FourthString);
 
   if StringIsAllNumbers(FirstString) then
   begin
@@ -2427,7 +2529,8 @@ begin
   end;
 end;
 
-function ProcessQSONumberNameAndDomesticOrDXQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessQSONumberNameAndDomesticOrDXQTHExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 
 { $Id: proc-nas.pas 1.2 94/09/09 01:48:52 jzap Exp $ }
 
@@ -2451,10 +2554,10 @@ function ProcessQSONumberNameAndDomesticOrDXQTHExchange(Exchange: Str80; var RXD
   changed.  }
 
 var
-  TempString                            : Str20;
-  NumberEntries, Result1                : integer;
-  DX                                    : boolean;
-  EntryList                             : EntryArray;
+  TempString: Str20;
+  NumberEntries, Result1: integer;
+  DX: boolean;
+  EntryList: EntryArray;
 
 begin
   ProcessQSONumberNameAndDomesticOrDXQTHExchange := False;
@@ -2486,31 +2589,31 @@ begin
     begin
       Val(EntryList[1], RXData.NumberReceived, Result1);
       RXData.Name := EntryList[2];
-      if NumberEntries >= 3 then RXData.QTHString := EntryList[3];
+      if NumberEntries >= 3 then
+        RXData.QTHString := EntryList[3];
+    end
+    else if StringIsAllNumbers(EntryList[2]) then
+    begin
+      Val(EntryList[2], RXData.NumberReceived, Result1);
+      RXData.Name := EntryList[1];
+      if NumberEntries >= 3 then
+        RXData.QTHString := EntryList[3];
+    end
+    else if StringIsAllNumbers(EntryList[3]) then
+    begin
+      Val(EntryList[3], RXData.NumberReceived, Result1);
+      RXData.Name := EntryList[1];
+      RXData.QTHString := EntryList[2];
     end
     else
-      if StringIsAllNumbers(EntryList[2]) then
-      begin
-        Val(EntryList[2], RXData.NumberReceived, Result1);
-        RXData.Name := EntryList[1];
-        if NumberEntries >= 3 then RXData.QTHString := EntryList[3];
-      end
-      else
-        if StringIsAllNumbers(EntryList[3]) then
-        begin
-          Val(EntryList[3], RXData.NumberReceived, Result1);
-          RXData.Name := EntryList[1];
-          RXData.QTHString := EntryList[2];
-        end
-        else
-        begin
-          ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
-          Exit;
-        end;
+    begin
+      ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
+      Exit;
+    end;
   end
 
-  else { We have four or more entries, use new procedure }
-    if (NumberEntries = 4) then
+  else
+    { We have four or more entries, use new procedure }if (NumberEntries = 4) then
     begin
       if StringIsAllNumbers(EntryList[2]) then
       begin
@@ -2518,41 +2621,38 @@ begin
         RXData.Name := EntryList[3];
         RXData.QTHString := EntryList[4];
       end
-      else
-        if StringIsAllNumbers(EntryList[3]) then
-        begin
-          Val(EntryList[3], RXData.NumberReceived, Result1);
-          RXData.Name := EntryList[4];
-          RXData.QTHString := EntryList[2];
-        end
-        else
-          if StringIsAllNumbers(EntryList[1]) and StringIsAllNumbers(EntryList[4]) then
-          begin
-            Val(EntryList[4], RXData.NumberReceived, Result1);
-            RXData.Name := EntryList[2];
-            RXData.QTHString := EntryList[3];
-
-
-    end
-    else
-
-      { Last chance - five or more entries }
-
-      if StringIsAllNumbers(EntryList[NumberEntries - 2]) then
+      else if StringIsAllNumbers(EntryList[3]) then
       begin
-        Val(EntryList[NumberEntries - 2], RXData.NumberReceived, Result1);
-        RXData.Name := EntryList[NumberEntries - 1];
-        RXData.QTHString := EntryList[NumberEntries];
+        Val(EntryList[3], RXData.NumberReceived, Result1);
+        RXData.Name := EntryList[4];
+        RXData.QTHString := EntryList[2];
+      end
+      else if StringIsAllNumbers(EntryList[1]) and
+        StringIsAllNumbers(EntryList[4]) then
+      begin
+        Val(EntryList[4], RXData.NumberReceived, Result1);
+        RXData.Name := EntryList[2];
+        RXData.QTHString := EntryList[3];
+
       end
       else
-      If (NumberEntries = 4) then    // n4af 4.51.6 allow name correction
-      if ((IsAlpha(EntryList[4])) and (StringIsAllNumbers(EntryList[1]))) then
-      begin
-       Val(EntryList[1], RXData.NumberReceived, Result1);
-       RXData.Name := EntryList[4];
-       RXData.QTHString := EntryList[3];
-      end;
-      end;
+
+        { Last chance - five or more entries }
+        if StringIsAllNumbers(EntryList[NumberEntries - 2]) then
+        begin
+          Val(EntryList[NumberEntries - 2], RXData.NumberReceived, Result1);
+          RXData.Name := EntryList[NumberEntries - 1];
+          RXData.QTHString := EntryList[NumberEntries];
+        end
+        else if (NumberEntries = 4) then // n4af 4.51.6 allow name correction
+          if ((IsAlpha(EntryList[4])) and (StringIsAllNumbers(EntryList[1])))
+            then
+          begin
+            Val(EntryList[1], RXData.NumberReceived, Result1);
+            RXData.Name := EntryList[4];
+            RXData.QTHString := EntryList[3];
+          end;
+    end;
   if (RXData.Name = '') or ((RXData.QTHString = '') and not DX) then
   begin
     ExchangeErrorMessage := TC_MISSINGQTHANDORNAME;
@@ -2576,27 +2676,26 @@ begin
 
   if not DomesticCountryCall(RXData.Callsign) then
     ProcessQSONumberNameAndDomesticOrDXQTHExchange := True
+  else if FoundDomesticQTH(RXData) then
+    ProcessQSONumberNameAndDomesticOrDXQTHExchange := True
   else
+  begin
+    TempString := RXData.Name;
+    RXData.Name := RXData.QTHString;
+    RXData.QTHString := TempString;
+
     if FoundDomesticQTH(RXData) then
       ProcessQSONumberNameAndDomesticOrDXQTHExchange := True
     else
-    begin
-      TempString := RXData.Name;
-      RXData.Name := RXData.QTHString;
-      RXData.QTHString := TempString;
+      ExchangeErrorMessage := TC_IMPROPERDOMESITCQTHORMISSINGNAME;
 
-      if FoundDomesticQTH(RXData) then
-        ProcessQSONumberNameAndDomesticOrDXQTHExchange := True
-      else
-        ExchangeErrorMessage := TC_IMPROPERDOMESITCQTHORMISSINGNAME;
-
-    end;
+  end;
 end;
 
 procedure ProcessSSEntry(InputString: Str80);
 
 var
-  NumberStr, TempString                 : Str20;
+  NumberStr, TempString: Str20;
 
 begin
   TempString := InputString;
@@ -2611,7 +2710,8 @@ begin
     Delete(TempString, 1, 1);
   end;
 
-  if length(NumberStr) > 4 then Exit; { I don't like this! }
+  if length(NumberStr) > 4 then
+    Exit; { I don't like this! }
 
   if (TempString = '') then { All we had was numbers.  Is it a check? }
   begin
@@ -2619,12 +2719,11 @@ begin
     begin
       if SSEx.Check = '' then
         SSEx.Check := NumberStr
-      else
-        if (SSEx.Number = '') {and (SSEx.Prec <> CHR(0))} then
-          SSEx.Number := NumberStr;
+      else if (SSEx.Number = '') {and (SSEx.Prec <> CHR(0))} then
+        SSEx.Number := NumberStr;
     end
-    else
-      if SSEx.Number = '' then SSEx.Number := NumberStr;
+    else if SSEx.Number = '' then
+      SSEx.Number := NumberStr;
 
     Exit;
   end;
@@ -2632,12 +2731,15 @@ begin
   { Gee, this next one works even if the guy only entered A B or Q! }
   if length(TempString) = 1 then
     if TempString[1] in SSPrec then
-{
-    IF (TempString = 'A') OR (TempString = 'B') OR (TempString = 'Q') OR
-       (TempString = 'U') OR (TempString = 'M') OR (TempString = 'S') THEN
-    }begin
-      if SSEx.Number = '' then SSEx.Number := NumberStr;
-      if SSEx.Prec = CHR(0) then SSEx.Prec := TempString[1];
+      {
+          IF (TempString = 'A') OR (TempString = 'B') OR (TempString = 'Q') OR
+             (TempString = 'U') OR (TempString = 'M') OR (TempString = 'S') THEN
+          }
+    begin
+      if SSEx.Number = '' then
+        SSEx.Number := NumberStr;
+      if SSEx.Prec = CHR(0) then
+        SSEx.Prec := TempString[1];
       Exit;
     end;
 
@@ -2645,41 +2747,48 @@ begin
 
   if length(TempString) > 0 then
     if TempString[1] in SSPrec then
-{
-    IF (Copy (TempString, 1, 1) = 'A') OR
-       (Copy (TempString, 1, 1) = 'B') OR
-       (Copy (TempString, 1, 1) = 'Q') OR
-       (Copy (TempString, 1, 1) = 'U') OR
-       (Copy (TempString, 1, 1) = 'M') OR
-       (Copy (TempString, 1, 1) = 'S') THEN
-}
-  { We might have a precedence and more info.  The only legal thing after
-    a real precedence is a number.  Otherwise, it must be part of the
-    section (ie: AB or AL) }
+      {
+          IF (Copy (TempString, 1, 1) = 'A') OR
+             (Copy (TempString, 1, 1) = 'B') OR
+             (Copy (TempString, 1, 1) = 'Q') OR
+             (Copy (TempString, 1, 1) = 'U') OR
+             (Copy (TempString, 1, 1) = 'M') OR
+             (Copy (TempString, 1, 1) = 'S') THEN
+      }
+        { We might have a precedence and more info.  The only legal thing after
+          a real precedence is a number.  Otherwise, it must be part of the
+          section (ie: AB or AL) }
 
       if StringIsAllNumbers(Copy(TempString, 2, 1)) then
 
-  { Okay, we have the A/B/Q/U/M/S followed by a number.  We will
-    assume this to be the precedence. }
+        { Okay, we have the A/B/Q/U/M/S followed by a number.  We will
+          assume this to be the precedence. }
 
       begin
-        if SSEx.Number = '' then SSEx.Number := NumberStr;
-        if SSEx.Prec = CHR(0) then SSEx.Prec := TempString[1];
-        if SSEx.Check = '' then SSEx.Check := Copy(TempString, 2, 2);
+        if SSEx.Number = '' then
+          SSEx.Number := NumberStr;
+        if SSEx.Prec = CHR(0) then
+          SSEx.Prec := TempString[1];
+        if SSEx.Check = '' then
+          SSEx.Check := Copy(TempString, 2, 2);
         Delete(TempString, 1, 3);
-        if SSEx.Section = '' then SSEx.Section := TempString;
+        if SSEx.Section = '' then
+          SSEx.Section := TempString;
         Exit;
       end;
 
   { We must be looking at a check and section, or maybe just a section }
 
   if length(NumberStr) = 2 then
-    if SSEx.Check = '' then SSEx.Check := NumberStr;
+    if SSEx.Check = '' then
+      SSEx.Check := NumberStr;
 
-  if SSEx.Section = '' then SSEx.Section := TempString;
+  if SSEx.Section = '' then
+    SSEx.Section := TempString;
 end;
 
-function ProcessQSONumberPrecedenceCheckDomesticQTHExchange(Exchange: ShortString {Str80};
+function ProcessQSONumberPrecedenceCheckDomesticQTHExchange(Exchange: ShortString
+  {Str80};
   var RXData: ContestExchange): boolean;
 
 { A new improved version!  It tries to maintain compatability with the old
@@ -2700,16 +2809,17 @@ function ProcessQSONumberPrecedenceCheckDomesticQTHExchange(Exchange: ShortStrin
 }
 
 var
-  Entries                               : array[0..10] of Str20;
-  NumberEntries                         : integer;
-  Entry, Result1                        : integer;
+  Entries: array[0..10] of Str20;
+  NumberEntries: integer;
+  Entry, Result1: integer;
 
 begin
   ProcessQSONumberPrecedenceCheckDomesticQTHExchange := False;
 
   Windows.ZeroMemory(@SSEx, SizeOf(SSEx));
   Windows.ZeroMemory(@Entries, SizeOf(Entries));
-  if length(Exchange) < 6 then Exit;
+  if length(Exchange) < 6 then
+    Exit;
 
   NumberEntries := 0;
 
@@ -2729,12 +2839,14 @@ begin
       (SSEx.Section <> '') then
     begin
       Val(SSEx.Number, RXData.NumberReceived, Result1);
-      if Result1 <> 0 then Exit;
+      if Result1 <> 0 then
+        Exit;
 
       RXData.Precedence := SSEx.Prec;
       RXData.Check := StrToInt(SSEx.Check);
 
-      if (length(SSEx.Check) <> 2) or not StringIsAllNumbers(SSEx.Check) then Exit;
+      if (length(SSEx.Check) <> 2) or not StringIsAllNumbers(SSEx.Check) then
+        Exit;
 
       RXData.QTHString := SSEx.Section;
 
@@ -2747,14 +2859,16 @@ begin
   end;
 end;
 
-function LooksLikeRST(Ex: Str80; var RST: Word {RSTString}; Mode: ModeType): boolean;
+function LooksLikeRST(Ex: Str80; var RST: Word {RSTString}; Mode: ModeType):
+  boolean;
 
 begin
   LooksLikeRST := False;
 
   if Mode = CW then
   begin
-    if length(Ex) <> 3 then Exit;
+    if length(Ex) <> 3 then
+      Exit;
 
     if (Ex[1] >= '1') and (Ex[1] <= '5') and
       (Ex[2] >= '1') and (Ex[2] <= '9') and
@@ -2792,10 +2906,11 @@ end;
 function ValidAllJAPrefecture(Prefecture: Str20): boolean;
 
 var
-  PrefectureValue, Result1              : integer;
+  PrefectureValue, Result1: integer;
 
 begin
-  if Copy(Prefecture, 1, 1) = 'p' then Delete(Prefecture, 1, 1);
+  if Copy(Prefecture, 1, 1) = 'p' then
+    Delete(Prefecture, 1, 1);
 
   Val(Prefecture, PrefectureValue, Result1);
 
@@ -2809,15 +2924,15 @@ begin
     ((PrefectureValue > 100) and (PrefectureValue < 115));
 end;
 
-function ProcessRSTAllJAPrefectureAndPrecedenceExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAllJAPrefectureAndPrecedenceExchange(Exchange: ShortString
+  {Str80}; var RXData: ContestExchange): boolean;
 
 { Updated for new rules.  Exchange now RS(T) + Prefixture # + Power (A/B/C) }
 
 var
-  ExchangeString                        : ShortString; {STR20} {WLI}
-  Entries                               : array[0..10] of ShortString {Str20}; {WLI}
-  NumberEntries                         : integer;
-
+  ExchangeString: ShortString; {STR20} {WLI}
+  Entries: array[0..10] of ShortString {Str20}; {WLI}
+  NumberEntries: integer;
 
 begin
   Exchange := UpperCase(Exchange);
@@ -2834,24 +2949,21 @@ begin
     RXData.Precedence := 'H';
     Delete(Exchange, pos('H', Exchange), 1);
   end
-  else
-    if StringHas(Exchange, 'M') then
-    begin
-      RXData.Precedence := 'M';
-      Delete(Exchange, pos('M', Exchange), 1);
-    end
-    else
-      if StringHas(Exchange, 'L') then
-      begin
-        RXData.Precedence := 'L';
-        Delete(Exchange, pos('L', Exchange), 1);
-      end
-      else
-        if StringHas(Exchange, 'P') then
-        begin
-          RXData.Precedence := 'P';
-          Delete(Exchange, pos('P', Exchange), 1);
-        end;
+  else if StringHas(Exchange, 'M') then
+  begin
+    RXData.Precedence := 'M';
+    Delete(Exchange, pos('M', Exchange), 1);
+  end
+  else if StringHas(Exchange, 'L') then
+  begin
+    RXData.Precedence := 'L';
+    Delete(Exchange, pos('L', Exchange), 1);
+  end
+  else if StringHas(Exchange, 'P') then
+  begin
+    RXData.Precedence := 'P';
+    Delete(Exchange, pos('P', Exchange), 1);
+  end;
 
   GetRidOfPostcedingSpaces(Exchange);
 
@@ -2880,21 +2992,21 @@ begin
             if ValidAllJAPrefecture(Copy(Entries[0], 2, 3)) then
             begin
               RXData.QTHString := 'p' + Copy(Entries[0], 2, 3);
-                    //              RXData.RSTReceived[2] := Entries[0][1];
+              //              RXData.RSTReceived[2] := Entries[0][1];
             end;
 
         5:
           if ValidAllJAPrefecture(Copy(Entries[0], 4, 2)) then
           begin
             RXData.QTHString := 'p' + Copy(Entries[0], 4, 2);
-                  //            RXData.RSTReceived := Copy(Entries[0], 1, 3);
+            //            RXData.RSTReceived := Copy(Entries[0], 1, 3);
           end;
 
         6:
           if ValidAllJAPrefecture(Copy(Entries[0], 4, 3)) then
           begin
             RXData.QTHString := 'p' + Copy(Entries[0], 4, 3);
-                  //            RXData.RSTReceived := Copy(Entries[0], 1, 3);
+            //            RXData.RSTReceived := Copy(Entries[0], 1, 3);
           end;
 
       end;
@@ -2910,12 +3022,11 @@ begin
         3:
           if ValidAllJAPrefecture(Entries[0]) then
             RXData.QTHString := 'p' + Entries[0]
-          else
-            if ValidAllJAPrefecture(Copy(Entries[0], 2, 2)) then
-            begin
-              RXData.QTHString := Copy(Entries[0], 2, 2);
-                    //              RXData.RSTReceived[2] := Entries[0][1];
-            end;
+          else if ValidAllJAPrefecture(Copy(Entries[0], 2, 2)) then
+          begin
+            RXData.QTHString := Copy(Entries[0], 2, 2);
+            //              RXData.RSTReceived[2] := Entries[0][1];
+          end;
 
         4:
           if Copy(Entries[0], 2, 1) = '1' then
@@ -2923,21 +3034,20 @@ begin
             if ValidAllJAPrefecture(Copy(Entries[0], 2, 3)) then
             begin
               RXData.QTHString := 'p' + Copy(Entries[0], 2, 3);
-                      //              RXData.RSTReceived[2] := Entries[0][1];
+              //              RXData.RSTReceived[2] := Entries[0][1];
             end;
           end
-          else
-            if ValidAllJAPrefecture(Copy(Entries[0], 3, 2)) then
-            begin
-              RXData.QTHString := 'p' + Copy(Entries[0], 3, 2);
-                    //              RXData.RSTReceived := Copy(Entries[0], 1, 2);
-            end;
+          else if ValidAllJAPrefecture(Copy(Entries[0], 3, 2)) then
+          begin
+            RXData.QTHString := 'p' + Copy(Entries[0], 3, 2);
+            //              RXData.RSTReceived := Copy(Entries[0], 1, 2);
+          end;
 
         5:
           if ValidAllJAPrefecture(Copy(Entries[0], 3, 3)) then
           begin
             RXData.QTHString := 'p' + Copy(Entries[0], 3, 3);
-                  //            RXData.RSTReceived := Copy(Entries[0], 1, 2);
+            //            RXData.RSTReceived := Copy(Entries[0], 1, 2);
           end;
 
       end;
@@ -2952,67 +3062,70 @@ begin
     if ValidAllJAPrefecture(Entries[0]) then
       if not ValidAllJAPrefecture(Entries[1]) then
       begin
-            {
-                    RXData.QTHString := Entries[0];
+        {
+                RXData.QTHString := Entries[0];
 
-                    case length(Entries[1]) of
-                      1: RXData.RSTReceived[2] := Entries[1][1];
+                case length(Entries[1]) of
+                  1: RXData.RSTReceived[2] := Entries[1][1];
 
-                      2:
-                        if ActiveMode = Phone then
-                          RXData.RSTReceived := Entries[1];
+                  2:
+                    if ActiveMode = Phone then
+                      RXData.RSTReceived := Entries[1];
 
-                      3:
-                        if ActiveMode = CW then
-                          RXData.RSTReceived := Entries[1];
-                    end;
-            }
+                  3:
+                    if ActiveMode = CW then
+                      RXData.RSTReceived := Entries[1];
+                end;
+        }
       end;
 
     if ValidAllJAPrefecture(Entries[1]) then
       if not ValidAllJAPrefecture(Entries[0]) then
       begin
         RXData.QTHString := Entries[1];
-            {
-                    case length(Entries[0]) of
-                      1: RXData.RSTReceived[2] := Entries[0][1];
+        {
+                case length(Entries[0]) of
+                  1: RXData.RSTReceived[2] := Entries[0][1];
 
-                      2:
-                        if ActiveMode = Phone then
-                          RXData.RSTReceived := Entries[0];
+                  2:
+                    if ActiveMode = Phone then
+                      RXData.RSTReceived := Entries[0];
 
-                      3:
-                        if ActiveMode = CW then
-                          RXData.RSTReceived := Entries[0];
+                  3:
+                    if ActiveMode = CW then
+                      RXData.RSTReceived := Entries[0];
 
-                    end;
-                  }
+                end;
+              }
       end;
 
     if ValidAllJAPrefecture(Entries[0]) then
       if ValidAllJAPrefecture(Entries[1]) then { Both valid }
       begin
-            {
-                    case length(Entries[0]) of
-                      1: RXData.RSTReceived[2] := Entries[0][1];
-                      2:
-                        if ActiveMode = Phone then RXData.RSTReceived := Entries[0];
-                      3:
-                        if ActiveMode = CW then RXData.RSTReceived := Entries[0];
-                    end;
-            }
+        {
+                case length(Entries[0]) of
+                  1: RXData.RSTReceived[2] := Entries[0][1];
+                  2:
+                    if ActiveMode = Phone then RXData.RSTReceived := Entries[0];
+                  3:
+                    if ActiveMode = CW then RXData.RSTReceived := Entries[0];
+                end;
+        }
         RXData.QTHString := Entries[1];
       end;
 
   end;
 
-  if not ValidAllJAPrefecture(RXData.QTHString) then Exit;
-  if not FoundDomesticQTH(RXData) then Exit;
+  if not ValidAllJAPrefecture(RXData.QTHString) then
+    Exit;
+  if not FoundDomesticQTH(RXData) then
+    Exit;
 
   ProcessRSTAllJAPrefectureAndPrecedenceExchange := RXData.Precedence <> '';
 end;
 
-function ProcessRSTAndAgeExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTAndAgeExchange(Exchange: Str80; var RXData: ContestExchange):
+  boolean;
 
 { The exchange must be made of only digits and spaces.  If the exchange has
   a space, the RS(T) is assumed to be the first entry, and the age the
@@ -3022,16 +3135,17 @@ function ProcessRSTAndAgeExchange(Exchange: Str80; var RXData: ContestExchange):
   the RS(T) information.                        }
 
 var
-  ExchangeString                        : ShortString;
-  Entries                               : array[0..10] of ShortString {Str20};
-  NumberEntries                         : integer;
-  TempInt                               : integer;
+  ExchangeString: ShortString;
+  Entries: array[0..10] of ShortString {Str20};
+  NumberEntries: integer;
+  TempInt: integer;
 begin
   RXData.RSTReceived := DefaultRST;
 
   ProcessRSTAndAgeExchange := False;
 
-  if not StringIsAllNumbersOrSpaces(Exchange) then Exit;
+  if not StringIsAllNumbersOrSpaces(Exchange) then
+    Exit;
 
   NumberEntries := 0;
 
@@ -3044,10 +3158,12 @@ begin
     inc(NumberEntries);
   end;
 
-  if (NumberEntries = 1) and ((length(Entries[0]) = 2) or (length(Entries[0]) = 3)) then
+  if (NumberEntries = 1) and ((length(Entries[0]) = 2) or (length(Entries[0]) =
+    3)) then
   begin
     TempInt := StrToInt(Entries[0]);
-    if TempInt > 255 then Exit;
+    if TempInt > 255 then
+      Exit;
     RXData.Age := Byte(TempInt);
     ProcessRSTAndAgeExchange := True;
     Exit;
@@ -3057,11 +3173,10 @@ begin
   begin
     if LooksLikeRST(Entries[0], RXData.RSTReceived, ActiveMode) then
       RXData.Age := StrToInt(Entries[1])
+    else if LooksLikeRST(Entries[1], RXData.RSTReceived, ActiveMode) then
+      RXData.Age := StrToInt(Entries[0])
     else
-      if LooksLikeRST(Entries[1], RXData.RSTReceived, ActiveMode) then
-        RXData.Age := StrToInt(Entries[0])
-      else
-        RXData.Age := StrToInt(Entries[1]);
+      RXData.Age := StrToInt(Entries[1]);
 
     ProcessRSTAndAgeExchange := RXData.Age <> 0 {length(RXData.Age) = 2};
     Exit;
@@ -3071,11 +3186,10 @@ begin
   begin
     if LooksLikeRST(Entries[1], RXData.RSTReceived, ActiveMode) then
       RXData.Age := StrToInt(Entries[2])
+    else if LooksLikeRST(Entries[2], RXData.RSTReceived, ActiveMode) then
+      RXData.Age := StrToInt(Entries[1])
     else
-      if LooksLikeRST(Entries[2], RXData.RSTReceived, ActiveMode) then
-        RXData.Age := StrToInt(Entries[1])
-      else
-        RXData.Age := StrToInt(Entries[2]);
+      RXData.Age := StrToInt(Entries[2]);
 
     ProcessRSTAndAgeExchange := RXData.Age <> 0 {length(RXData.Age) = 2};
     Exit;
@@ -3100,7 +3214,8 @@ begin
 
     4:
       begin
-        if ActiveMode <> Phone then Exit;
+        if ActiveMode <> Phone then
+          Exit;
         //        RXData.RSTReceived := Copy(Exchange, 1, 2);
         RXData.Age := StrToInt(Copy(Exchange, 3, 2));
         ProcessRSTAndAgeExchange := True;
@@ -3108,7 +3223,8 @@ begin
 
     5:
       begin
-        if ActiveMode <> CW then Exit;
+        if ActiveMode <> CW then
+          Exit;
         //        RXData.RSTReceived := Copy(Exchange, 1, 3);
         RXData.Age := StrToInt(Copy(Exchange, 4, 2));
         ProcessRSTAndAgeExchange := True;
@@ -3116,22 +3232,27 @@ begin
   end; { of case Length (Exchange) }
 end;
 
-function ProcessRSTAndPrefectureExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTAndPrefectureExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 var
-  ExchangeString                        : Str80;
-  Entries                               : array[0..3] of Str80;
-  NumberEntries                         : integer;
+  ExchangeString: Str80;
+  Entries: array[0..3] of Str80;
+  NumberEntries: integer;
 
 begin
   RXData.RSTReceived := DefaultRST;
 
   ProcessRSTAndPrefectureExchange := False;
 
-  if not StringIsAllNumbersOrSpaces(Exchange) then Exit;
+  if not StringIsAllNumbersOrSpaces(Exchange) then
+    Exit;
 
-  if length(RXData.QTH.CountryID) < 2 then Exit;
-  if not ((RXData.QTH.CountryID[1] = 'J') and (RXData.QTH.CountryID[2] in ['A', 'D'])) then Exit;
+  if length(RXData.QTH.CountryID) < 2 then
+    Exit;
+  if not ((RXData.QTH.CountryID[1] = 'J') and (RXData.QTH.CountryID[2] in ['A',
+    'D'])) then
+    Exit;
 
   NumberEntries := 0;
 
@@ -3146,7 +3267,7 @@ begin
 
   if (NumberEntries = 1) then
   begin
-    RXData.QTHString := {'p' +} Entries[0];
+    RXData.QTHString := {'p' +}Entries[0];
     ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
     Exit;
   end;
@@ -3155,152 +3276,163 @@ begin
   begin
     if LooksLikeRST(Entries[0], RXData.RSTReceived, ActiveMode) then
       RXData.QTHString := Entries[1]
+    else if LooksLikeRST(Entries[1], RXData.RSTReceived, ActiveMode) then
+      RXData.QTHString := Entries[0]
     else
+      RXData.QTHString := Entries[1];
+
+    ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
+    Exit;
+  end;
+
+  {
+    if NumberEntries = 3 then
+    begin
       if LooksLikeRST(Entries[1], RXData.RSTReceived, ActiveMode) then
-        RXData.QTHString := Entries[0]
+        RXData.QTHString := 'p' + Entries[2]
       else
-        RXData.QTHString := Entries[1];
+        if LooksLikeRST(Entries[2], RXData.RSTReceived, ActiveMode) then
+          RXData.QTHString := 'p' + Entries[1]
+        else
+          RXData.QTHString := 'p' + Entries[2];
 
-    ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
-    Exit;
-  end;
-
-{
-  if NumberEntries = 3 then
-  begin
-    if LooksLikeRST(Entries[1], RXData.RSTReceived, ActiveMode) then
-      RXData.QTHString := 'p' + Entries[2]
-    else
-      if LooksLikeRST(Entries[2], RXData.RSTReceived, ActiveMode) then
-        RXData.QTHString := 'p' + Entries[1]
-      else
-        RXData.QTHString := 'p' + Entries[2];
-
-    ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
-    Exit;
-  end;
-}
+      ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
+      Exit;
+    end;
+  }
   case length(Exchange) of
     2:
       begin
-//        RXData.QTHString := 'p' + Exchange;
-//        ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
+        //        RXData.QTHString := 'p' + Exchange;
+        //        ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
       end;
 
     3:
       begin
-{
-        Delete(DefaultRST, 2, 1);
-        Insert(Exchange[1], DefaultRST, 2);
-        RXData.RSTReceived := DefaultRST;
-        Delete(Exchange, 1, 1);
-        RXData.QTHString := 'p' + Exchange;
-        ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
-}
+        {
+                Delete(DefaultRST, 2, 1);
+                Insert(Exchange[1], DefaultRST, 2);
+                RXData.RSTReceived := DefaultRST;
+                Delete(Exchange, 1, 1);
+                RXData.QTHString := 'p' + Exchange;
+                ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
+        }
       end;
 
     4:
       begin
-{
-        if ActiveMode <> Phone then Exit;
-        RXData.RSTReceived := Copy(Exchange, 1, 2);
-        RXData.QTHString := 'p' + Copy(Exchange, 3, 2);
-        ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
-}
+        {
+                if ActiveMode <> Phone then Exit;
+                RXData.RSTReceived := Copy(Exchange, 1, 2);
+                RXData.QTHString := 'p' + Copy(Exchange, 3, 2);
+                ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
+        }
       end;
 
     5:
       begin
-{
-        if ActiveMode <> CW then Exit;
-        RXData.RSTReceived := Copy(Exchange, 1, 3);
-        RXData.QTHString := 'p' + Copy(Exchange, 4, 2);
-        ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
-}
+        {
+                if ActiveMode <> CW then Exit;
+                RXData.RSTReceived := Copy(Exchange, 1, 3);
+                RXData.QTHString := 'p' + Copy(Exchange, 4, 2);
+                ProcessRSTAndPrefectureExchange := FoundDomesticQTH(RXData);
+        }
       end;
   end; { of case Length (Exchange) }
 end;
 
-function ProcessRSTAgeAndQSONumberExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;   // 4.55.4
-var firststring,secondstring,thirdstring : str10;
+function ProcessRSTAgeAndQSONumberExchange(Exchange: ShortString; var RXData:
+  ContestExchange): boolean; // 4.55.4
+var
+  firststring, secondstring, thirdstring: str10;
 begin
   ColumnsArray[logColNumberSent].Enable := True;
   ColumnsArray[logColNumberReceive].Enable := True;
-  ColumnsArray[logColCheck].Enable := True;  
- ParseExchange(exchange,FirstString,SecondString,ThirdString);
- if SecondString = '' then exit;
- if thirdstring <> '' then
- begin
+  ColumnsArray[logColCheck].Enable := True;
+  ParseExchange(exchange, FirstString, SecondString, ThirdString);
+  if SecondString = '' then
+    exit;
+  if thirdstring <> '' then
+  begin
     if ActiveMode = CW then
-    if (length(FirstString) <> 3) then exit;
+      if (length(FirstString) <> 3) then
+        exit;
     if ActiveMode = Phone then
-    if length(FirstString) <>  2 then exit;
-   case ActiveMode of
-        CW:  RXData.RSTReceived := StrToInt(Copy(Exchange,1,3));
-      Phone: Rxdata.RSTReceived := StrToInt(Copy(Exchange,1,2));
-  end;   end;
+      if length(FirstString) <> 2 then
+        exit;
+    case ActiveMode of
+      CW: RXData.RSTReceived := StrToInt(Copy(Exchange, 1, 3));
+      Phone: Rxdata.RSTReceived := StrToInt(Copy(Exchange, 1, 2));
+    end;
+  end;
   if thirdstring = '' then
-   begin
+  begin
 
     case ActiveMode of
-        CW:  RXData.RSTReceived := 599;
-     Phone:  RXData.RSTReceived := 59;
+      CW: RXData.RSTReceived := 599;
+      Phone: RXData.RSTReceived := 59;
     end;
     RXData.Age := StrToInt(FirstString);
-     RXData.NumberReceived := StrToInt(SecondString);
-     end
+    RXData.NumberReceived := StrToInt(SecondString);
+  end
   else
-   begin
-      RXData.Age := StrToInt(SecondString);
+  begin
+    RXData.Age := StrToInt(SecondString);
     RXData.NumberReceived := StrToInt(ThirdString);
-   end;
+  end;
 
-  
-    Result := True;
-   
- end;
- function ProcessAgeAndQSONumberExchange(Exchange: ShortString; var RXData: ContestExchange): boolean;
-var firststring,secondstring,thirdstring : str10;
+  Result := True;
+
+end;
+
+function ProcessAgeAndQSONumberExchange(Exchange: ShortString; var RXData:
+  ContestExchange): boolean;
+var
+  firststring, secondstring, thirdstring: str10;
 
 begin
-ParseExchange(exchange,FirstString,SecondString,ThirdString);    //n4af 04.42.4
+  ParseExchange(exchange, FirstString, SecondString, ThirdString); //n4af 04.42.4
   Result := False;
-  if (SecondString = '') and (ThirdString = '') then exit  ; // n4af 4.45.7
-  if length(Exchange) < 3 then Exit;
-  if not StringIsAllNumbers(FirstString) then Exit;
+  if (SecondString = '') and (ThirdString = '') then
+    exit; // n4af 4.45.7
+  if length(Exchange) < 3 then
+    Exit;
+  if not StringIsAllNumbers(FirstString) then
+    Exit;
   RXData.Age := StrToInt(FirstString);
   if ThirdString <> '' then
   begin
-RXData.DomesticQTH := SecondString;
-RXData.NumberReceived := StrToInt(ThirdString)
-end
-else
-begin
-RXData.NumberReceived := StrToInt(SecondString);
-RXData.DomesticQTH := '';
-end;
-if (ActiveMode = CW) or (ActiveMode = Digital) then
- begin
-  RXData.RSTReceived := 599;
-  RXData.RSTSent := 599;
- end
- else
+    RXData.DomesticQTH := SecondString;
+    RXData.NumberReceived := StrToInt(ThirdString)
+  end
+  else
   begin
-     RXData.RSTReceived := 59;
-     RXData.RSTSent := 59;
+    RXData.NumberReceived := StrToInt(SecondString);
+    RXData.DomesticQTH := '';
+  end;
+  if (ActiveMode = CW) or (ActiveMode = Digital) then
+  begin
+    RXData.RSTReceived := 599;
+    RXData.RSTSent := 599;
+  end
+  else
+  begin
+    RXData.RSTReceived := 59;
+    RXData.RSTSent := 59;
   end;
   Result := True;
 end;
 
-function ProcessRSTAndDomesticQTHExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndDomesticQTHExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 
 { Any digits found at the start of the exchange will be used to determine
   the RS(T).  If the first character is not a digit, the default RS(T)
   will be used and the whole exchange will be used as the QTH. }
 
 var
-  TempString                            : Str80;
-  QTHFound                              : boolean;
+  TempString: Str80;
+  QTHFound: boolean;
 
 begin
   QTHFound := False;
@@ -3312,13 +3444,13 @@ begin
   begin
     RXData.RSTReceived := DefaultRST;
     RXData.QTHString := Exchange;
-    if length(Exchange)< 9 then      // n4af 4.43.12
-    ProcessRSTAndDomesticQTHExchange := FoundDomesticQTH(RXData)
+    if length(Exchange) < 9 then // n4af 4.43.12
+      ProcessRSTAndDomesticQTHExchange := FoundDomesticQTH(RXData)
     else
-    Result := False;
-    if Result = False  then
-    ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
-      {WLI}
+      Result := False;
+    if Result = False then
+      ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+    {WLI}
 //    if ActiveExchange = RSTZoneOrSocietyExchange then
 //      if CONTEST <> IARU then RXData.Zone := CountryTable.GetITUZone(RXData.Callsign);
     Exit;
@@ -3341,12 +3473,12 @@ begin
       else
         RXData.RSTReceived := StrToInt(TempString);
     end
-    else
-      if not QTHFound then
-      begin
-        RXData.QTHString := TempString;
-        if FoundDomesticQTH(RXData) then QTHFound := True;
-      end;
+    else if not QTHFound then
+    begin
+      RXData.QTHString := TempString;
+      if FoundDomesticQTH(RXData) then
+        QTHFound := True;
+    end;
   end;
 
   if QTHFound then
@@ -3354,7 +3486,7 @@ begin
     if RXData.RSTReceived = 0 then
       RXData.RSTReceived := DefaultRST;
     ProcessRSTAndDomesticQTHExchange := True;
-      //      Exit;
+    //      Exit;
   end
   else
     ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
@@ -3363,14 +3495,15 @@ end;
 
 {KK1L: 6.72}
 
-function ProcessRSTAndJAPrefectureExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndJAPrefectureExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 
 { A single entry is assumed to be the exchange and not RST. Two entries assume }
 { the RS(T) is the first provided it is 3 characters or less                   }
 
 var
-  TempString                            : Str80;
-  QTHFound                              : boolean;
+  TempString: Str80;
+  QTHFound: boolean;
 
 begin
   QTHFound := False;
@@ -3391,7 +3524,8 @@ begin
   begin
     TempString := RemoveLastString(Exchange);
 
-    if StringIsAllNumbers(TempString) and (RXData.RSTReceived = 0) and (length(TempString) < 4) then
+    if StringIsAllNumbers(TempString) and (RXData.RSTReceived = 0) and
+      (length(TempString) < 4) then
     begin
       if length(TempString) = 1 then
       begin
@@ -3404,12 +3538,12 @@ begin
         RXData.RSTReceived := StrToInt(TempString)
 
     end
-    else
-      if not QTHFound then
-      begin
-        RXData.QTHString := TempString;
-        if FoundDomesticQTH(RXData) then QTHFound := True;
-      end;
+    else if not QTHFound then
+    begin
+      RXData.QTHString := TempString;
+      if FoundDomesticQTH(RXData) then
+        QTHFound := True;
+    end;
   end;
 
   if QTHFound then
@@ -3422,10 +3556,11 @@ begin
 
 end;
 
-function ProcessRSTAndQTHExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndQTHExchange(Exchange: ShortString {Str80}; var RXData:
+  ContestExchange): boolean;
 
 var
-  RSTString                             : Str20;
+  RSTString: Str20;
 
 begin
   GetRidOfPrecedingSpaces(Exchange);
@@ -3456,7 +3591,8 @@ begin
     if StringIsAllNumbersOrSpaces(RSTString) then
     begin
       RXData.RSTReceived := StrToInt(RSTString);
-      RXData.QTHString := Copy(Exchange, 1, length(Exchange) - length(RSTString) - 1);
+      RXData.QTHString := Copy(Exchange, 1, length(Exchange) - length(RSTString)
+        - 1);
     end
     else
     begin
@@ -3465,83 +3601,79 @@ begin
     end;
   end;
 end;
- {
+{
 function ProcessRSTAndFOCNumberExchange(Exchange:Str80; var RXData:ContestExchange):boolean;     //n4af function added 4.32.5
 //    ProcessExchange := ProcessRSTNAMEAndPossibleFOCNumber(ExchangeString, RData);             //n4af add foc marathon
 var
-  NumberEntries,  Result1       : integer;
-    EntryList                             : EntryArray;
-    Exch : Str10;
+ NumberEntries,  Result1       : integer;
+   EntryList                             : EntryArray;
+   Exch : Str10;
+ begin
+ProcessRSTAndFOCNumberExchange := False;
+ ParseExchangeIntoFields(Exchange, EntryList, NumberEntries);
+  if NumberEntries = 1 then
   begin
- ProcessRSTAndFOCNumberExchange := False;
-  ParseExchangeIntoFields(Exchange, EntryList, NumberEntries);
-   if NumberEntries = 1 then
+  RXData.RSTReceived := DefaultRST;
+  RXData.FOCNumber := EntryList[1];
+     end
+  else
+  if ((EntryList[2][1] = '5') and (EntryList[2][3] = '9'))     then
+  begin
+  RXData.RSTReceived := StrToInt(EntryList[2]);
+  RXData.FOCNumber := EntryList[1];
+  end
+  else
+  begin
+  RXData.RSTReceived := StrToInt(EntryList[1]);
+  RXData.FOCNumber := EntryList[2];
+  end;
+  RXData.FOCNumber := Exchange;
+ProcessRSTAndFOCNumberExchange := RXData.FOCNumber <> '';
+
+  ProcessRSTAndFOCNumberExchange := True;
+  end;
+
+  {
+  if StringIsAllNumbers(FirstString) then
+  FirstString := StrToInt(FirstString);
+  else
+  FirstString := DefaultRST;
+
+   SecondString := RXData.Name;
+ if StringIsAllNumbers(ThirdString)  then
+    ThirdString := StrToInt(ThirdString);
+
+   if ThirdString <> '' then
    begin
-   RXData.RSTReceived := DefaultRST;
-   RXData.FOCNumber := EntryList[1];
-      end
-   else
-   if ((EntryList[2][1] = '5') and (EntryList[2][3] = '9'))     then
-   begin
-   RXData.RSTReceived := StrToInt(EntryList[2]);
-   RXData.FOCNumber := EntryList[1];
+     if StringIsAllNumbers(ThirdString) then
+     RXData.NumberReceived := StrToInt(ThirdString);
    end
    else
-   begin
-   RXData.RSTReceived := StrToInt(EntryList[1]);
-   RXData.FOCNumber := EntryList[2];
-   end;
-   RXData.FOCNumber := Exchange;
- ProcessRSTAndFOCNumberExchange := RXData.FOCNumber <> '';
+     RXData.NumberReceived := ' ';
+   Exit;      }
 
-   ProcessRSTAndFOCNumberExchange := True;
-   end;
-
-   {
-   if StringIsAllNumbers(FirstString) then
-   FirstString := StrToInt(FirstString);
-   else
-   FirstString := DefaultRST;
-
-    SecondString := RXData.Name;
-  if StringIsAllNumbers(ThirdString)  then
-     ThirdString := StrToInt(ThirdString);
-
-    if ThirdString <> '' then
-    begin
-      if StringIsAllNumbers(ThirdString) then
-      RXData.NumberReceived := StrToInt(ThirdString);
-    end
-    else
-      RXData.NumberReceived := ' ';
-    Exit;      }
-
-
-
-
-
-
-
-
-
-function ProcessRSTAndDomesticOrDXQTHExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndDomesticOrDXQTHExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 
 begin
   ProcessRSTAndDomesticOrDXQTHExchange := False;
 
   if DomesticCountryCall(RXData.Callsign) then
   begin
-    ProcessRSTAndDomesticOrDXQTHExchange := ProcessRSTAndDomesticQTHExchange(Exchange, RXData);
+    ProcessRSTAndDomesticOrDXQTHExchange :=
+      ProcessRSTAndDomesticQTHExchange(Exchange, RXData);
     Exit;
   end;
 
-//  if not ValidRST(Exchange, RXData.RSTReceived, ActiveMode) then Exit;
-//  ProcessRSTAndDomesticOrDXQTHExchange := True;
+  //  if not ValidRST(Exchange, RXData.RSTReceived, ActiveMode) then Exit;
+  //  ProcessRSTAndDomesticOrDXQTHExchange := True;
 
-  ProcessRSTAndDomesticOrDXQTHExchange := ProcessRSTAndQTHExchange(Exchange, RXData);
+  ProcessRSTAndDomesticOrDXQTHExchange := ProcessRSTAndQTHExchange(Exchange,
+    RXData);
 end;
 
-function ProcessRSTNameAndQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTNameAndQTHExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -3603,10 +3735,10 @@ begin
 
   if ThirdString <> '' then
   begin
-{
-    ProcessRSTNameAndQTHExchange := False;
-    Exit;
-}
+    {
+        ProcessRSTNameAndQTHExchange := False;
+        Exit;
+    }
     SecondString := SecondString + ' ' + ThirdString;
   end;
 
@@ -3618,8 +3750,8 @@ end;
 procedure LookForCutNumbers(var Exchange: ShortString {Str80});
 
 var
-  TempString, NewExchange               : ShortString {Str80};
-  Address                               : integer;
+  TempString, NewExchange: ShortString {Str80};
+  Address: integer;
 
 begin
   NewExchange := '';
@@ -3648,7 +3780,8 @@ begin
   Exchange := NewExchange;
 end;
 
-function ProcessRSTAndQSONumberExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndQSONumberExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -3663,7 +3796,7 @@ function ProcessRSTAndQSONumberExchange(Exchange: ShortString {Str80}; var RXDat
   Cut QSO numbers are changed to numeric. }
 
 var
-  code                                  : integer;
+  code: integer;
 
 begin
   ProcessRSTAndQSONumberExchange := False;
@@ -3673,20 +3806,21 @@ begin
   if StringIsAllNumbers(Exchange) then
   begin
     Val(Exchange, RXData.NumberReceived, code);
-    if code <> 0 then Exit;
+    if code <> 0 then
+      Exit;
     RXData.RSTReceived := DefaultRST;
     ProcessRSTAndQSONumberExchange := True;
   end
+  else if ValidRST(Exchange, RXData.RSTReceived, ActiveMode) then
+  begin
+    Exchange := RemoveFirstString(Exchange);
+    Val(Exchange, RXData.NumberReceived, code);
+    if code <> 0 then
+      Exit;
+    ProcessRSTAndQSONumberExchange := True;
+  end
   else
-    if ValidRST(Exchange, RXData.RSTReceived, ActiveMode) then
-    begin
-      Exchange := RemoveFirstString(Exchange);
-      Val(Exchange, RXData.NumberReceived, code);
-      if code <> 0 then Exit;
-      ProcessRSTAndQSONumberExchange := True;
-    end
-    else
-      ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
+    ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
 
 end;
 
@@ -3695,18 +3829,20 @@ function LooksLikePower(TestString: Str20): boolean;
 { Returns true if entry is all numbers, or all numbers with a W at the end }
 
 var
-  CharPos                               : integer;
+  CharPos: integer;
 
 begin
   LooksLikePower := False;
 
-  if TestString = '' then Exit;
+  if TestString = '' then
+    Exit;
 
   TestString := UpperCase(TestString);
 
   for CharPos := 1 to length(TestString) do
   begin
-    if not (TestString[CharPos] in ['0'..'9', 'W', 'M', 'R']) then Exit;
+    if not (TestString[CharPos] in ['0'..'9', 'W', 'M', 'R']) then
+      Exit;
     {
     if ((TestString[CharPos] < '0') or (TestString[CharPos] > '9')) and
       (TestString[CharPos] <> 'W') and (TestString[CharPos] <> 'M') and
@@ -3717,13 +3853,14 @@ begin
   LooksLikePower := True;
 end;
 
-function ProcessRSTPossibleDomesticQTHAndPowerExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTPossibleDomesticQTHAndPowerExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 
 { RST MaybeQTH and Power.  Power will either have numbers and a W in it, or
   four numbers (for ARCI member number) }
 
 var
-  FirstString, SecondString, ThirdString: {STRING} Str10;
+  FirstString, SecondString, ThirdString: {STRING}Str10;
   ThirdStringRST, SecondStringRST, FirstStringRST: ShortString;
 
 begin
@@ -3734,44 +3871,42 @@ begin
   if StringIsAllNumbers(ThirdString) and (length(ThirdString) <= 3) then
   begin
     ThirdStringRST := ThirdString;
-    if not ValidRST(ThirdStringRST, RXData.RSTReceived, ActiveMode) then Exit;
+    if not ValidRST(ThirdStringRST, RXData.RSTReceived, ActiveMode) then
+      Exit;
   end
+  else if StringIsAllNumbers(SecondString) and (length(SecondString) <= 3) then
+  begin
+    SecondStringRST := SecondString;
+    if not ValidRST(SecondStringRST, RXData.RSTReceived, ActiveMode) then
+      Exit;
+  end
+  else if StringIsAllNumbers(FirstString) and (length(FirstString) <= 3) then
+  begin
+    FirstStringRST := FirstString;
+    if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then
+      Exit;
+  end
+  else if ActiveMode = CW then
+    RXData.RSTReceived := 599
   else
-    if StringIsAllNumbers(SecondString) and (length(SecondString) <= 3) then
-    begin
-      SecondStringRST := SecondString;
-      if not ValidRST(SecondStringRST, RXData.RSTReceived, ActiveMode) then Exit;
-    end
-    else
-      if StringIsAllNumbers(FirstString) and (length(FirstString) <= 3) then
-      begin
-        FirstStringRST := FirstString;
-        if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then Exit;
-      end
-      else
-        if ActiveMode = CW then
-          RXData.RSTReceived := 599
-        else
-          RXData.RSTReceived := 59;
+    RXData.RSTReceived := 59;
 
   if LooksLikePower(ThirdString) then
     RXData.Power := ThirdString
-  else
-    if LooksLikePower(SecondString) then
-      RXData.Power := SecondString
-    else
-      if LooksLikePower(FirstString) then RXData.Power := FirstString;
+  else if LooksLikePower(SecondString) then
+    RXData.Power := SecondString
+  else if LooksLikePower(FirstString) then
+    RXData.Power := FirstString;
 
   if (ThirdString <> '') and (not LooksLikePower(ThirdString)) then
     RXData.QTHString := ThirdString
-  else
-    if (SecondString <> '') and (not LooksLikePower(SecondString)) then
-      RXData.QTHString := SecondString
-    else
-      if (FirstString <> '') and (not LooksLikePower(FirstString)) then
-        RXData.QTHString := FirstString;
+  else if (SecondString <> '') and (not LooksLikePower(SecondString)) then
+    RXData.QTHString := SecondString
+  else if (FirstString <> '') and (not LooksLikePower(FirstString)) then
+    RXData.QTHString := FirstString;
 
-  if RXData.Power = '' then Exit;
+  if RXData.Power = '' then
+    Exit;
 
   { RXData.DXQTH is only there if it is a DX call }
 
@@ -3781,28 +3916,30 @@ begin
     ProcessRSTPossibleDomesticQTHAndPowerExchange := True;
 end;
 
-function ProcessQSONumberAndPreviousQSONumber(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndPreviousQSONumber(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 var
-  l                                     : integer;
+  l: integer;
 
 begin
   Result := False;
   l := length(Exchange);
   if not (l in [4..6]) then
   begin
-     ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
+    ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
     Exit;
   end;
-  if not StringIsAllNumbers(Exchange) then Exit;
-   temprxdata.NumberReceived := StrToInt(Exchange);
-   rxdata.NumberReceived := StrToInt(Exchange);
-  PrevNr := Copy(Exchange, 1, 3);                 // 4.53.2
- 
+  if not StringIsAllNumbers(Exchange) then
+    Exit;
+  temprxdata.NumberReceived := StrToInt(Exchange);
+  rxdata.NumberReceived := StrToInt(Exchange);
+  PrevNr := Copy(Exchange, 1, 3); // 4.53.2
 
   Result := True;
 end;
 
-function ProcessRSTQSONumberAndDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTQSONumberAndDomesticQTHExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -3823,7 +3960,8 @@ var
 
 begin
   ProcessRSTQSONumberAndDomesticQTHExchange := False;
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
@@ -3835,27 +3973,27 @@ begin
     else
       NumberString := SecondString;
   end
-  else
-    if not StringIsAllNumbers(SecondString) then
-    begin
-      RXData.QTHString := SecondString;
-      if ThirdString <> '' then
-        NumberString := FirstString + ' ' + ThirdString
-      else
-        NumberString := FirstString;
-    end
+  else if not StringIsAllNumbers(SecondString) then
+  begin
+    RXData.QTHString := SecondString;
+    if ThirdString <> '' then
+      NumberString := FirstString + ' ' + ThirdString
     else
-    begin
-      RXData.QTHString := ThirdString;
-      NumberString := FirstString + ' ' + SecondString;
-    end;
+      NumberString := FirstString;
+  end
+  else
+  begin
+    RXData.QTHString := ThirdString;
+    NumberString := FirstString + ' ' + SecondString;
+  end;
 
   if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
     if RXData.QTHString <> '' then
       ProcessRSTQSONumberAndDomesticQTHExchange := FoundDomesticQTH(RXData);
 end;
 
-function ProcessRSTQSONumberAndGridSquareExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTQSONumberAndGridSquareExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -3876,7 +4014,8 @@ var
 
 begin
   ProcessRSTQSONumberAndGridSquareExchange := False;
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
@@ -3889,70 +4028,72 @@ begin
     else
       NumberString := SecondString;
   end
-  else
-    if not StringIsAllNumbers(SecondString) then
-    begin
-      RXData.QTHString := SecondString;
-      if ThirdString <> '' then
-        NumberString := FirstString + ' ' + ThirdString
-      else
-        NumberString := FirstString;
-    end
+  else if not StringIsAllNumbers(SecondString) then
+  begin
+    RXData.QTHString := SecondString;
+    if ThirdString <> '' then
+      NumberString := FirstString + ' ' + ThirdString
     else
-    begin
-      RXData.QTHString := ThirdString;
-      NumberString := FirstString + ' ' + SecondString;
-    end;
+      NumberString := FirstString;
+  end
+  else
+  begin
+    RXData.QTHString := ThirdString;
+    NumberString := FirstString + ' ' + SecondString;
+  end;
 
   if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
     if GoodLookingGrid(RXData.QTHString) then
       ProcessRSTQSONumberAndGridSquareExchange := FoundDomesticQTH(RXData);
 end;
- // n4af 4.51.2
-function ProcessRSTQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+// n4af 4.51.2
+
+function ProcessRSTQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 var
   NumberString, FirstString, SecondString, ThirdString: Str10;
 
 begin
   ProcessRSTQSONumberOrDomesticQTHExchange := False;
 
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
-   if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
-   if SecondString = '' then
-  begin
-  ProcessRSTAndDomesticQTHExchange(Exchange, RXData);  // n4af 4.40.5
-  Result := True;
+  if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
+    if SecondString = '' then
+    begin
+      ProcessRSTAndDomesticQTHExchange(Exchange, RXData); // n4af 4.40.5
+      Result := True;
       exit;
-  end;
-  if not StringIsAllNumbers(FirstString) and StringIsAllNumbers(SecondString) then   // n4af 4.42.7
+    end;
+  if not StringIsAllNumbers(FirstString) and StringIsAllNumbers(SecondString)
+    then // n4af 4.42.7
   begin
-  RXData.QTHString := FirstString;
-  RXData.NumberReceived := StrToInt(SecondString);
-  ProcessRSTQSONumberOrDomesticQTHExchange := FoundDomesticQTH(RXData);
-  Result := True;
+    RXData.QTHString := FirstString;
+    RXData.NumberReceived := StrToInt(SecondString);
+    ProcessRSTQSONumberOrDomesticQTHExchange := FoundDomesticQTH(RXData);
+    Result := True;
     exit;
   end;
-     if ThirdString <> '' then
-      NumberString := SecondString + ' ' + ThirdString ;
+  if ThirdString <> '' then
+    NumberString := SecondString + ' ' + ThirdString;
   //  else                                           // N4AF 4.42.9
   //    NumberString := SecondString;
 
-
-    if not StringIsAllNumbers(SecondString) then
-    begin
-      RXData.QTHString := SecondString;
-      if ThirdString <> '' then
-        NumberString := FirstString + ' ' + ThirdString
-      else
-        NumberString := FirstString;
-    end
-     else
-    begin
-      RXData.QTHString := ThirdString;
-      NumberString := FirstString + ' ' + SecondString;
-    end;
+  if not StringIsAllNumbers(SecondString) then
+  begin
+    RXData.QTHString := SecondString;
+    if ThirdString <> '' then
+      NumberString := FirstString + ' ' + ThirdString
+    else
+      NumberString := FirstString;
+  end
+  else
+  begin
+    RXData.QTHString := ThirdString;
+    NumberString := FirstString + ' ' + SecondString;
+  end;
 
   if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
   begin
@@ -3961,12 +4102,12 @@ begin
     else
       ProcessRSTQSONumberOrDomesticQTHExchange := FoundDomesticQTH(RXData)
   end
-   else
+  else
     ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
 end;
 
-
-function ProcessRSTQSONumberAndPossibleDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTQSONumberAndPossibleDomesticQTHExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -3990,74 +4131,77 @@ var
 begin
 
   ProcessRSTQSONumberAndPossibleDomesticQTHExchange := False;
-  if Exchange = '' then Exit;
-
+  if Exchange = '' then
+    Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
-   if Contest = UKEI then
-    begin
-      if (UKEIStation(RXData.Callsign)) then
-       if  (SecondString = '') then
-       begin
-         ExchangeErrorMessage := TC_INVALID;
-          exit;
-        end;
-     end;
-  if not stringisallnumbers(FirstString) then   //   n4af 4.42.9
-   if not stringisallnumbers(SecondString) then
-    if not stringisallnumbers(ThirdString) then
-     begin
-      ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
-      exit;
-     end;
+  if Contest = UKEI then
+  begin
+    if (UKEIStation(RXData.Callsign)) then
+      if (SecondString = '') then
+      begin
+        ExchangeErrorMessage := TC_INVALID;
+        exit;
+      end;
+  end;
+  if not stringisallnumbers(FirstString) then //   n4af 4.42.9
+    if not stringisallnumbers(SecondString) then
+      if not stringisallnumbers(ThirdString) then
+      begin
+        ExchangeErrorMessage := TC_NOQSONUMBERFOUND;
+        exit;
+      end;
 
   if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
-   if SecondString = '' then
-  begin
-  ProcessRSTAndDomesticQTHExchange(Exchange, RXData);  // n4af 4.40.5
-  Result := True;
+    if SecondString = '' then
+    begin
+      ProcessRSTAndDomesticQTHExchange(Exchange, RXData); // n4af 4.40.5
+      Result := True;
       exit;
-  end;
-  if not StringIsAllNumbers(FirstString) and StringIsAllNumbers(SecondString) then   // n4af 4.42.7
+    end;
+  if not StringIsAllNumbers(FirstString) and StringIsAllNumbers(SecondString)
+    then // n4af 4.42.7
   begin
-  RXData.QTHString := FirstString;
-  RXData.NumberReceived := StrToInt(SecondString);
-  ProcessRSTQSONumberAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData);
-  Result := True;
+    RXData.QTHString := FirstString;
+    RXData.NumberReceived := StrToInt(SecondString);
+    ProcessRSTQSONumberAndPossibleDomesticQTHExchange :=
+      FoundDomesticQTH(RXData);
+    Result := True;
     exit;
   end;
-     if ThirdString <> '' then
-      NumberString := SecondString + ' ' + ThirdString ;
+  if ThirdString <> '' then
+    NumberString := SecondString + ' ' + ThirdString;
   //  else                                           // N4AF 4.42.9
   //    NumberString := SecondString;
 
+  if not StringIsAllNumbers(SecondString) then
+  begin
+    RXData.QTHString := SecondString;
+    if ThirdString <> '' then
+      NumberString := FirstString + ' ' + ThirdString
+    else
+      NumberString := FirstString;
+  end
+  else
+  begin
+    RXData.QTHString := ThirdString;
+    NumberString := FirstString + ' ' + SecondString;
+  end;
 
-    if not StringIsAllNumbers(SecondString) then
-    begin
-      RXData.QTHString := SecondString;
-      if ThirdString <> '' then
-        NumberString := FirstString + ' ' + ThirdString
-      else
-        NumberString := FirstString;
-    end
-     else
-    begin
-      RXData.QTHString := ThirdString;
-      NumberString := FirstString + ' ' + SecondString;
-    end;
-
-   if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
+  if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
   begin
     if RXData.QTHString = '' then
       ProcessRSTQSONumberAndPossibleDomesticQTHExchange := True
     else
-      ProcessRSTQSONumberAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)
-  end ;
+      ProcessRSTQSONumberAndPossibleDomesticQTHExchange :=
+        FoundDomesticQTH(RXData)
+  end;
 
 end;
 {KK1L: 6.73 For Michigan QSO Party NOT WORKING!!!!!!}
 
-function ProcessQSONumberAndPossibleDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessQSONumberAndPossibleDomesticQTHExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -4074,7 +4218,8 @@ var
 
 begin
   ProcessQSONumberAndPossibleDomesticQTHExchange := False;
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
@@ -4083,16 +4228,14 @@ begin
     RXData.QTHString := FirstString;
     NumberString := SecondString;
   end
-  else
-  if (not StringIsAllNumbers(FirstString)) then
-  if SecondString = '' then
-  begin
-  RXData.QTHString := FirstString;
-  NumberString := '';
-  Result := False;
-  end
-  else
-    if not StringIsAllNumbers(SecondString) then
+  else if (not StringIsAllNumbers(FirstString)) then
+    if SecondString = '' then
+    begin
+      RXData.QTHString := FirstString;
+      NumberString := '';
+      Result := False;
+    end
+    else if not StringIsAllNumbers(SecondString) then
     begin
       RXData.QTHString := SecondString;
       NumberString := FirstString;
@@ -4102,7 +4245,8 @@ begin
     if RXData.QTHString = '' then
       ProcessQSONumberAndPossibleDomesticQTHExchange := True
     else
-      ProcessQSONumberAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData);
+      ProcessQSONumberAndPossibleDomesticQTHExchange :=
+        FoundDomesticQTH(RXData);
 
   if Result = True then
   begin
@@ -4110,7 +4254,8 @@ begin
   end;
 end;
 
-function ProcessNZFieldDayExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessNZFieldDayExchange(Exchange: ShortString {Str80}; var RXData:
+  ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The RST is
   optional.  The following formats will work:
@@ -4138,7 +4283,8 @@ var
 
 begin
   ProcessNZFieldDayExchange := False;
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   if RXData.QTH.CountryID = 'ZL' then
   begin
@@ -4146,20 +4292,22 @@ begin
 
     if ThirdString <> '' then
     begin
-      if length(ThirdString) > 2 then Exit;
+      if length(ThirdString) > 2 then
+        Exit;
       RXData.Zone := StrToInt(ThirdString);
     end
     else
     begin
-      if (SecondString = '') or (length(SecondString) > 2) then Exit;
+      if (SecondString = '') or (length(SecondString) > 2) then
+        Exit;
       RXData.Zone := StrToInt(SecondString);
-          //      if length(RXData.Zone) = 1 then RXData.Zone := '0' + RXData.Zone;
+      //      if length(RXData.Zone) = 1 then RXData.Zone := '0' + RXData.Zone;
     end;
 
-      //    if length(RXData.Zone) = 1 then RXData.Zone := '0' + RXData.Zone;
+    //    if length(RXData.Zone) = 1 then RXData.Zone := '0' + RXData.Zone;
     RemoveLastString(Exchange);
 
-      //    if not StringIsAllNumbers(RXData.Zone) then Exit;
+    //    if not StringIsAllNumbers(RXData.Zone) then Exit;
   end;
 
   if ProcessRSTAndQSONumberExchange(Exchange, RXData) then
@@ -4167,16 +4315,17 @@ begin
 
 end;
 
-function ProcessRSTQTHNameAndFistsNumberOrPowerExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTQTHNameAndFistsNumberOrPowerExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 
 { 599 QTH NAME FISTS# or 599 QTH NAME POWER.  Assumed to be FISTS # unless
   the number has a W at the end of it.  RST is optional.  QTH is required
   even for DX.  Name can only be one word.  Spaces required for each entry. }
 
 var
-  NumberEntries, Address, Result1       : integer;
-  DX                                    : boolean;
-  EntryList                             : EntryArray;
+  NumberEntries, Address, Result1: integer;
+  DX: boolean;
+  EntryList: EntryArray;
 
 begin
   ProcessRSTQTHNameAndFistsNumberOrPowerExchange := False;
@@ -4195,7 +4344,7 @@ begin
   begin
     RXData.RSTReceived := StrToInt(EntryList[1]);
 
-      { Remove the RST from the entry list }
+    { Remove the RST from the entry list }
 
     if NumberEntries > 1 then
       for Address := 1 to NumberEntries - 1 do
@@ -4208,7 +4357,8 @@ begin
   { We have removed the RST if it was there.  Should have QTH, Name
     and power or member # }
 
-  if NumberEntries < 2 then Exit; { Not enough data }
+  if NumberEntries < 2 then
+    Exit; { Not enough data }
 
   if (NumberEntries = 2) and DX then
   begin
@@ -4232,7 +4382,8 @@ begin
 
   { We should now just have the power or member number left }
 
-  if NumberEntries <> 1 then Exit;
+  if NumberEntries <> 1 then
+    Exit;
 
   if StringIsAllNumbers(EntryList[1]) then { member number }
     Val(EntryList[1], RXData.NumberReceived, Result1)
@@ -4245,7 +4396,8 @@ begin
     ProcessRSTQTHNameAndFistsNumberOrPowerExchange := FoundDomesticQTH(RXData);
 end;
 
-function ProcessRSTQSONumberAndRandomCharactersExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTQSONumberAndRandomCharactersExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -4266,7 +4418,8 @@ var
 
 begin
   ProcessRSTQSONumberAndRandomCharactersExchange := False;
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
@@ -4278,28 +4431,29 @@ begin
     else
       NumberString := SecondString;
   end
-  else
-    if not StringIsAllNumbers(SecondString) then
-    begin
-      RXData.RandomCharsReceived := SecondString;
-      if ThirdString <> '' then
-        NumberString := FirstString + ' ' + ThirdString
-      else
-        NumberString := FirstString;
-    end
+  else if not StringIsAllNumbers(SecondString) then
+  begin
+    RXData.RandomCharsReceived := SecondString;
+    if ThirdString <> '' then
+      NumberString := FirstString + ' ' + ThirdString
     else
-    begin
-      RXData.RandomCharsReceived := ThirdString;
-      NumberString := FirstString + ' ' + SecondString;
-    end;
+      NumberString := FirstString;
+  end
+  else
+  begin
+    RXData.RandomCharsReceived := ThirdString;
+    NumberString := FirstString + ' ' + SecondString;
+  end;
 
   if ProcessRSTAndQSONumberExchange(NumberString, RXData) then
-    ProcessRSTQSONumberAndRandomCharactersExchange := (length(RXData.RandomCharsReceived) = 5) and
+    ProcessRSTQSONumberAndRandomCharactersExchange :=
+      (length(RXData.RandomCharsReceived) = 5) and
       (length(RXData.RandomCharsSent) = 5);
 
 end;
 
-function ProcessRSTAndPostalCodeExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTAndPostalCodeExchange(Exchange: Str80; var RXData:
+  ContestExchange): boolean;
 
 { Legal entries HA1 1TA, RS(T) HA1 1TA or HA1 1TA RS(T) }
 
@@ -4308,7 +4462,8 @@ var
 
 begin
   Result := False;
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
@@ -4328,65 +4483,79 @@ begin
     Result := True;
   end;
 
-//  RXData.QTHString := Copy(RXData.PostalCode, 1, 2);
+  //  RXData.QTHString := Copy(RXData.PostalCode, 1, 2);
 
-//  ProcessRSTAndPostalCodeExchange := FoundDomesticQTH(RXData);
+  //  ProcessRSTAndPostalCodeExchange := FoundDomesticQTH(RXData);
 end;
 
-function ProcessRSTAndQSONumberOrFrenchDepartmentExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTAndQSONumberOrFrenchDepartmentExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 begin
   Result := False;
 
   if ParserArray.paCount = 2 then
   begin
-    if (ParserArray.paElements[0].prType <> eetNumber) or not (sETrst(ParserArray.paElements[0].prInteger, RXData.RSTReceived)) then Exit;
+    if (ParserArray.paElements[0].prType <> eetNumber) or not
+      (sETrst(ParserArray.paElements[0].prInteger, RXData.RSTReceived)) then
+      Exit;
   end;
 
   if FrenchID(RXData.QTH.CountryID) then
   begin
-   RXData.QTHString := Exchange;    //n4af 4.36.5
-//    RXData.QTHString := ParserArray.paElements[ParserArray.paCount - 1].prString;
-    if length(RXData.QTHString) = 1 then RXData.QTHString := '0' + RXData.QTHString;
-    if FoundDomesticQTH(RXData) then Result := True;
+    RXData.QTHString := Exchange; //n4af 4.36.5
+    //    RXData.QTHString := ParserArray.paElements[ParserArray.paCount - 1].prString;
+    if length(RXData.QTHString) = 1 then
+      RXData.QTHString := '0' + RXData.QTHString;
+    if FoundDomesticQTH(RXData) then
+      Result := True;
   end
   else
   begin
     if ParserArray.paElements[ParserArray.paCount - 1].prType = eetNumber then
     begin
-      RXData.NumberReceived := ParserArray.paElements[ParserArray.paCount - 1].prInteger;
+      RXData.NumberReceived := ParserArray.paElements[ParserArray.paCount -
+        1].prInteger;
       Result := True;
     end;
   end;
 end;
 
-function ProcessRSTAndQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTAndQSONumberOrDomesticQTHExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 label
   1;
 
 begin
-  if (ActiveQSOPointMethod = RACQSOPointMethod) and (Copy(RXData.Callsign, 1, 3) = 'VE0') then
+  if (ActiveQSOPointMethod = RACQSOPointMethod) and (Copy(RXData.Callsign, 1, 3)
+    = 'VE0') then
   begin
-    ProcessRSTAndQSONumberOrDomesticQTHExchange := ProcessRSTAndQSONumberExchange(Exchange, RXData);
+    ProcessRSTAndQSONumberOrDomesticQTHExchange :=
+      ProcessRSTAndQSONumberExchange(Exchange, RXData);
     Exit;
   end;
 
   if ActiveQSOPointMethod = ArktikaSpringQSOPointMethod then
   begin
     if StringIsAllNumbersOrSpaces(Exchange) then
-      ProcessRSTAndQSONumberOrDomesticQTHExchange := ProcessRSTAndQSONumberExchange(Exchange, RXData)
+      ProcessRSTAndQSONumberOrDomesticQTHExchange :=
+        ProcessRSTAndQSONumberExchange(Exchange, RXData)
     else
-      ProcessRSTAndQSONumberOrDomesticQTHExchange := ProcessRSTAndDomesticQTHExchange(Exchange, RXData);
+      ProcessRSTAndQSONumberOrDomesticQTHExchange :=
+        ProcessRSTAndDomesticQTHExchange(Exchange, RXData);
     Exit;
   end;
 
   1:
   if DomesticCountryCall(RXData.Callsign) then
-    ProcessRSTAndQSONumberOrDomesticQTHExchange := ProcessRSTAndDomesticQTHExchange(Exchange, RXData)
+    ProcessRSTAndQSONumberOrDomesticQTHExchange :=
+      ProcessRSTAndDomesticQTHExchange(Exchange, RXData)
   else
-    ProcessRSTAndQSONumberOrDomesticQTHExchange := ProcessRSTAndQSONumberExchange(Exchange, RXData);
+    ProcessRSTAndQSONumberOrDomesticQTHExchange :=
+      ProcessRSTAndQSONumberExchange(Exchange, RXData);
 end;
 
-function ProcessRSTZoneAndPossibleDomesticQTHExchange(Exchange: Str80; var RXData: ContestExchange): boolean;
+function ProcessRSTZoneAndPossibleDomesticQTHExchange(Exchange: Str80; var
+  RXData: ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -4403,58 +4572,60 @@ function ProcessRSTZoneAndPossibleDomesticQTHExchange(Exchange: Str80; var RXDat
 var
 
   FirstString, SecondString, ThirdString: Str10;
-  FirstStringRST : ShortString;
+  FirstStringRST: ShortString;
 
 begin
   ProcessRSTZoneAndPossibleDomesticQTHExchange := False;
-  if Exchange = '' then Exit;
+  if Exchange = '' then
+    Exit;
 
   RXData.QTHString := '';
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
-  if (IsAlpha(FirstString) and (StringIsAllNumbers(SecondString))) then      // n4af 4.52.2
-   begin
+  if (IsAlpha(FirstString) and (StringIsAllNumbers(SecondString))) then
+    // n4af 4.52.2
+  begin
     RXData.RSTReceived := DefaultRST;
-    RXData.QTHString   := FirstString;
-    RXData.Zone        := StrtoInt(SecondString);
-    ProcessRSTZoneAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)  ;
+    RXData.QTHString := FirstString;
+    RXData.Zone := StrtoInt(SecondString);
+    ProcessRSTZoneAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData);
     exit;
-   end;
+  end;
 
   if ThirdString <> '' then
   begin
     FirstStringRST := FirstString;
-    if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then Exit;
+    if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then
+      Exit;
     RXData.Zone := StrToInt(SecondString);
     RXData.QTHString := ThirdString;
   end
-  else
-    if SecondString <> '' then
-    begin
-      if IsAlpha(SecondString) then
-      begin
-        RXData.RSTReceived := DefaultRST;
-        RXData.Zone := StrToInt(FirstString);
-        RXData.QTHString := SecondString;
-       end
-      else
-       begin
-        if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then Exit;
-        RXData.Zone := StrToInt(SecondString);
-       end;
-      end;
-
-      if ((length(FirstString) > 2) or (isalpha(Firststring))) then
-    begin
-     QuickDisplay(TC_INVALID);
-     exit
-    end
-     else
-     if (SecondString='') and (ThirdString='') then     // 4.52.5
+  else if SecondString <> '' then
+  begin
+    if IsAlpha(SecondString) then
     begin
       RXData.RSTReceived := DefaultRST;
-      RXData.Zone := StrToInt(Exchange);
+      RXData.Zone := StrToInt(FirstString);
+      RXData.QTHString := SecondString;
+    end
+    else
+    begin
+      if not ValidRST(FirstStringRST, RXData.RSTReceived, ActiveMode) then
+        Exit;
+      RXData.Zone := StrToInt(SecondString);
     end;
+  end;
+
+  if ((length(FirstString) > 2) or (isalpha(Firststring))) then
+  begin
+    QuickDisplay(TC_INVALID);
+    exit
+  end
+  else if (SecondString = '') and (ThirdString = '') then // 4.52.5
+  begin
+    RXData.RSTReceived := DefaultRST;
+    RXData.Zone := StrToInt(Exchange);
+  end;
 
   if RXData.QTHString <> '' then
     ProcessRSTZoneAndPossibleDomesticQTHExchange := FoundDomesticQTH(RXData)
@@ -4462,9 +4633,8 @@ begin
     ProcessRSTZoneAndPossibleDomesticQTHExchange := True;
 end;
 
-
-
- function ProcessRSTAndPowerExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndPowerExchange(Exchange: ShortString {Str80}; var RXData:
+  ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -4481,7 +4651,8 @@ begin
 
   if StringHas(Exchange, ' ') then
   begin
-    if not ValidRST(Exchange, RXData.RSTReceived, ActiveMode) then Exit;
+    if not ValidRST(Exchange, RXData.RSTReceived, ActiveMode) then
+      Exit;
     GetRidOfPrecedingSpaces(Exchange);
     RXData.Power := Exchange;
   end
@@ -4494,7 +4665,8 @@ begin
   ProcessRSTAndPowerExchange := RXData.Power <> '';
 end;
 
-function ProcessRSTAndZoneExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndZoneExchange(Exchange: ShortString {Str80}; var RXData:
+  ContestExchange): boolean;
 
 { Each entry of the exchange must be separated by spaces.  The following
   formats work:
@@ -4513,7 +4685,8 @@ var
 begin
   ExchangeErrorMessage := TC_IMPROPERZONENUMBER;
   ProcessRSTAndZoneExchange := False;
-  if not StringIsAllNumbersOrSpaces(Exchange) then Exit;
+  if not StringIsAllNumbersOrSpaces(Exchange) then
+    Exit;
   RXData.RSTReceived := DefaultRST;
 
   if StringHas(Exchange, ' ') then
@@ -4526,14 +4699,15 @@ begin
       begin
         RXData.RSTReceived := StrToInt(SecondString);
         RXData.Zone := StrToInt(FirstString);
-              //        if length(RXData.Zone) = 1 then          Insert('0', RXData.Zone, 1);
+        //        if length(RXData.Zone) = 1 then          Insert('0', RXData.Zone, 1);
         ProcessRSTAndZoneExchange := True;
         ExchangeErrorMessage := nil;
         Exit;
       end;
     end;
 
-    if not ValidRST(Exchange, RXData.RSTReceived, ActiveMode) then Exit;
+    if not ValidRST(Exchange, RXData.RSTReceived, ActiveMode) then
+      Exit;
     GetRidOfPrecedingSpaces(Exchange);
   end;
 
@@ -4551,18 +4725,22 @@ begin
 
         if ActiveZoneMult = EUHFCYear then
         begin
-          if not (RXData.Zone in [0..99]) then Exit;
+          if not (RXData.Zone in [0..99]) then
+            Exit;
           ProcessRSTAndZoneExchange := True;
           ExchangeErrorMessage := nil;
           Exit;
         end;
 
-        if (CTY.ctyZoneMode = CQZoneMode) and (ActiveZoneMult <> JAPrefectures) then
-          if (Exchange[1] > '5') or ((Exchange[1] = '4') and (Exchange[2] >= '1')) then
+        if (CTY.ctyZoneMode = CQZoneMode) and (ActiveZoneMult <> JAPrefectures)
+          then
+          if (Exchange[1] > '5') or ((Exchange[1] = '4') and (Exchange[2] >=
+            '1')) then
             Exit;
 
         if ActiveZoneMult = JAPrefectures then
-          if (Exchange[1] > '6') or ((Exchange[1] = '5') and (Exchange[2] >= '1')) then
+          if (Exchange[1] > '6') or ((Exchange[1] = '5') and (Exchange[2] >=
+            '1')) then
             Exit;
 
         ProcessRSTAndZoneExchange := True;
@@ -4576,8 +4754,9 @@ procedure SaveLogFileToFloppy;
 
 begin
 
- if TR4W_FLOPPY_FILENAME[0] = #0 then  exit;
-  Windows.lstrcat(TR4W_FLOPPY_FILENAME,p); 
+  if TR4W_FLOPPY_FILENAME[0] = #0 then
+    exit;
+  Windows.lstrcat(TR4W_FLOPPY_FILENAME, p);
   asm
   lea  eax,TR4W_FLOPPY_FILENAME
   push eax
@@ -4585,11 +4764,12 @@ begin
   push eax
   end;
 
-{ h := CreateFile(@TR4W_Floppy_Filename, GENERIC_WRITE or GENERIC_READ, FILE_SHARE_WRITE or FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
-  SetFilePointer(h, 0, nil, FILE_END);
- tOpenFileForWrite(h,@TR4W_Floppy_Filename); }
+  { h := CreateFile(@TR4W_Floppy_Filename, GENERIC_WRITE or GENERIC_READ, FILE_SHARE_WRITE or FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+    SetFilePointer(h, 0, nil, FILE_END);
+   tOpenFileForWrite(h,@TR4W_Floppy_Filename); }
   wsprintf(QuickDisplayBuffer, TC_SAVINGTO);
-  asm add esp,16  end;
+  asm add esp,16
+  end;
   QuickDisplay(QuickDisplayBuffer);
 
   if not Windows.CopyFile(TR4W_LOG_FILENAME, TR4W_FLOPPY_FILENAME, False) then
@@ -4601,7 +4781,8 @@ begin
     push eax
     end;
     wsprintf(QuickDisplayBuffer, '%s: %s');
-    asm add esp,16  end;
+    asm add esp,16
+    end;
     QuickDisplay(QuickDisplayBuffer);
 
     DoABeep(Warning);
@@ -4613,57 +4794,58 @@ begin
       push eax
     end;
     wsprintf(QuickDisplayBuffer, TC_FILESAVEDTOSUCCESSFULLY);
-    asm add esp,12 end;
+    asm add esp,12
+    end;
     QuickDisplay(QuickDisplayBuffer);
   end;
-{
-  if FloppyFileSaveName = '' then Exit;
-  Windows.ZeroMemory(@TR4W_FLOPPY_FILENAME, SizeOf(TR4W_FLOPPY_FILENAME));
-  I := pos(':', FloppyFileSaveName);
-  if I = 0 then I := 3 else I := 0;
-  TR4W_FLOPPY_FILENAME[0] := 'A';
-  TR4W_FLOPPY_FILENAME[1] := ':';
-  TR4W_FLOPPY_FILENAME[2] := '/';
-  Windows.CopyMemory(@TR4W_FLOPPY_FILENAME[I], @FloppyFileSaveName[1], length(FloppyFileSaveName));
-  asm
-  lea  eax,TR4W_FLOPPY_FILENAME
-  push eax
-  lea  eax,TR4W_LOG_FILENAME
-  push eax
-  end;
-  wsprintf(QuickDisplayBuffer, TC_SAVINGTO);
-  asm add esp,16  end;
-  QuickDisplay(QuickDisplayBuffer);
-
-  if not Windows.CopyFile(TR4W_LOG_FILENAME, TR4W_FLOPPY_FILENAME, False) then
-  begin
-    SysErrorMessage(GetLastError);
+  {
+    if FloppyFileSaveName = '' then Exit;
+    Windows.ZeroMemory(@TR4W_FLOPPY_FILENAME, SizeOf(TR4W_FLOPPY_FILENAME));
+    I := pos(':', FloppyFileSaveName);
+    if I = 0 then I := 3 else I := 0;
+    TR4W_FLOPPY_FILENAME[0] := 'A';
+    TR4W_FLOPPY_FILENAME[1] := ':';
+    TR4W_FLOPPY_FILENAME[2] := '/';
+    Windows.CopyMemory(@TR4W_FLOPPY_FILENAME[I], @FloppyFileSaveName[1], length(FloppyFileSaveName));
     asm
-    push eax
     lea  eax,TR4W_FLOPPY_FILENAME
     push eax
+    lea  eax,TR4W_LOG_FILENAME
+    push eax
     end;
-    wsprintf(QuickDisplayBuffer, '%s: %s');
+    wsprintf(QuickDisplayBuffer, TC_SAVINGTO);
     asm add esp,16  end;
     QuickDisplay(QuickDisplayBuffer);
 
-    DoABeep(Warning);
-  end
-  else
-  begin
-    if I <> 0 then QuickDisplay(TC_FILESAVEDTOFLOPPYSUCCESSFULLY)
-    else
+    if not Windows.CopyFile(TR4W_LOG_FILENAME, TR4W_FLOPPY_FILENAME, False) then
     begin
+      SysErrorMessage(GetLastError);
       asm
-      lea  eax,FloppyFileSaveName[1]
+      push eax
+      lea  eax,TR4W_FLOPPY_FILENAME
       push eax
       end;
-      wsprintf(QuickDisplayBuffer, TC_FILESAVEDTOSUCCESSFULLY);
-      asm add esp,12 end;
+      wsprintf(QuickDisplayBuffer, '%s: %s');
+      asm add esp,16  end;
       QuickDisplay(QuickDisplayBuffer);
+
+      DoABeep(Warning);
+    end
+    else
+    begin
+      if I <> 0 then QuickDisplay(TC_FILESAVEDTOFLOPPYSUCCESSFULLY)
+      else
+      begin
+        asm
+        lea  eax,FloppyFileSaveName[1]
+        push eax
+        end;
+        wsprintf(QuickDisplayBuffer, TC_FILESAVEDTOSUCCESSFULLY);
+        asm add esp,12 end;
+        QuickDisplay(QuickDisplayBuffer);
+      end;
     end;
-  end;
-}
+  }
 end;
 
 procedure RestoreRadioFrequency(Radio: RadioType);
@@ -4676,16 +4858,16 @@ end;
 
 procedure ReviewBackCopyFiles;
 
-
 begin
   {WLI}
 
 end;
 
-function GetCorrectedCallFromExchangeString(var ExchangeString: ShortString {Str80}): Str80;
+function GetCorrectedCallFromExchangeString(var ExchangeString: ShortString
+  {Str80}): Str80;
 
 var
-  PotentialCall, TempString             : ShortString {Str40};
+  PotentialCall, TempString: ShortString {Str40};
 
 begin
   GetCorrectedCallFromExchangeString := '';
@@ -4701,15 +4883,15 @@ begin
       begin
         GetCorrectedCallFromExchangeString := PotentialCall;
 
-            { Delete all the stuff we have }
+        { Delete all the stuff we have }
 
         Delete(ExchangeString, 1, length(TempString));
 
-            { Remove the callsign }
+        { Remove the callsign }
 
         RemoveFirstString(ExchangeString);
 
-            { Rebuild the exchange string without the callsign }
+        { Rebuild the exchange string without the callsign }
 
         ExchangeString := TempString + ' ' + ExchangeString;
         Exit;
@@ -4721,13 +4903,12 @@ function ISentThisMultiMessage(MultMessage: string): boolean;
 
 { Works for both N6TR and K1EA network }
 
-
 begin
   ISentThisMultiMessage := False;
 
   if NetDebug then
   begin
-      //    SaveSetAndClearActiveWindow(DupeSheetWindow);
+    //    SaveSetAndClearActiveWindow(DupeSheetWindow);
 
     WriteLn('ISentThisMultiMessage called with : ');
 
@@ -4738,7 +4919,7 @@ begin
   if NetDebug then
   begin
     WriteLn('Entry not found.');
-      //RestorePreviousWindow;
+    //RestorePreviousWindow;
   end;
 end;
 
@@ -4749,7 +4930,7 @@ procedure CheckForLostMultiMessages;
   it finds one to send so it doesn't hog the computer too long. }
 
 var
-  LookAddress                           : integer;
+  LookAddress: integer;
 
 begin
   LookAddress := LastMultiMessage;
@@ -4762,10 +4943,12 @@ begin
         if RetryCount <= 10 then
         begin
 
-          if ((RetryCount < 2) and (ElaspedSec100(TimeMark) > MultiRetryTime * 100) or
+          if ((RetryCount < 2) and (ElaspedSec100(TimeMark) > MultiRetryTime *
+            100) or
             (RetryCount >= 2) and (ElaspedSec100(TimeMark) > 3000)) then
           begin
-            if RetryCount >= 3 then DoABeep(Beepsingle);
+            if RetryCount >= 3 then
+              DoABeep(Beepsingle);
             SendMultiMessage(Message);
             MarkTime(TimeMark);
             inc(RetryCount);
@@ -4776,7 +4959,7 @@ begin
         begin
           DoABeep(Warning);
           QuickDisplay('Please check multi network');
-                //                        ReminderPostedCount := 60;
+          //                        ReminderPostedCount := 60;
           Warnings := 1;
         end;
 
@@ -4784,7 +4967,7 @@ begin
         begin
           DoABeep(Warning);
           QuickDisplay('Possible data loss on multi network.');
-                //                        ReminderPostedCount := 60;
+          //                        ReminderPostedCount := 60;
           Warnings := 2;
         end;
 
@@ -4800,10 +4983,10 @@ function ValidCheckSum(Message: string): boolean;
   both K1EA and N6TR network. }
 
 var
-  CharPointer                           : integer;
-  CheckSum                              : Word;
-  K1EACheckSum                          : Byte;
-  TempString                            : string;
+  CharPointer: integer;
+  CheckSum: Word;
+  K1EACheckSum: Byte;
+  TempString: string;
 
 begin
   if length(Message) < 8 then
@@ -4816,7 +4999,7 @@ begin
   begin
     K1EACheckSum := 0;
 
-      { We count up to all but the last character }
+    { We count up to all but the last character }
 
     for CharPointer := 1 to length(Message) - 1 do
       K1EACheckSum := K1EACheckSum + Ord(Message[CharPointer]);
@@ -4825,7 +5008,7 @@ begin
 
     ValidCheckSum := K1EACheckSum = Ord(Message[length(Message)]);
 
-      {       ValidCheckSum := True;}
+    {       ValidCheckSum := True;}
 
     if K1EACheckSum <> Ord(Message[length(Message)]) then
       if NetDebug then
@@ -4857,8 +5040,8 @@ function TimeToDie(var Message: string): boolean;
   the K1EANetworkMode }
 
 var
-  TimeToLive                            : Byte;
-  CheckSum                              : Word;
+  TimeToLive: Byte;
+  CheckSum: Word;
 
 begin
   {
@@ -4889,10 +5072,10 @@ begin
 end;
 
 function ThisMessageIsForMe(Message: string): boolean;
- var
- Destination : Byte;
-{ This function will return TRUE if the message is addressed to us or is
-  a broadcast message. }
+var
+  Destination: Byte;
+  { This function will return TRUE if the message is addressed to us or is
+    a broadcast message. }
 
 begin
   if not 1 = 1 {K1EANetworkEnable} then { N6TR Network mode }
@@ -4917,9 +5100,9 @@ function WeHaveProcessedThisMessage(Message: string): boolean;
   will add it to the list of messages we have seen and return FALSE. }
 
 var
-  Source, Serial                        : Byte;
-  ActiveMessage                         : integer;
-  CheckSum                              : Word;
+  Source, Serial: Byte;
+  ActiveMessage: integer;
+  CheckSum: Word;
 
 begin
   {
@@ -5018,7 +5201,7 @@ function GetMultiPortCommand: string;
   It works for either K1EA or N6TR network modes!! }
 
 var
-  TempString                            : string;
+  TempString: string;
 
 begin
   //WLI ????????
@@ -5027,7 +5210,8 @@ begin
 
   GetMultiPortCommand := '';
 
-  if TempString = '' then Exit;
+  if TempString = '' then
+    Exit;
 
   if NetDebug then
     BlockWrite(NetDebugBinaryInput, TempString[1], length(TempString));
@@ -5058,11 +5242,13 @@ begin
 
   { If this message has been hoping around too long, ignore it }
 
-  if TimeToDie(TempString) then Exit;
+  if TimeToDie(TempString) then
+    Exit;
 
   { Okay, we have a valid message, and it isn't ours, pass it on. }
 
-  if not ThisMessageIsForMe(TempString) then Exit;
+  if not ThisMessageIsForMe(TempString) then
+    Exit;
 
   { We have a message for me to act on (unless I have already seen it) }
 
@@ -5103,9 +5289,8 @@ begin
 
 end;
 
-procedure SendMultiCommand(Source: Byte; Destination: Byte; ControlByte: Byte; Message: string);
-
-
+procedure SendMultiCommand(Source: Byte; Destination: Byte; ControlByte: Byte;
+  Message: string);
 
 begin
 
@@ -5134,13 +5319,15 @@ label
     indicated. }
 
 var
-  TempIndex                             : integer;
-  FirstTime                             : boolean;
+  TempIndex: integer;
+  FirstTime: boolean;
 begin
-  if Call = '' then Exit;
+  if Call = '' then
+    Exit;
   TempIndex := 0;
   FirstTime := True;
-  if not OpenLogFile then Exit;
+  if not OpenLogFile then
+    Exit;
   ReadVersionBlock;
   1:
   if ReadLogFile then
@@ -5157,12 +5344,14 @@ begin
           ListView_DeleteAllItems(tPreviousDupeQSOsWndHandle);
           FirstTime := False;
         end;
-        tAddContestExchangeToLog(TempRXData, tPreviousDupeQSOsWndHandle, TempIndex);
+        tAddContestExchangeToLog(TempRXData, tPreviousDupeQSOsWndHandle,
+          TempIndex);
 
       end;
     goto 1;
   end;
-  if not FirstTime then EnsureListViewColumnVisible(tPreviousDupeQSOsWndHandle);
+  if not FirstTime then
+    EnsureListViewColumnVisible(tPreviousDupeQSOsWndHandle);
   CloseLogFile;
 end;
 
@@ -5172,8 +5361,8 @@ begin
   {IF CodeSpeed > 4 THEN}
   if CodeSpeed > (CodeSpeedIncrement + 1) then {KK1L: 6.72}
   begin
-      {SetSpeed (CodeSpeed - 3);}
-   //   CW_SPEED1 := CW_SPEED1 - CodeSpeedIncrement;
+    {SetSpeed (CodeSpeed - 3);}
+ //   CW_SPEED1 := CW_SPEED1 - CodeSpeedIncrement;
     SetSpeed(CodeSpeed - CodeSpeedIncrement); {KK1L: 6.72}
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
@@ -5241,9 +5430,9 @@ end;
 procedure DisplayGridSquareStatus(Call: CallString);
 
 var
-  Range, Address                        : integer;
-  Change                                : boolean;
-  TempCall                              : CallString;
+  Range, Address: integer;
+  Change: boolean;
+  TempCall: CallString;
 
 begin
   NumberGridSquaresInList := 0;
@@ -5274,20 +5463,20 @@ begin
         until (not Change) or (Range < 0);
       end;
 
-          //      SaveSetAndClearActiveWindow(EditableLogWindow);
+      //      SaveSetAndClearActiveWindow(EditableLogWindow);
 
       for Address := 0 to NumberGridSquaresInList - 1 do
       begin
-              //{WLI}                IF WhereX >= 76 THEN WriteLn;
+        //{WLI}                IF WhereX >= 76 THEN WriteLn;
 
-              //{WLI}                IF WhereX > 1 THEN Write (' ');
+        //{WLI}                IF WhereX > 1 THEN Write (' ');
 
-              //{WLI}                Write (GridSquareList [Address]);
+        //{WLI}                Write (GridSquareList [Address]);
 
-              //   FRM.POSSIBLECALLWINDOW.Items.Add(GridSquareList [Address]);
+        //   FRM.POSSIBLECALLWINDOW.Items.Add(GridSquareList [Address]);
       end;
 
-          //            //RestorePreviousWindow;
+      //            //RestorePreviousWindow;
 
       GridSquareListShown := True;
     end;
@@ -5299,11 +5488,12 @@ function LogFileLooksOkay: boolean;
 { Returns TRUE if the LOG.DAT file looks about right for the number of
   QSOs the program thinks we have }
 
-
 begin
   Result := False;
-  if not OpenLogFile then Exit;
-  if Windows.GetFileSize(LogHandle, nil) = tRestartInfo.riTotalRecordsInLog {QSOTotals[All, Both] } * SizeOf(ContestExchange) + SizeOfTLogHeader then
+  if not OpenLogFile then
+    Exit;
+  if Windows.GetFileSize(LogHandle, nil) = tRestartInfo.riTotalRecordsInLog
+    {QSOTotals[All, Both] } * SizeOf(ContestExchange) + SizeOfTLogHeader then
     Result := True;
   CloseLogFile;
 
@@ -5334,7 +5524,6 @@ end;
 
 procedure NextPage;
 
-
 begin
 
   //W_L_I  if PrinterEnabled then
@@ -5351,48 +5540,52 @@ procedure CalculateQSOPoints(var RXData: ContestExchange);
 
 var
   PtsMult, Points, MyZoneValue, Result: integer;
-  Distance                              : LONGINT;
-  RXCty, TheirID, CountryID             : CallString;
-  TempOblast                            : string[2];
-  la1, la2, lo1, lo2                    : integer;
-  Grid1, Grid2                          : GridString;
-  russianRegion1, russianRegion2        : RussianRegionType;
-  temphour                              : byte;      // 4.58.2
-  iotastate                             : string[10];
+  Distance: LONGINT;
+  RXCty, TheirID, CountryID: CallString;
+  TempOblast: string[2];
+  la1, la2, lo1, lo2: integer;
+  Grid1, Grid2: GridString;
+  russianRegion1, russianRegion2: RussianRegionType;
+  temphour: byte; // 4.58.2
+  iotastate: string[10];
 
 begin
   RXData.QSOPoints := 0;
   RXCty := RXData.QTH.CountryID; // 4.67.15
-  if (QSOPointsDomesticCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH <> '') then
+  if (QSOPointsDomesticCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH <>
+    '') then
   begin
     RXData.QSOPoints := QSOPointsDomesticCW;
     Exit;
   end;
 
-  if (QSOPointsDXCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH = '') then
+  if (QSOPointsDXCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH = '')
+    then
   begin
     RXData.QSOPoints := QSOPointsDXCW;
     Exit;
   end;
 
-  if (QSOPointsDomesticPhone >= 0) and (RXData.Mode = Phone) and (RXData.DomesticQTH <> '') then
+  if (QSOPointsDomesticPhone >= 0) and (RXData.Mode = Phone) and
+    (RXData.DomesticQTH <> '') then
   begin
     RXData.QSOPoints := QSOPointsDomesticPhone;
     Exit;
   end;
 
-  if (QSOPointsDXPhone >= 0) and (RXData.Mode = Phone) and (RXData.DomesticQTH = '') then
+  if (QSOPointsDXPhone >= 0) and (RXData.Mode = Phone) and (RXData.DomesticQTH =
+    '') then
   begin
     RXData.QSOPoints := QSOPointsDXPhone;
     Exit;
   end;
- {  if contest = RSGB18 then
-   if RXData.QTH.CountryID[1] = 'G' then
-    RXCty := ''
-     else
+  {  if contest = RSGB18 then
+    if RXData.QTH.CountryID[1] = 'G' then
+     RXCty := ''
+      else
 
-  RXData.QTH.CountryID := '';
- }
+   RXData.QTH.CountryID := '';
+  }
   case ActiveQSOPointMethod of
 
     AllAsianQSOPointMethod:
@@ -5405,36 +5598,37 @@ begin
               Band160: RXData.QSOPoints := 9;
               Band80: RXData.QSOPoints := 6;
               Band10: RXData.QSOPoints := 6;
-            else RXData.QSOPoints := 3;
+            else
+              RXData.QSOPoints := 3;
+            end;
+          end
+          else if MyCountry <> RXCty then
+          begin
+            case RXData.Band of
+              Band160: RXData.QSOPoints := 3;
+              Band80: RXData.QSOPoints := 2;
+              Band10: RXData.QSOPoints := 2;
+            else
+              RXData.QSOPoints := 1;
             end;
           end
           else
-            if MyCountry <> RXCty then
-            begin
-              case RXData.Band of
-                Band160: RXData.QSOPoints := 3;
-                Band80: RXData.QSOPoints := 2;
-                Band10: RXData.QSOPoints := 2;
-              else RXData.QSOPoints := 1;
-              end;
-            end
-            else
-            begin
-              RXData.QSOPoints := 0;
-              RXData.InhibitMults := True; { Same country }
-            end;
+          begin
+            RXData.QSOPoints := 0;
+            RXData.InhibitMults := True; { Same country }
+          end;
 
         end
 
         else { I am not in Asia }
-
           if RXData.QTH.Continent = Asia then
           begin
             case RXData.Band of
               Band160: RXData.QSOPoints := 3;
               Band80: RXData.QSOPoints := 2;
               Band10: RXData.QSOPoints := 2;
-            else RXData.QSOPoints := 1;
+            else
+              RXData.QSOPoints := 1;
             end;
           end
           else
@@ -5449,25 +5643,22 @@ begin
       begin
         if StringIsAllNumbers(RXData.Power) then
           RXData.QSOPoints := 5
+        else if MyContinent = RXData.QTH.Continent then
+          RXData.QSOPoints := 2
         else
-          if MyContinent = RXData.QTH.Continent then
-            RXData.QSOPoints := 2
-          else
-            RXData.QSOPoints := 4;
+          RXData.QSOPoints := 4;
       end;
 
     ARIQSOPointMethod:
       if (RXCty = 'I') or (RXCty = 'IS') or (RXCty = '*IT9') then
-//      if RXCty[1] = 'I' then
+        //      if RXCty[1] = 'I' then
         RXData.QSOPoints := 10
+      else if RXData.QTH.Continent <> MyContinent then
+        RXData.QSOPoints := 3
+      else if RXCty <> MyCountry then
+        RXData.QSOPoints := 1
       else
-        if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 3
-        else
-          if RXCty <> MyCountry then
-            RXData.QSOPoints := 1
-          else
-            RXData.QSOPoints := 0;
+        RXData.QSOPoints := 0;
 
     ARRLDXQSOPointMethod:
       if (MyCountry = 'K') or
@@ -5481,22 +5672,21 @@ begin
           RXData.InhibitMults := True;
         end;
       end
+      else if (RXCty = 'K') or (RXCty = 'VE') then
+        RXData.QSOPoints := 3
       else
-        if (RXCty = 'K') or (RXCty = 'VE') then
-          RXData.QSOPoints := 3
-        else
-        begin
-          RXData.QSOPoints := 0;
-          RXData.InhibitMults := True;
-        end;
+      begin
+        RXData.QSOPoints := 0;
+        RXData.InhibitMults := True;
+      end;
 
     ARRLFieldDayQSOPointMethod:
-{
-      if StringHas(UpperCase(MyFDClass), 'D') and
-        StringHas(UpperCase(RXData.ceClass), 'D') then
-        RXData.QSOPoints := 0
-      else
-}
+      {
+            if StringHas(UpperCase(MyFDClass), 'D') and
+              StringHas(UpperCase(RXData.ceClass), 'D') then
+              RXData.QSOPoints := 0
+            else
+      }
       if RXData.Mode = Phone then
         RXData.QSOPoints := 1
       else
@@ -5505,20 +5695,19 @@ begin
     ARRL160QSOPointMethod:
       if DomesticCountryCall(RXData.Callsign) then
         RXData.QSOPoints := 2
+      else if DomesticCountryCall(MyCall) then
+        RXData.QSOPoints := 5
       else
-        if DomesticCountryCall(MyCall) then
-          RXData.QSOPoints := 5
-        else
-          RXData.QSOPoints := 0;
+        RXData.QSOPoints := 0;
 
     ARRL10QSOPointMethod:
-{
-      if ((Copy(RXData.Callsign, length(RXData.Callsign) - 1, 2) = '/T') or
-        (Copy(RXData.Callsign, length(RXData.Callsign) - 1, 2) = '/N')) and
-        (RXData.Mode = CW) then
-        RXData.QSOPoints := 8
-      else
-}
+      {
+            if ((Copy(RXData.Callsign, length(RXData.Callsign) - 1, 2) = '/T') or
+              (Copy(RXData.Callsign, length(RXData.Callsign) - 1, 2) = '/N')) and
+              (RXData.Mode = CW) then
+              RXData.QSOPoints := 8
+            else
+      }
       if RXData.Mode = CW then
         RXData.QSOPoints := 4
       else
@@ -5538,7 +5727,8 @@ begin
         Band10G: RXData.QSOPoints := 4;
         Band24G: RXData.QSOPoints := 4;
         BandLight: RXData.QSOPoints := 4;
-      else RXData.QSOPoints := 0;
+      else
+        RXData.QSOPoints := 0;
       end;
 
     ARRLVHFSSPointMethod:
@@ -5555,7 +5745,8 @@ begin
         Band10G: RXData.QSOPoints := 8;
         Band24G: RXData.QSOPoints := 8;
         BandLight: RXData.QSOPoints := 8;
-      else RXData.QSOPoints := 0;
+      else
+        RXData.QSOPoints := 0;
       end;
 
     ALRSUA1DZCupQSOPointMethod:
@@ -5570,14 +5761,16 @@ begin
         if RussianID(MyCountry) then
         begin
           TempOblast := GetOblast(MyCall);
-          russianRegion1 := GetRussiaOblastByTwoChars(TempOblast[1], TempOblast[2]);
+          russianRegion1 := GetRussiaOblastByTwoChars(TempOblast[1],
+            TempOblast[2]);
         end;
 
         Windows.ZeroMemory(@TempOblast, SizeOf(TempOblast));
         if RussianID(RXData.Callsign) then
         begin
           TempOblast := GetOblast(RXData.Callsign);
-          russianRegion2 := GetRussiaOblastByTwoChars(TempOblast[1], TempOblast[2]);
+          russianRegion2 := GetRussiaOblastByTwoChars(TempOblast[1],
+            TempOblast[2]);
         end;
 
         if (russianRegion1 in [rtUA1A, rtUA1C]) then
@@ -5604,17 +5797,17 @@ begin
             RXData.QSOPoints := RXData.QSOPoints + 50;
           end;
 
-      {
-              if RussianID(MyCountry) then
-              begin
+        {
+                if RussianID(MyCountry) then
+                begin
 
-      TempOblast
+        TempOblast
 
-      GetDistanceBetweenGrids
-        Oblast := GetOblast(Call);
-        if length(Oblast) < 2 then Exit;
-        reg := GetRussiaOblastByTwoChars(Oblast[1], Oblast[2]);
-        }
+        GetDistanceBetweenGrids
+          Oblast := GetOblast(Call);
+          if length(Oblast) < 2 then Exit;
+          reg := GetRussiaOblastByTwoChars(Oblast[1], Oblast[2]);
+          }
       end;
 
     BalticQSOPointMethod:
@@ -5626,26 +5819,23 @@ begin
           else
             RXData.QSOPoints := 2;
         end
-        else
-          if (RXCty = 'ES') or (RXCty = 'YL') or (RXCty = 'LY') then
-          begin
-            if MyContinent = Europe then
-              RXData.QSOPoints := 10
-            else
-              RXData.QSOPoints := 20;
-          end
+        else if (RXCty = 'ES') or (RXCty = 'YL') or (RXCty = 'LY') then
+        begin
+          if MyContinent = Europe then
+            RXData.QSOPoints := 10
           else
-            RXData.QSOPoints := 1;
+            RXData.QSOPoints := 20;
+        end
+        else
+          RXData.QSOPoints := 1;
       end;
 
-	  BWQPQSOPointMethod:
+    BWQPQSOPointMethod:
 
- 	  if StringIsAllNumbers(RXData.QTHString) then
-	  RXData.QSOPoints := 1
-	  else
-	  RXData.QSOPoints := 0;
-
-
+      if StringIsAllNumbers(RXData.QTHString) then
+        RXData.QSOPoints := 1
+      else
+        RXData.QSOPoints := 0;
 
     CISQSOPointMethod:
       begin
@@ -5653,24 +5843,25 @@ begin
 
         if RXCty <> MyCountry then
         begin
-          if RXData.QTH.Continent = MyContinent then RXData.QSOPoints := 2
+          if RXData.QTH.Continent = MyContinent then
+            RXData.QSOPoints := 2
           else
             RXData.QSOPoints := 3;
         end;
 
         if not CISCountry(MyCountry) then
-          if CISCountry(RXCty) then RXData.QSOPoints := 5;
+          if CISCountry(RXCty) then
+            RXData.QSOPoints := 5;
 
       end;
 
     CQ160QSOPointMethod:
       if RXCty = MyCountry then
         RXData.QSOPoints := 2
+      else if RXData.QTH.Continent = MyContinent then
+        RXData.QSOPoints := 5
       else
-        if RXData.QTH.Continent = MyContinent then
-          RXData.QSOPoints := 5
-        else
-          RXData.QSOPoints := 10;
+        RXData.QSOPoints := 10;
 
     CQMQSOPointMethod:
       begin
@@ -5689,14 +5880,17 @@ begin
         begin
           if not RussianID(RXCty) then
           begin
-            if (RXData.QTH.Continent in [Europe, Asia]) then RXData.QSOPoints := 2
-            else RXData.QSOPoints := 3;
+            if (RXData.QTH.Continent in [Europe, Asia]) then
+              RXData.QSOPoints := 2
+            else
+              RXData.QSOPoints := 3;
           end
+          else if InSameFederalOkrug(RXData.Callsign) then
+            RXData.QSOPoints := 1
           else
-            if InSameFederalOkrug(RXData.Callsign) then
-              RXData.QSOPoints := 1 else RXData.QSOPoints := 2;
+            RXData.QSOPoints := 2;
         end
-            {Outside Russia}
+          {Outside Russia}
         else
         begin
           if RussianID(RXCty) then
@@ -5707,8 +5901,12 @@ begin
               RXData.QSOPoints := 3;
             Exit;
           end;
-          if MyCountry = RXCty then RXData.QSOPoints := 1 else RXData.QSOPoints := 2;
-          if MyContinent <> RXData.QTH.Continent then RXData.QSOPoints := 3;
+          if MyCountry = RXCty then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 2;
+          if MyContinent <> RXData.QTH.Continent then
+            RXData.QSOPoints := 3;
         end;
 
       end;
@@ -5716,565 +5914,580 @@ begin
     CQVHFQSOPointMethod:
       begin
         case RXData.Band of
-          { Band6, Band2:      RXData.QSOPoints := 1;}{KK1L: 6.73 new rules for 2002}
-          { Band222, Band432:  RXData.QSOPoints := 2;}{KK1L: 6.73 new rules for 2002}
-          { Band902, Band1296: RXData.QSOPoints := 4;}{KK1L: 6.73 new rules for 2002}
-          { Band2304:          RXData.QSOPoints := 6;}{KK1L: 6.73 new rules for 2002}
-          { Band3456:          RXData.QSOPoints := 6;}{KK1L: 6.73 new rules for 2002}
-          { Band5760:          RXData.QSOPoints := 6;}{KK1L: 6.73 new rules for 2002}
-          { Band10G:           RXData.QSOPoints := 6;}{KK1L: 6.73 new rules for 2002}
-          { Band24G:           RXData.QSOPoints := 6;}{KK1L: 6.73 new rules for 2002}
-          { BandLight:         RXData.QSOPoints := 6;}{KK1L: 6.73 new rules for 2002}
+          { Band6, Band2:      RXData.QSOPoints := 1;} {KK1L: 6.73 new rules for 2002}
+          { Band222, Band432:  RXData.QSOPoints := 2;} {KK1L: 6.73 new rules for 2002}
+          { Band902, Band1296: RXData.QSOPoints := 4;} {KK1L: 6.73 new rules for 2002}
+          { Band2304:          RXData.QSOPoints := 6;} {KK1L: 6.73 new rules for 2002}
+          { Band3456:          RXData.QSOPoints := 6;} {KK1L: 6.73 new rules for 2002}
+          { Band5760:          RXData.QSOPoints := 6;} {KK1L: 6.73 new rules for 2002}
+          { Band10G:           RXData.QSOPoints := 6;} {KK1L: 6.73 new rules for 2002}
+          { Band24G:           RXData.QSOPoints := 6;} {KK1L: 6.73 new rules for 2002}
+          { BandLight:         RXData.QSOPoints := 6;} {KK1L: 6.73 new rules for 2002}
           Band2: RXData.QSOPoints := 2; {KK1L: 6.73 new rules for 2002}
           Band6: RXData.QSOPoints := 1; {KK1L: 6.73 new rules for 2002}
-  //      else RXData.QSOPoints := 0;
+          //      else RXData.QSOPoints := 0;
         end;
 
-//        if (RXData.Mode = CW) and (RXData.QSOPoints > 0) then inc(RXData.QSOPoints);
+        //        if (RXData.Mode = CW) and (RXData.QSOPoints > 0) then inc(RXData.QSOPoints);
       end;
 
-      HolyLand:
-      begin
-          case RXData.Band of
-            Band160: RXData.QSOPoints := 2;
-            Band80: RXData.QSOPoints := 2;
-            Band40: RXData.QSOPoints := 2;
-            Band20: RXData.QSOPoints := 1;
-            Band15: RXData.QSOPoints := 1;
-            Band10: RXData.QSOPoints := 1;
-          end;
-      end;
-
-
-    CQWPXQSOPointMethod:
-      if RXData.QTH.Continent = MyContinent then
-      begin
-        if RXCty = MyCountry then
-          RXData.QSOPoints := 1
-        else
-        begin
-          case RXData.Band of
-            Band160: RXData.QSOPoints := 2;
-            Band80: RXData.QSOPoints := 2;
-            Band40: RXData.QSOPoints := 2;
-            Band20: RXData.QSOPoints := 1;
-            Band15: RXData.QSOPoints := 1;
-            Band10: RXData.QSOPoints := 1;
-          end;
-
-          if MyContinent = NorthAmerica then
-            RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-        end;
-      end
-      else
-        case RXData.Band of
-          Band160: RXData.QSOPoints := 6;
-          Band80: RXData.QSOPoints := 6;
-          Band40: RXData.QSOPoints := 6;
-          Band20: RXData.QSOPoints := 3;
-          Band15: RXData.QSOPoints := 3;
-          Band10: RXData.QSOPoints := 3;
-        end;
-
-    CQWPXRTTYQSOPointMethod:
-      begin
-        if RXData.QTH.Continent = MyContinent then
-        begin
-          if RXCty = MyCountry then
-            RXData.QSOPoints := 1
-          else
-            RXData.QSOPoints := 2
-        end
-        else
-          RXData.QSOPoints := 3;
-
-        if (RXData.Band = Band80) or (RXData.Band = Band40) then
-          RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-
-      end;
-
-    CQWWQSOPointMethod:
-      if RXData.QTH.Continent <> MyContinent then
-        RXData.QSOPoints := 3
-      else
-        if RXCty <> MyCountry then
-          if MyContinent <> NorthAmerica then
-            RXData.QSOPoints := 1
-          else
-            RXData.QSOPoints := 2
-        else RXData.QSOPoints := 0;
-
-    CQWWRTTYQSOPointMethod:
-      if RXData.QTH.Continent <> MyContinent then
-        RXData.QSOPoints := 3
-      else
-        if RXCty <> MyCountry then
-          RXData.QSOPoints := 2
-        else
-         RXData.QSOPoints := 1;
-
-
-
-    CroatianQSOPointMethod:
-      if RXCty = '9A' then
+    HolyLand: // 4.69.1
       begin
         case RXData.Band of
-          Band160: RXData.QSOPoints := 10;
-          Band80: RXData.QSOPoints := 10;
-          Band40: RXData.QSOPoints := 10;
-          Band20: RXData.QSOPoints := 6;
-          Band15: RXData.QSOPoints := 6;
-          Band10: RXData.QSOPoints := 6;
-        end;
-      end
-      else
-        if RXData.QTH.Continent = MyContinent then
-        begin
-          case RXData.Band of
-            Band160: RXData.QSOPoints := 2;
-            Band80: RXData.QSOPoints := 2;
-            Band40: RXData.QSOPoints := 2;
-            Band20: RXData.QSOPoints := 1;
-            Band15: RXData.QSOPoints := 1;
-            Band10: RXData.QSOPoints := 1;
-          end;
-        end
-        else
-          case RXData.Band of
-            Band160: RXData.QSOPoints := 6;
-            Band80: RXData.QSOPoints := 6;
-            Band40: RXData.QSOPoints := 6;
-            Band20: RXData.QSOPoints := 3;
-            Band15: RXData.QSOPoints := 3;
-            Band10: RXData.QSOPoints := 3;
-          end;
-
-    EuropeanFieldDayQSOPointMethod:
-      begin
-        RXData.QSOPoints := 1;
-
-        CountryID := MyCountry;
-
-        if (CountryID = 'F') or (CountryID = 'OE') then
-        begin
-          if RXCty = MyCountry then
-          begin
-            if PortableStation(RXData.Callsign) then
-              RXData.QSOPoints := 50
-            else
-              RXData.QSOPoints := 10;
-          end
-          else
-            if RXData.QTH.Continent = Europe then
-            begin
-              if PortableStation(RXData.Callsign) then
-                RXData.QSOPoints := 5
-              else
-                RXData.QSOPoints := 1;
-            end
-            else
-              RXData.QSOPoints := 3;
-
-          Exit;
-        end;
-
-        if CountryID = 'OZ' then
-        begin
-          if RXCty = MyCountry then
-          begin
-            if PortableStation(RXData.Callsign) then
-              RXData.QSOPoints := 10
-            else
-              RXData.QSOPoints := 1;
-          end
-          else
-            if RXData.QTH.Continent = Europe then
-            begin
-              if PortableStation(RXData.Callsign) then
-                RXData.QSOPoints := 5
-              else
-                RXData.QSOPoints := 3;
-            end
-            else
-              RXData.QSOPoints := 6;
-
-          Exit;
-        end;
-
-        if CountryID = 'HB' then
-        begin
-          if PortableStation(RXData.Callsign) then
-            RXData.QSOPoints := 5
-          else
-            if RXData.QTH.Continent = Europe then
-              RXData.QSOPoints := 1
-            else
-              RXData.QSOPoints := 2;
-          Exit;
-        end;
-
-        if CountryID = 'I' then
-        begin
-          if PortableStation(RXData.Callsign) then
-            RXData.QSOPoints := 6
-          else
-            if RXData.QTH.Continent = Europe then
-              RXData.QSOPoints := 1
-            else
-              RXData.QSOPoints := 2;
-
-          if (RXData.Band = Band160) or (RXData.Band = Band80) then
-            RXData.QSOPoints := RXData.QSOPoints * 2;
-          Exit;
-        end;
-
-        { Anywhere else, including DL and PA }
-
-        if PortableStation(RXData.Callsign) then
-        begin
-          if RXData.QTH.Continent = Europe then
-            RXData.QSOPoints := 4
-          else
-            RXData.QSOPoints := 6;
-        end
-        else
-        begin
-          if RXData.QTH.Continent = Europe then
-            RXData.QSOPoints := 2
-          else
-            RXData.QSOPoints := 3;
-        end;
-
-        if CountryID[1] = 'G' then
-          if (RXData.Band = Band160) or (RXData.Band = Band10) then
-            RXData.QSOPoints := RXData.QSOPoints * 2;
-
-      end;
-
-    EuropeanSprintQSOPointMethod:
-      if MyContinent = Europe then
-        RXData.QSOPoints := 1
-      else
-        if RXData.QTH.Continent = Europe then
-          RXData.QSOPoints := 1
-        else
-          RXData.QSOPoints := 0;
-
-          FOCMarathonQSOPointMethod:
-
-          if RXData.Callsign = 'G4FOC' then
-      //    if RXData.Callsign = GM4FOC then
-          RXData.QSOPoints := 2
-
-          else
-          RXData.QSOPoints := 1;
-
-    RadioVHFFDQSOPointMethod {, ChampionshipRFVHFQSOPointMethod}:
-      begin
-        if MyGrid <> '' then
-        begin
-          Points := GetDistanceBetweenGrids {GetEuropeanDistanceBetweenGrids}(MyGrid, RXData.DomesticQTH);
-          if RXData.Band = Band2 then RXData.QSOPoints := Points * 1;   // 4.60.4
-          if RXData.Band = Band432 then RXData.QSOPoints := Points * 2;  // 4.60.4
-          if RXData.Band = Band1296 then RXData.QSOPoints := Points * 4;  // 4.60.6
-          if RXData.Band = Band2304 then RXData.QSOPoints := Points * 6; // 4.60.6
-        end;
-      end;
-
-    MakrothenQSOPointMethod:
-      begin
-        if MyGrid <> '' then
-        begin
-          if Copy(MyGrid, 1, 4) = Copy(RXData.DomesticQTH, 1, 4) then
-            RXData.QSOPoints := 100
-          else
-          begin
-            RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-            if RXData.Band = Band40 then
-              RXData.QSOPoints := round(RXData.QSOPoints * 1.5);
-
-            if RXData.Band = Band80 then
-              RXData.QSOPoints := RXData.QSOPoints * 2;
-          end;
-
-        end;
-      end;
-
-   {  NCQSOPointMethod:               // 4.66.1
-       begin
-          
-        if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
-           else
-             RXDATA.QSOPoints := 3;
-        if RXData.Callsign = 'NI4BK' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-        if RXData.Callsign = 'W4DW' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-        if RXData.Callsign = 'W1VOA' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-        if RXData.Callsign = 'NC4QP' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-         if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-       end;
-  }
-
-      OZHCRVHFQSOPointMethod:
-      if MyGrid <> '' then
-      begin
-        Points := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-        if RXData.Band = Band2 then RXData.QSOPoints := Points;
-        if RXData.Band = Band432 then RXData.QSOPoints := Points * 2;
-        if RXData.Band = Band1296 then RXData.QSOPoints := Points * 4;
-        if RXData.Band > Band1296 then RXData.QSOPoints := Points * 6;
-      end;
-
-       EuropeanVHFQSOPointMethod:
-//      if MyGrid <> '' then
-//        if RXData.DomesticQTH <> '' then
-      begin
-    //  RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-        RXData.QSOPoints :=  GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);    //n4af 4.36.11
-        if MyCountry = '9A' then
-        begin
-          if RXData.Band = Band432 then RXData.QSOPoints := RXData.QSOPoints * 5;
-          if RXData.Band = Band1296 then RXData.QSOPoints := RXData.QSOPoints * 10;
-          if RXData.Band = Band2304 then RXData.QSOPoints := RXData.QSOPoints * 20;
-          if RXData.Band in [Band3456, Band5760, Band10G] then RXData.QSOPoints := RXData.QSOPoints * 30;
-          if RXData.Band = Band24G then RXData.QSOPoints := RXData.QSOPoints * 100;
-        end;
-      end;
-
-    TeslaQSOPointMethod:
-//      if MyGrid <> '' then
-//        if RXData.DomesticQTH <> '' then
-     begin
-        RXData.QSOPoints :=  GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);    //n4af 4.36.11
-        if RXData.DomesticQTH = MyGrid then
-        RXData.QSOPoints := 90;
-        DisplayTotalScore;
-      end;
-
-    FistsQSOPointMethod:
-      if RXData.NumberReceived > 0 then
-        RXData.QSOPoints := 5
-      else
-        RXData.QSOPoints := 2;
-
-    HADXQSOPointMethod:
-   begin
-
-    If RXData.QTH.CountryID = 'HA' then        // 4.67.11
-      begin
-       if   (RXData.NumberReceived > 0) then
-        begin
-         RXData.DomesticQTH := InttoStr(RXData.NumberReceived);
-         RXData.DomesticMult := True;
-          RXData.QSOPoints := 6;
-          exit;
-        end;
-          RXData.QSOPoints := 6;
-          exit;
-        end;
-      
-        if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 3
-        else
-          RXData.QSOPoints := 1;
-      end;
-
-    YUDXQSOPointMethod:             // 4.57.5
-        if (MyCountry <> 'YU') and (RXCty = 'YU') then
-        RXData.QSOPoints := 10 
-         else
-        if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 4
-       else
-        if RXCty <> MyCountry then
-          RXData.QSOPoints := 2
-      else
-          RXData.QSOPoints := 1;
-
-     UKEIQSOPointMethod:             // 4.58.2
-       begin
-       if (MyContinent <> Europe) then        // if OOUTSIDE EUROPE
-        begin
-        if UKEIStation(RXData.Callsign) then
-          RXData.QSOPoints := 4
-         else
-          if RxData.QTH.Continent = Europe  then
-           RXData.QSOPoints := 2
-          else
-           RXData.QSOPoints := 1;
-        end;
-
-        if ((MyContinent = Europe) and (not UKEIStation(MyCountry))) then            // if IN Europe
-         begin
-          if (RxData.QTH.Continent = Europe) and (not UKEIStation(RxData.CallSign))then
-          RXData.QSOPoints := 1
-           else
-            RXData.QSOPoints := 2;
-          end;
-
-        if  UKEIStation(MyCountry) then            // if IN UK/EI
-         begin
-          if RxData.QTH.Continent = Europe then
-             RXData.QSOPoints := 2
-          else
-          RXData.QSOPoints := 4 ;
-          tGetSystemTime;
-                 TempHour := UTC.wHour;
-                 if (TempHour >= 01) and (TempHour < 05) then
-                  RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;    // double points if gmthours
-         end;
-
-           
-          Case RxData.Band of
-          Band80,Band40: RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-          end ;
-      
-      end;
-
-    HelvetiaQSOPointMethod:               // issue 214
-        if RXCty = 'HB' then
-          RXData.QSOPoints := 10
-       else
-      if RXData.QTH.Continent = MyContinent then
-            RXData.QSOPoints := 1
-        else
-          RXData.QSOPoints := 3;
-      
-
-
-    BSCIQSOPointMethod:
-      begin
-        Val(MyZone, MyZoneValue, Result);
-        if RXData.Zone = MyZoneValue then
-          RXData.QSOPoints := 1
-        else
-          if RXData.QTH.Continent = MyContinent then
-            RXData.QSOPoints := 3
-          else
-            RXData.QSOPoints := 5;
-
-        if (BlackSeaRegionCountry(RXCty)) or (Copy(RXData.QTHString, 1, 2) = 'BS') then
-          RXData.QSOPoints := 10;
-      end;
-
-    IARUQSOPointMethod:
-      if RXData.DomesticQTH = '' then
-      begin
-          //        Val(RXData.Zone, RXDataZoneValue, RESULT);
-        Val(MyZone, MyZoneValue, Result);
-
-        if RXData.Zone = MyZoneValue then
-          RXData.QSOPoints := 1
-        else
-          if RXData.QTH.Continent = MyContinent then
-            RXData.QSOPoints := 3
-          else
-            RXData.QSOPoints := 5;
-      end
-      else
-        RXData.QSOPoints := 1;
-    {
-      if RXData.DomesticQTH = '' then
-      begin
-        Val(RXData.Zone, RXDataZoneValue, RESULT);
-        Val(MyZone, MyZoneValue, RESULT);
-
-        if RXDataZoneValue = MyZoneValue then
-          RXData.QSOPoints := 1
-        else
-          if RXData.QTH.Continent = MyContinent then
-            RXData.QSOPoints := 3
-          else
-            RXData.QSOPoints := 5;
-      end
-      else
-        RXData.QSOPoints := 1;
-        }
-    InternetSixQSOPointMethod:
-      begin
-        if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 3
-        else
-          if MyContinent <> NorthAmerica then
-            RXData.QSOPoints := 1
-          else
-          begin
-            TheirID := RXCty;
-            if TheirID = 'VE' then TheirID := 'K';
-
-            if {(MyCounty <> 'K') and}(MyCountry <> 'VE') then
-            begin { I am DX }
-              if TheirID = 'K' then
-                RXData.QSOPoints := 3
-              else
-                RXData.QSOPoints := 1;
-            end
-            else
-              if TheirID <> 'K' then { I am W/VE }
-                RXData.QSOPoints := 3
-              else
-                RXData.QSOPoints := 1;
-          end;
-      end;
-
-    IOTAQSOPointMethod:
-      begin
-       if MyState = ''  then             // 4.61.3 change points
-        begin
-         if RXData.domesticQTH <> '' then
-          RXData.QSOpoints := 15
-           else
-            RXData.QSOpoints := 2;
-            exit;
-             end;
-        IOTASTATE := RXDATA.DomesticQTH;
-      {   if pos('-',rxdata.domesticqth) > 0 then     // 4.61.4 assumes dash delineates continent from #
-           delete(iotastate,(pos('-',rxdata.domesticqth)),1);       }
-         if ((RXData.DomesticQTH <> '') and   (MyState <> IOTAState)) then
-          RXData.QSOPoints := 15
-           else
-            RXData.QSOPoints := 5;
-
-   end;
-    JapanInternationalDXQSOPointMethod:
-      begin
-        case RXData.Band of
-          Band160: RXData.QSOPoints := 4;
+          Band160: RXData.QSOPoints := 2;
           Band80: RXData.QSOPoints := 2;
-          Band40: RXData.QSOPoints := 1;
+          Band40: RXData.QSOPoints := 2;
           Band20: RXData.QSOPoints := 1;
           Band15: RXData.QSOPoints := 1;
-          Band10: RXData.QSOPoints := 2;
+          Band10: RXData.QSOPoints := 1;
         end;
+      end;
 
-        if MyCountry = 'JA' then
+    OQPQSOPointMethod: // 4.70.7
+      // 3ODX, 3RAC and 3CCO -   10 points (CW and SSB)
+     begin
+       if RXData.QTH.CountryID = 'VE' then
         begin
-          if RXCty = 'JA' then
-          begin
-            RXData.QSOPoints := 0;
-            RXData.InhibitMults := True;
-          end;
-        end
-        else
-          if (RXCty <> 'JA') and (Copy(RXCty, 1, 2) <> 'JD') then
-          begin
-            RXData.QSOPoints := 0;
-            RXData.InhibitMults := True;
-          end;
-      end;
-
-    KCJQSOPointMethod:
-      if MyCountry = 'JA' then
-      begin
-        if (RXCty = 'JA') or (RXCty = 'JD1') then
-          RXData.QSOPoints := 1
-        else
-          RXData.QSOPoints := 5;
-      end
+          if ((pos('3ODX', RXData.Callsign) > 0) or (pos('3RAC', RXData.Callsign) > 0) or (pos('3CCO', RXData.Callsign) > 0)) then
+           begin
+               RXData.QSOPoints := 10;
+               exit;
+           end;
+        end;
+      if ActiveMode = CW then RXData.QSOPoints := 2
       else
-      begin
-        if (RXCty = 'JA') or (RXCty = 'JD1') then
-          RXData.QSOPoints := 1
-      end;
+        RXData.QSOPoints := 1;
+     end;
+
+CQWPXQSOPointMethod:
+if RXData.QTH.Continent = MyContinent then
+begin
+  if RXCty = MyCountry then
+    RXData.QSOPoints := 1
+  else
+  begin
+    case RXData.Band of
+      Band160: RXData.QSOPoints := 2;
+      Band80: RXData.QSOPoints := 2;
+      Band40: RXData.QSOPoints := 2;
+      Band20: RXData.QSOPoints := 1;
+      Band15: RXData.QSOPoints := 1;
+      Band10: RXData.QSOPoints := 1;
+    end;
+
+    if MyContinent = NorthAmerica then
+      RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+  end;
+end
+else
+  case RXData.Band of
+    Band160: RXData.QSOPoints := 6;
+    Band80: RXData.QSOPoints := 6;
+    Band40: RXData.QSOPoints := 6;
+    Band20: RXData.QSOPoints := 3;
+    Band15: RXData.QSOPoints := 3;
+    Band10: RXData.QSOPoints := 3;
+  end;
+
+CQWPXRTTYQSOPointMethod:
+begin
+  if RXData.QTH.Continent = MyContinent then
+  begin
+    if RXCty = MyCountry then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 2
+  end
+  else
+    RXData.QSOPoints := 3;
+
+  if (RXData.Band = Band80) or (RXData.Band = Band40) then
+    RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+
+end;
+
+CQWWQSOPointMethod:
+if RXData.QTH.Continent <> MyContinent then
+  RXData.QSOPoints := 3
+else if RXCty <> MyCountry then
+  if MyContinent <> NorthAmerica then
+    RXData.QSOPoints := 1
+  else
+    RXData.QSOPoints := 2
+else
+  RXData.QSOPoints := 0;
+
+CQWWRTTYQSOPointMethod:
+if RXData.QTH.Continent <> MyContinent then
+  RXData.QSOPoints := 3
+else if RXCty <> MyCountry then
+  RXData.QSOPoints := 2
+else
+  RXData.QSOPoints := 1;
+
+CroatianQSOPointMethod:
+if RXCty = '9A' then
+begin
+  case RXData.Band of
+    Band160: RXData.QSOPoints := 10;
+    Band80: RXData.QSOPoints := 10;
+    Band40: RXData.QSOPoints := 10;
+    Band20: RXData.QSOPoints := 6;
+    Band15: RXData.QSOPoints := 6;
+    Band10: RXData.QSOPoints := 6;
+  end;
+end
+else if RXData.QTH.Continent = MyContinent then
+begin
+  case RXData.Band of
+    Band160: RXData.QSOPoints := 2;
+    Band80: RXData.QSOPoints := 2;
+    Band40: RXData.QSOPoints := 2;
+    Band20: RXData.QSOPoints := 1;
+    Band15: RXData.QSOPoints := 1;
+    Band10: RXData.QSOPoints := 1;
+  end;
+end
+else
+  case RXData.Band of
+    Band160: RXData.QSOPoints := 6;
+    Band80: RXData.QSOPoints := 6;
+    Band40: RXData.QSOPoints := 6;
+    Band20: RXData.QSOPoints := 3;
+    Band15: RXData.QSOPoints := 3;
+    Band10: RXData.QSOPoints := 3;
+  end;
+
+EuropeanFieldDayQSOPointMethod:
+begin
+  RXData.QSOPoints := 1;
+
+  CountryID := MyCountry;
+
+  if (CountryID = 'F') or (CountryID = 'OE') then
+  begin
+    if RXCty = MyCountry then
+    begin
+      if PortableStation(RXData.Callsign) then
+        RXData.QSOPoints := 50
+      else
+        RXData.QSOPoints := 10;
+    end
+    else if RXData.QTH.Continent = Europe then
+    begin
+      if PortableStation(RXData.Callsign) then
+        RXData.QSOPoints := 5
+      else
+        RXData.QSOPoints := 1;
+    end
+    else
+      RXData.QSOPoints := 3;
+
+    Exit;
+  end;
+
+  if CountryID = 'OZ' then
+  begin
+    if RXCty = MyCountry then
+    begin
+      if PortableStation(RXData.Callsign) then
+        RXData.QSOPoints := 10
+      else
+        RXData.QSOPoints := 1;
+    end
+    else if RXData.QTH.Continent = Europe then
+    begin
+      if PortableStation(RXData.Callsign) then
+        RXData.QSOPoints := 5
+      else
+        RXData.QSOPoints := 3;
+    end
+    else
+      RXData.QSOPoints := 6;
+
+    Exit;
+  end;
+
+  if CountryID = 'HB' then
+  begin
+    if PortableStation(RXData.Callsign) then
+      RXData.QSOPoints := 5
+    else if RXData.QTH.Continent = Europe then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 2;
+    Exit;
+  end;
+
+  if CountryID = 'I' then
+  begin
+    if PortableStation(RXData.Callsign) then
+      RXData.QSOPoints := 6
+    else if RXData.QTH.Continent = Europe then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 2;
+
+    if (RXData.Band = Band160) or (RXData.Band = Band80) then
+      RXData.QSOPoints := RXData.QSOPoints * 2;
+    Exit;
+  end;
+
+  { Anywhere else, including DL and PA }
+
+  if PortableStation(RXData.Callsign) then
+  begin
+    if RXData.QTH.Continent = Europe then
+      RXData.QSOPoints := 4
+    else
+      RXData.QSOPoints := 6;
+  end
+  else
+  begin
+    if RXData.QTH.Continent = Europe then
+      RXData.QSOPoints := 2
+    else
+      RXData.QSOPoints := 3;
+  end;
+
+  if CountryID[1] = 'G' then
+    if (RXData.Band = Band160) or (RXData.Band = Band10) then
+      RXData.QSOPoints := RXData.QSOPoints * 2;
+
+end;
+
+EuropeanSprintQSOPointMethod:
+if MyContinent = Europe then
+  RXData.QSOPoints := 1
+else if RXData.QTH.Continent = Europe then
+  RXData.QSOPoints := 1
+else
+  RXData.QSOPoints := 0;
+
+FOCMarathonQSOPointMethod:
+
+if RXData.Callsign = 'G4FOC' then
+  //    if RXData.Callsign = GM4FOC then
+  RXData.QSOPoints := 2
+
+else
+  RXData.QSOPoints := 1;
+
+RadioVHFFDQSOPointMethod {, ChampionshipRFVHFQSOPointMethod}:
+begin
+  if MyGrid <> '' then
+  begin
+    Points := GetDistanceBetweenGrids {GetEuropeanDistanceBetweenGrids}(MyGrid,
+      RXData.DomesticQTH);
+    if RXData.Band = Band2 then
+      RXData.QSOPoints := Points * 1; // 4.60.4
+    if RXData.Band = Band432 then
+      RXData.QSOPoints := Points * 2; // 4.60.4
+    if RXData.Band = Band1296 then
+      RXData.QSOPoints := Points * 4; // 4.60.6
+    if RXData.Band = Band2304 then
+      RXData.QSOPoints := Points * 6; // 4.60.6
+  end;
+end;
+
+MakrothenQSOPointMethod:
+begin
+  if MyGrid <> '' then
+  begin
+    if Copy(MyGrid, 1, 4) = Copy(RXData.DomesticQTH, 1, 4) then
+      RXData.QSOPoints := 100
+    else
+    begin
+      RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+      if RXData.Band = Band40 then
+        RXData.QSOPoints := round(RXData.QSOPoints * 1.5);
+
+      if RXData.Band = Band80 then
+        RXData.QSOPoints := RXData.QSOPoints * 2;
+    end;
+
+  end;
+end;
+
+{  NCQSOPointMethod:               // 4.66.1
+    begin
+
+     if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
+        else
+          RXDATA.QSOPoints := 3;
+     if RXData.Callsign = 'NI4BK' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'W4DW' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'W1VOA' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'NC4QP' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+      if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+    end;
+}
+
+OZHCRVHFQSOPointMethod:
+if MyGrid <> '' then
+begin
+  Points := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+  if RXData.Band = Band2 then
+    RXData.QSOPoints := Points;
+  if RXData.Band = Band432 then
+    RXData.QSOPoints := Points * 2;
+  if RXData.Band = Band1296 then
+    RXData.QSOPoints := Points * 4;
+  if RXData.Band > Band1296 then
+    RXData.QSOPoints := Points * 6;
+end;
+
+EuropeanVHFQSOPointMethod:
+//      if MyGrid <> '' then
+//        if RXData.DomesticQTH <> '' then
+begin
+  //  RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+  RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+    //n4af 4.36.11
+  if MyCountry = '9A' then
+  begin
+    if RXData.Band = Band432 then
+      RXData.QSOPoints := RXData.QSOPoints * 5;
+    if RXData.Band = Band1296 then
+      RXData.QSOPoints := RXData.QSOPoints * 10;
+    if RXData.Band = Band2304 then
+      RXData.QSOPoints := RXData.QSOPoints * 20;
+    if RXData.Band in [Band3456, Band5760, Band10G] then
+      RXData.QSOPoints := RXData.QSOPoints * 30;
+    if RXData.Band = Band24G then
+      RXData.QSOPoints := RXData.QSOPoints * 100;
+  end;
+end;
+
+TeslaQSOPointMethod:
+//      if MyGrid <> '' then
+//        if RXData.DomesticQTH <> '' then
+begin
+  RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+    //n4af 4.36.11
+  if RXData.DomesticQTH = MyGrid then
+    RXData.QSOPoints := 90;
+  DisplayTotalScore;
+end;
+
+FistsQSOPointMethod:
+if RXData.NumberReceived > 0 then
+  RXData.QSOPoints := 5
+else
+  RXData.QSOPoints := 2;
+
+HADXQSOPointMethod:
+begin
+
+  if RXData.QTH.CountryID = 'HA' then // 4.67.11
+  begin
+    if (RXData.NumberReceived > 0) then
+    begin
+      RXData.DomesticQTH := InttoStr(RXData.NumberReceived);
+      RXData.DomesticMult := True;
+      RXData.QSOPoints := 6;
+      exit;
+    end;
+    RXData.QSOPoints := 6;
+    exit;
+  end;
+
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 1;
+end;
+
+YUDXQSOPointMethod: // 4.57.5
+if (MyCountry <> 'YU') and (RXCty = 'YU') then
+  RXData.QSOPoints := 10
+else if RXData.QTH.Continent <> MyContinent then
+  RXData.QSOPoints := 4
+else if RXCty <> MyCountry then
+  RXData.QSOPoints := 2
+else
+  RXData.QSOPoints := 1;
+
+UKEIQSOPointMethod: // 4.58.2
+begin
+  if (MyContinent <> Europe) then // if OOUTSIDE EUROPE
+  begin
+    if UKEIStation(RXData.Callsign) then
+      RXData.QSOPoints := 4
+    else if RxData.QTH.Continent = Europe then
+      RXData.QSOPoints := 2
+    else
+      RXData.QSOPoints := 1;
+  end;
+
+  if ((MyContinent = Europe) and (not UKEIStation(MyCountry))) then
+    // if IN Europe
+  begin
+    if (RxData.QTH.Continent = Europe) and (not UKEIStation(RxData.CallSign))
+      then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 2;
+  end;
+
+  if UKEIStation(MyCountry) then // if IN UK/EI
+  begin
+    if RxData.QTH.Continent = Europe then
+      RXData.QSOPoints := 2
+    else
+      RXData.QSOPoints := 4;
+    tGetSystemTime;
+    TempHour := UTC.wHour;
+    if (TempHour >= 01) and (TempHour < 05) then
+      RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+        // double points if gmthours
+  end;
+
+  case RxData.Band of
+    Band80, Band40: RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+  end;
+
+end;
+
+HelvetiaQSOPointMethod: // issue 214
+if RXCty = 'HB' then
+  RXData.QSOPoints := 10
+else if RXData.QTH.Continent = MyContinent then
+  RXData.QSOPoints := 1
+else
+  RXData.QSOPoints := 3;
+
+BSCIQSOPointMethod:
+begin
+  Val(MyZone, MyZoneValue, Result);
+  if RXData.Zone = MyZoneValue then
+    RXData.QSOPoints := 1
+  else if RXData.QTH.Continent = MyContinent then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 5;
+
+  if (BlackSeaRegionCountry(RXCty)) or (Copy(RXData.QTHString, 1, 2) = 'BS')
+    then
+    RXData.QSOPoints := 10;
+end;
+
+IARUQSOPointMethod:
+if RXData.DomesticQTH = '' then
+begin
+  //        Val(RXData.Zone, RXDataZoneValue, RESULT);
+  Val(MyZone, MyZoneValue, Result);
+
+  if RXData.Zone = MyZoneValue then
+    RXData.QSOPoints := 1
+  else if RXData.QTH.Continent = MyContinent then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 5;
+end
+else
+  RXData.QSOPoints := 1;
+{
+  if RXData.DomesticQTH = '' then
+  begin
+    Val(RXData.Zone, RXDataZoneValue, RESULT);
+    Val(MyZone, MyZoneValue, RESULT);
+
+    if RXDataZoneValue = MyZoneValue then
+      RXData.QSOPoints := 1
+    else
+      if RXData.QTH.Continent = MyContinent then
+        RXData.QSOPoints := 3
+      else
+        RXData.QSOPoints := 5;
+  end
+  else
+    RXData.QSOPoints := 1;
+    }
+InternetSixQSOPointMethod:
+begin
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 3
+  else if MyContinent <> NorthAmerica then
+    RXData.QSOPoints := 1
+  else
+  begin
+    TheirID := RXCty;
+    if TheirID = 'VE' then
+      TheirID := 'K';
+
+    if {(MyCounty <> 'K') and}(MyCountry <> 'VE') then
+    begin { I am DX }
+      if TheirID = 'K' then
+        RXData.QSOPoints := 3
+      else
+        RXData.QSOPoints := 1;
+    end
+    else if TheirID <> 'K' then { I am W/VE }
+      RXData.QSOPoints := 3
+    else
+      RXData.QSOPoints := 1;
+  end;
+end;
+
+IOTAQSOPointMethod:
+begin
+  if MyState = '' then // 4.61.3 change points
+  begin
+    if RXData.domesticQTH <> '' then
+      RXData.QSOpoints := 15
+    else
+      RXData.QSOpoints := 2;
+    exit;
+  end;
+  IOTASTATE := RXDATA.DomesticQTH;
+  {   if pos('-',rxdata.domesticqth) > 0 then     // 4.61.4 assumes dash delineates continent from #
+       delete(iotastate,(pos('-',rxdata.domesticqth)),1);       }
+  if ((RXData.DomesticQTH <> '') and (MyState <> IOTAState)) then
+    RXData.QSOPoints := 15
+  else
+    RXData.QSOPoints := 5;
+
+end;
+JapanInternationalDXQSOPointMethod:
+begin
+  case RXData.Band of
+    Band160: RXData.QSOPoints := 4;
+    Band80: RXData.QSOPoints := 2;
+    Band40: RXData.QSOPoints := 1;
+    Band20: RXData.QSOPoints := 1;
+    Band15: RXData.QSOPoints := 1;
+    Band10: RXData.QSOPoints := 2;
+  end;
+
+  if MyCountry = 'JA' then
+  begin
+    if RXCty = 'JA' then
+    begin
+      RXData.QSOPoints := 0;
+      RXData.InhibitMults := True;
+    end;
+  end
+  else if (RXCty <> 'JA') and (Copy(RXCty, 1, 2) <> 'JD') then
+  begin
+    RXData.QSOPoints := 0;
+    RXData.InhibitMults := True;
+  end;
+end;
+
+KCJQSOPointMethod:
+if MyCountry = 'JA' then
+begin
+  if (RXCty = 'JA') or (RXCty = 'JD1') then
+    RXData.QSOPoints := 1
+  else
+    RXData.QSOPoints := 5;
+end
+else
+begin
+  if (RXCty = 'JA') or (RXCty = 'JD1') then
+    RXData.QSOPoints := 1
+end;
 {
     MQPQSOPointMethod:
       if RXData.Callsign = 'W0EF' then
@@ -6285,486 +6498,499 @@ begin
         else
           RXData.QSOPoints := 1;
 }
-    NZFieldDayQSOPointMethod:
-      begin
-        if RXCty = 'ZL' then
-        begin
-          if RXData.Mode = CW then
-            RXData.QSOPoints := 5
-          else
-            RXData.QSOPoints := 3;
-        end
-        else
-          RXData.QSOPoints := 10;
+NZFieldDayQSOPointMethod:
+begin
+  if RXCty = 'ZL' then
+  begin
+    if RXData.Mode = CW then
+      RXData.QSOPoints := 5
+    else
+      RXData.QSOPoints := 3;
+  end
+  else
+    RXData.QSOPoints := 10;
 
-        if RXData.Zone = StrToInt(MyZone) then
-          RXData.ZoneMult := False;
+  if RXData.Zone = StrToInt(MyZone) then
+    RXData.ZoneMult := False;
 
-      end;
+end;
 
-    OKDXQSOPointMethod:
+OKDXQSOPointMethod:
 //      if (MyCountry = 'OK') or (MyCountry = 'OM') then
-      if OKOMStation(MyCountry) then
-      begin
-        if RXData.QTH.Continent <> Europe then
-          RXData.QSOPoints := 3
-        else
-//          if (RXCty <> 'OK') and (RXCty <> 'OM') then
-          if not OKOMStation(RXCty) then
-            RXData.QSOPoints := 1
-          else
-            RXData.QSOPoints := 0;
-      end
-      else
-//        if (RXCty = 'OK') or (RXCty = 'OM') then
-        if OKOMStation(RXCty) then
-        begin
-          if MyContinent = Europe then
-            RXData.QSOPoints := 1
-          else
-            RXData.QSOPoints := 3;
-        end
-        else
-          RXData.QSOPoints := 0;
+if OKOMStation(MyCountry) then
+begin
+  if RXData.QTH.Continent <> Europe then
+    RXData.QSOPoints := 3
+  else
+    {//          if (RXCty <> 'OK') and (RXCty <> 'OM') then} if not
+      OKOMStation(RXCty) then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 0;
+end
+else
+  {//        if (RXCty = 'OK') or (RXCty = 'OM') then} if OKOMStation(RXCty)
+    then
+  begin
+    if MyContinent = Europe then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 3;
+  end
+  else
+    RXData.QSOPoints := 0;
 
-    RAEMQSOPointMethod:
-      begin
+RAEMQSOPointMethod:
+begin
 
-        if LooksLikeAGeoCoordinates(MyState, la1, lo1) then
-          if LooksLikeAGeoCoordinates(RXData.QTHString, la2, lo2) then
-          begin
-            Distance := Abs(lo1 - lo2);
-            if Distance > 180 then Distance := 360 - Distance;
-            RXData.QSOPoints := 50 + Abs(la2 - la1) + Distance;
-            if RXData.Callsign = 'RAEM' then RXData.QSOPoints := RXData.QSOPoints + 300;
-            if la2 > 65 + 90 then RXData.QSOPoints := RXData.QSOPoints + 100;
-            if la1 > 65 + 90 then RXData.QSOPoints := round(RXData.QSOPoints * 1.1);
-          end;
+  if LooksLikeAGeoCoordinates(MyState, la1, lo1) then
+    if LooksLikeAGeoCoordinates(RXData.QTHString, la2, lo2) then
+    begin
+      Distance := Abs(lo1 - lo2);
+      if Distance > 180 then
+        Distance := 360 - Distance;
+      RXData.QSOPoints := 50 + Abs(la2 - la1) + Distance;
+      if RXData.Callsign = 'RAEM' then
+        RXData.QSOPoints := RXData.QSOPoints + 300;
+      if la2 > 65 + 90 then
+        RXData.QSOPoints := RXData.QSOPoints + 100;
+      if la1 > 65 + 90 then
+        RXData.QSOPoints := round(RXData.QSOPoints * 1.1);
+    end;
+end;
+
+RACQSOPointMethod:
+if RXCty = 'VE' then
+begin
+  if pos('RAC', RXData.Callsign) > 0 then
+    RXData.QSOPoints := 20
+  else
+    RXData.QSOPoints := 10;
+end
+else
+  RXData.QSOPoints := 2;
+
+RSGBQSOPointMethod:
+if MyCountry = RXCty then
+  RXData.QSOPoints := 0
+else
+  case RXData.QTH.Continent of
+    Europe: RXData.QSOPoints := 5;
+    Oceania: RXData.QSOPoints := 30;
+  else
+    RXData.QSOPoints := 15;
+  end;
+
+RSGB160Method: // 4.67.1
+begin
+  if (RXData.DomMultQTH <> '') and (mo.isdmmult(rxdata.dommultqth, all, both) =
+    TRUE) then
+    rxdata.qsopoints := 7
+  else if mo.isdxmult(RXData.QTH.Country, all, both) = TRUE then
+    rxdata.qsopoints := 7
+  else
+    rxdata.qsopoints := 2;
+  exit;
+end;
+
+RDAQSOPointMethod:
+begin
+  RXData.QSOPoints := 0;
+  if RussianID(MyCountry) then
+  begin
+    if RussianID(RXCty) then
+    begin
+      if pos('/P', RXData.Callsign) = length(RXData.Callsign) - 1 then
+      begin
+        RXData.QSOPoints := 10;
+        Exit;
       end;
-
-    RACQSOPointMethod:
-      if RXCty = 'VE' then
-      begin
-        if pos('RAC', RXData.Callsign) > 0 then
-          RXData.QSOPoints := 20
-        else
-          RXData.QSOPoints := 10;
-      end
-      else
-        RXData.QSOPoints := 2;
-
-    RSGBQSOPointMethod:
-      if MyCountry = RXCty then
-        RXData.QSOPoints := 0
-      else
-        case RXData.QTH.Continent of
-          Europe: RXData.QSOPoints := 5;
-          Oceania: RXData.QSOPoints := 30;
-        else RXData.QSOPoints := 15;
-        end;
-
-     RSGB160Method:                   // 4.67.1
-     begin
-      if (RXData.DomMultQTH <> '') and (mo.isdmmult(rxdata.dommultqth,all,both) = TRUE) then
-       rxdata.qsopoints := 7
-        else
-         if mo.isdxmult(RXData.QTH.Country,all,both) = TRUE then
-           rxdata.qsopoints := 7
-         else
-           rxdata.qsopoints := 2;
-            exit;
-             end;
-
-
-    RDAQSOPointMethod:
-      begin
-        RXData.QSOPoints := 0;
-        if RussianID(MyCountry) then
-        begin
-          if RussianID(RXCty) then
-          begin
-            if pos('/P', RXData.Callsign) = length(RXData.Callsign) - 1 then
-            begin
-              RXData.QSOPoints := 10;
-              Exit;
-            end;
-            RXData.QSOPoints := 1;
-            if RXData.QTH.Continent <> MyContinent then RXData.QSOPoints := 2;
-            Exit;
-          end;
-          if RXData.QTH.Continent = MyContinent then RXData.QSOPoints := 3 else RXData.QSOPoints := 5;
-        end
-        else
-          if RussianID(RXCty) then
-            RXData.QSOPoints := 10;
-      end;
-
-    RussianDXQSOPointMethod:
-      begin
-
-        if RussianID(MyCountry) then
-        begin
-          if RXData.QTH.Continent <> MyContinent then
-            RXData.QSOPoints := 5
-          else
-            if RXCty <> MyCountry then
-              RXData.QSOPoints := 3
-            else
-              RXData.QSOPoints := 2;
-        end
-
-            { I am not in Russia }
-
-        else
-          if RussianID(RXCty) then
-            RXData.QSOPoints := 10
-          else
-            if RXData.QTH.Continent <> MyContinent then
-              RXData.QSOPoints := 5
-            else
-              if RXCty <> MyCountry then
-                RXData.QSOPoints := 3
-              else
-                RXData.QSOPoints := 2;
-      end;
-
-    SalmonRunQSOPointMethod:
-      begin
-        if RXData.Mode = CW then
-          RXData.QSOPoints := 4
-        else
-          RXData.QSOPoints := 2;
-      end;
-
-    ScandinavianQSOPointMethod:
-      begin
-        if ScandinavianCountry(MyCountry) then
-        begin
-          if ScandinavianCountry(RXCty) then
-            RXData.QSOPoints := 0
-          else
-            if RXData.QTH.Continent = Europe then
-              RXData.QSOPoints := 2
-            else
-              RXData.QSOPoints := 3;
-        end
-        else
-        begin
-          if ScandinavianCountry(RXCty) then
-            RXData.QSOPoints := 1
-          else
-            RXData.QSOPoints := 0;
-
-          if MyContinent <> Europe then
-            if RXData.Band in [Band80, Band40] then
-              RXData.QSOPoints := RXData.QSOPoints * 3;
-        end;
-        if RXData.Band = Band160 then RXData.QSOPoints := 0;
-      end;
-
-   
-    
-
-    IndonesianQSOPointMethod:               // 4.64.1
-      begin
-        if IndonesianCountry(MyCountry) then
-        begin
-          if IndonesianCountry(RXCty) then
-            RXData.QSOPoints := 0
-          else
-            if RXData.QTH.Continent <> MyContinent then
-              RXData.QSOPoints := 10
-            else
-              RXData.QSOPoints := 5;
-        end
-        else
-        begin
-          if IndonesianCountry(RXCty) then
-            RXData.QSOPoints := 10
-          else
-          if RXData.QTH.Continent <> MyContinent then
-            RXData.QSOPoints := 3
-            else
-           if RXCty <> MyCountry then
-             RXData.QSOPoints := 2
-             else
-              RXData.QSOPoints := 1;
-         end;
-
-      end;
-
-
-
-    SLFivePointQSOMethod:
-      if Copy(RXData.Callsign, 1, 2) = 'SL' then
-        RXData.QSOPoints := 5
-      else
-        RXData.QSOPoints := 1;
-
-    SouthAmericanWWQSOPointMethod:
-      begin
-        if MyContinent = SouthAmerica then
-        begin
-          if RXData.QTH.Continent = SouthAmerica then
-            RXData.QSOPoints := 2
-          else
-            RXData.QSOPoints := 10;
-        end
-        else
-          if RXData.QTH.Continent = SouthAmerica then
-            RXData.QSOPoints := 10
-          else
-            RXData.QSOPoints := 2;
-      end;
-
-    StewPerryQSOPointMethod:
-      begin
-        if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
-        begin
-          Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-          RXData.QSOPoints := (Distance div 500) + 1;
-        end
-        else
-          RXData.QSOPoints := 1;
-      end;
-
-    TenTenQSOPointMethod:
-      if RXData.TenTenNum <> -1 then
-        RXData.QSOPoints := 2
-      else
-        RXData.QSOPoints := 1;
-
-    TOECQSOPointMethod:
+      RXData.QSOPoints := 1;
       if RXData.QTH.Continent <> MyContinent then
-        RXData.QSOPoints := 3
-      else
-        if StringHas(RXData.Callsign, '/M') then
-          RXData.QSOPoints := 3
-        else
-          RXData.QSOPoints := 1;
-
-    UBAQSOPointMethod:
-      begin
-        if RXCty = 'ON' then
-          RXData.QSOPoints := 10
-        else
-          if UBACountry(RXCty) then
-            RXData.QSOPoints := 3
-          else
-            RXData.QSOPoints := 1;
-      end;
-
-    UkrainianQSOPointMethod:
-      begin
-
-        if RXCty = 'UR' then
-          RXData.QSOPoints := 10
-        else
-          if RXCty = MyCountry then
-            RXData.QSOPoints := 1
-          else
-            if RXData.QTH.Continent = MyContinent then
-              RXData.QSOPoints := 2
-            else
-              RXData.QSOPoints := 3;
-        if MyCountry = 'UR' then
-        begin
-          if RXCty = 'UR' then RXData.QSOPoints := 1;
-          RXData.DomesticMult := False;
-        end;
-      end;
-
-    VKZLQSOPointMethod:
-      if ((MyContinent = Oceania) or (RXData.QTH.Continent = Oceania)) then
-      begin
-        case RXData.Band of
-          Band160: RXData.QSOPoints := 20;
-          Band80: RXData.QSOPoints := 10;
-          Band40: RXData.QSOPoints := 5;
-          Band20: RXData.QSOPoints := 1;
-          Band15: RXData.QSOPoints := 2;
-          Band10: RXData.QSOPoints := 3;
-        end;
-      end
-      else
-        RXData.QSOPoints := 0;
-
-    WAGQSOPointMethod:
-      if MyCountry = 'DL' then
-      begin
-        if RXCty = 'DL' then
-          RXData.QSOPoints := 1
-        else
-          if RXData.QTH.Continent = Europe then
-            RXData.QSOPoints := 3
-          else
-            RXData.QSOPoints := 5;
-      end
-      else
-      begin
-        if RXCty = 'DL' then
-          RXData.QSOPoints := 3
-        else
-          RXData.QSOPoints := 0;
-      end;
-
-    WAEQSOPointMethod:
-      if MyContinent = Europe then
-        if (RXData.QTH.Continent <> Europe) and (RXData.Band <> Band160) then
-          RXData.QSOPoints := 1
-        else
-          RXData.QSOPoints := 0
-      else
-        if (RXData.QTH.Continent = Europe) and (RXData.Band <> Band160) then
-          RXData.QSOPoints := 1
-        else
-          RXData.QSOPoints := 0;
-
-    WWLQSOPointMethod:
-      begin
-        if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
-        begin
-          Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-          RXData.QSOPoints := (Distance div 500) + 1;
-
-          if (RXData.Band = Band80) or (RXData.Band = Band160) then
-            RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-
-          if RXData.Band = Band160 then
-            RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-        end
-        else
-          RXData.QSOPoints := 1;
-      end;
-
-    YODXQSOPointMethod:
-      if RXCty = 'YO' then RXData.QSOPoints := 8
-      else
-
-        if MyCountry <> RXCty then
-          if RXData.QTH.Continent <> MyContinent then RXData.QSOPoints := 4
-          else
-            RXData.QSOPoints := 2
-        else
-          RXData.QSOPoints := 1; {KK1L: 6.71 Same country QSO}
-
-    NoQSOPointMethod: RXData.QSOPoints := 0;
-
-    AlwaysOnePointPerQSO: RXData.QSOPoints := 1;
-    OnePointPerQSO: RXData.QSOPoints := 1;
-    TwoPointsPerQSO: RXData.QSOPoints := 2;
-    ThreePointsPerQSO: RXData.QSOPoints := 3;
-    TenPointsPerQSO: RXData.QSOPoints := 10;
-
-    ThreePhoneFiveCWFourRTTY:       // 4.55.4
-     Case RXData.Mode of
-      CW:  RXData.QSOPoints := 5;
-      Phone: RXData.QSOPoints := 3 ;
-       else  RXData.QSOPoints := 4;
-      end;
-
-
-
-
-    TwoPhoneFourCW:
-      if RXData.Mode = CW then RXData.QSOPoints := 4
-      else RXData.QSOPoints := 2;
-
-    TwoPhoneThreeCW:
-      if RXData.Mode = CW then RXData.QSOPoints := 3
-      else RXData.QSOPoints := 2;
-
-    OnePhoneTwoCW:
-      if RXData.Mode = CW then RXData.QSOPoints := 2
-      else RXData.QSOPoints := 1;
-
-    ThreePhoneFiveCW:
-      if RXData.Mode = CW then RXData.QSOPoints := 5
-      else RXData.QSOPoints := 3;
-
-    OneEuropeTwoOther: {KK1L: 6.68 Used for WRTC 2002}
-      if MarineOrAirMobileStation(RXData.Callsign) then
-        RXData.QSOPoints := 2
-      else
-        if RXData.QTH.Continent = Europe then
-          RXData.QSOPoints := 1
-        else
-          RXData.QSOPoints := 2;
-
-
-    CupRFMethod:
-      begin
-
-        if (MyGrid <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
-        begin
-          Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString {DomesticQTH});
-
-          if Distance > 7000 then RXData.QSOPoints := 62;
-          if Distance <= 7000 then RXData.QSOPoints := 57;
-          if Distance <= 6000 then RXData.QSOPoints := 52;
-          if Distance <= 5000 then RXData.QSOPoints := 47;
-          if Distance <= 4000 then RXData.QSOPoints := 42;
-          if Distance <= 3000 then RXData.QSOPoints := 38;
-          if Distance <= 2000 then RXData.QSOPoints := 35;
-          if Distance <= 1000 then RXData.QSOPoints := 31;
-            //            if RXData.Band = Band160 then RXData.QSOPoints := round(RXData.QSOPoints * 1.3);
-            //            if RXData.Band = Band80 then RXData.QSOPoints := round(RXData.QSOPoints * 1.25);
-            //            if RXData.Band = Band40 then RXData.QSOPoints := round(RXData.QSOPoints * 1.15);
-            //            if RXData.Band = Band10 then RXData.QSOPoints := round(RXData.QSOPoints * 1.1);
-        end
-        else
-          RXData.QSOPoints := 1;
-
-      end;
-    UA4WMethod:
-      begin
         RXData.QSOPoints := 2;
+      Exit;
+    end;
+    if RXData.QTH.Continent = MyContinent then
+      RXData.QSOPoints := 3
+    else
+      RXData.QSOPoints := 5;
+  end
+  else if RussianID(RXCty) then
+    RXData.QSOPoints := 10;
+end;
 
-        if GetOblast(MyCall) = '4W' then
-        begin
-          if RXData.DomesticQTH <> MyState
-            then RXData.QSOPoints := 4;
-          Exit;
-        end;
+RussianDXQSOPointMethod:
+begin
 
-        if RXData.DomesticQTH <> MyState then
-        begin
-          if RXData.Band = Band80 then RXData.QSOPoints := 3;
-          if RXData.Band = Band160 then RXData.QSOPoints := 5;
+  if RussianID(MyCountry) then
+  begin
+    if RXData.QTH.Continent <> MyContinent then
+      RXData.QSOPoints := 5
+    else if RXCty <> MyCountry then
+      RXData.QSOPoints := 3
+    else
+      RXData.QSOPoints := 2;
+  end
 
-          if GetOblast(RXData.Callsign) = '4W' then
-          begin
-            if RXData.Band = Band80 then RXData.QSOPoints := 5;
-            if RXData.Band = Band160 then RXData.QSOPoints := 10;
-            MyZoneValue := ctyGetCQZone(MyCall);
-            if MyZoneValue in [18, 19] then
-            begin
-              if RXData.Band = Band80 then RXData.QSOPoints := 10;
-              if RXData.Band = Band160 then RXData.QSOPoints := 20;
-            end;
-          end;
-        end;
+    { I am not in Russia }
 
-      end;
-  
-    ChampionshipRFMethod:
+  else if RussianID(RXCty) then
+    RXData.QSOPoints := 10
+  else if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 5
+  else if RXCty <> MyCountry then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 2;
+end;
+
+SalmonRunQSOPointMethod:
+begin
+  if RXData.Mode = CW then
+    RXData.QSOPoints := 4
+  else
+    RXData.QSOPoints := 2;
+end;
+
+ScandinavianQSOPointMethod:
+begin
+  if ScandinavianCountry(MyCountry) then
+  begin
+    if ScandinavianCountry(RXCty) then
+      RXData.QSOPoints := 0
+    else if RXData.QTH.Continent = Europe then
+      RXData.QSOPoints := 2
+    else
+      RXData.QSOPoints := 3;
+  end
+  else
+  begin
+    if ScandinavianCountry(RXCty) then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 0;
+
+    if MyContinent <> Europe then
+      if RXData.Band in [Band80, Band40] then
+        RXData.QSOPoints := RXData.QSOPoints * 3;
+  end;
+  if RXData.Band = Band160 then
+    RXData.QSOPoints := 0;
+end;
+
+IndonesianQSOPointMethod: // 4.64.1
+begin
+  if IndonesianCountry(MyCountry) then
+  begin
+    if IndonesianCountry(RXCty) then
+      RXData.QSOPoints := 0
+    else if RXData.QTH.Continent <> MyContinent then
+      RXData.QSOPoints := 10
+    else
+      RXData.QSOPoints := 5;
+  end
+  else
+  begin
+    if IndonesianCountry(RXCty) then
+      RXData.QSOPoints := 10
+    else if RXData.QTH.Continent <> MyContinent then
+      RXData.QSOPoints := 3
+    else if RXCty <> MyCountry then
+      RXData.QSOPoints := 2
+    else
+      RXData.QSOPoints := 1;
+  end;
+
+end;
+
+SLFivePointQSOMethod:
+if Copy(RXData.Callsign, 1, 2) = 'SL' then
+  RXData.QSOPoints := 5
+else
+  RXData.QSOPoints := 1;
+
+SouthAmericanWWQSOPointMethod:
+begin
+  if MyContinent = SouthAmerica then
+  begin
+    if RXData.QTH.Continent = SouthAmerica then
+      RXData.QSOPoints := 2
+    else
+      RXData.QSOPoints := 10;
+  end
+  else if RXData.QTH.Continent = SouthAmerica then
+    RXData.QSOPoints := 10
+  else
+    RXData.QSOPoints := 2;
+end;
+
+StewPerryQSOPointMethod:
+begin
+  if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
+  begin
+    Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+    RXData.QSOPoints := (Distance div 500) + 1;
+  end
+  else
+    RXData.QSOPoints := 1;
+end;
+
+TenTenQSOPointMethod:
+if RXData.TenTenNum <> -1 then
+  RXData.QSOPoints := 2
+else
+  RXData.QSOPoints := 1;
+
+TOECQSOPointMethod:
+if RXData.QTH.Continent <> MyContinent then
+  RXData.QSOPoints := 3
+else if StringHas(RXData.Callsign, '/M') then
+  RXData.QSOPoints := 3
+else
+  RXData.QSOPoints := 1;
+
+UBAQSOPointMethod:
+begin
+  if RXCty = 'ON' then
+    RXData.QSOPoints := 10
+  else if UBACountry(RXCty) then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 1;
+end;
+
+UkrainianQSOPointMethod:
+begin
+
+  if RXCty = 'UR' then
+    RXData.QSOPoints := 10
+  else if RXCty = MyCountry then
+    RXData.QSOPoints := 1
+  else if RXData.QTH.Continent = MyContinent then
+    RXData.QSOPoints := 2
+  else
+    RXData.QSOPoints := 3;
+  if MyCountry = 'UR' then
+  begin
+    if RXCty = 'UR' then
+      RXData.QSOPoints := 1;
+    RXData.DomesticMult := False;
+  end;
+end;
+
+VKZLQSOPointMethod:
+if ((MyContinent = Oceania) or (RXData.QTH.Continent = Oceania)) then
+begin
+  case RXData.Band of
+    Band160: RXData.QSOPoints := 20;
+    Band80: RXData.QSOPoints := 10;
+    Band40: RXData.QSOPoints := 5;
+    Band20: RXData.QSOPoints := 1;
+    Band15: RXData.QSOPoints := 2;
+    Band10: RXData.QSOPoints := 3;
+  end;
+end
+else
+  RXData.QSOPoints := 0;
+
+WAGQSOPointMethod:
+if MyCountry = 'DL' then
+begin
+  if RXCty = 'DL' then
+    RXData.QSOPoints := 1
+  else if RXData.QTH.Continent = Europe then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 5;
+end
+else
+begin
+  if RXCty = 'DL' then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 0;
+end;
+
+WAEQSOPointMethod:
+if MyContinent = Europe then
+  if (RXData.QTH.Continent <> Europe) and (RXData.Band <> Band160) then
+    RXData.QSOPoints := 1
+  else
+    RXData.QSOPoints := 0
+else if (RXData.QTH.Continent = Europe) and (RXData.Band <> Band160) then
+  RXData.QSOPoints := 1
+else
+  RXData.QSOPoints := 0;
+
+WWLQSOPointMethod:
+begin
+  if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
+  begin
+    Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+    RXData.QSOPoints := (Distance div 500) + 1;
+
+    if (RXData.Band = Band80) or (RXData.Band = Band160) then
+      RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+
+    if RXData.Band = Band160 then
+      RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+  end
+  else
+    RXData.QSOPoints := 1;
+end;
+
+YODXQSOPointMethod:
+if RXCty = 'YO' then
+  RXData.QSOPoints := 8
+else
+  if MyCountry <> RXCty then
+    if RXData.QTH.Continent <> MyContinent then
+      RXData.QSOPoints := 4
+    else
+      RXData.QSOPoints := 2
+  else
+    RXData.QSOPoints := 1; {KK1L: 6.71 Same country QSO}
+
+NoQSOPointMethod: RXData.QSOPoints := 0;
+
+AlwaysOnePointPerQSO: RXData.QSOPoints := 1;
+OnePointPerQSO: RXData.QSOPoints := 1;
+TwoPointsPerQSO: RXData.QSOPoints := 2;
+ThreePointsPerQSO: RXData.QSOPoints := 3;
+TenPointsPerQSO: RXData.QSOPoints := 10;
+
+ThreePhoneFiveCWFourRTTY: // 4.55.4
+case RXData.Mode of
+  CW: RXData.QSOPoints := 5;
+  Phone: RXData.QSOPoints := 3;
+else
+  RXData.QSOPoints := 4;
+end;
+
+TwoPhoneFourCW:
+if RXData.Mode = CW then
+  RXData.QSOPoints := 4
+else
+  RXData.QSOPoints := 2;
+
+TwoPhoneThreeCW:
+if RXData.Mode = CW then
+  RXData.QSOPoints := 3
+else
+  RXData.QSOPoints := 2;
+
+OnePhoneTwoCW:
+if RXData.Mode = CW then
+  RXData.QSOPoints := 2
+else
+  RXData.QSOPoints := 1;
+
+ThreePhoneFiveCW:
+if RXData.Mode = CW then
+  RXData.QSOPoints := 5
+else
+  RXData.QSOPoints := 3;
+
+OneEuropeTwoOther: {KK1L: 6.68 Used for WRTC 2002}
+if MarineOrAirMobileStation(RXData.Callsign) then
+  RXData.QSOPoints := 2
+else if RXData.QTH.Continent = Europe then
+  RXData.QSOPoints := 1
+else
+  RXData.QSOPoints := 2;
+
+CupRFMethod:
+begin
+
+  if (MyGrid <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
+  begin
+    Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString {DomesticQTH});
+
+    if Distance > 7000 then
+      RXData.QSOPoints := 62;
+    if Distance <= 7000 then
+      RXData.QSOPoints := 57;
+    if Distance <= 6000 then
+      RXData.QSOPoints := 52;
+    if Distance <= 5000 then
+      RXData.QSOPoints := 47;
+    if Distance <= 4000 then
+      RXData.QSOPoints := 42;
+    if Distance <= 3000 then
+      RXData.QSOPoints := 38;
+    if Distance <= 2000 then
+      RXData.QSOPoints := 35;
+    if Distance <= 1000 then
+      RXData.QSOPoints := 31;
+    //            if RXData.Band = Band160 then RXData.QSOPoints := round(RXData.QSOPoints * 1.3);
+    //            if RXData.Band = Band80 then RXData.QSOPoints := round(RXData.QSOPoints * 1.25);
+    //            if RXData.Band = Band40 then RXData.QSOPoints := round(RXData.QSOPoints * 1.15);
+    //            if RXData.Band = Band10 then RXData.QSOPoints := round(RXData.QSOPoints * 1.1);
+  end
+  else
+    RXData.QSOPoints := 1;
+
+end;
+UA4WMethod:
+begin
+  RXData.QSOPoints := 2;
+
+  if GetOblast(MyCall) = '4W' then
+  begin
+    if RXData.DomesticQTH <> MyState then
+      RXData.QSOPoints := 4;
+    Exit;
+  end;
+
+  if RXData.DomesticQTH <> MyState then
+  begin
+    if RXData.Band = Band80 then
+      RXData.QSOPoints := 3;
+    if RXData.Band = Band160 then
+      RXData.QSOPoints := 5;
+
+    if GetOblast(RXData.Callsign) = '4W' then
+    begin
+      if RXData.Band = Band80 then
+        RXData.QSOPoints := 5;
+      if RXData.Band = Band160 then
+        RXData.QSOPoints := 10;
+      MyZoneValue := ctyGetCQZone(MyCall);
+      if MyZoneValue in [18, 19] then
       begin
-        if RussianID(RXCty) then
-        begin
-          RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign);
-          if MyState = '' then Exit;
-          if not (MyState[1] in ['1'..'7']) then Exit;
-          if not (RXData.Zone in [1..7]) then Exit;
-          RXData.QSOPoints := ChampionshipRFPointsArray[Ord(MyState[1]) - 48 + (RXData.Zone - 1) * 7];
-        end;
+        if RXData.Band = Band80 then
+          RXData.QSOPoints := 10;
+        if RXData.Band = Band160 then
+          RXData.QSOPoints := 20;
       end;
+    end;
+  end;
 
-    ChampionshipUkrMethod:
-      begin
-        if RXCty <> 'UR' then Exit;
-        //if (RXData.Band = Band80) or (RXData.Band = Band160) then
-        RXData.QSOPoints := 2;
-      end;
+end;
+
+ChampionshipRFMethod:
+begin
+  if RussianID(RXCty) then
+  begin
+    RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign);
+    if MyState = '' then
+      Exit;
+    if not (MyState[1] in ['1'..'7']) then
+      Exit;
+    if not (RXData.Zone in [1..7]) then
+      Exit;
+    RXData.QSOPoints := ChampionshipRFPointsArray[Ord(MyState[1]) - 48 +
+      (RXData.Zone - 1) * 7];
+  end;
+end;
+
+ChampionshipUkrMethod:
+begin
+  if RXCty <> 'UR' then
+    Exit;
+  //if (RXData.Band = Band80) or (RXData.Band = Band160) then
+  RXData.QSOPoints := 2;
+end;
 
 {
     UA4NQSOPointMethod:
@@ -6772,336 +6998,363 @@ begin
         if RXData.Zone <> StrToInt(MyState) then RXData.QSOPoints := 2 else RXData.QSOPoints := 1;
       end;
 }
-    WWPMCQSOPointMethod:
+WWPMCQSOPointMethod:
+begin
+  RXData.QSOPoints := 5;
+  if MyState = '' then
+  begin
+    if RXData.QTHString <> '' then
+      RXData.QSOPoints := 25;
+  end
+  else
+  begin
+    if RXData.QTHString <> '' then
+      if MyState <> RXData.QTHString then
+        RXData.QSOPoints := 10;
+  end;
+end;
+
+JTDXQSOPointMethod:
+begin
+  {
+          if RXCty = 'JT' then
+          begin
+            RXData.Prefix := RXData.Callsign;
+            if MyContinent = Asia then RXData.QSOPoints := 4 else RXData.QSOPoints := 8;
+            if MyCountry = 'JT' then RXData.QSOPoints := 0;
+            Exit;
+          end;
+  }
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 3
+  else if RXCty <> MyCountry then
+    RXData.QSOPoints := 2
+  else
+    RXData.QSOPoints := 1;
+
+  if RXCty = 'JT' then
+    if MyCountry = 'JT' then
+      RXData.QSOPoints := 0;
+
+end;
+
+MMCQSOPointMethod: //n4af added for marcon memorial contest
+begin
+
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 5
+  else if RXCty = MyCountry then
+    RXData.QSOPoints := 1
+  else
+    RXData.QSOPoints := 3;
+
+end;
+
+LZDXQSOPointMethod:
+begin
+
+  if RXCty = 'LZ' then
+  begin
+    if MyCountry = 'LZ' then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 10;
+  end
+  else
+  begin
+    if MyContinent <> RXData.QTH.Continent then
+      RXData.QSOPoints := 3
+    else
+      RXData.QSOPoints := 1;
+  end;
+end;
+
+OldNewYearQSOPointMethod:
+begin
+  RXData.QSOPoints := RXData.Age {RXData.NumberReceived};
+end;
+
+YouthChampionshipRFMethod:
+begin
+  //        if RussianID(RXCty) then
+  if RXData.Band in [Band40, Band20] then
+  begin
+
+    RXData.QSOPoints := 1;
+    RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign);
+
+  end;
+end;
+
+{   YOKQSOPointMethod:             // 4.55.4
+     RXData.QSOPoints:= 3;  }
+
+ChampionshipRFASMethod:
+if (MyState <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
+  if StringIsAllNumbers(MyState) then
+  begin
+    la1 := StrToInt(RXData.QTHString[1]);
+    lo1 := StrToInt(Copy(RXData.QTHString, 2, 2));
+
+    la2 := StrToInt(MyState[1]);
+    lo2 := StrToInt(Copy(MyState, 2, 2));
+    RXData.QSOPoints := Abs(la1 - la2) + Abs(lo1 - lo2) + 5;
+    if RXData.Mode = CW then
+      RXData.QSOPoints := RXData.QSOPoints + 5;
+  end;
+
+RegionOneFieldDayRCCQSOPointMethod:
+begin
+  if MyContinent = RXData.QTH.Continent then
+    RXData.QSOPoints := 2
+  else
+    RXData.QSOPoints := 3;
+  Result := pos('/P', RXData.Callsign);
+  if Result = 0 then
+    Result := pos('/M', RXData.Callsign);
+  if Result = length(RXData.Callsign) - 1 then
+    RXData.QSOPoints := 4;
+end;
+
+YL_ARCK_YL: // 4.66.3 YL-ARCK-YL
+begin
+  if (RXData.NumberReceived = 88) then // YL # rcvd
+  begin
+    RXData.QSOPoints := 5;
+    exit; // now exit points processing
+  end;
+  RXData.Prefix := ''; // if <> yl # then clear the multiplier
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 1
+end;
+
+GACWWWSACWQSOPointMethod:
+begin
+  {   if (RXData.NumberReceived = 88) and (Contest = Arktika_Spring) then     // 4.66.3 YL-ARCK-YL hooks
       begin
-        RXData.QSOPoints := 5;
-        if MyState = '' then
-        begin
-          if RXData.QTHString <> '' then RXData.QSOPoints := 25;
-        end
-        else
-        begin
-          if RXData.QTHString <> '' then if MyState <> RXData.QTHString then RXData.QSOPoints := 10;
-        end;
+        RXData.QSOPoints := 5 ;
+        exit;
       end;
 
-    JTDXQSOPointMethod:
-      begin
-{
-        if RXCty = 'JT' then
+        if (RXData.NumberReceived <> 88) and (Contest = Arktika_Spring) then
+        RXData.Prefix := '';
+   }
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 3
+  else if RXCty <> MyCountry then
+    RXData.QSOPoints := 1
+  else
+    RXData.QSOPoints := 0; // end YL-ARCK-YL hooks
+  if RXData.QTH.Continent = SouthAmerica then
+    RXData.QSOPoints := 5;
+end;
+
+LQPQSOPointMethod:
+begin
+  RXData.QSOPoints := 1000;
+  if (RXData.Name = 'LOCUST') or (RXData.Callsign = 'K6VVA') then
+    RXData.QSOPoints := 5000;
+end;
+
+ArktikaSpringQSOPointMethod:
+begin
+  if RXData.DomMultQTH <> '' then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 1;
+end;
+
+REFQSOPointMethod:
+begin
+  if not FrenchID(RXData.QTH.CountryID) then
+    Exit;
+
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 1;
+end;
+
+RadioMemoryQSOPointMethod:
+begin
+  RXData.QSOPoints := RXData.Age;
+  Result := pos(' ', RXData.QTHString);
+  if Result <> 0 then
+  begin
+    TheirID := Copy(RXData.QTHString, Result + 1, 3);
+
+    if StringIsAllNumbers(TheirID) then
+      inc(RXData.QSOPoints, StrToInt(TheirID));
+  end;
+end;
+
+TACQSOPointMethod:
+if RXData.Band in [Band80..Band10] then
+begin
+  if RXCty = MyCountry then
+    RXData.QSOPoints := 1
+  else
+    RXData.QSOPoints := 2;
+  if RXData.DomMultQTH <> '' then
+  begin
+    if MyState <> '' then
+      inc(RXData.QSOPoints, 6)
+    else
+      inc(RXData.QSOPoints, 2);
+  end;
+end;
+
+UNDXQSOPointMethod:
+begin
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 5
+  else if RXCty <> MyCountry then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 2;
+
+  if RXCty = 'UN' then
+    if MyCountry <> 'UN' then
+      RXData.QSOPoints := 10;
+end;
+
+KingOfSpainQSOPointMethod:
+begin
+  if not SpanishStation(RXCty) then
+    RXData.QSOPoints := 1
+  else
+  begin
+    if SpanishStation(MyCountry) then
+      RXData.QSOPoints := 2
+    else
+      RXData.QSOPoints := 3;
+  end;
+end;
+
+GagarinCupQSOPointMethod:
+begin
+
+  if RXData.QTH.Continent <> MyContinent then
+    RXData.QSOPoints := 4
+  else if RXCty <> MyCountry then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 2;
+
+  if RXData.Band in [Band160, Band80] then
+    RXData.QSOPoints := RXData.QSOPoints * 3;
+  if RXData.Band in [Band40] then
+    RXData.QSOPoints := RXData.QSOPoints * 2;
+  if RXData.Band = Band2 then
+    RXData.QSOPoints := 100;
+end;
+
+CQMMQSOPointMethod:
+begin
+  if RXData.Band in [Band80..Band10] then
+  begin
+    PtsMult := integer(RXData.Band in [Band40, Band80]) + 1;
+    if RXData.QTH.Continent <> MyContinent then
+    begin
+      RXData.QSOPoints := 3 * PtsMult;
+    end
+    else if RXCty <> MyCountry then
+      RXData.QSOPoints := 2 * PtsMult
+    else
+      RXData.QSOPoints := 1;
+
+    if (length(RXData.QTHString) = 3) then
+      if (RXData.QTHString[3] in ['M', 'Q', 'Y']) then
+        RXData.QSOPoints := 10;
+
+  end;
+end;
+
+Radio160QSOPointMethod:
+begin
+  if length(RXData.DomMultQTH) = 2 then
+  begin
+    if RXData.DomMultQTH[1] in ['A'..'Z'] then
+    begin
+      if RXData.DomMultQTH[2] in ['0'..'9'] then
+        if length(MyState) >= 2 then
         begin
-          RXData.Prefix := RXData.Callsign;
-          if MyContinent = Asia then RXData.QSOPoints := 4 else RXData.QSOPoints := 8;
-          if MyCountry = 'JT' then RXData.QSOPoints := 0;
+          la1 := Abs(Ord(UpCase(RXData.DomMultQTH[1])) - Ord(MyState[1])) + 1;
+          la2 := Abs(Ord(UpCase(RXData.DomMultQTH[2])) - Ord(MyState[2])) + 1;
+          if la1 >= la2 then
+            RXData.QSOPoints := la1
+          else
+            RXData.QSOPoints := la2;
           Exit;
         end;
-}
-        if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 3
-        else
-          if RXCty <> MyCountry then
-            RXData.QSOPoints := 2
-          else
-            RXData.QSOPoints := 1;
+      if RXData.DomMultQTH[2] = 'X' then
+        RXData.QSOPoints := 30;
+    end;
+  end;
+end;
 
-        if RXCty = 'JT' then if MyCountry = 'JT' then RXData.QSOPoints := 0;
+R9WUW9WKMemorialQSOPointMethod:
+begin
+  //        if RXData.Callsign = 'R100W' then RXData.QSOPoints := 10
+  //        else
+  case RXData.Zone of
+    1, 2: RXData.QSOPoints := 3;
+    3: RXData.QSOPoints := 4;
+    5: RXData.QSOPoints := 10;
+  end;
+end;
 
-      end;
+WRTCQSOPointMethod:
+if RXData.Band in [Band80..Band10] then
+begin
 
-    MMCQSOPointMethod:           //n4af added for marcon memorial contest
-      begin
+  if RXData.Zone = 8 then
+    RXData.QSOPoints := 2
+  else if RXData.QTH.Continent = NorthAmerica then
+    RXData.QSOPoints := 3
+  else
+    RXData.QSOPoints := 5;
+  if RXData.DomesticQTH <> '' then
+    RXData.QSOPoints := 2;
+  exit;
+end;
 
-        if RXData.QTH.Continent <> MyContinent then RXData.QSOPoints := 5
-        else
-        if RXCty = MyCountry then  RXData.QSOPoints := 1
-        else
-        RXData.QSOPoints := 3;
-
-
-        end;
-
-      LZDXQSOPointMethod:
-      begin
-
-          if RXCty = 'LZ' then
-          begin
-            if MyCountry = 'LZ' then RXData.QSOPoints := 1 else RXData.QSOPoints := 10;
-          end
-          else
-          begin
-            if MyContinent <> RXData.QTH.Continent then
-              RXData.QSOPoints := 3
-            else
-              RXData.QSOPoints := 1;
-          end;
-        end;
-
-
-
-    OldNewYearQSOPointMethod:
-      begin
-        RXData.QSOPoints := RXData.Age {RXData.NumberReceived};
-      end;
-
-    YouthChampionshipRFMethod:
-      begin
-        //        if RussianID(RXCty) then
-        if RXData.Band in [Band40, Band20] then
-        begin
-
-          RXData.QSOPoints := 1;
-          RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign);
-
-        end;
-      end;
-
-    {   YOKQSOPointMethod:             // 4.55.4
-         RXData.QSOPoints:= 3;  }
-
-
-    ChampionshipRFASMethod:
-      if (MyState <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
-        if StringIsAllNumbers(MyState) then
-        begin
-          la1 := StrToInt(RXData.QTHString[1]);
-          lo1 := StrToInt(Copy(RXData.QTHString, 2, 2));
-
-          la2 := StrToInt(MyState[1]);
-          lo2 := StrToInt(Copy(MyState, 2, 2));
-          RXData.QSOPoints := Abs(la1 - la2) + Abs(lo1 - lo2) + 5;
-          if RXData.Mode = CW then RXData.QSOPoints := RXData.QSOPoints + 5;
-        end;
-        
-   
-
-    RegionOneFieldDayRCCQSOPointMethod:
-      begin
-        if MyContinent = RXData.QTH.Continent then
-          RXData.QSOPoints := 2
-        else
-          RXData.QSOPoints := 3;
-        Result := pos('/P', RXData.Callsign);
-        if Result = 0 then
-          Result := pos('/M', RXData.Callsign);
-        if Result = length(RXData.Callsign) - 1 then RXData.QSOPoints := 4;
-      end;
-
-    YL_ARCK_YL:       // 4.66.3 YL-ARCK-YL
-    begin
-       if (RXData.NumberReceived = 88)  then      // YL # rcvd
-       begin
-         RXData.QSOPoints := 5;
-         exit;                  // now exit points processing
-       end;
-       RXData.Prefix := '';         // if <> yl # then clear the multiplier
-       if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 3
-        else
-          RXData.QSOPoints := 1
-     end;
-
-    GACWWWSACWQSOPointMethod:
-      begin
-   {   if (RXData.NumberReceived = 88) and (Contest = Arktika_Spring) then     // 4.66.3 YL-ARCK-YL hooks
-       begin
-         RXData.QSOPoints := 5 ;
-         exit;
-       end;
-
-         if (RXData.NumberReceived <> 88) and (Contest = Arktika_Spring) then
-         RXData.Prefix := '';
-    }
-     if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 3
-        else
-          if RXCty <> MyCountry then
-            RXData.QSOPoints := 1
-          else RXData.QSOPoints := 0;                                                                           // end YL-ARCK-YL hooks
-        if RXData.QTH.Continent = SouthAmerica then RXData.QSOPoints := 5;
-      end;
-
-    LQPQSOPointMethod:
-      begin
-        RXData.QSOPoints := 1000;
-        if (RXData.Name = 'LOCUST') or (RXData.Callsign = 'K6VVA') then RXData.QSOPoints := 5000;
-      end;
-
-    ArktikaSpringQSOPointMethod:
-      begin
-        if RXData.DomMultQTH <> '' then RXData.QSOPoints := 3 else RXData.QSOPoints := 1;
-      end;
-
-    REFQSOPointMethod:
-      begin
-        if not FrenchID(RXData.QTH.CountryID) then Exit;
-
-        if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 3 else RXData.QSOPoints := 1;
-      end;
-
-    RadioMemoryQSOPointMethod:
-      begin
-        RXData.QSOPoints := RXData.Age;
-        Result := pos(' ', RXData.QTHString);
-        if Result <> 0 then
-        begin
-          TheirID := Copy(RXData.QTHString, Result + 1, 3);
-
-
-          if StringIsAllNumbers(TheirID) then
-            inc(RXData.QSOPoints, StrToInt(TheirID));
-        end;
-      end;
-
-    TACQSOPointMethod:
-      if RXData.Band in [Band80..Band10] then
-      begin
-        if RXCty = MyCountry then RXData.QSOPoints := 1 else RXData.QSOPoints := 2;
-        if RXData.DomMultQTH <> '' then
-        begin
-          if MyState <> '' then inc(RXData.QSOPoints, 6) else inc(RXData.QSOPoints, 2);
-        end;
-      end;
-
-    UNDXQSOPointMethod:
-      begin
-        if RXData.QTH.Continent <> MyContinent then RXData.QSOPoints := 5
-        else
-          if RXCty <> MyCountry then
-            RXData.QSOPoints := 3
-          else
-            RXData.QSOPoints := 2;
-
-        if RXCty = 'UN' then
-          if MyCountry <> 'UN' then
-            RXData.QSOPoints := 10;
-      end;
-
-    KingOfSpainQSOPointMethod:
-      begin
-        if not SpanishStation(RXCty) then
-          RXData.QSOPoints := 1
-        else
-        begin
-          if SpanishStation(MyCountry) then
-            RXData.QSOPoints := 2
-          else
-            RXData.QSOPoints := 3;
-        end;
-      end;
-
-    GagarinCupQSOPointMethod:
-      begin
-
-        if RXData.QTH.Continent <> MyContinent then RXData.QSOPoints := 4
-        else
-          if RXCty <> MyCountry then
-            RXData.QSOPoints := 3
-          else
-            RXData.QSOPoints := 2;
-
-        if RXData.Band in [Band160, Band80] then RXData.QSOPoints := RXData.QSOPoints * 3;
-        if RXData.Band in [Band40] then RXData.QSOPoints := RXData.QSOPoints * 2;
-        if RXData.Band = Band2 then RXData.QSOPoints := 100;
-      end;
-
-    CQMMQSOPointMethod:
-      begin
-        if RXData.Band in [Band80..Band10] then
-        begin
-          PtsMult := integer(RXData.Band in [Band40, Band80]) + 1;
-          if RXData.QTH.Continent <> MyContinent then
-          begin
-            RXData.QSOPoints := 3 * PtsMult;
-          end
-          else
-            if RXCty <> MyCountry then
-              RXData.QSOPoints := 2 * PtsMult
-            else
-              RXData.QSOPoints := 1;
-
-          if (length(RXData.QTHString) = 3) then
-            if (RXData.QTHString[3] in ['M', 'Q', 'Y']) then RXData.QSOPoints := 10;
-
-        end;
-      end;
-
-    Radio160QSOPointMethod:
-      begin
-        if length(RXData.DomMultQTH) = 2 then
-        begin
-          if RXData.DomMultQTH[1] in ['A'..'Z'] then
-          begin
-            if RXData.DomMultQTH[2] in ['0'..'9'] then
-              if length(MyState) >= 2 then
-              begin
-                la1 := Abs(Ord(UpCase(RXData.DomMultQTH[1])) - Ord(MyState[1])) + 1;
-                la2 := Abs(Ord(UpCase(RXData.DomMultQTH[2])) - Ord(MyState[2])) + 1;
-                if la1 >= la2 then RXData.QSOPoints := la1 else RXData.QSOPoints := la2;
-                Exit;
-              end;
-            if RXData.DomMultQTH[2] = 'X' then RXData.QSOPoints := 30;
-          end;
-        end;
-      end;
-
-    R9WUW9WKMemorialQSOPointMethod:
-      begin
-//        if RXData.Callsign = 'R100W' then RXData.QSOPoints := 10
-//        else
-        case RXData.Zone of
-          1, 2: RXData.QSOPoints := 3;
-          3: RXData.QSOPoints := 4;
-          5: RXData.QSOPoints := 10;
-        end;
-      end;
-
-    WRTCQSOPointMethod:
-      if RXData.Band in [Band80..Band10] then
-      begin
-
-        if RXData.Zone = 8 then
-          RXData.QSOPoints := 2
-        else
-          if RXData.QTH.Continent = NorthAmerica then
-            RXData.QSOPoints := 3
-          else
-            RXData.QSOPoints := 5;
-        if RXData.DomesticQTH <> '' then
-          RXData.QSOPoints := 2;
-          exit;
-      end;
-
-  end; { of case }
+end; { of case }
 end;
 
 procedure SendMultiInfoMessage(Band: BandType; Mode: ModeType; Message: Str80);
 
 var
-  Sum                                   : Byte;
+  Sum: Byte;
 
 begin
   Sum := CheckSum(Message);
 
-  if Sum = LastMultiInfoMessageSum[Band, Mode] then Exit;
+  if Sum = LastMultiInfoMessageSum[Band, Mode] then
+    Exit;
 
   LastMultiInfoMessageSum[Band, Mode] := Sum;
 
   Message := AddBand(Band) + AddMode(Mode) + Message;
 
-  SendMultiCommand(MultiBandAddressArray[Band], $FF, MultiInformationMessage, Message);
+  SendMultiCommand(MultiBandAddressArray[Band], $FF, MultiInformationMessage,
+    Message);
 end;
 
 procedure RotorControl(Heading: integer);
 var
-  nNumberOfBytesToWrite                 : Cardinal;
-  TempPchar                             : PChar;
+  nNumberOfBytesToWrite: Cardinal;
+  TempPchar: PChar;
 begin
-  if UDPBroadcastRotor then    // Even if there is no rotator set, if the UDP option is requested, send the command // ny4i 4.44.9
-     begin
-     SendUDPRotorCommand(Heading);
-     end;
-  if ActiveRotatorPort = NoPort then Exit;
+  if UDPBroadcastRotor then
+    // Even if there is no rotator set, if the UDP option is requested, send the command // ny4i 4.44.9
+  begin
+    SendUDPRotorCommand(Heading);
+  end;
+  if ActiveRotatorPort = NoPort then
+    Exit;
   case ActiveRotatorType of
     OrionRotator: TempPchar := '#%03u'#$D;
     DCU1Rotator: TempPchar := 'AP1%03u;AM1;';
@@ -7127,7 +7380,8 @@ begin
     wsprintfBuffer[12] := #$20;
   end;
 
-  sWriteFile(CPUKeyer.SerialPortConfigured_Handle[ActiveRotatorPort], wsprintfBuffer, nNumberOfBytesToWrite);
+  sWriteFile(CPUKeyer.SerialPortConfigured_Handle[ActiveRotatorPort],
+    wsprintfBuffer, nNumberOfBytesToWrite);
 end;
 
 function MarineOrAirMobileStation(Call: CallString): boolean;
@@ -7137,19 +7391,22 @@ function MarineOrAirMobileStation(Call: CallString): boolean;
 
 var
 
-  l                                     : integer;
+  l: integer;
 begin
   MarineOrAirMobileStation := False;
   l := length(Call);
-  if l < 4 then Exit;
-  if Call[l - 2] <> '/' then Exit;
-  if (Call[l] = 'M') and (Call[l - 1] in ['A', 'M']) then MarineOrAirMobileStation := True;
-{
-  MarineOrAirMobileStation := False;
-  TempString := PostcedingString(Call, '/');
-  if StringHas(TempString, '/') then TempString := PostcedingString(TempString, '/');
-  if length(TempString) = 2 then if ((TempString = 'MM') or (TempString = 'AM')) then MarineOrAirMobileStation := True;
-}
+  if l < 4 then
+    Exit;
+  if Call[l - 2] <> '/' then
+    Exit;
+  if (Call[l] = 'M') and (Call[l - 1] in ['A', 'M']) then
+    MarineOrAirMobileStation := True;
+  {
+    MarineOrAirMobileStation := False;
+    TempString := PostcedingString(Call, '/');
+    if StringHas(TempString, '/') then TempString := PostcedingString(TempString, '/');
+    if length(TempString) = 2 then if ((TempString = 'MM') or (TempString = 'AM')) then MarineOrAirMobileStation := True;
+  }
 end;
 {
 function IsR150Country(OblastDigit, OblastChar: Char): boolean;
@@ -7168,23 +7425,29 @@ end;
 
 function InSameFederalOkrug(HisCallsign: CallString): boolean;
 var
-  MyOBlast, HisOblast                   : string[2];
-  o1, o2                                : OkrugType;
+  MyOBlast, HisOblast: string[2];
+  o1, o2: OkrugType;
 begin
   Result := True;
-  if StringHas(MyCall, '/') then Exit;
+  if StringHas(MyCall, '/') then
+    Exit;
   MyOBlast := GetOblast(MyCall);
-  if MyOBlast = '' then Exit;
+  if MyOBlast = '' then
+    Exit;
 
-  if StringHas(HisCallsign, '/') then Exit;
+  if StringHas(HisCallsign, '/') then
+    Exit;
   HisOblast := GetOblast(HisCallsign);
-  if HisOblast = '' then Exit;
+  if HisOblast = '' then
+    Exit;
 
   o1 := GetOkrugByOblast(GetRussiaOblastByTwoChars(MyOBlast[1], MyOBlast[2]));
-  if o1 = foUnKnownOkrug then Exit;
+  if o1 = foUnKnownOkrug then
+    Exit;
 
   o2 := GetOkrugByOblast(GetRussiaOblastByTwoChars(HisOblast[1], HisOblast[2]));
-  if o2 = foUnKnownOkrug then Exit;
+  if o2 = foUnKnownOkrug then
+    Exit;
 
   Result := o1 = o2;
 end;
@@ -7255,43 +7518,42 @@ begin
           RST := 50 + Ex;
           Result := True;
         end
-        else
-          if Ex in [11..59] then
-          begin
-            RST := Ex;
-            Result := True;
-          end
+        else if Ex in [11..59] then
+        begin
+          RST := Ex;
+          Result := True;
+        end
       end;
   end;
-{
-  if Ex in [1..9] then
-  begin
-    case ActiveMode of
-      CW: RST := 509 + Ex;
-      Phone: RST := 5 + Ex;
+  {
+    if Ex in [1..9] then
+    begin
+      case ActiveMode of
+        CW: RST := 509 + Ex;
+        Phone: RST := 5 + Ex;
+      end;
+      Result := True;
     end;
-    Result := True;
-  end;
 
-  if Ex in [111..599] then
-  begin
-    case ActiveMode of
-      CW: RST := 509 + Ex;
-      Phone: RST := 5 + Ex;
+    if Ex in [111..599] then
+    begin
+      case ActiveMode of
+        CW: RST := 509 + Ex;
+        Phone: RST := 5 + Ex;
+      end;
+      Result := True;
     end;
-    Result := True;
-  end;
-}
+  }
 end;
 
 function ParseArray(e: Str80): boolean;
 var
-   i                                     : integer;
-  TmpBuf                                : array[0..31] of Char;
-  St                                    : Cardinal;
-  en                                    : Cardinal;
-  copyCounter                           : Cardinal;
-  isN                                   : boolean;
+  i: integer;
+  TmpBuf: array[0..31] of Char;
+  St: Cardinal;
+  en: Cardinal;
+  copyCounter: Cardinal;
+  isN: boolean;
 begin
   Windows.ZeroMemory(@ParsedRecord, SizeOf(ParsedRecord));
 
@@ -7300,7 +7562,6 @@ begin
     Result := False;
     Exit;
   end;
-
 
   St := 0;
   en := 0;
@@ -7319,11 +7580,10 @@ begin
       begin
         en := i - 1;
       end
-      else
-        if i = length(e) then
-        begin
-          en := i;
-        end;
+      else if i = length(e) then
+      begin
+        en := i;
+      end;
 
       if en > 0 then
       begin
@@ -7331,13 +7591,15 @@ begin
         Windows.ZeroMemory(@TmpBuf, SizeOf(TmpBuf));
         for copyCounter := St to en do
         begin
-          if not (e[copyCounter] in ['0'..'9']) then isN := False;
+          if not (e[copyCounter] in ['0'..'9']) then
+            isN := False;
           TmpBuf[copyCounter - St] := e[copyCounter];
         end;
         inc(ParsedRecord.prTotalElements);
         if (isN) then
         begin
-          ParsedRecord.prNumbers[ParsedRecord.prTotalNumbers] := PCharToInt(@TmpBuf);
+          ParsedRecord.prNumbers[ParsedRecord.prTotalNumbers] :=
+            PCharToInt(@TmpBuf);
           inc(ParsedRecord.prTotalNumbers);
         end
         else
@@ -7359,11 +7621,11 @@ end;
 
 function ParseArray2(ExchangeString: Str80): boolean;
 var
-  Element                               : integer;
-  i                                     : integer;
-  Alpha                                 : boolean;
-  Number                                : boolean;
-  PositionCounter                       : integer;
+  Element: integer;
+  i: integer;
+  Alpha: boolean;
+  Number: boolean;
+  PositionCounter: integer;
 begin
   Windows.ZeroMemory(@ParserArray, SizeOf(ParserArray));
   if ExchangeString = '' then
@@ -7380,18 +7642,23 @@ begin
   begin
     if (ExchangeString[i] = ' ') or (i = length(ExchangeString) + 1) then
     begin
-      if PositionCounter = 0 then Continue;
+      if PositionCounter = 0 then
+        Continue;
 
       ParserArray.paElements[Element].prString[0] := CHR(PositionCounter);
 
       inc(ParserArray.paCount);
 
-      if Alpha then ParserArray.paElements[Element].prType := eetAlpha;
-      if Number then ParserArray.paElements[Element].prType := eetNumber;
-      if Alpha and Number then ParserArray.paElements[Element].prType := eetMixed;
+      if Alpha then
+        ParserArray.paElements[Element].prType := eetAlpha;
+      if Number then
+        ParserArray.paElements[Element].prType := eetNumber;
+      if Alpha and Number then
+        ParserArray.paElements[Element].prType := eetMixed;
 
       if ParserArray.paElements[Element].prType = eetNumber then
-        ParserArray.paElements[Element].prInteger := StrToInt(ParserArray.paElements[Element].prString);
+        ParserArray.paElements[Element].prInteger :=
+          StrToInt(ParserArray.paElements[Element].prString);
 
       ParserArray.paStatus[Element] := ParserArray.paElements[Element].prType;
 
@@ -7405,27 +7672,34 @@ begin
         Result := True;
         Exit;
       end
-      else Continue;
+      else
+        Continue;
 
     end;
     inc(PositionCounter);
-    ParserArray.paElements[Element].prString[PositionCounter] := ExchangeString[i];
-    if ExchangeString[i] in ['0'..'9'] then Number := True else Alpha := True;
+    ParserArray.paElements[Element].prString[PositionCounter] :=
+      ExchangeString[i];
+    if ExchangeString[i] in ['0'..'9'] then
+      Number := True
+    else
+      Alpha := True;
   end;
 end;
 
-function ProcessRSTAndGridSquareOrRDAExchange(Exchange: ShortString {Str80}; var RXData: ContestExchange): boolean;
+function ProcessRSTAndGridSquareOrRDAExchange(Exchange: ShortString {Str80}; var
+  RXData: ContestExchange): boolean;
 var
-  TestString                            : Str20;
-  Oblast                                : Str2;
-  RussianRegionMy                       : RussianRegionType;
-  RussianRegionHis                      : RussianRegionType;
+  TestString: Str20;
+  Oblast: Str2;
+  RussianRegionMy: RussianRegionType;
+  RussianRegionHis: RussianRegionType;
 begin
   Result := False;
   //RXData.DomesticQTH := '';
   RXData.RSTReceived := 0;
 
-  if length(Exchange) = 0 then Exit;
+  if length(Exchange) = 0 then
+    Exit;
 
   while Exchange <> '' do
   begin
@@ -7436,20 +7710,19 @@ begin
       if RXData.QTHString = '' then
         RXData.QTHString := TestString;
     end
-    else
-      if (RXData.RSTReceived = 0) and StringIsAllNumbers(TestString) then
+    else if (RXData.RSTReceived = 0) and StringIsAllNumbers(TestString) then
+    begin
+      if length(TestString) = 1 then
       begin
-        if length(TestString) = 1 then
-        begin
-          case ActiveMode of
-            CW: RXData.RSTReceived := 509 + (Ord(TestString[1]) - 48) * 10;
-            Phone: RXData.RSTReceived := 50 + (Ord(TestString[1]) - 48);
-          end;
-        end
-        else
-          RXData.RSTReceived := StrToInt(TestString);
+        case ActiveMode of
+          CW: RXData.RSTReceived := 509 + (Ord(TestString[1]) - 48) * 10;
+          Phone: RXData.RSTReceived := 50 + (Ord(TestString[1]) - 48);
+        end;
+      end
+      else
+        RXData.RSTReceived := StrToInt(TestString);
 
-      end;
+    end;
   end;
 
   Result := RXData.QTHString <> '';
@@ -7467,7 +7740,7 @@ begin
     Windows.ZeroMemory(@Oblast, SizeOf(Oblast));
     Oblast := Tree.GetOblast(RXData.Callsign);
     RussianRegionHis := GetRussiaOblastByTwoChars(Oblast[1], Oblast[2]);
-   RXData.DomesticQTH := RXData.QTHString;
+    RXData.DomesticQTH := RXData.QTHString;
     if (RussianID(MyCall)) then
     begin
       Windows.ZeroMemory(@Oblast, SizeOf(Oblast));
@@ -7492,73 +7765,88 @@ begin
 
 end;
 
-function ProcessExchange(ExchangeString: Str80; var RData: ContestExchange): boolean;
+function ProcessExchange(ExchangeString: Str80; var RData: ContestExchange):
+  boolean;
 
 begin
   Result := False;
   if not ParseArray(ExchangeString) then
-    if ActiveExchange <> RSTNameAndQTHExchange then Exit;
+    if ActiveExchange <> RSTNameAndQTHExchange then
+      Exit;
 
   case ActiveExchange of
 
     RSTAndGridSquareOrRDAExchange:
-      ProcessExchange := ProcessRSTAndGridSquareOrRDAExchange(ExchangeString, RData);
+      ProcessExchange := ProcessRSTAndGridSquareOrRDAExchange(ExchangeString,
+        RData);
 
     CheckAndChapterOrQTHExchange:
-      ProcessExchange := ProcessCheckAndChapterOrQTHExchange(ExchangeString, RData);
+      ProcessExchange := ProcessCheckAndChapterOrQTHExchange(ExchangeString,
+        RData);
 
     ClassDomesticOrDXQTHExchange:
-      ProcessExchange := ProcessClassAndDomesticOrDXQTHExchange(ExchangeString, RData);
+      ProcessExchange := ProcessClassAndDomesticOrDXQTHExchange(ExchangeString,
+        RData);
 
     KidsDayExchange:
       ProcessExchange := ProcessKidsExchange(ExchangeString, RData);
 
     NameQTHAndPossibleTenTenNumber:
-      ProcessExchange := ProcessNameQTHAndPossibleTenTenNumberExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessNameQTHAndPossibleTenTenNumberExchange(ExchangeString, RData);
 
     NameAndDomesticOrDXQTHExchange:
-      ProcessExchange := ProcessNameAndDomesticOrDXQTHExchange(ExchangeString, RData);
+      ProcessExchange := ProcessNameAndDomesticOrDXQTHExchange(ExchangeString,
+        RData);
 
     NameAndPossibleGridSquareExchange:
-      ProcessExchange := ProcessNameAndPossibleGridSquareExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessNameAndPossibleGridSquareExchange(ExchangeString, RData);
 
     QSONumberAndNameExchange:
       ProcessExchange := ProcessQSONumberAndNameExchange(ExchangeString, RData);
 
     QSONumberAndGeoCoordinates:
-      ProcessExchange := ProcessQSONumberAndGeoCoordinatesExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessQSONumberAndGeoCoordinatesExchange(ExchangeString, RData);
 
     QSONumberAndCoordinatesSum:
-      ProcessExchange := ProcessQSONumberAndCoordinatesSumExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessQSONumberAndCoordinatesSumExchange(ExchangeString, RData);
 
     QSONumberAndZone:
       ProcessExchange := ProcessQSONumberAndZoneExchange(ExchangeString, RData);
 
     QSONumberDomesticOrDXQTHExchange:
-      ProcessExchange := ProcessQSONumberAndDomesticOrDXQTHExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessQSONumberAndDomesticOrDXQTHExchange(ExchangeString, RData);
 
     QSONumberDomesticQTHExchange:
-      ProcessExchange := ProcessQSONumberAndDomesticQTHExchange(ExchangeString, RData);
+      ProcessExchange := ProcessQSONumberAndDomesticQTHExchange(ExchangeString,
+        RData);
 
     QSONumberAndGridSquare:
-      ProcessExchange := ProcessQSONumberAndGridSquareExchange(ExchangeString, RData);
+      ProcessExchange := ProcessQSONumberAndGridSquareExchange(ExchangeString,
+        RData);
 
     QSONumberNameChapterAndQTHExchange:
-      ProcessExchange := ProcessQSONumberNameChapterAndQTHExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessQSONumberNameChapterAndQTHExchange(ExchangeString, RData);
 
     QSONumberNameDomesticOrDXQTHExchange:
-      ProcessExchange := ProcessQSONumberNameAndDomesticOrDXQTHExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessQSONumberNameAndDomesticOrDXQTHExchange(ExchangeString, RData);
 
     RSTAgeExchange:
       ProcessExchange := ProcessRSTAndAgeExchange(ExchangeString, RData);
 
-    RSTAndFOCNumberExchange:     //n4af
-      ProcessExchange := ProcessRSTAndPowerExchange(ExchangeString, RData);   //n4af
+    RSTAndFOCNumberExchange: //n4af
+      ProcessExchange := ProcessRSTAndPowerExchange(ExchangeString, RData);
+        //n4af
 
+    AgeAndQSONumberExchange: ProcessExchange :=
+      ProcessAgeAndQSONumberExchange(ExchangeString, RData);
 
-    AgeAndQSONumberExchange: ProcessExchange := ProcessAgeAndQSONumberExchange(ExchangeString, RData);
-
-    
     RSTAgeAndPossibleSK:
       ProcessExchange := ProcessRSTAgeAndPossibleSK(ExchangeString, RData);
 
@@ -7566,13 +7854,15 @@ begin
       ProcessExchange := ProcessRSTAndContinentExchange(ExchangeString, RData);
 
     RSTALLJAPrefectureAndPrecedenceExchange:
-      ProcessExchange := ProcessRSTAllJAPrefectureAndPrecedenceExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTAllJAPrefectureAndPrecedenceExchange(ExchangeString, RData);
 
     RSTAndGridExchange:
       ProcessExchange := ProcessRSTAndGridSquareExchange(ExchangeString, RData);
 
     RSTAndOrGridExchange:
-      ProcessExchange := ProcessRSTAndOrGridSquareExchange(ExchangeString, RData);
+      ProcessExchange := ProcessRSTAndOrGridSquareExchange(ExchangeString,
+        RData);
 
     GridExchange:
       ProcessExchange := ProcessGridSquareExchange(ExchangeString, RData);
@@ -7581,30 +7871,36 @@ begin
       ProcessExchange := ProcessRSTAndPostalCodeExchange(ExchangeString, RData);
 
     RSTAndQSONumberOrDomesticQTHExchange:
-      ProcessExchange := ProcessRSTAndQSONumberOrDomesticQTHExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTAndQSONumberOrDomesticQTHExchange(ExchangeString, RData);
 
     RSTAndQSONumberOrFrenchDepartmentExchange:
-      ProcessExchange := ProcessRSTAndQSONumberOrFrenchDepartmentExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTAndQSONumberOrFrenchDepartmentExchange(ExchangeString, RData);
 
     RSTDomesticQTHExchange:
-      ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData);
+      ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString,
+        RData);
 
     RSTDomesticOrDXQTHExchange:
-      ProcessExchange := ProcessRSTAndDomesticOrDXQTHExchange(ExchangeString, RData);
+      ProcessExchange := ProcessRSTAndDomesticOrDXQTHExchange(ExchangeString,
+        RData);
 
-
-     RSTDomesticQTHOrQSONumberExchange:
-      if DomesticCountryCall(RData.Callsign) and (StringHasLetters(ExchangeString)) then   //n4af 4.44.4 HADX
-        ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData)
+    RSTDomesticQTHOrQSONumberExchange:
+      if DomesticCountryCall(RData.Callsign) and
+        (StringHasLetters(ExchangeString)) then //n4af 4.44.4 HADX
+        ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString,
+          RData)
       else
-        ProcessExchange := ProcessRSTAndQSONumberExchange(ExchangeString, RData);
-
+        ProcessExchange := ProcessRSTAndQSONumberExchange(ExchangeString,
+          RData);
 
     RSTNameAndQTHExchange:
       ProcessExchange := ProcessRSTNameAndQTHExchange(ExchangeString, RData);
 
     RSTPossibleDomesticQTHAndPower:
-      ProcessExchange := ProcessRSTPossibleDomesticQTHAndPowerExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTPossibleDomesticQTHAndPowerExchange(ExchangeString, RData);
 
     RSTPowerExchange:
       ProcessExchange := ProcessRSTAndPowerExchange(ExchangeString, RData);
@@ -7619,36 +7915,44 @@ begin
       ProcessExchange := ProcessNZFieldDayExchange(ExchangeString, RData);
 
     RSTQSONumberAndDomesticQTHExchange:
-      ProcessExchange := ProcessRSTQSONumberAndDomesticQTHExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTQSONumberAndDomesticQTHExchange(ExchangeString, RData);
 
     QSONumberAndPreviousQSONumber:
-      ProcessExchange := ProcessQSONumberAndPreviousQSONumber(ExchangeString, RData);
+      ProcessExchange := ProcessQSONumberAndPreviousQSONumber(ExchangeString,
+        RData);
 
     RSTQSONumberAndGridSquareExchange:
-      ProcessExchange := ProcessRSTQSONumberAndGridSquareExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTQSONumberAndGridSquareExchange(ExchangeString, RData);
 
     RSTQSONumberOrDomesticQTHExchange:
-    ProcessExchange := ProcessRSTQSONumberorDomesticQTHExchange(ExchangeString, RData);      // 4.53.2
+      ProcessExchange :=
+        ProcessRSTQSONumberorDomesticQTHExchange(ExchangeString, RData); // 4.53.2
 
     RSTQSONumberAndPossibleDomesticQTHExchange:
-      ProcessExchange := ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
 
     QSONumberAndPossibleDomesticQTHExchange:
-      ProcessExchange := ProcessQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData); {KK1L: 6.73}
-
-
+      ProcessExchange :=
+        ProcessQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
+        {KK1L: 6.73}
 
     RSTQSONumberAndRandomCharactersExchange:
-      ProcessExchange := ProcessRSTQSONumberAndRandomCharactersExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTQSONumberAndRandomCharactersExchange(ExchangeString, RData);
 
     RSTQTHNameAndFistsNumberOrPowerExchange:
-      ProcessExchange := ProcessRSTQTHNameAndFistsNumberOrPowerExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTQTHNameAndFistsNumberOrPowerExchange(ExchangeString, RData);
 
     RSTQTHExchange:
       ProcessExchange := ProcessRSTAndQTHExchange(ExchangeString, RData);
 
     RSTZoneAndPossibleDomesticQTHExchange:
-      ProcessExchange := ProcessRSTZoneAndPossibleDomesticQTHExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessRSTZoneAndPossibleDomesticQTHExchange(ExchangeString, RData);
 
     RSTZoneExchange:
       ProcessExchange := ProcessRSTAndZoneExchange(ExchangeString, RData);
@@ -7659,20 +7963,24 @@ begin
       else
       begin
         ExchangeString := UpperCase(ExchangeString);
-        ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData);
+        ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString,
+          RData);
       end;
 
     QSONumberPrecedenceCheckDomesticQTHExchange:
-      ProcessExchange := ProcessQSONumberPrecedenceCheckDomesticQTHExchange(ExchangeString, RData);
+      ProcessExchange :=
+        ProcessQSONumberPrecedenceCheckDomesticQTHExchange(ExchangeString, RData);
 
     RSTLongJAPrefectureExchange: {KK1L: 6.72 JA}
       begin
         ExchangeString := UpperCase(ExchangeString);
-        ProcessExchange := ProcessRSTAndJAPrefectureExchange(ExchangeString, RData);
+        ProcessExchange := ProcessRSTAndJAPrefectureExchange(ExchangeString,
+          RData);
       end;
     RSTZoneOrDomesticQTH:
       if DomesticCountryCall(RData.Callsign) then
-        ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData)
+        ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString,
+          RData)
       else
         ProcessExchange := ProcessRSTAndZoneExchange(ExchangeString, RData);
 
@@ -7682,26 +7990,26 @@ end;
 procedure LogStringToRXData(LogString: Str80; var RXData: ContestExchange);
 
 var
-  ExchangeString                        : ShortString {Str80};
+  ExchangeString: ShortString {Str80};
 
 begin
   ExchangeString := GetLogEntryExchangeString(LogString);
 
-  if ExchangeInformation.RST then RemoveFirstString(ExchangeString);
+  if ExchangeInformation.RST then
+    RemoveFirstString(ExchangeString);
 
   ProcessExchange(ExchangeString, RXData);
 end;
 
-  procedure ProcessPartialCallAndInitialExchange(RXData: ContestExchange);
+procedure ProcessPartialCallAndInitialExchange(RXData: ContestExchange);
 
 begin
- {       if PartialCallEnable or ExchangeMemoryEnable then         // n4af 40.40.1
-        AddCallToPartialList(RXData.Callsign, GetInitialExchangeStringFromContestExchange(RXData));
-    GetInitialExchangeStringFromContestExchange(RXData); // n4af 40.40.1       }
-  end;
+  {       if PartialCallEnable or ExchangeMemoryEnable then         // n4af 40.40.1
+         AddCallToPartialList(RXData.Callsign, GetInitialExchangeStringFromContestExchange(RXData));
+     GetInitialExchangeStringFromContestExchange(RXData); // n4af 40.40.1       }
+end;
 
 procedure CreateAndSendSAPMultiInfoMessage;
-
 
 begin
   {
@@ -7731,7 +8039,6 @@ begin
 end;
 
 procedure CreateAndSendCQMultiInfoMessage;
-
 
 begin
   {
@@ -7794,12 +8101,12 @@ begin
   }
 end;
 
-
-function DomStringParse(InputString:  Str14): Str14;             //Gav 4.44.8     Formats DOM from Initial Exchange to be used for Mult Needed display. Most DOM pass through untouched
+function DomStringParse(InputString: Str14): Str14;
+  //Gav 4.44.8     Formats DOM from Initial Exchange to be used for Mult Needed display. Most DOM pass through untouched
 
 var
-  Index                                : integer;
-  TempMultiplier, NumberString         : Str14;
+  Index: integer;
+  TempMultiplier, NumberString: Str14;
 
 begin
 
@@ -7816,11 +8123,10 @@ begin
           if InputString[3] in ['0'..'9'] then
             if InputString[4] in ['0'..'9'] then
             begin
-             result := InputString;
+              result := InputString;
             end;
     Exit;
   end;
-
 
   if ActiveDomesticMult = DOKCodes then
   begin
@@ -7840,14 +8146,16 @@ begin
   if ActiveDomesticMult = IOTADomestic then
   begin
     result := '';
-    if (length(InputString) < 3) or (length(InputString) > 5) then Exit;
+    if (length(InputString) < 3) or (length(InputString) > 5) then
+      Exit;
 
     ContinentString := UpperCase(Copy(InputString, 1, 2));
     if GetContinentFromString(ContinentString) <> UnknownContinent then
     begin
       NumberString := Copy(InputString, 3, length(InputString) - 2);
 
-      if not StringIsAllNumbers(NumberString) then Exit;
+      if not StringIsAllNumbers(NumberString) then
+        Exit;
 
       while length(NumberString) < 3 do
         NumberString := '0' + NumberString;
@@ -7882,7 +8190,8 @@ begin
   if ActiveDomesticMult = GridFields then
   begin
     result := '';
-    if (length(InputString) <> 4) or (InputString[1] < 'A') or (InputString[1] > 'R') or
+    if (length(InputString) <> 4) or (InputString[1] < 'A') or (InputString[1] >
+      'R') or
       (InputString[2] < 'A') or (InputString[2] > 'R') or
       (InputString[3] > '9') or (InputString[3] < '0') or
       (InputString[4] > '9') or (InputString[4] < '0') then
@@ -7893,21 +8202,21 @@ begin
     Exit;
   end;
 
-
 end;
 
-
-function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}): Word;
+function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}):
+  Word;
 
 var
-  PotentialRSTSent                      : Str80 {40};
-  TempString                            : ShortString {Str40};
-//  RSTString                   : string[3] {Str20};
+  PotentialRSTSent: Str80 {40};
+  TempString: ShortString {Str40};
+  //  RSTString                   : string[3] {Str20};
 
 begin
   GetSentRSTFromExchangeString := 0;
 
-  if not LookForRSTSent then Exit;
+  if not LookForRSTSent then
+    Exit;
 
   TempString := ExchangeString;
 
@@ -7924,15 +8233,15 @@ begin
         begin
           GetSentRSTFromExchangeString := Result;
 
-                { Delete all the stuff we have }
+          { Delete all the stuff we have }
 
           Delete(ExchangeString, 1, length(TempString));
 
-                { Remove the callsign }
+          { Remove the callsign }
 
           RemoveFirstString(ExchangeString);
 
-                { Rebuild the exchange string without the callsign }
+          { Rebuild the exchange string without the callsign }
 
           ExchangeString := TempString + ' ' + ExchangeString;
           Exit;
@@ -7948,11 +8257,12 @@ begin
   SpecAndExchangeMatch := False;
 end;
 
-function FoundExchangeFromTemplate(Template: string; ExchangeString: Str40; var RData: ContestExchange): boolean;
+function FoundExchangeFromTemplate(Template: string; ExchangeString: Str40; var
+  RData: ContestExchange): boolean;
 
 var
-  FormatSpec, Exchange                  : ShortString;
-  TestSpec, TestExchange                : Str40;
+  FormatSpec, Exchange: ShortString;
+  TestSpec, TestExchange: Str40;
 
 begin
   FoundExchangeFromTemplate := False;
@@ -7966,25 +8276,29 @@ begin
     TestSpec := RemoveFirstString(FormatSpec);
     TestExchange := RemoveFirstString(Exchange);
 
-    if not SpecAndExchangeMatch(TestSpec, TestExchange) then Exit;
+    if not SpecAndExchangeMatch(TestSpec, TestExchange) then
+      Exit;
   end;
 
   { We have found that the format spec and the exchange match up }
 
 end;
 
-function ProcessTemplateExchange(ExchangeString: Str40; var RData: ContestExchange): boolean;
+function ProcessTemplateExchange(ExchangeString: Str40; var RData:
+  ContestExchange): boolean;
 
 var
-  Entry                                 : integer;
+  Entry: integer;
 
 begin
   ProcessTemplateExchange := False;
 
-  if NumberExchangeTemplates = 0 then Exit;
+  if NumberExchangeTemplates = 0 then
+    Exit;
 
   for Entry := 0 to NumberExchangeTemplates - 1 do
-    if FoundExchangeFromTemplate(ExchangeTemplateList[Entry]^, ExchangeString, RData) then
+    if FoundExchangeFromTemplate(ExchangeTemplateList[Entry]^, ExchangeString,
+      RData) then
     begin
       ProcessTemplateExchange := True;
       Exit;
@@ -8003,12 +8317,13 @@ function GoodLookingRDA(rda: Str20): boolean;
 { Verifies that the grid square is legitimate }
 
 var
-  CharPosition                          : integer;
+  CharPosition: integer;
 
 begin
   result := False;
 
-  if not ((length(rda) = 4) ) then Exit;
+  if not ((length(rda) = 4)) then
+    Exit;
 
   strU(rda);
 
@@ -8027,111 +8342,109 @@ begin
   result := True;
 end;
 
-procedure SendUDPRotorCommand(Heading: integer);     // ny4i 4.44.9
+procedure SendUDPRotorCommand(Heading: integer); // ny4i 4.44.9
 var
   // msg: TIdBytes;
-   sBuf: AnsiString;
-   freq : integer;
-   sFreqBand : AnsiString;
+  sBuf: AnsiString;
+  freq: integer;
+  sFreqBand: AnsiString;
 begin
-   case ActiveRadio of
-      radioone: freq := Radio1.FilteredStatus.Freq;
-      RadioTwo: freq := Radio2.FilteredStatus.Freq;
-      else freq := 0;
-   end; // case
+  case ActiveRadio of
+    radioone: freq := Radio1.FilteredStatus.Freq;
+    RadioTwo: freq := Radio2.FilteredStatus.Freq;
+  else
+    freq := 0;
+  end; // case
 
-   case freq of
-      1800000..1899999: sFreqBand := '1.8';
-      3500000..3999999: sFreqBand := '3.5';
-      7000000..7999999: sFreqBand := '7';
-      10000000..10100000: sFreqBand := '10';
-      14201000..14999999: sFreqBand := '14';
-      18000000..18999999: sFreqBand := '18';
-      21000000..21999999: sFreqBand := '21';
-      24000000..24999999: sFreqBand := '24';
-      28000000..29999999: sFreqBand := '28';
-      else sFreqBand := ' ';
-   end; // case
-   sBuf := '<N1MMRotor>' +
-            '<rotor>rotor name</rotor>' +
-            '<goazi>' + SysUtils.Format('%0.0d',[Heading]) + '</goazi>' +
-            '<offset>0.0</offset>' +
-            '<bidirectional>0</bidirectional>' +
-            '<freqband>' + sFreqBand + '<freqband>' +
-            '</N1MMRotor>';
-   //SetLength(msg,Length(sBuf));
-   //msg := RawToBytes(sBuf[1], Length(sBuf));
-   //udp.Broadcast(msg, UDPBroadcastRotorPort);     // ny4i 4.44.9
-   udp.BroadcastEnabled := true;
-   udp.Send(UDPBroadcastAddress,UDPBroadcastRotorPort,sBuf);
-
+  case freq of
+    1800000..1899999: sFreqBand := '1.8';
+    3500000..3999999: sFreqBand := '3.5';
+    7000000..7999999: sFreqBand := '7';
+    10000000..10100000: sFreqBand := '10';
+    14201000..14999999: sFreqBand := '14';
+    18000000..18999999: sFreqBand := '18';
+    21000000..21999999: sFreqBand := '21';
+    24000000..24999999: sFreqBand := '24';
+    28000000..29999999: sFreqBand := '28';
+  else
+    sFreqBand := ' ';
+  end; // case
+  sBuf := '<N1MMRotor>' +
+    '<rotor>rotor name</rotor>' +
+    '<goazi>' + SysUtils.Format('%0.0d', [Heading]) + '</goazi>' +
+    '<offset>0.0</offset>' +
+    '<bidirectional>0</bidirectional>' +
+    '<freqband>' + sFreqBand + '<freqband>' +
+    '</N1MMRotor>';
+  //SetLength(msg,Length(sBuf));
+  //msg := RawToBytes(sBuf[1], Length(sBuf));
+  //udp.Broadcast(msg, UDPBroadcastRotorPort);     // ny4i 4.44.9
+  udp.BroadcastEnabled := true;
+  udp.Send(UDPBroadcastAddress, UDPBroadcastRotorPort, sBuf);
 
 end; // SendUDPRotatorCommand
 
-
-function ValidClass(sClass: Str10): boolean;   // ny4i 4.45.3
+function ValidClass(sClass: Str10): boolean; // ny4i 4.45.3
 var
-   i : integer;
-   sXmit : string;
-   sCategory : string;
-   classSet : boolean;
+  i: integer;
+  sXmit: string;
+  sCategory: string;
+  classSet: boolean;
 begin
-   classSet := false;
-   for i := 1 to length(sClass) do
-      begin
-      if sClass[i] in ['0'..'9'] then
-         begin
-         sXmit := sXmit + sClass[i];
-         end
-      else if (((contest = ARRLFIELDDAY) and (sClass[i] in ['A'..'F']))      OR
-              ((contest = WINTERFIELDDAY) and (sClass[i] in ['I','O','H']))) then
+  classSet := false;
+  for i := 1 to length(sClass) do
+  begin
+    if sClass[i] in ['0'..'9'] then
+    begin
+      sXmit := sXmit + sClass[i];
+    end
+    else if (((contest = ARRLFIELDDAY) and (sClass[i] in ['A'..'F'])) or
+      ((contest = WINTERFIELDDAY) and (sClass[i] in ['I', 'O', 'H']))) then
 
-         begin
-         if classSet then
-            begin
-            sCategory := '';
-            break;
-            end
-         else
-            begin
-            classSet := true;
-            sCategory := sCategory + sClass[i];
-            end;
-         end
+    begin
+      if classSet then
+      begin
+        sCategory := '';
+        break;
+      end
       else
-         begin                         // ny4i Issue163 There is something else here - Error
-         sCategory := ''; // Used to force an TC_IMPROPERARRLFIELDDAYCLASS error later
-         break; // jump to next part to evaluate error
-         end;
+      begin
+        classSet := true;
+        sCategory := sCategory + sClass[i];
       end;
-   if (length(sXmit) = 0) or
-       (not (StrToInt(sXmit) in [1..99])) then
-      begin
-      ExchangeErrorMessage := TC_IMPROPERTRANSMITTERCOUNT;
-      end
-   else if length(sCategory) <> 1 then
-      begin
-      if contest = ARRLFIELDDAY then
-         begin
-         ExchangeErrorMessage := TC_IMPROPERARRLFIELDDAYCLASS;
-         end
-      else if contest = WINTERFIELDDAY then
-         begin
-         ExchangeErrorMessage := TC_IMPROPERWINTERFIELDDAYCLASS;
-         end;
+    end
+    else
+    begin // ny4i Issue163 There is something else here - Error
+      sCategory := '';
+        // Used to force an TC_IMPROPERARRLFIELDDAYCLASS error later
+      break; // jump to next part to evaluate error
+    end;
+  end;
+  if (length(sXmit) = 0) or
+    (not (StrToInt(sXmit) in [1..99])) then
+  begin
+    ExchangeErrorMessage := TC_IMPROPERTRANSMITTERCOUNT;
+  end
+  else if length(sCategory) <> 1 then
+  begin
+    if contest = ARRLFIELDDAY then
+    begin
+      ExchangeErrorMessage := TC_IMPROPERARRLFIELDDAYCLASS;
+    end
+    else if contest = WINTERFIELDDAY then
+    begin
+      ExchangeErrorMessage := TC_IMPROPERWINTERFIELDDAYCLASS;
+    end;
 
-      end
-   else
-      begin
-      Result := true;
-      end;
+  end
+  else
+  begin
+    Result := true;
+  end;
   // Result := (StrToInt(sXmit) in [1..99]) and (length(sCategory) = 1);
 end;
-
 
 begin
   CD.CellBuffer.MaximumMemoryToUse := 40000 * ua4wliscpconst {*4 - ua4wli};
   StuffInit;
 end.
-
-

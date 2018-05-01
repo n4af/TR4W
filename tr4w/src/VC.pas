@@ -2577,7 +2577,8 @@ type
     MakrothenQSOPointMethod,
     NCQSOPointMethod,
     ALRSUA1DZCupQSOPointMethod,
-     HolyLand               // 4.69.1
+    HolyLand,               // 4.69.1
+    OQPQSOPointMethod                     // 4.70.
     );
 
 const
@@ -2701,7 +2702,8 @@ const
     'MAKROTHEN',
     'NC QSO Party',
     'ALRS-UA1DZ-CUP',
-     'HOLYLAND'  // 4.69.1
+     'HOLYLAND',       // 4.69.1
+     'OQPQSOPOINTMETHOD'             // 4.70.4
     );
 
 type
