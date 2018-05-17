@@ -475,7 +475,7 @@
   TC_CTRL_Y                             = 'Increase weight by 0.03';
   TC_CTRL_SL                            = 'Normal dit';
   TC_QSO_NUMBER                         = 'QSO Number';
-  
+
   TC_SALUTATION_AND_NAME_IF_KNOWN       = 'Salutation and name if known';
   TC_NAME_FROM_NAME_DATABASE            = 'Name from name database';
   TC_SEND_CHARACTERS_FROM_KEYBOARD      = 'Send characters from keyboard';

@@ -5967,25 +5967,20 @@ end;
 procedure SetRemMultsColumnWidth;
 var
   Width                                 : integer;
-  DomWidth                              : integer;
-//const
-//  dw                               = 45;
-begin
+ // DomWidth                              : integer;
 
+begin
+ // 4.71.2 attempt to allow longer column width for long DOM MULTS by setting SHOW DOMESTIC MULTIPLIER NAME to TRUE
 //  windows.ZeroMemory(@RemMultsColumnWidthArray, sizeof(RemMultsColumnWidthArray));
 
-//  if tShowDomesticMultiplierName then
-//  if DomWidth < BASECOLUMNWIDTH then DomWidth := BASECOLUMNWIDTH;
-    DomWidth := 45;      // issue 255  allow longer char dom   4.68.5
-  case RemainingMultDisplay of
-    rmDomestic: Width :=  BaseColumnWidth;
-    rmPrefix: Width := PREFIXCOLUMNWIDTH;
-  else
-    Width := BASECOLUMNWIDTH;
-  end;
+   if (tShowDomesticMultiplierName) or (DoingPrefixMults) then
+     Width := PREFIXCOLUMNWIDTH
+      else
+        Width := BASECOLUMNWIDTH;
+
   tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_REMMULTSWINDOW_INDEX].WndHandle, Width);
 
-  tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_STATIONS_RM_DOM].WndHandle, DomWidth);
+ // tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_STATIONS_RM_DOM].WndHandle, DomWidth);
 
 end;
 
