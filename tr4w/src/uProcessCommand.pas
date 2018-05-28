@@ -106,7 +106,7 @@ const
 
 
  // sCommands                             =  67  {$IF MMTYMODE} + 5  {$IFEND};
-  sCommands                             =  74;  // 4.56.6
+  sCommands                             =  73;  // 4.71.5
 
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
@@ -136,7 +136,7 @@ const
 (caCommand: '  ^ = Half space'; caAddress: @scEXCHANGERADIOS),
 (caCommand: '  CTRL-P CTRL-F = Faster'; caAddress: @scEXCHANGERADIOS),
 (caCommand: '  CTRL-P CTRL-S = Slower'; caAddress: @scWK_SWAPTUNE),
-(caCommand: ' + = Previous #'; caAddress: @scWK_RESET),       //4.53.2
+// (caCommand: ' + = Previous #'; caAddress: @scWK_RESET),       //4.53.2  // 4.71.5
 (caCommand: '  > = Reset RIT'; caAddress: @scSENDMESSAGE),
 (caCommand: ' < = SK'; caAddress: @scBOOLSWAP),
 (caCommand: ' = = BT'; caAddress: @tClearDupesheet),

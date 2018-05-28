@@ -251,14 +251,14 @@ begin
     Exit;
   end;
 }
-{
-  if ID = 'AUTO QSO NUMBER DECREMENT' then
+
+  if ID = 'AUTO QSO NUMBER DECREMENT' then         // 4.71.6
   begin
-    AutoQSONumberDecrement := StackBool;
+    AutoQSONumberDecrement := True;
     ProcessConfigInstructions1 := True;
     Exit;
   end;
-
+ {
   if ID = 'AUTO RETURN TO CQ MODE' then
   begin
     AutoReturnToCQMode := StackBool;
