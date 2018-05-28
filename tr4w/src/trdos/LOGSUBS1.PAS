@@ -581,7 +581,7 @@ begin
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
 
-  ClearRadioStatus(ActiveRadioPtr); //n4af 04.40.2
+//  ClearRadioStatus(ActiveRadioPtr); //n4af 4.71.3
   ShowInformation; // n4af 04.40.02
 
   SetUpToSendOnActiveRadio; // 4.62.1  issue 278 remove 4.54.2 comment on this line

@@ -176,7 +176,7 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.71.2' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.71.4' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
@@ -2578,7 +2578,8 @@ type
     NCQSOPointMethod,
     ALRSUA1DZCupQSOPointMethod,
     HolyLand,               // 4.69.1
-    OQPQSOPointMethod                     // 4.70.
+    OQPQSOPointMethod,                     // 4.70.
+    PortugalDay    // 4.70.4
     );
 
 const
@@ -2703,7 +2704,8 @@ const
     'NC QSO Party',
     'ALRS-UA1DZ-CUP',
      'HOLYLAND',       // 4.69.1
-     'OQPQSOPOINTMETHOD'             // 4.70.4
+     'OQPQSOPOINTMETHOD',             // 4.70.4
+     'PORTUGALDAY'     // 4.71.4
     );
 
 type

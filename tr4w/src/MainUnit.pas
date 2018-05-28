@@ -3774,11 +3774,14 @@ begin
      DoABeep(ThreeHarmonics);
      Exit;
    end;
+// removed 4.71.3
+{
  if (freq = 0) and (tShowFrequencyInLog) and (TwoRadioMode) then              // 4.68.7   // 4.68.15
   begin
     QuickDisplay(TC_FREQ_ZERO);
     sleep (800);
   end;
+ }
 { if not tShowFrequencyInLog then             // 4.68.7     4.68.15
    begin
     QuickDisplay(TC_FREQ_OFF);

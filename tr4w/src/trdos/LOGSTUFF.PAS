@@ -7321,6 +7321,18 @@ begin
   exit;
 end;
 
+PortugalDay:    // 4.71.4
+ begin
+      if (RXCty = 'CT') and (MyCountry <> 'CT') then
+             RXData.QSOPoints := 10
+             else  if (RXCty = 'CT') and (MyCountry = 'CT') then
+              RXData.QSOPoints := 5
+               else if RXData.QTH.Continent <> MyContinent then
+                RXData.QSOPoints := 2
+                 else  
+                  RXData.QSOPoints := 1;
+ end;
+
 end; { of case }
 end;
 
