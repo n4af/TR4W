@@ -3050,6 +3050,8 @@ begin
     CallSignPrefix: RData.Prefix := RData.Callsign;
     MongolianCallSignPrefix: if RData.QTH.CountryID = 'JT' then
         RData.Prefix := RData.Callsign;
+    RussianPrefixes: if Rdata.QTH.CountryID = 'UA' then
+        RData.Prefix := RData.Callsign;
     GCStation:
       begin
         if (RData.Callsign = 'RK1G') or (RData.Callsign = 'R3K') or

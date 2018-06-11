@@ -588,7 +588,7 @@ begin
        DupeInfoCall := FList^[Index2].FCall;
      end;
   end;
- if d >= BandMapGuardBand then       // 4.57.8
+ if (d >= BandMapGuardBand) or (Pos(MyCall,Flist^[Index2].FCall)>0) then       // 4.57.8  // 4.72.1
   begin
    ClearAltD;
    tClearDupeInfoCall;
@@ -644,6 +644,7 @@ begin
 
   if d <= BandMapGuardBand then
   begin
+  //if (Pos(MyCall,Flist^[Index2].FCall)>0) then continue;
     if FList^[Index2].FCall <> MyCall then
     if OpMode = SearchAndPounceOpMode then     // n4af 4.45.10
     begin

@@ -176,11 +176,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.71.6' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.72.2' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'May 28, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'June 10, 2018' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -2425,7 +2425,8 @@ type
     SouthAmericanPrefixes,
     SouthAndNorthAmericanPrefixes,
     GCStation,
-    CQNonEuropeanCountriesAndWAECallRegions
+    CQNonEuropeanCountriesAndWAECallRegions,
+    RussianPrefixes
     );
 
   ZoneMultType =
@@ -2455,7 +2456,8 @@ const
     'SOUTH AMERICAN PREFIXES',
     'SOUTH AND NORTH AMERICAN PREFIXES',
     'GC STATION',
-    'CQ NON EUROPEAN COUNTRIES AND WAE'
+    'CQ NON EUROPEAN COUNTRIES AND WAE',
+    'RUSSIAN PREFIXES'
     );
 type
   DomesticMultType =
@@ -2579,7 +2581,8 @@ type
     ALRSUA1DZCupQSOPointMethod,
     HolyLand,               // 4.69.1
     OQPQSOPointMethod,                     // 4.70.
-    PortugalDay    // 4.70.4
+    PortugalDay,    // 4.70.4
+    RPX         // 4.72.2
     );
 
 const
@@ -2705,7 +2708,8 @@ const
     'ALRS-UA1DZ-CUP',
      'HOLYLAND',       // 4.69.1
      'OQPQSOPOINTMETHOD',             // 4.70.4
-     'PORTUGALDAY'     // 4.71.4
+     'PORTUGALDAY',     // 4.71.4
+     'RPX'
     );
 
 type

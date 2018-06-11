@@ -7333,7 +7333,17 @@ PortugalDay:    // 4.71.4
                   RXData.QSOPoints := 1;
  end;
 
-end; { of case }
+ RPX:
+  begin
+ 
+   if (RXCty = 'UA') or (RXCty = 'UA2') or (RXCty = 'UA9')then
+     RXData.QSOPoints := 10
+      else
+        RXData.QSOPoints := 5;
+
+  end;
+
+end; { of c ase }
 end;
 
 procedure SendMultiInfoMessage(Band: BandType; Mode: ModeType; Message: Str80);
