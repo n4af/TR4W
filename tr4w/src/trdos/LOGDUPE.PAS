@@ -1921,6 +1921,7 @@ begin
     RXData.DomesticMult := mo.IsDmMult(RXData.DomMultQTH, GetAddMultBand(DomesticMultByBand, MultBand), MultMode);
 
   if (RXData.DXQTH <> '') and DoingDXMults {and (ActiveDXMult <> NoCountDXMults)} then
+ // if (activeqsopointmethod = DLRTTY then
     RXData.DXMult := mo.IsDXMult(RXData.QTH.Country, GetAddMultBand(DXCCMultByBand, MultBand), MultMode);
 
   if (RXData.Prefix <> '') and DoingPrefixMults then

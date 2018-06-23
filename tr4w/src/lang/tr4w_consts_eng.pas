@@ -622,7 +622,7 @@
   RC_DUPESHEET                          = 'Dupesheet';
   RC_FKEYS                              = 'Function keys';
   RC_TRMASTER                           = 'SCP';
-  RC_REMMULTS                           = 'Remaining mults';
+  RC_REMMULTS                           = 'Mults';     // 4.72.3
   RC_RM_DEFAULT                         = 'Default';
   RC_TELNET                             = 'DX Cluster';
   RC_NETWORK                            = 'Network';

@@ -1324,10 +1324,10 @@ begin
 
         for i := 0 to mo.DomList.Count - 1 do
         begin
-   //       if RemainingMultDisplayMode = HiLight then
-  //          goto AddDom;
+           if RemainingMultDisplayMode = HiLight then       // 4.72.4
+             goto AddDom;
           if not mo.DomList.StringIsDupeByIndex(i, TempMultBand, MultMode) then
-   //         AddDom:   |
+             AddDom:
             SetRemMultsColumnWidth;       // 4.71.2
             SendMessage(rmw, LB_ADDSTRING, 0, MakeLong(Ord(rmt), i));
         end;
@@ -2913,6 +2913,15 @@ begin
     TotalScore := QPoints;
     Exit;
   end;
+
+  if Contest = ARRLFIELDDAY then    // 4.72.4
+   begin
+     totalscore := QPoints;
+     exit;
+   end;
+{ if contest = DL-DX RTTY then
+ exit
+ }
 
   if Contest = WINTERFIELDDAY then // Issue 301 NY4I
   begin

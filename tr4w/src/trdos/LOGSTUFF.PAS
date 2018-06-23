@@ -6001,10 +6001,34 @@ begin
   else
     RXData.QSOPoints := 3;
 
-  if (RXData.Band = Band80) or (RXData.Band = Band40) then
-    RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+    if (RXData.Band = Band80) or (RXData.Band = Band40) then
+      RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+  end;
 
-end;
+
+DLRTTY:
+{ QSO with own country: 5 points.
+QSO with other countries in own continent: 10 points.
+QSO with other continents: 15 points.
+QSO with DL-Station by stations in Europe: 3 additional points
+QSO with DL-Station by stations outside Europe: 5 additional points
+}
+  begin
+
+ if (pos('JA',RXCty)>0) then  // 4.72.6
+    mo.IncrementTotals(ActiveBand, ActiveMode, rmDX);
+   if (RXCty = MyCountry) {and (RXCty <> 'DL')} then
+    RXData.QSOPoints := 5
+     else if  (RXCty <> MyCountry) and  (RXData.QTH.Continent = MyContinent) then
+         RXData.QSOPoints := 10
+     else
+         RXData.QSOPoints := 15;
+    if RXCty = 'DL' then
+    begin
+     if (MyContinent = Europe) then RXData.QSOPoints := RXData.QSOPoints + 3
+       else RXData.QSOPoints := RXData.QSOPoints + 5;
+    end;
+    end;
 
 CQWWQSOPointMethod:
 if RXData.QTH.Continent <> MyContinent then

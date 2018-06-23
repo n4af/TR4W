@@ -410,6 +410,7 @@ begin
 
     ARRLFIELDDAY:
       begin
+        ActiveDomesticMult := DomesticFile;
         ActiveDXMult := NoDXMults;
         WARCBandsEnabled := False;         // WARC is not allowed during FD ny4i 4.45.3
         SetCQMemoryString(CW, F1, 'CQ^FD \ \ FD');

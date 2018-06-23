@@ -4096,7 +4096,7 @@ begin
     Exit;
   end;
 }
-{
+
   if ID = 'REMAINING MULT DISPLAY MODE' then
   begin
     RemainingMultDisplayMode := NoRemainingMults;
@@ -4109,7 +4109,7 @@ begin
 
     Exit;
   end;
-}
+ 
 
 {
   if ID = 'REMINDER' then

@@ -132,7 +132,7 @@ uses
   ;
 
   var
-  
+  JA_Switch   
   PTT_SET                               : boolean = False; //4.53.9
   InSplit                               : boolean = False;
   STString                              : Str10;           // 4.56.7

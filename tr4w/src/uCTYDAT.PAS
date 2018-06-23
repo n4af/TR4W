@@ -381,7 +381,7 @@ var
 
   //  NumberCountriesIndex             : integer;
 const
-  rm = 'REMAINING MULTS';
+  rm = RC_REMMULTS;     // 4.72.3
 
 begin
   //3.900.000 ticks
