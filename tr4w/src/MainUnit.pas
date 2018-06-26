@@ -132,7 +132,10 @@ uses
   ;
 
   var
-  JA_Switch   
+  JA_Switch                             : boolean = False; // 4.72.5
+  VK_Switch                             : boolean = False; // 4.72.5
+  W_Switch                              : boolean = False; // 4.72.5
+  VE_Switch                             : boolean = False; // 4.72.5
   PTT_SET                               : boolean = False; //4.53.9
   InSplit                               : boolean = False;
   STString                              : Str10;           // 4.56.7
@@ -5112,8 +5115,7 @@ begin
     LogSize := ((LogSize - SizeOf(TLogHeader)) div SizeOfContestExchange);
   end;
   QSOCounter := 0;
-
-  MapFin := Windows.CreateFileMapping(LogHandle, nil, PAGE_READWRITE, 0, 0, nil);
+   MapFin := Windows.CreateFileMapping(LogHandle, nil, PAGE_READWRITE, 0, 0, nil);
   if MapFin = 0 then goto 2;
 
   MapBase := Windows.MapViewOfFile(MapFin, FILE_MAP_ALL_ACCESS, 0, 0, 0);
