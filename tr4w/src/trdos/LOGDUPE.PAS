@@ -1695,7 +1695,7 @@ procedure LoadInitialExchangeFile;
 var
   TempInteger                           : integer;
 begin
-//  if Contest = WRTC then Exit;
+
   if not EnumerateLinesInFile(TR4W_INITIALEX_FILENAME, EnumInitialEx, True) then Exit;
   TempInteger := Format(wsprintfBuffer, '%s:'#13#10 + TC_THEREWERECALLS, TR4W_INITIALEX_FILENAME, InitialExCallsigns, InitialExDupes);
 {$IF LANG = 'ENG'}

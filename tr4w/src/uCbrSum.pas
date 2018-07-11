@@ -48,7 +48,7 @@ type
     ctCategoryTime,
     ctCategoryTransmitter,
     ctCategoryOverlay,
-   ctCertificate,
+    ctCertificate,
     ctOperators,
     ctClub,
     ctLocation,
@@ -78,11 +78,13 @@ type
 
 const
 
-  CategoriesArray                       : array[ctCategoryAssisted..ctCategoryOverlay] of TCategoriesValuesRecord =
+    CategoriesArray                       : array[ctCategoryAssisted..ctCategoryOverlay] of TCategoriesValuesRecord =
+//    CategoriesArray                       : array[0..8] of TCategoriesValuesRecord =
     (
 {   ctCategoryAssisted    }(cvrStart: @tCategoryAssistedSA; cvrCount: integer(High(tCategoryAssisted))),
 {   ctCategoryBand        }(cvrStart: @tCategoryBandSA; cvrCount: integer(High(tCategoryBand))),
 {   ctCategoryMode        }(cvrStart: @tCategoryModeSA; cvrCount: integer(High(tCategoryMode))),
+//{   ctCertificate         }(cvrStart: @tCertificateSA; cvrCount: integer(High(tCertificate))),
 {   ctCategoryOperator    }(cvrStart: @tCategoryOperatorSA; cvrCount: integer(High(tCategoryOperator))),
 {   ctCategoryPower       }(cvrStart: @tCategoryPowerSA; cvrCount: integer(High(tCategoryPower))),
 {   ctCategoryStation     }(cvrStart: @StationCategory; cvrCount: NumberStationCategories - 1),
@@ -91,23 +93,23 @@ const
 {   ctCategoryOverlay     }(cvrStart: @OverlayCategory; cvrCount: NumberOverlayCategories - 1)
     );
 
-
+ // 4.72.8 allow most tags to save to tr4w.ini in settings, allowing preload
   CabrilloTagsArray                     : array[CabrilloTags] of TCabrilloTagRecord =
     (
 {(*}
     (ctrTag: '_CATEGORY-ASSISTED';      ctrCFG:True;  ctrSave: False; ctrList: True),
     (ctrTag: '_CATEGORY-BAND';          ctrCFG:True;  ctrSave: False; ctrList: True),
-    (ctrTag: '_CATEGORY-MODE';          ctrCFG:True;  ctrSave: False; ctrList: True),
-    (ctrTag: '_CATEGORY-OPERATOR';      ctrCFG:True;  ctrSave: False; ctrList: True),
-    (ctrTag: '_CATEGORY-POWER';         ctrCFG:True;  ctrSave: False; ctrList: True),
-    (ctrTag: '_CATEGORY-STATION';       ctrCFG:True;  ctrSave: False; ctrList: True),
+    (ctrTag: '_CATEGORY-MODE';          ctrCFG:True;  ctrSave: True; ctrList: True),
+    (ctrTag: '_CATEGORY-OPERATOR';      ctrCFG:True;  ctrSave: True; ctrList: True),
+    (ctrTag: '_CATEGORY-POWER';         ctrCFG:True;  ctrSave: True; ctrList: True),
+    (ctrTag: '_CATEGORY-STATION';       ctrCFG:False; ctrSave: True; ctrList: False),
     (ctrTag: '_CATEGORY-TIME';          ctrCFG:True;  ctrSave: False; ctrList: True),
-    (ctrTag: '_CATEGORY-TRANSMITTER';   ctrCFG:True;  ctrSave: False; ctrList: True),
+    (ctrTag: '_CATEGORY-TRANSMITTER';   ctrCFG:False; ctrSave: True; ctrList: False),
     (ctrTag: '_CATEGORY-OVERLAY';       ctrCFG:True;  ctrSave: False; ctrList: True),
-   (ctrTag: '_CERTIFICATE';            ctrCFG:True;  ctrSave: False; ctrList: False),
-    (ctrTag: '_OPERATORS';              ctrCFG:True;  ctrSave: False; ctrList: False),
+    (ctrTag: '_CERTIFICATE';            ctrCFG:True;  ctrSave: True; ctrList: False),
+    (ctrTag: '_OPERATORS';              ctrCFG:True;  ctrSave: True; ctrList: False),
     (ctrTag: '_CLUB';                   ctrCFG:False; ctrSave: True;  ctrList: False),
-    (ctrTag: '_LOCATION';               ctrCFG:True;  ctrSave: False; ctrList: False),
+    (ctrTag: '_LOCATION';               ctrCFG:True;  ctrSave: True; ctrList: False),
     (ctrTag: '_NAME';                   ctrCFG:False; ctrSave: True;  ctrList: False),
     (ctrTag: '_ADDRESS';                ctrCFG:False; ctrSave: True;  ctrList: False),
     (ctrTag: '_ADDRESS-CITY';           ctrCFG:False; ctrSave: True;  ctrList: False),
@@ -175,7 +177,7 @@ var
 const
   Left                                  = 10;
   TagHeight                             = 20;
-  InitialTagsValuesArray                : array[ctCategoryAssisted..ctCategoryPower] of PByte = (@CategoryAssisted,@CategoryBand, @CategoryMode, @CategoryOperator, @CategoryPower);
+  InitialTagsValuesArray                : array[ctCategoryAssisted..ctCategoryPower] of PByte = (@CategoryAssisted,@CategoryBand,@CategoryMode, @CategoryOperator, @CategoryPower);
 begin
   Result := False;
   case Msg of

@@ -134,7 +134,7 @@ uses
   var
   JA_Switch                             : boolean = False; // 4.72.5
   VK_Switch                             : boolean = False; // 4.72.5
-  W_Switch                              : boolean = False; // 4.72.5
+  K_Switch                              : boolean = False; // 4.72.5
   VE_Switch                             : boolean = False; // 4.72.5
   PTT_SET                               : boolean = False; //4.53.9
   InSplit                               : boolean = False;
@@ -917,6 +917,7 @@ begin
   end;
   DisplayGridSquareStatus(CallWindowString);
 
+ 
   if Contest <> GENERALQSO then
     begin
      ShowStationInformation(@CallWindowString);                                          //gav 4.44.8
@@ -4517,10 +4518,10 @@ begin
   QuickDisplay(inttopchar(Windows.GetTickCount - T1));
 //  showint(m);
 {$IFEND}
-{   if contest = RADIOYOC then    // 4.53.2
+    if contest = RADIOYOC then    // 4.53.2   // 4.72.9
    begin
     PrevNr := copy(IntToStr(TempRXData.NumberReceived),1,3);    // 4.53.2
-   end;   }
+   end;    
 end;
 
 function CreateEditableLog(Parent: HWND; X, Y, Width, Height: integer; DefaultSize: boolean): HWND;

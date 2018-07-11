@@ -38,7 +38,7 @@ uses
   TF,
   utils_text,
   uCallSignRoutines,
-uRussiaOblasts,
+  uRussiaOblasts,
   uCTYDAT,
   uMP3Recorder,
   utils_file,
@@ -52,6 +52,7 @@ uRussiaOblasts,
   Windows;
 //  Help,
 //  Country9;
+
 
 function FoundContest(CMD: ShortString): boolean;
 procedure SetUpFileNames;
@@ -275,9 +276,7 @@ var
   TmpBuf                                : array[0..255] of Char;
     TempOblast                       : Str2;
 begin
-  CTY.ctyCountryMode := ARRLCountryMode;
-//  CountryTable.ZoneMode := ITUZoneMode;
-//  LastLocateCall := '';
+  CTY.ctyCountryMode := ARRLCountryMode;  
 
   NoMultMarineMobile := False; {KK1L: 6.68 Added for WRTC 2002 as flag to not count /MM or /AM as mults or countries}
 
@@ -296,12 +295,7 @@ begin
     CTY.ctyZoneMode := ZoneModeType(ContestsBooleanArray[Contest] and (1 shl CQ_ZONE_MODE_BIT) = 0);
 
     CountDomesticCountries := ContestsBooleanArray[Contest] and (1 shl CDC_BIT) <> 0;
-   {
-    QSOByMode := ContestsArray[Contest].ciQM;
-    QSOByBand := ContestsArray[Contest].ciQB;
-    MultByMode := ContestsArray[Contest].ciMM;
-    MultByBand := ContestsArray[Contest].ciMB;
-   }
+
 
     ActiveQSOPointMethod := ContestsArray[Contest].QP;
     ActiveExchange := ContestsArray[Contest].AE;
@@ -343,57 +337,7 @@ begin
     end;
   end;
 
-  { You get these for free }
 
-      {KK1L: 6.68 Added for Helsinki}
-      {KK1L: 6.69 Moved here to be free}
-  {
-  if CMD = 'WRTC 2002' then
-  begin
-   LastLocateCall := '';
-   LocateCall(MyCall, TempQTH, True);
-   Str(CountryTable.GetZone(MyCall), MyZone);
-
-   ActiveDomesticMult := WYSIWYGDomestic;
-   DomesticQTHDataFileName := 'IARUHQ';
-   ActiveExchange := RSTZoneOrSocietyExchange;
-   ActiveInitialExchange := ZoneInitialExchange;// KK1L: 6.71 NOTE changed in code
-        //ActiveInitialExchange := None; {May need this to satisfy rules
-   ActiveDXMult := ARRLDXCC;
-   ActiveQSOPointMethod := OneEuropeTwoOther;
-   ActiveZoneMult := NoZoneMults;
-  //    ContestName := 'WRTC 2002 - Finland';
-   SCPMinimumLetters := 0; //KK1L: 6.68 closes SCP to WRTC
-   CQExchange := ' $5NN ' + MyZone;
-        //         ExchangeFunctionKeyMenu := 'F1-DE  F2-Ex  F3-RST  F4-Zone F5-Cl+Ex F8-EE  F9-?  Alt = Ask for his';
-   NoMultMarineMobile := True;
-   WRTC2002 := True;
-   MultByBand := True;
-   //MultByMode := False;
-   QSOByBand := True;
-   QSOByMode := True;
-   RepeatSearchAndPounceExchange := '5NN ' + MyZone;
-   SearchAndPounceExchange := '~ %5NN ' + MyZone;
-
-   SetCQMemoryString(CW, F3, '5NN ' + MyZone);
-
-   SetEXMemoryString(CW, F3, '5NN');
-   SetEXMemoryString(CW, F4, MyZone);
-   SetEXMemoryString(CW, F5, '@ DE \ 5NN ' + MyZone);
-
-   SetEXMemoryString(CW, AltF3, 'RST?');
-   SetEXMemoryString(CW, AltF4, 'ZONE?');
-
-   FoundContest := True;
-   Contest := PostUnit.WRTC2002;
-
-   LocateCall(MyCall, TempQTH, True);
-   MyCountry := CountryTable.GetCountryID(TempQTH.Country);
-   MyContinent := TempQTH.Continent;
-   Str(TempQTH.Zone, MyZone);
-
-  end;
-  }
   case Contest of
 
     WINTERFIELDDAY:
@@ -730,10 +674,9 @@ begin
       }
   FOCMARATHON:
   ExchangeMemoryEnable := True;
-  
+
     GENERALQSO:
       begin
-//        ActiveInitialExchange := NameQTHInitialExchange;
         AutoDupeEnableCQ := False;
         AutoDupeEnableSandP := False;
         ContestName := 'General QSOs';
@@ -766,7 +709,7 @@ begin
        AddDomesticCountry('GW');
        AddDomesticCountry('GU');
        AddDomesticCountry('EI');
-      
+
 
       end;
 
@@ -909,6 +852,7 @@ begin
         Add_KVEKH6KL;
         LiteralDomesticQTH := True;
       end;
+
 
     NEWENGLANDQSO:
       begin
@@ -1625,6 +1569,8 @@ begin
   begin
     MyCountry := TempQTH.CountryID;
     CountryString := MyCountry;
+    if MRC = '' then
+    MRC := MyCountry;
   end;
 
   if not MyZoneIsSet then
@@ -1635,6 +1581,8 @@ begin
   if not MyContinentIsSet then
   begin
     MyContinent := TempQTH.Continent;
+    if MyCo = '' then
+    MyCo := tContinentArray[MyContinent];
     ContinentString := tContinentArray[MyContinent];
   end;
 

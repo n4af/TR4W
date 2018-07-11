@@ -57,6 +57,10 @@ uses {Dos, Printer,}Tree,
   Windows
   ;
 
+var
+  MRC                    : Str10 ;
+  MyCo                   : String[14];
+
 const
   SSPrec: set of Char = ['A', 'B', 'Q', 'U', 'M', 'S'];
 
@@ -5548,8 +5552,7 @@ var
   russianRegion1, russianRegion2: RussianRegionType;
   temphour: byte; // 4.58.2
   iotastate: string[10];
-
-
+  continent: string;
 begin
   RXData.QSOPoints := 0;
   RXCty := RXData.QTH.CountryID; // 4.67.15
@@ -5580,13 +5583,7 @@ begin
     RXData.QSOPoints := QSOPointsDXPhone;
     Exit;
   end;
-  {  if contest = RSGB18 then
-    if RXData.QTH.CountryID[1] = 'G' then
-     RXCty := ''
-      else
-
-   RXData.QTH.CountryID := '';
-  }
+  
   case ActiveQSOPointMethod of
 
     AllAsianQSOPointMethod:
@@ -6015,102 +6012,27 @@ QSO with DL-Station by stations in Europe: 3 additional points
 QSO with DL-Station by stations outside Europe: 5 additional points
 }
   begin
-  RRC := copy(rxcty,0,(length(rxcty) -1));
-  MRC := copy(MyCountry,0,(length(rxcty)-1));
+  if (MyCountry = '')  or (MyContinent = UnknownContinent) then
+  begin
+    RXData.QSOPoints := 10;
+    exit;
+  end;
 
-  if (RRC = 'JA') then
-   begin
-     if MRC = 'JA' then
+     if MyCountry = RxData.QTH.countryid then
        RXData.QSOPoints := 5
        else
-        if MyContinent = RXData.QTH.Continent then
-          RXData.QSOPoints := 10
-          else
-            RXData.QSOPoints := 15;
-     if (JA_Switch = False) then  // 4.72.5
-     begin
-       mo.IncrementTotals(ActiveBand, ActiveMode, rmDX);
-       JA_Switch := True;
-     end;
-     exit;
-    end;
-
-   if RRC = 'K' then
-    begin
-     if MRC = 'K' then
-       RXData.QSOPoints := 5
-       else
-        if MyContinent = RXData.QTH.Continent then
+        if  rxdata.QTH.Continent = MyContinent then
           RXData.QSOPoints := 10
           else
             RXData.QSOPoints := 15;
 
-     if (K_Switch = False) then  // 4.72.5
-       begin
-       mo.IncrementTotals(ActiveBand, ActiveMode, rmDX);
-       K_Switch := True;
-   end;
-
-      end;
-
-  if RRC = 'VK' then
-   begin
-    if MRC = 'VK' then
-    RXData.QSOPoints := 5
-    else
-        if MyContinent = RXData.QTH.Continent then
-          RXData.QSOPoints := 10
-          else
-            RXData.QSOPoints := 15;
-    if (VK_Switch = False) then  // 4.72.5
-     begin
-       mo.IncrementTotals(ActiveBand, ActiveMode, rmDX);
-       VK_Switch := True;
-     end;
-     exit;
-   end;
-
-   if RRC = 'VE' then
-    begin
-      if MRC = 'VE' then
-        RXData.QSOPoints := 5
-        else
-        if MyContinent = RXData.QTH.Continent then
-          RXData.QSOPoints := 10
-          else
-            RXData.QSOPoints := 15;
-      if (VE_Switch = False) then  // 4.72.5
-        begin
-          mo.IncrementTotals(ActiveBand, ActiveMode, rmDX);
-          VE_Switch := True;
-        end;
-        exit;
-      end;
-
-     if (pos(MyCountry,RXcty)>0) then
-       RXData.QSOPoints := 5;
-      if ContestName = 'DL-DX RTTY' then
-
-        if (RXCty = MyCountry) {and (RXCty <> 'DL')} then
-         RXData.QSOPoints := 5
-        else if  (RXCty <> MyCountry) and  (RXData.QTH.Continent = MyContinent) then
-          RXData.QSOPoints := 10
-        else
-         RXData.QSOPoints := 15;
-      if (RXCty = 'DL') then     // 4.72.5
-                if (MyContinent = Europe) then
-                  RXData.QSOPoints := RXData.QSOPoints + 3
-                   else RXData.QSOPoints := RXData.QSOPoints + 5;
-       if ContestName <> 'DL-DX RTTY' then
-       if (RRC <> 'K') and (RRC <> 'VE') and (RRC <> 'JA') and (RRC <> 'VK') then
-         if (RXCty = MyCountry) then
-          RXData.QSOPoints := 5
-           else if  (RXCty <> MyCountry) and  (RXData.QTH.Continent = MyContinent) then
-             RXData.QSOPoints := 10
-              else
-               RXData.QSOPoints := 15;
-
-    end;
+      if ContestTitle = 'DL-DX-RTTY' then
+       if RXCty = 'DL' then
+        if  rxdata.QTH.Continent <> MyContinent then
+          RXData.QSOPoints :=  RXData.QSOPoints + 5
+           else
+             RXData.QSOPoints := RXData.QSOPoints +3 ;
+  end;
 
 CQWWQSOPointMethod:
 if RXData.QTH.Continent <> MyContinent then
@@ -7412,19 +7334,15 @@ begin
   end;
 end;
 
-WRTCQSOPointMethod:
+WRTCQSOPointMethod:               // 4.72.10
 if RXData.Band in [Band80..Band10] then
 begin
 
-  if RXData.Zone = 8 then
+   if RXData.QTH.Continent = Europe then
     RXData.QSOPoints := 2
-  else if RXData.QTH.Continent = NorthAmerica then
-    RXData.QSOPoints := 3
-  else
+   else
     RXData.QSOPoints := 5;
-  if RXData.DomesticQTH <> '' then
-    RXData.QSOPoints := 2;
-  exit;
+  
 end;
 
 PortugalDay:    // 4.71.4

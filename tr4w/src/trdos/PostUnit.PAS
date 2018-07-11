@@ -819,7 +819,7 @@ begin
   ContestDates[NumberDates] := Date;
   inc(NumberDates);
 
-  if NumberDates > 10 then
+  if (NumberDates > 10) and (Contest <> GENERALQSO) then     // 4.72.1
   begin
     showwarning(TC_TOOMANYCONTESTDATES);
       //    halt;
@@ -3230,26 +3230,28 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
             end;
           end;
 
-          QSONumberAndPreviousQSONumber:
+         QSONumberAndPreviousQSONumber:
           begin
+          hisnr := (nrreceived div 1000);    // 4.53.2
+           rxnr := (nrreceived mod 1000);    // 4.53.2
             asm
              push nrSent            // 4.53.2
              push pnr     // 4.53.2
             end;
-            wsprintf(CABRILLO_MYEX, '%-5.3u%-5.3d');
+            wsprintf(CABRILLO_MYEX, '%-.3u%-7.3d');    // 4.72.9
             asm add esp,16
             end;
-           
-          hisnr := (nrreceived div 1000);    // 4.53.2
-           rxnr := (nrreceived mod 1000);    // 4.53.2
+
+
 
             asm
-               push hisnr     // 4.53.4
-              push rxnr      //4.53.4
+               push RXNR     // 4.53.4           // 4.72.9
+              push HisNR      //4.53.4
 
             end;
-            pnr := temprxdata.numberreceived div  1000;      // 4.53.2
-             wsprintf(CABRILLO_HISEX, '%-5.3d%-5.3d');    // 4.53.4
+          //  pnr := temprxdata.numberreceived div  1000;      // 4.53.2
+              pnr := RXNR;
+             wsprintf(CABRILLO_HISEX, '%-.3d%-.3d');    // 4.53.4        // 4.72.9
              asm add esp,16
              end;
           end;

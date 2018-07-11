@@ -1628,8 +1628,8 @@ begin
     Exit;
   if Call = LastSCPCall then
     Exit;
-  if Contest = WRTC then
-    Exit;
+  if Contest = WRTC then           
+     Exit;
   LastSCPCall := Call;
 
   SCPScreenFull := False;

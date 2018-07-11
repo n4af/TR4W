@@ -28,12 +28,16 @@ uses
   Windows,
   Messages;
 
+
 {$INCLUDE w.pas}
+
+
 
 const
   tDebugMode                            = False;
   NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
   MMTTYMODE                             = True;
+
 
 type
 
@@ -142,14 +146,14 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
-          LANG                                  = 'ENG';
+         LANG                                  = 'ENG';
 //       LANG                                  = 'RUS';
 //       LANG                                  = 'SER';
 //       LANG                                  = 'ESP';
 //       LANG                                  = 'MNG';
 //       LANG                                  = 'POL';
-//         LANG                                  = 'CZE';
-//         LANG                                  = 'ROM';
+//       LANG                                  = 'CZE';
+//       LANG                                  = 'ROM';
 //       LANG                                  = 'CHN';
 
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
@@ -176,11 +180,11 @@ const
   OZCR2008                              = False;
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.72.5' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.73.2' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'June 22, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'July 2, 2018' ;
 
  
   TR4WSERVER_CURRENTVERSION             = '1.41';
@@ -723,27 +727,29 @@ type
   LogRecordKind = (rkQSO, rkQTCR, rkQTCS, rkNote);
   SpotModeType = (NormalSpot, SHDXSpot);
   MesWindowType = (CQMsgWin, ExMsgWin, OtherMsgWin);
-  tCertificate = (Yes, No);
   tCategoryAssisted = (caNONASSISTED, caASSISTED);
   tCategoryBand = (cbALL, cb160M, cb80M, cb40M, cb20M, cb15M, cb10M, cb6M, cb2M, cb222, cb432, cb902, cb12G);
   tCategoryMode = (cmCW, cmRTTY, cmSSB, cmMIXED);
+  tCertificate = (Yes, No);
   tCategoryOperator = (coSINGLEOP, coMULTIOP, coCHECKLOG);
   tCategoryPower = (cpHIGH, cpLOW, cpQRP);
   tCategoryTransmitter = (ctONE, ctTWO, ctLIMITED, ctUNLIMITED, ctSWL);
 
 const
-  tCertificateSA                        : array[tCertificate] of PChar = ('Yes', 'No');
+
   tCategoryAssistedSA                   : array[tCategoryAssisted] of PChar = ('NON-ASSISTED', 'ASSISTED');
   tCategoryBandSA                       : array[tCategoryBand] of PChar = ('ALL', '160M', '80M', '40M', '20M', '15M', '10M', '6M', '2M', '222', '432', '902', '1.2G');
   tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'SSB', 'MIXED');
+  tCertificateSA                        : array[tCertificate] of PChar = ('Yes', 'No');
   tCategoryOperatorSA                   : array[tCategoryOperator] of PChar = ('SINGLE-OP', 'MULTI-OP', 'CHECKLOG');
   tCategoryPowerSA                      : array[tCategoryPower] of PChar = ('HIGH', 'LOW', 'QRP');
   tCategoryTransmitterSA                : array[tCategoryTransmitter] of PChar = ('ONE', 'TWO', 'LIMITED', 'UNLIMITED', 'SWL');
+
 var
-  Certificate                           : tCertificate;
   CategoryAssisted                      : tCategoryAssisted;
   CategoryBand                          : tCategoryBand;
   CategoryMode                          : tCategoryMode;
+  Certificate                           : tCertificate;
   CategoryOperator                      : tCategoryOperator;
   CategoryPower                         : tCategoryPower;
   CategoryTransmitter                   : tCategoryTransmitter;
@@ -888,7 +894,6 @@ type
     YODX,
     YOUTHCHAMPIONSHIPRF,
     RUSSIAN160,
-    RADIOYOK,
     LQP,
     ARKTIKA_SPRING,
     UNDX,
@@ -920,7 +925,8 @@ type
     CQIR,
     WWIH,
     ALRS_UA1DZ_CUP,
-    WINTERFIELDDAY
+    WINTERFIELDDAY,
+    RADIOYOC
     );
 
 type
@@ -3034,7 +3040,6 @@ QSOPartiesCount = 13;
  ({Name: 'YO DX';                      }Email: nil;                      DF: 'romania';           WA7BNM:   98; {SK3BG: 'yodxc';      } QRZRUID: 328 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:ARRLDXCC;  QP:YODXQSOPointMethod),
  ({Name: 'SRR-JR';                     }Email: nil;                      DF: 'russian';           WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 331 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: AgeAndQSONumberExchange;                           XM:ARRLDXCC; QP:AlwaysOnePointPerQSO),      // n4af 04.42.6
  ({Name: 'RUSSIAN-160';                  }Email: nil;                    DF: 'russian';           WA7BNM:  202; {SK3BG: 'russ160';    } QRZRUID: 90  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC;  QP:RussianDXQSOPointMethod),      // 4.65.4
- ({Name: 'RADIO-YOK';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: AgeandQSONumberExchange;               XM:NoDXMults;  QP:ThreePhoneFiveCWFourRTTY),            // 4.55.4
  ({Name: 'LOCUST QP';                  }Email: nil;                      DF: 'naqp';              WA7BNM:  446; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange{QSONumberNameDomesticOrDXQTHExchange};        XM:NoDXMults; QP:LQPQSOPointMethod),
  ({Name: 'ARKTIKA-SPRING';             }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 351 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:NoDXMults; QP:ArktikaSpringQSOPointMethod),
  ({Name: 'UN DX';                      }Email: nil;                      DF: 'kda';               WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 13  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC;    QP:UNDXQSOPointMethod),
@@ -3066,8 +3071,8 @@ QSOPartiesCount = 13;
  ({Name: 'CQIR';                    }   Email: nil;                      DF: 'ireland';           WA7BNM:  434;                         QRZRUID:   0 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  DM: DomesticFile; P: 0; AE: QSONumberAndPossibleDomesticQTHExchange;           XM:NoDXMults; QP:TwoPhoneThreeCW),
  ({Name: 'WWIH';                    }   Email: nil;                      DF: nil;                 WA7BNM:  552;                         QRZRUID:   0 ; Pxm: NoPrefixMults; ZnM: CQZones;  AIE:ZoneInitialExchange;DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;           XM:CQDXCC; QP:CQWWRTTYQSOPointMethod),
  ({Name: 'ALRS_UA1DZ_CUP';          }   Email: nil;                      DF: 'russian';           WA7BNM: 0000;                         QRZRUID: 543 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  AIE:NoInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTDomesticQTHExchange;           XM:CQDXCC; QP:ALRSUA1DZCupQSOPointMethod),
- ({Name: 'WINTER FIELD DAY';        }   Email: 'wfda@winterfieldday.com';DF: 'arrlsect';          WA7BNM:   421; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod)
- 
+ ({Name: 'WINTER FIELD DAY';        }   Email: 'wfda@winterfieldday.com';DF: 'arrlsect';          WA7BNM:   421; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod),
+ ({Name: 'RADIO-YOC';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 119 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndPreviousQSONumber;               XM:ARRLDXCC;  QP:ThreePointsPerQSO) 
  {*)}
       );
 
@@ -3203,7 +3208,6 @@ QSOPartiesCount = 13;
       'YO DX',
       'SRR-JR',
       'RUSSIAN-160',      // 4.65.4
-      'RADIO-YOK',
       'LOCUST QSO PARTY',
       'ARKTIKA-SPRING',
       'UN DX',
@@ -3235,7 +3239,8 @@ QSOPartiesCount = 13;
       'CQIR',
       'WWIH',
       'ALRS-UA1DZ-CUP',
-      'WINTER FIELD DAY'
+      'WINTER FIELD DAY' ,
+      'RADIO-YOC'
       );
 
   const
@@ -3410,8 +3415,7 @@ QSOPartiesCount = 13;
       ({Name: 'XMAS';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'YO DX';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'SRR-JR';                     }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
-      ({Name: 'RUSSIAN-160';                }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB0 + ciQM0 + ciMB0 + ciMM0),      // 4.65.4
-      ({Name: 'RADIO-YOK';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
+      ({Name: 'RUSSIAN-160';                }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB0 + ciQM0 + ciMB0 + ciMM0),      // 4.65.
       ({Name: 'LQP';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'ARKTIKA-SPRING';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'UN DX';                      }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
@@ -3443,8 +3447,8 @@ QSOPartiesCount = 13;
       ({Name: 'CQIR';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),
       ({Name: 'WWIH';                       }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM1),
       ({Name: 'ALRS-UA1DZ-CUP';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
-      ({Name: 'WINTER-FIELD DAY';           }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0)        // 4.56.9 ny4i
-
+      ({Name: 'WINTER-FIELD DAY';           }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),        // 4.56.9 ny4i
+      ({Name: 'RADIO-YOC';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0)
       );
 
 

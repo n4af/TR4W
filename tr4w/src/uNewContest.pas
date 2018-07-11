@@ -370,7 +370,7 @@ begin
               OLDNEWYEAR: SetCommentAndEnableEditControl(TC_ENTERSUMOFYOURAGEANDAMOUNT, icmyQTH);
               RSGB_ROPOCO_CW, RSGB_ROPOCO_SSB: SetCommentAndEnableEditControl(TC_ENTERYOURPOSTCODE, icmyPostalCode);
 
-              RADIOYOK:  SetCommentAndEnableEditControl(TC_AGECALLSIGNAGE, icmyQTH);
+             
               RADIOMEMORY: SetCommentAndEnableEditControl(TC_AGECALLSIGNAGE, icmyQTH);
               CQMM: SetCommentAndEnableEditControl(TC_ENTERYOURCONTINENT, icmyState);
 
