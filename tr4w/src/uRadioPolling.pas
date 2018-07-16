@@ -126,6 +126,7 @@ begin
   repeat
     inc(rig^.tPollCount);
 
+    
     NumberOfSucceffulPolls := 0;
 
     for PollNumber := Low(tKenwoodCommands) to High(tKenwoodCommands) do
@@ -146,7 +147,7 @@ begin
       BufferNotChanged := 0;
 
       NextWait:
-      Sleep(80);
+       Sleep(40);
       ClearCommError(rig^.tCATPortHandle, Errs, @stat);
       if stat.cbInQue > BytesInBuffer then
       begin
@@ -510,17 +511,10 @@ begin
     rig.WritePollRequest(rig.CommandsBuffer[0], rig.CommandsBufferPointer);
     Windows.ZeroMemory(@rig.CommandsBuffer[0], SizeOf(rig.CommandsBuffer[0]));
     rig.CommandsBufferPointer := 0;
-    Sleep(100);
+     Sleep(80);
   end;
 
-{
-  if rig.OutPutBufferPoiner <> 0 then
-  begin
-    rig.WritePollRequest(rig.OutPutBuffer, rig.OutPutBufferPoiner);
-    Sleep(rig.OutPutBufferPoiner * 10);
-    rig.OutPutBufferPoiner := 0;
-  end;
-}
+
 //  if step = KenwoodPollCount then
   if rig.WritePollRequest('IF;', 3) then
   begin
@@ -553,17 +547,17 @@ begin
     end;
   end;
 
-  if step = 0 then
+   if step = 0 then
   begin
     if rig.CurrentStatus.VFOStatus = VFOA then TempVFO := VFOB else TempVFO := VFOA;
     if rig.WritePollRequest(KenwoodVFORequests[TempVFO]^, 3) then
-      if ReadFromCOMPort {OnEvent}(14, rig) then
+       if ReadFromCOMPort (14, rig) then   // on event
       begin
         rig^.CurrentStatus.VFO[TempVFO].Frequency := BufferToInt(@rig^.tBuf, 3, 11);
       end;
   end;
 
-  if Step = 0 then step := KenwoodPollCount;
+   if Step = 0 then step := KenwoodPollCount;
 
   UpdateStatus(rig);
   goto NextPoll;
@@ -1818,7 +1812,7 @@ begin
   Windows.ZeroMemory(@rig^.FilteredStatus, SizeOf(rig^.FilteredStatus));
   rig.CurrentStatus.Mode := NoMode;
   rig.FilteredStatus.Mode := NoMode;
-  rig.LastDisplayedFreq := 0;
+  rig.LastDisplayedFreq := 0;      
 end;
 
 procedure WriteToDebugFile(port: PortType; MessageType: DebugFileMessagetype; p: PChar; Count: Cardinal);
@@ -2015,7 +2009,7 @@ begin
   if rig = ActiveRadioPtr then
   begin
     dif := Abs(rig.FilteredStatus.Freq - rig.LastDisplayedFreq);
-    if rig.LastDisplayedFreq <> 0 then
+     if rig.LastDisplayedFreq <> 0 then
       if dif > AutoSAPEnableRate then
         if dif <= 10000 then
           if AutoSAPEnable {and (Not Switch) }then   // n4af 4.44.10
@@ -2067,15 +2061,7 @@ begin
   else
   begin   // Inactive Radio Processing
 
-   { if IsCWByCATActive(rig) then
-       begin
-       if not rig.FilteredStatus.TXOn then
-          begin
-          DebugMsg('rig.CWByCAT_Sending set to FALSE - Inactive radio');
-          rig.CWByCAT_Sending := false;
-          end;
-       end;
-    }
+
     if TuneDupeCheckEnable then
     begin
       SpotsList.TuneDupeCheck(rig.FilteredStatus.Freq);

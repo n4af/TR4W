@@ -144,7 +144,6 @@ begin
   repeat
     begin
        SendChar := SendString[CharacterCount];
-
       if CommandMode then
       begin
         case SendChar of
@@ -158,9 +157,9 @@ begin
         Continue;
       end;
 
-
-
        case SendChar of
+            '9':
+            if ShortIntegers then SendChar := 'N';
             '+':
             begin                              // n4af 4.53.2
               if PrevNr = '' then PrevNr := '000';
@@ -213,8 +212,7 @@ begin
 
             while LeadingZeros > length(TempString) do
               TempString := LeadingZeroCharacter + TempString;
-
-            if ShortIntegers then
+              if ShortIntegers then
               for CharPointer := 1 to length(TempString) do
               begin
                 if TempString[CharPointer] = '0' then TempString[CharPointer] := Short0;
@@ -222,6 +220,7 @@ begin
                 if TempString[CharPointer] = '2' then TempString[CharPointer] := Short2;
                 if TempString[CharPointer] = '9' then TempString[CharPointer] := Short9;
               end;
+
 
             AddStringToBuffer(TempString, CWTone);
           end;
@@ -319,38 +318,8 @@ begin
               i := QuickEditInteger(TC_WAITINGFORYOUENTERSTRENGTHOFRST, 1)
             else i := 9;
 
-            //            Key := '0';
 
-                              {                 REPEAT
-                                                   REPEAT
-                                                       IF NOT CWStillBeingSent THEN
-                                                           BEGIN
-                                                           IF NOT WaitForStrength THEN
-                                                               BEGIN
-                                                               Key := '9';
-                                                               Break;
-                                                               END
-                                                           ELSE
-                                                               IF NOT WarningSounded THEN
-                                                                   BEGIN
-                                                                   WarningSounded := True;
-                                                                   DoABeep (ThreeHarmonics);
-                                                                   END;
-                                                           END;
 
-                                                   UNTIL KeyPressed;
-
-                                                   IF Key <> '9' THEN Key := ReadKey;
-
-                                               UNTIL ((Key >= '1') AND (Key <= '9')) OR (Key = EscapeKey);
-                              }
-
-  {                       if Key = EscapeKey then
-                        begin
-                          FlushCWBufferAndClearPTT;
-                          Exit;
-                        end;
-  }
             if i = -1 then
             begin
               FlushCWBufferAndClearPTT;
@@ -406,18 +375,7 @@ begin
           begin
 
             AddStringToBuffer(VisibleLog.LastEntry(False, letQTHString), CWTone);
- {
-            TempString := '';
-            Entry := 5;
 
-            while (TempString = '') and (Entry >= 0) do
-            begin
-              TempString := VisibleLog.LastName(Entry);
-               dec(Entry);
-            end;
-
-            AddStringToBuffer(TempString, CWTone);
-}
           end;
 
         ControlW: AddStringToBuffer(VisibleLog.LastName(4), CWTone);

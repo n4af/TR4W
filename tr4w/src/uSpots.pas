@@ -606,8 +606,8 @@ begin
     DupeInfoCall := FList^[Index2].FCall;        // 4.65.2
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
-  end ;
- {  else
+  end  ;
+ {   else
     if d = BandMapGuardBand then exit // n4af 4.49.4 issue 171
   else
   begin
@@ -616,8 +616,8 @@ begin
  //   ClearAltD;
  // DupeInfoCallWindowCleared := True;
     tClearDupeInfoCall;       // issue 172       // 4.53.5
-  end;   }
-
+  end;
+}
 end;
 
 procedure TDXSpotsList.DisplayCallsignOnThisFreq(Freq: integer);

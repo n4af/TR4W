@@ -2246,7 +2246,7 @@ function tGenerateSummaryPortionOfCabrilloFile: boolean;
 var
   nNumberOfBytesToWrite                 : Cardinal;
   T2                                    : PChar;
-  T3                                    : PChar;
+  T3                                    : String;
   TempTag                               : CabrilloTags;
   TempPchar                             : PChar;
   Operator                              : integer;
@@ -2269,7 +2269,10 @@ begin
 //  T1 := TR4W_CURRENTVERSION;
   T2 := @MyCall[1];
 //  T3 := ContestTypeSA[Contest];
-T3 := @ContestTitle[1];        // 4.69.6
+ //if Contest = GENERALQSO then
+// T3:= ContestTitle[1]
+// else
+T3 := ContestName;        // 4.69.6   revised 4.73.3
   asm
   call TotalScore
   push eax
