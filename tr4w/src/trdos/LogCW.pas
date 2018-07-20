@@ -772,53 +772,13 @@ end;
 procedure DisplayCrypticCWMenu;
 
 begin
-//  Windows.SetDlgItemText(MemProgHWND, 101, TC_CWMENU);
 
-  {    GoToXY (1, Hi (WindMax) - 5);
-      WriteLn ('# QSO number   % database name    ~ GM/GA/GE         : Enable keyboard CW');
-      WriteLn ('[ RST prompt   ^ half space       ] repeat RST sent  @ Call window contents');
-      WriteLn ('$ GM + name    | received name    \ My callsign       partial corrected call');
-  //    WriteLn ('^F WPM+2  ^S WPM-2  + AR  < SK  = BT  ! SN  & AS     ) last QSO''s call');
-  //    Write   ('To program control characters, press Control-P first then control character.');
-     }
 end;
 
 procedure DisplayCrypticSSBMenu;
 
 begin
-  {
-     if DVPEnable then
-        Windows.SetDlgItemText(MemProgHWND, 101,
-           'Alt-W = Write selected message to DVP'#13'Alt-R = Read selected message from DVP (headphones only)')
-     else
-        Windows.SetDlgItemText(MemProgHWND, 101,
-           'You have not enabled your DVP or DVK.'#13'Set DVP ENABLE or DVK ENABLE to TRUE so you can program messages.')
-  }
-        {
-           if DVPEnable then
-              begin
-                         GoToXY (1, Hi (WindMax) - 4);
-                         WriteLn ('Alt-W = Write selected message to DVP');
-                         WriteLn ('Alt-R = Read selected message from DVP (headphones only)');
-                         Write   ('');
- 
-              end
-           else
-              if ActiveDVKPort <> NoPort then
-                 begin
-                                GoToXY (1, Hi (WindMax) - 4);
-                                WriteLn ('Alt-W = Write selected message to DVK (DVP1 to DVP4 only');
-                                WriteLn ('Alt-R = Play selected message from DVK (to transmitter)');
-                                Write   ('');
-                 end
-              else
-                 begin
-                                GoToXY (1, Hi (WindMax) - 4);
-                                WriteLn ('You have not enabled your DVP or DVK.');
-                                WriteLn ('Set DVP ENABLE or DVK ENABLE to TRUE so you can program messages.');
-                                Write   ('');
-                 end;
-                               }
+
 end;
 
 procedure ShowCQFunctionKeyStatus;

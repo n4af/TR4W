@@ -147,7 +147,7 @@ begin
       BufferNotChanged := 0;
 
       NextWait:
-       Sleep(40);
+       Sleep(10);       // 4.73.5 was set to 40
       ClearCommError(rig^.tCATPortHandle, Errs, @stat);
       if stat.cbInQue > BytesInBuffer then
       begin

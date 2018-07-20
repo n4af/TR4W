@@ -260,12 +260,12 @@ const
     'OVER-100',
     'POLAR'
     );
-{
-  OperatorCategory                      : array[0..NumberOperatorCategories - 1] of PChar = (
+
+ { OperatorCategory                      : array[0..NumberOperatorCategories - 1] of PChar = (
     'SINGLE-OP',
     'MULTI-OP',
     'CHECKLOG');
-}
+ }
   TimeCategory                          : array[0..NumberTimeCategories - 1] of PChar = (
     '6-HOURS',
     '12-HOURS',
@@ -471,7 +471,6 @@ begin
 
   Windows.ZeroMemory(@Radio1IDs, SizeOf(Radio1IDs));
   SetTransmittersId := TF.SendDlgItemMessage(CreateCabrilloWindow, $CF {124}, CB_GETCURSEL) = 1;
-
 
   if Contest = IOTA then
     if TF.SendDlgItemMessage(CreateCabrilloWindow, 120, CB_GETCURSEL) = 1 then SetTransmittersId := True;
@@ -2379,13 +2378,15 @@ var
   hisAge                                : Integer;
   csQTHString                           : PChar;
   HisZone                               : integer;
-
+  str1                                  : widestring;
   nrReceived                            : integer;
   nrSent                                : integer;
+  tempcategoryoperator                  : tcategoryoperator;
 
   T1                                    : PChar;
   T2                                    : PChar;
   T3                                    : PChar;
+  T4                                    : PChar;      // 4.73.6
   cRandomCharsReceived                  : PChar;
   cKids                                 : PChar;
   TempGrid                              : Str20;
@@ -3308,33 +3309,39 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
 
       StrUpper(CABRILLO_HISEX);
 
+  if CategoryOperator = coMULTIOP then
+      if temprxdata.cecomputerid = ComputerID then        // 4.73.6
 
-
+      T4 := '1'
+       else
+        T4 := '0';
+ if CategoryOperator <> coMULTIOP then
+ T4 := '';
       T1 := CABRILLO_FIRST_PART;
       T2 := CABRILLO_MYEX;
       T3 := CABRILLO_HISEX;
 
       asm
+      push t4
       push t3
       push HisCallsign
       push t2
       push t1
       end;
-      if Contest = ARKTIKA_SPRING then
+
+         if Contest = ARKTIKA_SPRING then
       nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-14s%-10s'#13#10)
-      else
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-14s%-10s'#13#10);
+     else
+      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-14s%-10s %-5s'#13#10);
       asm add esp,24
       end;
-       if Radio1IDs <> '' then
-      begin
-        if tPos(Radio1IDs, TempRXData.ceComputerID) <> 0 then CABRILLO_BUFFER[TransmitterIDPos] := '1' else CABRILLO_BUFFER[TransmitterIDPos] := '0';
-      end;       
+
 //      if Radio2ID <> #0 then if TempRXData.ceComputerID = Radio2ID then CABRILLO_BUFFER[80] := '1';
       sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
 
       previousqsonr := nrReceived mod 1000;
     end;
+
 
     Windows.ZeroMemory(@PreviousQTHString, SizeOf(PreviousQTHString));
     PreviousQTHString := TempRXData.QTHString;

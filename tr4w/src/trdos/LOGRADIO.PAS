@@ -1225,9 +1225,10 @@ begin
  { if NoPollDuringPTT then
   if tPTTStatus = PTT_ON then
   Sleep(500);   }
-      try
+ //     try
+     begin
       Result := WriteToCATPort(Buffer, nNumberOfBytesToWrite);
-      except //on E : Exception do
+  //    except //on E : Exception do
       ; // TLogger.GetInstance.Debug(Format('In WritePollRequest, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
       end;
    if not Result then

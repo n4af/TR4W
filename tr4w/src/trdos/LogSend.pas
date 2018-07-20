@@ -158,8 +158,6 @@ begin
       end;
 
        case SendChar of
-            '9':
-            if ShortIntegers then SendChar := 'N';
             '+':
             begin                              // n4af 4.53.2
               if PrevNr = '' then PrevNr := '000';
