@@ -6034,6 +6034,16 @@ QSO with DL-Station by stations outside Europe: 5 additional points
              RXData.QSOPoints := RXData.QSOPoints +3 ;
   end;
 
+JAKARTARTTY:                // 4.74.2
+ if RXCty = 'YB' then
+  RXData.QSOPoints := 50
+   else
+    if  rxdata.QTH.Continent <> MyContinent then
+     RXData.QSOPoints := 5
+      else
+       RXData.QSOPoints := 3;
+
+
 CQWWQSOPointMethod:
 if RXData.QTH.Continent <> MyContinent then
   RXData.QSOPoints := 3
