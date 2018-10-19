@@ -6034,6 +6034,16 @@ QSO with DL-Station by stations outside Europe: 5 additional points
              RXData.QSOPoints := RXData.QSOPoints +3 ;
   end;
 
+JAKARTARTTY:                // 4.74.2
+ if RXCty = 'YB' then
+  RXData.QSOPoints := 50
+   else
+    if  rxdata.QTH.Continent <> MyContinent then
+     RXData.QSOPoints := 5
+      else
+       RXData.QSOPoints := 3;
+
+
 CQWWQSOPointMethod:
 if RXData.QTH.Continent <> MyContinent then
   RXData.QSOPoints := 3
@@ -6237,7 +6247,7 @@ begin
   end;
 end;
 
-{  NCQSOPointMethod:               // 4.66.1
+   NCQSOPointMethod:               // 4.66.1
     begin
 
      if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
@@ -6249,8 +6259,15 @@ end;
      if RXData.Callsign = 'NC4QP' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
       if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then rxdata.QSOPoints:= rxdata.qsopoints + 50;
     end;
-}
 
+  PAQSOPointMethod:               // 4.74.3
+    begin
+
+     if RXData.Mode = PHONE then RXDATA.QSOPoints := 1
+        else
+          RXDATA.QSOPoints := 2;
+     END;
+     
 OZHCRVHFQSOPointMethod:
 if MyGrid <> '' then
 begin
