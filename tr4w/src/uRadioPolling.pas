@@ -126,7 +126,7 @@ begin
   repeat
     inc(rig^.tPollCount);
 
-    
+
     NumberOfSucceffulPolls := 0;
 
     for PollNumber := Low(tKenwoodCommands) to High(tKenwoodCommands) do
@@ -180,15 +180,18 @@ begin
                   case TempCommand of
                     kcFA:
                       begin
+             //         debugmsg('polling: FA');
                         rig^.CurrentStatus.VFO[VFOA].Frequency := BufferToInt(@rig^.tBuf[i - 13], 3, 11);
                       end;
                     kcFB:
                       begin
+             //         debugmsg('polling: FB');
                         rig^.CurrentStatus.VFO[VFOB].Frequency := BufferToInt(@rig^.tBuf[i - 13], 3, 11);
                       end;
 
                     kcIF:
                       begin
+              //        debugmsg('polling IF ' + rig^.tBuf[i - 8]);
                         rig^.CurrentStatus.Freq := BufferToInt(@rig^.tBuf[i - 37], 3, 11);
                         CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
                         case rig^.tBuf[i - 8] of
@@ -200,6 +203,7 @@ begin
 
                         if rig^.tBuf[i - 7] = '0' then
                         begin
+            //            debugmsg('polling IF ' + inttostr(rig^.CurrentStatus.Freq));
                           rig^.CurrentStatus.VFO[VFOA].Frequency := rig^.CurrentStatus.Freq;
 //        ActiveVFO_is_A := True;
                           rig^.CurrentStatus.VFOStatus := VFOA;

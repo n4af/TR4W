@@ -147,7 +147,7 @@ const
 
 const
          LANG                                  = 'ENG';
-//       LANG                                  = 'RUS';
+//         LANG                                  = 'RUS';
 //       LANG                                  = 'SER';
 //       LANG                                  = 'ESP';
 //       LANG                                  = 'MNG';
@@ -181,18 +181,15 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.74.3' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.75.1' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Oct 19, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'Nov 2, 2018' ;
 
 
 
-  TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Oct 19, 2018' ;
 
- 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
   LOGVERSION1                           = 'v';
@@ -2597,12 +2594,9 @@ type
     PortugalDay,    // 4.70.4
     RPX ,        // 4.72.2
     DLRTTY ,      // 4.72.5
-<<<<<<< HEAD
     JAKARTARTTY,     // 4.74.2
     PAQSOPOINTMETHOD // 4.74.3
-=======
-    JAKARTARTTY     // 4.74.2
->>>>>>> 23d16519942b320c44daa6f7dd8d17b13d585969
+
     );
 
 const
@@ -2731,12 +2725,8 @@ const
      'PORTUGALDAY',     // 4.71.4
      'RPX' ,            // 4.72.2
      'DL-RTTY',         // 4.72.5
-<<<<<<< HEAD
      'JAKARTA-RTTY',     // 4.74.2
      'PA QSO PARTY'      // 4.74.3
-=======
-     'JAKARTA-RTTY'     // 4.74.2
->>>>>>> 23d16519942b320c44daa6f7dd8d17b13d585969
     );
 
 type

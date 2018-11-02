@@ -849,7 +849,7 @@ Jari OH6BG
 //  Showint(LoWord(1245108));//65460   - $FFB4
   }
 //  if LoWord(GetKeyboardLayout(0)) = $0419 then
- //    LoadKeyboardLayout('00000409', KLF_ACTIVATE);   // issue 178 force Latin  
+//     LoadKeyboardLayout('00000409', KLF_ACTIVATE);   // issue 178 force Latin
 end;
 {
 procedure tSetDlgItemTypText(hDlg: HWND; nIDDlgItem: integer; lpString: PChar);
@@ -879,7 +879,7 @@ var
   Len                                   : integer;
   TempHWND                              : HWND;
 begin
-{убрать эту функцию ?}
+
   if Control = -1 then
     TempHWND := h
   else
