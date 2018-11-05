@@ -71,8 +71,8 @@ begin
 
   //      tcreatestaticwindow(tempbuffer1,es_center,15,3,250,30,hwnddlg,0);
   //      tcreateeditwindow($00020014,tempbuffer1,$50010014,es_center,15,27,250,30,hwnddlg);
-          AltDEditWindowHandle := CreateEdit( WS_MaximizeBox or WS_MinimizeBOX or  ES_CENTER or ES_UPPERCASE or WS_BORDER,15, 27, 250, 30, hwnddlg, 101);
-      //  altdeditwindowhandle := createmodaldialog( 250,15,hwnddlg,@newaltdeditproc,0);
+            AltDEditWindowHandle := CreateEdit(WS_MaximizeBox or WS_MinimizeBOX or  ES_CENTER or ES_UPPERCASE or WS_BORDER,15, 27, 250, 30, hwnddlg, 101);
+    //    altdeditwindowhandle := createmodaldialog( 250,15,hwnddlg,@newaltdeditproc,0);
 
         asm
     mov edx,[MainWindowEditFont]
