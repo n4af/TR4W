@@ -2595,6 +2595,7 @@ type
     RPX ,        // 4.72.2
     DLRTTY ,      // 4.72.5
     JAKARTARTTY,     // 4.74.2
+    TRCDIGITAL,       // 4.75.2
     PAQSOPOINTMETHOD // 4.74.3
 
     );
@@ -2726,6 +2727,7 @@ const
      'RPX' ,            // 4.72.2
      'DL-RTTY',         // 4.72.5
      'JAKARTA-RTTY',     // 4.74.2
+     'TRC-DIGITAL',      // 4.75.2
      'PA QSO PARTY'      // 4.74.3
     );
 

@@ -6343,6 +6343,15 @@ begin
     RXData.QSOPoints := 1;
 end;
 
+TRCDIGITAL:
+if rxdata.domesticqth = 'TRC' then
+ RXData.QSOPoints := 10
+  else
+   if RXData.QTH.Continent <> MyContinent then
+     RXData.QSOPoints := 2
+      else
+       RXData.QSOPoints := 1;
+       
 YUDXQSOPointMethod: // 4.57.5
 if (MyCountry <> 'YU') and (RXCty = 'YU') then
   RXData.QSOPoints := 10
