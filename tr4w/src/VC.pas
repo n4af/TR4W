@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.75.1' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.75.3' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Nov 2, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'Nov 13, 2018' ;
 
 
 
@@ -2079,7 +2079,7 @@ const
   menu_home_page                        = 10606;
 //  menu_send_bug                         = 10605;
   menu_wiki_rus                         = 10604;
-  menu_download_latest_version          = 10603;
+  menu_download_latest_cty_dat             = 10603;  // 4.75.3
   menu_contents                         = 10602;
   menu_about                            = 10601;
   menu_historytxt                       = 10600;
@@ -2334,7 +2334,7 @@ var
 
   TR4W_INTERCOM_FILENAME                : FileNameType;
   TR4W_REMAININGMULTS_FILENAME          : FileNameType;
-//  TR4W_HLP_FILENAME                     : FileNameType;
+  TR4W_CTY_DAT_FILENAME                 : FileNameType;     // 4.75.3
   TR4W_INI_FILENAME                     : FileNameType;
   TR4W_CTY_FILENAME                     : FileNameType;
   TR4W_RFOBL_FILENAME                  : FileNameTYpe; // n4af 04.42.6

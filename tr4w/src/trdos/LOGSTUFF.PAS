@@ -6344,13 +6344,17 @@ begin
 end;
 
 TRCDIGITAL:
-if rxdata.domesticqth = 'TRC' then
- RXData.QSOPoints := 10
-  else
-   if RXData.QTH.Continent <> MyContinent then
-     RXData.QSOPoints := 2
-      else
+begin
+ if rxdata.domesticqth = 'TRC' then
+  RXData.QSOPoints := 10
+   else
+    if RXData.QTH.Continent <> MyContinent then
+      RXData.QSOPoints := 2
+       else
+        RXData.QSOPoints := 1;
+ if (MyState =  'TRC') and (RXData.DomesticQTH = 'TRC') then      // throw away above & use one point -if- fellow TRC
        RXData.QSOPoints := 1;
+end;
        
 YUDXQSOPointMethod: // 4.57.5
 if (MyCountry <> 'YU') and (RXCty = 'YU') then

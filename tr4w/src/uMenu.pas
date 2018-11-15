@@ -65,7 +65,7 @@ const
   RC_KILLCW_HK                          = #9'Alt+K';
   RC_SEARCHLOG_HK                       = #9'Alt+L';
 
-//  RC_REMINDER_HK                      = #9'Alt+O';
+  RC_Download_HK                   = #9'Alt+O';
   RC_ALTP_HK                            = #9'Alt+P';
   RC_AUTOCQ_HK                          = #9'Alt+Q';
   RC_TOOGLERIGS_HK                      = #9'Alt+R';
@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 174{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 176{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -263,8 +263,9 @@ const
     (mrText: RC_SEARCHLOG + RC_SEARCHLOG_HK; mrId: menu_alt_searchlog),
     (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
 
-//    (mrText: RC_REMINDER + RC_REMINDER_HK; mrId: menu_alt_reminder),
+ //   (mrText: RC_Download + RC_Download_HK; mrId: menu_download_latest_cty_dat), // 4.75.3
 //    (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transfreq),     // 4.68.11
+    (mrText: RC_Download + RC_Download_HK; mrId: menu_download_latest_cty_dat;),  // 4.75.3
     (mrText: RC_ALTP + RC_ALTP_HK; mrId: menu_alt_p),
     (mrText: RC_AUTOCQ + RC_AUTOCQ_HK; mrId: menu_alt_autocq),
     (mrText: RC_TOOGLERIGS + RC_TOOGLERIGS_HK; mrId: menu_alt_tooglerigs),
@@ -385,9 +386,9 @@ const
 {$IFEND}
 //    (mrText: RC_SEND_BUG; mrId: menu_send_bug),
 //    (mrText: '-'; mrId: 0),
-//    (mrText: RC_DOWNLOAD; mrId: menu_download_latest_version),
     (mrText: RC_HOMEPAGE; mrId: menu_home_page),
-{$IF LANG = 'RUS'}
+    (mrText: RC_Download + RC_Download_HK; mrID: menu_download_latest_cty_dat), // 4.75.3
+    {$IF LANG = 'RUS'}
     (mrText: RC_WIKI; mrId: menu_wiki_rus),
 {$IFEND}
 //    (mrText: 'History.txt'; mrId: menu_historytxt),

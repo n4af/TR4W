@@ -519,6 +519,7 @@
   TC_VERSIONONSERVER                    = 'The last version on server';
   TC_THISVERSION2                       = 'This version';
   TC_DOWNLOADIT                         = 'Would you like to download the latest version?';
+ 
 
   TC_LIST_OF_COMMAND                    = 'List of commands';
 
@@ -527,6 +528,7 @@
   RC_VIEWEDITLOG2                       = 'View / Edit log';
   RC_CT1BOHIS2                          = 'CT1BOH info screen';
   RC_BANDPLAN                           = 'Band plan';
+  RC_DOWNLOAD_CTY_DAT                   = 'Download latest cty.dat';  // 4.75.3
   CLOSE_WORD                            = 'Close';
   CANCEL_WORD                           = 'Cancel';
   HELP_WORD                             = 'Help';
@@ -696,7 +698,7 @@
   RC_SENDMESSAGE                        = 'Send message';
   RC_SYNLOG                             = 'Compare and synchronize logs';
   RC_CLEARALLLOGS                       = 'Clear all logs in network';
-  RC_DOWNLOAD                           = 'Check the latest version';
+  RC_DOWNLOAD                           = 'Download the latest CTY.DAT';
   RC_CONTENTS                           = 'Contents';
   RC_ABOUT                              = 'About';
   RC_CONFFILE                           = 'Configuration file';

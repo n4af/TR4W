@@ -188,7 +188,7 @@ procedure EnableWindowTrue(h: HWND; nIDDlgItem: integer);
 procedure EnableWindowFalse(h: HWND; nIDDlgItem: integer);
 function _StrInt64(Val: int64; Width: integer): ShortString;
 function ShowServerDialog(AHandle: THandle): string;
-//function tShellexecute(HWND: HWND; Operation, FileName, Parameters, Directory: PChar; showCmd: integer): hInst;
+//function tShellexecute(HWND: HWND; Operation, FileName, Parameters, Directory: PChar; showCmd: integer): hInst; // 4.75.3
 function tSetDlgItemIntFalse(hDlg: HWND; nIDDlgItem: integer; uValue: UINT): BOOL; stdcall;
 function CreateModalDialog(Width, Height: integer; ParentHWND: HWND; lpDialogFunc: TFNDlgProc; dwInitParam: lParam): integer;
 function CreateListBox(X, Y, nWidth, nHeight: Word; hwndParent: HWND; HMENU: HMENU): HWND;

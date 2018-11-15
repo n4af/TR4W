@@ -26,6 +26,7 @@ unit MainUnit;
 interface
 
 uses
+  ShellAPI,
   uMenu,
   uAltD,
   uMessagesList,
@@ -2999,11 +3000,14 @@ begin
       ShowHelp('index');
 {$IFEND}
 
-//    menu_download_latest_version:      CheckLatestVersion;
+     menu_download_latest_cty_dat:
 
+ //      OpenUrl('http://www.tr4w.net/');
 //      if GetScoresThreadID = 0 then CreateThread(nil, 0, @CheckLatestVersion, nil, 0, GetScoresThreadID);
-//      tShellexecute(0, 'open', 'http://tr4w.qrz.ru/free/download.php?file=tr4w', nil, nil, SW_SHOWNORMAL);
+ //       OpenURL('http://www.country-files.com/cty/cty.dat/');  // 4.75.3
 
+       Shellexecute(0, 'open', 'http://www.country-files.com/cty/cty.dat', nil, nil, SW_SHOW);       // 4.75.3
+      
     menu_spmode_ortab:
       ProcessTAB(LowordWparam);
 
@@ -3087,8 +3091,8 @@ begin
       OpenUrl('http://www.hornucopia.com/contestcal/weeklycont.php');
 
    menu_3830_scores_posting:             // 4.51.8
-   OpenUrl('http://www.3830scores.com/');
-
+  // OpenUrl('http://www.3830scores.com/');
+  Shellexecute(0, 'open', 'http://www.3830scores.com/', nil, nil, SW_SHOW);       // 4.75.3
    menu_arrl_submit:             // 4.53.3
    OpenUrl('http://contest-log-submission.arrl.org/');
 
