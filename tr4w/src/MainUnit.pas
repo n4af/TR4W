@@ -26,6 +26,7 @@ unit MainUnit;
 interface
 
 uses
+  IdHTTP,
   ShellAPI,
   uMenu,
   uAltD,
@@ -2427,6 +2428,8 @@ var
   tCardinal                             : HWND;
   focus                                 : HWND;
   TempCallstring                        : CallString;
+   http : TidHttp;
+  page : String;
 begin
   LowordWparam := LoWord(menuID);
 
@@ -3088,24 +3091,35 @@ begin
 //    menu_compare_logs: SendToNet(NET_LOGINFO_MESSAGE, SizeOf(NET_LOGINFO_MESSAGE));
 
     menu_wa7bnm_calendar:
-      OpenUrl('http://www.hornucopia.com/contestcal/weeklycont.php');
-
+    //  OpenUrl('http://www.hornucopia.com/contestcal/weeklycont.php');
+  //  Shellexecute(0, 'open', 'http://www.hornucopia.com/contestcal/weeklycont.php', nil, nil, SW_NORMAL);       // 4.75.3
+   begin
+  http := TidHttp.Create(nil);
+  try
+  page := http.get('http://www.hornucopia.com/contestcal/weeklycont.php');
+  finally 
+    http.Free;
+  end;
+   end;
    menu_3830_scores_posting:             // 4.51.8
   // OpenUrl('http://www.3830scores.com/');
-  Shellexecute(0, 'open', 'http://www.3830scores.com/', nil, nil, SW_SHOW);       // 4.75.3
+  Shellexecute(0, 'open', 'http://www.3830scores.com/', nil, nil, SW_NORMAL);       // 4.75.3
    menu_arrl_submit:             // 4.53.3
-   OpenUrl('http://contest-log-submission.arrl.org/');
+  // OpenUrl('http://contest-log-submission.arrl.org/');
+  Shellexecute(0, 'open', 'http://contest-log-submission.arrl.org/', nil, nil, SW_NORMAL);       // 4.75.3
 
     menu_qrzru_calendar:
       begin
         Format(TempBuffer1, 'http://www.qrz.ru/contest/detail/%d.html', ContestsArray[Contest].QRZRUID);
-        OpenUrl(TempBuffer1);
+    //     OpenUrl(TempBuffer1);
+    Shellexecute(0, 'open', TempBuffer1, nil, nil, SW_NORMAL);       // 4.75.3
       end;
 
     menu_sk3bg_calendar:
       begin
-        Format(TempBuffer1, 'http://www.hornucopia.com/contestcal/contestdetails.php?ref=%u', ContestsArray[Contest].WA7BNM);
-        OpenUrl(TempBuffer1);
+ //       Format(TempBuffer1, 'http://www.hornucopia.com/contestcal/contestdetails.php?ref=%u', ContestsArray[Contest].WA7BNM);
+ //       OpenUrl(TempBuffer1);
+ Shellexecute(0, 'open', 'http://www.hornucopia.com/contestcal/weeklycont.php', nil, nil, SW_NORMAL);       // 4.75.3
       end;
 
     menu_run_devicemanager:
