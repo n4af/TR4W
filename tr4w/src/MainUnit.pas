@@ -3257,7 +3257,7 @@ begin
      begin
        SwitchNext := False;
        Switch     := False;
-       if (WKBusy) then     // 4.52.4 issue 192
+       if ((WKBusy) or (CWThreadID <> 0)) then     // 4.52.4 issue 192
        begin
         FlushCWBuffer;
         ReturnInCQOpMode;
@@ -6076,7 +6076,7 @@ procedure CheckInactiveRigCallingCQ;
 
 begin
   if SwitchNext then //n4af 4.30.1
-  if ((length(CallWindowString) > 0) {or (InactiveSwapRadio)}) and (not WKBusy) then   // n4af 4.52.6
+  if ((length(CallWindowString) > 0) {or (InactiveSwapRadio)}) and ((not WKBusy)and (not(CWThreadID <> 0))) then   // n4af 4.52.6
   begin
    InactiveRigCallingCQ := False;
    scWk_Reset;
