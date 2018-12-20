@@ -3180,7 +3180,7 @@ begin
     case RateDisplay of
       QSOs: Rate := Rate + RateMinuteArray[RateMinute].TotalQSOs;
       Points: Rate := Rate + RateMinuteArray[RateMinute].TotalPoints;
-      BandQSOs: if ActiveBand in [Band160..Band10] then Rate := Rate + RateMinuteArray[RateMinute].BandQSOs[ActiveBand] ;  // n4af 4.54.4
+      BandQSOs: if ActiveBand in [Band160..Band10] then Rate := Rate + RateMinuteArray[RateMinute].BandQSOs[ActiveBand] +  RateMinuteArray[RateMinute].BandQSOs[InactiveRadioPtr.BandMemory];  // n4af 4.76.4
     end;
 
 //       Compute last sixty minute totals

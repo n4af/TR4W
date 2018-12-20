@@ -177,7 +177,7 @@ begin
         {CONTEST}
         tCreateComboBoxWindow(WS_VSCROLL + CBS_SORT + CBS_UPPERCASE + CBS_DROPDOWNLIST or CBS_AUTOHSCROLL or WS_CHILD or WS_VISIBLE or WS_TABSTOP, 455, 30, 150, hwnddlg, NC_CONTEST_COMBOBOX);
         {I AM IN}
-        Windows.ShowWindow(CreateButton(BS_AUTOCHECKBOX or BS_LEFT or BS_TOP or BS_MULTILINE or WS_CHILD or WS_TABSTOP, nil, 420, 60, 430, hwnddlg, NC_CHECKBOX_IAMIN), SW_HIDE); // 4.76.3
+         Windows.ShowWindow(CreateButton(BS_AUTOCHECKBOX or BS_LEFT or BS_TOP or BS_MULTILINE or WS_CHILD or WS_TABSTOP, nil, 420, 60, 430, hwnddlg, NC_CHECKBOX_IAMIN), SW_HIDE); // 4.76.3
 
         Windows.SetWindowText(hwnddlg, TR4W_CURRENTVERSION + TC_OPENCONFIGURATIONFILE);
 
@@ -193,6 +193,8 @@ begin
         for ct := Succ(DUMMYCONTEST) to High(ContestType) do tCB_ADDSTRING_PCHAR(hwnddlg, NC_CONTEST_COMBOBOX, ContestTypeSA[ct]);
 
         NewContestCheckBox := GetDlgItem(hwnddlg, NC_CHECKBOX_IAMIN);
+
+
         NewContestCommentWndHandle := GetDlgItem(hwnddlg, 106);
         tLoadKeyboardLayout;
 
@@ -263,7 +265,8 @@ begin
             ClearFields;
 
             Windows.SetWindowText(NewContestCommentWndHandle, nil);
-            if Windows.SendMessage(NewContestCheckBox, BM_GETCHECK, 0, 0) = BST_UNCHECKED then
+             if Windows.SendMessage(NewContestCheckBox, BM_GETCHECK, 0, 0) = BST_UNCHECKED then
+
 
             begin
 {
@@ -285,7 +288,7 @@ begin
 
               ARRL10, ARRL160, ARRLDXCW, ARRL_RTTY_ROUNDUP:
                 begin
-
+                   Windows.SendMessage(107, BM_SETCHECK, BST_CHECKED, 0);
                   SetCommentAndEnableEditControl(TC_ENTERTHEQTHTHATYOUWANTTOSEND, icmyState);
                 end;
 
