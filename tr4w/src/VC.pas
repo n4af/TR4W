@@ -146,8 +146,8 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
-         LANG                                  = 'ENG';
-//         LANG                                  = 'RUS';
+//         LANG                                  = 'ENG';
+//       LANG                                  = 'RUS';
 //       LANG                                  = 'SER';
 //       LANG                                  = 'ESP';
 //       LANG                                  = 'MNG';
@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.76.4' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.76.5' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Dec 20, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'Dec 22, 2018' ;
 
 
 
@@ -3428,7 +3428,7 @@ QSOPartiesCount = 14;
       ({Name: 'XMAS';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'YO DX';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'SRR-JR';                     }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
-      ({Name: 'RUSSIAN-160';                }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB0 + ciQM0 + ciMB0 + ciMM0),      // 4.65.
+      ({Name: 'RUSSIAN-160';                }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB0 + ciQM1 + ciMB0 + ciMM0),      // 4.65.    // 4.76.5
       ({Name: 'LQP';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'ARKTIKA-SPRING';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'UN DX';                      }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
