@@ -395,7 +395,7 @@ begin
 
     STEWPERRY:
       begin
-        ContestName := 'STEW PERRY TOPBAND CHALLENGE';
+        ContestName := 'STEW-PERRY';      // 4.76.6
         CQExchange := ' ' + MyGrid;
         SearchAndPounceExchange := MyGrid;
         ActiveBand := Band160;
