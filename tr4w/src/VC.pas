@@ -147,13 +147,13 @@ const
 
 const
         LANG                                  = 'ENG';
-//       LANG                                  = 'RUS';
-//       LANG                                  = 'SER';
+//         LANG                                  = 'RUS';
+//         LANG                                  = 'SER';
 //       LANG                                  = 'ESP';
 //       LANG                                  = 'MNG';
 //       LANG                                  = 'POL';
 //        LANG                                  = 'CZE';
-//        LANG                                  = 'ROM';
+        LANG                                  = 'ROM';
 //       LANG                                  = 'CHN';
 
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.76.6' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.77.0' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Dec 30, 2018' ;
+  TR4W_CURRENTVERSIONDATE               = 'Jan 01, 2019' ;
 
 
 
