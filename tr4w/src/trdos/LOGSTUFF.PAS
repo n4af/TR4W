@@ -6788,6 +6788,11 @@ begin
   begin
     Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
     RXData.QSOPoints := (Distance div 500) + 1;
+    if CategoryPower = cpQRP then
+      RXDATA.QSOPoints :=  RXDATA.QSOPoints * 3;
+      if CategoryPower = cpLOW then
+         RXDATA.QSOPoints :=  Round(RXData.QSOPoints * 1.5);
+
   end
   else
     RXData.QSOPoints := 1;
@@ -6978,8 +6983,8 @@ begin
       RXData.QSOPoints := 38;
     if Distance <= 2000 then
       RXData.QSOPoints := 35;
-    if Distance <= 1000 then
-      RXData.QSOPoints := 31;
+ //   if Distance <= 1000 then    // 4.77.1
+ //     RXData.QSOPoints := 31;   // 4.77.1
     //            if RXData.Band = Band160 then RXData.QSOPoints := round(RXData.QSOPoints * 1.3);
     //            if RXData.Band = Band80 then RXData.QSOPoints := round(RXData.QSOPoints * 1.25);
     //            if RXData.Band = Band40 then RXData.QSOPoints := round(RXData.QSOPoints * 1.15);
