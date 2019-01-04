@@ -153,7 +153,7 @@ const
 //       LANG                                  = 'MNG';
 //       LANG                                  = 'POL';
 //        LANG                                  = 'CZE';
-        LANG                                  = 'ROM';
+//        LANG                                  = 'ROM';
 //       LANG                                  = 'CHN';
 
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
