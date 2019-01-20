@@ -6355,7 +6355,19 @@ begin
  if (MyState =  'TRC') and (RXData.DomesticQTH = 'TRC') then      // throw away above & use one point -if- fellow TRC
        RXData.QSOPoints := 1;
 end;
-       
+
+XERTTY:                                 // 4.77.5
+begin
+ if RXData.QTH.CountryID = 'XE' then
+  RXData.QSOPoints := 4
+   else
+    if RXData.QTH.CountryID <> MyCountry then
+      RXData.QSOPoints := 3
+       else
+        RXData.QSOPoints := 2;
+end;
+
+
 YUDXQSOPointMethod: // 4.57.5
 if (MyCountry <> 'YU') and (RXCty = 'YU') then
   RXData.QSOPoints := 10
