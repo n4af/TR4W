@@ -6358,9 +6358,17 @@ end;
 
 XERTTY:                                 // 4.77.5
 begin
- if RXData.QTH.CountryID = 'XE' then
-  RXData.QSOPoints := 4
-   else
+  if MyCountry = 'XE' then
+   if RXCty <> 'XE' then
+       RXData.QSOPoints := 3
+        else
+         RXData.QSOPoints := 4 ;
+
+    if RXData.QTH.CountryID = 'XE' then
+     begin
+      RXData.QSOPoints := 4;
+      exit;
+     end;
     if RXData.QTH.CountryID <> MyCountry then
       RXData.QSOPoints := 3
        else
