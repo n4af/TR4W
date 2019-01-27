@@ -721,7 +721,7 @@ begin
     end;
   end;
   Index := l;
-end;
+   end;
 {
 function ctyInit(ctyFilename: PChar): boolean;
 begin
@@ -759,6 +759,7 @@ begin
 
   if Call[1] = '/' then
     Exit;
+
 
   Windows.ZeroMemory(@QTH, SizeOf(QTHRecord));
   if length(Call) = 0 then

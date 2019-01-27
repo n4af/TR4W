@@ -4819,12 +4819,6 @@ Domestic:
 
   if RXData.DomesticMult then
   begin
-{ if Contest = NCQSOParty then     
-  begin
-   if MyCall[length(MyCall)-1] = '/' then
-    if MyCall[length(MyCall)] = '4' then
-      RXData.QSOPoints := RXData.QSOPoints + 100;
-  end;   }
     MultString[Mults] := 'd';
     inc(Mults);
   end;

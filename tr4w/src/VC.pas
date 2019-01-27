@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.77.5' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.77.6' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Jan 20, 2019' ;
+  TR4W_CURRENTVERSIONDATE               = 'Jan 27, 2019' ;
 
 
 
@@ -2945,9 +2945,9 @@ QSOPartiesCount = 14;
  ({Name: 'CIS';                        }Email: nil;                      DF: 'cis';               WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 500 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:CISQSOPointMethod),
  ({Name: 'CQP';                        }Email: nil;                      DF: 'california_cty';    WA7BNM:  0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;   P: 6 ;AE: QSONumberDomesticOrDXQTHExchange;                    XM:NoDXMults; QP:TwoPhoneThreeCW),           //n4af
  ({Name: 'COUNTY HUNTER';              }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQTHExchange;                              XM:NoDXMults; QP:OnePointPerQSO),
- ({Name: 'CQ-160-CW';                  }Email: '160CW@kkn.net';          DF: 's48p14dc';          WA7BNM:  232; {SK3BG: 'cqww160';    } QRZRUID: 311 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                        XM:CQDXCCWithNoUSAOrCanada; QP:CQ160QSOPointMethod),
- ({Name: 'CQ-160-SSB';                 }Email: '160SSB@kkn.net';         DF: 's48p14dc';          WA7BNM:  259; {SK3BG: 'cqww160';    } QRZRUID: 312 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                        XM:CQDXCCWithNoUSAOrCanada; QP:CQ160QSOPointMethod),
- ({Name: 'CQ-M';                       }Email: nil;                      DF: nil;                 WA7BNM:   14; {SK3BG: 'cqmidxc';    } QRZRUID: 126 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:CQDXCC{ARRLDXCC};  QP:CQMQSOPointMethod),
+ ({Name: 'CQ-160-CW';                  }Email: '160CW@kkn.net';          DF: 's48p14dc';          WA7BNM:  232; {SK3BG: 'cqww160';    } QRZRUID: 311 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE:RSTZoneOrDomesticQTH;                          XM:ARRLDXCCWithNoUSAOrCanada; QP:CQ160QSOPointMethod),     // 4.77.6
+ ({Name: 'CQ-160-SSB';                 }Email: '160SSB@kkn.net';         DF: 's48p14dc';          WA7BNM:  259; {SK3BG: 'cqww160';    } QRZRUID: 312 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                         XM:ARRLDXCCWithNoUSAOrCanada; QP:OnePointPerQSO),           // 4.77.6
+  ({Name: 'CQ-M';                       }Email: nil;                      DF: nil;                 WA7BNM:   14; {SK3BG: 'cqmidxc';    } QRZRUID: 126 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:CQDXCC{ARRLDXCC};  QP:CQMQSOPointMethod),
  ({Name: 'CQ-VHF';                     }Email: nil;                      DF: nil;                 WA7BNM:   73; {SK3BG: 'cqwwvhf';    } QRZRUID: 363 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:CQVHFQSOPointMethod),
  ({Name: 'CQ-WPX-CW';                  }Email: 'cw@cqwpx.com';           DF: nil;                 WA7BNM:   29; {SK3BG: nil;          } QRZRUID: 18  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:CQWPXQSOPointMethod),
  ({Name: 'CQ-WPX-SSB';                 }Email: 'ssb@cqwpx.com';          DF: nil;                 WA7BNM:  291; {SK3BG: nil;          } QRZRUID: 6   ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:CQWPXQSOPointMethod),

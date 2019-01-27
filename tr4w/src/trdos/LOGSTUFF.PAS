@@ -5853,27 +5853,21 @@ begin
 
       end;
 
-    CQ160QSOPointMethod:
-      if RXCty = MyCountry then
-        RXData.QSOPoints := 2
-      else if RXData.QTH.Continent = MyContinent then
-        RXData.QSOPoints := 5
-      else
-        RXData.QSOPoints := 10;
+    CQ160QSOPointMethod:   // 4.76.6
+  begin
+
+  if RXCty = MyCountry then
+
+       RXData.QSOPoints := 2
+        else
+          if (RXCty <> MyCountry) and (RXData.QTH.Continent = MyContinent) then
+          RXData.QSOPoints := 5
+           else
+            RXData.QSOPoints := 10;
+  end;
 
     CQMQSOPointMethod:
       begin
-        {
-                if RussianID(RXCty) then
-                  begin
-                    TempOblast := GetOblast(RXData.Callsign);
-                    if TempOblast <> '' then
-                      begin
-                        if IsR150Country(TempOblast[1], TempOblast[2]) then
-                          RXData.DXQTH := 'R' + TempOblast;
-                      end;
-                  end;
-        }
         if RussianID(MyCountry) then
         begin
           if not RussianID(RXCty) then
@@ -8078,12 +8072,16 @@ begin
         ProcessExchange := ProcessRSTAndJAPrefectureExchange(ExchangeString,
           RData);
       end;
+
     RSTZoneOrDomesticQTH:
-      if DomesticCountryCall(RData.Callsign) then
+      if (DomesticCountryCall(RData.Callsign) or (not (StringisAllNumbersorSpaces(exchangestring)))) then       // 4.77.6
         ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString,
           RData)
       else
         ProcessExchange := ProcessRSTAndZoneExchange(ExchangeString, RData);
+
+
+
 
   end; { of case }
 end;
