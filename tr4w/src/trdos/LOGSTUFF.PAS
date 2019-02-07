@@ -5853,7 +5853,7 @@ begin
 
       end;
 
-    CQ160QSOPointMethod:   // 4.76.6
+    CQ160QSOPointMethod:   // 4.77.6
   begin
 
   if RXCty = MyCountry then

@@ -14,8 +14,8 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT.
-If not, ref:
+     Public License along with TR4W in  GPL_License.TXT. 
+If not, ref: 
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit uCTYDAT;
@@ -43,7 +43,7 @@ type
 }
 
 const
-  MaxCountries = 1000 {380}; // n4af 4.42.6
+  MaxCountries                          = 1000 {380};    // n4af 4.42.6
 const
 {(*}
   RussianGrids                          : array['A'..'Z'] of array['0'..'9'] of  FourChar =
@@ -79,12 +79,10 @@ const
 {*)}
 const
 
-  GridsArraysCount = 18;
+  GridsArraysCount                      = 18;
 
-  GridsIndexArray: array[1..GridsArraysCount] of string[2] =
-    ('ZS', 'K', 'CE', 'CP', 'EA', 'EU', 'HK', 'JA', 'OA', 'OH', 'PY', 'SM',
-      'ZP',
-    'YV', 'YB', 'VE', 'VK', 'XE');
+  GridsIndexArray                       : array[1..GridsArraysCount] of string[2] =
+    ('ZS', 'K', 'CE', 'CP', 'EA', 'EU', 'HK', 'JA', 'OA', 'OH', 'PY', 'SM', 'ZP', 'YV', 'YB', 'VE', 'VK', 'XE');
 
 {(*}
   GridsArray                            : array[1..GridsArraysCount] of array['0'..'9'] of FourChar =
@@ -109,76 +107,73 @@ const
     ('',     'EK09', 'DM21', 'EK48', '',     '',     '',     '',     '',     '')
     );
 {*)}
-  {
-    ZSGrids                               : array['0'..'9'] of GridString =
-      ('', 'KF07', 'KF26', 'KG12', 'KG31', 'KG50', 'KG44', '', '', '');
+{
+  ZSGrids                               : array['0'..'9'] of GridString =
+    ('', 'KF07', 'KF26', 'KG12', 'KG31', 'KG50', 'KG44', '', '', '');
 
-    KGrids                                : array['0'..'9'] of GridString =
-      ('EN12', 'FN48', 'FN22', 'FN10', 'EM73', 'EM01', 'DM06', 'DN21', 'EN81', 'EN52');
+  KGrids                                : array['0'..'9'] of GridString =
+    ('EN12', 'FN48', 'FN22', 'FN10', 'EM73', 'EM01', 'DM06', 'DN21', 'EN81', 'EN52');
 
-    CEGrids                               : array['0'..'9'] of GridString =
-      ('', 'FG58', 'FG41', 'FF47', 'FF45', 'FF32', 'FF30', 'FE22', '', '');
+  CEGrids                               : array['0'..'9'] of GridString =
+    ('', 'FG58', 'FG41', 'FF47', 'FF45', 'FF32', 'FF30', 'FE22', '', '');
 
-    CPGrids                               : array['0'..'9'] of GridString =
-      ('', 'FH63', 'FH70', 'FH61', 'FG69', 'FH73', 'FH93', 'FG88', 'FH77', 'FH68');
+  CPGrids                               : array['0'..'9'] of GridString =
+    ('', 'FH63', 'FH70', 'FH61', 'FG69', 'FH73', 'FH93', 'FG88', 'FH77', 'FH68');
 
-    EAGrids                               : array['0'..'9'] of GridString =
-      ('', 'IN62', 'IN82', 'IN92', 'IM79', 'IM98', '', 'IM77', '', '');
+  EAGrids                               : array['0'..'9'] of GridString =
+    ('', 'IN62', 'IN82', 'IN92', 'IM79', 'IM98', '', 'IM77', '', '');
 
-    EUGrids                               : array['0'..'9'] of GridString =
-      ('', 'KO33', 'KO33', 'KO12', 'KO13', '', 'KO55', 'KO53', 'KO52', '');
+  EUGrids                               : array['0'..'9'] of GridString =
+    ('', 'KO33', 'KO33', 'KO12', 'KO13', '', 'KO55', 'KO53', 'KO52', '');
 
-    HKGrids                               : array['0'..'9'] of GridString =
-      ('', 'FK20', 'GK80', 'FJ34', 'FJ16', 'FJ16', 'FJ23', 'FJ35', 'FJ21', 'FJ40');
+  HKGrids                               : array['0'..'9'] of GridString =
+    ('', 'FK20', 'GK80', 'FJ34', 'FJ16', 'FJ16', 'FJ23', 'FJ35', 'FJ21', 'FJ40');
 
-    JAGrids                               : array['0'..'9'] of GridString =
-      ('', 'PM95', 'PM84', 'PM74', 'PM65', 'PM63', 'PM52', 'QM09', 'QN13', 'PM86');
+  JAGrids                               : array['0'..'9'] of GridString =
+    ('', 'PM95', 'PM84', 'PM74', 'PM65', 'PM63', 'PM52', 'QM09', 'QN13', 'PM86');
 
-    OAGrids                               : array['0'..'9'] of GridString =
-      ('', 'EI95', 'FI03', 'FI20', 'FH18', 'FH26', 'FH32', 'FH46', 'FI27', 'FI14');
+  OAGrids                               : array['0'..'9'] of GridString =
+    ('', 'EI95', 'FI03', 'FI20', 'FH18', 'FH26', 'FH32', 'FH46', 'FI27', 'FI14');
 
-    OHGrids                               : array['0'..'9'] of GridString =
-      ('', 'KP10', 'KP20', 'KP11', 'KP32', 'KP20', 'KP03', 'KP42', 'KP44', 'KP25');
+  OHGrids                               : array['0'..'9'] of GridString =
+    ('', 'KP10', 'KP20', 'KP11', 'KP32', 'KP20', 'KP03', 'KP42', 'KP44', 'KP25');
 
-    PYGrids                               : array['0'..'9'] of GridString =
-      ('', 'GG88', 'GH65', 'GG30', 'GH71', 'GG44', 'GH97', 'HI13', 'GI05', 'GH25');
+  PYGrids                               : array['0'..'9'] of GridString =
+    ('', 'GG88', 'GH65', 'GG30', 'GH71', 'GG44', 'GH97', 'HI13', 'GI05', 'GH25');
 
-    SMGrids                               : array['0'..'9'] of GridString =
-      ('', 'JO97', 'KP05', 'JP83', 'JO79', 'JO89', 'JO67', 'JO76', '', '');
+  SMGrids                               : array['0'..'9'] of GridString =
+    ('', 'JO97', 'KP05', 'JP83', 'JO79', 'JO89', 'JO67', 'JO76', '', '');
 
-    ZPGrids                               : array['0'..'9'] of GridString =
-      ('', 'GG08', 'GG06', 'GG17', 'GG16', 'GG14', 'GG14', 'GG25', 'GG13', 'GG24');
+  ZPGrids                               : array['0'..'9'] of GridString =
+    ('', 'GG08', 'GG06', 'GG17', 'GG16', 'GG14', 'GG14', 'GG25', 'GG13', 'GG24');
 
-    YVGrids                               : array['0'..'9'] of GridString =
-      ('', 'FK30', 'FJ48', 'FK40', 'FJ57', 'FK60', 'FJ86', 'FK80', 'FJ99', 'FJ63');
+  YVGrids                               : array['0'..'9'] of GridString =
+    ('', 'FK30', 'FJ48', 'FK40', 'FJ57', 'FK60', 'FJ86', 'FK80', 'FJ99', 'FJ63');
 
-    YBGrids                               : array['0'..'9'] of GridString =
-      ('OI33', 'OI33', 'OI52', 'OI62', 'OI27', 'OJ00', 'NJ93', 'OI68', 'PI08', 'OI07');
+  YBGrids                               : array['0'..'9'] of GridString =
+    ('OI33', 'OI33', 'OI52', 'OI62', 'OI27', 'OJ00', 'NJ93', 'OI68', 'PI08', 'OI07');
 
-    VEGrids                               : array['0'..'9'] of GridString =
-      ('', 'FN75', 'FN25', 'FN04', 'EN19', 'DO72', 'DO33', 'CN99', 'DP20', 'FN65');
+  VEGrids                               : array['0'..'9'] of GridString =
+    ('', 'FN75', 'FN25', 'FN04', 'EN19', 'DO72', 'DO33', 'CN99', 'DP20', 'FN65');
 
-    VKGrids                               : array['0'..'9'] of GridString =
-      ('', 'QF56', 'QF46', 'QF22', 'QG53', 'PF85', 'OF88', 'QE37', 'PH65', '');
-  }
-  ARRLSectionCountryString =
-    ' K VE KC6 KG4 KL KH0 KH1 KH2 KH3 KH4 KH5 KH6 KH7 KH8 KH9 KP1 KP2 KP3 KP4 KP5 ';
+  VKGrids                               : array['0'..'9'] of GridString =
+    ('', 'QF56', 'QF46', 'QF22', 'QG53', 'PF85', 'OF88', 'QE37', 'PH65', '');
+}
+  ARRLSectionCountryString              = ' K VE KC6 KG4 KL KH0 KH1 KH2 KH3 KH4 KH5 KH6 KH7 KH8 KH9 KP1 KP2 KP3 KP4 KP5 ';
 
-  UBAEuroCountryString =
-    ' 5B 9H CT CT3 CU DL EA EA6 EA8 EI ES F FG FM FR FY G GD GI GJ GM GU GW HA I IS LX LY LZ OE OH OH0 OJ0 OK OM OZ PA S5 SM SP SV SV5 SV9 SY TK YL YO ';
+  UBAEuroCountryString                  = ' 5B 9H CT CT3 CU DL EA EA6 EA8 EI ES F FG FM FR FY G GD GI GJ GM GU GW HA I IS LX LY LZ OE OH OH0 OJ0 OK OM OZ PA S5 SM SP SV SV5 SV9 SY TK YL YO ';
 
-  ScandinavianCountries = ' LA JW JX OH OH0 OJ0 OX OY OZ SM TF ';
+  ScandinavianCountries                 = ' LA JW JX OH OH0 OJ0 OX OY OZ SM TF ';
 
-  BlackSeaCountriesString =
-    ' OE ZA EU LZ E7 HA DL 4L I Z3 ER SP UA YO OM S5 TA UR 9A 4O OK HB YU ';
+  BlackSeaCountriesString               = ' OE ZA EU LZ E7 HA DL 4L I Z3 ER SP UA YO OM S5 TA UR 9A 4O OK HB YU ';
 
 type
   DXMultString = array[0..7] of Char;
   PrefixName = array[0..13] of Char;
 
-  //  ZoneModeType = (CQZoneMode, ITUZoneMode);
-  //const
-  //  ZoneModeTypeSA                        : array[ZoneModeType] of PChar = ('CQ Zone', 'ITU Zone');
+//  ZoneModeType = (CQZoneMode, ITUZoneMode);
+//const
+//  ZoneModeTypeSA                        : array[ZoneModeType] of PChar = ('CQ Zone', 'ITU Zone');
 
 type
 
@@ -201,7 +196,7 @@ type
 
     {08}DefaultGrid: GridString;
 
-    {32} Name: array[0..31] of Char;
+    {32}Name: array[0..31] of Char;
     {01}DefaultITUZone: Byte;
     {02}UTCOffset: Smallint;
     {01}DefaultCQZone: Byte;
@@ -213,13 +208,13 @@ type
   CTYInterface = record
     ctyVersion: array[0..15] of Char;
     ctyTable: CountryInfoArrayType;
-    ctyNumberCountries: longint; // 4.42.6
+    ctyNumberCountries: longint;   // 4.42.6
     ctyPrefixesTable: HDSA;
     ctyPrefixesTableRecords: longword;
     ctyZoneMode: ZoneModeType;
     ctyTempQTHRecord: QTHRecord;
     ctyCountryMode: CountryModeType;
-    //    ctyLastCountryCall: CallString;
+//    ctyLastCountryCall: CallString;
     ctyNumberRemainingCountries: longint; // 4.42.6
     ctyCustomRemainingCountryListFound: boolean;
     ctyIndexArray: array[Char] of Smallint;
@@ -227,19 +222,18 @@ type
     ctyLastLocatedCall: CallString;
     ctyLastLocatedRecord: QTHRecord;
     ctyLastIndex: integer;
-    ctyrfOblMode: boolean; // n4af 4.42.6
+    ctyrfOblMode: boolean;    // n4af 4.42.6
     ctyR150SMode: boolean;
-    //    ctyUA3Country: Word;
-    //    ctyUA9Country: Word;
+//    ctyUA3Country: Word;
+//    ctyUA9Country: Word;
   end;
 
-  //  RemainingDXMultTemplateType = array[0..MaxCountries - 1] of DXMultString; //FourBytes;
-  //  RemainingDXMultTemplatePointer = ^RemainingDXMultTemplateType;
+//  RemainingDXMultTemplateType = array[0..MaxCountries - 1] of DXMultString; //FourBytes;
+//  RemainingDXMultTemplatePointer = ^RemainingDXMultTemplateType;
 
 function ctyLocateCall(Call: CallString; var QTH: QTHRecord): boolean;
 //function ctyInit(ctyFilename: PChar): boolean;
-function ctyLoadInCountryFile(ctyFilename: PChar; CheckDupe: boolean;
-  LoadRemainingMults: boolean): boolean;
+function ctyLoadInCountryFile(ctyFilename: PChar; CheckDupe: boolean; LoadRemainingMults: boolean): boolean;
 function ctyFindCallsign(const s: PChar; var Index: integer): boolean;
 function ctyGetGrid(Call: CallString; var ID: DXMultiplierString): GridString;
 function ctyGetContinent(Call: CallString): ContinentType;
@@ -267,39 +261,37 @@ function ctyGetCountryID(Call: CallString): DXMultiplierString;
 procedure ctyShellSort;
 procedure ctyAddNewPrefixRecord(pr: PrefixRecPtr; CheckDupe: boolean);
 procedure ctyMakeDefaultRemainingCountryList;
-procedure ctyLoadInRFOblList; // n4af 4.42.6
+procedure ctyLoadInRFOblList;   // n4af 4.42.6
 procedure ctyLoadInRemainingMults(p: PChar);
 procedure ctyLoadInR150SList;
 
 var
-  CTY: CTYInterface;
+  CTY                                   : CTYInterface;
 
 implementation
 
 procedure ctyAddNewPrefixRecord(pr: PrefixRecPtr; CheckDupe: boolean);
 var
-  TempIndex: integer;
+  TempIndex                             : integer;
 begin
 
   if not pr.FullCallsigns then
   begin
     if pr.Prefix[0] = 'R' then
-      //      if pr.Prefix[1] in ['B'..'Z'] then
+//      if pr.Prefix[1] in ['B'..'Z'] then
       if pr.Prefix[1] in ['B'..'H', 'J'..'Z'] then
         if pr.Prefix[2] <> '2' then
           Exit;
 
     if pr.Prefix[0] = 'U' then
-      if pr.Prefix[1] in ['B'..'E', 'G'..'I'] then
-        Exit;
+      if pr.Prefix[1] in ['B'..'E', 'G'..'I'] then Exit;
 
   end;
-  if CheckDupe then
+   if CheckDupe then
   begin
 
     for TempIndex := 0 to CTY.CTYPrefixesTableRecords - 1 do
-      if StrComp(PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable,
-        TempIndex))^.Prefix, pr.Prefix) = 0 then
+      if StrComp(PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Prefix, pr.Prefix) = 0 then
       begin
         DSA_SetItem(CTY.CTYPrefixesTable, TempIndex, pr);
         Exit;
@@ -313,8 +305,8 @@ end;
 procedure ReplaceCountry(r: CountryInfoRecord);
 var
 
-  i, Index1, Index2: Word;
-  c: Cardinal;
+  i, Index1, Index2                     : Word;
+  c                                     : Cardinal;
 begin
   Index1 := MAXWORD;
   Index2 := MAXWORD;
@@ -329,77 +321,71 @@ begin
     begin
       Index2 := i;
     end;
-    //    tf.StrComp()
+//    tf.StrComp()
   end;
-  if Index1 = MAXWORD then
-    Exit;
-  if Index2 = MAXWORD then
-    Exit;
+  if Index1 = MAXWORD then Exit;
+  if Index2 = MAXWORD then Exit;
 
   CTY.ctyTable[Index1].VisibleInRM := 1;
   for c := 0 to CTY.CTYPrefixesTableRecords - 1 do
   begin
-    if PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, c))^.Country = Index1
-      then
+    if PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, c))^.Country = Index1 then
       PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, c))^.Country := Index2;
   end;
 
 end;
 
-function ctyLoadInCountryFile(ctyFilename: PChar; CheckDupe: boolean;
-  LoadRemainingMults: boolean): boolean;
+function ctyLoadInCountryFile(ctyFilename: PChar; CheckDupe: boolean; LoadRemainingMults: boolean): boolean;
 
 // (#) Override CQ Zone
 // [#] Override ITU Zone
 // ? <#/#> Override latitude/longitude
 // ? {aa} Override Continent
 type
-  ctyColumns = (cpCountryName, cpCQZone, cpITUZone, cpContinent, cpLatitude,
-    cpLongitude, cpTimeOffset, cpPrimaryPrefix, cpUnDef);
+  ctyColumns = (cpCountryName, cpCQZone, cpITUZone, cpContinent, cpLatitude, cpLongitude, cpTimeOffset, cpPrimaryPrefix, cpUnDef);
 
 label
   1, 2;
 var
-  MapFin: Cardinal;
-  MapBase: Pointer;
-  p: PChar;
-  h: HWND;
-  i: Cardinal;
-  s: Cardinal;
-  b: array[0..31] of Char;
-  c: ctyColumns;
-  l: Cardinal;
-  Lat, Lon: REAL;
-  code: integer;
-  r: CountryInfoRecord;
-  pr: PrefixRec;
-  e: Cardinal;
-  z: Cardinal;
-  oITU: Byte;
-  oCQ: Byte;
-  Size: Cardinal;
-
-  //  NumberCountriesIndex             : integer;
+  MapFin                                : Cardinal;
+  MapBase                               : Pointer;
+  p                                     : PChar;
+  h                                     : HWND;
+  i                                     : Cardinal;
+  s                                     : Cardinal;
+  b                                     : array[0..31] of Char;
+  rmbuffer                              : array[0..4096 - 1] of Char;
+  c                                     : ctyColumns;
+  x                                     : Cardinal;
+  l                                     : Cardinal;
+  Lat, Lon                              : REAL;
+  code                                  : integer;
+  r                                     : CountryInfoRecord;
+  pr                                    : PrefixRec;
+  e                                     : Cardinal;
+  z                                     : Cardinal;
+  oITU                                  : Byte;
+  oCQ                                   : Byte;
+  Size                                  : Cardinal;
+  Minutes                               : integer;
+  pppp                                  : integer;
+//  NumberCountriesIndex             : integer;
 const
-  rm = RC_REMMULTS;     // 4.72.3
+  rm                                    = 'REMAINING MULTS';
 
 begin
-  //3.900.000 ticks
-  //  Start := GetCPU;
+//3.900.000 ticks
+//  Start := GetCPU;
   Result := False;
 
-  h := CreateFile(ctyFilename, GENERIC_READ, FILE_SHARE_READ, nil,
-    OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
-  if h = INVALID_HANDLE_VALUE then
-    Exit;
+  h := CreateFile(ctyFilename, GENERIC_READ, FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+  if h = INVALID_HANDLE_VALUE then Exit;
 
   MapFin := Windows.CreateFileMapping(h, nil, PAGE_READONLY, 0, 0, nil);
-  if MapFin = 0 then
-    goto 1;
+  if MapFin = 0 then goto 1;
 
   MapBase := Windows.MapViewOfFile(MapFin, FILE_MAP_READ, 0, 0, 0);
-  if MapBase = nil then
-    goto 2;
+  if MapBase = nil then goto 2;
 
   if CTY.CTYPrefixesTable = 0 then
     CTY.CTYPrefixesTable := DSA_Create(SizeOf(PrefixRec), 100);
@@ -411,13 +397,13 @@ begin
   oITU := 0;
   oCQ := 0;
 
-  //  Windows.ZeroMemory(@CTY.CTYTable, SizeOf(CountryInfoArrayType));
+//  Windows.ZeroMemory(@CTY.CTYTable, SizeOf(CountryInfoArrayType));
 
-  Size := Windows.GetFileSize(h, nil);
+    Size := Windows.GetFileSize(h, nil);
 
   for i := 0 to Size - 1 do
   begin
-    case p[i] of
+           case p[i] of
       ':':
         begin
           l := i - s;
@@ -433,8 +419,7 @@ begin
               begin
                 if r.Name[0] = '!' then
                 begin
-                  asm nop
-                  end;
+                  asm nop end;
                   Windows.CopyMemory(@r.ID[1], @p[i - l], l);
                   r.ID[0] := CHR(l);
                   ReplaceCountry(r);
@@ -442,33 +427,23 @@ begin
                   Continue;
                 end;
                 r.DefaultCQZone := Ord(p[i - 1]) - Ord('0');
-                if l = 2 then
-                  r.DefaultCQZone := r.DefaultCQZone + (Ord(p[i - 2]) - Ord('0'))
-                    * 10;
+                if l = 2 then r.DefaultCQZone := r.DefaultCQZone + (Ord(p[i - 2]) - Ord('0')) * 10;
               end;
 
             cpITUZone:
               begin
                 r.DefaultITUZone := Ord(p[i - 1]) - Ord('0');
-                if l = 2 then
-                  r.DefaultITUZone := r.DefaultITUZone + (Ord(p[i - 2]) -
-                    Ord('0')) * 10;
+                if l = 2 then r.DefaultITUZone := r.DefaultITUZone + (Ord(p[i - 2]) - Ord('0')) * 10;
               end;
 
             cpContinent:
               begin
-                if p[i - 2] = 'E' then
-                  r.DefaultContinent := Europe;
-                if p[i - 2] = 'O' then
-                  r.DefaultContinent := Oceania;
-                if p[i - 2] = 'N' then
-                  r.DefaultContinent := NorthAmerica;
-                if p[i - 2] = 'S' then
-                  r.DefaultContinent := SouthAmerica;
-                if p[i - 1] = 'S' then
-                  r.DefaultContinent := Asia;
-                if p[i - 1] = 'F' then
-                  r.DefaultContinent := Africa;
+                if p[i - 2] = 'E' then r.DefaultContinent := Europe;
+                if p[i - 2] = 'O' then r.DefaultContinent := Oceania;
+                if p[i - 2] = 'N' then r.DefaultContinent := NorthAmerica;
+                if p[i - 2] = 'S' then r.DefaultContinent := SouthAmerica;
+                if p[i - 1] = 'S' then r.DefaultContinent := Asia;
+                if p[i - 1] = 'F' then r.DefaultContinent := Africa;
               end;
 
             cpLatitude:
@@ -484,10 +459,9 @@ begin
 
                 Windows.ZeroMemory(@b, SizeOf(b));
                 Windows.CopyMemory(@b, @p[s], l);
-                //                Val(b, Lon, code);
+//                Val(b, Lon, code);
                 Lon := ValExt(b, code);
-                if code = 0 then
-                  r.DefaultGrid := ConvertLatLonToGrid(Lat, Lon);
+                if code = 0 then r.DefaultGrid := ConvertLatLonToGrid(Lat, Lon);
               end;
 
             cpTimeOffset:
@@ -495,25 +469,31 @@ begin
                 Windows.ZeroMemory(@b, SizeOf(b));
                 Windows.CopyMemory(@b, @p[s], l);
                 r.UTCOffset := PCharToInt(@b) * 60;
-                {
-                                for Minutes := 1 to 3 do
-                                  if b[Minutes] = '.' then
-                                  begin
-                                    if b[Minutes + 1] <> '0' then
-                                      r.UTCOffset := r.UTCOffset + (PCharToInt(@b[Minutes + 1]) div 25) * 15;
-                                  end;
-                }
-                                //tPos(
-                //                Lon := ValExt(b, code);
-                //                if code = 0 then r.UTCOffset := round(Lon * 100);
+{
+                for Minutes := 1 to 3 do
+                  if b[Minutes] = '.' then
+                  begin
+                    if b[Minutes + 1] <> '0' then
+                      r.UTCOffset := r.UTCOffset + (PCharToInt(@b[Minutes + 1]) div 25) * 15;
+                  end;
+}
+                //tPos(
+//                Lon := ValExt(b, code);
+//                if code = 0 then r.UTCOffset := round(Lon * 100);
               end;
             cpPrimaryPrefix:
               begin
                 Windows.CopyMemory(@r.ID[1], @p[s], l);
                 r.ID[0] := CHR(l);
-                //                if r.ID = 'UA9' then
-                //                  asm nop end;
-
+//                if r.ID = 'UA9' then
+//                  asm nop end;
+{
+                for NumberCountriesIndex := 0 to MaxCountries - 1 do
+                begin
+                  if CountryInfoTable^[NumberCountriesIndex].ID = r.ID then Break;
+                  if CountryInfoTable^[NumberCountriesIndex].ID = '' then Break;
+                end;
+}
                 CTY.CTYTable[CTY.CTYNumberCountries] := r;
                 inc(CTY.CTYNumberCountries);
 
@@ -521,28 +501,22 @@ begin
           end;
           inc(c);
         end;
-      ' ', #9: if c <> cpCountryName then
-          s := i + 1;
+      ' ', #9: if c <> cpCountryName then s := i + 1;
       #13, #10: s := i + 1;
-
-      '[', '(':
-        begin
-          z := i + 1;
-          if e = 0 then
-            e := i + 1;
+   
+      '[', '(': begin z := i + 1;
+          if e = 0 then e := i + 1;
         end;
       ')':
         begin
           oCQ := Ord(p[i - 1]) - Ord('0');
 
-          if i - z = 2 then
-            oCQ := oCQ + (Ord(p[i - 2]) - Ord('0')) * 10;
+          if i - z = 2 then oCQ := oCQ + (Ord(p[i - 2]) - Ord('0')) * 10;
         end;
       ']':
         begin
           oITU := Ord(p[i - 1]) - Ord('0');
-          if i - z = 2 then
-            oITU := oITU + (Ord(p[i - 2]) - Ord('0')) * 10;
+          if i - z = 2 then oITU := oITU + (Ord(p[i - 2]) - Ord('0')) * 10;
         end;
 
       ',', ';':
@@ -553,22 +527,18 @@ begin
             inc(s);
             pr.FullCallsigns := True;
           end;
-          l := i - s;
+               l := i - s;
           if e <> 0 then
-            if (s <= e) then //n4af 4.35.2
-              l := (e - s - 1);
+          if (s <= e)  then   //n4af 4.35.2
+          l := (e - s - 1);
           Windows.CopyMemory(@pr.Prefix, @p[s], l);
           pr.PrefLength := l;
 
           pr.Country := CTY.CTYNumberCountries - 1;
-          if oCQ <> 0 then
-          begin
-            pr.CQZone := oCQ;
+          if oCQ <> 0 then begin pr.CQZone := oCQ;
             oCQ := 0;
           end { else pr.CQZone := r.DefaultCQZone};
-          if oITU <> 0 then
-          begin
-            pr.ITUZone := oITU;
+          if oITU <> 0 then begin pr.ITUZone := oITU;
             oITU := 0;
           end {else pr.ITUZone := r.DefaultITUZone};
           ctyAddNewPrefixRecord(@pr, CheckDupe);
@@ -581,8 +551,7 @@ begin
 
           s := i + 1;
           e := 0;
-          if p[i] = ';' then
-            c := cpCountryName;
+          if p[i] = ';' then c := cpCountryName;
         end;
     end;
 
@@ -591,8 +560,7 @@ begin
   if LoadRemainingMults then
   begin
     p := Strpos(MapBase, rm);
-    if p <> nil then
-      ctyLoadInRemainingMults(p);
+    if p <> nil then ctyLoadInRemainingMults(p);
   end;
 
   1: Windows.UnmapViewOfFile(MapBase);
@@ -601,18 +569,18 @@ begin
 
   Result := True;
   ctyShellSort;
-  //  Stop := GetCPU;
-  //  showint(Stop - Start);
+//  Stop := GetCPU;
+//  showint(Stop - Start);
 end;
 
 procedure ctyShellSort;
 var
-  iI, iJ, iK, iSize: integer;
-  wTemp1: PrefixRec;
-  wTemp2: PrefixRec;
-
-  TempChar: Char;
-  TempPtr: PrefixRecPtr;
+  iI, iJ, iK, iSize                     : integer;
+  wTemp1                                : PrefixRec;
+  wTemp2                                : PrefixRec;
+  h                                     : HWND;
+  TempChar                              : Char;
+  TempPtr                               : PrefixRecPtr;
 begin
   iSize := CTY.ctyPrefixesTableRecords - 1;
   iK := iSize shr 1;
@@ -622,7 +590,7 @@ begin
     begin
       iJ := iI;
       while (iJ >= 0) and (
-        //aSort[iJ] > aSort[iJ + iK]
+      //aSort[iJ] > aSort[iJ + iK]
         StrComp(
         PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, iJ))^.Prefix,
         PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, iJ + iK))^.Prefix
@@ -635,9 +603,9 @@ begin
         DSA_GetItem(CTY.CTYPrefixesTable, iJ + iK, @wTemp2);
 
         DSA_SetItem(CTY.CTYPrefixesTable, iJ, @wTemp2);
-        //        aSort[iJ] := aSort[iJ + iK];
+//        aSort[iJ] := aSort[iJ + iK];
         DSA_SetItem(CTY.CTYPrefixesTable, iJ + iK, @wTemp1);
-        //        aSort[iJ + iK] := wTemp;
+//        aSort[iJ + iK] := wTemp;
 
         if iJ > iK then
           dec(iJ, iK)
@@ -649,12 +617,10 @@ begin
   end;
 
   FillChar(CTY.ctyIndexArray, SizeOf(CTY.ctyIndexArray), -1);
-  Windows.ZeroMemory(@CTY.ctyMaxLengthIndexArray,
-    SizeOf(CTY.ctyMaxLengthIndexArray));
+  Windows.ZeroMemory(@CTY.ctyMaxLengthIndexArray, SizeOf(CTY.ctyMaxLengthIndexArray));
 
 {$IF tDebugMode}
-  MessageBox(0, 'debug mode created prefixes.txt', 'debug mode', MB_OK or
-    MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
+  MessageBox(0, 'debug mode created prefixes.txt', 'debug mode', MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
   utils_file.tOpenFileForWrite(h, 'prefixes.txt');
 {$IFEND}
 
@@ -662,14 +628,12 @@ begin
   begin
     TempPtr := PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, iI));
 {$IF tDebugMode}
-    sWriteFile(h, wsprintfBuffer, Format(wsprintfBuffer, '%04u %-15s %u'#13#10,
-      iI, @TempPtr^.Prefix, TempPtr.Country));
+    sWriteFile(h, wsprintfBuffer, Format(wsprintfBuffer, '%04u %-15s %u'#13#10, iI, @TempPtr^.Prefix, TempPtr.Country));
 {$IFEND}
     CTY.ctyIndexArray[TempPtr^.Prefix[0]] := iI;
 
     if not TempPtr^.FullCallsigns then
-      if TempPtr^.PrefLength > CTY.ctyMaxLengthIndexArray[TempPtr^.Prefix[0]]
-        then
+      if TempPtr^.PrefLength > CTY.ctyMaxLengthIndexArray[TempPtr^.Prefix[0]] then
         CTY.ctyMaxLengthIndexArray[TempPtr^.Prefix[0]] := TempPtr^.PrefLength;
   end;
 
@@ -685,19 +649,19 @@ begin
       CTY.ctyIndexArray[TempChar] := CTY.ctyIndexArray[CHR(Ord(TempChar) + 1)];
   end;
 
-  //  CTY.ctyIndexArray[CHR(Ord('9') + 1)] := CTY.ctyIndexArray['A'];
+//  CTY.ctyIndexArray[CHR(Ord('9') + 1)] := CTY.ctyIndexArray['A'];
 
 end;
 
 function ctyFindCallsign(const s: PChar; var Index: integer): boolean;
 var
-  l, h, i, c: integer;
+  l, h, i, c                            : integer;
 
 begin
   Result := False;
 
-  //  l := 0;
-  //  h := CTY.ctyPrefixesTableRecords - 1;
+//  l := 0;
+//  h := CTY.ctyPrefixesTableRecords - 1;
 
   l := CTY.ctyIndexArray[s[0]];
   h := CTY.ctyIndexArray[CHR(Ord(s[0]) + 1)];
@@ -706,11 +670,8 @@ begin
   begin
     i := (l + h) shr 1;
 
-    c := StrComp(PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, i))^.Prefix,
-      s);
-    if c < 0 then
-      l := i + 1
-    else
+    c := StrComp(PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, i))^.Prefix, s);
+    if c < 0 then l := i + 1 else
     begin
       h := i - 1;
       if c = 0 then
@@ -721,7 +682,7 @@ begin
     end;
   end;
   Index := l;
-   end;
+end;
 {
 function ctyInit(ctyFilename: PChar): boolean;
 begin
@@ -736,16 +697,15 @@ end;
 
 function ctyLocateCall(Call: CallString; var QTH: QTHRecord): boolean;
 label
-  FillRecord, next;
-
+  FillRecord;
 var
-
-  TempIndex: integer;
-  TempPrefixRec: PrefixRecPtr;
-  TempLength: integer;
-  TempPrefix: PrefixName;
-  TempPointer: integer;
-  GuantanamoBayCallsign: boolean;
+  TempIndex                             : integer;
+  TempPrefixRec                         : PrefixRecPtr;
+  TempLength                            : integer;
+  TempPrefix                            : PrefixName;
+  TempPointer                           : integer;
+  StandardCall                          : CallString;
+  GuantanamoBayCallsign                 : boolean;
 begin
   TempIndex := 0;
   if Call = CTY.ctyLastLocatedCall then
@@ -757,13 +717,10 @@ begin
 
   Result := False;
 
-  if Call[1] = '/' then
-    Exit;
-
+  if Call[1] = '/' then Exit;
 
   Windows.ZeroMemory(@QTH, SizeOf(QTHRecord));
-  if length(Call) = 0 then
-    Exit;
+  if length(Call) = 0 then Exit;
 
   Windows.CopyMemory(@TempPrefix, @Call[1], length(Call));
   TempPrefix[length(Call)] := #0;
@@ -776,61 +733,50 @@ begin
     if QTH.StandardCall[2] = 'G' then
       if QTH.StandardCall[3] = '4' then
         if length(QTH.StandardCall) <> 5 then
-          //        if (PInteger(@QTH.StandardCall)^ = $34474B04) or (PInteger(@QTH.StandardCall)^ = $34474B06) then
+//        if (PInteger(@QTH.StandardCall)^ = $34474B04) or (PInteger(@QTH.StandardCall)^ = $34474B06) then
         begin
           TempPrefix[1] := 'A';
           GuantanamoBayCallsign := True;
         end;
 
-  //  MainUnit.showint(PInteger(@QTH.StandardCall)^);
-  next:
+//  MainUnit.showint(PInteger(@QTH.StandardCall)^);
+
   if ctyFindCallsign(@TempPrefix, TempIndex) then
   begin
+//    asm nop end;
 
     if CTY.ctyCountryMode = ARRLCountryMode then
     begin
-      // hack to handle *4u1v entities 4U1A, 4U2U, 4U0R, and C7A  4.68.2
-      if (tempindex = 112) or (TempIndex = 109) or (TempIndex = 1455) or
-        (TempIndex = 122) then
-        tempindex := 130;
-      if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable,
-        TempIndex))^.Country].ID[1] <> '*' then
-        goto FillRecord;
-    end
-    else
-      //     if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '' then goto next;
+      if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] <> '*' then goto FillRecord;
+    end else
+      goto FillRecord;
   end;
 
   if length(QTH.StandardCall) > 3 then
     if QTH.StandardCall[1] = 'M' then
       if QTH.StandardCall[2] = 'M' then
-        if QTH.StandardCall[3] = '/' then
-          Exit;
+        if QTH.StandardCall[3] = '/' then Exit;
 
-  if length(Call) = 1 then
-    Exit;
+  if length(Call) = 1 then Exit;
 
-  Windows.CopyMemory(@TempPrefix, @QTH.StandardCall[1],
-    length(QTH.StandardCall));
+  Windows.CopyMemory(@TempPrefix, @QTH.StandardCall[1], length(QTH.StandardCall));
   TempPrefix[length(QTH.StandardCall)] := #0;
 
   if GuantanamoBayCallsign then
     TempPrefix[1] := 'A';
 
   if TempPrefix[0] = 'R' then
-    //    if TempPrefix[1] in ['B'..'H','J'..'Z'] then
+//    if TempPrefix[1] in ['B'..'H','J'..'Z'] then
     if TempPrefix[1] in ['B'..'Z'] then
       if TempPrefix[2] <> '2' then
         TempPrefix[1] := 'A';
 
   if TempPrefix[0] = 'U' then
-    if TempPrefix[1] in ['B'..'E', 'G'..'I'] then
-      TempPrefix[1] := 'A';
+    if TempPrefix[1] in ['B'..'E', 'G'..'I'] then TempPrefix[1] := 'A';
 
   TempLength := length(QTH.StandardCall);
 
-  if CTY.ctyMaxLengthIndexArray[TempPrefix[0]] < TempLength then
-    TempLength := CTY.ctyMaxLengthIndexArray[TempPrefix[0]];
+  if CTY.ctyMaxLengthIndexArray[TempPrefix[0]] < TempLength then TempLength := CTY.ctyMaxLengthIndexArray[TempPrefix[0]];
 
   for TempPointer := TempLength downto 1 do
   begin
@@ -840,16 +786,10 @@ begin
 
       if CTY.ctyCountryMode = ARRLCountryMode then
       begin
-        if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable,
-          TempIndex))^.Country].ID[1] = '*' then
-          Continue
-        else
-          goto FillRecord;
-
+        if CTY.ctyTable[PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.Country].ID[1] = '*' then Continue;
       end;
 
-      if not PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable,
-        TempIndex))^.FullCallsigns then
+      if not PrefixRecPtr(DSA_GetItemPtr(CTY.CTYPrefixesTable, TempIndex))^.FullCallsigns then
         goto FillRecord;
 
     end;
@@ -877,17 +817,17 @@ begin
       CQZoneMode: QTH.Zone := CTY.ctyTable[QTH.Country].DefaultCQZone;
     end;
 
-  //  QTH.Zone := TempPrefixRec.CQZone;
+//  QTH.Zone := TempPrefixRec.CQZone;
 
   QTH.Prefix := GetPrefix(QTH.StandardCall);
-  {
-    if CTY.ctyR150SMode then
-      if QTH.Country = CTY.ctyUA9Country then
-      begin
-        QTH.Country := CTY.ctyUA3Country;
-        QTH.CountryID := 'UA';
-      end;
-  }
+{
+  if CTY.ctyR150SMode then
+    if QTH.Country = CTY.ctyUA9Country then
+    begin
+      QTH.Country := CTY.ctyUA3Country;
+      QTH.CountryID := 'UA';
+    end;
+}
   Result := True;
   CTY.ctyLastLocatedCall := Call;
   CTY.ctyLastLocatedRecord := QTH;
@@ -895,9 +835,10 @@ end;
 
 function ctyGetGrid(Call: CallString; var ID: DXMultiplierString): GridString;
 var
-  TempInteger: integer;
-  TempChar: Char;
-  Oblast: Str2;
+  TempInteger                           : integer;
+  TempChar                              : Char;
+  TempFourChar                          : FourChar;
+  Oblast                                : Str2;
 begin
   if ctyLocateCall(Call, CTY.ctyTempQTHRecord) then
   begin
@@ -910,8 +851,7 @@ begin
         if TempChar in ['0'..'9'] then
         begin
           Result := GridsArray[TempInteger][TempChar];
-          if Result <> '' then
-            Exit;
+          if Result <> '' then Exit;
         end;
       end;
 
@@ -923,8 +863,7 @@ begin
         if (Oblast[2] in ['A'..'Z']) {and (Oblast[1] <> '2')} then
         begin
           Result := RussianGrids[Oblast[2]][Oblast[1]];
-          if Result <> '' then
-            Exit;
+          if Result <> '' then Exit;
         end;
       end;
     end;
@@ -958,8 +897,7 @@ end;
 function ctyGetCountryIdByIndex(Country: Word): DXMultiplierString;
 begin
   Windows.ZeroMemory(@Result, SizeOf(Result));
-  if Country = UNKNOWN_COUNTRY then
-    Exit;
+  if Country = UNKNOWN_COUNTRY then Exit;
   Result := CTY.ctyTable[Country].ID;
 end;
 
@@ -974,46 +912,42 @@ end;
 function ctyGetDefaultGrid(Country: Word): GridString;
 begin
   Windows.ZeroMemory(@Result, SizeOf(Result));
-  if Country = UNKNOWN_COUNTRY then
-    Exit;
+  if Country = UNKNOWN_COUNTRY then Exit;
   Result := CTY.ctyTable[Country].DefaultGrid;
 end;
 
 function ctyGetDefaultITUZone(Country: Word): Byte;
 begin
   Result := 0;
-  if Country = UNKNOWN_COUNTRY then
-    Exit;
+  if Country = UNKNOWN_COUNTRY then Exit;
   Result := CTY.ctyTable[Country].DefaultITUZone;
 end;
 
 function ctyGetDefaultCQZone(Country: Word): Byte;
 begin
   Result := 0;
-  if Country = UNKNOWN_COUNTRY then
-    Exit;
+  if Country = UNKNOWN_COUNTRY then Exit;
   Result := CTY.ctyTable[Country].DefaultCQZone;
 end;
 
 function ctyGetCountryUTCOffset(Country: Word): Smallint;
 begin
   Result := 0;
-  if Country = UNKNOWN_COUNTRY then
-    Exit;
+  if Country = UNKNOWN_COUNTRY then Exit;
   Result := CTY.ctyTable[Country].UTCOffset;
 end;
 
 function ctyGetZone(Call: CallString): Byte;
 var
-  TempPrefixRec: PrefixRecPtr;
+  TempPrefixRec                         : PrefixRecPtr;
 begin
   if ctyLocateCall(Call, CTY.ctyTempQTHRecord) then
   begin
     TempPrefixRec := DSA_GetItemPtr(CTY.CTYPrefixesTable, CTY.ctyLastIndex);
 
     Result := 0;
-    //     Result := CTY.ctyTempQTHRecord.Zone;
-    //    if Result <> 0 then Exit;
+//     Result := CTY.ctyTempQTHRecord.Zone;
+//    if Result <> 0 then Exit;
 
     case CTY.ctyZoneMode of
       ITUZoneMode:
@@ -1028,18 +962,16 @@ begin
             case GetNumber(Call) of
               '5', '0': Result := 7;
               '6', '7': Result := 6;
-            else
-              Result := 8;
+            else Result := 8;
             end;
 
-          { In China }
+            { In China }
 
           if CTY.ctyTempQTHRecord.CountryID = 'BY' then
             case GetNumber(Call) of
               '8', '9': Result := 43;
               '0': Result := 42;
-            else
-              Result := 44;
+            else Result := 44;
             end;
 
           if CTY.ctyTempQTHRecord.CountryID = 'CE' then
@@ -1051,53 +983,46 @@ begin
           if CTY.ctyTempQTHRecord.CountryID = 'CP' then
             case GetNumber(Call) of
               '1', '8', '9': Result := 12;
-            else
-              Result := 14;
+            else Result := 14;
             end;
 
           if CTY.ctyTempQTHRecord.CountryID = 'LU' then
             case GetFirstSuffixLetter(Call) of
               'V', 'W', 'X': Result := 16;
-            else
-              Result := 14;
+            else Result := 14;
             end;
 
           if CTY.ctyTempQTHRecord.CountryID = 'PY' then
             case GetNumber(Call) of
               '6', '7', '8': Result := 13;
-            else
-              Result := 15;
+            else Result := 15;
             end;
 
           if CTY.ctyTempQTHRecord.CountryID = 'UN' then
             case GetFirstSuffixLetter(Call) of
               'J', 'D', 'V', 'G': Result := 31;
-            else
-              Result := 30;
+            else Result := 30;
             end;
 
-          if (CTY.ctyTempQTHRecord.CountryID = 'UA') or
-            (CTY.ctyTempQTHRecord.CountryID = 'UA9') then
+       if (CTY.ctyTempQTHRecord.CountryID = 'UA') or (CTY.ctyTempQTHRecord.CountryID = 'UA9') then
             case GetNumber(Call) of
               '1': case GetFirstSuffixLetter(Call) of
                   'N', 'Z', 'O': Result := 19;
-                else
-                  Result := 29;
+                else Result := 29;
                 end;
 
               '3', '6': Result := 29;
 
               '4': case GetFirstSuffixLetter(Call) of
-                  'A', 'C', 'F', 'L', 'N', 'Q', 'S', 'U', 'Y': Result := 29;
-                  // n4af 4.41.4
+                  'A', 'C', 'F', 'L', 'N', 'Q', 'S', 'U', 'Y': Result := 29;   // n4af 4.41.4
                   'H', 'P', 'W': Result := 30;
                 end;
-              {
-                          end;
+{
+            end;
 
-                        if CTY.ctyTempQTHRecord.CountryID = 'UA9' then
-                          case GetNumber(Call) of
-              }
+          if CTY.ctyTempQTHRecord.CountryID = 'UA9' then
+            case GetNumber(Call) of
+}
               '8': case GetFirstSuffixLetter(Call) of
                   'T': Result := 32;
                   'V': Result := 33;
@@ -1118,8 +1043,7 @@ begin
                   'I': Result := 24;
                   'X': Result := 25;
                   'K': Result := 26;
-                  'A', 'O', 'R', 'S', 'W', 'Y': Result := 32;
-                  // n4af 4.54.3 issue 213
+                  'A', 'O', 'R', 'S', 'W', 'Y': Result := 32; // n4af 4.54.3 issue 213
                   'D', 'J', 'U': Result := 33;
                   'C', 'F', 'L': Result := 34;
                   'Z': Result := 35;
@@ -1133,30 +1057,26 @@ begin
               '2', '3': Result := 4;
               '4', '5': Result := 3;
               '6', '7': Result := 2;
-            else
-              Result := 0;
+            else Result := 0;
             end;
 
           if CTY.ctyTempQTHRecord.CountryID = 'VK' then
             case GetNumber(Call) of
               '4', '8': Result := 55;
               '6': Result := 58;
-            else
-              Result := 59;
+            else Result := 59;
             end;
-          if Result = 0 then
-            Result := CTY.ctyTable[CTY.ctyTempQTHRecord.Country].DefaultITUZone;
-          // 4.54.4
+           if Result = 0 then  Result := CTY.ctyTable[CTY.ctyTempQTHRecord.Country].DefaultITUZone;    // 4.54.4
         end;
 
       CQZoneMode:
         begin
 
-          if TempPrefixRec^.CQZone <> 0 then
+         if TempPrefixRec^.CQZone <> 0 then
           begin
             Result := TempPrefixRec^.CQZone;
             Exit;
-          end;
+          end;        
 
           if CTY.ctyTempQTHRecord.CountryID = 'K' then
             case GetNumber(Call) of
@@ -1165,7 +1085,7 @@ begin
               '6', '7': Result := 3;
             end;
 
-          { We have to check for call areas for UA9 }
+            { We have to check for call areas for UA9 }
 
           if CTY.ctyTempQTHRecord.CountryID = 'VE' then
             case GetNumber(Call) of
@@ -1180,23 +1100,20 @@ begin
               '8': Result := 18;
 
               '9': case GetFirstSuffixLetter(Call) of
-                  'A', 'C', 'D', 'F', 'G', 'J', 'K', 'L', 'M', 'N', 'Q', 'R',
-                    'S', 'T', 'W', 'X': Result := 17;
+                  'A', 'C', 'D', 'F', 'G', 'J', 'K', 'L', 'M', 'N', 'Q', 'R', 'S', 'T', 'W', 'X': Result := 17;
                   'H', 'O', 'U', 'Y', 'Z': Result := 18;
                 end;
 
               '0': case GetFirstSuffixLetter(Call) of
-                  'A', 'B', 'H', 'O', 'R', 'S', 'U', 'W': Result := 18;
-                  // 4.54.3 issue 213
+                  'A', 'B', 'H', 'O', 'R', 'S', 'U', 'W': Result := 18;  // 4.54.3 issue 213
                   'C', 'D', 'E', 'F', 'I', 'J', 'K', 'L': Result := 19;
                   'Q', 'X', 'Z': Result := 19;
                   'Y': Result := 23;
-                else
-                  Result := 19;
+                else Result := 19;
                 end;
             end;
 
-          { And China }
+            { And China }
 
           if CTY.ctyTempQTHRecord.CountryID = 'BY' then
             case GetNumber(Call) of
@@ -1204,32 +1121,28 @@ begin
 
               '3': case GetFirstSuffixLetter(Call) of
                   'G', 'H', 'I', 'J', 'K', 'L': Result := 23;
-                else
-                  Result := 24;
+                else Result := 24;
                 end;
 
               '4', '5', '6', '7', '8': Result := 24;
 
               '9': case GetFirstSuffixLetter(Call) of
                   'M', 'N', 'P', 'Q', 'R', 'S': Result := 24;
-                else
-                  Result := 23;
+                else Result := 23;
                 end;
 
               '0': Result := 23;
             end;
 
-          { And Austrailia }
+            { And Austrailia }
 
           if CTY.ctyTempQTHRecord.CountryID = 'VK' then
             case GetNumber(Call) of
               '6', '8': Result := 29;
-            else
-              Result := 30;
+            else Result := 30;
             end;
-
-          if Result = 0 then
-            Result := CTY.ctyTable[CTY.ctyTempQTHRecord.Country].DefaultCQZone;
+        
+          if Result = 0 then Result := CTY.ctyTable[CTY.ctyTempQTHRecord.Country].DefaultCQZone;
         end;
     end;
 
@@ -1240,7 +1153,7 @@ end;
 
 function ctyGetITUZone(Call: CallString): Byte;
 var
-  TempZoneModeType: ZoneModeType;
+  TempZoneModeType                      : ZoneModeType;
 begin
   TempZoneModeType := CTY.ctyZoneMode;
   CTY.ctyZoneMode := ITUZoneMode;
@@ -1250,7 +1163,7 @@ end;
 
 function ctyGetCQZone(Call: CallString): Byte;
 var
-  TempZoneModeType: ZoneModeType;
+  TempZoneModeType                      : ZoneModeType;
 begin
   TempZoneModeType := CTY.ctyZoneMode;
   CTY.ctyZoneMode := CQZoneMode;
@@ -1296,20 +1209,17 @@ end;
 
 procedure ctyLoadInRemainingMults(p: PChar);
 var
-  i: Cardinal;
-  s: Cardinal;
-  b: PrefixName;
-  e: Cardinal;
+  i                                     : Cardinal;
+  s                                     : Cardinal;
+  b                                     : PrefixName;
+  e                                     : Cardinal;
 begin
   s := 0;
   for i := 0 to 4096 - 1 do
   begin
-    if p[i] in ['*', 'A'..'Z', 'a'..'z', '1'..'9'] then
-      if s = 0 then
-        s := i;
+    if p[i] in ['*', 'A'..'Z', 'a'..'z', '1'..'9'] then if s = 0 then s := i;
 
-    if p[i] in [' ', #13, #10, ',', ';', #0] then
-      if s <> 0 then
+    if p[i] in [' ', #13, #10, ',', ';', #0] then if s <> 0 then
       begin
         Windows.ZeroMemory(@b, SizeOf(b));
         Windows.CopyMemory(@b, @p[s], i - s);
@@ -1326,8 +1236,7 @@ begin
         end;
         s := 0;
       end;
-    if p[i] = #0 then
-      Break;
+    if p[i] = #0 then Break;
   end;
 end;
 
@@ -1352,7 +1261,9 @@ begin
 end;
 
 procedure ctyLoadInR150SList;
-
+var
+  TempIndex                             : integer;
+  TempRec                               : PrefixRecPtr;
 begin
 
   cty.ctyR150SMode := True;
@@ -1363,7 +1274,9 @@ begin
 end;
 
 procedure ctyLoadInRFOblList;
-
+var
+  TempIndex                             : integer;
+  TempRec                               : PrefixRecPtr;
 begin
 
   cty.ctyRFOblMode := True;
@@ -1374,3 +1287,4 @@ begin
 end;
 
 end.
+

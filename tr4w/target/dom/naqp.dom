@@ -3,7 +3,7 @@
 This file is only used for the NA QSO Party.
 
 INCLUDE FILE S50.DOM
-
+dc = DC, ^ District of Columbia
 vE7 = VE7, BC, ^BritishColumbia
 vE6 = VE6, AB, ALT, ALB, ^Alberta
 vE5 = VE5, SK, SAS, ^Saskatchewan
