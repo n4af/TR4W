@@ -2265,13 +2265,15 @@ begin
     end;
 
   if not tOpenFileForWrite(tReportFileWrite, tReportsFilename) then Exit;
-//  T1 := TR4W_CURRENTVERSION;
   T2 := @MyCall[1];
-//  T3 := ContestTypeSA[Contest];
- //if Contest = GENERALQSO then
-// T3:= ContestTitle[1]
-// else
-T3 := ContestName;        // 4.69.6   revised 4.73.3
+  T3 := ContestTypeSA[contest];        // 4.78.2
+   if Contest = GENERALQSO then       // 4.78.3
+    if length(ContestTitle) <> 0  then
+     T3 := ContestTitle
+      else
+       if length(ContestName) <> 0  then      // 4.78.3
+        T3 := ContestName;
+
   asm
   call TotalScore
   push eax
