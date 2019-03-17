@@ -6298,14 +6298,61 @@ begin
   end;
 end;
 
-TeslaQSOPointMethod:
+TeslaQSOPointMethod:      // 4.79.1
 //      if MyGrid <> '' then
 //        if RXData.DomesticQTH <> '' then
 begin
-  RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-    //n4af 4.36.11
+  Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+   Case distance of
+    0 .. 600:             RXData.QSOPoints := 10;
+    601 .. 1200:          RXData.QSOPoints := 13;
+    1201 .. 1800:         RXData.QSOPoints := 16;
+    1801 .. 2400:         RXData.QSOPoints := 20;
+    2401 .. 3600:         RXData.QSOPoints := 24;
+    3601 .. 4800:         RXData.QSOPoints := 28;
+    4801 .. 6000:         RXData.QSOPoints := 32;
+    6001 .. 7200:         RXData.QSOPoints := 36;
+    7201 .. 8400:         RXData.QSOPoints := 40;
+    else
+                          RXData.QSOPoints := 45;
+   end;
+
+ { revised points 2019 rules:    // 4.79.1
+ Points are calculated based on the distance between the centers of the middle of QTH grids:
+
+
+Up to 600 km = 10 points
+
+
+601 - 1200 km = 13 points
+
+
+1201 - 1800 km = 16 points
+
+
+1801 - 2400 km = 20 points
+
+
+2401 - 3600 km = 24 points
+
+
+3600 - 4800 km = 28 points
+
+
+4801 - 6000 km = 32 points
+
+
+6001 - 7200 km = 36 points
+
+
+7201 - 8400 km = 40 points
+
+
+above 8401 km = 45 points
+
+   //n4af 4.36.11
   if RXData.DomesticQTH = MyGrid then
-    RXData.QSOPoints := 90;
+    RXData.QSOPoints := 90; }
   DisplayTotalScore;
 end;
 

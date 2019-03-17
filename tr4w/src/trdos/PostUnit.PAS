@@ -2267,7 +2267,7 @@ begin
   if not tOpenFileForWrite(tReportFileWrite, tReportsFilename) then Exit;
   T2 := @MyCall[1];
   T3 := ContestTypeSA[contest];        // 4.78.2
-   if Contest = GENERALQSO then       // 4.78.3
+   if Contest = GENERALQSO then       // 4.78.3        // ALLOW CUSTOM CONFIG Contest Title or Contest Name
     if length(ContestTitle) <> 0  then
      T3 := ContestTitle
       else
@@ -3264,7 +3264,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
 
         RSTAndQSONumberOrFrenchDepartmentExchange, RSTAndQSONumberOrDomesticQTHExchange, RSTDomesticQTHOrQSONumberExchange:
           begin
-            if MyState <> '' then
+           if MyState <> '' then
             begin
               asm
               push cMyState
@@ -3280,7 +3280,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
               push nrSent
               push RSTSent
               end;
-              wsprintf(CABRILLO_MYEX, '%-8s %-7d');  // n4af 4.43.12
+              wsprintf(CABRILLO_MYEX, '%-4s %-7d');  // n4af 4.43.12
               asm add esp,16
               end;
             end;

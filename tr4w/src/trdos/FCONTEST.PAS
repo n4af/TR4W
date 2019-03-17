@@ -991,6 +991,8 @@ begin
       begin
         AddRussianDomesticCountrys;
         AddDomesticCountry('CE9');
+        if not RussianID(MyCountry) then        // 4.79.2
+         MyState := '';
 //        CountDomesticCountries := True;
 //        ContestName := 'Russian DX Contest';
       end;
