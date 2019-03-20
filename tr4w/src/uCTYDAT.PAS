@@ -377,7 +377,7 @@ begin
 //3.900.000 ticks
 //  Start := GetCPU;
   Result := False;
-
+  z := 0; // 4.79.3
   h := CreateFile(ctyFilename, GENERIC_READ, FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
   if h = INVALID_HANDLE_VALUE then Exit;
 

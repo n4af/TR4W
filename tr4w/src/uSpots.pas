@@ -177,7 +177,7 @@ var
 //    CurCursorPosData                     : integer;
   NumberEntriesDisplayed                   : integer;
 begin
-
+  bottom := 0; top := 1;    centrefound := False;        // 4.79.3
 //  inc(SpotsDisplayed);
 //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then Exit;
@@ -575,7 +575,7 @@ begin
      end;
 
   d := MAXLONG;
-
+//  Index2 := 0; // 4.79.3
   for Index := 0 to FCount - 1 do
   begin
     a := Abs(FList^[Index].FFrequency - Freq);
@@ -632,7 +632,7 @@ begin
   if CallsignIsTypedByOperator then Exit;
 
   d := MAXLONG;
-
+//  index2 := 0; // 4.79.3
   for Index := 0 to FCount - 1 do
   begin
     a := Abs(FList^[Index].FFrequency - Freq);

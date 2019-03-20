@@ -820,7 +820,7 @@ function ProcessDX(DX: integer; InListBox: boolean; var Stringtype: TelnetString
 label
   1;
 var
-  i, i1                                 : integer;
+  i,i1                                     : integer;
   TempFrequency                         : integer;
 
   f                                     : integer;

@@ -69,6 +69,7 @@ var
 const
   WM_NCMOUSELEAVE                       = $02A2;
 begin
+   p := ''; // 4.79.3
   Result := False;
   case Msg of
     //    WM_WINDOWPOSCHANGING: WINDOWPOSCHANGINGPROC(PWindowPos(lParam));

@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.79.2' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.79.3' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'Mar 17, 2019' ;
+  TR4W_CURRENTVERSIONDATE               = 'Mar 18, 2019' ;
 
 
 
@@ -1079,7 +1079,7 @@ type
     frMode: ModeType;
   end;
 const
-  FreqModeArraySize                     = 26;
+  FreqModeArraySize                     = 25;
   FreqModeArray                         : array[1..FreqModeArraySize] of FreqRecord =
 {(*}
     (
@@ -1121,8 +1121,8 @@ const
     (frMin: 400000000;  frMax: 500000000;  frBand:Band432;  frMode: Phone),
 
     (frMin: 900000000;  frMax: 1000000000; frBand:Band902;  frMode: Phone),
-    (frMin: 1000000000; frMax: 1500000000; frBand:Band1296; frMode: Phone),
-    (frMin: 2300000000; frMax: 2400000000; frBand:Band2304; frMode: Phone)
+    (frMin: 1000000000; frMax: 1500000000; frBand:Band1296; frMode: Phone)
+//    (frMin: 2300000000; frMax: 2400000000; frBand:Band2304; frMode: Phone)
     );
 {*)}
 

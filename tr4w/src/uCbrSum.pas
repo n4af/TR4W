@@ -79,7 +79,7 @@ type
 const
 
     CategoriesArray                       : array[ctCategoryAssisted..ctCategoryOverlay] of TCategoriesValuesRecord =
-//    CategoriesArray                       : array[0..8] of TCategoriesValuesRecord =
+   //    CategoriesArray                       : array[0..8] of TCategoriesValuesRecord =
     (
 {   ctCategoryAssisted    }(cvrStart: @tCategoryAssistedSA; cvrCount: integer(High(tCategoryAssisted))),
 {   ctCategoryBand        }(cvrStart: @tCategoryBandSA; cvrCount: integer(High(tCategoryBand))),
