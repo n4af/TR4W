@@ -165,9 +165,12 @@ begin
     if wParam = VK_PRIOR then ProcessMenu(menu_cwspeedup);
     if wParam = VK_NEXT then ProcessMenu(menu_cwspeeddown);
   end;
-  if Msg = WM_SYSKEYDOWN then if wParam = VK_F10 then CloseSendKeyboardInputDialog(False); //Windows.PostMessage(SendKeyboardWindow, WM_CLOSE, 0, 0);
-  Result := CallWindowProc(OldSendKeyboardEditProc, hwnddlg, Msg, wParam, lParam);
-end;
+  if Msg = WM_SYSKEYDOWN then if wParam = VK_F10 then
+    CloseSendKeyboardInputDialog(False); //Windows.PostMessage(SendKeyboardWindow, WM_CLOSE, 0, 0);
+    {$RangeChecks Off}     // 4.79.4
+   Result := CallWindowProc(OldSendKeyboardEditProc, hwnddlg, Msg, wParam, lParam);
+    {$RangeChecks On}
+  end;
 
 procedure CloseSendKeyboardInputDialog(StopSending: boolean);
 begin

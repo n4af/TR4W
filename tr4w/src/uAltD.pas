@@ -83,9 +83,8 @@ begin
 //        AltDEditWindowHandle := Get101Window(hwnddlg);
 
         SendMessage(AltDEditWindowHandle, EM_LIMITTEXT, 12, 0);
-        OldAltDEditProc := Pointer(Windows.SetWindowLong(AltDEditWindowHandle, GWL_WNDPROC, integer(@NewAltDEditProc)));
-
-        if AltDBufferEnable then
+         OldAltDEditProc := Pointer(Windows.SetWindowLong(AltDEditWindowHandle, GWL_WNDPROC, integer(@NewAltDEditProc)));
+         if AltDBufferEnable then
           Windows.SetWindowText(AltDEditWindowHandle, @DupeInfoCall[1]);
       end;
 
@@ -133,12 +132,13 @@ end;
 
 function NewAltDEditProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): UINT; stdcall;
 begin
-  if Msg = WM_CHAR then
+   if Msg = WM_CHAR then
   begin
     if KeyboardCallsignChar(wParam, False) = False then Exit;
   end;
-
+  {$RangeChecks OFF}   // 4.79.4
   Result := CallWindowProc(OldAltDEditProc, hwnddlg, Msg, wParam, lParam);
+  {$RangeChecks On}
 end;
 end.
 

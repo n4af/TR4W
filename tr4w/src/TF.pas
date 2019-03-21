@@ -1793,37 +1793,7 @@ begin
   tempDLGTEMPLATE.cx := Width;
   tempDLGTEMPLATE.cy := Height;
   tempDLGTEMPLATE.Style := DS_SETFONT or DS_CENTER or WS_SYSMENU or DS_MODALFRAME or WS_CAPTION or WS_VISIBLE;
-{
-  tempDLGTEMPLATE.bbb[0] := $42;
-  tempDLGTEMPLATE.bbb[2] := $42;
-  tempDLGTEMPLATE.bbb[4] := $42;
-  tempDLGTEMPLATE.c80[2] := $08;
 
-  tempDLGTEMPLATE.fn[0] := 'C';
-  tempDLGTEMPLATE.fn[2] := 'o';
-  tempDLGTEMPLATE.fn[4] := 'u';
-  tempDLGTEMPLATE.fn[6] := 'r';
-  tempDLGTEMPLATE.fn[8] := 'i';
-  tempDLGTEMPLATE.fn[10] := 'e';
-  tempDLGTEMPLATE.fn[12] := 'r';
-  tempDLGTEMPLATE.fn[14] := ' ';
-  tempDLGTEMPLATE.fn[16] := 'N';
-  tempDLGTEMPLATE.fn[18] := 'e';
-  tempDLGTEMPLATE.fn[20] := 'w';
-
-  h := CreateFile
-    (
-    'dlg2',
-    GENERIC_WRITE or GENERIC_READ,
-    FILE_SHARE_WRITE or FILE_SHARE_READ,
-    nil,
-    OPEN_ALWAYS,
-    FILE_FLAG_SEQUENTIAL_SCAN,
-    0
-    );
-  Windows.WriteFile(h, p^, 1024, lpNumberOfBytesWritten, nil);
-  CloseHandle(h);
-}
   Result := DialogBoxIndirectParam(hInstance, p^, ParentHWND, lpDialogFunc, dwInitParam);
 
 //  if Result = -1 then MessageBox(0, SysErrorMessage(GetLastError), nil, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
