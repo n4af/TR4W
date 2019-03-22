@@ -138,7 +138,7 @@ begin
     end;
     if NetSocket = 0 then Exit;
     wassend := SendToNet(NET_Buffer, length(Message));
- //   if wassend + 1 <> CharPointer then         // 4.79.4 charpointer not used
+ //  if wassend + 1 <> CharPointer then         // 4.79.4 charpointer not used
         //      showmessage('Can`t sent' + #13 + message + #13 + 'Check connection');
                  //{WLI}         if NetDebug then  RestorePreviousWindow;
   end;

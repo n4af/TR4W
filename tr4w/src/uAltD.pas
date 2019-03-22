@@ -136,7 +136,7 @@ begin
   begin
     if KeyboardCallsignChar(wParam, False) = False then Exit;
   end;
-  {$RangeChecks OFF}   // 4.79.4
+  {$RangeChecks OFF}     // 4.79.4
   Result := CallWindowProc(OldAltDEditProc, hwnddlg, Msg, wParam, lParam);
 
 end;

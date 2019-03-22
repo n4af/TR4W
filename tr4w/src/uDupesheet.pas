@@ -82,7 +82,7 @@ var
   Left                                  : integer;
 
 begin
-  left := 1;   // 4.79.4
+  left := 1;    // 4.79.4
   Result := False;
   case Msg of
     WM_WINDOWPOSCHANGING, WM_EXITSIZEMOVE: DefTR4WProc(Msg, lParam, hwnddlg);
