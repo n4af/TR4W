@@ -541,7 +541,7 @@ begin
               Break;
             end;
       end;
-      {$RangeChecks ON}
+      
     end;
  //   if not ColumnDupeSheetEnable then
     begin
