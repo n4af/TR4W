@@ -169,7 +169,7 @@ begin
     CloseSendKeyboardInputDialog(False); //Windows.PostMessage(SendKeyboardWindow, WM_CLOSE, 0, 0);
     {$RangeChecks Off}     // 4.79.4
    Result := CallWindowProc(OldSendKeyboardEditProc, hwnddlg, Msg, wParam, lParam);
-    {$RangeChecks On}
+   
   end;
 
 procedure CloseSendKeyboardInputDialog(StopSending: boolean);

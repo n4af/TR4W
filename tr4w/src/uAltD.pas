@@ -138,7 +138,7 @@ begin
   end;
   {$RangeChecks OFF}   // 4.79.4
   Result := CallWindowProc(OldAltDEditProc, hwnddlg, Msg, wParam, lParam);
-  {$RangeChecks On}
+
 end;
 end.
 

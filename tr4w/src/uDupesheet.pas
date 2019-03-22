@@ -82,7 +82,7 @@ var
   Left                                  : integer;
 
 begin
-
+  left := 1;   // 4.79.4
   Result := False;
   case Msg of
     WM_WINDOWPOSCHANGING, WM_EXITSIZEMOVE: DefTR4WProc(Msg, lParam, hwnddlg);
@@ -122,6 +122,7 @@ begin
   bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
   else
       bgColor := -1;
+      {$RangeChecks OFF}
         if Left <> 0 then
         GradientRect(
           VDDRAWITEMSTRUCT^.HDC,
@@ -129,7 +130,8 @@ begin
           tr4wColorsArray[VDColorsArray[bgColor]],
           tr4wColorsArray[VDColorsArray[bgColor]],
           gdHorizontal
-          )  
+          )
+          {$RangeChecks ON} 
       else
          begin
       //     GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict]], tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict + 1]], gdVertical);

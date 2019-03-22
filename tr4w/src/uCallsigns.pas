@@ -525,7 +525,8 @@ begin
     begin
       if (FList^[Index].FDupesArray[Mode] and (1 shl Ord(Band))) <> 0 then
       begin
-        for i := 0 to length(FList^[Index].FCall) do
+      {$RangeChecks OFF}
+        for i := 0 to length(FList^[Index].FCall) do        // 4.79.3
           if FList^[Index].FCall[i - 1] in ['A'..'Z'] then
             if FList^[Index].FCall[i] in ['0'..'9'] then
             begin
@@ -540,6 +541,7 @@ begin
               Break;
             end;
       end;
+      {$RangeChecks ON}
     end;
  //   if not ColumnDupeSheetEnable then
     begin
