@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.80.0' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.80.1' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'April 1, 2019' ;
+  TR4W_CURRENTVERSIONDATE               = 'April 10, 2019' ;
 
 
 
@@ -930,7 +930,8 @@ type
     ALRS_UA1DZ_CUP,
     WINTERFIELDDAY,
     RADIOYOC,
-    PAQSOPARTY  // 4.74.3
+    PAQSOPARTY,  // 4.74.3
+    OKOMSSB    // 4.80.1
     );
 
 type
@@ -2597,7 +2598,9 @@ type
     JAKARTARTTY,     // 4.74.2
     TRCDIGITAL,       // 4.75.2
     PAQSOPOINTMETHOD, // 4.74.3
-    XERTTY           // 4.77.5
+    XERTTY,           // 4.77.5
+    OKOMSSBQSOPointMethod  // 4.80.1
+
 
     );
 
@@ -2730,7 +2733,8 @@ const
      'JAKARTA-RTTY',     // 4.74.2
      'TRC-DIGITAL',      // 4.75.2
      'PA QSO PARTY',      // 4.74.3
-     'XE RTTY'           // 4.77.5
+     'XE RTTY',           // 4.77.5
+     'OKOM SSB'           // 4.80.1
     );
 
 type
@@ -3086,7 +3090,8 @@ QSOPartiesCount = 14;
  ({Name: 'ALRS_UA1DZ_CUP';          }   Email: nil;                      DF: 'russian';           WA7BNM: 0000;                         QRZRUID: 543 ; Pxm: NoPrefixMults; ZnM: NoZoneMults;  AIE:NoInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTDomesticQTHExchange;           XM:CQDXCC; QP:ALRSUA1DZCupQSOPointMethod),
  ({Name: 'WINTER FIELD DAY';        }   Email: 'wfda@winterfieldday.com';DF: 'arrlsect';          WA7BNM:   421; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod),
  ({Name: 'RADIO-YOC';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 119 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndPreviousQSONumber;               XM:ARRLDXCC;  QP:ThreePointsPerQSO),
- ({Name: 'PA QSO PARTY';               }Email: nil;                      DF: 'pa_cty';            WA7BNM: 0000; {SK3BG:  nil ;       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 14; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod)     // 4.74.3
+ ({Name: 'PA QSO PARTY';               }Email: nil;                      DF: 'pa_cty';            WA7BNM: 0000; {SK3BG:  nil ;       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 14; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod),     // 4.74.3
+ ({Name: 'OK-OM SSB';                  }Email: nil;                      DF: 'okom';              WA7BNM:  185; {SK3BG: 'okomdxc';    } QRZRUID: 12  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:CQDXCC; QP:OKOMSSBQSOPointMethod)     // 4.80.1
  {*)}
       );
 
@@ -3174,7 +3179,7 @@ QSOPartiesCount = 14;
       'OCEANIA-DX-CW',
       'OCEANIA-DX-SSB',
       'OHIO QSO PARTY',
-      'OK-OM DX',
+      'OK-OM DX CW',
       'RADIO-ONY',
       'OZCHR-TEAMS',
       'OZCHR',
@@ -3255,7 +3260,8 @@ QSOPartiesCount = 14;
       'ALRS-UA1DZ-CUP',
       'WINTER FIELD DAY' ,
       'RADIO-YOC',
-      'PA QSO PARTY'  // 4.74.3
+      'PA QSO PARTY',  // 4.74.3
+      'OK-OM DX SSB'       // 4.80.1
       );
 
   const
@@ -3464,7 +3470,8 @@ QSOPartiesCount = 14;
       ({Name: 'ALRS-UA1DZ-CUP';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'WINTER-FIELD DAY';           }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),        // 4.56.9 ny4i
       ({Name: 'RADIO-YOC';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
-      ({Name: 'PA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0)       // 4.74.3
+      ({Name: 'PA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),       // 4.74.3
+      ({Name: 'OK-OM SSB';                  }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0)         // 4.80.1
       );
 
 

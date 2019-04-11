@@ -314,7 +314,7 @@ begin
 
               DARC10M, WAG, DARCXMAS: SetCommentAndEnableEditControl(TC_ENTERYOURDOK, icmyState);
 
-              SPDX, OKDX, YODX, RSGB18, LZDX:
+              SPDX, OKDX, OKOMSSB, YODX, RSGB18, LZDX:                // 4.80.1
                 SetCommentAndEnableEditControl(TC_ENTERYOURDISTRICTABBREVIATION, icmyState);
 
               RDA: SetCommentAndEnableEditControl(TC_ENTERYOURRDAID, icmyState);
@@ -409,7 +409,7 @@ begin
               ARI_DX: DisplayCheckBox(TC_ITALY);
               UNDX: DisplayCheckBox(TC_KAZAKHSTAN);
               UKRAINIAN: DisplayCheckBox(TC_UKRAINE);
-              OKDX: DisplayCheckBox(TC_CZECHREPUBLICORINSLOVAKIA);
+              OKDX, OKOMSSB: DisplayCheckBox(TC_CZECHREPUBLICORINSLOVAKIA);
               LZDX: DisplayCheckBox(TC_BULGARIA);
               YODX: DisplayCheckBox(TC_ROMANIA);
               HADX: DisplayCheckBox(TC_HUNGARY);

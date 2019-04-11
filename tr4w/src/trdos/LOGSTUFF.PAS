@@ -6659,6 +6659,34 @@ else
   else
     RXData.QSOPoints := 0;
 
+OKOMSSBQSOPointMethod:              // 4.80.1
+ 
+if OKOMStation(MyCountry) then
+ begin
+ if ((MyCountry = 'OK') and  (RXData.QTH.CountryID = 'OM')) or
+ ((MyCountry = 'OM') and  (RXData.QTH.CountryID = 'OK')) then
+   RXdata.QSOPoints := 3
+   else
+   if (RXCty = 'OK') or (RXCty = 'OM') then
+    RXData.QSOPoints := 2
+     else
+      if RXData.QTH.Continent = Europe then
+      RXData.QSOPoints := 3
+       else
+        RXData.QSOPoints := 5;
+  end
+    else
+      if (RXCty = 'OK') or (RXCty = 'OM') then
+       RXData.QSOPoints := 10
+        else
+          if RXCTY = MyCountry then
+            RXData.QSOPoints := 1
+             else
+              if RXData.QTH.Continent <> MyContinent then
+               RXData.QSOPoints := 5
+              else
+               RXData.QSOPoints := 3;
+
 RAEMQSOPointMethod:
 begin
 

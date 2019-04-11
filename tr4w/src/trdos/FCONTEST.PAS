@@ -901,14 +901,19 @@ begin
 
 //        ContestName := 'NRAU Baltic Contest';
       end;
+    OKOMSSB:           // 4.80.1
+     begin
+         AddDomesticCountry('OK');
+         AddDomesticCountry('OM');
+        ActiveMode := Phone;
+   //     ContestName := 'OK-OM DX SSB';
+     end;
 
     OKDX:
       begin
-//        CountryTable.ZoneMode := CQZoneMode;
-
         AddDomesticCountry('OK');
         AddDomesticCountry('OM');
-//        ContestName := 'OK/OM DX Contest';
+ //       ContestName := 'OK-OM DX CW';
 
         if not OKOMStation(MyCountry) then
         begin
