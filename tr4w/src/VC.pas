@@ -1018,6 +1018,7 @@ type
     IC7850,
     IC7851,
     IC9100,
+    IC9700,
 
     OMNI6,
     Orion);

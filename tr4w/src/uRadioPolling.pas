@@ -2186,7 +2186,7 @@ begin
   c := 0;
   stat.cbInQue := 0;
 
-  if rig^.RadioModel in [IC78..IC9100,OMNI6] then
+  if rig^.RadioModel in [IC78..IC9700,OMNI6] then
     SleepMs := IcomResponseTimeout
   else
   begin
@@ -2294,7 +2294,7 @@ begin
       pFTDX9000(rig);
     FT891, FT991:
        pFT891(rig); // ny4i Issue218 9 byte frequency
-    IC78..IC9100, OMNI6:
+    IC78..IC9700, OMNI6:
       pIcomNew(rig);
 //    pIcom(rig);
 

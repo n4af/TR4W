@@ -519,6 +519,7 @@ const
     ({Name: 'IC7850';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC7851';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC9100';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $7C; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC9700';     } BR:BR38400; P: 1; C: 0; S: 0; T:0; RA: $A2; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'OMNI6';      } BR:BR9600;  P: 1; C: 1; S: 1; T:0; RA: $04; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'ORION';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt:rtOrion)
@@ -608,6 +609,7 @@ const
       'IC7850',
       'IC7851',
       'IC9100',
+      'IC9700',
       'OMNI6',
       'ORION'
 
@@ -834,8 +836,9 @@ begin
          ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR($FF) + CHR($09), 5);
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
+         // Check what radios support this and send command to clear 21 00 00 00 00 on 9700
          Exit;
          end;
 
@@ -893,8 +896,9 @@ begin
          Exit;
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
+         // Have to know what RIT is set to now and then increase it by a bit. RIT should be in radio poll so we always know
          Exit;
          end;
 
@@ -941,7 +945,7 @@ begin
          Exit;
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          Exit;
          end;
@@ -1002,7 +1006,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($02));
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1069,7 +1073,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($03));
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1320,7 +1324,7 @@ begin
       begin
       Exit;
       end;
-   if RadioModel in [IC78..IC9100, FT100, Orion] then
+   if RadioModel in [IC78..IC9700, FT100, Orion] then
       begin
       RadioStopBits := 1;
       end
@@ -1482,7 +1486,7 @@ begin
          //        ActiveRadioPtr.WriteBufferToCATPort('FT1;');//vfo b = tx
          end;
 
-      IC78..IC9100, OMNI6: { KK1L: 6.73 Added OMNI6 }
+      IC78..IC9700, OMNI6: { KK1L: 6.73 Added OMNI6 }
          begin
 
          CommandsTempBuffer[0] := CHR(8);
@@ -1537,7 +1541,7 @@ begin
          //        ActiveRadioPtr.WriteBufferToCATPort('FT0;');
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          // TLogger.GetInstance.Debug('Sending commands to take Icom out of Split');
          CommandsTempBuffer[0] := CHR(8);
@@ -2662,7 +2666,7 @@ begin
 
       case RadioModel of
 
-         IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+         IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
             begin
             // TLogger.GetInstance.Debug('In Icom radio code');
             if VFO = 'B' then
@@ -3291,7 +3295,7 @@ begin
           WaitAnswer := 14;
        end;
 }
-      //      IC78..IC9100, OMNI6: Exit;
+      //      IC78..IC9700, OMNI6: Exit;
 {
     IC7800, IC746..IC756PROIII, IC7000:
       begin
@@ -3336,14 +3340,14 @@ const
 begin
    RadioSupportsCWByCAT := [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000,
                             FLEX, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
-                            IC7850, IC7851, IC9100, Orion];
+                            IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
       [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000, FLEX, FT450, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
-      IC7850, IC7851, IC9100, Orion];  // ny4i Issue 120
-   ICOMRadios := [IC78..IC9100];
+      IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
+   ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];
    for i := 1 to 2 do
