@@ -57,6 +57,7 @@ const
    ICOM_SET_MODE        = #$06;
    ICOM_SET_VFO_COMMAND = #$07;
 
+   ICOM_SPLIT_MODE     = #$0F;
    ICOM_SET_SPLIT_MODE = #$0F;
 
    ICOM_SET_SLIDERS  = #$14;
@@ -65,6 +66,9 @@ const
 
    ICOM_SEND_CW        = #$17;
    ICOM_SET_XMIT_STATE = #$18;  // + 00 for XMIT off, 01 for XMIT on.
+
+   ICOM_GET_RIT_FREQ   = #$21;
+   //ICOM_SET_RIT_FREQ   =
 
    ICOM_SET_VFO_A_COMMAND = #$00;
    ICOM_SET_VFO_B_COMMAND = #$01;
@@ -117,7 +121,7 @@ type
 
    VFOStatusType = record
       {04}Frequency: longint;
-      {04}RITFreq:   integer;
+      {04}RITFreq:   integer;  // This should not be an integer but a float
       {01}Band:      BandType;
       {01}Mode:      ModeType;
       {01}Split:     boolean;
@@ -264,6 +268,8 @@ type
       procedure PutRadioOutOfSplit;
       procedure SendIcomCommand(Command: byte);
       procedure SendXMITStatusCommand;
+      procedure SendRITStatusCommand;
+      procedure SendRITFreqCommand;
       //    function SendFiveBytes: boolean;
       procedure SetRadioCWSpeed(speed: longint);
       procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
@@ -1467,7 +1473,29 @@ begin
    WriteToCATPort(tIcom7Bytes, 7);
 end; // SendXMITStatusCommand;
  //------------------------------------------------------------------------------
+ procedure RadioObject.SendRITStatusCommand;
+begin
+   tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[2] := ReceiverAddress;
+   tIcom7Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom7Bytes[4] := Ord(ICOM_GET_RIT_FREQ);
+   tIcom7Bytes[5] := (Ord(Chr(1)));
+   tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom7Bytes, 7);
+end; // SendRITStatusCommand;
 
+procedure RadioObject.SendRITFreqCommand;
+begin
+   tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[2] := ReceiverAddress;
+   tIcom7Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom7Bytes[4] := Ord(ICOM_GET_RIT_FREQ);
+   tIcom7Bytes[5] := (Ord(Chr(0)));
+   tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom7Bytes, 7);
+end; // SendRITFreqCommand;
 procedure RadioObject.PutRadioIntoSplit;
 
 begin

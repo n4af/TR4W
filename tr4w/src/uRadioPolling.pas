@@ -1109,6 +1109,40 @@ begin
                      rig.CurrentStatus.TXOn := Boolean(Ord(rig.tBuf[i+4+2])); //ny4i  // 4.44.5
                      UpdateStatus(rig);
                      end;
+              ICOM_SPLIT_MODE:
+                  if Ord(rig.tBuf[i+4+1]) = 1 then
+                     begin
+                     rig.CurrentStatus.Split := True;
+                     UpdateStatus(rig);
+                     end
+                  else
+                     begin
+                     rig.CurrentStatus.Split := false;
+                     UpdateStatus(rig);
+                     end;
+
+              ICOM_GET_RIT_FREQ:
+                 if (Ord(rig.tBuf[i+4+1])) = 1 then  // RIT Status Response (On/Off)
+                    begin
+                    if (Ord(rig.tBuf[i+4+2])) = 1 then
+                       begin
+                       rig.CurrentStatus.RIT := true;
+                       end
+                    else if (Ord(rig.tBuf[i+4+2])) = 0 then
+                       begin
+                       rig.CurrentStatus.RIT := false;
+                       end;
+                    UpdateStatus(rig);
+                    end
+                 else if (Ord(rig.tBuf[i+4+1])) = 0 then // RIT Frequency Response
+                    begin
+                    rig.CurrentStatus.RITFreq := (GetFrequencyFromBCD(2,@rig.tBuf[i + 6]));
+                    if (Ord(rig.tBuf[i+8])) = 1 then // 1 if negative RIT
+                       begin
+                       rig.CurrentStatus.RITFreq := rig.CurrentStatus.RITFreq * -1;
+                       end;
+                    UpdateStatus(rig);
+                    end;
             end;
           end;
     Windows.ZeroMemory(@rig.tBuf, stat.cbInQue);
@@ -1152,6 +1186,32 @@ begin
   end;
 
   rig.SendIcomCommand(Ord(ICOM_GET_FREQ));
+  if not icomCheckBuffer(rig) then
+  begin
+    ClearRadioStatus(rig);
+    UpdateStatus(rig);
+    Sleep(1000);
+    goto NextPoll;
+  end;
+
+  rig.SendIcomCommand(Ord(ICOM_SPLIT_MODE));
+  if not icomCheckBuffer(rig) then
+  begin
+    ClearRadioStatus(rig);
+    UpdateStatus(rig);
+    Sleep(1000);
+    goto NextPoll;
+  end;
+  rig.SendRITStatusCommand;
+  if not icomCheckBuffer(rig) then
+  begin
+    ClearRadioStatus(rig);
+    UpdateStatus(rig);
+    Sleep(1000);
+    goto NextPoll;
+  end;
+
+  rig.SendRITFreqCommand;
   if not icomCheckBuffer(rig) then
   begin
     ClearRadioStatus(rig);
@@ -1918,16 +1978,18 @@ begin
   else
     F1 := 0;
 
-  F1 := F1 + ((Ord(Addr[4 - c]) and $F0) shr 4); { 10s of mhz }
-  F1 := F1 * 10;
-  F1 := F1 + (Ord(Addr[4 - c]) and $0F); { 1s of mhz}
-  F1 := F1 * 10;
+  if Count <> 2 then
+     begin
+     F1 := F1 + ((Ord(Addr[4 - c]) and $F0) shr 4); { 10s of mhz }
+     F1 := F1 * 10;
+     F1 := F1 + (Ord(Addr[4 - c]) and $0F); { 1s of mhz}
+     F1 := F1 * 10;
 
-  F1 := F1 + ((Ord(Addr[3 - c]) and $F0) shr 4);
-  F1 := F1 * 10;
-  F1 := F1 + (Ord(Addr[3 - c]) and $0F);
-  F1 := F1 * 10;
-
+     F1 := F1 + ((Ord(Addr[3 - c]) and $F0) shr 4);
+     F1 := F1 * 10;
+     F1 := F1 + (Ord(Addr[3 - c]) and $0F);
+     F1 := F1 * 10;
+     end;
   F1 := F1 + ((Ord(Addr[2 - c]) and $F0) shr 4);
   F1 := F1 * 10;
   F1 := F1 + (Ord(Addr[2 - c]) and $0F);
@@ -2132,7 +2194,8 @@ begin
   if rig.CurrentStatus.PrevRITFreq <> rig.CurrentStatus.RITFreq then
   begin
 { $ R A NGECHECKS OFF}
-    SetDlgItemInt(h, 120, Cardinal(rig.CurrentStatus.RITFreq), rig.CurrentStatus.RITFreq < 0);
+    //SetDlgItemInt(h, 120, Cardinal(rig.CurrentStatus.RITFreq), rig.CurrentStatus.RITFreq < 0);
+    SetDlgItemText(h, 120, RITFreqToPchar(rig.CurrentStatus.RITFreq));
 { $ R A NGECHECKS ON}
     rig.CurrentStatus.PrevRITFreq := rig.CurrentStatus.RITFreq;
   end;
