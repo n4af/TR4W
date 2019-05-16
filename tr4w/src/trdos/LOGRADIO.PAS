@@ -239,7 +239,7 @@ type
 
       tIcom6Bytes: array[0..5] of byte;
       tIcom7Bytes: array[0..6] of byte; //ny4i  // 4.44.5
-
+      tIcom11Bytes: array[0..10] of byte; //ny4i
       tIcomFilterWidth: integer;
 
       tKenwood14Bytes: array[0..14] of char;
@@ -270,6 +270,7 @@ type
       procedure SendXMITStatusCommand;
       procedure SendRITStatusCommand;
       procedure SendRITFreqCommand;
+      procedure SendIcomClearRITCommand;
       //    function SendFiveBytes: boolean;
       procedure SetRadioCWSpeed(speed: longint);
       procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
@@ -842,7 +843,11 @@ begin
          ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR($FF) + CHR($09), 5);
          end;
 
-      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700:
+         begin
+         ActiveRadioPtr.SendIcomClearRITCommand;
+         end;
+      OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          // Check what radios support this and send command to clear 21 00 00 00 00 on 9700
          Exit;
@@ -1495,6 +1500,21 @@ begin
    tIcom7Bytes[5] := (Ord(Chr(0)));
    tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
    WriteToCATPort(tIcom7Bytes, 7);
+end; // SendRITFreqCommand;
+
+procedure RadioObject.SendIcomClearRITCommand;
+begin
+   tIcom11Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[2] := ReceiverAddress;
+   tIcom11Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom11Bytes[4] := Ord(ICOM_GET_RIT_FREQ);
+   tIcom11Bytes[5] := (Ord(Chr(0)));
+   tIcom11Bytes[6] := (Ord(Chr(0)));
+   tIcom11Bytes[7] := (Ord(Chr(0)));
+   tIcom11Bytes[8] := (Ord(Chr(0)));
+   tIcom11Bytes[9] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom11Bytes, 10);
 end; // SendRITFreqCommand;
 procedure RadioObject.PutRadioIntoSplit;
 
