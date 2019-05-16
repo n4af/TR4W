@@ -121,7 +121,7 @@ type
 
    VFOStatusType = record
       {04}Frequency: longint;
-      {04}RITFreq:   integer;  // This should not be an integer but a float
+      {04}RITFreq:   integer;
       {01}Band:      BandType;
       {01}Mode:      ModeType;
       {01}Split:     boolean;
@@ -270,6 +270,7 @@ type
       procedure SendXMITStatusCommand;
       procedure SendRITStatusCommand;
       procedure SendRITFreqCommand;
+      procedure SetICOMRITFrequency(hz: integer);
       procedure SendIcomClearRITCommand;
       //    function SendFiveBytes: boolean;
       procedure SetRadioCWSpeed(speed: longint);
@@ -283,6 +284,7 @@ type
       procedure UpdateBandOutputInfo(Band: BandType; Mode: ModeType);
       procedure UpdateRadioStatus;
       function ConvertBCDStringToFreq(BCDString: Str20): longint;
+
       procedure FreqToBCD(Freq: longint; Swap: boolean; OpCode: byte);
       procedure CheckAndInitializeSerialPorts_ForThisRadio;
       function WriteToCATPort(const Buffer; nNumberOfBytesToWrite: DWORD): longbool;
@@ -907,10 +909,10 @@ begin
          Exit;
          end;
 
-      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}    // This does not work for all Icom radios.
          begin
          // Have to know what RIT is set to now and then increase it by a bit. RIT should be in radio poll so we always know
-         Exit;
+         ActiveRadioPtr.SetICOMRITFrequency(ActiveRadioPtr.CurrentStatus.RITFreq + 1);
          end;
 
       Orion:
@@ -958,7 +960,7 @@ begin
 
       IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
-         Exit;
+         ActiveRadioPtr.SetICOMRITFrequency(ActiveRadioPtr.CurrentStatus.RITFreq - 1);
          end;
 
       Orion:
@@ -1501,6 +1503,31 @@ begin
    tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
    WriteToCATPort(tIcom7Bytes, 7);
 end; // SendRITFreqCommand;
+
+
+procedure RadioObject.SetICOMRITFrequency(hz: integer);
+var newFreq: integer;
+begin
+   tIcom11Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[2] := ReceiverAddress;
+   tIcom11Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom11Bytes[4] := Ord(ICOM_GET_RIT_FREQ);
+   tIcom11Bytes[5] := (Ord(Chr(0)));
+   newFreq := IntegerToBCD(abs(hz));
+   tIcom11Bytes[6] := (Ord(Chr(newFreq div 100)));// Put frequency here
+   tIcom11Bytes[7] := (Ord(Chr(newFreq mod 100)));
+   if hz < 0 then
+      begin
+      tIcom11Bytes[8] := (Ord(Chr(1)));
+      end
+   else
+      begin
+      tIcom11Bytes[8] := (Ord(Chr(0)));
+      end;
+   tIcom11Bytes[9] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom11Bytes, 10);
+end;
 
 procedure RadioObject.SendIcomClearRITCommand;
 begin
