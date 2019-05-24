@@ -1016,6 +1016,7 @@ var
   i                                     : integer;
   FDPos                                 : integer;
   DummyMode                             : ModeType;
+  freq                                  : Cardinal;
 //  p                                     : pchar;
 const
   FD_NOT_FOUND                          = 12;
@@ -1084,7 +1085,21 @@ begin
                   with rig.CurrentStatus do CalculateBandMode(Freq, Band, DummyMode);
                   UpdateStatus(rig);
                 end;
-
+              ICOM_GET_EXTENDEDVFO:
+                if Ord(rig.tBuf[i +4+1]) = 0 then
+                   begin // VFO A
+                   rig.CurrentStatus.Freq := GetFrequencyFromBCD(4, @rig.tBuf[i + 5]) + rig^.FrequencyAdder;
+                   rig.CurrentStatus.VFO[VFOA].Frequency := rig.CurrentStatus.Freq;
+                   with rig.CurrentStatus do CalculateBandMode(Freq, Band, DummyMode);
+                   UpdateStatus(rig);
+                   end
+                else if Ord(rig.tBuf[i +4+1]) = 1 then
+                   begin // VFO B
+                   freq := GetFrequencyFromBCD(FDPos - 6, @rig.tBuf[i + 6]) + rig^.FrequencyAdder;
+                   rig.CurrentStatus.VFO[VFOB].Frequency := freq;
+                   //with rig.CurrentStatus do CalculateBandMode(Freq, Band, DummyMode);
+                   //UpdateStatus(rig);
+                   end;
               ICOM_TRANSFER_MODE, ICOM_GET_MODE:
                 if FDPos in [6, 7] then
                 begin
@@ -1194,6 +1209,29 @@ begin
     goto NextPoll;
   end;
 
+  if rig^.RadioModel in IcomRadiosThatSupportVFOB then
+     begin
+     {rig.SendIcomTwoByteCommand(ICOM_GET_EXTENDEDVFO,0);
+     if not icomCheckBuffer(rig) then
+        begin
+        ClearRadioStatus(rig);
+        UpdateStatus(rig);
+        Sleep(1000);
+        goto NextPoll;
+        end;
+     }
+     //rig.SendIcomTwoByteCommand(Ord(ICOM_GET_EXTENDEDVFO),1);  // Unselected VFO (B)
+     rig.SendIcomExtendedVFO(true);
+     if not icomCheckBuffer(rig) then
+        begin
+        ClearRadioStatus(rig);
+        UpdateStatus(rig);
+        Sleep(1000);
+        goto NextPoll;
+
+        end;
+     end;
+
   rig.SendIcomCommand(Ord(ICOM_SPLIT_MODE));
   if not icomCheckBuffer(rig) then
   begin
@@ -1202,24 +1240,26 @@ begin
     Sleep(1000);
     goto NextPoll;
   end;
-  rig.SendRITStatusCommand;
-  if not icomCheckBuffer(rig) then
-  begin
-    ClearRadioStatus(rig);
-    UpdateStatus(rig);
-    Sleep(1000);
-    goto NextPoll;
-  end;
+  if rig^.RadioModel in IcomRadiosThatSupportRIT then
+     begin
+     rig.SendRITStatusCommand;
+     if not icomCheckBuffer(rig) then
+     begin
+       ClearRadioStatus(rig);
+       UpdateStatus(rig);
+       Sleep(1000);
+       goto NextPoll;
+     end;
 
-  rig.SendRITFreqCommand;
-  if not icomCheckBuffer(rig) then
-  begin
-    ClearRadioStatus(rig);
-    UpdateStatus(rig);
-    Sleep(1000);
-    goto NextPoll;
+     rig.SendRITFreqCommand;
+     if not icomCheckBuffer(rig) then
+     begin
+       ClearRadioStatus(rig);
+       UpdateStatus(rig);
+       Sleep(1000);
+       goto NextPoll;
+     end;
   end;
-
   rig.SendXMITStatusCommand;
   if not icomCheckBuffer(rig) then
      begin
