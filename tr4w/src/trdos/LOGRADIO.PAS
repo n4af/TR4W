@@ -57,6 +57,7 @@ const
    ICOM_SET_MODE        = #$06;
    ICOM_SET_VFO_COMMAND = #$07;
 
+   ICOM_SPLIT_MODE     = #$0F;
    ICOM_SET_SPLIT_MODE = #$0F;
 
    ICOM_SET_SLIDERS  = #$14;
@@ -65,6 +66,10 @@ const
 
    ICOM_SEND_CW        = #$17;
    ICOM_SET_XMIT_STATE = #$18;  // + 00 for XMIT off, 01 for XMIT on.
+
+   ICOM_GET_RIT_FREQ   = #$21;
+   ICOM_GET_EXTENDEDVFO = #$25;
+   //ICOM_SET_RIT_FREQ   =
 
    ICOM_SET_VFO_A_COMMAND = #$00;
    ICOM_SET_VFO_B_COMMAND = #$01;
@@ -235,7 +240,7 @@ type
 
       tIcom6Bytes: array[0..5] of byte;
       tIcom7Bytes: array[0..6] of byte; //ny4i  // 4.44.5
-
+      tIcom11Bytes: array[0..10] of byte; //ny4i
       tIcomFilterWidth: integer;
 
       tKenwood14Bytes: array[0..14] of char;
@@ -263,7 +268,13 @@ type
       procedure PutRadioIntoSplit;
       procedure PutRadioOutOfSplit;
       procedure SendIcomCommand(Command: byte);
+      procedure SendIcomTwoByteCommand(Command: byte; opCode: byte);
       procedure SendXMITStatusCommand;
+      procedure SendIcomExtendedVFO(bVFO: boolean);
+      procedure SendRITStatusCommand;
+      procedure SendRITFreqCommand;
+      procedure SetICOMRITFrequency(hz: integer);
+      procedure SendIcomClearRITCommand;
       //    function SendFiveBytes: boolean;
       procedure SetRadioCWSpeed(speed: longint);
       procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
@@ -276,6 +287,7 @@ type
       procedure UpdateBandOutputInfo(Band: BandType; Mode: ModeType);
       procedure UpdateRadioStatus;
       function ConvertBCDStringToFreq(BCDString: Str20): longint;
+
       procedure FreqToBCD(Freq: longint; Swap: boolean; OpCode: byte);
       procedure CheckAndInitializeSerialPorts_ForThisRadio;
       function WriteToCATPort(const Buffer; nNumberOfBytesToWrite: DWORD): longbool;
@@ -375,6 +387,8 @@ var
    InActiveRadioPtr: RadioPtr = @Radio2;
    RadioSupportsCWByCAT: InterfacedRadioTypeSet;
    RadioSupportsCWSpeedSync: InterfacedRadioTypeSet;
+   IcomRadiosThatSupportRIT: InterfacedRadioTypeSet;
+   IcomRadiosThatSupportVFOB: InterfacedRadioTypeSet;
    ICOMRadios:       ICOMRadioTypes;
    KenwoodRadios:    KenwoodRadioTypes;
 
@@ -430,7 +444,7 @@ type
     2. Each new radio requires the type in InterfacedRadioType, the entry
        below in the RadioParametersArray array and the literal name of the
        radio in InterfacedRadioTypeSA below.  // Issue 120
-    3. Also update the Sets in InitRadio wherever applicable for the new radio.
+    3. Also update the Sets in InitRadio wherever applicable for the new radio. ** Important for CWBYCAT ad RIT functions
  - ny4i
 }
 const
@@ -519,6 +533,7 @@ const
     ({Name: 'IC7850';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC7851';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC9100';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $7C; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC9700';     } BR:BR38400; P: 1; C: 0; S: 0; T:0; RA: $A2; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
 
     ({Name: 'OMNI6';      } BR:BR9600;  P: 1; C: 1; S: 1; T:0; RA: $04; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'ORION';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt:rtOrion)
@@ -608,6 +623,7 @@ const
       'IC7850',
       'IC7851',
       'IC9100',
+      'IC9700',
       'OMNI6',
       'ORION'
 
@@ -669,6 +685,7 @@ const
 
 
 function IntegerToBCD(Value: DWORD): integer; // ny4i  // 4.44.5
+function Integer4ToBCD(Value: DWORD): integer; // ny4i  // 4.44.5
 procedure InitRadios;
 function OpenCATDebugFile(port: PortType): boolean;
 //procedure CloseCATDebugFile(port: PortType);
@@ -779,6 +796,19 @@ begin
       end;
 end;//IntegerToBCD
 
+function Integer4ToBCD(Value: DWORD): integer;
+const
+   Dividers: array[1..8] of integer = (1, 10, 100, 1000, 10000, 100000, 1000000, 10000000);
+var
+   j: integer;
+begin
+   Result := 0;
+   for j := 2 downto 1 do //4 digits
+      begin
+      Result := (Result shl 4) or ((Value div Dividers[j]) mod 10);
+      end;
+end;//Integer4ToBCD
+
 
 function BufToStr(var buf; bufSize: integer): string;
 begin
@@ -834,8 +864,16 @@ begin
          ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR($FF) + CHR($09), 5);
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700:
          begin
+         if IntRadioType in IcomRadiosThatSupportRIT then
+            begin
+            ActiveRadioPtr.SendIcomClearRITCommand;
+            end;
+         end;
+      OMNI6: {KK1L: 6.73 Added OMNI6}
+         begin
+         // Check what radios support this and send command to clear 21 00 00 00 00 on 9700
          Exit;
          end;
 
@@ -893,8 +931,14 @@ begin
          Exit;
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}    // This does not work for all Icom radios.
          begin
+         if IntRadioType in IcomRadiosThatSupportRIT then
+            begin
+         // Have to know what RIT is set to now and then increase it by a bit. RIT should be in radio poll so we always know
+         // Not implemented yet due to issues converting the hz to BCD
+         //ActiveRadioPtr.SetICOMRITFrequency(ActiveRadioPtr.CurrentStatus.RITFreq + 10);
+            end;
          Exit;
          end;
 
@@ -941,8 +985,13 @@ begin
          Exit;
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6} // Add code somewhere tohandle radios that do not support 21 code.
          begin
+         if IntRadioType in IcomRadiosThatSupportRIT then
+            begin
+            // Not implemented yet due to issues converting the hz to BCD
+            //ActiveRadioPtr.SetICOMRITFrequency(ActiveRadioPtr.CurrentStatus.RITFreq - 10);
+            end;
          Exit;
          end;
 
@@ -1002,7 +1051,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($02));
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1069,7 +1118,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($03));
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1320,7 +1369,7 @@ begin
       begin
       Exit;
       end;
-   if RadioModel in [IC78..IC9100, FT100, Orion] then
+   if RadioModel in [IC78..IC9700, FT100, Orion] then
       begin
       RadioStopBits := 1;
       end
@@ -1348,7 +1397,7 @@ var
    c: cardinal;
    TempFreq: longint;
 begin
-   ZeroMemory(@tYaesuFreq5Bytes, SizeOf(tYaesuFreq5Bytes));
+   ZeroMemory(@tYaesuFreq5Bytes, SizeOf (tYaesuFreq5Bytes));
    tYaesuFreq5Bytes[4] := OpCode;
    TempFreq := Freq div 10;
    for c := 3 downto 0 do
@@ -1436,6 +1485,19 @@ begin
    FrequencyFromFourBytes := F1 + F2 + F3 + Ord(FreqStr[4]);
 end;
 
+procedure RadioObject.SendIcomTwoByteCommand(Command: byte; opCode: byte);
+
+begin
+
+   tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[2] := ReceiverAddress;
+   tIcom7Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom7Bytes[4] := Command;
+   tIcom7Bytes[5] := Ord(Chr(opCode));
+   tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom6Bytes, 7);
+end;
 procedure RadioObject.SendIcomCommand(Command: byte);
 
 begin
@@ -1463,6 +1525,96 @@ begin
    WriteToCATPort(tIcom7Bytes, 7);
 end; // SendXMITStatusCommand;
  //------------------------------------------------------------------------------
+ procedure RadioObject.SendRITStatusCommand;
+begin
+   tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[2] := ReceiverAddress;
+   tIcom7Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom7Bytes[4] := Ord(ICOM_GET_RIT_FREQ);
+   tIcom7Bytes[5] := (Ord(Chr(1)));
+   tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom7Bytes, 7);
+end; // SendRITStatusCommand;
+
+procedure RadioObject.SendRITFreqCommand;
+begin
+   tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[2] := ReceiverAddress;
+   tIcom7Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom7Bytes[4] := Ord(ICOM_GET_RIT_FREQ);
+   tIcom7Bytes[5] := (Ord(Chr(0)));
+   tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom7Bytes, 7);
+end; // SendRITFreqCommand;
+
+
+procedure RadioObject.SetICOMRITFrequency(hz: integer);
+var newFreq: integer;
+    absHz : integer;
+    foo : integer;
+begin
+   {CommandsTempBuffer[0] := Chr(11);
+   CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+   CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+   CommandsTempBuffer[3] := Chr(ReceiverAddress);
+   CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+   CommandsTempBuffer[5] := ICOM_GET_RIT_FREQ;
+   CommandsTempBuffer[6] := Chr(0);
+   {absHz := abs(hz);
+   foo := Integer4ToBCD(absHz);
+   newFreq := ((absHz mod 100) * 100) + absHz div 100;
+
+   CommandsTempBuffer[7] := Chr(absHz mod 100);// Put frequency here
+   CommandsTempBuffer[8] := Chr(absHz div 100);
+   CommandsTempBuffer[7] := Chr(absHz div 1000 mod 10);
+   CommandsTempBuffer[8] := Chr(absHz div 100 mod 10);
+   CommandsTempBuffer[7] := Chr(foo div 100);
+   CommandsTempBuffer[8] := Chr(foo mod 100);
+
+
+
+    if hz < 0 then
+      begin
+      CommandsTempBuffer[9] := Chr(1);
+      end
+   else
+      begin
+      CommandsTempBuffer[9] := Chr(0);
+      end;
+   CommandsTempBuffer[10] := ICOM_END_OF_MESSAGE_CODE;
+   AddCommandToBuffer;
+   }
+end;
+
+procedure RadioObject.SendIcomClearRITCommand;
+begin
+   tIcom11Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[2] := ReceiverAddress;
+   tIcom11Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom11Bytes[4] := Ord(ICOM_GET_RIT_FREQ);
+   tIcom11Bytes[5] := (Ord(Chr(0)));
+   tIcom11Bytes[6] := (Ord(Chr(0)));
+   tIcom11Bytes[7] := (Ord(Chr(0)));
+   tIcom11Bytes[8] := (Ord(Chr(0)));
+   tIcom11Bytes[9] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom11Bytes, 10);
+end; // SendRITFreqCommand;
+
+
+procedure RadioObject.SendIcomExtendedVFO(bVFO: boolean);
+begin
+   tIcom11Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[2] := ReceiverAddress;
+   tIcom11Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom11Bytes[4] := Ord(ICOM_GET_EXTENDEDVFO);
+   tIcom11Bytes[5] := ifthen(bVFO,Ord(Chr(1)),Ord(Chr(0)));
+   tIcom11Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom11Bytes, 7);
+end; // SendIcomExtendedVFO
 
 procedure RadioObject.PutRadioIntoSplit;
 
@@ -1482,7 +1634,7 @@ begin
          //        ActiveRadioPtr.WriteBufferToCATPort('FT1;');//vfo b = tx
          end;
 
-      IC78..IC9100, OMNI6: { KK1L: 6.73 Added OMNI6 }
+      IC78..IC9700, OMNI6: { KK1L: 6.73 Added OMNI6 }
          begin
 
          CommandsTempBuffer[0] := CHR(8);
@@ -1537,7 +1689,7 @@ begin
          //        ActiveRadioPtr.WriteBufferToCATPort('FT0;');
          end;
 
-      IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          // TLogger.GetInstance.Debug('Sending commands to take Icom out of Split');
          CommandsTempBuffer[0] := CHR(8);
@@ -2662,7 +2814,7 @@ begin
 
       case RadioModel of
 
-         IC78..IC9100, OMNI6: {KK1L: 6.73 Added OMNI6}
+         IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
             begin
             // TLogger.GetInstance.Debug('In Icom radio code');
             if VFO = 'B' then
@@ -3283,15 +3435,15 @@ begin
     ReplyLength=14
     Validate=FEFE70E01C0001FD.FEFEE070FBFD
     }
-{
-    IC746, IC756, IC7000, IC7800:
+
+    IC78..IC9700:
        begin
           TempString := CHR($FE) + CHR($FE) + CHR(Radio1.ReceiverAddress) + CHR($E0) + CHR($1C) + CHR($00) + CHR($00) + CHR($FD);
           if PTTOn then TempString[7] := CHR($01);
           WaitAnswer := 14;
        end;
-}
-      //      IC78..IC9100, OMNI6: Exit;
+
+      //      IC78..IC9700, OMNI6: Exit;
 {
     IC7800, IC746..IC756PROIII, IC7000:
       begin
@@ -3336,14 +3488,16 @@ const
 begin
    RadioSupportsCWByCAT := [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000,
                             FLEX, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
-                            IC7850, IC7851, IC9100, Orion];
+                            IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
       [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000, FLEX, FT450, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
-      IC7850, IC7851, IC9100, Orion];  // ny4i Issue 120
-   ICOMRadios := [IC78..IC9100];
+      IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
+   IcomRadiosThatSupportRIT := [IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
+   IcomRadiosThatSupportVFOB := [IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
+   ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];
    for i := 1 to 2 do

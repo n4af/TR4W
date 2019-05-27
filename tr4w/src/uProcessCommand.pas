@@ -264,7 +264,7 @@ begin
 {
     if CommandString = 'SRS' then
     begin
-      if ActiveRadioPtr.RadioModel in [IC78..IC9100, OMNI6] then
+      if ActiveRadioPtr.RadioModel in [IC78..IC9700, OMNI6] then
         ActiveRadioPtr.ICOM_COMMAND_CUSTOM := scFileName
       else
         WriteToSerialCATPort(scFileName, ActiveRadioPtr.tCATPortHandle);
@@ -272,7 +272,7 @@ begin
 
     if CommandString = 'SRSI' then
     begin
-      if InActiveRadioPtr.RadioModel in [IC78..IC9100, OMNI6] then
+      if InActiveRadioPtr.RadioModel in [IC78..IC9700, OMNI6] then
         InActiveRadioPtr.ICOM_COMMAND_CUSTOM := scFileName
       else
         WriteToSerialCATPort(scFileName, InActiveRadioPtr.tCATPortHandle);
@@ -280,7 +280,7 @@ begin
 
     if CommandString = 'SRS1' then
     begin
-      if Radio1.RadioModel in [IC78..IC9100, OMNI6] then
+      if Radio1.RadioModel in [IC78..IC9700, OMNI6] then
         Radio1.ICOM_COMMAND_CUSTOM := scFileName
       else
         WriteToSerialCATPort(scFileName, Radio1.tCATPortHandle);
@@ -288,7 +288,7 @@ begin
 
     if CommandString = 'SRS2' then
     begin
-      if Radio2.RadioModel in [IC78..IC9100, OMNI6] then
+      if Radio2.RadioModel in [IC78..IC9700, OMNI6] then
         Radio2.ICOM_COMMAND_CUSTOM := scFileName
       else
         WriteToSerialCATPort(scFileName, Radio2.tCATPortHandle);
@@ -559,7 +559,7 @@ end;
 
 procedure scSRS;
 begin
-  if ActiveRadioPtr.RadioModel in [IC78..IC9100, OMNI6] then
+  if ActiveRadioPtr.RadioModel in [IC78..IC9700, OMNI6] then
   begin
 //    ActiveRadioPtr.ICOM_COMMAND_CUSTOM := scFileName;
 //    ActiveRadioPtr.CommandsTempBuffer
@@ -574,7 +574,7 @@ end;
 
 procedure scSRSI;
 begin
-  if InActiveRadioPtr.RadioModel in [IC78..IC9100, OMNI6] then
+  if InActiveRadioPtr.RadioModel in [IC78..IC9700, OMNI6] then
   begin
     Windows.CopyMemory(@InActiveRadioPtr.CommandsTempBuffer[1], @scFileName[1], length(scFileName));
     InActiveRadioPtr.CommandsTempBuffer[0] := CHR(length(scFileName));
@@ -588,7 +588,7 @@ end;
 
 procedure scSRS1;
 begin
-  if Radio1.RadioModel in [IC78..IC9100, OMNI6] then
+  if Radio1.RadioModel in [IC78..IC9700, OMNI6] then
   begin
     Windows.CopyMemory(@Radio1.CommandsTempBuffer[1], @scFileName[1], length(scFileName));
     Radio1.CommandsTempBuffer[0] := CHR(length(scFileName));
@@ -602,7 +602,7 @@ end;
 
 procedure scSRS2;
 begin
-  if Radio2.RadioModel in [IC78..IC9100, OMNI6] then
+  if Radio2.RadioModel in [IC78..IC9700, OMNI6] then
   begin
     Windows.CopyMemory(@Radio2.CommandsTempBuffer[1], @scFileName[1], length(scFileName));
     Radio2.CommandsTempBuffer[0] := CHR(length(scFileName));

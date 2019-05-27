@@ -167,6 +167,7 @@ procedure ShowSysErrorMessage(ID: PChar);
 
 
 //function tr4w_GetTimeString: PChar;
+function RITFreqToPchar(i: integer): PChar;
 function FreqToPChar(i: integer): PChar;
 function FreqToPChar2(i: integer): PChar;
 function FreqToPCharWithoutHZ(i: integer): PChar;
@@ -298,6 +299,21 @@ begin
   Result := FreqToPCharBuffer;
 end;
 
+function RITFreqToPchar(i: integer): PChar;
+var absI: integer;
+begin  // This does not handle negative numbers very well.
+   if i < 0 then
+      begin
+      absI := i * -1;
+      Format(FreqToPCharBuffer, '-%u.%2u', absI div 1000, (absI mod 1000) div 10); // Make 190 appear as 0.19
+      end
+   else
+      begin
+      Format(FreqToPCharBuffer, '%d.%2u', i div 1000, (abs(i) mod 1000) div 10); // Make 190 appear as 0.19
+      end;
+   Result := FreqToPCharBuffer;
+end;
+
 function FreqToPChar(i: integer): PChar;
 var
   hz                                    : integer;
@@ -354,7 +370,7 @@ begin
    mov ax,word ptr Freq
    movzx eax,ax
    push eax
-  end;
+  end;                                
   wsprintf(FreqToPCharBuffer, '%6u');
   asm add esp,12
   end;
