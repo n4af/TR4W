@@ -5445,7 +5445,8 @@ begin
       if CurrentStatus.PrevRITFreq <> CurrentStatus.RITFreq then
       begin
 {$RANGECHECKS OFF}
-        SetDlgItemInt(h, 120, CurrentStatus.RITFreq, CurrentStatus.RITFreq < 0);
+       //SetDlgItemInt(h, 120, CurrentStatus.RITFreq, CurrentStatus.RITFreq < 0);
+       SetDlgItemText(h, 120, RITFreqToPChar(CurrentStatus.RITFreq)); //FreqToPChar(CurrentStatus.RITFreq));
 {$RANGECHECKS ON}
         CurrentStatus.PrevRITFreq := CurrentStatus.RITFreq;
       end;
