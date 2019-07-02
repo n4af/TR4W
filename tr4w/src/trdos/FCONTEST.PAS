@@ -899,22 +899,18 @@ begin
         AddDomesticCountry('TF');
         AddDomesticCountry('YL');
 
-//        ContestName := 'NRAU Baltic Contest';
       end;
     OKOMSSB:           // 4.80.1
      begin
          AddDomesticCountry('OK');
          AddDomesticCountry('OM');
         ActiveMode := Phone;
-   //     ContestName := 'OK-OM DX SSB';
      end;
 
     OKDX:
       begin
         AddDomesticCountry('OK');
         AddDomesticCountry('OM');
- //       ContestName := 'OK-OM DX CW';
-
         if not OKOMStation(MyCountry) then
         begin
           ActiveDomesticMult := DomesticFile;
@@ -962,6 +958,8 @@ begin
 
     RAC_CANADA_DAY, RAC_CANADA_WINTER:
       begin
+      if MyCountry <> 'VE' then      // 4.82.1
+         MyState := '';
         AddDomesticCountry('VE');
         AddDomesticCountry('CY0');
         AddDomesticCountry('CY9');
