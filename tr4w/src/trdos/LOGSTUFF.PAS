@@ -7497,6 +7497,16 @@ PortugalDay:    // 4.71.4
 
   end;
 
+  UQRQCPM:                      // 4.82.3
+  if (RXData.QTH.Continent <> MyContinent) then
+   RXData.QSOPoints := 4
+    else
+     if (RXCty <> MyCountry) then
+      RXData.QSOPoints := 3
+       else
+        RXData.QSOPoints := 2;
+
+
 end; { of c ase }
 end;
 

@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.82.2' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.82.3' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July 2, 2019' ;
+  TR4W_CURRENTVERSIONDATE               = 'July 6, 2019' ;
 
 
 
@@ -2600,7 +2600,8 @@ type
     TRCDIGITAL,       // 4.75.2
     PAQSOPOINTMETHOD, // 4.74.3
     XERTTY,           // 4.77.5
-    OKOMSSBQSOPointMethod  // 4.80.1
+    OKOMSSBQSOPointMethod, // 4.80.1
+    uQRQCPM      // 4.82.3
 
 
     );
@@ -2735,7 +2736,8 @@ const
      'TRC-DIGITAL',      // 4.75.2
      'PA QSO PARTY',      // 4.74.3
      'XE RTTY',           // 4.77.5
-     'OKOM SSB'           // 4.80.1
+     'OKOM SSB',          // 4.80.1
+     'UQRQCPM'           // 4.82.3
     );
 
 type
