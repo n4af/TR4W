@@ -65,7 +65,7 @@ const
   RC_KILLCW_HK                          = #9'Alt+K';
   RC_SEARCHLOG_HK                       = #9'Alt+L';
 
-  RC_Download_HK                   = #9'Alt+O';
+  RC_Download_HK                        = #9'Alt+O';
   RC_ALTP_HK                            = #9'Alt+P';
   RC_AUTOCQ_HK                          = #9'Alt+Q';
   RC_TOOGLERIGS_HK                      = #9'Alt+R';
@@ -263,9 +263,8 @@ const
     (mrText: RC_SEARCHLOG + RC_SEARCHLOG_HK; mrId: menu_alt_searchlog),
     (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
 
- //   (mrText: RC_Download + RC_Download_HK; mrId: menu_download_latest_cty_dat), // 4.75.3
+    (mrText: RC_Download + RC_Download_HK; mrId: menu_download_latest_cty_dat), // 4.75.3
 //    (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transfreq),     // 4.68.11
-    (mrText: RC_Download + RC_Download_HK; mrId: menu_download_latest_cty_dat;),  // 4.75.3
     (mrText: RC_ALTP + RC_ALTP_HK; mrId: menu_alt_p),
     (mrText: RC_AUTOCQ + RC_AUTOCQ_HK; mrId: menu_alt_autocq),
     (mrText: RC_TOOGLERIGS + RC_TOOGLERIGS_HK; mrId: menu_alt_tooglerigs),

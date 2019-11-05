@@ -181,14 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.82.3' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.83.0' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July 6, 2019' ;
-
-
-
+  TR4W_CURRENTVERSIONDATE               = 'November 4, 2019' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -453,7 +450,7 @@ type
 //http://www.w3.org/TR/CSS2/syndata.html#value-def-color
 //http://www.w3schools.com/CSS/css_colorsfull.asp
 const
-  BASECOLUMNWIDTH                       = 45;
+  BASECOLUMNWIDTH                       = 65;
   PREFIXCOLUMNWIDTH                     = 65;
 
   tr4wColorsSA                          : array[tr4wColors] of PChar = (

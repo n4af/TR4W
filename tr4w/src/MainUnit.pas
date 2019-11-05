@@ -5985,7 +5985,7 @@ end;
 procedure SetRemMultsColumnWidth;
 var
   Width                                 : integer;
- // DomWidth                              : integer;
+  DomWidth                              : integer;
 
 begin
  // 4.71.2 attempt to allow longer column width for long DOM MULTS by setting SHOW DOMESTIC MULTIPLIER NAME to TRUE
@@ -5998,7 +5998,7 @@ begin
 
   tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_REMMULTSWINDOW_INDEX].WndHandle, Width);
 
- // tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_STATIONS_RM_DOM].WndHandle, DomWidth);
+//  tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_STATIONS_RM_DOM].WndHandle, DomWidth);
 
 end;
 
