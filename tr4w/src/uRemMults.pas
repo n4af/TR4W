@@ -192,9 +192,9 @@ begin
               Windows.ZeroMemory(@TempCall, SizeOf(TempCall));
 
               if tShowDomesticMultiplierName and (mo.DomList.FList[Index].FAltName <> '') then
-                TempCall := mo.DomList.FList[Index].FAltName
+                 TempCall := mo.DomList.FList[Index].FAltName
               else
-                TempCall := mo.DomList.Get(Index);
+                 TempCall := mo.DomList.Get(Index);
 
               p := @TempCall[1];
               quickdisplay(p);

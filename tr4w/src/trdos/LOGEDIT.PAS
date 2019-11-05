@@ -1303,7 +1303,6 @@ begin
     Exit;
   if not tWindowsExist(Window) then
     Exit;
- //  DomWidth := 45;
   SetRemMultsColumnWidth;       // 4.71.2      // 4.83.0
   rmw := Windows.GetDlgItem(tr4w_WindowsArray[Window].WndHandle, 101);
 
