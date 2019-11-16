@@ -73,7 +73,7 @@ var
   
 implementation
 uses
-  LogDupe;
+  LogDupe; 
 
 procedure MultsObject.IncrementTotals(Band: BandType; Mode: ModeType; m: RemainingMultiplierType);
 begin
@@ -85,8 +85,8 @@ begin
   if Band <> All then
     inc(MTotals[All, Mode, m]);
 
-  if ((Mode <> Both) and (Band <> All)) then
-    inc(MTotals[All, Both, m]);
+   if ((Mode <> Both) and (Band <> All)) then
+     inc(MTotals[All, Both, m]);
 end;
 
 procedure MultsObject.ClearAllMults;

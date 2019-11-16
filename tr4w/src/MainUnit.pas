@@ -964,7 +964,7 @@ begin
 
       if QTCsEnabled then DisplayQTCNumber(NumberQTCsThisStation(CallWindowString));
 
-      if ExchangeWindowString = '' then
+      if (ExchangeWindowString = '') and (ExchangeMemoryEnable) then    // 4.83.3
       begin
         if not LeaveCursorInCallWindow then tExchangeWindowSetFocus;
         tSetExchWindInitExchangeEntry;
@@ -1065,7 +1065,7 @@ begin
     if not AutoDupeEnableSandP then     // n4af 4.49.5
     tExchangeWindowSetFocus;   // n4af issue155 4.47.12
   end;
-  if ExchangeWindowString = '' then
+  if (ExchangeWindowString = '') then
     if (length(CallWindowString) >= 3) and
       ((not tCallWindowStringIsDupe) or
       (not AutoDupeEnableSandP)) then
@@ -1091,7 +1091,7 @@ begin
   DisplayGridSquareStatus(CallWindowString);
   ShowStationInformation(@CallWindowString);
 
-  if ExchangeWindowString = '' then
+  if (ExchangeWindowString = '')  and (ExchangeMemoryEnable) then    // 4.83.3
   begin
     tSetExchWindInitExchangeEntry;
     CheckAndSetInitialExchangeCursorPos;
@@ -3184,7 +3184,7 @@ begin
 }
 end;
 
-{procedure ProcessKeyDownTerm;        // 4.46.2
+ procedure ProcessKeyDownTerm;        // 4.46.2
  begin
  if activeradioptr^.cwbycat and autosendenable and autocallterminate then
  if length(CallWindowString) = AutoSendCharacterCount then
@@ -3194,7 +3194,7 @@ end;
         CheckAndSetInitialExchangeCursorPos;
    processreturn;
  end;
- end;  }
+ end;
 
 procedure ProcessReturn;
 var

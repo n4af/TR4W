@@ -3857,7 +3857,7 @@ begin
   LooksLikePower := True;
 end;
 
-function ProcessRSTPossibleDomesticQTHAndPowerExchange(Exchange: Str80; var
+function ProcessRSTPossibleDomesticQTHAndPowerExchange(Exchange: Str80; var
   RXData: ContestExchange): boolean;
 
 { RST MaybeQTH and Power.  Power will either have numbers and a W in it, or
@@ -4057,7 +4057,8 @@ function ProcessRSTQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData:
 var
   NumberString, FirstString, SecondString, ThirdString: Str10;
 
-begin
+
+ begin
   ProcessRSTQSONumberOrDomesticQTHExchange := False;
 
   if Exchange = '' then
@@ -4071,7 +4072,7 @@ begin
       Result := True;
       exit;
     end;
-  if not StringIsAllNumbers(FirstString) and StringIsAllNumbers(SecondString)
+  if not StringIsAllNumbers(FirstString)
     then // n4af 4.42.7
   begin
     RXData.QTHString := FirstString;
@@ -4085,7 +4086,7 @@ begin
   //  else                                           // N4AF 4.42.9
   //    NumberString := SecondString;
 
-  if not StringIsAllNumbers(SecondString) then
+  if (not StringIsAllNumbers(SecondString)) and (SecondString <> '') then
   begin
     RXData.QTHString := SecondString;
     if ThirdString <> '' then
@@ -4526,6 +4527,8 @@ end;
 
 function ProcessRSTAndQSONumberOrDomesticQTHExchange(Exchange: Str80; var
   RXData: ContestExchange): boolean;
+  var
+  i: integer;
 label
   1;
 
@@ -4535,6 +4538,21 @@ begin
   begin
     ProcessRSTAndQSONumberOrDomesticQTHExchange :=
       ProcessRSTAndQSONumberExchange(Exchange, RXData);
+    Exit;
+  end;
+
+  if ActiveQSOPointMethod = TACQSOPointMethod then         // 4.83.2
+  begin
+ //    if RXData.DomesticQTH <> ''  then
+     if not StringIsAllNumbers(Exchange) then
+      ProcessRSTAndQSONumberOrDomesticQTHExchange :=
+        ProcessRSTAndDomesticQTHExchange(Exchange, RXData)
+        else
+
+         ProcessRSTAndQSONumberOrDomesticQTHExchange :=
+         ProcessRSTAndQSONumberExchange(Exchange, RXData)  ;
+
+
     Exit;
   end;
 
@@ -7078,12 +7096,7 @@ begin
       RXData.QSOPoints := 38;
     if Distance <= 2000 then
       RXData.QSOPoints := 35;
- //   if Distance <= 1000 then    // 4.77.1
- //     RXData.QSOPoints := 31;   // 4.77.1
-    //            if RXData.Band = Band160 then RXData.QSOPoints := round(RXData.QSOPoints * 1.3);
-    //            if RXData.Band = Band80 then RXData.QSOPoints := round(RXData.QSOPoints * 1.25);
-    //            if RXData.Band = Band40 then RXData.QSOPoints := round(RXData.QSOPoints * 1.15);
-    //            if RXData.Band = Band10 then RXData.QSOPoints := round(RXData.QSOPoints * 1.1);
+
   end
   else
     RXData.QSOPoints := 1;
@@ -7150,12 +7163,7 @@ begin
   RXData.QSOPoints := 2;
 end;
 
-{
-    UA4NQSOPointMethod:
-      begin
-        if RXData.Zone <> StrToInt(MyState) then RXData.QSOPoints := 2 else RXData.QSOPoints := 1;
-      end;
-}
+
 WWPMCQSOPointMethod:
 begin
   RXData.QSOPoints := 5;
@@ -7174,16 +7182,7 @@ end;
 
 JTDXQSOPointMethod:
 begin
-  {
-          if RXCty = 'JT' then
-          begin
-            RXData.Prefix := RXData.Callsign;
-            if MyContinent = Asia then RXData.QSOPoints := 4 else RXData.QSOPoints := 8;
-            if MyCountry = 'JT' then RXData.QSOPoints := 0;
-            Exit;
-          end;
-  }
-  if RXData.QTH.Continent <> MyContinent then
+    if RXData.QTH.Continent <> MyContinent then
     RXData.QSOPoints := 3
   else if RXCty <> MyCountry then
     RXData.QSOPoints := 2
@@ -7290,15 +7289,7 @@ end;
 
 GACWWWSACWQSOPointMethod:
 begin
-  {   if (RXData.NumberReceived = 88) and (Contest = Arktika_Spring) then     // 4.66.3 YL-ARCK-YL hooks
-      begin
-        RXData.QSOPoints := 5 ;
-        exit;
-      end;
-
-        if (RXData.NumberReceived <> 88) and (Contest = Arktika_Spring) then
-        RXData.Prefix := '';
-   }
+  
   if RXData.QTH.Continent <> MyContinent then
     RXData.QSOPoints := 3
   else if RXCty <> MyCountry then
@@ -7348,21 +7339,23 @@ begin
   end;
 end;
 
-TACQSOPointMethod:
+TACQSOPointMethod:             // 4.83.2
 if RXData.Band in [Band80..Band10] then
 begin
-  if RXCty = MyCountry then
-    RXData.QSOPoints := 1
-  else
-    RXData.QSOPoints := 2;
-  if RXData.DomMultQTH <> '' then
-  begin
-    if MyState <> '' then
-      inc(RXData.QSOPoints, 6)
-    else
-      inc(RXData.QSOPoints, 2);
-  end;
-end;
+ RXData.QSOPoints := 0;
+ result := length(RXData.QTHString);    // found 'M' in recvd nr ?
+    if RXCty <> MyCountry then
+     RXData.QSOPoints := 2
+      else
+       RXData.QSOPoints := 1;
+ 
+  if (RXData.QTHString[result] = 'M') and  (StringIsAllNumbers(MyState)) then
+   inc(RXData.QSOPoints, 6)
+     else
+      if (RXData.QTHString[result] = 'M') and (not StringIsAllNumbers(MyState)) then
+          inc(RXData.QSOPoints, 2);
+
+ end;
 
 UNDXQSOPointMethod:
 begin
@@ -8194,8 +8187,8 @@ end;
 procedure ProcessPartialCallAndInitialExchange(RXData: ContestExchange);
 
 begin
-  {       if PartialCallEnable or ExchangeMemoryEnable then         // n4af 40.40.1
-         AddCallToPartialList(RXData.Callsign, GetInitialExchangeStringFromContestExchange(RXData));
+          if PartialCallEnable or ExchangeMemoryEnable then         // n4af 40.40.1
+    //     AddCallToPartialList(RXData.Callsign, GetInitialExchangeStringFromContestExchange(RXData));
      GetInitialExchangeStringFromContestExchange(RXData); // n4af 40.40.1       }
 end;
 

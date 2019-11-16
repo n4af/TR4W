@@ -1319,59 +1319,7 @@ begin
   end;
   CloseLogFile;
 
-  {
-    if not OpenFileForRead(FileRead, LogFileName) then exit;
-    repeat
-      repeat
-        ReadLn(FileRead, TempString);
-        Band := GetLogEntryBand(TempString);
-      until (Band <> NoBand) or Eof(FileRead);
-
-      if (Band <> NoBand) then
-        if not ((StringHas(TempString, '*DUPE*')) or (StringHas(TempString, '*ZERO*'))) then
-        begin
-          begin
-            inc(TempQSOTotals[Band]);
-            ExpandTabs(TempString);
-            Call := StandardCallFormat(UpperCase(GetLogEntryCall(TempString)), true);
-          end;
-
-          Continent := CountryTable.GetContinent(Call);
-          Country := CountryTable.GetCountry(Call, true);
-
-          ID := CountryTable.GetCountryID(Country);
-          if ID = 'UA' then
-            ListContinent := UA
-          else
-            if ID = 'K' then
-              ListContinent := USA
-            else
-              if ID = 'VE' then
-                ListContinent := Canada
-              else
-                if ID = 'JA' then
-                  ListContinent := Japan
-                else
-                  case Continent of
-                    NorthAmerica: ListContinent := na;
-                    SouthAmerica: ListContinent := SA;
-                    Europe: ListContinent := eu;
-                    Africa: ListContinent := af;
-                    Asia: ListContinent := ASI;
-                    Oceania: ListContinent := OC;
-                  else ListContinent := UK;
-                  end;
-
-          inc(ContTotals[Band, ListContinent]);
-
-          if ListContinent = UK then
-            if ContTotals[Band, UK] <= MaxUnknownCalls then
-              UnknownCalls[Band, ContTotals[Band, UK] - 1] := Call;
-        end;
-
-    until Eof(FileRead);
-    Close(FileRead);
-  }
+ 
   WriteLn(FileWrite);
   WriteLnVarCenter(FileWrite, ContestTitle);
   //  WriteLn(FileWrite);
@@ -2400,6 +2348,7 @@ var
   hisnr                                 : integer;
   rxnr                                  : integer;
 
+
 begin
   TransmitterIDPos := 83;
   pnr := 0;
@@ -2923,14 +2872,7 @@ if TempRXData.DomMultQTH = '' then
 
         QSONumberAndPossibleDomesticQTHExchange, RSTQSONumberAndDomesticQTHExchange, RSTQSONumberAndPossibleDomesticQTHExchange:
           begin
-{
-IOTA
-QSO: 21000 CW 2002-07-27 1726 G3XTT         599 0014 EU-005 OH9A          599 0883 EU-173
-QSO: 21000 CW 2002-07-27 1728 G3XTT         599 0015 EU-005 9V1YC         599 0331 AS-019
-QSO: 21000 CW 2002-07-27 1732 G3XTT         599 0016 EU-005 S53EO         599 0402 ------
-QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  0362 AF-030
 
-                 }
             asm
             push cMyState
             push nrSent
@@ -3264,7 +3206,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
 
         RSTAndQSONumberOrFrenchDepartmentExchange, RSTAndQSONumberOrDomesticQTHExchange, RSTDomesticQTHOrQSONumberExchange:
           begin
-           if MyState <> '' then
+           if (MyState <> '') and (Contest <> TAC) then      // 4.83.2
             begin
               asm
               push cMyState
@@ -3275,24 +3217,43 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
               end;
             end
             else
-            begin
-              asm
-              push nrSent
-              push RSTSent
-              end;
-              wsprintf(CABRILLO_MYEX, '%-4s %-7d');  // n4af 4.43.12
+             if StringIsAllNumbers(MyState) then
+              begin
+               asm
+               push nrSent
+               push RSTSent
+               end;
+              wsprintf(CABRILLO_MYEX, '%-4s %03u/M   ');  // n4af 4.43.12
               asm add esp,16
               end;
-            end;
+             end
+              else
+               begin
+                asm
+                push nrSent
+                push RSTSent
+                end;
+               wsprintf(CABRILLO_MYEX, '%-4s %03u   ');  // n4af 4.43.12
+               asm add esp,16
+               end;
+              end;
+
 
             if TempRXData.QTHString {.DomMultQTH} <> '' then
             begin
+            rxnr := length(csQTHString);
+             if csQTHString[rxnr-1] = 'M' then
+              begin
+               csQTHString[rxnr-1] :='/';
+               csQTHString[rxnr] :='M';
+
               asm
               push csQTHString
               push RSTReceived
               end;
-              wsprintf(CABRILLO_HISEX, '%-3s %-7s');
+              wsprintf(CABRILLO_HISEX, '%-3s %05s');
               asm add esp,16
+              end;
               end;
             end
             else
@@ -3301,7 +3262,7 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
               push nrReceived
               push RSTReceived
               end;
-              wsprintf(CABRILLO_HISEX, '%-3s %-7u');
+              wsprintf(CABRILLO_HISEX, '%-3s %03u');
               asm add esp,16
               end;
             end;
@@ -3332,9 +3293,9 @@ QSO: 21000 PH 2002-07-27 1734 G3XTT         59  0017 EU-005 ZD9IR         59  03
       end;
 
          if Contest = ARKTIKA_SPRING then
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-14s%-10s'#13#10)
+      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-10s%-10s'#13#10)
      else
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-14s%-10s %-5s'#13#10);
+      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-11s%-10s %-5s'#13#10);
       asm add esp,24
       end;
 
@@ -3905,183 +3866,4 @@ begin
   CloseHandle(tReportFileWrite);
   FilePreview;
 end;
-
-{
-procedure RateReport;
-
-var
-  QSONumber, FirstHourOfTheContest, LastHourOfTheContest, Hour: INTEGER;
-  NumberDifferentBands, NumberHoursWithContacts: INTEGER;
-  Day, LastDay                          : INTEGER;
-  FileName, DayString, Title, TempString: Str80;
-  Band                                  : BandType;
-  Mode                                  : ModeType;
-  CenterSpaces, Space, TotalContacts    : INTEGER;
-  UnderLineString                       : string[150];
-  QSOTotals                             : array[BandType, ModeType] of INTEGER;
-  Destination                           : CHAR;
-  FileRead, FileWrite                   : TEXT;
-
-begin
-  New(RateSheet);
-
-  for Day := 1 to 3 do
-    for Hour := 0 to 23 do
-      for Band := Band160 to All do
-        for Mode := CW to Both do
-          RateSheet^[Day, Hour, Band, Mode] := 0;
-
-//  WriteLn('This procedure will generate a rate sheet for the active log.  This sheet   ');
-//  WriteLn('will show the band by band, hour by hour statistics.');
-
-//  DetermineLogTotals;
-
-  NumberDifferentBands := 0;
-
-  for Band := Band160 to BandLight do
-    for Mode := CW to Phone do
-    begin
-      if LogTotals[Band, Mode] > 0 then
-        Inc(NumberDifferentBands);
-      QSOTotals[Band, Mode] := 0;
-    end;
-
-  if NumberDifferentBands = 0 then Exit;
-
-  if not OpenFileForRead(FileRead, LogFileName) then
-  begin
-    ReportError(LogFileName + ' file not found!!');
-    WaitForKeyPressed;
-    Dispose(RateSheet);
-    Exit;
-  end;
-
-  if not OpenFileForWrite(FileWrite, FileName) then
-  begin
-    ReportError('Unable to open output file or device.');
-    WaitForKeyPressed;
-    Dispose(RateSheet);
-    Exit;
-  end;
-
-  if FileName = '' then ClrScr;
-
-  if Destination <> 'S' then
-  begin
-    WriteLn(FileWrite);
-    WriteLn(FileWrite, Title);
-    WriteLn(FileWrite);
-  end;
-
-  Day := 0;
-
-  QSONumber := 0;
-  Write(QSONumber);
-
-  repeat
-    repeat
-      ReadLn(FileRead, TempString);
-      Band := GetLogEntryBand(TempString);
-    until (Band <> NoBand) or EOF(FileRead);
-
-    if Band <> NoBand then
-      if not ((StringHas(TempString, '*DUPE*')) or (StringHas(TempString, '*ZERO*'))) then
-      begin
-        ExpandTabs(TempString);
-        Mode := GetLogEntryMode(TempString);
-        LastHourOfTheContest := GetLogEntryHour(TempString);
-        Inc(QSOTotals[Band, Mode]);
-
-        case Day of
-          0: begin
-              DayString := GetLogEntryDateString(TempString);
-              FirstHourOfTheContest := GetLogEntryHour(TempString);
-              Day := 1;
-            end;
-
-          1: if DayString <> GetLogEntryDateString(TempString) then
-            begin
-              Day := 2;
-              DayString := GetLogEntryDateString(TempString);
-            end;
-
-          2: if DayString <> GetLogEntryDateString(TempString) then
-              Day := 3;
-        end;
-
-        Hour := GetLogEntryHour(TempString);
-
-        Inc(RateSheet^[Day, Hour, Band, Mode]);
-        Inc(RateSheet^[Day, Hour, All, Both]);
-
-        Inc(QSONumber);
-        GoToXY(1, WhereY);
-        Write(QSONumber);
-      end;
-
-  until Eof(FileRead);
-  Close(FileRead);
-
-  GoToXY(1, WhereY);
-  ClrEol;
-
-  if QSONumber = 0 then Exit;
-  TotalContacts := 0;
-
-  LastDay := Day;
-
-  UnderLineString := '';
-
-  WriteLn(FileWrite);
-  Write(FileWrite, '  HOUR  ');
-  UnderLineString := '  ----  ';
-
-  for Band := Band160 to BandLight do
-    for Mode := CW to Phone do
-      if LogTotals[Band, Mode] > 0 then
-      begin
-        TempString := BandString[Band] + ModeString[Mode];
-        case Length(TempString) of
-          4: TempString := ' ' + TempString + ' ';
-          5: TempString := ' ' + TempString;
-        end;
-        Write(FileWrite, TempString, '  ');
-        UnderLineString := UnderLineString + '------  ';
-      end;
-
-  WriteLn(FileWrite, ' TOTAL   ACCUM');
-  UnderLineString := UnderLineString + ' -----   -----';
-  WriteLn(FileWrite, UnderLineString);
-
-  for Day := 1 to LastDay do
-    for Hour := 0 to 23 do
-      if (((Day = 1) and (Hour >= FirstHourOfTheContest)) or (Day > 1)) and
-        (((Day = LastDay) and (Hour <= LastHourOfTheContest)) or (Day < LastDay)) then
-      begin
-        Write(FileWrite, Hour: 5);
-        for Band := Band160 to BandLight do
-          for Mode := CW to Phone do
-            if LogTotals[Band, Mode] > 0 then
-              Write(FileWrite, RateSheet^[Day, Hour, Band, Mode]: 8);
-        Write(FileWrite, RateSheet^[Day, Hour, All, Both]: 8);
-        TotalContacts := TotalContacts + RateSheet^[Day, Hour, All, Both];
-        WriteLn(Filewrite, TotalContacts: 8);
-        if (Hour = 23) and (Day <> LastDay) then WriteLn(FileWrite);
-      end;
-
-  WriteLn(FileWrite);
-  Write(FileWrite, '  TOTAL');
-
-  for Band := Band160 to BandLight do
-    for Mode := CW to Phone do
-      if LogTotals[Band, Mode] > 0 then
-        Write(FileWrite, QSOTotals[Band, Mode]: 6, '  ');
-
-  Write(FileWrite, ControlL);
-  Dispose(RateSheet);
-  Close(FileWrite);
-  WriteLn;
-  if FileName = '' then WaitForKeyPressed;
-end;
-}
 end.

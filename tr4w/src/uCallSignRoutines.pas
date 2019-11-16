@@ -243,20 +243,7 @@ begin
     StandardCallFormat := FirstPart + '/' + SecondPart;
     Exit;
   end;
-{
-  if SecondPart[1] = 'M' then
-    if length(SecondPart) = 1 then
-    begin
-      StandardCallFormat := FirstPart;
-      Exit;
-    end
-    else
-    begin
-      Delete(SecondPart, 1, 1);
-      StandardCallFormat := StandardCallFormat(FirstPart + '/' + SecondPart, Complete);
-      Exit;
-    end;
-}
+
   if length(Call) = 11 then if (Call[1] = 'V') and (Call[2] = 'U') and (Call[7] = '/') then if Call[8] in ['0', '9'] then
       begin
         StandardCallFormat := Call;

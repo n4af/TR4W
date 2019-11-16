@@ -148,38 +148,7 @@ begin
     if ParseExchangeIntoContestExchange(LogString, RData) then
     begin
       ProcessPartialCallAndInitialExchange(RData);
-          {
-                if (ActiveMultiPort <> NoPort) and (not SendQSOImmediately) then
-                begin
-                  if (not MultiMultsOnly) or
-                    (GetLogEntryMultString(LogString) <> '') then
-                    if K1EANetworkEnable then
-                    begin
-                                        // Don't send notes
-                      if Copy(LogString, 1, 1) <> ';' then
-                      begin
-                        TempString := ConvertN6TRLogStringToK1EANetworkFormat(LogString);
-                        SendMultiMessage(TempString);
-                      end;
-                    end
-                    else
-                    begin
-                      SendMultiCommand(MultiBandAddressArray[ActiveBand], $FF, MultiQSOData, LogString);
-                    end;
-                end
-                else // QSO doesn't make sense - probably a note
-                  if (ActiveMultiPort <> NoPort) and (not SendQSOImmediately) then
-                    if K1EANetworkEnable then
-                    begin
-                                     // I don't know how to do this on the K1EA network
-                    end
-                    else
-                    begin
-                      SendMultiCommand(MultiBandAddressArray[ActiveBand],
-                        $FF, MultiQSOData, LogString);
-                    end;
-                   }
-    end;
+           end;
   end;
 end;
 procedure ProcessCallWindowCommand(Command: Str80);
