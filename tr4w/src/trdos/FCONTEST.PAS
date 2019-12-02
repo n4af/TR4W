@@ -645,33 +645,7 @@ begin
 //        VHFBandsEnabled := True;
       end;
 
-{
-    NYQP:
-      begin
-        Add_KVEKH6KL;
 
-        if FoundMyStateInDomFile then
-          DomesticQTHDataFileName := 'NYQP'
-        else
-          DomesticQTHDataFileName := 'FQP';
-      end;
-
-    FLORIDAQSOPARTY:
-      begin
-        if FoundMyStateInDomFile then
-        begin
-//          DomesticQTHDataFileName := 'FQP_FL';
-          ActiveExchange := RSTDomesticOrDXQTHExchange;
-          ActiveDXMult := ARRLDXCCWithNoUSACanadaKH6OrKL7;
-        end
-        else
-        begin
-//          DomesticQTHDataFileName := 'FQP';
-          ActiveExchange := RSTDomesticQTHExchange;
-        end;
-//        Add_KVEKH6KL;
-      end;
-      }
   FOCMARATHON:
   ExchangeMemoryEnable := True;
 
@@ -1408,13 +1382,7 @@ begin
        ActivePrefixMult := MongolianCallSignPrefix;
       end;
 
- 
-    {RUSSIAN160, RADIOYOC:
-      begin
-        TourDuration := 60;
-//        Sheet.tAutoReset := True;
-        ColumnsArray[logColNumberReceive].Width := 4;
-      end;  }
+
 
     CQIR:
       begin
@@ -1448,48 +1416,17 @@ begin
 //    RADIOMEMORY:
 //      CallsignUpdateEnable := False;
 
-//    TAC:      ActivePrefixMult := Prefix;
-
-
+   PCC:
+   begin
+    ExchangeMemoryEnable := False;
+    SetCursorPos(0,1);
+    INITIALEXCHANGEOVERWRITE := TRUE;
+   end;
 
 
   end;
 
-  {
-    if CMD = 'INTERNET SIX' then
-      begin
-        ActiveBand := Band6;
-        ActiveDomesticMult := GridSquares;
-        ActiveDXMult := CQDXCC;
-        ActiveExchange := RSTDomesticQTHExchange;
-        ActiveQSOPointMethod := InternetSixQSOPointMethod;
-        ContestName := 'Internet 6m Contest';
-        HFBandEnable := False;
-        VHFBandsEnabled := True;
-      end;
-  }
-
-{
-  if CMD = 'QCWA GOLDEN' then
-    begin
-      ActiveExchange := CheckAndChapterOrQTHExchange;
-      ActiveQSOPointMethod := OnePointPerQSO;
-
-      ContestName := 'QCWA Golden Anniversary';
-      //MultByBand := False;
-      //MultByMode := False;
-      //QSOByBand := True;
-      //QSOByMode := True;
-      FoundContest := True;
-      Contest := QCWA;
-    end;
-}
-
-   
-
-  //  ContestTitle := GetYearString + ' ' + ContestName + ' ' + MyCall;
-
-//TempDomesticQTHDataFileName
+  
   if TempDomesticQTHDataFileName <> nil then
   begin
     Windows.lstrcat(DomQTHDataFileName, TempDomesticQTHDataFileName);

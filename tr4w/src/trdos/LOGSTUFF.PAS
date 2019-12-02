@@ -2378,6 +2378,12 @@ var
 
 begin
   LooksLikeACallSign := False;
+ if contest = PCC then  // 4.83.7
+  begin
+   if (length(Call) = 3) and (Call[2] = '/') then
+    LooksLikeACallSign := False;
+      Exit;
+  end;
 
   {MMAA contest}
   if length(Call) > 3 then
@@ -4541,7 +4547,7 @@ begin
     Exit;
   end;
 
-  if ActiveQSOPointMethod = TACQSOPointMethod then         // 4.83.2
+  if ActiveQSOPointMethod = PCCQSOPointMethod then         // 4.83.2
   begin
  //    if RXData.DomesticQTH <> ''  then
      if not StringIsAllNumbers(Exchange) then
@@ -7339,9 +7345,10 @@ begin
   end;
 end;
 
-TACQSOPointMethod:             // 4.83.2
-if RXData.Band in [Band80..Band10] then
+PCCQSOPointMethod:             // 4.83.2
 begin
+if RXData.Band in [Band80..Band10] then
+
  RXData.QSOPoints := 0;
  result := length(RXData.QTHString);    // found 'M' in recvd nr ?
     if RXCty <> MyCountry then
@@ -7356,7 +7363,7 @@ begin
           inc(RXData.QSOPoints, 2);
 
  end;
-
+                                                                   
 UNDXQSOPointMethod:
 begin
   if RXData.QTH.Continent <> MyContinent then
@@ -7482,7 +7489,7 @@ PortugalDay:    // 4.71.4
 
  RPX:
   begin
- 
+
    if (RXCty = 'UA') or (RXCty = 'UA2') or (RXCty = 'UA9')then
      RXData.QSOPoints := 10
       else
@@ -7491,13 +7498,32 @@ PortugalDay:    // 4.71.4
   end;
 
   UQRQCPM:                      // 4.82.3
-  if (RXData.QTH.Continent <> MyContinent) then
-   RXData.QSOPoints := 4
-    else
-     if (RXCty <> MyCountry) then
-      RXData.QSOPoints := 3
-       else
-        RXData.QSOPoints := 2;
+  begin
+   if (RXData.QTH.Continent <> MyContinent) then
+    RXData.QSOPoints := 4
+     else
+      if (RXCty <> MyCountry) then
+       RXData.QSOPoints := 3
+        else
+         RXData.QSOPoints := 2;
+  end;
+
+   OKOMRTTY:        // 4.83.4
+   begin
+    if RXData.Band in [Band80..Band40] then
+     if (RXData.QTH.Continent <> MyContinent) then
+       RXData.QSOPoints := 6
+        else
+         RXData.QSOPoints := 3;
+
+     if RXData.Band in [Band20..Band10] then
+      if (RXData.QTH.Continent <> MyContinent) then
+      RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 1;
+  end;
+
+
 
 
 end; { of c ase }

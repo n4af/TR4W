@@ -987,8 +987,6 @@ begin
         end;
 
     if ParametersOkay(CallWindowString, ExchangeWindowString, ActiveBand, ActiveMode, ActiveRadioPtr.LastDisplayedFreq, ReceivedData) then
-//      if (ProcessExchange(ExchangeWindowString, ReceivedData)) and (GoodCallSyntax(CallWindowString)) then
-
     begin
       if ActiveMode = CW then
       begin

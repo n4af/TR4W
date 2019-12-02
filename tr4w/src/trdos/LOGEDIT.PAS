@@ -2631,16 +2631,7 @@ begin
         end
         else
         begin
-          {
-          if ActiveQSOPointMethod = RussianDXQSOPointMethod then
-             begin
-                LocateCall(Call, TempQTH, True);
-                if (TempQTH.CountryID[1] = 'U') then
-                   if (TempQTH.CountryID[2] = 'A') then
-                      TempString := GetOblastID(Call);
-             end
-          else
-          }
+          
           TempString := GetVEInitialExchange(Call);
         end;
 
@@ -3061,6 +3052,8 @@ begin
         RData.Prefix := RData.Callsign;
     RussianPrefixes: if Rdata.QTH.CountryID = 'UA' then
         RData.Prefix := RData.Callsign;
+    // CzechRepublicCallsignPrefix: if RData.QTH.CountryID = 'OK' then
+    //      RDATA.Prefix := RDATA.Callsign;
     GCStation:
       begin
         if (RData.Callsign = 'RK1G') or (RData.Callsign = 'R3K') or

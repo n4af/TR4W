@@ -761,7 +761,7 @@ begin
 
     NRAUBALTICCW, NRAUBALTICSSB, RUSSIAN160, {WWPMC,} UBACW, UBASSB: tCQExchange := ' 5NN # ' + MyState;
 
-    TAC, IOTA, HELVETIA: if MyState <> '' then tCQExchange := ' 5NN # ' + MyState else tCQExchange := ' 5NN #';
+    PCC, IOTA, HELVETIA: if MyState <> '' then tCQExchange := ' 5NN # ' + MyState else tCQExchange := ' 5NN #';
 
     EUSPRINT_SPRING_SSB, EUSPRINT_AUTUMN_CW, EUSPRINT_AUTUMN_SSB, EUSPRINT_SPRING_CW:
       begin
@@ -820,18 +820,7 @@ var
 
   GetRidOfPrecedingSpaces(FileString^);
   GetRidOfPostcedingSpaces(FileString^);
-{
-  if StringHas(FileString^, 'INPUT CONFIG FILE') then
-  begin
-    Windows.ZeroMemory(@TR4W_INPUT_CFG_FILENAME, SizeOf(TR4W_INPUT_CFG_FILENAME));
-    FileName := PostcedingString(FileString^, '=');
-    GetRidOfPrecedingSpaces(FileName);
-    Windows.CopyMemory(@TR4W_INPUT_CFG_FILENAME, @FileName[1], length(FileName));
-    EnumerateLinesInFile(CFGFilesArray[cfgINPUT], EnmuCFGFile, True);
-  end;
-}
-//  Windows.ZeroMemory(@ID, SizeOf(ID));
-//  Windows.ZeroMemory(@CMD, SizeOf(CMD));
+
 
   ID := PrecedingString(FileString^, '=');
   CMD := PostcedingString(FileString^, '=');

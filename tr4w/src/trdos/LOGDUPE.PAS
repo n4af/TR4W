@@ -1806,11 +1806,12 @@ begin
     RXData.DXMult := mo.IsDXMult(RXData.QTH.Country, GetAddMultBand(DXCCMultByBand, MultBand), MultMode);
 
   if (RXData.Prefix <> '') and DoingPrefixMults then
-   if contest = TAC then        // 4.83.2
-    if RXData.QTH.CountryID = MyCountry then
-     RXData.PrefixMult := False;
-    RXData.PrefixMult := mo.IsPxMult(RXData.Prefix, MultBand, MultMode);
-
+   begin        // 4.83.6
+    if (contest = PCC) and  (RXData.QTH.CountryID = MyCountry) then
+            RXData.PrefixMult := False
+        else
+     RXData.PrefixMult := mo.IsPxMult(RXData.Prefix, MultBand, MultMode);
+   end;
     if (Contest = NZFIELDDAY) then
     if (RXData.Zone = StrToInt(MyZone)) or (RXData.Zone = 00) then   exit;  //n4af 4.41.6
 

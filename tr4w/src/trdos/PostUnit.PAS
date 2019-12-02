@@ -3206,7 +3206,7 @@ if TempRXData.DomMultQTH = '' then
 
         RSTAndQSONumberOrFrenchDepartmentExchange, RSTAndQSONumberOrDomesticQTHExchange, RSTDomesticQTHOrQSONumberExchange:
           begin
-           if (MyState <> '') and (Contest <> TAC) then      // 4.83.2
+           if (MyState <> '') and (Contest <> PCC) then      // 4.83.2
             begin
               asm
               push cMyState
@@ -3240,20 +3240,19 @@ if TempRXData.DomMultQTH = '' then
 
 
             if TempRXData.QTHString {.DomMultQTH} <> '' then
-            begin
-            rxnr := length(csQTHString);
+           begin
+         {   rxnr := length(csQTHString);
              if csQTHString[rxnr-1] = 'M' then
               begin
                csQTHString[rxnr-1] :='/';
                csQTHString[rxnr] :='M';
-
+         }
               asm
               push csQTHString
               push RSTReceived
               end;
               wsprintf(CABRILLO_HISEX, '%-3s %05s');
               asm add esp,16
-              end;
               end;
             end
             else

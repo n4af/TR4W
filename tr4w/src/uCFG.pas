@@ -798,14 +798,7 @@ begin
 
             Exit;
           end;
-{
-  if pshortstring(Command)^ = 'REMINDER' then
-  begin
-    ProcessReminder(pshortstring(Command)^, CustomCMD);
-    Result := True;
-    Exit;
-  end;
- }
+
   if pshortstring(Command)^ = 'TOTAL SCORE MESSAGE' then
   begin
     //ProcessTotalScoreMessage(pshortstring(Command)^, CustomCMD);
