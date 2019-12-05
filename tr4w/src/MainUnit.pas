@@ -967,7 +967,7 @@ begin
       if (ExchangeWindowString = '') and (ExchangeMemoryEnable) then    // 4.83.3
       begin
         if not LeaveCursorInCallWindow then tExchangeWindowSetFocus;
-        tSetExchWindInitExchangeEntry;
+        tSetExchWindInitExchangeEntry; // 4.83.9
         CheckAndSetInitialExchangeCursorPos;
       end;
 
@@ -1068,7 +1068,7 @@ begin
       ((not tCallWindowStringIsDupe) or
       (not AutoDupeEnableSandP)) then
 
-    begin
+      begin
 //      ExchangeHasBeenSent := False;
         if GoodCallSyntax(CallWindowString) then
       begin
@@ -1089,12 +1089,13 @@ begin
   DisplayGridSquareStatus(CallWindowString);
   ShowStationInformation(@CallWindowString);
 
-  if (ExchangeWindowString = '')  and (ExchangeMemoryEnable) then    // 4.83.3
-  begin
+  if (ExchangeWindowString = '')  {and (ExchangeMemoryEnable)} then    // 4.84.1
+   begin
+    if ExchangeMemoryEnable then
     tSetExchWindInitExchangeEntry;
     CheckAndSetInitialExchangeCursorPos;
     Exit;
-  end;
+   end;
 
   VisibleLog.DoPossibleCalls(CallWindowString);
   //  DDX(MaybeRespondToMyCall);
@@ -3794,20 +3795,7 @@ begin
      DoABeep(ThreeHarmonics);
      Exit;
    end;
-// removed 4.71.3
-{
- if (freq = 0) and (tShowFrequencyInLog) and (TwoRadioMode) then              // 4.68.7   // 4.68.15
-  begin
-    QuickDisplay(TC_FREQ_ZERO);
-    sleep (800);
-  end;
- }
-{ if not tShowFrequencyInLog then             // 4.68.7     4.68.15
-   begin
-    QuickDisplay(TC_FREQ_OFF);
-     sleep (500);
-   end;
-                 }
+
   LogBadQSOString := '';
 
   { Need this in case we exit soon }

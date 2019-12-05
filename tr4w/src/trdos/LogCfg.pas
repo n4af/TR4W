@@ -761,7 +761,7 @@ begin
 
     NRAUBALTICCW, NRAUBALTICSSB, RUSSIAN160, {WWPMC,} UBACW, UBASSB: tCQExchange := ' 5NN # ' + MyState;
 
-    PCC, IOTA, HELVETIA: if MyState <> '' then tCQExchange := ' 5NN # ' + MyState else tCQExchange := ' 5NN #';
+   PCC, IOTA, HELVETIA: if MyState <> '' then tCQExchange := ' 5NN # ' + MyState else tCQExchange := ' 5NN #';
 
     EUSPRINT_SPRING_SSB, EUSPRINT_AUTUMN_CW, EUSPRINT_AUTUMN_SSB, EUSPRINT_SPRING_CW:
       begin

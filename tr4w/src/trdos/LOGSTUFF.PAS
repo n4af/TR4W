@@ -2381,8 +2381,10 @@ begin
  if contest = PCC then  // 4.83.7
   begin
    if (length(Call) = 3) and (Call[2] = '/') then
+    begin
     LooksLikeACallSign := False;
       Exit;
+    end;
   end;
 
   {MMAA contest}
