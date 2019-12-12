@@ -107,7 +107,7 @@ type
     FOCNumber: boolean;
     Kids: boolean;
     Name: boolean;
-//    PostalCode: boolean;
+//  PostalCode: boolean;
     Power: boolean;
     Precedence: boolean;
     QSONumber: boolean;
@@ -126,7 +126,7 @@ type
   TAdditionalMultByBand = (dmbbDefauld, dmbbAllBand);
   Yaesu5Bytes = array[0..4] of Byte;
   FileNameType = array[0..MAX_PATH - 1] of Char;
-  OperatorType = array[0..6] of Char;
+  OperatorType = array[0..10] of Char;  // 4.84.3
   ZoneModeType = (CQZoneMode, ITUZoneMode);
 
 const
@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.84.0' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.84.3' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'December 1, 2019' ;
+  TR4W_CURRENTVERSIONDATE               = 'December 12, 2019' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -1538,14 +1538,18 @@ type
 
 {01}//  res8:                Byte;
 {01}//  res9:                Byte;
-{01}//  res10:               Byte;
+{01}//  res10:               Byte;   // 4.84.3
+{01}//  res11:               Byte;   // 4.84.3
+{01}//  res12:               Byte;   // 4.84.3
+{01}//  res13:               Byte;   // 4.84.3
+
+
 {******************************}
 
-{01}  res11:               Byte;
-
-{01}  res12:               Byte;
-{01}  res13:               Byte;
-{01}  res14:               Byte;
+//{01}  res11:               Byte;       // 4.84.3
+//{01}  res12:               Byte;       // 4.84.3
+//{01}  res13:               Byte;       // 4.84.3
+//{01}  res14:               Byte;       // 4.84.3
 {01}  res15:               Byte;
 
 {01}  res16:               Byte;
@@ -2979,7 +2983,7 @@ QSOPartiesCount = 14;
  ({Name: 'GAGARIN-CUP';                }Email: nil;                      DF: nil;                 WA7BNM:  367; {SK3BG: 'ygintc';     } QRZRUID: 82  ; Pxm: GCStation; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:GagarinCupQSOPointMethod),
  ({Name: 'GENERAL QSO';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTNameAndQTHExchange;                       XM:NoDXMults; QP:OnePointPerQSO),
  ({Name: 'GRID LOC';                   }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: NameAndPossibleGridSquareExchange;           XM:NoDXMults; QP:OnePointPerQSO),
- ({Name: 'HA DX';                      }Email: nil;                      DF: 'hungary';           WA7BNM:  228; {SK3BG: '`c';      } QRZRUID: 116 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:NoDXMults; QP:HADXQSOPointMethod),
+ ({Name: 'HA DX';                      }Email: nil;                      DF: 'hungary';           WA7BNM:  228; {SK3BG: '`c';      } QRZRUID: 116 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:CQDXCC; QP:HADXQSOPointMethod),     // 4.84.2
  ({Name: 'YUDX ';                      }Email: nil;                      DF: 'yu';                WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:CQDXCC; QP:YUDXQSOPointMethod),     // 4.57.5
  ({Name: 'UKEI ';                      }Email: nil;                      DF: 'uk-ei';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQSONUMBERAndPossibleDomesticQTHExchange;           XM:CQDXCC; QP:UKEIQSOPointMethod),     // 4.58.2
  ({Name: 'HELVETIA';                   }Email: nil;                      DF: 'swiss';             WA7BNM:  326; {SK3BG: 'helvc';      } QRZRUID: 157 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;  XM:ARRLDXCC; QP:HelvetiaQSOPointMethod),          // 4.54.6 issue 214

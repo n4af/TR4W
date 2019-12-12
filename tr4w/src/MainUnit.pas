@@ -4436,7 +4436,7 @@ begin
       begin
         showwarning(TC_ERRORINLOGFILE);
         CloseLogFile;
-        halt;
+        halt;           // 4.84.3
       end;
     end;
   end
