@@ -1,108 +1,472 @@
-127.0.0.1:7000
-telnet.reversebeacon.net:7000   
-dl4rck.ham-radio-op.net:8000    
-dxusa.net:7300        
-65.172.152.29:7300    
-k1aj.mine.nu:7300     
-K1RFI.com:7300        
-k1eu.dynip.com:23      
-dx.w1gq.net:23                  
-dxc.kb1h.com:7300              
-dx.w1nr.net:23         
-173.255.227.205       
-usdx.w1nr.net:23       
-173.255.232.93        
-dxc.ww1r.com:7300               
-k1ttt.net:23                     
-k2can.net:23           
-173.87.85.242         
-dxc.wc2l.com:23                
-dxc.k2ls.com:23                 
-dxc.aa2mf.net:23                 
-w3lpl.net:23                    
-dx.k3lr.com:23         
-75.185.154.114        
-dxc.wd4ixd.net:23               
-dxc.wc4j.net:23                 
-dxc.w4ml.net:23                 
-skcc.matrixlist.com:7300        
-208.111.3.150:7300   
-rn6bn.73.ru
-nadxc.no-ip.org:7300  
-75.148.198.113        
-dxspots.com:23         
-204.221.76.52         
-dxc.ab5k.net:23        
-dxc-us.ab5k.net:23     
-usrdude.webhop.net:7300         
-k6exo.dyndns.org:7300 
-w6kk.zapto.org:7300   
-ucsbdx.ece.ucsb.edu:7300        
-128.111.56.240:7300   
-n6ws.no-ip.org:7300   
-www.k7ek.net:9000              
-www.kl7g.org:8000              
-dxc.nc7j.com:23        
-n7od.pentux.net:23               
-n7xy.net:7300                  
-n8noe.us                       
-n8noe.us:7373                  
-w9bg.com:23                     
-w9bg.com:7373                  
-dxc.f2f.us:7300                
-n9kt.homenet.org:8000          
-w9odd.bien.mu.edu     
-134.48.91.173         
-kr9u.net:23                     
-soliton.csl.illinois.edu:8000   
-dxc.w9zrx.net:23       
-w0mw.dynip.com:23               
-wa0roi.no-ip.com:23             
-db0spc.myvnc.com:8000 
-db0sue.de:8000        
-dxfun.com:8000        
-eadx.org              
-213.97.191.228        
-dx.ea7urc.org:8000    
-150.214.111.198:8000  
-gb7dxg.shacknet.nu:7300         
-gb7mbc.spoo.org:8000  
-gb7nhr.shacknet.nu:7300         
-g3ldi.shacknet.nu:7000
-dx.hu:9000            
-dx.arilimbiate.net:7300         
-195.43.189.178:8000   
-195.43.189.178:8000   
-ik4icz.dyndns.org:8000
-ik7imo.dyndns.org:7000
-ik7qlz.dyndns.org:7000
-ik7uxw.dyndns.org:7300
-ik8hjc.dyndns.org:8000
-ik8vrn.dyndns.org:7000
-iz5fsa.homedns.org:7300         
-dx.iz7auh.net:8000    
-kp4jrs.dyndns.org     
-oh1ab.dy.fi:8000      
-213.186.225.90:8000   
-on0dxk.dyndns.org:8000
-oz5bbs.no-ip.org:8000 
-dynamically assigned  
-pa1rbz.dyndns.org:9000
-pa4jj.ham-radio-op.net:7300     
-dxc.pi4cc.nl:8000     
-dx.feerc.ru:8000      
-bonaparte.infrax.si:41112       
-sv2hrt.ath.cx:7300    
-ve1dxi.no-ip.com:23    
-dx.fireroute.com:23    
-dx.middlebrook.ca:8000
-64.59.129.23:8000     
-dxc.ve7cc.net:23       
-ve9emo.gnb.ca         
-205.174.162.164       
-www.ve9sc.com:6300    
-dxc.ardi.lv:8000      
-yo8saw.netroute.ro:7300         
-yv6btf.no-ip.org:8000 
-olson.net.nz:9000     
-zl2arn.dyndns.org:7300
+dxc.dx.or.kr:23,AR-Cluster
+7n4twl.homeip.net:8000,DX Spider
+9a0dxc.hamradio.hr:8000,DX Spider
+9a0dxv.hamradio.hr:8000,DX Spider
+62.150.41.82:8000,AR-Cluster
+9m2pju.hamradio.my:7300,DX Spider
+50.182.225.11:23,CC Cluster
+dxspots.com:7300,CC Cluster
+dxc.ai9t.com:7300,AR-Cluster
+dxc.ai9t.com:7373,AR-Cluster
+58.244.248.177:7373,AR-Cluster
+spot.ba2ia.com:7373,AR-Cluster
+lowband.club:7300,DX Spider
+dx.5iyou.cn:7300,DX Spider
+BG8FFE.XICP.NET:7373,DX Spider
+BG8FFE.XICP.NET:7373,DX Spider
+WWW.BG8NUD.COM:7373,AR-Cluster
+103.207.69.56:7300,DX Spider
+spots.bi4scc.net:7300,AR-Cluster
+146.83.196.31:9000,DxNet
+cluster.arlc.pt:7373,DX Spider
+hamradio.isel.ipl.pt:41112,DX Spider
+cluster.no-ip.org:7300,DX Spider
+ct1enq.myvnc.com:35000,AR-Cluster
+cu3hy.duckdns.org:7300,DX Spider
+cx2sa.net:9000,DxNet
+cx2sa.net:7300,DX Spider
+www.db0erf.de:41113,DX Spider
+db0fhn.efi.fh-nuernberg.de:7300,DX Spider
+dx.prgm.org:41112,DX Spider
+db0spc.ath.cx:8000,DX Spider
+db0sue.de:8000,DX Spider
+dd5xx.dxcluster.net:7000,DX Spider
+rbn.dh8wr.com:7373,AR-Cluster
+ccc.dh8wr.com:7373,CC Cluster
+dl0rtg-2.spdns.eu:7300,DX Spider
+37.120.185.166:7373,AR-Cluster
+dl8fcl.dyndns.org:8000,DX Spider
+dl8las.dyndns.org:7301,CW Skimmer
+dxc.funkerportal.de:443,OTHER
+dxcluster.dq8z.de:23,AR-Cluster
+e73du.no-ip.org:7300,DX Spider
+185.73.168.155:23,AR-Cluster
+campelo.cdf.udc.es:8000,DX Spider
+ea2cw.ddns.net:7300,CC Cluster
+rcfcloud.dyndns.org:7300,DX Spider
+dx.ea2urv.com:7300,DX Spider
+ea3aks.org:8000,DX Spider
+ea3aks.org:41112,CLX
+ea4fit.ddns.net:8000,DX Spider
+ea4fit.ddns.net:7373,CC Cluster
+ea4rch.dxfun.com:8000,DX Spider
+eadx.org:7300,DX Spider
+dx.ea5rci.com:8000,DX Spider
+ea5urm.dns2go.com:7000,DX Spider
+dxmaps.com:7300,DX Spider
+ea7urg.es:8001,DX Spider
+dx.ea7urm.org:8000,DX Spider
+dx.ed1zac.net:8000,DX Spider
+80.32.111.228:9000,DX Spider
+mayodx.ath.cx:7300,DX Spider
+shandx.ath.cx:5000,DX Spider
+84.74.112.8:7300,DX Spider
+212.24.100.199:7300,DX Spider
+f1oyp-1.ampr.org:7000,DX Spider
+f1oyp.no-ip.org:7400,DX Spider
+f1oyp.no-ip.org:7300,AR-Cluster
+f1oyp.no-ip.org:7373,DX Spider
+82.64.40.245:7300,DX Spider
+f4erg.hd.free.fr:9000,DX Spider
+ham.crx.cloud:7300,OTHER
+dxcluster.f4gve.net:7300,DX Spider
+lecluster.f5len.org:7373,DX Spider
+f5mzn.org:9000,DX Spider
+dxspider.sysinf.fr:7300,DX Spider
+78.198.83.131:8000,DX Spider
+f6bvp.org:7300,DX Spider
+clx.lunique.fr:9000,CLX
+f6gcp-pat.dyndns.org:7300,DX Spider
+dx.ldxg.fr:8000,DX Spider
+dxcluster.arp75.org:7373,DX Spider
+f8coj.no-ip.org:7300,DX Spider
+dxc.g3lrs.org.uk:7300,DX Spider
+g6nhu.getmyip.com:7300,DX Spider
+g7vjr.org:7300,OTHER
+gb7baa.com:7300,DX Spider
+gb7djk.dxcluster.net:7300,DX Spider
+90.155.35.170:7300,DX Spider
+GB7DXG.lebs.org.uk:7373,CC Cluster
+gb7dxg-1.lebs.org.uk:7300,DX Spider
+81.149.0.149:7300,CC Cluster
+gb7cow.dyndns.org:9000,DxNet
+www.gb7mbc.net:8000,DX Spider
+gb7rau.dxcluster.net:7374,DX Spider
+cluster.g3ldi.co.uk:7000,CC Cluster
+gb7ujs.ham-radio-op.net:7373,DX Spider
+dx.hu:9000,DX Spider
+kh6am.no-ip.org:7550,CW Skimmer
+kh6am.ddns.net:7551,CW Skimmer
+spider.ham-radio.ch:8000,DX Spider
+dxc.iapc.ch:8000,DX Spider
+www.hb9on.org:8000,DX Spider
+78.47.138.186:7300,DX Spider
+hg8lxl.ham.hu:8000,DX Spider
+hp2at.privatedns.org:9000,DX Spider
+hp2ng.privatedns.org:7300,DX Spider
+hp2at.privatedns.org:7300,DX Spider
+hs0zer.no-ip.com:9000,DxNet
+i0inu.dyndns.org:7300,DX Spider
+i0ojj.mooo.com:8000,DX Spider
+swlcluster.homepc.it:7300,DX Spider
+ik3stg.ddns.net:8000,DX Spider
+dxcluster.i8zse.eu:7300,DX Spider
+ik2duw.homepc.it:7300,DX Spider
+ik2xde.ddns.net:8000,CC Cluster
+ik3edj.dxgang.net:9000,DX Spider
+ik4icz-5.dyndns.org:7300,CC Cluster
+ik4icz.dyndns.org:8000,DX Spider
+ik5pwj-6.dyndns.org:8000,DX Spider
+ik6ihl.dyndns.org:7300,DX Spider
+82.63.231.82:8000,DX Spider
+ik6xmi.homepc.it:8000,DX Spider
+ik7imo.ddns.net:7000,DX Spider
+ik7nxu.dyndns.org:9000,DxNet
+ik7nxu.dyndns.org:7300,DX Spider
+ik7qlz.dyndns.org:7000,DX Spider
+ik7uxw.dyndns.org:7300,DX Spider
+ik7xlw.dyndns.org:7300,DX Spider
+ik8hjc.dyndns.org:8000,DX Spider
+ik8vkw.no-ip.biz:9001,DX Spider
+ik8vkw.no-ip.biz:7300,DxNet
+cluster.iq0lt.net:7300,DX Spider
+185.58.193.163:7300,DX Spider
+cluster.ari-rivarolo.org:7000,DX Spider
+iq1la-6.dyndns-ip.com:7300,DX Spider
+aribra.it:7000,DX Spider
+88.62.17.250:64300,DX Spider
+77.43.115.57:7373,AR-Cluster
+dx.arilimbiate.it:7300,DX Spider
+dxcluster.arimodena.it:8000,DX Spider
+80.205.215.149:8000,DX Spider
+160.97.55.211:80,DxNet
+iq8pq.aripozzuoli.com:9000,DX Spider
+iq8rb.rblob.com:8000,DX Spider
+79.9.210.9:7300,DX Spider
+kwos.dyndns.org:7373,CC Cluster
+ir2ugi.dyndns.org:9500,DX Spider
+ir3dxc.net:41112,DX Spider
+dxc.aricesena.it:8000,DX Spider
+82.51.241.1:8000,DX Spider
+it9obk.org:41112,DX Spider
+iv3scp.dyndns.org:7300,DX Spider
+82.91.115.48:8000,DX Spider
+iw0qnlserver.ns0.it:9002,AR-Cluster
+iw1psc-6.ddns.net:7300,DX Spider
+cluster.hrdlog.net:7300,DX Spider
+cluster.hrdlog.net:7373,AR-Cluster
+1972.dyndns.tv:7300,DX Spider
+www.dxcluster.world:23,DX Spider
+0.0.0.0:0,CC Cluster
+iw2noy.ddns.net:7300,DX Spider
+dx.iw3fvz.it:8000,DX Spider
+ham.homelinux.org:8000,DX Spider
+spider.iw8pgt.org:8000,DX Spider
+iw9edp.ddns.net:7300,DX Spider
+iw9fdd.homeip.net:7300,DX Spider
+dxspider.iw9fra.com:7300,DX Spider
+clx.iw9gtd.it:7300,DX Spider
+iz0awg.it:7300,DX Spider
+clx.noantri.org:23,AR-Cluster
+dxcluster.iz0tws.com:7300,DX Spider
+cluster-iz0uin.dlinkddns.com:7300,DX Spider
+www.iz3lsv.net:8000,DX Spider
+cluster.iz3mez.it:8000,DX Spider
+www.iz5fsa.net:8000,DX Spider
+iz5ilu.ns0.it:7300,DX Spider
+79.23.57.37:0,AR-Cluster
+cluster.cisarabruzzo.org:7300,DX Spider
+dx.iz7auh.net:8000,DX Spider
+iz8bri.dyndns.org:9000,CC Cluster
+iz8dmz.no-ip.org:8000,DX Spider
+iz8gcb.ddns.net:7300,DX Spider
+dx.iz8mbw.net:7300,DX Spider
+ja2yyf.d2g.com:23,AR-Cluster
+dxcluster.jp:7300,DX Spider
+bld.dxscape.com:8000,DxNet
+ja3yaq.ampr.org:9000,DX Spider
+jh1rfm.ddo.jp:9000,DxNet
+jh1rfm.ddo.jp:7300,DX Spider
+jh2zyy.d2g.com:23,AR-Cluster
+www.610dx.com:41112,CLX
+dx-cluster.com:8877,AR-Cluster
+dxspider.jk1zrw.org:7300,DX Spider
+K0DIV.NET:23,CC Cluster
+pi.k0pir.us:7300,DX Spider
+k0wl.ddns.net:23,AR-Cluster
+dx.byrg.net:0,DX Spider
+dxc.k0xm.net:7300,CC Cluster
+k1eu.dynip.com:23,AR-Cluster
+k1rfi.com:7300,DX Spider
+sebago.ddns.net:7373,AR-Cluster
+k1ttt.net:7373,AR-Cluster
+k1vu.miketheactuary.com:4242,AR-Cluster
+K2CAN.NET:23,CC Cluster
+dxc.k2ls.com:23,DX Spider
+216.135.40.104:7300,DX Spider
+dx.k3lr.com:23,AR-Cluster
+dxc.k4ea.net:23,AR-Cluster
+k4jw.no-ip.com:41414,DX Spider
+dxc.k4kyd.com:7300,DX Spider
+K4MD.no-ip.com:23,AR-Cluster
+cluster-us.dx-is.com:7300,DX Spider
+cluster-eu.dx-is.com:7300,DX Spider
+k4zr.no-ip.org:7300,DX Spider
+dxc.tdxs.net:7373,AR-Cluster
+dxc.k5jz.net:7373,AR-Cluster
+k7ar.net:7374,AR-Cluster
+k7ek.ddns.net:9000,CC Cluster
+k8az.no-ip.com:23,AR-Cluster
+dxc.k9aj.net:23,AR-Cluster
+soliton.csl.illinois.edu:8000,DX Spider
+dx.ka2pbt.com:7300,DX Spider
+96.27.205.110:7373,AR-Cluster
+kb2faf.net:7300,DX Spider
+kb2sse.dyndns.org:7300,DX Spider
+dx.scarcnj.org:7300,DX Spider
+kb5vjy.com:8000,DX Spider
+www.kb8pmy.net:7300,DX Spider
+kc5nyo.dns2go.com:23,AR-Cluster
+dxspots.kc9aop.net:7300,DX Spider
+kc9gwk.squaretfarm.com:7300,DX Spider
+kd8atf.ddns.net:7300,DX Spider
+ke0cqf.120v.ac:7300,DX Spider
+ke2oi.dyndns.org:7300,DX Spider
+themaincomputer.net:7300,DX Spider
+KF4LLF.no-IP.org:2300,CC Cluster
+dxfinder.bfielding.com:7300,DX Spider
+98.181.43.23:7300,CC Cluster
+kn2m.d2g.com:23,CC Cluster
+dxc.kn4f.net:23,AR-Cluster
+kn9n.no-ip.org:7300,DX Spider
+136.145.86.189:23,AR-Cluster
+kq8m.no-ip.org:7373,AR-Cluster
+kq8m.no-ip.org:7374,AR-Cluster
+kq8m.no-ip.org:3608,AR-Cluster
+kq8m.no-ip.org:23,AR-Cluster
+spots.qsoparty.com:7300,DX Spider
+dx.ultradx.com:23,AR-Cluster
+dxc.ky4xx.com:7300,DX Spider
+dxc.ky9j.com:7300,DX Spider
+193.75.61.192:7300,DX Spider
+la3waa.ddns.net:8000,CC Cluster
+la7q.ddns.net:9000,CC Cluster
+lu9da.no-ip.org:9000,DX Spider
+nakz.ddns.net:8000,DX Spider
+lz0dxc.tabakov.net:7300,DX Spider
+cluster.lz1kaa.com:7300,CC Cluster
+dx.m0kgx.com:7300,DX Spider
+dx.m0nzo.uk:7300,DX Spider
+mb6wv.ddns.net:7373,DX Spider
+dx.onlineradioclub.org:7300,DX Spider
+n0cda.homedns.org:7300,DX Spider
+cluster.dxcentral.com:23,DX Spider
+n1uan.org:7300,DX Spider
+dxc.n2ki.com:7300,DX Spider
+dxc.n2wls.com:7300,DX Spider
+home.n3tuq.com:2323,CC Cluster
+N3UA.HOPTO.ORG:7373,AR-Cluster
+dxc.n4den.us:7373,CC Cluster
+n4dw.ddns.net:7300,DX Spider
+n4lem.net:7300,AR-Cluster
+dx.harwood.com:8000,DX Spider
+dxc.n4zkf.com:23,AR-Cluster
+dxc.n4zkf.com:7373,CC Cluster
+dxc.n5uxt.org:23,AR-Cluster
+n6ws.ddns.net:7302,DX Spider
+n6ws.ddns.net:7300,DX Spider
+n7od.pentux.net:23,AR-Cluster
+dxc.n7tr.com:7300,AR-Cluster
+dxc.n7tr.com:7373,AR-Cluster
+n8dxe.dxengineering.com:23,AR-Cluster
+n8dxe.dxengineering.com:7373,AR-Cluster
+76.236.93.115:7300,DX Spider
+dx.n8noe.us:23,AR-Cluster
+dxc.n8usk.com:7373,DX Spider
+n9ai.no-ip.org:7373,AR-Cluster
+dxc.n9bc.com:7300,DX Spider
+dx.n9jr.com:7300,DX Spider
+n9kt.hamshack.info:8000,DX Spider
+uronode.n9lya.ampr.org:7300,DX Spider
+N9PMO.NO-IP.ORG:7373,AR-Cluster
+n9vi-bbs.from-in.com:7323,AR-Cluster
+n9vi-bbs.from-in.com:7373,AR-Cluster
+na7kr.na7kr.us:9000,DX Spider
+dxc.nc7j.com:23,AR-Cluster
+dxc.nc7j.com:7373,AR-Cluster
+dxc.nc7j.com:7300,CW Skimmer
+dxc.nc7j.com:7200,OTHER
+dxc.ng9r.com:23,CC Cluster
+nk7z-cluster.ddns.net:7373,AR-Cluster
+nl7s.net:8000,DX Spider
+k1rfi.com:7300,DX Spider
+dxc.np3n.com:7300,DX Spider
+nr1x.budlog.net:7300,DX Spider
+NU1G-1.NO-IP.ORG:7300,CC Cluster
+dxc.f2f.us:7300,DX Spider
+dxcluster.oevsv.at:41112,DX Spider
+oe9xpr.ampr.org:8000,DX Spider
+oh1ab.dy.fi:8000,DX Spider
+ham.connect.fi:7300,DX Spider
+ok0dxh.goo.cz:8000,DX Spider
+ok0dxi.nagano.cz:41112,DX Spider
+ok0ntu.ampr.cz:7373,DxNet
+hamqth.com:7300,DX Spider
+44.144.11.254:8000,DX Spider
+193.53.39.133:7300,DX Spider
+on0dxk.dyndns.org:8000,CC Cluster
+on0llv.ddns.net:7300,DX Spider
+nolcluster.on8ar.eu:7300,DX Spider
+dxl.radioclubleuven.be:7300,DX Spider
+dxspider.on3ure.be:7300,DX Spider
+151.80.57.37:7300,DX Spider
+op0p.no-ip.org:8000,CC Cluster
+oz5bbs.dk:8000,DX Spider
+83.163.98.212:7373,AR-Cluster
+80.60.80.8:8000,DX Spider
+pa0esh.com:7300,DX Spider
+pa1rbz.dyndns.org:9000,DX Spider
+www.hanslammerts.nl:7300,DX Spider
+ea1.pa4ab.net:8000,DX Spider
+83.162.186.242:7300,DX Spider
+83.162.186.242:7388,DX Spider
+pa8f.ddns.net:7300,DX Spider
+dxc.pe1itr.com:7300,DX Spider
+85.151.146.92:23,AR-Cluster
+dxc.pi4cc.nl:8000,DX Spider
+pi8cdr.halerbrug.nl:7000,DX Spider
+cluster.riodxgroup.com:7000,DX Spider
+ok2pen.ampr.org:7300,DX Spider
+dxc.baependi.com.br:8000,DX Spider
+idxcluster.shacknet.us:7300,DX Spider
+py5jo.no-ip.org:8000,DX Spider
+77.91.196.82:7300,DX Spider
+r5acq.no-ip.org:7373,DX Spider
+dx.znuki.ru:7300,DX Spider
+212.96.100.27:7300,DX Spider
+176.62.179.24:7373,CC Cluster
+dxc.vxnet.ru:8000,DX Spider
+odxc.ru:8000,DX Spider
+93.88.130.90:8000,DX Spider
+s50arx.hamradio.si:7300,AR-Cluster
+s50clx.infrax.si:41112,DX Spider
+s50dxs.s53m.com:8000,DX Spider
+sk3w.se:8000,DX Spider
+sm6.se:8000,DX Spider
+ax25.org:8000,DX Spider
+cluster.sk4bw.net:8000,DX Spider
+sm6hoc.dyndns.org:7300,DX Spider
+sk6aw.net:8000,DX Spider
+sm7gvf.dyndns.org:8000,DX Spider
+www.sp7ydd.ampr.org:9000,DxNet
+217.96.37.168:9000,DxNet
+www.sr1bsz.ampr.org:9000,DxNet
+ampr.bsb.com.pl:9000,DxNet
+klub.sp2put.pl:7300,DX Spider
+dx.jestok.com:7300,DX Spider
+78.8.39.233:9000,DxNet
+87.105.249.51:9100,DxNet
+www.sr8bbs.ampr.org:9000,DxNet
+157.158.185.199:9000,DxNet
+zhp.tl.krakow.pl:9000,DxNet
+sv1cmg.no-ip.org:17300,DX Spider
+sv1iw.ignorelist.com:73,DX Spider
+sv2cui.net:7300,DX Spider
+sv2hrt.ath.cx:7300,DX Spider
+dxc.sv5fri.eu:7300,DX Spider
+home.kayhan.name.tr:7300,DX Spider
+tf1mt.motiff.net:7300,DX Spider
+zavod.remoltd.com:8000,DX Spider
+145.255.160.182:23,CC Cluster
+dxinua.com:8000,DX Spider
+91.211.17.87:8000,DX Spider
+dxc.us6iq.com:7300,DX Spider
+dx.mixw.net:7300,DX Spider
+dx.net.ua:7300,DX Spider
+uu1dx.com:23,DX Spider
+va2bbs.dyndns.org:8000,DX Spider
+va3mw.dxcluster.org:41112,DX Spider
+sparc.no-ip.info:7300,DX Spider
+dx.ve2hew.com:7300,DX Spider
+ve2pkt.dyndns.org:9000,DX Spider
+ve2sg.net:7300,DX Spider
+ve3cgr.dyndns.org:7300,DX Spider
+dx.fireroute.com:23,DX Spider
+dxc.ve3zin.com:7300,DX Spider
+dxc.middlebrook.ca:8000,DX Spider
+dxc.middlebrook.ca:23,CLX
+ve7cc.net:23,CC Cluster
+ve9emo.gnb.ca:23,DX Spider
+ve9sc.no-ip.org:6300,DX Spider
+ve9sc.no-ip.org:7373,AR-Cluster
+clx.vk3ama.vkdxer.net:7300,DX Spider
+vk3apc.mdrc.org.au:7300,DX Spider
+Vk3atm.ozeham.net:7300,DX Spider
+cluster.vk3ave.net:7300,DX Spider
+dxcluster.parksnpeaks.org:7300,DX Spider
+gate.vk5gr.id.au:7300,DX Spider
+203.38.121.133:7300,DX Spider
+w0apq.hopto.org:7300,CC Cluster
+w0mu.net:7373,CC Cluster
+dxusa.net:7300,DX Spider
+dxc.w1nr.net:23,DX Spider
+usdx.w1nr.net:23,DX Spider
+dxc.w1ve.com:23,AR-Cluster
+dx.w2dz.net:23,AR-Cluster
+w3gq.no-ip.com:7373,CC Cluster
+dxc.w3lpl.net:23,AR-Cluster
+dxc.w3lpl.net:7373,AR-Cluster
+w4dxa.no-ip.com:23,AR-Cluster
+204.29.106.100:23,AR-Cluster
+w4mr.tzo.com:7300,AR-Cluster
+207.162.164.91:7373,CC Cluster
+w5cmm.ddns.net:7300,DX Spider
+w6cua.no-ip.org:7300,AR-Cluster
+w6kk.zapto.org:7300,DX Spider
+ucsbdx.ece.ucsb.edu:7300,DX Spider
+ch.w6rk.com:7300,DX Spider
+w7jd.ddns.net:9000,CC Cluster
+paul.w8aef.com:7373,CC Cluster
+w8bs.ddns.net:7300,DX Spider
+dxc.w8wts.net:7374,AR-Cluster
+dxc.w8wts.net:23,AR-Cluster
+dxc.w8wts.net:7373,CC Cluster
+dx.svs.com:7300,DX Spider
+w9az.ddns.net:23,AR-Cluster
+w9az.ddns.net:7373,AR-Cluster
+w9bg.com:23,AR-Cluster
+131.156.2.135:41112,CLX
+134.48.91.82:23,AR-Cluster
+dxc.w9pa.net:23,AR-Cluster
+dxc.w9pa.net:7373,AR-Cluster
+dxc.w9pa.net:7374,AR-Cluster
+w9yb-dx.student-orgs.purdue.edu:23,AR-Cluster
+w9yb-dx.student-orgs.purdue.edu:7373,AR-Cluster
+rich.iplocate.net:7300,DX Spider
+dxc.wa9pie.net:8000,DX Spider
+dxc.leadmon.net:7300,DX Spider
+108.67.41.107:7373,CC Cluster
+telnet.reversebeacon.net:7000,DX Spider
+wb8zrl.no-ip.org:7300,DX Spider
+dxc.wc2l.com:23,AR-Cluster
+dxc.wc2l.com:7373,AR-Cluster
+DXC.WD1L.net:7300,CC Cluster
+dxc.wd4ixd.net:23,CC Cluster
+we4m.no-ip.org:23,AR-Cluster
+wf5e.no-ip.com:23,AR-Cluster
+wg9l.no-ip.com:23,AR-Cluster
+dxc.np3a.com:7373,CC Cluster
+wr3d.dxcluster.net:7300,DX Spider
+ws7i.ewarg.org:7300,CC Cluster
+wt3q.gofrc.org:7300,DX Spider
+dxc.ww1r.com:7300,DX Spider
+xq8fgc.cx2sa.net:9000,DxNet
+dxc.ardi.lv:8000,DX Spider
+82.77.126.79:8000,DX Spider
+bastus.ro:8000,DX Spider
+www.yu1exy.org:8000,DX Spider
+yv5aj.org:7000,DX Spider
+yv6btf.no-ip.org:8000,AR-Cluster
+olson.nz:9000,DX Spider
+zl2arn.ddns.net:7300,DX Spider
+zs2ez.dlinkddns.com:7373,CC Cluster
