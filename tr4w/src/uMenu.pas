@@ -98,7 +98,7 @@ const
   RC_EXECONFIGFILE_HK                   = #9'Ctrl+V' ;
   RC_REFRESHBM_HK                       = #9'Ctrl+Y';
   RC_SPLITOFF_HK                        = #9'-';
-  RC_CURSORINBM_HK                      = #9'Ctrl+End';
+//  RC_CURSORINBM_HK                      = #9'Ctrl+End';
   RC_CURSORTELNET_HK                    = #9'Ctrl+Home';
   RC_QSOWITHNOCW_HK                     = #9'Ctrl+Enter';
   RC_CT1BOHIS_HK                        = #9'Ctrl+]';
@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 176{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 175{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -302,7 +302,7 @@ const
 //    (mrText: RC_VIEWPAKSPOTS + RC_VIEWPAKSPOTS_HK; mrId: menu_ctrl_viewpacketspots),
     (mrText: RC_EXECONFIGFILE + RC_EXECONFIGFILE_HK; mrId: menu_ctrl_execute_config),
     (mrText: RC_REFRESHBM + RC_REFRESHBM_HK; mrId: menu_ctrl_refreshbandmap),
-    (mrText: RC_CURSORINBM + RC_CURSORINBM_HK; mrId: menu_ctrl_cursorinbandmap),
+//    (mrText: RC_CURSORINBM + RC_CURSORINBM_HK; mrId: menu_ctrl_cursorinbandmap),
     (mrText: RC_QSOWITHNOCW + RC_QSOWITHNOCW_HK; mrId: menu_ctrl_logqsowithoutcw),
     (mrText: RC_CURSORTELNET + RC_CURSORTELNET_HK; mrId: menu_ctrl_cursorintelnet),
     (mrText: RC_ADDBANDMAPPH + RC_ADDBANDMAPPH_HK; mrId: menu_ctrl_PlaceHolder),

@@ -2708,12 +2708,13 @@ begin
        
 
     menu_ctrl_refreshbandmap:
-      UpdateBlinkingBandMapCall;
+  //    UpdateBlinkingBandMapCall;
+    Windows.SetFocus(BandMapListBox);   // 4.84.1
 
     menu_ctrl_cursorinbandmap:
       begin
-        if tWindowsExist(tw_BANDMAPWINDOW_INDEX) then
-          Windows.SetFocus(BandMapListBox);
+ //    TuneRadioToSpot(@tspotrecord,RadioType);
+ //   windows.SetFocus(bandmaplistbox);
       end;
 
     menu_ctrl_cursorintelnet:
@@ -2739,6 +2740,7 @@ begin
           FrmSetFocus;
           Exit;
         end;
+
 
       end;
 
@@ -4436,7 +4438,7 @@ begin
       begin
         showwarning(TC_ERRORINLOGFILE);
         CloseLogFile;
-        halt;
+        halt;           // 4.84.3
       end;
     end;
   end
@@ -4978,6 +4980,7 @@ var
   nNumberOfBytesToWrite                 : Cardinal;
   InitialExchange                       : CallString;
   Callsign                              : CallString;
+  Str1                           : String;
 begin
 //  MakeReportFileName('CUSTOM_INITIAL.EX');
   if not tOpenFileForWrite(h, FileName {@ReportsFilename[1]}) then Exit;
@@ -4986,13 +4989,15 @@ begin
   begin
     Windows.ZeroMemory(@InitialExchange, SizeOf(InitialExchange));
     InitialExchange := CallsignsList.GetIniitialExchangeByIndex(i);
-    if InitialExchange <> '' then
+            if InitialExchange <> '' then
 
     begin
       Windows.ZeroMemory(@Callsign, SizeOf(Callsign));
       Callsign := CallsignsList.Get(i);
 //      if tPos(Callsign, '/') = 0 then
       begin
+        //if StringHas(InitialExchange, '255 ') then
+          InitialExchange := GetLastString(initialexchange);
         nNumberOfBytesToWrite := Format(wsprintfBuffer, '%-15s  %s'#13#10, @Callsign[1], @InitialExchange[1]);
         sWriteFile(h, wsprintfBuffer, nNumberOfBytesToWrite);
       end;

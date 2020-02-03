@@ -3241,17 +3241,11 @@ if TempRXData.DomMultQTH = '' then
 
             if TempRXData.QTHString {.DomMultQTH} <> '' then
            begin
-         {   rxnr := length(csQTHString);
-             if csQTHString[rxnr-1] = 'M' then
-              begin
-               csQTHString[rxnr-1] :='/';
-               csQTHString[rxnr] :='M';
-         }
-              asm
+             asm
               push csQTHString
               push RSTReceived
-              end;
-              wsprintf(CABRILLO_HISEX, '%-3s %05s');
+             end;
+              wsprintf(CABRILLO_HISEX, '%-3s %-3s'); // 4.84.2
               asm add esp,16
               end;
             end

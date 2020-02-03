@@ -2479,7 +2479,16 @@ begin
       end;
     end;
 
-    if ExchangeInformation.Zone then TempString := IntToStr(Zone);
+    if ActiveExchange = RSTZoneOrDomesticQTH then
+     if Exchangeinformation.QTH then
+      TempString := Qstring
+       else
+        TempString := IntToStr(Zone);
+
+    if ExchangeInformation.Zone then
+       
+      TempString := IntToStr(Zone);
+
     if ExchangeInformation.Name then TempString := Name;
     if ExchangeInformation.ClassEI then TempString := ceClass;
     if ExchangeInformation.Age then TempString := IntToStr(Age);

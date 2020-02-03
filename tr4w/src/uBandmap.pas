@@ -466,54 +466,6 @@ begin
   end;
 
 end;
-{
-procedure UnregisterBMHotKeys;
-begin
-  UnregisterHotKey(tr4w_WindowsArray[tr4w_BANDMAPWINDOW_INDEX].tr4w_WndHandle, bm_hotkey_escape);
-  UnregisterHotKey(tr4w_WindowsArray[tr4w_BANDMAPWINDOW_INDEX].tr4w_WndHandle, bm_hotkey_delete);
-  UnregisterHotKey(tr4w_WindowsArray[tr4w_BANDMAPWINDOW_INDEX].tr4w_WndHandle, bm_hotkey_return);
-  UnregisterHotKey(tr4w_WindowsArray[tr4w_BANDMAPWINDOW_INDEX].tr4w_WndHandle, bm_hotkey_pause);
-
-end;
-}
-{
-procedure CheckUncheckAllBandMapPopupMenus;
-
-begin
-  CheckUncheckBandMapPopupMenu(200, @BandMapAllBands);
-  CheckUncheckBandMapPopupMenu(201, @BandMapAllModes);
-  CheckUncheckBandMapPopupMenu(202, @BandMapDisplayCQ);
-  CheckUncheckBandMapPopupMenu(203, @BandMapDupeDisplay);
-end;
-
-procedure CheckUncheckBandMapPopupMenu(Position: Cardinal; CommandAddress: PBoolean);
-var
-  c                                     : Cardinal;
-begin
-  if CommandAddress^ = True then c := MF_CHECKED else c := MF_UNCHECKED;
-  Windows.CheckMenuItem(BandMapMenu, Position, c);
-end;
-}
-
-{
-procedure WriteBandMapMenuValue(Command: PChar; BoolCommand: Boolean);
-var
-//  command                               : string;
-//  command                               : PChar;
-  value                                 : PChar;
-//  CBuffer                               : array[0..40] of Char;
-//  I                                     : integer;
-begin
-  if BoolCommand = True then value := 'TRUE' else value := 'FALSE';
-//  command := 'a';
-//  I := GetMenuString(BandMapMenu, Position, @CBuffer , 40, MF_BYCOMMAND);
-//  command := CBuffer;
-//  if CBuffer[I - 2] = #9 then setstring(command, PChar(command), I - 2); //if hotkey char in menustring
-
-  Windows.WritePrivateProfileString(_COMMANDS, Command, value, PChar(TR4W_INI_FILENAME));
-
-end;
-}
 
 procedure ShowBandMapPopupMenu;
 var
