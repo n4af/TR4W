@@ -52,7 +52,7 @@ const
 //  PrefixMultArraySize                   = 1500;
 
   MaxVisDupeCallTotal                   = 40;
-  MaxInitialExchanges                   = 2000;
+  MaxInitialExchanges                   = 60000; // 4.86.4
   MaxLongPartialCalls                   = 150;
 
   { Note that the four byte and eight byte blocks must be the same

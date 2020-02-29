@@ -6279,10 +6279,13 @@ end;
      if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
         else
           RXDATA.QSOPoints := 3;
-     if RXData.Callsign = 'NI4BK' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-     if RXData.Callsign = 'W4DW' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-     if RXData.Callsign = 'W1VOA' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-     if RXData.Callsign = 'NC4QP' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'N4T' then rxdata.QSOPoints:= rxdata.qsopoints + 50;     // 4.86.3
+     if RXData.Callsign = 'N4A' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'N4R' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'N4H' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'N4E' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'W4E' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
+     if RXData.Callsign = 'N4L' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
       if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then rxdata.QSOPoints:= rxdata.qsopoints + 50;
     end;
 

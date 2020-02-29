@@ -3010,7 +3010,7 @@ begin
 //      if GetScoresThreadID = 0 then CreateThread(nil, 0, @CheckLatestVersion, nil, 0, GetScoresThreadID);
  //       OpenURL('http://www.country-files.com/cty/cty.dat/');  // 4.75.3
 
-       Shellexecute(0, 'open', 'http://www.country-files.com/cty/cty.dat', nil, nil, SW_SHOW);       // 4.75.3
+       Shellexecute(0, 'open', 'https://www.country-files.com/cty/cty.dat', nil, nil, SW_SHOW);       // 4.86.2
       
     menu_spmode_ortab:
       ProcessTAB(LowordWparam);
