@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.87.0' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.87.2' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'March 1, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'March 20, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -932,11 +932,11 @@ type
     );
 
 type
-  InterfacedRadioType = (
+    InterfacedRadioType = (
     NoInterfacedRadio,
     K2,
     K3,
-
+    FLEX,       // 4.87.2
     TS140,
     TS440,
     TS450,
@@ -950,8 +950,6 @@ type
     TS950,
     TS990,
     TS2000,
-    FLEX,
-
     FT100,
     FT450,
     FT736R,
