@@ -146,9 +146,9 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
-         LANG                                  = 'ENG';
-//        LANG                                  = 'RUS';
-//        LANG                                  = 'SER';
+          LANG                                  = 'ENG';
+//       LANG                                  = 'RUS';
+//       LANG                                  = 'SER';
 //       LANG                                  = 'ESP';
 //       LANG                                  = 'MNG';
 //       LANG                                  = 'POL';
@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.87.2' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.88.0' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'March 20, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'April 1, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -931,6 +931,7 @@ type
     OKOMSSB    // 4.80.1
     );
 
+    { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
 type
     InterfacedRadioType = (
     NoInterfacedRadio,
@@ -974,7 +975,6 @@ type
     FTDX3000,
     FTDX5000,
     FTDX9000,
-
     IC78,
     IC706,
     IC706II,
@@ -1014,7 +1014,6 @@ type
     IC7851,
     IC9100,
     IC9700,
-
     OMNI6,
     Orion);
 
