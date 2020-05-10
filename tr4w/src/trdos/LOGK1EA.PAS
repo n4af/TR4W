@@ -1917,7 +1917,7 @@ end;
 function K1EAKeyer.CWStillBeingSent: boolean;
 begin
   Result := CWThreadID <> 0;
-//  CWStillBeingSent := PTTAsserted;
+  // CWStillBeingSent := PTTAsserted;
 end;
 
 procedure K1EAKeyer.FlushCWBuffer;

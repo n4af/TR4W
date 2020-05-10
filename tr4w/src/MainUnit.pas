@@ -581,6 +581,7 @@ begin
   begin
       if tAutoSendMode then EditingCallsignSent := True;
        tAutoSendMode := False;
+
       FlushCWBufferAndClearPTT; //n4af 4.33.3
   //    opmode := CQOpMode;
 
@@ -2658,8 +2659,8 @@ begin
       tClearDupesheet_Ctrl_K;
 
     menu_ctrl_viewlogdat:
-      //tDialogBox(74, @LogEditDlgProc);
-      CreateModalDialog(396, 212, tr4whandle, @LogEditDlgProc, 0);
+  //  tDialogBox(74, @LogEditDlgProc);
+    CreateModalDialog(396, 212, tr4whandle, @LogEditDlgProc, 0);
 
     menu_ctrl_note:
       tr4w_add_note_in_log;
@@ -4707,13 +4708,7 @@ begin
       asm call setitem
       end;
     end;
- {   if contest <> RadioYOC then        // 4.53.8
-      begin
-      elvi.iSubItem := ColumnsArray[logColNumberReceive].pos; //Ord(logColNumberReceive);
-      elvi.pszText := inttopchar(RXData.NumberReceived);
-      asm call setitem  end;
-      end ;
-  }
+
   if RXData.ceRecordKind in [rkQTCR, rkQTCS] then
   begin
     elvi.iSubItem := ColumnsArray[logColQTC].pos; //Ord(logColQTC);
@@ -4774,19 +4769,7 @@ begin
       end;
 
   end;
-  {
-  if ColumnsArray[logColFOC].Enable then
- if Contest = FOCMARATHON then
-  begin
-    elvi.iSubItem := ColumnsArray[logColFOC].pos; //n4af 4.32.5
-    Format(LogDisplayBuffer, '%s',  @RXData.Power[1]);
-    elvi.pszText := LogDisplayBuffer;
 
- //      elvi.pszText := @RXData.FOCNumber[1];
-    asm call setitem
-    end;
-  end;
- }
   if ColumnsArray[logColPrefixMult].Enable then
   begin
     elvi.iSubItem := ColumnsArray[logColPrefixMult].pos; //Ord(logColPrefixMult);
@@ -4833,18 +4816,7 @@ Domestic:
     asm call setitem
     end;
   end;
-{
-  if ColumnsArray[logColPostCode].Enable then
-  begin
-    if RXData.PostalCode <> '' then
-    begin
-      elvi.iSubItem := ColumnsArray[logColPostCode].pos; //Ord(logColCheck);
-      elvi.pszText := @RXData.PostalCode[1];
-      asm call setitem
-      end;
-    end;
-  end;
-}
+
   if ColumnsArray[logColPrecedence].Enable then
   begin
     elvi.iSubItem := ColumnsArray[logColPrecedence].pos; //rd(logColPrecedence);

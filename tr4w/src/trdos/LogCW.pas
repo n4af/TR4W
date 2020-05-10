@@ -99,7 +99,7 @@ var
 
   NeedToSetCQMode                       : boolean; {KK1L: 6.69 This variable is used to leap around some AutoS&PMode code.}
 
-  QuickQSLMessage2                      : Str40 { = 'EE'};
+  QuickQSLMessage2                      : Str40 { = 'TU'}; // 4.88.1
 
 //  RadioOneKeyerOutputPort          : PortType = NoPort;
 //  RadioTwoKeyerOutputPort          : PortType = NoPort;
@@ -268,7 +268,7 @@ begin
     begin
    //  if not WKbusy then flushcwbuffer;  // ny4i winkeyer
       wkAddCWMessageToInternalBuffer(Msg);
-//      wkBUSY := True;
+       wkBUSY := True;   // 4.88.2
       Exit;
     end;
 

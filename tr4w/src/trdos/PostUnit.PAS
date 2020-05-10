@@ -2524,6 +2524,8 @@ if TempRXData.DomMultQTH = '' then
           end;
 
         RSTQSONumberAndGridSquareExchange:
+
+
           begin
             asm
                 push cMyGrid
@@ -2544,6 +2546,10 @@ if TempRXData.DomMultQTH = '' then
             end;
           end;
 
+          RSTAndSerialNumberAndGridandPossibleMemberNumber:
+          begin
+          end;
+
        RSTQSONumberOrDomesticQTHExchange:      //n4af 4.40.6
           begin
          p  := (IntToPchar(nrReceived)) ;
@@ -2557,7 +2563,8 @@ if TempRXData.DomMultQTH = '' then
                push cMyState
                push RSTSent
              end ;
-              wsprintf(CABRILLO_MYEX, '%-3s  %-11s') ;      // n4af 4.70.3
+  //            wsprintf(CABRILLO_MYEX, '%-3s  %-11s') ;      // n4af 4.70.3
+                wsprintf(CABRILLO_MYEX, '%-3s  %-5s') ;        // 4.88.3
  end ;
 
  if cMystate[1] = '' then
@@ -2683,7 +2690,8 @@ if TempRXData.DomMultQTH = '' then
                 push cMyName
                 push nrSent
             end;
-            wsprintf(CABRILLO_MYEX, '%-4d %-7s %-4s');
+//            wsprintf(CABRILLO_MYEX, '%-10d %-7s %-4s');
+            wsprintf(CABRILLO_MYEX, '%-4d %-7s %-8s');      // 4.88.3
             asm add esp,20
             end;
 
@@ -2692,7 +2700,8 @@ if TempRXData.DomMultQTH = '' then
                 push csName
                 push nrReceived
             end;
-            wsprintf(CABRILLO_HISEX, '%-4u %-10s %-4s');
+      //      wsprintf(CABRILLO_HISEX, '%-4u %-10s %-4s');
+              wsprintf(CABRILLO_HISEX, '%-4u %-5s %-4s');   // 4.88.3
             asm add esp,20
             end;
           end;

@@ -146,7 +146,7 @@ const
   ICOM_LONG_MODECOMMAND                 = True;
 
 const
-          LANG                                  = 'ENG';
+         LANG                                  = 'ENG';
 //       LANG                                  = 'RUS';
 //       LANG                                  = 'SER';
 //       LANG                                  = 'ESP';
@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.88.0' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.88.3' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'April 1, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'May 5, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -928,6 +928,7 @@ type
     WINTERFIELDDAY,
     RADIOYOC,
     PAQSOPARTY,  // 4.74.3
+    INQSOPARTY,  // 4.88.2
     OKOMSSB    // 4.80.1
     );
 
@@ -2437,7 +2438,7 @@ type
     GCStation,
     CQNonEuropeanCountriesAndWAECallRegions,
     RussianPrefixes
-    // CzechRepublicCallsignPrefix     // 4.83.5
+
     );
 
   ZoneMultType =
@@ -2469,8 +2470,7 @@ const
     'GC STATION',
     'CQ NON EUROPEAN COUNTRIES AND WAE',
     'RUSSIAN PREFIXES' 
-    // 'CZECH REPUBLIC CALLSIGN PREFIX'     // 4.83.5
-    );
+       );
 type
   DomesticMultType =
     (
@@ -2499,7 +2499,6 @@ type
     ARRLVHFSSPointMethod,
     BalticQSOPointMethod,
     BWQPQSOPointMethod,
- //   CQPQSOPointMethod,
     CISQSOPointMethod,
     CQ160QSOPointMethod,
     CQMQSOPointMethod,
@@ -2599,6 +2598,7 @@ type
     JAKARTARTTY,     // 4.74.2
     TRCDIGITAL,       // 4.75.2
     PAQSOPOINTMETHOD, // 4.74.3
+    INQsoPoinrMethod,  // 4.88.2
     XERTTY,           // 4.77.5
     OKOMSSBQSOPointMethod, // 4.80.1
     uQRQCPM,      // 4.82.3
@@ -2736,15 +2736,17 @@ const
      'JAKARTA-RTTY',     // 4.74.2
      'TRC-DIGITAL',      // 4.75.2
      'PA QSO PARTY',      // 4.74.3
+     'IN QSO PARTY',      // 4.88.2
      'XE RTTY',           // 4.77.5
      'OKOM SSB',          // 4.80.1
      'UQRQCPM',           // 4.82.3
      'OKOMRTTY'           // 4.83.4
+
     );
 
 type
   ExchangeType = (
-  UnknownExchange,
+  UnknownExchange,                                                   
     NoExchangeReceived,
     AgeAndQSONumberExchange, //WLI
     CheckAndChapterOrQTHExchange,
@@ -2775,6 +2777,7 @@ type
     RSTAndGridExchange,
     RSTAndOrGridExchange,
     RSTAndQSONumberOrDomesticQTHExchange,
+    RSTAndSerialNumberAndGridandPossibleMemberNumber,  // 4.88.3
     RSTAndPostalCodeExchange,
     RSTDomesticOrDXQTHExchange,
     RSTDomesticQTHExchange,
@@ -2808,7 +2811,7 @@ const
     (
      'UNKNOWN',
     'NONE',
-	'AGE AND QSO NUMBER',
+  	'AGE AND QSO NUMBER',
     'CHECK AND CHAPTER OR QTH EXCHANGE',
     'CLASS DOMESTIC OR DX QTH',
     'KIDS DAY EXCHANGE',
@@ -2849,6 +2852,7 @@ const
     'RST QSO NUMBER',
     'RST QSO NUMBER AND DOMESTIC QTH',           
     'RST QSO NUMBER AND GRID SQUARE',
+    'RST QSO NUMBER AND GRID AND POSSIBLE NUMBER', // 4.88.3
     'RST QSO NUMBER AND POSSIBLE DOMESTIC QTH',
     'RST QSO NUMBER AND RANDOM CHARACTERS',
     'RST QSO NUMBER OR DOMESTIC QTH',
@@ -2873,7 +2877,7 @@ type
   end;
 
 const
-QSOPartiesCount = 14;
+QSOPartiesCount = 15;
 
   QSOParties                         : array[1..QSOPartiesCount] of TUSQSOPartyRecord =
   (
@@ -2891,7 +2895,8 @@ QSOPartiesCount = 14;
   (InsideStateDOMFile:'florida';    {OutsideStateDOMFile:'FLORIDA';    }StateName:'FL'),
   (InsideStateDOMFile:'colorado';   {OutsideStateDOMFile:'COLORADO';   }StateName:'CO'),
   (InsideStateDOMFile:'nc';         {OutsideStateDOMFile:'NC';         }StateName:'NC'),
-  (InsideStateDOMFile:'pa';         {OutsideStateDOMFile:'PA';         }StateName:'PA')    // 4.74.3
+  (InsideStateDOMFile:'pa';         {OutsideStateDOMFile:'PA';         }StateName:'PA'),    // 4.74.3
+  (InsideStateDOMFile:'in';         {OutsideStateDOMFile:'IN';         }StateName:'IN')
   );
 {*)}
 
@@ -2929,12 +2934,18 @@ QSOPartiesCount = 14;
 // NOTE This array below and ContestTypeSA have to be in the same order
 // This really should be setup so the name of the contest is the first parameter sothere is only one array rather
 // than a parallel array. NY4I Issue 222
+{ Note - # entries FOUR ARRAYS must match:
+ Contest Type ~  Line #768
+ QSO Point Method ` 3637
+ ContestTypeSA  ` 3110
+ Contests Boolean array ~ 3321
+ }
   const
     ContestsArray                       : array[ContestType] of TContestInfo =
       (
 
  (Name: 'DUMMY CONTEST';               Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: UnknownExchange;                             XM:NoDXMults; QP:NoQSOPointMethod),
- (Name: '7QP';                         Email: nil;                      DF: 'seven_cty';                 WA7BNM:  404; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 10;AE: RSTDomesticOrDXQTHExchange;          XM:NoDXMults; QP:TwoPhoneThreeCW),
+ (Name: '7QP';                         Email: nil;                      DF: 'seven_cty';         WA7BNM:  404; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 10;AE: RSTDomesticOrDXQTHExchange;          XM:NoDXMults; QP:TwoPhoneThreeCW),
  (Name: 'ALL ASIAN CW';                Email: nil;                      DF: nil;                 WA7BNM:   47; {SK3BG: 'allasia';    } QRZRUID: 146 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:AllAsianQSOPointMethod),
  (Name: 'ALL ASIAN SSB';               Email: nil;                      DF: nil;                 WA7BNM:  102; {SK3BG: 'allasia';    } QRZRUID: 146 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:AllAsianQSOPointMethod),
  ({Name: 'ALL JA';                     }Email: nil;                      DF: 'allja';             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTALLJAPrefectureAndPrecedenceExchange;     XM:NoDXMults; QP:OnePointPerQSO),
@@ -3096,6 +3107,7 @@ QSOPartiesCount = 14;
  ({Name: 'WINTER FIELD DAY';        }   Email: 'wfda@winterfieldday.com';DF: 'arrlsect';          WA7BNM:   421; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod),
  ({Name: 'RADIO-YOC';                  }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 119 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndPreviousQSONumber;               XM:ARRLDXCC;  QP:ThreePointsPerQSO),
  ({Name: 'PA QSO PARTY';               }Email: nil;                      DF: 'pa_cty';            WA7BNM: 0000; {SK3BG:  nil ;       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 14; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod),     // 4.74.3
+ ({Name: 'IN QSO PARTY';               }Email: nil;                      DF: 'in_cty';            WA7BNM: 0000; {SK3BG:  nil ;       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 15; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod),     // 4.88.2
  ({Name: 'OK-OM SSB';                  }Email: nil;                      DF: 'okom';              WA7BNM:  185; {SK3BG: 'okomdxc';    } QRZRUID: 12  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:CQDXCC; QP:OKOMSSBQSOPointMethod)     // 4.80.1
  {*)}
       );
@@ -3266,6 +3278,7 @@ QSOPartiesCount = 14;
       'WINTER FIELD DAY' ,
       'RADIO-YOC',
       'PA QSO PARTY',  // 4.74.3
+      'IN QSO PARTY', // 4.88.2
       'OK-OM DX SSB'       // 4.80.1
       );
 
@@ -3476,6 +3489,7 @@ QSOPartiesCount = 14;
       ({Name: 'WINTER-FIELD DAY';           }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),        // 4.56.9 ny4i
       ({Name: 'RADIO-YOC';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'PA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),       // 4.74.3
+      ({Name: 'IN QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),     // 4.88.2
       ({Name: 'OK-OM SSB';                  }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0)         // 4.80.1
       );
 
