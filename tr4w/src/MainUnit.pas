@@ -515,7 +515,6 @@ var
 
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
-  
    if CallWindowString <> '' then
     Call_Found := True
    else
@@ -581,7 +580,6 @@ begin
   begin
       if tAutoSendMode then EditingCallsignSent := True;
        tAutoSendMode := False;
-
       FlushCWBufferAndClearPTT; //n4af 4.33.3
   //    opmode := CQOpMode;
 
@@ -608,8 +606,7 @@ begin
     ActiveRadioPtr^.tTwoRadioMode := TR0;
     InActiveRadioPtr^.tTwoRadioMode := TR0;
     SwapRadios;
-    SetOpMode(CQOpMode);
-    Exit;
+    SetOpMode(CQOpMode); 
   end;
 
 //  if tr4w_ExchangeWindowActive then
@@ -618,6 +615,7 @@ begin
     begin
       tCleareExchangeWindow;
       tCallWindowSetFocus;
+      FlushCWBufferAndClearPTT;       // 4.88.4
       Exit;
     end;
 
@@ -630,6 +628,7 @@ begin
     ExchangeHasBeenSent := False;
     SeventyThreeMessageSent := False;
     ClearInfoWindows;
+    FlushCWBufferAndClearPTT;         // 4.88.4
     if OpMode = CQOpMode then
     begin
       if OpMode2 = SearchAndPounceOpMode then
@@ -654,7 +653,7 @@ begin
     SwapRadios;
     if OpMode = SearchAndPounceOpMode then
     if (not Call_Found) then
-    SetOpMode(CQOpMode);
+     SetOpMode(CQOpMode);  
   end;
 
   if tPreviousDupeQSOsShowed then ShowPreviousDupeQSOsWnd(False); //DestroyPreviousDupeQSOsWnd;
@@ -712,12 +711,12 @@ begin
   else
   begin
     if
-      (
-      (OpMode <> SearchAndPounceOpMode) and ((CallWindowString = '') or not SpaceBarDupeCheckEnable)) then
+   ((OpMode <> SearchAndPounceOpMode) and ((CallWindowString = '') or not SpaceBarDupeCheckEnable)) then
+    
     begin
       if CWStillBeingSent then FlushCWBufferAndClearPTT; { Clear CW sent on Inactive Radio}
 
-      SetUpToSendOnActiveRadio;
+     SetUpToSendOnActiveRadio;
 
       InactiveRigCallingCQ := False;
 
@@ -920,7 +919,7 @@ begin
   end;
   DisplayGridSquareStatus(CallWindowString);
 
- 
+
   if Contest <> GENERALQSO then
     begin
      ShowStationInformation(@CallWindowString);                                          //gav 4.44.8
@@ -945,7 +944,7 @@ begin
   begin
     if CallAlreadySent = False then
     begin
-      if ActiveMode in [CW, Digital] then  // WLI  
+      if ActiveMode in [CW, Digital] then  // WLI
       begin
         OpMode2 := SearchAndPounceOpMode;
         ShowFMessages(0);
@@ -1171,7 +1170,7 @@ begin
       else
         Result := SendCrypticMessage(MyCall);
    //     Result := SendCrypticMessage('N4AFDOTNET');
-      KeyStamp(F1);
+        KeyStamp(F1);
     end;
     Exit;
   end;
@@ -3294,8 +3293,8 @@ begin
       SwitchNext := False;
     //  exit;
       end;
-    ReturnInCQOpMode;
-      Exit;
+       ReturnInCQOpMode;
+       Exit;
       end;
 
   if OpMode = SearchAndPounceOpMode then
@@ -4439,7 +4438,7 @@ begin
       begin
         showwarning(TC_ERRORINLOGFILE);
         CloseLogFile;
-        halt;           // 4.84.3
+         halt;           // 4.84.3
       end;
     end;
   end
@@ -4969,7 +4968,7 @@ begin
 //      if tPos(Callsign, '/') = 0 then
       begin
         //if StringHas(InitialExchange, '255 ') then
-          InitialExchange := GetLastString(initialexchange);
+   //       InitialExchange := GetLastString(initialexchange);   remove 4.88.5
         nNumberOfBytesToWrite := Format(wsprintfBuffer, '%-15s  %s'#13#10, @Callsign[1], @InitialExchange[1]);
         sWriteFile(h, wsprintfBuffer, nNumberOfBytesToWrite);
       end;
@@ -6033,7 +6032,1281 @@ procedure CheckInactiveRigCallingCQ;
 
 begin
   if SwitchNext then //n4af 4.30.1
-  if ((length(CallWindowString) > 0) {or (InactiveSwapRadio)}) and ((not WKBusy)and (not(CWThreadID <> 0))) then   // n4af 4.52.6
+  if ((length(CallWindowString) > 0) or (InactiveSwapRadio)) and ((not WKBusy)and (not(CWThreadID <> 0))) then   // n4af 4.52.6
+  begin
+   InactiveRigCallingCQ := False;
+    scWk_Reset;
+     SwapRadios;
+      SwitchNext := False;       // 4.52.8
+       if  (not AutoSendEnable) or (not AutoSendCharacterCount > 0) then     //n4af 4.42.10  Redrive dupe check
+            ReturninCQopmode;
+        ShowInformation;
+    end;
+ //  pRadio := ActiveRadioPtr;
+ //   if ((ActiveMode = CW) and   autosendenable and (not WKBusy)) then
+    // {((CWThreadID <> 0) or wkBUSY or pRadio.CWByCAT_Sending))} then
+//  begin
+ //  SwapRadios;
+ //  inactiverigcallingcq := False;
+//  end
+
+
+
+end;
+
+function CheckWindowAndColor(Window: HWND; var Brush: HBRUSH; var Color: integer): boolean;
+var
+  TempWindowElement                     : TMainWindowElement;
+begin
+  Result := False;
+  for TempWindowElement := Low(TMainWindowElement) to High(TMainWindowElement) do
+  begin
+    if wh[TempWindowElement] = Window then
+    begin
+      Brush := tr4wBrushArray[TWindows[TempWindowElement].mweBackG];
+      Color := tr4wColorsArray[TWindows[TempWindowElement].mweColor];
+      Result := True;
+      Break;
+    end;
+  end;
+{
+  for i := 1 to WindowsColorArraySize do
+  begin
+    if Window = WindowsColorArray[i].wcWindow^ then
+    begin
+      Brush := tr4wBrushArray[WindowsColorArray[i].wcbackground^];
+      Color := tr4wColorsArray[WindowsColorArray[i].wcColor^];
+      Result := True;
+      Break;
+    end;
+  end;
+}
+end;
+
+procedure ImportFromADIF;
+label
+  1, 2, 3, 4, Increment, again;
+var
+  MapFin                                : Cardinal;
+  MapBase                               : Pointer;
+  LogSize                               : Cardinal;
+  h                                     : HWND;
+  CurrentPos                            : PChar;
+  StartPos                              : PChar;
+  PosDecimal                            : integer; // 4.55.1
+  QSOCounter                            : integer;
+  FieldLength                           : integer;
+//  delta                                 : integer;
+  lpNumberOfBytesWritten                : Cardinal;
+  Switch                                : Boolean;
+  TempBand                              : BandType;
+  TempMode                              : ModeType;
+  TempBuffer                            : array[0..8] of Char;
+  TempInteger                           : integer;
+const
+  ADIF_CALL                             = Ord('L') * $1000000 + Ord('L') * $10000 + Ord('A') * $100 + Ord('C');
+  ADIF_FREQ                           = Ord('Q') * $1000000 + Ord('E') * $10000 + Ord('R') * $100 + Ord('F');
+  ADIF_NAME                             = Ord('E') * $1000000 + Ord('M') * $10000 + Ord('A') * $100 + Ord('N');
+
+  ADIF_QTH                              = Ord(':') * $1000000 + Ord('H') * $10000 + Ord('T') * $100 + Ord('Q');
+  ADIF_STATE                            = Ord('T') * $1000000 + Ord('A') * $10000 + Ord('T') * $100 + Ord('S');
+  ADIF_PRECEDENCE                       = Ord('C') * $1000000 + Ord('E') * $10000 + Ord('R') * $100 + Ord('P');
+  ADIF_CHECK                            = Ord('C') * $1000000 + Ord('E') * $10000 + Ord('H') * $100 + Ord('C');
+  ADIF_ARRL_SECT                        = Ord('L') * $1000000 + Ord('R') * $10000 + Ord('R') * $100 + Ord('A');
+
+  ADIF_QSO_                             = Ord('_') * $1000000 + Ord('O') * $10000 + Ord('S') * $100 + Ord('Q');
+  ADIF_DATE                             = Ord('E') * $1000000 + Ord('T') * $10000 + Ord('A') * $100 + Ord('D');
+  ADIF_TIME                             = Ord('E') * $1000000 + Ord('M') * $10000 + Ord('I') * $100 + Ord('T');
+  ADIF_STX                              = Ord(':') * $1000000 + Ord('X') * $10000 + Ord('T') * $100 + Ord('S');
+  ADIF_SRX                              = Ord(':') * $1000000 + Ord('X') * $10000 + Ord('R') * $100 + Ord('S');
+
+  ADIF_RST_                             = Ord('_') * $1000000 + Ord('T') * $10000 + Ord('S') * $100 + Ord('R');
+  ADIF_RCVD                             = Ord('D') * $1000000 + Ord('V') * $10000 + Ord('C') * $100 + Ord('R');
+  ADIF_SENT                             = Ord('T') * $1000000 + Ord('N') * $10000 + Ord('E') * $100 + Ord('S');
+
+  ADIF_MODE                             = Ord('E') * $1000000 + Ord('D') * $10000 + Ord('O') * $100 + Ord('M');
+  ADIF_BAND                             = Ord('D') * $1000000 + Ord('N') * $10000 + Ord('A') * $100 + Ord('B');
+
+  ADIF_ITUZ                             = Ord('Z') * $1000000 + Ord('U') * $10000 + Ord('T') * $100 + Ord('I');
+  ADIF_CQZ                              = Ord(':') * $1000000 + Ord('Z') * $10000 + Ord('Q') * $100 + Ord('C');
+
+  ADIF_RXPWR                            = Ord('P') * $1000000 + Ord('_') * $10000 + Ord('X') * $100 + Ord('R');
+
+  ADIF_EOR                              = Ord('>') * $1000000 + Ord('R') * $10000 + Ord('O') * $100 + Ord('E');
+
+  procedure DisplayLoadedQSOs;
+  begin
+
+    Format(QuickDisplayBuffer, '%u ' + TC_QSO_IMPORTED, QSOCounter);
+    SetTextInQuickCommandWindow(QuickDisplayBuffer);
+  end;
+
+begin
+
+  h := CreateFile(TR4W_ADIF_FILENAME, GENERIC_READ, FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  if h = INVALID_HANDLE_VALUE then Exit;
+  LogSize := Windows.GetFileSize(h, nil);
+
+  MapFin := Windows.CreateFileMapping(h, nil, PAGE_READONLY, 0, 0, nil);
+  if MapFin = 0 then goto 2;
+
+  MapBase := Windows.MapViewOfFile(MapFin, FILE_MAP_READ, 0, 0, 0);
+  if MapBase = nil then goto 3;
+
+  if not OpenLogFile then goto 3;
+  tSetFilePointer(0, FILE_END);
+
+  CurrentPos := MapBase;
+//  PosCounter := 0;
+  QSOCounter := 0;
+  TempBuffer[8] := #0;
+  ClearContestExchange(TempRXData);
+  1:
+
+  if CurrentPos[0] = '<' then
+  begin
+    StartPos := CurrentPos;
+    Switch := False;
+    while (StartPos[0] <> '>') and (StartPos - CurrentPos < 15) do inc(StartPos);
+//    asm nop end;
+
+    inc(CurrentPos);
+    inc(StartPos);
+
+    Windows.CopyMemory(@TempBuffer, CurrentPos, 8);
+    StrUpper(@TempBuffer);
+
+    if PInteger(@TempBuffer)^ = ADIF_CALL then
+    begin
+      FieldLength := GetNumberFromCharBuffer(@CurrentPos[5]);
+      TempRXData.Callsign[0] := CHR(FieldLength);
+      Windows.CopyMemory(@TempRXData.Callsign[1], StartPos, FieldLength);
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_CQZ then
+      if ActiveZoneMult = CQZones then
+        TempRXData.Zone := GetNumberFromCharBuffer(StartPos);
+
+    if PInteger(@TempBuffer)^ = ADIF_ITUZ then
+    begin
+//      if not (TempBuffer[7] in ['0'..'9']) then
+//        asm nop end;
+
+//      if ActiveZoneMult = ITUZones then
+      TempRXData.Zone := GetNumberFromCharBuffer(StartPos);
+
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_QSO_ then
+      if PInteger(@TempBuffer[4])^ = ADIF_DATE then
+      begin
+        TempRXData.tSysTime.qtYear := (Ord(StartPos[3]) - Ord('0')) + (Ord(StartPos[2]) - Ord('0')) * 10;
+        TempRXData.tSysTime.qtMonth := (Ord(StartPos[5]) - Ord('0')) + (Ord(StartPos[4]) - Ord('0')) * 10;
+        TempRXData.tSysTime.qtDay := (Ord(StartPos[7]) - Ord('0')) + (Ord(StartPos[6]) - Ord('0')) * 10;
+      end;
+
+    if PInteger(@TempBuffer)^ = ADIF_TIME then
+    begin
+      TempRXData.tSysTime.qtHour := (Ord(StartPos[1]) - Ord('0')) + (Ord(StartPos[0]) - Ord('0')) * 10;
+      TempRXData.tSysTime.qtMinute := (Ord(StartPos[3]) - Ord('0')) + (Ord(StartPos[2]) - Ord('0')) * 10;
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_STX then
+      TempRXData.NumberSent := GetNumberFromCharBuffer(StartPos);
+
+    if PInteger(@TempBuffer)^ = ADIF_SRX then
+      TempRXData.NumberReceived := GetNumberFromCharBuffer(StartPos);
+
+    if PInteger(@TempBuffer)^ = ADIF_RST_ then
+    begin
+      if PInteger(@TempBuffer[4])^ = ADIF_RCVD then
+        TempRXData.RSTReceived := GetNumberFromCharBuffer(StartPos);
+
+      if PInteger(@TempBuffer[4])^ = ADIF_SENT then
+        TempRXData.RSTSent := GetNumberFromCharBuffer(StartPos);
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_MODE then
+    begin
+      TempMode := NoMode;
+      case StartPos[0] of
+        'C': TempMode := CW;
+        'S': TempMode := Phone;
+        'P', 'R': TempMode := Digital;
+        'F': TempMode := Phone;
+      end;
+      TempRXData.Mode := TempMode;
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_NAME then
+    begin
+      FieldLength := GetNumberFromCharBuffer(@CurrentPos[5]);
+      if FieldLength > SizeOf(TempRXData.Name) - 2 then FieldLength := SizeOf(TempRXData.Name) - 2;
+      TempRXData.Name[0] := CHR(FieldLength);
+      Windows.CopyMemory(@TempRXData.Name[1], StartPos, FieldLength);
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_PRECEDENCE then
+    begin
+      TempRXData.Precedence := CurrentPos[13];
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_CHECK then
+    begin
+      TempRXData.Check := GetNumberFromCharBuffer(StartPos);
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_QTH then
+    begin
+      FieldLength := GetNumberFromCharBuffer(@CurrentPos[4]);
+      if FieldLength > SizeOf(TempRXData.QTHString) - 2 then FieldLength := SizeOf(TempRXData.QTHString) - 2;
+      TempRXData.QTHString[0] := CHR(FieldLength);
+      Windows.CopyMemory(@TempRXData.QTHString[1], StartPos, FieldLength);
+      DomQTHTable.GetDomQTH(TempRXData.QTHString, TempRXData.DomMultQTH, TempRXData.DomesticQTH);
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_RXPWR then
+    begin
+      FieldLength := GetNumberFromCharBuffer(@CurrentPos[7]);
+      if FieldLength > SizeOf(TempRXData.Power) - 2 then FieldLength := SizeOf(TempRXData.Power) - 2;
+      TempRXData.Power[0] := CHR(FieldLength);
+      Windows.CopyMemory(@TempRXData.Power[1], StartPos, FieldLength);
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_STATE then
+      if TempBuffer[4] = 'E' then
+      begin
+        FieldLength := GetNumberFromCharBuffer(@CurrentPos[6]);
+        TempRXData.QTHString[0] := CHR(FieldLength);
+        Windows.CopyMemory(@TempRXData.QTHString[1], StartPos, FieldLength);
+        DomQTHTable.GetDomQTH(TempRXData.QTHString, TempRXData.DomMultQTH, TempRXData.DomesticQTH);
+      end;
+
+    if PInteger(@TempBuffer)^ = ADIF_ARRL_SECT then
+      if TempBuffer[4] = '_' then
+      begin
+        FieldLength := GetNumberFromCharBuffer(@CurrentPos[10]);
+        TempRXData.QTHString[0] := CHR(FieldLength);
+        Windows.CopyMemory(@TempRXData.QTHString[1], StartPos, FieldLength);
+        DomQTHTable.GetDomQTH(TempRXData.QTHString, TempRXData.DomMultQTH, TempRXData.DomesticQTH);
+      end;
+
+    if (PInteger(@TempBuffer)^ = ADIF_FREQ) then
+    begin
+      FieldLength := GetNumberFromCharBuffer(@CurrentPos[5]);
+      again:
+      for TempInteger := 0 to FieldLength-1  do
+        begin
+         if StartPos[TempInteger] = '.' then
+          begin
+          PosDecimal := TempInteger;
+            if Switch = False  then
+              begin
+               FieldLength :=   FieldLength + 1;
+               Switch := True;
+                  //    goto again;
+              end;
+           end;
+         if StartPos[TempInteger] in ['0'..'9'] then
+           TempRXData.Frequency := Ord(StartPos[TempInteger]) - Ord('0') + TempRXData.Frequency * 10
+           else
+            if StartPos[TempInteger] = '' then
+             TempRXData.Frequency := TempRXData.Frequency * 10;
+         end;
+         if PosDecimal >0 then
+         begin
+          while FieldLength - PosDecimal < 8 do          // 4.55.1
+           begin
+            TempRXData.Frequency := TempRXData.Frequency * 10;
+            FieldLength := FieldLength + 1 ;
+           end;
+          end;
+           
+      if TempRXData.Frequency < 30000 then
+        TempRXData.Frequency := TempRXData.Frequency * 1000;
+
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_BAND then
+    begin
+      TempBand := NoBand;
+      case StartPos[0] of
+        '1':
+          case StartPos[1] of
+            '6': TempBand := Band160;
+            '5': TempBand := Band15;
+            '2': TempBand := Band12;
+            '7': TempBand := Band17;
+            '0': TempBand := Band10;
+          end;
+        '2':
+          case StartPos[1] of
+            '0': TempBand := Band20;
+            'M': TempBand := Band2;
+          end;
+        '3': TempBand := Band30;
+        '4': TempBand := Band40;
+        '6': TempBand := Band6;
+        '7': TempBand := Band222;
+        '8': TempBand := Band80;
+
+      end;
+      TempRXData.Band := TempBand;
+    end;
+
+    if PInteger(@TempBuffer)^ = ADIF_EOR then
+    begin
+      ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
+//    if DoingDXMults then GetDXQTH(TempRXData);
+//    if DoingPrefixMults then SetPrefix(TempRXData);
+//    Sheet.SetMultFlags(TempRXData);
+
+      tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange), lpNumberOfBytesWritten);
+
+      inc(QSOCounter);
+      ClearContestExchange(TempRXData);
+      if QSOCounter mod 100 = 0 then DisplayLoadedQSOs;
+//      if QSOCounter > 4446 then
+//        asm nop end;
+    end;
+
+  end;
+{
+  if PInteger(CurrentPos)^ = EORAsInteger then
+  begin
+    LocateCall(TempRXData.Callsign, TempRXData.QTH, True);
+//    if DoingDXMults then GetDXQTH(TempRXData);
+//    if DoingPrefixMults then SetPrefix(TempRXData);
+//    Sheet.SetMultFlags(TempRXData);
+    tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange), lpNumberOfBytesWritten);
+    inc(QSOCounter);
+    ClearContestExchange(TempRXData);
+    if QSOCounter mod 100 = 0 then DisplayLoadedQSOs;
+  end;
+}
+  Increment:
+
+  if CurrentPos - MapBase < LogSize then
+  begin
+    inc(CurrentPos);
+//    inc(PosCounter);
+    goto 1;
+  end;
+  CloseLogFile;
+  4:
+//  FlushViewOfFile(MapBase, 0);
+  Windows.UnmapViewOfFile(MapBase);
+  3:
+  CloseHandle(MapFin);
+  2:
+  CloseHandle(h);
+
+  tUpdateLog(actRescore);
+  LoadinLog;
+  DisplayLoadedQSOs;
+  ImportFromADIFThreadID := 0;
+ // showint(QSOCounter);
+
+end;
+
+procedure ImportFromADIF_old;
+label
+  1, 2, 3, 4;
+var
+  MapFin                                : Cardinal;
+  MapBase                               : Pointer;
+  LogSize                               : Cardinal;
+  h                                     : HWND;
+  CurrentPos                            : PChar;
+  PosCounter                            : integer;
+  QSOCounter                            : integer;
+  FieldLength                           : integer;
+  delta                                 : integer;
+  lpNumberOfBytesWritten                : Cardinal;
+  TempBand                              : BandType;
+  TempMode                              : ModeType;
+
+const
+  RSTSentAsInteger                      = Ord('T') * $1000000 + Ord('N') * $10000 + Ord('E') * $100 + Ord('S');
+  RSTRcvdAsInteger                      = Ord('D') * $1000000 + Ord('V') * $10000 + Ord('C') * $100 + Ord('R');
+  ITUZoneAsInteger                      = Ord('Z') * $1000000 + Ord('U') * $10000 + Ord('T') * $100 + Ord('I');
+  CQZoneAsInteger                       = Ord('Z') * $1000000 + Ord('Q') * $10000 + Ord('C') * $100 + Ord('<');
+  TimeAsInteger                         = Ord('N') * $1000000 + Ord('O') * $10000 + Ord('_') * $100 + Ord('E');
+  DateAsInteger                         = Ord('E') * $1000000 + Ord('T') * $10000 + Ord('A') * $100 + Ord('D');
+  ModeAsInteger                         = Ord('E') * $1000000 + Ord('D') * $10000 + Ord('O') * $100 + Ord('M');
+  BandAsInteger                         = Ord('D') * $1000000 + Ord('N') * $10000 + Ord('A') * $100 + Ord('B');
+  CallAsInteger                         = Ord('L') * $1000000 + Ord('L') * $10000 + Ord('A') * $100 + Ord('C');
+  StateAsInteger                        = Ord('T') * $1000000 + Ord('A') * $10000 + Ord('T') * $100 + Ord('S');
+  EORAsInteger                          = Ord('>') * $1000000 + Ord('R') * $10000 + Ord('O') * $100 + Ord('E');
+  STXAsInteger                          = Ord('X') * $1000000 + Ord('T') * $10000 + Ord('S') * $100 + Ord('<');
+  SRXAsInteger                          = Ord('X') * $1000000 + Ord('R') * $10000 + Ord('S') * $100 + Ord('<');
+
+  procedure DisplayLoadedQSOs;
+  begin
+    asm
+      push QSOCounter
+    end;
+    wsprintf(QuickDisplayBuffer, '%u ' + TC_QSO_IMPORTED);
+    asm add esp,12
+    end;
+    SetTextInQuickCommandWindow(QuickDisplayBuffer);
+  end;
+
+begin
+
+  h := CreateFile(TR4W_ADIF_FILENAME, GENERIC_READ, FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+  if h = INVALID_HANDLE_VALUE then Exit;
+  LogSize := Windows.GetFileSize(h, nil);
+
+  MapFin := Windows.CreateFileMapping(h, nil, PAGE_READONLY, 0, 0, nil);
+  if MapFin = 0 then goto 2;
+
+  MapBase := Windows.MapViewOfFile(MapFin, FILE_MAP_READ, 0, 0, 0);
+  if MapBase = nil then goto 3;
+
+  if not OpenLogFile then goto 3;
+  tSetFilePointer(0, FILE_END);
+
+  CurrentPos := MapBase;
+  PosCounter := 0;
+  QSOCounter := 0;
+  ClearContestExchange(TempRXData);
+  1:
+
+  if PInteger(CurrentPos)^ = CallAsInteger then if CurrentPos[4] = ':' then
+    begin
+      FieldLength := GetNumberFromCharBuffer(@CurrentPos[5]);
+      delta := 7;
+      if FieldLength > 9 then inc(delta);
+      TempRXData.Callsign[0] := CHR(FieldLength);
+      Windows.CopyMemory(@TempRXData.Callsign[1], @CurrentPos[delta], FieldLength);
+    end;
+
+  if PInteger(CurrentPos)^ = StateAsInteger then
+    if CurrentPos[5] = ':' then
+    begin
+      FieldLength := GetNumberFromCharBuffer(@CurrentPos[6]);
+      delta := 8;
+      if FieldLength > 9 then inc(delta);
+      TempRXData.QTHString[0] := CHR(FieldLength);
+      Windows.CopyMemory(@TempRXData.QTHString[1], @CurrentPos[delta], FieldLength);
+      TempRXData.DomMultQTH := TempRXData.QTHString;
+//      TempRXData.DomesticQTH := TempRXData.QTHString;
+    end;
+
+  if PInteger(CurrentPos)^ = CQZoneAsInteger then
+    if CurrentPos[4] = ':' then
+      if ActiveZoneMult = CQZones then
+      begin
+        TempRXData.Zone := GetNumberFromCharBuffer(@CurrentPos[7]);
+      end;
+
+  if PInteger(CurrentPos)^ = ITUZoneAsInteger then
+    if CurrentPos[4] = ':' then
+      if ActiveZoneMult = ITUZones then
+      begin
+        TempRXData.Zone := GetNumberFromCharBuffer(@CurrentPos[7]);
+      end;
+
+  if PInteger(CurrentPos)^ = DateAsInteger then
+    if CurrentPos[4] = ':' then
+    begin
+      TempRXData.tSysTime.qtYear := (Ord(CurrentPos[10]) - Ord('0')) + (Ord(CurrentPos[9]) - Ord('0')) * 10;
+      TempRXData.tSysTime.qtMonth := (Ord(CurrentPos[12]) - Ord('0')) + (Ord(CurrentPos[11]) - Ord('0')) * 10;
+      TempRXData.tSysTime.qtDay := (Ord(CurrentPos[14]) - Ord('0')) + (Ord(CurrentPos[13]) - Ord('0')) * 10;
+    end;
+
+  if PInteger(CurrentPos)^ = TimeAsInteger then if CurrentPos[4] = ':' then
+    begin
+      TempRXData.tSysTime.qtHour := (Ord(CurrentPos[8]) - Ord('0')) + (Ord(CurrentPos[7]) - Ord('0')) * 10;
+      TempRXData.tSysTime.qtMinute := (Ord(CurrentPos[10]) - Ord('0')) + (Ord(CurrentPos[9]) - Ord('0')) * 10;
+    end;
+
+  if PInteger(CurrentPos)^ = STXAsInteger then if CurrentPos[4] = ':' then
+    begin
+      TempRXData.NumberSent := GetNumberFromCharBuffer(@CurrentPos[7]);
+    end;
+
+  if PInteger(CurrentPos)^ = SRXAsInteger then if CurrentPos[4] = ':' then
+    begin
+      TempRXData.NumberReceived := GetNumberFromCharBuffer(@CurrentPos[7]);
+    end;
+
+  if PInteger(CurrentPos)^ = RSTSentAsInteger then if CurrentPos[4] = ':' then
+    begin
+      TempRXData.RSTSent := GetNumberFromCharBuffer(@CurrentPos[7]);
+    end;
+
+  if PInteger(CurrentPos)^ = RSTRcvdAsInteger then if CurrentPos[4] = ':' then
+    begin
+      TempRXData.RSTReceived := GetNumberFromCharBuffer(@CurrentPos[7]);
+    end;
+
+  if PInteger(CurrentPos)^ = ModeAsInteger then if CurrentPos[4] = ':' then
+    begin
+      TempMode := NoMode;
+      case CurrentPos[7] of
+        'C': TempMode := CW;
+        'S': TempMode := Phone;
+        'R': TempMode := Digital;
+        'F': TempMode := Phone;
+      end;
+      TempRXData.Mode := TempMode;
+    end;
+
+  if PInteger(CurrentPos)^ = BandAsInteger then if CurrentPos[4] = ':' then
+    begin
+      TempBand := NoBand;
+      case CurrentPos[7] of
+        '1':
+          case CurrentPos[8] of
+            '6': TempBand := Band160;
+            '5': TempBand := Band15;
+            '2': TempBand := Band12;
+            '0': TempBand := Band10;
+          end;
+        '2':
+          case CurrentPos[8] of
+            '0': TempBand := Band20;
+            'M': TempBand := Band2;
+          end;
+        '3': TempBand := Band30;
+        '4': TempBand := Band40;
+        '6': TempBand := Band6;
+        '7': TempBand := Band222;
+        '8': TempBand := Band80;
+
+      end;
+      TempRXData.Band := TempBand;
+    end;
+
+{
+  for TempBand := Band160 to Band432 do
+  begin
+    if Windows.lstrcmp(@CurrentPos[7], ADIFBANDSTRINGSARRAY[TempBand]) = 0 then
+    begin
+      TempRXData.Band := TempBand;
+      Break;
+    end;
+  end;
+}
+  if PInteger(CurrentPos)^ = EORAsInteger then
+  begin
+    ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
+//    if DoingDXMults then GetDXQTH(TempRXData);
+//    if DoingPrefixMults then SetPrefix(TempRXData);
+//    Sheet.SetMultFlags(TempRXData);
+
+    tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange), lpNumberOfBytesWritten);
+
+    inc(QSOCounter);
+    ClearContestExchange(TempRXData);
+    if QSOCounter mod 100 = 0 then DisplayLoadedQSOs;
+//    if QSOCounter >= 4400
+//        then asm nop end;
+
+  end;
+
+  if PosCounter <> LogSize - 4 then
+  begin
+    inc(CurrentPos);
+    inc(PosCounter);
+    goto 1;
+  end;
+  CloseLogFile;
+  4:
+  FlushViewOfFile(MapBase, 0);
+  Windows.UnmapViewOfFile(MapBase);
+  3:
+  CloseHandle(MapFin);
+  2:
+  CloseHandle(h);
+
+  tUpdateLog(actRescore);
+  LoadinLog;
+  DisplayLoadedQSOs;
+  ImportFromADIFThreadID := 0;
+ // showint(QSOCounter);
+
+end;
+
+procedure StartNewContest;
+begin
+//  ReleaseMutex(tMutex);
+  CloseHandle(tMutex);
+  Windows.SetCurrentDirectory(TR4W_PATH_NAME);
+  Windows.WinExec('D:\TR4W_WinAPI\out\tr4w.exe', 0);
+  ExitProgram(False);
+end;
+
+procedure CheckQuestionMark;
+var
+  i                                     : integer;
+begin
+  if CallWindowString = '' then Exit;
+  for i := 1 to CallstringLength do
+  begin
+    if CallWindowString[i] = '?' then
+    begin
+      SendMessage(wh[mweCall], EM_SETSEL, i - 1, i);
+      Break;
+    end;
+  end;
+end;
+
+procedure ChangeFocus(Text: PChar);
+var
+  h                                     : HWND;
+  t                                     : Cardinal;
+  r                                     : integer;
+begin
+  h := CreateFile('D:\TR4W_WinAPI\out\TEST\focus.txt', GENERIC_WRITE or GENERIC_READ, FILE_SHARE_WRITE or FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+  SetFilePointer(h, 0, nil, FILE_END);
+
+  asm
+  push Text
+  call windows.GetTickCount
+  push eax
+  end;
+  r := wsprintf(TempBuffer1, '%u %s'#13#10);
+  asm add esp,16 end;
+  Windows.WriteFile(h, TempBuffer1, r, t, nil);
+  CloseHandle(h);
+//  AddStringToTelnetConsole(Text, tstSend);
+end;
+
+procedure SetCommand(c: PChar);
+begin
+  Format(TempBuffer1, TC_SET_VALUE_OF_SET_NOW, c);
+  if YesOrNo(tr4whandle, TempBuffer1) = IDno then Exit;
+  CommandToSet := c;
+  ProcessMenu(menu_options);
+end;
+
+function Get101Window(h: HWND): HWND;
+begin
+  Result := Windows.GetDlgItem(h, 101)
+end;
+
+procedure InvertBooleanCommand(Command: PBoolean);
+var
+  i                                     : integer;
+  p                                     : Pointer;
+begin
+  for i := 1 to CommandsArraySize do
+    if CFGCA[i].crAddress = Command then
+    begin
+      InvertBoolean(Command^);
+      Windows.WritePrivateProfileString(_COMMANDS, CFGCA[i].crCommand, BA[Command^], TR4W_INI_FILENAME);
+      p := CommandsProcArray[CFGCA[i].crP];
+      asm
+      call p
+      end;
+    end;
+end;
+
+procedure ShowHelp(Topic: PChar);
+{$IF LANG = 'RUS'}
+var
+  HelpBuffer                            : array[0..127] of Char;
+{$IFEND}
+begin
+{$IF LANG = 'RUS'}
+  Format(HelpBuffer, '%str4w_manual_' + LANG + '.chm::/%s.html', TR4W_PATH_NAME, Topic);
+  HtmlHelp.hh(tr4whandle {GetDesktopWindow()}, HelpBuffer, HH_DISPLAY_TOPIC, 0);
+{$IFEND}
+end;
+
+procedure RunExplorer(Command: PChar);
+var
+  TempPchar                             : PChar;
+begin
+
+  if strpos(Command, '.') <> nil then
+    TempPchar := 'explorer /select, %s' else TempPchar := 'explorer %s';
+
+  Format(wsprintfBuffer, TempPchar, Command);
+  WinExec(wsprintfBuffer, SW_SHOW);
+end;
+
+procedure RunOptionsDialog(f: CFGFunc);
+begin
+  CommandsFilter := f;
+//  tDialogBox(61, @SettingsDlgProc2);
+  CreateModalDialog(390, 250, tr4whandle, @SettingsDlgProc2, 0);
+end;
+
+procedure OpenUrl(url: PChar);
+var
+  lpcbValue                             : DWORD;
+  phkResult                             : hkey;
+begin
+  lpcbValue := SizeOf(TempBuffer2);
+
+  if RegOpenKeyEx(HKEY_CLASSES_ROOT, 'http\shell\open\command', 0, KEY_ALL_ACCESS, phkResult) = ERROR_SUCCESS then
+  begin
+    RegQueryValueEx(phkResult, nil, nil, nil, @TempBuffer2, @lpcbValue);
+    RegCloseKey(phkResult);
+
+    for lpcbValue := 0 to SizeOf(TempBuffer2) - 2 do
+      if TempBuffer2[lpcbValue] = '"' then if TempBuffer2[lpcbValue + 1] = ' ' then
+          TempBuffer2[lpcbValue + 1] := #0;
+
+    Format(wsprintfBuffer, '%s "%s"', TempBuffer2, url);
+
+    WinExec(wsprintfBuffer, SW_SHOWNORMAL);
+  end
+  else
+    RunExplorer(url);
+end;
+
+function GetAddMultBand(Mult: TAdditionalMultByBand; Band: BandType): BandType;
+begin
+  case Mult of
+    dmbbDefauld: Result := Band;
+    dmbbAllBand: Result := All;
+  end;
+
+end;
+
+function DeviceIoControlHandler
+  (
+  code: ULONG;
+  pBuffer: PChar;
+  InputBufferLength:
+  ULONG; OutputBufferLength:
+  ULONG; pOutputLength: PULONG
+  ): Cardinal;
+
+var
+  store_count                           : DWORD;
+  data_ptr                              : PUCHAR;
+  data                                  : UCHAR;
+  adr                                   : PUCHAR;
+begin
+  asm
+	mov eax,Code                   // ???. ?????????, ??? ?? ??? ? ??? ??????.
+
+	cmp eax,IOCTL_READ_PORTS       // ?????? ????????? LPT-?????
+	jz	@@loc_read_port
+	cmp eax,IOCTL_WRITE_PORTS      // ?????? ? ???????? LPT-?????
+	jz	@@loc_write_port
+	mov eax,0//STATUS_NOT_IMPLEMENTED // ????????????????? ??? ???????
+	ret
+
+	// ?????? ?? ????????? ????? LPT
+@@loc_read_port:
+	mov eax,InputBufferLength      // ????? ????????? ?????? ?????? ???? ????? ????? ????????
+	cmp eax,OutputBufferLength
+	jnz @@loc_fault_ioctl
+
+	and eax,0FFFEH                 // ????? ?????????? ??? ?????-??????
+	mov store_count,eax
+	cmp eax,0                      // ????????? ?????
+	jz  @@loc_fault_ioctl
+
+	mov eax,pBuffer
+	mov data_ptr,eax
+
+@@in_loop:			// ???? ????? ??????
+	push ebx
+	push edx
+	mov ebx,data_ptr
+	xor eax,eax
+	mov al,BYTE ptr [ebx]	// ?????? ???? -- ????? ????? ? ???????? ????????
+	inc ebx
+	mov data_ptr,ebx
+	mov ah,al
+	shr al,1
+	shr al,1
+	shr al,1
+	shr al,1	// al -- ????? ????? LPT -- 1,2 ??? 3
+	and al,3
+	mov edx,3BCH	// LPT1
+	cmp al,1
+	jz @@1
+	mov edx,378H	// LPT2
+	cmp al,2
+	jz @@1
+	mov edx,278H	// LPT3
+ @@1:
+	mov al,ah
+	mov ah,0
+	and al,7	// ???????? ???????? LPT -- 0..7
+	add edx,eax	// ???? ????? + ???????? ????????
+	mov adr,edx
+	pop edx
+	pop ebx
+
+//	invoke READ_PORT_UCHAR, adr	// ?????? ????
+
+	push ebx
+	mov ebx,data_ptr
+	mov BYTE ptr [ebx],0//al	 //????????? ??????????? ???? ? ??????
+	inc ebx
+	mov data_ptr,ebx
+	pop ebx
+
+	mov eax,store_count	// ???????? ??????? ??????
+	sub eax,2
+	mov store_count,eax
+	cmp eax,0
+	jnz @@in_loop		// ???? ?? ??? ???? ?????????? -- ?????.
+
+	push ebx
+	mov eax,OutputBufferLength
+	mov ebx,pOutputLength	// ????? ??????, ???????????? ??????? ?????????? ????????????.
+	mov DWORD ptr [ebx],eax
+	pop ebx
+
+	mov eax,0//STATUS_SUCCESS
+//	ret
+jmp @@all
+
+
+	// ?????? ? ???????? ????? LPT
+@@loc_write_port:
+//	mov eax,InputBufferLength
+//	and eax,0FFFEH	// ????? ?????????? ??? ?????-??????
+//	mov store_count,eax
+//	cmp eax,0	// ????????? ?????!!!
+//	jz  @@loc_fault_ioctl
+
+	mov eax,pBuffer
+	mov data_ptr,eax
+
+@@out_loop:			// ???? ?????? ??????
+	push ebx
+	push edx
+	mov ebx,data_ptr
+        inc ebx
+        inc ebx
+	xor eax,eax
+	mov ax,word ptr [ebx]	// ?????? ???? -- ????? ????? ? ???????? ????????
+	inc ebx
+        add ebx,4
+
+	mov ah,al
+	shr al,1
+	shr al,1
+	shr al,1
+	shr al,1	// al -- ????? ????? LPT -- 1,2 ??? 3;
+	and al,3
+	mov edx,3BCH	// LPT1
+	cmp al,1
+	jz @@2
+	mov edx,378H	// LPT2
+	cmp al,2
+	jz @@2
+	mov edx,278H	// LPT3
+ @@2:
+	mov al,ah
+	mov ah,0
+	and al,7	// ???????? ???????? LPT -- 0..7
+	add edx,eax	// ???? ????? + ???????? ????????
+	mov adr,edx
+
+	mov al,BYTE ptr [ebx]	// ???? ??????
+	mov data,al
+	inc ebx
+	mov data_ptr,ebx
+
+	pop edx
+	pop ebx
+
+//	invoke WRITE_PORT_UCHAR, adr, data	// ????? ? ????
+
+	mov eax,store_count	// ???????? ??????? ??????
+	sub eax,2
+	mov store_count,eax
+	cmp eax,0
+	jnz @@out_loop		// ???? ?? ??? ???? ?????????? -- ?????.
+
+	mov eax,0//STATUS_SUCCESS
+	ret
+
+@@loc_fault_ioctl:
+	mov eax,0//STATUS_UNSUCCESSFULL
+	ret
+
+@@all:
+  end;
+end;
+
+function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
+const
+  TOOLTIPS_CLASS                        = 'tooltips_class32';
+  TTS_ALWAYSTIP                         = $01;
+  TTS_NOPREFIX                          = $02;
+  TTS_BALLOON                           = $40;
+  TTF_SUBCLASS                          = $0010;
+  TTF_TRANSPARENT                       = $0100;
+  TTF_TRACK                             = $0020;
+  TTF_CENTERTIP                         = $0002;
+  TTF_ABSOLUTE                          = $0080;
+  TTM_ADDTOOL                           = $0400 + 50;
+  TTM_SETTITLE                          = (WM_USER + 32);
+  ICC_WIN95_CLASSES                     = $000000FF;
+
+begin
+  Result := CreateWindow(TOOLTIPS_CLASS, nil, WS_POPUP or TTS_NOPREFIX {or TTS_BALLOON } or TTS_ALWAYSTIP, 100, 100, 100, 100, Control, 0, hInstance, nil);
+  if Result <> 0 then
+  begin
+    SetWindowPos(Result, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOACTIVATE or SWP_NOMOVE or SWP_NOSIZE);
+    Windows.ZeroMemory(@ti, SizeOf(ti));
+    ti.cbSize := SizeOf(ti);
+    //ti.uFlags := 0;//TTF_ABSOLUTE or TTF_TRACK;
+    ti.uFlags := {TTF_CENTERTIP or } TTF_TRANSPARENT or TTF_SUBCLASS;
+    ti.HWND := Control;
+    Windows.GetClientRect(Control, ti.rect);
+    SendMessage(Result, TTM_ADDTOOL, 1, integer(@ti));
+  end;
+end;
+
+{$IF MORSERUNNER}
+
+function GetMorseRunnerWindow: boolean;
+begin
+  Result := False;
+  MorseRunnerWindow := Windows.FindWindow('TMainForm', 'Morse Runner');
+  if MorseRunnerWindow = 0 then Exit;
+  MorseRunnerWindowsCounter := 0;
+  EnumChildWindows(MorseRunnerWindow, @EnumMorseRunnerChildProc, 0);
+end;
+
+function EnumMorseRunnerChildProc(wnd: HWND; l: lParam): BOOL; stdcall;
+begin
+  Windows.GetClassName(wnd, wsprintfBuffer, SizeOf(wsprintfBuffer));
+  if Windows.lstrcmp(wsprintfBuffer, 'TEdit') = 0 then
+  begin
+    if MorseRunnerWindowsCounter = 0 then MorseRunner_MyCallsign := wnd;
+    if MorseRunnerWindowsCounter = 1 then MorseRunner_Number := wnd;
+    if MorseRunnerWindowsCounter = 2 then MorseRunner_RST := wnd;
+    if MorseRunnerWindowsCounter = 3 then MorseRunner_Callsign := wnd;
+    inc(MorseRunnerWindowsCounter);
+  end;
+  Result := True;
+
+end;
+
+{$IFEND}
+
+procedure RunPlugin(PluginNumber: integer);
+var
+  CreatedReport                         : PChar;
+  MakeRescore, ReLoadLog                : boolean;
+  module                                : HWND;
+  TempFunc                              : Tmain;
+begin
+  Format(TempBuffer1, '%sPlugins\%s', TR4W_PATH_NAME, PluginsArray[PluginNumber - 10700]);
+  module := LoadLibrary(TempBuffer1);
+  TempFunc := GetProcAddress(module, 'main');
+  CreatedReport := nil;
+  ReLoadLog := False;
+  MakeRescore := False;
+  TempFunc(TR4W_LOG_FILENAME, CreatedReport, ReLoadLog, MakeRescore, ExchangeInformation, ActiveExchange, 0, 0, 0);
+  if ReLoadLog then LoadinLog;
+
+  if CreatedReport <> nil then
+  begin
+    PreviewFileNameAddress := CreatedReport; //TR4W_CFG_FILENAME;
+    FilePreview;
+  end;
+
+  FreeLibrary(module);
+
+end;
+
+procedure LoadInPlugins();
+label
+  1, Next;
+var
+  lpFindFileData                        : TWIN32FindData;
+  hFindFile                             : HWND;
+  module                                : HWND;
+  TempFunc                              : Ttr4wGetPlugin;
+  pop                                   : HMENU;
+const
+  MAXLOADEDPLUGINS                      = 10;
+begin
+  Format(TempBuffer1, '%sPlugins\tr4w*.dll', TR4W_PATH_NAME);
+
+  hFindFile := Windows.FindFirstFile(TempBuffer1, lpFindFileData);
+  if hFindFile <> INVALID_HANDLE_VALUE then goto 1 else Exit;
+
+  Next:
+  if FindNextFile(hFindFile, lpFindFileData) then
+  begin
+    1:
+    Format(TempBuffer1, '%sPlugins\%s', TR4W_PATH_NAME, lpFindFileData.cFileName);
+
+    module := LoadLibrary(TempBuffer1);
+    TempFunc := GetProcAddress(module, 'tr4wGetPlugin');
+    if @TempFunc <> nil then
+    begin
+      if LoadedPlugins = 0 then
+      begin
+        pop := CreatePopupMenu;
+        Windows.InsertMenu(tr4w_main_menu, menu_exit, MF_BYCOMMAND or MF_POPUP, pop, 'Plugins');
+      end;
+      inc(LoadedPlugins);
+      Windows.AppendMenu(pop, MF_STRING, 10700 + LoadedPlugins, TempFunc());
+      Windows.lstrcat(PluginsArray[LoadedPlugins], lpFindFileData.cFileName);
+    end;
+    FreeLibrary(module);
+    goto Next;
+  end;
+  Windows.FindClose(hFindFile);
+  if LoadedPlugins > 0 then
+    Windows.InsertMenu(tr4w_main_menu, menu_exit, MF_BYCOMMAND or MF_SEPARATOR, 0, nil);
+
+end;
+
+procedure RichEditOperation(Load: boolean);
+begin
+
+  if Load then
+  begin
+    if RichEditObject.reLibModule = 0 then
+    begin
+      RichEditObject.reLibModule := Windows.LoadLibrary('RICHED32.DLL');
+    end;
+    inc(RichEditObject.reUsers);
+  end
+  else
+  begin
+    dec(RichEditObject.reUsers);
+    if RichEditObject.reUsers = 0 then
+    begin
+      FreeLibrary(RichEditObject.reLibModule);
+      RichEditObject.reLibModule := 0;
+    end;
+  end;
+
+end;
+
+procedure OpenStationInformationWindow(dwInitParam: lParam);
+begin
+  CreateModalDialog(187, 260, tr4whandle, @CreateCabrilloDlgProc, dwInitParam);
+end;
+
+procedure OpenListOfMessages;
+begin
+  CreateModalDialog(397, 177, tr4whandle, @AltPDlgProc, 0);
+end;
+
+procedure RenameCommand(Old, New: PChar);
+begin
+  if GetPrivateProfileString(_COMMANDS, Old, nil, TempBuffer1, SizeOf(TempBuffer1), TR4W_INI_FILENAME) = 0 then Exit;
+  Windows.WritePrivateProfileString(_COMMANDS, Old, nil, TR4W_INI_FILENAME);
+  Windows.WritePrivateProfileString(_COMMANDS, New, TempBuffer1, TR4W_INI_FILENAME);
+end;
+
+procedure RenameCommands();
+begin
+  RenameCommand('DVP ENABLE', 'DVK ENABLE');
+  RenameCommand('DVP PATH', 'DVK PATH');
+  RenameCommand('DVP RECORDER', 'DVK RECORDER');
+end;
+
+procedure PTTOn;
+label
+  DrawPTTLabel;
+var
+//  hand                                  : HWND;
+  TempPTTValue                          : Byte;
+  TempPortInterface                     : PortInterface;
+  TempByte                              : Byte;
+begin
+  if not PTTEnable then
+  begin
+
+    if ActiveRadioPtr.tKeyerPort in [Parallel1..Parallel3] then
+      if DriverIsLoaded() then
+      begin
+        TempByte := GetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl);
+        DriverBitOperation(TempByte, STROBE_SIGNAL, boSet1);
+        SetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl, TempByte);
+      end;
+
+    Exit;
+  end;
+
+  begin
+    if wkTurnPTT(True) then goto DrawPTTLabel;
+    if tPTTVIACAT(True) then goto DrawPTTLabel;
+    TempPortInterface := tGetPortType(ActiveRadioPtr.tKeyerPort);
+    if TempPortInterface <> NoInterface then
+    begin
+      if TempPortInterface = SerialInterface then
+      begin
+        TempPTTValue := 0;
+        if ActiveRadioPtr.tr4w_keyer_rts_state = RtsDtr_PTT then TempPTTValue := SETRTS;
+        if ActiveRadioPtr.tr4w_keyer_DTR_state = RtsDtr_PTT then TempPTTValue := SETDTR;
+
+        if TempPTTValue = 0 then Exit;
+        if ActiveRadioPtr.tKeyerPortHandle <> INVALID_HANDLE_VALUE then
+        begin
+          TREscapeCommFunction(ActiveRadioPtr.tKeyerPortHandle, TempPTTValue);
+          goto DrawPTTLabel;
+        end;
+        Exit;
+      end;
+
+      if not DriverIsLoaded() then Exit;
+
+      TempByte := GetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl);
+      DriverBitOperation(TempByte, STROBE_SIGNAL, boSet1);
+      DriverBitOperation(TempByte, PTT_SIGNAL, boSet1);
+//      TempByte := TempByte or BIT0; //1pin (Inverted)
+//      TempByte := TempByte or BIT2; //16pin
+      SetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl, TempByte);
+
+      DrawPTTLabel:
+
+      ActiveRadioPtr.tPTTStatus := PTT_ON;
+      PTTStatusChanged;
+
+      Sleep(PTTTurnOnDelay);
+    end;
+  end;
+end;
+
+procedure PTTOff;
+label
+  DrawPTTLabel;
+var
+  PTT_value                             : Byte;
+  TempPortInterface                     : PortInterface;
+  TempByte                              : Byte;
+begin
+  DebugMsg('Enter MainUnit.PTTOff');
+  if not PTTEnable then
+  begin
+    if ActiveRadioPtr.tKeyerPort in [Parallel1..Parallel3] then
+      if DriverIsLoaded() then
+      begin
+        TempByte := GetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl);
+        DriverBitOperation(TempByte, STROBE_SIGNAL, boSet0);
+        SetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl, TempByte);
+      end;
+
+    Exit;
+
+  end;
+  if IsCWByCATActive(ActiveRadioPtr) then    // ny4i Issue 131
+     begin
+     DEBUGMsg('Stopping CW from PTTOff');
+     ActiveRadioPtr^.StopSendingCW;
+     goto DrawPTTLabel; // Fix this goto...Put the code below in an IF... TODO
+     end;
+  if wkTurnPTT(False) then goto DrawPTTLabel;
+  if tPTTVIACAT(False) then goto DrawPTTLabel;
+  TempPortInterface := tGetPortType(ActiveRadioPtr.tKeyerPort);
+  if TempPortInterface <> NoInterface then
+  begin
+    if TempPortInterface = SerialInterface then
+    begin
+      PTT_value := 0;
+      if ActiveRadioPtr.tr4w_keyer_rts_state = RtsDtr_PTT then PTT_value := CLRRTS;
+      if ActiveRadioPtr.tr4w_keyer_DTR_state = RtsDtr_PTT then PTT_value := CLRDTR;
+      if PTT_value = 0 then Exit;
+
+      if ActiveRadioPtr.tKeyerPortHandle <> INVALID_HANDLE_VALUE then
+      begin
+        TREscapeCommFunction(ActiveRadioPtr.tKeyerPortHandle, PTT_value);
+        goto DrawPTTLabel;
+      end;
+      Exit;
+    end;
+
+    if not DriverIsLoaded() then Exit;
+
+    TempByte := GetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl);
+    DriverBitOperation(TempByte, STROBE_SIGNAL, boSet0);
+    DriverBitOperation(TempByte, PTT_SIGNAL, boSet0);
+    SetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl, TempByte);
+
+    DrawPTTLabel:
+    ActiveRadioPtr.tPTTStatus := PTT_OFF;
+    PTTStatusChanged;
+
+  end;
+end;
+
+procedure DebugRadioTempBuffer(sDecorator: string; var bRay: array of char);   // ny4i Added in Issue 145
+{$IF NEWER_DEBUG}
+var
+   i: integer;
+   s: string;
+   Buf: array[0..100 * 2] of Char;
+   nLen: integer;
+{$IFEND}
+begin
+{$IF NEWER_DEBUG}
+   // Only do this stuff if the log level is set right (future change) ny4i
+   nLen := Ord(bRay[0]);
+   BinToHex(@bRay[1],Buf,nLen);
+   Buf[(nLen*2) - 2] := #0;
+   DebugMsg(sDecorator + ': ' + Buf);
+{$IFEND}
+end;
+
+procedure DebugMsg(s: string);
+{$IF NEWER_DEBUG}
+var formattedDate: string;
+{$IFEND}
+begin
+{$IF NEWER_DEBUG}
+   LongTimeFormat := 'hh nn ss (zzz)';
+   DateTimeToString(formattedDate, 'tt', Now);
+   AddStringToTelnetConsole(PChar('[' + formattedDate + '] ' + s),tstSend);
+{$IFEND}
+end;
+
+// These two functions are overloaded so on can call without any parameters to
+// test the active radio. Or pass a ptr to the radio of one's choosing. If the
+// radio pointer is nil, then it just uses the active radio.
+
+function IsCWByCATActive(theRadio: RadioPtr): boolean;  // ny4i Issue # 111
+var ptr: RadioPtr;
+begin
+   if not Assigned(theRadio) then
+      begin
+      ptr := ActiveRadioPtr;
+      end
+   else
+      begin
+      ptr := theRadio;
+      end;
+   Result := (ptr.CWByCAT) and
+             (ptr.RadioModel in RadioSupportsCWByCAT);
+end;
+
+function IsCWByCATActive: boolean;  // ny4i Issue # 111
+begin
+   Result := IsCWByCatActive(ActiveRadioPtr);  // Call base function with active radio // ny4i Issue 111
+end;
+
+{
+procedure SelectFileOfFolder(Parent: HWND; FileName: PChar; Mask: PChar; SelectType: CFGType);
+begin
+  SelectedFileName := FileName;
+  SelectedFileNameMask := Mask;
+  SelectedFileType := SelectType;
+  if SelectType = ctFileName then SelectedFileNameFlag := DDL_ARCHIVE or DDL_READWRITE or DDL_DIRECTORY;
+  if SelectType = ctDirectory then SelectedFileNameFlag := DDL_ARCHIVE or DDL_EXCLUSIVE or DDL_DIRECTORY;
+  tDialogBox(77, @SelectFileDlgProc);
+end;
+}
+begin
+{$IF tDebugMode}
+  SetNewMemMgr;
+//Msidle.dll  GetIdleMinutes(
+{$IFEND}
+
+end.
+
   begin
    InactiveRigCallingCQ := False;
    scWk_Reset;

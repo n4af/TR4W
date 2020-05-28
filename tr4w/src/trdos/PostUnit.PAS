@@ -2546,10 +2546,10 @@ if TempRXData.DomMultQTH = '' then
             end;
           end;
 
-          RSTAndSerialNumberAndGridandPossibleMemberNumber:
+ {         RSTAndSerialNumberAndGridandPossibleMemberNumber:
           begin
           end;
-
+  }
        RSTQSONumberOrDomesticQTHExchange:      //n4af 4.40.6
           begin
          p  := (IntToPchar(nrReceived)) ;

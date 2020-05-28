@@ -269,18 +269,19 @@ begin
    //  if not WKbusy then flushcwbuffer;  // ny4i winkeyer
       wkAddCWMessageToInternalBuffer(Msg);
        wkBUSY := True;   // 4.88.2
-      Exit;
+     Exit;
     end;
 
    if ActiveRadioPtr.tPTTStatus = PTT_OFF then
       begin
-      PTTOn;
+       PTTOn;
       end;
    CPUKeyer.AddStringToCWBuffer(Msg, Tone);
 //    CountsSinceLastCW := 0;
 
     if CWThreadID = 0 then
     begin
+    wkBusy := True;   // 4.86.6
 //      ExitFromCWThread := False;
 //      inc(CWThreadCounter);
 //      windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));

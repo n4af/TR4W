@@ -812,6 +812,7 @@ begin
       if lpNumberOfBytesRead > 0 then
         for i := 0 to lpNumberOfBytesRead - 1 do
         begin
+          wkBusy := True;
 {$IF K6VVA_WK_DEBUG}
           wkWriteToDebugFile(Char(wkThreadReadBuffer[i]), False);
 {$IFEND}
@@ -833,15 +834,16 @@ begin
 //            sWriteFile(wkDebugFileRX, wkThreadReadBuffer[I], 1);
 {$IFEND}
     {(*}
-            wkBUSY    := (wkThreadReadBuffer[I] and (1 shl 2)) <> 0;
+      //      wkBUSY    := (wkThreadReadBuffer[I] and (1 shl 2)) <> 0;  // 4.88.6
             wkBREAKIN := (wkThreadReadBuffer[I] and (1 shl 1)) <> 0;
             wkXOFF    := (wkThreadReadBuffer[I] and (1 shl 0)) <> 0;
     {*)}
 
 {$IF WINKEYDEBUG}
-            if wkBUSY then AddStringToTelnetConsole('YES', tstSend)
-            else
-              AddStringToTelnetConsole('NO', tstSend);
+             if wkBusy then AddStringToTelnetConsole('YES', tstSend)
+
+              else
+                             AddStringToTelnetConsole('NO', tstSend);
 
 {$IFEND}
 
@@ -855,7 +857,7 @@ begin
 //              wkHostBufferSendIndex := 0;
 //              wkWaitingBytesInHost := 0;
               if not tStartAutoCallTerminate(wkThreadID) then tStartAutoCQ;
-              BackToInactiveRadioAfterQSO;
+               BackToInactiveRadioAfterQSO;
             end;
           end
           else
@@ -1129,14 +1131,13 @@ begin
   BytesSendNow := 0;
   while BytesSendNow < 5 do
   begin
-    if wkWaitingBytesInHost <= 0 then Exit;
+     if wkWaitingBytesInHost <= 0 then Exit;
 {!!!}
 {$IF NOT K6VVA_WK_DEBUG}
 //    if wkXOFF then Exit;
 {$IFEND}
 
     wkSendByte(Ord(wkInternalCWBuffer[wkHostBufferSendIndex]));
-
 {$IF K6VVA_WK_DEBUG}
     CID_TWO_BYTES[0] := wkInternalCWBuffer[wkHostBufferSendIndex];
     AddStringToTelnetConsole(CID_TWO_BYTES);
