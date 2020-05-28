@@ -99,7 +99,7 @@ type
     reUsers: Cardinal;
   end;
 
-  ExchangeInformationRecord = record
+ ExchangeInformationRecord = record
     Age: boolean;
     Chapter: boolean;
     Check: boolean;
@@ -107,7 +107,7 @@ type
     FOCNumber: boolean;
     Kids: boolean;
     Name: boolean;
-//  PostalCode: boolean;
+//    PostalCode: boolean;
     Power: boolean;
     Precedence: boolean;
     QSONumber: boolean;
@@ -118,7 +118,6 @@ type
     Zone: boolean;
     ZoneOrSociety: boolean;
   end;
-
   SCPIndexArrayType = array[0..36, 0..36] of longword {LONGINT n6tr} {LongWord {ua4wli};
   SCPIndexArrayPtr = ^SCPIndexArrayType;
 
@@ -126,7 +125,7 @@ type
   TAdditionalMultByBand = (dmbbDefauld, dmbbAllBand);
   Yaesu5Bytes = array[0..4] of Byte;
   FileNameType = array[0..MAX_PATH - 1] of Char;
-  OperatorType = array[0..10] of Char;  // 4.84.3
+  OperatorType = array[0..10] of Char;
   ZoneModeType = (CQZoneMode, ITUZoneMode);
 
 const
@@ -181,11 +180,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.88.3' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.88.4' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'May 5, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'May 19, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -1171,7 +1170,7 @@ const
 
   MonthTags                             : array[1..12] of PChar = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
-  CallstringLength                      = 13;
+  CallstringLength                      = 13;         
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
   ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
@@ -1386,7 +1385,7 @@ type
    {07}Prefix: PrefixMultiplierString;
    {01}Continent: ContinentType;
 
-   {14}StandardCall: CallString;
+   {14}StandardCall: CallString; 
    {02}Country: Word;
 
   end;
@@ -1536,18 +1535,14 @@ type
 
 {01}//  res8:                Byte;
 {01}//  res9:                Byte;
-{01}//  res10:               Byte;   // 4.84.3
-{01}//  res11:               Byte;   // 4.84.3
-{01}//  res12:               Byte;   // 4.84.3
-{01}//  res13:               Byte;   // 4.84.3
-
-
+{01}//  res10:               Byte;
 {******************************}
 
-//{01}  res11:               Byte;       // 4.84.3
-//{01}  res12:               Byte;       // 4.84.3
-//{01}  res13:               Byte;       // 4.84.3
-//{01}  res14:               Byte;       // 4.84.3
+{01}//  res11:               Byte;
+
+{01}//  res12:               Byte;
+{01}//  res13:               Byte;
+{01}//  res14:               Byte;
 {01}  res15:               Byte;
 
 {01}  res16:               Byte;
