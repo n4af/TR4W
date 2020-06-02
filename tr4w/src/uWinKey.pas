@@ -282,7 +282,7 @@ begin
 
   wkSendAdminCommand(wkECHOTEST);
   wkSendByte(wkECHOTESTBYTE);
-//  Sleep(150);
+  // Sleep(150); 
 
   if ((not wkRead(1)) or (wkREADBuffer[0] <> wkECHOTESTBYTE)) then
   begin
@@ -834,7 +834,7 @@ begin
 //            sWriteFile(wkDebugFileRX, wkThreadReadBuffer[I], 1);
 {$IFEND}
     {(*}
-      //      wkBUSY    := (wkThreadReadBuffer[I] and (1 shl 2)) <> 0;  // 4.88.6
+            wkBUSY    := (wkThreadReadBuffer[I] and (1 shl 2)) <> 0;  
             wkBREAKIN := (wkThreadReadBuffer[I] and (1 shl 1)) <> 0;
             wkXOFF    := (wkThreadReadBuffer[I] and (1 shl 0)) <> 0;
     {*)}

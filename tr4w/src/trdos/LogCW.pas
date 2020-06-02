@@ -281,13 +281,13 @@ begin
 
     if CWThreadID = 0 then
     begin
-    wkBusy := True;   // 4.86.6
-//      ExitFromCWThread := False;
-//      inc(CWThreadCounter);
-//      windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));
+       wkBusy := True;            // 4.88.6
+    //   ExitFromCWThread := False;
+    //    inc(CWThreadCounter);
+    //   windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));
 
       CWThreadHandle := tCreateThread(@CWThreadProc, CWThreadID);
-//                       THREAD_PRIORITY_ABOVE_NORMAL
+     //                  THREAD_PRIORITY_ABOVE_NORMAL
       asm
 
       //push THREAD_PRIORITY_ABOVE_NORMAL

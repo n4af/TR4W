@@ -615,7 +615,6 @@ begin
     begin
       tCleareExchangeWindow;
       tCallWindowSetFocus;
-      FlushCWBufferAndClearPTT;       // 4.88.4
       Exit;
     end;
 
@@ -628,7 +627,6 @@ begin
     ExchangeHasBeenSent := False;
     SeventyThreeMessageSent := False;
     ClearInfoWindows;
-    FlushCWBufferAndClearPTT;         // 4.88.4
     if OpMode = CQOpMode then
     begin
       if OpMode2 = SearchAndPounceOpMode then
@@ -898,7 +896,7 @@ begin
       if MessageEnable then
       begin
         TryKillAutoCQ;
-        SendFunctionKeyMessage(F1, CQOpMode);
+         SendFunctionKeyMessage(F1, CQOpMode);
         InactiveRigCallingCQ := False;      // n4af 4.44.3
       end;
       Exit;
@@ -1170,7 +1168,7 @@ begin
       else
         Result := SendCrypticMessage(MyCall);
    //     Result := SendCrypticMessage('N4AFDOTNET');
-        KeyStamp(F1);
+   //     KeyStamp(F1);  // 4.88.6
     end;
     Exit;
   end;
@@ -3258,7 +3256,7 @@ begin
      begin
        SwitchNext := False;
        Switch     := False;
-       if ((WKBusy) or (CWThreadID <> 0)) then     // 4.52.4 issue 192
+        if ((WKBusy) or (CWThreadID <> 0)) then     // 4.52.4 issue 192
        begin
         FlushCWBuffer;
         ReturnInCQOpMode;
@@ -3295,7 +3293,7 @@ begin
       end;
        ReturnInCQOpMode;
        Exit;
-      end;
+     end;
 
   if OpMode = SearchAndPounceOpMode then
   begin
