@@ -515,6 +515,7 @@ var
 
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
+  
    if CallWindowString <> '' then
     Call_Found := True
    else
@@ -606,7 +607,8 @@ begin
     ActiveRadioPtr^.tTwoRadioMode := TR0;
     InActiveRadioPtr^.tTwoRadioMode := TR0;
     SwapRadios;
-    SetOpMode(CQOpMode); 
+    SetOpMode(CQOpMode);
+    Exit;
   end;
 
 //  if tr4w_ExchangeWindowActive then
@@ -651,7 +653,7 @@ begin
     SwapRadios;
     if OpMode = SearchAndPounceOpMode then
     if (not Call_Found) then
-     SetOpMode(CQOpMode);  
+    SetOpMode(CQOpMode);
   end;
 
   if tPreviousDupeQSOsShowed then ShowPreviousDupeQSOsWnd(False); //DestroyPreviousDupeQSOsWnd;
@@ -671,6 +673,7 @@ begin
     if (EscapeExitsSearchAndPounce) then SetOpMode(CQOpMode);
 
 end;
+
 
 procedure SpaceBarProc2;
 begin
