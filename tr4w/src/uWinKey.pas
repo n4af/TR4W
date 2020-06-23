@@ -850,7 +850,7 @@ begin
             ActiveRadioPtr.tPTTStatus := PTTStatusType(wkBUSY);
             SendStationStatus(sstPTT);
 
-            if not wkBUSY then
+            if Not WKBusy  then       
             begin
               wkWaitingBytesInWK := 0;
 //              wkHostBufferIndex := 0;

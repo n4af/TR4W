@@ -504,6 +504,7 @@ var
   AlarmMinute                           : integer;
   AlarmHour                             : integer;
   AltDBufferEnable                      : boolean;
+  AltDCQEnable                          : boolean;
   AskForFrequencies                     : boolean;
   AutoReturnToCQMode                    : boolean = True;
   AutoSAPEnableRate                     : LONGINT = 500;
