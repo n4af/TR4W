@@ -52,7 +52,7 @@ const
 //  PrefixMultArraySize                   = 1500;
 
   MaxVisDupeCallTotal                   = 40;
-  MaxInitialExchanges                   = 2000;
+  MaxInitialExchanges                   = 60000; // 4.86.4
   MaxLongPartialCalls                   = 150;
 
   { Note that the four byte and eight byte blocks must be the same
@@ -1013,33 +1013,7 @@ begin
 
         RXData.DXQTH := RXData.QTH.CountryID;
       end;
-{
-    CQNonEuropeanCountriesAndWAECallRegions: //KK1L: 6.70 Added for new (old) mult method
-      if (RXData.QTH.Continent <> Europe) then
-      begin
-        NumberChar := GetNumber(RXData.Callsign);
 
-        if (RXData.QTH.CountryID = 'JA') or (RXData.QTH.CountryID = 'K') or
-          (RXData.QTH.CountryID = 'PY') or (RXData.QTH.CountryID = 'VE') or
-          (RXData.QTH.CountryID = 'VK') or (RXData.QTH.CountryID = 'ZS') or
-          (RXData.QTH.CountryID = 'ZL') then
-        begin
-          RXData.DXQTH := RXData.QTH.CountryID + NumberChar;
-          Exit;
-        end;
-
-        if (RXData.QTH.CountryID = 'UA9') then
-          case NumberChar of
-            '8', '9', '0':
-              begin
-                RXData.DXQTH := 'UA' + NumberChar;
-                Exit;
-              end;
-          end;
-
-        RXData.DXQTH := RXData.QTH.CountryID;
-      end;
-}
   else
     RXData.DXQTH := RXData.QTH.CountryID;
   end;
@@ -1060,69 +1034,7 @@ var
   MultArray                             : array[1..2] of Str20;
 
 begin
-  {
-    RXData.DomesticQTH := '';
-    RXData.DomMultQTH := '';
-    RXData.DXQTH := '';
-    RXData.Prefix := '';
-    RXData.Zone := '';
 
-    if NumberDifferentMults = 0 then Exit;
-
-    MultString := GetLogEntryMultString(LogEntry);
-
-    if MultString = '' then Exit;
-
-    if StringHas(MultString, ' ') then
-    begin
-      MultArray[1] := PrecedingString(MultString, ' ');
-      MultArray[2] := PostcedingString(MultString, ' ');
-      NumberMults := 2;
-    end
-    else
-    begin
-      MultArray[1] := MultString;
-      NumberMults := 1;
-    end;
-
-    for Mult := 1 to NumberMults do
-    begin
-      if DoingDomesticMults and
-        (StringHasLowerCase(MultArray[Mult]) or (NumberDifferentMults = 1)) then
-      begin
-        RXData.QTHString := MultArray[Mult];
-        RXData.Callsign := GetLogEntryCall(LogEntry);
-
-                 // This next step is necessary to fake the FoundDomesticQTH routine into
-                 //  thinking the Domestic QTH is valid if you are using GridFields.
-
-        if ActiveDomesticMult = GridFields then
-          RXData.QTHString := RXData.QTHString + '12';
-
-        if not FoundDomesticQTH(RXData) and LoadingInLogFile then
-        begin
-          showmessage(PChar(string('Unknown domestic QTH found and ignored = ' + MultArray[Mult])));
-                       //                Wait (1000);
-        end;
-
-        Continue;
-      end;
-
-      if DoingZoneMults and StringIsAllNumbers(MultArray[Mult]) then
-      begin
-        RXData.Zone := MultArray[Mult];
-        Continue;
-      end;
-
-      if DoingPrefixMults then
-      begin
-        RXData.Prefix := MultArray[Mult];
-        Continue;
-      end;
-
-      if DoingDXMults then RXData.DXQTH := MultArray[Mult];
-    end;
-   }
 end;
 
 procedure TransferLogEntryInfoToContestExchange(LogEntry: Str80; var RXData: ContestExchange);
@@ -1162,26 +1074,7 @@ var
   DupeMode                              : ModeType;
 
 begin
-  {
-    if QSOByBand then DupeBand := Band else DupeBand := All;
-    if QSOByMode then DupeMode := Mode else DupeMode := Both;
-
-    NumberCalls := DupeSheet.Totals[DupeBand, DupeMode];
-    DupeBlock := NumberCalls div FourByteBlockSize + 1;
-    BlockAddress := NumberCalls mod FourByteBlockSize;
-
-    if BlockAddress = 0 then // we need to set up a new block
-      begin
-
-        if DupeBlock > MaxCallBlocks then Exit; //wli
-
-        if DupeSheet.DupeList[DupeBand, DupeMode, DupeBlock] = nil then
-          New(DupeSheet.DupeList[DupeBand, DupeMode, DupeBlock]);
-      end;
-
-    DupeSheet.DupeList[DupeBand, DupeMode, DupeBlock]^[BlockAddress] := Call;
-    inc(DupeSheet.Totals[DupeBand, DupeMode]);
-  }
+  
 end;
 
 procedure DupeAndMultSheet.AddQSOToSheets(RXData: ContestExchangePtr; AddToPartials: boolean);
@@ -1899,19 +1792,7 @@ begin
 
   if MultByBand then MultBand := RXData.Band else MultBand := All;
   if MultByMode then MultMode := RXData.Mode else MultMode := Both;
-{
-  if Contest in [CUPUA1DZ] then
-  begin
-    if not IsUA1AStation(MyCall) then
-    begin
-      if not IsUA1AStation(RXData.Callsign) then goto SkipDomesticMult;
-    end
-    else
-    begin
-      if not RussianID(RXData.QTH.CountryID) then goto SkipDomesticMult;
-    end;
-  end;
-}
+
   if (RXData.DomMultQTH = '') and (RXData.DomesticQTH <> '') then
     RXData.DomMultQTH := RXData.DomesticQTH;
 
@@ -1925,8 +1806,12 @@ begin
     RXData.DXMult := mo.IsDXMult(RXData.QTH.Country, GetAddMultBand(DXCCMultByBand, MultBand), MultMode);
 
   if (RXData.Prefix <> '') and DoingPrefixMults then
-    RXData.PrefixMult := mo.IsPxMult(RXData.Prefix, MultBand, MultMode);
-
+   begin        // 4.83.6
+    if (contest = PCC) and  (RXData.QTH.CountryID = MyCountry) then
+            RXData.PrefixMult := False
+        else
+     RXData.PrefixMult := mo.IsPxMult(RXData.Prefix, MultBand, MultMode);
+   end;
     if (Contest = NZFIELDDAY) then
     if (RXData.Zone = StrToInt(MyZone)) or (RXData.Zone = 00) then   exit;  //n4af 4.41.6
 
@@ -2093,44 +1978,7 @@ begin
   BandMapMode := ActiveMode; {KK1L: 6.68 gets BM in sync when no radio connected}
 
   sReadFile(h, RemainingMultDisplay, SizeOf(RemainingMultDisplay));
-{
-  with MultSheet do
-  begin
-    BlockRead(FileRead, Totals, SizeOf(Totals), Result1);
 
-    for Band := Band160 to All do
-      for Mode := CW to Both do
-        if (((MultByBand) and (Band <> All)) or
-          ((not MultByBand) and (Band = All))) and
-          (((MultByMode) and (Mode <> Both)) or
-          ((not MultByMode) and (Mode = Both))) then
-        begin
-          if Totals[Band, Mode].NumberDomesticMults > 0 then
-          begin
-            if DomesticList[Band, Mode] = nil then New(DomesticList[Band, Mode]);
-            BlockRead(FileRead, DomesticList[Band, Mode]^, SizeOf(DomesticList[Band, Mode]^), Result1);
-          end;
-
-          if Totals[Band, Mode].NumberDXMults > 0 then
-          begin
-            if DXList[Band, Mode] = nil then New(DXList[Band, Mode]);
-            BlockRead(FileRead, DXList[Band, Mode]^, SizeOf(DXList[Band, Mode]^), Result1);
-          end;
-
-          if Totals[Band, Mode].NumberPrefixMults > 0 then
-          begin
-            if PrefixList[Band, Mode] = nil then New(PrefixList[Band, Mode]);
-            BlockRead(FileRead, PrefixList[Band, Mode]^, SizeOf(PrefixList[Band, Mode]^), Result1);
-          end;
-
-          if Totals[Band, Mode].NumberZoneMults > 0 then
-          begin
-            if ZoneList[Band, Mode] = nil then New(ZoneList[Band, Mode]);
-            BlockRead(FileRead, ZoneList[Band, Mode]^, SizeOf(ZoneList[Band, Mode]^), Result1);
-          end;
-        end;
-  end;
-}
 //  for Band := Band160 to Band2 do    for Mode := CW to Phone do      BlockRead(FileRead, FreqMemory[Band, Mode], SizeOf(FreqMemory[Band, Mode]), Result1);
   sReadFile(h, FreqMemory, SizeOf(FreqMemory));
 
@@ -2631,7 +2479,16 @@ begin
       end;
     end;
 
-    if ExchangeInformation.Zone then TempString := IntToStr(Zone);
+    if ActiveExchange = RSTZoneOrDomesticQTH then
+     if Exchangeinformation.QTH then
+      TempString := Qstring
+       else
+        TempString := IntToStr(Zone);
+
+    if ExchangeInformation.Zone then
+       
+      TempString := IntToStr(Zone);
+
     if ExchangeInformation.Name then TempString := Name;
     if ExchangeInformation.ClassEI then TempString := ceClass;
     if ExchangeInformation.Age then TempString := IntToStr(Age);

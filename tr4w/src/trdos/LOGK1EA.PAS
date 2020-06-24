@@ -1917,7 +1917,7 @@ end;
 function K1EAKeyer.CWStillBeingSent: boolean;
 begin
   Result := CWThreadID <> 0;
-//  CWStillBeingSent := PTTAsserted;
+  // CWStillBeingSent := PTTAsserted;
 end;
 
 procedure K1EAKeyer.FlushCWBuffer;
@@ -3183,11 +3183,11 @@ begin
     SwapRadios;
     SetOpMode(CQOpMode);
     if OnDeckCall = '' then
-      SendCrypticMessage(GetCQMemoryString(ActiveMode, F1))
+//    SendCrypticMessage(GetCQMemoryString(ActiveMode, F1)) // 4.88.6
     else
-    begin
+     begin
       PutCallToCallWindow(OnDeckCall);
-    end;
+     end;
   end;
 
 //  if ActiveRadioPtr^.tTwoRadioMode = TR2 then

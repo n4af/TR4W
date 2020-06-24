@@ -328,7 +328,7 @@ begin
               WWPMC:
                 SetCommentAndEnableEditControl(TC_ENTERYOURCITYIDENTIFIER, icmyState);
 
-              TAC, ARKTIKA_SPRING:
+              PCC, ARKTIKA_SPRING:
                 SetCommentAndEnableEditControl(TC_ENTERYOURMEMBERSHIPNUMBER, icmyState);
 
               JIDXCW, JIDXSSB:
@@ -430,7 +430,7 @@ begin
                 end;
 
               WWPMC: DisplayCheckBox('PMC');
-              TAC, ARKTIKA_SPRING: DisplayCheckBox(TC_ARKTIKACLUB);
+              PCC,ARKTIKA_SPRING: DisplayCheckBox(TC_ARKTIKACLUB);
 
               NAQSOCW, NAQSOSSB, NAQSORTTY:
                 begin
@@ -488,9 +488,9 @@ begin
               ALLASIANCW, ALLASIANSSB, YOUTHCHAMPIONSHIPRF:
                 SetCommentAndEnableEditControl(TC_ENTERYOURAGEINMYSTATEFIELD, icmyState);
 
-              UKRAINECHAMPIONSHIP:
+       {       UKRAINECHAMPIONSHIP:
                 SetCommentAndEnableEditControl(TC_ENTERYOUROBLASTID, icmyState);
-
+        }
               ARRLDXCW,
                 ARRLDXSSB:
                 SetCommentAndEnableEditControl(TC_ENTERYOURQTHORPOWER, icmyState);

@@ -99,7 +99,7 @@ var
 
   NeedToSetCQMode                       : boolean; {KK1L: 6.69 This variable is used to leap around some AutoS&PMode code.}
 
-  QuickQSLMessage2                      : Str40 { = 'EE'};
+  QuickQSLMessage2                      : Str40 { = 'TU'}; // 4.88.1
 
 //  RadioOneKeyerOutputPort          : PortType = NoPort;
 //  RadioTwoKeyerOutputPort          : PortType = NoPort;
@@ -268,25 +268,26 @@ begin
     begin
    //  if not WKbusy then flushcwbuffer;  // ny4i winkeyer
       wkAddCWMessageToInternalBuffer(Msg);
-//      wkBUSY := True;
-      Exit;
+       wkBUSY := True;   // 4.88.2
+     Exit;
     end;
 
    if ActiveRadioPtr.tPTTStatus = PTT_OFF then
       begin
-      PTTOn;
+       PTTOn;
       end;
    CPUKeyer.AddStringToCWBuffer(Msg, Tone);
 //    CountsSinceLastCW := 0;
 
     if CWThreadID = 0 then
     begin
-//      ExitFromCWThread := False;
-//      inc(CWThreadCounter);
-//      windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));
+       wkBusy := True;            // 4.88.6
+    //   ExitFromCWThread := False;
+    //    inc(CWThreadCounter);
+    //   windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));
 
       CWThreadHandle := tCreateThread(@CWThreadProc, CWThreadID);
-//                       THREAD_PRIORITY_ABOVE_NORMAL
+     //                  THREAD_PRIORITY_ABOVE_NORMAL
       asm
 
       //push THREAD_PRIORITY_ABOVE_NORMAL

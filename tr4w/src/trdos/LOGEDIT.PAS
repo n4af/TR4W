@@ -1303,7 +1303,8 @@ begin
     Exit;
   if not tWindowsExist(Window) then
     Exit;
-  // DomWidth := 45;
+ //  DomWidth := 45;
+  SetRemMultsColumnWidth;       // 4.71.2      // 4.83.0
   rmw := Windows.GetDlgItem(tr4w_WindowsArray[Window].WndHandle, 101);
 
   tSetWindowRedraw(rmw, False);
@@ -1328,7 +1329,6 @@ begin
              goto AddDom;
           if not mo.DomList.StringIsDupeByIndex(i, TempMultBand, MultMode) then
              AddDom:
-            SetRemMultsColumnWidth;       // 4.71.2
             SendMessage(rmw, LB_ADDSTRING, 0, MakeLong(Ord(rmt), i));
         end;
       end;
@@ -2631,16 +2631,7 @@ begin
         end
         else
         begin
-          {
-          if ActiveQSOPointMethod = RussianDXQSOPointMethod then
-             begin
-                LocateCall(Call, TempQTH, True);
-                if (TempQTH.CountryID[1] = 'U') then
-                   if (TempQTH.CountryID[2] = 'A') then
-                      TempString := GetOblastID(Call);
-             end
-          else
-          }
+          
           TempString := GetVEInitialExchange(Call);
         end;
 
@@ -3061,6 +3052,8 @@ begin
         RData.Prefix := RData.Callsign;
     RussianPrefixes: if Rdata.QTH.CountryID = 'UA' then
         RData.Prefix := RData.Callsign;
+    // CzechRepublicCallsignPrefix: if RData.QTH.CountryID = 'OK' then
+    //      RDATA.Prefix := RDATA.Callsign;
     GCStation:
       begin
         if (RData.Callsign = 'RK1G') or (RData.Callsign = 'R3K') or

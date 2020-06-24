@@ -33,7 +33,7 @@ uses
   LogSCP;
 
 const
-  MAXCALLSIGNSINLIST                    = 50000;
+  MAXCALLSIGNSINLIST                    = 60000;
 
 type
   PCallsignItem = ^TCallsignItem;

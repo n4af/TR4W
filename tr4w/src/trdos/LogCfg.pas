@@ -264,44 +264,8 @@ begin
     Windows.lstrcat(DomQTHDataFileName, wsprintfBuffer);
     if not DomQTHTable.LoadInDomQTHFile(DomQTHDataFileName) then halt;
   end;
-  //    IF (BandMapEnable AND DisplayBandMapEnable) OR (ActiveRTTYPort <> NoPort) OR NetDebug OR
-  //       VisibleDupesheetEnable OR
-  //       ((GridMapCenter <> '') AND (ActiveDomesticMult = GridSquares)) THEN
-  //           IF VGADisplayEnable THEN
-  //{WLI}               TextMode (C80 + Font8X8);   { Select 42 or 50 line mode }
 
-  //    Showmessage ('Initializing program...');
 
-  //{WLI}    ScreenHeight := Hi (WindMax) + 1;
-  //    BandMapWindowRY := ScreenHeight;
-
-  //    SuperDupeSheetWindowRY := BandMapWindowRY;
-
-  //    SuperDupeSheet := (BandMapWindowRY >= 40) AND (NOT BandMapEnable);
-
-  //    IF BandMapEnable AND (BandMapWindowRY < 40) THEN
-  //        BEGIN
-  //        Showmessage ('Your display will not support the band map!!');
-  //        BandMapEnable := False;
-  //        END;
-
-  //    IF (ActiveRTTYPort <> NoPort) AND (BandMapWindowRY < 40) THEN
-  //        BEGIN
-  //        Showmessage ('Your display will not support RTTY display!!');
-  //        ActiveRTTYPort := NoPort;
-  //        END;
-{
-  if DoingRescore then //KK1L: 6.71 KK1L: 6.73 Moved here from end of proc. Now works to force DVPEnable=FALSE
-    begin
-      CodeSpeed := 99;
-      CWTone := 0;
-      DVPEnable := False;
-      AutoDupeEnableCQ := False;
-      AutoDupeEnableSandP := False;
-      Radio1.PollingEnable := False;
-      Radio2.PollingEnable := False;
-    end;
-}
   //wli  if DVPEnable then
   begin
     //         WriteLn('DVP Initialization in process...');
@@ -797,7 +761,7 @@ begin
 
     NRAUBALTICCW, NRAUBALTICSSB, RUSSIAN160, {WWPMC,} UBACW, UBASSB: tCQExchange := ' 5NN # ' + MyState;
 
-    TAC, IOTA, HELVETIA: if MyState <> '' then tCQExchange := ' 5NN # ' + MyState else tCQExchange := ' 5NN #';
+   PCC, IOTA, HELVETIA: if MyState <> '' then tCQExchange := ' 5NN # ' + MyState else tCQExchange := ' 5NN #';
 
     EUSPRINT_SPRING_SSB, EUSPRINT_AUTUMN_CW, EUSPRINT_AUTUMN_SSB, EUSPRINT_SPRING_CW:
       begin
@@ -856,18 +820,7 @@ var
 
   GetRidOfPrecedingSpaces(FileString^);
   GetRidOfPostcedingSpaces(FileString^);
-{
-  if StringHas(FileString^, 'INPUT CONFIG FILE') then
-  begin
-    Windows.ZeroMemory(@TR4W_INPUT_CFG_FILENAME, SizeOf(TR4W_INPUT_CFG_FILENAME));
-    FileName := PostcedingString(FileString^, '=');
-    GetRidOfPrecedingSpaces(FileName);
-    Windows.CopyMemory(@TR4W_INPUT_CFG_FILENAME, @FileName[1], length(FileName));
-    EnumerateLinesInFile(CFGFilesArray[cfgINPUT], EnmuCFGFile, True);
-  end;
-}
-//  Windows.ZeroMemory(@ID, SizeOf(ID));
-//  Windows.ZeroMemory(@CMD, SizeOf(CMD));
+
 
   ID := PrecedingString(FileString^, '=');
   CMD := PostcedingString(FileString^, '=');

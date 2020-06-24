@@ -495,7 +495,7 @@ begin
                     OldTelnetFreezeMode := TelnetFreezeMode;
                     TelnetFreezeMode := True;
                   end;
-        }
+         }
       end;
 
     //    WM_NCHITTEST:      if TelnetHint <> 0 then PostMessage(TelnetHint, WM_CLOSE, 0, 0);

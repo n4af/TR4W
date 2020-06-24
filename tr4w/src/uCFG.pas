@@ -798,14 +798,7 @@ begin
 
             Exit;
           end;
-{
-  if pshortstring(Command)^ = 'REMINDER' then
-  begin
-    ProcessReminder(pshortstring(Command)^, CustomCMD);
-    Result := True;
-    Exit;
-  end;
- }
+
   if pshortstring(Command)^ = 'TOTAL SCORE MESSAGE' then
   begin
     //ProcessTotalScoreMessage(pshortstring(Command)^, CustomCMD);
@@ -1508,7 +1501,7 @@ const
     (isString: @QSOBeforeMessage; isPcharString: ' SRI QSO B4 TU \ TEST'),
 
     (isString: @QuickQSLMessage1; isPcharString: 'TU'),
-    (isString: @QuickQSLMessage2; isPcharString: 'EE'),
+    (isString: @QuickQSLMessage2; isPcharString: 'TU'), // 4.88.1
   //  (isString: @TailEndMessage; isPcharString: 'R'),
 
     (isString: @CorrectedCallPhoneMessage; isPcharString: 'CORCALL.WAV')
