@@ -282,7 +282,7 @@ begin
 
   wkSendAdminCommand(wkECHOTEST);
   wkSendByte(wkECHOTESTBYTE);
-  // Sleep(150); 
+//  Sleep(150);
 
   if ((not wkRead(1)) or (wkREADBuffer[0] <> wkECHOTESTBYTE)) then
   begin
@@ -812,7 +812,6 @@ begin
       if lpNumberOfBytesRead > 0 then
         for i := 0 to lpNumberOfBytesRead - 1 do
         begin
-          wkBusy := True;
 {$IF K6VVA_WK_DEBUG}
           wkWriteToDebugFile(Char(wkThreadReadBuffer[i]), False);
 {$IFEND}
@@ -828,42 +827,41 @@ begin
 //196 - 11000100
 //198 - 11000110
 
-          {it’s a status byte. (Host may or may not have asked for it.)process status change, note that it could be a pushbutton change}
+          {it?s a status byte. (Host may or may not have asked for it.)process status change, note that it could be a pushbutton change}
 {$IF WINKEYDEBUG}
             AddStringToTelnetConsole(PChar(string('status byte ' + IntToStr(wkThreadReadBuffer[i]))), tstSend);
 //            sWriteFile(wkDebugFileRX, wkThreadReadBuffer[I], 1);
 {$IFEND}
     {(*}
-            wkBUSY    := (wkThreadReadBuffer[I] and (1 shl 2)) <> 0;  
+            wkBUSY    := (wkThreadReadBuffer[I] and (1 shl 2)) <> 0;
             wkBREAKIN := (wkThreadReadBuffer[I] and (1 shl 1)) <> 0;
             wkXOFF    := (wkThreadReadBuffer[I] and (1 shl 0)) <> 0;
     {*)}
 
 {$IF WINKEYDEBUG}
-             if wkBusy then AddStringToTelnetConsole('YES', tstSend)
-
-              else
-                             AddStringToTelnetConsole('NO', tstSend);
+            if wkBUSY then AddStringToTelnetConsole('YES', tstSend)
+            else
+              AddStringToTelnetConsole('NO', tstSend);
 
 {$IFEND}
 
             ActiveRadioPtr.tPTTStatus := PTTStatusType(wkBUSY);
             SendStationStatus(sstPTT);
 
-            if Not WKBusy  then       
+            if not wkBUSY then
             begin
               wkWaitingBytesInWK := 0;
 //              wkHostBufferIndex := 0;
 //              wkHostBufferSendIndex := 0;
 //              wkWaitingBytesInHost := 0;
               if not tStartAutoCallTerminate(wkThreadID) then tStartAutoCQ;
-               BackToInactiveRadioAfterQSO;
+              BackToInactiveRadioAfterQSO;
             end;
           end
           else
             if (wkThreadReadBuffer[i] and $C0) = $80 then
             begin
-            {it’s a speed pot byte (Host may or may not have asked for it.) process speed pot change}
+            {it?s a speed pot byte (Host may or may not have asked for it.) process speed pot change}
 {$IF WINKEYDEBUG}
 //              AddStringToTelnetConsole('speed pot byte');
 {$IFEND}
@@ -1131,13 +1129,14 @@ begin
   BytesSendNow := 0;
   while BytesSendNow < 5 do
   begin
-     if wkWaitingBytesInHost <= 0 then Exit;
+    if wkWaitingBytesInHost <= 0 then Exit;
 {!!!}
 {$IF NOT K6VVA_WK_DEBUG}
 //    if wkXOFF then Exit;
 {$IFEND}
 
     wkSendByte(Ord(wkInternalCWBuffer[wkHostBufferSendIndex]));
+
 {$IF K6VVA_WK_DEBUG}
     CID_TWO_BYTES[0] := wkInternalCWBuffer[wkHostBufferSendIndex];
     AddStringToTelnetConsole(CID_TWO_BYTES);

@@ -3182,7 +3182,7 @@ begin
     InActiveRadioPtr^.tTwoRadioMode := TR0;
     SwapRadios;
     SetOpMode(CQOpMode);
-    if AltDCQEnable then  // 4.89.3
+     if AltDCQEnable then  // 4.89.3
      if OnDeckCall = '' then
       SendCrypticMessage(GetCQMemoryString(ActiveMode, F1))
      else
