@@ -180,11 +180,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.89.4' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.89.6' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'June 26, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'June 28, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -3149,7 +3149,7 @@ QSOPartiesCount = 15;
       'EUROPEAN HFC',
       'EUROPEAN VHF',
       'TESLA',
-      'ARRL-FD',
+      'ARRL-FIELD-DAY',    // 4.89.6
       'FISTS',
       'FOC MARATHON',  //n4af
       'FLORIDA QSO PARTY',
