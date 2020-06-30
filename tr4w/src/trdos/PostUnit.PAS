@@ -17,7 +17,7 @@
      Public License along with TR4W.  If not, see
  <http: www.gnu.org/licenses/>.
  }
- 
+
  unit PostUnit;
 
 {$IMPORTEDDATA OFF}
@@ -130,6 +130,8 @@ function CalculateTotals: boolean;
 procedure SummarySheet;
 procedure CreateCabrilloFile;
 procedure CheckForNewContestDate(Date: TQSOTime);
+
+procedure WriteADIFField(sFieldName: string; sFieldValue: string);
 
 procedure WriteTitleBlockToSummarySheet;
 
@@ -457,6 +459,13 @@ implementation
 uses
   uCbrSum,
   MainUnit;
+
+procedure WriteADIFField(sFieldName: string; sFieldValue: string);
+var sBuffer: string;
+begin
+   sBuffer := SysUtils.Format('<%s:%u>%s ', [sFieldName,length(sFieldValue),sFieldValue]);
+   sWriteFileFromString(tReportFileWrite, sBuffer);
+end;
 
 procedure CreateCabrilloFile;
 label
@@ -1697,6 +1706,7 @@ label
   1;
 
 var
+  sBuffer                               : string;
   tCallStringLength                     : Cardinal;
 
   tBandString                           : PChar;
@@ -1712,6 +1722,8 @@ var
   tContestNamelength                    : Cardinal;
   nNumberOfBytesToWrite                 : Cardinal;
   p                                     : PChar;
+  nLength                               : integer;
+  sTemp                                 : string;
 //  IOTAstring                            : Str10;
 begin
   lstrcpy(tReportsFilename, TR4W_LOG_FILENAME);
@@ -1736,7 +1748,7 @@ begin
   begin
     if GoodLookingQSO then
     begin
-      tContestName := ContestTypeSA[Contest];
+      tContestName := ContestsArray[Contest].ADIFName;     // NY4I
       tContestNamelength := Windows.lstrlen(tContestName);
 
       tCallStringLength := length(TempRXData.Callsign);
@@ -1763,7 +1775,11 @@ begin
 
       if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
       if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
-
+      // It is 2020. No reason to do this stuff anymore.   It is not like we export every single
+      // contact. Why add the complexity for something done rarely that doesn't need blazing speed.
+      // Premature Optimization for its own sake...
+      // Granted, we have to convert becuae this uses PChars instead of proper Delphi strings, but no big deal to do that
+      {
       asm
         push tContestName
         mov eax,dword ptr tContestNamelength
@@ -1813,16 +1829,46 @@ begin
 
       end;
 
+
       nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER,
         '<CALL:%u>%s<BAND:%u>%s<MODE:%u>%s<QSO_DATE:8>%u%02d%02d<TIME_ON:6>%02d%02d%02d<RST_SENT:%u>%u<RST_RCVD:%u>%u<CONTEST_ID:%u>%s');           //n4af 04.30.2
       asm add esp,80
       end;
-      sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+      }
+
+      //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s', tCallStringLength, p);
+      //          sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+
+
+      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <MODE:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%u <RST_RCVD:%u>%u <CONTEST_ID:%u>%s'
+                  ,[length(TempRXData.Callsign), TempRXData.Callsign
+                  ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
+                  ,length(ModeStringArray[TempRXData.Mode]), ModeStringArray[TempRXData.Mode]
+                  ,TempRXData.tSysTime.qtYear+2000
+                  ,TempRXData.tSysTime.qtMonth
+                  ,TempRXData.tSysTime.qtDay
+                  ,TempRXData.tSysTime.qtHour
+                  ,TempRXData.tSysTime.qtMinute
+                  ,TempRXData.tSysTime.qtSecond
+                  ,TempRXData.tSysTime.qtHour
+                  ,TempRXData.tSysTime.qtMinute
+                  ,TempRXData.tSysTime.qtSecond
+                  ,tRSTSendStringLength, TempRXData.RSTSent
+                  ,tRSTRcvdStringLength, TempRXData.RSTReceived
+                  ,tContestNamelength, StrPas(tContestName)
+                  ]
+                  );
+      //StrLCopy(CABRILLO_BUFFER, PChar(sBuffer), High(CABRILLO_BUFFER));
+      sWriteFileFromString(tReportFileWrite, sBuffer);
 
       if TempRXData.Frequency <> 0 then //14149280  or 7025000
-      begin
+         begin
+         // Making this simpler...
+         sTemp := FloatToStr((TempRXData.Frequency/1000000));
+         sBuffer := SysUtils.Format('<FREQ:%u>%s',[length(sTemp),sTemp]);
+         sWriteFileFromString(tReportFileWrite, sBuffer);
 
-        asm
+        {asm
         mov eax,[TempRXData.Frequency]
         mov ecx,1000000
         cdq
@@ -1830,7 +1876,7 @@ begin
         push edx
         push eax
         end;
-        nNumberOfBytesToWrite := wsprintf(ADIF_FREQ_STRING, '%u.%06u');
+        nNumberOfBytesToWrite := wsprintf(ADIF_FREQ_STRING, '%u.%06u ');
         asm add esp,16 end;
 
         asm
@@ -1838,17 +1884,18 @@ begin
         push eax
         push nNumberOfBytesToWrite
         end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<FREQ:%u>%s');
+        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<FREQ:%u>%s ');
         asm add esp,16 end;
 
 //        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FREQ:%u>%s',nNumberOfBytesToWrite,ADIF_FREQ_STRING);
 
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+        }
       end;
 
       if TempRXData.Precedence <> #0 then
       begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<PRECEDENCE:1>%c', TempRXData.Precedence);
+        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<PRECEDENCE:1>%c ', TempRXData.Precedence);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
       end;
 
@@ -1873,7 +1920,7 @@ begin
 
         if (LooksLikeAGrid(TempRXData.DomesticQTH) and (ActiveDomesticMult <> RDADistrict)) then
         begin
-          nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<GRIDSQUARE:%u>%s', tCallStringLength, p);
+          nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<GRIDSQUARE:%u>%s ', tCallStringLength, p);
           sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
         end
         else
@@ -1886,31 +1933,44 @@ begin
 
             ARRLFIELDDAY, ARRLSSCW, ARRLSSSSB, WINTERFIELDDAY:
               begin
-                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s', tCallStringLength, p);
-                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+                if TempRXData.QTHString <> 'DX' then     // Change to validate it is a section
+                   begin
+                   WriteADIFField('ARRL_SECT',TempRXData.QTHString);
+                   //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s ', tCallStringLength, p);
+                   //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+                   end;
+
+                nLength := length(MyFDClass) + 1 + length(MySection);
+                sBuffer := SysUtils.Format('<STX_STRING:%u>%s %s ',[nLength, MyFDClass, MySection]);
+                sWriteFileFromString(tReportFileWrite, sBuffer);
+
+                nLength := length(TempRXData.ceClass) + 1 + length(TempRXData.QTHString);
+                sBuffer := SysUtils.Format('<SRX_STRING:%u>%s %s ', [nLength, TempRXData.ceClass, TempRXData.QTHString]);
+                sWriteFileFromString(tReportFileWrite, sBuffer);
+
               end;
 
             CQ160CW, CQ160SSB, NASPRINTCW, SPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
               begin
-                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s', tCallStringLength, p);
+                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s ', tCallStringLength, p);
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
 
             IOTA:
               begin
                 strU(TempRXData.DomesticQTH);
-                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<IOTA:6>%s', @TempRXData.DomesticQTH[1]);
+                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<IOTA:6>%s ', @TempRXData.DomesticQTH[1]);
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
 
             IARU:
               begin
-                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_HQ:%u>%-7s', tCallStringLength, p);
+                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_HQ:%u>%-7s ', tCallStringLength, p);
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
           else
             begin
-               nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<QTH:%u>%s',tCallStringLength, p);
+               nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<QTH:%u>%s ',tCallStringLength, p);
                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);  //n4af 04.30.2
             end;
           end;
@@ -1919,14 +1979,14 @@ begin
 
       if TempRXData.Name <> '' then
       begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<NAME:%u>%s', length(TempRXData.Name), @TempRXData.Name[1]);
+        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<NAME:%u>%s ', length(TempRXData.Name), @TempRXData.Name[1]);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);         //n4af 04.30.2
       end;
 
    if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then
       begin
         nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);          
+        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
       end;
       if ((TempRXData.Power <> '') and (Contest <> FOCMARATHON)) then
       begin
@@ -2436,7 +2496,7 @@ if TempRXData.DomMultQTH = '' then
   begin
   TempRXData.DomMultQTH := 'DX';
   csQTHString := 'DX';
-  end; 
+  end;
   end;
     HisZone := TempRXData.Zone;
 
@@ -2491,7 +2551,7 @@ if TempRXData.DomMultQTH = '' then
             Format(CABRILLO_MYEX, '%-3s %-5s %-7s', RSTSent, cMyName, cMyState);
             Format(CABRILLO_HISEX, '%-3s %-5s %-7s', RSTReceived, csName, csQTHString);
           end;
-        
+
         QSONumberAndNameExchange:
           begin
             asm
@@ -2512,7 +2572,7 @@ if TempRXData.DomMultQTH = '' then
           end;
 
 
-          
+
 
         RSTAndPostalCodeExchange:
           begin
@@ -2755,11 +2815,11 @@ if TempRXData.DomMultQTH = '' then
             asm
                 push nrSent
                 push cMyState
-                 
+
 
             xor eax,eax
            mov ax, word ptr TempRXData.RSTSent
-            
+
            push eax
            end;
             wsprintf(CABRILLO_MYEX, '%-3d %-2s %03d      ');
@@ -3011,6 +3071,10 @@ if TempRXData.DomMultQTH = '' then
         ClassDomesticOrDXQTHExchange:
           begin
             Format(CABRILLO_MYEX, '%-3s %-7s ', @MyFDClass[1], @MySection[1]);
+            if Contest in [ARRLFIELDDAY, WINTERFIELDDAY] then
+               begin
+               csQTHString := @TempRXData.QTHString[1];   // Issue 407 ny4i
+               end;
             Format(CABRILLO_HISEX, '%-3s %-7s', @TempRXData.ceClass[1], csQTHString);
           end;
 
