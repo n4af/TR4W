@@ -5705,17 +5705,24 @@ begin
       end;
 
     ARRLFieldDayQSOPointMethod:
-      {
+      {      // Why was this commented out? For this year?
             if StringHas(UpperCase(MyFDClass), 'D') and
               StringHas(UpperCase(RXData.ceClass), 'D') then
               RXData.QSOPoints := 0
             else
       }
+      begin
       if RXData.Mode = Phone then
         RXData.QSOPoints := 1
       else
         RXData.QSOPoints := 2;
 
+      if StringHas(UpperCase(MyFDClass), 'D') and
+         StringHas(UpperCase(RXData.ceClass), 'D') then
+         begin
+         RXData.QSOPoints := 0;
+         end;
+      end;
     ARRL160QSOPointMethod:
       if DomesticCountryCall(RXData.Callsign) then
         RXData.QSOPoints := 2
