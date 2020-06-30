@@ -2,11 +2,12 @@ unit utils_file;
 
 interface
 
-uses Windows;
+uses SysUtils, Windows;
 
 function FileExists(FileName: PChar): boolean;
 
 function sWriteFile(hFile: THandle; const Buffer; nNumberOfBytesToWrite: DWORD): BOOL;
+function sWriteFileFromString(hFile: THandle; sBuffer: string): BOOL;
 function tWriteFile(hFile: THandle; const Buffer; nNumberOfBytesToWrite: DWORD; var lpNumberOfBytesWritten: DWORD): BOOL;
 function sReadFile(hFile: THandle; var Buffer; nNumberOfBytesToRead: DWORD): BOOL;
 
@@ -51,6 +52,14 @@ begin
   Result := Windows.WriteFile(hFile, Buffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, nil);
 end;
 
+function sWriteFileFromString(hFile: THandle; sBuffer: string): BOOL;
+var
+   lpNumberOfBytesWritten                : DWORD;
+   buffer                                : array[0..255] of Char;
+begin
+   StrLCopy(buffer, PChar(sBuffer), High(buffer));
+   Result := Windows.WriteFile(hFile, buffer, length(sBuffer), lpNumberOfBytesWritten, nil);
+end;
 
 function tOpenFileForWrite(var h: HWND; FileName: PChar): boolean;
 begin
