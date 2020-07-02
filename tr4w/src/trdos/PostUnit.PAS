@@ -1724,8 +1724,10 @@ var
   p                                     : PChar;
   nLength                               : integer;
   sTemp                                 : string;
+  dtReportTime                          : TDateTime;
 //  IOTAstring                            : Str10;
 begin
+  dtReportTime := Now;
   lstrcpy(tReportsFilename, TR4W_LOG_FILENAME);
   tReportsFilename[Windows.lstrlen(tReportsFilename) - 3] := #0;
   lstrcat(tReportsFilename, 'ADI');
@@ -1737,10 +1739,24 @@ begin
     Exit;
   end;
 
-  nNumberOfBytesToWrite := Format(wsprintfBuffer, TR4W_CURRENTVERSION + #13#10'%s'#13#10'<EOH>'#13#10, @ContestTitle[1]);
+  // Issue 405 to fix up the header - ny4i
+  sWriteFileFromString(tReportFileWrite,'ADIF File'#13#10);
+  sWriteFileFromString(tReportFileWrite,'Created by TR4W version ' + TR4W_CURRENTVERSION + ' on ' + FormatDateTime('nn-mmm-yyyy hh:mm:ss',dtReportTime) + #13#10);
 
+  WriteADIFField('ADIF_VER','3.1.0');
+  sWriteFile(tReportFileWrite, #13#10, 1);
 
-  sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+  WriteADIFField('CREATED_TIMESTAMP',FormatDateTime('yyyymmdd hhnnss',dtReportTime));
+  sWriteFile(tReportFileWrite, #13#10, 1);
+
+  WriteADIFField('PROGRAMID','TR4W');
+  sWriteFile(tReportFileWrite, #13#10, 1);
+
+  WriteADIFField('PROGRAMVERSION',TR4W_CURRENTVERSION);
+  sWriteFile(tReportFileWrite, #13#10, 1);
+
+  sWriteFile(tReportFileWrite, #13#10'<EOH>'#13#10, 9);
+
 
   ReadVersionBlock;
   1:
@@ -1748,7 +1764,15 @@ begin
   begin
     if GoodLookingQSO then
     begin
-      tContestName := ContestsArray[Contest].ADIFName;     // NY4I
+      // If there is nothing in the ADIFName, then use the ContestTypeSA[Contest]
+      if length(ContestsArray[Contest].ADIFName) = 0 then
+         begin
+         tContestName := ContestTypeSA[Contest]
+         end
+      else
+         begin
+         tContestName := ContestsArray[Contest].ADIFName;     // NY4I
+         end;
       tContestNamelength := Windows.lstrlen(tContestName);
 
       tCallStringLength := length(TempRXData.Callsign);
@@ -1775,72 +1799,8 @@ begin
 
       if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
       if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
-      // It is 2020. No reason to do this stuff anymore.   It is not like we export every single
-      // contact. Why add the complexity for something done rarely that doesn't need blazing speed.
-      // Premature Optimization for its own sake...
-      // Granted, we have to convert becuae this uses PChars instead of proper Delphi strings, but no big deal to do that
-      {
-      asm
-        push tContestName
-        mov eax,dword ptr tContestNamelength
-        push eax
 
-        xor eax,eax
-        mov ax, word ptr TempRXData.RSTReceived
-        push eax
-        push tRSTRcvdStringLength
-
-        xor eax,eax
-        mov ax, word ptr TempRXData.RSTSent
-        push eax
-        push tRSTSendStringLength
-
-        movzx eax,TempRXData.tSysTime.qtSecond
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtMinute
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtHour
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtDay
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtMonth
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtYear
-        add eax,2000
-        push eax
-
-        push tModeString
-        mov eax,dword ptr tModeStringLength
-        push eax
-
-        push tBandString
-        mov eax,dword ptr tBandStringLength
-        push eax
-
-        lea  eax,TempRXData.Callsign+1
-        push eax
-        mov eax,dword ptr tCallStringLength
-        push eax
-
-      end;
-
-
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER,
-        '<CALL:%u>%s<BAND:%u>%s<MODE:%u>%s<QSO_DATE:8>%u%02d%02d<TIME_ON:6>%02d%02d%02d<RST_SENT:%u>%u<RST_RCVD:%u>%u<CONTEST_ID:%u>%s');           //n4af 04.30.2
-      asm add esp,80
-      end;
-      }
-
-      //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s', tCallStringLength, p);
-      //          sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-
-
-      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <MODE:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%u <RST_RCVD:%u>%u <CONTEST_ID:%u>%s'
+      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <MODE:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%u <RST_RCVD:%u>%u <CONTEST_ID:%u>%s '
                   ,[length(TempRXData.Callsign), TempRXData.Callsign
                   ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
                   ,length(ModeStringArray[TempRXData.Mode]), ModeStringArray[TempRXData.Mode]
@@ -1858,7 +1818,6 @@ begin
                   ,tContestNamelength, StrPas(tContestName)
                   ]
                   );
-      //StrLCopy(CABRILLO_BUFFER, PChar(sBuffer), High(CABRILLO_BUFFER));
       sWriteFileFromString(tReportFileWrite, sBuffer);
 
       if TempRXData.Frequency <> 0 then //14149280  or 7025000
@@ -2274,13 +2233,21 @@ begin
 
   if not tOpenFileForWrite(tReportFileWrite, tReportsFilename) then Exit;
   T2 := @MyCall[1];
-  T3 := ContestTypeSA[contest];        // 4.78.2
-   if Contest = GENERALQSO then       // 4.78.3        // ALLOW CUSTOM CONFIG Contest Title or Contest Name
-    if length(ContestTitle) <> 0  then
-     T3 := ContestTitle
+  if length(ContestsArray[Contest].CABName) = 0 then
+         begin
+         T3 := ContestTypeSA[Contest]
+         end
       else
-       if length(ContestName) <> 0  then      // 4.78.3
-        T3 := ContestName;
+         begin
+         T3 := ContestsArray[Contest].ADIFName;     // NY4I
+         end;
+
+  //T3 := ContestTypeSA[contest];        // 4.78.2
+   if Contest = GENERALQSO then       // 4.78.3        // ALLOW CUSTOM CONFIG Contest Title or Contest Name
+      if length(ContestTitle) <> 0  then
+         T3 := ContestTitle
+      else if length(ContestName) <> 0  then      // 4.78.3
+         T3 := ContestName;
 
   asm
   call TotalScore
