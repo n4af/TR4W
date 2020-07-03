@@ -1926,9 +1926,8 @@ begin
 
             IARU:
               begin
-                WriteADIFField('APP_TR4W_HQ',TempRXData.QTHString);
-                //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_HQ:%u>%-7s ', tCallStringLength, p);
-                //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_HQ:%u>%-7s ', tCallStringLength, p);
+                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
           else
             begin
@@ -1945,9 +1944,9 @@ begin
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);         //n4af 04.30.2
       end;
 
-   if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then  // FOC_NUM is not a valid ADIF field
+   if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then
       begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
+        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
       end;
       if ((TempRXData.Power <> '') and (Contest <> FOCMARATHON)) then
