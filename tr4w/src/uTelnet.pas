@@ -340,8 +340,15 @@ begin
           Close(TempFile);
         end;
 }
-        EnumerateLinesInFile('TRCLUSTER.DAT', EmunTRCLUSTERDAT, False);
 
+        // Issue 392
+        // If the cluster in the config file is not in TRCLUSTER.DAT, this does not connect.
+        // We could add it to the EnumTRClusterDAT or just take it as a host and connect.
+        // We should check the hosts is valid too but we can see that in the connect.
+        // Also, ensure we get a useful error message when we cannot connect.
+        // Currently it just says Operation Successful which is false and not helpful.
+        EnumerateLinesInFile('TRCLUSTER.DAT', EmunTRCLUSTERDAT, False);
+        EmunTRCLUSTERDAT(@TelnetServer);   // Issue 392 ny4i - This adds the value in the config for telnet server to the drop-down
          i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRING, -1, integer(@TelnetServer[1]));    //n4af 4.35.1
    //     i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRINGEXACT, -1,integer(@TelnetServer[1]));
         if i <> CB_ERR then tCB_SETCURSEL(hwnddlg, 102, i);
