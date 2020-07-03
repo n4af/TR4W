@@ -6,7 +6,7 @@ uses
 
   Windows,
   WinSock2;
-function GetConnection(var socket: DWORD; Host: PChar; port: Cardinal; struct: integer; sError: string): boolean;
+function GetConnection(var socket: DWORD; Host: PChar; port: Cardinal; struct: integer): boolean;
 
 var
   WindowsSocketsInitialised             : boolean;
@@ -14,7 +14,7 @@ var
 
 implementation
 
-function GetConnection(var socket: DWORD; Host: PChar; port: Cardinal; struct: integer; sError: string): boolean;
+function GetConnection(var socket: DWORD; Host: PChar; port: Cardinal; struct: integer): boolean;
 var
   TempSockaddr                          : sockaddr_in;
   TempHostent                           : Phostent;

@@ -24,7 +24,6 @@ unit uTelnet ;
 interface
 
 uses
-  SysUtils,
   ClipBrd,
   uCTYDAT,
   uGradient,
@@ -341,14 +340,8 @@ begin
           Close(TempFile);
         end;
 }
-        // Issue 392
-        // If the cluter in the config file is not in TRCLUSTER.DAT, this does not connect.
-        // We could add it to the EnumTRClusterDAT or just take it as a host and connect.
-        // We should check the hosts is valid too but we can see that in the connect.
-        // Also, ensure we get a useful error message when we cannto connect.
-        // Currently it just says Operation Successful which is false and not helpful.
         EnumerateLinesInFile('TRCLUSTER.DAT', EmunTRCLUSTERDAT, False);
-        EmunTRCLUSTERDAT(@TelnetServer);
+
          i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRING, -1, integer(@TelnetServer[1]));    //n4af 4.35.1
    //     i := SendDlgItemMessage(hwnddlg, 102, CB_FINDSTRINGEXACT, -1,integer(@TelnetServer[1]));
         if i <> CB_ERR then tCB_SETCURSEL(hwnddlg, 102, i);
@@ -434,11 +427,11 @@ begin
           if PInteger(@TelnetBuffer[0])^ = $64205844 {DX D} then
             if ProcessDX(0, True, StringType) then
               TuneRadioToSpot(TempSpot, RadioOne);
-
+              
                        end;
 
         if (wParam >= 1000) then
-          if  (wParam <= 1000 + MAXITEMSINTELNETPOPUPMENU) then
+          if  (wParam <= 1000 + MAXITEMSINTELNETPOPUPMENU) then     
           begin
             GetMenuString(TelPopMemu, wParam, wsprintfBuffer, 256, MF_BYCOMMAND);    //n4af    4.51.1
             SendViaTelnetSocket(wsprintfBuffer);
@@ -556,7 +549,6 @@ var
 
   port                                  : Word;
   i                                     : integer;
-  sErrorMsg                             : string;
 
 label
   processed;
@@ -578,12 +570,11 @@ begin
        end;
     dec(i);
   end;
-  AddStringToTelnetConsole(PChar(SysUtils.Format('%s%s:%u',[TC_CONNECTINGTO,TempBuffer1, port])),tstTR4W);
-  if not GetConnection(TelnetSock, TempBuffer1, port, SOCK_STREAM, sErrorMsg) then
+
+  if not GetConnection(TelnetSock, TempBuffer1, port, SOCK_STREAM) then
 
   begin
-    AddStringToTelnetConsole(PChar(SysUtils.Format('%s%s:%u',[TC_FAILEDTOCONNECTTO,TempBuffer1, port])), tstTR4W);
-    //TelnetConnectionError;
+    TelnetConnectionError;
     TelThreadID := 0;
     Disconnect;
     Exit;
@@ -632,7 +623,6 @@ end;
 
 procedure TelnetConnectionError;
 begin
-// By the time this code is called, the lasterror is gone. This is a bad way to manage Windows error messages. Have to capture the error at the source and save it off. NY4I
   AddStringToTelnetConsole(SysErrorMessage(WSAGetLastError), tstError);
 end;
 

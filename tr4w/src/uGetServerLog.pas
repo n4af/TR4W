@@ -140,14 +140,13 @@ var
   FirstPacket                           : boolean;
   Offset                                : integer;
   LogSize                               : integer;
-  sErrorMsg                             : string;
 begin
 
   CommitChangesInLocalLog;
 
   FirstPacket := True;
 
-  if not GetConnection(LogSyncSocket, @ServerAddress[1], ServerPort + 1, SOCK_STREAM, sErrorMsg) then goto e;
+  if not GetConnection(LogSyncSocket, @ServerAddress[1], ServerPort + 1, SOCK_STREAM) then goto e;
 {
   LogSyncSocket :=GetSocket;// socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   tr4w_saddr.sin_addr.S_addr := inet_addr(tgethostbyname(@ServerAddress[1]));

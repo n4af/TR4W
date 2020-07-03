@@ -149,7 +149,6 @@ var
   Module                                : HWND;
   UrlGetPart                            : TUrlGetPart;
   pcchOut                               : DWORD;
-  sErrorMsg                             : string;
 const
   URL_PART_NONE                         = 0;
   URL_PART_SCHEME                       = 1;
@@ -184,7 +183,7 @@ begin
   end;
   FreeLibrary(Module);
 
-  if not GetConnection(GetScoresSocket, GetScoresHost, GetScoresPort, SOCK_STREAM, sErrorMsg) then
+  if not GetConnection(GetScoresSocket, GetScoresHost, GetScoresPort, SOCK_STREAM) then
   begin
 //    showmessage(SysErrorMessage(WSAGetLastError));
     ShowGetScoresStatus(TC_FAILEDTOCONNECTTOGETSCORESORG);

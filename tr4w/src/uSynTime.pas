@@ -224,7 +224,6 @@ label
 var
   i                                     : integer;
   p                                     : PChar;
-  sErrorMsg                             : string;
 begin
 
   EnableWindowFalse(st_window_handle, 201);
@@ -237,7 +236,7 @@ begin
 //    InitiatesUseOfTheWindowsSockets;
 //    ST_SOCKET := socket(AF_INET, SOCK_DGRAM, IPPROTO_IP);
 
-    if not GetConnection(ST_SOCKET, NTP_SERVER, 123, SOCK_DGRAM, sErrorMsg) then goto Unsuccessful;
+    if not GetConnection(ST_SOCKET, NTP_SERVER, 123, SOCK_DGRAM) then goto Unsuccessful;
 {
     InitiatesUseOfTheWindowsSockets;
 

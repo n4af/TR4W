@@ -43,10 +43,9 @@ uses MainUnit;
 procedure CheckLatestVersion;
 label 1;
 var
-
+ 
   p                                     : PChar;
   TempSocket                            : Cardinal;
-  sErrorMsg                             : string;
 const
   checkVersionRequest                   : PChar =
     'GET /include_pages/version.txt HTTP/1.1'#13#10 +
@@ -54,7 +53,7 @@ const
     'Host: www.tr4w.net'#13#10 +
     #13#10;                      // n4af 04.42.5
 begin
-  if not GetConnection(TempSocket, 'tr4w.net', 80, SOCK_STREAM, sErrorMsg) then
+  if not GetConnection(TempSocket, 'tr4w.com', 80, SOCK_STREAM) then
   begin
     ShowSyserror(WSAGetLastError);
     Exit;

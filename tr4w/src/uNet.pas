@@ -603,12 +603,11 @@ label
 var
   i                                     : integer;
   TempSocket                            : TSocket;
-  sErrorMsg                             : string;
 begin
   DifferentContests := False;
   ShowConnectionStatus(TC_CONNECTINGTO);
 
-  if GetConnection(TempSocket, @ServerAddress[1], ServerPort, SOCK_STREAM, sErrorMsg) then
+  if GetConnection(TempSocket, @ServerAddress[1], ServerPort, SOCK_STREAM) then
 {
   TempSocket := GetSocket; // socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
   tr4w_saddr.sin_addr.S_addr := inet_addr(tgethostbyname(@ServerAddress[1]));
