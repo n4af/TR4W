@@ -4442,6 +4442,12 @@ begin
     end
     else
     begin
+      (* When adding somethign to ContestExchange, this causes an error since
+         the size is wrong. From this code, it appears the the TRW file is
+         simply a serialization of the ContestExchanges. So the size of the
+         file should always be evenly divisible by the SizeOf(ContestExchange).
+         NY4I 3 JUL 2020
+      *)
       if (Size mod SizeOf(ContestExchange)) <> 0 {SizeOf(TLogHeader)} then
       begin
         showwarning(TC_ERRORINLOGFILE);
