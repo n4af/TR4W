@@ -6201,17 +6201,22 @@ begin
                Case AnsiIndexText(AnsiUpperCase(fieldName),
                      ['ARRL_SECT', 'BAND','CALL', 'CHECK', 'CLASS', 'CQ_Z',
                       'CONTEST_ID', 'CNTY', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
-                      'IOTA', 'ITU_Z', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
+                      'IOTA', 'ITUZ', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
                       'QSO_DATE', 'QSO_DATE_OFF' ,'TIME_ON', 'TIME_OFF',
                       'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                       'STATE', 'STX', 'STX_STRING', 'SUBMODE','TEN_TEN',
-                      'VE_PROV']) of
-                  1: exch.Band := GetADIFBand(fieldValue);
+                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ']) of
+                  1:
+                     begin
+                     exch.Band := GetADIFBand(fieldValue);
+                     DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                     end;
                   2: exch.Callsign := AnsiUpperCase(fieldValue);
                   3: exch.Check := StrToInt(fieldValue);
                   4: exch.ceClass := AnsiUpperCase(fieldValue);
                   5: exch.Zone := StrToInt(fieldValue);
                   9: exch.Frequency := 14200000;
+                  12: exch.Zone := StrToInt(fieldValue);
                   13: exch.Mode := GetADIFMode(fieldValue);
                   17: //QSO_DATE
                      if not ADIFDateStringToQSOTime(fieldValue,exch.tSysTime) then
@@ -6229,12 +6234,25 @@ begin
                   24: exch.NumberReceived := StrToInt(fieldValue);
                   25: // SRX_STRING    // Call a function passing my contest type and break this out based on exchange. Sweepstakes will be fun :)
                      ;
-                  26: exch.QTHString := fieldValue;    // STATE
+                  26: if Length(exch.QTHString) = 0 then
+                         begin
+                         exch.QTHString := fieldValue;    // STATE
+                         DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                         end;
                   27: exch.NumberSent := StrToInt(fieldValue);
                   29: // submode
                      ;
                   30: exch.TenTenNum := StrToInt(fieldValue);
-                  31: exch.QTHString := fieldValue; // VE_Prov
+                  31: if Length(exch.QTHString) = 0 then
+                         begin
+                         exch.QTHString := fieldValue; // VE_Prov
+                         end;
+                  32, 33: // APP_TR4W_HQ or APP_N1MM_HQ
+                     if contest = IARU then
+                        begin
+                        exch.QTHString := fieldValue;
+                        DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                        end;
                   -1: // Not present so log the error
                   else
                      ; // present but not handled in this case statement
@@ -6248,9 +6266,7 @@ begin
          else if (MidStr(sADIF_UPPER, i, 5) = '<EOR>') or
                  (MidStr(sADIF_UPPER, i, 4) = 'EOR>')  then
             begin
-            //Log('Found field: [' + fieldName + '], [' + fieldLen + '], [' + fieldValue + ']');
-            //Log('Record end');
-                  ctyLocateCall(exch.Callsign, exch.QTH);
+            ctyLocateCall(exch.Callsign, exch.QTH);
            //    if DoingDXMults then GetDXQTH(TempRXData);
            //    if DoingPrefixMults then SetPrefix(TempRXData);
            //    Sheet.SetMultFlags(TempRXData);
@@ -6367,9 +6383,9 @@ begin
          ClearContestExchange(TempRXData);
          if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
             begin
+            ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
             tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange), lpNumberOfBytesWritten);
             inc(QSOCounter);
-            ClearContestExchange(TempRXData);
             if QSOCounter mod 100 = 0 then
                begin
                DisplayLoadedQSOs;
