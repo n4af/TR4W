@@ -6158,12 +6158,14 @@ var
   cU: string; // Uppercase version of C for comparison
   theString: string;
   i: integer;
+  freq: real;
   lpNumberOfBytesWritten: Cardinal;
 begin
    lookingForFieldName := false;
    lookingForFieldLen := false;
    lookingForFieldValue := false;
 
+   try
    sADIF_UPPER := ANSIUPPERCASE(sADIF); // For testing without changing original
   // Log('Parsing ' + sADIF); // <BAND:3>20m <...
    originalLen := length(sADIF);
@@ -6215,7 +6217,11 @@ begin
                   3: exch.Check := StrToInt(fieldValue);
                   4: exch.ceClass := AnsiUpperCase(fieldValue);
                   5: exch.Zone := StrToInt(fieldValue);
-                  9: exch.Frequency := 14200000;
+                  9:
+                     begin
+                     exch.Frequency := StrToInt (FloatToStr( StrToFloat(fieldValue) * 1000000));
+                     // := freq * 10000000; // Convert ADIF Mhz tointernal Hz.
+                     end;
                   12: exch.Zone := StrToInt(fieldValue);
                   13: exch.Mode := GetADIFMode(fieldValue);
                   17: //QSO_DATE
@@ -6228,7 +6234,7 @@ begin
                         begin
                         ; //exit;
                         end;
-                  21: exch.RSTReceived := 599; // ADIF RST is a string but TR is a word (positive integers onluy so SNR from FT8 is out)...fieldValue;
+                  21: exch.RSTReceived := 599; // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
                   22: exch.RSTSent := 599; //fieldValue;   // Same for ADIF RST Sent...
                   23: exch.Power := fieldValue;
                   24: exch.NumberReceived := StrToInt(fieldValue);
@@ -6253,9 +6259,9 @@ begin
                         exch.QTHString := fieldValue;
                         DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                         end;
-                  -1: // Not present so log the error
+                  -1: DebugMsg('ADIF ' + fieldName + ' is not present in this list');
                   else
-                     ; // present but not handled in this case statement
+                     DebugMsg('ADIF ' + fieldName + ' is present but no handler');
                   end;
                //Log('Found field: [' + fieldName + '], [' + fieldLen + '], [' + fieldValue + ']');
                end;
@@ -6309,6 +6315,9 @@ begin
          theString := theString + c;
          end;
       end;
+      except
+         DebugMsg('Exception processign ADIF Record ' + sADIF);
+      end;
    end; // of ParseADIFRecord
 (*----------------------------------------------------------------------------*)
 procedure ImportFromADIF;
@@ -6357,6 +6366,7 @@ begin
       openDlg.Free;
    end;
 
+   // Add code to make sure the FileExists
    if not OpenLogFile then
       begin
       QuickDisplay('Could not open log file');
@@ -6364,6 +6374,13 @@ begin
       end;
   tSetFilePointer(0, FILE_END);
    // Now open te file and process
+
+   if not FileExists(adifFileName) then
+      begin
+      DebugMsg('In ImportADIF, ADIF file ' + adifFilename + ' does not exists');
+      Exit;
+      end;
+
    AssignFile(adif, adifFileName);
    //ReWrite(adif);
 

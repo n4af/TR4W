@@ -35,7 +35,7 @@ uses
 
 const
   tDebugMode                            = False;
-  NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
+  NEWER_DEBUG                           = True; // ny4i added this as tDebugMode changes too much.
   MMTTYMODE                             = True;
 
 
@@ -1048,6 +1048,7 @@ type
     );
   PBandType = ^BandType;
 
+  ExtendedModeType = (eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM);
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
   {    ModeType = (CW, Phone, Both, NoMode, FM, Digital);   { Use for calltest }
   OpModeType = (CQOpMode, SearchAndPounceOpMode);
@@ -1174,7 +1175,7 @@ const
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
   ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
-
+  ExtendedModeStringArray               : array[ExtendedModeType] of PChar = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM');
   BandStringsArray                      : array[BandType] of PChar {string} =
     (
     '160',
@@ -1466,7 +1467,7 @@ type
 {01}  DXMult:              boolean;
 {01}  PrefixMult:          boolean;
 {01}  ZoneMult:            boolean;
-
+      ExtMode:             ExtendedModeType;
 {04}  ceClass:             string[3]{10}; { Field day class }
 
 {01}  ZERO_04:             DummyByte;
