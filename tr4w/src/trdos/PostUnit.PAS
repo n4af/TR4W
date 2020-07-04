@@ -2249,7 +2249,7 @@ begin
          end
       else
          begin
-         T3 := ContestsArray[Contest].ADIFName;     // NY4I
+         T3 := ContestsArray[Contest].CABName;     // NY4I
          end;
 
   //T3 := ContestTypeSA[contest];        // 4.78.2
