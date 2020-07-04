@@ -1886,61 +1886,54 @@ end;
 Procedure WagCheck;          //added by n4af at behest of wag contest mgr
 var
 ARF                                  : integer;
-Const
-WagWarn =     'Warning: Out of WAG allowed frequency range';
 
 begin
 ARF :=  ActiveRadioPtr.CurrentStatus.Freq div 1000;
 
-if   (ARF > 3560) and (ARF < 3800) then
-begin
-QuickDisplay(WagWarn);
-exit ;
-end;
-
-if   (ARF > 3650) and (ARF < 3700)  then
-begin
-QuickDisplay(WagWarn);
-exit;
-end;
+ if   (ARF > 3650) and (ARF < 3700)  then
+ begin
+  QuickDisplay(TC_WagWarn);  // 4.90.3
+  exit;
+  end;
 
 if   (ARF > 7043) and (ARF < 7080) then
-begin
-QuickDisplay(WagWarn);
-exit;
-end;
+ begin
+  QuickDisplay(TC_WagWarn);
+  exit;
+ end;
 
 if   (ARF > 7080) and (ARF < 7143) then
-begin
-QuickDisplay(WagWarn);
-exit
-end;
+ begin
+  QuickDisplay(TC_WagWarn);
+  exit;
+ end;
 
 if   (ARF > 14060) and (ARF < 14125)  then
-begin
-QuickDisplay(WagWarn);
-exit;
-end;
+ begin
+  QuickDisplay(TC_WagWarn);
+  exit;
+ end;
 
 if   (ARF > 14280) and (ARF < 14350) then
-begin
-QuickDisplay(WagWarn);
-exit
-end;
+ begin
+  QuickDisplay(TC_WagWarn);
+  exit;
+ end;
 
 
 if   (ARF > 21347) and (ARF < 21450)  then
-begin
-QuickDisplay(WagWarn);
-exit;
-end;
+ begin
+  QuickDisplay(TC_WagWarn);
+  exit;
+ end;
 
 if   (ARF > 28225) and (ARF < 28400)  then
-begin
-QuickDisplay(WagWarn);
-exit;
+ begin
+  QuickDisplay(TC_WagWarn);
+  exit;
+ end;
 end;
-end;
+
 
 procedure CallWindowChange;
 var
