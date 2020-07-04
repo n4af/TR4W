@@ -4223,7 +4223,7 @@ const
 begin
   Windows.GetClientRect(nWidthhwndParent, temprect);
   X := (temprect.Right div 2) - (button_width + 5);
-  Y := temprect.Bottom - temprect.Top - 35;
+  Y := temprect.Bottom - temprect.Top - 27 {35};  // ny4i changed this for the Cabrillo dialog as the buttons were too close to the last text field. The window may need to be a bit longer.
   CreateButton(0, OK_WORD, X, Y, button_width, nWidthhwndParent, 1);
   CreateButton(0, CANCEL_WORD, X + button_width + 10, Y, button_width, nWidthhwndParent, 2);
 end;
@@ -6098,27 +6098,87 @@ begin
 }
 end;
 (*----------------------------------------------------------------------------*)
-function GetADIFMode(sMode: string): ModeType;
+function GetADIFMode(sMode: string): ModeAndExtendedModeType;
 var
    sModeUpper: string;
 begin
    sModeUpper := ANSIUPPERCASE(sMode);
-   Case AnsiIndexText(AnsiUpperCase(sMode), ['CW', 'SSB', 'FT8', 'RTTY']) of
+   Case AnsiIndexText(AnsiUpperCase(sMode), ['CW', 'SSB', 'AM', 'FM', 'FT8', 'RTTY', 'MFSK']) of
       0: // CW
-         Result := CW;
-      1: // SSB
-         Result := Phone;
+         begin
+         Result.msmMode := CW;
+         Result.msmExtendedMode := eCW;
+         end;
+
+      1: begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eSSB;
+         end;
       2:
-         Result := Digital; // FT8 should be its own mode
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eAM;
+         end;
       3:
-         Result := Digital;
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eFM;
+         end;
+      4:
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eFT8;
+         end;
+      5:
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eRTTY;
+         end;
+      6:
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eMFSK;
+         end;
       -1:
-         Result := NoMode;
+         Result.msmMode := NoMode;
       else
-         Result := NoMode;
+         Result.msmMode := NoMode;
       end;
    end;
 (*----------------------------------------------------------------------------*)
+function GetADIFSubMode(sSubMode: string): ModeAndExtendedModeType;
+var
+   sModeUpper: string;
+begin
+   sModeUpper := ANSIUPPERCASE(sSubMode);
+   Case AnsiIndexText(AnsiUpperCase(sSubMode), ['FT4', 'JS8', 'USB', 'LSB']) of
+      0: // CW
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eFT4;
+         end;
+      1: begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eJS8;
+         end;
+      2:
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eUSB;
+         end;
+      3:
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eLSB;
+         end;
+      -1:
+         Result.msmMode := NoMode;
+      else
+         Result.msmMode := NoMode;
+      end;
+   end;
+(*----------------------------------------------------------------------------*)
+
 function GetADIFBand(sBand: string): BandType;
 var
    sBandLower: string;
@@ -6154,6 +6214,7 @@ var
   sADIF_UPPER : string;
   //colonPosition: integer;
   neFreq: extended;
+  msm: ModeAndExtendedModeType;
   lookingForFieldName: boolean;
   lookingForFieldLen: boolean;
   lookingForFieldValue: boolean;
@@ -6204,7 +6265,7 @@ begin
             fieldValue := Trim(theString);
             if length(fieldValue) <> StrToInt(fieldLen) then
                begin
-               //Log('[' + fieldName + '] ' + 'field value length = ' + fieldLen + ' but actual length = ' + IntToStr(length(fieldValue)));
+               DEBUGMSG('[' + fieldName + '] ' + 'field value length = ' + fieldLen + ' but actual length = ' + IntToStr(length(fieldValue)));
                end
             else
                begin
@@ -6233,7 +6294,15 @@ begin
                      exch.Frequency := Trunc(neFreq);
                      end;
                   12: exch.Zone := StrToInt(fieldValue);
-                  13: exch.Mode := GetADIFMode(fieldValue);
+                  13:
+                     begin
+                     if exch.Mode = NoMode then
+                        begin
+                        msm := GetADIFMode(fieldValue);
+                        exch.Mode := msm.msmMode;
+                        exch.ExtMode := msm.msmExtendedMode;
+                        end;
+                     end;
                   15: StrPLCopy(exch.ceOperator, fieldValue, High(exch.ceOperator));
                   17: //QSO_DATE
                      if not ADIFDateStringToQSOTime(fieldValue,exch.tSysTime) then
@@ -6257,8 +6326,12 @@ begin
                          DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                          end;
                   27: exch.NumberSent := StrToInt(fieldValue);
-                  29: // submode
-                     ;
+                  29:
+                     begin
+                     msm := GetADIFSubmode(fieldValue);
+                     exch.Mode := msm.msmMode;
+                     exch.ExtMode := msm.msmExtendedMode;
+                     end;
                   30: exch.TenTenNum := StrToInt(fieldValue);
                   31: if Length(exch.QTHString) = 0 then
                          begin

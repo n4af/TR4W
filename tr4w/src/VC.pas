@@ -1048,11 +1048,18 @@ type
     NoBand
     );
   PBandType = ^BandType;
+  //SubModeType = (smUSB, smLSB, smFT4, smJS8);
 
-  ExtendedModeType = (eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM);
+  ExtendedModeType = (eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
+
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
   {    ModeType = (CW, Phone, Both, NoMode, FM, Digital);   { Use for calltest }
   OpModeType = (CQOpMode, SearchAndPounceOpMode);
+
+   ModeAndExtendedModeType = record
+      msmMode: ModeType;
+      msmExtendedMode: ExtendedModeType;
+   end;
 
   PTTStatusType = (PTT_OFF, PTT_ON);
 
@@ -1176,7 +1183,8 @@ const
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
   ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
-  ExtendedModeStringArray               : array[ExtendedModeType] of PChar = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM');
+  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'SSB');
+
   BandStringsArray                      : array[BandType] of PChar {string} =
     (
     '160',

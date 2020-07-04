@@ -34,6 +34,7 @@ uses
   utils_file,
   sysutils,
   StrUtils,
+  Classes,
   Tree,
   VC,
 //  Help,
@@ -134,6 +135,7 @@ procedure CreateCabrilloFile;
 procedure CheckForNewContestDate(Date: TQSOTime);
 
 procedure WriteADIFField(sFieldName: string; sFieldValue: string);
+function GetOperatorsFromLog: string;
 
 procedure WriteTitleBlockToSummarySheet;
 
@@ -465,8 +467,15 @@ uses
 procedure WriteADIFField(sFieldName: string; sFieldValue: string);
 var sBuffer: string;
 begin
-   sBuffer := SysUtils.Format('<%s:%u>%s ', [sFieldName,length(sFieldValue),sFieldValue]);
-   sWriteFileFromString(tReportFileWrite, sBuffer);
+   if length(sFieldValue) > 0 then
+      begin
+      sBuffer := SysUtils.Format('<%s:%u>%s ', [sFieldName,length(sFieldValue),sFieldValue]);
+      sWriteFileFromString(tReportFileWrite, sBuffer);
+      end
+   else
+      begin
+      DEBUGMSG('[WriteADIFField] ' + sFieldName + ' value is blank - skipping');
+      end;
 end;
 
 procedure CreateCabrilloFile;
@@ -1728,6 +1737,8 @@ var
   sTemp                                 : string;
   dtReportTime                          : TDateTime;
   stxString                             : string;
+  sMode                                 : string;
+  sSubMode                              : string;
 //  IOTAstring                            : Str10;
 begin
   dtReportTime := Now;
@@ -1803,10 +1814,11 @@ begin
       if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
       if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
 
-      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <MODE:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%u <RST_RCVD:%u>%u <CONTEST_ID:%u>%s '
+      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%u <RST_RCVD:%u>%u <CONTEST_ID:%u>%s '
                   ,[length(TempRXData.Callsign), TempRXData.Callsign
                   ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
-                  ,length(ModeStringArray[TempRXData.Mode]), ModeStringArray[TempRXData.Mode]
+                 // ,length(ExtendedModeStringArray[TempRXData.Mode]), ExtendedModeStringArray[TempRXData.Mode]
+                 // ,length(ModeStringArray[TempRXData.Mode]), ModeStringArray[TempRXData.Mode]
                   ,TempRXData.tSysTime.qtYear+2000
                   ,TempRXData.tSysTime.qtMonth
                   ,TempRXData.tSysTime.qtDay
@@ -1823,11 +1835,28 @@ begin
                   );
       sWriteFileFromString(tReportFileWrite, sBuffer);
 
+      if TempRXData.ExtMode = eFT4 then    // ??? In MFSKModes[TempRXData.ExtMode]?
+         begin
+         sMode := 'MFSK';
+         sSubMode := ExtendedModeStringArray[TempRXData.ExtMode];
+         end
+      else
+         begin
+         sMode := ExtendedModeStringArray[TempRXData.ExtMode];
+         end;
+       WriteADIFField('MODE',sMode);
+       if sSubMode <> '' then
+          begin
+          WriteADIFField('SUBMODE',sSubMode);
+          end;
+
+
 
 
       if TempRXData.Frequency <> 0 then //14149280  or 7025000
          begin
          // Making this simpler...
+         DecimalSeparator := '.';
          sTemp := FloatToStr((TempRXData.Frequency/1000000));
          sBuffer := SysUtils.Format('<FREQ:%u>%s',[length(sTemp),sTemp]);
          sWriteFileFromString(tReportFileWrite, sBuffer);
@@ -1979,7 +2008,7 @@ begin
         asm
           push TempRXData.NumberSent
         end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<STX:5>%05u');
+        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<STX:5>%05u ');
         asm add esp,12
         end;
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
@@ -2193,8 +2222,8 @@ begin
       nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER,
         '%s,%s,%s,%u%02d%02d,%02d%02d%02d,%u,%u,%s');
 
- 
-      end;   
+
+      end;
 
       sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
 
@@ -2277,10 +2306,21 @@ begin
     if ErmakSpecification then if TempTag = ctOperators then Continue;
 
     Windows.GetDlgItemText(CreateCabrilloWindow, integer(TempTag) + 200, @TempBuffer2, SizeOf(TempBuffer2));
-    if TempBuffer2[0] = #0 then Continue;
+    //if TempBuffer2[0] = #0 then Continue;
+    if TempTag = ctOperators then
+       begin
+       ;
+       end
+    else if TempBuffer2[0] =#0 then
+      begin
+      Continue;
+      end;
 
     TempPchar := @CabrilloTagsArray[TempTag].ctrTag[1];
-
+    if TempTag = ctOperators then
+       begin
+       Format(TempBuffer2, '%s', PChar(GetOperatorsFromLog));
+       end;
     asm
     push offset TempBuffer2
     push TempPchar
@@ -2346,6 +2386,8 @@ function tGenerateLogPortionOfCabrilloFile: boolean;
 label
   1;
 var
+   s                                    : string;
+   i                                    : integer;
   nNumberOfBytesToWrite                 : Cardinal;
   HisCallsign                           : PChar;
   RSTSent                               : PChar;
@@ -2384,6 +2426,7 @@ var
   pnr                                   : integer;
   hisnr                                 : integer;
   rxnr                                  : integer;
+  slOperators                           : TStringList;
 
 
 begin
@@ -2399,7 +2442,11 @@ begin
 
   ReadVersionBlock;
 
-  TempGrid := MyGrid;
+   try
+      try
+      slOperators := TStringList.Create;
+      slOperators.Duplicates := dupIgnore;
+      TempGrid := MyGrid;
   TempGrid[5] := #0;
   cMyGrid := @TempGrid[1];
 
@@ -2413,6 +2460,7 @@ begin
   if ReadLogFile then
   begin
     inc(contacts);
+    slOperators.Add(TempRXData.ceOperator);
 
     HisCallsign := @TempRXData.Callsign[1];
 
@@ -3406,8 +3454,16 @@ if TempRXData.DomMultQTH = '' then
     goto 1;
   end;
   sWriteFile(tReportFileWrite, 'END-OF-LOG: ', 12);
+
   CloseLogFile;
   Result := True;
+   except
+      on E: Exception do
+         DebugMsg(E.ClassName + ' error raised with message ' + E.Message);
+   end;
+   finally
+      FreeANdNil(slOperators);
+   end;
 end;
 
 procedure SetTransmittersIdentifiers;
@@ -4174,6 +4230,35 @@ begin
    except
    end;
    end;
+(*----------------------------------------------------------------------------*)
+function GetOperatorsFromLog: string;
+var
+  slOperators                           : TStringList;
+begin
+  Result := '';
+  if not OpenLogFile then Exit;
+
+  ReadVersionBlock;
+
+   try
+      try
+         slOperators := TStringList.Create;
+         slOperators.Duplicates := dupIgnore;
+	      slOperators.Sorted := true;
+         while ReadLogFile do
+            begin
+            slOperators.Add(TempRXData.ceOperator);
+            end;
+         CloseLogFile;
+         Result := slOperators.DelimitedText;
+      except
+      on E: Exception do
+         DebugMsg(E.ClassName + ' error raised with message ' + E.Message);
+      end;
+   finally
+      FreeAndNil(slOperators);
+   end;
+end;
 (*----------------------------------------------------------------------------*)
 end.
 
