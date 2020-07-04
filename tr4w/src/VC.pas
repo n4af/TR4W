@@ -1479,7 +1479,7 @@ type
 {01}  PrefixMult:          boolean;
 {01}  ZoneMult:            boolean;
       ExtMode:             ExtendedModeType;
- ///     ExchString:          string[?];  // What is entered as SRX exchange
+      ExchString:          Str40;  // What is entered as SRX exchange
 {04}  ceClass:             string[3]{10}; { Field day class }
 
 {01}  ZERO_04:             DummyByte;

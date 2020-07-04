@@ -33,6 +33,7 @@ uses
   utils_text,
   utils_file,
   sysutils,
+  StrUtils,
   Tree,
   VC,
 //  Help,
@@ -110,6 +111,7 @@ type
         csDummy
         );
   }
+function GetMyExchangeForExport: string;
 procedure ExportToEDI;
 procedure ExportToEDIByBand(Band: BandType);
 procedure ExportToADIF;
@@ -1725,6 +1727,7 @@ var
   nLength                               : integer;
   sTemp                                 : string;
   dtReportTime                          : TDateTime;
+  stxString                             : string;
 //  IOTAstring                            : Str10;
 begin
   dtReportTime := Now;
@@ -1820,6 +1823,8 @@ begin
                   );
       sWriteFileFromString(tReportFileWrite, sBuffer);
 
+
+
       if TempRXData.Frequency <> 0 then //14149280  or 7025000
          begin
          // Making this simpler...
@@ -1852,6 +1857,10 @@ begin
         }
       end;
 
+      WriteADIFField('SRX_STRING',TempRXData.ExchString);
+      stxString := GetMyExchangeForExport;
+      WriteADIFField('STX_STRING',Trim(stxString));
+
       if TempRXData.Precedence <> #0 then
       begin
         nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<PRECEDENCE:1>%c ', TempRXData.Precedence);
@@ -1867,7 +1876,7 @@ begin
       if TempRXData.QTHString <> '' then
       begin
    //   getridofprecedingspaces(TempRXData.QTHString);
-      p := nil;
+         p := nil;
         p := @TempRXData.QTHString[1];
         if TempRXData.QTHString[1] = ' ' then        //n4af 4.34.6    remove preceding space using pointer math
        begin                                           //n4af 4.34.6
@@ -1903,9 +1912,9 @@ begin
                 sBuffer := SysUtils.Format('<STX_STRING:%u>%s %s ',[nLength, MyFDClass, MySection]);
                 sWriteFileFromString(tReportFileWrite, sBuffer);
 
-                nLength := length(TempRXData.ceClass) + 1 + length(TempRXData.QTHString);
-                sBuffer := SysUtils.Format('<SRX_STRING:%u>%s %s ', [nLength, TempRXData.ceClass, TempRXData.QTHString]);
-                sWriteFileFromString(tReportFileWrite, sBuffer);
+                //nLength := length(TempRXData.ceClass) + 1 + length(TempRXData.QTHString);
+                //sBuffer := SysUtils.Format('<SRX_STRING:%u>%s %s ', [nLength, TempRXData.ceClass, TempRXData.QTHString]);
+                //sWriteFileFromString(tReportFileWrite, sBuffer);
 
               end;
 
@@ -2054,7 +2063,7 @@ begin
         mov al, byte ptr MyCall
         push eax
         end;
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<OPERATOR:%u>%s');
+      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<OPERATOR:%u>%s ');
       asm add esp,16 end;
       sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
 
@@ -3900,4 +3909,271 @@ begin
   CloseHandle(tReportFileWrite);
   FilePreview;
 end;
+
+(*----------------------------------------------------------------------------*)
+
+function GetMyExchangeForExport: string;
+var
+  //HisCallsign                           : PChar;
+  cMyZone                               : integer;
+  cMyState                              : string;
+  cMyName                               : PChar;
+  //csName                                : PChar;
+  cMyFOCNumber                          : PChar;
+  cMyCheck                              : PChar;
+  //csCheck                               : integer {PChar};
+  crFOCNr                               : PChar;
+  cMyGrid                               : PChar;
+  csPower                               : PChar;
+  //hisAge                                : Integer;
+  csQTHString                           : PChar;
+  HisZone                               : integer;
+  //str1                                  : widestring;
+  //nrReceived                            : integer;
+  nrSent                                : integer;
+  //tempcategoryoperator                  : tcategoryoperator;
+
+  //T1                                    : PChar;
+  //T2                                    : PChar;
+  //T3                                    : PChar;
+  //T4                                    : PChar;      // 4.73.6
+  cRandomCharsReceived                  : PChar;
+  //cKids                                 : PChar;
+  TempGrid                              : Str20;
+  previousqsonr                         : integer;
+  TransmitterIDPos                      : integer;
+  contacts                              : integer;
+  PreviousQTHString                     : Str10;
+  pnr                                   : integer;
+  hisnr                                 : integer;
+  rxnr                                  : integer;
+
+
+begin
+   Result := 'Error generating my exchange';
+   try
+   TempGrid := MyGrid;
+   TempGrid[5] := #0;
+   cMyGrid := @TempGrid[1];
+
+   cMyName := @MyName[1];
+
+   cMyZone := StrToInt(MyZone);
+   cMyState := MyState;
+
+   previousqsonr := 0;
+   nrSent := TempRXData.NumberSent;
+
+   if GoodLookingQSO then
+      begin
+
+      {Make Exchanges Strings}
+      case ActiveExchange of
+         GridExchange:
+            begin
+            Result := cMyGrid;
+            //Format(CABRILLO_MYEX, '%-11s', cMyGrid);
+            end;
+
+         RSTNameAndQTHExchange:
+            begin
+            Result := SysUtils.Format('%-3d %-5s %-7s', [TempRXData.RSTSent, cMyName, cMyState]);
+            end;
+
+         QSONumberAndNameExchange:
+            begin
+            Result := SysUtils.Format('%-3d %-7s', [nrSent, cMyName]);
+            end;
+
+         RSTAndPostalCodeExchange:
+            begin
+            if contacts = 1 then
+               begin
+               Result := SysUtils.Format('%-3d %-10s', [TempRXData.RSTSent, MyPostalCode]);
+               end
+            else
+               begin
+               Result := SysUtils.Format('%-3d %-10s', [TempRXData.RSTSent, PreviousQTHString]);
+               end;
+            end;
+
+         RSTQSONumberAndGridSquareExchange:
+            begin
+            Result := SysUtils.Format('%-3d %-4d %-7s', [TempRXData.RSTSent, nrSent, cMyGrid]);
+            end;
+
+         RSTQSONumberOrDomesticQTHExchange:      //n4af 4.40.6
+            begin
+            if cMystate[1] <> '' then
+               begin
+               Result := SysUtils.Format('%-3d  %-5s', [TempRXData.RSTSent, cMyState]);
+               end
+            else if cMystate[1] = '' then
+               begin
+               Result := SysUtils.Format('%-3d  %-6d', [TempRXData.RSTSent, nrSent]);
+               end;
+            end;
+
+         RSTPrefectureExchange:
+            Result := SysUtils.Format('%-3d %-7d', [TempRXData.RSTSent, cMyZone]);
+
+         NameAndDomesticOrDXQTHExchange:
+            Result := SysUtils.Format('  %-10s %-4s', [cMyName, cMyState]);
+
+
+         QSONumberPrecedenceCheckDomesticQTHExchange:
+            begin
+            CID_TWO_BYTES[0] := TempRXData.Precedence;
+            //csName := CID_TWO_BYTES;
+
+            cMyName := @MyPrec[1] ;
+            //csCheck := {inttopchar}(TempRXData.Check);
+            cMyCheck := @MyCheck[1];
+            //cMyState := @MySection[1];
+
+            Result := SysUtils.Format('%-4d %s %s %-3s ', [nrSent, cMyName, cMyCheck, MySection]);
+            end;
+
+         QSONumberNameDomesticOrDXQTHExchange:
+            begin
+            //csName := @TempRXData.Name[1];
+            cMyName := @MyName[1];
+            if MyState = '' then cMyState := 'DX';
+            if TempRXData.QTHString = '' then csQTHString := 'DX';
+            Result := SysUtils.Format('%-4d %-7s %-8s', [nrSent, cMyNAme, cMyState]);
+            end;
+
+         RSTAgeAndPossibleSK:
+            Result := SysUtils.Format('%-3d %-16s', [TempRXData.RSTSent, cMyState]);
+
+         RSTAgeExchange:
+            Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyState]);
+
+         AgeAndQSONumberExchange:      // 4.55.4
+            Result := SysUtils.Format('%-3d %-2s %03d      ', [cMyState, nrSent]);
+
+         RSTPowerExchange:
+            begin
+            csPower := @TempRXData.Power[1];
+            if contest = FOCMARATHON then
+               begin
+               cMyFOCNumber :=  @MyFOCNumber[1];
+               crFOCNr := @TempRXData.Power[1];
+               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyFOCNumber]);
+               end
+            else if Contest <> FOCMARATHON then
+               begin
+               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyState]);
+               end;
+            end;
+         RSTAndOrGridExchange:
+            begin
+            Result := SysUtils.Format('%-3d %-7s',[TempRXData.RSTSent, cMyGrid]);
+            end;
+
+         QSONumberAndGridSquare:
+            Result := SysUtils.Format('%-3s %-7s',[nrSent, cMyState]);
+
+         QSONumberDomesticOrDXQTHExchange, QSONumberDomesticQTHExchange:
+            Result := SysUtils.Format('%-4s %-6d', [cMyState, nrSent]);
+
+         QSONumberAndPossibleDomesticQTHExchange, RSTQSONumberAndDomesticQTHExchange, RSTQSONumberAndPossibleDomesticQTHExchange:
+            if cMyState = 'TRC' then
+               begin
+               Result := SysUtils.Format('%-3d %d%-6s',[TempRXData.RSTSent, nrSent, cMyState]);
+               end
+            else
+               begin
+               Result := SysUtils.Format('%-3d %-4d %-6s ',[TempRXData.RSTSent, nrSent, cMyState]);
+               end;
+
+         RSTZoneAndPossibleDomesticQTHExchange:
+            begin
+            if MyState = '' then
+               begin
+               cMyState := 'DX';
+               end;
+            Result := SysUtils.Format('%-3d %02u %-4s', [TempRXData.RSTSent, MyZone, cMyState]);
+            end;
+         RSTZoneOrDomesticQTH, RSTZoneOrSocietyExchange:
+            if MyState <> '' then
+               begin
+               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyState]);
+               end
+            else
+               begin
+               Result := SysUtils.Format('%-3d %-7d', [TempRXData.RSTSent, cMyZone]);
+               end;
+
+         QSONumberAndCoordinatesSum: {RFASCHAMPIONSHIP}
+            Result := SysUtils.Format('%-3s %03d    ', [cMyState, nrSent]);
+
+         ClassDomesticOrDXQTHExchange:
+            Result := SysUtils.Format('%-3s %-7s ', [ MyFDClass, MySection]);
+
+         RSTQSONumberExchange:
+            Result := SysUtils.Format('%-3d %04d ', [TempRXData.RSTSent, nrSent]);      // issue 177
+
+
+         RSTAndContinentExchange:
+            Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyState]);
+
+         RSTDomesticQTHExchange:
+            if Contest in [ARRLVHFQSO, ARRLVHFSS, CQVHF {, MMAA}] then
+               begin
+               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyGrid]);
+               end
+            else
+               begin
+               if MyState = '' then
+                  begin
+                  cMyState := 'DX';
+                  end;
+               if Contest in [SPDX, PACC] then
+                  begin
+                  MyState := inttopchar(nrSent);
+                  end;
+               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyState]);
+               end;
+
+         RSTDomesticOrDXQTHExchange:
+            Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyState]);
+
+         QSONumberAndZone:
+            Result := SysUtils.Format('  %s    %03d ', [cMyState, nrSent]);
+
+         RSTZoneExchange:
+            Result := SysUtils.Format('%-3d %-7.2d', [TempRXData.RSTSent, cMyZone]);
+
+         QSONumberAndPreviousQSONumber:
+            begin
+            //hisnr := (nrreceived div 1000);    // 4.53.2
+            //rxnr := (nrreceived mod 1000);    // 4.53.2
+            Result := SysUtils.Format('%-.3u%-7.3d', [pnr, nrSent]);
+            end;
+
+         RSTAndQSONumberOrFrenchDepartmentExchange,
+         RSTAndQSONumberOrDomesticQTHExchange,
+         RSTDomesticQTHOrQSONumberExchange:
+            begin
+            if (MyState <> '') and (Contest <> PCC) then      // 4.83.2
+               begin
+               Result := SysUtils.Format('%-3d %-7s',[TempRXData.RSTSent, cMyState]);
+               end
+            else if StringIsAllNumbers(MyState) then
+               begin
+               Result := SysUtils.Format('%-4d %03u/M   ', [TempRXData.RSTSent, nrSent]);
+               end
+            else
+               begin
+               Result := SysUtils.Format('%-4d %03u   ', [TempRXData.RSTSent, nrSent]);
+               end;
+            end;
+         end; // of case ActiveExchange
+      end;
+   except
+   end;
+   end;
+(*----------------------------------------------------------------------------*)
 end.
+

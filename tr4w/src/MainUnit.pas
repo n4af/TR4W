@@ -3933,6 +3933,7 @@ begin
     else
       RData.RSTReceived := LogRSTSent;
 
+  RData.ExchString := ExchangeString;
   CalculateQSOPoints(RData);
 end;
 
@@ -6152,6 +6153,7 @@ function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
 var
   sADIF_UPPER : string;
   //colonPosition: integer;
+  neFreq: extended;
   lookingForFieldName: boolean;
   lookingForFieldLen: boolean;
   lookingForFieldValue: boolean;
@@ -6225,11 +6227,14 @@ begin
                   5: exch.Zone := StrToInt(fieldValue);
                   9:
                      begin
-                     exch.Frequency := StrToInt (FloatToStr( StrToFloat(fieldValue) * 1000000));
-                     // := freq * 10000000; // Convert ADIF Mhz tointernal Hz.
+                     DecimalSeparator := '.';
+                     neFreq := StrToFloat(fieldValue);
+                     neFreq := neFreq * 1000000;
+                     exch.Frequency := Trunc(neFreq);
                      end;
                   12: exch.Zone := StrToInt(fieldValue);
                   13: exch.Mode := GetADIFMode(fieldValue);
+                  15: StrPLCopy(exch.ceOperator, fieldValue, High(exch.ceOperator));
                   17: //QSO_DATE
                      if not ADIFDateStringToQSOTime(fieldValue,exch.tSysTime) then
                         begin
@@ -6265,7 +6270,10 @@ begin
                         exch.QTHString := fieldValue;
                         DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                         end;
-                  -1: DebugMsg('ADIF ' + fieldName + ' is not present in this list');
+                  -1: if MidStr(fieldName,1,4) <> 'APP_' then
+                         begin
+                         DebugMsg('ADIF ' + fieldName + ' is not present in this list');
+                         end;
                   else
                      DebugMsg('ADIF ' + fieldName + ' is present but no handler');
                   end;
