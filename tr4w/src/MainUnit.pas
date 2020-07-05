@@ -333,7 +333,7 @@ function IsCWByCATActive(theRadio: RadioPtr): boolean; overload;  // ny4i Issue 
 function IsCWByCATActive: boolean; overload;  // ny4i Issue # 111
 function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
 function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
-
+function DigitsIn(n: smallInt): byte;
 function ParametersOkay(Call: CallString;
   ExchangeString: Str40 {CallString};
   Band: BandType;
@@ -6229,6 +6229,7 @@ var
   i: integer;
   freq: real;
   lpNumberOfBytesWritten: Cardinal;
+
 begin
    lookingForFieldName := false;
    lookingForFieldLen := false;
@@ -6269,7 +6270,7 @@ begin
                end
             else
                begin
-               Case AnsiIndexText(AnsiUpperCase(fieldName),
+               Case AnsiIndexText(AnsiUpperCase(fieldName),    // Be careful addng these.The order matters in the case...
                      ['ARRL_SECT', 'BAND','CALL', 'CHECK', 'CLASS', 'CQ_Z',
                       'CONTEST_ID', 'CNTY', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
                       'IOTA', 'ITUZ', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
@@ -6277,10 +6278,10 @@ begin
                       'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                       'STATE', 'STX', 'STX_STRING', 'SUBMODE','TEN_TEN',
                       'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ']) of
+                  0: exch.QTHString := fieldValue;
                   1:
                      begin
                      exch.Band := GetADIFBand(fieldValue);
-                     DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                      end;
                   2: exch.Callsign := AnsiUpperCase(fieldValue);
                   3: exch.Check := StrToInt(fieldValue);
@@ -6314,8 +6315,8 @@ begin
                         begin
                         ; //exit;
                         end;
-                  21: exch.RSTReceived := 599; // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
-                  22: exch.RSTSent := 599; //fieldValue;   // Same for ADIF RST Sent...
+                  21: exch.RSTReceived := StrToIntDef(fieldValue,599); // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
+                  22: exch.RSTSent := StrToIntDef(fieldValue,599); //fieldValue;   // Same for ADIF RST Sent...
                   23: exch.Power := fieldValue;
                   24: exch.NumberReceived := StrToInt(fieldValue);
                   25: // SRX_STRING    // Call a function passing my contest type and break this out based on exchange. Sweepstakes will be fun :)
@@ -6323,7 +6324,7 @@ begin
                   26: if Length(exch.QTHString) = 0 then
                          begin
                          exch.QTHString := fieldValue;    // STATE
-                         DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                         //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                          end;
                   27: exch.NumberSent := StrToInt(fieldValue);
                   29:
@@ -6341,7 +6342,7 @@ begin
                      if contest = IARU then
                         begin
                         exch.QTHString := fieldValue;
-                        DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                        //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                         end;
                   -1: if MidStr(fieldName,1,4) <> 'APP_' then
                          begin
@@ -6405,6 +6406,7 @@ begin
       except
          DebugMsg('Exception processign ADIF Record ' + sADIF);
       end;
+      DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
    end; // of ParseADIFRecord
 (*----------------------------------------------------------------------------*)
 procedure ImportFromADIF;
@@ -6453,10 +6455,16 @@ begin
       openDlg.Free;
    end;
 
-   // Add code to make sure the FileExists
+   if not FileExists(adifFileName) then
+      begin
+      MessageDlg({TC_IMPORTFILENOTFOUND}'The import file is not available' + ' ' + adifFileName,mtError, [mbOK], 0);
+      exit;
+      end;
+
    if not OpenLogFile then
       begin
-      QuickDisplay('Could not open log file');
+      MessageDlg({TC_CANNOTOPENLOG}'Cannot open log file',mtError, [mbOK], 0);
+
       exit;
       end;
   tSetFilePointer(0, FILE_END);
@@ -7763,6 +7771,24 @@ begin
       end;
    end;
 
+function DigitsIn(n: smallInt): byte; // byte is 0 to 255 so more than enough, smallInt is -32768..32767
+var
+   isNegative : boolean;
+begin
+   if n < 0 then
+      begin
+      isNegative := true;
+      n := n * -1;
+      end;
+   if n > 9999 then Result := 5
+   else if n > 999 then Result := 4
+   else if n > 99 then Result := 3
+   else if n > 9 then Result := 2
+   else Result := 1;
+
+   if isNegative then Result := Result + 1;
+end;
+
 
 {
 procedure SelectFileOfFolder(Parent: HWND; FileName: PChar; Mask: PChar; SelectType: CFGType);
@@ -7780,5 +7806,6 @@ begin
   SetNewMemMgr;
 //Msidle.dll  GetIdleMinutes(
 {$IFEND}
+
 
 end.

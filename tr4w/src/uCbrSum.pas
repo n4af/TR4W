@@ -100,7 +100,7 @@ const
     (ctrTag: '_CATEGORY-ASSISTED';      ctrCFG:True;  ctrSave: False; ctrList: True),
     (ctrTag: '_CATEGORY-BAND';          ctrCFG:True;  ctrSave: False; ctrList: True),
     (ctrTag: '_CATEGORY-MODE';          ctrCFG:True;  ctrSave: True; ctrList: True),
-    (ctrTag: '_CATEGORY-OPERATOR';      ctrCFG:True;  ctrSave: True; ctrList: True),
+    (ctrTag: '_CATEGORY-OPERATOR';      ctrCFG:True;  ctrSave: False; ctrList: True),    // ny4i changed this since we dete3rmine from the log
     (ctrTag: '_CATEGORY-POWER';         ctrCFG:True;  ctrSave: True; ctrList: True),
     (ctrTag: '_CATEGORY-STATION';       ctrCFG:False; ctrSave: True; ctrList: False),
     (ctrTag: '_CATEGORY-TIME';          ctrCFG:True;  ctrSave: False; ctrList: True),

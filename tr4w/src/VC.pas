@@ -1516,8 +1516,8 @@ type
 {04}  NumberReceived:      integer;
 {04}  NumberSent:          integer;
 
-{02}  RSTSent:             Word;
-{02}  RSTReceived:         Word;
+{02}  RSTSent:             smallInt; {Word;}
+{02}  RSTReceived:         smallInt; {Word;}  // if this was an int, I could put ft8 reports here.
 
 {11}  QTHString:           Str10;//QTH received by user (literal)
 {01}  ZERO_10:             DummyByte;

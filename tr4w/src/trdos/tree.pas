@@ -910,7 +910,7 @@ function UpperCase_old(const s: string): string;
 
 //function UpperCase(const s: string): string;
 
-function ValidRST(var Ex: ShortString {Str80} {WLI}; var RST: Word {RSTString}; Mode: ModeType): boolean;
+function ValidRST(var Ex: ShortString {Str80} {WLI}; var RST: smallInt {Word} {RSTString}; Mode: ModeType): boolean;
 
 function WhiteSpaceCharacter(InputChar: Char): boolean;
 
@@ -4038,7 +4038,7 @@ end;
     END;
 }
 
-function ValidRST(var Ex: ShortString; var RST: Word; Mode: ModeType): boolean;
+function ValidRST(var Ex: ShortString; var RST: smallInt {Word}; Mode: ModeType): boolean;
 
 var
 

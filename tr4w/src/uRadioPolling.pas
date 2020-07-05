@@ -2673,16 +2673,17 @@ begin
     end; // of case
    sBuf := '<?xml version="1.0"?>' +
            '<RadioInfo>' +
-           '<RadioNr>' + '1' + '</RadioNr>' +
-           '<Freq>' + Format('%d',[freq div 10]) + '</Freq>' +
-           '<TXFreq>' + Format('%d',[txFreq div 10]) + '</TXFreq>' +
-           '<Mode>' + sMode + '</Mode>' +
-           '<OpCall>' + '' + '</OpCall>' +
-           '<IsRunning>' + 'False' + '</IsRunning>' +
-           '<FocusEntry>0</FocusEntry>' +
-           '<Antenna>-1</Antenna>' +
-           '<Rotors>-1</Rotors>' +
-           '<FocusRadioNr>1</FocusRadioNr>' +
+           #9 + '<app>TR4W</app>' + sLineBreak +
+           #9 + '<RadioNr>' + '1' + '</RadioNr>' +
+           #9 + '<Freq>' + Format('%d',[freq div 10]) + '</Freq>' +
+           #9 + '<TXFreq>' + Format('%d',[txFreq div 10]) + '</TXFreq>' +
+           #9 + '<Mode>' + sMode + '</Mode>' +
+           #9 + '<OpCall>' + '' + '</OpCall>' +
+           #9 + '<IsRunning>' + 'False' + '</IsRunning>' +
+           #9 + '<FocusEntry>0</FocusEntry>' +
+           #9 + '<Antenna>-1</Antenna>' +
+           #9 + '<Rotors>-1</Rotors>' +
+           #9 + '<FocusRadioNr>1</FocusRadioNr>' +
            '</RadioInfo>';
 
    //SetLength(msg,Length(sBuf));

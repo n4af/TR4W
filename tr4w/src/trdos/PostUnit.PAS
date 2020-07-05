@@ -1811,10 +1811,13 @@ begin
       tModeString := ADIFModeString[TempRXData.Mode];
       tModeStringLength := Windows.lstrlen(tModeString);
 
-      if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
-      if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
 
-      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%u <RST_RCVD:%u>%u <CONTEST_ID:%u>%s '
+      tRSTSendStringLength := DigitsIn(TempRXData.RSTSent);
+      tRSTRcvdStringLength := DigitsIn(TempRXData.RSTReceived);
+      //if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
+      //if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
+
+      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%d <RST_RCVD:%u>%d <CONTEST_ID:%u>%s '
                   ,[length(TempRXData.Callsign), TempRXData.Callsign
                   ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
                  // ,length(ExtendedModeStringArray[TempRXData.Mode]), ExtendedModeStringArray[TempRXData.Mode]
@@ -2470,7 +2473,7 @@ begin
     push eax
     end;
 
-    wsprintf(CABRILLO_RST_SEND, '%u');
+    wsprintf(CABRILLO_RST_SEND, '%d');
     asm add esp,12 end;
     RSTSent := CABRILLO_RST_SEND;
 
@@ -2479,7 +2482,7 @@ begin
     mov ax,word ptr TempRXData.RSTReceived
     push eax
     end;
-    wsprintf(CABRILLO_RST_RCVD, '%u');
+    wsprintf(CABRILLO_RST_RCVD, '%d');
     asm add esp,12 end;
     RSTReceived := CABRILLO_RST_RCVD;
 
@@ -2493,8 +2496,26 @@ begin
         if TempRXData.Frequency < 30000000 then
           Freq := inttopchar(TempRXData.Frequency div 1000);
     end;
-
-    ModeString := tCabrilloModeString[TempRXData.Mode];
+    // This was just assumeing any digital contact was RY which is obviously not true.
+    if TempRXData.Mode = Digital then
+       begin
+       if TempRXData.ExtMode = eRTTY then
+          begin
+          ModeString := 'RY';
+          end
+       else
+          begin
+          ModeString := 'DG';
+          if Contest = WINTERFIELDDAY then
+             begin
+             ModeString := 'DI'; // Fluke in WFD's parser they have not yet fixed'
+             end;
+          end;
+       end
+    else
+       begin
+       ModeString := tCabrilloModeString[TempRXData.Mode];
+       end;
 
     if DoingDomesticMults then
     begin

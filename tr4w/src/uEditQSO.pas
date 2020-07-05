@@ -22,6 +22,7 @@ unit uEditQSO;
 
 {$IMPORTEDDATA OFF}
 
+(* ---------- I M P O R T A N T    Form is in the RES file -------------------*)
 interface
 
 uses
@@ -185,6 +186,8 @@ begin
         {Zone}
         Windows.SendDlgItemMessage(hwnddlg, FLD_ZONE, EM_SETLIMITTEXT, 2, 0);
         {RST}
+        // Reset the form field to not be a number so the user can enter a negative
+        //Windows.SetWindowLong(hwnddlg, FLD_RSTSENT,)
         Windows.SendDlgItemMessage(hwnddlg, FLD_RSTSEND, EM_SETLIMITTEXT, 3, 0);
         Windows.SendDlgItemMessage(hwnddlg, FLD_RSTRECEIVED, EM_SETLIMITTEXT, 3, 0);
         Windows.SendDlgItemMessage(hwnddlg, FLD_CALLSIGN, EM_SETLIMITTEXT, SizeOf(CallString) - 2, 0);
@@ -297,8 +300,8 @@ begin
         if EditableQSORXData.TenTenNum <> MAXWORD then
           Windows.SetDlgItemText(hwnddlg, FLD_TENTENNUM, inttopchar(EditableQSORXData.TenTenNum));
 
-        tSetDlgItemIntFalse(hwnddlg, FLD_RSTSEND, EditableQSORXData.RSTSent);
-        tSetDlgItemIntFalse(hwnddlg, FLD_RSTRECEIVED, EditableQSORXData.RSTReceived);
+        tSetDlgItemIntSigned(hwnddlg, FLD_RSTSEND, EditableQSORXData.RSTSent);
+        tSetDlgItemIntSigned(hwnddlg, FLD_RSTRECEIVED, EditableQSORXData.RSTReceived);
 
         Windows.SendDlgItemMessage(hwnddlg, FLD_INHIBITMULTS, BM_SETCHECK, integer(EditableQSORXData.InhibitMults), 0);
         Windows.SendDlgItemMessage(hwnddlg, FLD_DXMULT, BM_SETCHECK, integer(EditableQSORXData.DXMult), 0);
@@ -627,19 +630,19 @@ begin
      end;
 
   {RSTSent}
-  TempWord := Word(Windows.GetDlgItemInt(eq_handle, FLD_RSTSEND, lpTranslated, True));
+  TempInteger {TempWord} := {Word}Integer(Windows.GetDlgItemInt(eq_handle, FLD_RSTSEND, lpTranslated, True));
   if lpTranslated then
      begin
      ZeroMemory(@EditableQSORXData.RSTSent, SizeOf(EditableQSORXData.RSTSent));
-     EditableQSORXData.RSTSent := TempWord;
+     EditableQSORXData.RSTSent := TempInteger {TempWord};
      end;
 
   {RSTReceived}
-  TempWord := Word(Windows.GetDlgItemInt(eq_handle, FLD_RSTRECEIVED, lpTranslated, True));
+  TempInteger {TempWord} := {Word}Integer(Windows.GetDlgItemInt(eq_handle, FLD_RSTRECEIVED, lpTranslated, True));
   if lpTranslated then
      begin
      ZeroMemory(@EditableQSORXData.RSTReceived, SizeOf(EditableQSORXData.RSTReceived));
-     EditableQSORXData.RSTReceived := TempWord;
+     EditableQSORXData.RSTReceived := TempInteger {TempWord};
      end;
 
   IndexInMap := IndexOfItemInLogForEdit;
@@ -724,8 +727,8 @@ begin
  // if ExchangeInformation.FOCNumber then MakeEditWindow('FOC', ctByte, @EditableQSORXData.FOCNumber[1]);
   if ExchangeInformation.RST then
   begin
-    MakeEditWindow('RST recv', ctWord, @EditableQSORXData.RSTReceived);
-    MakeEditWindow('RST sent', ctWord, @EditableQSORXData.RSTSent);
+    MakeEditWindow('RST recv', ctInteger {ctWord}, @EditableQSORXData.RSTReceived);
+    MakeEditWindow('RST sent', ctInteger {ctWord}, @EditableQSORXData.RSTSent);
   end;
 
   if ExchangeInformation.QSONumber then
