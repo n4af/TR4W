@@ -2475,7 +2475,8 @@ begin
 
     menu_import_adif:
       begin
-        Windows.ZeroMemory(@TR4W_ADIF_FILENAME, SizeOf(TR4W_ADIF_FILENAME));
+      ImportFromADIF;
+        (*Windows.ZeroMemory(@TR4W_ADIF_FILENAME, SizeOf(TR4W_ADIF_FILENAME));
         if OpenFileDlg(nil, tr4whandle, 'ADIF (*.adi)'#0'*.adi', TR4W_ADIF_FILENAME, OFN_HIDEREADONLY or OFN_ENABLESIZING or OFN_FILEMUSTEXIST) then
         begin
           if QSOTotals[All, Both] > 0 then
@@ -2483,7 +2484,7 @@ begin
 //          if ImportFromADIFThreadID = 0 then tCreateThread(@ImportFromADIF, ImportFromADIFThreadID);
           ImportFromADIF;
         end;
-
+        *)
       end;
 
     menu_export_notes: MakeNotesList;
@@ -6512,6 +6513,14 @@ begin
 
    CloseLogFile;
 
+
+
+  tUpdateLog(actRescore);
+  LoadinLog;
+  DisplayLoadedQSOs;
+  ImportFromADIFThreadID := 0;
+
+end; // of ImportFromADIF
 (*
 
 procedure ImportFromADIF;
