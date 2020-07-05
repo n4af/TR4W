@@ -14,8 +14,8 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+     Public License along with TR4W in  GPL_License.TXT.
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 
@@ -129,6 +129,8 @@ uses
   LogWind,
   Tree,
   SysUtils,
+  StrUtils,
+  Dialogs,
   ZoneCont, 
   classes
   ;
