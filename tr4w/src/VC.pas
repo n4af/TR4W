@@ -1048,8 +1048,7 @@ type
     NoBand
     );
   PBandType = ^BandType;
-  //SubModeType = (smUSB, smLSB, smFT4, smJS8);
-
+  (* ****** If you add any new extended modes, please update MainUnit.GetModeFromExtendedMode *)
   ExtendedModeType = (eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
 
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
@@ -1183,7 +1182,7 @@ const
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
   ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
-  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'SSB');
+  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'LSB');
 
   BandStringsArray                      : array[BandType] of PChar {string} =
     (

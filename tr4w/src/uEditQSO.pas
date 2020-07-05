@@ -134,6 +134,7 @@ var
   TempString {, DString}                : ShortString;
   bt                                    : BandType;
   mt                                    : ModeType;
+  extMode                               : ExtendedModeType;
   IndexInMap                            : integer;
   lpNumberOfBytesRead                   : Cardinal;
 //  w                                     : Word;
@@ -203,11 +204,19 @@ begin
 
         tCB_SETCURSEL(hwnddlg, FLD_BAND, Ord(EditableQSORXData.Band));
 
-        for mt := CW to FM do tCB_ADDSTRING_PCHAR(hwnddlg, FLD_MODE, ModeStringArray[mt]);
+        // Add new modes from extended modes
+        for extMode := Low(ExtendedModeType) to High(ExtendedModeType) do
+           begin
+           tCB_ADDSTRING_PCHAR(hwnddlg, FLD_MODE, PChar(ExtendedModeStringArray[extMode]));
+           end;
+        tCB_SETCURSEL(hwnddlg, FLD_MODE, Ord(EditableQSORXData.ExtMode));
+
+        {
+        for mt := CW to FM do tCB_ADDSTRING_PCHAR(hwnddlg, FLD_MODE, ModeStringArray[mt]);  // NY4I to show extended modes
 
         //        if EditableQSORXData.ceFMMode then mt := FM else mt := EditableQSORXData.Mode;
         tCB_SETCURSEL(hwnddlg, FLD_MODE, Ord(EditableQSORXData.Mode));
-
+        }
         tSetDlgItemIntFalse(hwnddlg, FLD_FREQUENCY, EditableQSORXData.Frequency);
 {
         lpNumberOfBytesRead :=
@@ -510,7 +519,10 @@ begin
   EditableQSORXData.Band := BandType(tCB_GETCURSEL(eq_handle, FLD_BAND));
 
   {Mode}
-  EditableQSORXData.Mode := ModeType(tCB_GETCURSEL(eq_handle, FLD_MODE));
+  // Mode has an extendedMode so grab it and convert it to a modeType and store both
+  EditableQSORXData.ExtMode := ExtendedModeType(tCB_GETCURSEL(eq_handle, FLD_MODE));
+  EditableQSORXData.Mode := GetModeFromExtendedMode(EditableQSORXData.ExtMode);
+  //EditableQSORXData.Mode := ModeType(tCB_GETCURSEL(eq_handle, FLD_MODE));
   {
     if EditableQSORXData.Mode = FM then
       begin

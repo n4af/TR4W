@@ -334,6 +334,7 @@ function IsCWByCATActive: boolean; overload;  // ny4i Issue # 111
 function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
 function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
 function DigitsIn(n: smallInt): byte;
+function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
 function ParametersOkay(Call: CallString;
   ExchangeString: Str40 {CallString};
   Band: BandType;
@@ -7770,6 +7771,21 @@ begin
       Result := false;
       end;
    end;
+
+//   ExtendedModeType = (eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
+
+//  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
+function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
+begin
+//ExtendedModeStringArray               : array[ExtendedModeType] of string = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'SSB');
+   case extMode of
+      eCW: Result := CW;
+      eSSB, eFM, eAM, eUSB, eLSB:
+         Result := Phone;
+      else
+         Result := Digital;
+      end;
+end;
 
 function DigitsIn(n: smallInt): byte; // byte is 0 to 255 so more than enough, smallInt is -32768..32767
 var
