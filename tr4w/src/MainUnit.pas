@@ -27,9 +27,7 @@ interface
 
 uses
   //IdHTTP,
-  Dialogs,
   ShellAPI,
-  StrUtils,
   uMenu,
   uAltD,
   uMessagesList,
@@ -131,7 +129,7 @@ uses
   LogWind,
   Tree,
   SysUtils,
-  ZoneCont,
+  ZoneCont, 
   classes
   ;
 
@@ -268,7 +266,7 @@ procedure FindAndSaveRectOfAllWindows;
 procedure sm1;
 function TryKillAutoCQ: boolean;
 procedure RunAutoCQ;
-function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
+
 procedure TestMP;
 procedure tSetWindowLeft(h: HWND; Left: integer);
 procedure FlashCallWindow;
@@ -331,10 +329,12 @@ procedure DebugMsg(s: string); // ny4i
 procedure DebugRadioTempBuffer(sDecorator: string; var bRay: array of char); // ny4i Issue 145
 function IsCWByCATActive(theRadio: RadioPtr): boolean; overload;  // ny4i Issue # 111
 function IsCWByCATActive: boolean; overload;  // ny4i Issue # 111
+
 function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
 function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
 function DigitsIn(n: smallInt): byte;
 function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
+
 function ParametersOkay(Call: CallString;
   ExchangeString: Str40 {CallString};
   Band: BandType;
@@ -2473,8 +2473,7 @@ begin
 
     menu_import_adif:
       begin
-         ImportFromADIF;
-        (*Windows.ZeroMemory(@TR4W_ADIF_FILENAME, SizeOf(TR4W_ADIF_FILENAME));
+        Windows.ZeroMemory(@TR4W_ADIF_FILENAME, SizeOf(TR4W_ADIF_FILENAME));
         if OpenFileDlg(nil, tr4whandle, 'ADIF (*.adi)'#0'*.adi', TR4W_ADIF_FILENAME, OFN_HIDEREADONLY or OFN_ENABLESIZING or OFN_FILEMUSTEXIST) then
         begin
           if QSOTotals[All, Both] > 0 then
@@ -2482,7 +2481,6 @@ begin
 //          if ImportFromADIFThreadID = 0 then tCreateThread(@ImportFromADIF, ImportFromADIFThreadID);
           ImportFromADIF;
         end;
-        *)
 
       end;
 
@@ -6098,6 +6096,7 @@ begin
   end;
 }
 end;
+
 (*----------------------------------------------------------------------------*)
 function GetADIFMode(sMode: string): ModeAndExtendedModeType;
 var
@@ -6511,15 +6510,9 @@ begin
 
    CloseLogFile;
 
+(*
 
-
-  tUpdateLog(actRescore);
-  LoadinLog;
-  DisplayLoadedQSOs;
-  ImportFromADIFThreadID := 0;
-
-end; // of ImportFromADIF
-(*procedure ImportFromADIF;
+procedure ImportFromADIF;
 label
   1, 2, 3, 4, Increment, again;
 var
@@ -6757,7 +6750,7 @@ begin
             FieldLength := FieldLength + 1 ;
            end;
           end;
-
+           
       if TempRXData.Frequency < 30000 then
         TempRXData.Frequency := TempRXData.Frequency * 1000;
 
@@ -7727,6 +7720,7 @@ function IsCWByCATActive: boolean;  // ny4i Issue # 111
 begin
    Result := IsCWByCatActive(ActiveRadioPtr);  // Call base function with active radio // ny4i Issue 111
 end;
+
 
 function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
 

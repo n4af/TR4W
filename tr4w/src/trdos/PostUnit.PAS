@@ -1753,6 +1753,8 @@ begin
     Exit;
   end;
 
+  DecimalSeparator := '.'; // Set this so we use . as reqired by ADIF and not localized separator ny4i
+  
   // Issue 405 to fix up the header - ny4i
   sWriteFileFromString(tReportFileWrite,'ADIF File'#13#10);
   sWriteFileFromString(tReportFileWrite,'Created by TR4W version ' + TR4W_CURRENTVERSION + ' on ' + FormatDateTime('nn-mmm-yyyy hh:mm:ss',dtReportTime) + #13#10);
@@ -1975,9 +1977,8 @@ begin
 
             IARU:
               begin
-                WriteADIFField('APP_TR4W_HQ',TempRXData.QTHString);
-                //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_HQ:%u>%-7s ', tCallStringLength, p);
-                //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_HQ:%u>%-7s ', tCallStringLength, p);
+                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
           else
             begin
@@ -1994,9 +1995,9 @@ begin
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);         //n4af 04.30.2
       end;
 
-   if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then  // FOC_NUM is not a valid ADIF field
+   if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then
       begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
+        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
       end;
       if ((TempRXData.Power <> '') and (Contest <> FOCMARATHON)) then
