@@ -1437,7 +1437,7 @@ type
 
   {(*}
 
-(* The TLogHeader type had a dependency ont he size of the ContestExchange
+(* The TLogHeader type had a dependency on the size of the ContestExchange
    to build the dummy area of its type definition. This meant that to add something
    to ContestExchange, you had to go to find TLogRecord to change the number of
    bytes in ther dummy array. I changed this (at bottom of VC.pas) so the size
@@ -2484,7 +2484,7 @@ const
     'SOUTH AND NORTH AMERICAN PREFIXES',
     'GC STATION',
     'CQ NON EUROPEAN COUNTRIES AND WAE',
-    'RUSSIAN PREFIXES' 
+    'RUSSIAN PREFIXES'
        );
 type
   DomesticMultType =

@@ -1812,7 +1812,7 @@ begin
       tModeStringLength := Windows.lstrlen(tModeString);
 
 
-      tRSTSendStringLength := DigitsIn(TempRXData.RSTSent);
+      tRSTSendStringLength := DigitsIn(TempRXData.RSTSent);  // ny4i This changed as RST could be different lengths now.
       tRSTRcvdStringLength := DigitsIn(TempRXData.RSTReceived);
       //if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
       //if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
@@ -1906,17 +1906,24 @@ begin
       end;
 
       if TempRXData.QTHString <> '' then
-      begin
-   //   getridofprecedingspaces(TempRXData.QTHString);
+         begin
+   //    getridofprecedingspaces(TempRXData.QTHString);
          p := nil;
-        p := @TempRXData.QTHString[1];
-        if TempRXData.QTHString[1] = ' ' then        //n4af 4.34.6    remove preceding space using pointer math
-       begin                                           //n4af 4.34.6
-       inc(p);                                          //n4af 4.34.6    bump pointer past space
-       tCallStringLength := length(TempRXData.QTHString)-1;  //n4af 4.34.6
-       end
-       else
-       tCallStringLength := length(TempRXData.QTHString);
+         p := @TempRXData.QTHString[1];
+         if TempRXData.QTHString[1] = ' ' then        //n4af 4.34.6    remove preceding space using pointer math
+            begin                                           //n4af 4.34.6
+            inc(p);                                          //n4af 4.34.6    bump pointer past space
+            tCallStringLength := length(TempRXData.QTHString)-1;  //n4af 4.34.6
+            end
+         else
+            tCallStringLength := length(TempRXData.QTHString);
+
+         if TempRXData.DomesticMult then           // ny4i Issue 398
+            begin
+            WriteADIFFIeld('STATE',TempRXData.QTHString);
+            end;
+
+        //if ContestsArray[Contest].DM = DomesticMult
 
         if (LooksLikeAGrid(TempRXData.DomesticQTH) and (ActiveDomesticMult <> RDADistrict)) then
         begin
@@ -1949,11 +1956,10 @@ begin
                 //sWriteFileFromString(tReportFileWrite, sBuffer);
 
               end;
-
             CQ160CW, CQ160SSB, NASPRINTCW, SPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
               begin
-                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s ', tCallStringLength, p);
-                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+                //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s ', tCallStringLength, p);  // Removed NY4I Issue 398 as we use CE.DomesticMult but whazt happens if Italy works Italy?
+                //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
 
             IOTA:
