@@ -1049,7 +1049,7 @@ type
     );
   PBandType = ^BandType;
   (* ****** If you add any new extended modes, please update MainUnit.GetModeFromExtendedMode *)
-  ExtendedModeType = (eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
+  ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
 
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
   {    ModeType = (CW, Phone, Both, NoMode, FM, Digital);   { Use for calltest }
@@ -1178,11 +1178,11 @@ const
 
   MonthTags                             : array[1..12] of PChar = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
-  CallstringLength                      = 13;         
+  CallstringLength                      = 13;
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
   ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
-  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'LSB');
+  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('NoMode', 'CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'LSB');
 
   BandStringsArray                      : array[BandType] of PChar {string} =
     (

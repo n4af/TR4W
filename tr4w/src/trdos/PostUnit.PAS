@@ -1838,7 +1838,11 @@ begin
                   );
       sWriteFileFromString(tReportFileWrite, sBuffer);
 
-      if TempRXData.ExtMode = eFT4 then    // ??? In MFSKModes[TempRXData.ExtMode]?
+      if TempRXData.ExtMode = eNoMode then
+         begin
+         sMode := ADIFModeString[TempRXData.mode];
+         end
+      else if TempRXData.ExtMode = eFT4 then    // ??? In MFSKModes[TempRXData.ExtMode]?
          begin
          sMode := 'MFSK';
          sSubMode := ExtendedModeStringArray[TempRXData.ExtMode];
