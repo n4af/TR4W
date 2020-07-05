@@ -627,6 +627,10 @@ begin
   mov  [tNet_Event],eax
   end;
 
+  DEBUGMSG('Current program version = ' + TR4W_CURRENTVERSION);
+  DEBUGMSG('Current TR4W Server version = ' + TR4WSERVER_CURRENTVERSION);
+  DEBUGMSG('Current log version = ' + LOGVERSION);
+
   if not tHandLogMode then
   begin
     SetTimer(tr4whandle, ONE_SECOND_TIMER_HANDLE, 1000, @OneSecTimerProc);
