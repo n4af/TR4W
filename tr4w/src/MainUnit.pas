@@ -132,7 +132,8 @@ uses
   StrUtils,
   Dialogs,
   ZoneCont, 
-  classes
+  classes,
+  uWSJTX
   ;
 
   var
@@ -152,6 +153,7 @@ uses
   Call_Found                            : Boolean = False;
   Second                                : Boolean = False;
   Third                                 : Boolean = False;
+  wsjtx                                 : TWSJTXServer;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 function DeviceIoControlHandler
@@ -184,6 +186,7 @@ procedure InvertBooleanCommand(Command: PBoolean);
 procedure RunExplorer(Command: PChar);
 procedure RunOptionsDialog(f: CFGFunc);
 procedure OpenUrl(url: PChar);
+function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
 
 {$IF MORSERUNNER}
 function GetMorseRunnerWindow: boolean;
@@ -359,6 +362,8 @@ procedure tListBoxClientAlign(Parent: HWND);
 //function FindStringInInitCallsignListBox(s: CallString; var Index: integer): boolean;
 
 procedure tWinHelp(WindowHelpID: Byte);
+
+function AskConvertLog(sVersion: string): boolean;   // ny4i
 
 function tCreateStaticWindow(lpWindowName: PChar;
   dwStyle: DWORD; X, Y, nWidth, nHeight: integer; hwndParent: HWND;
@@ -1821,6 +1826,8 @@ end;
 
 procedure tr4w_ShutDown;
 begin
+   wsjtx.Stop;
+   FreeANdNil(wsjtx);
   Windows.UnregisterClass(tr4w_ClassName, hInstance);   // ny4i Issue 145. UnregisterClass was not qualifies and it conflicted with classes.UnregisterClass
   ExitProcess(hInstance);
 end;
@@ -4441,11 +4448,15 @@ begin
       Format(wsprintfBuffer, TC_DIFVERSION, _LOGFILE, LogHeader.lhVersionString, TempBuffer1);
       showwarning(wsprintfBuffer);
       CloseLogFile;
-      halt;
+      // Convert the log?
+      //if not AskConvertLog(TempBuffer1) then
+      //   begin
+         halt;
+      //   end;
     end
     else
     begin
-      (* When adding somethign to ContestExchange, this causes an error since
+      (* When adding something to ContestExchange, this causes an error since
          the size is wrong. From this code, it appears the the TRW file is
          simply a serialization of the ContestExchanges. So the size of the
          file should always be evenly divisible by the SizeOf(ContestExchange).
@@ -6280,7 +6291,7 @@ begin
                       'QSO_DATE', 'QSO_DATE_OFF' ,'TIME_ON', 'TIME_OFF',
                       'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                       'STATE', 'STX', 'STX_STRING', 'SUBMODE','TEN_TEN',
-                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ']) of
+                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN']) of
                   0: exch.QTHString := fieldValue;
                   1:
                      begin
@@ -6290,6 +6301,15 @@ begin
                   3: exch.Check := StrToInt(fieldValue);
                   4: exch.ceClass := AnsiUpperCase(fieldValue);
                   5: exch.Zone := StrToInt(fieldValue);
+                  6: ; // CONTEST_ID
+                  7: ; //CNTY
+                  8: if Length(exch.QTHString) = 0 then
+                         begin
+                         if ActiveDomesticMult = GridSquares then
+                            begin
+                            exch.QTHString := fieldValue; // GRIDSQUARE
+                            end;
+                         end;
                   9:
                      begin
                      DecimalSeparator := '.';
@@ -6347,6 +6367,7 @@ begin
                         exch.QTHString := fieldValue;
                         //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                         end;
+                  34: ; // STATION_CALLSIGN
                   -1: if MidStr(fieldName,1,4) <> 'APP_' then
                          begin
                          DebugMsg('ADIF ' + fieldName + ' is not present in this list');
@@ -6410,6 +6431,11 @@ begin
          DebugMsg('Exception processign ADIF Record ' + sADIF);
       end;
       DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+      // fix up operator
+      if exch.ceOperator = '' then
+         begin
+         exch.ceOperator := currentOperator;
+         end;
    end; // of ParseADIFRecord
 (*----------------------------------------------------------------------------*)
 procedure ImportFromADIF;
@@ -6499,6 +6525,7 @@ begin
          if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
             begin
             ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
+            CalculateQSOPoints(TempRXData);
             tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange), lpNumberOfBytesWritten);
             inc(QSOCounter);
             if QSOCounter mod 100 = 0 then
@@ -7810,7 +7837,110 @@ begin
    if isNegative then Result := Result + 1;
 end;
 
+(*----------------------------------------------------------------------------*)
+function AskConvertLog(sVersion: string): boolean;
+Var
+  OldFile, NewFile: String;
+  fileSetCode, attrs: integer;
+  h: HWND;
+  i: integer;
+begin
+   Result := false;
+// TR4W_LOG_FILENAME
+   if not OpenLogFile then
+      begin
+      ShowWarning(PChar('Could not open log file'));
+      Exit;
+      end;
+   //ReadVersionBlock; // Just resets points to the start
+   // Read the version block to confirm the versions are different. Ask again if they want to convert
+   { The general logic here is as follows:
 
+   Read the log header and confirm.
+   If the user wants to convert, make a backup of the current log with priorVersion in the name (as read from the version record)
+   }
+   //OldFile := TR4W_LOG_FILENAME;
+   NewFile := StrPas(TR4W_LOG_FILENAME) + '-' + sVersion + '.bkup';
+   If FileExists(TR4W_LOG_FILENAME) Then
+      begin
+      if FileExists(PChar(NewFile)) then
+         begin
+         attrs := FileGetAttr(NewFile);
+         if attrs and faReadOnly > 0 then
+            begin
+            ShowMessage(PChar('Cannot copy log file -- target exists and is read-only'));
+            Exit;
+            end;
+         end;
+      if CopyFile(TR4W_LOG_FILENAME, PChar(NewFile), false) then
+         begin
+         ShowMessage(PChar('Log file backup created')); // good copy so set to read-only
+         fileSetCode := FileSetAttr(NewFile, faReadOnly);
+         if fileSetCode = 0 then
+            begin
+            ShowMessage(PChar(NewFile + ' made into a read only file'));
+            end
+         else
+            begin
+            ShowMessage('Could not make backup file read-only');
+            end;
+
+         //***
+         // Now the file is backed up so time to convert...
+         //***
+         if not tOpenFileForWrite(h, 'newlog.trw') then Exit;
+         sWriteFile(h, LogHeader, SizeOfTLogHeader);
+
+
+  for i := 1 to 30000 do
+  begin
+
+    ClearContestExchange(TempRXData);
+    tGetQSOSystemTime(TempRXData.tSysTime);
+    TempRXData.Band := Band40;
+    TempRXData.Band := BandType(Random(6));
+    TempRXData.Mode := ModeType(Random(2));
+    TempRXData.Callsign := CD.GetRandomCall;
+    TempRXData.NumberSent := i;
+    ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
+    TempRXData.DXQTH := TempRXData.QTH.CountryID;
+    TempRXData.Zone := ctyGetCQZone(TempRXData.Callsign);
+    TempRXData.NumberSent := i;
+    TempRXData.NumberReceived := i + 100;
+    sWriteFile(h, TempRXData, SizeOf(ContestExchange));
+  end;
+  CloseHandle(h);
+         sWriteFile(h, LogHeader, SizeOfTLogHeader);
+         end
+      else
+         begin
+         ShowMessage(PChar('Could not make a backup copy of ' + StrPas(TR4W_LOG_FILENAME)));
+         end;
+      end;
+   {
+   Done - Make the backup and verify it is on disk and then set to read only
+   Read the backup to make sure it is a byte for byte match to the current log.
+   >>> If so, proceed.
+   Read the old log and write the records into the new one.
+   Write the new version header
+   With TempRXDataOld do
+      begin                                  
+      TempRXData.<field> = <same field>
+      Note: Update the new fields (ExtendedMode and STX_STRING in v1.5 to v1.6 log version).
+      Write the new log record
+      end;
+
+   Close the file and verify
+   Give a message that the log has been converted
+   Return and make sure the caller of this proc restarts the process (including checkign the version number).
+   }
+
+
+
+
+
+end;
+(*----------------------------------------------------------------------------*)
 {
 procedure SelectFileOfFolder(Parent: HWND; FileName: PChar; Mask: PChar; SelectType: CFGType);
 begin

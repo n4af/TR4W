@@ -105,7 +105,8 @@ uses
   utils_text in 'src\utils\utils_text.pas',
   utils_math in 'src\utils\utils_math.pas',
   utils_file in 'src\utils\utils_file.pas',
-  exportto_trlog in 'src\exportto_trlog.pas';
+  exportto_trlog in 'src\exportto_trlog.pas',
+  uWSJTX in 'src\uWSJTX.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -683,6 +684,8 @@ begin
   GetMorseRunnerWindow;
 {$IFEND}
 
+   wsjtx := TWSJTXServer.Create;
+   wsjtx.Start;
     {****************************  Main CallBack  ****************************}
 
   while (GetMessage(Msg, 0, 0, 0)) do
