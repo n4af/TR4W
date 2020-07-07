@@ -40,12 +40,17 @@ uses
   type
   QWord = packed record      // was Int64Rec
     case Integer of
-      0: (Lo, Hi: Cardinal); 
-      1: (Cardinals: array [0..1] of Cardinal); 
+      0: (Lo, Hi: Cardinal);
+      1: (Cardinals: array [0..1] of Cardinal);
       2: (Words: array [0..3] of Word);
       3: (Bytes: array [0..7] of Byte);
   end;
 
+function SwapEndian32(Value: integer): integer; register;
+function SwapEndian16(Value: smallint): smallint; register;
+
+procedure PackFF00(var AData: TIdBytes);
+procedure Pack(var AData: TIdBytes; const AValue: Byte); overload; 
 procedure Pack(var AData: TIdBytes; const AValue: Word); overload;         // Unsigned 16 bit
 procedure Pack(var AData: TIdBytes; const AValue: LongInt); overload;
 procedure Pack(var AData: TIdBytes; const AValue: ShortInt); overload;
@@ -67,11 +72,6 @@ procedure UnpackIntDouble(const AData: TIdBytes; var index: Integer; var AValue:
 procedure UnpackIntDateTime(const AData: TIdBytes; var index: Integer; var ADateTime: TDateTime);
 
 implementation
-
-function SwapEndian32(Value: integer): integer; register;
-asm
-  bswap eax
-end;
 
 procedure UnpackIntLongInt(const AData: TIdBytes; var index: Integer; var AValue: LongInt);
 begin
@@ -143,10 +143,26 @@ begin
   ADateTime := Now; {IncMilliSecond(JulianDateToDateTime(temp),tm);  }
 end;
 
+procedure Pack(var AData: TIdBytes; const AValue: Byte); overload;
+begin
+  // AppendBytes(AData,ToBytes(SwapEndian16(AValue)));
+  //AppendBytes(AData,ToBytes(AValue));
+  AppendByte(AData, AValue);
+end;
+
+procedure PackFF00(var AData: TIdBytes);
+var i: byte;
+begin
+   i := 255;
+   Pack(AData,i);
+   i := 0;
+   Pack(AData,i);
+end;
 
 procedure Pack(var AData: TIdBytes; const AValue: Word); overload;
 begin
-   AppendBytes(AData,ToBytes(AValue));
+  // AppendBytes(AData,ToBytes(SwapEndian16(AValue)));
+  AppendBytes(AData,ToBytes(AValue));
 end;
 
 procedure Pack(var AData: TIdBytes; const AValue: LongInt); overload;
@@ -183,7 +199,7 @@ end;
 
 procedure Pack(var AData: TIdBytes; const AValue: ShortInt) overload;
 begin
-   AppendBytes(AData,ToBytes(AValue));
+   AppendBytes(AData,ToBytes(SwapEndian16(AValue)));
 end;
 
 procedure Pack(var AData: TIdBytes; const AFlag: Boolean) overload;
@@ -207,6 +223,16 @@ var
   temp: QWord absolute AValue;
 begin
   Pack(AData,temp);
+end;
+
+function SwapEndian32(Value: integer): integer; register;
+asm
+  bswap eax
+end;
+
+function SwapEndian16(Value: smallint): smallint; register;
+asm
+  rol   ax, 8
 end;
 
 procedure Pack(var AData: TIdBytes; const ADateTime: TDateTime) overload;

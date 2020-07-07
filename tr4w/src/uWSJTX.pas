@@ -17,12 +17,12 @@ type
   TWSJTXServer = class(TObject)
   private
       udpServ : TIdUDPServer;
-      udp: TIdUDPClient;
       UFreq, UModeRX, UModeTX, UDXCall, URSTs, UHeureDeb : string;
       UCall,ULoc : string;
       UIndex:integer;
       peerPort: word;
       SNR: LongInt;
+      firstTime: boolean;
   protected
     procedure OnServerRead(ASender: TIdUDPListenerThread; const AData: TIdBytes; ABinding: TIdSocketHandle);
     procedure OnBeforeBind(AHandle: TIdSocketHandle);
@@ -31,7 +31,8 @@ type
     procedure Start;    // May want to add the port number to a constructor - for now use default
     procedure Stop;
     destructor Destroy;
-    procedure HighlightCall(sCall: string; color: integer);
+    procedure HighlightCall(sCall: string; color: integer; sId: string);
+    procedure ClearColors(sId: string);
   end;
 
 (*
@@ -74,12 +75,14 @@ uses
    ,utils_file    // For tWriteFile
    ,LOGSUBS2      // For LogContact
    ,LogStuff      // For CalculateQSOPoints
-   ,LogEdit       // For ShowStationInformation
+   ,LogEdit       // For ShowStationInformation and DetermineIfNewMult
+   ,LOGWIND       // for GetBandMapBandModeFromFrequency
    ;
 // {$R *.dfm}
 
 constructor TWSJTXServer.Create;
 begin
+   firstTime := true;
    udpServ := TIdUDPServer.Create(nil);
    udpServ.ThreadedEvent := true;
    udpServ.DefaultPort := 2237; // Make a config option
@@ -87,11 +90,7 @@ begin
    udpServ.OnUDPRead := Self.OnServerRead;
    udpServ.OnBeforeBind := Self.OnBeforeBind;
 
-   // Now create the UDP client to talk back to WSJT-X. Use same port.
-   udp := TIdUDPClient.create(nil);
-   udp.Port := udpServ.DefaultPort; // Same port back?
-
-end;
+   end;
 
 procedure TWSJTXServer.Start;
 begin
@@ -108,8 +107,7 @@ begin
    udpServ.Active := false;
    FreeAndNil(udpServ);
 
-   udp.Disconnect;
-   FreeAndNil(udp);
+
 end;
 
 procedure TWSJTXServer.OnBeforeBind(AHandle: TIdSocketHandle);
@@ -122,6 +120,7 @@ var
   index: Integer;
   magic, schema, messageType: LongInt;
   id, mode, DXCall, report, TXMode, message, DXGrid, DEGrid, DECall, reportReceived: string;
+  call : CallString;
   TXPower, comments, DXName, adif: string;
   frequency: QWord;
   isNew, TXEnabled, transmitting, Decoding: Boolean;
@@ -137,6 +136,8 @@ var
   TempRXData: ContestExchange;
   lpNumberOfBytesWritten: Cardinal;
   inx: integer;
+  TempMode: ModeType;
+  TempBand: BandType;
 
 begin
      //FUDP.IdUDPServer1.Bindings := '127.0.0.1:2237,[::]:2237';
@@ -162,6 +163,11 @@ begin
             case messageType of
             0: begin
                DEBUGMSG('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
+               if firstTime then
+                  begin
+                  ClearColors(id);
+                  firstTime := false;
+                  end;
                end;
             1:         {............................................................Status}
                begin
@@ -206,13 +212,24 @@ begin
                Memomessage :='Decode:'+' '+BoolToStr(isNew)+' '+FormatDateTime('hhmm',ztime)+' '+IntToStr(SNR)
                                    +' '+ FloatToStrF(DT, ffGeneral,4,1)+' '+IntToStr(DF)
                                    +' '+ mode +' '+ message +' '+ timeToStr(ztime) +' '+ FloatToStr(DT) +' '+ intToStr(tm);
-               DEBUGMSG('WSJTX >>> ' + Memomessage);
+               ///////DEBUGMSG('WSJTX >>> ' + Memomessage);
                if MidStr(message,1,2) = 'CQ' then
                   begin
                   DXCall := MidStr(message,4,length(message)-4);
                   inx := AnsiPos(' ',DXCall);
                   DXCall := MidStr(DXCall,1,inx);
-                  HighLightCall(DXCall,1);
+                  call := DXCall;
+                  GetBandMapBandModeFromFrequency(frequency.Hi, TempBand, TempMode);
+                  if  VisibleLog.CallIsADupe(call, TempBand, TempMode) then
+                     begin
+                     DEBUGMSG(DXCall + ' is a DUPE');
+                     HighLightCall(message,1,id);
+                     end
+                  else if VisibleLog.DetermineIfNewMult(call, TempBand, TempMode) then
+                     begin
+                     DEBUGMSG(DXCall + ' is a MULT');
+                     HighLightCall(message,2, id); // Pass back id as given to us
+                     end;
                   end;
 
                // This is where we need to look for CQ decodes and highlight the call by sending back
@@ -306,44 +323,104 @@ end;
                            Foreground Color       QColor
                            Highlight last         bool
 }
-procedure TWSJTXServer.HighlightCall(sCall: string; color: integer);
+procedure TWSJTXServer.HighlightCall(sCall: string; color: integer; sId: string);
 var
    sBuffer: string;
    AData: TIdBytes;
    messageType, magic, schema: LongInt;
    id, Ip, message: String;
-   colorType: ShortInt;
+   colorType: byte;
 begin
 // Build a header for a message
    magic := $ADBCCBDA;
-   schema :=2;
-   messageType :=4;
-   id := 'TR4W';
+   schema := 2;
+   messageType := 13;
+   id := sID;
    colorType := 1; // RGB
    pack(AData, magic);            {.............................................Magic number}
    pack(AData, schema);          {..............................................Schema}
    Pack(AData,messageType);        {............................................MessageType}
    pack(AData,id);                   {..........................................ID}
-   Pack(AData,sCall);
-   Pack(AData,colorType);
+   Pack(AData,Trim(sCall));
 
-   // Foreground to Red
-   Pack(AData,Word(0));     // Alpha
-   Pack(AData,Word(255));   // R
-   Pack(AData,Word(0));     // G
-   Pack(AData,Word(0));     // B
-   Pack(AData,Word(0));     // Padding
+   if color = 1 then // DUPE  defaults to red - Add code to pull from config if there
+      begin
+      // Background QColor first
+      // Red  RGB(255,0,0)
+      Pack(AData,colorType);
+      PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
+      PackFF00(AData); //Pack(AData,Word(65280));   // R
+      Pack(AData,Word(0));     // G
+      Pack(AData,Word(0));     // B
+      Pack(AData,Word(0));     // Padding
+      end
+   else if color = 2 then // multiplier
+      begin
+      // Background QColor first
+      // Yellow  RGB(0,255,255)
+      Pack(AData,colorType);
+      PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
+      Pack(AData,Word(0));     // R
+      PackFF00(AData); //Pack(AData,Word(65280));   // G
+      PackFF00(AData);  // B
+      Pack(AData,Word(0));     // Padding
+      end;
 
-   // Background to White
-   Pack(AData,Word(0));     // Alpha
-   Pack(AData,Word(255));   // R
-   Pack(AData,Word(255));   // G
-   Pack(AData,Word(255));   // B
+   // Foreground QColor
+   // Black RGB(0,0,0)
+   Pack(AData,colorType);
+   PackFF00(AData); //Pack(AData,Word(65280));     // Alpha     // 65280 is FF 00 (255 in Big Endian
+   Pack(AData,Word(0));   // R
+   Pack(AData,Word(0));   // G
+   Pack(AData,Word(0));   // B
    Pack(AData,Word(0));     // Padding
 
    Pack(AData,true);        // Highlight last only
 
-   DEBUGMSG('Sending command to highlight ' + sCall + ' to RED');
+   DEBUGMSG('Sending command to highlight ' + Trim(sCall) + ' to RED');
+   udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
+
+end;
+
+procedure TWSJTXServer.ClearColors(sId: string);
+var
+   sBuffer: string;
+   AData: TIdBytes;
+   messageType, magic, schema: LongInt;
+   id, Ip, message: String;
+   colorType: byte;
+begin
+// Build a header for a message
+   magic := $ADBCCBDA;
+   schema := 2;
+   messageType := 13;
+   id := sID;
+   colorType := 1; // RGB
+   pack(AData, magic);            {.............................................Magic number}
+   pack(AData, schema);          {..............................................Schema}
+   Pack(AData,messageType);        {............................................MessageType}
+   pack(AData,id);                   {..........................................ID}
+   Pack(AData,' ');                // blank call?
+
+
+   // Background QColor first
+   //
+   Pack(AData,Byte(0));
+   Pack(AData,Word(0));
+   Pack(AData,Word(0));
+   Pack(AData,Word(0));
+   Pack(AData,Word(0));
+
+   Pack(AData,Byte(0));
+   Pack(AData,Word(0));
+   Pack(AData,Word(0));
+   Pack(AData,Word(0));
+   Pack(AData,Word(0));
+
+
+   Pack(AData,true);        // Highlight last only
+
+   DEBUGMSG('Sending Reset Colors');
    udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
 
 end;
