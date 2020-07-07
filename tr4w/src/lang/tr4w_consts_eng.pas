@@ -7,7 +7,7 @@
   TC_TRANSLATION_LANGUAGE               = 'ENGLISH';
   TC_TRANSLATION_AUTHOR                 = 'N4AF';
   TC_TRANSLATOR_EMAIL                   = 'tr4w@qrz.ru';
-
+  TC_WAGWarn                            = 'Warning: Out of WAG allowed frequency range';
   TC_FREQ                               = 'Freq';
   TC_POINTS                             = 'Pts';
   TC_OP                                 = 'Op';

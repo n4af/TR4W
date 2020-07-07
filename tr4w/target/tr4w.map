@@ -1,6 +1,6 @@
 
  Start         Length     Name                   Class
- 0001:00000000 000C7870H .text                   CODE
+ 0001:00000000 000C7888H .text                   CODE
  0002:00000000 00008F8CH .data                   DATA
  0002:00008F8C 00040701H .bss                    BSS
 
@@ -195,14 +195,14 @@ Detailed map of segments
  0001:000AD810 0000CB8D C=CODE     S=.text    G=(none)   M=LogStuff ACBP=A9
  0001:000BA3A0 00001738 C=CODE     S=.text    G=(none)   M=Tree     ACBP=A9
  0001:000BBAD8 00000264 C=CODE     S=.text    G=(none)   M=uAltD    ACBP=A9
- 0001:000BBD3C 00008883 C=CODE     S=.text    G=(none)   M=MainUnit ACBP=A9
- 0001:000C45C0 00001E20 C=CODE     S=.text    G=(none)   M=uNewContest ACBP=A9
- 0001:000C63E0 00000038 C=CODE     S=.text    G=(none)   M=EncdDecd ACBP=A9
- 0001:000C6418 00000038 C=CODE     S=.text    G=(none)   M=uInet    ACBP=A9
- 0001:000C6450 00000038 C=CODE     S=.text    G=(none)   M=uProfiler ACBP=A9
- 0001:000C6488 00000038 C=CODE     S=.text    G=(none)   M=utils_hw ACBP=A9
- 0001:000C64C0 00000038 C=CODE     S=.text    G=(none)   M=exportto_trlog ACBP=A9
- 0001:000C64F8 00001378 C=CODE     S=.text    G=(none)   M=tr4w     ACBP=A9
+ 0001:000BBD3C 0000889B C=CODE     S=.text    G=(none)   M=MainUnit ACBP=A9
+ 0001:000C45D8 00001E20 C=CODE     S=.text    G=(none)   M=uNewContest ACBP=A9
+ 0001:000C63F8 00000038 C=CODE     S=.text    G=(none)   M=EncdDecd ACBP=A9
+ 0001:000C6430 00000038 C=CODE     S=.text    G=(none)   M=uInet    ACBP=A9
+ 0001:000C6468 00000038 C=CODE     S=.text    G=(none)   M=uProfiler ACBP=A9
+ 0001:000C64A0 00000038 C=CODE     S=.text    G=(none)   M=utils_hw ACBP=A9
+ 0001:000C64D8 00000038 C=CODE     S=.text    G=(none)   M=exportto_trlog ACBP=A9
+ 0001:000C6510 00001378 C=CODE     S=.text    G=(none)   M=tr4w     ACBP=A9
  0002:00000000 000000D0 C=DATA     S=.data    G=DGROUP   M=System   ACBP=A9
  0002:000000D0 00000020 C=DATA     S=.data    G=DGROUP   M=SysInit  ACBP=A9
  0002:000000F0 000026C0 C=DATA     S=.data    G=DGROUP   M=VC       ACBP=A9
@@ -903,7 +903,7 @@ Detailed map of segments
  0001:000A3D6C       AddNewClient
  0001:000211AC       AddNotFinished
  0001:0007CFA0       AddOnCQExchange
- 0001:000C2F78       AddRecordToLogAndSendToNetwork
+ 0001:000C2F90       AddRecordToLogAndSendToNetwork
  0001:0008348C       AddRussianDomesticCountrys
  0001:00091AE0       AddStringToBuffer
  0001:0008ED00       AddStringToTelnetConsole
@@ -1064,7 +1064,7 @@ Detailed map of segments
  0002:000075C4       BeepFileName
  0001:0009A8B0       BeepUnit
  0001:0001DD90       BeginGlobalLoading
- 0001:000C5E10       BeginNewContest
+ 0001:000C5E28       BeginNewContest
  0001:00006890       BeginPaint
  0001:0007AD24       BeginPolling
  0001:00003DA0       BeginThread
@@ -1166,10 +1166,10 @@ Detailed map of segments
  0002:00040FA0       CallsignsList
  0002:00040108       CallsignUpdateEnable
  0001:000129DC       CallTerminateProcs
- 0001:000BD7F4       CallWindowChange
+ 0001:000BD80C       CallWindowChange
  0002:00008568       CallWindowEmpty
- 0001:000C00F4       CallWindowKeyDownProc
- 0001:000C0604       CallWindowKeyUpProc
+ 0001:000C010C       CallWindowKeyDownProc
+ 0001:000C061C       CallWindowKeyUpProc
  0002:0004827F       CallWindowPosition
  0002:000081BC       CallWindowPositionTypeSA
  0001:000068A0       CallWindowProc
@@ -1210,9 +1210,9 @@ Detailed map of segments
  0002:00022050       CF_PICTURE
  0002:000084A8       ChampionshipRFPointsArray
  0002:00021DEC       ChangeAnyProc
- 0001:000C12D8       ChangeCaret
+ 0001:000C12F0       ChangeCaret
  0002:00024F7C       Changed
- 0001:000C62EC       ChangeDir
+ 0001:000C6304       ChangeDir
  0001:00075128       ChangeValue2
  0001:00003F0C       CharFromWChar
  0001:0005CD28       CharIsInSet
@@ -1226,25 +1226,25 @@ Detailed map of segments
  0001:00012110       CharToByteLen
  0001:000068B8       CharToOemA
  0001:0007BC60       CheckAndInitializeSerialPorts
- 0001:000C0AE0       CheckAndSetInitialExchangeCursorPos
+ 0001:000C0AF8       CheckAndSetInitialExchangeCursorPos
  0001:0002A03C       CheckBool
  0001:00058F58       CheckByteEncoding
  0001:000887E4       CheckCommand
- 0001:000C320C       CheckCommandInCallsignWindow
- 0001:000C31B8       CheckEditableWindowHeight
+ 0001:000C3224       CheckCommandInCallsignWindow
+ 0001:000C31D0       CheckEditableWindowHeight
  0001:00094054       CheckForNewContestDate
- 0001:000C348C       CheckInactiveRigCallingCQ
+ 0001:000C34A4       CheckInactiveRigCallingCQ
  0001:00066D34       CheckIsReadable
  0001:00003414       CheckJmp
  0001:000937E4       CheckLog
  0002:0004923A       CheckLogFileSize
  0001:000068C0       CheckMenuItem
  0001:00089C58       CheckMMError
- 0001:000C08BC       CheckNumber
+ 0001:000C08D4       CheckNumber
  0001:000BB7C0       CheckPTTLockout
  0001:0007EB94       CheckQTCNr
  0001:0007EC2C       CheckQTCR
- 0001:000C3BEC       CheckQuestionMark
+ 0001:000C3C04       CheckQuestionMark
  0002:00003EE8       Checks
  0001:0008629C       CheckServerAnswer
  0001:000A9D7C       CheckSpeedChange
@@ -1255,7 +1255,7 @@ Detailed map of segments
  0001:0007D80C       CheckTwoRadioState
  0001:0004A750       CheckUndock
  0001:00011DDC       CheckWin32Version
- 0001:000C34E8       CheckWindowAndColor
+ 0001:000C3500       CheckWindowAndColor
  0002:00000B14       CID_TWO_BYTES
  0002:00003820       CInvalidCustomVariantType
  0001:000165F4       CISCountry
@@ -1272,11 +1272,11 @@ Detailed map of segments
  0001:0009EC54       ClearContestExchange
  0001:000AD3C4       ClearDomesticCountryList
  0002:00023A6C       ClearDupeSheetCommandGiven
- 0001:000C5DD4       ClearFields
- 0001:000C0B24       ClearInfoWindows
- 0001:000C2DE4       ClearLog
+ 0001:000C5DEC       ClearFields
+ 0001:000C0B3C       ClearInfoWindows
+ 0001:000C2DFC       ClearLog
  0001:00090A5C       ClearMasterListBox
- 0001:000C3308       ClearMultSheet_CtrlC
+ 0001:000C3320       ClearMultSheet_CtrlC
  0001:000AAE48       ClearQuickDisplayText
  0002:00009AD0       ClearQuickDisplayTimer
  0001:0007A3EC       ClearRadioStatus
@@ -1293,13 +1293,13 @@ Detailed map of segments
  0001:00000228       CloseHandle
  0001:0006128C       CloseIDNLibrary
  0001:00060274       CloseLibrary
- 0001:000C2B60       CloseLogFile
+ 0001:000C2B78       CloseLogFile
  0001:00074800       CloseSendKeyboardInputDialog
  0002:00004344       closesocket
  0001:00057CFC       closesocket
  0001:00089AAC       CloseTempMP3File
  0002:00021F58       CloseThemeData
- 0001:000C08E8       CloseTR4WWindow
+ 0001:000C0900       CloseTR4WWindow
  0002:00024E7C       CMD
  0002:0000903C       CmdLine
  0002:00009038       CmdShow
@@ -1336,7 +1336,7 @@ Detailed map of segments
  0001:000062D8       CompareString
  0001:0000D484       CompareText
  0001:0000D9E4       CompareWith
- 0001:000C2E54       CompleteCallsign
+ 0001:000C2E6C       CompleteCallsign
  0002:00009C68       CompleteCallsignMask
  0001:00021CEC       ComponentCreated
  0002:0004923C       ComputerID
@@ -1425,7 +1425,7 @@ Detailed map of segments
  0001:00090BF8       CreateCabrilloDlgProc
  0001:0009371C       CreateCabrilloFile
  0002:00009690       CreateCabrilloWindow
- 0001:000C1828       CreateCallOrExchangeWin
+ 0001:000C1840       CreateCallOrExchangeWin
  0001:000068D0       CreateCaret
  0001:0000B6D0       CreateComboBox
  0001:000066A8       CreateCompatibleBitmap
@@ -1436,38 +1436,38 @@ Detailed map of segments
  0001:000066C0       CreateDIBitmap
  0001:000066B8       CreateDIBSection
  0001:000062E8       CreateDirectory
- 0001:000C0AC0       CreateDirectoryIfNotExist
+ 0001:000C0AD8       CreateDirectoryIfNotExist
  0001:0000B860       CreateEdit
- 0001:000C1D14       CreateEditableLog
+ 0001:000C1D2C       CreateEditableLog
  0001:000062F0       CreateEvent
  0001:000062F8       CreateFile
  0001:00000230       CreateFileA
  0001:00006300       CreateFileMapping
  0001:000066C8       CreateFont
  0001:000066D0       CreateFontIndirect
- 0001:000BE264       CreateFonts
+ 0001:000BE27C       CreateFonts
  0001:0009EB98       CreateGridSquareList
  0001:000066D8       CreateHalftonePalette
  0001:000068E0       CreateIcon
  0001:00011764       CreateInOutError
  0001:0000B770       CreateListBox
- 0001:000C1E1C       CreateListView
+ 0001:000C1E34       CreateListView
  0001:0000B710       CreateListView2
- 0001:000BDC08       CreateMainWindow
+ 0001:000BDC20       CreateMainWindow
  0001:000068E8       CreateMenu
  0001:0000B628       CreateModalDialog
  0001:0000B8F4       Createmsctls_progress32
- 0001:000BDAA0       CreateMultsWindows
+ 0001:000BDAB8       CreateMultsWindows
  0001:00006310       CreateMutex
  0001:000A3A24       CreateNetworkListView
- 0001:000C1608       CreateOKCancelButtons
+ 0001:000C1620       CreateOKCancelButtons
  0001:0000B8B8       CreateOwnerDrawListBox
  0001:000066E0       CreatePalette
  0001:000066E8       CreatePen
  0001:000066F0       CreatePenIndirect
  0001:000068F0       CreatePopupMenu
- 0001:000C13A8       CreateProgress32InMainWindow
- 0001:000BD950       CreateQSONeedWindows
+ 0001:000C13C0       CreateProgress32InMainWindow
+ 0001:000BD968       CreateQSONeedWindows
  0001:0000B938       CreateRichEdit
  0001:000066F8       CreateSolidBrush
  0001:0000B7C4       CreateStatic
@@ -1475,10 +1475,10 @@ Detailed map of segments
  0001:00000290       CreateThread
  0001:00006330       CreateThread
  0001:0000C114       CreateToolBarEx
- 0001:000C113C       CreateTotalWindow
+ 0001:000C1154       CreateTotalWindow
  0001:0000A114       CreateTR4WMenu
- 0001:000C0960       CreateTR4WStaticWindow
- 0001:000C09A0       CreateTR4WStaticWindowID
+ 0001:000C0978       CreateTR4WStaticWindow
+ 0001:000C09B8       CreateTR4WStaticWindowID
  0001:0000C11C       CreateUpDownControl
  0001:00006F94       CreateWindow
  0001:00006F3C       CreateWindowEx
@@ -1566,8 +1566,8 @@ Detailed map of segments
  0001:00025880       DeallocateHWnd
  0002:00049340       Debug
  0002:0000002C       DebugHook
- 0001:000C44F0       DebugMsg
- 0001:000C44C8       DebugRadioTempBuffer
+ 0001:000C4508       DebugMsg
+ 0001:000C44E0       DebugRadioTempBuffer
  0002:00049560       debugstr
  0002:0001448F       DecimalSeparator
  0001:0000F83C       DecodeDate
@@ -1595,7 +1595,7 @@ Detailed map of segments
  0002:00003B70       DefPenData
  0002:00002FB8       DefShortDayNames
  0002:00002F58       DefShortMonthNames
- 0001:000C2F44       DefTR4WProc
+ 0001:000C2F5C       DefTR4WProc
  0001:00006908       DefWindowProc
  0001:0000535C       DelayLoadResourceModule
  0001:0000047C       DeleteBlock
@@ -1647,7 +1647,7 @@ Detailed map of segments
  0001:000AA824       DisplayBandMode
  0001:000A2784       DisplayBandTotals
  0001:000AA480       DisplayBeamHeading
- 0001:000C6170       DisplayCheckBox
+ 0001:000C6188       DisplayCheckBox
  0001:000A3A78       DisplayClientStatus
  0001:000AA9AC       DisplayCodeSpeed
  0001:000AA970       DisplayContestTitle
@@ -1656,9 +1656,9 @@ Detailed map of segments
  0002:000485DE       DisplayedCodeSpeed
  0001:000B4CDC       DisplayGridSquareStatus
  0001:000AAC18       DisplayHour
- 0001:000C6354       DisplayInitialCommand
+ 0001:000C636C       DisplayInitialCommand
  0001:000AAA84       DisplayInsertMode
- 0001:000C3540       DisplayLoadedQSOs
+ 0001:000C3558       DisplayLoadedQSOs
  0001:000ACB3C       DisplayLocalTime
  0001:00084F78       DisplaymessagesList
  0001:000AAA9C       DisplayNamePercentage
@@ -1767,7 +1767,7 @@ Detailed map of segments
  0002:00021F84       DrawThemeIcon
  0002:00022008       DrawThemeParentBackground
  0002:00021F60       DrawThemeText
- 0001:000BE39C       DrawWindows
+ 0001:000BE3B4       DrawWindows
  0001:0009A600       DriverBitOperation
  0001:0009A49C       DriverCreate
  0001:0009A53C       DriverDestroy
@@ -1839,7 +1839,7 @@ Detailed map of segments
  0001:0009B420       EditableLog.ShowRemMultsInWindow
  0001:0009B870       EditableLog.SuperCheckPartial
  0002:00009C44       EditableLogHeight
- 0001:000C1308       EditableLogWindowDblClick
+ 0001:000C1320       EditableLogWindowDblClick
  0002:0002329C       EditableQSORXData
  0001:00077F40       EditFullLog
  0002:0000BD58       EditingCallsignSent
@@ -1849,7 +1849,7 @@ Detailed map of segments
  0002:00023A84       EditMessageWnd
  0002:00002DDC       EditPChar
  0001:000770F0       EditQSODlgProc
- 0001:000C09E4       EditSetSelLength
+ 0001:000C09FC       EditSetSelLength
  0002:00007354       EDI_DupeArray
  0002:00007334       EDI_ModeCodes
  0002:0000734C       EDI_NewArray
@@ -1879,7 +1879,7 @@ Detailed map of segments
  0001:000069B0       EnableWindow
  0001:0000ABD4       EnableWindowFalse
  0001:0000ABBC       EnableWindowTrue
- 0001:000C6410       EncdDecd
+ 0001:000C6428       EncdDecd
  0001:0000F6C0       EncodeDate
  0001:0000F520       EncodeTime
  0001:000069B8       EndDialog
@@ -1888,8 +1888,8 @@ Detailed map of segments
  0001:00003DE4       EndThread
  0001:0007C890       EnmuCFGFile
  0001:00058F04       EnsureEncoding
- 0001:000C3124       EnsureListViewColumnVisible
- 0001:000C61D0       EnterCountyOrState
+ 0001:000C313C       EnsureListViewColumnVisible
+ 0001:000C61E8       EnterCountyOrState
  0001:000003DC       EnterCriticalSection
  0001:00006350       EnterCriticalSection
  0001:00006358       EnumCalendarInfoA
@@ -1961,7 +1961,7 @@ Detailed map of segments
  0001:000BD624       ExchangeWindowChange
  0002:0004936C       ExchangeWindowString
  0001:00006710       ExcludeClipRect
- 0001:000C3154       ExecuteConfigurationFile
+ 0001:000C316C       ExecuteConfigurationFile
  0002:00000000       ExitCode
  0001:00003B9C       ExitDll
  0002:00009040       ExitProc
@@ -1979,7 +1979,7 @@ Detailed map of segments
  0001:00096D0C       ExportToCSV
  0001:00095B94       ExportToEDI
  0001:00095BB0       ExportToEDIByBand
- 0001:000C64F0       exportto_trlog
+ 0001:000C6508       exportto_trlog
  0001:000305A4       ExtActns
  0001:00057CCC       ExtCtrls
  0001:00030410       ExtDlgs
@@ -2007,7 +2007,7 @@ Detailed map of segments
  0002:000075B8       FileNameStr
  0001:00001D24       FileNOPProc
  0001:0000DB08       FileOpen
- 0001:000C171C       FilePreview
+ 0001:000C1734       FilePreview
  0001:0000DB8C       FileRead
  0002:000038D4       FilerSignature
  0001:0000DBE4       FileSeek
@@ -2021,13 +2021,13 @@ Detailed map of segments
  0001:00000D34       FillerSizeBeforeGap
  0001:000069E0       FillRect
  0001:00085A1C       FillStationsColumn
- 0001:000C6488       Finalization
+ 0001:000C64A0       Finalization
  0001:00092F08       Finalization
  0001:000784EC       Finalization
  0001:0001ADBC       Finalization
  0001:00007214       Finalization
  0001:0001AB98       Finalization
- 0001:000C64C0       Finalization
+ 0001:000C64D8       Finalization
  0001:0001B584       Finalization
  0001:0001B5DC       Finalization
  0001:00040BCC       Finalization
@@ -2036,7 +2036,7 @@ Detailed map of segments
  0001:000071D4       Finalization
  0001:00058C2C       Finalization
  0001:0003F480       Finalization
- 0001:000C4554       Finalization
+ 0001:000C456C       Finalization
  0001:00077F80       Finalization
  0001:0006E54C       Finalization
  0001:0006F118       Finalization
@@ -2047,7 +2047,7 @@ Detailed map of segments
  0001:00018238       Finalization
  0001:0007BA84       Finalization
  0001:00090F70       Finalization
- 0001:000C63A8       Finalization
+ 0001:000C63C0       Finalization
  0001:00090A70       Finalization
  0001:0006DB50       Finalization
  0001:00090870       Finalization
@@ -2088,7 +2088,7 @@ Detailed map of segments
  0001:00058738       Finalization
  0001:0009A880       Finalization
  0001:0009A8B8       Finalization
- 0001:000C63E0       Finalization
+ 0001:000C63F8       Finalization
  0001:00077DE8       Finalization
  0001:00089CB0       Finalization
  0001:00007134       Finalization
@@ -2096,7 +2096,7 @@ Detailed map of segments
  0001:000070FC       Finalization
  0001:0007EF8C       Finalization
  0001:000770B8       Finalization
- 0001:000C67DC       Finalization
+ 0001:000C67F4       Finalization
  0001:0009D998       Finalization
  0001:00076EFC       Finalization
  0001:0009DD7C       Finalization
@@ -2110,7 +2110,7 @@ Detailed map of segments
  0001:00060F5C       Finalization
  0001:00060F9C       Finalization
  0001:00058670       Finalization
- 0001:000C6450       Finalization
+ 0001:000C6468       Finalization
  0001:0000C698       Finalization
  0001:0000C370       Finalization
  0001:000581F4       Finalization
@@ -2194,7 +2194,7 @@ Detailed map of segments
  0001:0002F9EC       Finalization
  0001:000BBD04       Finalization
  0001:0002FA24       Finalization
- 0001:000C6418       Finalization
+ 0001:000C6430       Finalization
  0001:00057C84       Finalization
  0001:000303E0       Finalization
  0001:0002FA5C       Finalization
@@ -2398,17 +2398,17 @@ Detailed map of segments
  0001:000290DC       GDICheck
  0001:00029034       GDIError
  0001:00094158       GenerateAllTotalsPerHour
- 0001:000C2440       GenerateCallsignsList
+ 0001:000C2458       GenerateCallsignsList
  0001:000956DC       GenerateCountryMultiplierTotals
  0001:00098A4C       GenerateZoneMultiplierTotals
- 0001:000C3C80       Get101Window
+ 0001:000C3C98       Get101Window
  0001:00001BC0       Get8087CW
  0002:000044F0       GetAcceptExSockaddrs
  0001:000063E8       GetACP
  0001:00006A00       GetActiveWindow
  0002:000045BC       GetAdaptersAddresses
  0002:000045B8       GetAdaptersInfo
- 0001:000C3E38       GetAddMultBand
+ 0001:000C3E50       GetAddMultBand
  0002:0000451C       getaddrinfo
  0002:00004530       GetAddrInfoEx
  0001:0003CB2C       GetAnimation
@@ -2928,7 +2928,7 @@ Detailed map of segments
  0001:00061EA8       Impl_GetIpAddrTable
  0001:0005AED4       Impl_GetTickCount64
  0001:00061F04       Impl_GetUniDirectionalAdapterInfo
- 0001:000C3578       ImportFromADIF
+ 0001:000C3590       ImportFromADIF
  0002:00009C28       ImportFromADIFThreadID
  0002:00002F50       IMSecsPerDay
  0002:00022380       in4addr_alligmpv3routersonlink
@@ -3047,7 +3047,7 @@ Detailed map of segments
  0001:00092C00       InitializeKeyer
  0001:000060E4       InitializeModule
  0001:0007BAF4       InitializeOtherLPTPorts
- 0001:000C17E0       InitializeQSO
+ 0001:000C17F8       InitializeQSO
  0001:000BACD8       InitializeSerialPort
  0001:00089334       InitializeStrings
  0001:0005F924       InitializeStubs
@@ -3136,7 +3136,7 @@ Detailed map of segments
  0001:0001CD78       InvalidPoint
  0002:000145A0       InvalidPointer
  0001:0000A938       InvertBoolean
- 0001:000C3C8C       InvertBooleanCommand
+ 0001:000C3CA4       InvertBooleanCommand
  0001:00003094       InvokeImplGetter
  0002:0000434C       ioctlsocket
  0001:00057D0C       ioctlsocket
@@ -3164,8 +3164,8 @@ Detailed map of segments
  0001:00049B44       IsBeforeTargetWindow
  0001:00006BC0       IsChild
  0002:00009044       IsConsole
- 0001:000C4548       IsCWByCATActive
- 0001:000C4518       IsCWByCATActive
+ 0001:000C4560       IsCWByCATActive
+ 0001:000C4530       IsCWByCATActive
  0001:00049FA0       IsDelphiHandle
  0001:00006BC8       IsDialogMessage
  0002:00003F38       ISeparators
@@ -3306,8 +3306,8 @@ Detailed map of segments
  0001:00006C20       LoadIcon
  0001:00006C28       LoadImage
  0001:0009F5B8       LoadInitialExchangeFile
- 0001:000C18F0       LoadinLog
- 0001:000C3F14       LoadInPlugins
+ 0001:000C1908       LoadinLog
+ 0001:000C3F2C       LoadInPlugins
  0001:0007BEF4       LoadInSeparateConfigFile
  0001:00006C30       LoadKeyboardLayout
  0001:00006528       LoadLibrary
@@ -3404,14 +3404,14 @@ Detailed map of segments
  0002:0000902C       MainInstance
  0002:00009030       MainThreadID
  0002:000000F0       MAINTR4WDLGTEMPLATE
- 0001:000C4590       MainUnit
+ 0001:000C45A8       MainUnit
  0002:00009C3C       MainWindowCaptionAndHeader
  0002:00009C40       MainWindowChildsWidth
  0002:00009CA8       MainWindowEditFont
  0002:00009C30       MainWindowEditHeight
  0002:00009C38       MainWindowWidth
  0002:00000118       MAIN_CALLSIGN
- 0001:000C2590       MakeAllCallsignsList
+ 0001:000C25A8       MakeAllCallsignsList
  0001:0005B464       MakeCanonicalIPv6Address
  0001:00000444       MakeEmpty
  0001:00003B40       MakeErrorMessage
@@ -3593,7 +3593,7 @@ Detailed map of segments
  0002:000495B8       NewContestCheckBox
  0002:000495C4       NewContestCommentWndHandle
  0002:000495B4       NewContestDisplayedCommands
- 0001:000C46B0       NewContestDlgProc
+ 0001:000C46C8       NewContestDlgProc
  0002:000495BC       NewContestDlgWndHandle
  0002:000495C0       NewContestListBoxHandle
  0002:000078CC       newIcomResponseTimeout
@@ -3602,7 +3602,7 @@ Detailed map of segments
  0001:000A4050       NewNetWndProc
  0002:00022EB8       newpos
  0001:0007E8C8       NewQTCREditProc
- 0001:000C62B4       NewSelectContestListBoxProc
+ 0001:000C62CC       NewSelectContestListBoxProc
  0001:00074684       NewSendKeyboardEditProc
  0002:000238D8       NewServerLogHandle
  0001:00075A44       NewSLVProc
@@ -3684,16 +3684,16 @@ Detailed map of segments
  0001:0007EDF0       OpenFileDlg
  0001:000BAEF8       OpenFileForRead_old
  0001:000135B8       OpenFileForWrite
- 0001:000C40E0       OpenListOfMessages
- 0001:000C2B30       OpenLogFile
+ 0001:000C40F8       OpenListOfMessages
+ 0001:000C2B48       OpenLogFile
  0001:0009A620       OpenLPT
- 0001:000BE204       OpenOtherWindows
- 0001:000C40C4       OpenStationInformationWindow
+ 0001:000BE21C       OpenOtherWindows
+ 0001:000C40DC       OpenStationInformationWindow
  0001:00089A38       OpenTempMP3File
  0001:00001C78       OpenText
  0002:00021F54       OpenThemeData
- 0001:000C0674       OpenTR4WWindow
- 0001:000C3D74       OpenUrl
+ 0001:000C068C       OpenTR4WWindow
+ 0001:000C3D8C       OpenUrl
  0002:000009E0       OPERATORINFO
  0002:0004890A       OpMode
  0002:0004890B       OpMode2
@@ -3725,7 +3725,7 @@ Detailed map of segments
  0002:00003BD0       PalSize
  0002:000085A0       ParameterOkayMode
  0002:00008554       ParameterOkayModeTypeStringArray
- 0001:000C0B50       ParametersOkay
+ 0001:000C0B68       ParametersOkay
  0002:00046CF0       ParameterToNetwork
  0001:00001B00       ParamStr
  0001:000547D0       ParentNotLast
@@ -3759,7 +3759,7 @@ Detailed map of segments
  0001:0007A054       pFTDX9000
  0001:000796EC       pIcomNew
  0001:00078530       pKenwood2
- 0001:000C2ED8       PlaceCaretToTheEnd
+ 0001:000C2EF0       PlaceCaretToTheEnd
  0001:000914BC       PlayWAVFile
  0002:0003F850       PLeftOnBiState
  0002:000097C4       PluginsArray
@@ -3782,7 +3782,7 @@ Detailed map of segments
  0002:000085AC       PossibleCallLeftKey
  0002:00040CA4       PossibleCallList
  0002:000085B0       PossibleCallRightKey
- 0001:000C101C       PossibleCallsProc
+ 0001:000C1034       PossibleCallsProc
  0001:0000A46C       PostcedingString
  0001:00006C88       PostMessage
  0001:00099584       PostMmttyMessage
@@ -3811,11 +3811,11 @@ Detailed map of segments
  0001:0008A5E4       ProcessExchangeFunctionKey
  0001:0003B14C       ProcessExecute
  0001:0007A5EC       ProcessFilteredStatus
- 0001:000C0A30       ProcessFuntionKeys
+ 0001:000C0A48       ProcessFuntionKeys
  0001:000AF914       ProcessGridSquareExchange
  0001:000356B8       ProcessHorz
  0001:000AE2C0       ProcessKidsExchange
- 0001:000BE4D0       ProcessMenu
+ 0001:000BE4E8       ProcessMenu
  0001:000890C4       ProcessMessage
  0001:000AECA8       ProcessNameAndDomesticOrDXQTHExchange
  0001:000AFB04       ProcessNameAndPossibleGridSquareExchange
@@ -3833,7 +3833,7 @@ Detailed map of segments
  0001:000B03B4       ProcessQSONumberNameAndDomesticOrDXQTHExchange
  0001:000B0030       ProcessQSONumberNameChapterAndQTHExchange
  0001:000B0C20       ProcessQSONumberPrecedenceCheckDomesticQTHExchange
- 0001:000BFEFC       ProcessReturn
+ 0001:000BFF14       ProcessReturn
  0001:000AE560       ProcessRSTAgeAndPossibleSK
  0001:000B1080       ProcessRSTAllJAPrefectureAndPrecedenceExchange
  0001:000B1984       ProcessRSTAndAgeExchange
@@ -3863,7 +3863,7 @@ Detailed map of segments
  0001:000B4330       ProcessRSTZoneAndPossibleDomesticQTHExchange
  0001:000A3CD8       ProcessServerLogInfo
  0001:000B09D4       ProcessSSEntry
- 0001:000BFEC4       ProcessTAB
+ 0001:000BFEDC       ProcessTAB
  0001:0008EEBC       ProcessTelnetString
  0001:0003B24C       ProcessUpdate
  0001:00035724       ProcessVert
@@ -3877,14 +3877,14 @@ Detailed map of segments
  0002:000473B4       PTTDelayCount
  0002:00007880       PTTEnable
  0002:0004737D       PTTLockout
- 0001:000C431C       PTTOff
- 0001:000C41D4       PTTOn
+ 0001:000C4334       PTTOff
+ 0001:000C41EC       PTTOn
  0001:0007B0C8       PTTStatusChanged
  0002:00008794       PTTStatusString
  0002:00007884       PTTTurnOnDelay
  0002:000087F4       PTT_SET
  0001:00006558       PurgeComm
- 0001:000C300C       PutCallToCallWindow
+ 0001:000C3024       PutCallToCallWindow
  0001:0000EA4C       PutExponent
  0001:000A6BBC       PutRadioIntoSplit
  0001:000A6BDC       PutRadioOutOfSplit
@@ -3955,7 +3955,7 @@ Detailed map of segments
  0002:0003DD38       QuickQSLMessage1
  0002:0003EDBC       QuickQSLMessage2
  0002:0003E2F4       QuickQSLPhoneMessage
- 0001:000C2CC4       QuickQSLProcedure
+ 0001:000C2CDC       QuickQSLProcedure
  0002:00009680       QZBRandomOffsetEnable
  0002:00008114       ra
  0002:000473D0       Radio1
@@ -4017,12 +4017,12 @@ Detailed map of segments
  0001:00029B1C       ReadIcon
  0001:0007C160       ReadInConfigFile
  0001:000022C8       ReadLine
- 0001:000C2B6C       ReadLogFile
+ 0001:000C2B84       ReadLogFile
  0001:00063904       ReadSet
- 0001:000C2E44       ReadVersionBlock
+ 0001:000C2E5C       ReadVersionBlock
  0001:000067C0       RealizePalette
  0001:0000AAA0       RealToStr2
- 0001:000C33A0       ReCalculateHourDisplay
+ 0001:000C33B8       ReCalculateHourDisplay
  0001:00083538       RecalculateMyCountryContinentAndZoneNew
  0002:000493F0       ReceivedData
  0002:00006F70       RecorderBitrate
@@ -4088,8 +4088,8 @@ Detailed map of segments
  0001:00005838       RemoveModuleUnloadProc
  0001:00006CE0       RemoveProp
  0001:00023FF0       RemoveThread
- 0001:000C4100       RenameCommand
- 0001:000C4154       RenameCommands
+ 0001:000C4118       RenameCommand
+ 0001:000C416C       RenameCommands
  0002:0003DD64       RepeatSearchAndPounceExchange
  0002:0003E3F4       RepeatSearchAndPouncePhoneExchange
  0001:00014CC4       ReplaceCountry
@@ -4114,7 +4114,7 @@ Detailed map of segments
  0001:00029514       RGBTripleToQuad
  0001:0002F9E4       RichEdit
  0002:00009684       RichEditObject
- 0001:000C406C       RichEditOperation
+ 0001:000C4084       RichEditOperation
  0002:0003DC50       RichEditViewer
  0002:00009C48       RightTopWidth
  0001:000A6894       RITBumpDown
@@ -4139,10 +4139,10 @@ Detailed map of segments
  0001:000BD194       RunAutoCQ
  0002:000000A0       runErrMsg
  0001:00001844       RunErrorAt
- 0001:000C3CEC       RunExplorer
+ 0001:000C3D04       RunExplorer
  0002:00023A6D       RunningConfigFile
- 0001:000C3D50       RunOptionsDialog
- 0001:000C3E4C       RunPlugin
+ 0001:000C3D68       RunOptionsDialog
+ 0001:000C3E64       RunPlugin
  0001:0008606C       RunPOSTGetScoresThread
  0001:00083C7C       RunSyncThread
  0002:000030F0       RussianGrids
@@ -4162,7 +4162,7 @@ Detailed map of segments
  0001:00035050       SaveFocusState
  0001:00089B3C       SaveLastQSOToMP3File
  0001:000B4924       SaveLogFileToFloppy
- 0001:000C5E90       SaveNewContest
+ 0001:000C5EA8       SaveNewContest
  0001:00077800       SaveQSOToEditableLog
  0001:0007E66C       SaveQTCR
  0001:0007F830       SaveQTCS
@@ -4308,9 +4308,9 @@ Detailed map of segments
  0001:0004940C       SetCaptureControl
  0001:00006D18       SetClassLong
  0001:0001A71C       SetClearVarToEmptyParam
- 0001:000C3064       SetColumnsWidth
- 0001:000C3C28       SetCommand
- 0001:000C61B8       SetCommentAndEnableEditControl
+ 0001:000C307C       SetColumnsWidth
+ 0001:000C3C40       SetCommand
+ 0001:000C61D0       SetCommentAndEnableEditControl
  0001:00006580       SetCommState
  0001:00006588       SetCommTimeouts
  0001:00021E7C       SetCompName
@@ -4366,7 +4366,7 @@ Detailed map of segments
  0001:000A6BFC       SetRadioFreq
  0001:00006D70       SetRect
  0001:000A4438       SetRelayForActiveRadio
- 0001:000C3460       SetRemMultsColumnWidth
+ 0001:000C3478       SetRemMultsColumnWidth
  0001:00006828       SetROP2
  0001:000B8C98       SetRST
  0001:00006D78       SetScrollInfo
@@ -4421,7 +4421,7 @@ Detailed map of segments
  0001:00006DA0       SetWindowPlacement
  0001:00006DA8       SetWindowPos
  0001:00006DB8       SetWindowsHookEx
- 0001:000C2768       SetWindowSize
+ 0001:000C2780       SetWindowSize
  0001:00006DB0       SetWindowText
  0002:00021FC0       SetWindowTheme
  0002:000494F1       SeventyThreeMessageSent
@@ -4459,19 +4459,19 @@ Detailed map of segments
  0002:00004040       ShowFlags
  0001:000781D0       ShowFMessages
  0001:0008625C       ShowGetScoresStatus
- 0001:000C3CE8       ShowHelp
+ 0001:000C3D00       ShowHelp
  0001:00075B08       ShowHelpMessageForCommand
- 0001:000C2C4C       ShowInformation
- 0001:000C16CC       showint
+ 0001:000C2C64       ShowInformation
+ 0001:000C16E4       showint
  0001:00035060       ShowMDIClientEdge
- 0001:000C1704       ShowMessage
- 0001:000C16F0       ShowMessageParent
+ 0001:000C171C       ShowMessage
+ 0001:000C1708       ShowMessageParent
  0001:000ADF94       ShowName
  0001:00077D78       ShowNote
  0001:00006DD0       ShowOwnedPopups
  0001:0008A4E4       ShowPartialCallMults
  0001:000B4BDC       ShowPreviousDupeQSOs
- 0001:000C2B98       ShowPreviousDupeQSOsWnd
+ 0001:000C2BB0       ShowPreviousDupeQSOsWnd
  0002:000494FC       ShowQSOStatusCall
  0002:00004810       showresverlogcontent
  0001:00006DD8       ShowScrollBar
@@ -4529,11 +4529,11 @@ Detailed map of segments
  0002:00008488       SSPrec
  0001:00016C2C       StandardCallFormat
  0001:0001D998       StartClassGroup
- 0001:000C6270       StartContestFromListbox
+ 0001:000C6288       StartContestFromListbox
  0002:0000BD5C       StartCPU
  0002:00008410       StartingFrequencies
  0001:00089758       StartRecorder
- 0001:000C2D4C       StartSendingNow
+ 0001:000C2D64       StartSendingNow
  0002:000085D0       StartSendingNowKey
  0002:000469E8       STARTTIMEOFTHETR4W
  0002:00002DD4       StaticPChar
@@ -4770,7 +4770,7 @@ Detailed map of segments
  0002:00021EA0       SystemPalette16
  0001:00029734       SystemPaletteOverride
  0001:00006DE8       SystemParametersInfo
- 0001:000C2F04       SystemTimeChanging
+ 0001:000C2F1C       SystemTimeChanging
  0001:000065E8       SystemTimeToFileTime
  0001:0000AC50       SystemTimeToString
  0002:000143E8       SystemTimeToStringBuffer
@@ -4804,7 +4804,7 @@ Detailed map of segments
  0001:00032B78       TActionLink.SetShortCut
  0001:00032B7C       TActionLink.SetVisible
  0002:0000778C       tActiveStereoPortBaseAddress
- 0001:000C1ED8       tAddContestExchangeToLog
+ 0001:000C1EF0       tAddContestExchangeToLog
  0002:0004909C       tAddDomesticCountryString
  0001:0008AF78       tAddQSOToLog
  0002:0004951A       TailEnding
@@ -4812,7 +4812,7 @@ Detailed map of segments
  0002:0003E5F4       TailEndPhoneMessage
  0002:000076E8       tAllowAutoUpdate
  0002:00040104       tAllowDupeQSOs
- 0001:000C2738       tAltE
+ 0001:000C2750       tAltE
  0001:000BD21C       tAltI
  0001:00013650       Tan
  0001:0003EF44       TApplication.ActivateHint
@@ -4998,7 +4998,7 @@ Detailed map of segments
  0001:000A1A34       TCallsignsList.Init
  0001:000A1E58       TCallsignsList.InsertCallsign
  0001:000A1EC0       TCallsignsList.SetCapacity
- 0001:000C1754       tCallWindowSetFocus
+ 0001:000C176C       tCallWindowSetFocus
  0002:00049226       tCallWindowStringIsDupe
  0001:00028F78       TCanvas.BrushChanged
  0001:00028E4C       TCanvas.Changed
@@ -5051,12 +5051,12 @@ Detailed map of segments
  0001:0001D60C       TClassFinder.Create
  0001:0001D738       TClassFinder.Destroy
  0001:0001D768       TClassFinder.GetClass
- 0001:000C1414       tClearDupeInfoCall
+ 0001:000C142C       tClearDupeInfoCall
  0001:000BD474       tClearDupesheet
  0001:000BD414       tClearDupesheet_Ctrl_K
- 0001:000C1424       tCleareCallWindow
- 0001:000C1434       tCleareExchangeWindow
- 0001:000C3374       tClearMultSheet
+ 0001:000C143C       tCleareCallWindow
+ 0001:000C144C       tCleareExchangeWindow
+ 0001:000C338C       tClearMultSheet
  0001:0001EC94       TCollection.Add
  0001:0001ECB4       TCollection.Changed
  0001:0001ECC4       TCollection.Clear
@@ -5380,11 +5380,11 @@ Detailed map of segments
  0002:0004823C       tCountryNamePrevState
  0002:00000B0C       tCRC32
  0001:0008F610       tCreateAndAddNewSpot
- 0001:000C1570       tCreateButtonWindow
- 0001:000C14DC       tCreateComboBoxWindow
- 0001:000C15BC       tCreateEditWindow
- 0001:000BE244       tCreateFont
- 0001:000C1524       tCreateStaticWindow
+ 0001:000C1588       tCreateButtonWindow
+ 0001:000C14F4       tCreateComboBoxWindow
+ 0001:000C15D4       tCreateEditWindow
+ 0001:000BE25C       tCreateFont
+ 0001:000C153C       tCreateStaticWindow
  0001:0000B098       tCreateThread
  0001:0002EF98       TCriticalSection.Acquire
  0001:0002EF28       TCriticalSection.Create
@@ -5822,7 +5822,7 @@ Detailed map of segments
  0002:00009046       Test8086
  0001:0008EF70       TestSocketBuffer
  0001:000A662C       TEventHandlers.OnTimerTick
- 0001:000C1760       tExchangeWindowSetFocus
+ 0001:000C1778       tExchangeWindowSetFocus
  0002:00047360       tExitFromDVPThread
  0002:00047338       tExitFromPaddleFootSwitchThread
  0001:00001D74       TextClose
@@ -5876,7 +5876,7 @@ Detailed map of segments
  0001:0000AEDC       tGetDateFormat
  0001:000A6270       tGetPortType
  0001:000BB720       tGetQSOSystemTime
- 0001:000C2EF0       tGetSystemTime
+ 0001:000C2F08       tGetSystemTime
  0001:00091014       tGetWAVDurationFromHeader
  0001:0002A27C       TGraphic.Changed
  0001:0002A244       TGraphic.Create
@@ -6450,7 +6450,7 @@ Detailed map of segments
  0001:0005A2FC       TIdUTF8Encoding.GetMaxCharCount
  0001:0005A300       TIdUTF8Encoding.GetPreamble
  0002:000144A0       TimeAMString
- 0001:000C1894       TimeApplet
+ 0001:000C18AC       TimeApplet
  0001:00007174       timeBeginPeriod
  0002:00007214       TimeCategory
  0001:0000717C       timeEndPeriod
@@ -6502,7 +6502,7 @@ Detailed map of segments
  0001:0001E2F8       TList.Remove
  0001:0001E318       TList.SetCapacity
  0001:0001E354       TList.SetCount
- 0001:000C1494       tListBoxClientAlign
+ 0001:000C14AC       tListBoxClientAlign
  0001:0000ACD4       tLoadKeyboardLayout
  0002:00048248       tLocalTimePrevState
  0002:00009CC0       tLogIndex
@@ -6811,7 +6811,7 @@ Detailed map of segments
  0001:000A9310       tPTTVIACAT
  0002:0004737E       tPTTViaCommand
  0002:00048238       tQSOsWithThisStationPrevState
- 0001:000C6E2C       tr4w
+ 0001:000C6E44       tr4w
  0002:0000BD80       tr4wBrushArray
  0002:0000016C       tr4wColorsArray
  0002:00000128       tr4wColorsSA
@@ -6957,7 +6957,7 @@ Detailed map of segments
  0002:000099C8       tRemMultsColumnWidth
  0002:0003F298       tReportFileWrite
  0002:0003F194       tReportsFilename
- 0001:000C0B40       TREscapeCommFunction
+ 0001:000C0B58       TREscapeCommFunction
  0001:00027208       TResourceManager.AllocResource
  0001:00027414       TResourceManager.AssignResource
  0001:0002739C       TResourceManager.ChangeResource
@@ -6973,7 +6973,7 @@ Detailed map of segments
  0002:00040484       tRestartInfo
  0001:0000D5A4       Trim
  0002:00014590       TrueBoolStrs
- 0001:000C17B0       tRuntPaddleAndFootSwitchThread
+ 0001:000C17C8       tRuntPaddleAndFootSwitchThread
  0001:000A3838       TryConnectToNetwork
  0001:0000F5F8       TryEncodeDate
  0001:0000F4B0       TryEncodeTime
@@ -6982,7 +6982,7 @@ Detailed map of segments
  0001:000BBD9C       TryLogContact
  0001:00002220       TryOpenForInput
  0001:000024C4       TryOpenForOutput
- 0001:000C2BEC       TryPutSpaceinExchangeWindow
+ 0001:000C2C04       TryPutSpaceinExchangeWindow
  0001:0007BBDC       TryRunPaddleAndFootSwitchThread
  0001:0000DA20       TryStrToBool
  0001:0000F450       TryStrToCurr
@@ -7052,8 +7052,8 @@ Detailed map of segments
  0001:00036730       TScrollingWinControl.WMSize
  0001:00036830       TScrollingWinControl.WMVScroll
  0001:0000ADA8       tSetDlgItemIntFalse
- 0001:000C1444       tSetExchWindInitExchangeEntry
- 0001:000C2B18       tSetFilePointer
+ 0001:000C145C       tSetExchWindInitExchangeEntry
+ 0001:000C2B30       tSetFilePointer
  0001:000A6144       tSetPaddleElementLength
  0001:0007C1A4       tSetupExchangeNumbers
  0001:000BD1DC       tSetWindowLeft
@@ -7240,7 +7240,7 @@ Detailed map of segments
  0001:000BCF8C       TuneOnFreqFromCallWindow
  0001:0008D4A4       TuneRadioToSpot
  0002:0004738F       TuneWithDits
- 0001:000C27E4       tUpdateLog
+ 0001:000C27FC       tUpdateLog
  0001:000A42D0       TurnOffActivePort
  0001:000A4384       TurnOnActivePort
  0002:00047330       tUseControlPort
@@ -7530,7 +7530,7 @@ Detailed map of segments
  0001:00086774       uGetScores
  0001:00083F34       uGetServerLog
  0001:00072DD8       uGradient
- 0001:000C6448       uInet
+ 0001:000C6460       uInet
  0001:0009DF90       uInputQuery
  0001:00083A48       uIntercom
  0001:0009A688       uIO
@@ -7549,7 +7549,7 @@ Detailed map of segments
  0001:000A26D8       uMults
  0001:0000AF2C       UnableToFindFileMessage
  0001:000A4174       uNet
- 0001:000C63D8       uNewContest
+ 0001:000C63F0       uNewContest
  0001:00000278       UnhandledExceptionFilter
  0001:0003CAD0       UnhookHintHooks
  0001:00006E10       UnhookWindowsHookEx
@@ -7592,11 +7592,11 @@ Detailed map of segments
  0001:000AB2AC       UpdateTimeAndRateDisplays
  0001:000A29C8       UpdateTotals2
  0001:00006E28       UpdateWindow
- 0001:000C166C       UpdateWindows
+ 0001:000C1684       UpdateWindows
  0001:0000D3BC       UpperCase
  0001:0000A22C       UpperCase
  0001:0009A494       uProcessCommand
- 0001:000C6480       uProfiler
+ 0001:000C6498       uProfiler
  0001:0007EDE8       uQTCR
  0001:0007FB04       uQTCS
  0001:00085580       uQuickEdit
@@ -7624,7 +7624,7 @@ Detailed map of segments
  0001:00005C98       UTF8Encode
  0001:00005B60       Utf8ToUnicode
  0001:00013648       utils_file
- 0001:000C64B8       utils_hw
+ 0001:000C64D0       utils_hw
  0001:000136E0       utils_math
  0001:00057EA8       utils_net
  0001:0000A628       utils_text
@@ -7764,8 +7764,8 @@ Detailed map of segments
  0001:00031C88       WindowEnumerationTester
  0001:00006E40       WindowFromPoint
  0002:00004044       WindowPos
- 0001:000C2A90       WINDOWPOSCHANGINGPROC
- 0001:000C64F8       WindowProc
+ 0001:000C2AA8       WINDOWPOSCHANGINGPROC
+ 0001:000C6510       WindowProc
  0001:0000712C       Windows
  0002:00000B04       WindowSize
  0001:000768EC       WindowsManagerDlgProc
@@ -13425,148 +13425,148 @@ Detailed map of segments
  0001:000BD5B0       ShowBeamAndHeadingInVHFContest
  0001:000BD624       ExchangeWindowChange
  0001:000BD704       WagCheck
- 0001:000BD7F4       CallWindowChange
- 0001:000BD950       CreateQSONeedWindows
- 0001:000BDAA0       CreateMultsWindows
- 0001:000BDC08       CreateMainWindow
- 0001:000BE204       OpenOtherWindows
- 0001:000BE244       tCreateFont
- 0001:000BE264       CreateFonts
- 0001:000BE39C       DrawWindows
- 0001:000BE4D0       ProcessMenu
- 0001:000BFEC4       ProcessTAB
- 0001:000BFEFC       ProcessReturn
- 0001:000C00F4       CallWindowKeyDownProc
- 0001:000C0604       CallWindowKeyUpProc
- 0001:000C0674       OpenTR4WWindow
- 0001:000C08BC       CheckNumber
- 0001:000C08E8       CloseTR4WWindow
- 0001:000C0960       CreateTR4WStaticWindow
- 0001:000C09A0       CreateTR4WStaticWindowID
- 0001:000C09E4       EditSetSelLength
- 0001:000C0A30       ProcessFuntionKeys
- 0001:000C0AC0       CreateDirectoryIfNotExist
- 0001:000C0AE0       CheckAndSetInitialExchangeCursorPos
- 0001:000C0B24       ClearInfoWindows
- 0001:000C0B40       TREscapeCommFunction
- 0001:000C0B50       ParametersOkay
- 0001:000C101C       PossibleCallsProc
- 0001:000C113C       CreateTotalWindow
- 0001:000C12D8       ChangeCaret
- 0001:000C1308       EditableLogWindowDblClick
- 0001:000C13A8       CreateProgress32InMainWindow
- 0001:000C1414       tClearDupeInfoCall
- 0001:000C1424       tCleareCallWindow
- 0001:000C1434       tCleareExchangeWindow
- 0001:000C1444       tSetExchWindInitExchangeEntry
- 0001:000C1494       tListBoxClientAlign
- 0001:000C14DC       tCreateComboBoxWindow
- 0001:000C1524       tCreateStaticWindow
- 0001:000C1570       tCreateButtonWindow
- 0001:000C15BC       tCreateEditWindow
- 0001:000C1608       CreateOKCancelButtons
- 0001:000C166C       UpdateWindows
- 0001:000C16CC       showint
- 0001:000C16F0       ShowMessageParent
- 0001:000C1704       ShowMessage
- 0001:000C171C       FilePreview
- 0001:000C1754       tCallWindowSetFocus
- 0001:000C1760       tExchangeWindowSetFocus
- 0001:000C17B0       tRuntPaddleAndFootSwitchThread
- 0001:000C17E0       InitializeQSO
- 0001:000C1828       CreateCallOrExchangeWin
- 0001:000C1894       TimeApplet
- 0001:000C18F0       LoadinLog
- 0001:000C1D14       CreateEditableLog
- 0001:000C1E1C       CreateListView
- 0001:000C1ED8       tAddContestExchangeToLog
- 0001:000C2440       GenerateCallsignsList
- 0001:000C2590       MakeAllCallsignsList
- 0001:000C2738       tAltE
- 0001:000C2768       SetWindowSize
- 0001:000C27E4       tUpdateLog
- 0001:000C2A90       WINDOWPOSCHANGINGPROC
- 0001:000C2B18       tSetFilePointer
- 0001:000C2B30       OpenLogFile
- 0001:000C2B60       CloseLogFile
- 0001:000C2B6C       ReadLogFile
- 0001:000C2B98       ShowPreviousDupeQSOsWnd
- 0001:000C2BEC       TryPutSpaceinExchangeWindow
- 0001:000C2C4C       ShowInformation
- 0001:000C2CC4       QuickQSLProcedure
- 0001:000C2D4C       StartSendingNow
- 0001:000C2DE4       ClearLog
- 0001:000C2E44       ReadVersionBlock
- 0001:000C2E54       CompleteCallsign
- 0001:000C2ED8       PlaceCaretToTheEnd
- 0001:000C2EF0       tGetSystemTime
- 0001:000C2F04       SystemTimeChanging
- 0001:000C2F44       DefTR4WProc
- 0001:000C2F78       AddRecordToLogAndSendToNetwork
- 0001:000C300C       PutCallToCallWindow
- 0001:000C3064       SetColumnsWidth
- 0001:000C3124       EnsureListViewColumnVisible
- 0001:000C3154       ExecuteConfigurationFile
- 0001:000C31B8       CheckEditableWindowHeight
- 0001:000C320C       CheckCommandInCallsignWindow
- 0001:000C3308       ClearMultSheet_CtrlC
- 0001:000C3374       tClearMultSheet
- 0001:000C33A0       ReCalculateHourDisplay
- 0001:000C3460       SetRemMultsColumnWidth
- 0001:000C348C       CheckInactiveRigCallingCQ
- 0001:000C34E8       CheckWindowAndColor
- 0001:000C3540       DisplayLoadedQSOs
- 0001:000C3578       ImportFromADIF
- 0001:000C3BEC       CheckQuestionMark
- 0001:000C3C28       SetCommand
- 0001:000C3C80       Get101Window
- 0001:000C3C8C       InvertBooleanCommand
- 0001:000C3CE8       ShowHelp
- 0001:000C3CEC       RunExplorer
- 0001:000C3D50       RunOptionsDialog
- 0001:000C3D74       OpenUrl
- 0001:000C3E38       GetAddMultBand
- 0001:000C3E4C       RunPlugin
- 0001:000C3F14       LoadInPlugins
- 0001:000C406C       RichEditOperation
- 0001:000C40C4       OpenStationInformationWindow
- 0001:000C40E0       OpenListOfMessages
- 0001:000C4100       RenameCommand
- 0001:000C4154       RenameCommands
- 0001:000C41D4       PTTOn
- 0001:000C431C       PTTOff
- 0001:000C44C8       DebugRadioTempBuffer
- 0001:000C44F0       DebugMsg
- 0001:000C4518       IsCWByCATActive
- 0001:000C4548       IsCWByCATActive
- 0001:000C4554       Finalization
- 0001:000C4590       MainUnit
- 0001:000C46B0       NewContestDlgProc
- 0001:000C5DD4       ClearFields
- 0001:000C5E10       BeginNewContest
- 0001:000C5E90       SaveNewContest
- 0001:000C6170       DisplayCheckBox
- 0001:000C61B8       SetCommentAndEnableEditControl
- 0001:000C61D0       EnterCountyOrState
- 0001:000C6270       StartContestFromListbox
- 0001:000C62B4       NewSelectContestListBoxProc
- 0001:000C62EC       ChangeDir
- 0001:000C6354       DisplayInitialCommand
- 0001:000C63A8       Finalization
- 0001:000C63D8       uNewContest
- 0001:000C63E0       Finalization
- 0001:000C6410       EncdDecd
- 0001:000C6418       Finalization
- 0001:000C6448       uInet
- 0001:000C6450       Finalization
- 0001:000C6480       uProfiler
- 0001:000C6488       Finalization
- 0001:000C64B8       utils_hw
- 0001:000C64C0       Finalization
- 0001:000C64F0       exportto_trlog
- 0001:000C64F8       WindowProc
- 0001:000C67DC       Finalization
- 0001:000C6E2C       tr4w
+ 0001:000BD80C       CallWindowChange
+ 0001:000BD968       CreateQSONeedWindows
+ 0001:000BDAB8       CreateMultsWindows
+ 0001:000BDC20       CreateMainWindow
+ 0001:000BE21C       OpenOtherWindows
+ 0001:000BE25C       tCreateFont
+ 0001:000BE27C       CreateFonts
+ 0001:000BE3B4       DrawWindows
+ 0001:000BE4E8       ProcessMenu
+ 0001:000BFEDC       ProcessTAB
+ 0001:000BFF14       ProcessReturn
+ 0001:000C010C       CallWindowKeyDownProc
+ 0001:000C061C       CallWindowKeyUpProc
+ 0001:000C068C       OpenTR4WWindow
+ 0001:000C08D4       CheckNumber
+ 0001:000C0900       CloseTR4WWindow
+ 0001:000C0978       CreateTR4WStaticWindow
+ 0001:000C09B8       CreateTR4WStaticWindowID
+ 0001:000C09FC       EditSetSelLength
+ 0001:000C0A48       ProcessFuntionKeys
+ 0001:000C0AD8       CreateDirectoryIfNotExist
+ 0001:000C0AF8       CheckAndSetInitialExchangeCursorPos
+ 0001:000C0B3C       ClearInfoWindows
+ 0001:000C0B58       TREscapeCommFunction
+ 0001:000C0B68       ParametersOkay
+ 0001:000C1034       PossibleCallsProc
+ 0001:000C1154       CreateTotalWindow
+ 0001:000C12F0       ChangeCaret
+ 0001:000C1320       EditableLogWindowDblClick
+ 0001:000C13C0       CreateProgress32InMainWindow
+ 0001:000C142C       tClearDupeInfoCall
+ 0001:000C143C       tCleareCallWindow
+ 0001:000C144C       tCleareExchangeWindow
+ 0001:000C145C       tSetExchWindInitExchangeEntry
+ 0001:000C14AC       tListBoxClientAlign
+ 0001:000C14F4       tCreateComboBoxWindow
+ 0001:000C153C       tCreateStaticWindow
+ 0001:000C1588       tCreateButtonWindow
+ 0001:000C15D4       tCreateEditWindow
+ 0001:000C1620       CreateOKCancelButtons
+ 0001:000C1684       UpdateWindows
+ 0001:000C16E4       showint
+ 0001:000C1708       ShowMessageParent
+ 0001:000C171C       ShowMessage
+ 0001:000C1734       FilePreview
+ 0001:000C176C       tCallWindowSetFocus
+ 0001:000C1778       tExchangeWindowSetFocus
+ 0001:000C17C8       tRuntPaddleAndFootSwitchThread
+ 0001:000C17F8       InitializeQSO
+ 0001:000C1840       CreateCallOrExchangeWin
+ 0001:000C18AC       TimeApplet
+ 0001:000C1908       LoadinLog
+ 0001:000C1D2C       CreateEditableLog
+ 0001:000C1E34       CreateListView
+ 0001:000C1EF0       tAddContestExchangeToLog
+ 0001:000C2458       GenerateCallsignsList
+ 0001:000C25A8       MakeAllCallsignsList
+ 0001:000C2750       tAltE
+ 0001:000C2780       SetWindowSize
+ 0001:000C27FC       tUpdateLog
+ 0001:000C2AA8       WINDOWPOSCHANGINGPROC
+ 0001:000C2B30       tSetFilePointer
+ 0001:000C2B48       OpenLogFile
+ 0001:000C2B78       CloseLogFile
+ 0001:000C2B84       ReadLogFile
+ 0001:000C2BB0       ShowPreviousDupeQSOsWnd
+ 0001:000C2C04       TryPutSpaceinExchangeWindow
+ 0001:000C2C64       ShowInformation
+ 0001:000C2CDC       QuickQSLProcedure
+ 0001:000C2D64       StartSendingNow
+ 0001:000C2DFC       ClearLog
+ 0001:000C2E5C       ReadVersionBlock
+ 0001:000C2E6C       CompleteCallsign
+ 0001:000C2EF0       PlaceCaretToTheEnd
+ 0001:000C2F08       tGetSystemTime
+ 0001:000C2F1C       SystemTimeChanging
+ 0001:000C2F5C       DefTR4WProc
+ 0001:000C2F90       AddRecordToLogAndSendToNetwork
+ 0001:000C3024       PutCallToCallWindow
+ 0001:000C307C       SetColumnsWidth
+ 0001:000C313C       EnsureListViewColumnVisible
+ 0001:000C316C       ExecuteConfigurationFile
+ 0001:000C31D0       CheckEditableWindowHeight
+ 0001:000C3224       CheckCommandInCallsignWindow
+ 0001:000C3320       ClearMultSheet_CtrlC
+ 0001:000C338C       tClearMultSheet
+ 0001:000C33B8       ReCalculateHourDisplay
+ 0001:000C3478       SetRemMultsColumnWidth
+ 0001:000C34A4       CheckInactiveRigCallingCQ
+ 0001:000C3500       CheckWindowAndColor
+ 0001:000C3558       DisplayLoadedQSOs
+ 0001:000C3590       ImportFromADIF
+ 0001:000C3C04       CheckQuestionMark
+ 0001:000C3C40       SetCommand
+ 0001:000C3C98       Get101Window
+ 0001:000C3CA4       InvertBooleanCommand
+ 0001:000C3D00       ShowHelp
+ 0001:000C3D04       RunExplorer
+ 0001:000C3D68       RunOptionsDialog
+ 0001:000C3D8C       OpenUrl
+ 0001:000C3E50       GetAddMultBand
+ 0001:000C3E64       RunPlugin
+ 0001:000C3F2C       LoadInPlugins
+ 0001:000C4084       RichEditOperation
+ 0001:000C40DC       OpenStationInformationWindow
+ 0001:000C40F8       OpenListOfMessages
+ 0001:000C4118       RenameCommand
+ 0001:000C416C       RenameCommands
+ 0001:000C41EC       PTTOn
+ 0001:000C4334       PTTOff
+ 0001:000C44E0       DebugRadioTempBuffer
+ 0001:000C4508       DebugMsg
+ 0001:000C4530       IsCWByCATActive
+ 0001:000C4560       IsCWByCATActive
+ 0001:000C456C       Finalization
+ 0001:000C45A8       MainUnit
+ 0001:000C46C8       NewContestDlgProc
+ 0001:000C5DEC       ClearFields
+ 0001:000C5E28       BeginNewContest
+ 0001:000C5EA8       SaveNewContest
+ 0001:000C6188       DisplayCheckBox
+ 0001:000C61D0       SetCommentAndEnableEditControl
+ 0001:000C61E8       EnterCountyOrState
+ 0001:000C6288       StartContestFromListbox
+ 0001:000C62CC       NewSelectContestListBoxProc
+ 0001:000C6304       ChangeDir
+ 0001:000C636C       DisplayInitialCommand
+ 0001:000C63C0       Finalization
+ 0001:000C63F0       uNewContest
+ 0001:000C63F8       Finalization
+ 0001:000C6428       EncdDecd
+ 0001:000C6430       Finalization
+ 0001:000C6460       uInet
+ 0001:000C6468       Finalization
+ 0001:000C6498       uProfiler
+ 0001:000C64A0       Finalization
+ 0001:000C64D0       utils_hw
+ 0001:000C64D8       Finalization
+ 0001:000C6508       exportto_trlog
+ 0001:000C6510       WindowProc
+ 0001:000C67F4       Finalization
+ 0001:000C6E44       tr4w
  0002:00000000       ExitCode
  0002:00000004       ErrorAddr
  0002:00000008       RandSeed
@@ -15548,4 +15548,4 @@ res\tr4w_eng.res
 tr4w.drf
 
 
-Program entry point at 0001:000C6E2C
+Program entry point at 0001:000C6E44

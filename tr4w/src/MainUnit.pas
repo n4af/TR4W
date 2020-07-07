@@ -1870,7 +1870,7 @@ begin
           Continue;
 
         end;
-//      if not DQTH then TempExchange.DomMultQTH := '';
+//      if not DQTH then TempExchange.DomMultQTH := '' ;
 //      strU(TempExchange.DomMultQTH);
         VisibleLog.SetMultStatus(CallWindowString, TempExchange.DomMultQTH);
         if DQTH then Exit;

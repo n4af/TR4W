@@ -142,7 +142,7 @@ const
   OGLVERSION                            = False;
   K6VVA_WK_DEBUG                        = False;
   MORSERUNNER                           = False;
-  ICOM_LONG_MODECOMMAND                 = True;
+  ICOM_LONG_MODECOMMAND                 = True ;
 
 const
          LANG                                  = 'ENG';
@@ -180,7 +180,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.90.1' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.90.3' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
