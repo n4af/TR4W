@@ -23,6 +23,7 @@ type
       peerPort: word;
       SNR: LongInt;
       firstTime: boolean;
+      isConnected: boolean;
   protected
     procedure OnServerRead(ASender: TIdUDPListenerThread; const AData: TIdBytes; ABinding: TIdSocketHandle);
     procedure OnBeforeBind(AHandle: TIdSocketHandle);
@@ -33,6 +34,7 @@ type
     destructor Destroy;
     procedure HighlightCall(sCall: string; color: integer; sId: string);
     procedure ClearColors(sId: string);
+    property connected: boolean read isConnected;
   end;
 
 (*
@@ -77,6 +79,7 @@ uses
    ,LogStuff      // For CalculateQSOPoints
    ,LogEdit       // For ShowStationInformation and DetermineIfNewMult
    ,LOGWIND       // for GetBandMapBandModeFromFrequency
+   ,TF            // for SetMainWindowText
    ;
 // {$R *.dfm}
 
@@ -163,6 +166,9 @@ begin
             case messageType of
             0: begin
                DEBUGMSG('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
+               SetMainWindowText(mweWSJTX,'WSJTX');
+               Windows.ShowWindow(wh[mweWSJTX], SW_SHOW);
+               isConnected := true;
                if firstTime then
                   begin
                   ClearColors(id);
@@ -290,6 +296,13 @@ begin
                                + ' Report received:' + reportReceived + ' TX Power:' + TXPower
                                + ' Comments:' + comments + ' Name:' + DXName);
             }  end;
+            6:
+               begin
+               DEBUGMSG('WSJT-X close message received'); // We may want to indicate it somehow on main screen
+               SetMainWindowText(mweWSJTX,'');
+               Windows.ShowWindow(wh[mweWSJTX], SW_HIDE);
+               isConnected := false;
+               end;
             10: begin
                 DEBUGMSG('Received message 10');
                 end;

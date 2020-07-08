@@ -154,6 +154,8 @@ uses
   Second                                : Boolean = False;
   Third                                 : Boolean = False;
   wsjtx                                 : TWSJTXServer;
+  saveLastADIFName                      : string;               // ny4i to save for ContestByADIFName cache
+  saveLastContest                       : ContestType;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 function DeviceIoControlHandler
@@ -1361,6 +1363,7 @@ end;
 procedure OneSecTimerProc(uTimerID, uMessage: UINT; dwUser, dw1, dw2: DWORD) stdcall;
 begin
   UpdateTimeAndRateDisplays(True, True);
+
 {$IF tDebugMode}
   //  Windows.SetWindowText(tr4whandle, inttopchar({GetHeapStatus.TotalFree}AllocMemSize));
 //  Windows.SetWindowText(InsertWindowHandle, inttopchar(FreeMemCount));
@@ -2367,6 +2370,7 @@ function DrawWindows(lParam: lParam; wParam: wParam): Cardinal;
 var
   TempBrush                             : HBRUSH;
   TempWindowColor                       : integer;
+  charText: array [0..255] of char;
 const
   DupeInfoCallWindowColorArray          : array[DupeInfoState] of tr4wColors = (trBtnFace, trRed, trYellow, trLightBlue);
 begin
@@ -2396,6 +2400,24 @@ begin
           TempBrush := tr4wBrushArray[trYellow];
       end;
     end;
+
+    if lParam = integer(wh[mweWSJTX]) then
+      begin
+      if wsjtx.Connected then
+         begin
+         SetMainWindowText(mweWSJTX,'WSJTX');
+         TempBrush := tr4wBrushArray[trGreen];
+         end
+      else
+         begin
+         //windows.GetWindowText(wh[mweWSJTX],charText,10);
+         //if StrPas(charText) = 'WSJTX' then
+          //  begin
+            TempBrush := tr4wBrushArray[trRed];
+          //  end;
+         end;
+      end;
+
 
     goto DrawWindow;
   end;
@@ -7959,17 +7981,30 @@ begin
 
 end;
 (*----------------------------------------------------------------------------*)
+// NY4I
+// Note we cache last returned one to avoid a subsequent lookup since the
+// contest most likely did not change. An example is an ADIF file import.
+
 function GetContestByADIFName(sADIFName: string): ContestType;
 var
-   i: ContestType;    // Use this function  sparingly as it is an O(n) walk through the contests.
+   i: ContestType;
 begin
-   Result := Low(ContestsArray); // First contest is DmmyContest
-   for i := low(ContestsArray) to High(ContestsArray) do
+   if sADIFName = saveLastADIFName then
       begin
-      if ContestsArray[i].ADIFName = sADIFName then
+      Result := saveLastContest;
+      end
+   else
+      begin
+      Result := Low(ContestsArray); // First contest is DmmyContest
+      for i := low(ContestsArray) to High(ContestsArray) do
          begin
-         Result := i;
-         break;
+         if ContestsArray[i].ADIFName = sADIFName then
+            begin
+            Result := i;
+            saveLastADIFName := sADIFName;  // caches last since most likely did not change
+            saveLastContest := i;
+            break;
+            end;
          end;
       end;
 end;

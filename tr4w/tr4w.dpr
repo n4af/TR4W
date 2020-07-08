@@ -577,6 +577,7 @@ begin
   CreateMultsWindows;
   CreateQSONeedWindows;
 
+  Windows.ShowWindow(wh[mweWSJTX], SW_HIDE);
   SetUpGlobalsAndInitialize;
   if SayHiEnable then DisplayNamePercentage;
   SetStereoPin(StereoControlPin, StereoPinState);
