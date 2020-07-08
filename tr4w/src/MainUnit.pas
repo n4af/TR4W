@@ -187,6 +187,7 @@ procedure RunExplorer(Command: PChar);
 procedure RunOptionsDialog(f: CFGFunc);
 procedure OpenUrl(url: PChar);
 function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
+function GetContestByADIFName(sADIFName: string): ContestType;
 
 {$IF MORSERUNNER}
 function GetMorseRunnerWindow: boolean;
@@ -6243,6 +6244,8 @@ var
   i: integer;
   freq: real;
   lpNumberOfBytesWritten: Cardinal;
+  contest: ContestType;
+  appHQ: string;
 
 begin
    lookingForFieldName := false;
@@ -6291,7 +6294,7 @@ begin
                       'QSO_DATE', 'QSO_DATE_OFF' ,'TIME_ON', 'TIME_OFF',
                       'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                       'STATE', 'STX', 'STX_STRING', 'SUBMODE','TEN_TEN',
-                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN']) of
+                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN', 'QTH']) of
                   0: exch.QTHString := fieldValue;
                   1:
                      begin
@@ -6301,7 +6304,13 @@ begin
                   3: exch.Check := StrToInt(fieldValue);
                   4: exch.ceClass := AnsiUpperCase(fieldValue);
                   5: exch.Zone := StrToInt(fieldValue);
-                  6: ; // CONTEST_ID
+                  6: begin // CONTEST_ID
+                     contest := GetContestByADIFNAme(fieldValue);
+                     if ContestsArray[contest].ADIFName = fieldValue then
+                        begin
+                        exch.ceContest := contest;
+                        end;
+                     end;
                   7: ; //CNTY
                   8: if Length(exch.QTHString) = 0 then
                          begin
@@ -6327,6 +6336,7 @@ begin
                         exch.ExtMode := msm.msmExtendedMode;
                         end;
                      end;
+                  14: exch.Name := fieldValue;
                   15: StrPLCopy(exch.ceOperator, fieldValue, High(exch.ceOperator));
                   17: //QSO_DATE
                      if not ADIFDateStringToQSOTime(fieldValue,exch.tSysTime) then
@@ -6362,12 +6372,11 @@ begin
                          exch.QTHString := fieldValue; // VE_Prov
                          end;
                   32, 33: // APP_TR4W_HQ or APP_N1MM_HQ
-                     if contest = IARU then
-                        begin
-                        exch.QTHString := fieldValue;
-                        //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
-                        end;
+                     appHQ := fieldValue;
                   34: ; // STATION_CALLSIGN
+                  35: begin      // QTH
+                      exch.QTHString := fieldValue;
+                      end;
                   -1: if MidStr(fieldName,1,4) <> 'APP_' then
                          begin
                          DebugMsg('ADIF ' + fieldName + ' is not present in this list');
@@ -6431,10 +6440,19 @@ begin
          DebugMsg('Exception processign ADIF Record ' + sADIF);
       end;
       DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+
       // fix up operator
       if exch.ceOperator = '' then
          begin
          exch.ceOperator := currentOperator;
+         end;
+      case contest of
+         CWOPS:
+            exch.Age := StrToInt(exch.QTHString);
+         IARU:
+            exch.QTHString := fieldValue;
+         else
+            ;
          end;
    end; // of ParseADIFRecord
 (*----------------------------------------------------------------------------*)
@@ -7941,6 +7959,21 @@ begin
 
 end;
 (*----------------------------------------------------------------------------*)
+function GetContestByADIFName(sADIFName: string): ContestType;
+var
+   i: ContestType;    // Use this function  sparingly as it is an O(n) walk through the contests.
+begin
+   Result := Low(ContestsArray); // First contest is DmmyContest
+   for i := low(ContestsArray) to High(ContestsArray) do
+      begin
+      if ContestsArray[i].ADIFName = sADIFName then
+         begin
+         Result := i;
+         break;
+         end;
+      end;
+end;
+
 {
 procedure SelectFileOfFolder(Parent: HWND; FileName: PChar; Mask: PChar; SelectType: CFGType);
 begin
