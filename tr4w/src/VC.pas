@@ -2597,8 +2597,8 @@ type
     XERTTY,           // 4.77.5
     OKOMSSBQSOPointMethod, // 4.80.1
     uQRQCPM,      // 4.82.3
-    OKOMRTTY     // 4.83.4
-
+    OKOMRTTY,     // 4.83.4
+    SRRQSOPOINTMETHOD // 4.90.4
 
     );
 
@@ -2735,7 +2735,8 @@ const
      'XE RTTY',           // 4.77.5
      'OKOM SSB',          // 4.80.1
      'UQRQCPM',           // 4.82.3
-     'OKOMRTTY'           // 4.83.4
+     'OKOMRTTY',           // 4.83.4
+     'SRRQSOPOINTMETHOD'  // 4.90.4
 
     );
 
