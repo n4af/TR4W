@@ -4,14 +4,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs,  IdComponent, IdUDPBase, IdUDPServer, IdUDPClient, IdBaseComponent, IdSocketHandle,
-  IdGlobal, IdStackConsts, StdCtrls, NetworkMessageUtils, DateUtils, StrUtils
-{  ,VC       // For ContestExchange
-  ,MainUnit // For ParseADIFRecord
-  ,LogDupe  // For ClearContestExchange - Stuff is all over the place in this code! de NY4I
-  ,uCTYDAT  // For ctyLocateCall
-  ,utils_file // For tWriteFile }
-  ,LOGRADIO
+  Dialogs,  IdComponent, IdUDPBase, IdUDPServer, IdTCPServer,IdUDPClient, IdContext,
+  IdBaseComponent, IdSocketHandle, IdGlobal, IdStackConsts, StdCtrls,
+  NetworkMessageUtils, DateUtils, StrUtils, LOGRADIO
   ;
 
 type
@@ -24,6 +19,7 @@ type
   TWSJTXServer = class(TObject)
   private
       udpServ : TIdUDPServer;
+      tcpServ: TIdTCPServer;
       UFreq, UModeRX, UModeTX, UDXCall, URSTs, UHeureDeb : string;
       UCall,ULoc : string;
       UIndex:integer;
@@ -36,10 +32,13 @@ type
       colorsDupeFore: TColorRec;
       colorsMultBack: TColorRec;
       colorsDupeBack: TColorRec;
+      context: TIdContext;
       //radio: radioObject;
   protected
     procedure OnServerRead(ASender: TIdUDPListenerThread; const AData: TIdBytes; ABinding: TIdSocketHandle);
     procedure OnBeforeBind(AHandle: TIdSocketHandle);
+    procedure IdTCPServer1Execute(AContext: TIdContext);
+    procedure IdTCPServer1Connect(AContext: TIdContext);
   public
     constructor Create; overload;
     //constructor Create(radio: radioObject); overload;
@@ -97,6 +96,9 @@ begin
    colorsMultFore.G := $00;
    colorsMultFore.B := $00;
 
+   tcpServ := TIdTCPServer.Create(nil);
+   //tcpServ.OnExecute := Self.IdTCPServer1Execute(context);
+   //tcpServ.OnConnect := Self.IdTCPServer1Connect(context);
 end;
 
 {constructor TWSJTXServer.Create(radio: radioObject);
@@ -119,6 +121,9 @@ destructor TWSJTXServer.Destroy;
 begin
    udpServ.Active := false;
    FreeAndNil(udpServ);
+
+   tcpServ.Active := false;
+   FreeAndNil(tcpServ);
 
 
 end;
@@ -490,4 +495,23 @@ end;
    Self.colorsMultFore.G := bGreen;
    Self.colorsMultFore.B := bBlue;
 end;
+
+
+
+
+procedure TWSJTXServer.IdTCPServer1Execute(AContext: TIdContext);
+var recv: string;
+begin
+   recv := AContext.Connection.Socket.ReadLn;
+   DEBUGMSG(recv)
+end;
+
+procedure TWSJTXServer.IdTCPServer1Connect(AContext: TIdContext);
+begin
+DEBUGMSG('TCP client Connected');
+end;
 end.
+
+
+
+
