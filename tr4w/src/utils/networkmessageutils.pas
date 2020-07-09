@@ -35,7 +35,7 @@ unit NetworkMessageUtils;
 interface
 
 uses
-  Classes, SysUtils, DateUtils, {Sockets,} IdGlobal,{ IdStack} IdWinsock2;
+  Classes, SysUtils, DateUtils, {Sockets,} IdGlobal, IdStack, IdWinsock2;
 
   type
   QWord = packed record      // was Int64Rec
@@ -71,7 +71,19 @@ procedure UnpackIntLongword(const AData: TIdBytes; var index: Integer; var AValu
 procedure UnpackIntDouble(const AData: TIdBytes; var index: Integer; var AValue: Double);
 procedure UnpackIntDateTime(const AData: TIdBytes; var index: Integer; var ADateTime: TDateTime);
 
+//procedure ReverseBytes(var Src: PByte; Dst: Pointer; Count: integer);
+
 implementation
+
+{//big endian to little endian
+procedure ReverseBytes(var Src: PByte; Dst: Pointer; Count: integer);
+var
+  i: integer;
+begin
+  for i:=0 to Count-1 do PByte(Dst)[i] := Src[Count-1-i];
+  Inc(Src, Count);
+end;
+}
 
 procedure UnpackIntLongInt(const AData: TIdBytes; var index: Integer; var AValue: LongInt);
 begin
@@ -82,9 +94,11 @@ end;
 procedure UnpackIntInt64(const AData: TIdBytes; var index: Integer; var AValue: Int64);
 begin
   AValue := BytesToInt64(AData, index);
+  AValue := Int64(GStack.NetworkToHost(UInt64(AValue)));
   index := index + SizeOf(AValue);
+  //ReverseBytes(p, @Result, 8);
   //{$IFNDEF BIG_ENDIAN}
-  //AValue := SwapEndian(AValue);
+  //AValue := SwapEndian32(AValue);
   //{$ENDIF}
 end;
 

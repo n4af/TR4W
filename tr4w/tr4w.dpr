@@ -107,7 +107,7 @@ uses
   utils_file in 'src\utils\utils_file.pas',
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas';
-
+                  // pass TRGB????
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
 {$IF LANG = 'SER'}{$R res\tr4w_ser.res}{$IFEND}
@@ -423,6 +423,8 @@ var
 {$IFEND}
   logBuffer                             : string;
   tempStickyKey                         : STICKYKEYS;
+  tc: tcolor;
+  rgb: cardinal;
 begin
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
@@ -523,7 +525,7 @@ begin
 
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
-  
+
   
 
   if CTY.ctyR150SMode then
@@ -685,7 +687,15 @@ begin
   GetMorseRunnerWindow;
 {$IFEND}
 
-   wsjtx := TWSJTXServer.Create;
+   wsjtx := TWSJTXServer.Create; //(radio1);
+   //tc := TWindows[mweQSOB4Status].mweBackG;
+   //tc := tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG];    // foreground is mweColor];
+   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]);
+   wsjtx.SetDupeColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+
+   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]);
+   wsjtx.SetMultColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+
    wsjtx.Start;
     {****************************  Main CallBack  ****************************}
 

@@ -1153,14 +1153,6 @@ end;
 
 procedure UnableToFindFileMessage(FileName: PChar);
 begin
-{
-  asm
-    push FileName
-    call GetLastError
-    call SysErrorMessage
-    push eax
-  end;
-}
   Format(wsprintfBuffer, '%s'#13#13'%s', SysErrorMessage(GetLastError), FileName);
 
   showwarning(wsprintfBuffer);
@@ -1183,8 +1175,6 @@ begin
   Format(wsprintfBuffer, '%s: %s', ID, SysErrorMessage(Windows.GetLastError));
   showwarning(wsprintfBuffer);
 end;
-
-
 
 procedure SelectParentDir(h: HWND);
 var

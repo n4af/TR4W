@@ -133,7 +133,8 @@ uses
   Dialogs,
   ZoneCont, 
   classes,
-  uWSJTX
+  uWSJTX,
+  Math
   ;
 
   var
@@ -180,7 +181,6 @@ procedure scWK_RESET;  // n4af 4.43.10
 procedure SetCommand(c: PChar);
 procedure ChangeFocus(Text: PChar);
 procedure ImportFromADIF;
-procedure ImportFromADIF_old;
 procedure StartNewContest;
 procedure CheckQuestionMark;
 function Get101Window(h: HWND): HWND;
@@ -6920,226 +6920,6 @@ begin
 
 end;
 *)
-procedure ImportFromADIF_old;
-label
-  1, 2, 3, 4;
-var
-  MapFin                                : Cardinal;
-  MapBase                               : Pointer;
-  LogSize                               : Cardinal;
-  h                                     : HWND;
-  CurrentPos                            : PChar;
-  PosCounter                            : integer;
-  QSOCounter                            : integer;
-  FieldLength                           : integer;
-  delta                                 : integer;
-  lpNumberOfBytesWritten                : Cardinal;
-  TempBand                              : BandType;
-  TempMode                              : ModeType;
-
-const
-  RSTSentAsInteger                      = Ord('T') * $1000000 + Ord('N') * $10000 + Ord('E') * $100 + Ord('S');
-  RSTRcvdAsInteger                      = Ord('D') * $1000000 + Ord('V') * $10000 + Ord('C') * $100 + Ord('R');
-  ITUZoneAsInteger                      = Ord('Z') * $1000000 + Ord('U') * $10000 + Ord('T') * $100 + Ord('I');
-  CQZoneAsInteger                       = Ord('Z') * $1000000 + Ord('Q') * $10000 + Ord('C') * $100 + Ord('<');
-  TimeAsInteger                         = Ord('N') * $1000000 + Ord('O') * $10000 + Ord('_') * $100 + Ord('E');
-  DateAsInteger                         = Ord('E') * $1000000 + Ord('T') * $10000 + Ord('A') * $100 + Ord('D');
-  ModeAsInteger                         = Ord('E') * $1000000 + Ord('D') * $10000 + Ord('O') * $100 + Ord('M');
-  BandAsInteger                         = Ord('D') * $1000000 + Ord('N') * $10000 + Ord('A') * $100 + Ord('B');
-  CallAsInteger                         = Ord('L') * $1000000 + Ord('L') * $10000 + Ord('A') * $100 + Ord('C');
-  StateAsInteger                        = Ord('T') * $1000000 + Ord('A') * $10000 + Ord('T') * $100 + Ord('S');
-  EORAsInteger                          = Ord('>') * $1000000 + Ord('R') * $10000 + Ord('O') * $100 + Ord('E');
-  STXAsInteger                          = Ord('X') * $1000000 + Ord('T') * $10000 + Ord('S') * $100 + Ord('<');
-  SRXAsInteger                          = Ord('X') * $1000000 + Ord('R') * $10000 + Ord('S') * $100 + Ord('<');
-
-  procedure DisplayLoadedQSOs;
-  begin
-    asm
-      push QSOCounter
-    end;
-    wsprintf(QuickDisplayBuffer, '%u ' + TC_QSO_IMPORTED);
-    asm add esp,12
-    end;
-    SetTextInQuickCommandWindow(QuickDisplayBuffer);
-  end;
-
-begin
-
-  h := CreateFile(TR4W_ADIF_FILENAME, GENERIC_READ, FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-  if h = INVALID_HANDLE_VALUE then Exit;
-  LogSize := Windows.GetFileSize(h, nil);
-
-  MapFin := Windows.CreateFileMapping(h, nil, PAGE_READONLY, 0, 0, nil);
-  if MapFin = 0 then goto 2;
-
-  MapBase := Windows.MapViewOfFile(MapFin, FILE_MAP_READ, 0, 0, 0);
-  if MapBase = nil then goto 3;
-
-  if not OpenLogFile then goto 3;
-  tSetFilePointer(0, FILE_END);
-
-  CurrentPos := MapBase;
-  PosCounter := 0;
-  QSOCounter := 0;
-  ClearContestExchange(TempRXData);
-  1:
-
-  if PInteger(CurrentPos)^ = CallAsInteger then if CurrentPos[4] = ':' then
-    begin
-      FieldLength := GetNumberFromCharBuffer(@CurrentPos[5]);
-      delta := 7;
-      if FieldLength > 9 then inc(delta);
-      TempRXData.Callsign[0] := CHR(FieldLength);
-      Windows.CopyMemory(@TempRXData.Callsign[1], @CurrentPos[delta], FieldLength);
-    end;
-
-  if PInteger(CurrentPos)^ = StateAsInteger then
-    if CurrentPos[5] = ':' then
-    begin
-      FieldLength := GetNumberFromCharBuffer(@CurrentPos[6]);
-      delta := 8;
-      if FieldLength > 9 then inc(delta);
-      TempRXData.QTHString[0] := CHR(FieldLength);
-      Windows.CopyMemory(@TempRXData.QTHString[1], @CurrentPos[delta], FieldLength);
-      TempRXData.DomMultQTH := TempRXData.QTHString;
-//      TempRXData.DomesticQTH := TempRXData.QTHString;
-    end;
-
-  if PInteger(CurrentPos)^ = CQZoneAsInteger then
-    if CurrentPos[4] = ':' then
-      if ActiveZoneMult = CQZones then
-      begin
-        TempRXData.Zone := GetNumberFromCharBuffer(@CurrentPos[7]);
-      end;
-
-  if PInteger(CurrentPos)^ = ITUZoneAsInteger then
-    if CurrentPos[4] = ':' then
-      if ActiveZoneMult = ITUZones then
-      begin
-        TempRXData.Zone := GetNumberFromCharBuffer(@CurrentPos[7]);
-      end;
-
-  if PInteger(CurrentPos)^ = DateAsInteger then
-    if CurrentPos[4] = ':' then
-    begin
-      TempRXData.tSysTime.qtYear := (Ord(CurrentPos[10]) - Ord('0')) + (Ord(CurrentPos[9]) - Ord('0')) * 10;
-      TempRXData.tSysTime.qtMonth := (Ord(CurrentPos[12]) - Ord('0')) + (Ord(CurrentPos[11]) - Ord('0')) * 10;
-      TempRXData.tSysTime.qtDay := (Ord(CurrentPos[14]) - Ord('0')) + (Ord(CurrentPos[13]) - Ord('0')) * 10;
-    end;
-
-  if PInteger(CurrentPos)^ = TimeAsInteger then if CurrentPos[4] = ':' then
-    begin
-      TempRXData.tSysTime.qtHour := (Ord(CurrentPos[8]) - Ord('0')) + (Ord(CurrentPos[7]) - Ord('0')) * 10;
-      TempRXData.tSysTime.qtMinute := (Ord(CurrentPos[10]) - Ord('0')) + (Ord(CurrentPos[9]) - Ord('0')) * 10;
-    end;
-
-  if PInteger(CurrentPos)^ = STXAsInteger then if CurrentPos[4] = ':' then
-    begin
-      TempRXData.NumberSent := GetNumberFromCharBuffer(@CurrentPos[7]);
-    end;
-
-  if PInteger(CurrentPos)^ = SRXAsInteger then if CurrentPos[4] = ':' then
-    begin
-      TempRXData.NumberReceived := GetNumberFromCharBuffer(@CurrentPos[7]);
-    end;
-
-  if PInteger(CurrentPos)^ = RSTSentAsInteger then if CurrentPos[4] = ':' then
-    begin
-      TempRXData.RSTSent := GetNumberFromCharBuffer(@CurrentPos[7]);
-    end;
-
-  if PInteger(CurrentPos)^ = RSTRcvdAsInteger then if CurrentPos[4] = ':' then
-    begin
-      TempRXData.RSTReceived := GetNumberFromCharBuffer(@CurrentPos[7]);
-    end;
-
-  if PInteger(CurrentPos)^ = ModeAsInteger then if CurrentPos[4] = ':' then
-    begin
-      TempMode := NoMode;
-      case CurrentPos[7] of
-        'C': TempMode := CW;
-        'S': TempMode := Phone;
-        'R': TempMode := Digital;
-        'F': TempMode := Phone;
-      end;
-      TempRXData.Mode := TempMode;
-    end;
-
-  if PInteger(CurrentPos)^ = BandAsInteger then if CurrentPos[4] = ':' then
-    begin
-      TempBand := NoBand;
-      case CurrentPos[7] of
-        '1':
-          case CurrentPos[8] of
-            '6': TempBand := Band160;
-            '5': TempBand := Band15;
-            '2': TempBand := Band12;
-            '0': TempBand := Band10;
-          end;
-        '2':
-          case CurrentPos[8] of
-            '0': TempBand := Band20;
-            'M': TempBand := Band2;
-          end;
-        '3': TempBand := Band30;
-        '4': TempBand := Band40;
-        '6': TempBand := Band6;
-        '7': TempBand := Band222;
-        '8': TempBand := Band80;
-
-      end;
-      TempRXData.Band := TempBand;
-    end;
-
-{
-  for TempBand := Band160 to Band432 do
-  begin
-    if Windows.lstrcmp(@CurrentPos[7], ADIFBANDSTRINGSARRAY[TempBand]) = 0 then
-    begin
-      TempRXData.Band := TempBand;
-      Break;
-    end;
-  end;
-}
-  if PInteger(CurrentPos)^ = EORAsInteger then
-  begin
-    ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
-//    if DoingDXMults then GetDXQTH(TempRXData);
-//    if DoingPrefixMults then SetPrefix(TempRXData);
-//    Sheet.SetMultFlags(TempRXData);
-
-    tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange), lpNumberOfBytesWritten);
-
-    inc(QSOCounter);
-    ClearContestExchange(TempRXData);
-    if QSOCounter mod 100 = 0 then DisplayLoadedQSOs;
-//    if QSOCounter >= 4400
-//        then asm nop end;
-
-  end;
-
-  if PosCounter <> LogSize - 4 then
-  begin
-    inc(CurrentPos);
-    inc(PosCounter);
-    goto 1;
-  end;
-  CloseLogFile;
-  4:
-  FlushViewOfFile(MapBase, 0);
-  Windows.UnmapViewOfFile(MapBase);
-  3:
-  CloseHandle(MapFin);
-  2:
-  CloseHandle(h);
-
-  tUpdateLog(actRescore);
-  LoadinLog;
-  DisplayLoadedQSOs;
-  ImportFromADIFThreadID := 0;
- // showint(QSOCounter);
-
-end;
 
 procedure StartNewContest;
 begin
@@ -7765,12 +7545,34 @@ end;
 
 procedure DebugMsg(s: string);
 {$IF NEWER_DEBUG}
-var formattedDate: string;
+var
+   formattedDate: string;
+   bytesToWrite: integer;
+   first: boolean;
 {$IFEND}
 begin
 {$IF NEWER_DEBUG}
+   first := true;
    LongTimeFormat := 'hh nn ss (zzz)';
    DateTimeToString(formattedDate, 'tt', Now);
+   if length(s) > 60 then
+      begin
+      while Length(s) > 0 do
+         begin
+         bytesToWrite := min(length(s),60);
+         if first then
+            begin
+            AddStringToTelnetConsole(PChar('[' + '             ' + '] ' + AnsiLeftStr(s,bytesToWrite)),tstSend);
+            first := false;
+            end
+         else
+            begin
+            AddStringToTelnetConsole(PChar('[' + formattedDate + '] ' + AnsiLeftStr(s,bytesToWrite)),tstSend);
+            end;
+         s := AnsiRightStr(s,length(s) - bytesToWrite);
+         end;
+      end;
+
    AddStringToTelnetConsole(PChar('[' + formattedDate + '] ' + s),tstSend);
 {$IFEND}
 end;
