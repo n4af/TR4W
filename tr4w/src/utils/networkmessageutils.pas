@@ -62,51 +62,38 @@ procedure Pack(var AData: TIdBytes; const AValue: Longword); overload;
 procedure Pack(var AData: TIdBytes; const AValue: Double); overload;
 procedure Pack(var AData: TIdBytes; const ADateTime: TDateTime); overload;
 
-procedure UnpackIntLongInt(const AData: TIdBytes; var index: Integer; var AValue: LongInt);
-procedure UnpackIntString(const AData: TIdBytes; var index: Integer; var AString: string);
-procedure UnpackIntQWord(const AData: TIdBytes; var index: Integer; var AValue: QWord);
-procedure UnpackIntInt64(const AData: TIdBytes; var index: Integer; var AValue: Int64);
-procedure UnpackIntBoolean(const AData: TIdBytes; var index: Integer; var AFlag: Boolean);
-procedure UnpackIntLongword(const AData: TIdBytes; var index: Integer; var AValue: Longword);
-procedure UnpackIntDouble(const AData: TIdBytes; var index: Integer; var AValue: Double);
-procedure UnpackIntDateTime(const AData: TIdBytes; var index: Integer; var ADateTime: TDateTime);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: LongInt); overload;
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AString: string); overload;
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: QWord); overload;
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: Int64); overload;
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AFlag: Boolean); overload;
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: Longword); overload;
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: Double); overload;
+procedure Unpack(const AData: TIdBytes; var index: Integer; var ADateTime: TDateTime); overload;
 
 //procedure ReverseBytes(var Src: PByte; Dst: Pointer; Count: integer);
 
 implementation
 
-{//big endian to little endian
-procedure ReverseBytes(var Src: PByte; Dst: Pointer; Count: integer);
-var
-  i: integer;
-begin
-  for i:=0 to Count-1 do PByte(Dst)[i] := Src[Count-1-i];
-  Inc(Src, Count);
-end;
-}
 
-procedure UnpackIntLongInt(const AData: TIdBytes; var index: Integer; var AValue: LongInt);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: LongInt);
 begin
   AValue := {GStack.HostToNetwork}htonl(BytesToLongInt(AData, index));
   index := index + SizeOf(AValue);
 end;
 
-procedure UnpackIntInt64(const AData: TIdBytes; var index: Integer; var AValue: Int64);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: Int64);
 begin
   AValue := BytesToInt64(AData, index);
   AValue := Int64(GStack.NetworkToHost(UInt64(AValue)));
   index := index + SizeOf(AValue);
-  //ReverseBytes(p, @Result, 8);
-  //{$IFNDEF BIG_ENDIAN}
-  //AValue := SwapEndian32(AValue);
-  //{$ENDIF}
 end;
 
-procedure UnpackIntString(const AData: TIdBytes; var index: Integer; var AString: string);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AString: string);
 var
   length: LongInt;
 begin
-  UnpackIntLongInt(AData,index,length);
+  Unpack(AData,index,length);
   if length <> LongInt($ffffffff) then
   begin
     AString := BytesToString(AData,index,length,enUtf8);
@@ -115,41 +102,41 @@ begin
   else AString := '';
 end;
 
-procedure UnpackIntQWord(const AData: TIdBytes; var index: Integer; var AValue: QWord);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: QWord);
 var
    temp: Int64 absolute AValue;
 begin
-  UnpackIntInt64(AData,index,temp);
+  Unpack(AData,index,temp);
 end;
 
-procedure UnpackIntBoolean(const AData: TIdBytes; var index: Integer; var AFlag: Boolean);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AFlag: Boolean);
 begin
   AFlag := AData[index] <> 0;
   index := index + 1;
 end;
 
-procedure UnpackIntLongword(const AData: TIdBytes; var index: Integer; var AValue: Longword);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: Longword);
 begin
   AValue := Longword({GStack.HostToNetwork}htonl(BytesToLongInt(AData, index)));
   index := index + SizeOf(AValue);
 end;
 
-procedure UnpackIntDouble(const AData: TIdBytes; var index: Integer; var AValue: Double);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var AValue: Double);
 var
   temp: QWord absolute AValue;
 begin
-  UnpackIntQWord(AData,index,temp);
+  Unpack(AData,index,temp);
 end;
 
-procedure UnpackIntDateTime(const AData: TIdBytes; var index: Integer; var ADateTime: TDateTime);
+procedure Unpack(const AData: TIdBytes; var index: Integer; var ADateTime: TDateTime);
 var
   dt: Int64;
   tm: Longword;
   ts: Byte;
   temp: Double;
 begin
-  UnpackIntInt64(AData,index,dt);
-  UnpackIntLongword(AData,index,tm);
+  Unpack(AData,index,dt);
+  Unpack(AData,index,tm);
   ts := AData[index];
   index := index + 1;
   {assume UTC for now}
@@ -159,8 +146,6 @@ end;
 
 procedure Pack(var AData: TIdBytes; const AValue: Byte); overload;
 begin
-  // AppendBytes(AData,ToBytes(SwapEndian16(AValue)));
-  //AppendBytes(AData,ToBytes(AValue));
   AppendByte(AData, AValue);
 end;
 

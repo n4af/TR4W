@@ -29,11 +29,13 @@ type
       UIndex:integer;
       peerPort: word;
       SNR: LongInt;
-      frequency: Int64; //QWord;
+      frequency: Int64;
       firstTime: boolean;
       isConnected: boolean;
-      colorsMult: TColorRec;
-      colorsDupe: TColorRec;
+      colorsMultFore: TColorRec;
+      colorsDupeFore: TColorRec;
+      colorsMultBack: TColorRec;
+      colorsDupeBack: TColorRec;
       //radio: radioObject;
   protected
     procedure OnServerRead(ASender: TIdUDPListenerThread; const AData: TIdBytes; ABinding: TIdSocketHandle);
@@ -47,8 +49,10 @@ type
     procedure HighlightCall(sCall: string; color: integer; sId: string);
     procedure ClearColors(sId: string);
     property connected: boolean read isConnected;
-    procedure SetDupeColor(bRed: byte; bGreen: byte; bBlue: byte);
-    procedure SetMultColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
 
   end;
 
@@ -77,13 +81,21 @@ begin
    udpServ.Bindings.Add.IP := '';
    udpServ.OnUDPRead := Self.OnServerRead;
    udpServ.OnBeforeBind := Self.OnBeforeBind;
-   colorsDupe.R := $FF;
-   colorsDupe.G := $00;
-   colorsDupe.B := $00;
+   colorsDupeBack.R := $FF;
+   colorsDupeBack.G := $00;
+   colorsDupeBack.B := $00;
 
-   colorsMult.R := $FF;
-   colorsMult.G := $FF;
-   colorsMult.B := $00;
+   colorsMultBack.R := $FF;
+   colorsMultBack.G := $FF;
+   colorsMultBack.B := $00;
+
+   colorsDupeFore.R := $00;
+   colorsDupeFore.G := $00;
+   colorsDupeFore.B := $00;
+
+   colorsMultFore.R := $00;
+   colorsMultFore.G := $00;
+   colorsMultFore.B := $00;
 
 end;
 
@@ -151,15 +163,15 @@ begin
   //DEBUGMSG('WSJTX >>> Datagram received - length: ' + IntToStr(Length(AData))); { DO NOT DELETE THIS }
    while index < Length(AData) do
    begin
-      UnpackIntLongInt(AData, index, magic);
+      Unpack(AData, index, magic);
       //DEBUGMSG('WSJTX >>> index:' + IntToStr(index) + ' magic:$' + IntToHex(magic,8)); { DO NOT DELETE THIS }
       if (magic = LongInt($ADBCCBDA)) and (index < Length(AData)) then
          begin
-         UnpackIntLongInt(AData, index, schema);
+         Unpack(AData, index, schema);
          if (schema = 2) and (index < Length(AData)) then
             begin
-            UnpackIntLongInt(AData,index,messageType);
-            UnpackIntString(AData,index,id);
+            Unpack(AData,index,messageType);
+            Unpack(AData,index,id);
             //DEBUGMSG('Message type:' + IntToStr(messageType) + ' from:[' + id + ']');   { DO NOT DELETE THIS }
 
             case messageType of
@@ -176,20 +188,20 @@ begin
                end;
             1:         {............................................................Status}
                begin
-               UnpackIntInt64(AData,index,frequency);
-               UnpackIntString(AData,index,mode);
-               UnpackIntString(AData,index,DXCall);
-               UnpackIntString(AData,index,report);
-               UnpackIntString(AData,index,TXMode);
-               UnpackIntBoolean(AData,index,TXEnabled);
-               UnpackIntBoolean(AData,index,transmitting);
+               Unpack(AData,index,frequency);
+               Unpack(AData,index,mode);
+               Unpack(AData,index,DXCall);
+               Unpack(AData,index,report);
+               Unpack(AData,index,TXMode);
+               Unpack(AData,index,TXEnabled);
+               Unpack(AData,index,transmitting);
 
-               UnpackIntBoolean(AData,index,Decoding);
-               UnpackIntLongInt(AData,index,RXDF);
-               UnpackIntLongInt(AData,index,TXDF);
-               UnpackIntString(AData,index,DECall);
-               UnpackIntString(AData,index,DEGrid);
-               UnpackIntString(AData,index,DXGrid);
+               Unpack(AData,index,Decoding);
+               Unpack(AData,index,RXDF);
+               Unpack(AData,index,TXDF);
+               Unpack(AData,index,DECall);
+               Unpack(AData,index,DEGrid);
+               Unpack(AData,index,DXGrid);
               // Memomessage := IntToStr(frequency.Hi);
                {DEBUGMSG('WSJTX >>> Status: Frequency: ' + IntToStr(frequency) + ' Mode: ' + mode + ' DX Call: ' + DXCall
                                     + ' Report: ' + report + ' TX Mode: ' + TXMode + ' TX Enabled: ' + BoolToStr(TXEnabled)
@@ -207,14 +219,14 @@ begin
             2: begin        {............................................................Decode}
                            // This is where we need to look for CQ decodes and highlight the call by sending back
                            // a message to the UDP receiver in WSJT-X.
-               UnpackIntBoolean(AData,index,isNew);
-               UnpackIntLongword(AData,index,tm);
+               Unpack(AData,index,isNew);
+               Unpack(AData,index,tm);
                ztime := IncMilliSecond(0,tm);
-               UnpackIntLongInt(AData,index,SNR);
-               UnpackIntDouble(AData,index,DT);
-               UnpackIntLongword(AData,index,DF);
-               UnpackIntString(AData,index,mode);
-               UnpackIntString(AData,index,message);
+               Unpack(AData,index,SNR);
+               Unpack(AData,index,DT);
+               Unpack(AData,index,DF);
+               Unpack(AData,index,mode);
+               Unpack(AData,index,message);
 
                Memomessage :='Decode:'+' '+BoolToStr(isNew)+' '+FormatDateTime('hhmm',ztime)+' '+IntToStr(SNR)
                                    +' '+ FloatToStrF(DT, ffGeneral,4,1)+' '+IntToStr(DF)
@@ -283,16 +295,16 @@ begin
 
             5: begin        {..........I may grab this from the ADIF record so this would not be needed   QSO logged}
             {
-               UnpackIntDateTime(AData,index,date);
-               UnpackIntString(AData,index,DXCall);
-               UnpackIntString(AData,index,DXGrid);
-               UnpackIntQWord(AData,index,frequency);
-               UnpackIntString(AData,index,mode);
-               UnpackIntString(AData,index,report);
-               UnpackIntString(AData,index,reportReceived);
-               UnpackIntString(AData,index,TXPower);
-               UnpackIntString(AData,index,comments);
-               UnpackIntString(AData,index,DXName);
+               Unpack(AData,index,date);
+               Unpack(AData,index,DXCall);
+               Unpack(AData,index,DXGrid);
+               Unpack(AData,index,frequency);
+               Unpack(AData,index,mode);
+               Unpack(AData,index,report);
+               Unpack(AData,index,reportReceived);
+               Unpack(AData,index,TXPower);
+               Unpack(AData,index,comments);
+               Unpack(AData,index,DXName);
 
                DEBUGMSG('QSO logged: Date:' + FormatDateTime('dd-mmm-yyyy hh:mm:ss',date)
                                + ' DX Call:' + DXCall + ' DX Grid:' + DXGrid
@@ -311,7 +323,7 @@ begin
                 DEBUGMSG('Received message 10');
                 end;
             12: begin
-               UnpackIntString(AData,index,adif);
+               Unpack(AData,index,adif);
                DEBUGMSG('WSJTX >>> ADIF Record to log: ' + adif);
                ClearContestExchange(TempRXData);
                if ParseADIFRecord(adif, TempRXData) then // processed a record if true
@@ -366,10 +378,19 @@ end;
       begin
       // Background QColor first
       Pack(AData,colorType); // RGB
-      PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
-      Pack(AData,Byte(colorsDupe.R)); Pack(AData,Byte(0)); // Red
-      Pack(AData,Byte(colorsDupe.G)); Pack(AData,Byte(0)); // Green
-      Pack(AData,Byte(colorsDupe.B)); Pack(AData,Byte(0)); // Blue
+      PackFF00(AData);    // Alpha
+      Pack(AData,Byte(colorsDupeBack.R)); Pack(AData,Byte(0)); // Red
+      Pack(AData,Byte(colorsDupeBack.G)); Pack(AData,Byte(0)); // Green
+      Pack(AData,Byte(colorsDupeBack.B)); Pack(AData,Byte(0)); // Blue
+      PackFF00(AData); //Pack(AData,Word(65280));   // R
+      Pack(AData,Word(0));     // Padding
+
+      // foreground
+      Pack(AData,colorType); // RGB
+      PackFF00(AData);    // Alpha
+      Pack(AData,Byte(colorsDupeFore.R)); Pack(AData,Byte(0)); // Red
+      Pack(AData,Byte(colorsDupeFore.G)); Pack(AData,Byte(0)); // Green
+      Pack(AData,Byte(colorsDupeFore.B)); Pack(AData,Byte(0)); // Blue
       PackFF00(AData); //Pack(AData,Word(65280));   // R
       Pack(AData,Word(0));     // Padding
       end
@@ -379,55 +400,18 @@ end;
 
       Pack(AData,colorType);
       PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
-      Pack(AData,Byte(colorsMult.R)); Pack(AData,Byte(0)); // Red
-      Pack(AData,Byte(colorsMult.G)); Pack(AData,Byte(0)); // Green
-      Pack(AData,Byte(colorsMult.B)); Pack(AData,Byte(0)); // Blue
+      Pack(AData,Byte(colorsMultBack.R)); Pack(AData,Byte(0)); // Red
+      Pack(AData,Byte(colorsMultBack.G)); Pack(AData,Byte(0)); // Green
+      Pack(AData,Byte(colorsMultBack.B)); Pack(AData,Byte(0)); // Blue
       Pack(AData,Word(0));     // Padding
-      end;
 
-   // Foreground QColor
-   // Black RGB(0,0,0)
-   Pack(AData,colorType);
-   PackFF00(AData); //Pack(AData,Word(65280));     // Alpha     // 65280 is FF 00 (255 in Big Endian
-   Pack(AData,Word(0));   // R
-   Pack(AData,Word(0));   // G
-   Pack(AData,Word(0));   // B
-   Pack(AData,Word(0));     // Padding
-
-   Pack(AData,true);        // Highlight last only
-
-   (*
-   if color = 1 then // DUPE  defaults to red - Add code to pull from config if there
-      begin
-      // Background QColor first
-      // Red  RGB(255,0,0)
       Pack(AData,colorType);
       PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
-      PackFF00(AData); //Pack(AData,Word(65280));   // R
-      Pack(AData,Word(0));     // G
-      Pack(AData,Word(0));     // B
-      Pack(AData,Word(0));     // Padding
-      end
-   else if color = 2 then // multiplier
-      begin
-      // Background QColor first
-      // Yellow  RGB(255,255,0)
-      Pack(AData,colorType);
-      PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
-      PackFF00(AData);     // R
-      PackFF00(AData);     // G
-      Pack(AData,Word(0)); // B
+      Pack(AData,Byte(colorsMultFore.R)); Pack(AData,Byte(0)); // Red
+      Pack(AData,Byte(colorsMultFore.G)); Pack(AData,Byte(0)); // Green
+      Pack(AData,Byte(colorsMultFore.B)); Pack(AData,Byte(0)); // Blue
       Pack(AData,Word(0));     // Padding
       end;
-    *)
-   // Foreground QColor
-   // Black RGB(0,0,0)
-   Pack(AData,colorType);
-   PackFF00(AData); //Pack(AData,Word(65280));     // Alpha     // 65280 is FF 00 (255 in Big Endian
-   Pack(AData,Word(0));   // R
-   Pack(AData,Word(0));   // G
-   Pack(AData,Word(0));   // B
-   Pack(AData,Word(0));     // Padding
 
    Pack(AData,true);        // Highlight last only
 
@@ -449,7 +433,7 @@ end;
    schema := 2;
    messageType := 13;
    id := sID;
-   colorType := 1; // RGB
+   colorType := 0; // RGB
    pack(AData, magic);            {.............................................Magic number}
    pack(AData, schema);          {..............................................Schema}
    Pack(AData,messageType);        {............................................MessageType}
@@ -479,18 +463,31 @@ end;
 
 end;
 
-procedure TWSJTXServer.SetDupeColor(bRed: byte; bGreen: byte; bBlue: byte);
+procedure TWSJTXServer.SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
 begin
-   Self.colorsDupe.R := bRed;
-   Self.colorsDupe.G := bGreen;
-   Self.colorsDupe.B := bBlue;
+   Self.colorsDupeBack.R := bRed;
+   Self.colorsDupeBack.G := bGreen;
+   Self.colorsDupeBack.B := bBlue;
 end;
 
-procedure TWSJTXServer.SetMultColor(bRed: byte; bGreen: byte; bBlue: byte);
+procedure TWSJTXServer.SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
 begin
-   Self.colorsMult.R := bRed;
-   Self.colorsMult.G := bGreen;
-   Self.colorsMult.B := bBlue;
+   Self.colorsMultBack.R := bRed;
+   Self.colorsMultBack.G := bGreen;
+   Self.colorsMultBack.B := bBlue;
 end;
 
+procedure TWSJTXServer.SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+begin
+   Self.colorsDupeFore.R := bRed;
+   Self.colorsDupeFore.G := bGreen;
+   Self.colorsDupeFore.B := bBlue;
+end;
+
+procedure TWSJTXServer.SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+begin
+   Self.colorsMultFore.R := bRed;
+   Self.colorsMultFore.G := bGreen;
+   Self.colorsMultFore.B := bBlue;
+end;
 end.
