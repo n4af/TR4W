@@ -180,11 +180,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.90.3' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.90.4' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July 2, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'July 9, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -2597,8 +2597,8 @@ type
     XERTTY,           // 4.77.5
     OKOMSSBQSOPointMethod, // 4.80.1
     uQRQCPM,      // 4.82.3
-    OKOMRTTY     // 4.83.4
-
+    OKOMRTTY,     // 4.83.4
+    SRRQSOPOINTMETHOD // 4.90.4
 
     );
 
@@ -2735,7 +2735,8 @@ const
      'XE RTTY',           // 4.77.5
      'OKOM SSB',          // 4.80.1
      'UQRQCPM',           // 4.82.3
-     'OKOMRTTY'           // 4.83.4
+     'OKOMRTTY',           // 4.83.4
+     'SRRQSOPOINTMETHOD'  // 4.90.4
 
     );
 
