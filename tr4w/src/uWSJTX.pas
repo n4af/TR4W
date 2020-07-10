@@ -181,7 +181,7 @@ begin
 
             case messageType of
             0: begin
-               DEBUGMSG('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
+               //DEBUGMSG('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
                SetMainWindowText(mweWSJTX,'WSJTX');
                Windows.ShowWindow(wh[mweWSJTX], SW_SHOW);
                isConnected := true;
@@ -233,10 +233,10 @@ begin
                Unpack(AData,index,mode);
                Unpack(AData,index,message);
 
-               Memomessage :='Decode:'+' '+BoolToStr(isNew)+' '+FormatDateTime('hhmm',ztime)+' '+IntToStr(SNR)
+              { Memomessage :='Decode:'+' '+BoolToStr(isNew)+' '+FormatDateTime('hhmm',ztime)+' '+IntToStr(SNR)
                                    +' '+ FloatToStrF(DT, ffGeneral,4,1)+' '+IntToStr(DF)
                                    +' '+ mode +' '+ message +' '+ timeToStr(ztime) +' '+ FloatToStr(DT) +' '+ intToStr(tm);
-               DEBUGMSG('WSJTX >>> ' + Memomessage);
+               DEBUGMSG('WSJTX >>> ' + Memomessage);  }
                if MidStr(message,1,2) = 'CQ' then
                   begin
                   slCQMessage := TStringList.Create;

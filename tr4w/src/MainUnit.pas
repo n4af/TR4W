@@ -6268,6 +6268,8 @@ var
   lpNumberOfBytesWritten: Cardinal;
   contest: ContestType;
   appHQ: string;
+  recordFromWSJTX: boolean;
+  gridSquare: string;
 
 begin
    lookingForFieldName := false;
@@ -6316,7 +6318,7 @@ begin
                       'QSO_DATE', 'QSO_DATE_OFF' ,'TIME_ON', 'TIME_OFF',
                       'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                       'STATE', 'STX', 'STX_STRING', 'SUBMODE','TEN_TEN',
-                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN', 'QTH']) of
+                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN', 'QTH', 'PROGRAMID']) of
                   0: exch.QTHString := fieldValue;
                   1:
                      begin
@@ -6334,13 +6336,16 @@ begin
                         end;
                      end;
                   7: ; //CNTY
-                  8: if Length(exch.QTHString) = 0 then
+                  8: begin
+                     gridSquare := fieldValue;
+                     if Length(exch.QTHString) = 0 then
                          begin
                          if ActiveDomesticMult = GridSquares then
                             begin
                             exch.QTHString := fieldValue; // GRIDSQUARE
                             end;
                          end;
+                     end;
                   9:
                      begin
                      DecimalSeparator := '.';
@@ -6398,6 +6403,12 @@ begin
                   34: ; // STATION_CALLSIGN
                   35: begin      // QTH
                       exch.QTHString := fieldValue;
+                      end;
+                  36: begin
+                      if fieldValue = 'WSJT-X' then
+                         begin
+                         recordFromWSJTX := true;
+                         end;
                       end;
                   -1: if MidStr(fieldName,1,4) <> 'APP_' then
                          begin
@@ -6462,7 +6473,6 @@ begin
          DebugMsg('Exception processign ADIF Record ' + sADIF);
       end;
       DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
-
       // fix up operator
       if exch.ceOperator = '' then
          begin
@@ -6475,6 +6485,19 @@ begin
             exch.QTHString := fieldValue;
          else
             ;
+         end; // of case
+
+      case exch.ceContest of
+         GENERALQSO:
+            if recordFromWSJTX then
+               begin
+               exch.QTHString := gridSquare;
+               end;
+         end; // of case
+
+      if recordFromWSJTX then
+         begin
+         exch.DomesticQTH := gridSquare;
          end;
    end; // of ParseADIFRecord
 (*----------------------------------------------------------------------------*)
