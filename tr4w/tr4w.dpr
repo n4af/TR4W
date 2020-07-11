@@ -107,7 +107,7 @@ uses
   utils_file in 'src\utils\utils_file.pas',
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas';
-                  // pass TRGB????
+
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
 {$IF LANG = 'SER'}{$R res\tr4w_ser.res}{$IFEND}

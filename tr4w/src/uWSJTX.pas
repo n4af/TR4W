@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs,  IdComponent, IdUDPBase, IdUDPServer, IdTCPServer,IdUDPClient, IdContext,
   IdBaseComponent, IdSocketHandle, IdGlobal, IdStackConsts, StdCtrls,
-  NetworkMessageUtils, DateUtils, StrUtils, LOGRADIO
+  NetworkMessageUtils, DateUtils, StrUtils, LOGRADIO, IdThreadSafe, IdThread
   ;
 
 type
@@ -33,6 +33,8 @@ type
       colorsMultBack: TColorRec;
       colorsDupeBack: TColorRec;
       context: TIdContext;
+      buffer: TIdBytes;
+      sBuffer: string;
       //radio: radioObject;
   protected
     procedure OnServerRead(ASender: TIdUDPListenerThread; const AData: TIdBytes; ABinding: TIdSocketHandle);
@@ -52,6 +54,7 @@ type
     procedure SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
     procedure SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
     procedure SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure Display(p_sender : String; p_message : string);
 
   end;
 
@@ -97,8 +100,8 @@ begin
    colorsMultFore.B := $00;
 
    tcpServ := TIdTCPServer.Create(nil);
-   //tcpServ.OnExecute := Self.IdTCPServer1Execute(context);
-   //tcpServ.OnConnect := Self.IdTCPServer1Connect(context);
+   tcpServ.OnExecute := Self.IdTCPServer1Execute;
+   tcpServ.OnConnect := Self.IdTCPServer1Connect;
 end;
 
 {constructor TWSJTXServer.Create(radio: radioObject);
@@ -110,11 +113,24 @@ end;
 procedure TWSJTXServer.Start;
 begin
    udpServ.Active := true;
+
+   // ... START SERVER:
+
+    // ... clear the Bindings property ( ... Socket Handles )
+   tcpServ.Bindings.Clear;
+    // ... Bindings is a property of class: TIdSocketHandles;
+
+    // ... add listening ports:
+
+    // ... add a port for connections from guest clients.
+   tcpServ.Bindings.Add.Port := 52002;
+   tcpServ.Active := true;
 end;
 
 procedure TWSJTXServer.Stop;
 begin
    udpServ.Active := false;
+   tcpServ.Active := false;
 end;
 
 destructor TWSJTXServer.Destroy;
@@ -500,16 +516,130 @@ end;
 
 
 procedure TWSJTXServer.IdTCPServer1Execute(AContext: TIdContext);
-var recv: string;
+var
+    Port          : Integer;
+    PeerPort      : Integer;
+    PeerIP        : string;
+
+    msgFromClient : string;
+    msgToClient   : string;
+    bytesWritten: integer;
+    //buffer: TIdBytes;
+    //sBuffer : string;
+    const GETFREQ = '<command:10>CmdGetFreq<parameters:0>';
+    const SENDTX = '<command:9>CmdSendTx<parameters:0>';
+    const SETFREQ = '<command:10>CmdSetFreq<parameters:23><xcvrfreq:10> 7,074.000';
+    const SETFREQ2= '<command:10>CmdSetFreq<parameters:23><xcvrfreq:10> 7,074.055';
+    const SENDSPLIT = '<command:12>CmdSendSplit<parameters:0>';
+    const SENDMODE = '<command:11>CmdSendMode<parameters:0>';
+    const SETRX = '<command:5>CmdRX<parameters:0>';
+    const SETTX = '<command:5>CmdTX<parameters:0>';
+    const GETTXFREQ = '<command:12>CmdGetTXFreq<parameters:0>';
+
 begin
-   recv := AContext.Connection.Socket.ReadLn;
-   DEBUGMSG(recv)
+    // ... get message from client
+    AContext.Connection.IOHandler.ReadBytes(buffer,-1,true);
+    sBuffer := BytesToString(buffer);
+    RemoveBytes(buffer,length(sBuffer));
+
+
+    // ... getting IP address, Port and PeerPort from Client that connected
+    peerIP    := AContext.Binding.PeerIP;
+    peerPort  := AContext.Binding.PeerPort;
+
+    // ... message log
+    Display('CLIENT', '(Peer=' + PeerIP + ':' + IntToStr(PeerPort) + ') ' + sBuffer);
+    // ...
+    while Length(sBuffer) > 0  do
+       begin
+       Display ('SERVER','Processing message ' + sBuffer);
+
+       if AnsiStartsStr('<command', sBuffer) then
+          begin
+         // ProcessCommand(sBuffer,slFields);
+       if AnsiStartsStr(GETFREQ, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(GETFREQ));
+          AContext.Connection.IOHandler.Write('<CmdFreq:9>7,074.000');
+          end
+       else if AnsiStartsStr(SETRX, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETRX));
+          //AContext.Connection.IOHandler.Write('<CmdSendRX:3>OFF')
+          end
+       else if AnsiStartsStr(SETFREQ, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETFREQ));
+          end
+       else if AnsiStartsStr(SETFREQ2, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETFREQ2));
+          end
+       else if AnsiStartsStr(SETTX, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETTX));
+          end
+       else if AnsiStartsStr(SENDSPLIT, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDSPLIT));
+          AContext.Connection.IOHandler.Write('<CmdSplit:3>OFF');
+          end
+       else if AnsiStartsStr(SENDMODE, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDMODE));
+          AContext.Connection.IOHandler.Write('<CmdMode:6>Data-U');
+          end
+       else if AnsiStartsStr(SENDTX, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDTX));
+          AContext.Connection.IOHandler.Write('<CmdTX:3>OFF');
+          end
+       else if AnsiStartsStr(GETTXFREQ, sBuffer) then
+          begin
+          sBuffer := RightStr(sBuffer,length(sBuffer) - length(GETTXFREQ));
+          AContext.Connection.IOHandler.Write('<CmdTXFreq:9>7,074.000');
+          end
+       else
+          begin
+          Display('CLIENT','Undefined message ' + sBuffer);
+          sBuffer := '';
+          end;
+       end;
+    end;
+
+       Display('CLIENT','length(sBuffer) = ' + IntToStr(length(sBuffer)));
+    // ... process message from Client
+
+    // ...
+
+    // ... send response to Client
+
+    //AContext.Connection.IOHandler.WriteLn('... message sent from server :)');
 end;
 
 procedure TWSJTXServer.IdTCPServer1Connect(AContext: TIdContext);
 begin
-DEBUGMSG('TCP client Connected');
+//DEBUGMSG('TCP client Connected');
 end;
+
+procedure TWSJTXServer.Display(p_sender : String; p_message : string);
+begin
+   DEBUGMSG(p_message);
+{    // ... DISPLAY MESSAGE
+    TThread.Queue(nil, procedure
+                       begin
+                           DEBUGMSG('[' + p_sender + '] - '
+                           + getNow() + ': ' + p_message);
+                       end
+                 );
+
+    // ... see doc..
+    // ... TThread.Queue() causes the call specified by AMethod to
+    //     be asynchronously executed using the main thread, thereby avoiding
+    //     multi-thread conflicts.
+}
+end;
+
 end.
 
 
