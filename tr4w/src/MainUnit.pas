@@ -14,8 +14,8 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+     Public License along with TR4W in  GPL_License.TXT.
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 
@@ -129,6 +129,8 @@ uses
   LogWind,
   Tree,
   SysUtils,
+  StrUtils,
+  Dialogs,
   ZoneCont, 
   classes
   ;
@@ -330,6 +332,10 @@ procedure DebugRadioTempBuffer(sDecorator: string; var bRay: array of char); // 
 function IsCWByCATActive(theRadio: RadioPtr): boolean; overload;  // ny4i Issue # 111
 function IsCWByCATActive: boolean; overload;  // ny4i Issue # 111
 
+function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
+function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
+function DigitsIn(n: smallInt): byte;
+function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
 
 function ParametersOkay(Call: CallString;
   ExchangeString: Str40 {CallString};
@@ -2462,7 +2468,8 @@ begin
 
     menu_import_adif:
       begin
-        Windows.ZeroMemory(@TR4W_ADIF_FILENAME, SizeOf(TR4W_ADIF_FILENAME));
+      ImportFromADIF;
+        (*Windows.ZeroMemory(@TR4W_ADIF_FILENAME, SizeOf(TR4W_ADIF_FILENAME));
         if OpenFileDlg(nil, tr4whandle, 'ADIF (*.adi)'#0'*.adi', TR4W_ADIF_FILENAME, OFN_HIDEREADONLY or OFN_ENABLESIZING or OFN_FILEMUSTEXIST) then
         begin
           if QSOTotals[All, Both] > 0 then
@@ -2470,7 +2477,7 @@ begin
 //          if ImportFromADIFThreadID = 0 then tCreateThread(@ImportFromADIF, ImportFromADIFThreadID);
           ImportFromADIF;
         end;
-
+        *)
       end;
 
     menu_export_notes: MakeNotesList;
@@ -3921,6 +3928,7 @@ begin
     else
       RData.RSTReceived := LogRSTSent;
 
+  RData.ExchString := ExchangeString;
   CalculateQSOPoints(RData);
 end;
 
@@ -4210,7 +4218,7 @@ const
 begin
   Windows.GetClientRect(nWidthhwndParent, temprect);
   X := (temprect.Right div 2) - (button_width + 5);
-  Y := temprect.Bottom - temprect.Top - 35;
+  Y := temprect.Bottom - temprect.Top - 27 {35};  // ny4i changed this for the Cabrillo dialog as the buttons were too close to the last text field. The window may need to be a bit longer.
   CreateButton(0, OK_WORD, X, Y, button_width, nWidthhwndParent, 1);
   CreateButton(0, CANCEL_WORD, X + button_width + 10, Y, button_width, nWidthhwndParent, 2);
 end;
@@ -4430,6 +4438,12 @@ begin
     end
     else
     begin
+      (* When adding somethign to ContestExchange, this causes an error since
+         the size is wrong. From this code, it appears the the TRW file is
+         simply a serialization of the ContestExchanges. So the size of the
+         file should always be evenly divisible by the SizeOf(ContestExchange).
+         NY4I 3 JUL 2020
+      *)
       if (Size mod SizeOf(ContestExchange)) <> 0 {SizeOf(TLogHeader)} then
       begin
         showwarning(TC_ERRORINLOGFILE);
@@ -6079,6 +6093,429 @@ begin
 }
 end;
 
+(*----------------------------------------------------------------------------*)
+function GetADIFMode(sMode: string): ModeAndExtendedModeType;
+var
+   sModeUpper: string;
+begin
+   sModeUpper := ANSIUPPERCASE(sMode);
+   Case AnsiIndexText(AnsiUpperCase(sMode), ['CW', 'SSB', 'AM', 'FM', 'FT8', 'RTTY', 'MFSK']) of
+      0: // CW
+         begin
+         Result.msmMode := CW;
+         Result.msmExtendedMode := eCW;
+         end;
+
+      1: begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eSSB;
+         end;
+      2:
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eAM;
+         end;
+      3:
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eFM;
+         end;
+      4:
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eFT8;
+         end;
+      5:
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eRTTY;
+         end;
+      6:
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eMFSK;
+         end;
+      -1:
+         Result.msmMode := NoMode;
+      else
+         Result.msmMode := NoMode;
+      end;
+   end;
+(*----------------------------------------------------------------------------*)
+function GetADIFSubMode(sSubMode: string): ModeAndExtendedModeType;
+var
+   sModeUpper: string;
+begin
+   sModeUpper := ANSIUPPERCASE(sSubMode);
+   Case AnsiIndexText(AnsiUpperCase(sSubMode), ['FT4', 'JS8', 'USB', 'LSB']) of
+      0: // CW
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eFT4;
+         end;
+      1: begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eJS8;
+         end;
+      2:
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eUSB;
+         end;
+      3:
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eLSB;
+         end;
+      -1:
+         Result.msmMode := NoMode;
+      else
+         Result.msmMode := NoMode;
+      end;
+   end;
+(*----------------------------------------------------------------------------*)
+
+function GetADIFBand(sBand: string): BandType;
+var
+   sBandLower: string;
+   iBand: BandType;
+begin
+   sBandLower := AnsiLowerCase(sBand);
+   for iBand := Low(BandType) to High(BandType) do
+      begin
+      if sBandLower = ADIFBANDSTRINGSARRAY[iBand] then
+         begin
+         Result := iBand;
+         Break;
+         end;
+      end;
+  (* Case AnsiIndexText(AnsiUpperCase(sBand), ['160M', '80M', '40M', ,'30M', '20M', '17M', '15M', '12M', '10M', '6M', '2M''RTTY']) of
+      0: // CW
+         Result := CW;
+      1: // SSB
+         Result := Phone;
+      2:
+         Result := Digital; // FT8 should be its own mode
+      3:
+         Result := Digital;
+      -1:
+         Result := NoMode;
+      else
+         Result := NoMode;
+      end; *)
+   end;
+(*----------------------------------------------------------------------------*)
+function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
+var
+  sADIF_UPPER : string;
+  //colonPosition: integer;
+  neFreq: extended;
+  msm: ModeAndExtendedModeType;
+  lookingForFieldName: boolean;
+  lookingForFieldLen: boolean;
+  lookingForFieldValue: boolean;
+  fieldName: string;
+  fieldLen: string;
+  fieldValue: string;
+  testStr: string;
+  originalLen: integer;
+  c: string;
+  cU: string; // Uppercase version of C for comparison
+  theString: string;
+  i: integer;
+  freq: real;
+  lpNumberOfBytesWritten: Cardinal;
+
+begin
+   lookingForFieldName := false;
+   lookingForFieldLen := false;
+   lookingForFieldValue := false;
+
+   try
+   sADIF_UPPER := ANSIUPPERCASE(sADIF); // For testing without changing original
+  // Log('Parsing ' + sADIF); // <BAND:3>20m <...
+   originalLen := length(sADIF);
+
+   for i := 1 to originalLen do
+      begin
+      c := MidStr(sADIF, i, 1);
+      cU := AnsiUpperCase(c);
+      //Log('Next 10 bytes = ' + MidStr(sADIF,i,10) + ' - theString = ' + theString + ' LookingForFieldValue = ' + BoolToStr(lookingForFieldValue));
+      if cU = 'E' then
+         begin
+         testStr := MidStr(sADIF_UPPER,i,4);
+         if MidStr(sADIF_UPPER,i,4) = 'EOR>' then
+            begin
+            ctyLocateCall(exch.Callsign, exch.QTH);
+            Result := true;
+            break;
+            end
+         else
+            begin
+            theString := theString + c;
+            end;
+         end
+      else if c = '<' then
+         begin
+         if lookingForFieldValue then
+            begin
+            fieldValue := Trim(theString);
+            if length(fieldValue) <> StrToInt(fieldLen) then
+               begin
+               DEBUGMSG('[' + fieldName + '] ' + 'field value length = ' + fieldLen + ' but actual length = ' + IntToStr(length(fieldValue)));
+               end
+            else
+               begin
+               Case AnsiIndexText(AnsiUpperCase(fieldName),    // Be careful addng these.The order matters in the case...
+                     ['ARRL_SECT', 'BAND','CALL', 'CHECK', 'CLASS', 'CQ_Z',
+                      'CONTEST_ID', 'CNTY', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
+                      'IOTA', 'ITUZ', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
+                      'QSO_DATE', 'QSO_DATE_OFF' ,'TIME_ON', 'TIME_OFF',
+                      'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
+                      'STATE', 'STX', 'STX_STRING', 'SUBMODE','TEN_TEN',
+                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ']) of
+                  0: exch.QTHString := fieldValue;
+                  1:
+                     begin
+                     exch.Band := GetADIFBand(fieldValue);
+                     end;
+                  2: exch.Callsign := AnsiUpperCase(fieldValue);
+                  3: exch.Check := StrToInt(fieldValue);
+                  4: exch.ceClass := AnsiUpperCase(fieldValue);
+                  5: exch.Zone := StrToInt(fieldValue);
+                  9:
+                     begin
+                     DecimalSeparator := '.';
+                     neFreq := StrToFloat(fieldValue);
+                     neFreq := neFreq * 1000000;
+                     exch.Frequency := Trunc(neFreq);
+                     end;
+                  12: exch.Zone := StrToInt(fieldValue);
+                  13:
+                     begin
+                     if exch.Mode = NoMode then
+                        begin
+                        msm := GetADIFMode(fieldValue);
+                        exch.Mode := msm.msmMode;
+                        exch.ExtMode := msm.msmExtendedMode;
+                        end;
+                     end;
+                  15: StrPLCopy(exch.ceOperator, fieldValue, High(exch.ceOperator));
+                  17: //QSO_DATE
+                     if not ADIFDateStringToQSOTime(fieldValue,exch.tSysTime) then
+                        begin
+                        ; //exit;
+                        end;
+                  19: // time_on
+                     if not ADIFTimeStringToQSOTime(fieldValue,exch.tSysTime) then
+                        begin
+                        ; //exit;
+                        end;
+                  21: exch.RSTReceived := StrToIntDef(fieldValue,599); // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
+                  22: exch.RSTSent := StrToIntDef(fieldValue,599); //fieldValue;   // Same for ADIF RST Sent...
+                  23: exch.Power := fieldValue;
+                  24: exch.NumberReceived := StrToInt(fieldValue);
+                  25: // SRX_STRING    // Call a function passing my contest type and break this out based on exchange. Sweepstakes will be fun :)
+                     ;
+                  26: if Length(exch.QTHString) = 0 then
+                         begin
+                         exch.QTHString := fieldValue;    // STATE
+                         //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                         end;
+                  27: exch.NumberSent := StrToInt(fieldValue);
+                  29:
+                     begin
+                     msm := GetADIFSubmode(fieldValue);
+                     exch.Mode := msm.msmMode;
+                     exch.ExtMode := msm.msmExtendedMode;
+                     end;
+                  30: exch.TenTenNum := StrToInt(fieldValue);
+                  31: if Length(exch.QTHString) = 0 then
+                         begin
+                         exch.QTHString := fieldValue; // VE_Prov
+                         end;
+                  32, 33: // APP_TR4W_HQ or APP_N1MM_HQ
+                     if contest = IARU then
+                        begin
+                        exch.QTHString := fieldValue;
+                        //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                        end;
+                  -1: if MidStr(fieldName,1,4) <> 'APP_' then
+                         begin
+                         DebugMsg('ADIF ' + fieldName + ' is not present in this list');
+                         end;
+                  else
+                     DebugMsg('ADIF ' + fieldName + ' is present but no handler');
+                  end;
+               //Log('Found field: [' + fieldName + '], [' + fieldLen + '], [' + fieldValue + ']');
+               end;
+            theString := '';
+            lookingForFieldValue := false;
+            lookingForFieldName := true;
+            end
+         else if (MidStr(sADIF_UPPER, i, 5) = '<EOR>') or
+                 (MidStr(sADIF_UPPER, i, 4) = 'EOR>')  then
+            begin
+            ctyLocateCall(exch.Callsign, exch.QTH);
+           //    if DoingDXMults then GetDXQTH(TempRXData);
+           //    if DoingPrefixMults then SetPrefix(TempRXData);
+           //    Sheet.SetMultFlags(TempRXData);
+
+            Result := true;
+            break;
+            end
+         else
+            begin
+            theString := '';
+            lookingForFieldName := true;
+            end;
+         end
+      else if c = ':' then
+         begin
+         if lookingForFieldName then
+            begin
+            FieldName := theString;
+            theString := '';
+            lookingForFieldName := false;
+            lookingForFieldLen := true;
+            end
+         else
+            begin
+            theString := theString + c;
+            end;
+         end
+      else if c = '>' then
+         begin
+         if lookingForFieldLen then
+            begin
+            FieldLen := theString;
+            theString := '';
+            lookingForFieldLen := false;
+            lookingForFieldValue := true;
+            end;
+         end
+      else
+         begin
+         theString := theString + c;
+         end;
+      end;
+      except
+         DebugMsg('Exception processign ADIF Record ' + sADIF);
+      end;
+      DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+   end; // of ParseADIFRecord
+(*----------------------------------------------------------------------------*)
+procedure ImportFromADIF;
+var
+   openDlg: TOpenDialog;
+   buttonSelected: integer;
+   adif: TextFile;
+   adifFileName: string;
+   sBuffer: string;
+   FoundEOH: boolean;
+   QSOCounter: integer;
+   lpNumberOfBytesWritten: Cardinal;
+
+   procedure DisplayLoadedQSOs;
+   begin
+      Format(QuickDisplayBuffer, '%u ' + TC_QSO_IMPORTED, QSOCounter);
+      SetTextInQuickCommandWindow(QuickDisplayBuffer);
+   end;
+begin
+   { This is a total rewrite of the ADIF import processing. - NY4I 2020 Jul 2
+   }
+   FoundEOH := false;
+   try
+      openDlg := TOpenDialog.Create(nil);
+      openDlg.InitialDir := GetCurrentDir;
+      openDlg.Options := [ofFileMustExist, ofHideReadOnly, ofEnableSizing];
+      openDlg.Filter := 'ADIF (*.adi, *.adif)|*.adi;*.adif';
+      openDlg.FilterIndex := 1;
+      if openDlg.Execute then
+         begin // File was selected in openDlg.FileName
+         adifFileName := openDlg.FileName;
+         if QSOTotals[All, Both] > 0 then
+            begin
+            buttonSelected := MessageDlg( TC_APPENDIMPORTEDQSOSTOCURRENTLOG
+                                         ,mtConfirmation
+                                         ,[mbYes, mbNo]
+                                         ,0
+                                        );
+            if buttonSelected = 7 then // 7 = mrNo but enum is not here for some reason.
+               begin
+               exit;
+               end;
+            end;
+         end;
+   finally
+      openDlg.Free;
+   end;
+
+   if not FileExists(adifFileName) then
+      begin
+      MessageDlg({TC_IMPORTFILENOTFOUND}'The import file is not available' + ' ' + adifFileName,mtError, [mbOK], 0);
+      exit;
+      end;
+
+   if not OpenLogFile then
+      begin
+      MessageDlg({TC_CANNOTOPENLOG}'Cannot open log file',mtError, [mbOK], 0);
+
+      exit;
+      end;
+  tSetFilePointer(0, FILE_END);
+   // Now open te file and process
+
+   if not FileExists(adifFileName) then
+      begin
+      DebugMsg('In ImportADIF, ADIF file ' + adifFilename + ' does not exists');
+      Exit;
+      end;
+
+   AssignFile(adif, adifFileName);
+   //ReWrite(adif);
+
+   Reset(adif);
+   while not Eof(adif) do
+      begin
+      ReadLn(adif,sBuffer);
+      if not FoundEOH then
+         begin
+         if trim(AnsiUpperCase(sBuffer)) = '<EOH>' then
+            begin
+            FoundEOH := true;
+            end;
+         end
+      else
+         begin
+         ClearContestExchange(TempRXData);
+         if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
+            begin
+            ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
+            tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange), lpNumberOfBytesWritten);
+            inc(QSOCounter);
+            if QSOCounter mod 100 = 0 then
+               begin
+               DisplayLoadedQSOs;
+               end;
+            end;
+         end;
+      end;
+
+   CloseFile(adif);
+
+   CloseLogFile;
+
+
+
+  tUpdateLog(actRescore);
+  LoadinLog;
+  DisplayLoadedQSOs;
+  ImportFromADIFThreadID := 0;
+
+end; // of ImportFromADIF
+(*
+
 procedure ImportFromADIF;
 label
   1, 2, 3, 4, Increment, again;
@@ -6408,7 +6845,7 @@ begin
  // showint(QSOCounter);
 
 end;
-
+*)
 procedure ImportFromADIF_old;
 label
   1, 2, 3, 4;
@@ -7288,6 +7725,85 @@ begin
    Result := IsCWByCatActive(ActiveRadioPtr);  // Call base function with active radio // ny4i Issue 111
 end;
 
+
+function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
+
+begin
+   Result := false;
+   try
+      if Length(sDate) = 8 then
+         begin
+         qsoTime.qtYear := Ord(StrToInt(MidStr(sDate,1,4)) mod 100);
+         qsoTime.qtMonth := Ord(StrToInt(MidStr(sDate,5,2)));
+         qsoTime.qtDay := Ord(StrToInt(MidStr(sDate,7,2)));
+         Result := true;
+         end;
+   except
+      result := false;
+   end;
+   end;
+
+function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
+begin
+   Result := false;
+   if Length(sTime) in [4,6] then
+      begin
+      try
+         qsoTime.qtHour := Ord(StrToInt(MidStr(sTime,1,2)));
+         qsoTime.qtMinute := Ord(StrToInt(MidStr(sTime,3,2)));
+         if Length(sTime) = 6 then
+            begin
+            qsoTime.qtSecond := Ord(StrToInt(MidStr(sTime,5,2)));
+            end
+         else
+            begin
+            qsoTime.qtSecond := 0;
+            end;
+         Result := true;
+      except
+         result := false;
+      end;
+      end
+   else
+      begin // ADIF Time is too small
+      Result := false;
+      end;
+   end;
+
+//   ExtendedModeType = (eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
+
+//  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
+function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
+begin
+//ExtendedModeStringArray               : array[ExtendedModeType] of string = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'SSB');
+   case extMode of
+      eCW: Result := CW;
+      eSSB, eFM, eAM, eUSB, eLSB:
+         Result := Phone;
+      else
+         Result := Digital;
+      end;
+end;
+
+function DigitsIn(n: smallInt): byte; // byte is 0 to 255 so more than enough, smallInt is -32768..32767
+var
+   isNegative : boolean;
+begin
+   if n < 0 then
+      begin
+      isNegative := true;
+      n := n * -1;
+      end;
+   if n > 9999 then Result := 5
+   else if n > 999 then Result := 4
+   else if n > 99 then Result := 3
+   else if n > 9 then Result := 2
+   else Result := 1;
+
+   if isNegative then Result := Result + 1;
+end;
+
+
 {
 procedure SelectFileOfFolder(Parent: HWND; FileName: PChar; Mask: PChar; SelectType: CFGType);
 begin
@@ -7304,5 +7820,6 @@ begin
   SetNewMemMgr;
 //Msidle.dll  GetIdleMinutes(
 {$IFEND}
+
 
 end.

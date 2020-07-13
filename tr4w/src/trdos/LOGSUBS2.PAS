@@ -3320,6 +3320,7 @@ begin
      begin
      sBuf := '<?xml version="1.0"?>' + sLineBreak +
             '<contactdelete>' +  sLineBreak +
+            #9 + '<app>TR4W</app>' + sLineBreak +
             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
                SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
                       RxData.tSysTime.qtYear,
@@ -3374,8 +3375,15 @@ begin
     case RXData.Mode of
          CW: sMode := 'CW';
          Phone: sMode := 'SSB';
-         Digital: sMode := 'RTTY';
-         else sMode := ' ';
+         Digital:
+            if RXData.ExtMode = eRTTY then
+               begin
+               sMode := 'RTTY';
+               end
+            else
+               begin
+               sMode := ExtendedModeStringArray[RXData.extMode];
+               end;
        end; // of case
     if RxData.ceComputerID = #0 then
        begin
@@ -3396,6 +3404,7 @@ begin
     nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
     sBuf := '<?xml version="1.0"?>' + sLineBreak +
             '<contactinfo>' +  sLineBreak +
+            #9 + '<app>TR4W</app>' + sLineBreak +
             #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
             #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
