@@ -583,7 +583,6 @@ begin
        tAutoSendMode := False;
 
       FlushCWBufferAndClearPTT; //n4af 4.33.3
-  //    opmode := CQOpMode;
 
   //  else
       if DVPOn then
@@ -596,7 +595,8 @@ begin
         PTTOff;
         DisplayCodeSpeed;
       end;
-    Exit;
+        SetOpMode(CQOpMode);       // 4.90.5
+      Exit;
   end;
 
   if ActiveRadioPtr^.tTwoRadioMode = TR2  then

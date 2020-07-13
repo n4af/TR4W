@@ -180,11 +180,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.90.4' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.90.5' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July 9, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'July 13, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -2773,7 +2773,7 @@ type
     RSTAndGridExchange,
     RSTAndOrGridExchange,
     RSTAndQSONumberOrDomesticQTHExchange,
-    RSTAndSerialNumberAndGridandPossibleMemberNumber,  // 4.88.3
+//    RSTAndSerialNumberAndGridandPossibleMemberNumber,  // 4.88.3
     RSTAndPostalCodeExchange,
     RSTDomesticOrDXQTHExchange,
     RSTDomesticQTHExchange,
@@ -2836,6 +2836,7 @@ const
     'RST AND GRID',
     'RST AND OR GRID',
     'RST AND QSO NUMBER OR DOMESTIC QTH',
+//    'RST QSO NUMBER AND GRID AND POSSIBLE NUMBER', // 4.88.3
     'RST AND POSTAL CODE',
     'RST DOMESTIC OR DX QTH',
     'RST DOMESTIC QTH',
@@ -2846,9 +2847,8 @@ const
     'RST POWER',
     'RST PREFECTURE',
     'RST QSO NUMBER',
-    'RST QSO NUMBER AND DOMESTIC QTH',           
+    'RST QSO NUMBER AND DOMESTIC QTH',
     'RST QSO NUMBER AND GRID SQUARE',
-    'RST QSO NUMBER AND GRID AND POSSIBLE NUMBER', // 4.88.3
     'RST QSO NUMBER AND POSSIBLE DOMESTIC QTH',
     'RST QSO NUMBER AND RANDOM CHARACTERS',
     'RST QSO NUMBER OR DOMESTIC QTH',

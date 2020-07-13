@@ -27,3 +27,7 @@ Thumbs.db
 *.dcu
 copy*
 *.~*
+*.dproj
+*/__recovery/
+../*.res
+
