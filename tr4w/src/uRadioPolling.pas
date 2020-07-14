@@ -490,7 +490,18 @@ begin
         '6', '9': rig^.CurrentStatus.Mode := Digital;
         '3', '7', '8': rig^.CurrentStatus.Mode := CW;
       end;
-
+      //1 (LSB), 2 (USB), 3 (CW), 4 (FM), 5 (AM), 6 (DATA), 7 (CW- REV), or 9 (DATA-REV).
+      (*case rig^.tBuf[30] of
+        '1': rig^.CurrentStatus.ModeActual := rLSB;
+        '2': rig^.CurrentStatus.ModeActual := rUSB;
+        '3': rig^.CurrentStatus.ModeActual := rCW;
+        '4': rig^.CurrentStatus.ModeActual := rFM;
+        '5': rig^.CurrentStatus.ModeActual := rAM;
+        '6': rig^.CurrentStatus.ModeActual := rRTTY;
+        '7': rig^.CurrentStatus.ModeActual := rCW_R;
+        '9': rig^.CurrentStatus.ModeActual := rRTTY_L;
+      end;
+     *)
       rig^.CurrentStatus.RITFreq := BufferToInt(@rig^.tBuf, 19, 5);
 
       rig^.CurrentStatus.Split := rig^.tBuf[33] <> '0';

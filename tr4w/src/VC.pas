@@ -1055,6 +1055,8 @@ type
   ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
 
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
+           //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
+  ExtendedRadioModeType = (rNoMode, rCW, rLSB, rUSB, rAM, rFM, rRTTY, rRTTY_R, rAFSK, rDATA_U, rDATA_L, rDIGITAL, rCW_R);
   {    ModeType = (CW, Phone, Both, NoMode, FM, Digital);   { Use for calltest }
   OpModeType = (CQOpMode, SearchAndPounceOpMode);
 

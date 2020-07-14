@@ -516,6 +516,7 @@ var
   QuickQSL: QuickQSLKeyType; { to indicate a quick QSL is desired }
   QuickQSLKey1: Char = '\';
   QuickQSLKey2: Char = '=';
+  RadioServerTCPPort: integer = 52002; // Commander Interface (inbound for WSJT-X)
 
   RadioSetFreq: LONGINT;
   RandomCQMode: boolean;
@@ -586,6 +587,8 @@ var
   WaitForStrength: boolean = True;
 
   WindowDupeCheckCall: CallString;
+
+  WSJTXUDPPort: integer = 2237;
 
   tPreviousDupeQSOsShowed: boolean;
   tPreviousDupeQSOsWndHandle: HWND;

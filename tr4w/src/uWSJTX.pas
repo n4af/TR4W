@@ -24,6 +24,8 @@ type
       UCall,ULoc : string;
       UIndex:integer;
       peerPort: word;
+      FUDPPort: integer;
+      FTCPPort: integer;
       SNR: LongInt;
       frequency: Int64;
       firstTime: boolean;
@@ -35,7 +37,9 @@ type
       context: TIdContext;
       buffer: TIdBytes;
       sBuffer: string;
-      //radio: radioObject;
+      procedure SetUDPPort(nPort: integer);
+      procedure SetTCPPort(nPort: integer);
+      function GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
   protected
     procedure OnServerRead(ASender: TIdUDPListenerThread; const AData: TIdBytes; ABinding: TIdSocketHandle);
     procedure OnBeforeBind(AHandle: TIdSocketHandle);
@@ -43,6 +47,7 @@ type
     procedure IdTCPServer1Connect(AContext: TIdContext);
   public
     constructor Create; overload;
+    constructor Create(nUDPPort: integer; nTCPPort: integer); overload;
     //constructor Create(radio: radioObject); overload;
     procedure Start;    // May want to add the port number to a constructor - for now use default
     procedure Stop;
@@ -55,6 +60,8 @@ type
     procedure SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
     procedure SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
     procedure Display(p_sender : String; p_message : string);
+    Property UDPPort: integer read FUDPPort write SetUDPPort;
+    Property TCPPort: integer read FTCPPort write SetTCPPort;
 
   end;
 
@@ -71,6 +78,7 @@ uses
    ,LogEdit       // For ShowStationInformation and DetermineIfNewMult
    ,LOGWIND       // for GetBandMapBandModeFromFrequency
    ,TF            // for SetMainWindowText
+   ,utils_text
    ;
 // {$R *.dfm}
 
@@ -79,7 +87,17 @@ begin
    firstTime := true;
    udpServ := TIdUDPServer.Create(nil);
    udpServ.ThreadedEvent := true;
-   udpServ.DefaultPort := 2237; // Make a config option
+   if FUDPPort = 0 then
+      begin
+      FUDPPort := 2237;
+   end;
+
+   if FTCPPort = 0 then
+      begin
+      FTCPPort := 52002;
+      end;
+
+   udpServ.DefaultPort := FUDPPort;
    udpServ.Bindings.Add.IP := '';
    udpServ.OnUDPRead := Self.OnServerRead;
    udpServ.OnBeforeBind := Self.OnBeforeBind;
@@ -102,6 +120,13 @@ begin
    tcpServ := TIdTCPServer.Create(nil);
    tcpServ.OnExecute := Self.IdTCPServer1Execute;
    tcpServ.OnConnect := Self.IdTCPServer1Connect;
+end;
+
+constructor TWSJTXServer.Create(nUDPPort: integer; nTCPPort: integer);
+begin
+   FUDPPort := nUDPPort;
+   FTCPPort := nTCPPort;
+   inherited Create;
 end;
 
 {constructor TWSJTXServer.Create(radio: radioObject);
@@ -142,6 +167,22 @@ begin
    FreeAndNil(tcpServ);
 
 
+end;
+
+procedure TWSJTXServer.SetUDPPort(nPort: integer);
+begin
+   Self.FUDPPort := nPort;
+   if Self.udpServ.Active then
+      begin
+      Self.udpServ.active := false;
+      udpServ.DefaultPort := Self.FUDPPort;
+      udpServ.Active := true;
+      end;
+end;
+
+procedure TWSJTXServer.SetTCPPort(nPort: integer);
+begin
+   Self.FTCPPort := nPort;
 end;
 
 procedure TWSJTXServer.OnBeforeBind(AHandle: TIdSocketHandle);
@@ -198,6 +239,7 @@ begin
             case messageType of
             0: begin
                //DEBUGMSG('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
+               DEBUGMSG('Radio frequency = ' + IntToStr(radio1.CurrentStatus.Freq));
                SetMainWindowText(mweWSJTX,'WSJTX');
                Windows.ShowWindow(wh[mweWSJTX], SW_SHOW);
                isConnected := true;
@@ -524,12 +566,17 @@ end;
     msgFromClient : string;
     msgToClient   : string;
     bytesWritten: integer;
+    sFreq: string;
+    sLen: string;
+    nPos, len, n0, n1, newEnd: integer;
+    freq: extended;
+    fieldName, fieldValue: string;
     //buffer: TIdBytes;
     //sBuffer : string;
     const GETFREQ = '<command:10>CmdGetFreq<parameters:0>';
     const SENDTX = '<command:9>CmdSendTx<parameters:0>';
-    const SETFREQ = '<command:10>CmdSetFreq<parameters:23><xcvrfreq:10> 7,074.000';
-    const SETFREQ2= '<command:10>CmdSetFreq<parameters:23><xcvrfreq:10> 7,074.055';
+    const SETFREQ = '<command:10>CmdSetFreq'; //<parameters:23><xcvrfreq:10> 7,074.000';
+    const SETFREQ2= '<command:10>CmdSetFreq<parameters:23><xcvrfreq:10> 7,040.000';
     const SENDSPLIT = '<command:12>CmdSendSplit<parameters:0>';
     const SENDMODE = '<command:11>CmdSendMode<parameters:0>';
     const SETRX = '<command:5>CmdRX<parameters:0>';
@@ -550,62 +597,170 @@ begin
     // ... message log
     Display('CLIENT', '(Peer=' + PeerIP + ':' + IntToStr(PeerPort) + ') ' + sBuffer);
     // ...
-    while Length(sBuffer) > 0  do
-       begin
-       Display ('SERVER','Processing message ' + sBuffer);
+   while Self.GetNextADIFField(sBuffer,fieldName, fieldValue) do
+      begin
+      if fieldValue = 'CmdGetFreq' then
+         begin
+         sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.Freq/1000);
+         Display('client','Sending frequency as ' + sFreq);
+         AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+         end
+      else if fieldName = 'xcvrfreq' then
+         begin
+         freq := SafeFloat(fieldValue);
+         radio1.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
+         DEBUGMSG('Setting radio to frequency ' + IntToStr(Trunc(freq)));
+         end
+      else if fieldValue = 'CmdSendSplit' then
+         begin
+         if radio1.CurrentStatus.Split then
+            begin
+            AContext.Connection.IOHandler.Write('<CmdSplit:2>ON');
+            DEBUGMSG('Sending ' + '<CmdSplit:2>ON');
+            end
+         else
+            begin
+            AContext.Connection.IOHandler.Write('<CmdSplit:3>OFF');
+            DEBUGMSG('Sending ' + '<CmdSplit:3>OFF');
+            end;
+         end
+      else if fieldValue = 'CmdRX' then
+         begin
+         tPTTVIACAT(false);
+         end
+      else if fieldValue = 'CmdTX' then
+         begin
+         tPTTVIACAT(true);
+         end
+      else if fieldValue = 'CmdSendMode' then
+         begin
+         DEBUGMSG('Sending ' + '<CmdMode:6>Data-U');
+         AContext.Connection.IOHandler.Write('<CmdMode:6>Data-U');
+         end;
+      end;
 
-       if AnsiStartsStr('<command', sBuffer) then
-          begin
+   while Length(sBuffer) > 0  do
+      begin
+      Display ('SERVER','Processing message ' + sBuffer);
+
+      if AnsiStartsStr('<command', sBuffer) then
+         begin
          // ProcessCommand(sBuffer,slFields);
-       if AnsiStartsStr(GETFREQ, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(GETFREQ));
-          AContext.Connection.IOHandler.Write('<CmdFreq:9>7,074.000');
-          end
-       else if AnsiStartsStr(SETRX, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETRX));
-          //AContext.Connection.IOHandler.Write('<CmdSendRX:3>OFF')
-          end
-       else if AnsiStartsStr(SETFREQ, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETFREQ));
-          end
-       else if AnsiStartsStr(SETFREQ2, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETFREQ2));
-          end
-       else if AnsiStartsStr(SETTX, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETTX));
-          end
-       else if AnsiStartsStr(SENDSPLIT, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDSPLIT));
-          AContext.Connection.IOHandler.Write('<CmdSplit:3>OFF');
-          end
-       else if AnsiStartsStr(SENDMODE, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDMODE));
-          AContext.Connection.IOHandler.Write('<CmdMode:6>Data-U');
-          end
-       else if AnsiStartsStr(SENDTX, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDTX));
-          AContext.Connection.IOHandler.Write('<CmdTX:3>OFF');
-          end
-       else if AnsiStartsStr(GETTXFREQ, sBuffer) then
-          begin
-          sBuffer := RightStr(sBuffer,length(sBuffer) - length(GETTXFREQ));
-          AContext.Connection.IOHandler.Write('<CmdTXFreq:9>7,074.000');
-          end
-       else
-          begin
-          Display('CLIENT','Undefined message ' + sBuffer);
-          sBuffer := '';
-          end;
-       end;
-    end;
+         if AnsiStartsStr(GETFREQ, sBuffer) then
+            begin
+            sBuffer := RightStr(sBuffer,length(sBuffer) - length(GETFREQ));
+            sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.Freq/1000);
+            Display('client','Sending frequency as ' + sFreq);
+            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+            end
+         else if AnsiStartsStr(SETRX, sBuffer) then
+            begin
+            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETRX));
+            tPTTVIACAT(false);
+            //AContext.Connection.IOHandler.Write('<CmdSendRX:3>OFF')
+            end
+         else if AnsiStartsStr(SETFREQ, sBuffer) then  // Parse out frequency    // <command:10>CmdSetFreq<parameters:23><xcvrfreq:10> 7,074.000';
+            begin
+            // find xcvrfreq
+            nPos := AnsiPos('xcvrfreq',sBuffer);
+            if nPos > 0 then
+               begin
+               if AnsiMidStr(sBuffer,nPos+8,1) = ':' then
+                  begin
+                  n0 := nPos + 9;
+                  newEnd := n0;
+                  n1 := AnsiPos('>',AnsiMidStr(sBuffer,nPos+9,length(sBuffer)));
+                  if n1 > 0 then //n1 points to the > n0 to the number
+                     begin
+                     newEnd := newEnd + n1;
+                     sLen := AnsiMidStr(sBuffer,n0,n1-1);
+                     if length(sLen) > 0 then
+                        begin
+                        len := StrToIntDef(sLen,-1);
+                        if len > -1 then
+                           begin    // len is length of count for frequency frequency starts at n1+1
+                           sFreq := AnsiMidStr(sBuffer,n0+n1+0,len);
+                           newEnd := newEnd + len;
+                           sFreq := Trim(sFreq);
+                           freq := SafeFloat(sFreq);
+                           radio1.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
+                           DEBUGMSG('Setting radio to frequency ' + IntToStr(Trunc(freq)));
+                           end
+                        else
+                           begin
+                           DEBUGMSG('Could not convert len of frequency to a number');
+                           end;
+                        end;
+                     end
+                  else
+                     begin
+                     DEBUGMSG('Count not find > before frequency');
+                     end;
+                  end;
+               end;
+            if newEnd > 0 then
+               begin
+               sBuffer := RightStr(sBuffer,length(sBuffer) - newEnd);
+               newEnd := 0;
+               end
+            else
+               begin
+               sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETFREQ));
+               end;
+            end
+         else if AnsiStartsStr(SETTX, sBuffer) then
+            begin
+            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETTX));
+            tPTTVIACAT(true);
+            end
+         else if AnsiStartsStr(SENDSPLIT, sBuffer) then
+            begin
+            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDSPLIT));
+            if radio1.CurrentStatus.Split then
+               begin
+               AContext.Connection.IOHandler.Write('<CmdSplit:2>ON');
+               DEBUGMSG('Sending ' + '<CmdSplit:2>ON');
+               end
+            else
+               begin
+               AContext.Connection.IOHandler.Write('<CmdSplit:3>OFF');
+               DEBUGMSG('Sending ' + '<CmdSplit:3>OFF');
+               end;
+            end
+         else if AnsiStartsStr(SENDMODE, sBuffer) then
+            begin
+            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDMODE));
+            DEBUGMSG('Sending ' + '<CmdMode:6>Data-U');
+            AContext.Connection.IOHandler.Write('<CmdMode:6>Data-U');
+            end
+         else if AnsiStartsStr(SENDTX, sBuffer) then
+            begin
+            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDTX));
+            if radio1.CurrentStatus.TXOn then
+               begin
+               AContext.Connection.IOHandler.Write('<CmdTX:2>ON');
+               DebugMsg('Sending ' + '<CmdTX:2>ON');
+               end
+            else
+               begin
+               AContext.Connection.IOHandler.Write('<CmdTX:3>OFF');
+               DebugMsg('Sending ' + '<CmdTX:3>OFF');
+               end;
+            end
+         else if AnsiStartsStr(GETTXFREQ, sBuffer) then
+            begin
+            sBuffer := RightStr(sBuffer,length(sBuffer) - length(GETTXFREQ));
+            sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.Freq/1000);
+            Display('CLIENT','Sending frequency as ' + sFreq);
+            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdTXFreq:%u>%s',[length(sFreq),sFreq]));
+            end
+         else
+            begin
+            Display('CLIENT','Undefined message ' + sBuffer);
+            sBuffer := '';
+            end;
+         end;
+      end;
 
        Display('CLIENT','length(sBuffer) = ' + IntToStr(length(sBuffer)));
     // ... process message from Client
@@ -621,6 +776,105 @@ procedure TWSJTXServer.IdTCPServer1Connect(AContext: TIdContext);
 begin
 //DEBUGMSG('TCP client Connected');
 end;
+
+(*aaa:=copy(vstup,z+1,length(vstup));
+    z:=pos(':',aaa);
+    x:=pos('>',aaa);
+    if (x=0) then exit; //  the record was not terminated ... disappearing
+
+    //detect length of ADIF Data
+    for i:=z+1 to x do
+    begin
+      if (aaa[i] in ['0'..'9']) then
+        slen := slen + aaa[i]
+    end;
+    if slen = '' then
+      DataLen := 0
+    else
+      DataLen := StrToInt(slen);
+    //if dmData.DebugLevel >=1 then Write('Got length:',DataLen);
+
+    if z<>0 then
+      prik:=trim(copy(aaa,1,z-1))
+    else
+      prik:=trim(copy(aaa,1,x-1));
+
+    aaa:=copy(aaa,x+1,length(aaa));
+
+    z:=pos('<',aaa);
+    i:= pos('_INTL',upcase(prik));
+    *)
+
+function TWSJTXServer.GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
+var
+   i, z, n, x, dataLen: integer;
+   aaa, sLen: string;
+begin
+   Result := false;
+// Assumes we are pointing at the < in the next field
+   z := AnsiPos('<',sBuffer);
+   if z = 0 then
+      begin
+      DEBUGMSG('sBuffer does not start with < ' + sBuffer);
+      sBuffer := '';
+      exit;//  there is no other record - disappearing.
+      end;
+
+
+   aaa := copy(sBuffer,z+1,length(sBuffer));
+   z := AnsiPos(':',aaa);
+   x := AnsiPos('>',aaa);
+   if x = 0 then
+      begin
+      exit; //  the record was not terminated ... disappearing
+      end;
+   for i := z + 1 to x do
+      begin
+      if aaa[i] in ['0'..'9'] then
+         begin
+         slen := slen + aaa[i];
+         end;
+      end;
+
+    if slen = '' then
+      begin
+      DataLen := 0;
+      end
+    else
+      begin
+      DataLen := StrToInt(slen);
+      end;
+    DEBUGMSG('Got length:' + IntToStr(DataLen));
+
+    if z<>0 then
+      begin
+      fieldName := trim(copy(aaa,1,z-1));
+      end
+    else
+      begin
+      fieldName := trim(copy(aaa,1,x-1));
+      end;
+
+    aaa := copy(aaa,x+1,length(aaa));
+
+    z := AnsiPos('<',aaa);
+    i := AnsiPos('_INTL',AnsiUppercase(fieldName));
+    //if dmData.DebugLevel >=1 then Write(' pos INTL:',i);
+    if z = 0 then
+      begin
+      fieldValue := copy(aaa,1,DataLen);
+      sBuffer := copy(aaa,z,length(aaa)); // Was vstup:=''
+      end
+    else
+      begin
+      fieldValue := copy(aaa,1,DataLen);
+      sBuffer := copy(aaa,z,length(aaa))
+      end;
+    fieldValue := Trim(fieldValue);
+    Result := true;
+    DEBUGMSG(fieldName + '=' + fieldValue);
+end;
+(*--------------------------------------------------------------------------------------------------------------------------------*)
 
 procedure TWSJTXServer.Display(p_sender : String; p_message : string);
 begin
