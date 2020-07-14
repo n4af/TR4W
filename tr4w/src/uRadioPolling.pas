@@ -358,55 +358,7 @@ begin
       Sleep(500);
     end;
 
-{
-    rig.WritePollRequest('?AF'#13, 4);
-    if not ReadFromCOMPort(12, rig) then begin ClearRadioStatus(rig); goto 1; end;
 
-//?
-    if rig.tBuf[2] <> 'A' then
-    begin
-      Sleep(500);
-      PurgeComm(rig^.tCATPortHandle, PURGE_RXCLEAR or PURGE_RXABORT);
-      ClearRadioStatus(rig);
-      goto 1;
-    end;
-
-//    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@AF03526900');
-    rig^.CurrentStatus.VFO[VFOA].Frequency := BufferToInt(@rig^.tBuf, 4, 8);
-
-    rig.WritePollRequest('?BF'#13, 4);
-    if not ReadFromCOMPort(12, rig) or (rig.tBuf[2] <> 'B') then begin ClearRadioStatus(rig); goto 1; end;
-//    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@BF14173490');
-    rig^.CurrentStatus.VFO[VFOB].Frequency := BufferToInt(@rig^.tBuf, 4, 8);
-
-    rig.WritePollRequest('?KV'#13, 4);
-    if not ReadFromCOMPort(7, rig) or (rig.tBuf[2] <> 'K') then begin ClearRadioStatus(rig); goto 1; end;
-//    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@KVAAA');
-
-    if rig.tBuf[4] = 'A' then
-    begin
-      rig^.CurrentStatus.Freq := rig^.CurrentStatus.VFO[VFOA].Frequency;
-      rig^.CurrentStatus.VFOStatus := VFOA;
-    end
-    else
-    begin
-      rig^.CurrentStatus.Freq := rig^.CurrentStatus.VFO[VFOB].Frequency;
-      rig^.CurrentStatus.VFOStatus := VFOB;
-    end;
-    CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, TempMode);
-
-    rig.WritePollRequest('?RMM'#13, 5);
-    if not ReadFromCOMPort(6, rig) or (rig.tBuf[2] <> 'R') then begin ClearRadioStatus(rig); goto 1; end;
-//    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@RMM2');
-
-    case rig.tBuf[5] of
-      '0', '1', '4': TempMode := Phone;
-      '2', '3': TempMode := CW;
-      '5': TempMode := FM;
-      '6': TempMode := Digital;
-    end;
-    rig^.CurrentStatus.Mode := TempMode;
-}
     1:
     UpdateStatus(rig);
   until rig^.tPollCount < 0;
@@ -538,7 +490,18 @@ begin
         '6', '9': rig^.CurrentStatus.Mode := Digital;
         '3', '7', '8': rig^.CurrentStatus.Mode := CW;
       end;
-
+      //1 (LSB), 2 (USB), 3 (CW), 4 (FM), 5 (AM), 6 (DATA), 7 (CW- REV), or 9 (DATA-REV).
+      (*case rig^.tBuf[30] of
+        '1': rig^.CurrentStatus.ModeActual := rLSB;
+        '2': rig^.CurrentStatus.ModeActual := rUSB;
+        '3': rig^.CurrentStatus.ModeActual := rCW;
+        '4': rig^.CurrentStatus.ModeActual := rFM;
+        '5': rig^.CurrentStatus.ModeActual := rAM;
+        '6': rig^.CurrentStatus.ModeActual := rRTTY;
+        '7': rig^.CurrentStatus.ModeActual := rCW_R;
+        '9': rig^.CurrentStatus.ModeActual := rRTTY_L;
+      end;
+     *)
       rig^.CurrentStatus.RITFreq := BufferToInt(@rig^.tBuf, 19, 5);
 
       rig^.CurrentStatus.Split := rig^.tBuf[33] <> '0';
@@ -861,24 +824,6 @@ begin
       goto 1;
     end;
 
-    {
-        rig.tBuf[1] := CHR(255 - 100); //Split
-        rig.tBuf[2] := CHR(20); //BPF Selection
-        rig.tBuf[3] := CHR(21); //Frequency
-        rig.tBuf[4] := CHR(99); //Frequency
-        rig.tBuf[5] := CHR(Random(255)); //Frequency
-
-        rig.tBuf[6] := CHR($00); //Frequency
-        rig.tBuf[7] := CHR($00); //Frequency
-
-        rig.tBuf[8] := CHR(2); //Frequency
-
-        rig.tBuf[12] := CHR(21); //Frequency
-        rig.tBuf[13] := CHR(99); //Frequency
-        rig.tBuf[14] := CHR(Random(255)); //Frequency
-
-        Sleep(400);
-    }
     with rig.CurrentStatus do
     begin
       if Ord(rig.tBuf[1]) and $40 > 0 then Split := True else Split := False;
@@ -937,14 +882,6 @@ begin
       goto 1;
     end;
 
-{
-    rig.tBuf[1] := CHR($01);
-    rig.tBuf[2] := CHR($42);
-    rig.tBuf[3] := CHR($00);
-    rig.tBuf[4] := CHR($00);
-    rig.tBuf[5] := CHR($01);
-    Sleep(400);
-}
     with rig.CurrentStatus do
     begin
       F1 := (Ord(rig.tBuf[1]) and $F0) shr 4; { 100s of mhz }
@@ -1410,64 +1347,6 @@ begin
 
     1:
 
-//    if rig.ICOM_COMMAND_B1 <> '' then {7 bytes $FE $FE RA $E0 $07 $01 $FD}
-//    begin
-//      rig.WritePollRequest(rig.ICOM_COMMAND_B1[1], length(rig.ICOM_COMMAND_B1));
-//      rig.ICOM_COMMAND_B1 := '';
-//      if not ReadICOM {ReadFromCOMPort}(13, rig) then goto 2;
-//    end;
-
-//    if rig.ICOM_COMMAND_SET_MODE <> '' then {8 bytes #$FE #$FE RA #$E0 #$06 #mode #filterwidth #$FD}
-//    begin
-//      rig.WritePollRequest(rig.ICOM_COMMAND_SET_MODE[1], length(rig.ICOM_COMMAND_SET_MODE));
-//      rig.ICOM_COMMAND_SET_MODE := '';
-//      if not ReadICOM {ReadFromCOMPort}(
-{$IF ICOM_LONG_MODECOMMAND}
-//        14
-{$ELSE}
-//        13
-{$IFEND}
-//        , rig) then goto 2;
-//    end;
-
-//    if rig.ICOM_COMMAND_SET_FREQ <> '' then {11 bytes #$FE #$FE RA #$E0 #$05 #1 #1 #1 #1 #00 #$FD}
-//    begin
-//      rig.WritePollRequest(rig.ICOM_COMMAND_SET_FREQ[1], length(rig.ICOM_COMMAND_SET_FREQ));
-//      rig.ICOM_COMMAND_SET_FREQ := '';
-//      if rig.RadioModel = IC735 then c := 16 else c := 17;
-//      if not ReadICOM {ReadFromCOMPort}(c, rig) then goto 2;
-//    end;
-
-//    if rig.ICOM_COMMAND_B2 <> '' then {7 bytes $FE $FE RA $E0 $07 $00 $FD}
-//    begin
-//      rig.WritePollRequest(rig.ICOM_COMMAND_B2[1], length(rig.ICOM_COMMAND_B2));
-//      rig.ICOM_COMMAND_B2 := '';
-//      if not ReadICOM {ReadFromCOMPort}(13, rig) then goto 2;
-//    end;
-
-//    if rig.ICOM_COMMAND_CUSTOM <> '' then
-//    begin
-//      rig.WritePollRequest(rig.ICOM_COMMAND_CUSTOM[1], length(rig.ICOM_COMMAND_CUSTOM));
-//      c := length(rig.ICOM_COMMAND_CUSTOM);
-//      rig.ICOM_COMMAND_CUSTOM := '';
-//      if not ReadICOM {ReadFromCOMPort}(c + 6, rig) then goto 2;
-//    end;
-{
-    if rig.ICOM_COMMAND_PTT <> #255 then
-    begin
-      rig.ICOM_SET_PTT[0] := #$FE;
-      rig.ICOM_SET_PTT[1] := #$FE;
-      rig.ICOM_SET_PTT[2] := CHR(rig.ReceiverAddress);
-      rig.ICOM_SET_PTT[3] := #$E0;
-      rig.ICOM_SET_PTT[4] := #$1C;
-      rig.ICOM_SET_PTT[5] := #$00;
-      rig.ICOM_SET_PTT[6] := rig.ICOM_COMMAND_PTT;
-      rig.ICOM_SET_PTT[7] := #$FD;
-      rig.WritePollRequest(rig.ICOM_SET_PTT, SizeOf(rig.ICOM_SET_PTT));
-      rig.ICOM_COMMAND_PTT := #255;
-      if not ReadICOM(14, rig) then goto 2;
-    end;
-}
     2:
     failures := 0;
     UpdateStatus(rig);
@@ -1967,21 +1846,6 @@ begin
   end;
   sWriteFile(h, '</TD></TR>'#13#10, 12);
 end;
-{
-function WriteToSerialCATPort(data: Str80; port: HWND): Cardinal;
-begin
-//  if NoPollDuringPTT then while tPTTStatus = PTT_ON do Sleep(100);
-  tWriteFile(port, data[1], length(data), Result);
-  if CPUKeyer.SerialPortDebug then
-  begin
-    if port = Radio1.tCATPortHandle then
-      WriteToDebugFile(Radio1.tCATPortType, dfmTX, @data[1], Result);
-
-    if port = Radio2.tCATPortHandle then
-      WriteToDebugFile(Radio2.tCATPortType, dfmTX, @data[1], Result);
-  end;
-end;
-}
 
 function GetFrequencyForYaesu3(p: PChar): Cardinal;
 {p ????????? ?? ?????? ???????? ????}
@@ -2673,16 +2537,17 @@ begin
     end; // of case
    sBuf := '<?xml version="1.0"?>' +
            '<RadioInfo>' +
-           '<RadioNr>' + '1' + '</RadioNr>' +
-           '<Freq>' + Format('%d',[freq div 10]) + '</Freq>' +
-           '<TXFreq>' + Format('%d',[txFreq div 10]) + '</TXFreq>' +
-           '<Mode>' + sMode + '</Mode>' +
-           '<OpCall>' + '' + '</OpCall>' +
-           '<IsRunning>' + 'False' + '</IsRunning>' +
-           '<FocusEntry>0</FocusEntry>' +
-           '<Antenna>-1</Antenna>' +
-           '<Rotors>-1</Rotors>' +
-           '<FocusRadioNr>1</FocusRadioNr>' +
+           #9 + '<app>TR4W</app>' + sLineBreak +
+           #9 + '<RadioNr>' + '1' + '</RadioNr>' +
+           #9 + '<Freq>' + Format('%d',[freq div 10]) + '</Freq>' +
+           #9 + '<TXFreq>' + Format('%d',[txFreq div 10]) + '</TXFreq>' +
+           #9 + '<Mode>' + sMode + '</Mode>' +
+           #9 + '<OpCall>' + '' + '</OpCall>' +
+           #9 + '<IsRunning>' + 'False' + '</IsRunning>' +
+           #9 + '<FocusEntry>0</FocusEntry>' +
+           #9 + '<Antenna>-1</Antenna>' +
+           #9 + '<Rotors>-1</Rotors>' +
+           #9 + '<FocusRadioNr>1</FocusRadioNr>' +
            '</RadioInfo>';
 
    //SetLength(msg,Length(sBuf));

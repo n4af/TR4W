@@ -516,6 +516,7 @@ var
   QuickQSL: QuickQSLKeyType; { to indicate a quick QSL is desired }
   QuickQSLKey1: Char = '\';
   QuickQSLKey2: Char = '=';
+  RadioServerTCPPort: integer = 52002; // Commander Interface (inbound for WSJT-X)
 
   RadioSetFreq: LONGINT;
   RandomCQMode: boolean;
@@ -587,6 +588,8 @@ var
 
   WindowDupeCheckCall: CallString;
 
+  WSJTXUDPPort: integer = 2237;
+
   tPreviousDupeQSOsShowed: boolean;
   tPreviousDupeQSOsWndHandle: HWND;
   //const  tr4w_StartSendingNowKey                    : ;
@@ -614,7 +617,7 @@ function GetCorrectedCallFromExchangeString(var ExchangeString: ShortString
   {Str80}): Str80;
 function GetMultiPortCommand: string;
 function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}):
-  Word;
+  smallInt {Word};
 
 procedure IncrementQTCCount(Call: CallString);
 
@@ -655,7 +658,7 @@ function ProcessExchange(ExchangeString: Str80; var RData: ContestExchange):
   boolean;
 function ParseArray(e: Str80): boolean;
 function ParseArray2(ExchangeString: Str80): boolean;
-function SetRST(Ex: integer; var RST: Word): boolean;
+function SetRST(Ex: integer; var RST: smallInt {Word}): boolean;
 
 procedure ProcessPartialCallAndInitialExchange(RXData: ContestExchange);
 function ProperSalutation(Call: CallString): Str80;
@@ -2871,12 +2874,17 @@ begin
   end;
 end;
 
-function LooksLikeRST(Ex: Str80; var RST: Word {RSTString}; Mode: ModeType):
+function LooksLikeRST(Ex: Str80; var RST: smallInt {Word} {RSTString}; Mode: ModeType):
   boolean;
 
 begin
   LooksLikeRST := False;
-
+   if Mode = DIGITAL then
+      begin
+      LooksLikeRST := true;
+      RST := StrToIntDef(Ex,-86);
+      Exit;
+      end;
   if Mode = CW then
   begin
     if length(Ex) <> 3 then
@@ -7715,7 +7723,7 @@ begin
 end;
 }
 
-function SetRST(Ex: integer; var RST: Word): boolean;
+function SetRST(Ex: integer; var RST: smallInt {Word}): boolean;
 begin
   Result := False;
 
@@ -8434,7 +8442,7 @@ begin
 end;
 
 function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}):
-  Word;
+  smallInt {Word};
 
 var
   PotentialRSTSent: Str80 {40};
