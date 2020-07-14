@@ -6535,6 +6535,20 @@ begin
     RXData.QSOPoints := 10;
 end;
 
+SRRQSOPointMethod:         // 4.90.4
+  if RXData.DomesticQTH = '' then
+   begin
+    Val(MyZone, MyZoneValue, Result);
+
+
+    if RXData.Zone = MyZoneValue then
+     RXData.QSOPoints := 2
+     else
+      RXData.QSOPoints := 3;
+   end
+ else
+   RXData.QSOPoints := 1;
+
 IARUQSOPointMethod:
 if RXData.DomesticQTH = '' then
 begin

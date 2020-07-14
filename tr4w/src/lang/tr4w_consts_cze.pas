@@ -25,6 +25,8 @@ const
   TC_CHECKCALLSIGN                      = 'Kontroluj znaèku';
   TC_FREQUENCYFORCALLINKHZ              = 'Kmitoèet pro %s v kHz';
   TC_DIFVERSION                         = '%s pochází z jiné programové verze.'#13'TR4W oèekává programovou verzi %s.'#13'Pokoušíš se èíst soubor ve verzi %s.';
+  TC_WagWarn = 'Pozor: Mimo povolený rozsah frekvencí WAG';
+
 
 
   TC_M                                  = 'm'; //minuta

@@ -7,6 +7,7 @@ const
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
   TC_EnterYourDistrictCode              = 'Введите ваш код района';
   TC_UKEI                               = 'UK/EI';
+  TC_WAGWarn                            = 'Warning: Out of WAG allowed frequency range';
   RC_BACKUPLOG                         = 'Резервное копирование лога';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Классы в Winter Field Day должны быть H, I или O.';
   TC_INVALID                            = 'Неверный ввод';
