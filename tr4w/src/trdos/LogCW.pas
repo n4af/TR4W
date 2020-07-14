@@ -268,7 +268,7 @@ begin
     begin
    //  if not WKbusy then flushcwbuffer;  // ny4i winkeyer
       wkAddCWMessageToInternalBuffer(Msg);
-       wkBUSY := True;   // 4.88.2
+   //   wkBUSY := True;   // 4.88.2      remove 4.90.5
      Exit;
     end;
 
@@ -281,7 +281,7 @@ begin
 
     if CWThreadID = 0 then
     begin
-       wkBusy := True;            // 4.88.6
+     //    wkBusy := True;            // 4.88.6 remove 4.90.5
     //   ExitFromCWThread := False;
     //    inc(CWThreadCounter);
     //   windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));

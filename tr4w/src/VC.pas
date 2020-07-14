@@ -2773,7 +2773,7 @@ type
     RSTAndGridExchange,
     RSTAndOrGridExchange,
     RSTAndQSONumberOrDomesticQTHExchange,
-//    RSTAndSerialNumberAndGridandPossibleMemberNumber,  // 4.88.3
+    RSTAndSerialNumberAndGridandPossibleMemberNumber,  // 4.88.3
     RSTAndPostalCodeExchange,
     RSTDomesticOrDXQTHExchange,
     RSTDomesticQTHExchange,
@@ -2836,7 +2836,7 @@ const
     'RST AND GRID',
     'RST AND OR GRID',
     'RST AND QSO NUMBER OR DOMESTIC QTH',
-//    'RST QSO NUMBER AND GRID AND POSSIBLE NUMBER', // 4.88.3
+    'RST QSO NUMBER AND GRID AND POSSIBLE NUMBER', // 4.88.3
     'RST AND POSTAL CODE',
     'RST DOMESTIC OR DX QTH',
     'RST DOMESTIC QTH',

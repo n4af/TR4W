@@ -183,7 +183,7 @@ var
   wkActive                              : LongBool = False;
   wkCWSpeed                             : integer;
 
-  wkBUSY                                : boolean;
+  wkBUSY                                : boolean = False; // 4.90.5
   wkBREAKIN                             : boolean;
   wkXOFF                                : boolean;
 
@@ -459,7 +459,7 @@ begin
   wkSendByte(wkCMD_NULLIMM);                                //Gav    4.36.13
  wkSendByte(wkCMD_CLEARBUFFER);                           //Gav     4.36.13
 
-//  wkBUSY := False;
+
 {$IF WINKEYDEBUG}
 //  AddStringToTelnetConsole('CLEAR');
 {$IFEND}
