@@ -44,6 +44,7 @@ procedure CreateHintListBox;
 function DestroyHintListBox: boolean;
 procedure AddHintsToHintListBox;
 procedure MoveSelectedItemInHintListBox(wParam: integer);
+function PutCommandFromHintListBox: boolean;
 procedure DeleteEscapeChars(var s: ShortString);
 
 type
@@ -446,6 +447,32 @@ begin
 //  SendMessage(HintListBox, LVM_REDRAWITEMS, 0, 100);
 
 //  tLB_SETCURSEL(HintListBox, SelectedItemInHitListBox);
+end;
+
+function PutCommandFromHintListBox: boolean;
+//var
+//  Selection                             : TSelection;
+//  p                                     : PChar;
+//  CS                                    : integer;
+begin
+{
+  RESULT := HintListBoxCreated;
+  CS := ListView_GetNextItem(HintListView, -1, LVNI_SELECTED); //tLB_GETCURSEL(HintListBox);
+  if CS <> LB_ERR then
+    if HintListBoxCreated then
+    begin
+      SendMessage(MsgEditHWND, EM_GETSEL, LONGINT(@Selection.StartPos), LONGINT(@Selection.EndPos));
+      Windows.GetWindowText(MsgEditHWND, TempBuffer1, SizeOf(TempBuffer1));
+      Windows.ZeroMemory(@TempBuffer2, SizeOf(TempBuffer1));
+      Windows.CopyMemory(@TempBuffer2, @TempBuffer1, Selection.StartPos);
+      p := Windows.lstrcat(TempBuffer2, HintMessageArray[CS].hmCommand);
+      p := Windows.lstrcat(p, @TempBuffer1[Selection.EndPos]);
+      Windows.SetWindowText(MsgEditHWND, p);
+      CS := Selection.StartPos + StrLen(HintMessageArray[CS].hmCommand);
+      Windows.SendMessage(MsgEditHWND, EM_SETSEL, CS, CS);
+    end;
+}
+//  DestroyHintListBox;
 end;
 
 procedure DeleteEscapeChars(var s: ShortString);

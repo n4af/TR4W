@@ -22,7 +22,6 @@ unit uEditQSO;
 
 {$IMPORTEDDATA OFF}
 
-(* ---------- I M P O R T A N T    Form is in the RES file -------------------*)
 interface
 
 uses
@@ -134,7 +133,6 @@ var
   TempString {, DString}                : ShortString;
   bt                                    : BandType;
   mt                                    : ModeType;
-  extMode                               : ExtendedModeType;
   IndexInMap                            : integer;
   lpNumberOfBytesRead                   : Cardinal;
 //  w                                     : Word;
@@ -187,8 +185,6 @@ begin
         {Zone}
         Windows.SendDlgItemMessage(hwnddlg, FLD_ZONE, EM_SETLIMITTEXT, 2, 0);
         {RST}
-        // Reset the form field to not be a number so the user can enter a negative
-        //Windows.SetWindowLong(hwnddlg, FLD_RSTSENT,)
         Windows.SendDlgItemMessage(hwnddlg, FLD_RSTSEND, EM_SETLIMITTEXT, 3, 0);
         Windows.SendDlgItemMessage(hwnddlg, FLD_RSTRECEIVED, EM_SETLIMITTEXT, 3, 0);
         Windows.SendDlgItemMessage(hwnddlg, FLD_CALLSIGN, EM_SETLIMITTEXT, SizeOf(CallString) - 2, 0);
@@ -204,19 +200,11 @@ begin
 
         tCB_SETCURSEL(hwnddlg, FLD_BAND, Ord(EditableQSORXData.Band));
 
-        // Add new modes from extended modes
-        for extMode := Low(ExtendedModeType) to High(ExtendedModeType) do
-           begin
-           tCB_ADDSTRING_PCHAR(hwnddlg, FLD_MODE, PChar(ExtendedModeStringArray[extMode]));
-           end;
-        tCB_SETCURSEL(hwnddlg, FLD_MODE, Ord(EditableQSORXData.ExtMode));
-
-        {
-        for mt := CW to FM do tCB_ADDSTRING_PCHAR(hwnddlg, FLD_MODE, ModeStringArray[mt]);  // NY4I to show extended modes
+        for mt := CW to FM do tCB_ADDSTRING_PCHAR(hwnddlg, FLD_MODE, ModeStringArray[mt]);
 
         //        if EditableQSORXData.ceFMMode then mt := FM else mt := EditableQSORXData.Mode;
         tCB_SETCURSEL(hwnddlg, FLD_MODE, Ord(EditableQSORXData.Mode));
-        }
+
         tSetDlgItemIntFalse(hwnddlg, FLD_FREQUENCY, EditableQSORXData.Frequency);
 {
         lpNumberOfBytesRead :=
@@ -309,8 +297,8 @@ begin
         if EditableQSORXData.TenTenNum <> MAXWORD then
           Windows.SetDlgItemText(hwnddlg, FLD_TENTENNUM, inttopchar(EditableQSORXData.TenTenNum));
 
-        tSetDlgItemIntSigned(hwnddlg, FLD_RSTSEND, EditableQSORXData.RSTSent);
-        tSetDlgItemIntSigned(hwnddlg, FLD_RSTRECEIVED, EditableQSORXData.RSTReceived);
+        tSetDlgItemIntFalse(hwnddlg, FLD_RSTSEND, EditableQSORXData.RSTSent);
+        tSetDlgItemIntFalse(hwnddlg, FLD_RSTRECEIVED, EditableQSORXData.RSTReceived);
 
         Windows.SendDlgItemMessage(hwnddlg, FLD_INHIBITMULTS, BM_SETCHECK, integer(EditableQSORXData.InhibitMults), 0);
         Windows.SendDlgItemMessage(hwnddlg, FLD_DXMULT, BM_SETCHECK, integer(EditableQSORXData.DXMult), 0);
@@ -519,10 +507,7 @@ begin
   EditableQSORXData.Band := BandType(tCB_GETCURSEL(eq_handle, FLD_BAND));
 
   {Mode}
-  // Mode has an extendedMode so grab it and convert it to a modeType and store both
-  EditableQSORXData.ExtMode := ExtendedModeType(tCB_GETCURSEL(eq_handle, FLD_MODE));
-  EditableQSORXData.Mode := GetModeFromExtendedMode(EditableQSORXData.ExtMode);
-  //EditableQSORXData.Mode := ModeType(tCB_GETCURSEL(eq_handle, FLD_MODE));
+  EditableQSORXData.Mode := ModeType(tCB_GETCURSEL(eq_handle, FLD_MODE));
   {
     if EditableQSORXData.Mode = FM then
       begin
@@ -642,19 +627,19 @@ begin
      end;
 
   {RSTSent}
-  TempInteger {TempWord} := {Word}Integer(Windows.GetDlgItemInt(eq_handle, FLD_RSTSEND, lpTranslated, True));
+  TempWord := Word(Windows.GetDlgItemInt(eq_handle, FLD_RSTSEND, lpTranslated, True));
   if lpTranslated then
      begin
      ZeroMemory(@EditableQSORXData.RSTSent, SizeOf(EditableQSORXData.RSTSent));
-     EditableQSORXData.RSTSent := TempInteger {TempWord};
+     EditableQSORXData.RSTSent := TempWord;
      end;
 
   {RSTReceived}
-  TempInteger {TempWord} := {Word}Integer(Windows.GetDlgItemInt(eq_handle, FLD_RSTRECEIVED, lpTranslated, True));
+  TempWord := Word(Windows.GetDlgItemInt(eq_handle, FLD_RSTRECEIVED, lpTranslated, True));
   if lpTranslated then
      begin
      ZeroMemory(@EditableQSORXData.RSTReceived, SizeOf(EditableQSORXData.RSTReceived));
-     EditableQSORXData.RSTReceived := TempInteger {TempWord};
+     EditableQSORXData.RSTReceived := TempWord;
      end;
 
   IndexInMap := IndexOfItemInLogForEdit;
@@ -739,8 +724,8 @@ begin
  // if ExchangeInformation.FOCNumber then MakeEditWindow('FOC', ctByte, @EditableQSORXData.FOCNumber[1]);
   if ExchangeInformation.RST then
   begin
-    MakeEditWindow('RST recv', ctInteger {ctWord}, @EditableQSORXData.RSTReceived);
-    MakeEditWindow('RST sent', ctInteger {ctWord}, @EditableQSORXData.RSTSent);
+    MakeEditWindow('RST recv', ctWord, @EditableQSORXData.RSTReceived);
+    MakeEditWindow('RST sent', ctWord, @EditableQSORXData.RSTSent);
   end;
 
   if ExchangeInformation.QSONumber then

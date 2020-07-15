@@ -35,7 +35,7 @@ uses
 
 const
   tDebugMode                            = False;
-  NEWER_DEBUG                           = True; // ny4i added this as tDebugMode changes too much.
+  NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
   MMTTYMODE                             = True;
 
 
@@ -188,11 +188,10 @@ const
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
-  LOGVERSION                            = 'v1.6'; // This is broken out below for comparison later on. Again, needlessly complex. de NY4I
   LOGVERSION1                           = 'v';
   LOGVERSION2                           = '1';
   LOGVERSION3                           = '.';
-  LOGVERSION4                           = '6';     // ny4i Added ExtendedMode to ContestExchange
+  LOGVERSION4                           = '5';
   CURRENTVERSIONASINTEGER               = Ord(LOGVERSION1) + Ord(LOGVERSION2) * 256 + Ord(LOGVERSION3) * $10000 + Ord(LOGVERSION4) * $1000000;
   TR4W_DOWNLOAD_LINK                    : PChar = 'http://www.tr4w.net/download/?' + TR4W_CURRENTVERSION_NUMBER;
 
@@ -370,7 +369,7 @@ const
 
 {$IF tDebugMode}
 var
-
+   
   cw_tick_array                         : array[0..500] of Cardinal;
   cw_tick                               : integer;
 {$IFEND}
@@ -630,13 +629,11 @@ type
     mweTotalScore,
     mweUserInfo,
     mweWholeScreen,
-    mweWinKey,
-    mweWSJTX
+    mweWinKey
 
     );
 
 var
-   
 //  tR150SMode                            : boolean;
 //  OrionWaitTime                         : integer = 50;
 
@@ -705,16 +702,15 @@ var
 {mweRadioTwoFreq}         (mweName: 'RADIO TWO FREQ';          mweiStyle: DefStyleDis;       mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 04; mweiY: 08; mweiWidth: 04; mweiHeight: 1 ),
 {mweRadioTwo}             (mweName: 'RADIO TWO NAME';          mweiStyle: DefStyleDis;       mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 04; mweiY: 09; mweiWidth: 04; mweiHeight: 1 ),
 {mweRate}                 (mweName: 'RATE';                    mweiStyle: defStyle;          mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 33; mweiY: 09; mweiWidth: 05; mweiHeight: 1 ),
-{mweSPQSOCounter}         (mweName: 'S&P COUNTER';             mweiStyle: defStyle;          mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 42; mweiY: 08; mweiWidth: 04; mweiHeight: 1 ),
+{mweSPQSOCounter}         (mweName: 'S&P COUNTER';           mweiStyle: defStyle;          mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 42; mweiY: 08; mweiWidth: 04; mweiHeight: 1 ),
+
 {mweStations}             (mweName: 'STATIONS';                mweiStyle: 1;                 mweText:nil         ; mweColor: trBlack; mweBackG: trWhite;   mweI:0; mweB: 0; mweiX: 23; mweiY: 01; mweiWidth: 09; mweiHeight: 2 ),
 
 {mweTenMinuts}            (mweName: 'TEN MINUTES';             mweiStyle: defStyle;          mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 0; mweiX: 00; mweiY: 01; mweiWidth: 05; mweiHeight: 1 ),
 {mweTotalScore}           (mweName: 'TOTAL SCORE';             mweiStyle: defStyle;          mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 0; mweiX: 23; mweiY: 00; mweiWidth: 09; mweiHeight: 1 ),
 {mweUserInfo}             (mweName: 'USER INFO';               mweiStyle: defStyle;          mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:1; mweB: 1; mweiX: 15; mweiY: 11; mweiWidth: 10; mweiHeight: 1 ),
 {mweWholeScreen}          (mweName: 'WHOLE SCREEN';            mweiStyle: 0;                 mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 15; mweiY: 11; mweiWidth: 10; mweiHeight: 1 ),
-{mweWinKey}               (mweName: 'WINKEYER';                mweiStyle: DefStyleDis;       mweText:'WK'        ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 38; mweiY: 11; mweiWidth: 04; mweiHeight: 1 ),
-{mweWSJTX   }             (mweName: 'WSJTX';                   mweiStyle: defStyle;          mweText:nil         ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 08; mweiY: 09; mweiWidth: 03; mweiHeight: 1 )
-
+{mweWinKey}               (mweName: 'WINKEYER';                mweiStyle: DefStyleDis;       mweText:'WK'        ; mweColor: trBlack; mweBackG: trBtnFace; mweI:0; mweB: 1; mweiX: 38; mweiY: 11; mweiWidth: 04; mweiHeight: 1 )
 
 {*)}
     );
@@ -1051,19 +1047,10 @@ type
     NoBand
     );
   PBandType = ^BandType;
-  (* ****** If you add any new extended modes, please update MainUnit.GetModeFromExtendedMode *)
-  ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
 
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
-           //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
-  ExtendedRadioModeType = (rNoMode, rCW, rLSB, rUSB, rAM, rFM, rRTTY, rRTTY_R, rAFSK, rDATA_U, rDATA_L, rDIGITAL, rCW_R);
   {    ModeType = (CW, Phone, Both, NoMode, FM, Digital);   { Use for calltest }
   OpModeType = (CQOpMode, SearchAndPounceOpMode);
-
-   ModeAndExtendedModeType = record
-      msmMode: ModeType;
-      msmExtendedMode: ExtendedModeType;
-   end;
 
   PTTStatusType = (PTT_OFF, PTT_ON);
 
@@ -1183,11 +1170,10 @@ const
 
   MonthTags                             : array[1..12] of PChar = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
 
-  CallstringLength                      = 13;
+  CallstringLength                      = 13;         
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
   ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
-  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('NoMode', 'CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'LSB');
 
   BandStringsArray                      : array[BandType] of PChar {string} =
     (
@@ -1441,16 +1427,6 @@ type
   PLogFileInformation = ^TLogFileInformation;
 
   {(*}
-
-(* The TLogHeader type had a dependency on the size of the ContestExchange
-   to build the dummy area of its type definition. This meant that to add something
-   to ContestExchange, you had to go to find TLogRecord to change the number of
-   bytes in ther dummy array. I changed this (at bottom of VC.pas) so the size
-   is derived on the sizes so no change elsewhere required.
-   I found this because I added a field to CE and the program complained as the
-   TRN file was not the right size. This should eliminate that maintenance
-   step. de NY4I
-*)
 type
 
   ContestExchange = record
@@ -1490,8 +1466,7 @@ type
 {01}  DXMult:              boolean;
 {01}  PrefixMult:          boolean;
 {01}  ZoneMult:            boolean;
-      ExtMode:             ExtendedModeType;
-      ExchString:          Str40;  // What is entered as SRX exchange
+
 {04}  ceClass:             string[3]{10}; { Field day class }
 
 {01}  ZERO_04:             DummyByte;
@@ -1520,8 +1495,8 @@ type
 {04}  NumberReceived:      integer;
 {04}  NumberSent:          integer;
 
-{02}  RSTSent:             smallInt; {Word;}
-{02}  RSTReceived:         smallInt; {Word;}  // if this was an int, I could put ft8 reports here.
+{02}  RSTSent:             Word;
+{02}  RSTReceived:         Word;
 
 {11}  QTHString:           Str10;//QTH received by user (literal)
 {01}  ZERO_10:             DummyByte;
@@ -1589,143 +1564,6 @@ const
 type
   ContestExchangePtr = ^ContestExchange;
 
-// This is another declaration of ContestExchange for version 1.5. This is used to convert
-
-  ContestExchangev1_5 = record
-{COMMON START}
-
-{06}  tSysTime:            TQSOTime;
-{01}  Band:                BandType;
-{01}  Mode:                ModeType;
-
-{04}  ceQSOID1:            Cardinal;
-{04}  ceQSOID2:            Cardinal;
-{04}  Frequency:           LONGINT;
-
-{01}  ceQSO_Deleted:       boolean;
-{01}  ceComputerID:        Char;
-{01}  ceOperatorID:        Byte;
-{01}  ceRecordKind:        LogRecordKind;
-
-{01}  ceQSO_Skiped:        boolean;
-{01}  ceSendToServer:      boolean;
-{01}  ceNeedSendToServerAE:    boolean;
-{01}  ceDupe:              boolean;
-
-{07}  PostalCode_old:          PostalCodeString;
-{01}  ZERO_01:             DummyByte;
-
-{COMMON END}
-
-{07}  Prefix:              PrefixMultiplierString;
-{01}  ZERO_02:             DummyByte;
-
-{14}  Callsign:            CallString;
-{01}  Age:                 byte;
-{01}  ceWasSendInQTC:      Boolean;
-
-{01}  DomesticMult:        boolean;
-{01}  DXMult:              boolean;
-{01}  PrefixMult:          boolean;
-{01}  ZoneMult:            boolean;
-      ExtMode:             ExtendedModeType;
-      ExchString:          Str40;  // What is entered as SRX exchange
-{04}  ceClass:             string[3]{10}; { Field day class }
-
-{01}  ZERO_04:             DummyByte;
-{01}  Precedence:          Char;
-{01}  ceRadio:             RadioType;
-{01}  Check:               Byte;           {The CHECK is two numbers (year)}
-
-{32}  QTH:                 QTHRecord;
-
-{06}  DXQTH:               DXMultiplierString;
-{01}  ZERO_05:             DummyByte;
-{01}  Radio:               InterfacedRadioType;
-
-{11}  DomMultQTH:          DomesticMultiplierString; //String for dom mult count
-{01}  ZERO_06:             DummyByte;
-
-{11}  DomesticQTH:         Str10;//Corrected QTH - if it is need  - i.e. AF1 -> AF-001 in IOTA contest.
-{01}  ZERO_07:             DummyByte;
-
-{11}  Name:                Str10;
-{01}  ZERO_08:             DummyByte;
-
-{07}  Power:               string[6];
-{01}  ZERO_09:             DummyByte;
-
-{04}  NumberReceived:      integer;
-{04}  NumberSent:          integer;
-
-{02}  RSTSent:             smallInt; {Word;}
-{02}  RSTReceived:         smallInt; {Word;}  // if this was an int, I could put ft8 reports here.
-
-{11}  QTHString:           Str10;//QTH received by user (literal)
-{01}  ZERO_10:             DummyByte;
-
-{06} RandomCharsSent:      string[5];
-{02} TenTenNum:            word;
-
-{05}  Chapter:             string[4];
-{01}  ZERO_11:             DummyByte;
-{01}  ceClearDupeSheet:    boolean;
-{01}  ceSearchAndPounce:   boolean;
-
-{01}  Prefecture:          Byte;
-{01}  InhibitMults:        boolean;
-{01}  Zone:                Byte;
-{01}  NameSent:            boolean;
-
-{21}  Kids:                Str20; { Used for whole ex string }
-{01}  ceContest:           ContestType;
-{02}  QSOPoints:           word{Smallint};
-
-{08}  RandomCharsReceived: string[7];
-
-{01}  ZERO_13:             DummyByte;
-{01}  ceClearMultSheet:    Boolean;
-{01}  MP3Record:           Boolean;
-{01}  res3:                Byte;
-
-{******************************}
-{07}  ceOperator:          OperatorType;
-
-{01}//  res4:                Byte;
-{01}//  res5:                Byte;
-{01}//  res6:                Byte;
-{01}//  res7:                Byte;
-
-{01}//  res8:                Byte;
-{01}//  res9:                Byte;
-{01}//  res10:               Byte;
-{******************************}
-
-{01}//  res11:               Byte;
-
-{01}//  res12:               Byte;
-{01}//  res13:               Byte;
-{01}//  res14:               Byte;
-{01}  res15:               Byte;
-
-{01}  res16:               Byte;
-{01}  res17:               Byte;
-{01}  res18:               Byte;
-{01}  res19:               Byte;
-
-{01}  res20:               Byte;
-{01}  res21:               Byte;
-{01}  res22:               Byte;
-{01}  res23:               Byte;
-
-//{01}  res25:               Byte;
-   end;
-
-   const
-  SizeOfContestExchangev1_5                 = SizeOf(ContestExchangev1_5);
-type
-  ContestExchangePtrv1_5 = ^ContestExchangev1_5;
-//----------------------------------------------------------------------------------------
 type
   TNetSynQSOInformation = packed record
     qsID: Word;
@@ -2626,7 +2464,7 @@ const
     'SOUTH AND NORTH AMERICAN PREFIXES',
     'GC STATION',
     'CQ NON EUROPEAN COUNTRIES AND WAE',
-    'RUSSIAN PREFIXES'
+    'RUSSIAN PREFIXES' 
        );
 type
   DomesticMultType =
@@ -3662,33 +3500,13 @@ QSOPartiesCount = 15;
       wcbackground: ptr4wColors;
     end;
 
-  // Well this is bizzare. In order for the file size check to match, TLogHeader needs to be the same size as the ContestExchange record.
-  // So it looks like lhDummy is used to pad this out.
-  // But rather than keep this in the same place like when you change contestexchange, you have to figure that out.
-  // The better way to do this is to take SIZEOFCONTEXTEXCHANGE - the used bytes in log header as the size of the lhDummy char array de NY4I
-  const SizeOfLHVersionString = 8;
-  const SizeOfLHFileDesc = 16;
-  const SizeOfLHWarningString = 36;
-  const SizeOfLHValid = (SizeOfLHVersionString + SizeOfLHFileDesc + SizeOfLHWarningString);
 
-  type TLogHeader = record
-      lhVersionString: array[0..(SizeOfLHVersionString-1)] of Char;
-      lhFileDesc: array[0..(SizeOfLHFileDesc-1)] of Char;
-      lhWarningString: array[0..(SizeOfLHWarningString-1)] of Char;
-      lhDummy: array[0..(SizeOfContestExchange-SizeOfLHValid-1)] of Char;  // three fields above are 60 bytes
-   //   lhDummy: array[0..(SizeOfContestExchange-SizeOfTLogHeader-1)] of Char;  // three fields above are 60 bytes
-
-    end;
-  (*
   TLogHeader = record
       lhVersionString: array[0..7] of Char;
       lhFileDesc: array[0..15] of Char;
       lhWarningString: array[0..35] of Char;
-   //   lhDummy: array[0..(SIZEOFCONTEXTEXCHANGE-60-1)] of Char;  // three fields above are 60 bytes
-   //   lhDummy: array[0..(SizeOfContestExchange-SizeOfTLogHeader-1)] of Char;  // three fields above are 60 bytes
-
+      lhDummy: array[0..195] of Char;
     end;
-  *)
 
   const
     LogHeader                           : TLogHeader =
@@ -3700,8 +3518,6 @@ QSOPartiesCount = 15;
 
   const
     SizeOfTLogHeader                    = SizeOf(TLogHeader);
-
-
 
   var
     tr4wBrushArray                      : array[tr4wColors] of HBRUSH;

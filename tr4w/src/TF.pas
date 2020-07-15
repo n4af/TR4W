@@ -191,7 +191,6 @@ function _StrInt64(Val: int64; Width: integer): ShortString;
 function ShowServerDialog(AHandle: THandle): string;
 //function tShellexecute(HWND: HWND; Operation, FileName, Parameters, Directory: PChar; showCmd: integer): hInst; // 4.75.3
 function tSetDlgItemIntFalse(hDlg: HWND; nIDDlgItem: integer; uValue: UINT): BOOL; stdcall;
-function tSetDlgItemIntSigned(hDlg: HWND; nIDDlgItem: integer; uValue: integer): BOOL; stdcall;
 function CreateModalDialog(Width, Height: integer; ParentHWND: HWND; lpDialogFunc: TFNDlgProc; dwInitParam: lParam): integer;
 function CreateListBox(X, Y, nWidth, nHeight: Word; hwndParent: HWND; HMENU: HMENU): HWND;
 function CreateButton(dwStyle: Cardinal; lpWindowName: PChar; X, Y, nWidth: integer; hwndParent: HWND; HMENU: HMENU): HWND;
@@ -947,11 +946,6 @@ begin
   Windows.SetDlgItemInt(hDlg, nIDDlgItem, uValue, False);
 end;
 
-function tSetDlgItemIntSigned(hDlg: HWND; nIDDlgItem: integer; uValue: integer): BOOL; stdcall;
-begin
-  Windows.SetDlgItemInt(hDlg, nIDDlgItem, uValue, True);
-end;
-
 function GetWindowByHandle(h: HWND): WindowsType;
 var
   wt                                    : WindowsType;
@@ -1153,6 +1147,14 @@ end;
 
 procedure UnableToFindFileMessage(FileName: PChar);
 begin
+{
+  asm
+    push FileName
+    call GetLastError
+    call SysErrorMessage
+    push eax
+  end;
+}
   Format(wsprintfBuffer, '%s'#13#13'%s', SysErrorMessage(GetLastError), FileName);
 
   showwarning(wsprintfBuffer);
@@ -1175,6 +1177,8 @@ begin
   Format(wsprintfBuffer, '%s: %s', ID, SysErrorMessage(Windows.GetLastError));
   showwarning(wsprintfBuffer);
 end;
+
+
 
 procedure SelectParentDir(h: HWND);
 var

@@ -145,7 +145,6 @@ type
       {01}VFOStatus: ActiveVFOStatusType;
       {01}PrevVFOStatus: ActiveVFOStatusType;
       {01}TXOn:      boolean;
-        //  ModeActual:ExtendedRadioModeType; // tom
    end;
 
    RadioObject = object

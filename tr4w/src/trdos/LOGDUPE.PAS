@@ -878,7 +878,6 @@ begin
   Windows.ZeroMemory(@Exchange, SizeOf(ContestExchange));
   Exchange.Band := NoBand;
   Exchange.Mode := NoMode;
-  Exchange.ExtMode := eNoMode;
   Exchange.NumberReceived := -1;
   Exchange.NumberSent := -1;
   Exchange.Prefecture := MAXBYTE;

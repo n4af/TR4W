@@ -197,11 +197,7 @@ begin
                 TempCall := mo.DomList.Get(Index);
 
               p := @TempCall[1];
-              // Why is this QD here? When the program first starts, it display a mut for no reason.
-              // Why would we display the mult in the quick display?
-              // We do not do this for other multipler types.
-              // I commented this out for now.
-              // quickdisplay(p);
+              quickdisplay(p);
               Gradient := mo.DomList.StringIsDupeByIndex(Index, GetAddMultBand(DomesticMultByBand, MultBand), MultMode);
             end;
 

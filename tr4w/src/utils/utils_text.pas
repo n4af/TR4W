@@ -1,13 +1,12 @@
 unit utils_text;
 
 interface
-uses VC, SysUtils;
+uses VC;
 
 function UpperCase(const s: ShortString): ShortString;
 
 function tCharIsNumbers(c: Char): boolean;
 
-function safeFloat(sStringFloat : AnsiString) : double;
 function StringHas(LongString: Str160; SearchString: Str80): boolean;
 function StringHasNumber(Prompt: Str80): boolean;
 function StringHasLowerCase(InputString: Str160): boolean;
@@ -303,28 +302,5 @@ asm
 //        POP     ECX
 end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  safeFloat
-
-  Strips many bad characters from a string and returns it as a double.
-}
-function safeFloat(sStringFloat : AnsiString) : double;
-var
-  dReturn : double;
-
-begin
-  sStringFloat := stringReplace(sStringFloat, '%', '', [rfIgnoreCase, rfReplaceAll]);
-  sStringFloat := stringReplace(sStringFloat, CurrencyString , '', [rfIgnoreCase, rfReplaceAll]);
-  sStringFloat := stringReplace(sStringFloat, ' ', '', [rfIgnoreCase, rfReplaceAll]);
-  //sStringFloat := stringReplace(sStringFloat, ',', '', [rfIgnoreCase, rfReplaceAll]);
-  sStringFloat := stringReplace(sStringFloat, ThousandSeparator, '', [rfIgnoreCase, rfReplaceAll]);
-  try
-    dReturn := strToFloat(sStringFloat);
-  except
-    dReturn := 0;
-  end;
-  result := dReturn;
-
-end;
 end.
 
