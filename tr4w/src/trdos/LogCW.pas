@@ -281,7 +281,7 @@ begin
 
     if CWThreadID = 0 then
     begin
-     //    wkBusy := True;            // 4.88.6 remove 4.90.5
+         wkBusy := False;            //  4.90.5
     //   ExitFromCWThread := False;
     //    inc(CWThreadCounter);
     //   windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));
@@ -397,6 +397,7 @@ begin
 
   tAutoSendMode := False;
   CPUKeyer.FlushCWBuffer;
+  WKBusy := False; // 4.90.5
 //  if wkActive then wkClearBuffer;    // Gav    remove
 end;
 

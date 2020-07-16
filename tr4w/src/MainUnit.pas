@@ -512,7 +512,6 @@ end;
 
 procedure Escape_proc;
 var
-
    pRadio : RadioPtr; // ny4i used to make code cleaner Issue 94. Moved here with Issue #111
 begin
   
@@ -583,8 +582,8 @@ begin
        tAutoSendMode := False;
 
       FlushCWBufferAndClearPTT; //n4af 4.33.3
+      exit;
 
-  //  else
       if DVPOn then
       begin
         tExitFromDVPThread := True;
@@ -595,9 +594,7 @@ begin
         PTTOff;
         DisplayCodeSpeed;
       end;
-        SetOpMode(CQOpMode);       // 4.90.5
-      Exit;
-  end;
+     end;
 
   if ActiveRadioPtr^.tTwoRadioMode = TR2  then
   if (not Call_Found) then
@@ -642,10 +639,11 @@ begin
   end;
 
   if ExchangeWindowString <> '' then
-  begin
+   begin
     tCleareExchangeWindow;
-    Exit;
-  end;
+    Exit;  //4.90.5
+   end;
+
 
   if ActiveRadioPtr^.tTwoRadioMode = TR1 then
   begin
@@ -4964,7 +4962,7 @@ begin
 //      if tPos(Callsign, '/') = 0 then
       begin
         //if StringHas(InitialExchange, '255 ') then
-          InitialExchange := GetLastString(initialexchange);
+  //      InitialExchange := GetLastString(initialexchange);   // 4.90.6
         nNumberOfBytesToWrite := Format(wsprintfBuffer, '%-15s  %s'#13#10, @Callsign[1], @InitialExchange[1]);
         sWriteFile(h, wsprintfBuffer, nNumberOfBytesToWrite);
       end;
