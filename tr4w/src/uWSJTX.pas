@@ -45,6 +45,7 @@ type
     procedure OnBeforeBind(AHandle: TIdSocketHandle);
     procedure IdTCPServer1Execute(AContext: TIdContext);
     procedure IdTCPServer1Connect(AContext: TIdContext);
+    procedure IdTCPServer1Disconnect(AContext: TIdContext);
   public
     constructor Create; overload;
     constructor Create(nUDPPort: integer; nTCPPort: integer); overload;
@@ -79,6 +80,7 @@ uses
    ,LOGWIND       // for GetBandMapBandModeFromFrequency
    ,TF            // for SetMainWindowText
    ,utils_text
+   ,LogK1EA       // to access tPTTViaCommand
    ;
 // {$R *.dfm}
 
@@ -120,6 +122,7 @@ begin
    tcpServ := TIdTCPServer.Create(nil);
    tcpServ.OnExecute := Self.IdTCPServer1Execute;
    tcpServ.OnConnect := Self.IdTCPServer1Connect;
+   tcpServ.OnDisconnect := Self.IdTCPServer1Disconnect;
 end;
 
 constructor TWSJTXServer.Create(nUDPPort: integer; nTCPPort: integer);
@@ -148,13 +151,15 @@ begin
     // ... add listening ports:
 
     // ... add a port for connections from guest clients.
-   tcpServ.Bindings.Add.Port := 52002;
+   tcpServ.MaxConnections := 1; // Just allow the single client
+   tcpServ.Bindings.Add.Port := FTCPPort;
    tcpServ.Active := true;
 end;
 
 procedure TWSJTXServer.Stop;
 begin
    udpServ.Active := false;
+   tcpServ.IOHandler.Shutdown;
    tcpServ.Active := false;
 end;
 
@@ -163,6 +168,7 @@ begin
    udpServ.Active := false;
    FreeAndNil(udpServ);
 
+   tcpServ.IOHandler.Shutdown;
    tcpServ.Active := false;
    FreeAndNil(tcpServ);
 
@@ -239,7 +245,7 @@ begin
             case messageType of
             0: begin
                //DEBUGMSG('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
-               DEBUGMSG('Radio frequency = ' + IntToStr(radio1.CurrentStatus.Freq));
+               DEBUGMSG('Radio frequency = ' + IntToStr(radio1.CurrentStatus.VFO[VFOA].Frequency));
                SetMainWindowText(mweWSJTX,'WSJTX');
                Windows.ShowWindow(wh[mweWSJTX], SW_SHOW);
                isConnected := true;
@@ -585,6 +591,7 @@ end;
 
 begin
     // ... get message from client
+    try
     AContext.Connection.IOHandler.ReadBytes(buffer,-1,true);
     sBuffer := BytesToString(buffer);
     RemoveBytes(buffer,length(sBuffer));
@@ -601,9 +608,18 @@ begin
       begin
       if fieldValue = 'CmdGetFreq' then
          begin
-         sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.Freq/1000);
-         Display('client','Sending frequency as ' + sFreq);
-         AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+         if radio1.CurrentStatus.VFO[VFOA].Frequency = 0 then
+            begin
+            DEBUGMSG('**** radio1.CurrentStatus.VFO[VFOA].Frequency = 0');
+            Display('client','Sending frequency as .000');
+            AContext.Connection.IOHandler.Write('<CmdFreq:4>.000');
+            end
+         else
+            begin
+            sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.VFO[VFOA].Frequency/1000);
+            Display('client','Sending frequency as ' + sFreq);
+            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+            end;
          end
       else if fieldName = 'xcvrfreq' then
          begin
@@ -626,20 +642,45 @@ begin
          end
       else if fieldValue = 'CmdRX' then
          begin
+         if not tPTTViaCommand then
+            begin
+            QuickDisplay('PTT VIA COMMANDS (CTRL-J) option must be true for WSJT-X use - Setting to true');
+            tPTTViaCommand := true;
+            end;
+
          tPTTVIACAT(false);
+        // AContext.Connection.IOHandler.Write('<CmdSendRX:3>OFF')
          end
       else if fieldValue = 'CmdTX' then
          begin
+         if not tPTTViaCommand then
+            begin
+            QuickDisplay('PTT VIA COMMANDS (CTRL-J) option must be true for WSJT-X use - Setting to true');
+            tPTTViaCommand := true;
+            end;
          tPTTVIACAT(true);
          end
       else if fieldValue = 'CmdSendMode' then
          begin
          DEBUGMSG('Sending ' + '<CmdMode:6>Data-U');
          AContext.Connection.IOHandler.Write('<CmdMode:6>Data-U');
+         end
+      else if fieldValue = 'CmdSendTx' then
+         begin
+         if radio1.CurrentStatus.TXOn then
+            begin
+            AContext.Connection.IOHandler.Write('<CmdTX:2>ON');
+            DebugMsg('Sending ' + '<CmdTX:2>ON');
+            end
+         else
+            begin
+            AContext.Connection.IOHandler.Write('<CmdTX:3>OFF');
+            DebugMsg('Sending ' + '<CmdTX:3>OFF');
+            end;
          end;
       end;
 
-   while Length(sBuffer) > 0  do
+  (* while Length(sBuffer) > 0  do
       begin
       Display ('SERVER','Processing message ' + sBuffer);
 
@@ -762,6 +803,8 @@ begin
          end;
       end;
 
+      *)
+
        Display('CLIENT','length(sBuffer) = ' + IntToStr(length(sBuffer)));
     // ... process message from Client
 
@@ -770,6 +813,10 @@ begin
     // ... send response to Client
 
     //AContext.Connection.IOHandler.WriteLn('... message sent from server :)');
+     except
+      on E : Exception do
+         DEBUGMSG(E.ClassName+' error raised, with message : '+E.Message);
+      end;
 end;
 
 procedure TWSJTXServer.IdTCPServer1Connect(AContext: TIdContext);
@@ -777,6 +824,10 @@ begin
 //DEBUGMSG('TCP client Connected');
 end;
 
+procedure TWSJTXServer.IdTCPServer1Disconnect(AContext: TIdContext);
+begin
+   DEBUGMSG('TCP Client disconnected');
+end;
 (*aaa:=copy(vstup,z+1,length(vstup));
     z:=pos(':',aaa);
     x:=pos('>',aaa);

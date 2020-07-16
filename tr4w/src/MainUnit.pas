@@ -3281,7 +3281,14 @@ begin
    end;
    SetFreq:
   if TuneOnFreqFromCallWindow then Exit;
-
+  if CallWindowString = 'TXON' then
+     begin
+     tPTTVIACAT(true);
+     end
+  else if CallWindowString = 'TXOFF' then
+     begin
+     tPTTVIACAT(false);
+     end;
   if OpMode = CQOpMode then
   begin
 
