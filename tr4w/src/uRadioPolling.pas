@@ -223,6 +223,14 @@ begin
                         rig^.CurrentStatus.XIT := rig^.tBuf[i - 13] = '1';
 
                         rig^.CurrentStatus.TXOn := rig^.tBuf[i-9] = '1';
+                        if rig^.tBuf[i-9] = '1' then
+                           begin
+                           DEBUGMSG('K3/Kenwood2 says radio is transmitting');
+                           end;
+                        if radio1.CurrentStatus.TXOn then
+                           begin
+                           DEBUGMSG('radio1.CurrentStatus.TXOn is true');
+                           end;
                       end;
                   end;
                 end;
