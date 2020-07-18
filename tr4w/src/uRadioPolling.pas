@@ -14,8 +14,8 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+     Public License along with TR4W in  GPL_License.TXT.
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit uRadioPolling;
@@ -44,7 +44,7 @@ uses
   idUDPClient, // ny4i 4.44.9
   idGlobal, // ny4i 4.44.9
   Windows;
- 
+
 type
   DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
 
@@ -97,11 +97,11 @@ procedure SetVFOB(rig: RadioPtr);
 function getIcomResponceSpeed(rig: RadioPtr): boolean;
 procedure PTTStatusChanged;
 procedure SendRadioInfoToUDP(rig: RadioPtr);
-
+var saveVFOAFreq: integer;
 const
   POLLINGDEBUG                          = False;
   ICOM_DEBUG                            = False;
- 
+
 implementation
 
 procedure pKenwood2(rig: RadioPtr);
@@ -2082,17 +2082,57 @@ end;
 procedure DisplayCurrentStatus(rig: RadioPtr);
 var
   h                                     : HWND;
+  //fa: integer;
 begin
   if rig = ActiveRadioPtr then SendStationStatus(sstBandModeFreq);
   if UDPBroadcastRadio then
      begin
      SendRadioInfoToUDP(rig); // ny4i 4.44.9 // Broadcast Radio Info if set
      end;
-  Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
+  //Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
   h := rig.tRadioInterfaceWndHandle;
-  if h = 0 then Exit;
-  SetDlgItemText(h, 102, FreqToPChar(rig.CurrentStatus.VFO[VFOA].Frequency));
-  SetDlgItemText(h, 104, FreqToPChar(rig.CurrentStatus.VFO[VFOB].Frequency));
+  //if h = 0 then Exit;
+  //tSetWindowRedraw(h,false);
+  if rig.CurrentStatus.VFO[VFOA].Frequency <> rig.CurrentStatus.previousVFO[VFOA].Frequency then
+     begin
+     if h <> 0 then
+        begin
+        SetDlgItemText(h, 102, FreqToPChar(rig.CurrentStatus.VFO[VFOA].Frequency));
+        end;
+     Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
+     end
+  else
+     begin
+     rig.CurrentStatus.previousVFO[VFOA].Frequency := rig.CurrentStatus.VFO[VFOA].Frequency;
+     end;
+  (*fa := rig.CurrentStatus.VFO[VFOA].Frequency;    // This is so pointless updates do not flicker.
+  if fa <> saveVFOAFreq then                      // We need a changed flag so we can check them all.
+     begin
+     if h <> 0 then
+        begin
+        SetDlgItemText(h, 102, FreqToPChar(fa));
+        end;
+     Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
+     end
+  else
+     begin
+     saveVFOAFreq := fa;
+     end;
+     *)
+  if rig.CurrentStatus.VFO[VFOB].Frequency <> rig.CurrentStatus.previousVFO[VFOB].Frequency then
+     begin
+     if h <> 0 then
+        begin
+        SetDlgItemText(h, 104, FreqToPChar(rig.CurrentStatus.VFO[VFOB].Frequency));
+        end;
+     //Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
+     end
+  else
+     begin
+     rig.CurrentStatus.previousVFO[VFOB].Frequency := rig.CurrentStatus.VFO[VFOB].Frequency;
+     end;
+  //tSetWindowRedraw(h,true);
+  //UpdateWindow(h);
  // ActiveRadioPtr.tPTTStatus :=
   if rig.CurrentStatus.TXOn then
      begin

@@ -134,6 +134,7 @@ type
       //    {24}VFOA: VFOStatusType;
       //    {24}VFOB: VFOStatusType;
       VFO:           array[ActiveVFOStatusType] of VFOStatusType;
+      previousVFO:   array[ActiveVFOStatusType] of VFOStatusType;
       {04}Freq:      longint; // This is the active frequency for the radio
       {04}Split:     longbool;
       {04}RIT:       longbool;
@@ -1741,7 +1742,7 @@ end;
 
 procedure RadioObject.UpdateRadioStatus;
 
-{ Updates the filtered radio status }
+{ Updates the filtered radio status } // This is not called anymore
 
 begin
    if CurrentStatus.Freq = PreviousStatus.Freq then
