@@ -6900,6 +6900,27 @@ begin
 
 end;
 
+YBFT8QP: // 4.90.7
+begin
+  if IndonesianCountry(MyCountry) then
+  begin
+    if IndonesianCountry(RXCty) then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 2 ;
+  end
+  else
+   begin
+    if IndonesianCountry(RXCty) then
+      RXData.QSOPoints := 2
+    else
+     if RXCty <> MyCountry then
+      RXData.QSOPoints := 1
+    else
+      RXData.QSOPoints := 0;
+   end;
+end;
+
 SLFivePointQSOMethod:
 if Copy(RXData.Callsign, 1, 2) = 'SL' then
   RXData.QSOPoints := 5

@@ -180,11 +180,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.90.6' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.90.7' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July 16, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'July 19, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -2598,7 +2598,8 @@ type
     OKOMSSBQSOPointMethod, // 4.80.1
     uQRQCPM,      // 4.82.3
     OKOMRTTY,     // 4.83.4
-    SRRQSOPOINTMETHOD // 4.90.4
+    SRRQSOPOINTMETHOD, // 4.90.4
+    YBFT8QP              // 4.90.7
 
     );
 
@@ -2736,8 +2737,8 @@ const
      'OKOM SSB',          // 4.80.1
      'UQRQCPM',           // 4.82.3
      'OKOMRTTY',           // 4.83.4
-     'SRRQSOPOINTMETHOD'  // 4.90.4
-
+     'SRRQSOPOINTMETHOD',  // 4.90.4
+     'YBFT8QP'               // 4.90.7
     );
 
 type
@@ -3278,7 +3279,7 @@ QSOPartiesCount = 15;
       'PA QSO PARTY',  // 4.74.3
       'IN QSO PARTY', // 4.88.2
       'OK-OM DX SSB'       // 4.80.1
-      );
+     );
 
   const
     {QSO BY BAND BIT 0}
