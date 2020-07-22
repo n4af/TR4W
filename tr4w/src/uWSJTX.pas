@@ -37,6 +37,10 @@ type
       context: TIdContext;
       buffer: TIdBytes;
       sBuffer: string;
+      TXKludge: boolean;
+      txKludgeStart: TDateTime;
+      RXKludge: boolean;
+      rxKludgeStart: TDateTime;
       procedure SetUDPPort(nPort: integer);
       procedure SetTCPPort(nPort: integer);
       function GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
@@ -66,6 +70,7 @@ type
 
   end;
 
+const KLUDGESECONDSV = 2;
 implementation
 
 uses
@@ -328,7 +333,7 @@ begin
                               end;
                            call := DXCall;
 
-                           // Here we cheat a little bit on Frequency. The idea is that the status command is send enough that it gives
+                           // Here we cheat a little bit on Frequency. The idea is that the status command is sent enough that it gives
                            // us the frequency. SO turn the frequency into the band.
                            // We could also use the radio object to check
                            GetBandMapBandModeFromFrequency(frequency, TempBand, TempMode);
@@ -363,7 +368,7 @@ begin
                end;
 
             5: begin        {..........I may grab this from the ADIF record so this would not be needed   QSO logged}
-            {
+
                Unpack(AData,index,date);
                Unpack(AData,index,DXCall);
                Unpack(AData,index,DXGrid);
@@ -377,10 +382,10 @@ begin
 
                DEBUGMSG('QSO logged: Date:' + FormatDateTime('dd-mmm-yyyy hh:mm:ss',date)
                                + ' DX Call:' + DXCall + ' DX Grid:' + DXGrid
-                               + ' Frequency:' + IntToStr(frequency.Hi) + ' Mode:' + mode + ' Report sent: ' + report
+                               + ' Frequency:' + IntToStr(frequency) + ' Mode:' + mode + ' Report sent: ' + report
                                + ' Report received:' + reportReceived + ' TX Power:' + TXPower
                                + ' Comments:' + comments + ' Name:' + DXName);
-            }  end;
+              end;
             6:
                begin
                DEBUGMSG('WSJT-X close message received'); // We may want to indicate it somehow on main screen
@@ -574,6 +579,10 @@ end;
     bytesWritten: integer;
     sFreq: string;
     sLen: string;
+    sDebug: string;
+    s: string;
+    sReply: string;
+
     nPos, len, n0, n1, newEnd: integer;
     freq: extended;
     fieldName, fieldValue: string;
@@ -604,19 +613,52 @@ begin
     // ... message log
     Display('CLIENT', '(Peer=' + PeerIP + ':' + IntToStr(PeerPort) + ') ' + sBuffer);
     // ...
+
+    { The TX and RX Kludge business is just that...a kludge. The problem is that WSJT-X wants to see the effected state change
+      (TX on in response to a CmdTX or RX on in response to a CmdRX) in one second. Due to the polling interval of the attached radio
+      we may not have a reply that fast. If WSJT-X does not get that, it aborts the connection. So we fool it. When the TX status
+      change is requested, we force it to be what WSJT-X wants for 5 seconds to give us plenty of time to get the status from the radio.
+      Not a great system but short of a much faster indication if we are transmitting, this seems to work.
+      Work should be done to speed up the actual state change notification so this can be a truer indication or at least the
+      timer lowered from 5 seconds.   // NY4I wrote this and the kludge--lest anyone else get blamed for this nastiness...
+    }
    while Self.GetNextADIFField(sBuffer,fieldName, fieldValue) do
       begin
+      if TXKludge then
+         begin
+         if SecondsBetween(txKludgeStart,Now) > KLUDGESECONDSV then
+            begin
+            TXKludge := false;
+            end
+         else
+            begin
+            DEBUGMSG('TXKludge is true');
+            end;
+         end;
+
+      if RXKludge then
+         begin
+         if SecondsBetween(rxKludgeStart,Now) > KLUDGESECONDSV then
+            begin
+            RXKludge := false;
+            end
+         else
+            begin
+            DEBUGMSG('RXKludge is true');
+            end;
+         end;
+
       if fieldValue = 'CmdGetFreq' then
          begin
-         if radio1.CurrentStatus.VFO[VFOA].Frequency = 0 then
+         if ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency = 0 then
             begin
-            DEBUGMSG('**** radio1.CurrentStatus.VFO[VFOA].Frequency = 0');
+            DEBUGMSG('**** ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency = 0');
             Display('client','Sending frequency as .000');
             AContext.Connection.IOHandler.Write('<CmdFreq:4>.000');
             end
          else
             begin
-            sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.VFO[VFOA].Frequency/1000);
+            sFreq := SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency/1000);
             Display('client','Sending frequency as ' + sFreq);
             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             end;
@@ -624,12 +666,16 @@ begin
       else if fieldName = 'xcvrfreq' then
          begin
          freq := SafeFloat(fieldValue);
-         radio1.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
+         ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
          DEBUGMSG('Setting radio to frequency ' + IntToStr(Trunc(freq)));
+         end
+      else if fieldValue = 'CmdSetMode' then
+         begin
+         DEBUGMSG('CmdSetMode received ' + sBuffer);
          end
       else if fieldValue = 'CmdSendSplit' then
          begin
-         if radio1.CurrentStatus.Split then
+         if ActiveRadioPtr.CurrentStatus.Split then
             begin
             AContext.Connection.IOHandler.Write('<CmdSplit:2>ON');
             DEBUGMSG('Sending ' + '<CmdSplit:2>ON');
@@ -640,16 +686,18 @@ begin
             DEBUGMSG('Sending ' + '<CmdSplit:3>OFF');
             end;
          end
-      else if fieldValue = 'CmdRX' then
+      else if fieldValue = 'CmdRX' then     // No reply
          begin
          if not tPTTViaCommand then
             begin
             QuickDisplay('PTT VIA COMMANDS (CTRL-J) option must be true for WSJT-X use - Setting to true');
             tPTTViaCommand := true;
             end;
-
+         DEBUGMSG('<<<<<<<<<<<<<<<<<<<<< PTT OFF *********************');
          tPTTVIACAT(false);
-        // AContext.Connection.IOHandler.Write('<CmdSendRX:3>OFF')
+         TXKludge := false;
+         RXKludge := true;
+         rxKludgeStart := Now;
          end
       else if fieldValue = 'CmdTX' then
          begin
@@ -658,161 +706,72 @@ begin
             QuickDisplay('PTT VIA COMMANDS (CTRL-J) option must be true for WSJT-X use - Setting to true');
             tPTTViaCommand := true;
             end;
+         DEBUGMSG('>>>>>>>>>>>>>>>>>>> PTT ON *********************');
          tPTTVIACAT(true);
+         txKludgeStart := Now;
+         TXKludge := true;
+         RXKludge := false;
          end
       else if fieldValue = 'CmdSendMode' then
          begin
-         DEBUGMSG('Sending ' + '<CmdMode:6>Data-U');
-         AContext.Connection.IOHandler.Write('<CmdMode:6>Data-U');
+         case ActiveRadioPtr.CurrentStatus.ExtendedMode of
+            eAM: s := 'AM';
+            eCW: s := 'CW';
+            eCW_R: s := 'CW-R';
+            eDATA_R: s := 'DATA-L';
+            eDATA: s := 'DATA-U';
+            eFM: s := 'FM';
+            eLSB: s := 'LSB';
+            eUSB: s := 'USB';
+            eRTTY: s := 'RTTY';
+            eRTTY_R: s := 'RTTY-R';
+            else
+               DEBUGMSG('Mode not handled in SENDMODE');
+            end;
+         AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
+         DEBUGMSG('Sending ' + SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
          end
       else if fieldValue = 'CmdSendTx' then
          begin
-         if radio1.CurrentStatus.TXOn then
+         if TXKludge then
             begin
-            AContext.Connection.IOHandler.Write('<CmdTX:2>ON');
-            DebugMsg('Sending ' + '<CmdTX:2>ON');
+            sReply := '<CmdTX:2>ON';
+            end
+         else if RXKludge then
+            begin
+            sReply := '<CmdTX:3>OFF';
             end
          else
             begin
-            AContext.Connection.IOHandler.Write('<CmdTX:3>OFF');
-            DebugMsg('Sending ' + '<CmdTX:3>OFF');
+            if ActiveRadioPtr.CurrentStatus.TXOn then
+               begin
+               sReply := '<CmdTX:2>ON';
+               end
+            else
+               begin
+               sReply := '<CmdTX:3>OFF';
+               end;
             end;
+         sDebug := '';
+         if TXKludge then
+            begin
+            sDebug := ' TXKludge ';
+            end;
+         if RXKludge then
+            begin
+            sDebug := sDebug + ' RXKludge ';
+            end;
+         if Length(sDebug) > 0 then
+            begin
+            sDebug := '[' + sDebug + '] ';
+            end;
+         sDebug := sDebug + 'Sending ' + sReply;
+         DEBUGMSG(sDebug);
+         AContext.Connection.IOHandler.Write(sReply);
          end;
       end;
 
-  (* while Length(sBuffer) > 0  do
-      begin
-      Display ('SERVER','Processing message ' + sBuffer);
-
-      if AnsiStartsStr('<command', sBuffer) then
-         begin
-         // ProcessCommand(sBuffer,slFields);
-         if AnsiStartsStr(GETFREQ, sBuffer) then
-            begin
-            sBuffer := RightStr(sBuffer,length(sBuffer) - length(GETFREQ));
-            sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.Freq/1000);
-            Display('client','Sending frequency as ' + sFreq);
-            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
-            end
-         else if AnsiStartsStr(SETRX, sBuffer) then
-            begin
-            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETRX));
-            tPTTVIACAT(false);
-            //AContext.Connection.IOHandler.Write('<CmdSendRX:3>OFF')
-            end
-         else if AnsiStartsStr(SETFREQ, sBuffer) then  // Parse out frequency    // <command:10>CmdSetFreq<parameters:23><xcvrfreq:10> 7,074.000';
-            begin
-            // find xcvrfreq
-            nPos := AnsiPos('xcvrfreq',sBuffer);
-            if nPos > 0 then
-               begin
-               if AnsiMidStr(sBuffer,nPos+8,1) = ':' then
-                  begin
-                  n0 := nPos + 9;
-                  newEnd := n0;
-                  n1 := AnsiPos('>',AnsiMidStr(sBuffer,nPos+9,length(sBuffer)));
-                  if n1 > 0 then //n1 points to the > n0 to the number
-                     begin
-                     newEnd := newEnd + n1;
-                     sLen := AnsiMidStr(sBuffer,n0,n1-1);
-                     if length(sLen) > 0 then
-                        begin
-                        len := StrToIntDef(sLen,-1);
-                        if len > -1 then
-                           begin    // len is length of count for frequency frequency starts at n1+1
-                           sFreq := AnsiMidStr(sBuffer,n0+n1+0,len);
-                           newEnd := newEnd + len;
-                           sFreq := Trim(sFreq);
-                           freq := SafeFloat(sFreq);
-                           radio1.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
-                           DEBUGMSG('Setting radio to frequency ' + IntToStr(Trunc(freq)));
-                           end
-                        else
-                           begin
-                           DEBUGMSG('Could not convert len of frequency to a number');
-                           end;
-                        end;
-                     end
-                  else
-                     begin
-                     DEBUGMSG('Count not find > before frequency');
-                     end;
-                  end;
-               end;
-            if newEnd > 0 then
-               begin
-               sBuffer := RightStr(sBuffer,length(sBuffer) - newEnd);
-               newEnd := 0;
-               end
-            else
-               begin
-               sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETFREQ));
-               end;
-            end
-         else if AnsiStartsStr(SETTX, sBuffer) then
-            begin
-            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SETTX));
-            tPTTVIACAT(true);
-            end
-         else if AnsiStartsStr(SENDSPLIT, sBuffer) then
-            begin
-            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDSPLIT));
-            if radio1.CurrentStatus.Split then
-               begin
-               AContext.Connection.IOHandler.Write('<CmdSplit:2>ON');
-               DEBUGMSG('Sending ' + '<CmdSplit:2>ON');
-               end
-            else
-               begin
-               AContext.Connection.IOHandler.Write('<CmdSplit:3>OFF');
-               DEBUGMSG('Sending ' + '<CmdSplit:3>OFF');
-               end;
-            end
-         else if AnsiStartsStr(SENDMODE, sBuffer) then
-            begin
-            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDMODE));
-            DEBUGMSG('Sending ' + '<CmdMode:6>Data-U');
-            AContext.Connection.IOHandler.Write('<CmdMode:6>Data-U');
-            end
-         else if AnsiStartsStr(SENDTX, sBuffer) then
-            begin
-            sBuffer := RightStr(sBuffer,length(sBuffer) - length(SENDTX));
-            if radio1.CurrentStatus.TXOn then
-               begin
-               AContext.Connection.IOHandler.Write('<CmdTX:2>ON');
-               DebugMsg('Sending ' + '<CmdTX:2>ON');
-               end
-            else
-               begin
-               AContext.Connection.IOHandler.Write('<CmdTX:3>OFF');
-               DebugMsg('Sending ' + '<CmdTX:3>OFF');
-               end;
-            end
-         else if AnsiStartsStr(GETTXFREQ, sBuffer) then
-            begin
-            sBuffer := RightStr(sBuffer,length(sBuffer) - length(GETTXFREQ));
-            sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.Freq/1000);
-            Display('CLIENT','Sending frequency as ' + sFreq);
-            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdTXFreq:%u>%s',[length(sFreq),sFreq]));
-            end
-         else
-            begin
-            Display('CLIENT','Undefined message ' + sBuffer);
-            sBuffer := '';
-            end;
-         end;
-      end;
-
-      *)
-
-       Display('CLIENT','length(sBuffer) = ' + IntToStr(length(sBuffer)));
-    // ... process message from Client
-
-    // ...
-
-    // ... send response to Client
-
-    //AContext.Connection.IOHandler.WriteLn('... message sent from server :)');
+        Display('CLIENT','length(sBuffer) = ' + IntToStr(length(sBuffer)));
      except
       on E : Exception do
          DEBUGMSG(E.ClassName+' error raised, with message : '+E.Message);
@@ -866,8 +825,11 @@ end;
    z := AnsiPos('<',sBuffer);
    if z = 0 then
       begin
-      DEBUGMSG('sBuffer does not start with < ' + sBuffer);
-      sBuffer := '';
+      if length(sBuffer) > 0 then
+         begin
+         DEBUGMSG('sBuffer does not start with < ' + sBuffer);
+         sBuffer := '';
+         end;
       exit;//  there is no other record - disappearing.
       end;
 
@@ -914,11 +876,13 @@ end;
     if z = 0 then
       begin
       fieldValue := copy(aaa,1,DataLen);
+      DEBUGMSG('1-Trimming sBuffer to [' + copy(aaa,z,length(aaa)) + ']');
       sBuffer := copy(aaa,z,length(aaa)); // Was vstup:=''
       end
     else
       begin
       fieldValue := copy(aaa,1,DataLen);
+      DEBUGMSG('2-Trimming sBuffer to [' + copy(aaa,z,length(aaa)) + ']');
       sBuffer := copy(aaa,z,length(aaa))
       end;
     fieldValue := Trim(fieldValue);

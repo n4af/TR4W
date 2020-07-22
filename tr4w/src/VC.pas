@@ -35,7 +35,7 @@ uses
 
 const
   tDebugMode                            = False;
-  NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
+  NEWER_DEBUG                           = True; // ny4i added this as tDebugMode changes too much.
   MMTTYMODE                             = True;
 
 
@@ -1051,8 +1051,8 @@ type
     NoBand
     );
   PBandType = ^BandType;
-  (* ****** If you add any new extended modes, please update MainUnit.GetModeFromExtendedMode *)
-  ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
+  (* ****** If you add any new non-Data extended modes, please update MainUnit.GetModeFromExtendedMode *)
+  ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB, eData, eCW_R, eData_R, eRTTY_R);
 
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
            //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
@@ -1187,7 +1187,7 @@ const
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
   ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
-  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('NoMode', 'CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'LSB');
+  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('NoMode', 'CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'LSB', 'DATA', 'CW-R', 'DATA-R', 'RTTY-R');
 
   BandStringsArray                      : array[BandType] of PChar {string} =
     (

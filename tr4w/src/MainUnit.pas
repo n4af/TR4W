@@ -7566,6 +7566,31 @@ begin
 {$IFEND}
 end;
 
+procedure CreateLogfile(aLine: string);
+var
+  aFileName : string;
+  myFile : TextFile;
+  aFilePath : string;
+begin
+  try
+    //aLine := 'The line which you want to print. You can change this line dynamically by passing   aLine as  parameter to CreateLogfile function';
+    aFileName := 'TR4WLogfile_' + FormatDateTime('dd-mm-yyyy',Now)+'.log';
+    aFilePath := aFileName;
+    AssignFile(myFile, aFilePath);
+    try
+       if FileExists(aFilePath) then
+          Append(myFile)
+       else
+         Rewrite(myFile);
+       WriteLn(myFile, FormatDateTime('dd-mmm-yyyy hh:nn:ss.zzz',Now) + ': ' + ALine);
+       Flush(myFile);
+    except
+    end;
+  finally
+    CloseFile(myFile);
+  end;
+end;
+
 procedure DebugMsg(s: string);
 {$IF NEWER_DEBUG}
 var
@@ -7575,6 +7600,7 @@ var
 {$IFEND}
 begin
 {$IF NEWER_DEBUG}
+   (* Switched to write a file
    first := true;
    LongTimeFormat := 'hh nn ss (zzz)';
    DateTimeToString(formattedDate, 'tt', Now);
@@ -7597,6 +7623,8 @@ begin
       end;
 
    AddStringToTelnetConsole(PChar('[' + formattedDate + '] ' + s),tstSend);
+   *)
+   CreateLogFile(s);
 {$IFEND}
 end;
 
@@ -7676,7 +7704,7 @@ function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
 begin
 //ExtendedModeStringArray               : array[ExtendedModeType] of string = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'SSB');
    case extMode of
-      eCW: Result := CW;
+      eCW, eCW_R: Result := CW;
       eSSB, eFM, eAM, eUSB, eLSB:
          Result := Phone;
       else

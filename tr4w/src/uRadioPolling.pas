@@ -14,8 +14,8 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+     Public License along with TR4W in  GPL_License.TXT.
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit uRadioPolling;
@@ -44,7 +44,7 @@ uses
   idUDPClient, // ny4i 4.44.9
   idGlobal, // ny4i 4.44.9
   Windows;
- 
+
 type
   DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
 
@@ -67,6 +67,7 @@ procedure pFT100(rig: RadioPtr);
 procedure pIcom(rig: RadioPtr);
 procedure pIcomNew(rig: RadioPtr);
 function icomCheckBuffer(rig: RadioPtr): boolean;
+procedure SetVFOModeExtendedMode(rig: RadioPtr; which: Cardinal; mode: ModeType; em: ExtendedModeType);
 
 procedure pFTDX9000(rig: RadioPtr);
 procedure pFT891(rig: RadioPtr);
@@ -97,11 +98,11 @@ procedure SetVFOB(rig: RadioPtr);
 function getIcomResponceSpeed(rig: RadioPtr): boolean;
 procedure PTTStatusChanged;
 procedure SendRadioInfoToUDP(rig: RadioPtr);
-
+var saveVFOAFreq: integer;
 const
   POLLINGDEBUG                          = False;
   ICOM_DEBUG                            = False;
- 
+
 implementation
 
 procedure pKenwood2(rig: RadioPtr);
@@ -201,6 +202,7 @@ begin
                           '3', '7', '8': rig^.CurrentStatus.Mode := CW;
                         end;
 
+                        
                         if rig^.tBuf[i - 7] = '0' then
                         begin
             //            debugmsg('polling IF ' + inttostr(rig^.CurrentStatus.Freq));
@@ -226,6 +228,10 @@ begin
                         if rig^.tBuf[i-9] = '1' then
                            begin
                            DEBUGMSG('K3/Kenwood2 says radio is transmitting');
+                           end
+                        else
+                           begin
+                           DEBUGMSG('K3/Kenwood2 says radio is RECEIVING');
                            end;
                         if radio1.CurrentStatus.TXOn then
                            begin
@@ -456,7 +462,7 @@ begin
   until rig^.tPollCount < 0;
 end;
 
-procedure pKenwoodNew(rig: RadioPtr);
+procedure pKenwoodNew(rig: RadioPtr);   // K3 is here
 label
   NextPoll;
 var
@@ -498,6 +504,56 @@ begin
         '6', '9': rig^.CurrentStatus.Mode := Digital;
         '3', '7', '8': rig^.CurrentStatus.Mode := CW;
       end;
+
+      // Set the extendedMode based on the actual mode ny4i
+      case rig^.tBuf[30] of
+      '1': begin
+           rig^.CurrentStatus.ExtendedMode := eLSB;
+           rig^.CurrentStatus.Mode := Phone;
+           end;
+      '2': begin
+           rig^.CurrentStatus.ExtendedMode := eUSB;
+           rig^.CurrentStatus.Mode := Phone;
+           end;
+      '3': begin
+           rig^.CurrentStatus.ExtendedMode := eCW;
+           rig^.CurrentStatus.Mode := CW;
+           end;
+      '4': begin
+           rig^.CurrentStatus.ExtendedMode := eFM;
+           rig^.CurrentStatus.Mode := FM;
+           end;
+      '5': begin
+           rig^.CurrentStatus.ExtendedMode := eAM;
+           rig^.CurrentStatus.Mode := Phone;
+           end;
+       '6': begin
+            rig^.CurrentStatus.ExtendedMode := eRTTY;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+       '7': begin
+            rig^.CurrentStatus.ExtendedMode := eCW_R;
+            rig^.CurrentStatus.Mode := CW;
+            end;
+       '8': begin
+            rig^.CurrentStatus.Mode := CW;
+            rig^.CurrentStatus.ExtendedMode := eCW_R;
+            end;
+       '9': begin
+            rig^.CurrentStatus.ExtendedMode := eRTTY_R;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+       'A': begin
+            rig^.CurrentStatus.ExtendedMode := eDATA;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+       'B': begin
+            rig^.CurrentStatus.ExtendedMode := eDATA_R;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+        else
+            DEBUGMSG('Invalid mode received from KenwoodNew ' + rig^.tBuf[30]);
+        end;
       //1 (LSB), 2 (USB), 3 (CW), 4 (FM), 5 (AM), 6 (DATA), 7 (CW- REV), or 9 (DATA-REV).
       (*case rig^.tBuf[30] of
         '1': rig^.CurrentStatus.ModeActual := rLSB;
@@ -1033,34 +1089,109 @@ begin
               ICOM_GET_EXTENDEDVFO:
                 if Ord(rig.tBuf[i +4+1]) = 0 then
                    begin // VFO A
-                   rig.CurrentStatus.Freq := GetFrequencyFromBCD(4, @rig.tBuf[i + 5]) + rig^.FrequencyAdder;
+                   rig.CurrentStatus.Freq := GetFrequencyFromBCD(5, @rig.tBuf[i + 6]) + rig^.FrequencyAdder;
                    rig.CurrentStatus.VFO[VFOA].Frequency := rig.CurrentStatus.Freq;
                    with rig.CurrentStatus do CalculateBandMode(Freq, Band, DummyMode);
                    UpdateStatus(rig);
                    end
                 else if Ord(rig.tBuf[i +4+1]) = 1 then
                    begin // VFO B
-                   freq := GetFrequencyFromBCD(FDPos - 6, @rig.tBuf[i + 6]) + rig^.FrequencyAdder;
+                   freq := GetFrequencyFromBCD(5, @rig.tBuf[i + 6]) + rig^.FrequencyAdder;
                    rig.CurrentStatus.VFO[VFOB].Frequency := freq;
+
+                   //rig.CurrentStatus.VFO[VFOB].Mode :=
                    //with rig.CurrentStatus do CalculateBandMode(Freq, Band, DummyMode);
                    //UpdateStatus(rig);
                    end;
+              ICOM_GET_EXTENDEDMODE:
+                 begin
+                 case Ord(rig.tBuf[i + 6]) of
+                    0: begin        // LSB
+                       if Ord(rig.tBuf[i+7]) = 0 then
+                          begin
+                          SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),Phone,eLSB);
+                          end
+                       else
+                          begin
+                          SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),Digital,eDATA_R);
+                          end;
+                       end;
+                    1: begin
+                       if Ord(rig.tBuf[i+7]) = 0 then
+                          begin
+                          SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),Phone,eUSB);
+                          end
+                       else
+                          begin
+                          SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),Digital,eDATA);
+                          end;
+                       end;
+                    2: SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),Phone,eAM);
+                    3: SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),CW,eCW);
+                    4: SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),Digital,eRTTY);
+                    5: SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),FM,eFM);
+                    7: SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),CW,eCW_R);
+                    8: SetVFOModeExtendedMode(rig,Ord(rig.tBuf[i+5]),Digital,eRTTY_R);
+                    else
+                       DEBUGMSG('Unknown Mode command from Icom ' + IntToStr( Ord(rig.tBuf[i + 6])));
+                    end;
+                 if Ord(rig.tBuf[i+8]) > 0 then
+                    begin
+                    Icom_Filter_Width := Ord(rig.tBuf[i + 8]);      
+                    end;
+                 UpdateStatus(rig);
+                 end;
               ICOM_TRANSFER_MODE, ICOM_GET_MODE:
                 if FDPos in [6, 7] then
                 begin
                   //------------------00.01.02.03.04.05.06.07
                   //FE.FE.ra.E0.04.FD.FE.FE.E0.ra.04.00.00.FD + IF passband width data (06)
                   //FE.FE.ra.E0.04.FD.FE.FE.E0.ra.04.00.FD
-
                   case Ord(rig.tBuf[i + 5]) of
+                     0: begin
+                        rig.CurrentStatus.Mode := Phone;
+                        rig.CurrentStatus.ExtendedMode := eLSB;
+                        end;
+                     1: begin
+                        rig.CurrentStatus.Mode := Phone;
+                        rig.CurrentStatus.ExtendedMode := eUSB;
+                        end;
+                     2: begin
+                        rig.CurrentStatus.Mode := Phone;
+                        rig.CurrentStatus.ExtendedMode := eAM;
+                        end;
+                     3: begin
+                        rig.CurrentStatus.Mode := CW;
+                        rig.CurrentStatus.ExtendedMode := eCW;
+                        end;
+                     4: begin
+                        rig.CurrentStatus.Mode := Digital;
+                        rig.CurrentStatus.ExtendedMode := eRTTY;
+                        end;
+                     5: begin
+                        rig.CurrentStatus.Mode := Phone;
+                        rig.CurrentStatus.ExtendedMode := eFM;
+                        end;
+                     7: begin
+                        rig.CurrentStatus.Mode := CW;
+                        rig.CurrentStatus.ExtendedMode := eCW_R;
+                        end;
+                     8: begin
+                        rig.CurrentStatus.Mode := Digital;
+                        rig.CurrentStatus.ExtendedMode := eRTTY_R;
+                        end;
+                     else
+                         DEBUGMSG('Unknown Mode command from Icom ' + IntToStr( Ord(rig.tBuf[i + 5])));
+                     end;
+                  {case Ord(rig.tBuf[i + 5]) of
                     5: rig.CurrentStatus.Mode := FM;
                     3, 7: rig.CurrentStatus.Mode := CW;
                     4, 8: rig.CurrentStatus.Mode := Digital;
                   else rig.CurrentStatus.Mode := Phone;
-                  end;
+                  end;}
 
                   if (Ord(rig.tBuf[i+6]) > 0) then         // n4af 4.43.4
-                  Icom_Filter_Width := Ord(rig.tBuf[i + 6]);      // 4.43.4
+                     Icom_Filter_Width := Ord(rig.tBuf[i + 6]);      // 4.43.4
                   UpdateStatus(rig);
                 end;
               ICOM_XMIT_SETTINGS:
@@ -1136,7 +1267,7 @@ begin
 //  sleep(200);
   Sleep(FreqPollRate);
 
-  rig.SendIcomCommand(Ord(ICOM_GET_MODE));
+ { rig.SendIcomCommand(Ord(ICOM_GET_MODE));
   if not icomCheckBuffer(rig) then
   begin
     ClearRadioStatus(rig);
@@ -1153,19 +1284,31 @@ begin
     Sleep(1000);
     goto NextPoll;
   end;
-
+ }
   if rig^.RadioModel in IcomRadiosThatSupportVFOB then
      begin
-     {rig.SendIcomTwoByteCommand(ICOM_GET_EXTENDEDVFO,0);
+
+     rig.SendIcomExtendedVFO(false);
      if not icomCheckBuffer(rig) then
         begin
         ClearRadioStatus(rig);
         UpdateStatus(rig);
         Sleep(1000);
         goto NextPoll;
+
         end;
-     }
-     //rig.SendIcomTwoByteCommand(Ord(ICOM_GET_EXTENDEDVFO),1);  // Unselected VFO (B)
+
+
+     rig.SendIcomExtendedMode(false);
+     if not icomCheckBuffer(rig) then
+        begin
+        ClearRadioStatus(rig);
+        UpdateStatus(rig);
+        Sleep(1000);
+        goto NextPoll;
+
+        end;
+
      rig.SendIcomExtendedVFO(true);
      if not icomCheckBuffer(rig) then
         begin
@@ -1175,8 +1318,39 @@ begin
         goto NextPoll;
 
         end;
+
+
+     rig.SendIcomExtendedMode(true);
+     if not icomCheckBuffer(rig) then
+        begin
+        ClearRadioStatus(rig);
+        UpdateStatus(rig);
+        Sleep(1000);
+        goto NextPoll;
+
+        end;
+
+     end
+  else
+     begin
+     rig.SendIcomCommand(Ord(ICOM_GET_MODE));
+     if not icomCheckBuffer(rig) then
+        begin
+        ClearRadioStatus(rig);
+        UpdateStatus(rig);
+        Sleep(1000);
+        goto NextPoll;
      end;
 
+     rig.SendIcomCommand(Ord(ICOM_GET_FREQ));
+     if not icomCheckBuffer(rig) then
+        begin
+        ClearRadioStatus(rig);
+        UpdateStatus(rig);
+        Sleep(1000);
+        goto NextPoll;
+        end;
+     end;
   rig.SendIcomCommand(Ord(ICOM_SPLIT_MODE));
   if not icomCheckBuffer(rig) then
   begin
@@ -2082,17 +2256,57 @@ end;
 procedure DisplayCurrentStatus(rig: RadioPtr);
 var
   h                                     : HWND;
+  //fa: integer;
 begin
   if rig = ActiveRadioPtr then SendStationStatus(sstBandModeFreq);
   if UDPBroadcastRadio then
      begin
      SendRadioInfoToUDP(rig); // ny4i 4.44.9 // Broadcast Radio Info if set
      end;
-  Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
+  //Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
   h := rig.tRadioInterfaceWndHandle;
-  if h = 0 then Exit;
-  SetDlgItemText(h, 102, FreqToPChar(rig.CurrentStatus.VFO[VFOA].Frequency));
-  SetDlgItemText(h, 104, FreqToPChar(rig.CurrentStatus.VFO[VFOB].Frequency));
+  //if h = 0 then Exit;
+  //tSetWindowRedraw(h,false);
+  if rig.CurrentStatus.VFO[VFOA].Frequency <> rig.CurrentStatus.previousVFO[VFOA].Frequency then
+     begin
+     if h <> 0 then
+        begin
+        SetDlgItemText(h, 102, FreqToPChar(rig.CurrentStatus.VFO[VFOA].Frequency));
+        end;
+     Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
+     end
+  else
+     begin
+     rig.CurrentStatus.previousVFO[VFOA].Frequency := rig.CurrentStatus.VFO[VFOA].Frequency;
+     end;
+  (*fa := rig.CurrentStatus.VFO[VFOA].Frequency;    // This is so pointless updates do not flicker.
+  if fa <> saveVFOAFreq then                      // We need a changed flag so we can check them all.
+     begin
+     if h <> 0 then
+        begin
+        SetDlgItemText(h, 102, FreqToPChar(fa));
+        end;
+     Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
+     end
+  else
+     begin
+     saveVFOAFreq := fa;
+     end;
+     *)
+  if rig.CurrentStatus.VFO[VFOB].Frequency <> rig.CurrentStatus.previousVFO[VFOB].Frequency then
+     begin
+     if h <> 0 then
+        begin
+        SetDlgItemText(h, 104, FreqToPChar(rig.CurrentStatus.VFO[VFOB].Frequency));
+        end;
+     //Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
+     end
+  else
+     begin
+     rig.CurrentStatus.previousVFO[VFOB].Frequency := rig.CurrentStatus.VFO[VFOB].Frequency;
+     end;
+  //tSetWindowRedraw(h,true);
+  //UpdateWindow(h);
  // ActiveRadioPtr.tPTTStatus :=
   if rig.CurrentStatus.TXOn then
      begin
@@ -2568,6 +2782,28 @@ begin
         // ShowMessage(PChar('Exception in SendRadioInfoToUDP. Message = '));
    end;
 end; // SendRadioInfoToUDP;
+
+procedure SetVFOModeExtendedMode(rig: RadioPtr; which: Cardinal; mode: ModeType; em: ExtendedModeType);
+begin
+   if which = 0 then
+      begin
+      rig.CurrentStatus.VFO[VFOA].Mode := mode;
+      rig.CurrentStatus.VFO[VFOB].ExtendedMode := em;
+      rig.CurrentStatus.Mode := mode;
+      rig.CurrentStatus.ExtendedMode := em;
+      end
+   else if which = 1 then
+      begin
+      rig.CurrentStatus.VFO[VFOB].Mode := mode;
+      rig.CurrentStatus.VFO[VFOB].ExtendedMode := em;
+      end
+   else
+      begin
+      DEBUGMSG('In SetVFOModeExtendedMode, which is not valid ' + IntToStr(which));
+      end;
+end;
+
+
 
 end.
 

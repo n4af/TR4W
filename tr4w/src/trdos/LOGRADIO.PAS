@@ -69,6 +69,7 @@ const
 
    ICOM_GET_RIT_FREQ   = #$21;
    ICOM_GET_EXTENDEDVFO = #$25;
+   ICOM_GET_EXTENDEDMODE = #$26;
    //ICOM_SET_RIT_FREQ   =
 
    ICOM_SET_VFO_A_COMMAND = #$00;
@@ -128,12 +129,14 @@ type
       {01}Split:     boolean;
       {01}RIT:       boolean;
       {01}XIT:       boolean;
+       ExtendedMode: ExtendedModeType;
    end;
 
    RadioStatusRecord = record
       //    {24}VFOA: VFOStatusType;
       //    {24}VFOB: VFOStatusType;
       VFO:           array[ActiveVFOStatusType] of VFOStatusType;
+      previousVFO:   array[ActiveVFOStatusType] of VFOStatusType;
       {04}Freq:      longint; // This is the active frequency for the radio
       {04}Split:     longbool;
       {04}RIT:       longbool;
@@ -142,6 +145,7 @@ type
       {04}PrevRITFreq: integer;
       {01}Band:      BandType;
       {01}Mode:      ModeType;
+      ExtendedMode:  ExtendedModeType;
       {01}VFOStatus: ActiveVFOStatusType;
       {01}PrevVFOStatus: ActiveVFOStatusType;
       {01}TXOn:      boolean;
@@ -272,6 +276,7 @@ type
       procedure SendIcomTwoByteCommand(Command: byte; opCode: byte);
       procedure SendXMITStatusCommand;
       procedure SendIcomExtendedVFO(bVFO: boolean);
+      procedure SendIcomExtendedMode(bVFO: boolean);
       procedure SendRITStatusCommand;
       procedure SendRITFreqCommand;
       procedure SetICOMRITFrequency(hz: integer);
@@ -1615,6 +1620,18 @@ begin
    WriteToCATPort(tIcom11Bytes, 7);
 end; // SendIcomExtendedVFO
 
+procedure RadioObject.SendIcomExtendedMode(bVFO: boolean);
+begin
+   tIcom11Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom11Bytes[2] := ReceiverAddress;
+   tIcom11Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom11Bytes[4] := Ord(ICOM_GET_EXTENDEDMODE);
+   tIcom11Bytes[5] := ifthen(bVFO,Ord(Chr(1)),Ord(Chr(0)));
+   tIcom11Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom11Bytes, 7);
+end; // SendIcomExtendedMode
+
 procedure RadioObject.PutRadioIntoSplit;
 
 begin
@@ -1741,7 +1758,7 @@ end;
 
 procedure RadioObject.UpdateRadioStatus;
 
-{ Updates the filtered radio status }
+{ Updates the filtered radio status } // This is not called anymore
 
 begin
    if CurrentStatus.Freq = PreviousStatus.Freq then
@@ -2553,11 +2570,13 @@ var
 //   VFOByte: byte;
 //   p: PChar;
    tempFilterWidth: integer;
+   skipMode : boolean;
 const
    FT847ModeString = CHR(0) + CHR(0) + CHR(0) + CHR(7);
 
 begin
    // TLogger.GetInstance.Debug(SysUtils.Format('[Enter SetRadioFreq] %s - set frequency to %u',[RadioName,freq]));
+   skipMode := false;
       try
       case RadioParametersArray[RadioModel].rt of
          rtYaesu1:
@@ -2703,7 +2722,7 @@ begin
          rtYaesu2,
          rtYaesu3:
             begin
-            if RadioParametersArray[RadioModel].rt = rtYaesu3 then  //ny4i Issue 218 - Only change to this command is the freq is 9 bytes long.
+            if RadioParametersArray[RadioModel].rt = rtYaesu3 then  //ny4i Issue 218 - Only change to this command if the freq is 9 bytes long.
                begin
                Format(@tKenwood14Bytes, 'FA%09u;', Freq);
                nBytesToWrite := 12;
@@ -2827,48 +2846,53 @@ begin
                CommandsTempBuffer[6] := ICOM_SET_VFO_B_COMMAND;
                CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
                AddCommandToBuffer;
-{
-          ICOM_COMMAND_B1 :=
-            ICOM_PREAMBLE_CODE +
-            ICOM_PREAMBLE_CODE +
-            CHR(ReceiverAddress) +
-            ICOM_CONTROLLER_ADDRESS +
-            ICOM_SET_VFO_COMMAND +
-            ICOM_SET_VFO_B_COMMAND +
-            ICOM_END_OF_MESSAGE_CODE;
-}
                end;
 
             { Send the mode information }
             // TLogger.GetInstance.Debug('Sending Icom mode information');
+            // If the mode is digital, only send a fresh one of it changed.
+            if Mode = Digital then
+               begin
+               if ActiveRadioPtr.CurrentStatus.Mode = Digital then
+                  begin
+                  skipMode := true;
+                  end;
+               end;
+
             if Mode = FM then
                begin
                TempChar := #5;
-               end else
-               if Mode = CW then
+               end
+            else if Mode = CW then
+               begin
+               TempChar := #3;
+               end
+            else if Mode = Digital then
+               begin
+               TempChar := #4;
+               end
+            else
+               begin      //must be phone
+               if Freq < 10000000 then
                   begin
-                  TempChar := #3;
-                  end else
-                  if Mode = Digital then
-                     begin
-                     TempChar := #4;
-                     end else
-                  //must be phone
-                     if Freq < 10000000 then
-                        begin
-                        TempChar := #0;
-                        end else
-                        begin
-                        TempChar := #1;
-                        end;
+                  TempChar := #0;
+                  end
+               else
+                  begin
+                  TempChar := #1;
+                  end;
+               end;
             // TLogger.GetInstance.Debug(Format('Sending Icom mode information - %u',[Ord(Mode)]));
-            CommandsTempBuffer[0] := CHR(9);
-            CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
-            CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
-            CommandsTempBuffer[3] := CHR(ReceiverAddress);
-            CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
-            CommandsTempBuffer[5] := ICOM_SET_MODE;
-            CommandsTempBuffer[6] := TempChar;
+            if not skipMode then
+               begin
+               CommandsTempBuffer[0] := CHR(9);
+               CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+               CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+               CommandsTempBuffer[3] := CHR(ReceiverAddress);
+               CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+               CommandsTempBuffer[5] := ICOM_SET_MODE;
+               CommandsTempBuffer[6] := TempChar;
+               end;
 
             // ny4i: I'm trying to understand this logic   // 4.43.4
             // The way Dave indicated this is supposed to work is that
