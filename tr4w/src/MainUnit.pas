@@ -7597,10 +7597,13 @@ var
    formattedDate: string;
    bytesToWrite: integer;
    first: boolean;
+const bSendToTelnetWindow = FALSE;
 {$IFEND}
 begin
 {$IF NEWER_DEBUG}
-   (* Switched to write a file
+   // Switched to write a file
+if bSendToTelnetWindow then
+   begin
    first := true;
    LongTimeFormat := 'hh nn ss (zzz)';
    DateTimeToString(formattedDate, 'tt', Now);
@@ -7623,8 +7626,11 @@ begin
       end;
 
    AddStringToTelnetConsole(PChar('[' + formattedDate + '] ' + s),tstSend);
-   *)
+   end
+else
+   begin
    CreateLogFile(s);
+   end;
 {$IFEND}
 end;
 

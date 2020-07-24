@@ -514,6 +514,7 @@ begin
   mov  [tNet_Event],eax
   end;
 
+
   DEBUGMSG('Current program version = ' + TR4W_CURRENTVERSION);
   DEBUGMSG('Current TR4W Server version = ' + TR4WSERVER_CURRENTVERSION);
   DEBUGMSG('Current log version = ' + LOGVERSION);
@@ -547,8 +548,12 @@ begin
   Windows.CopyMemory(@TR4W_LATESTCFG_FILENAME, @TR4W_CFG_FILENAME, SizeOf(FileNameType));
 //  Windows.CharLower(TR4W_LATESTCFG_FILENAME);
   Windows.WritePrivateProfileString(_COMMANDS, LATEST_CONFIG_FILE, TR4W_LATESTCFG_FILENAME, TR4W_INI_FILENAME);
+  QuickDisplay('Warning - This is a Debug version');
 {$IFEND}
 
+{$IF NEWER_DEBUG}
+  QuickDisplay('Warning - This is a Debug version');
+{$IFEND}
   if CPUKeyer.SerialPortDebug then
     ShowMessage('Command SERIAL PORT DEBUG is no longer supported.'#13#10'Use instead Portmon program:'#13#10'http://technet.microsoft.com/sysinternals/bb896644.aspx');
 

@@ -434,7 +434,15 @@ begin
   SetEXCaptionMemoryString(CW, F1, 'Мой позывной');
   SetEXCaptionMemoryString(CW, F2, 'Контр. номер');
 {$ELSE}
- SetEXCaptionMemoryString(CW, F1, 'DE+Call');
+ if DEEnable then        // ny4i Issue 69
+    begin
+    SetEXCaptionMemoryString(CW, F1, 'DE+Call');
+    end
+ else
+    begin
+    SetEXCaptionMemoryString(CW, F1, 'Call');
+    end;
+
   SetEXCaptionMemoryString(CW, F2, 'S&P Exchange');
   SetEXCaptionMemoryString(Phone, F2, 'S&P Exchange');
 
