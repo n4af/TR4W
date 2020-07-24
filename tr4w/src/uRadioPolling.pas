@@ -124,6 +124,11 @@ const
   KenwoodPollRequests                   : array[tKenwoodCommands] of PChar = ('IF;', 'FA;', 'FB;');
   KenwoodPollRequestsAnswerLength       : array[tKenwoodCommands] of integer = (38, 14, 14);
 begin
+  if rig.RadioModel in [K3] then
+     begin
+     SetK3ExtendedCommandMode;
+     end;
+
   repeat
     inc(rig^.tPollCount);
 
@@ -195,12 +200,76 @@ begin
               //        debugmsg('polling IF ' + rig^.tBuf[i - 8]);
                         rig^.CurrentStatus.Freq := BufferToInt(@rig^.tBuf[i - 37], 3, 11);
                         CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
-                        case rig^.tBuf[i - 8] of
+                        {case rig^.tBuf[i - 8] of
                           '4': rig^.CurrentStatus.Mode := FM;
                           '1', '2', '5': rig^.CurrentStatus.Mode := Phone;
                           '6', '9': rig^.CurrentStatus.Mode := Digital;
                           '3', '7', '8': rig^.CurrentStatus.Mode := CW;
                         end;
+                        }
+       //DEBUGMSG('In Kenwood2, mode = ' + rig^.tBuf[i - 8]);
+       case rig^.tBuf[i - 8] of
+      '1': begin
+           rig^.CurrentStatus.ExtendedMode := eLSB;
+           rig^.CurrentStatus.Mode := Phone;
+           end;
+      '2': begin
+           rig^.CurrentStatus.ExtendedMode := eUSB;
+           rig^.CurrentStatus.Mode := Phone;
+           end;
+      '3': begin
+           rig^.CurrentStatus.ExtendedMode := eCW;
+           rig^.CurrentStatus.Mode := CW;
+           end;
+      '4': begin
+           rig^.CurrentStatus.ExtendedMode := eFM;
+           rig^.CurrentStatus.Mode := FM;
+           end;
+      '5': begin
+           rig^.CurrentStatus.ExtendedMode := eAM;
+           rig^.CurrentStatus.Mode := Phone;
+           end;
+       '6': begin
+            if rig^.RadioModel in [K3] then
+               begin
+               case rig^.tBuf[i - 3] of
+                  '0': rig^.CurrentStatus.ExtendedMode := eData;
+                  '1': rig^.CurrentStatus.ExtendedMode := eRTTY;
+                  '2': rig^.CurrentStatus.ExtendedMode := eRTTY;
+                  '3': rig^.CurrentStatus.ExtendedMode := ePSK31;
+                  else
+                     DEBUGMSG('Unknown value from K3 ExtendedMode response' + rig^.tBuf);
+                  end;
+               end
+            else
+               begin
+               rig^.CurrentStatus.ExtendedMode := eRTTY;
+               end;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+       '7': begin
+            rig^.CurrentStatus.ExtendedMode := eCW_R;
+            rig^.CurrentStatus.Mode := CW;
+            end;
+       '8': begin
+            rig^.CurrentStatus.Mode := CW;
+            rig^.CurrentStatus.ExtendedMode := eCW_R;
+            end;
+       '9': begin
+            rig^.CurrentStatus.ExtendedMode := eRTTY_R;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+       'A': begin
+            rig^.CurrentStatus.ExtendedMode := eDATA;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+       'B': begin
+            rig^.CurrentStatus.ExtendedMode := eDATA_R;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+        else
+            DEBUGMSG('Invalid mode received from KenwoodNew ' + rig^.tBuf[30]);
+        end;
 
                         
                         if rig^.tBuf[i - 7] = '0' then
@@ -231,11 +300,11 @@ begin
                            end
                         else
                            begin
-                           DEBUGMSG('K3/Kenwood2 says radio is RECEIVING');
+                           //DEBUGMSG('K3/Kenwood2 says radio is RECEIVING');
                            end;
                         if radio1.CurrentStatus.TXOn then
                            begin
-                           DEBUGMSG('radio1.CurrentStatus.TXOn is true');
+                           //DEBUGMSG('radio1.CurrentStatus.TXOn is true');
                            end;
                       end;
                   end;

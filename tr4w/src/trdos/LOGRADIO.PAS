@@ -303,6 +303,7 @@ type
       procedure OnCWByCATTimeEvent(Sender :TObject);
       procedure EnableCWBYCATTimer(ms: integer);
       procedure AddTimeToCWByCATTimer(ms: integer);
+
       //    property fddd;
    end;
    RadioPtr = ^RadioObject;
@@ -722,6 +723,8 @@ procedure RITBumpUp;
 procedure VFOBumpDown;
 procedure VFOBumpUp;
 
+procedure SetK3ExtendedCommandMode;
+
 
 
 
@@ -836,6 +839,11 @@ begin
 end;
 
 
+procedure SetK3ExtendedCommandMode;
+begin
+   ActiveRadioPtr.WriteBufferToCATPort('K31;');
+end;
+
 
 procedure RITClear;
 
@@ -892,17 +900,6 @@ begin
          Exit;
          end;
       end;
-
-   { Anyone know why this stuff is here?  I am chicken to remove it }
-{
- CPUKeyer.AddSerialPortString(SerialPort, CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR(0) +
-   CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR(0) +
-   CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR(0) +
-   CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR(0) +
-   CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR(0) +
-   CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR(0) +
-   CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR(0));
-}
 end;
 
 procedure RITBumpUp;

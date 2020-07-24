@@ -41,6 +41,10 @@ type
       txKludgeStart: TDateTime;
       RXKludge: boolean;
       rxKludgeStart: TDateTime;
+      processingCmdSplit: boolean;
+      processingCmdSetTXFreq: boolean;
+      processingCmdQSXSplit: boolean;
+      processingCmdSetFreq: boolean;
       procedure SetUDPPort(nPort: integer);
       procedure SetTCPPort(nPort: integer);
       function GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
@@ -653,21 +657,50 @@ begin
          if ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency = 0 then
             begin
             DEBUGMSG('**** ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency = 0');
-            Display('client','Sending frequency as .000');
+            Display('client','Sending VFOA frequency as .000');
             AContext.Connection.IOHandler.Write('<CmdFreq:4>.000');
             end
          else
             begin
             sFreq := SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency/1000);
-            Display('client','Sending frequency as ' + sFreq);
+            Display('client','Sending VFOA frequency as ' + sFreq);
             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             end;
+         end
+      else if fieldValue = 'CmdSetFreq' then
+         begin
+         processingCmdSetFreq := true;
          end
       else if fieldName = 'xcvrfreq' then
          begin
          freq := SafeFloat(fieldValue);
-         ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
+         if processingCmdSetFreq then // Set Main VFO
+            begin
+            ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
+            processingCmdSetFreq := false;
+            end
+         else if processingCmdSetTXFreq then
+            begin
+            ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
+            processingCmdSetTXFreq := false;
+            end
+         else if processingCmdQSXSplit then
+            begin
+            ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
+            processingCmdQSXSplit := false;
+            end
+         else
+            begin
+            DEBUGMSG('Received xcvrfreq to ' + IntToStr(Trunc(freq)) + ' without state variable');
+            end;
          DEBUGMSG('Setting radio to frequency ' + IntToStr(Trunc(freq)));
+         end
+      else if fieldValue = 'CmdSetTXFreq' then
+         begin
+         processingCmdSetTXFreq := true;
+         end
+      else if fieldName = 'SuppressDual' then
+         begin
          end
       else if fieldValue = 'CmdSetMode' then
          begin
@@ -725,8 +758,12 @@ begin
             eUSB: s := 'USB';
             eRTTY: s := 'RTTY';
             eRTTY_R: s := 'RTTY-R';
+            ePSK31: s := 'DATA-U';
             else
-               DEBUGMSG('Mode not handled in SENDMODE');
+               begin
+               DEBUGMSG('Mode not handled in SENDMODE ' + IntToStr(Ord(ActiveRadioPtr.CurrentStatus.ExtendedMode)));
+               s := 'DATA-U';
+               end;
             end;
          AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
          DEBUGMSG('Sending ' + SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
@@ -768,7 +805,55 @@ begin
          sDebug := sDebug + 'Sending ' + sReply;
          DEBUGMSG(sDebug);
          AContext.Connection.IOHandler.Write(sReply);
+         end
+      else if fieldValue = 'CmdGetTXFreq' then
+         begin             // Return VFO B
+         if ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency = 0 then
+            begin
+            DEBUGMSG('**** ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency = 0');
+            Display('client','Sending VFOB frequency as .000');
+            AContext.Connection.IOHandler.Write('<CmdFreq:4>.000');
+            end
+         else
+            begin
+            sFreq := SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency/1000);
+            Display('client','Sending VFOB frequency as ' + sFreq);
+            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+            end;
+         end
+      else if fieldValue = 'CmdQSXSplit' then
+         begin
+         processingCmdQSXSplit := true;
+         end
+      else if fieldValue = 'CmdSplit' then
+         begin
+         processingCmdSplit := true;
+         end
+      else if fieldValue = 'off' then
+         begin
+         if processingCmdSplit then
+            begin
+            processingCmdSplit := false;
+            ActiveRadioPtr.PutRadioOutOfSplit;
+            end
+         else
+            begin
+            DEBUGMSG('off command received for unknown reason');
+            end;
+         end
+      else if fieldValue = 'on' then
+         begin
+         if processingCmdSplit then
+            begin
+            processingCmdSplit := false;
+            ActiveRadioPtr.PutRadioIntoSplit;
+            end
+         else
+            begin
+            DEBUGMSG('on command received for unknown reason');
+            end;
          end;
+
       end;
 
         Display('CLIENT','length(sBuffer) = ' + IntToStr(length(sBuffer)));
