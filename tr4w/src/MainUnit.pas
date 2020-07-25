@@ -7597,7 +7597,7 @@ var
    formattedDate: string;
    bytesToWrite: integer;
    first: boolean;
-const bSendToTelnetWindow = TRUE;
+const bSendToTelnetWindow = FALSE;
 {$IFEND}
 begin
 {$IF NEWER_DEBUG}
