@@ -43,7 +43,8 @@ uses
   LogK1EA,
   idUDPClient, // ny4i 4.44.9
   idGlobal, // ny4i 4.44.9
-  Windows;
+  Windows,
+  StrUtils;
 
 type
   DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
@@ -186,18 +187,18 @@ begin
                   case TempCommand of
                     kcFA:
                       begin
-             //         debugmsg('polling: FA');
+                        DEBUGMSG('polling: FA ' + AnsiLeftStr(rig^.tBuf,40));
                         rig^.CurrentStatus.VFO[VFOA].Frequency := BufferToInt(@rig^.tBuf[i - 13], 3, 11);
                       end;
                     kcFB:
                       begin
-             //         debugmsg('polling: FB');
+                        //DEBUGMSG('polling: FB ' + AnsiLeftStr(rig^.tBuf,40));
                         rig^.CurrentStatus.VFO[VFOB].Frequency := BufferToInt(@rig^.tBuf[i - 13], 3, 11);
                       end;
 
                     kcIF:
                       begin
-              //        debugmsg('polling IF ' + rig^.tBuf[i - 8]);
+                        //DEBUGMSG('polling IF ' + AnsiLeftStr(rig^.tBuf,40));
                         rig^.CurrentStatus.Freq := BufferToInt(@rig^.tBuf[i - 37], 3, 11);
                         CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
                         {case rig^.tBuf[i - 8] of
