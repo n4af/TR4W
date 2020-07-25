@@ -281,6 +281,7 @@ type
       procedure SendRITFreqCommand;
       procedure SetICOMRITFrequency(hz: integer);
       procedure SendIcomClearRITCommand;
+      function CalculateIcomFilterWidth: integer;
       //    function SendFiveBytes: boolean;
       procedure SetRadioCWSpeed(speed: longint);
       procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
@@ -698,6 +699,7 @@ function OpenCATDebugFile(port: PortType): boolean;
 function tPTTVIACAT(PTTOn: boolean): boolean;
 //function GetRadioFromString(RadioName: ShortString): InterfacedRadioType;
 procedure TestRadioInterface;
+
 
 { Old style function calls supported here }
 
@@ -2828,22 +2830,31 @@ begin
          end;
 
       case RadioModel of
+      (* Older Icom radios could not directly change VFO B. The code had to make VFO B active and then change things.
+         This is now different for radios that support VFOB. IcomRadiosThatSupportVFOB is a radio group that supports this command.
+         So, if the radioModel is in IcomRadiosThatSupportVFOB, then just directly address VFOB and do nto do the switch-a-roo.
+       *)
 
-         IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
+        IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
             begin
             // TLogger.GetInstance.Debug('In Icom radio code');
             if VFO = 'B' then
                begin
-               CommandsTempBuffer[0] := CHR(8);
-               CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
-               CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
-               CommandsTempBuffer[3] := CHR(ReceiverAddress);
-               CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
-               CommandsTempBuffer[5] := ICOM_SET_VFO_COMMAND;
-               CommandsTempBuffer[6] := ICOM_SET_VFO_B_COMMAND;
-               CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
-               AddCommandToBuffer;
+               if not (RadioModel in IcomRadiosThatSupportVFOB) then   // For old radios, swap the VFOs  ny4i
+                  begin
+                  CommandsTempBuffer[0] := CHR(8);
+                  CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[3] := CHR(ReceiverAddress);
+                  CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+                  CommandsTempBuffer[5] := ICOM_SET_VFO_COMMAND;
+                  CommandsTempBuffer[6] := ICOM_SET_VFO_B_COMMAND;
+                  CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
+                  AddCommandToBuffer;
+                  end;
                end;
+
+
 
             { Send the mode information }
             // TLogger.GetInstance.Debug('Sending Icom mode information');
@@ -2880,171 +2891,159 @@ begin
                   end;
                end;
             // TLogger.GetInstance.Debug(Format('Sending Icom mode information - %u',[Ord(Mode)]));
-            if not skipMode then
+            if RadioModel in IcomRadiosThatSupportVFOB then
                begin
-               CommandsTempBuffer[0] := CHR(9);
-               CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
-               CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
-               CommandsTempBuffer[3] := CHR(ReceiverAddress);
-               CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
-               CommandsTempBuffer[5] := ICOM_SET_MODE;
-               CommandsTempBuffer[6] := TempChar;
-               end;
-
-            // ny4i: I'm trying to understand this logic   // 4.43.4
-            // The way Dave indicated this is supposed to work is that
-            // if the CFG option of ICOM_FILTER_BYTE is set to 0, then we want to send
-            // whatever the filter setting the rig had.
-            // If the value is 1, 2 or 3, then we want to send that when we change
-            // mode.
-            // tIcomFilterWidth is the value from the CFG file
-            //     if Mode = Phone then  CommandsTempBuffer[7] := CHR(tIcomFilterWidth);
-            if (RadioModel = OMNI6) and (Mode = CW) then      // n4af 4.43.3
-               begin
-               CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;   // n4af 4.43.3
-               end
-            else
-               begin // ny4i 4.43.6
-               case tIcomFilterWidth of             // Not set in CFG so send current value
-                  0:
+               if not skipMode then
+                  begin   // Build VFO and frequency into Command $25, mode and filter byte into command $26
+                  // Mode - Command $26
+                  CommandsTempBuffer[0] := CHR(10);
+                  CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[3] := CHR(ReceiverAddress);
+                  CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+                  CommandsTempBuffer[5] := ICOM_GET_EXTENDEDMODE;  // Sets too...
+                  if VFO = 'A' then
                      begin
-                     //IcomCheckBuffer(ActiveRadioPtr);  // n4af 4.34.4 get icom pb filter setting
-                     if Icom_Filter_Width > 0 then
-                        // this is the module global stored fromthe rig message in uRadioPolling
-                        begin
-                        tempFilterWidth := Icom_Filter_Width;  // n4af 4.43.4    tIcomFilterWidth
-                        end
-                     else
-                        begin
-                        tempFilterWidth := 1;
-                        // Default to 1 if no CFG set and we do not have a value from the radio. We cannot send 0 to some radios as they reject the command. Others handle the zero though.
-                        end;
-                     end;
-                  1..3:
-                     begin
-                     tempFilterWidth := tIcomFilterWidth;
+                     CommandsTempBuffer[6] := Chr(0);
                      end
                   else
                      begin
-                     tempFilterWIdth := 0;
+                     CommandsTempBuffer[6] := Chr(1);
                      end;
-                  end; // case
-               CommandsTempBuffer[7] := CHR(tempFilterWidth);
-               // ny4i // n4af 4.43.4  set icom filter
-               CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
-               end;
 
-         {if (Mode <> CW) or (tIcomFilterWidth = 0) then  // This rejects all of the above - comment for now and test
-          begin
-          CommandsTempBuffer[0] := CHR(8);
-          CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
+                  if mode = Digital then                  // Sets Data mode setting field
+                     begin
+                     CommandsTempBuffer[7] := Chr(1);
+                     end
+                  else
+                     begin
+                     CommandsTempBuffer[7] := Chr(0);
+                     end;
 
-         end;
-         }
+                  CommandsTempBuffer[8] := CHR(CalculateIcomFilterWidth);
+                  CommandsTempBuffer[9] := ICOM_END_OF_MESSAGE_CODE;
+                  AddCommandToBuffer;
+                  end;
+                  // Now send frequency for selected VFO
 
-            AddCommandToBuffer;
-      {
-        ICOM_COMMAND_SET_MODE :=
-          ICOM_PREAMBLE_CODE +
-          ICOM_PREAMBLE_CODE +
-          CHR(ReceiverAddress) +
-          ICOM_CONTROLLER_ADDRESS +
-          ICOM_SET_MODE +
-          #$00 +
-// $ I F ICOM_LONG_MODECOMMAND
-        #$02 +
-// $ I FEND
+                  CommandsTempBuffer[0]  := CHR(13);
+                  CommandsTempBuffer[1]  := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[2]  := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[3]  := CHR(ReceiverAddress);
+                  CommandsTempBuffer[4]  := ICOM_CONTROLLER_ADDRESS;
+                  CommandsTempBuffer[5]  := ICOM_GET_EXTENDEDVFO;
+                  if VFO = 'A' then
+                     begin
+                     CommandsTempBuffer[6] := Chr(0);
+                     end
+                  else
+                     begin
+                     CommandsTempBuffer[6] := Chr(1);
+                     end;
 
-        ICOM_END_OF_MESSAGE_CODE;
 
-        if Mode = FM then
-          TempChar := #5 else
-          if Mode = CW then
-            TempChar := #3
-          else
-            if Mode = Digital then
-              TempChar := #4
-            else //must be phone
-              if Freq < 10000000 then
-                TempChar := #0
-              else
-                TempChar := #1;
-        ICOM_COMMAND_SET_MODE[6] := TempChar;
- g1704
- }
-            //        WriteToSerialCATPort(ICOM_COMMAND_SET_MODE, tCATPortHandle);
+                  Format(wsprintfBuffer, '%10.10u', Freq);
+                  i := 6;
+                  for CharPointer := 9 downto 0 do
+                     begin
+                     if not Odd(CharPointer) then
+                        begin
+                        Inc(i);
+                        TempByte := Ord(wsprintfBuffer[CharPointer]) - $30;
+                        SendByte := SendByte or (TempByte shl 4);
+                        CommandsTempBuffer[i] := CHR(SendByte);
+                        end
+                     else
+                        begin
+                        SendByte := Ord(wsprintfBuffer[CharPointer]) - $30;
+                        end;
+                     end;
 
-            { Send the frequency information }
-{
-        if RadioModel = IC735 then
-          ICOM_COMMAND_SET_FREQ := ICOM_PREAMBLE_CODE + ICOM_PREAMBLE_CODE + CHR(ReceiverAddress) + #$E0 + ICOM_SET_FREQ + #1 + #1 + #1 + #1 + #$FD
-        else
-          ICOM_COMMAND_SET_FREQ := ICOM_PREAMBLE_CODE + ICOM_PREAMBLE_CODE + CHR(ReceiverAddress) + #$E0 + ICOM_SET_FREQ + #1 + #1 + #1 + #1 + #00 + #$FD;
+                     CommandsTempBuffer[12] := ICOM_END_OF_MESSAGE_CODE;
+                     AddCommandToBuffer;
 
-        Str(Freq, FreqStr);
-        while length(FreqStr) < 8 do FreqStr := '0' + FreqStr;
-
-        i := 5; //wli
-        for CharPointer := length(FreqStr) downto 1 do
-          if Odd(CharPointer) then
-          begin
-            inc(i);
-            TempByte := Ord(FreqStr[CharPointer]) - $30;
-            SendByte := SendByte or (TempByte shl 4);
-            ICOM_COMMAND_SET_FREQ[i] := CHR(SendByte);
-          end
-          else
-            SendByte := Ord(FreqStr[CharPointer]) - $30;
-}
-
-            CommandsTempBuffer[0]  := CHR(12);
-            CommandsTempBuffer[1]  := ICOM_PREAMBLE_CODE;
-            CommandsTempBuffer[2]  := ICOM_PREAMBLE_CODE;
-            CommandsTempBuffer[3]  := CHR(ReceiverAddress);
-            CommandsTempBuffer[4]  := ICOM_CONTROLLER_ADDRESS;
-            CommandsTempBuffer[5]  := ICOM_SET_FREQ;
-            CommandsTempBuffer[11] := ICOM_END_OF_MESSAGE_CODE;
-
-            Format(wsprintfBuffer, '%10.10u', Freq);
-            i := 5;
-            for CharPointer := 9 downto 0 do
-               begin
-               if not Odd(CharPointer) then
-                  begin
-                  Inc(i);
-                  TempByte := Ord(wsprintfBuffer[CharPointer]) - $30;
-                  SendByte := SendByte or (TempByte shl 4);
-                  CommandsTempBuffer[i] := CHR(SendByte);
                   end
                else
-                  begin
-                  SendByte := Ord(wsprintfBuffer[CharPointer]) - $30;
+                  begin              // For older Icom radios that do not support VFOB selection (Commands 25 and 26)
+                  if not skipMode then
+                     begin
+                     CommandsTempBuffer[0] := CHR(9);
+                     CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+                     CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+                     CommandsTempBuffer[3] := CHR(ReceiverAddress);
+                     CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+                     CommandsTempBuffer[5] := ICOM_SET_MODE;
+                     CommandsTempBuffer[6] := TempChar;
+
+                  // ny4i: I'm trying to understand this logic   // 4.43.4
+                  // The way Dave indicated this is supposed to work is that
+                  // if the CFG option of ICOM_FILTER_BYTE is set to 0, then we want to send
+                  // whatever the filter setting the rig had.
+                  // If the value is 1, 2 or 3, then we want to send that when we change
+                  // mode.
+                  // tIcomFilterWidth is the value from the CFG file
+                  //     if Mode = Phone then  CommandsTempBuffer[7] := CHR(tIcomFilterWidth);
+                     if (RadioModel = OMNI6) and (Mode = CW) then      // n4af 4.43.3
+                        begin
+                        CommandsTempBuffer[0] := Chr(8); // Have to update since we are not adding filter Byte  // ny4i
+                        CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;   // n4af 4.43.3
+                        end
+                     else
+                        begin // ny4i 4.43.6
+                        CommandsTempBuffer[7] := CHR(CalculateIcomFilterWidth);
+                        // ny4i // n4af 4.43.4  set icom filter
+                        CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
+                        end;
+                     AddCommandToBuffer;
+                     end; // if not skipMode
+
+                  CommandsTempBuffer[0]  := CHR(12);
+                  CommandsTempBuffer[1]  := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[2]  := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[3]  := CHR(ReceiverAddress);
+                  CommandsTempBuffer[4]  := ICOM_CONTROLLER_ADDRESS;
+                  CommandsTempBuffer[5]  := ICOM_SET_FREQ;
+                  CommandsTempBuffer[11] := ICOM_END_OF_MESSAGE_CODE;
+
+                  Format(wsprintfBuffer, '%10.10u', Freq);
+                  i := 5;
+                  for CharPointer := 9 downto 0 do
+                     begin
+                     if not Odd(CharPointer) then
+                        begin
+                        Inc(i);
+                        TempByte := Ord(wsprintfBuffer[CharPointer]) - $30;
+                        SendByte := SendByte or (TempByte shl 4);
+                        CommandsTempBuffer[i] := CHR(SendByte);
+                        end
+                     else
+                        begin
+                        SendByte := Ord(wsprintfBuffer[CharPointer]) - $30;
+                        end;
+                     end;
+
+                  if RadioModel = IC735 then
+                     begin
+                     CommandsTempBuffer[0]  := CHR(11);
+                     CommandsTempBuffer[10] := ICOM_END_OF_MESSAGE_CODE;
+                     end;
+
+                  AddCommandToBuffer;
+
+                  if VFO = 'B' then
+                     begin
+                     CommandsTempBuffer[0] := CHR(8);
+                     CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+                     CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+                     CommandsTempBuffer[3] := CHR(ReceiverAddress);
+                     CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+                     CommandsTempBuffer[5] := ICOM_SET_VFO_COMMAND;
+                     CommandsTempBuffer[6] := ICOM_SET_VFO_A_COMMAND;
+                     CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
+                     AddCommandToBuffer;
+                     end;
                   end;
                end;
-
-            if RadioModel = IC735 then
-               begin
-               CommandsTempBuffer[0]  := CHR(11);
-               CommandsTempBuffer[10] := ICOM_END_OF_MESSAGE_CODE;
-               end;
-
-            AddCommandToBuffer;
-
-            if VFO = 'B' then
-               begin
-
-               CommandsTempBuffer[0] := CHR(8);
-               CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
-               CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
-               CommandsTempBuffer[3] := CHR(ReceiverAddress);
-               CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
-               CommandsTempBuffer[5] := ICOM_SET_VFO_COMMAND;
-               CommandsTempBuffer[6] := ICOM_SET_VFO_A_COMMAND;
-               CommandsTempBuffer[7] := ICOM_END_OF_MESSAGE_CODE;
-               AddCommandToBuffer;
-
-               end;
-            end;
 
          Orion:
             begin
@@ -3470,7 +3469,7 @@ begin
          end;
       else
          begin
-         DEBUGMSG('Radio model does ot support TX/RX commands');
+         DEBUGMSG('Radio model does not support TX/RX commands');
          Exit;
          end;
       end;
@@ -3482,6 +3481,28 @@ begin
       ReadFromCOMPort(WaitAnswer, @Radio1);
       end;
    Result := True;
+end;
+
+function RadioObject.CalculateIcomFilterWidth: integer;
+begin
+   Result := 0;
+   case tIcomFilterWidth of             // Not set in CFG so send current value
+      0: begin
+         if Icom_Filter_Width > 0 then     // this is the module global stored fromthe rig message in uRadioPolling
+            begin
+            Result := Icom_Filter_Width;  // n4af 4.43.4    tIcomFilterWidth
+            end
+         else
+            begin
+            Result := 1;       // Default to 1 if no CFG set and we do not have a value from the radio. We cannot send 0 to some radios as they reject the command. Others handle the zero though.
+            end;
+         end;
+      1..3: Result := tIcomFilterWidth;
+      else
+         begin
+         Result := 0;
+         end;
+      end; // case
 end;
 
 
