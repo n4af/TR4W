@@ -45,6 +45,7 @@ type
       processingCmdSetTXFreq: boolean;
       processingCmdQSXSplit: boolean;
       processingCmdSetFreq: boolean;
+      requestedTXFreq: extended;
       procedure SetUDPPort(nPort: integer);
       procedure SetTCPPort(nPort: integer);
       function GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
@@ -654,50 +655,61 @@ begin
 
       if fieldValue = 'CmdGetFreq' then
          begin
-         if ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency = 0 then
+         if radio1.CurrentStatus.VFO[VFOA].Frequency = 0 then
             begin
-            DEBUGMSG('**** ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency = 0');
+            DEBUGMSG('**** radio1.CurrentStatus.VFO[VFOA].Frequency = 0');
             Display('client','Sending VFOA frequency as .000');
             AContext.Connection.IOHandler.Write('<CmdFreq:4>.000');
             end
          else
             begin
-            sFreq := SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOA].Frequency/1000);
-            Display('client','Sending VFOA frequency as ' + sFreq);
+            sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.VFO[VFOA].Frequency/1000);
+            Display('client','Sending VFOA frequency: ' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             end;
          end
       else if fieldValue = 'CmdSetFreq' then
          begin
          processingCmdSetFreq := true;
+         DEBUGMSG('Setting processingCmdSetFreq');
          end
       else if fieldName = 'xcvrfreq' then
          begin
          freq := SafeFloat(fieldValue);
          if processingCmdSetFreq then // Set Main VFO
             begin
+            DEBUGMSG('Setting VFOA to frequency ' + IntToStr(Trunc(freq)));
             ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
             processingCmdSetFreq := false;
+            DEBUGMSG('Resetting processingCmdSetFreq');
             end
          else if processingCmdSetTXFreq then
             begin
+            DEBUGMSG('[processingCmdSetTXFreq] Setting VFOB to frequency ' + IntToStr(Trunc(freq)));
+            Self.requestedTXFreq := Trunc(freq * 1000);
             ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
             processingCmdSetTXFreq := false;
+            DEBUGMSG('Resetting processingCmdSetTXFreq');
             end
          else if processingCmdQSXSplit then
             begin
-            ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
+            DEBUGMSG('[processingCmdQSXSplit] Setting VFOB to frequency ' + IntToStr(Trunc(freq)));
+            Self.requestedTXFreq := Trunc(freq * 1000);
+            radio1.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
+            ActiveRadioPtr.PutRadioIntoSplit;
             processingCmdQSXSplit := false;
+            DEBUGMSG('Resetting processingCmdQSXSplit');
             end
          else
             begin
-            DEBUGMSG('Received xcvrfreq to ' + IntToStr(Trunc(freq)) + ' without state variable');
+            DEBUGMSG('<***** ERROR ******> Received xcvrfreq to ' + IntToStr(Trunc(freq)) + ' without state variable');
             end;
-         DEBUGMSG('Setting radio to frequency ' + IntToStr(Trunc(freq)));
+
          end
       else if fieldValue = 'CmdSetTXFreq' then
          begin
          processingCmdSetTXFreq := true;
+         DEBUGMSG('Setting processingCmdSetTXFreq');
          end
       else if fieldName = 'SuppressDual' then
          begin
@@ -761,7 +773,7 @@ begin
             ePSK31: s := 'DATA-U';
             else
                begin
-               DEBUGMSG('Mode not handled in SENDMODE ' + IntToStr(Ord(ActiveRadioPtr.CurrentStatus.ExtendedMode)));
+               DEBUGMSG('<***** ERROR ******> Mode not handled in SENDMODE ' + IntToStr(Ord(ActiveRadioPtr.CurrentStatus.ExtendedMode)));
                s := 'DATA-U';
                end;
             end;
@@ -810,35 +822,40 @@ begin
          begin             // Return VFO B
          if ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency = 0 then
             begin
-            DEBUGMSG('**** ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency = 0');
-            Display('client','Sending VFOB frequency as .000');
-            AContext.Connection.IOHandler.Write('<CmdFreq:4>.000');
+            //DEBUGMSG('**** radio1.CurrentStatus.VFO[VFOB].Frequency = 0');
+            DEBUGMSG('       ActiveRadioPtr.CurrentStatus.VFO[VFOB] = ' + SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency/1000));
+            DEBUGMSG('Sending VFOB frequency as requestedTXFreq since we do not have frequency [' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]) + ']');
+            sFreq := SysUtils.FormatFloat(',0.000',Self.requestedTXFreq/1000);
+            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdTXFreq:%u>%s',[length(sFreq),sFreq]));
             end
          else
             begin
             sFreq := SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency/1000);
-            Display('client','Sending VFOB frequency as ' + sFreq);
-            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+            Display('client','Sending VFOB frequency as ' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+            AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdTXFreq:%u>%s',[length(sFreq),sFreq]));
             end;
          end
       else if fieldValue = 'CmdQSXSplit' then
          begin
          processingCmdQSXSplit := true;
+         DEBUGMSG('Setting processingCmdQSXSplit');
          end
       else if fieldValue = 'CmdSplit' then
          begin
          processingCmdSplit := true;
+         DEBUGMSG('Setting processingCmdSplit');
          end
       else if fieldValue = 'off' then
          begin
          if processingCmdSplit then
             begin
             processingCmdSplit := false;
+            DEBUGMSG('Resetting processingCmdSplit');
             ActiveRadioPtr.PutRadioOutOfSplit;
             end
          else
             begin
-            DEBUGMSG('off command received for unknown reason');
+            DEBUGMSG('<***** ERROR ******> off command received for unknown reason');
             end;
          end
       else if fieldValue = 'on' then
@@ -846,11 +863,12 @@ begin
          if processingCmdSplit then
             begin
             processingCmdSplit := false;
+            DEBUGMSG('Resetting processingCmdSplit');
             ActiveRadioPtr.PutRadioIntoSplit;
             end
          else
             begin
-            DEBUGMSG('on command received for unknown reason');
+            DEBUGMSG('<***** ERROR ******> on command received for unknown reason');
             end;
          end;
 
@@ -978,7 +996,10 @@ end;
 
 procedure TWSJTXServer.Display(p_sender : String; p_message : string);
 begin
-   DEBUGMSG(p_message);
+   try
+      DEBUGMSG(p_message);
+   except
+   end;
 {    // ... DISPLAY MESSAGE
     TThread.Queue(nil, procedure
                        begin
