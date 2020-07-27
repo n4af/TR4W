@@ -1,3 +1,19 @@
+{
+ Copyright Thomas M. Schaefer, NY4I (c) 2020.
+ This file is part of TR4W  (SRC)
+ TR4W is free software: you can redistribute it and/or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation, either version 2 of the
+ License, or (at your option) any later version.
+ TR4W is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ You should have received a copy of the GNU General
+     Public License along with TR4W in  GPL_License.TXT. 
+If not, ref: 
+http://www.gnu.org/licenses/gpl-3.0.txt
+ }
 unit uWSJTX;
 
 interface
@@ -255,7 +271,7 @@ begin
             case messageType of
             0: begin
                //DEBUGMSG('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
-               DEBUGMSG('Radio frequency = ' + IntToStr(radio1.CurrentStatus.VFO[VFOA].Frequency));
+               DEBUGMSG('In UDP Heartbeat, Radio frequency = ' + IntToStr(radio1.CurrentStatus.VFO[VFOA].Frequency));
                SetMainWindowText(mweWSJTX,'WSJTX');
                Windows.ShowWindow(wh[mweWSJTX], SW_SHOW);
                isConnected := true;
@@ -357,8 +373,8 @@ begin
                           end;
                         end;
                      except
-                        DEBUGMSG('*** Error in stringList access - sl.Count = ' + IntToStr(slCQMessage.Count));
-                        DEBUGMSG('*** Message = ' + message);
+                        logger.Error('*** Error in stringList access - sl.Count = ' + IntToStr(slCQMessage.Count));
+                        logger.Error('*** Message = ' + message);
                      end;
                   finally
                      slCQMessage.Free;
@@ -369,7 +385,7 @@ begin
                end;
 
             3: begin        {............................................................Clear}
-               DEBUGMSG('WSJTX >>> Clear');
+               logger.Trace('WSJTX >>> Clear');
                end;
 
             5: begin        {..........I may grab this from the ADIF record so this would not be needed   QSO logged}
@@ -385,7 +401,7 @@ begin
                Unpack(AData,index,comments);
                Unpack(AData,index,DXName);
 
-               DEBUGMSG('QSO logged: Date:' + FormatDateTime('dd-mmm-yyyy hh:mm:ss',date)
+               logger.Trace('QSO logged: Date:' + FormatDateTime('dd-mmm-yyyy hh:mm:ss',date)
                                + ' DX Call:' + DXCall + ' DX Grid:' + DXGrid
                                + ' Frequency:' + IntToStr(frequency) + ' Mode:' + mode + ' Report sent: ' + report
                                + ' Report received:' + reportReceived + ' TX Power:' + TXPower
@@ -393,17 +409,17 @@ begin
               end;
             6:
                begin
-               DEBUGMSG('WSJT-X close message received'); // We may want to indicate it somehow on main screen
+               logger.Info('WSJT-X close message received'); // We may want to indicate it somehow on main screen
                SetMainWindowText(mweWSJTX,'');
                Windows.ShowWindow(wh[mweWSJTX], SW_HIDE);
                isConnected := false;
                end;
             10: begin
-                DEBUGMSG('Received message 10');
+                logger.Trace('Received message 10');
                 end;
             12: begin
                Unpack(AData,index,adif);
-               DEBUGMSG('WSJTX >>> ADIF Record to log: ' + adif);
+               logger.Trace('WSJTX >>> ADIF Record to log: ' + adif);
                ClearContestExchange(TempRXData);
                if ParseADIFRecord(adif, TempRXData) then // processed a record if true
                   begin
@@ -417,7 +433,7 @@ begin
                end;
             else
                begin
-               DEBUGMSG('WSJTX >>> Unrecognized message type:' + IntToStr(messageType));
+               logger.Error('WSJTX >>> Unrecognized message type:' + IntToStr(messageType));
                end;
          end;
       end;
@@ -664,59 +680,59 @@ begin
          else
             begin
             sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.VFO[VFOA].Frequency/1000);
-            Display('client','Sending VFOA frequency: ' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+            logger.Trace('Sending VFOA frequency: ' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             end;
          end
       else if fieldValue = 'CmdSetFreq' then
          begin
          processingCmdSetFreq := true;
-         DEBUGMSG('Setting processingCmdSetFreq');
+         logger.Trace('Setting processingCmdSetFreq');
          end
       else if fieldName = 'xcvrfreq' then
          begin
          freq := SafeFloat(fieldValue);
          if processingCmdSetFreq then // Set Main VFO
             begin
-            DEBUGMSG('Setting VFOA to frequency ' + IntToStr(Trunc(freq)));
+            logger.Trace('Setting VFOA to frequency ' + IntToStr(Trunc(freq)));
             ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
             processingCmdSetFreq := false;
-            DEBUGMSG('Resetting processingCmdSetFreq');
+            logger.Trace('Resetting processingCmdSetFreq');
             end
          else if processingCmdSetTXFreq then
             begin
-            DEBUGMSG('[processingCmdSetTXFreq] Setting VFOB to frequency ' + IntToStr(Trunc(freq)));
+            logger.Trace('[processingCmdSetTXFreq] Setting VFOB to frequency ' + IntToStr(Trunc(freq)));
             Self.requestedTXFreq := Trunc(freq * 1000);
             ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
             processingCmdSetTXFreq := false;
-            DEBUGMSG('Resetting processingCmdSetTXFreq');
+            logger.Trace('Resetting processingCmdSetTXFreq');
             end
          else if processingCmdQSXSplit then
             begin
-            DEBUGMSG('[processingCmdQSXSplit] Setting VFOB to frequency ' + IntToStr(Trunc(freq)));
+            logger.Trace('[processingCmdQSXSplit] Setting VFOB to frequency ' + IntToStr(Trunc(freq)));
             Self.requestedTXFreq := Trunc(freq * 1000);
             radio1.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
             ActiveRadioPtr.PutRadioIntoSplit;
             processingCmdQSXSplit := false;
-            DEBUGMSG('Resetting processingCmdQSXSplit');
+            logger.Trace('Resetting processingCmdQSXSplit');
             end
          else
             begin
-            DEBUGMSG('<***** ERROR ******> Received xcvrfreq to ' + IntToStr(Trunc(freq)) + ' without state variable');
+            logger.Debug('<***** ERROR ******> Received xcvrfreq to ' + IntToStr(Trunc(freq)) + ' without state variable');
             end;
 
          end
       else if fieldValue = 'CmdSetTXFreq' then
          begin
          processingCmdSetTXFreq := true;
-         DEBUGMSG('Setting processingCmdSetTXFreq');
+         logger.Trace('Setting processingCmdSetTXFreq');
          end
       else if fieldName = 'SuppressDual' then
          begin
          end
       else if fieldValue = 'CmdSetMode' then
          begin
-         DEBUGMSG('CmdSetMode received ' + sBuffer);
+         logger.Trace('CmdSetMode received ' + sBuffer);
          end
       else if fieldValue = 'CmdSendSplit' then
          begin
@@ -738,7 +754,7 @@ begin
             QuickDisplay('PTT VIA COMMANDS (CTRL-J) option must be true for WSJT-X use - Setting to true');
             tPTTViaCommand := true;
             end;
-         DEBUGMSG('<<<<<<<<<<<<<<<<<<<<< PTT OFF *********************');
+         logger.Trace('<<<<<<<<<<<<<<<<<<<<< PTT OFF *********************');
          tPTTVIACAT(false);
          TXKludge := false;
          RXKludge := true;
@@ -749,9 +765,10 @@ begin
          if not tPTTViaCommand then
             begin
             QuickDisplay('PTT VIA COMMANDS (CTRL-J) option must be true for WSJT-X use - Setting to true');
+            logger.Info('Set tPTTViaCommand for user');
             tPTTViaCommand := true;
             end;
-         DEBUGMSG('>>>>>>>>>>>>>>>>>>> PTT ON *********************');
+         logger.Trace('>>>>>>>>>>>>>>>>>>> PTT ON *********************');
          tPTTVIACAT(true);
          txKludgeStart := Now;
          TXKludge := true;
@@ -773,12 +790,12 @@ begin
             ePSK31: s := 'DATA-U';
             else
                begin
-               DEBUGMSG('<***** ERROR ******> Mode not handled in SENDMODE ' + IntToStr(Ord(ActiveRadioPtr.CurrentStatus.ExtendedMode)));
+               logger.Error('<***** ERROR ******> Mode not handled in SENDMODE ' + IntToStr(Ord(ActiveRadioPtr.CurrentStatus.ExtendedMode)));
                s := 'DATA-U';
                end;
             end;
          AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
-         DEBUGMSG('Sending ' + SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
+         logger.Trace('Sending ' + SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
          end
       else if fieldValue = 'CmdSendTx' then
          begin
@@ -815,7 +832,7 @@ begin
             sDebug := '[' + sDebug + '] ';
             end;
          sDebug := sDebug + 'Sending ' + sReply;
-         DEBUGMSG(sDebug);
+         logger.Trace(sDebug);
          AContext.Connection.IOHandler.Write(sReply);
          end
       else if fieldValue = 'CmdGetTXFreq' then
@@ -831,31 +848,31 @@ begin
          else
             begin
             sFreq := SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency/1000);
-            Display('client','Sending VFOB frequency as ' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+            logger.Trace('Sending VFOB frequency as ' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdTXFreq:%u>%s',[length(sFreq),sFreq]));
             end;
          end
       else if fieldValue = 'CmdQSXSplit' then
          begin
          processingCmdQSXSplit := true;
-         DEBUGMSG('Setting processingCmdQSXSplit');
+         logger.Trace('Setting processingCmdQSXSplit');
          end
       else if fieldValue = 'CmdSplit' then
          begin
          processingCmdSplit := true;
-         DEBUGMSG('Setting processingCmdSplit');
+         logger.Trace('Setting processingCmdSplit');
          end
       else if fieldValue = 'off' then
          begin
          if processingCmdSplit then
             begin
             processingCmdSplit := false;
-            DEBUGMSG('Resetting processingCmdSplit');
+            logger.Trace('Resetting processingCmdSplit');
             ActiveRadioPtr.PutRadioOutOfSplit;
             end
          else
             begin
-            DEBUGMSG('<***** ERROR ******> off command received for unknown reason');
+            logger.Error('<***** ERROR ******> off command received for unknown reason');
             end;
          end
       else if fieldValue = 'on' then
@@ -863,32 +880,32 @@ begin
          if processingCmdSplit then
             begin
             processingCmdSplit := false;
-            DEBUGMSG('Resetting processingCmdSplit');
+            logger.Trace('Resetting processingCmdSplit');
             ActiveRadioPtr.PutRadioIntoSplit;
             end
          else
             begin
-            DEBUGMSG('<***** ERROR ******> on command received for unknown reason');
+            logger.Error('<***** ERROR ******> on command received for unknown reason');
             end;
          end;
 
       end;
 
-        Display('CLIENT','length(sBuffer) = ' + IntToStr(length(sBuffer)));
+        logger.Trace('length(sBuffer) = ' + IntToStr(length(sBuffer)));
      except
       on E : Exception do
-         DEBUGMSG(E.ClassName+' error raised, with message : '+E.Message);
+         logger.error(' Error processing UDP message', E);
       end;
 end;
 
 procedure TWSJTXServer.IdTCPServer1Connect(AContext: TIdContext);
 begin
-//DEBUGMSG('TCP client Connected');
+logger.Trace('TCP client Connected');
 end;
 
 procedure TWSJTXServer.IdTCPServer1Disconnect(AContext: TIdContext);
 begin
-   DEBUGMSG('TCP Client disconnected');
+   logger.Trace('TCP Client disconnected');
 end;
 (*aaa:=copy(vstup,z+1,length(vstup));
     z:=pos(':',aaa);
@@ -930,7 +947,7 @@ end;
       begin
       if length(sBuffer) > 0 then
          begin
-         DEBUGMSG('sBuffer does not start with < ' + sBuffer);
+         logger.Trace('sBuffer does not start with < ' + sBuffer);
          sBuffer := '';
          end;
       exit;//  there is no other record - disappearing.
@@ -960,7 +977,7 @@ end;
       begin
       DataLen := StrToInt(slen);
       end;
-    DEBUGMSG('Got length:' + IntToStr(DataLen));
+    logger.Trace('Got length:' + IntToStr(DataLen));
 
     if z<>0 then
       begin
@@ -979,18 +996,18 @@ end;
     if z = 0 then
       begin
       fieldValue := copy(aaa,1,DataLen);
-      DEBUGMSG('1-Trimming sBuffer to [' + copy(aaa,z,length(aaa)) + ']');
+      logger.Trace('1-Trimming sBuffer to [' + copy(aaa,z,length(aaa)) + ']');
       sBuffer := copy(aaa,z,length(aaa)); // Was vstup:=''
       end
     else
       begin
       fieldValue := copy(aaa,1,DataLen);
-      DEBUGMSG('2-Trimming sBuffer to [' + copy(aaa,z,length(aaa)) + ']');
+      logger.Trace('2-Trimming sBuffer to [' + copy(aaa,z,length(aaa)) + ']');
       sBuffer := copy(aaa,z,length(aaa))
       end;
     fieldValue := Trim(fieldValue);
     Result := true;
-    DEBUGMSG(fieldName + '=' + fieldValue);
+    logger.Trace(fieldName + '=' + fieldValue);
 end;
 (*--------------------------------------------------------------------------------------------------------------------------------*)
 

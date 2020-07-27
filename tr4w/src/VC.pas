@@ -26,7 +26,8 @@ interface
 uses
 
   Windows,
-  Messages;
+  Messages,
+  Log4D;
 
 
 {$INCLUDE w.pas}
@@ -35,7 +36,7 @@ uses
 
 const
   tDebugMode                            = False;
-  NEWER_DEBUG                           = True; // ny4i added this as tDebugMode changes too much.
+  NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
   MMTTYMODE                             = True;
 
 
@@ -1047,7 +1048,7 @@ type
     Band10G,
     Band24G,
     BandLight,
-    All,
+    AllBands,
     NoBand
     );
   PBandType = ^BandType;

@@ -601,7 +601,7 @@ begin
 //  push TempInteger
   push tRestartInfo.riCQTotalCounter
   end;
-  MillisecondsToFormattedString(TimeSpentByBand[All] * 1000, False);
+  MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False);
   asm
   push eax
   end;
@@ -650,14 +650,17 @@ begin
 
   for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
   begin
-    if mo.MTotals[All, Both, m] = 0 then Continue;
+    if mo.MTotals[AllBands, Both, m] = 0 then
+       begin
+       Continue;
+       end;
     nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10s', mn[m]);
     sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
   end;
 
   sWriteFile(tReportFileWrite, breakline, length(breakline));
 
-  for Band := Band160 to All do
+  for Band := Band160 to AllBands do
     for Mode := CW to Phone do
       if RawQSOTotals[Band, Mode] > 0 then
       begin
@@ -666,7 +669,7 @@ begin
         MString := ModeStringArray[Mode];
 
         TempMode := Mode;
-        if Band = All then
+        if Band = AllBands then
         begin
           if TotalLine then Continue;
           sWriteFile(tReportFileWrite, breakline, length(breakline));
@@ -703,7 +706,10 @@ begin
 
         for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
         begin
-          if mo.MTotals[All, Both, m] = 0 then Continue;
+          if mo.MTotals[AllBands, Both, m] = 0 then
+             begin
+             Continue;
+             end;
           nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', mo.MTotals[Band, TempMode, m]);
           sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
         end;
@@ -753,7 +759,7 @@ Min := 30;
 //  OperatingTime := 0;
   CalculateTotals := False;
   ZeroMemory(@TimeSpentByBand, SizeOf(TimeSpentByBand));
-  for Band := Band160 to All do
+  for Band := Band160 to AllBands do
     for Mode := CW to Both do
     begin
       PostQSOTotals[Band, Mode] := 0;
@@ -778,8 +784,8 @@ Min := 30;
 
     inc(RawQSOTotals[TempRXData.Band, TempMode]);
     inc(RawQSOTotals[TempRXData.Band, Both]);
-    inc(RawQSOTotals[All, TempMode]);
-    inc(RawQSOTotals[All, Both]);
+    inc(RawQSOTotals[AllBands, TempMode]);
+    inc(RawQSOTotals[AllBands, Both]);
 
     if GoodLookingQSO then if TempRXData.ceDupe = False then
       begin
@@ -792,7 +798,7 @@ Min := 30;
           begin
             if PreviousBand = TempRXData.Band then
               inc(TimeSpentByBand[TempRXData.Band], TimeDifference);
-            inc(TimeSpentByBand[All], TimeDifference);
+            inc(TimeSpentByBand[AllBands], TimeDifference);
           end;
           PreviousBand := TempRXData.Band;
         end;
@@ -804,13 +810,13 @@ Min := 30;
 
         inc(PostQSOTotals[TempRXData.Band, TempMode]);
         inc(PostQSOTotals[TempRXData.Band, Both]);
-        inc(PostQSOTotals[All, TempMode]);
-        inc(PostQSOTotals[All, Both]);
+        inc(PostQSOTotals[AllBands, TempMode]);
+        inc(PostQSOTotals[AllBands, Both]);
 
         QSOPointTotals[TempRXData.Band, TempMode] := QSOPointTotals[TempRXData.Band, TempMode] + TempRXData.QSOPoints;
         QSOPointTotals[TempRXData.Band, Both] := QSOPointTotals[TempRXData.Band, Both] + TempRXData.QSOPoints;
-        QSOPointTotals[All, TempMode] := QSOPointTotals[All, TempMode] + TempRXData.QSOPoints;
-        QSOPointTotals[All, Both] := QSOPointTotals[All, Both] + TempRXData.QSOPoints;
+        QSOPointTotals[AllBands, TempMode] := QSOPointTotals[AllBands, TempMode] + TempRXData.QSOPoints;
+        QSOPointTotals[AllBands, Both] := QSOPointTotals[AllBands, Both] + TempRXData.QSOPoints;
       end;
     goto 1;
   end;
@@ -961,14 +967,14 @@ begin
       inc(TotalLogQSOs);
 
       inc(LogHourTotals^[CurrentHourIndex].QSOs[TempRXData.Band, TempRXData.Mode]);
-      inc(LogHourTotals^[CurrentHourIndex].QSOs[All, TempRXData.Mode]);
+      inc(LogHourTotals^[CurrentHourIndex].QSOs[AllBands, TempRXData.Mode]);
       inc(LogHourTotals^[CurrentHourIndex].QSOs[TempRXData.Band, Both]);
-      inc(LogHourTotals^[CurrentHourIndex].QSOs[All, Both]);
+      inc(LogHourTotals^[CurrentHourIndex].QSOs[AllBands, Both]);
 
       inc(LogHourTotals^[CurrentHourIndex].QSOPoints[TempRXData.Band, TempRXData.Mode], TempRXData.QSOPoints);
-      inc(LogHourTotals^[CurrentHourIndex].QSOPoints[All, TempRXData.Mode], TempRXData.QSOPoints);
+      inc(LogHourTotals^[CurrentHourIndex].QSOPoints[AllBands, TempRXData.Mode], TempRXData.QSOPoints);
       inc(LogHourTotals^[CurrentHourIndex].QSOPoints[TempRXData.Band, Both], TempRXData.QSOPoints);
-      inc(LogHourTotals^[CurrentHourIndex].QSOPoints[All, Both], TempRXData.QSOPoints);
+      inc(LogHourTotals^[CurrentHourIndex].QSOPoints[AllBands, Both], TempRXData.QSOPoints);
 
       TempMults := 0;
       if TempRXData.DXMult then inc(TempMults);
@@ -980,9 +986,9 @@ begin
 //      if (TempRXData.DXMult or TempRXData.DomesticMult or TempRXData.ZoneMult or TempRXData.PrefixMult) then
       begin
         inc(LogHourTotals^[CurrentHourIndex].Mults[TempRXData.Band, TempRXData.Mode], TempMults);
-        inc(LogHourTotals^[CurrentHourIndex].Mults[All, TempRXData.Mode], TempMults);
+        inc(LogHourTotals^[CurrentHourIndex].Mults[AllBands, TempRXData.Mode], TempMults);
         inc(LogHourTotals^[CurrentHourIndex].Mults[TempRXData.Band, Both], TempMults);
-        inc(LogHourTotals^[CurrentHourIndex].Mults[All, Both], TempMults);
+        inc(LogHourTotals^[CurrentHourIndex].Mults[AllBands, Both], TempMults);
       end;
 
     end;
@@ -1079,9 +1085,9 @@ begin
       if LastHourPrinted > 23 then LastHourPrinted := 0;
     end;
 
-    TotalContacts := TotalContacts + LogHourTotals^[HourIndex].QSOs[All, Both];
-    TotalMults := TotalMults + LogHourTotals^[HourIndex].Mults[All, Both];
-    TotalQSOPoints := TotalQSOPoints + LogHourTotals^[HourIndex].QSOPoints[All, Both];
+    TotalContacts := TotalContacts + LogHourTotals^[HourIndex].QSOs[AllBands, Both];
+    TotalMults := TotalMults + LogHourTotals^[HourIndex].Mults[AllBands, Both];
+    TotalQSOPoints := TotalQSOPoints + LogHourTotals^[HourIndex].QSOPoints[AllBands, Both];
 
     if DoingDay1 then
     begin
@@ -1116,9 +1122,9 @@ begin
           Write(FileWrite, '     --- ');
       end;
 
-      Write(FileWrite, QSOs[All, Both]: 5, '/', Mults[All, Both]);
+      Write(FileWrite, QSOs[AllBands, Both]: 5, '/', Mults[AllBands, Both]);
 
-      if Mults[All, Both] < 10 then Write(FileWrite, ' ');
+      if Mults[AllBands, Both] < 10 then Write(FileWrite, ' ');
 
       Write(FileWrite, TotalContacts: 6, '/', TotalMults);
 
@@ -1220,7 +1226,7 @@ begin
       for Minute := LastMinute + 1 to 59 do
       begin
         inc(LogHourTotals^[LastHourIndex].Minutes[LastBand, Both]);
-        inc(LogHourTotals^[LastHourIndex].Minutes[All, Both]);
+        inc(LogHourTotals^[LastHourIndex].Minutes[AllBands, Both]);
       end;
 
   end;
@@ -1256,7 +1262,7 @@ begin
       end;
     end;
 
-    Correction := LogHourTotals^[HourIndex].Minutes[All, Both] - HourTotal;
+    Correction := LogHourTotals^[HourIndex].Minutes[AllBands, Both] - HourTotal;
 
     if Correction <> 0 then
       LogHourTotals^[HourIndex].Minutes[BiggestBand, Both] :=

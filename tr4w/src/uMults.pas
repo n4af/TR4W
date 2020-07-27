@@ -82,11 +82,11 @@ begin
   if Mode <> Both then
     inc(MTotals[Band, Both, m]);
 
-  if Band <> All then
-    inc(MTotals[All, Mode, m]);
+  if Band <> AllBands then
+    inc(MTotals[AllBands, Mode, m]);
 
-   if ((Mode <> Both) and (Band <> All)) then
-     inc(MTotals[All, Both, m]);
+   if ((Mode <> Both) and (Band <> AllBands)) then
+     inc(MTotals[AllBands, Both, m]);
 end;
 
 procedure MultsObject.ClearAllMults;
@@ -103,8 +103,8 @@ begin
   if not (Zone in [0..ZoneMultArraySize]) then Exit;
   ZoneMultsArray[Zone][Mode] := ZoneMultsArray[Zone][Mode] or (1 shl Ord(Band));
   ZoneMultsArray[Zone][Both] := ZoneMultsArray[Zone][Both] or (1 shl Ord(Band));
-  ZoneMultsArray[Zone][Mode] := ZoneMultsArray[Zone][Mode] or (1 shl Ord(All));
-  ZoneMultsArray[Zone][Both] := ZoneMultsArray[Zone][Both] or (1 shl Ord(All));
+  ZoneMultsArray[Zone][Mode] := ZoneMultsArray[Zone][Mode] or (1 shl Ord(AllBands));
+  ZoneMultsArray[Zone][Both] := ZoneMultsArray[Zone][Both] or (1 shl Ord(AllBands));
   IncrementTotals(Band, Mode, rmZone);
 end;
 
@@ -114,8 +114,8 @@ begin
 
   DXMultsArray[Cntr][Mode] := DXMultsArray[Cntr][Mode] or (1 shl Ord(Band));
   DXMultsArray[Cntr][Both] := DXMultsArray[Cntr][Both] or (1 shl Ord(Band));
-  DXMultsArray[Cntr][Mode] := DXMultsArray[Cntr][Mode] or (1 shl Ord(All));
-  DXMultsArray[Cntr][Both] := DXMultsArray[Cntr][Both] or (1 shl Ord(All));
+  DXMultsArray[Cntr][Mode] := DXMultsArray[Cntr][Mode] or (1 shl Ord(AllBands));
+  DXMultsArray[Cntr][Both] := DXMultsArray[Cntr][Both] or (1 shl Ord(AllBands));
   IncrementTotals(Band, Mode, rmDX);
 end;
 

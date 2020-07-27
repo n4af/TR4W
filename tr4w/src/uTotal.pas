@@ -94,7 +94,7 @@ begin
   end;
 //  col_title := BandStringsArrayWithOutSpaces[Band];
   inc(Column);
-  if Band = All then Column := 7;
+  if Band = AllBands then Column := 7;
   {
     if Band in [Band160..Band10] then Column := integer(Band) + 1;
 
@@ -131,16 +131,16 @@ begin
   if QSOByMode then
   begin
 
-    if (ActiveMode = CW) or ((QTotals[All, CW] > 0) and (NumberDifferentMults < 3)) then iTotalTextOut(QTotals[Band, CW]);
-    if (ActiveMode = Phone) or ((QTotals[All, Phone] > 0) and (NumberDifferentMults < 3)) then iTotalTextOut(QTotals[Band, Phone]);
-    if (ActiveMode = Digital) or ((QTotals[All, Digital] > 0) and (NumberDifferentMults < 3)) then iTotalTextOut(QTotals[Band, Digital]);
+    if (ActiveMode = CW) or ((QTotals[AllBands, CW] > 0) and (NumberDifferentMults < 3)) then iTotalTextOut(QTotals[Band, CW]);
+    if (ActiveMode = Phone) or ((QTotals[AllBands, Phone] > 0) and (NumberDifferentMults < 3)) then iTotalTextOut(QTotals[Band, Phone]);
+    if (ActiveMode = Digital) or ((QTotals[AllBands, Digital] > 0) and (NumberDifferentMults < 3)) then iTotalTextOut(QTotals[Band, Digital]);
   end
   else
     iTotalTextOut(QTotals[Band, Both]);
 
   if MultByMode then TempMode := ActiveMode else TempMode := Both;
 
-  if (DoingDomesticMults) and (MultByBand or (Band = All)) and MultDisplayEnable then
+  if (DoingDomesticMults) and (MultByBand or (Band = AllBands)) and MultDisplayEnable then
   begin
 {
     if MultByMode then
@@ -151,7 +151,7 @@ begin
     iTotalTextOut(mo.MTotals[Band, TempMode, rmDomestic]);
   end;
 
-  if (DoingDXMults) and (MultByBand or (Band = All)) and MultDisplayEnable {and (ActiveDXMult <> NoCountDXMults)} then
+  if (DoingDXMults) and (MultByBand or (Band = AllBands)) and MultDisplayEnable {and (ActiveDXMult <> NoCountDXMults)} then
   begin
 {
     if MultByMode then
@@ -162,7 +162,7 @@ begin
     iTotalTextOut(mo.MTotals[Band, TempMode, rmDX]);
   end;
 
-  if (DoingPrefixMults) and (MultByBand or (Band = All)) and MultDisplayEnable then
+  if (DoingPrefixMults) and (MultByBand or (Band = AllBands)) and MultDisplayEnable then
   begin
 {
     if MultByMode then
@@ -173,7 +173,7 @@ begin
     iTotalTextOut(mo.MTotals[Band, TempMode, rmPrefix]);
   end;
 
-  if (DoingZoneMults) and (MultByBand or (Band = All)) and MultDisplayEnable then
+  if (DoingZoneMults) and (MultByBand or (Band = AllBands)) and MultDisplayEnable then
     iTotalTextOut(mo.MTotals[Band, TempMode, rmZone]);
 
 end;
@@ -215,10 +215,10 @@ begin
   if QSOByMode then
   begin
   if Contest = OZCR_O   then      //n4af 04.34.8
-  if (QTotals[All,CW] > 0) and (QTotals[All,Phone]> 0)   then
+  if (QTotals[AllBands,CW] > 0) and (QTotals[AllBands,Phone]> 0)   then
   begin
-  CWi  := (QTotals[All,CW]) / ((Qtotals[All,CW])+(Qtotals[All,Phone])) * 100;
-  PHi  := ((QTotals[All,Phone]) / (Qtotals[All,CW]+Qtotals[All,Phone]) * 100);
+  CWi  := (QTotals[AllBands,CW]) / ((Qtotals[AllBands,CW])+(Qtotals[AllBands,Phone])) * 100;
+  PHi  := ((QTotals[AllBands,Phone]) / (Qtotals[AllBands,CW]+Qtotals[AllBands,Phone]) * 100);
   Str(round(CWi),s1);
    S1 := concat('CW: ',s1,'%');
     CWp := pchar(S1);
@@ -232,9 +232,9 @@ begin
   end;
   if QSOByMode then
   begin
-    if (ActiveMode = CW) or ((QTotals[All, CW] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText('CW - ');
-    if (ActiveMode = Phone) or ((QTotals[All, Phone] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText(TC_SSBQSOS);
-    if (ActiveMode = Digital) or ((QTotals[All, Digital] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText(TC_DIGQSOS);
+    if (ActiveMode = CW) or ((QTotals[AllBands, CW] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText('CW - ');
+    if (ActiveMode = Phone) or ((QTotals[AllBands, Phone] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText(TC_SSBQSOS);
+    if (ActiveMode = Digital) or ((QTotals[AllBands, Digital] > 0) and (NumberDifferentMults < 3)) then WriteLeftColumnText(TC_DIGQSOS);
   end
   else
     WriteLeftColumnText(TC_QSOS);
@@ -334,7 +334,7 @@ begin
   begin
     DisplayBandTotals(NoBand);
   end;
-   DisplayBandTotals(All);
+   DisplayBandTotals(AllBands);
  //  TotalTextOut('Ratio',column+1,0);
   if QTCsEnabled then
   begin

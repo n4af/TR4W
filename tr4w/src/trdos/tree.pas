@@ -4153,7 +4153,7 @@ begin
    //  Tail := 0;
    //  Head := 0;
    //  New(List);
-    // Debug := False;
+    // DebugFlag := False;
 end;
 
 procedure CharacterBuffer.ClearBuffer;

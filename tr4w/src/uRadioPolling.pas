@@ -71,7 +71,7 @@ function icomCheckBuffer(rig: RadioPtr): boolean;
 procedure SetVFOModeExtendedMode(rig: RadioPtr; which: Cardinal; mode: ModeType; em: ExtendedModeType);
 
 procedure pFTDX9000(rig: RadioPtr);
-procedure pFT891(rig: RadioPtr);
+procedure pFT891_FT991(rig: RadioPtr);
 procedure pOrion(rig: RadioPtr);
 procedure pOrion3(rig: RadioPtr);
 //procedure pOrionNew(rig: RadioPtr);
@@ -1936,7 +1936,7 @@ FT9000 - RECEIVER STATUS
   until rig.tPollCount < 0;
 end;
 //-----
-procedure pFT891(rig: RadioPtr);  // Stopped here. Just copied this from DX9000. Change frequency bytes and check the rest.
+procedure pFT891_FT991(rig: RadioPtr);  // Stopped here. Just copied this from DX9000. Change frequency bytes and check the rest.
 label
   1;
 var
@@ -1946,7 +1946,7 @@ begin
     inc(rig.tPollCount);
 
 //    WriteToSerialCATPort('IF;', rig.tCATPortHandle); {information}
-    rig.WritePollRequest('IF;', 3);
+    rig.WritePollRequest('IF;', 3);        // This retreives VFO A (Primary). Get other VFO with OI; command.
 {$IF NOT POLLINGDEBUG}
     if ((not ReadFromCOMPort(28, rig)) or (PWORD(@rig.tBuf)^ <> $4649)) then begin ClearRadioStatus(rig);
       goto 1;
@@ -2552,7 +2552,7 @@ begin
     FT450, FT950, FT1200,FT2000, FTDX3000,FTDX5000,FTDX9000:
       pFTDX9000(rig);
     FT891, FT991:
-       pFT891(rig); // ny4i Issue218 9 byte frequency
+       pFT891_FT991(rig); // ny4i Issue218 9 byte frequency
     IC78..IC9700, OMNI6:
       pIcomNew(rig);
 //    pIcom(rig);

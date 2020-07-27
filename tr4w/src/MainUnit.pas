@@ -134,7 +134,8 @@ uses
   ZoneCont, 
   classes,
   uWSJTX,
-  Math
+  Math,
+  Log4D
   ;
 
   var
@@ -157,7 +158,10 @@ uses
   wsjtx                                 : TWSJTXServer;
   saveLastADIFName                      : string;               // ny4i to save for ContestByADIFName cache
   saveLastContest                       : ContestType;
+  logger                                : TLogLogger;
+  appender                              :TLogFileAppender;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
+
 
 function DeviceIoControlHandler
   (
@@ -992,7 +996,7 @@ begin
 
     if ExchangeHasBeenSent = False then
       if MessageEnable and not BeSilent then
-        if not (Debug and (CWTone = 0)) then
+        if not (DebugFlag and (CWTone = 0)) then
         begin
               //          Frm.ExchangeWindow . SetFocus;
           tExchangeWindowSetFocus;
@@ -4474,6 +4478,7 @@ begin
       // Convert the log?
       //if not AskConvertLog(TempBuffer1) then
       //   begin
+      logger.Fatal(wsprintfBuffer);
          halt;
       //   end;
     end
@@ -4489,6 +4494,7 @@ begin
       begin
         showwarning(TC_ERRORINLOGFILE);
         CloseLogFile;
+        logger.Fatal('Log file is not the correct size');
         halt;           // 4.84.3
       end;
     end;
@@ -4529,9 +4535,9 @@ begin
           if TempMode = FM then TempMode := Phone;
           inc(QSOTotals[TempRXData.Band, TempMode]);
           inc(QSOTotals[TempRXData.Band, Both]);
-          inc(QSOTotals[All, TempMode]);
+          inc(QSOTotals[AllBands, TempMode]);
 
-          if (SingleBand = TempRXData.Band) or (SingleBand = All) then
+          if (SingleBand = TempRXData.Band) or (SingleBand = AllBands) then
             TotalQSOPoints := TotalQSOPoints + TempRXData.QSOPoints;
 
           Sheet.AddQSOToSheets(@TempRXData, True);
@@ -4541,12 +4547,12 @@ begin
 //          if TempRXData.Band in [Band160..Band10] then
           begin
             inc(ContinentQSOCount[TempRXData.Band, TempRXData.QTH.Continent]);
-            inc(ContinentQSOCount[All, TempRXData.QTH.Continent]);
+            inc(ContinentQSOCount[AllBands, TempRXData.QTH.Continent]);
 //            inc(TimeSpentByBand[TempRXData.Band]);
 //            PreviousBand := TempRXData.Band;
           end;
         end;
-        inc(QSOTotals[All, Both]);
+        inc(QSOTotals[AllBands, Both]);
       end;
 //      else
 //        asm nop end;
@@ -5778,7 +5784,7 @@ begin
       asm
     push PreviousProcAddress
       end;
-      wsprintf(wsprintfBuffer, 'If you see this message, please send this code: '#13#10#13#10'GM-%X'#13#10#13#10'to tr4w@qrz.ru.');
+      wsprintf(wsprintfBuffer, 'If you see this message, please send this code: '#13#10#13#10'GM-%X'#13#10#13#10'to ny4i@ny4i.com.');
       asm add esp,12
       end;
       showwarning(wsprintfBuffer);
@@ -6530,7 +6536,7 @@ begin
       if openDlg.Execute then
          begin // File was selected in openDlg.FileName
          adifFileName := openDlg.FileName;
-         if QSOTotals[All, Both] > 0 then
+         if QSOTotals[AllBands, Both] > 0 then
             begin
             buttonSelected := MessageDlg( TC_APPENDIMPORTEDQSOSTOCURRENTLOG
                                          ,mtConfirmation
@@ -7078,7 +7084,7 @@ function GetAddMultBand(Mult: TAdditionalMultByBand; Band: BandType): BandType;
 begin
   case Mult of
     dmbbDefauld: Result := Band;
-    dmbbAllBand: Result := All;
+    dmbbAllBand: Result := AllBands;
   end;
 
 end;
@@ -7590,20 +7596,24 @@ begin
     CloseFile(myFile);
   end;
 end;
-
+{--------------------------------------------------------------------
+   We always write to the Logger facility. If NEWER_DEBUG is set, we also write to the TELNET window
+}
 procedure DebugMsg(s: string);
 {$IF NEWER_DEBUG}
 var
    formattedDate: string;
    bytesToWrite: integer;
    first: boolean;
-const bSendToTelnetWindow = FALSE;
 {$IFEND}
 begin
+   if Assigned(logger) then
+      begin
+      logger.Debug(s);
+      end;
 {$IF NEWER_DEBUG}
    // Switched to write a file
-if bSendToTelnetWindow then
-   begin
+
    first := true;
    LongTimeFormat := 'hh nn ss (zzz)';
    DateTimeToString(formattedDate, 'tt', Now);
@@ -7626,12 +7636,8 @@ if bSendToTelnetWindow then
       end;
 
    AddStringToTelnetConsole(PChar('[' + formattedDate + '] ' + s),tstSend);
-   end
-else
-   begin
-   CreateLogFile(s);
-   end;
 {$IFEND}
+
 end;
 
 // These two functions are overloaded so on can call without any parameters to

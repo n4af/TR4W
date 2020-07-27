@@ -451,13 +451,13 @@ begin
     tCategoryBandSA[CategoryBand],
     tCategoryTransmitterSA[CategoryTransmitter]
     );
-  for TempBand := Band160 to All do
+  for TempBand := Band160 to AllBands do
     for TempMode := CW to Both do
     begin
       if QSOTotals[TempBand, TempMode] = 0 then Continue;
 
       BandPchar := BandStringsArrayWithOutSpaces[TempBand];
-      if TempBand = All then
+      if TempBand = AllBands then
         BandPchar := 'total';
 
       Index := Index + Format(@RequestBody[Index],
@@ -467,14 +467,14 @@ begin
         QSOTotals[TempBand, TempMode]);
     end;
 
-  for TempBand := Band160 to All do
+  for TempBand := Band160 to AllBands do
     for TempMode := CW to Both do
       for m := Succ(Low(RemainingMultiplierType)) to High(RemainingMultiplierType) do
       begin
         if mo.MTotals[TempBand, TempMode, m] = 0 then Continue;
 
         BandPchar := BandStringsArrayWithOutSpaces[TempBand];
-        if TempBand = All then
+        if TempBand = AllBands then
           BandPchar := 'total';
 
         Index := Index + Format(@RequestBody[Index],
