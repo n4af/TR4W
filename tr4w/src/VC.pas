@@ -151,7 +151,7 @@ const
 //       LANG                                  = 'ESP';
 //       LANG                                  = 'MNG';
 //       LANG                                  = 'POL';
-//         LANG                                  = 'CZE';
+//       LANG                                  = 'CZE';
 //       LANG                                  = 'ROM';
 //       LANG                                  = 'CHN';
 
@@ -180,11 +180,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.90.7' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.90.8' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July 19, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'July 27, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -2599,7 +2599,8 @@ type
     uQRQCPM,      // 4.82.3
     OKOMRTTY,     // 4.83.4
     SRRQSOPOINTMETHOD, // 4.90.4
-    YBFT8QP              // 4.90.7
+    YBFT8QP,              // 4.90.7
+    WWDIGIQP              // 4.90.8
 
     );
 
@@ -2738,7 +2739,8 @@ const
      'UQRQCPM',           // 4.82.3
      'OKOMRTTY',           // 4.83.4
      'SRRQSOPOINTMETHOD',  // 4.90.4
-     'YBFT8QP'               // 4.90.7
+     'YBFT8QP',               // 4.90.7
+     'WWDIGIQP'              // 4.90.8
     );
 
 type

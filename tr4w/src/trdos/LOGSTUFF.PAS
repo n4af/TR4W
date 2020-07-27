@@ -6952,11 +6952,18 @@ begin
       RXDATA.QSOPoints :=  RXDATA.QSOPoints * 3;
       if CategoryPower = cpLOW then
          RXDATA.QSOPoints :=  Round(RXData.QSOPoints * 1.5);
-
   end
   else
     RXData.QSOPoints := 1;
 end;
+
+WWDigiQP:                       // 4.90.8
+  if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
+  begin
+    Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+    RXData.QSOPoints := (Distance div 3000) + 1;
+   end;
+
 
 TenTenQSOPointMethod:
 if RXData.TenTenNum <> -1 then
