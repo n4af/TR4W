@@ -2561,7 +2561,7 @@ if TempRXData.DomMultQTH = '' then
                 push nrSent
                 push RSTSent
             end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-4d %-7s');
+            wsprintf(CABRILLO_MYEX, '%-3s %-4.4d %-7s');
             asm add esp,20
             end;
 
@@ -2570,7 +2570,7 @@ if TempRXData.DomMultQTH = '' then
                  push nrReceived
                 push RSTReceived
             end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-4u %-7s');
+            wsprintf(CABRILLO_HISEX, '%-3s %-4.4u %-7s');
             asm add esp,20
             end;
           end;
