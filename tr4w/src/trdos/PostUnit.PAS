@@ -2879,15 +2879,15 @@ if TempRXData.DomMultQTH = '' then
 
         QSONumberAndGridSquare:
           begin
-            Format(CABRILLO_MYEX, '%03d %-6s ', nrSent, cMyState);
-            Format(CABRILLO_HISEX, '%03u %-6s', nrReceived, csQTHString);
+            Format(CABRILLO_MYEX, '%03d %-6.4s ', nrSent, cMyState);
+            Format(CABRILLO_HISEX, '%03.4u %-6s', nrReceived, csQTHString);
           end;
 
         QSONumberDomesticOrDXQTHExchange, QSONumberDomesticQTHExchange:
           if (Contest = UKRAINECHAMPIONSHIP) or (Contest = CUPURAL) then
           begin
-            Format(CABRILLO_MYEX, '%-4s %-6d', cMyState, nrSent);
-            Format(CABRILLO_HISEX, '%-4s %-6u', csQTHString, nrReceived);
+            Format(CABRILLO_MYEX, '%-4s %-6.4d', cMyState, nrSent);
+            Format(CABRILLO_HISEX, '%-4s %-6.4u', csQTHString, nrReceived);
           end
           else
           begin
@@ -2903,7 +2903,7 @@ if TempRXData.DomMultQTH = '' then
                   push csQTHString
                   push nrReceived
             end;
-            wsprintf(CABRILLO_HISEX, '%-4u %-6s');
+            wsprintf(CABRILLO_HISEX, '%-4.4u %-6s');
             asm add esp,16
             end;
           end;
@@ -2920,7 +2920,7 @@ if TempRXData.DomMultQTH = '' then
           if cMyState = 'TRC' then      // 4.63.3
            wsprintf(CABRILLO_MYEX, '%-3s %d%-6s')
            else
-          wsprintf(CABRILLO_MYEX, '%-3s %-4d %-6s ');
+          wsprintf(CABRILLO_MYEX, '%-3s %-4.4d %-6s ');
 
             asm add esp,20
             end;
@@ -2950,12 +2950,12 @@ if TempRXData.DomMultQTH = '' then
             push RSTReceived
             end;
             if Contest = DARC10M then     // n4af 4.43.7
-            wsprintf(CABRILLO_HISEX, '%-3s %4d %3s')
+            wsprintf(CABRILLO_HISEX, '%-3s %4.4d %3s')
             else
             if csQTHString = 'TRC' then      // 4.63.3
               wsprintf(CABRILLO_HISEX, '%-3s%5d%-8s')
               else
-               wsprintf(CABRILLO_HISEX, '%-3s %4d %8s');
+               wsprintf(CABRILLO_HISEX, '%-3s %4.4d %8s');
             asm add esp,20
             end;
           end;
@@ -3024,7 +3024,7 @@ if TempRXData.DomMultQTH = '' then
             push nrSent
             push cMyState
             end;
-            wsprintf(CABRILLO_MYEX, '%-3s %03d    ');
+            wsprintf(CABRILLO_MYEX, '%-3s %03.4d    ');
             asm add esp,16
             end;
 
@@ -3032,7 +3032,7 @@ if TempRXData.DomMultQTH = '' then
             push nrReceived
             push csQTHString
             end;
-            wsprintf(CABRILLO_HISEX, '%-3s %03u');
+            wsprintf(CABRILLO_HISEX, '%-3s %03.4u');
             asm add esp,16
             end;
           end;
@@ -3053,7 +3053,7 @@ if TempRXData.DomMultQTH = '' then
             push cMyState
             push nrSent
             end;
-            wsprintf(CABRILLO_MYEX, '%-3d %-7s ');
+            wsprintf(CABRILLO_MYEX, '%-3.4d %-7s ');
             asm add esp,16
             end;
 
@@ -3061,7 +3061,7 @@ if TempRXData.DomMultQTH = '' then
             push csQTHString
             push nrReceived
             end;
-            wsprintf(CABRILLO_HISEX, '%-3u %-7s');
+            wsprintf(CABRILLO_HISEX, '%-3.4u %-7s');
             asm add esp,16
             end;
           end;
@@ -3086,7 +3086,7 @@ if TempRXData.DomMultQTH = '' then
             asm add esp,16
             end;
           end;   }
-          Format(Cabrillo_HISEX, '%-3s %04u',RSTReceived, nrReceived);   // issue 177
+          Format(Cabrillo_HISEX, '%-3s %04.4u',RSTReceived, nrReceived);   // issue 177
           end;
         RSTAndContinentExchange:
           begin
@@ -3186,7 +3186,7 @@ if TempRXData.DomMultQTH = '' then
 //              if Contest = UA4N then
 //                wsprintf(CABRILLO_HISEX, '%02u%03u')
 //              else
-              wsprintf(CABRILLO_HISEX, '  %u   %03u');
+              wsprintf(CABRILLO_HISEX, '  %.4u   %03u');
               asm add esp,16
               end;
 
@@ -3194,7 +3194,7 @@ if TempRXData.DomMultQTH = '' then
                 push nrSent
                 push cMyState
               end;
-              wsprintf(CABRILLO_MYEX, '  %s    %03d ');
+              wsprintf(CABRILLO_MYEX, '  %s    %03.4d ');
               asm add esp,16
               end;
             end;
@@ -3228,7 +3228,7 @@ if TempRXData.DomMultQTH = '' then
              push nrSent            // 4.53.2
              push pnr     // 4.53.2
             end;
-            wsprintf(CABRILLO_MYEX, '%-.3u%-7.3d');    // 4.72.9
+            wsprintf(CABRILLO_MYEX, '%-.3u%-7.4d');    // 4.72.9
             asm add esp,16
             end;
 
@@ -3241,7 +3241,7 @@ if TempRXData.DomMultQTH = '' then
             end;
           //  pnr := temprxdata.numberreceived div  1000;      // 4.53.2
               pnr := RXNR;
-             wsprintf(CABRILLO_HISEX, '%-.3d%-.3d');    // 4.53.4        // 4.72.9
+             wsprintf(CABRILLO_HISEX, '%-.4d%-.4d');    // 4.53.4        // 4.72.9
              asm add esp,16
              end;
           end;
@@ -3265,7 +3265,7 @@ if TempRXData.DomMultQTH = '' then
                push nrSent
                push RSTSent
                end;
-              wsprintf(CABRILLO_MYEX, '%-4s %03u/M   ');  // n4af 4.43.12
+              wsprintf(CABRILLO_MYEX, '%-4s %03.4u/M   ');  // n4af 4.43.12
               asm add esp,16
               end;
              end
@@ -3275,7 +3275,7 @@ if TempRXData.DomMultQTH = '' then
                 push nrSent
                 push RSTSent
                 end;
-               wsprintf(CABRILLO_MYEX, '%-4s %03u   ');  // n4af 4.43.12
+               wsprintf(CABRILLO_MYEX, '%-4s %03.4u   ');  // n4af 4.43.12
                asm add esp,16
                end;
               end;
