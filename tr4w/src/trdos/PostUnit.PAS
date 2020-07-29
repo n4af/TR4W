@@ -4291,7 +4291,7 @@ begin
          Result := slOperators.DelimitedText;
       except
       on E: Exception do
-         DebugMsg(E.ClassName + ' error raised with message ' + E.Message);
+         logger.error('Exception in GetOperatorsFromLog ',E);
       end;
    finally
       FreeAndNil(slOperators);

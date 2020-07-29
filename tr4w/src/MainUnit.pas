@@ -135,7 +135,8 @@ uses
   classes,
   uWSJTX,
   Math,
-  Log4D
+  Log4D,
+  Controls
   ;
 
   var
@@ -4287,33 +4288,22 @@ end;
 
 procedure ShowMessageParent(Text: PChar; Parent: HWND);
 begin
+  logger.Info('Sending to MessageBox: ' + Text);
   MessageBox(Parent, Text, tr4w_ClassName, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
 end;
 
 procedure ShowMessage2(Text: PChar);
 begin
+  logger.Info('Sending to MessageBox: ' + Text);
   MessageBox(tr4whandle, Text, nil, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
 end;
 
 procedure ShowMessage(Text: PChar);
 //var  MsgInfo                          : TMsgBoxParams;
 begin
+  logger.Info('Sending to MessageBox: ' + Text);
   MessageBox(tr4whandle, Text, tr4w_ClassName, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
-{
-  with MsgInfo do
-  begin
-    lpfnMsgBoxCallback := nil;
-    cbSize := SizeOf(TMsgBoxParams);
-    hwndOwner := tr4whandle;
-    hInstance := SysInit.hInstance;//GetWindowLong(tr4whandle, GWL_HINSTANCE);
-    lpszText := Text;
-    lpszCaption := 'TR4W';
-    dwStyle := MB_USERICON or MB_TOPMOST or MB_OK;
-    lpszIcon := 'MAINICON';
-    dwLanguageId := GetSystemDefaultLangID;
-  end;
-  MessageBoxIndirect(MsgInfo);
-}
+
 end;
 
 procedure FilePreview;
@@ -4432,7 +4422,7 @@ end;
 
 procedure LoadinLog;
 label
-  1, 2;
+  1, 2, start;
 var
   pNumberOfBytesRead                    : Cardinal;
   Size                                  : Cardinal;
@@ -4442,6 +4432,7 @@ var
  
 begin
 
+start:
 {$IF tDebugMode}
   T1 := Windows.GetTickCount;
 //  m:=0;
@@ -4476,11 +4467,15 @@ begin
       showwarning(wsprintfBuffer);
       CloseLogFile;
       // Convert the log?
-      //if not AskConvertLog(TempBuffer1) then
-      //   begin
-      logger.Fatal(wsprintfBuffer);
+      if not AskConvertLog(TempBuffer1) then
+         begin
+         logger.Fatal(wsprintfBuffer);
          halt;
-      //   end;
+         end
+      else
+         begin
+         goto start;
+         end;
     end
     else
     begin
@@ -4491,12 +4486,13 @@ begin
          NY4I 3 JUL 2020
       *)
       if (Size mod SizeOf(ContestExchange)) <> 0 {SizeOf(TLogHeader)} then
-      begin
-        showwarning(TC_ERRORINLOGFILE);
-        CloseLogFile;
-        logger.Fatal('Log file is not the correct size');
-        halt;           // 4.84.3
-      end;
+         begin
+         showwarning(TC_ERRORINLOGFILE);
+         CloseLogFile;
+         logger.Fatal('Log file is not the correct size');
+         halt;           // 4.84.3
+         end;
+
     end;
   end
   else
@@ -6543,7 +6539,7 @@ begin
                                          ,[mbYes, mbNo]
                                          ,0
                                         );
-            if buttonSelected = 7 then // 7 = mrNo but enum is not here for some reason.
+            if buttonSelected = mrNo then 
                begin
                exit;
                end;
@@ -7745,18 +7741,20 @@ end;
 (*----------------------------------------------------------------------------*)
 function AskConvertLog(sVersion: string): boolean;
 Var
-  OldFile, NewFile: String;
+  OldFile, NewFile, fName: String;
   fileSetCode, attrs: integer;
-  h: HWND;
+  oldFH: file of ContestExchangev1_5;
+  newFH: file of ContestExchange;
+  headerFH: file of TLogHeader;
   i: integer;
+  oldRXData: ContestExchangev1_5;
+  newRXData: ContestExchange;
+  lpNumberOfBytesWritten: Cardinal;
+  done: boolean;
 begin
    Result := false;
-// TR4W_LOG_FILENAME
-   if not OpenLogFile then
-      begin
-      ShowWarning(PChar('Could not open log file'));
-      Exit;
-      end;
+   done := false;
+
    //ReadVersionBlock; // Just resets points to the start
    // Read the version block to confirm the versions are different. Ask again if they want to convert
    { The general logic here is as follows:
@@ -7764,86 +7762,173 @@ begin
    Read the log header and confirm.
    If the user wants to convert, make a backup of the current log with priorVersion in the name (as read from the version record)
    }
-   //OldFile := TR4W_LOG_FILENAME;
-   NewFile := StrPas(TR4W_LOG_FILENAME) + '-' + sVersion + '.bkup';
-   If FileExists(TR4W_LOG_FILENAME) Then
+   If YesOrNo(0,'Would you like to convert this log to the latest format') = mrNo then
       begin
-      if FileExists(PChar(NewFile)) then
+      logger.Fatal('User opted to not upgrade log format');
+      Halt;
+      end;
+   NewFile := StrPas(TR4W_LOG_FILENAME) + '-' + sVersion + '.bkup';
+   If not FileExists(TR4W_LOG_FILENAME) then
+      begin
+      ShowMessage(PChar('Log file not found'));
+      Exit;
+      end;
+
+   if FileExists(PChar(NewFile)) then
+      begin
+      attrs := FileGetAttr(NewFile);
+      if attrs and faReadOnly > 0 then
          begin
-         attrs := FileGetAttr(NewFile);
-         if attrs and faReadOnly > 0 then
-            begin
-            ShowMessage(PChar('Cannot copy log file -- target exists and is read-only'));
-            Exit;
-            end;
+         ShowMessage(PChar('Cannot copy log file -- target exists and is read-only'));
+         Exit;
          end;
-      if CopyFile(TR4W_LOG_FILENAME, PChar(NewFile), false) then
+      end;
+
+   if not CopyFile(TR4W_LOG_FILENAME, PChar(NewFile), false) then
+      begin
+      ShowMessage(PChar('Could not make a backup copy of ' + StrPas(TR4W_LOG_FILENAME)));
+      Exit;
+      end;
+
+   ShowMessage(PChar('Log file backup created')); // good copy so set to read-only
+   fileSetCode := FileSetAttr(NewFile, faReadOnly);
+   if fileSetCode = 0 then
+      begin
+      logger.Info(NewFile + ' made into a read only file');
+      end
+   else
+      begin
+      ShowMessage('Could not make backup file read-only');
+      Exit;
+      end;
+
+   // Now change the name of the original log file to TR4W_LOG_FILENAME + .v1_5
+   OldFile := StrPas(TR4W_LOG_FILENAME) + '.v1_5';
+   fName := StrPas(TR4W_LOG_FILENAME);
+   if not RenameFile(fName, OldFile) then
+      begin
+      ShowMessage(PChar('Could not rename ' + fName + ' to ' + OldFile));
+      Exit;
+      end;
+   //***
+   // Now the file is backed up so time to convert...
+   //***
+
+   AssignFile(headerFH, TR4W_LOG_FILENAME);
+   ReWrite(headerFH);
+   Write(headerFH,LogHeader);
+   CloseFile(headerFH);
+
+   AssignFile(oldFH, OldFile);
+   FileMode := fmOpenRead;
+   Reset(oldFH);
+
+   AssignFile(newFH, TR4W_LOG_FILENAME);
+   FileMode := fmOpenWrite ;
+   Reset(newFH);
+
+   Seek(newFH,1); // 0 relative to 1 is second record -- after the header
+   seek(oldFH,1); // Skip old header
+   // Now read the log
+   while not EOF(oldFH) do
+      begin
+      Read(oldFH,oldRXData);
+      ClearContestExchange(newRXData);
+      newRXData.tSysTime             := oldRXData.tSysTime;
+      newRXData.Band                 := oldRXData.Band;
+      newRXData.Mode                 := oldRXData.Mode;
+      newRXData.ceQSOID1             := oldRXData.ceQSOID1;
+      newRXData.ceQSOID2             := oldRXData.ceQSOID2;
+      newRXData.Frequency            := oldRXData.Frequency;
+         newRXData.ceQSO_Deleted        := oldRXData.ceQSO_Deleted;
+         newRXData.ceComputerID         := oldRXData.ceComputerID;
+         newRXData.ceOperatorID         := oldRXData.ceOperatorID;
+         newRXData.ceRecordKind         := oldRXData.ceRecordKind;
+         newRXData.ceQSO_Skiped         := oldRXData.ceQSO_Skiped;
+         newRXData.ceSendToServer       := oldRXData.ceSendToServer;
+         newRXData.ceNeedSendToServerAE := oldRXData.ceNeedSendToServerAE;
+         newRXData.ceDupe               := oldRXData.ceDupe;
+         newRXData.PostalCode_old       := oldRXData.PostalCode_old;
+         newRXData.ZERO_01              := oldRXData.ZERO_01;
+         newRXData.Prefix               := oldRXData.Prefix;
+         newRXData.ZERO_02              := oldRXData.ZERO_02;
+         newRXData.Callsign             := oldRXData.Callsign;
+         newRXData.Age                  := oldRXData.Age;
+         newRXData.ceWasSendInQTC       := oldRXData.ceWasSendInQTC;
+         newRXData.DomesticMult         := oldRXData.DomesticMult;
+         newRXData.DXMult               := oldRXData.DXMult;
+         newRXData.PrefixMult           := oldRXData.PrefixMult;
+         newRXData.ZoneMult             := oldRXData.ZoneMult;
+         newRXData.ceClass              := oldRXData.ceClass;
+         newRXData.ZERO_04              := oldRXData.ZERO_04;
+         newRXData.Precedence           := oldRXData.Precedence;
+         newRXData.ceRadio              := oldRXData.ceRadio;
+         newRXData.Check                := oldRXData.Check;
+         newRXData.QTH                  := oldRXData.QTH;
+         newRXData.DXQTH                := oldRXData.DXQTH;
+         newRXData.ZERO_05              := oldRXData.ZERO_05;
+         newRXData.Radio                := oldRXData.Radio;
+         newRXData.DomMultQTH           := oldRXData.DomMultQTH;
+               newRXData.ZERO_06              := oldRXData.ZERO_06;
+               newRXData.DomesticQTH          := oldRXData.DomesticQTH;
+               newRXData.ZERO_07              := oldRXData.ZERO_07;
+               newRXData.Name                 := oldRXData.Name;
+               newRXData.ZERO_08              := oldRXData.ZERO_08;
+               newRXData.Power                := oldRXData.Power;
+               newRXData.ZERO_09              := oldRXData.ZERO_09;
+               newRXData.NumberReceived       := oldRXData.NumberReceived;
+               newRXData.NumberSent           := oldRXData.NumberSent;
+               newRXData.RSTSent              := oldRXData.RSTSent;
+               newRXData.RSTReceived          := oldRXData.RSTReceived;
+               newRXData.QTHString            := oldRXData.QTHString;
+               newRXData.ZERO_10              := oldRXData.ZERO_10;
+               newRXData.RandomCharsSent      := oldRXData.RandomCharsSent;
+               newRXData.TenTenNum            := oldRXData.TenTenNum;
+               newRXData.Chapter              := oldRXData.Chapter;
+         newRXData.ZERO_11              := oldRXData.ZERO_11;
+         newRXData.ceClearDupeSheet     := oldRXData.ceClearDupeSheet;
+         newRXData.ceSearchAndPounce    := oldRXData.ceSearchAndPounce;
+               newRXData.Prefecture           := oldRXData.Prefecture;
+               newRXData.InhibitMults         := oldRXData.InhibitMults;
+               newRXData.Zone                 := oldRXData.Zone;
+               newRXData.NameSent             := oldRXData.NameSent;
+               newRXData.Kids                 := oldRXData.Kids;
+               newRXData.ceContest            := oldRXData.ceContest;
+               newRXData.QSOPoints            := oldRXData.QSOPoints;
+               newRXData.RandomCharsReceived  := oldRXData.RandomCharsReceived;
+               newRXData.ZERO_13              := oldRXData.ZERO_13;
+               newRXData.ceClearMultSheet     := oldRXData.ceClearMultSheet;
+               newRXData.MP3Record            := oldRXData.MP3Record;
+               newRXData.res3                 := oldRXData.res3;
+               newRXData.ceOperator           := oldRXData.ceOperator;
+               newRXData.res15                := oldRXData.res15;
+               newRXData.res16                := oldRXData.res16;
+               newRXData.res17                := oldRXData.res17;
+               newRXData.res18                := oldRXData.res18;
+               newRXData.res19                := oldRXData.res19;
+               newRXData.res20                := oldRXData.res20;
+      newRXData.res21                := oldRXData.res21;
+      newRXData.res22                := oldRXData.res22;
+      newRXData.res23                := oldRXData.res23;
+      if oldRXData.Mode = CW then
          begin
-         ShowMessage(PChar('Log file backup created')); // good copy so set to read-only
-         fileSetCode := FileSetAttr(NewFile, faReadOnly);
-         if fileSetCode = 0 then
-            begin
-            ShowMessage(PChar(NewFile + ' made into a read only file'));
-            end
-         else
-            begin
-            ShowMessage('Could not make backup file read-only');
-            end;
-
-         //***
-         // Now the file is backed up so time to convert...
-         //***
-         if not tOpenFileForWrite(h, 'newlog.trw') then Exit;
-         sWriteFile(h, LogHeader, SizeOfTLogHeader);
-
-
-  for i := 1 to 30000 do
-  begin
-
-    ClearContestExchange(TempRXData);
-    tGetQSOSystemTime(TempRXData.tSysTime);
-    TempRXData.Band := Band40;
-    TempRXData.Band := BandType(Random(6));
-    TempRXData.Mode := ModeType(Random(2));
-    TempRXData.Callsign := CD.GetRandomCall;
-    TempRXData.NumberSent := i;
-    ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
-    TempRXData.DXQTH := TempRXData.QTH.CountryID;
-    TempRXData.Zone := ctyGetCQZone(TempRXData.Callsign);
-    TempRXData.NumberSent := i;
-    TempRXData.NumberReceived := i + 100;
-    sWriteFile(h, TempRXData, SizeOf(ContestExchange));
-  end;
-  CloseHandle(h);
-         sWriteFile(h, LogHeader, SizeOfTLogHeader);
+         newRXData.extMode := eCW;
          end
-      else
+      else if oldRXData.Mode = Phone then
          begin
-         ShowMessage(PChar('Could not make a backup copy of ' + StrPas(TR4W_LOG_FILENAME)));
+         newRXData.ExtMode := eSSB;
+         end
+      else if oldRXData.Mode = Digital then
+         begin
+         newRXData.ExtMode := eRTTY;
          end;
-      end;
-   {
-   Done - Make the backup and verify it is on disk and then set to read only
-   Read the backup to make sure it is a byte for byte match to the current log.
-   >>> If so, proceed.
-   Read the old log and write the records into the new one.
-   Write the new version header
-   With TempRXDataOld do
-      begin                                  
-      TempRXData.<field> = <same field>
-      Note: Update the new fields (ExtendedMode and STX_STRING in v1.5 to v1.6 log version).
-      Write the new log record
+      newRXData.ExchString := oldRXData.QTHString;
+      Write(newFH,newRXData);
       end;
 
-   Close the file and verify
-   Give a message that the log has been converted
-   Return and make sure the caller of this proc restarts the process (including checkign the version number).
-   }
-
-
-
-
-
+   CloseFile(oldFH);
+   CloseFile(newFH);
+   Result := true;
 end;
 (*----------------------------------------------------------------------------*)
 // NY4I

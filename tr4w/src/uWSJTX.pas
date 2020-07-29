@@ -114,6 +114,7 @@ constructor TWSJTXServer.Create;
 begin
    firstTime := true;
    udpServ := TIdUDPServer.Create(nil);
+   udpServ.Binding.SetSockOpt(Id_SOL_SOCKET, Id_SO_REUSEADDR,Id_SO_True);
    udpServ.ThreadedEvent := true;
    if FUDPPort = 0 then
       begin
