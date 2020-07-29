@@ -13,8 +13,8 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+     Public License along with TR4W in  GPL_License.TXT.
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit TF;
@@ -191,6 +191,7 @@ function _StrInt64(Val: int64; Width: integer): ShortString;
 function ShowServerDialog(AHandle: THandle): string;
 //function tShellexecute(HWND: HWND; Operation, FileName, Parameters, Directory: PChar; showCmd: integer): hInst; // 4.75.3
 function tSetDlgItemIntFalse(hDlg: HWND; nIDDlgItem: integer; uValue: UINT): BOOL; stdcall;
+function tSetDlgItemIntSigned(hDlg: HWND; nIDDlgItem: integer; uValue: integer): BOOL; stdcall;
 function CreateModalDialog(Width, Height: integer; ParentHWND: HWND; lpDialogFunc: TFNDlgProc; dwInitParam: lParam): integer;
 function CreateListBox(X, Y, nWidth, nHeight: Word; hwndParent: HWND; HMENU: HMENU): HWND;
 function CreateButton(dwStyle: Cardinal; lpWindowName: PChar; X, Y, nWidth: integer; hwndParent: HWND; HMENU: HMENU): HWND;
@@ -238,6 +239,8 @@ const
   //function ExtractIconEx(lpszFile: PChar; nIconIndex: integer; var phiconLarge, phiconSmall: HICON; nIcons: UINT): UINT; stdcall;
 
 implementation
+
+uses MainUnit;
 function Format(Output: PChar; Format: PChar; c: Char): integer; external user32 Name 'wsprintfA';
 
 function Format(Output: PChar; Format: PChar; s1: PChar; u1: integer; u2: integer; u3: integer; u4: integer; u5: integer; u6: integer; s2: PChar; s3: PChar): integer; external user32 Name 'wsprintfA';
@@ -261,26 +264,6 @@ function Format(Output: PChar; Format: PChar; p: PChar; i: integer; P2: PChar): 
 function Format(Output: PChar; Format: PChar; i: integer; p: PChar; i2: integer): integer; external user32 Name 'wsprintfA';
 function Format(Output: PChar; Format: PChar; P1, P2, p3, p4, p5, p6, p7: PChar): integer; external user32 Name 'wsprintfA';
 //uses mainunit;
-{
-function SetHint(AWnd: HWND; HintText: PChar): HWND;
-var
-  TH                                    : TTOOLINFO;
-  Hint                                  : HWND;
-begin
-  Hint := CreateWindowEx(0, TOOLTIPS_CLASS, nil, 0, 0, 0, 0, 0, AWnd, 0, hInstance, nil);
-  TH.uId := AWnd;
-  TH.hInst := hInstance;
-  TH.uFlags := TTDT_AUTOMATIC or TTF_TRANSPARENT or TTF_IDISHWND or TTF_SUBCLASS;
-  TH.lpszText := HintText;
-//  th.Rect.Bottom:=400;
-  SendMessage(Hint, TTM_ADDTOOL, 0, LONGINT(@TH));
-  SendMessage(Hint, TTM_SETDELAYTIME, TTDT_INITIAL, 10);
-//  SendMessage(Hint, TTM_SETTIPTEXTCOLOR, 0, $FFFFFF);
-//  SendMessage(Hint, TTM_SETTIPBKCOLOR, 0, $00FFFF);
-
-  RESULT := Hint;
-end;
-}
 
 function SysErrorMessage(ErrorCode: Cardinal): PChar;
 begin
@@ -290,6 +273,7 @@ end;
 
 procedure showwarning(Text: PChar);
 begin
+  logger.Warn(Text);
   MessageBox(0, Text, tr4w_ClassName, MB_OK or MB_ICONWARNING or MB_SYSTEMMODAL or MB_TOPMOST);
 end;
 
@@ -946,6 +930,11 @@ begin
   Windows.SetDlgItemInt(hDlg, nIDDlgItem, uValue, False);
 end;
 
+function tSetDlgItemIntSigned(hDlg: HWND; nIDDlgItem: integer; uValue: integer): BOOL; stdcall;
+begin
+  Windows.SetDlgItemInt(hDlg, nIDDlgItem, uValue, True);
+end;
+
 function GetWindowByHandle(h: HWND): WindowsType;
 var
   wt                                    : WindowsType;
@@ -1147,14 +1136,6 @@ end;
 
 procedure UnableToFindFileMessage(FileName: PChar);
 begin
-{
-  asm
-    push FileName
-    call GetLastError
-    call SysErrorMessage
-    push eax
-  end;
-}
   Format(wsprintfBuffer, '%s'#13#13'%s', SysErrorMessage(GetLastError), FileName);
 
   showwarning(wsprintfBuffer);
@@ -1177,8 +1158,6 @@ begin
   Format(wsprintfBuffer, '%s: %s', ID, SysErrorMessage(Windows.GetLastError));
   showwarning(wsprintfBuffer);
 end;
-
-
 
 procedure SelectParentDir(h: HWND);
 var

@@ -90,7 +90,7 @@ begin
         LogSearchWndHandle := hwnddlg;
         LogSearchListView := CreateEditableLog(hwnddlg, 1, 35, 770, 245, True);
         for bt := Band160 to NoBand do tCB_ADDSTRING_PCHAR(hwnddlg, 202, BandStringsArray[bt]);
-        tCB_SETCURSEL(hwnddlg, 202, Ord(All));
+        tCB_SETCURSEL(hwnddlg, 202, Ord(AllBands));
 
         for mt := CW to FM do tCB_ADDSTRING_PCHAR(hwnddlg, 201, ModeStringArray[mt]);
         tCB_SETCURSEL(hwnddlg, 201, Ord(Both));
@@ -129,7 +129,7 @@ begin
               if ReadLogFile then
               begin
                 inc(CurrentRecord);
-                if tBand <> All then if TempRXData.Band <> tBand then goto NextRecord;
+                if tBand <> AllBands then if TempRXData.Band <> tBand then goto NextRecord;
                 if tMode <> Both then if TempRXData.Mode <> tMode then goto NextRecord;
                 if TempString[0] <> #0 then if pos(TempString, TempRXData.Callsign) = 0 then goto NextRecord;
                 if TempOperator[0] <> #0 then

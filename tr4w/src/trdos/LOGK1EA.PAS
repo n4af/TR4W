@@ -1269,7 +1269,7 @@ begin
                Serial6: Port [Com6PortBaseAddress + TransmitDataAddressOffset] := NextByte;
                END;
 
-         //If Debug is active - add the character to the output file
+         //If DebugFlag is active - add the character to the output file
 
            IF SerialPortOutputBuffer [SerialPort].Debug THEN
                BlockWrite (SerialPortOutputBuffer [SerialPort].DebugFile, NextByte, 1);

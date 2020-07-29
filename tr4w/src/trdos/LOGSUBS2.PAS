@@ -272,7 +272,7 @@ begin
           begin
 //            Dupe := VisibleLog.CallIsADupe(Call, Band, ActiveMode);
                 { These didn't have the NOT in them until 6.36 }
-            if not MultByBand then Band := All;
+            if not MultByBand then Band := AllBands;
             if not MultByMode then Mode := Both;
                 { Runtime 201 here when hitting F1s - probably on 160.
                   Initialized Mode to Active mode before calling
@@ -347,8 +347,8 @@ begin
           DisplayInsertMode;
           DisplayNextQSONumber;
           if FloppyFileSaveFrequency > 0 then
-            if QSOTotals[All, Both] > 0 then
-              if QSOTotals[All, Both] mod FloppyFileSaveFrequency = 0 then
+            if QSOTotals[AllBands, Both] > 0 then
+              if QSOTotals[AllBands, Both] mod FloppyFileSaveFrequency = 0 then
                 SaveLogFileToFloppy;
           if UpdateRestartFileEnable then Sheet.SaveRestartFile;
        //   if MultiUpdateMultDisplay and NewMult then
@@ -427,7 +427,7 @@ begin
           begin
      //       Dupe := VisibleLog.CallIsADupe(Call, Band, ActiveMode);
                 { These didn't have the NOT in them until 6.36 }
-            if not MultByBand then Band := All;
+            if not MultByBand then Band := AllBands;
             if not MultByMode then Mode := Both;
                 { Runtime 201 here when hitting F1s - probably on 160.
                   Initialized Mode to Active mode before calling
@@ -479,8 +479,8 @@ begin
           DisplayInsertMode;
           DisplayNextQSONumber;
           if FloppyFileSaveFrequency > 0 then
-            if QSOTotals[All, Both] > 0 then
-              if QSOTotals[All, Both] mod FloppyFileSaveFrequency = 0 then
+            if QSOTotals[AllBands, Both] > 0 then
+              if QSOTotals[AllBands, Both] mod FloppyFileSaveFrequency = 0 then
                 SaveLogFileToFloppy;
           if UpdateRestartFileEnable then Sheet.SaveRestartFile;
     //      if MultiUpdateMultDisplay and NewMult then
@@ -1448,7 +1448,7 @@ begin
     VisibleLog.DisplayVisibleDupeSheet(ActiveBand, ActiveMode);
   end;
   { Special trap if we are in debug or read in log mode }
-  if Debug {or ReadInLog} then
+  if DebugFlag {or ReadInLog} then
   begin
     repeat
         //            if ActiveMultiPort <> NoPort then CheckMultiState;
@@ -1457,7 +1457,7 @@ begin
     until (not CWStillBeingSent) or NewKeyPressed;
     if NewKeyPressed then
     begin
-      Debug := False;
+      DebugFlag := False;
 {
       if ReadInLog then
       begin
@@ -1471,7 +1471,7 @@ begin
     else
     begin
           { If we are in the exchange window, do a Return to log the QSO }
-//      if Debug or (ReadInLog and not (ActiveWindow = CallWindow)) then
+//      if DebugFlag or (ReadInLog and not (ActiveWindow = CallWindow)) then
       begin
         KeyChar := CarriageReturn;
         Exit;
@@ -1973,15 +1973,15 @@ begin
   begin
     inc(QSOTotals[RXData.Band, TempMode]);
     inc(QSOTotals[RXData.Band, Both]);
-    inc(QSOTotals[All, TempMode]);
-    inc(QSOTotals[All, Both]);
+    inc(QSOTotals[AllBands, TempMode]);
+    inc(QSOTotals[AllBands, Both]);
     Sheet.SetMultFlags(RXData);
     Sheet.AddQSOToSheets(@RXData, True);
     CallsignsList.AddCallsign(RXData.Callsign, TempMode, RXData.Band, False);
     CallsignsList.AddIniitialExchange(RXData.Callsign, GetInitialExchangeStringFromContestExchange(RXData));
     SendStationStatus(sstQSOs);
   end;
-  if SingleBand <> All then
+  if SingleBand <> AllBands then
   begin
     if RXData.Band = SingleBand then TotalQSOPoints := TotalQSOPoints + RXData.QSOPoints;
   end
@@ -2021,8 +2021,8 @@ begin
   //  CheckAvailableMemory;
   if BeepEvery10QSOs and (TotalContacts mod 10 = 0) then QuickBeep;
   if FloppyFileSaveFrequency > 0 then
-    if QSOTotals[All, Both] > 0 then
-      if QSOTotals[All, Both] mod FloppyFileSaveFrequency = 0 then
+    if QSOTotals[AllBands, Both] > 0 then
+      if QSOTotals[AllBands, Both] mod FloppyFileSaveFrequency = 0 then
         SaveLogFileToFloppy;
 //  if UpdateRestartFileEnable then Sheet.SaveRestartFile;
   BeSilent := False;
@@ -2145,7 +2145,7 @@ begin
     QuickDisplay('ENTER a callsign.  SPACE for dupecheck.  Alt-H for help.');
 //    DDX(MaybeSendANewCall);
 {
-    if Debug and (DDXState = CallSentInResponseToACQ) then
+    if DebugFlag and (DDXState = CallSentInResponseToACQ) then
     begin
       CallWindowString := DDXCall1;
       Write(CallWindowString);
@@ -2611,7 +2611,7 @@ nop
                 begin
                   InactiveRigCallingCQ := False;
                   SetUpToSendOnActiveRadio;
-                  if MessageEnable and not ((CWTone = 0) and Debug) then
+                  if MessageEnable and not ((CWTone = 0) and DebugFlag) then
                       //wli                                SendFunctionKeyMessage (F1, CQOpMode);
                                                   { This is where the initial CQ gets sent if you
                                                     are in debug mode! }
@@ -2981,7 +2981,7 @@ var
     if (ActiveMode = CW) and (not TailEnding) and (not CallAlreadySent) then
     begin
       if MessageEnable and not BeSilent then
-        if not (Debug and (CWTone = 0)) then
+        if not (DebugFlag and (CWTone = 0)) then
           AddStringToBuffer(CallsignICameBackTo, CWTone);
       CallAlreadySent := True;
     end;
@@ -3071,7 +3071,7 @@ var
     else { not a dupe or not AutoDupeEnable }
     begin
       if MessageEnable and not BeSilent then
-        if not (Debug and (CWTone = 0)) then
+        if not (DebugFlag and (CWTone = 0)) then
             //wli                    AddOnCQExchange;
           ShowName(CallsignICameBackTo);
       DisplayGridSquareStatus(CallsignICameBackTo);
@@ -3124,7 +3124,7 @@ var
           begin
             RememberInactiveCQ := InactiveRigCallingCQ;
                     //wli                        SendCorrectCallIfNeeded;
-            if not (Debug and (CWTone = 0)) then
+            if not (DebugFlag and (CWTone = 0)) then
             begin
               if MessageEnable and not (BeSilent or TailEnding) then
                 if QuickQSL <> NoQuickQSLKey then
@@ -3258,13 +3258,13 @@ begin
                  '" transmitter="' + tCategoryTransmitterSA[CategoryTransmitter] +
                  '" assisted="' + tCategoryAssistedSA[CategoryAssisted] + '"></class>' + sLineBreak +
             #9 + '<breakdown>' + sLineBreak;
-  for TempBand := Band160 to All do
+  for TempBand := Band160 to AllBands do
      begin
      for TempMode := CW to Both do // Was Phone for a test do
         begin
         if QSOTotals[TempBand, TempMode] = 0 then Continue;
         BandPchar := BandStringsArrayWithOutSpaces[TempBand];
-        if TempBand = All then
+        if TempBand = AllBands then
            begin
            BandPchar := 'total';
            end;
@@ -3320,6 +3320,7 @@ begin
      begin
      sBuf := '<?xml version="1.0"?>' + sLineBreak +
             '<contactdelete>' +  sLineBreak +
+            #9 + '<app>TR4W</app>' + sLineBreak +
             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
                SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
                       RxData.tSysTime.qtYear,
@@ -3374,8 +3375,15 @@ begin
     case RXData.Mode of
          CW: sMode := 'CW';
          Phone: sMode := 'SSB';
-         Digital: sMode := 'RTTY';
-         else sMode := ' ';
+         Digital:
+            if RXData.ExtMode = eRTTY then
+               begin
+               sMode := 'RTTY';
+               end
+            else
+               begin
+               sMode := ExtendedModeStringArray[RXData.extMode];
+               end;
        end; // of case
     if RxData.ceComputerID = #0 then
        begin
@@ -3396,6 +3404,7 @@ begin
     nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
     sBuf := '<?xml version="1.0"?>' + sLineBreak +
             '<contactinfo>' +  sLineBreak +
+            #9 + '<app>TR4W</app>' + sLineBreak +
             #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
             #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00

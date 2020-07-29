@@ -105,7 +105,10 @@ uses
   utils_text in 'src\utils\utils_text.pas',
   utils_math in 'src\utils\utils_math.pas',
   utils_file in 'src\utils\utils_file.pas',
-  exportto_trlog in 'src\exportto_trlog.pas';
+  exportto_trlog in 'src\exportto_trlog.pas',
+  uWSJTX in 'src\uWSJTX.pas',
+  uGridLookup in 'src\uGridLookup.pas',
+  Log4D in 'src\Log4D.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -164,52 +167,22 @@ begin
     WM_NOTIFY:
       begin
 
-//        if (PNMHdr(lParam)^.hWndFrom = SettingshLV) then sm;
-
         with PNMHdr(lParam)^ do
 
           if (hWndFrom = wh[mweEditableLog]) then
             case code of
-              //              NM_RELEASEDCAPTURE: FrmSetFocus;
+
               NM_DBLCLK: EditableLogWindowDblClick;
 
               NM_SETFOCUS:
                 begin
                   ActiveMainWindow := awEditableLog;
-//                  EditabledLogFocused := True;
-                  //                  ListView_EditLabel(_NewELogWindow,2);
                 end;
               NM_KILLFOCUS:
                 begin
-///                  EditabledLogFocused := False;
-                  //                           LogEnsureVisible;
                 end;
-              //              NM_SETCURSOR: SM;
-               {
-              NM_CUSTOMDRAW:
-                begin
-                  lplvcd := PNMLVCustomDraw(lParam);
-
-                  case lplvcd.nmcd.dwDrawStage of
-                    CDDS_PREPAINT:
-                      begin
-                        RESULT := CDRF_NOTIFYITEMDRAW;
-                        Exit;
-                      end;
-                    CDDS_ITEMPREPAINT:
-                      begin
-                        if lplvcd.nmcd.dwItemSpec = 1 then
-                        begin
-                          lplvcd.clrText := $00FF0000;
-                          lplvcd.clrTextBk:=$0000FFFF;
-                        end;
-                      end;
-                  end;
-                end;
-                }
             end
           else
-//            if PNMHdr(lParam)^.code = NM_RELEASEDCAPTURE then              FrmSetFocus;
       end;
     WM_MEASUREITEM: if wParam = MainWindowPCLID then
         PMeasureItemStruct(lParam).itemHeight := ws;
@@ -218,18 +191,10 @@ begin
       begin
         if wParam = MainWindowPCLID then
           PossibleCallsProc(PDrawItemStruct(lParam));
-        //        if wParam > 999 then        BandButtonsProc(Pointer(lParam));
-        //        if wParam = MainWindowELLID then EditableLogProc(Pointer(lParam));
       end;
 
-    //    wm_move: FindAndSaveRectOfAllWindows;
+
     WM_LBUTTONDOWN: DragWindow(TRHWND);
-    //      PostMessage(tr4whandle, WM_NCRBUTTONDOWN, HTMENU, 0);
-
-//    WM_KILLFOCUS: ActiveMainWindow := awUnknown;
-
-//  asm nop end;
-//      Windows.SetWindowText(InsertWindowHandle, inttopchar(wParam));
 
     WM_SETFOCUS:
       begin
@@ -241,89 +206,11 @@ begin
 
       end;
 
-    {
-        WM_CTLCOLORBTN:
-          begin
-            Result := DrawEdit(lParam, wParam);
-            if Result <> 0 then Exit;
-          end;
-    }
-
-//    WM_CTLCOLORLISTBOX:
-//      begin
-//        Result := tr4wBrushArray[trBtnFace];
-//        Exit;
-//      end;
-
-//    WM_CTLCOLOREDIT:
-//      begin
-//        if HWND(lParam) = ExchangeWindowHandle then
-//          if OpMode = SearchAndPounceOpMode then
-//          begin
-//            SetBkColor(HDC(wParam), tr4wColorsArray[trGreen{ColorColors.ExchangeSAndPWindowBackground}]);
-//            Result := tr4wBrushArray[trGreen{ColorColors.ExchangeSAndPWindowBackground}];
-//            Exit;
-//          end;
-
-//        if HWND(lParam) = wh[mweCall] then
-//        begin
-//          SetTextColor(HDC(wParam), tr4wColorsArray[ColorColors.CallWindowColor]);
-//          SetBkColor(HDC(wParam), tr4wColorsArray[ColorColors.CallWindowBackground]);
-//          Result := tr4wBrushArray[ColorColors.CallWindowBackground];
-//          Exit;
-//        end;
-
-//      end;
-
     WM_CTLCOLORLISTBOX, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC:
       begin
-{
-        if HWND(lParam) = wh[mweExchange] then
-        begin
-          if OpMode = SearchAndPounceOpMode then
-          begin
-            SetBkColor(HDC(wParam), tr4wColorsArray[trGreen]);
-            Result := tr4wBrushArray[trGreen];
-            Exit;
-          end
-          else goto CallDefWindowProc;
-        end;
-}
         Result := DrawWindows(lParam, wParam);
         if Result <> 0 then Exit;
       end;
-
-    {
-        WM_CTLCOLORBTN:
-          begin
-            SetBkMode(HDC(wParam), TRANSPARENT);
-            SetTextColor(HDC(wParam), clBlue);
-
-            RESULT := WhiteBrush;
-            exit;
-
-    //        textout(hdc(wparam), 10, 10, '222', 3);
-    //      windows.Beep(1000,10);
-    //        result:=YellowBrush;
-    //        exit;
-          end;
-    }
-    {
-        WM_CTLCOLOREDIT:
-          begin
-            Result := DrawEdit(lParam, wParam);
-            if Result <> 0 then Exit;
-          end;
-    }
-
-    {    WM_CTLCOLORLISTBOX,
-          WM_CTLCOLORSTATIC,
-          WM_CTLCOLOREDIT:
-          begin
-            Result := DrawEdit(lParam, wParam);
-            if Result <> 0 then Exit;
-          end;
-    }
 
     WM_CLOSE:
       begin
@@ -349,15 +236,14 @@ begin
 {$IFEND}
 
         if (LoWord(wParam) >= 10000) and (LoWord(wParam) <= 10700) then
-        ProcessMenu(wParam);
+           ProcessMenu(wParam);
         if (LoWord(wParam) >= 10700) and (LoWord(wParam) <= 10750) then
-          RunPlugin(LoWord(wParam));
+            RunPlugin(LoWord(wParam));
 
         if lParam = integer(wh[mweCall]) then
         begin
           if HiWord(wParam) = EN_KILLFOCUS then
           begin
-//            tr4w_CallWindowActive := False;
             if tr4w_CustomCaret then DestroyCaret;
             CheckQuestionMark;
           end;
@@ -365,7 +251,6 @@ begin
 
           if HiWord(wParam) = EN_SETFOCUS then
           begin
-//            tr4w_CallWindowActive := True;
             ActiveMainWindow := awCallWindow;
             ChangeCaret(wh[mweCall]);
 {$IF MORSERUNNER}
@@ -378,13 +263,11 @@ begin
         begin
           if HiWord(wParam) = EN_KILLFOCUS then
           begin
-//            tr4w_ExchangeWindowActive := False;
             if tr4w_CustomCaret then DestroyCaret;
           end;
           if HiWord(wParam) = EN_CHANGE then ExchangeWindowChange;
           if HiWord(wParam) = EN_SETFOCUS then
           begin
-//            tr4w_ExchangeWindowActive := True;
             ActiveMainWindow := awExchangeWindow;
             ChangeCaret(wh[mweExchange]);
 {$IF MORSERUNNER}
@@ -422,7 +305,17 @@ var
 {$IFEND}
   logBuffer                             : string;
   tempStickyKey                         : STICKYKEYS;
+  tc: tcolor;
+  rgb: cardinal;
 begin
+   appender := TLogRollingFileAppender.Create('name','tr4w.log');
+   //appender.Layout := TLogPatternLayout.Create('%d [%5p] %m%n');
+   appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
+   //appender.Layout := TLogHTMLLayout.Create;
+   TLogBasicConfigurator.Configure(appender);
+   TLogLogger.GetRootLogger.Level := Trace;
+   logger := TLogLogger.GetLogger('TR4WDebugLog');
+   logger.Trace('trace output');
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
   if tMutex = 0 then
@@ -485,7 +378,7 @@ begin
 
   WindowsOSversion := tr4w_osverinfo.dwPlatformId;
 
-  StickyKeysAtStartup.cbSize := sizeof(STICKYKEYS);
+  StickyKeysAtStartup.cbSize := sizeof(STICKYKEYS); // This prevents multiple shift keys from activating sticky keys. It saves settng and restore upon exit. ny4i
   Windows.SystemParametersInfo(SPI_GETSTICKYKEYS, sizeof(STICKYKEYS), @StickyKeysAtStartup, 0);
   tempStickyKey.cbSize := StickyKeysAtStartup.cbSize;
   tempStickyKey.dwFlags := StickyKeysAtStartup.dwFlags and not (SKF_STICKYKEYSON or SKF_HOTKEYACTIVE);
@@ -507,6 +400,7 @@ begin
   if not ctyLoadInCountryFile(TR4W_CTY_FILENAME, False, True) then
   begin
     UnableToFindFileMessage(TR4W_CTY_FILENAME);
+    logger.Fatal('Unable to find ' + TR4W_CTY_FILENAME);
     halt;
   end;
 
@@ -522,7 +416,7 @@ begin
 
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
-  
+
   
 
   if CTY.ctyR150SMode then
@@ -542,11 +436,13 @@ begin
   tSetupExchangeNumbers;
 
   if (HFBandEnable = False) and (VHFBandsEnabled = True) then
-  begin
-  ActiveBand := Band6;
-  BandMapDisplayGhz := True;    // n4af 4.42.8
-  end;
-  if HFBandEnable then  BandMapDisplayGhz := False;    // n4af 4.42.8
+     begin
+     ActiveBand := Band6;
+     BandMapDisplayGhz := True;    // n4af 4.42.8
+     end;
+  if HFBandEnable then
+     BandMapDisplayGhz := False;    // n4af 4.42.8
+
   SetWindowSize;
   CreateFonts;
 
@@ -563,7 +459,7 @@ begin
   tr4w_main_menu := CreateTR4WMenu(@T_MENU_ARRAY, T_MENU_ARRAY_SIZE, False);
 
 {$IFDEF AUTOSPOT}
-   ShowMessage('AUTOSPOT is enabled - Test Mode Only');
+   ShowMessage('AUTOSPOT is enabled - Test Mode Only'); // Hard on relays - be careful
 {$ENDIF}
   tr4w_accelerators := LoadAccelerators(hInstance, 'T');
   RegisterClass(tr4w_WinClass);
@@ -576,8 +472,10 @@ begin
   CreateMultsWindows;
   CreateQSONeedWindows;
 
+  Windows.ShowWindow(wh[mweWSJTX], SW_HIDE);
   SetUpGlobalsAndInitialize;
-  if SayHiEnable then DisplayNamePercentage;
+  if SayHiEnable then
+     DisplayNamePercentage;
   SetStereoPin(StereoControlPin, StereoPinState);
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
@@ -627,15 +525,20 @@ begin
   mov  [tNet_Event],eax
   end;
 
+
+  DEBUGMSG('Current program version = ' + TR4W_CURRENTVERSION);
+  DEBUGMSG('Current TR4W Server version = ' + TR4WSERVER_CURRENTVERSION);
+  DEBUGMSG('Current log version = ' + LOGVERSION);
+
   if not tHandLogMode then
-  begin
-    SetTimer(tr4whandle, ONE_SECOND_TIMER_HANDLE, 1000, @OneSecTimerProc);
-    for c := menu_alt_increment_time_1 to menu_alt_increment_time_0 do EnableMenuItem(tr4w_main_menu, c, MF_GRAYED + MF_BYCOMMAND);
-  end
+     begin
+     SetTimer(tr4whandle, ONE_SECOND_TIMER_HANDLE, 1000, @OneSecTimerProc);
+     for c := menu_alt_increment_time_1 to menu_alt_increment_time_0 do EnableMenuItem(tr4w_main_menu, c, MF_GRAYED + MF_BYCOMMAND);
+     end
   else
-  begin
-    showwarning('HAND LOG MODE = TRUE');
-  end;
+     begin
+     showwarning('HAND LOG MODE = TRUE');
+     end;
 
 //  wkLoadSettings;
   tCreateThread(@wkOpen, wkThreadID);
@@ -656,8 +559,12 @@ begin
   Windows.CopyMemory(@TR4W_LATESTCFG_FILENAME, @TR4W_CFG_FILENAME, SizeOf(FileNameType));
 //  Windows.CharLower(TR4W_LATESTCFG_FILENAME);
   Windows.WritePrivateProfileString(_COMMANDS, LATEST_CONFIG_FILE, TR4W_LATESTCFG_FILENAME, TR4W_INI_FILENAME);
+  QuickDisplay('Warning - This is a Debug version');
 {$IFEND}
 
+{$IF NEWER_DEBUG}
+  QuickDisplay('Warning - This is a Debug version');
+{$IFEND}
   if CPUKeyer.SerialPortDebug then
     ShowMessage('Command SERIAL PORT DEBUG is no longer supported.'#13#10'Use instead Portmon program:'#13#10'http://technet.microsoft.com/sysinternals/bb896644.aspx');
 
@@ -679,6 +586,21 @@ begin
   GetMorseRunnerWindow;
 {$IFEND}
 
+   wsjtx := TWSJTXServer.Create;
+
+   // Send colors for Dupes (QSOB4)
+   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]);
+   wsjtx.SetDupeBackgroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]);
+   wsjtx.SetDupeForegroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+
+   // Send colors for multipliers
+   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]);
+   wsjtx.SetMultBackgroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]);
+   wsjtx.SetMultForegroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+
+   wsjtx.Start;
     {****************************  Main CallBack  ****************************}
 
   while (GetMessage(Msg, 0, 0, 0)) do
@@ -743,8 +665,15 @@ begin
                 goto NoTransMess;
               end;
 
-            if (Msg.wParam = VK_UP) and (ActiveMainWindow = awCallWindow {tr4w_CallWindowActive}) and (CallWindowString = '') then if tLogIndex <> 0 then
-                tAltE;
+            if (Msg.wParam = VK_UP)                                      and
+               (ActiveMainWindow = awCallWindow {tr4w_CallWindowActive}) and
+               (CallWindowString = '')                                   then
+                begin
+                if tLogIndex <> 0 then
+                   begin
+                   tAltE;
+                   end;
+                end;
 
             if (Msg.wParam = VK_UP {38}) or (Msg.wParam = VK_DOWN {40}) then
             begin

@@ -392,6 +392,7 @@ begin
       if NumberBytes > BufferArraySize then
       begin
               //{WLI}                ReportError ('This cell is too big!');
+        logger.Fatal('In FigureOutBufferSizes, the cell is too big');
         halt;
       end
       else

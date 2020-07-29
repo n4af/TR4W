@@ -544,7 +544,7 @@ begin
       MyStationState.ssOpMode := OpMode;
 }
     sstQSOs:
-      MyStationState.ssQSOTotals := Word(QSOTotals[All, Both] {TotalContacts});
+      MyStationState.ssQSOTotals := Word(QSOTotals[AllBands, Both] {TotalContacts});
 
     sstCallsign:
       begin

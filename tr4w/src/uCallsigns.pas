@@ -188,10 +188,10 @@ begin
   FList^[Result].FDupesArray[Both] := Value or (1 shl Ord(Band));
 
   Value := FList^[Result].FDupesArray[Mode];
-  FList^[Result].FDupesArray[Mode] := Value or (1 shl Ord(All));
+  FList^[Result].FDupesArray[Mode] := Value or (1 shl Ord(AllBands));
 
   Value := FList^[Result].FDupesArray[Both];
-  FList^[Result].FDupesArray[Both] := Value or (1 shl Ord(All));
+  FList^[Result].FDupesArray[Both] := Value or (1 shl Ord(AllBands));
 
 end;
 
@@ -206,7 +206,7 @@ begin
   begin
 //    TempMode := Mode;
     if QSOByMode then TempMode := Mode else TempMode := Both;
-    if QSOByBand then TempBand := Band else TempBand := All;
+    if QSOByBand then TempBand := Band else TempBand := AllBands;
 
     if TempMode = FM then TempMode := Phone;
 
@@ -575,7 +575,7 @@ begin
     Windows.ZeroMemory(@FList^[Index].FDupesArray, SizeOf(TDupesArray));
     FList^[Index].FQSOs := 0;
       {
-            for Band := Band160 to All do
+            for Band := Band160 to AllBands do
               for Mode := CW to Both do
                 FList^[Index].FDupesArray[Mode, Band] := 0;
       }

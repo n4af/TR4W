@@ -1031,7 +1031,6 @@ procedure ResetSavedWindowListAndPutUpCallWindow;
 
 //procedure SaveActiveWindow;
 procedure SaveBandMap;
-procedure SetBackground(Color: integer);
 procedure SetColor(Color: integer);
 //procedure SaveAndSetActiveWindow(WindowName: WindowType);
 //procedure SaveSetAndClearActiveWindow(WindowName: WindowType);
@@ -1548,520 +1547,7 @@ begin
   //    TextColor (Color);
 end;
 
-procedure SetBackground(Color: integer);
 
-begin
-  //    ActiveBackground := Color;
-  //    TextBackground (Color);
-end;
-
-//procedure SaveActiveWindow;
-
-{ This procedure will store information about the current active window into
-  the SavedWindowList.  This is so the current window paramters can be
-  restored by calling RestoreActiveWindow.  The information stored includes
-  the present cursor position, the window coordinates and the colors.
-
-  The SavedWindowList has room for 11 entries.  Normally only a few are
-  ever used.  If a unbalance occurs resulting in too many entries, a
-  SendMorse routine will start sending the number of windows being saved.  }
-
-//var  MorseString: Str80;
-
-//begin
-//  if NumberSavedWindows > 9 then NumberSavedWindows := 8;
-
-//  with SavedWindowList[NumberSavedWindows] do
-//  begin
-   {        CursorX           := WhereX;
-           CursorY           := WhereY;
-           UpperLeftCorner   := WindMin;
-           LowerRightCorner  := WindMax;
-           Color             := ActiveColor;
-           Background        := ActiveBackground;
-           SavedActiveWindow := ActiveWindow;
-  }
-//  end;
-
-//  Inc(NumberSavedWindows);
-
-//  if NumberSavedWindows > 7 then
-//  begin
-//    Str(NumberSavedWindows, MorseString);
-   //{WLI}        SendMorse (MorseString + ' ');
-//  end;
-//end;
-
-//procedure RestorePreviousWindow;
-
-{ This is used to pop window information for the most recently saved window
-  off the SavedWindowList.  If NumberOfSaved equals zero, then nothing
-  happens.                                                        }
-
-//begin
- //    IF ActiveWindow = ExchangeWindow THEN
- //        ExchangeWindowCursorPosition := WhereX;
-
- //    IF NumberSavedWindows > 0 THEN
- //        BEGIN
- //        Dec (NumberSavedWindows);
-
- //        WITH SavedWindowList [NumberSavedWindows] DO
- //            BEGIN
- {            Window (Lo (UpperLeftCorner) + 1, Hi (UpperLeftCorner) + 1, Lo (LowerRightCorner) + 1, Hi (LowerRightCorner) + 1);
-             SetColor (Color);
-             SetBackground (Background);
-             GoToXY (CursorX, CursorY);
-             ActiveWindow := SavedActiveWindow;
-             END;
-         END;
-}
-//end;
-
-//procedure RemoveAndRestorePreviousWindow;
-
-{ This procedure is the same as the RestorePreviousWindow procedure except
-  it will remove the current active window from the display.              }
-
-//begin
- {    TextBackground (SelectedColors.WholeScreenBackground);
-     ClrScr;
-     RestorePreviousWindow;
-}
-//end;
-
-//procedure SetWindow(WindowName: WindowType);
-
-{ This procedure will set the window paramters and colors for the specified
-   window.                                                              }
-
-//begin
- {    CASE WindowName OF
- 
-       AlarmWindow:
-           BEGIN
-           Window (AlarmWindowLX, AlarmWindowLY, AlarmWindowRX, AlarmWindowRY);
-           SetBackground (SelectedColors.AlarmWindowBackground);
-           SetColor      (SelectedColors.AlarmWindowColor);
-           END;
- 
-       AltCallWindow: {KK1L: 6.73}
- {          BEGIN
-           Window (AltCallWindowLX, AltCallWindowLY, AltCallWindowRX, AltCallWindowRY);
-           SetBackground (SelectedColors.AltCallWindowBackground);
-           SetColor      (SelectedColors.AltCallWindowColor);
-           END;
- 
-       BandMapWindow:
-           BEGIN
-           Window (BandMapWindowLX, BandMapWindowLY, BandMapWindowRX, BandMapWindowRY);
-           SetBackground (SelectedColors.BandMapWindowBackground);
-           SetColor      (SelectedColors.BandMapWindowColor);
-           END;
- 
-       BandModeWindow:
-           IF CallWindowPosition = NormalCallWindowPosition THEN
-               BEGIN
-               Window (BandModeWindowLX, BandModeWindowLY, BandModeWindowRX, BandModeWindowRY);
-               SetBackground (SelectedColors.BandModeWindowBackground);
-               SetColor      (SelectedColors.BandModeWindowColor);
-               END
-           ELSE
-               BEGIN
-               Window (BandModeWindowUpLX, BandModeWindowUpLY, BandModeWindowUpRX, BandModeWindowUpRY);
-               SetBackground (SelectedColors.BandModeWindowBackground);
-               SetColor      (SelectedColors.BandModeWindowColor);
-               END;
- 
-       BeamHeadingWindow:
-           BEGIN
-           Window (BeamHeadingWindowLX, BeamHeadingWindowLY, BeamHeadingWindowRX, BeamHeadingWindowRY);
-           SetBackground (SelectedColors.BeamHeadingWindowBackground);
-           SetColor      (SelectedColors.BeamHeadingWindowColor);
-           END;
- 
-       BigWindow:
-           BEGIN
-           Window (BigWindowLX, BigWindowLY, BigWindowRX, BigWindowRY);
-           SetBackground (SelectedColors.BigWindowBackground);
-           SetColor      (SelectedColors.BigWindowColor);
-           END;
-
-       CallWindow:
-           IF CallWindowPosition = NormalCallWindowPosition THEN
-               BEGIN
-               Window (CallWindowLX, CallWindowLY, CallWindowRX, CallWindowRY);
-               SetBackground (SelectedColors.CallWindowBackground);
-               SetColor      (SelectedColors.CallWindowColor);
-               END
-           ELSE
-               BEGIN
-               Window (CallWindowUpLX, CallWindowUpLY, CallWindowUpRX, CallWindowUpRY);
-               SetBackground (SelectedColors.BandMapWindowBackground);
-               SetColor      (SelectedColors.BandMapWindowColor);
-               END;
- 
-       ClockWindow:
-           IF CallWindowPosition = NormalCallWindowPosition THEN
-               BEGIN
-               Window (ClockWindowLX, ClockWindowLY, ClockWindowRX, ClockWindowRY);
-               SetBackground (SelectedColors.ClockWindowBackground);
-               SetColor      (SelectedColors.ClockWindowColor);
-               END
-           ELSE
-               BEGIN
-               Window (ClockWindowUpLX, ClockWindowUpLY, ClockWindowUpRX, ClockWindowUpRY);
-               SetBackground (SelectedColors.ClockWindowBackground);
-               SetColor      (SelectedColors.ClockWindowColor);
-               END;
- 
-       CodeSpeedWindow:
-           BEGIN
-           Window (CodeSpeedWindowLX, CodeSpeedWindowLY, CodeSpeedWindowRX, CodeSpeedWindowRY);
-           SetBackground (SelectedColors.CodeSpeedWindowBackground);
-           SetColor      (SelectedColors.CodeSpeedWindowColor);
-           END;
- 
-       ContestTitleWindow:
-           BEGIN
-           Window (ContestTitleWindowLX, ContestTitleWindowLY,
-                   ContestTitleWindowRX, ContestTitleWindowRY);
-           SetBackground (SelectedColors.ContestTitleWindowBackground);
-           SetColor      (SelectedColors.ContestTitleWindowColor);
-           END;
- 
-       CountryNameWindow:
-           BEGIN
-           Window (CountryNameWindowLX, CountryNameWindowLY,
-                   CountryNameWindowRX, CountryNameWindowRY);
-           SetBackground (SelectedColors.CountryNameWindowBackground);
-           SetColor      (SelectedColors.CountryNameWindowColor);
-           END;
- 
-       DateWindow:
-           IF CallWindowPosition = NormalCallWindowPosition THEN
-               BEGIN
-               Window (DateWindowLX, DateWindowLY, DateWindowRX, DateWindowRY);
-               SetBackground (SelectedColors.DateWindowBackground);
-               SetColor      (SelectedColors.DateWindowColor);
-               END
-           ELSE
-               BEGIN
-               Window (DateWindowUpLX, DateWindowUpLY, DateWindowUpRX, DateWindowUpRY);
-               SetBackground (SelectedColors.DateWindowBackground);
-               SetColor      (SelectedColors.DateWindowColor);
-               END;
-
-       DupeInfoWindow:
-           BEGIN
-           Window (DupeInfoWindowLX, DupeInfoWindowLY, DupeInfoWindowRX, DupeInfoWindowRY);
-           SetBackground (SelectedColors.DupeInfoWindowBackground);
-           SetColor      (SelectedColors.DupeInfoWindowColor);
-           END;
- 
-       DupeSheetWindow:
-           BEGIN
-           IF SuperDupeSheet THEN
-               Window (SuperDupeSheetWindowLX,
-                       SuperDupeSheetWindowLY,
-                       SuperDupeSheetWindowRX,
-                       SuperDupeSheetWindowRY)
- 
-           ELSE
-               Window (NormalDupeSheetWindowLX,
-                       NormalDupeSheetWindowLY,
-                       NormalDupeSheetWindowRX,
-                       NormalDupeSheetWindowRY);
- 
-           SetBackground (SelectedColors.DupeSheetWindowBackground);
-           SetColor      (SelectedColors.DupeSheetWindowColor);
-           END;
- 
- 
- 
- 
-       EditableLogWindow:
-           BEGIN
-           Window (EditableLogWindowLX, EditableLogWindowLY, EditableLogWindowRX, EditableLogWindowRY);
-           SetBackground (SelectedColors.EditableLogWindowBackground);
-           SetColor      (SelectedColors.EditableLogWindowColor);
-           END;
- 
-       ExchangeWindow:
-           IF OpMode = SearchAndPounceOpMode THEN
-               BEGIN
-               Window (ExchangeWindowLX, ExchangeWindowLY, ExchangeWindowRX, ExchangeWindowRY);
-               SetBackground (SelectedColors.ExchangeSAndPWindowBackground);
-               SetColor      (SelectedColors.ExchangeWindowColor);
-               END
-           ELSE
-               BEGIN
-               Window (ExchangeWindowLX, ExchangeWindowLY, ExchangeWindowRX, ExchangeWindowRY);
-               SetBackground (SelectedColors.ExchangeWindowBackground);
-               SetColor      (SelectedColors.ExchangeWindowColor);
-               END;
- 
-       FreeMemoryWindow:
-           BEGIN
-           Window (FreeMemoryWindowLX, FreeMemoryWindowLY, FreeMemoryWindowRX, FreeMemoryWindowRY);
-           SetBackground (SelectedColors.FreeMemoryWindowBackground);
-           SetColor      (SelectedColors.FreeMemoryWindowColor);
-           END;
- 
-       FrequencyOneWindow:
-           BEGIN
-           Window (FrequencyOneWindowLX, FrequencyOneWindowLY, FrequencyOneWindowRX, FrequencyOneWindowRY);
-           SetBackground (SelectedColors.FrequencyOneWindowBackground);
-           SetColor      (SelectedColors.FrequencyOneWindowColor);
-           END;
- 
-       FrequencyTwoWindow: {KK1L: 6.73}
- {          BEGIN
-           Window (FrequencyTwoWindowLX, FrequencyTwoWindowLY, FrequencyTwoWindowRX, FrequencyTwoWindowRY);
-           SetBackground (SelectedColors.FrequencyTwoWindowBackground);
-           SetColor      (SelectedColors.FrequencyTwoWindowColor);
-           END;
- 
-       FunctionKeyWindow:
-           BEGIN
-           Window (FunctionKeyWindowLX, FunctionKeyWindowLY, FunctionKeyWindowRX, FunctionKeyWindowRY);
-           SetBackground (SelectedColors.FunctionKeyWindowBackground);
-           SetColor      (SelectedColors.FunctionKeyWindowColor);
-           END;
- 
-       HourRateWindow:
-           BEGIN
-           Window (AlarmWindowLX, AlarmWindowLY, AlarmWindowRX, AlarmWindowRY);
-           SetBackground (SelectedColors.RateWindowBackground);
-           SetColor      (SelectedColors.RateWindowColor);
-           END;
- 
-       InsertWindow:
-           BEGIN
-           Window (InsertWindowLX, InsertWindowLY, InsertWindowRX, InsertWindowRY);
-           SetBackground (SelectedColors.InsertWindowBackground);
-           SetColor      (SelectedColors.InsertWindowColor);
-           END;
- 
-       MultiplierInformationWindow:
-           BEGIN
-           Window (MultiplierInformationWindowLX, MultiplierInformationWindowLY,
-                   MultiplierInformationWindowRX, MultiplierInformationWindowRY);
-           SetBackground (SelectedColors.MultiplierInformationWindowBackground);
-           SetColor      (SelectedColors.MultiplierInformationWindowColor);
-           END;
- 
-       NamePercentageWindow:
-           BEGIN
-           Window (NamePercentageWindowLX, NamePercentageWindowLY, NamePercentageWindowRX, NamePercentageWindowRY);
-           SetBackground (SelectedColors.NamePercentageWindowBackground);
-           SetColor      (SelectedColors.NamePercentageWindowColor);
-           END;
- 
-       NameSentWindow:
-           BEGIN
-           Window (NameSentWindowLX, NameSentWindowLY, NameSentWindowRX, NameSentWindowRY);
-           SetBackground (SelectedColors.NameSentWindowBackground);
-           SetColor      (SelectedColors.NameSentWindowColor);
-           END;
- 
- 
- 
-
-       PossibleCallWindow:
-           BEGIN
-           Window (PossibleCallWindowLX, PossibleCallWindowLY, PossibleCallWindowRX, PossibleCallWindowRY);
-           SetBackground (SelectedColors.PossibleCallWindowBackground);
-           SetColor      (SelectedColors.PossibleCallWindowColor);
-           END;
- 
-       QSOInformationWindow:
-           BEGIN
-           Window (QSOInformationWindowLX, QSOInformationWindowLY,
-                   QSOInformationWindowRX, QSOInformationWindowRY);
-           SetBackground (SelectedColors.QSOInformationWindowBackground);
-           SetColor      (SelectedColors.QSOInformationWindowColor);
-           END;
- 
-       QSONumberWindow:
-           IF CallWindowPosition = NormalCallWindowPosition THEN
-               BEGIN
-               Window (QSONumberWindowLX, QSONumberWindowLY, QSONumberWindowRX, QSONumberWindowRY);
-               SetBackground (SelectedColors.QSONumberWindowBackground);
-               SetColor      (SelectedColors.QSONumberWindowColor);
-               END
-           ELSE
-               BEGIN
-               Window (QSONumberWindowUpLX, QSONumberWindowUpLY, QSONumberWindowUpRX, QSONumberWindowUpRY);
-               SetBackground (SelectedColors.QSONumberWindowBackground);
-               SetColor      (SelectedColors.QSONumberWindowColor);
-               END;
-
-       QTCNumberWindow:
-           BEGIN
-           Window (QTCNumberWindowLX, QTCNumberWindowLY, QTCNumberWindowRX, QTCNumberWindowRY);
-           SetBackground (SelectedColors.QTCNumberWindowBackground);
-           SetColor      (SelectedColors.QTCNumberWindowColor);
-           END;
- 
-       QuickCommandWindow:
-           BEGIN
-           Window (QuickCommandWindowLX, QuickCommandWindowLY, QuickCommandWindowRX, QuickCommandWindowRY);
-           SetBackground (SelectedColors.QuickCommandWindowBackground);
-           SetColor      (SelectedColors.QuickCommandWindowColor);
-           END;
- 
-       QuickCommand2Window:
-           BEGIN
-           Window (QuickCommand2WindowLX, QuickCommand2WindowLY, QuickCommand2WindowRX, QuickCommand2WindowRY);
-           SetBackground (SelectedColors.QuickCommandWindowBackground);
-           SetColor      (SelectedColors.QuickCommandWindowColor);
-           END;
- 
-       RadioWindow:
-           BEGIN
-           Window (RadioWindowLX, RadioWindowLY, RadioWindowRX, RadioWindowRY);
-           SetBackground (SelectedColors.RadioOneWindowBackground); {KK1L: 6.73 Updated color variable}
- {          SetColor      (SelectedColors.RadioOneWindowColor);      {KK1L: 6.73 Updated color variable}
- {          END;
- 
-       RateWindow:
-           BEGIN
-           Window (RateWindowLX, RateWindowLY, RateWindowRX, RateWindowRY);
-           SetBackground (SelectedColors.RateWindowBackground);
-           SetColor      (SelectedColors.RateWindowColor);
-           END;
- 
-       RTTYWindow:
-           BEGIN
-           Window (RTTYWindowLX, RTTYWindowLY, RTTYWindowRX, BandMapWindowRY - 5);
-           SetBackground (SelectedColors.RTTYWindowBackground);
-           SetColor      (SelectedColors.RTTYWindowColor);
-           END;
- 
-       RTTYInverseWindow:
-           BEGIN
-           Window (RTTYInverseWindowLX, BandMapWindowRY - 4, RTTYInverseWindowRX, BandMapWindowRY);
-           SetBackground (SelectedColors.RTTYInverseWindowBackground);
-           SetColor      (SelectedColors.RTTYInverseWindowColor);
-           END;
- 
-       RemainingMultsWindow:
-           BEGIN
-           IF BigRemainingList THEN
-               Window (BigRemainingMultsWindowLX,
-                       BigRemainingMultsWindowLY,
-                       BigRemainingMultsWindowRX,
-                       BigRemainingMultsWindowRY)
-           ELSE
-               Window (RemainingMultsWindowLX,
-                       RemainingMultsWindowLY,
-                       RemainingMultsWindowRX,
-                       RemainingMultsWindowRY);
- 
-           SetBackground (SelectedColors.RemainingMultsWindowBackground);
-           SetColor      (SelectedColors.RemainingMultsWindowColor);
-           END;
- 
-       TotalScoreWindow:
-           BEGIN
-           Window (TotalScoreWindowLX, TotalScoreWindowLY, TotalScoreWindowRX, TotalScoreWindowRY);
-           SetBackground (SelectedColors.TotalScoreWindowBackground);
-           SetColor      (SelectedColors.TotalScoreWindowColor);
-           END;
- 
-       TotalWindow:
-           BEGIN
-           Window (TotalWindowLX, TotalWindowLY, TotalWindowRX, TotalWindowRY);
-           SetBackground (SelectedColors.TotalWindowBackground);
-           SetColor      (SelectedColors.TotalWindowColor);
-           END;
-
-       UserInfoWindow:
-           BEGIN
-           Window (UserInfoWindowLX, UserInfoWindowLY, UserInfoWindowRX, UserInfoWindowRY);
-           SetBackground (SelectedColors.UserInfoWindowBackground);
-           SetColor      (SelectedColors.UserInfoWindowColor);
-           END;
-
-       WholeScreenWindow:
-           BEGIN
-           Window (1, 1, 80, ScreenHeight);
-           SetBackground (SelectedColors.WholeScreenBackground);
-           SetColor      (SelectedColors.WholeScreenColor);
-           END;
-
-       ELSE SendMorse ('Illegal window name');
-       END;  { of case }
-
-//end;
-
-//procedure SetActiveWindow(WindowName: WindowType);
-
-{ This procedure will set up the window paramters for the specified window.
-  Nothing is saved on the SavedWindowList here.                       }
-
-//begin
-//  SetWindow(WindowName);
-//  ActiveWindow := WindowName;
-
-//  if (ActiveWindow = ExchangeWindow) and (ExchangeWindowCursorPosition = 0) then
-//    ExchangeWindowCursorPosition := 1;
-//end;
-
-//procedure SaveAndSetActiveWindow(WindowName: WindowType);
-
-//begin
-//  SaveActiveWindow;
-//  SetActiveWindow(WindowName);
- //    IF WindowName = ExchangeWindow THEN
- //        GoToXY (ExchangeWindowCursorPosition, 1)
- //    ELSE
- //        GoToXY (1,1);
-//end;
-
-//procedure SaveSetAndClearActiveWindow(WindowName: WindowType);
-
-//begin
-//  if ActiveWindow = ExchangeWindow then ExchangeWindowCursorPosition := 0;
-//  SaveActiveWindow;
-
- { Set active window - RT201 0E32:0D1B }
-
- // SetActiveWindow(WindowName);
- //    ClrScr;
-//end;
-
-//procedure ClearWindow(WindowName: WindowType);
-
-{ This procedure will clear out the window specified.  The active window
-  does not change.                                                      }
-
-//begin
-//  if WindowName = ExchangeWindow then ExchangeWindowCursorPosition := 0;
-
- {    IF ActiveWindow <> WindowName  THEN
-         BEGIN
- {        SaveAndSetActiveWindow (WindowName);
- //        ClrScr;
- //        RestorePreviousWindow;
-         END
-     ELSE
-         ClrScr;
-}
-//end;
-{
-procedure RemoveWindow(WindowName: WindowType);
-
-begin
-  if WindowName = ExchangeWindow then
-    ExchangeWindowCursorPosition := 0;
-  if WindowName = POSSIBLECALLWINDOW then
-    PossibleCallList.NumberPossibleCalls := 0;
-   //  if ActiveWindow <> WindowName then SaveAndSetActiveWindow(WindowName);
-   //  RemoveAndRestorePreviousWindow;
-end;
-}
 
 procedure DisplayBandMode(Band: BandType; Mode: ModeType; UpdateRadio: boolean);
 begin
@@ -2077,24 +1563,12 @@ begin
   //  LastDisplayedFMMode := FMMode;
 
   UpdateTotals2;
-{
-  asm
-  xor eax,eax
-  mov al,Mode
-  mov eax, [eax*4 +ModeString]
-  push eax
 
-  xor eax,eax
-  mov al,Band
-  mov eax, [eax*4 +BandStringsArray]
-  push eax
-  end;
-}
   Format(wsprintfBuffer, TWO_STRINGS, BandStringsArray[Band], ModeStringArray[Mode]);
 
   SetMainWindowText(mweBandMode, wsprintfBuffer);
 
-  if MultByBand then MultBand := ActiveBand else MultBand := All;
+  if MultByBand then MultBand := ActiveBand else MultBand := AllBands;
   if MultByMode then MultMode := ActiveMode else MultMode := Both;
 
          { Update the band output port for this radio }
@@ -2441,7 +1915,7 @@ begin
   if not AlarmSet then
   begin
 
-      {
+      {        REMOVECANDIDATE
           case HourDisplay of
             ThisHour:
               begin
@@ -2706,7 +2180,7 @@ begin
       GoToXY (ExchangeWindowCursorPosition, WhereY)
  }
 end;
-{
+{  REMOVECANDIDATE
 procedure DisplayRemainingMults(RemMultDisplay: RemainingMultiplierType);
 label
   AddMult, AddMultDX, AddMultDOM, AddMultZone, 1;
@@ -5125,7 +4599,7 @@ var
   Mode                                  : ModeType;
 begin
   {
-  for Band := Band160 to All do
+  for Band := Band160 to AllBands do
     for Mode := CW to Both do
     begin
       if MultiStatus[Band, Mode] <> nil then
@@ -5561,6 +5035,7 @@ begin
       if FrequencyMemoryEnable then
         FreqMemory[FilteredStatus.Band, FilteredStatus.Mode] := FilteredStatus.Freq;
     end;
+  (*  start   REMOVECANDIDATE
 //    LastDisplayedFreq[ActiveRadio] := FilteredStatus.Freq;
 
       {
@@ -5684,6 +5159,7 @@ begin
                 end;
           LastDisplayedFreq[radioone] := FilteredStatus.Freq;
          }
+         *)
   end;
 end;
 
@@ -5693,7 +5169,7 @@ d              : integer;
 OperatingTime                        : integer;
   PreviousQSOTime                       : TQSOTime;
 begin
-{
+{  REMOVECANDIDATE
 if tElapsedTimeFromLastQSO <= 0  then
 tElapsedTimeFromLastQSO := 0
 else
@@ -5723,7 +5199,7 @@ var
   TimeDifference                       : Integer;
  //n4af 4.35.5
  begin
-{ if not Start then
+{ if not Start then      REMOVECANDIDATE
  begin
  T2 := tElapsedTimeFromLastQSO;  // T2 = initial elapsed
  Start := True;
@@ -5856,7 +5332,7 @@ var
   FileString                            : Str80;
   WhereY                                : integer;
 begin
-{
+{  REMOVECANDIDATE
   //  if tr4w_WindowsArray[tr4w_LAST5WINDOW_INDEX].tr4w_WndHandle = 0 then Exit;
   if not OpenFileForRead(FileRead, FileName) then Exit;
 
@@ -5961,7 +5437,7 @@ begin
   DisplayAutoSendCharacterCount;
 end;
 
-{
+{  REMOVECANDIDATE
 function GetInitialExchangeFromString(CMD: pShortString): InitialExchangeType;
 var
   ie                                   : InitialExchangeType;

@@ -301,7 +301,7 @@ var
 //  RemMultMatrix                         : array[Band160..All, CW..Both, RemainingMultiplierType] of RemainingMultListPointer;
 
   RestartVersionNumber                  : Str10 = '4.7';
-  SingleBand                            : BandType = All;
+  SingleBand                            : BandType = AllBands;
   StartHour, StartMinute, StartSecond, StartSec100: Word;
 
   TakingABreak                          : boolean;
@@ -878,6 +878,7 @@ begin
   Windows.ZeroMemory(@Exchange, SizeOf(ContestExchange));
   Exchange.Band := NoBand;
   Exchange.Mode := NoMode;
+  Exchange.ExtMode := eNoMode;
   Exchange.NumberReceived := -1;
   Exchange.NumberSent := -1;
   Exchange.Prefecture := MAXBYTE;
@@ -1336,6 +1337,7 @@ begin
           //      SetWindow(WholeScreenWindow);
                //{WLI}            ClrScr;
       ShowMessage('Not finding zero at end visible dupesheet list!!');
+      logger.Fatal('Not finding zero at end visible dupesheet list!!');
       halt;
     end;
 
@@ -1473,7 +1475,7 @@ begin
 
   mo.ClearAllMults;
 {
-  for Band := Band160 to All do
+  for Band := Band160 to AllBands do
     for Mode := CW to Both do
     begin
 
@@ -1534,7 +1536,7 @@ var
 
 begin
 {
-  for Band := Band160 to All do
+  for Band := Band160 to AllBands do
     for Mode := CW to Both do
       QTotals[Band, Mode] := 0;
 
@@ -1790,7 +1792,7 @@ begin
   RXData.PrefixMult := False;
   RXData.ZoneMult := False;
 
-  if MultByBand then MultBand := RXData.Band else MultBand := All;
+  if MultByBand then MultBand := RXData.Band else MultBand := AllBands;
   if MultByMode then MultMode := RXData.Mode else MultMode := Both;
 
   if (RXData.DomMultQTH = '') and (RXData.DomesticQTH <> '') then
@@ -2652,8 +2654,8 @@ begin
   end
   else
   begin
-    StartBand := All;
-    FinishBand := All;
+    StartBand := AllBands;
+    FinishBand := AllBands;
   end;
 
   if MultByMode then

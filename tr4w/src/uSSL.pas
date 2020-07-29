@@ -98,8 +98,8 @@ begin
   if JustAdd then Exit;
   FList^[Result].FArray[Mode] := FList^[Result].FArray[Mode] or (1 shl Ord(Band));
   FList^[Result].FArray[Both] := FList^[Result].FArray[Both] or (1 shl Ord(Band));
-  FList^[Result].FArray[Mode] := FList^[Result].FArray[Mode] or (1 shl Ord(All));
-  FList^[Result].FArray[Both] := FList^[Result].FArray[Both] or (1 shl Ord(All));
+  FList^[Result].FArray[Mode] := FList^[Result].FArray[Mode] or (1 shl Ord(AllBands));
+  FList^[Result].FArray[Both] := FList^[Result].FArray[Both] or (1 shl Ord(AllBands));
 end;
 
 procedure TSSL.Clear;
