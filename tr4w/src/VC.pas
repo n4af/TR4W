@@ -26,7 +26,8 @@ interface
 uses
 
   Windows,
-  Messages;
+  Messages,
+  Log4D;
 
 
 {$INCLUDE w.pas}
@@ -35,7 +36,7 @@ uses
 
 const
   tDebugMode                            = False;
-  NEWER_DEBUG                           = True; // ny4i added this as tDebugMode changes too much.
+  NEWER_DEBUG                           = False; // ny4i added this as tDebugMode changes too much.
   MMTTYMODE                             = True;
 
 
@@ -1047,7 +1048,7 @@ type
     Band10G,
     Band24G,
     BandLight,
-    All,
+    AllBands,
     NoBand
     );
   PBandType = ^BandType;
@@ -1628,8 +1629,6 @@ type
 {01}  DXMult:              boolean;
 {01}  PrefixMult:          boolean;
 {01}  ZoneMult:            boolean;
-      ExtMode:             ExtendedModeType;
-      ExchString:          Str40;  // What is entered as SRX exchange
 {04}  ceClass:             string[3]{10}; { Field day class }
 
 {01}  ZERO_04:             DummyByte;

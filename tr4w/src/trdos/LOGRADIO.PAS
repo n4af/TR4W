@@ -252,21 +252,10 @@ type
 
       tOrionFreq:   array[0..15] of char;
       tOrionMode:   array[0..07] of char;
-      //    OutPutBuffer: array[0..255] of Char;
-      //    OutPutBufferPoiner: integer;
-      //    tEnablePolling: boolean;
-      //    tDebugBuf: array[0..511] of Char;
       CommandPause: integer;
       tmrCWByCAT: TTimer;
       EventHandlers : TEventHandlers;
-      //    ControlDelay: integer;
-      //      FilterRadioMessageLength: boolean;
-      //    TrackingEnable: boolean;
-      //    UpdateSeconds: integer;
-      //    RadioSerialPort: PortType;
-      //    PollTimeout: LONGINT; { 100th of seconds for timeout }
       procedure AddCommandToBuffer;
-      procedure CheckRadioStatus;
       function  CheckAutoCallTerminate: boolean;
       function DeleteLastCWCharacter: boolean;
       procedure FlushCWByCATBuffer;
@@ -282,10 +271,8 @@ type
       procedure SetICOMRITFrequency(hz: integer);
       procedure SendIcomClearRITCommand;
       function CalculateIcomFilterWidth: integer;
-      //    function SendFiveBytes: boolean;
       procedure SetRadioCWSpeed(speed: longint);
       procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
-      //    procedure _SetRadioFreq(Freq: LONGINT; Mode: ModeType; VFO: Char);
       procedure SendCW(Msg: Str160);
       procedure SetUpRadioInterface;
       procedure StopSendingCW;
@@ -1744,17 +1731,6 @@ begin
    //TLogger.GetInstance.Debug(Format('      Leaving PutRadioOutOfSplit: %s',[RadioName]));
 end;
 
-{
-function RadioObject.TimeToGiveUp: boolean;
-
-// Returns TRUE if it is time to give up on getting a response from the
-//  current pending poll
-
-begin
-  TimeToGiveUp := ElaspedSec100(PollTime) * 10 > PollTimeout;
-end;
-}
-
 procedure RadioObject.UpdateRadioStatus;
 
 { Updates the filtered radio status } // This is not called anymore
@@ -1889,87 +1865,7 @@ begin
    //TLogger.GetInstance.Debug('Leaving AddCommandToBuffer');
 end;
 
-procedure RadioObject.CheckRadioStatus;
 
-  { This is the procedure to call to make sure the radio status is as current
-    as possible. It will look to see what the most recent request for data
-    was - and see if the data has been received yet, or if it is time to
-    give up.  In either case, it will initiate the appropriate next request
-    based upon the radio type. }
-
-   //VAR SerialPort: PortType;
-
-begin
-  { One thing we like to do is check the serial ports to see if any
-    data is there waiting.  This helps keep up with those 56K baud
-    radios like the Orion - if the CheckRadioStatus routine is called
-    often enough. }
- {
-   WriteToSerialPort('IF;', radio1.Port_Handle);
-
-   answer := ReadFromSerialPort(radio1.Port_Handle, 38);
-  //answer:='FA00000070000;';
-   t.Label4 . Caption := answer;
-   if Copy(answer, Length(answer), 1) = ';' then
-     if Length(answer) = 14 then
-       if Copy(answer, 1, 2) = 'FA' then
-       begin
-         if answer[14] = ';' then
-         begin
-           Delete(answer, 14, 1);
-           Delete(answer, 1, 2);
-           if StringIsAllNumbers(answer) then CurrentStatus.VFOA.Frequency := strtoint(answer);
-         end;
-       end;
- }
-  {
-
-  WriteToSerialPort ('FB;',radio1.Port_Handle);
-
-  answer:=ReadFromSerialPort(radio1.Port_Handle);
-  Frm.Label5 . Caption:=answer;
-  IF Copy (answer, Length (answer), 1) = ';' THEN
-  IF Length (answer) = 14 THEN
-  IF Copy (answer, 1, 2) = 'FB' THEN
-  BEGIN
-  IF answer [14] = ';' THEN
-  BEGIN
-  Delete (answer, 14, 1);
-  Delete (answer,  1, 2);
-  IF StringIsAllNumbers (answer) THEN CurrentStatus.VFOB.Frequency:=strtoint(answer);
-  END;
-  end;
-
-  WriteToSerialPort ('IF;',radio1.Port_Handle);
-
-  answer:=ReadFromSerialPort(radio1.Port_Handle);
-  Frm.Label6 . Caption:=answer;
-  IF Copy (answer, Length (answer), 1) = ';' THEN
-  IF Length (answer) = 38 THEN
-  IF Copy (answer, 1, 2) = 'IF' THEN
-  BEGIN
-  FreqString := Copy (answer, 3, 11);
-  IF StringIsAllNumbers (FreqString) THEN
-  CurrentStatus.Freq:=strtoint(FreqString);
-  CalculateBandMode (CurrentStatus.Freq, CurrentStatus.Band, TempMode);
-  TestString := Copy (answer, 30, 1);
-  IF TestString <> '' THEN
-  CASE TestString [1] OF
-  '1', '2', '4', '5': CurrentStatus.Mode := Phone;
-  '6', '9':           CurrentStatus.Mode := Digital;
-  '3', '7', '8':      CurrentStatus.Mode := CW;
-  END;
-  IF Copy (answer, 33, 1) = '0' THEN CurrentStatus.Split := NoSplit
-  ELSE
-  CurrentStatus.Split := SplitOn;
-  end;
-
-  UpdateRadioStatus;
-  }
-
-   //UpdateRadioStatus;
-
-end;
 //------------------------------------------------------------------------------
 function RadioObject.DeleteLastCWCharacter: boolean;  // ny4i Procedure added Issue149
 begin
@@ -2719,11 +2615,18 @@ begin
             end;
 
          rtYaesu2,
-         rtYaesu3:
+         rtYaesu3:        // FT991 FT891
             begin
             if RadioParametersArray[RadioModel].rt = rtYaesu3 then  //ny4i Issue 218 - Only change to this command if the freq is 9 bytes long.
                begin
-               Format(@tKenwood14Bytes, 'FA%09u;', Freq);
+               if VFO = 'B' then
+                  begin
+                  Format(@tKenwood14Bytes, 'FB%09u;', Freq);    // Kenwood14Bytes is a terribly specific name for a shared buffer.
+                  end
+               else
+                  begin
+                  Format(@tKenwood14Bytes, 'FA%09u;', Freq);
+                  end;
                nBytesToWrite := 12;
                end
             else
@@ -3237,97 +3140,7 @@ begin
    RadioTwoLastDisplayedPreviousStatus := '';
    RadioTwoLastDisplayedFilteredStatus := '';
 
-  {    GoToXY (1, 6);
-      Writeln ('Latest Radio One Status');
-     GoToXY (1, 9);
-      Writeln ('Previous Radio One Previous Status');
-     GoToXY (1, 12);
-      Write ('Filtered Radio One Status (gets updated when Previous = Latest)');
-      GoToXY (1, 15);
-      Write ('Latest Radio Two Status');
-      GoToXY (1, 18);
-      Write ('Previous Radio Two Status');
-      GoToXY (1, 21);
-      Write ('Filtered Radio Two Status (gets updated when Previous = Latest)');
 
-  repeat
-
-    Radio1.CheckRadioStatus;
-
-    TempStatusString := GenerateStatusString(Radio1.CurrentStatus);
-
-    if TempStatusString <> RadioOneLastDisplayedCurrentStatus then
-    begin
-         //             GoToXY (1, 7);
-        //
-        
-
-      RadioOneLastDisplayedCurrentStatus := TempStatusString;
-    end;
-
-    TempStatusString := GenerateStatusString(Radio1.PreviousStatus);
-
-    if TempStatusString <> RadioOneLastDisplayedPreviousStatus then
-    begin
-        //            GoToXY (1, 10);
-        //            Write (TempStatusString);
-
-      RadioOneLastDisplayedPreviousStatus := TempStatusString;
-    end;
-
-    TempStatusString := GenerateStatusString(Radio1.FilteredStatus);
-
-    if TempStatusString <> RadioOneLastDisplayedFilteredStatus then
-    begin
-        //        GoToXY (1, 13);
-        //
-
-
-      RadioOneLastDisplayedFilteredStatus := TempStatusString;
-    end;
-
-    Radio2.CheckRadioStatus;
-
-    TempStatusString := GenerateStatusString(Radio2.CurrentStatus);
-
-    if TempStatusString <> RadioTwoLastDisplayedCurrentStatus then
-    begin
-        //           GoToXY (1, 16);
-        //            Write (TempStatusString);
-
-      RadioTwoLastDisplayedCurrentStatus := TempStatusString;
-    end;
-
-    TempStatusString := GenerateStatusString(Radio2.PreviousStatus);
-
-    if TempStatusString <> RadioTwoLastDisplayedPreviousStatus then
-    begin
-        //             GoToXY (1, 19);
-        //            Write (TempStatusString);
-      ShowMessage (TempStatusString);
-      RadioTwoLastDisplayedPreviousStatus := TempStatusString;
-    end;
-
-    TempStatusString := GenerateStatusString(Radio2.FilteredStatus);
-
-    if TempStatusString <> RadioTwoLastDisplayedFilteredStatus then
-    begin
-        //             GoToXY (1, 22);
-        // 
-        ShowMessage (TempStatusString);
-
-      RadioTwoLastDisplayedFilteredStatus := TempStatusString;
-    end;
-     
-
-  until OperatorEscape;
-  {
-  CPUKeyer.UnInitializeKeyer; { Fix interrupts and close debug files }
-
-   //{WLI}    GoToXY (1, 24);
-   //{WLI}    ClrEol;
-   //{WLI}    BigCursor;
-   // halt;
 end;
 
 function RadioObject.CheckAutoCallTerminate: boolean;

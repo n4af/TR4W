@@ -57,7 +57,8 @@ uses
   LogNet,
   LogRadio,
   CFGDEF,
-  SysUtils 
+  SysUtils,
+  Log4D
   ;
 
 type
@@ -218,28 +219,7 @@ begin
     if ActiveRotatorType = DCU1Rotator then BaudRate := 4800;
     InitializeSerialPort(ActiveRotatorPort, BaudRate, 8, tNoParity, 1, FILE_ATTRIBUTE_NORMAL, #0);
   end;
-  {
-     if ActiveMultiPort <> NoPort then
-        begin
-           if (ActiveMultiPort = Radio1.tr4w_CATPort) or
-              (ActiveMultiPort = Radio2.tr4w_CATPort) or
-              (ActiveMultiPort = ActiveRotatorPort) or
-              (ActiveMultiPort = Packet.PacketSerialPort) then
-              begin
-                 showwarning('Multi serial port assigned for two functions!!!');
-                 halt;
-              end;
-           InitializeSerialPort(ActiveMultiPort, MultiPortBaudRate, 8, tNoParity, 2);
-           New(MultiRememberBuffer);
-        end;
-  }
-{
-  if IntercomFileenable then
-    begin
-      OpenFileForAppend(IntercomFileWrite, 'INTERCOM.TXT');
-      IntercomFileOpen := True;
-    end;
-}
+ 
 
   Radio1.CheckAndInitializeSerialPorts_ForThisRadio;
   Radio2.CheckAndInitializeSerialPorts_ForThisRadio;
@@ -480,101 +460,27 @@ begin
   PacketFile := False;
    for ParameterCount := 1 to ParamCount do
   begin
-//    if FileExists(ParamStr(ParameterCount) + '.CFG') then      ContestConfigFileTitle := ParamStr(ParameterCount);
 
-  {  if UpperCase(ParamStr(ParameterCount)) = 'B64DECODE' then
-    begin
-//      Bin64Decode;
-      halt;
-    end;      }
- 
+
     if UpperCase(ParamStr(ParameterCount)) = 'BANDMAP' then
       FakeBandMap := True;
 
-    if UpperCase(ParamStr(ParameterCount)) = 'COAX' then
-    begin
-//      CoaxLength;
-      halt;
-    end;
+    if UpperCase(ParamStr(ParameterCount)) = 'DEBUG' then
+       begin
+       DebugFlag := True;
+       logger.Level := Debug;
+       end;
 
-    if UpperCase(ParamStr(ParameterCount)) = 'DEBUG' then Debug := True;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'DISTANCE' then
-    begin
-//      ComputeGridDistance;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'FINDFILE' then
-    begin
-          //            WriteLn (FindDirectory (ParamStr (ParameterCount + 1)));
-      halt;
-    end;
+     if UpperCase(ParamStr(ParameterCount)) = 'TRACE' then
+       begin
+       DebugFlag := True;
+       logger.Level := Trace;
+       end;
 
     if UpperCase(ParamStr(ParameterCount)) = 'FOOTSWITCHDEBUG' then
       FootSwitchDebug := True;
 
-    if UpperCase(ParamStr(ParameterCount)) = 'GRID' then
-    begin
-//      TellMeMyGrid;
-      halt;
-    end;
 
-    if UpperCase(ParamStr(ParameterCount)) = 'HP' then
-    begin
-//      HP;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'HEXDUMP' then
-    begin
-//      HexDump;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'HEXCONVERT' then
-    begin
-//      HexConvert;
-      halt;
-    end;
-
-    if (UpperCase(ParamStr(ParameterCount)) = 'HELP') or
-      (UpperCase(ParamStr(ParameterCount)) = '?') then
-    begin
-//      StartUpHelp;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'LC' then
-    begin
-//      Inductance;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'IOPORT' then
-    begin
-//      IOPort;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'KEYCODE' then
-    begin
-//      KeyCode;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'LOOPBACK' then
-    begin
-//      LoopBackTest;
-      halt;
-    end;
-      {
-               if UpperCase(ParamStr(ParameterCount)) = 'UNIXTIME' then
-                  begin
-                     TestUnixTimeConversionRoutines;
-                     halt;
-                  end;
-      }
     if UpperCase(ParamStr(ParameterCount)) = 'NETDEBUG' then NetDebug := True;
 
     if UpperCase(ParamStr(ParameterCount)) = 'PACKET' then
@@ -583,15 +489,7 @@ begin
     if UpperCase(ParamStr(ParameterCount)) = 'PACKETFILE' then
     begin
       WriteLn('Opening ', ParamStr(ParameterCount + 1), ' as a packet file to process.');
-{
-      if FileExists(ParamStr(ParameterCount + 1)) then
-      begin
-        WriteLn('Found file');
-        Assign(PacketFileRead, ParamStr(ParameterCount + 1));
-        Reset(PacketFileRead, 1);
-        PacketFile := True;
-      end;
-    }end;
+    end;
 
     if UpperCase(ParamStr(ParameterCount)) = 'PACKETINPUTFILE' then
     begin
@@ -602,33 +500,6 @@ begin
         TempString := ParamStr(ParameterCount + 2);
         Val(TempString, PacketInputFileDelay, Result);
       end;
-    end;
-
-//    if UpperCase(ParamStr(ParameterCount)) = 'PACKETMESS' then      PacketMess;
-
-    if (UpperCase(ParamStr(ParameterCount)) = 'PORT') or
-      (UpperCase(ParamStr(ParameterCount)) = 'PORTS') then
-    begin
-//      ShowIOPorts;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'PORTTOFILE' then
-    begin
-//      PortToFile;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'PACKETSIMULATE' then
-    begin
-//      PacketSimulate;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'PASSTHROUGH' then
-    begin
-//      PassThrough;
-      halt;
     end;
 
     if UpperCase(ParamStr(ParameterCount)) = 'READ' then
@@ -642,11 +513,6 @@ begin
 
     if UpperCase(ParamStr(ParameterCount)) = 'RESCORE' then
     begin
-//      ReadInLog := True;
-          //          DoingRescore := True;
-                    ////{WLI}            TempString := SelectAvailableLog;
-//      if TempString <> '' then SetUpFileNames(@TempString[1]);
-          {SetUpFileNames ('LOGCFG');}
       PushLogFiles(LastPushedLogName);
       ReadInLogFileName := LastPushedLogName;
       WriteLn('Ready to rescore ', ReadInLogFileName, '!');
@@ -657,27 +523,6 @@ begin
       (UpperCase(ParamStr(ParameterCount)) = 'TALKDEBUG') then
       CPUKeyer.SerialPortDebug := True;
 
-      //    if UpperCase(ParamStr(ParameterCount)) = 'SLOW' then CPUKeyer.SlowInterrupts := True;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'SUN' then
-    begin
-//      SunriseSunset;
-      halt;
-    end;
-
-      //    if UpperCase(ParamStr(ParameterCount)) = 'TRACE' then      Trace := True;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'UUDECODE' then
-    begin
-//      UUDecode;
-      halt;
-    end;
-
-    if UpperCase(ParamStr(ParameterCount)) = 'VIEWRADIODEBUG' then
-    begin
-//      ViewRadioDebug;
-      halt;
-    end;
 
   end;
 end;

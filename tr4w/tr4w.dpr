@@ -106,7 +106,9 @@ uses
   utils_math in 'src\utils\utils_math.pas',
   utils_file in 'src\utils\utils_file.pas',
   exportto_trlog in 'src\exportto_trlog.pas',
-  uWSJTX in 'src\uWSJTX.pas';
+  uWSJTX in 'src\uWSJTX.pas',
+  uGridLookup in 'src\uGridLookup.pas',
+  Log4D in 'src\Log4D.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -306,6 +308,14 @@ var
   tc: tcolor;
   rgb: cardinal;
 begin
+   appender := TLogRollingFileAppender.Create('name','tr4w.log');
+   //appender.Layout := TLogPatternLayout.Create('%d [%5p] %m%n');
+   appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
+   //appender.Layout := TLogHTMLLayout.Create;
+   TLogBasicConfigurator.Configure(appender);
+   TLogLogger.GetRootLogger.Level := Trace;
+   logger := TLogLogger.GetLogger('TR4WDebugLog');
+   logger.Trace('trace output');
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
   if tMutex = 0 then
@@ -390,6 +400,7 @@ begin
   if not ctyLoadInCountryFile(TR4W_CTY_FILENAME, False, True) then
   begin
     UnableToFindFileMessage(TR4W_CTY_FILENAME);
+    logger.Fatal('Unable to find ' + TR4W_CTY_FILENAME);
     halt;
   end;
 

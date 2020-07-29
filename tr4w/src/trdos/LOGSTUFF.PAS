@@ -411,7 +411,7 @@ var
   ControlBreakStatus: boolean;
   CountryInformationFile: ShortString;
 
-  Debug: boolean;
+  DebugFlag: boolean;
   DEEnable: boolean = True;
   DefaultRST: Word;
   //  DoingRescore                     : boolean; {KK1L: 6.71}
@@ -6788,10 +6788,10 @@ else
 
 RSGB160Method: // 4.67.1
 begin
-  if (RXData.DomMultQTH <> '') and (mo.isdmmult(rxdata.dommultqth, all, both) =
+  if (RXData.DomMultQTH <> '') and (mo.isdmmult(rxdata.dommultqth, AllBands, both) =
     TRUE) then
     rxdata.qsopoints := 7
-  else if mo.isdxmult(RXData.QTH.Country, all, both) = TRUE then
+  else if mo.isdxmult(RXData.QTH.Country, AllBands, both) = TRUE then
     rxdata.qsopoints := 7
   else
     rxdata.qsopoints := 2;

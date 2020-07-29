@@ -46,7 +46,7 @@ var
   BandTotals                            : array[Band160..Band10] of integer;
   counter                               : integer;
 const
-  ca                                    : array[1..7] of BandType = (Band160, Band80, Band40, Band20, Band15, Band10, All);
+  ca                                    : array[1..7] of BandType = (Band160, Band80, Band40, Band20, Band15, Band10, AllBands);
 begin
   Result := False;
   case Msg of

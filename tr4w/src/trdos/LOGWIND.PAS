@@ -1568,7 +1568,7 @@ begin
 
   SetMainWindowText(mweBandMode, wsprintfBuffer);
 
-  if MultByBand then MultBand := ActiveBand else MultBand := All;
+  if MultByBand then MultBand := ActiveBand else MultBand := AllBands;
   if MultByMode then MultMode := ActiveMode else MultMode := Both;
 
          { Update the band output port for this radio }
@@ -4599,7 +4599,7 @@ var
   Mode                                  : ModeType;
 begin
   {
-  for Band := Band160 to All do
+  for Band := Band160 to AllBands do
     for Mode := CW to Both do
     begin
       if MultiStatus[Band, Mode] <> nil then

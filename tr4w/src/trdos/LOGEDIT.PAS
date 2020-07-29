@@ -279,7 +279,7 @@ begin
   if QSONumberByBand then
     TotalContacts := QSOTotals[ActiveBand, Both]
   else
-    TotalContacts := QSOTotals[All, Both];
+    TotalContacts := QSOTotals[AllBands, Both];
 end;
 
 procedure BandDownOrUp(Direction: DirectionType);
@@ -474,7 +474,7 @@ begin
   if QSOByBand then
     TempBand := Band
   else
-    TempBand := All;
+    TempBand := AllBands;
   //  call[length(call)+1] := #0;
   Result := CallsignsList.CallsignIsDupe(Call, TempBand, TempMode, Index);
 end;
@@ -781,7 +781,7 @@ begin
   else
     TempMode := Mode;
   if not MultByBand then
-    TempBand := All
+    TempBand := AllBands
   else
     TempBand := Band;
   OutputValue := GetMultArray(Call, TempMode, '');
@@ -846,7 +846,7 @@ begin
       Band := Band6;
   end
   else
-    Band := All;
+    Band := AllBands;
 
   while True do
   begin
@@ -881,7 +881,7 @@ begin
               OutputString := OutputString + '    ';
     }
     case Band of
-      All: Exit;
+      AllBands: Exit;
       Band160: Band := Band80;
       Band80: Band := Band40;
       Band40: Band := Band20;
@@ -1083,7 +1083,7 @@ begin
   end
   else
     {//    nCmndShow := integer(OutputString = 0);} if (OutputString and (1 shl
-      integer(All))) <> 0 then
+      integer(AllBands))) <> 0 then
       nCmndShow := SW_SHOWNORMAL;
 
   DispalayNewMult(nCmndShow);
@@ -1136,7 +1136,7 @@ begin
     CreateModeSpecificMultiplierInfo(Call, TempMult, Both, OutputValue);
 
     if not MultByBand then
-      if (OutputValue and (1 shl integer(All))) <> 0 then
+      if (OutputValue and (1 shl integer(AllBands))) <> 0 then
         OutputValue := $FFFFFFFF
       else
         OutputValue := 0;
@@ -1165,7 +1165,7 @@ begin
       Band := Band6;
   end
   else
-    Band := All;
+    Band := AllBands;
 
   while True do
   begin
@@ -1200,7 +1200,7 @@ begin
                 OutputString := OutputString + BandStringsArray[Band] + ' ';
     }
     case Band of
-      All: Exit;
+      AllBands: Exit;
       Band160: Band := Band80;
       Band80: Band := Band40;
       Band40: Band := Band20;
@@ -2594,7 +2594,7 @@ begin
           if TempZone {TempQTH.Zone} <> DUMMYZONE then
             Str(TempZone {TempQTH.Zone}, TempString);
           GetRidOfPrecedingSpaces(TempString);
-          if Debug and (TempString = '') then
+          if DebugFlag and (TempString = '') then
             TempString := '40';
 
           { InitialExchangePutUp := TempString <> ''; }
@@ -2940,7 +2940,7 @@ begin
     //  VisibleLog.IncrementMultTotalsWithContentsOfEditableWindow(MTotals);
 //   TotalMults := 0;
 
-  if SingleBand <> All then
+  if SingleBand <> AllBands then
   begin
       
     for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
@@ -2968,7 +2968,7 @@ begin
   else
   begin
     for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
-      TotalMults := TotalMults + mo.MTotals[All, Both, m];
+      TotalMults := TotalMults + mo.MTotals[AllBands, Both, m];
 
     //      TotalMults := mo.MTotals[All, Both, rmDomestic];
 
@@ -2980,7 +2980,7 @@ begin
 
     //      TotalMults := TotalMults + MTotals[All, Both].NumberZoneMults;
     if Contest = CUPURAL then
-      TotalMults := TotalMults - mo.MTotals[All, Both, rmPrefix];
+      TotalMults := TotalMults - mo.MTotals[AllBands, Both, rmPrefix];
   end;
 
   if Contest = RSGB18 then
@@ -3022,7 +3022,7 @@ begin
   TotalScore := QPoints * TotalMults;
 
   if Contest = CUPURAL then
-    Result := Result + 10 * mo.MTotals[All, Both, rmPrefix];
+    Result := Result + 10 * mo.MTotals[AllBands, Both, rmPrefix];
 
 end;
 
