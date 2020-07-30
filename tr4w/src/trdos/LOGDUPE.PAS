@@ -2175,7 +2175,12 @@ begin
         ExchangeInformation.Power := True;
       end;
 
-    GridExchange:
+    Grid2Exchange:
+      begin
+        ExchangeInformation.QTH := True;
+      end;
+
+       GridExchange:
       begin
         ExchangeInformation.QTH := True;
       end;

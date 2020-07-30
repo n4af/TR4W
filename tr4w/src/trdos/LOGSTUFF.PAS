@@ -53,6 +53,7 @@ uses {Dos, Printer,}Tree,
   idUDPClient, // ny4i 4.44.9
   idGlobal, // ny4i 4.44.9
   SysUtils, // ny4i 4.44.9
+  StrUtils, // 4.90.11
   uMults,
   Windows
   ;
@@ -2181,6 +2182,28 @@ begin
   end
 
 end;
+
+function ProcessGrid2Exchange(Exchange: ShortString {Str80}; var RXData:     // 4.90.11
+  ContestExchange): boolean;
+begin
+  Result := False;
+  RXData.DomesticQTH := '';
+
+  if length(Exchange) = 0 then
+    Exit;
+
+  if GoodLookingGrid2(Exchange) then
+  begin
+    if RXData.DomesticQTH = '' then
+    begin
+      RXData.DomesticQTH := LeftStr(Exchange,2);
+      RXData.QTHString := Exchange;
+      Result := True;
+    end;
+  end
+
+end;
+
 
 function ProcessRSTAndGridSquareExchange(Exchange: ShortString {Str80}; var
   RXData: ContestExchange): boolean;
@@ -6968,7 +6991,7 @@ end;
 WWDigiQP:                       // 4.90.8
   if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
   begin
-    Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+    Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString);
     RXData.QSOPoints := (Distance div 3000) + 1;
    end;
 
@@ -8127,6 +8150,10 @@ begin
 
     GridExchange:
       ProcessExchange := ProcessGridSquareExchange(ExchangeString, RData);
+
+   Grid2Exchange:
+      ProcessExchange := ProcessGrid2Exchange(ExchangeString, RData);
+
 
     RSTAndPostalCodeExchange:
       ProcessExchange := ProcessRSTAndPostalCodeExchange(ExchangeString, RData);

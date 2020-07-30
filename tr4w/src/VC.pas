@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.90.10' ;  // N4af     New  Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.90.11' ;  // N4af     New  Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July 29, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'July 30, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -2906,7 +2906,7 @@ const
 
 type
   ExchangeType = (
-  UnknownExchange,                                                   
+  UnknownExchange,
     NoExchangeReceived,
     AgeAndQSONumberExchange, //WLI
     CheckAndChapterOrQTHExchange,
@@ -2916,7 +2916,8 @@ type
     NameQTHAndPossibleTenTenNumber,
     NameAndPossibleGridSquareExchange,
     NZFieldDayExchange,
-    GridExchange,         
+    GridExchange,
+    Grid2Exchange,
     QSONumberAndPreviousQSONumber, //WLI
     QSONumberAndGeoCoordinates, //WLI
     QSONumberAndCoordinatesSum, //WLI
@@ -2980,6 +2981,7 @@ const
     'NAME AND POSSIBLE GRID SQUARE',
     'NZ FIELD DAY',
     'GRID',
+    'GRID2',
     'QSO NUMBER AND PREVIOUS QSO NUMBER',
     'QSO NUMBER AND GEO COORDINATES',
     'QSO NUMBER AND COORDINATES SUM',

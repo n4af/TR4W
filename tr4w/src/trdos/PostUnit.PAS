@@ -2426,6 +2426,7 @@ var
   csPower                               : PChar;
   hisAge                                : Integer;
   csQTHString                           : PChar;
+  csDomesticQTH                         : PChar;
   HisZone                               : integer;
   str1                                  : widestring;
   nrReceived                            : integer;
@@ -2539,7 +2540,10 @@ begin
       if LiteralDomesticQTH then
         csQTHString := @TempRXData.QTHString[1]
       else
-        csQTHString := @TempRXData.DomesticQTH {DomMultQTH} [1];
+       if ContestTitle = 'WWDIGI' then
+        csQTHString := @TempRXData.QTHString[1]
+      else
+        csQTHString := @TempRXData.DomesticQTH[1] {DomMultQTH};
     end
     else
       csQTHString := @TempRXData.QTHString[1];
@@ -2604,6 +2608,12 @@ if TempRXData.DomMultQTH = '' then
       case ActiveExchange of
 
         GridExchange:
+          begin
+            Format(CABRILLO_MYEX, '%-11s', cMyGrid);
+            Format(CABRILLO_HISEX, '%-11s', csQTHString);
+          end;
+
+        Grid2Exchange:
           begin
             Format(CABRILLO_MYEX, '%-11s', cMyGrid);
             Format(CABRILLO_HISEX, '%-11s', csQTHString);
