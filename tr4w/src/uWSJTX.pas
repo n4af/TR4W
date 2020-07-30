@@ -84,12 +84,17 @@ type
     procedure SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
     procedure SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
     procedure SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-    procedure SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-    procedure Display(p_sender : String; p_message : string);
-    Property UDPPort: integer read FUDPPort write SetUDPPort;
-    Property TCPPort: integer read FTCPPort write SetTCPPort;
 
-  end;
+    procedure SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+
+    procedure Display(p_sender : String; p_message : string);
+
+    Property UDPPort: integer read FUDPPort write SetUDPPort;
+
+    Property TCPPort: integer read FTCPPort write SetTCPPort;
+
+
+  end;
 
 const KLUDGESECONDSV = 2;
 implementation
@@ -114,7 +119,7 @@ constructor TWSJTXServer.Create;
 begin
    firstTime := true;
    udpServ := TIdUDPServer.Create(nil);
-   udpServ.Binding.SetSockOpt(Id_SOL_SOCKET, Id_SO_REUSEADDR,Id_SO_True);
+   // udpServ.Binding.SetSockOpt(Id_SOL_SOCKET,Id_SO_REUSEADDR,Id_SO_True);
    udpServ.ThreadedEvent := true;
    if FUDPPort = 0 then
       begin
@@ -442,156 +447,269 @@ begin
   end;
 end;
 
-{
-Highlight Callsign In   13                     quint32    Integer
-                           Id (unique key)        utf8
+
+{
+
+Highlight Callsign In   13                     quint32    Integer
+
+                           Id (unique key)        utf8
                            Callsign               utf8
                            Background Color       QColor
                            Foreground Color       QColor
                            Highlight last         bool
-}
-procedure TWSJTXServer.HighlightCall(sCall: string; color: integer; sId: string);
-var
-   sBuffer: string;
-   AData: TIdBytes;
-   messageType, magic, schema: LongInt;
-   id, Ip, message: String;
-   colorType: byte;
-begin
-// Build a header for a message
-   magic := $ADBCCBDA;
-   schema := 2;
+
+}
+
+procedure TWSJTXServer.HighlightCall(sCall: string; color: integer; sId: string);
+
+var
+
+   sBuffer: string;
+
+   AData: TIdBytes;
+
+   messageType, magic, schema: LongInt;
+
+   id, Ip, message: String;
+
+   colorType: byte;
+
+begin
+
+// Build a header for a message
+
+   magic := $ADBCCBDA;
+
+   schema := 2;
    messageType := 13;
    id := sID;
-   colorType := 1; // RGB
-   pack(AData, magic);            {.............................................Magic number}
-   pack(AData, schema);          {..............................................Schema}
+
+   colorType := 1; // RGB
+
+   pack(AData, magic);            {.............................................Magic number}
+
+   pack(AData, schema);          {..............................................Schema}
    Pack(AData,messageType);        {............................................MessageType}
    pack(AData,id);                   {..........................................ID}
    Pack(AData,Trim(sCall));
 
-   if color = 1 then // DUPE  defaults to red - Add code to pull from config if there
-      begin
-      // Background QColor first
-      Pack(AData,colorType); // RGB
-      PackFF00(AData);    // Alpha
-      Pack(AData,Byte(colorsDupeBack.R)); Pack(AData,Byte(0)); // Red
-      Pack(AData,Byte(colorsDupeBack.G)); Pack(AData,Byte(0)); // Green
-      Pack(AData,Byte(colorsDupeBack.B)); Pack(AData,Byte(0)); // Blue
-      PackFF00(AData); //Pack(AData,Word(65280));   // R
-      Pack(AData,Word(0));     // Padding
 
-      // foreground
-      Pack(AData,colorType); // RGB
-      PackFF00(AData);    // Alpha
-      Pack(AData,Byte(colorsDupeFore.R)); Pack(AData,Byte(0)); // Red
-      Pack(AData,Byte(colorsDupeFore.G)); Pack(AData,Byte(0)); // Green
-      Pack(AData,Byte(colorsDupeFore.B)); Pack(AData,Byte(0)); // Blue
-      PackFF00(AData); //Pack(AData,Word(65280));   // R
-      Pack(AData,Word(0));     // Padding
-      end
-   else if color = 2 then // multiplier
-      begin
-      // Background QColor first
+   if color = 1 then // DUPE  defaults to red - Add code to pull from config if there
 
-      Pack(AData,colorType);
-      PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
-      Pack(AData,Byte(colorsMultBack.R)); Pack(AData,Byte(0)); // Red
-      Pack(AData,Byte(colorsMultBack.G)); Pack(AData,Byte(0)); // Green
-      Pack(AData,Byte(colorsMultBack.B)); Pack(AData,Byte(0)); // Blue
-      Pack(AData,Word(0));     // Padding
+      begin
 
-      Pack(AData,colorType);
-      PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
-      Pack(AData,Byte(colorsMultFore.R)); Pack(AData,Byte(0)); // Red
-      Pack(AData,Byte(colorsMultFore.G)); Pack(AData,Byte(0)); // Green
-      Pack(AData,Byte(colorsMultFore.B)); Pack(AData,Byte(0)); // Blue
-      Pack(AData,Word(0));     // Padding
-      end;
+      // Background QColor first
 
-   Pack(AData,true);        // Highlight last only
+      Pack(AData,colorType); // RGB
 
-   DEBUGMSG('Sending command to highlight ' + Trim(sCall));
-   udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
+      PackFF00(AData);    // Alpha
 
-end;
+      Pack(AData,Byte(colorsDupeBack.R)); Pack(AData,Byte(0)); // Red
 
-procedure TWSJTXServer.ClearColors(sId: string);
-var
-   sBuffer: string;
-   AData: TIdBytes;
-   messageType, magic, schema: LongInt;
-   id, Ip, message: String;
-   colorType: byte;
-begin
-// Build a header for a message
-   magic := $ADBCCBDA;
-   schema := 2;
+      Pack(AData,Byte(colorsDupeBack.G)); Pack(AData,Byte(0)); // Green
+
+      Pack(AData,Byte(colorsDupeBack.B)); Pack(AData,Byte(0)); // Blue
+
+      PackFF00(AData); //Pack(AData,Word(65280));   // R
+
+      Pack(AData,Word(0));     // Padding
+
+
+      // foreground
+
+      Pack(AData,colorType); // RGB
+
+      PackFF00(AData);    // Alpha
+
+      Pack(AData,Byte(colorsDupeFore.R)); Pack(AData,Byte(0)); // Red
+
+      Pack(AData,Byte(colorsDupeFore.G)); Pack(AData,Byte(0)); // Green
+
+      Pack(AData,Byte(colorsDupeFore.B)); Pack(AData,Byte(0)); // Blue
+
+      PackFF00(AData); //Pack(AData,Word(65280));   // R
+
+      Pack(AData,Word(0));     // Padding
+
+      end
+
+   else if color = 2 then // multiplier
+
+      begin
+
+      // Background QColor first
+
+
+      Pack(AData,colorType);
+
+      PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
+
+      Pack(AData,Byte(colorsMultBack.R)); Pack(AData,Byte(0)); // Red
+
+      Pack(AData,Byte(colorsMultBack.G)); Pack(AData,Byte(0)); // Green
+
+      Pack(AData,Byte(colorsMultBack.B)); Pack(AData,Byte(0)); // Blue
+
+      Pack(AData,Word(0));     // Padding
+
+
+      Pack(AData,colorType);
+
+      PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
+
+      Pack(AData,Byte(colorsMultFore.R)); Pack(AData,Byte(0)); // Red
+
+      Pack(AData,Byte(colorsMultFore.G)); Pack(AData,Byte(0)); // Green
+
+      Pack(AData,Byte(colorsMultFore.B)); Pack(AData,Byte(0)); // Blue
+
+      Pack(AData,Word(0));     // Padding
+
+      end;
+
+
+   Pack(AData,true);        // Highlight last only
+
+
+   DEBUGMSG('Sending command to highlight ' + Trim(sCall));
+
+   udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
+
+
+end;
+
+
+procedure TWSJTXServer.ClearColors(sId: string);
+
+var
+
+   sBuffer: string;
+
+   AData: TIdBytes;
+
+   messageType, magic, schema: LongInt;
+
+   id, Ip, message: String;
+
+   colorType: byte;
+
+begin
+
+// Build a header for a message
+
+   magic := $ADBCCBDA;
+
+   schema := 2;
    messageType := 13;
    id := sID;
-   colorType := 0; // RGB
-   pack(AData, magic);            {.............................................Magic number}
-   pack(AData, schema);          {..............................................Schema}
+
+   colorType := 0; // RGB
+
+   pack(AData, magic);            {.............................................Magic number}
+
+   pack(AData, schema);          {..............................................Schema}
    Pack(AData,messageType);        {............................................MessageType}
    pack(AData,id);                   {..........................................ID}
    Pack(AData,' ');                // blank call?
 
 
-   // Background QColor first
-   //
-   Pack(AData,Byte(0));
-   Pack(AData,Word(0));
-   Pack(AData,Word(0));
-   Pack(AData,Word(0));
-   Pack(AData,Word(0));
 
-   Pack(AData,Byte(0));
-   Pack(AData,Word(0));
-   Pack(AData,Word(0));
-   Pack(AData,Word(0));
-   Pack(AData,Word(0));
+   // Background QColor first
+
+   //
+
+   Pack(AData,Byte(0));
+
+   Pack(AData,Word(0));
+
+   Pack(AData,Word(0));
+
+   Pack(AData,Word(0));
+
+   Pack(AData,Word(0));
 
 
-   Pack(AData,true);        // Highlight last only
+   Pack(AData,Byte(0));
 
-   DEBUGMSG('Sending Reset Colors');
-   udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
+   Pack(AData,Word(0));
 
-end;
+   Pack(AData,Word(0));
 
-procedure TWSJTXServer.SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-begin
-   Self.colorsDupeBack.R := bRed;
-   Self.colorsDupeBack.G := bGreen;
-   Self.colorsDupeBack.B := bBlue;
-end;
+   Pack(AData,Word(0));
 
-procedure TWSJTXServer.SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-begin
-   Self.colorsMultBack.R := bRed;
-   Self.colorsMultBack.G := bGreen;
-   Self.colorsMultBack.B := bBlue;
-end;
-
-procedure TWSJTXServer.SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-begin
-   Self.colorsDupeFore.R := bRed;
-   Self.colorsDupeFore.G := bGreen;
-   Self.colorsDupeFore.B := bBlue;
-end;
-
-procedure TWSJTXServer.SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-begin
-   Self.colorsMultFore.R := bRed;
-   Self.colorsMultFore.G := bGreen;
-   Self.colorsMultFore.B := bBlue;
-end;
+   Pack(AData,Word(0));
 
 
 
+   Pack(AData,true);        // Highlight last only
 
-procedure TWSJTXServer.IdTCPServer1Execute(AContext: TIdContext);
-var
+
+   DEBUGMSG('Sending Reset Colors');
+
+   udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
+
+
+end;
+
+
+procedure TWSJTXServer.SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+
+begin
+
+   Self.colorsDupeBack.R := bRed;
+
+   Self.colorsDupeBack.G := bGreen;
+
+   Self.colorsDupeBack.B := bBlue;
+
+end;
+
+
+procedure TWSJTXServer.SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+
+begin
+
+   Self.colorsMultBack.R := bRed;
+
+   Self.colorsMultBack.G := bGreen;
+
+   Self.colorsMultBack.B := bBlue;
+
+end;
+
+
+procedure TWSJTXServer.SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+
+begin
+
+   Self.colorsDupeFore.R := bRed;
+
+   Self.colorsDupeFore.G := bGreen;
+
+   Self.colorsDupeFore.B := bBlue;
+
+end;
+
+
+procedure TWSJTXServer.SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+
+begin
+
+   Self.colorsMultFore.R := bRed;
+
+   Self.colorsMultFore.G := bGreen;
+
+   Self.colorsMultFore.B := bBlue;
+
+end;
+
+
+
+
+
+procedure TWSJTXServer.IdTCPServer1Execute(AContext: TIdContext);
+
+var
     Port          : Integer;
     PeerPort      : Integer;
     PeerIP        : string;
@@ -904,12 +1022,18 @@ begin
 logger.Trace('TCP client Connected');
 end;
 
-procedure TWSJTXServer.IdTCPServer1Disconnect(AContext: TIdContext);
-begin
-   logger.Trace('TCP Client disconnected');
-end;
-(*aaa:=copy(vstup,z+1,length(vstup));
-    z:=pos(':',aaa);
+
+procedure TWSJTXServer.IdTCPServer1Disconnect(AContext: TIdContext);
+
+begin
+
+   logger.Trace('TCP Client disconnected');
+
+end;
+
+(*aaa:=copy(vstup,z+1,length(vstup));
+
+    z:=pos(':',aaa);
     x:=pos('>',aaa);
     if (x=0) then exit; //  the record was not terminated ... disappearing
 
@@ -934,17 +1058,27 @@ end;
 
     z:=pos('<',aaa);
     i:= pos('_INTL',upcase(prik));
-    *)
 
-function TWSJTXServer.GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
-var
-   i, z, n, x, dataLen: integer;
-   aaa, sLen: string;
-begin
-   Result := false;
-// Assumes we are pointing at the < in the next field
-   z := AnsiPos('<',sBuffer);
-   if z = 0 then
+    *)
+
+
+function TWSJTXServer.GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
+
+var
+
+   i, z, n, x, dataLen: integer;
+
+   aaa, sLen: string;
+
+begin
+
+   Result := false;
+
+// Assumes we are pointing at the < in the next field
+
+   z := AnsiPos('<',sBuffer);
+
+   if z = 0 then
       begin
       if length(sBuffer) > 0 then
          begin
@@ -955,15 +1089,22 @@ end;
       end;
 
 
-   aaa := copy(sBuffer,z+1,length(sBuffer));
-   z := AnsiPos(':',aaa);
+
+   aaa := copy(sBuffer,z+1,length(sBuffer));
+
+   z := AnsiPos(':',aaa);
    x := AnsiPos('>',aaa);
    if x = 0 then
-      begin
-      exit; //  the record was not terminated ... disappearing
-      end;
-   for i := z + 1 to x do
-      begin
+
+      begin
+
+      exit; //  the record was not terminated ... disappearing
+
+      end;
+
+   for i := z + 1 to x do
+
+      begin
       if aaa[i] in ['0'..'9'] then
          begin
          slen := slen + aaa[i];
@@ -1007,13 +1148,19 @@ end;
       sBuffer := copy(aaa,z,length(aaa))
       end;
     fieldValue := Trim(fieldValue);
-    Result := true;
-    logger.Trace(fieldName + '=' + fieldValue);
-end;
-(*--------------------------------------------------------------------------------------------------------------------------------*)
 
-procedure TWSJTXServer.Display(p_sender : String; p_message : string);
-begin
+    Result := true;
+
+    logger.Trace(fieldName + '=' + fieldValue);
+
+end;
+
+(*--------------------------------------------------------------------------------------------------------------------------------*)
+
+
+procedure TWSJTXServer.Display(p_sender : String; p_message : string);
+
+begin
    try
       DEBUGMSG(p_message);
    except
@@ -1033,7 +1180,8 @@ end;
 }
 end;
 
-end.
+
+end.
 
 
 
