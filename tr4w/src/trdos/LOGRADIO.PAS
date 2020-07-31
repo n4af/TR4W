@@ -2671,13 +2671,18 @@ begin
                   TempChar := '4';
                   end;
                end;
-
-            tKenwood14Bytes[0] := 'M';
-            tKenwood14Bytes[1] := 'D';
-            tKenwood14Bytes[2] := '0'; //Ord(VFO) - 17;
-            tKenwood14Bytes[3] := TempChar;
-            tKenwood14Bytes[4] := ';';
-            WriteToCATPort(tKenwood14Bytes, 5);
+            if Mode = Digital then
+               begin
+               if ActiveRadioPtr.CurrentStatus.Mode <> Digital then
+                  begin
+                  tKenwood14Bytes[0] := 'M';
+                  tKenwood14Bytes[1] := 'D';
+                  tKenwood14Bytes[2] := '0'; //Ord(VFO) - 17;
+                  tKenwood14Bytes[3] := TempChar;
+                  tKenwood14Bytes[4] := ';';
+                  WriteToCATPort(tKenwood14Bytes, 5);
+                  end;
+               end;
             end;
 
          rtKenwood:

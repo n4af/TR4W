@@ -14,7 +14,7 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
+     Public License along with TR4W in  GPL_License.TXT.
 If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
@@ -25,63 +25,63 @@ unit uCFG;
 interface
 
 uses
-uIO,
-  uCTYDAT,
-  uWinKey,
-  uGetScores,
-  uStations,
-  uRemMults,
-  PostUnit,
-  LogEdit,
-  LogGrid,
-  LogSCP,
-  TF,
-  FCONTEST,
-  uMP3Recorder,
-  ZoneCont,
-utils_text,
-  //Country9,
-  CFGCMD,
-  Windows,
-  LogStuff,
-  LogK1EA,
-  LOGWAE,
-  LogDom,
-  LOGDVP,
-  LogRadio,
-  LogDupe,
-  LogPack,
-  LogCW,
-  uNet,
-  LogWind,
-  uBandmap,
-  uTelnet,
-  uFunctionKeys,
-  Tree,
-  VC,
-  idUDPClient,
-  idGlobal
-  ;
-
-
-type
-  ArrayRecord = record
-    arArrayPtr: PInteger;
-    arArrayLength: integer;
-    arVar: PInteger;
-  end;
+   uIO,
+   uCTYDAT,
+   uWinKey,
+   uGetScores,
+   uStations,
+   uRemMults,
+   PostUnit,
+   LogEdit,
+   LogGrid,
+   LogSCP,
+   TF,
+   FCONTEST,
+   uMP3Recorder,
+   ZoneCont,
+   utils_text,
+   //Country9,
+   CFGCMD,
+   Windows,
+   LogStuff,
+   LogK1EA,
+   LOGWAE,
+   LogDom,
+   LOGDVP,
+   LogRadio,
+   LogDupe,
+   LogPack,
+   LogCW,
+   uNet,
+   LogWind,
+   uBandmap,
+   uTelnet,
+   uFunctionKeys,
+   Tree,
+   VC,
+   idUDPClient,
+   idGlobal,
+   Log4D
+   ;
 
 type
-  ListParamRecord = record
+   ArrayRecord = record
+      arArrayPtr: PInteger;
+      arArrayLength: integer;
+      arVar: PInteger;
+   end;
+
+type
+   ListParamRecord = record
     {(*}
     lpArray  : Pointer;
     lpLength : Byte;
     lpVar    : PByte;
     {*)}
 
-  end;
+   end;
 
-  CFGRecord = record
+   CFGRecord = record
     {(*}
     {04}crCommand : PChar;
     {04}crAddress : Pointer;
@@ -99,9 +99,9 @@ type
     {01}cfFunc    : CFGFunc;
     {01}crType    : CFGType;
     {*)}
-  end;
+   end;
 
-//procedure F_MY_GRID;
+   //procedure F_MY_GRID;
 function F_RADIO_ONE_TYPE: boolean;
 function F_RADIO_TWO_TYPE: boolean;
 function F_SCP_COUNTRY_STRING: boolean;
@@ -125,32 +125,39 @@ function F_MY_ZONE: boolean;
 function F_MY_CALL: boolean;
 function F_ZONE_MULTIPLIER: boolean;
 function F_AUTO_SEND_CHARACTER_COUNT: boolean;
+procedure UpdateDebugLogLevel;
 //function F_SETPARALLELPORT: boolean;
 
 const
-  ICOM_FILTER_WIDTH                     : array[0..03] of integer = (0, 1, 2, 3);
-  SCP_MINIMUM_LETTERS_ARRAY             : array[0..03] of integer = (0, 3, 4, 5);
-  AUTO_SEND_CHARACTER_COUNT_ARRAY       : array[0..06] of integer = (0, 1, 2, 3, 4, 5, 6);
-  AUTO_QSL_INTERVAL                     : array[0..06] of integer = (0, 1, 2, 3, 4, 5, 6);
-  ROW_COUNT_ARRAY                       : array[0..10] of integer = (5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  WINDOW_SIZE_ARRAY                     : array[0..14] of integer = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
-  CW_SPEED_INCREMENT                    : array[1..10] of integer = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-  MULT_REPORT_MINIMUM_BANDS_ARRAY       : array[0..02] of integer = (2, 3, 4);
-  STEREO_CONTROL_PIN_ARRAY              : array[0..01] of integer = (5, 9);
-  //FilterBandMap                         : array[0..02] of pchar = ('OFF','CW','Digital');
-  RECORDER_BITRATE_ARRAY                : array[0..07] of integer = (8, 16, 24, 32, 40, 48, 56, 64 {, 80, 96, 112, 128});
-  RECORDER_SAMPLERATE_ARRAY             : array[0..05] of integer = (08000, 11025, 12000, 16000, 22050, 44100);
+   ICOM_FILTER_WIDTH: array[0..03] of integer = (0, 1, 2, 3);
+   SCP_MINIMUM_LETTERS_ARRAY: array[0..03] of integer = (0, 3, 4, 5);
+   AUTO_SEND_CHARACTER_COUNT_ARRAY: array[0..06] of integer = (0, 1, 2, 3, 4, 5,
+      6);
+   AUTO_QSL_INTERVAL: array[0..06] of integer = (0, 1, 2, 3, 4, 5, 6);
+   ROW_COUNT_ARRAY: array[0..10] of integer = (5, 6, 7, 8, 9, 10, 11, 12, 13,
+      14, 15);
+   WINDOW_SIZE_ARRAY: array[0..14] of integer = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+      11, 12, 13, 14, 15);
+   CW_SPEED_INCREMENT: array[1..10] of integer = (1, 2, 3, 4, 5, 6, 7, 8, 9,
+      10);
+   MULT_REPORT_MINIMUM_BANDS_ARRAY: array[0..02] of integer = (2, 3, 4);
+   STEREO_CONTROL_PIN_ARRAY: array[0..01] of integer = (5, 9);
+   //FilterBandMap                         : array[0..02] of pchar = ('OFF','CW','Digital');
+   RECORDER_BITRATE_ARRAY: array[0..07] of integer = (8, 16, 24, 32, 40, 48, 56,
+      64 {, 80, 96, 112, 128});
+   RECORDER_SAMPLERATE_ARRAY: array[0..05] of integer = (08000, 11025, 12000,
+      16000, 22050, 44100);
 
-  CAT_BAUDRATE_ARRAY                    : array[0..07] of integer = (1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200);
-  DITDAHRATIO_ARRAY                     : array[0..03] of integer = (3, 4, 5, 6);
-  LEADING_ZEROS_ARRAY                   : array[0..03] of integer = (0, 1, 2, 3);
+   CAT_BAUDRATE_ARRAY: array[0..07] of integer = (1200, 2400, 4800, 9600, 19200,
+      38400, 57600, 115200);
+   DITDAHRATIO_ARRAY: array[0..03] of integer = (3, 4, 5, 6);
+   LEADING_ZEROS_ARRAY: array[0..03] of integer = (0, 1, 2, 3);
 
-  ArrayRecordArray                      : array[1..16] of ArrayRecord =
-    (
+   ArrayRecordArray: array[1..16] of ArrayRecord =
+      (
     {(*}
     (arArrayPtr: @SCP_MINIMUM_LETTERS_ARRAY;       arArrayLength: high(SCP_MINIMUM_LETTERS_ARRAY);       arVar: @SCPMinimumLetters),
     (arArrayPtr: @AUTO_SEND_CHARACTER_COUNT_ARRAY; arArrayLength: high(AUTO_SEND_CHARACTER_COUNT_ARRAY); arVar: @AutoSendCharacterCount),
-
 
     (arArrayPtr: @AUTO_QSL_INTERVAL;               arArrayLength: high(AUTO_QSL_INTERVAL);               arVar: @AutoQSLInterval),
 
@@ -160,7 +167,6 @@ const
     (arArrayPtr: @MULT_REPORT_MINIMUM_BANDS_ARRAY; arArrayLength: high(MULT_REPORT_MINIMUM_BANDS_ARRAY); arVar: @MultReportMinimumBands),
     (arArrayPtr: @STEREO_CONTROL_PIN_ARRAY;        arArrayLength: high(STEREO_CONTROL_PIN_ARRAY);        arVar: @StereoControlPin),
     (arArrayPtr: @RECORDER_BITRATE_ARRAY;          arArrayLength: high(RECORDER_BITRATE_ARRAY);          arVar: @RecorderBitrate),
-
 
     (arArrayPtr: @RECORDER_SAMPLERATE_ARRAY;       arArrayLength: high(RECORDER_SAMPLERATE_ARRAY);       arVar: nil{@RecorderSampleRate}),
 
@@ -172,55 +178,56 @@ const
     (arArrayPtr: @ICOM_FILTER_WIDTH;               arArrayLength: high(ICOM_FILTER_WIDTH);               arVar: @Radio1.tIcomFilterWidth),
     (arArrayPtr: @ICOM_FILTER_WIDTH;               arArrayLength: high(ICOM_FILTER_WIDTH);               arVar: @Radio2.tIcomFilterWidth)
     {*)}
-    );
+      );
 
-  {crA}
-  AdditionalProcsArray                  : array[1..22] of Pointer =
-    (
-    @F_CONTEST,
-    @F_ZONE_MULTIPLIER,
-    @F_ORION_PORT,
-    @F_CLEAR_DUPE_SHEET,
-    @F_BAND_MAP_DECAY_TIME,
-    @F_AUTO_QSL_INTERVAL,
-    @F_CONTEST_NAME,
-    @F_MY_COUNTRY,
-    @F_RADIO_ONE_TYPE,
-    @F_RADIO_TWO_TYPE,
-    @F_SCP_COUNTRY_STRING,
-    @F_KEYER_RADIO_ONE_OUTPUT_PORT,
-    @F_KEYER_RADIO_TWO_OUTPUT_PORT,
-    @F_MY_CALL,
-    nil {@F_MY_GRID},
-    @F_ADD_DOMESTIC_COUNTRY,
-    @F_BAND_MAP_CUTOFF_FREQUENCY,
-    @F_FREQUENCY_MEMORY,
-    @F_START_SENDING_NOW_KEY,
-    @F_DX_MULTIPLIER,
-    @F_MY_ZONE,
-    @F_MY_CONTINENT
-//@F_SETPARALLELPORT
-    );
+   {crA}
+   AdditionalProcsArray: array[1..22] of Pointer =
+      (
+      @F_CONTEST,
+      @F_ZONE_MULTIPLIER,
+      @F_ORION_PORT,
+      @F_CLEAR_DUPE_SHEET,
+      @F_BAND_MAP_DECAY_TIME,
+      @F_AUTO_QSL_INTERVAL,
+      @F_CONTEST_NAME,
+      @F_MY_COUNTRY,
+      @F_RADIO_ONE_TYPE,
+      @F_RADIO_TWO_TYPE,
+      @F_SCP_COUNTRY_STRING,
+      @F_KEYER_RADIO_ONE_OUTPUT_PORT,
+      @F_KEYER_RADIO_TWO_OUTPUT_PORT,
+      @F_MY_CALL,
+      nil {@F_MY_GRID},
+      @F_ADD_DOMESTIC_COUNTRY,
+      @F_BAND_MAP_CUTOFF_FREQUENCY,
+      @F_FREQUENCY_MEMORY,
+      @F_START_SENDING_NOW_KEY,
+      @F_DX_MULTIPLIER,
+      @F_MY_ZONE,
+      @F_MY_CONTINENT
+      //@F_SETPARALLELPORT
+      );
 
-  CommandsProcArray                     : array[1..12] of Pointer =
-    (
-    @DisplayBandMap,
-    @EditableLog.ShowRemainingMultipliers,
-    @DispalayLogGridLines,
-    @UpadateAutoSend,
-    @DisplayNextQSONumber,
-    @SetComputerName,
-    @DisplayCodeSpeed,
-    @DisplayInsertMode,
-    @UpdateRemainingMultsWindows,
-    nil {@SetEditableLogWindowColors},
-    @UpadateMainWindow,
-    @SetStationsCallsignMask
-    );
+   CommandsProcArray: array[1..13] of Pointer =
+      (
+      @DisplayBandMap,
+      @EditableLog.ShowRemainingMultipliers,
+      @DispalayLogGridLines,
+      @UpadateAutoSend,
+      @DisplayNextQSONumber,
+      @SetComputerName,
+      @DisplayCodeSpeed,
+      @DisplayInsertMode,
+      @UpdateRemainingMultsWindows,
+      nil {@SetEditableLogWindowColors},
+      @UpadateMainWindow,
+      @SetStationsCallsignMask,
+      @UpdateDebugLogLevel
+      );
 
-  {List}
-  ListParamArray                        : array[0..51] of ListParamRecord =
-    (
+   {List}
+   ListParamArray: array[0..52] of ListParamRecord =
+      (
     {(*}
     (lpArray: @RateDisplayTypeStringArray;        lpLength: Byte(High(RateDisplayType));        lpVar: @RateDisplay; ),
     (lpArray: @QSOPointMethodArray;               lpLength: Byte(High(QSOPointMethodType));     lpVar: @ActiveQSOPointMethod),
@@ -281,31 +288,37 @@ const
 
     (lpArray: @tCategoryTransmitterSA;            lpLength: Byte(High(tCategoryTransmitter));   lpVar: @CategoryTransmitter;),
     (lpArray: @tCategoryAssistedSA;               lpLength: Byte(High(tCategoryAssisted));      lpVar: @CategoryAssisted;),
-    (lpArray: @tCertificateSA;                    lpLength: Byte(High(tCertificate));           lpVar: @Certificate;)
+    (lpArray: @tCertificateSA;                    lpLength: Byte(High(tCertificate));           lpVar: @Certificate;),
+
+    (lpArray: @tLogLevelsSA;                         lpLength: Byte(High(tLogLevels));           lpVar: @logLevels;)
     {*)}
-    );
+      );
 
-//  CFGKindStringArray                    : array[CFGKind] of PChar = ('Supported', 'Supported', 'Supported', 'Supported', 'Supported', 'Added', 'Removed', 'Not supported');
+   //  CFGKindStringArray                    : array[CFGKind] of PChar = ('Supported', 'Supported', 'Supported', 'Supported', 'Supported', 'Added', 'Removed', 'Not supported');
 
-  CFGStatusArray                        : array[CFGStatus] of PChar = ('New', 'Old', 'Removed');
+   CFGStatusArray: array[CFGStatus] of PChar = ('New', 'Old', 'Removed');
 
-  CFGTypeStringArray                    : array[CFGType] of PChar = (nil, 'Directory', 'FileName', 'String', 'Multiplier', 'Boolean', 'Real', 'Byte', 'Integer', 'Integer', { 'Integer', } 'String', 'URL', 'Operation', 'Other', 'Char', 'Char', {'Port',} 'Port', 'Band');
+   CFGTypeStringArray: array[CFGType] of PChar = (nil, 'Directory', 'FileName',
+      'String', 'Multiplier', 'Boolean', 'Real', 'Byte', 'Integer', 'Integer',
+      { 'Integer', } 'String', 'URL', 'Operation', 'Other', 'Char', 'Char',
+      {'Port',} 'Port', 'Band');
 
 var
-  CMD                                   : ShortString;
+   CMD: ShortString;
 
 const
 
-  CommandsArraySize                     = 408+ 1{RadioOneCWSpeedSync} + 1{RadioTwoCWSpeedSync}
-                                              + 1{RadioOneCWByCAT}     + 1{RadioTwoCWByCAT} //ny4i // 4.44.5
-                                              + 9{UDPBroadcast Variables} //ny4i 4.44.9  - Issue 82 added one more UDP variable   Issue 304 Added UDPBroadcastScore
-                                              + 1 {WSJTXUDPPort}
-                                              + 1 {Radio TCP Server Port}
-                                              ;
-  CFGCA                                 : array[1..CommandsArraySize] of CFGRecord =
-    (
+   CommandsArraySize = 408 + 1 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}
+   + 1 {RadioOneCWByCAT} + 1 {RadioTwoCWByCAT} //ny4i // 4.44.5
+   + 9 {UDPBroadcast Variables}
+      //ny4i 4.44.9  - Issue 82 added one more UDP variable   Issue 304 Added UDPBroadcastScore
+   + 1 {WSJTXUDPPort}
+   + 1 {Radio TCP Server Port}
+   + 1 {DebugLogLevel}
+   ;
+   CFGCA: array[1..CommandsArraySize] of CFGRecord =
+      (
     {(*}
-
 
  (crCommand: 'ADD DOMESTIC COUNTRY';          crAddress: @tAddDomesticCountryString;      crMin:0;  crMax:13;       crS: csOld; crA: 16;crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'ALL CW MESSAGES CHAINABLE';     crAddress: @AllCWMessagesChainable;         crMin:0;  crMax:0;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
@@ -397,7 +410,8 @@ const
  (crCommand: 'CW SPEED INCREMENT';            crAddress: pointer(6);                      crMin:1;  crMax:10;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'CW TONE';                       crAddress: @CWTone;                         crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'DE ENABLE';                     crAddress: @DEEnable;                       crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'DIGITAL MODE ENABLE';           crAddress: @DigitalModeEnable;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'DEBUG LOG LEVEL';               crAddress: pointer(52);                     crMin:0;   crMax:0;      crS: csNew; crA: 0; crC:0 ; crP:13; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
+  (crCommand: 'DIGITAL MODE ENABLE';           crAddress: @DigitalModeEnable;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
 // (crCommand: 'DISPLAY MODE';                  crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctOther),
  (crCommand: 'DISTANCE MODE';                 crAddress: pointer(20);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
  (crCommand: 'DIT DAH RATIO';                 crAddress: pointer(13);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray;   cfFunc: cfAll; crType: ctInteger),
@@ -751,7 +765,7 @@ const
  (crCommand: 'YAESU RESPONSE TIMEOUT';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'ZONE MULTIPLIER';               crAddress: pointer(23);                     crMin:0;  crMax:0;       crS: csOld; crA: 2; crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctMultiplier)
     {*)}
-    );
+      );
 function CheckCommand(Command: PChar; CustomCMD: ShortString): boolean;
 function ProcessMessage(ID, CMD: ShortString): boolean;
 procedure ProcessReminder(ID, CMD: ShortString);
@@ -759,306 +773,335 @@ procedure ProcessTotalScoreMessage(ID, CMD: ShortString);
 procedure InitializeStrings;
 
 var
-  Changed                               : array[0..CommandsArraySize - 1] of boolean;
+   Changed: array[0..CommandsArraySize - 1] of boolean;
 
 implementation
 uses MainUnit;
 var
-  TempBand                              : BandType;
-  TempMode                              : ModeType;
-  TempFreq                              : integer;
+   TempBand: BandType;
+   TempMode: ModeType;
+   TempFreq: integer;
 
-  Result1                               : integer;
+   Result1: integer;
 
 function CheckCommand(Command: PChar; CustomCMD: ShortString): boolean;
 label
-  AdditionalProc;
+   AdditionalProc;
 var
-  i                                     : integer;
-  TempInteger                           : integer;
-  TempInteger2                          : integer;
-  TempReal                              : REAL;
-  code                                  : integer;
-  Proc                                  : Pointer;
-  TempByte                              : Byte;
-//  TempString                            : Str10;
-  TempElement                           : TMainWindowElement;
+   i: integer;
+   TempInteger: integer;
+   TempInteger2: integer;
+   TempReal: REAL;
+   code: integer;
+   Proc: Pointer;
+   TempByte: Byte;
+   //  TempString                            : Str10;
+   TempElement: TMainWindowElement;
 begin
 {$IF MAKE_DEFAULT_VALUES = TRUE}
-  Result := True;
-  Exit;
+   Result := True;
+   Exit;
 {$IFEND}
 
-  Command[Ord(Command[0]) + 1] := #0;
-  Result := False;
- { if pshortstring(Command)^ = 'QSO POINT METHOD' then
-   result := false;  }
-  if length(pshortstring(Command)^) > 5 then
+   Command[Ord(Command[0]) + 1] := #0;
+   Result := False;
+   { if pshortstring(Command)^ = 'QSO POINT METHOD' then
+     result := false;  }
+   if length(pshortstring(Command)^) > 5 then
 
-    if pshortstring(Command)^[1] in ['C', 'E'] then
-      if pshortstring(Command)^[3] in [' '] then
-        if pshortstring(Command)^[4] in ['S', 'C', 'D', 'M'] then
-//          if pshortstring(Command)^[7] in [' ', 'M', 'O'] then
-          if pshortstring(Command)^[10] in ['M', 'O', ' '] then
-          begin
-            Result := ProcessMessage(pshortstring(Command)^, CustomCMD);
+      if pshortstring(Command)^[1] in ['C', 'E'] then
+         if pshortstring(Command)^[3] in [' '] then
+            if pshortstring(Command)^[4] in ['S', 'C', 'D', 'M'] then
+               //          if pshortstring(Command)^[7] in [' ', 'M', 'O'] then
+               if pshortstring(Command)^[10] in ['M', 'O', ' '] then
+                  begin
+                     Result := ProcessMessage(pshortstring(Command)^,
+                        CustomCMD);
 
-            Exit;
-          end;
+                     Exit;
+                  end;
 
-  if pshortstring(Command)^ = 'TOTAL SCORE MESSAGE' then
-  begin
-    //ProcessTotalScoreMessage(pshortstring(Command)^, CustomCMD);
-    Result := True;
-    Exit;
-  end;
-
-  if StrPos(@Command[1], ' WINDOW ') <> nil then
-  begin
-    for TempElement := Low(TMainWindowElement) to High(TMainWindowElement) do
-    begin
-
-      if StrPos(@Command[1], TWindows[TempElement].mweName) = @Command[1] then
+   if pshortstring(Command)^ = 'TOTAL SCORE MESSAGE' then
       begin
-        TempByte := GetValueFromArray(@tr4wColorsSA, Byte(High(tr4wColors)), @CustomCMD);
-        if TempByte <> UNKNOWNTYPE then
-        begin
-          if StrPos(@Command[1], ' COLOR') <> nil then
-            TWindows[TempElement].mweColor := tr4wColors(TempByte)
-          else
-            TWindows[TempElement].mweBackG := tr4wColors(TempByte);
-          Result := True;
-          Exit;
-        end
-        else
-          Break;
-
+         //ProcessTotalScoreMessage(pshortstring(Command)^, CustomCMD);
+         Result := True;
+         Exit;
       end;
 
-    end;
-  end;
-
-  for i := 1 to CommandsArraySize do
-
-   if (StrComp(@Command[1], CFGCA[i].crCommand) = 0) then
-
-    begin
-{if (CFGCA[i].crCommand[0] = 'Q') then
-      Result := False;   }
-
-      if CFGCA[i].crS = csRem then
+   if StrPos(@Command[1], ' WINDOW ') <> nil then
       begin
-        Result := True;
-        Exit;
+         for TempElement := Low(TMainWindowElement) to High(TMainWindowElement)
+            do
+            begin
+
+               if StrPos(@Command[1], TWindows[TempElement].mweName) =
+                  @Command[1] then
+                  begin
+                     TempByte := GetValueFromArray(@tr4wColorsSA,
+                        Byte(High(tr4wColors)), @CustomCMD);
+                     if TempByte <> UNKNOWNTYPE then
+                        begin
+                           if StrPos(@Command[1], ' COLOR') <> nil then
+                              TWindows[TempElement].mweColor :=
+                                 tr4wColors(TempByte)
+                           else
+                              TWindows[TempElement].mweBackG :=
+                                 tr4wColors(TempByte);
+                           Result := True;
+                           Exit;
+                        end
+                     else
+                        Break;
+
+                  end;
+
+            end;
       end;
 
-      if CFGCA[i].crKind = ckArray then
-      begin
-        Val(CustomCMD, TempInteger2, code);
-        if code <> 0 then
-        Exit;
-        TempInteger := integer(CFGCA[i].crAddress);
-        Result := SetParameterInArray
-          (
-          ArrayRecordArray[TempInteger].arArrayPtr,
-          ArrayRecordArray[TempInteger].arArrayLength,
-          ArrayRecordArray[TempInteger].arVar,
-          TempInteger2
-          );
-        if not Result then
-        Exit;
-        goto AdditionalProc;
-      end;
+   for i := 1 to CommandsArraySize do
 
-      if CFGCA[i].crKind = ckList then
-      begin
-        TempInteger := integer(CFGCA[i].crAddress);
-        TempByte := GetValueFromArray(ListParamArray[TempInteger].lpArray, ListParamArray[TempInteger].lpLength, @CustomCMD);
-        if TempByte <> UNKNOWNTYPE then
-        begin
-       //   if tempinteger = 1 then    // if QSOPOINTMETHOD then decrement tempbyte 4.57.1
-       //   tempbyte := tempbyte -1;
-          ListParamArray[TempInteger].lpVar^ := TempByte;
-          Result := True;
-          goto AdditionalProc;
-        end
-        else Exit;
+      if (StrComp(@Command[1], CFGCA[i].crCommand) = 0) then
 
-      end;
+         begin
+            {if (CFGCA[i].crCommand[0] = 'Q') then
+                  Result := False;   }
 
-      if CFGCA[i].crAddress <> nil then
-      begin
-        case CFGCA[i].crType of
+            if CFGCA[i].crS = csRem then
+               begin
+                  Result := True;
+                  Exit;
+               end;
 
-          ctMessage:
-            begin
-              SniffOutControlCharacters(CustomCMD);
-              PShortString(CFGCA[i].crAddress)^ := CustomCMD;
-              PShortString(CFGCA[i].crAddress)^[length(CustomCMD) + 1] := #0;
-            end;
+            if CFGCA[i].crKind = ckArray then
+               begin
+                  Val(CustomCMD, TempInteger2, code);
+                  if code <> 0 then
+                     Exit;
+                  TempInteger := integer(CFGCA[i].crAddress);
+                  Result := SetParameterInArray
+                     (
+                     ArrayRecordArray[TempInteger].arArrayPtr,
+                     ArrayRecordArray[TempInteger].arArrayLength,
+                     ArrayRecordArray[TempInteger].arVar,
+                     TempInteger2
+                     );
+                  if not Result then
+                     Exit;
+                  goto AdditionalProc;
+               end;
 
-          ctDirectory, ctFileName:
-            begin
-              Windows.CopyMemory(CFGCA[i].crAddress, @CustomCMD[1], length(CustomCMD));
-              FileNameType(CFGCA[i].crAddress^)[length(CustomCMD)] := #0;
-            end;
+            if CFGCA[i].crKind = ckList then
+               begin
+                  TempInteger := integer(CFGCA[i].crAddress);
+                  TempByte :=
+                     GetValueFromArray(ListParamArray[TempInteger].lpArray,
+                     ListParamArray[TempInteger].lpLength, @CustomCMD);
+                  if TempByte <> UNKNOWNTYPE then
+                     begin
+                        //   if tempinteger = 1 then    // if QSOPOINTMETHOD then decrement tempbyte 4.57.1
+                        //   tempbyte := tempbyte -1;
+                        ListParamArray[TempInteger].lpVar^ := TempByte;
+                        Result := True;
+                        goto AdditionalProc;
+                     end
+                  else
+                     Exit;
 
-          ctString, ctURL:
-            begin
-              PShortString(CFGCA[i].crAddress)^ := CustomCMD;
-              ;
-              PShortString(CFGCA[i].crAddress)^[length(CustomCMD) + 1] := #0;
-              if CFGCA[i].crType = ctURL then Windows.CharLower(PChar(CFGCA[i].crAddress) + 1);
-            end;
+               end;
 
-          ctPortLPT:
-            PPortType(CFGCA[i].crAddress)^ :=
-              GetLPTPortFromChar(CustomCMD);
+            if CFGCA[i].crAddress <> nil then
+               begin
+                  case CFGCA[i].crType of
 
-          ctChar:
-            PChar(CFGCA[i].crAddress)^ := CustomCMD[1];
+                     ctMessage:
+                        begin
+                           SniffOutControlCharacters(CustomCMD);
+                           PShortString(CFGCA[i].crAddress)^ := CustomCMD;
+                           PShortString(CFGCA[i].crAddress)^[length(CustomCMD) +
+                              1] := #0;
+                        end;
 
-          ctAlphaChar:
-            begin
-              if CustomCMD[1] in ['A'..'Z'] then PChar(CFGCA[i].crAddress)^ := CustomCMD[1] else Exit;
-            end;
+                     ctDirectory, ctFileName:
+                        begin
+                           Windows.CopyMemory(CFGCA[i].crAddress, @CustomCMD[1],
+                              length(CustomCMD));
+                           FileNameType(CFGCA[i].crAddress^)[length(CustomCMD)]
+                              := #0;
+                        end;
 
-          ctBoolean:
-            begin
-              if not (CustomCMD[1] in ['T', 'F']) then Exit;
-              ;
-              PBoolean(CFGCA[i].crAddress)^ := CustomCMD[1] = 'T';
-            end;
+                     ctString, ctURL:
+                        begin
+                           PShortString(CFGCA[i].crAddress)^ := CustomCMD;
+                           ;
+                           PShortString(CFGCA[i].crAddress)^[length(CustomCMD) +
+                              1] := #0;
+                           if CFGCA[i].crType = ctURL then
+                              Windows.CharLower(PChar(CFGCA[i].crAddress) + 1);
+                        end;
 
-          ctReal:
-            begin
-              Val(CustomCMD, TempReal, code);
-//             TempReal := ValExt(@CustomCMD[1], code);
-              if code <> 0 then Exit;
-              if (TempReal < CFGCA[i].crMin / 10) or (TempReal > CFGCA[i].crMax / 10) then Exit;
-              PDouble(CFGCA[i].crAddress)^ := TempReal;
-            end;
+                     ctPortLPT:
+                        PPortType(CFGCA[i].crAddress)^ :=
+                           GetLPTPortFromChar(CustomCMD);
 
-          ctByte, ctWord, ctInteger:
-            begin
-              Val(CustomCMD, TempInteger, code);
-//              TempInteger := round(ValExt(@CustomCMD[1], code));
-              if code <> 0 then Exit;
+                     ctChar:
+                        PChar(CFGCA[i].crAddress)^ := CustomCMD[1];
 
-              if (TempInteger >= CFGCA[i].crMin) and ((TempInteger <= CFGCA[i].crMax) or (CFGCA[i].crMax = MAXWORD - 1 {MAXLONG})) then
-              begin
+                     ctAlphaChar:
+                        begin
+                           if CustomCMD[1] in ['A'..'Z'] then
+                              PChar(CFGCA[i].crAddress)^ := CustomCMD[1]
+                           else
+                              Exit;
+                        end;
 
-                if CFGCA[i].crType = ctWord then
-                  PWORD(CFGCA[i].crAddress)^ := TempInteger;
+                     ctBoolean:
+                        begin
+                           if not (CustomCMD[1] in ['T', 'F']) then
+                              Exit;
+                           ;
+                           PBoolean(CFGCA[i].crAddress)^ := CustomCMD[1] = 'T';
+                        end;
 
-                if CFGCA[i].crType = ctInteger then
-                  PInteger(CFGCA[i].crAddress)^ := TempInteger;
+                     ctReal:
+                        begin
+                           Val(CustomCMD, TempReal, code);
+                           //             TempReal := ValExt(@CustomCMD[1], code);
+                           if code <> 0 then
+                              Exit;
+                           if (TempReal < CFGCA[i].crMin / 10) or (TempReal >
+                              CFGCA[i].crMax / 10) then
+                              Exit;
+                           PDouble(CFGCA[i].crAddress)^ := TempReal;
+                        end;
 
-                if CFGCA[i].crType = ctByte then
-                  PByte(CFGCA[i].crAddress)^ := TempInteger;
+                     ctByte, ctWord, ctInteger:
+                        begin
+                           Val(CustomCMD, TempInteger, code);
+                           //              TempInteger := round(ValExt(@CustomCMD[1], code));
+                           if code <> 0 then
+                              Exit;
 
-              end
-              else
-                Exit;
-            end;
-        end;
-      end;
+                           if (TempInteger >= CFGCA[i].crMin) and ((TempInteger
+                              <= CFGCA[i].crMax) or (CFGCA[i].crMax = MAXWORD - 1
+                              {MAXLONG})) then
+                              begin
 
-      AdditionalProc:
-      if CFGCA[i].crA <> 0 then
-      begin
-        CMD := CustomCMD;
-        Proc := AdditionalProcsArray[CFGCA[i].crA];
-        asm
+                                 if CFGCA[i].crType = ctWord then
+                                    PWORD(CFGCA[i].crAddress)^ := TempInteger;
+
+                                 if CFGCA[i].crType = ctInteger then
+                                    PInteger(CFGCA[i].crAddress)^ :=
+                                       TempInteger;
+
+                                 if CFGCA[i].crType = ctByte then
+                                    PByte(CFGCA[i].crAddress)^ := TempInteger;
+
+                              end
+                           else
+                              Exit;
+                        end;
+                  end;
+               end;
+
+            AdditionalProc:
+            if CFGCA[i].crA <> 0 then
+               begin
+                  CMD := CustomCMD;
+                  Proc := AdditionalProcsArray[CFGCA[i].crA];
+                  asm
             call Proc
             mov byte ptr result,al
-        end;
-        if Result = False then
-        exit;
-      end;
+                  end;
+                  if Result = False then
+                     exit;
+               end;
 
-      Result := True;
-      Break;
-    end;
+            Result := True;
+            Break;
+         end;
 
 end;
 
 function F_ADD_DOMESTIC_COUNTRY: boolean;
 begin
-  if CMD = 'CLEAR' then ClearDomesticCountryList else AddDomesticCountry(CMD);
-  Result := True;
+   if CMD = 'CLEAR' then
+      ClearDomesticCountryList
+   else
+      AddDomesticCountry(CMD);
+   Result := True;
 end;
 
 function F_AUTO_QSL_INTERVAL: boolean;
 begin
-  AutoQSLCount := AutoQSLInterval;
-  Result := True;
+   AutoQSLCount := AutoQSLInterval;
+   Result := True;
 end;
 
 function F_AUTO_SEND_CHARACTER_COUNT: boolean;
 begin
-//  AutoQSLCount := AutoQSLInterval;
-  AutoSendEnable := AutoSendCharacterCount > 0;
-  Result := True;
+   //  AutoQSLCount := AutoQSLInterval;
+   AutoSendEnable := AutoSendCharacterCount > 0;
+   Result := True;
 end;
 
 function F_BAND_MAP_CUTOFF_FREQUENCY: boolean;
 var
-  TempLongInt                           : integer;
+   TempLongInt: integer;
 begin
-  Val(CMD, TempLongInt, Result1);
-  Result := Result1 = 0;
-  if Result then AddBandMapModeCutoffFrequency(TempLongInt);
+   Val(CMD, TempLongInt, Result1);
+   Result := Result1 = 0;
+   if Result then
+      AddBandMapModeCutoffFrequency(TempLongInt);
 end;
 
 function F_BAND_MAP_DECAY_TIME: boolean;
 begin
-//  BandMapDecayMultiplier := (BandMapDecayValue div 64) + 1;
-//  BandMapDecayTime := BandMapDecayValue div BandMapDecayMultiplier;
-  Result := True;
+   //  BandMapDecayMultiplier := (BandMapDecayValue div 64) + 1;
+   //  BandMapDecayTime := BandMapDecayValue div BandMapDecayMultiplier;
+   Result := True;
 end;
 
 function F_CLEAR_DUPE_SHEET: boolean;
 begin
-//  if ClearDupeSheetCommandGiven then
-  ClearDupeSheetCommandGiven := RunningConfigFile;
-  Result := True;
+   //  if ClearDupeSheetCommandGiven then
+   ClearDupeSheetCommandGiven := RunningConfigFile;
+   Result := True;
 end;
 
 function F_CONTEST: boolean;
 begin
-  Result := FoundContest(CMD);
-  F_DX_MULTIPLIER;
+   Result := FoundContest(CMD);
+   F_DX_MULTIPLIER;
 end;
 
 function F_CONTEST_NAME: boolean;
 begin
-  SetContestTitle;
-  Result := True;
+   SetContestTitle;
+   Result := True;
 end;
 
 function F_FREQUENCY_MEMORY: boolean;
 begin
-  if StringHas(CMD, 'SSB') then
-  begin
-    Delete(CMD, pos('SSB ', CMD), 4);
-    Val(CMD, TempFreq, Result1);
-    if Result1 = 0 then
-    begin
-      CalculateBandMode(TempFreq, TempBand, TempMode);
-      DefaultFreqMemory[TempBand, Phone] := TempFreq;
-    end;
-  end
-  else
-  begin
-    Val(CMD, TempFreq, Result1);
-    if Result1 = 0 then
-    begin
-      CalculateBandMode(TempFreq, TempBand, TempMode);
-      DefaultFreqMemory[TempBand, CW] := TempFreq;
-    end;
-  end;
-  Result := Result1 = 0;
+   if StringHas(CMD, 'SSB') then
+      begin
+         Delete(CMD, pos('SSB ', CMD), 4);
+         Val(CMD, TempFreq, Result1);
+         if Result1 = 0 then
+            begin
+               CalculateBandMode(TempFreq, TempBand, TempMode);
+               DefaultFreqMemory[TempBand, Phone] := TempFreq;
+            end;
+      end
+   else
+      begin
+         Val(CMD, TempFreq, Result1);
+         if Result1 = 0 then
+            begin
+               CalculateBandMode(TempFreq, TempBand, TempMode);
+               DefaultFreqMemory[TempBand, CW] := TempFreq;
+            end;
+      end;
+   Result := Result1 = 0;
 end;
 {
 function F_ICOM_RESPONSE_TIMEOUT: boolean;
@@ -1072,129 +1115,130 @@ end;
 
 function F_KEYER_RADIO_ONE_OUTPUT_PORT: boolean;
 begin
-  Radio1SerialInvert := StringHas(CMD, 'INVERT');
-  Result := True;
+   Radio1SerialInvert := StringHas(CMD, 'INVERT');
+   Result := True;
 end;
 
 function F_KEYER_RADIO_TWO_OUTPUT_PORT: boolean;
 begin
-  Radio2SerialInvert := StringHas(CMD, 'INVERT');
-  Result := True;
+   Radio2SerialInvert := StringHas(CMD, 'INVERT');
+   Result := True;
 end;
 
 function F_ORION_PORT: boolean;
 begin
-  ActiveRotatorType := OrionRotator;
-  Result := True;
+   ActiveRotatorType := OrionRotator;
+   Result := True;
 end;
 
 function F_MY_CONTINENT: boolean;
 begin
-  MyContinentIsSet := True;
-  Result := True;
+   MyContinentIsSet := True;
+   Result := True;
 end;
 
 function F_MY_ZONE: boolean;
 begin
-  MyZoneIsSet := True;
-  Result := True;
+   MyZoneIsSet := True;
+   Result := True;
 end;
 
 function F_MY_COUNTRY: boolean;
 var
-  TempQTH                               : QTHRecord;
+   TempQTH: QTHRecord;
 begin
-  Result := False;
-  ctyLocateCall(CMD, TempQTH);
-  if MyCountry <> TempQTH.CountryID then Exit;
+   Result := False;
+   ctyLocateCall(CMD, TempQTH);
+   if MyCountry <> TempQTH.CountryID then
+      Exit;
 
-  MyCountryIsSet := True;
-  RecalculateMyCountryContinentAndZoneNew(CMD);
-  CountryString := MyCountry;
-{
-  ctyLocateCall(CMD, TempQTH);
-  MyCountry := TempQTH.CountryID;
-  MyContinent := TempQTH.Continent;
-  Str(TempQTH.Zone, MyZone);
-  CountryString := MyCountry;
-  ContinentString := tContinentArray[MyContinent];
-}
-  Result := True;
+   MyCountryIsSet := True;
+   RecalculateMyCountryContinentAndZoneNew(CMD);
+   CountryString := MyCountry;
+   {
+     ctyLocateCall(CMD, TempQTH);
+     MyCountry := TempQTH.CountryID;
+     MyContinent := TempQTH.Continent;
+     Str(TempQTH.Zone, MyZone);
+     CountryString := MyCountry;
+     ContinentString := tContinentArray[MyContinent];
+   }
+   Result := True;
 end;
 
 function F_MY_CALL: boolean;
 
 begin
-  DEPlusMyCall := 'DE ' + MyCall;
-  RecalculateMyCountryContinentAndZoneNew(MyCall);
-{
-  ctyLocateCall(MyCall, TempQTH);
-  MyCountry := TempQTH.CountryID;
-  MyContinent := TempQTH.Continent;
-  Str(TempQTH.Zone, MyZone);
-  CountryString := MyCountry;
-  ContinentString := tContinentArray[MyContinent];
-}
-  Result := True;
+   DEPlusMyCall := 'DE ' + MyCall;
+   RecalculateMyCountryContinentAndZoneNew(MyCall);
+   {
+     ctyLocateCall(MyCall, TempQTH);
+     MyCountry := TempQTH.CountryID;
+     MyContinent := TempQTH.Continent;
+     Str(TempQTH.Zone, MyZone);
+     CountryString := MyCountry;
+     ContinentString := tContinentArray[MyContinent];
+   }
+   Result := True;
 end;
 
 function F_ZONE_MULTIPLIER: boolean;
 begin
-  if ActiveZoneMult = CQZones then
-  begin
-    ActiveInitialExchange := ZoneInitialExchange;
-    CTY.ctyZoneMode := CQZoneMode;
-  end;
+   if ActiveZoneMult = CQZones then
+      begin
+         ActiveInitialExchange := ZoneInitialExchange;
+         CTY.ctyZoneMode := CQZoneMode;
+      end;
 
-  if ActiveZoneMult = ITUZones then
-  begin
-    ActiveInitialExchange := ZoneInitialExchange;
-    CTY.ctyZoneMode := ITUZoneMode;
-  end;
-  Result := True;
+   if ActiveZoneMult = ITUZones then
+      begin
+         ActiveInitialExchange := ZoneInitialExchange;
+         CTY.ctyZoneMode := ITUZoneMode;
+      end;
+   Result := True;
 end;
 
 function F_RADIO_ONE_TYPE: boolean;
 begin
-  Radio1.ReceiverAddress := RadioParametersArray[Radio1.RadioModel].RA;
-  Result := True;
+   Radio1.ReceiverAddress := RadioParametersArray[Radio1.RadioModel].RA;
+   Result := True;
 end;
 
 function F_RADIO_TWO_TYPE: boolean;
 begin
-  Radio2.ReceiverAddress := RadioParametersArray[Radio2.RadioModel].RA;
-  Result := True;
+   Radio2.ReceiverAddress := RadioParametersArray[Radio2.RadioModel].RA;
+   Result := True;
 end;
 
 function F_SCP_COUNTRY_STRING: boolean;
 begin
-  if CD.CountryString <> '' then
-    if Copy(CD.CountryString, length(CD.CountryString), 1) <> ',' then
-      CD.CountryString := CD.CountryString + ',';
-  Result := True;
+   if CD.CountryString <> '' then
+      if Copy(CD.CountryString, length(CD.CountryString), 1) <> ',' then
+         CD.CountryString := CD.CountryString + ',';
+   Result := True;
 end;
 
 function F_DX_MULTIPLIER: boolean;
 begin
-  if not (ActiveDXMult in
-    [
-    ARRLDXCCWithNoUSAOrCanada,
-      ARRLDXCCWithNoARRLSections,
-      ARRLDXCCWithNoUSACanadaKH6OrKL7,
-      ARRLDXCCWithNoIOrIS0,
-      ARRLDXCCWithNoJT,
-      ARRLDXCC]) then
-    CTY.ctyCountryMode := CQCountryMode
-  else
-    CTY.ctyCountryMode := ARRLCountryMode;
-  Result := True;
+   if not (ActiveDXMult in
+      [
+      ARRLDXCCWithNoUSAOrCanada,
+         ARRLDXCCWithNoARRLSections,
+         ARRLDXCCWithNoUSACanadaKH6OrKL7,
+         ARRLDXCCWithNoIOrIS0,
+         ARRLDXCCWithNoJT,
+         ARRLDXCC]) then
+      CTY.ctyCountryMode := CQCountryMode
+   else
+      CTY.ctyCountryMode := ARRLCountryMode;
+   Result := True;
 end;
 
 function F_START_SENDING_NOW_KEY: boolean;
 begin
-//??????
-//  if CMD = 'SPACE' then StartSendingNowKey := ' ';
-  Result := True;
+   //??????
+   //  if CMD = 'SPACE' then StartSendingNowKey := ' ';
+   Result := True;
 end;
 {
 function F_SETPARALLELPORT: boolean;
@@ -1207,328 +1251,348 @@ end;
 
 procedure ProcessReminder(ID, CMD: ShortString);
 var
-  TimeString                            : string;
-  DateString, DayString                 : Str20;
+   TimeString: string;
+   DateString, DayString: Str20;
 
 begin
 
-  if NumberReminderRecords >= MaximumReminderRecords then
-  begin
-    ShowMessage(TC_MAXIMUMNUMBEROFREMINDERSEXCEEDED);
-    Exit;
-  end;
+   if NumberReminderRecords >= MaximumReminderRecords then
+      begin
+         ShowMessage(TC_MAXIMUMNUMBEROFREMINDERSEXCEEDED);
+         Exit;
+      end;
 
-  if NumberReminderRecords = 0 then New(Reminders);
+   if NumberReminderRecords = 0 then
+      New(Reminders);
 
-  Reminders^[NumberReminderRecords].DateString := '';
-  Reminders^[NumberReminderRecords].DayString := '';
-  Reminders^[NumberReminderRecords].Alarm := False;
+   Reminders^[NumberReminderRecords].DateString := '';
+   Reminders^[NumberReminderRecords].DayString := '';
+   Reminders^[NumberReminderRecords].Alarm := False;
 
-  TimeString := Copy(CMD, 1, 4);
+   TimeString := Copy(CMD, 1, 4);
 
-  if not StringIsAllNumbers(TimeString) then
-  begin
-    asm
+   if not StringIsAllNumbers(TimeString) then
+      begin
+         asm
           push TimeString
-    end;
-    wsprintf(wsprintfBuffer, '%s '#13 + TC_INVALIDREMINDERTIME);
-    asm add esp,12
-    end;
-    ShowMessage(wsprintfBuffer);
-          //      showmessage(TimeString + #13 + 'Invalid reminder time!!');
-    Exit;
-  end;
+         end;
+         wsprintf(wsprintfBuffer, '%s '#13 + TC_INVALIDREMINDERTIME);
+         asm add esp,12
+         end;
+         ShowMessage(wsprintfBuffer);
+         //      showmessage(TimeString + #13 + 'Invalid reminder time!!');
+         Exit;
+      end;
 
-  Val(TimeString, Reminders^[NumberReminderRecords].Time, Result1);
+   Val(TimeString, Reminders^[NumberReminderRecords].Time, Result1);
 
-  DateString := BracketedString(CMD, ' ON ', '');
+   DateString := BracketedString(CMD, ' ON ', '');
 
-  if StringHas(DateString, 'ALARM') then
-  begin
-    Reminders^[NumberReminderRecords].Alarm := True;
-    DateString := BracketedString(DateString, '', ' ALARM');
-  end;
+   if StringHas(DateString, 'ALARM') then
+      begin
+         Reminders^[NumberReminderRecords].Alarm := True;
+         DateString := BracketedString(DateString, '', ' ALARM');
+      end;
 
-      //WLI
-  GetRidOfPostcedingSpaces(DateString);
+   //WLI
+   GetRidOfPostcedingSpaces(DateString);
 
-  if StringHas(DateString, '-') then
-  begin
-    case length(DateString) of
-      8:
-        if (DateString[2] <> '-') or (DateString[6] <> '-') then
-        begin
-          ShowMessage(TC_INVALIDREMINDERDATE);
-          Exit;
-        end
-        else
-          DateString := '0' + DateString;
+   if StringHas(DateString, '-') then
+      begin
+         case length(DateString) of
+            8:
+               if (DateString[2] <> '-') or (DateString[6] <> '-') then
+                  begin
+                     ShowMessage(TC_INVALIDREMINDERDATE);
+                     Exit;
+                  end
+               else
+                  DateString := '0' + DateString;
 
-      9:
-        if (DateString[3] <> '-') or (DateString[7] <> '-') then
-        begin
-          ShowMessage(TC_INVALIDREMINDERDATE);
-          Exit;
-        end;
+            9:
+               if (DateString[3] <> '-') or (DateString[7] <> '-') then
+                  begin
+                     ShowMessage(TC_INVALIDREMINDERDATE);
+                     Exit;
+                  end;
 
-    else
-      ShowMessage(TC_INVALIDREMINDERDATE);
-    end;
-    Reminders^[NumberReminderRecords].DateString := DateString;
-  end
-  else
-  begin
-    DayString := Copy(DateString, length(DateString) - 2, 3);
-    if (DayString <> 'DAY') and (DayString <> 'ALL') then
-    begin
-      ShowMessage(TC_INVALIDREMINDERDATE);
-      Exit;
-    end;
+            else
+               ShowMessage(TC_INVALIDREMINDERDATE);
+         end;
+         Reminders^[NumberReminderRecords].DateString := DateString;
+      end
+   else
+      begin
+         DayString := Copy(DateString, length(DateString) - 2, 3);
+         if (DayString <> 'DAY') and (DayString <> 'ALL') then
+            begin
+               ShowMessage(TC_INVALIDREMINDERDATE);
+               Exit;
+            end;
 
-    Reminders^[NumberReminderRecords].DayString := DateString;
-  end;
+         Reminders^[NumberReminderRecords].DayString := DateString;
+      end;
 
-  ReadLn(ConfigFileRead, Reminders^[NumberReminderRecords].RemMessage);
-  inc(NumberReminderRecords);
- 
+   ReadLn(ConfigFileRead, Reminders^[NumberReminderRecords].RemMessage);
+   inc(NumberReminderRecords);
+
 end;
 
 function ProcessMessage(ID, CMD: ShortString): boolean;
 var
-  CQMessage                             : boolean;
-  TempValue                             : integer;
-  TempMode                              : ModeType;
-  Offset                                : Cardinal;
-  FuncKey                               : Cardinal;
+   CQMessage: boolean;
+   TempValue: integer;
+   TempMode: ModeType;
+   Offset: Cardinal;
+   FuncKey: Cardinal;
 begin
-{
-CQ DIG MEMORY F1=CQ CQ CQ \ \ TEST
-CQ DIG MEMORY ALTF1=CQ CQ CQ \ \ TEST
-CQ CW MEMORY CONTROLF1=CQ CQ CQ \ \ TEST
-CQ MEMORY F1 =\\ TEST
-CQ DIG MEMORY F1 CAPTION=
-CQ CW MEMORY CONTROLF5=<03>SRS=PB1;<04>
-CQ CW MEMORY CONTROLF5 CAPTION=PLAYCH1MSG
-}
+   {
+   CQ DIG MEMORY F1=CQ CQ CQ \ \ TEST
+   CQ DIG MEMORY ALTF1=CQ CQ CQ \ \ TEST
+   CQ CW MEMORY CONTROLF1=CQ CQ CQ \ \ TEST
+   CQ MEMORY F1 =\\ TEST
+   CQ DIG MEMORY F1 CAPTION=
+   CQ CW MEMORY CONTROLF5=<03>SRS=PB1;<04>
+   CQ CW MEMORY CONTROLF5 CAPTION=PLAYCH1MSG
+   }
 
-//  if ID[1] = 'C' then CQMessage := True else CQMessage := False;
-  Result := False;
-  CQMessage := ID[1] = 'C';
-  TempMode := NoMode;
+   //  if ID[1] = 'C' then CQMessage := True else CQMessage := False;
+   Result := False;
+   CQMessage := ID[1] = 'C';
+   TempMode := NoMode;
 
-  Offset := 8; //Pos of  "MEMORY"
+   Offset := 8; //Pos of  "MEMORY"
 
-  case ID[4] of
-    'S': TempMode := Phone;
-    'D': TempMode := Digital;
-    'C':
+   case ID[4] of
+      'S': TempMode := Phone;
+      'D': TempMode := Digital;
+      'C':
+         begin
+            TempMode := CW;
+            Offset := 7;
+         end;
+
+      'M':
+         begin
+            TempMode := CW;
+            Offset := 4;
+         end;
+   end;
+
+   if TempMode = NoMode then
+      Exit;
+
+   TempValue := 0;
+   case ID[Offset + 7] of
+      'F':
+         begin
+            TempValue := 111;
+            inc(Offset, 8);
+         end;
+      'A':
+         begin
+            TempValue := 135;
+            inc(Offset, 8 + 3);
+         end;
+      'C':
+         begin
+            TempValue := 123;
+            inc(Offset, 8 + 7);
+         end;
+   end;
+   FuncKey := Ord(ID[Offset]) - Ord('0');
+   if length(ID) > Offset then
+      if ID[Offset + 1] in ['0'..'2'] then
+         FuncKey := Ord(ID[Offset + 1]) - Ord('0') + 10;
+
+   if not (FuncKey in [1..12]) then
+      Exit;
+
+   Result := True;
+
+   if ID[length(ID)] = 'N' then
       begin
-        TempMode := CW;
-        Offset := 7;
+         if CQMessage then
+            SetCQCaptionMemoryString(TempMode, CHR(TempValue + FuncKey), CMD)
+         else
+            SetEXCaptionMemoryString(TempMode, CHR(TempValue + FuncKey), CMD);
+      end
+   else
+      begin
+         if CQMessage then
+            SetCQMemoryString(TempMode, CHR(TempValue + FuncKey), CMD)
+         else
+            SetEXMemoryString(TempMode, CHR(TempValue + FuncKey), CMD);
       end;
 
-    'M':
-      begin
-        TempMode := CW;
-        Offset := 4;
-      end;
-  end;
+   //  Exit;
+   {
+     if TempValue = 0 then Exit;
 
-  if TempMode = NoMode then Exit;
+     TempModeType := CW;
+     if StringHas(ID, 'MEMORY F') or StringHas(ID, 'CW MEMORY F') then TempValue := 111;
+     if StringHas(ID, 'MEMORY ALTF') or StringHas(ID, 'CW MEMORY ALTF') then TempValue := 135;
+     if StringHas(ID, 'MEMORY CONTROLF') or StringHas(ID, 'CW MEMORY CONTROLF') then TempValue := 123;
 
-  TempValue := 0;
-  case ID[Offset + 7] of
-    'F':
-      begin
-        TempValue := 111;
-        inc(Offset, 8);
-      end;
-    'A':
-      begin
-        TempValue := 135;
-        inc(Offset, 8 + 3);
-      end;
-    'C':
-      begin
-        TempValue := 123;
-        inc(Offset, 8 + 7);
-      end;
-  end;
-  FuncKey := Ord(ID[Offset]) - Ord('0');
-  if length(ID) > Offset then
-    if ID[Offset + 1] in ['0'..'2'] then
-      FuncKey := Ord(ID[Offset + 1]) - Ord('0') + 10;
+     if StringHas(ID, 'SSB MEMORY F') then
+     begin
+       TempValue := 111;
+       TempModeType := Phone;
+     end;
 
-  if not (FuncKey in [1..12]) then Exit;
+     if StringHas(ID, 'SSB MEMORY ALTF') then
+     begin
+       TempValue := 135;
+       TempModeType := Phone;
+     end;
 
-  Result := True;
+     if StringHas(ID, 'SSB MEMORY CONTROLF') then
+     begin
+       TempValue := 123;
+       TempModeType := Phone;
+     end;
 
-  if ID[length(ID)] = 'N' then
-  begin
-    if CQMessage then
-      SetCQCaptionMemoryString(TempMode, CHR(TempValue + FuncKey), CMD)
-    else
-      SetEXCaptionMemoryString(TempMode, CHR(TempValue + FuncKey), CMD);
-  end
-  else
-  begin
-    if CQMessage then
-      SetCQMemoryString(TempMode, CHR(TempValue + FuncKey), CMD)
-    else
-      SetEXMemoryString(TempMode, CHR(TempValue + FuncKey), CMD);
-  end;
+     if StringHas(ID, 'DIG MEMORY F') then
+     begin
+       TempValue := 111;
+       TempModeType := Digital;
+     end;
 
-//  Exit;
-{
-  if TempValue = 0 then Exit;
+     if StringHas(ID, 'DIG MEMORY ALTF') then
+     begin
+       TempValue := 135;
+       TempModeType := Digital;
+     end;
 
-  TempModeType := CW;
-  if StringHas(ID, 'MEMORY F') or StringHas(ID, 'CW MEMORY F') then TempValue := 111;
-  if StringHas(ID, 'MEMORY ALTF') or StringHas(ID, 'CW MEMORY ALTF') then TempValue := 135;
-  if StringHas(ID, 'MEMORY CONTROLF') or StringHas(ID, 'CW MEMORY CONTROLF') then TempValue := 123;
+     if StringHas(ID, 'DIG MEMORY CONTROLF') then
+     begin
+       TempValue := 123;
+       TempModeType := Digital;
+     end;
 
-  if StringHas(ID, 'SSB MEMORY F') then
-  begin
-    TempValue := 111;
-    TempModeType := Phone;
-  end;
+     if TempValue > 0 then
+     begin
+       Result := True;
+       if TempValue = 111 then ID := PostcedingString(ID, 'MEMORY F');
+       if TempValue = 123 then ID := PostcedingString(ID, 'CONTROLF');
+       if TempValue = 135 then ID := PostcedingString(ID, 'ALTF');
 
-  if StringHas(ID, 'SSB MEMORY ALTF') then
-  begin
-    TempValue := 135;
-    TempModeType := Phone;
-  end;
+       if StringIsAllNumbers(ID) then
+       begin
+         TempLongInt := StrToInt(ID);
+         if (TempLongInt > 0) and (TempLongInt < 13) then
+         begin
+           if CQMessage then
+             SetCQMemoryString(TempModeType, CHR(TempValue + TempLongInt), CMD)
+           else
+             SetEXMemoryString(TempModeType, CHR(TempValue + TempLongInt), CMD);
+           Exit;
+         end;
+       end
+       else
+         if StringHas(ID, ' CAPTION') then
+         begin
 
-  if StringHas(ID, 'SSB MEMORY CONTROLF') then
-  begin
-    TempValue := 123;
-    TempModeType := Phone;
-  end;
+           TempLongInt := StrToInt(Copy(ID, 1, pos(' CAPTION', ID)));
+           if (TempLongInt > 0) and (TempLongInt < 13) then
+           begin
+             if CQMessage then
+               SetCQCaptionMemoryString(TempModeType, CHR(TempValue + TempLongInt), CMD)
+             else
+               SetEXCaptionMemoryString(TempModeType, CHR(TempValue + TempLongInt), CMD);
+             Exit;
+           end;
+         end;
 
-  if StringHas(ID, 'DIG MEMORY F') then
-  begin
-    TempValue := 111;
-    TempModeType := Digital;
-  end;
+     end;
+   }
+end;
 
-  if StringHas(ID, 'DIG MEMORY ALTF') then
-  begin
-    TempValue := 135;
-    TempModeType := Digital;
-  end;
+procedure UpdateDebugLogLevel; // This is called when changed in the Config dialog
+begin
+   case logLevels of
+      llNone: logger.Level := Off;
+      llFatal: logger.level := Fatal;
+      llError: logger.Level := Error;
+      llWarn: logger.Level := Warn;
+      llDebug: logger.Level := Debug;
+      llTrace: logger.Level := Trace;
+      else ;
+   end;
 
-  if StringHas(ID, 'DIG MEMORY CONTROLF') then
-  begin
-    TempValue := 123;
-    TempModeType := Digital;
-  end;
-
-  if TempValue > 0 then
-  begin
-    Result := True;
-    if TempValue = 111 then ID := PostcedingString(ID, 'MEMORY F');
-    if TempValue = 123 then ID := PostcedingString(ID, 'CONTROLF');
-    if TempValue = 135 then ID := PostcedingString(ID, 'ALTF');
-
-    if StringIsAllNumbers(ID) then
-    begin
-      TempLongInt := StrToInt(ID);
-      if (TempLongInt > 0) and (TempLongInt < 13) then
-      begin
-        if CQMessage then
-          SetCQMemoryString(TempModeType, CHR(TempValue + TempLongInt), CMD)
-        else
-          SetEXMemoryString(TempModeType, CHR(TempValue + TempLongInt), CMD);
-        Exit;
-      end;
-    end
-    else
-      if StringHas(ID, ' CAPTION') then
-      begin
-
-        TempLongInt := StrToInt(Copy(ID, 1, pos(' CAPTION', ID)));
-        if (TempLongInt > 0) and (TempLongInt < 13) then
-        begin
-          if CQMessage then
-            SetCQCaptionMemoryString(TempModeType, CHR(TempValue + TempLongInt), CMD)
-          else
-            SetEXCaptionMemoryString(TempModeType, CHR(TempValue + TempLongInt), CMD);
-          Exit;
-        end;
-      end;
-
-  end;
-}
 end;
 
 procedure ProcessTotalScoreMessage(ID, CMD: ShortString);
 begin
-{
-  if NumberTotalScoreMessages < 10 then
-  begin
-    Val(CMD, TotalScoreMessages[NumberTotalScoreMessages].Score, Result1);
-    ReadLn(ConfigFileRead, TotalScoreMessages[NumberTotalScoreMessages].MessageString);
-    inc(NumberTotalScoreMessages);
-  end
-  else
-    ShowMessage(TC_TOOMANYTOTALSCOREMESSAGES);
-}
+   {
+     if NumberTotalScoreMessages < 10 then
+     begin
+       Val(CMD, TotalScoreMessages[NumberTotalScoreMessages].Score, Result1);
+       ReadLn(ConfigFileRead, TotalScoreMessages[NumberTotalScoreMessages].MessageString);
+       inc(NumberTotalScoreMessages);
+     end
+     else
+       ShowMessage(TC_TOOMANYTOTALSCOREMESSAGES);
+   }
 end;
 
 procedure InitializeStrings;
 
 type
-  IniStringRecord = record
-    isString: PShortString;
-    isPcharString: PChar;
-  end;
+   IniStringRecord = record
+      isString: PShortString;
+      isPcharString: PChar;
+   end;
 const
-  SAS                                   = 16;
-  SA                                    : array[1..SAS] of IniStringRecord =
-    (
-    (isString: @CQPhoneExchange; isPcharString: 'CQEXCHNG.WAV'),
-    (isString: @CQPhoneExchangeNameKnown; isPcharString: 'CQEXNAME.WAV'),
-    (isString: @CorrectedCallMessage; isPcharString: '} OK %'),
-    (isString: @QSOBeforePhoneMessage; isPcharString: 'QSOB4.WAV'),
-    (isString: @QuickQSLPhoneMessage; isPcharString: 'QUICKQSL.WAV'),
-    (isString: @QSLPhoneMessage; isPcharString: 'QSL.WAV'),
-    (isString: @RepeatSearchAndPouncePhoneExchange; isPcharString: 'RPTSPEX.WAV'),
-    (isString: @SearchAndPouncePhoneExchange; isPcharString: 'SAPEXCHG.WAV'),
- //   (isString: @TailEndPhoneMessage; isPcharString: 'TAILEND.WAV'),
-{
-    (isString: @GetScoresSeverPostingAddress; isPcharString: 'http://www.getscores.org/postscore.aspx'),
-    (isString: @GetScoresSeverReadingAddress; isPcharString: 'http://www.getscores.org/'),
-}
-    (isString: @GetScoresSeverPostingAddress; isPcharString: 'http://cqcontest.ru/postscore.jsp'),
-    (isString: @GetScoresSeverReadingAddress; isPcharString: 'http://cqcontest.ru'),
+   SAS = 16;
+   SA: array[1..SAS] of IniStringRecord =
+      (
+      (isString: @CQPhoneExchange; isPcharString: 'CQEXCHNG.WAV'),
+      (isString: @CQPhoneExchangeNameKnown; isPcharString: 'CQEXNAME.WAV'),
+      (isString: @CorrectedCallMessage; isPcharString: '} OK %'),
+      (isString: @QSOBeforePhoneMessage; isPcharString: 'QSOB4.WAV'),
+      (isString: @QuickQSLPhoneMessage; isPcharString: 'QUICKQSL.WAV'),
+      (isString: @QSLPhoneMessage; isPcharString: 'QSL.WAV'),
+      (isString: @RepeatSearchAndPouncePhoneExchange; isPcharString:
+         'RPTSPEX.WAV'),
+      (isString: @SearchAndPouncePhoneExchange; isPcharString: 'SAPEXCHG.WAV'),
+      //   (isString: @TailEndPhoneMessage; isPcharString: 'TAILEND.WAV'),
+     {
+         (isString: @GetScoresSeverPostingAddress; isPcharString: 'http://www.getscores.org/postscore.aspx'),
+         (isString: @GetScoresSeverReadingAddress; isPcharString: 'http://www.getscores.org/'),
+     }
+      (isString: @GetScoresSeverPostingAddress; isPcharString:
+         'http://cqcontest.ru/postscore.jsp'),
+      (isString: @GetScoresSeverReadingAddress; isPcharString:
+         'http://cqcontest.ru'),
 
-    (isString: @UnknownCountryFileName; isPcharString: 'UNKNOWN.CTY'),
+      (isString: @UnknownCountryFileName; isPcharString: 'UNKNOWN.CTY'),
 
-    (isString: @QSLMessage; isPcharString: 'TU \ TEST'),
-    (isString: @QSOBeforeMessage; isPcharString: ' SRI QSO B4 TU \ TEST'),
+      (isString: @QSLMessage; isPcharString: 'TU \ TEST'),
+      (isString: @QSOBeforeMessage; isPcharString: ' SRI QSO B4 TU \ TEST'),
 
-    (isString: @QuickQSLMessage1; isPcharString: 'TU'),
-    (isString: @QuickQSLMessage2; isPcharString: 'TU'), // 4.88.1
-  //  (isString: @TailEndMessage; isPcharString: 'R'),
+      (isString: @QuickQSLMessage1; isPcharString: 'TU'),
+      (isString: @QuickQSLMessage2; isPcharString: 'TU'), // 4.88.1
+      //  (isString: @TailEndMessage; isPcharString: 'R'),
 
-    (isString: @CorrectedCallPhoneMessage; isPcharString: 'CORCALL.WAV')
-    );
+      (isString: @CorrectedCallPhoneMessage; isPcharString: 'CORCALL.WAV')
+      );
 var
-  i                                     : integer;
-  p                                     : pchar;
+   i: integer;
+   p: pchar;
 begin
-  for i := 1 to SAS do
-  begin
-    Windows.lstrcat(PChar(integer(SA[i].isString) + 1), SA[i].isPcharString);
-    SA[i].isString^[0] := Char(lstrlen(SA[i].isPcharString));
-  end;
-  p := 'logback.tr4w';
-  Windows.lstrcat(TR4W_FLOPPY_FILENAME,p);  // 4.56.13
-  Windows.lstrcat(TR4W_INITIALEX_FILENAME, 'INITIAL.EX');
-  Windows.lstrcat(TR4W_MP3PATH, 'MP3');
-  Windows.lstrcat(TR4W_DVKPATH, 'DVK');
+   for i := 1 to SAS do
+      begin
+         Windows.lstrcat(PChar(integer(SA[i].isString) + 1),
+            SA[i].isPcharString);
+         SA[i].isString^[0] := Char(lstrlen(SA[i].isPcharString));
+      end;
+   p := 'logback.tr4w';
+   Windows.lstrcat(TR4W_FLOPPY_FILENAME, p); // 4.56.13
+   Windows.lstrcat(TR4W_INITIALEX_FILENAME, 'INITIAL.EX');
+   Windows.lstrcat(TR4W_MP3PATH, 'MP3');
+   Windows.lstrcat(TR4W_DVKPATH, 'DVK');
 
 end;
 
 end.
-

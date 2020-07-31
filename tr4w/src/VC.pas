@@ -731,6 +731,7 @@ type
   LogRecordKind = (rkQSO, rkQTCR, rkQTCS, rkNote);
   SpotModeType = (NormalSpot, SHDXSpot);
   MesWindowType = (CQMsgWin, ExMsgWin, OtherMsgWin);
+  tLogLevels = (llNone, llFatal, llError, llWarn, llInfo, llDebug, llTrace);
   tCategoryAssisted = (caNONASSISTED, caASSISTED);
   tCategoryBand = (cbALL, cb160M, cb80M, cb40M, cb20M, cb15M, cb10M, cb6M, cb2M, cb222, cb432, cb902, cb12G);
   tCategoryMode = (cmCW, cmRTTY, cmSSB, cmMIXED);
@@ -740,7 +741,8 @@ type
   tCategoryTransmitter = (ctONE, ctTWO, ctLIMITED, ctUNLIMITED, ctSWL);
 
 const
-
+                                            // Use uppercase
+  tLogLevelsSA                          : array[tLogLevels] of PChar = ('NONE' ,'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE');
   tCategoryAssistedSA                   : array[tCategoryAssisted] of PChar = ('NON-ASSISTED', 'ASSISTED');
   tCategoryBandSA                       : array[tCategoryBand] of PChar = ('ALL', '160M', '80M', '40M', '20M', '15M', '10M', '6M', '2M', '222', '432', '902', '1.2G');
   tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'SSB', 'MIXED');
@@ -757,6 +759,7 @@ var
   CategoryOperator                      : tCategoryOperator;
   CategoryPower                         : tCategoryPower;
   CategoryTransmitter                   : tCategoryTransmitter;
+  logLevels                             : tLogLevels;
 type
 
   CFGKind = (ckNormal, ckArray, ckList);
@@ -1053,7 +1056,8 @@ type
     );
   PBandType = ^BandType;
   (* ****** If you add any new non-Data extended modes, please update MainUnit.GetModeFromExtendedMode *)
-  ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB, eData, eCW_R, eData_R, eRTTY_R);
+  ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM,
+                      eMFSK, eJS8, eUSB, eLSB, eData, eCW_R, eData_R, eRTTY_R, eFM_N, eAM_N,eData_FM, eC4FM, eDStar);
 
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
            //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
@@ -1188,7 +1192,12 @@ const
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
   ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
-  ExtendedModeStringArray               : array[ExtendedModeType] of string = ('NoMode', 'CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'LSB', 'DATA', 'CW-R', 'DATA-R', 'RTTY-R');
+
+  
+  ExtendedModeStringArray               : array[ExtendedModeType] of string =
+                                              ('NoMode', 'CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM',
+                                               'MFSK', 'JS8', 'USB', 'LSB', 'DATA', 'CW-R', 'DATA-R', 'RTTY-R', 'FM-N', 'AM-N',
+                                               'DATA-FM', 'C4FM', 'D-STAR');
 
   BandStringsArray                      : array[BandType] of PChar {string} =
     (

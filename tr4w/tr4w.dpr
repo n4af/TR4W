@@ -313,7 +313,8 @@ begin
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
    //appender.Layout := TLogHTMLLayout.Create;
    TLogBasicConfigurator.Configure(appender);
-   TLogLogger.GetRootLogger.Level := Trace;
+   logLevels := llError; // For after we load config so we can set the value.
+   TLogLogger.GetRootLogger.Level := Error;
    logger := TLogLogger.GetLogger('TR4WDebugLog');
    logger.Trace('trace output');
 
@@ -414,6 +415,9 @@ begin
   ReadInConfigFile(cfgCFG);          //n4af 4.31.5
   ReadInConfigFile(cfgCommMes);      //common messages gets precedence - n4af
 
+  UpdateDebugLogLevel;
+
+  
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
 
@@ -559,11 +563,10 @@ begin
   Windows.CopyMemory(@TR4W_LATESTCFG_FILENAME, @TR4W_CFG_FILENAME, SizeOf(FileNameType));
 //  Windows.CharLower(TR4W_LATESTCFG_FILENAME);
   Windows.WritePrivateProfileString(_COMMANDS, LATEST_CONFIG_FILE, TR4W_LATESTCFG_FILENAME, TR4W_INI_FILENAME);
-  QuickDisplay('Warning - This is a Debug version');
 {$IFEND}
 
 {$IF NEWER_DEBUG}
-  QuickDisplay('Warning - This is a Debug version');
+  //QuickDisplay('Warning - This is a Debug version');
 {$IFEND}
   if CPUKeyer.SerialPortDebug then
     ShowMessage('Command SERIAL PORT DEBUG is no longer supported.'#13#10'Use instead Portmon program:'#13#10'http://technet.microsoft.com/sysinternals/bb896644.aspx');

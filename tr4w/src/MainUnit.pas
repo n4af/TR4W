@@ -196,6 +196,7 @@ procedure OpenUrl(url: PChar);
 function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
 function GetContestByADIFName(sADIFName: string): ContestType;
 
+
 {$IF MORSERUNNER}
 function GetMorseRunnerWindow: boolean;
 function EnumMorseRunnerChildProc(wnd: HWND; l: lParam): BOOL; stdcall;
@@ -7703,16 +7704,14 @@ begin
       end;
    end;
 
-//   ExtendedModeType = (eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM, eMFSK, eJS8, eUSB, eLSB);
-
-//  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
 function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
 begin
 //ExtendedModeStringArray               : array[ExtendedModeType] of string = ('CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM', 'MFSK', 'JS8', 'USB', 'SSB');
    case extMode of
       eCW, eCW_R: Result := CW;
-      eSSB, eFM, eAM, eUSB, eLSB:
+      eSSB, eAM, eAM_N, eUSB, eLSB:
          Result := Phone;
+      eFM, eFM_N, eDstar, eC4FM: Result := FM;
       else
          Result := Digital;
       end;
@@ -7956,6 +7955,8 @@ begin
          end;
       end;
 end;
+
+
 
 {
 procedure SelectFileOfFolder(Parent: HWND; FileName: PChar; Mask: PChar; SelectType: CFGType);
