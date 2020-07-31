@@ -1942,75 +1942,79 @@ label
 var
   TempVFO                               : VFOStatusType;
 begin
-  repeat
-    inc(rig.tPollCount);
+   repeat
+      inc(rig.tPollCount);
 
-//    WriteToSerialCATPort('IF;', rig.tCATPortHandle); {information}
-    rig.WritePollRequest('IF;', 3);        // This retreives VFO A (Primary). Get other VFO with OI; command.
-{$IF NOT POLLINGDEBUG}
-    if ((not ReadFromCOMPort(28, rig)) or (PWORD(@rig.tBuf)^ <> $4649)) then begin ClearRadioStatus(rig);
-      goto 1;
-    end;
-{$IFEND}
+      rig.WritePollRequest('IF;', 3);        // This retreives VFO A (Primary). Get other VFO with OI; command.
+      if ((not ReadFromCOMPort(28, rig)) or
+          (PWORD(@rig.tBuf)^ <> $4649))  then
+         begin
+         ClearRadioStatus(rig);
+         goto 1;
+         end;
 
-{$IF POLLINGDEBUG}
-    SetVFOA(rig);
-{$IFEND}
-    GetVFOInfoForYaesuType3(@rig.tBuf, rig.CurrentStatus.VFO[VFOA], rig.FrequencyAdder);
+      GetVFOInfoForYaesuType3(@rig.tBuf, rig.CurrentStatus.VFO[VFOA], rig.FrequencyAdder);
 
-    {opposite band information}
-    //WriteToSerialCATPort('OI;', rig.tCATPortHandle);
-    rig.WritePollRequest('OI;', 3);
 
-{$IF NOT POLLINGDEBUG}
-    if ((not ReadFromCOMPort(28, rig)) or (PWORD(@rig.tBuf)^ <> $494F)) then begin ClearRadioStatus(rig);
-      goto 1;
-    end;
-{$IFEND}
+      rig.WritePollRequest('OI;', 3);       //opposite band information
 
-{$IF POLLINGDEBUG}
-    SetVFOB(rig);
-{$IFEND}
-    GetVFOInfoForYaesuType3(@rig.tBuf, rig.CurrentStatus.VFO[VFOB], rig.FrequencyAdder);
-{
-FR
-FT450  - NO
-FT950  - FUNCTION RX
-FT2000 - FUNCTION RX
-FT9000 - RECEIVER STATUS
-}
-    TempVFO := rig.CurrentStatus.VFO[VFOA];
-    rig^.CurrentStatus.VFOStatus := VFOA;
+      if ((not ReadFromCOMPort(28, rig)) or
+          (PWORD(@rig.tBuf)^ <> $494F))  then
+         begin
+         ClearRadioStatus(rig);
+         goto 1;
+         end;
 
-    if rig.RadioModel in [FT950, FT2000, FTDX9000] then
-    begin
-      {function rx}
-//      WriteToSerialCATPort('FR;', rig.tCATPortHandle);
-      rig.WritePollRequest('FR;', 3);
-{$IF NOT POLLINGDEBUG}
-      if ((not ReadFromCOMPort(4, rig)) or (PWORD(@rig.tBuf)^ <> $5246)) then begin ClearRadioStatus(rig);
-        goto 1;
-      end;
-{$IFEND}
+      GetVFOInfoForYaesuType3(@rig.tBuf, rig.CurrentStatus.VFO[VFOB], rig.FrequencyAdder);
 
-{$IF POLLINGDEBUG}
-      rig.tBuf[3] := '1';
-{$IFEND}
-      if rig.tBuf[3] = '4' then
-      begin
-        TempVFO := rig.CurrentStatus.VFO[VFOB];
-        rig^.CurrentStatus.VFOStatus := VFOB;
-      end
+      TempVFO := rig.CurrentStatus.VFO[VFOA];
+      rig^.CurrentStatus.VFOStatus := VFOA;
+
+
+      rig.WritePollRequest('FT;', 3);        // This retreives which VFO is different, then we are in split.
+      if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $494F) } ) then
+         begin
+         ClearRadioStatus(rig);
+         goto 1;
+         end;
+      if rig.tBuf[3] = '1' then // VFO is the TX
+         begin
+         rig^.CurrentStatus.Split := true;
+         end
+      else if rig.tBuf[3] = '0' then
+         begin
+         rig^.CurrentStatus.Split := false;
+         end
       else
-      begin
-//        TempVFO := rig.CurrentStatus.VFOA;
-//        rig^.CurrentStatus.VFOStatus := vfoA;
-      end;
-    end;
+         begin
+         Logger.Error('Yaesu tBuf after FT; command unexpected result (Split set to false)- ' + rig.tBuf);
+         rig^.CurrentStatus.Split := false;
+         end;
+
+      rig.WritePollRequest('TX;', 3);
+      if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $4649)} ) then
+         begin
+         ClearRadioStatus(rig);
+         goto 1;
+         end;
+      if rig.tBuf[3] in ['1', '2'] then // VFO is the TX
+         begin
+         rig^.CurrentStatus.TXOn := true;
+         end
+      else if rig.tBuf[3] = '0' then
+         begin
+         rig^.CurrentStatus.TXOn := false;
+         end
+      else
+         begin
+         Logger.Error('Yaesu tBuf after TX; command unexpected result (TXOn set to false)- ' + rig.tBuf);
+         rig^.CurrentStatus.TxOn := false;
+         end;
 
     rig.CurrentStatus.Freq := TempVFO.Frequency;
     rig.CurrentStatus.Band := TempVFO.Band;
     rig.CurrentStatus.Mode := TempVFO.Mode;
+    rig.CurrentStatus.ExtendedMode := TempVFO.ExtendedMode;
 //    Windows.SetWindowText(tr4whandle, inttopchar(integer(rig.CurrentStatus.Mode)));
     rig.CurrentStatus.RITFreq := TempVFO.RITFreq;
     rig.CurrentStatus.RIT := TempVFO.RIT;
@@ -2632,7 +2636,8 @@ end;
 // Issue 218 added this procedure NY4I
 procedure GetVFOInfoForYaesuType3(buf: PChar; var VFO: VFOStatusType; FrequencyAdder: integer);
 var
-  TempMode                              : ModeType;
+  TempMode: ModeType;
+  TempExtendedMode: ExtendedModeType;
 begin
   TempMode := NoMode;
   VFO.Frequency := BufferToInt(buf, 6, 9) + FrequencyAdder;   // 9 bytes on this radio
@@ -2641,23 +2646,71 @@ begin
   VFO.RIT := buf[20 - 1] = '1';
   VFO.XIT := buf[21 - 1] = '1';
   case buf[22 - 1] of
-    '1': TempMode := Phone;
-    '2': TempMode := Phone;
-    '3': TempMode := CW;
-    '4': TempMode := FM;
-    '5': TempMode := Phone;
-    '6': TempMode := Digital;
-    '7': TempMode := CW;
-    '8': TempMode := Digital;
-    '9': TempMode := Digital;
-    'A': TempMode := Digital;
-    'B': TempMode := FM;
-    'C': TempMode := Digital;
-    'D': TempMode := Phone;
-    'E': TempMode := Phone;
+    '1': begin
+         TempMode := Phone;
+         tempExtendedMode := eLSB;
+         end;
+    '2': begin
+         TempMode := Phone;
+         tempExtendedMode := eUSB;
+         end;
+    '3': begin
+         TempMode := CW;
+         tempExtendedMode := eCW;
+         end;
+    '4': begin
+         TempMode := FM;
+         tempExtendedMode := eFM;
+         end;
+    '5': begin
+         TempMode := Phone;
+         tempExtendedMode := eAM;
+         end;
+    '6': begin
+         TempMode := Digital;
+         tempExtendedMode := eRTTY_R;
+         end;
+    '7': begin
+         TempMode := CW;
+         tempExtendedMode := eCW_R;
+         end;
+    '8': begin
+         TempMode := Digital;
+         tempExtendedMode := eDATA_R;
+         end;
+    '9': begin
+         TempMode := Digital;
+         tempExtendedMode := eRTTY;
+         end;
+    'A': begin
+         TempMode := Digital;
+         tempExtendedMode := eDATA_FM;
+         end;
+    'B': begin
+         TempMode := FM;
+         tempExtendedMode := eFM_N;
+         end;
+    'C': begin
+         TempMode := Digital;
+         tempExtendedMode := eData;
+         end;
+    'D': begin
+         TempMode := Phone;
+         tempExtendedMode := eAM_N;
+         end;
+    'E': begin
+         TempMode := FM;
+         tempExtendedMode := eC4FM;
+         end;
+    else
+         begin
+         logger.Error('Unknown mode value for FT891/991 ' + buf[22 - 1]);
+         tempExtendedMode := eNoMode;
+         end;
 
   end;
   VFO.Mode := TempMode;
+  VFO.ExtendedMode := tempExtendedMode;
 
 end;
 //------
