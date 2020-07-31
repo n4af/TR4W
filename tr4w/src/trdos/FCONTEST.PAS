@@ -532,6 +532,12 @@ begin
  //    BWQP:
    //   ActiveExchange := RSTPowerExchange;
 
+    BATAVIA_FT8:
+      begin
+      DigitalModeEnable := true;
+      QSOByMode := False;
+      QSOByBand := True;
+      end;
     CALQSOPARTY:
       begin
 //        if PWORD(@MyState[1])^ = $4143 {CA} then

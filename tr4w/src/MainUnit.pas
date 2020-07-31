@@ -4281,8 +4281,9 @@ end;
 
 procedure showint(Num: integer);
 begin
-  Format(wsprintfBuffer, '%i', Num);
-  ShowMessage(wsprintfBuffer);
+  logger.Error(IntToStr(Num));
+  //Format(wsprintfBuffer, '%i', Num);
+  //ShowMessage(wsprintfBuffer);
 end;
 
 procedure ShowMessageParent(Text: PChar; Parent: HWND);
