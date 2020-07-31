@@ -3908,12 +3908,7 @@ begin
   end;
 
  
- {  if not Switch then
-   begin
-   Switch := True;    // n4af 4.44.7
-   FirstQSO := Windows.GetTickCount;
-   end;
-   }
+ 
   RData.Band := Band;
   RData.Mode := Mode;
   RData.NumberSent := TotalContacts + 1;
