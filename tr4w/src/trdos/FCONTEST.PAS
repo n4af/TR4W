@@ -1429,6 +1429,12 @@ begin
     INITIALEXCHANGEOVERWRITE := TRUE;
    end;
 
+   WWDIGI:
+      begin
+      DigitalModeEnable := true;
+      QSOByMode := False;
+      QSOByBand := True;
+      end;
 
   end;
 

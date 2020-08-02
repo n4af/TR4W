@@ -310,9 +310,9 @@ begin
                Unpack(AData,index,DECall);
                Unpack(AData,index,DEGrid);
                Unpack(AData,index,DXGrid);
-               if logger.IsDebugEnabled then
+               if logger.IsTraceEnabled then
                   begin
-                  logger.debug('WSJTX Status>>> Frequency: ' + IntToStr(frequency) + ' Mode: ' + mode + ' DX Call: ' + DXCall
+                  logger.trace('WSJTX Status>>> Frequency: ' + IntToStr(frequency) + ' Mode: ' + mode + ' DX Call: ' + DXCall
                                     + ' Report: ' + report + ' TX Mode: ' + TXMode + ' TX Enabled: ' + BooleanToStr(TXEnabled)
                                     + ' Transmitting: ' + BooleanToStr(transmitting) + ' Decoding: ' + BooleanToStr(Decoding)
                                     + ' RXDF: ' + intToStr(RXDF) + ' TXDF: ' + intToStr(TXDF) + ' DECall: ' + DECall + ' DEGrid: ' + DEGrid
@@ -320,6 +320,7 @@ begin
                   end;
                if transmitting then
                   begin
+                  logger.debug('Calling station ' + DXCall + ' TotalContacts = ' + IntToStr(TotalContacts));
                   PutCalltoCallWindow(DXCall);
                   DisplayBeamHeading(DXCall,DXGrid);
                   end;
@@ -380,12 +381,12 @@ begin
 
                            if  VisibleLog.CallIsADupe(call, TempBand, TempMode) then
                               begin
-                              DEBUGMSG(DXCall + ' is a DUPE');
+                              logger.trace(DXCall + ' is a DUPE');
                               HighLightCall(message,1,id);
                               end
                            else if VisibleLog.DetermineIfNewMult(call, TempBand, TempMode) then
                               begin
-                              DEBUGMSG(DXCall + ' is a MULT');
+                              logger.trace(DXCall + ' is a MULT');
                               HighLightCall(message,2, id); // Pass back id as given to us
                               end;
                           end;
@@ -604,7 +605,7 @@ begin
    Pack(AData,true);        // Highlight last only
 
 
-   DEBUGMSG('Sending command to highlight ' + Trim(sCall));
+   logger.trace('Sending command to highlight ' + Trim(sCall));
 
    udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
 
@@ -677,7 +678,7 @@ begin
    Pack(AData,true);        // Highlight last only
 
 
-   DEBUGMSG('Sending Reset Colors');
+   logger.trace('Sending Reset Colors');
 
    udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
 
@@ -791,7 +792,7 @@ begin
             end
          else
             begin
-            DEBUGMSG('TXKludge is true');
+            logger.trace('TXKludge is true');
             end;
          end;
 
@@ -803,7 +804,7 @@ begin
             end
          else
             begin
-            DEBUGMSG('RXKludge is true');
+            logger.trace('RXKludge is true');
             end;
          end;
 
@@ -812,8 +813,8 @@ begin
          if (ActiveRadioPtr.RadioModel = NoInterfacedRadio) or
             (radio1.CurrentStatus.VFO[VFOA].Frequency = 0) then
             begin
-            DEBUGMSG('**** radio1.CurrentStatus.VFO[VFOA].Frequency = 0');
-            Display('client','Sending VFOA frequency as .000');
+            logger.error('**** radio1.CurrentStatus.VFO[VFOA].Frequency = 0');
+            logger.trace('Sending VFOA frequency as .000');
             AContext.Connection.IOHandler.Write('<CmdFreq:4>.000');
             end
          else
@@ -878,12 +879,12 @@ begin
          if ActiveRadioPtr.CurrentStatus.Split then
             begin
             AContext.Connection.IOHandler.Write('<CmdSplit:2>ON');
-            DEBUGMSG('Sending ' + '<CmdSplit:2>ON');
+            logger.trace('Sending ' + '<CmdSplit:2>ON');
             end
          else
             begin
             AContext.Connection.IOHandler.Write('<CmdSplit:3>OFF');
-            DEBUGMSG('Sending ' + '<CmdSplit:3>OFF');
+            logger.trace('Sending ' + '<CmdSplit:3>OFF');
             end;
          end
       else if fieldValue = 'CmdRX' then     // No reply
@@ -980,8 +981,8 @@ begin
             (ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency = 0) then
             begin
             //DEBUGMSG('**** radio1.CurrentStatus.VFO[VFOB].Frequency = 0');
-            DEBUGMSG('       ActiveRadioPtr.CurrentStatus.VFO[VFOB] = ' + SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency/1000));
-            DEBUGMSG('Sending VFOB frequency as requestedTXFreq since we do not have frequency [' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]) + ']');
+            logger.error('       ActiveRadioPtr.CurrentStatus.VFO[VFOB] = ' + SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency/1000));
+            logger.trace('Sending VFOB frequency as requestedTXFreq since we do not have frequency [' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]) + ']');
             sFreq := SysUtils.FormatFloat(',0.000',Self.requestedTXFreq/1000);
             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdTXFreq:%u>%s',[length(sFreq),sFreq]));
             end

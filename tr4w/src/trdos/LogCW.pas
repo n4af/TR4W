@@ -382,12 +382,14 @@ procedure FlushCWBuffer;
 
 begin
 //  CPUKeyer.PTTUnForce;
+  if ActiveRadioPtr.CurrentStatus.Mode = CW then
   if IsCWByCATActive(ActiveRadioPtr) then
      begin
      DebugMsg('Flushing CWBuffer - Stop Sending on ActiveRadio CWBC');
      ActiveRadioPtr.CWByCATBuffer := '';
      ActiveRadioPtr.StopSendingCW;
      end;
+  if InactiveRadioPtr.CurrentStatus.Mode = CW then
   if IsCWByCATActive(InactiveRadioPtr) then
      begin
      DebugMsg('Flushing CWBuffer - Stop Sending on InactiveRadio CWBC');

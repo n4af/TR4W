@@ -937,7 +937,8 @@ type
     PAQSOPARTY,  // 4.74.3
     INQSOPARTY,  // 4.88.2
     OKOMSSB,    // 4.80.1
-    BATAVIA_FT8 // 4.90.11
+    BATAVIA_FT8, // 4.90.11
+    WWDIGI
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -3283,7 +3284,9 @@ QSOPartiesCount = 15;
  ({Name: 'PA QSO PARTY';               }Email: nil;                      DF: 'pa_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 14; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'PA-QSO-PARTY';   CABName:''),     // 4.74.3
  ({Name: 'IN QSO PARTY';               }Email: nil;                      DF: 'in_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 15; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN-QSO-PARTY';   CABName:''),     // 4.88.2
  ({Name: 'OK-OM SSB';                  }Email: nil;                      DF: 'okom';              WA7BNM:  185; {SK3BG: 'okomdxc';    } QRZRUID: 12  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:CQDXCC; QP:OKOMSSBQSOPointMethod; ADIFName:'';   CABName:''),     // 4.80.1
- ({Name: 'BATAVIA-FT8';                }Email: nil;                      DF: nil;                 WA7BNM:  10686;                       QRZRUID: 0   ; Pxm: Prefix;        ZnM: NoZoneMults; AIE: GridInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAndOrGridExchange;                        XM:CQDXCC; QP:YBFT8QP; ADIFName:'';   CABName:'BATAVIA')    // 4.90.11
+ ({Name: 'BATAVIA-FT8';                }Email: nil;                      DF: nil;                 WA7BNM:  10686;                       QRZRUID: 0   ; Pxm: Prefix;        ZnM: NoZoneMults; AIE: GridInitialExchange; DM: NoDomesticMults; P: 0; AE: GridExchange;                           XM:CQDXCC; QP:YBFT8QP; ADIFName:'';   CABName:'BATAVIA'),    // 4.90.11
+ ({Name: 'WWDIGI';                     }Email: nil;                      DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: NoDomesticMults; P: 0; AE: GridExchange;                           XM:CQDXCC; QP:WWDIGIQP; ADIFName:'';   CABName:'WW-DIGI')    // 4.90.11
+
       );
 
  //({Name: 'CQ-WPX-CW';                  }Email: 'cw@cqwpx.com';           DF: nil;                 WA7BNM:   29; {SK3BG: nil;          } QRZRUID: 18  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:CQWPXQSOPointMethod; ADIFName:'';   CABName:''),
@@ -3457,7 +3460,8 @@ QSOPartiesCount = 15;
       'PA QSO PARTY',  // 4.74.3
       'IN QSO PARTY', // 4.88.2
       'OK-OM DX SSB',       // 4.80.1
-      'BATAVIA-FT8'    // 4.90.11
+      'BATAVIA-FT8',    // 4.90.11
+      'WWDIGI'
      );
 
   const
@@ -3669,7 +3673,9 @@ QSOPartiesCount = 15;
       ({Name: 'PA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),       // 4.74.3
       ({Name: 'IN QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),     // 4.88.2
       ({Name: 'OK-OM SSB';                  }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'BATAVIA-FT8';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0)         // 4.80.1
+      ({Name: 'BATAVIA-FT8';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
+      ({Name: 'WW-DIGI';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0)
+
       );
 
 

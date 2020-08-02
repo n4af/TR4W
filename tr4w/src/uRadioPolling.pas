@@ -2215,6 +2215,7 @@ procedure ProcessFilteredStatus(rig: RadioPtr);
 var
   dif                                   : integer;
 begin
+   if rig.CurrentStatus.Mode = CW then
    if IsCWByCATActive(rig) then
        begin
        if not rig.FilteredStatus.TXOn then
@@ -2799,6 +2800,7 @@ begin
      end
   else      //n4af 04.30.3
      begin
+     if ActiveRadioPtr.CurrentStatus.Mode = CW then
      if IsCWByCATActive then
         begin
         ActiveRadioPtr.CWByCAT_Sending := false; // If we were sending but the PTT goes off, now reset this.
