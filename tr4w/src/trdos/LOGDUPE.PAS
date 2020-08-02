@@ -2347,6 +2347,7 @@ begin
   RXData.Callsign := GetLogEntryCall(LogEntry);
   RXData.Band := GetLogEntryBand(LogEntry);
   RXData.Mode := GetLogEntryMode(LogEntry);
+  SetExtendedModeFromMode(RXData);
   RXData.QSOPoints := GetLogEntryQSOPoints(LogEntry);
   //  RXData.Date := GetLogEntryDateString(LogEntry);
   //  RXData.Time := GetLogEntryIntegerTime(LogEntry);

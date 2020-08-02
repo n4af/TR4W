@@ -3126,11 +3126,6 @@ begin
         scLASTCQFREQ;
       end;
 
-//    FootSwitchNextBandMap: GoToNextBandMapFrequency;
-//    FootSwitchNextMultBandMap: GoToNextMultBandMapFrequency;
-//    FootSwitchNextDisplayedBandMap: GoToNextDisplayedBandMapFrequency;
-//    FootSwitchNextMultDisplayedBandMap: GoToNextMultDisplayedBandMapFrequency;
-
     FootSwitchUpdateBandMapBlinkingCall: UpdateBlinkingBandMapCall;
 
     FootSwitchDupecheck: DupeCheckOnInactiveRadio(False);

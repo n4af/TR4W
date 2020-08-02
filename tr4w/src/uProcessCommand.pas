@@ -372,72 +372,8 @@ begin
               //        UpdateTotals2;
               //        Sheet.ClearDupeSheet;
       end;
- {
-      RunningConfigFile := False;
-    end;
-
-
-    if CommandString = 'NEXTBANDMAP' then
-    begin
-      if not CommandUseInactiveRadio then
-        CallWindowString := '';
-
-      GoToNextBandMapFrequency;
-
-      if not CommandUseInactiveRadio then //KK1L: 6.73 applies to active radio only
-        CWMessageCommand := CWCommandSAPMode; //KK1L: 6.68 Takes you to S&P mode when surfing band map
-    end;
-
-      //KK1L: 6.64 finds next entry from displayed bandmap rather than just current band/mode
-    if CommandString = 'NEXTDISPLAYEDBANDMAP' then
-    begin
-      if not CommandUseInactiveRadio then
-        CallWindowString := '';
-
-      GoToNextDisplayedBandMapFrequency;
-
-      if not CommandUseInactiveRadio then
-        CWMessageCommand := CWCommandSAPMode;
-    end;
-
-    if CommandString = 'NEXTMULTBANDMAP' then
-    begin
-      if not CommandUseInactiveRadio then
-        CallWindowString := '';
-
-      GoToNextMultBandMapFrequency;
-
-      if not CommandUseInactiveRadio then
-        CWMessageCommand := CWCommandSAPMode;
-    end;
-
-    if CommandString = 'NEXTMULTDISPLAYEDBANDMAP' then
-    begin
-      if not CommandUseInactiveRadio then
-        CallWindowString := '';
-
-      GoToNextMultDisplayedBandMapFrequency;
-
-      if not CommandUseInactiveRadio then
-        CWMessageCommand := CWCommandSAPMode;
-    end;
- 
- }
-//    if CommandString = 'LASTCQFREQ' then
-//    begin
-//      if not CommandUseInactiveRadio then {KK1L: 6.73 applies to active radio only}
-//        CallWindowString := ''; {KK1L: 6.69 clears callwindow}
-
-//      if not CommandUseInactiveRadio then {KK1L: 6.73 applies to active radio only}
-//        CWMessageCommand := CWCommandCQMode; {KK1L: 6.68 Takes you to CQ mode when returning to CQ freq}
-//    end;
-
-      //{WLI}         IF CommandString = 'LOGLASTCALL'    THEN LogLastCall;
 
     if CommandString = 'QSY' then CWMessageCommand := CWCommandQSY;
-
-//    if CommandString = 'SAPMODE' then CWMessageCommand := CWCommandSAPMode;
-//    if CommandString = 'CQMODE' then CWMessageCommand := CWCommandCQMode;
 
     if Copy(CommandString, 1, 5) = 'SPEED' then
     begin

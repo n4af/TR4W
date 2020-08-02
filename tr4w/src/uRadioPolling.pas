@@ -51,8 +51,6 @@ type
 
 function ReadFromSerialPort(BytesToRead: Cardinal; rig: RadioPtr): boolean;
 function ReadFromCOMPort(b: Cardinal; rig: RadioPtr): boolean;
-//function ReadFromCOMPortOnEvent(b: Cardinal; rig: RadioPtr): boolean;
-procedure pKenwood(rig: RadioPtr);
 procedure pKenwood2(rig: RadioPtr);
 procedure pKenwoodNew(rig: RadioPtr);
 procedure pFT990_FT1000(rig: RadioPtr);
@@ -201,14 +199,7 @@ begin
                         //DEBUGMSG('polling IF ' + AnsiLeftStr(rig^.tBuf,40));
                         rig^.CurrentStatus.Freq := BufferToInt(@rig^.tBuf[i - 37], 3, 11);
                         CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
-                        {case rig^.tBuf[i - 8] of
-                          '4': rig^.CurrentStatus.Mode := FM;
-                          '1', '2', '5': rig^.CurrentStatus.Mode := Phone;
-                          '6', '9': rig^.CurrentStatus.Mode := Digital;
-                          '3', '7', '8': rig^.CurrentStatus.Mode := CW;
-                        end;
-                        }
-       //DEBUGMSG('In Kenwood2, mode = ' + rig^.tBuf[i - 8]);
+
        case rig^.tBuf[i - 8] of
       '1': begin
            rig^.CurrentStatus.ExtendedMode := eLSB;
@@ -423,11 +414,40 @@ begin
                 begin
                   CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
                   case rig.tBuf[i + 4] of
-                    '0', '1', '4': rig^.CurrentStatus.Mode := Phone;
-                    '2', '3': rig^.CurrentStatus.Mode := CW;
-                    '5': rig^.CurrentStatus.Mode := FM;
-                    '6': rig^.CurrentStatus.Mode := Digital;
-                  end;
+                     '0':  begin
+                           rig^.CurrentStatus.Mode := Phone;
+                           rig^.CurrentStatus.ExtendedMode := eUSB;
+                           end;
+                     '1':  begin
+                           rig^.CurrentStatus.Mode := Phone;
+                           rig^.CurrentStatus.ExtendedMode := eLSB;
+                           end;
+                     '2':  begin
+                           rig^.CurrentStatus.Mode := CW;
+                           rig^.CurrentStatus.ExtendedMode := eCW;
+                           end;
+                     '3':  begin
+                           rig^.CurrentStatus.Mode := CW;
+                           rig^.CurrentStatus.ExtendedMode := eCW_R;
+                           end;
+                     '4':  begin
+                           rig^.CurrentStatus.Mode := Phone;
+                           rig^.CurrentStatus.ExtendedMode := eAM;
+                           end;
+                     '5':  begin
+                           rig^.CurrentStatus.Mode := FM;
+                           rig^.CurrentStatus.ExtendedMode := eFM;
+                           end;
+                     '6':  begin
+                           rig^.CurrentStatus.Mode := Digital;
+                           rig^.CurrentStatus.ExtendedMode := eRTTY;
+                           end;
+                     else
+                           begin
+                           logger.Warn('Invalid mode character from Orion = ' + rig.tBuf[i + 4]);
+                           end;
+                     end;
+
                 end;
             end;
           end;
@@ -518,14 +538,41 @@ begin
       goto 1;
     end;
 //    Windows.ZeroMemory(@rig^.tBuf, 512); Windows.lstrcat(@rig^.tBuf, '@RMM2');
-
     case rig.tBuf[5] of
-      '0', '1', '4': TempMode := Phone;
-      '2', '3': TempMode := CW;
-      '5': TempMode := FM;
-      '6': TempMode := Digital;
-    end;
-    rig^.CurrentStatus.Mode := TempMode;
+       '0':  begin
+             rig^.CurrentStatus.Mode := Phone;
+             rig^.CurrentStatus.ExtendedMode := eUSB;
+             end;
+       '1':  begin
+             rig^.CurrentStatus.Mode := Phone;
+             rig^.CurrentStatus.ExtendedMode := eLSB;
+             end;
+       '2':  begin
+             rig^.CurrentStatus.Mode := CW;
+             rig^.CurrentStatus.ExtendedMode := eCW;
+             end;
+        '3':  begin
+              rig^.CurrentStatus.Mode := CW;
+              rig^.CurrentStatus.ExtendedMode := eCW_R;
+              end;
+        '4':  begin
+              rig^.CurrentStatus.Mode := Phone;
+              rig^.CurrentStatus.ExtendedMode := eAM;
+              end;
+        '5':  begin
+              rig^.CurrentStatus.Mode := FM;
+              rig^.CurrentStatus.ExtendedMode := eFM;
+              end;
+        '6':  begin
+              rig^.CurrentStatus.Mode := Digital;
+              rig^.CurrentStatus.ExtendedMode := eRTTY;
+              end;
+        else
+              begin
+              logger.Warn('Invalid mode character from Orion = ' + rig.tBuf[5]);
+              end;
+        end;
+
 
     1:
     UpdateStatus(rig);
@@ -568,12 +615,6 @@ begin
       if rig.CurrentStatus.Freq = rig.PreviousStatus.Freq then Sleep(200);
 
       CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
-      case rig^.tBuf[30] of
-        '4': rig^.CurrentStatus.Mode := FM;
-        '1', '2', '5': rig^.CurrentStatus.Mode := Phone;
-        '6', '9': rig^.CurrentStatus.Mode := Digital;
-        '3', '7', '8': rig^.CurrentStatus.Mode := CW;
-      end;
 
       // Set the extendedMode based on the actual mode ny4i
       case rig^.tBuf[30] of
@@ -633,6 +674,7 @@ begin
 
       rig.CurrentStatus.VFO[rig.CurrentStatus.VFOStatus].Frequency := rig.CurrentStatus.Freq;
       rig.CurrentStatus.VFO[rig.CurrentStatus.VFOStatus].Mode := rig.CurrentStatus.Mode;
+      rig.CurrentStatus.VFO[rig.CurrentStatus.VFOStatus].ExtendedMode := rig.CurrentStatus.ExtendedMode;
       dec(Step);
     end;
   end;
@@ -653,103 +695,6 @@ begin
   goto NextPoll;
 end;
 
-procedure pKenwood(rig: RadioPtr);
-var
-  PollSecVFO                            : Cardinal;
-  ActiveVFO_is_A                        : boolean;
-  TempCardinal                          : Cardinal;
-//  TempMode                              : ModeType;
-label
-  DontPollSecondVfos, NextPoll;
-
-begin
-  PollSecVFO := 0; // Initialize ny4i Issue 116
-  repeat
-    NextPoll:
-    Sleep(FreqPollRate);
-    inc(rig^.tPollCount);
-    inc(PollSecVFO);
-//    if not rig.WritePollRequest('IF;', 3) then goto DontPollSecondVfos;
-//    if not rig.WritePollRequest('IF;', 3) then goto NextPoll;
-    rig.WritePollRequest('IF;', 3);
-
-    if not ReadFromCOMPort(38, rig) then
-    begin
-      ClearRadioStatus(rig);
-      PollSecVFO := 0;
-      goto DontPollSecondVfos;
-    end;
-
-    if rig^.tBuf[1] = 'I' then
-    begin
-//IF00028017660     -003000 18<0-tx/rx>30000   ;
-      rig^.CurrentStatus.TXOn := rig^.tBuf[29] = '1';
-//      Windows.SetWindowText(tr4whandle, inttopchar(integer(rig^.CurrentStatus.TXOn)));
-      rig^.CurrentStatus.Freq := BufferToInt(@rig^.tBuf, 3, 11);
-
-      if rig^.tBuf[31] = '0' then
-      begin
-        rig^.CurrentStatus.VFO[VFOA].Frequency := rig^.CurrentStatus.Freq;
-        ActiveVFO_is_A := True;
-        rig^.CurrentStatus.VFOStatus := VFOA;
-      end
-      else
-      begin
-        rig^.CurrentStatus.VFO[VFOB].Frequency := rig^.CurrentStatus.Freq;
-        ActiveVFO_is_A := False;
-        rig^.CurrentStatus.VFOStatus := VFOB;
-      end;
-
-      rig^.CurrentStatus.Freq := rig^.CurrentStatus.Freq + rig^.FrequencyAdder;
-      rig^.CurrentStatus.RITFreq := BufferToInt(@rig^.tBuf, 19, 5);
-
-      CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
-
-      case rig^.tBuf[30] of
-        '4': rig^.CurrentStatus.Mode := FM;
-        '1', '2', '5': rig^.CurrentStatus.Mode := Phone;
-        '6', '9': rig^.CurrentStatus.Mode := Digital;
-        '3', '7', '8': rig^.CurrentStatus.Mode := CW;
-      end;
-
-      rig^.CurrentStatus.Split := rig^.tBuf[33] <> '0';
-      rig^.CurrentStatus.RIT := rig^.tBuf[24] = '1';
-      rig^.CurrentStatus.XIT := rig^.tBuf[25] = '1';
-{
-      if rig.tRadioInterfaceWndHandle <> 0 then
-      begin
-        rig.WritePollRequest('SM;', 3);
-        if ReadFromCOMPort(7, rig) then
-        begin
-
-          Windows.SendDlgItemMessage(rig.tRadioInterfaceWndHandle, 111, PBM_SETPOS, ((Ord(rig.tBuf[5]) - Ord('0')) * 10 + Ord(rig.tBuf[6]) - Ord('0')) * 3, 0);          Windows.SetWindowText(wh[mweInsert], @rig.tBuf);
-        end;
-      end;
-}
-      if PollSecVFO < 10 then goto DontPollSecondVfos;
-
-      if ActiveVFO_is_A = True then
-        rig.WritePollRequest('FB;', 3)
-      else
-        rig.WritePollRequest('FA;', 3);
-
-      if ReadFromCOMPort(14, rig) then
-        if rig^.tBuf[14] = ';' then
-        begin
-          TempCardinal := BufferToInt(@rig^.tBuf, 3, 11);
-          if ActiveVFO_is_A = True then
-            rig^.CurrentStatus.VFO[VFOB].Frequency := TempCardinal
-          else
-            rig^.CurrentStatus.VFO[VFOA].Frequency := TempCardinal
-        end;
-    end;
-
-    PollSecVFO := 0;
-    DontPollSecondVfos:
-    UpdateStatus(rig);
-  until rig^.tPollCount < 0;
-
-end;
 
 procedure pFT990_FT1000(rig: RadioPtr);
 label
@@ -965,6 +910,7 @@ begin
     end;
     rig.CurrentStatus.VFO[VFOA].Frequency := rig.CurrentStatus.Freq;
     rig.CurrentStatus.VFO[VFOA].Mode := rig.CurrentStatus.Mode;
+    rig.CurrentStatus.VFO[VFOA].ExtendedMode := rig.CurrentStatus.ExtendedMode;
     rig.CurrentStatus.VFO[VFOA].Band := rig.CurrentStatus.Band;
 
     with rig.CurrentStatus.VFO[VFOB] do
@@ -1697,10 +1643,34 @@ begin
       CalculateBandMode(Freq, Band, Mode);
 
       case (Ord(rig.tBuf[8]) and $07) of
-        0, 1, 3: Mode := Phone;
-        2: Mode := CW;
-        4: Mode := FM;
-        5, 6: Mode := Digital;
+         0: begin
+            Mode := Phone;
+            ExtendedMode := eLSB;
+            end;
+         1: begin
+            Mode := Phone;
+            ExtendedMode := eUSB;
+            end;
+         2: begin
+            Mode := CW;
+            ExtendedMode := eCW;
+            end;
+         3: begin
+            Mode := Phone;
+            ExtendedMode := eAM;
+            end;
+         4: begin
+            Mode := FM;
+            ExtendedMode := eFM;
+            end;
+         5: begin
+            Mode := Digital;
+            ExtendedMode := eRTTY;
+            end;
+         6: begin
+            Mode := Digital;
+            ExtendedMode := eData;
+            end;
       end;
     end;
 

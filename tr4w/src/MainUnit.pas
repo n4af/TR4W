@@ -195,6 +195,7 @@ procedure RunOptionsDialog(f: CFGFunc);
 procedure OpenUrl(url: PChar);
 function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
 function GetContestByADIFName(sADIFName: string): ContestType;
+procedure SetExtendedModeFromMode (RData: ContestExchange);
 
 
 {$IF MORSERUNNER}
@@ -1256,18 +1257,8 @@ begin
    //                Write (' DUPE!!');
     EscapeDeletedCallEntry := CallWindowString;
 
-    if QTCsEnabled then DisplayQTCNumber(NumberQTCsThisStation(StandardCallFormat(CallWindowString, False)))
-    else
-    begin
-          {                    MarkTime (RememberTime);
-          {                    REPEAT
-                                  IF ActiveMultiPort <> NoPort THEN CheckMultiState;
-                                  UpdateTimeAndRateDisplays (True, True);
-                                  Packet.CheckPacket;
-                              UNTIL ElaspedSec100 (RememberTime) >= 30;
-          }
-
-    end;
+    if QTCsEnabled then
+       DisplayQTCNumber(NumberQTCsThisStation(StandardCallFormat(CallWindowString, False)))
   end;
 
   CallAlreadySent := False;
@@ -3871,6 +3862,7 @@ begin
     begin
     RData.Band := Band;
     RData.Mode := Mode;
+    SetExtendedModeFromMode(RData);
     RData.NumberSent := TotalContacts + 1;
     RData.Frequency := Freq;
 
@@ -3914,6 +3906,7 @@ begin
  
   RData.Band := Band;
   RData.Mode := Mode;
+  SetExtendedModeFromMode(RData);
   RData.NumberSent := TotalContacts + 1;
   RData.Frequency := Freq;
 
@@ -5530,6 +5523,7 @@ begin
     TempRXData.Band := Band40;
     TempRXData.Band := BandType(Random(6));
     TempRXData.Mode := ModeType(Random(2));
+    SetExtendedModeFromMode(TempRXData);
     TempRXData.Callsign := CD.GetRandomCall;
     TempRXData.NumberSent := i;
     ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
@@ -5649,6 +5643,7 @@ begin
   CE.ceContest := Contest;
   CE.Band := ActiveBand;
   CE.Mode := ActiveMode;
+  SetExtendedModeFromMode(CE);
   tGetQSOSystemTime(CE.tSysTime);
   CE.ceOperator := CurrentOperator;
 
@@ -7954,6 +7949,31 @@ begin
          end;
       end;
 end;
+
+
+procedure SetExtendedModeFromMode (RData: ContestExchange);
+   begin
+   if RData.ExtMode = eNoMode then
+       begin
+       if RData.Mode = PHONE then
+          begin
+          RData.ExtMode := eSSB;
+          end
+       else if RData.Mode = CW then
+          begin
+          RData.ExtMode := eCW;
+          end
+       else if RData.Mode = Digital then
+          begin
+          RData.ExtMode := eDATA;
+          end
+       else if RData.Mode = FM then
+          begin
+          RData.ExtMode := eFM;
+          end;
+       end;
+
+   end;
 
 
 

@@ -1748,6 +1748,11 @@ begin
       FilteredStatus.Mode := CurrentStatus.Mode;
       end;
 
+      if CurrentStatus.ExtendedMode = PreviousStatus.ExtendedMode then
+      begin
+      FilteredStatus.ExtendedMode := CurrentStatus.ExtendedMode;
+      end;
+
    if CurrentStatus.Band = PreviousStatus.Band then
       begin
       FilteredStatus.Band := CurrentStatus.Band;
@@ -1773,6 +1778,11 @@ begin
       FilteredStatus.VFO[VFOA].Mode := CurrentStatus.VFO[VFOA].Mode;
       end;
 
+   if CurrentStatus.VFO[VFOA].ExtendedMode = PreviousStatus.VFO[VFOA].ExtendedMode then
+      begin
+      FilteredStatus.VFO[VFOA].ExtendedMode := CurrentStatus.VFO[VFOA].ExtendedMode;
+      end;
+
    //   if CurrentStatus.VFOA.TXRX = PreviousStatus.VFOA.TXRX then
    //      FilteredStatus.VFOA.TXRX := CurrentStatus.VFOA.TXRX;
 
@@ -1789,6 +1799,11 @@ begin
    if CurrentStatus.VFO[VFOB].Mode = PreviousStatus.VFO[VFOB].Mode then
       begin
       FilteredStatus.VFO[VFOB].Mode := CurrentStatus.VFO[VFOB].Mode;
+      end;
+
+   if CurrentStatus.VFO[VFOB].ExtendedMode = PreviousStatus.VFO[VFOB].ExtendedMode then
+      begin
+      FilteredStatus.VFO[VFOB].ExtendedMode := CurrentStatus.VFO[VFOB].ExtendedMode;
       end;
 
    //   if CurrentStatus.VFOB.TXRX = PreviousStatus.VFOB.TXRX then

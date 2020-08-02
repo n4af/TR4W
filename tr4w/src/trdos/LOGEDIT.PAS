@@ -613,6 +613,7 @@ begin
   Windows.ZeroMemory(@TempRXData, SizeOf(ContestExchange));
   TempRXData.Band := Band;
   TempRXData.Mode := Mode;
+  SetExtendedModeFromMode(TempRXData);
   TempRXData.QTHString := DomesticMult;
 
   if FoundDomesticQTH(TempRXData) then
