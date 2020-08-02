@@ -444,7 +444,7 @@ begin
                            end;
                      else
                            begin
-                           logger.Warn('Invalid mode character from Orion = ' + rig.tBuf[i + 4]);
+                           logger.Warn('Invalid mode character from Orion3 = ' + rig.tBuf[i + 4]);
                            end;
                      end;
 

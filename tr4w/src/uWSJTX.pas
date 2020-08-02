@@ -321,6 +321,7 @@ begin
                if transmitting then
                   begin
                   PutCalltoCallWindow(DXCall);
+                  DisplayBeamHeading(DXCall,DXGrid);
                   end;
                end;
 

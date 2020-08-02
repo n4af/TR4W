@@ -532,16 +532,7 @@ begin
   // Mode has an extendedMode so grab it and convert it to a modeType and store both
   EditableQSORXData.ExtMode := ExtendedModeType(tCB_GETCURSEL(eq_handle, FLD_MODE));
   EditableQSORXData.Mode := GetModeFromExtendedMode(EditableQSORXData.ExtMode);
-  //EditableQSORXData.Mode := ModeType(tCB_GETCURSEL(eq_handle, FLD_MODE));
-  {
-    if EditableQSORXData.Mode = FM then
-      begin
-        EditableQSORXData.Mode := Phone;
-        EditableQSORXData.ceFMMode := True;
-      end
-    else
-      EditableQSORXData.ceFMMode := False;
-  }
+
     {Frequency}
   lpNumberOfBytesWritten := Windows.GetDlgItemInt(eq_handle, FLD_FREQUENCY, lpTranslated, False);
   //if lpNumberOfBytesWritten < MAXDWORD then
