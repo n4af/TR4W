@@ -1493,6 +1493,8 @@ begin
     SetRadioFreq(ActiveRadio, TempFreq, TempMode, TempVFO);
     tCleareCallWindow;
     Result := True;
+    SetMainWindowText(mweMultNeedsHeader,PChar(''));
+    SetMainWindowText(mweQSONeedsHeader,PChar(''));
   end;
 
 {
@@ -3360,7 +3362,7 @@ begin
   CallWinKeyDown  := True; // 4.52.4
   CallsignIsTypedByOperator := True;
   Key := Char(wParam);
-  DebugMsg('[CallWindowKeyDownProc] Key pressed = ' + key);
+  logger.trace('[CallWindowKeyDownProc] Key pressed = ' + key);
   if tAutoCQMode then if TryKillAutoCQ then Escape_proc;
 
 // start sending now code
@@ -3405,7 +3407,7 @@ begin
         end
         else
         begin
-          DebugMsg('[CallWindowKeyDownProc] Calling AddStringToBuffer with !');
+          logger.trace('[CallWindowKeyDownProc] Calling AddStringToBuffer with !');
           AddStringToBuffer('!', CWTone);
           EditingCallsignSent := True;
         end;
@@ -3419,7 +3421,7 @@ begin
            begin // Send the character now - No buffering
            if true then // (length(CallWindowString) = AutosendCharacterCount)  then //n4af 4.46.12
               begin
-              DebugMsg('[CallWindowKeyDownProc] Call RadioObject.SendCW with ' + Key);
+              logger.trace('[CallWindowKeyDownProc] Call RadioObject.SendCW with ' + Key);
               //ActiveRadioPtr.AddTimeToCWByCATTimer(Round(1200 / DisplayedCodeSpeed) * 5); // Give us more time but this does not work yet.
               ActiveRadioPtr.SendCW(Key);  // start sending if = autosend cc
               ActiveRadioPtr.SendCW(CWByCATBufferTerminator);
@@ -3431,7 +3433,7 @@ begin
           end
         else if wkActive then
            begin
-           DebugMsg('[CallWindowKeyDownProc] Calling wsSendByte with ' + key);
+           logger.trace('[CallWindowKeyDownProc] Calling wsSendByte with ' + key);
            wkSendByte(Ord(UpCase(Key)));
            end
         else
@@ -6337,7 +6339,8 @@ begin
                      gridSquare := fieldValue;
                      if Length(exch.QTHString) = 0 then
                          begin
-                         if ActiveDomesticMult = GridSquares then
+                         if (ActiveDomesticMult = GridSquares) or
+                            (ActiveExchange = RSTAndOrGridExchange)            then
                             begin
                             exch.QTHString := fieldValue; // GRIDSQUARE
                             end;

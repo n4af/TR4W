@@ -1786,6 +1786,15 @@ var
   c                                     : integer;
 
 begin
+   logger.Trace('>>> Entering DupeAndMultSheet.SetMultFlags');
+   if logger.IsDebugEnabled then
+      begin
+      logger.debug('DoingDomesticMults = ' + BooleanToStr(DoingDomesticMults));
+      logger.debug('DoingDXMults       = ' + BooleanToStr(DoingDXMults));
+      logger.debug('DoingPrefixMults   = ' + BooleanToStr(DoingPrefixMults));
+      logger.debug('DoingZoneMults     = ' + BooleanToStr(DoingZoneMults));
+      end;
+
   if RXData.ceClearMultSheet then Exit;
   RXData.DomesticMult := False;
   RXData.DXMult := False;
@@ -1807,13 +1816,18 @@ begin
  // if (activeqsopointmethod = DLRTTY then
     RXData.DXMult := mo.IsDXMult(RXData.QTH.Country, GetAddMultBand(DXCCMultByBand, MultBand), MultMode);
 
-  if (RXData.Prefix <> '') and DoingPrefixMults then
-   begin        // 4.83.6
-    if (contest = PCC) and  (RXData.QTH.CountryID = MyCountry) then
-            RXData.PrefixMult := False
-        else
-     RXData.PrefixMult := mo.IsPxMult(RXData.Prefix, MultBand, MultMode);
-   end;
+   if (RXData.Prefix <> '') and DoingPrefixMults then
+      begin        // 4.83.6
+      if (contest = PCC) and
+         (RXData.QTH.CountryID = MyCountry) then
+         begin
+         RXData.PrefixMult := False
+         end
+      else
+         begin
+         RXData.PrefixMult := mo.IsPxMult(RXData.Prefix, MultBand, MultMode);
+         end;
+      end;
     if (Contest = NZFIELDDAY) then
     if (RXData.Zone = StrToInt(MyZone)) or (RXData.Zone = 00) then   exit;  //n4af 4.41.6
 

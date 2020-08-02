@@ -270,6 +270,7 @@ end;
 
 function TotalContacts: integer;
 begin
+
   if ServerSerialNumber <> 0 then
   begin
     Result := ServerSerialNumber - 1;
@@ -277,9 +278,10 @@ begin
   end;
 
   if QSONumberByBand then
-    TotalContacts := QSOTotals[ActiveBand, Both]
+    Result := QSOTotals[ActiveBand, Both]
   else
-    TotalContacts := QSOTotals[AllBands, Both];
+    Result := QSOTotals[AllBands, Both];
+  logger.debug('In TotalContacts, returning ' + IntToStr(Result));
 end;
 
 procedure BandDownOrUp(Direction: DirectionType);
@@ -310,147 +312,7 @@ begin
     end;
   end;
 end;
-{
-procedure BandUp;
 
-begin
-   if (MultipleBandsEnabled) or (TotalContacts = 0) then
-      begin
-         if CommandUseInactiveRadio then //KK1L: 6.73 Band change on inactive radio via command
-            begin
-               BandChange(BandMemory[InactiveRadio], DirectionUp);
-            end
-         else
-            begin
-               BandChange(ActiveBand, DirectionUp);
-
-               UpdateTotals2;
-
-               //WLI            IF QSOByBand THEN VisibleDupeSheetChanged := True;
-               if QSOByBand then VisibleLog.DisplayVisibleDupeSheet(ActiveBand, ActiveMode);
-
-               if MultByBand then
-                  VisibleLog.ShowRemainingMultipliers;
-
-               BandMapBand := ActiveBand;
-               DisplayBandMap;
-
-               if QSONumberByBand then
-                  DisplayNextQSONumber(TotalContacts + 1);
-            end;
-      end;
-end;
-
-procedure BandDown;
-
-begin
-   if (MultipleBandsEnabled) or (TotalContacts = 0) then
-      begin
-         if CommandUseInactiveRadio then //KK1L: 6.73 Band change on inactive radio via command
-            begin
-               BandChange(BandMemory[InactiveRadio], DirectionDown);
-            end
-         else
-            begin
-               BandChange(ActiveBand, DirectionDown);
-               UpdateTotals2;
-
-               //wli            IF QSOByBand THEN VisibleDupeSheetChanged := True;
-               if QSOByBand then VisibleLog.DisplayVisibleDupeSheet(ActiveBand, ActiveMode);
-
-               if MultByBand then
-                  VisibleLog.ShowRemainingMultipliers;
-
-               BandMapBand := ActiveBand;
-               DisplayBandMap;
-
-               if QSONumberByBand then
-                  DisplayNextQSONumber(TotalContacts + 1);
-
-            end;
-      end;
-end;
-}
-
-{
-procedure EditableLog.UpdateTempLogFile;
-
-var
-  Entry                                 : integer;
-  FileWrite                             : Text;
-
-begin
-
-  if OpenFileForWrite(FileWrite, LogTempFileName) then
-  begin
-    for Entry := 1 to NumberEditableLines do
-      WriteLn(FileWrite, LogEntries[Entry]);
-    Close(FileWrite);
-  end;
-
-end;
-}
-{
-procedure EditableLog.SetUpEditableLog;
-
-var
-  Entry                                 : integer;
-  FileRead                              : Text;
-  TempBand                              : BandType;
-
-begin
-  if OpenFileForRead(FileRead, LogTempFileName) then
-  begin
-    for Entry := 1 to NumberEditableLines do
-      ReadLn(FileRead, LogEntries[Entry]);
-    Close(FileRead);
-  end
-  else
-    for Entry := 1 to NumberEditableLines do
-      LogEntries[Entry] := '';
-
-  DisplayEditableLog(LogEntries);
-end;
-}
-{
-function EditableLog.PushLogEntry(NewEntry: str80): str80;
-
-var
-  Entry                                 : integer;
-
-begin
-  PushLogEntry := LogEntries[1];
-
-  for Entry := 1 to NumberEditableLines - 1 do
-    LogEntries[Entry] := LogEntries[Entry + 1];
-
-  LogEntries[NumberEditableLines] := NewEntry;
-
-   //WLI    IF ActiveWindow <> DupeSheetWindow THEN // not doing packet window
-  DisplayEditableLog(LogEntries);
-
-  UpdateTempLogFile;
-end;
-}
-{
-function EditableLog.CallIsInEditableLog(Call: CallString; Band: BandType; Mode: ModeType): boolean;
-
-var
-  Entry                                 : integer;
-
-begin
-  for Entry := 1 to NumberEditableLines do
-    if (Band = GetLogEntryBand(LogEntries[Entry])) or not QSOByBand then
-      if (Mode = GetLogEntryMode(LogEntries[Entry])) or not QSOByMode then
-        if GetLogEntryCall(LogEntries[Entry]) = Call then
-        begin
-          CallIsInEditableLog := True;
-          Exit;
-        end;
-
-  CallIsInEditableLog := False;
-end;
-}
 
 function EditableLog.CallIsADupe(var Call: CallString; Band: BandType; Mode:
   ModeType): boolean;

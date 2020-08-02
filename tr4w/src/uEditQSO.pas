@@ -209,6 +209,16 @@ begin
            begin
            tCB_ADDSTRING_PCHAR(hwnddlg, FLD_MODE, PChar(ExtendedModeStringArray[extMode]));
            end;
+        if EditableQSORXData.ExtMode = eNoMode then
+           begin
+           case EditableQSORXData.Mode of
+              CW:EditableQSORXData.ExtMode := eCW;
+              Phone: EditableQSORXData.ExtMode := eSSB;
+              Digital: EditableQSORXData.ExtMode := eRTTY;
+              FM: EditableQSORXData.ExtMode := eFM;
+              end; // of case
+           end; 
+
         tCB_SETCURSEL(hwnddlg, FLD_MODE, Ord(EditableQSORXData.ExtMode));
 
         {

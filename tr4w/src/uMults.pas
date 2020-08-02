@@ -32,7 +32,8 @@ uses
   uCTYDAT,
   //Country9,
   Windows,
-  uCallsigns;
+  uCallsigns,
+  Log4D;
 
 
 const
@@ -73,7 +74,7 @@ var
   
 implementation
 uses
-  LogDupe; 
+  LogDupe, MainUnit;
 
 procedure MultsObject.IncrementTotals(Band: BandType; Mode: ModeType; m: RemainingMultiplierType);
 begin
@@ -155,7 +156,11 @@ var
 begin
   Prfx[Ord(Prfx[0]) + 1] := #0;
   Result := not PrfList.StringIsDupe(Prfx, Band, Mode, Index);
-  if Index = -1 then Result := True;
+  if Index = -1 then
+     begin
+     logger.debug('In MultsObject.IsPxMult, for Prfx of ' + Prfx + ', Result = true');
+     Result := True;
+     end;
 end;
 
 function MultsObject.IsDmMult(Dom: CallString; Band: BandType; Mode: ModeType): boolean;

@@ -127,6 +127,7 @@ function RealToStr2(Num: REAL): string;
 function IntToStr(Num: integer): ShortString;
 function StrToInt(s: ShortString): integer;
 function PCharToInt(p: PChar): integer;
+function BooleanToStr(b: boolean): string;
 //function CenterString(s: string; count: byte): string;
 procedure strU(Str: ShortString) assembler;
 procedure SetMainWindowText(Window: TMainWindowElement; Text: PChar);
@@ -562,6 +563,15 @@ end;
 function IntToStr(Num: integer): ShortString;
 begin
   Str(Num, Result);
+end;
+
+function BooleanToStr(b: boolean): string;
+begin
+   Result := 'FALSE';
+   if b then
+      begin
+      Result := 'TRUE';
+      end;
 end;
 
 {  Function to convert string to int. (No sys utils = smaller EXE)  }

@@ -1298,12 +1298,12 @@ function RadioObject.WriteToCATPort(const Buffer;
    nNumberOfBytesToWrite: DWORD): longbool;
 var
    lpNumberOfBytesWritten: DWORD;
-{$IF NEWER_DEBUG}
+
    i: integer;
    s: string;
    Buf: array[0..100 * 2] of Char;
    nLen: integer;
-{$IFEND}
+
 begin
 {
   if not DVKEnable then
@@ -1319,17 +1319,19 @@ begin
               end;
 }
       try
-{$IF NEWER_DEBUG}
-      if not (nNumberOfBytesToWrite in [3,6,7]) then
+      if logger.IsTraceEnabled then
          begin
-         DebugMsg('>>>>Enter WriteToCATPort');
-         SetString(debugStr,PChar(@Buffer),nNumberOfBytesToWrite);
-         nLen := nNumberOfBytesToWrite; //Ord(Buffer[0]);
-         BinToHex(@Buffer,Buf,nLen);
-         Buf[(nLen*2) - 2] := #0;
-         DebugMsg(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,Buf]));
+         if not (nNumberOfBytesToWrite in [3,6,7]) then
+            begin
+            logger.trace('>>>>Enter WriteToCATPort');
+            SetString(debugStr,PChar(@Buffer),nNumberOfBytesToWrite);
+            nLen := nNumberOfBytesToWrite; //Ord(Buffer[0]);
+            BinToHex(@Buffer,Buf,nLen);
+            Buf[(nLen*2) - 2] := #0;
+            logger.trace(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,Buf]));
+            end;
          end;
-{$IFEND}
+
       Windows.WriteFile(tCATPortHandle, Buffer, nNumberOfBytesToWrite,
          lpNumberOfBytesWritten, nil);
       except // on E : Exception do
@@ -3268,7 +3270,15 @@ begin
     IC78..IC9700:
        begin
           TempString := CHR($FE) + CHR($FE) + CHR(Radio1.ReceiverAddress) + CHR($E0) + CHR($1C) + CHR($00) + CHR($00) + CHR($FD);
-          if PTTOn then TempString[7] := CHR($01);
+          if PTTOn then
+             begin
+             logger.debug('Setting Icom to TX');
+             TempString[7] := CHR($01);
+             end
+          else
+             begin
+             logger.debug('Setting Icom to RX');
+             end;
           WaitAnswer := 14;
        end;
 

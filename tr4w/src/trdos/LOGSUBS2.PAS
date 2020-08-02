@@ -1877,7 +1877,7 @@ var
 
   TempMode                              : ModeType;
 begin
-  //  if Trace then Write('!');
+  logger.trace('>>>Entering LogContact');
   StationInformationCall := '';
   ShowQSOStatusCall := '';
   VisibleDupeSheetChanged := True;
@@ -1897,12 +1897,13 @@ begin
   tLastLogEntryIsDeleted := False;
   WindowDupeCheckCall := RXData.Callsign;
   //  LastQSOLogged := RXData;
-  if TenMinuteRule <> NoTenMinuteRule then UpdateTenMinuteDate(rxData.band,rxData.Mode);
+  if TenMinuteRule <> NoTenMinuteRule then
+     UpdateTenMinuteDate(rxData.band,rxData.Mode);
   //  if not DDX(VerifyContact) then RXData.QSOPoints := 0;
      //  if not TailEnding then RemoveWindow(PossibleCallWindow);
   //  if Trace then Write('@');
   if MobileCall(RXData.Callsign) and (ActiveDomesticMult = DomesticFile) then    // n4af 4.41.8 Add Q.P. Rover
-  RXData.Callsign := PrecedingString(RXData.Callsign,'/')  + '/' + RXData.DomesticQTH;  // n4af 4.41.7
+     RXData.Callsign := PrecedingString(RXData.Callsign,'/')  + '/' + RXData.DomesticQTH;  // n4af 4.41.7
  
   if VisibleLog.CallIsADupe(RXData.Callsign, RXData.Band, RXData.Mode) or
     ((ActiveDomesticMult = GridSquares) and RoverCall(RXData.Callsign) and (NumberGridSquaresInList > 0)) then
@@ -3459,6 +3460,7 @@ begin
   // SetLength(msg,Length(sBuf));
    //msg := RawToBytes(sBuf[1], Length(sBuf));
    udp.BroadcastEnabled := true;
+   logger.Trace('Sending UDP Broadcast data: ' + sBuf);
    udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
    //udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
 end;

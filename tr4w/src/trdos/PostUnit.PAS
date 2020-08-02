@@ -1876,29 +1876,7 @@ begin
          sBuffer := SysUtils.Format('<FREQ:%u>%s',[length(sTemp),sTemp]);
          sWriteFileFromString(tReportFileWrite, sBuffer);
 
-        {asm
-        mov eax,[TempRXData.Frequency]
-        mov ecx,1000000
-        cdq
-        idiv ecx
-        push edx
-        push eax
-        end;
-        nNumberOfBytesToWrite := wsprintf(ADIF_FREQ_STRING, '%u.%06u ');
-        asm add esp,16 end;
 
-        asm
-        lea eax,ADIF_FREQ_STRING
-        push eax
-        push nNumberOfBytesToWrite
-        end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<FREQ:%u>%s ');
-        asm add esp,16 end;
-
-//        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FREQ:%u>%s',nNumberOfBytesToWrite,ADIF_FREQ_STRING);
-
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-        }
       end;
 
       WriteADIFField('SRX_STRING',TempRXData.ExchString);
@@ -1963,9 +1941,7 @@ begin
                 sBuffer := SysUtils.Format('<STX_STRING:%u>%s %s ',[nLength, MyFDClass, MySection]);
                 sWriteFileFromString(tReportFileWrite, sBuffer);
 
-                //nLength := length(TempRXData.ceClass) + 1 + length(TempRXData.QTHString);
-                //sBuffer := SysUtils.Format('<SRX_STRING:%u>%s %s ', [nLength, TempRXData.ceClass, TempRXData.QTHString]);
-                //sWriteFileFromString(tReportFileWrite, sBuffer);
+
 
               end;
             CQ160CW, CQ160SSB, NASPRINTCW, SPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
@@ -2485,25 +2461,24 @@ begin
 
     HisCallsign := @TempRXData.Callsign[1];
 
-    asm
-    xor eax,eax
-    mov ax,word ptr TempRXData.RSTSent
-    push eax
-    end;
+    if TempRXData.RSTSent < 25 then
+       begin
+       RSTSent := PChar(SysUtils.Format('%d', [wsjtx.ConvertSNRToRST(TempRXData.RSTSent)]));
+       end
+    else
+       begin
+       RSTSent := PChar(SysUtils.Format('%d', [TempRXData.RSTSent]));
+       end;
 
-    wsprintf(CABRILLO_RST_SEND, '%d');
-    asm add esp,12 end;
-    RSTSent := CABRILLO_RST_SEND;
-
-    asm
-    xor eax,eax
-    mov ax,word ptr TempRXData.RSTReceived
-    push eax
-    end;
-    wsprintf(CABRILLO_RST_RCVD, '%d');
-    asm add esp,12 end;
-    RSTReceived := CABRILLO_RST_RCVD;
-
+    if TempRXData.RSTReceived < 25 then
+       begin
+       RSTReceived := PChar(SysUtils.Format('%d', [wsjtx.ConvertSNRToRST(TempRXData.RSTReceived)]));
+       end
+    else
+       begin
+       RSTReceived := PChar(SysUtils.Format('%d', [TempRXData.RSTReceived]));
+       end;
+    
     nrReceived := TempRXData.NumberReceived;
     nrSent := TempRXData.NumberSent;
     Freq := tCabrilloFreqString[TempRXData.Band];
@@ -2514,7 +2489,7 @@ begin
         if TempRXData.Frequency < 30000000 then
           Freq := inttopchar(TempRXData.Frequency div 1000);
     end;
-    // This was just assumeing any digital contact was RY which is obviously not true.
+    // This was just assuming any digital contact was RY which is obviously not true.
     if TempRXData.Mode = Digital then
        begin
        if TempRXData.ExtMode = eRTTY then
@@ -2526,7 +2501,7 @@ begin
           ModeString := 'DG';
           if Contest = WINTERFIELDDAY then
              begin
-             ModeString := 'DI'; // Fluke in WFD's parser they have not yet fixed'
+             ModeString := 'DI'; // Error in WFD's parser they refuse to fix. de NY4I
              end;
           end;
        end

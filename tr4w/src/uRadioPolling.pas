@@ -239,7 +239,7 @@ begin
                   '2': rig^.CurrentStatus.ExtendedMode := eRTTY;
                   '3': rig^.CurrentStatus.ExtendedMode := ePSK31;
                   else
-                     DEBUGMSG('Unknown value from K3 ExtendedMode response' + rig^.tBuf);
+                     logger.info('Unknown value from K3 ExtendedMode response' + rig^.tBuf);
                   end;
                end
             else
@@ -269,7 +269,7 @@ begin
             rig^.CurrentStatus.Mode := Digital;
             end;
         else
-            DEBUGMSG('Invalid mode received from KenwoodNew ' + rig^.tBuf[30]);
+            logger.info('Invalid mode received from KenwoodNew ' + rig^.tBuf[30]);
         end;
 
                         
@@ -297,15 +297,15 @@ begin
                         rig^.CurrentStatus.TXOn := rig^.tBuf[i-9] = '1';
                         if rig^.tBuf[i-9] = '1' then
                            begin
-                           DEBUGMSG('K3/Kenwood2 says radio is transmitting');
+                           logger.trace('K3/Kenwood2 says radio is transmitting');
                            end
                         else
                            begin
-                           //DEBUGMSG('K3/Kenwood2 says radio is RECEIVING');
+                           logger.trace('K3/Kenwood2 says radio is RECEIVING');
                            end;
                         if radio1.CurrentStatus.TXOn then
                            begin
-                           //DEBUGMSG('radio1.CurrentStatus.TXOn is true');
+                           logger.trace('radio1.CurrentStatus.TXOn is true');
                            end;
                       end;
                   end;
@@ -624,18 +624,7 @@ begin
         else
             DEBUGMSG('Invalid mode received from KenwoodNew ' + rig^.tBuf[30]);
         end;
-      //1 (LSB), 2 (USB), 3 (CW), 4 (FM), 5 (AM), 6 (DATA), 7 (CW- REV), or 9 (DATA-REV).
-      (*case rig^.tBuf[30] of
-        '1': rig^.CurrentStatus.ModeActual := rLSB;
-        '2': rig^.CurrentStatus.ModeActual := rUSB;
-        '3': rig^.CurrentStatus.ModeActual := rCW;
-        '4': rig^.CurrentStatus.ModeActual := rFM;
-        '5': rig^.CurrentStatus.ModeActual := rAM;
-        '6': rig^.CurrentStatus.ModeActual := rRTTY;
-        '7': rig^.CurrentStatus.ModeActual := rCW_R;
-        '9': rig^.CurrentStatus.ModeActual := rRTTY_L;
-      end;
-     *)
+
       rig^.CurrentStatus.RITFreq := BufferToInt(@rig^.tBuf, 19, 5);
 
       rig^.CurrentStatus.Split := rig^.tBuf[33] <> '0';
@@ -1591,11 +1580,53 @@ begin
 {$IFEND}
     if rig.tBuf[ModeBytes] = #$FD then
       case Ord(rig.tBuf[12]) of
-        5: rig.CurrentStatus.Mode := FM;
-        3, 7: rig.CurrentStatus.Mode := CW;
-        4, 8: rig.CurrentStatus.Mode := Digital;
-      else rig.CurrentStatus.Mode := Phone;
-      end;
+        0: begin
+           rig.CurrentStatus.Mode := Phone;
+           rig.CurrentStatus.ExtendedMode := eLSB;
+           end;
+        1: begin
+           rig.CurrentStatus.Mode := Phone;
+           rig.CurrentStatus.ExtendedMode := eUSB;
+           end;
+        2: begin
+           rig.CurrentStatus.Mode := Phone;
+           rig.CurrentStatus.ExtendedMode := eAM;
+           end;
+        5, 6:
+           begin
+           rig.CurrentStatus.Mode := FM;
+           rig.CurrentStatus.ExtendedMode := eFM;
+           end;
+        3: begin
+           rig.CurrentStatus.Mode := CW;
+           rig.CurrentStatus.ExtendedMode := eCW;
+           end;
+        7: begin
+           rig.CurrentStatus.Mode := CW;
+           rig.CurrentStatus.ExtendedMode := eCW_R;
+           end;
+        4: begin
+           rig.CurrentStatus.Mode := Digital;
+           rig.CurrentStatus.ExtendedMode := eRTTY;
+           end;
+        8: begin
+           rig.CurrentStatus.Mode := Digital;
+           rig.CurrentStatus.ExtendedMode := eRTTY;
+           end;
+        12:begin
+           rig.CurrentStatus.Mode := Digital;
+           rig.CurrentStatus.ExtendedMode := eDATA;
+           end;
+        13:begin
+           rig.CurrentStatus.Mode := Digital;
+           rig.CurrentStatus.ExtendedMode := eDATA_R;
+           end;
+        else
+           begin
+           logger.Error('Unknown mode value in pIcom - ' + rig.tBuf[12]);
+           end;
+         end;
+      
 
     1:
 

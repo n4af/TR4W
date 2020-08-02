@@ -84,6 +84,7 @@ type
     procedure SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
     procedure SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
     procedure SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    function ConvertSNRToRST(snr: integer): integer;
 
     procedure SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
 
@@ -272,12 +273,18 @@ begin
             begin
             Unpack(AData,index,messageType);
             Unpack(AData,index,id);
-            //DEBUGMSG('Message type:' + IntToStr(messageType) + ' from:[' + id + ']');   { DO NOT DELETE THIS }
+            if logger.IsTraceEnabled then
+               begin
+               logger.trace('Message type:' + IntToStr(messageType) + ' from:[' + id + ']');   { DO NOT DELETE THIS }
+               end;
 
             case messageType of
             0: begin
-               //DEBUGMSG('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
-               DEBUGMSG('In UDP Heartbeat, Radio frequency = ' + IntToStr(radio1.CurrentStatus.VFO[VFOA].Frequency));
+               logger.trace('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
+               if logger.IsTraceEnabled then
+                  begin
+                  logger.trace('In UDP Heartbeat, Radio frequency = ' + IntToStr(radio1.CurrentStatus.VFO[VFOA].Frequency));
+                  end;
                SetMainWindowText(mweWSJTX,'WSJTX');
                Windows.ShowWindow(wh[mweWSJTX], SW_SHOW);
                isConnected := true;
@@ -303,18 +310,18 @@ begin
                Unpack(AData,index,DECall);
                Unpack(AData,index,DEGrid);
                Unpack(AData,index,DXGrid);
-              // Memomessage := IntToStr(frequency.Hi);
-               {DEBUGMSG('WSJTX >>> Status: Frequency: ' + IntToStr(frequency) + ' Mode: ' + mode + ' DX Call: ' + DXCall
-                                    + ' Report: ' + report + ' TX Mode: ' + TXMode + ' TX Enabled: ' + BoolToStr(TXEnabled)
-                                    + ' Transmitting: ' + BoolToStr(transmitting) + ' Decoding: ' + BoolToStr(Decoding)
+               if logger.IsDebugEnabled then
+                  begin
+                  logger.debug('WSJTX Status>>> Frequency: ' + IntToStr(frequency) + ' Mode: ' + mode + ' DX Call: ' + DXCall
+                                    + ' Report: ' + report + ' TX Mode: ' + TXMode + ' TX Enabled: ' + BooleanToStr(TXEnabled)
+                                    + ' Transmitting: ' + BooleanToStr(transmitting) + ' Decoding: ' + BooleanToStr(Decoding)
                                     + ' RXDF: ' + intToStr(RXDF) + ' TXDF: ' + intToStr(TXDF) + ' DECall: ' + DECall + ' DEGrid: ' + DEGrid
                                     + ' DXGrid: ' + DXGrid);
-               }
-
-               // if transmitting then
-               //    FalarmeJT.SLedTransmit.Brush.Color:=clRed
-               // else
-               //   FalarmeJT.SLedTransmit.Brush.Color:=clGreen;
+                  end;
+               if transmitting then
+                  begin
+                  PutCalltoCallWindow(DXCall);
+                  end;
                end;
 
             2: begin        {............................................................Decode}
@@ -329,10 +336,14 @@ begin
                Unpack(AData,index,mode);
                Unpack(AData,index,message);
 
-              { Memomessage :='Decode:'+' '+BoolToStr(isNew)+' '+FormatDateTime('hhmm',ztime)+' '+IntToStr(SNR)
+              if logger.IsTraceEnabled then
+                 begin
+                 Memomessage :='Decode:'+' '+BoolToStr(isNew)+' '+FormatDateTime('hhmm',ztime)+' '+IntToStr(SNR)
                                    +' '+ FloatToStrF(DT, ffGeneral,4,1)+' '+IntToStr(DF)
                                    +' '+ mode +' '+ message +' '+ timeToStr(ztime) +' '+ FloatToStr(DT) +' '+ intToStr(tm);
-               DEBUGMSG('WSJTX >>> ' + Memomessage);  }
+                 logger.trace('WSJTX Decode >>> ' + Memomessage);
+                 end;
+                 
                if MidStr(message,1,2) = 'CQ' then
                   begin
                   slCQMessage := TStringList.Create;
@@ -423,17 +434,38 @@ begin
             10: begin
                 logger.Trace('Received message 10');
                 end;
-            12: begin
-               Unpack(AData,index,adif);
+            12: begin                         // Note that ParseADIFRecord has some logic to determine where to put the gridsquare
+                if logger.IsDebugEnabled then
+                   begin
+                   logger.debug('TotalContacts at start of uWSJTX ADIF UDP message = ' + IntToStr(TotalContacts));
+                   end;
+                Unpack(AData,index,adif);
                logger.Trace('WSJTX >>> ADIF Record to log: ' + adif);
                ClearContestExchange(TempRXData);
+
                if ParseADIFRecord(adif, TempRXData) then // processed a record if true
                   begin
                   ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
-                  CalculateQSOPoints(TempRXData);
-                  LogContact(TempRXData, true);
 
-                  ShowStationInformation(@TempRXData.Callsign);
+                  if DoingDXMults then
+                     begin
+                     GetDXQTH(TempRXData);
+                     end;
+                  if DoingPrefixMults then
+                     begin
+                     SetPrefix(TempRXData);
+                     end;
+
+                  CalculateQSOPoints(TempRXData);
+                   if logger.IsDebugEnabled then
+                   begin
+                   logger.debug('TotalContacts right before update of NumberSent in uWSJTX ADIF UDP message = ' + IntToStr(TotalContacts));
+                   end;
+                  TempRXData.NumberSent := TotalContacts;
+                  LogContact(TempRXData, true);
+                  tCleareCallWindow;
+
+                  //ShowStationInformation(@TempRXData.Callsign);
                   UpdateWindows;
                   end;
                end;
@@ -703,10 +735,6 @@ begin
 
 end;
 
-
-
-
-
 procedure TWSJTXServer.IdTCPServer1Execute(AContext: TIdContext);
 
 var
@@ -726,17 +754,7 @@ var
     nPos, len, n0, n1, newEnd: integer;
     freq: extended;
     fieldName, fieldValue: string;
-    //buffer: TIdBytes;
-    //sBuffer : string;
-    const GETFREQ = '<command:10>CmdGetFreq<parameters:0>';
-    const SENDTX = '<command:9>CmdSendTx<parameters:0>';
-    const SETFREQ = '<command:10>CmdSetFreq'; //<parameters:23><xcvrfreq:10> 7,074.000';
-    const SETFREQ2= '<command:10>CmdSetFreq<parameters:23><xcvrfreq:10> 7,040.000';
-    const SENDSPLIT = '<command:12>CmdSendSplit<parameters:0>';
-    const SENDMODE = '<command:11>CmdSendMode<parameters:0>';
-    const SETRX = '<command:5>CmdRX<parameters:0>';
-    const SETTX = '<command:5>CmdTX<parameters:0>';
-    const GETTXFREQ = '<command:12>CmdGetTXFreq<parameters:0>';
+
 
 begin
     // ... get message from client
@@ -790,7 +808,8 @@ begin
 
       if fieldValue = 'CmdGetFreq' then
          begin
-         if radio1.CurrentStatus.VFO[VFOA].Frequency = 0 then
+         if (ActiveRadioPtr.RadioModel = NoInterfacedRadio) or
+            (radio1.CurrentStatus.VFO[VFOA].Frequency = 0) then
             begin
             DEBUGMSG('**** radio1.CurrentStatus.VFO[VFOA].Frequency = 0');
             Display('client','Sending VFOA frequency as .000');
@@ -873,7 +892,7 @@ begin
             QuickDisplay('PTT VIA COMMANDS (CTRL-J) option must be true for WSJT-X use - Setting to true');
             tPTTViaCommand := true;
             end;
-         logger.Trace('<<<<<<<<<<<<<<<<<<<<< PTT OFF *********************');
+         logger.Debug('<<<<<<<<<<<<<<<<<<<<< PTT OFF *********************');
          tPTTVIACAT(false);
          TXKludge := false;
          RXKludge := true;
@@ -887,7 +906,7 @@ begin
             logger.Info('Set tPTTViaCommand for user');
             tPTTViaCommand := true;
             end;
-         logger.Trace('>>>>>>>>>>>>>>>>>>> PTT ON *********************');
+         logger.debug('>>>>>>>>>>>>>>>>>>> PTT ON *********************');
          tPTTVIACAT(true);
          txKludgeStart := Now;
          TXKludge := true;
@@ -928,7 +947,7 @@ begin
             end
          else
             begin
-            if ActiveRadioPtr.CurrentStatus.TXOn then
+            if  ActiveRadioPtr.CurrentStatus.TXOn then
                begin
                sReply := '<CmdTX:2>ON';
                end
@@ -956,7 +975,8 @@ begin
          end
       else if fieldValue = 'CmdGetTXFreq' then
          begin             // Return VFO B
-         if ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency = 0 then
+         if (ActiveRadioPtr.RadioModel = NoInterfacedRadio) or
+            (ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency = 0) then
             begin
             //DEBUGMSG('**** radio1.CurrentStatus.VFO[VFOB].Frequency = 0');
             DEBUGMSG('       ActiveRadioPtr.CurrentStatus.VFO[VFOB] = ' + SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency/1000));
@@ -1019,7 +1039,7 @@ end;
 
 procedure TWSJTXServer.IdTCPServer1Connect(AContext: TIdContext);
 begin
-logger.Trace('TCP client Connected');
+logger.debug('TCP client Connected');
 end;
 
 
@@ -1027,39 +1047,10 @@ procedure TWSJTXServer.IdTCPServer1Disconnect(AContext: TIdContext);
 
 begin
 
-   logger.Trace('TCP Client disconnected');
+   logger.debug('TCP Client disconnected');
 
 end;
 
-(*aaa:=copy(vstup,z+1,length(vstup));
-
-    z:=pos(':',aaa);
-    x:=pos('>',aaa);
-    if (x=0) then exit; //  the record was not terminated ... disappearing
-
-    //detect length of ADIF Data
-    for i:=z+1 to x do
-    begin
-      if (aaa[i] in ['0'..'9']) then
-        slen := slen + aaa[i]
-    end;
-    if slen = '' then
-      DataLen := 0
-    else
-      DataLen := StrToInt(slen);
-    //if dmData.DebugLevel >=1 then Write('Got length:',DataLen);
-
-    if z<>0 then
-      prik:=trim(copy(aaa,1,z-1))
-    else
-      prik:=trim(copy(aaa,1,x-1));
-
-    aaa:=copy(aaa,x+1,length(aaa));
-
-    z:=pos('<',aaa);
-    i:= pos('_INTL',upcase(prik));
-
-    *)
 
 
 function TWSJTXServer.GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
@@ -1162,23 +1153,56 @@ procedure TWSJTXServer.Display(p_sender : String; p_message : string);
 
 begin
    try
-      DEBUGMSG(p_message);
+      logger.trace(p_message);
    except
    end;
-{    // ... DISPLAY MESSAGE
-    TThread.Queue(nil, procedure
-                       begin
-                           DEBUGMSG('[' + p_sender + '] - '
-                           + getNow() + ': ' + p_message);
-                       end
-                 );
 
-    // ... see doc..
-    // ... TThread.Queue() causes the call specified by AMethod to
-    //     be asynchronously executed using the main thread, thereby avoiding
-    //     multi-thread conflicts.
-}
 end;
+
+function TWSJTXServer.ConvertSNRToRST(snr: integer): integer;
+begin
+   if snr <= -20 then
+      begin
+      Result := 509;
+      end
+   else if snr < -14 then
+      begin
+      Result := 519;
+      end
+   else if snr < -8 then
+      begin
+      Result := 529;
+      end
+   else if snr < -2 then
+      begin
+      Result := 539;
+      end
+   else if snr < 4 then
+      begin
+      Result := 549;
+      end
+   else if snr < 10 then
+      begin
+      Result := 559;
+      end
+   else if snr < 16 then
+      begin
+      Result := 569;
+      end
+   else if snr < 22 then
+      begin
+      Result := 579;
+      end
+   else if snr < 28 then
+      begin
+      Result := 589;
+      end
+   else
+      begin
+      Result := 599;
+      end;
+   end;
+
 
 
 end.
