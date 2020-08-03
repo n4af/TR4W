@@ -181,11 +181,11 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.90.13' ;  // N4af     New  Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.90.15' ;  // N4af     New  Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July 31, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'August 3, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -734,7 +734,7 @@ type
   tLogLevels = (llNone, llFatal, llError, llWarn, llInfo, llDebug, llTrace);
   tCategoryAssisted = (caNONASSISTED, caASSISTED);
   tCategoryBand = (cbALL, cb160M, cb80M, cb40M, cb20M, cb15M, cb10M, cb6M, cb2M, cb222, cb432, cb902, cb12G);
-  tCategoryMode = (cmCW, cmRTTY, cmSSB, cmMIXED);
+  tCategoryMode = (cmCW, cmRTTY, cmDigital, cmSSB, cmMIXED);   // 4.90.14
   tCertificate = (Yes, No);
   tCategoryOperator = (coSINGLEOP, coMULTIOP, coCHECKLOG);
   tCategoryPower = (cpHIGH, cpLOW, cpQRP);
@@ -745,7 +745,7 @@ const
   tLogLevelsSA                          : array[tLogLevels] of PChar = ('NONE' ,'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE');
   tCategoryAssistedSA                   : array[tCategoryAssisted] of PChar = ('NON-ASSISTED', 'ASSISTED');
   tCategoryBandSA                       : array[tCategoryBand] of PChar = ('ALL', '160M', '80M', '40M', '20M', '15M', '10M', '6M', '2M', '222', '432', '902', '1.2G');
-  tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'SSB', 'MIXED');
+  tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'DIGITAL', 'SSB', 'MIXED');
   tCertificateSA                        : array[tCertificate] of PChar = ('Yes', 'No');
   tCategoryOperatorSA                   : array[tCategoryOperator] of PChar = ('SINGLE-OP', 'MULTI-OP', 'CHECKLOG');
   tCategoryPowerSA                      : array[tCategoryPower] of PChar = ('HIGH', 'LOW', 'QRP');
@@ -937,8 +937,7 @@ type
     PAQSOPARTY,  // 4.74.3
     INQSOPARTY,  // 4.88.2
     OKOMSSB,    // 4.80.1
-    BATAVIA_FT8, // 4.90.11
-    WWDIGI
+    BATAVIA_FT8 // 4.90.11
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -1061,9 +1060,9 @@ type
   ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM,
                       eMFSK, eJS8, eUSB, eLSB, eData, eCW_R, eData_R, eRTTY_R, eFM_N, eAM_N,eData_FM, eC4FM, eDStar);
 
-  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
+  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }        // 4.90.14
            //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
-  ExtendedRadioModeType = (rNoMode, rCW, rLSB, rUSB, rAM, rFM, rRTTY, rRTTY_R, rAFSK, rDATA_U, rDATA_L, rDIGITAL, rCW_R);
+  ExtendedRadioModeType = (rNoMode, rCW, rLSB, rUSB, rAM, rFM, rRTTY, rRTTY_R, rAFSK, rDATA_U, rDATA_L, rDIGI, rCW_R); // 4.90.14
   {    ModeType = (CW, Phone, Both, NoMode, FM, Digital);   { Use for calltest }
   OpModeType = (CQOpMode, SearchAndPounceOpMode);
 
@@ -1192,8 +1191,8 @@ const
 
   CallstringLength                      = 13;
 
-  ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
-  ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
+  ADIFModeString                        : array[ModeType] of PChar = ('CW',  'DIGITAL', 'SSB', 'BTH', 'NON', 'FM');  // 4.90.14
+  ModeStringArray                       : array[ModeType] of PChar = ('CW',  'DIGITAL', 'SSB', 'BTH', 'NON', 'FM');  // 4.90.14
 
   
   ExtendedModeStringArray               : array[ExtendedModeType] of string =
@@ -3284,9 +3283,7 @@ QSOPartiesCount = 15;
  ({Name: 'PA QSO PARTY';               }Email: nil;                      DF: 'pa_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 14; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'PA-QSO-PARTY';   CABName:''),     // 4.74.3
  ({Name: 'IN QSO PARTY';               }Email: nil;                      DF: 'in_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 15; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN-QSO-PARTY';   CABName:''),     // 4.88.2
  ({Name: 'OK-OM SSB';                  }Email: nil;                      DF: 'okom';              WA7BNM:  185; {SK3BG: 'okomdxc';    } QRZRUID: 12  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:CQDXCC; QP:OKOMSSBQSOPointMethod; ADIFName:'';   CABName:''),     // 4.80.1
- ({Name: 'BATAVIA-FT8';                }Email: nil;                      DF: nil;                 WA7BNM:  10686;                       QRZRUID: 0   ; Pxm: Prefix;        ZnM: NoZoneMults; AIE: GridInitialExchange; DM: NoDomesticMults; P: 0; AE: GridExchange;                           XM:CQDXCC; QP:YBFT8QP; ADIFName:'';   CABName:'BATAVIA'),    // 4.90.11
- ({Name: 'WWDIGI';                     }Email: nil;                      DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: NoDomesticMults; P: 0; AE: GridExchange;                           XM:CQDXCC; QP:WWDIGIQP; ADIFName:'';   CABName:'WW-DIGI')    // 4.90.11
-
+ ({Name: 'BATAVIA-FT8';                }Email: nil;                      DF: nil;                 WA7BNM:  10686;                       QRZRUID: 0   ; Pxm: Prefix;        ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridSquares; P: 0; AE: RSTAndOrGridExchange;                        XM:CQDXCC; QP:YBFT8QP; ADIFName:'';   CABName:'')    // 4.90.11
       );
 
  //({Name: 'CQ-WPX-CW';                  }Email: 'cw@cqwpx.com';           DF: nil;                 WA7BNM:   29; {SK3BG: nil;          } QRZRUID: 18  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:CQWPXQSOPointMethod; ADIFName:'';   CABName:''),
@@ -3460,8 +3457,7 @@ QSOPartiesCount = 15;
       'PA QSO PARTY',  // 4.74.3
       'IN QSO PARTY', // 4.88.2
       'OK-OM DX SSB',       // 4.80.1
-      'BATAVIA-FT8',    // 4.90.11
-      'WWDIGI'
+      'BATAVIA-FT8'    // 4.90.11
      );
 
   const
@@ -3673,9 +3669,7 @@ QSOPartiesCount = 15;
       ({Name: 'PA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),       // 4.74.3
       ({Name: 'IN QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),     // 4.88.2
       ({Name: 'OK-OM SSB';                  }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'BATAVIA-FT8';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
-      ({Name: 'WW-DIGI';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0)
-
+      ({Name: 'BATAVIA-FT8';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0)         // 4.80.1
       );
 
 

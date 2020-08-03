@@ -43,8 +43,7 @@ utils_text,
   ZoneCont,
   Windows,
   utils_file,
-  BeepUnit,
-  SysUtils
+  BeepUnit
   ;
 
 const
@@ -1987,7 +1986,6 @@ end;
 
 procedure QuickDisplay(Prompt: PChar);
 begin
-  logger.Info('QuickDisplay: ' + StrPas(Prompt));
   SetTextInQuickCommandWindow(Prompt);
   if tFlashQDThreadID = 0 then tCreateThread(@FlashQickDisplay, tFlashQDThreadID);
   if ClearQuickDisplayTimer <> 0 then Windows.KillTimer(tr4whandle, ClearQuickDisplayTimer);
