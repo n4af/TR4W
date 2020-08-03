@@ -348,6 +348,7 @@ type
       overload;
     procedure AssertLog(const Assertion: Boolean; const Message: TObject);
       overload;
+    procedure Debug(const sFormat: string; const Args: array of const); overload; virtual;
     procedure Debug(const Message: string; const Err: Exception = nil);
       overload; virtual;
     procedure Debug(const Message: TObject; const Err: Exception = nil);
@@ -386,6 +387,7 @@ type
     procedure RemoveAllAppenders;
     procedure RemoveAppender(const Appender: ILogAppender); overload;
     procedure RemoveAppender(const Name: string); overload;
+    procedure Trace(const sFormat: string; const Args: array of const); overload; virtual;
     procedure Trace(const Message: string; const Err: Exception = nil);
       overload; virtual;
     procedure Trace(const Message: TObject; const Err: Exception = nil);
@@ -1615,6 +1617,14 @@ begin
     Result := Result + Parent.CountAppenders;
 end;
 
+procedure TLogLogger.Debug(const sFormat: string; const Args: array of const);
+begin
+   if Self.IsDebugEnabled then
+      begin
+      Log(Log4D.Debug,Format(sFormat, Args));
+      end;
+end;
+
 procedure TLogLogger.Debug(const Message: string; const Err: Exception);
 begin
   Log(Log4D.Debug, Message, Err);
@@ -1825,6 +1835,15 @@ begin
   finally
     UnlockLogger;
   end;
+end;
+
+procedure TLogLogger.Trace(const sFormat: string; const Args: array of const);
+begin
+   if Self.IsTraceEnabled then     // We do this so we do not spend time formattign a statement we will not use
+      begin
+      Log( Log4D.Trace,Format(sFormat, Args));
+      end;
+
 end;
 
 procedure TLogLogger.Trace(const Message: string; const Err: Exception);
