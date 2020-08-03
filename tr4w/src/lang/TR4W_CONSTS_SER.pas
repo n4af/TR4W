@@ -48,6 +48,13 @@ const
   TC_SORRYNOLOG                         = 'Parametar NO LOG = TRUE zabranjuje upis veza na ovom racunaru';
   TC_SETCOMPUTERIDVALUE                 = 'Podesite vrednost COMPUTER ID';
 
+  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
+  TC_LOGFILENOTFOUND                    = 'Log file not found';
+  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
+  TC_BACKUPCREATED                      = 'Log file backup created';
+  TC_CANNOTRENAME                       = 'Can not rename';
+
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" ocisti sve dnevnike u mrezi';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" ocisti sve litse duplih veza na mrezi';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" ocisti sve liste mnozitelja na mrezi';

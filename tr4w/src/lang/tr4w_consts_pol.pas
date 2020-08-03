@@ -41,6 +41,13 @@ const
   TC_SORRYNOLOG                         = 'Sorry!! Brak LOG = TRUE co uniemo¿liwia logowanie ³¹cznoœci na tym komputerze';
   TC_SETCOMPUTERIDVALUE                 = 'WprowadŸ COMPUTER ID.';
 
+  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
+  TC_LOGFILENOTFOUND                    = 'Log file not found';
+  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
+  TC_BACKUPCREATED                      = 'Log file backup created';
+  TC_CANNOTRENAME                       = 'Can not rename';
+
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" czyœci wszystkie logi w sieci';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" czyœci zestawienia stacji w sieci';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" czyœci wykaz mno¿ników w sieci';

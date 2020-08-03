@@ -51,6 +51,13 @@ const
   TC_SORRYNOLOG                         = 'Regret!! NO LOG = TRUE nu permite logarea QSO-urilor pe acest calculator';
   TC_SETCOMPUTERIDVALUE                 = 'Inscrie valoarea COMPUTER ID.';
 
+  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
+  TC_LOGFILENOTFOUND                    = 'Log file not found';
+  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
+  TC_BACKUPCREATED                      = 'Log file backup created';
+  TC_CANNOTRENAME                       = 'Can not rename';
+
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" Sterge toate logurile din retea';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" Sterge toate filele cu duble din retea';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" Sterge toate filele cu multipl din retea';

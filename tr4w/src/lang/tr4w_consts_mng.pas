@@ -45,6 +45,14 @@ const
   TC_HASIMPROPERSYNTAX                  = '%s СИНТАКС алдаа!!';
   TC_SORRYNOLOG                         = 'Уучлаарай!! NO LOG = TRUE холбоог компьютер луу оруулах боломжгvй';
   TC_SETCOMPUTERIDVALUE                 = 'Компьютерийн ID -г тохируулна уу';
+
+  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
+  TC_LOGFILENOTFOUND                    = 'Log file not found';
+  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
+  TC_BACKUPCREATED                      = 'Log file backup created';
+  TC_CANNOTRENAME                       = 'Can not rename';
+
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" сvлжээний бvх логийг арилгана';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" сvлжээний бvх давтагдсан холбооны логийг арилгана';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" сvлжээний бvх vржvvлэгчийн логийг арилгана';

@@ -46,6 +46,13 @@ const
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" to clear all dupesheets in network';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" to clear all multsheets in network';
 
+  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
+  TC_LOGFILENOTFOUND                    = 'Log file not found';
+  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
+  TC_BACKUPCREATED                      = 'Log file backup created';
+  TC_CANNOTRENAME                       = 'Can not rename';
+
   TC_REALLYWANTTOCLEARTHELOG            = 'Do you really want to clear the current log?';
   TC_MESSAGETOSENDVIANETWORK            = 'message to send via network';
   TC_SENDTIMETOCOMPUTERSONTHENETWORK    = 'Do you really want to send time to computers on the network?';

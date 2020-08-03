@@ -41,6 +41,13 @@
   TC_SORRYNOLOG                         = 'Sorry!! NO LOG = TRUE which prohibits logging QSOs on this computer';
   TC_SETCOMPUTERIDVALUE                 = 'Set COMPUTER ID value.';
 
+  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
+  TC_LOGFILENOTFOUND                    = 'Log file not found';
+  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
+  TC_BACKUPCREATED                      = 'Log file backup created';
+  TC_CANNOTRENAME                       = 'Can not rename';
+  
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" to clear all logs in network';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" to clear all dupesheets in network';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" to clear all multsheets in network';

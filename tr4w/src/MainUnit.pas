@@ -7753,7 +7753,7 @@ begin
    Read the log header and confirm.
    If the user wants to convert, make a backup of the current log with priorVersion in the name (as read from the version record)
    }
-   If YesOrNo(0,'Would you like to convert this log to the latest format') = mrNo then
+   If YesOrNo(0,TC_WANTTOCONVERTLOG) = mrNo then
       begin
       logger.Fatal('User opted to not upgrade log format');
       Halt;
@@ -7761,7 +7761,7 @@ begin
    NewFile := StrPas(TR4W_LOG_FILENAME) + '-' + sVersion + '.bkup';
    If not FileExists(TR4W_LOG_FILENAME) then
       begin
-      ShowMessage(PChar('Log file not found'));
+      ShowMessage(PChar(TC_LOGFILENOTFOUND));
       Exit;
       end;
 
@@ -7770,18 +7770,18 @@ begin
       attrs := FileGetAttr(NewFile);
       if attrs and faReadOnly > 0 then
          begin
-         ShowMessage(PChar('Cannot copy log file -- target exists and is read-only'));
+         ShowMessage(PChar(TC_CANNOTCOPYLOGREADONLY));
          Exit;
          end;
       end;
 
    if not CopyFile(TR4W_LOG_FILENAME, PChar(NewFile), false) then
       begin
-      ShowMessage(PChar('Could not make a backup copy of ' + StrPas(TR4W_LOG_FILENAME)));
+      ShowMessage(PChar(TC_CANNOTBACKUPLOG + StrPas(TR4W_LOG_FILENAME)));
       Exit;
       end;
 
-   ShowMessage(PChar('Log file backup created')); // good copy so set to read-only
+   ShowMessage(PChar(TC_BACKUPCREATED)); // good copy so set to read-only
    fileSetCode := FileSetAttr(NewFile, faReadOnly);
    if fileSetCode = 0 then
       begin
@@ -7789,7 +7789,7 @@ begin
       end
    else
       begin
-      ShowMessage('Could not make backup file read-only');
+      ShowMessage(TC_CANNOTCOPYLOGREADONLY);
       Exit;
       end;
 
@@ -7798,7 +7798,7 @@ begin
    fName := StrPas(TR4W_LOG_FILENAME);
    if not RenameFile(fName, OldFile) then
       begin
-      ShowMessage(PChar('Could not rename ' + fName + ' to ' + OldFile));
+      ShowMessage(PChar(TC_CANNOTRENAME + ' ' + fName + ' >>> ' + OldFile));
       Exit;
       end;
    //***
@@ -7831,73 +7831,73 @@ begin
       newRXData.ceQSOID1             := oldRXData.ceQSOID1;
       newRXData.ceQSOID2             := oldRXData.ceQSOID2;
       newRXData.Frequency            := oldRXData.Frequency;
-         newRXData.ceQSO_Deleted        := oldRXData.ceQSO_Deleted;
-         newRXData.ceComputerID         := oldRXData.ceComputerID;
-         newRXData.ceOperatorID         := oldRXData.ceOperatorID;
-         newRXData.ceRecordKind         := oldRXData.ceRecordKind;
-         newRXData.ceQSO_Skiped         := oldRXData.ceQSO_Skiped;
-         newRXData.ceSendToServer       := oldRXData.ceSendToServer;
-         newRXData.ceNeedSendToServerAE := oldRXData.ceNeedSendToServerAE;
-         newRXData.ceDupe               := oldRXData.ceDupe;
-         newRXData.PostalCode_old       := oldRXData.PostalCode_old;
-         newRXData.ZERO_01              := oldRXData.ZERO_01;
-         newRXData.Prefix               := oldRXData.Prefix;
-         newRXData.ZERO_02              := oldRXData.ZERO_02;
-         newRXData.Callsign             := oldRXData.Callsign;
-         newRXData.Age                  := oldRXData.Age;
-         newRXData.ceWasSendInQTC       := oldRXData.ceWasSendInQTC;
-         newRXData.DomesticMult         := oldRXData.DomesticMult;
-         newRXData.DXMult               := oldRXData.DXMult;
-         newRXData.PrefixMult           := oldRXData.PrefixMult;
-         newRXData.ZoneMult             := oldRXData.ZoneMult;
-         newRXData.ceClass              := oldRXData.ceClass;
-         newRXData.ZERO_04              := oldRXData.ZERO_04;
-         newRXData.Precedence           := oldRXData.Precedence;
-         newRXData.ceRadio              := oldRXData.ceRadio;
-         newRXData.Check                := oldRXData.Check;
-         newRXData.QTH                  := oldRXData.QTH;
-         newRXData.DXQTH                := oldRXData.DXQTH;
-         newRXData.ZERO_05              := oldRXData.ZERO_05;
-         newRXData.Radio                := oldRXData.Radio;
-         newRXData.DomMultQTH           := oldRXData.DomMultQTH;
-               newRXData.ZERO_06              := oldRXData.ZERO_06;
-               newRXData.DomesticQTH          := oldRXData.DomesticQTH;
-               newRXData.ZERO_07              := oldRXData.ZERO_07;
-               newRXData.Name                 := oldRXData.Name;
-               newRXData.ZERO_08              := oldRXData.ZERO_08;
-               newRXData.Power                := oldRXData.Power;
-               newRXData.ZERO_09              := oldRXData.ZERO_09;
-               newRXData.NumberReceived       := oldRXData.NumberReceived;
-               newRXData.NumberSent           := oldRXData.NumberSent;
-               newRXData.RSTSent              := oldRXData.RSTSent;
-               newRXData.RSTReceived          := oldRXData.RSTReceived;
-               newRXData.QTHString            := oldRXData.QTHString;
-               newRXData.ZERO_10              := oldRXData.ZERO_10;
-               newRXData.RandomCharsSent      := oldRXData.RandomCharsSent;
-               newRXData.TenTenNum            := oldRXData.TenTenNum;
-               newRXData.Chapter              := oldRXData.Chapter;
-         newRXData.ZERO_11              := oldRXData.ZERO_11;
-         newRXData.ceClearDupeSheet     := oldRXData.ceClearDupeSheet;
-         newRXData.ceSearchAndPounce    := oldRXData.ceSearchAndPounce;
-               newRXData.Prefecture           := oldRXData.Prefecture;
-               newRXData.InhibitMults         := oldRXData.InhibitMults;
-               newRXData.Zone                 := oldRXData.Zone;
-               newRXData.NameSent             := oldRXData.NameSent;
-               newRXData.Kids                 := oldRXData.Kids;
-               newRXData.ceContest            := oldRXData.ceContest;
-               newRXData.QSOPoints            := oldRXData.QSOPoints;
-               newRXData.RandomCharsReceived  := oldRXData.RandomCharsReceived;
-               newRXData.ZERO_13              := oldRXData.ZERO_13;
-               newRXData.ceClearMultSheet     := oldRXData.ceClearMultSheet;
-               newRXData.MP3Record            := oldRXData.MP3Record;
-               newRXData.res3                 := oldRXData.res3;
-               newRXData.ceOperator           := oldRXData.ceOperator;
-               newRXData.res15                := oldRXData.res15;
-               newRXData.res16                := oldRXData.res16;
-               newRXData.res17                := oldRXData.res17;
-               newRXData.res18                := oldRXData.res18;
-               newRXData.res19                := oldRXData.res19;
-               newRXData.res20                := oldRXData.res20;
+      newRXData.ceQSO_Deleted        := oldRXData.ceQSO_Deleted;
+      newRXData.ceComputerID         := oldRXData.ceComputerID;
+      newRXData.ceOperatorID         := oldRXData.ceOperatorID;
+      newRXData.ceRecordKind         := oldRXData.ceRecordKind;
+      newRXData.ceQSO_Skiped         := oldRXData.ceQSO_Skiped;
+      newRXData.ceSendToServer       := oldRXData.ceSendToServer;
+      newRXData.ceNeedSendToServerAE := oldRXData.ceNeedSendToServerAE;
+      newRXData.ceDupe               := oldRXData.ceDupe;
+      newRXData.PostalCode_old       := oldRXData.PostalCode_old;
+      newRXData.ZERO_01              := oldRXData.ZERO_01;
+      newRXData.Prefix               := oldRXData.Prefix;
+      newRXData.ZERO_02              := oldRXData.ZERO_02;
+      newRXData.Callsign             := oldRXData.Callsign;
+      newRXData.Age                  := oldRXData.Age;
+      newRXData.ceWasSendInQTC       := oldRXData.ceWasSendInQTC;
+      newRXData.DomesticMult         := oldRXData.DomesticMult;
+      newRXData.DXMult               := oldRXData.DXMult;
+      newRXData.PrefixMult           := oldRXData.PrefixMult;
+      newRXData.ZoneMult             := oldRXData.ZoneMult;
+      newRXData.ceClass              := oldRXData.ceClass;
+      newRXData.ZERO_04              := oldRXData.ZERO_04;
+      newRXData.Precedence           := oldRXData.Precedence;
+      newRXData.ceRadio              := oldRXData.ceRadio;
+      newRXData.Check                := oldRXData.Check;
+      newRXData.QTH                  := oldRXData.QTH;
+      newRXData.DXQTH                := oldRXData.DXQTH;
+      newRXData.ZERO_05              := oldRXData.ZERO_05;
+      newRXData.Radio                := oldRXData.Radio;
+      newRXData.DomMultQTH           := oldRXData.DomMultQTH;
+      newRXData.ZERO_06              := oldRXData.ZERO_06;
+      newRXData.DomesticQTH          := oldRXData.DomesticQTH;
+      newRXData.ZERO_07              := oldRXData.ZERO_07;
+      newRXData.Name                 := oldRXData.Name;
+      newRXData.ZERO_08              := oldRXData.ZERO_08;
+      newRXData.Power                := oldRXData.Power;
+      newRXData.ZERO_09              := oldRXData.ZERO_09;
+      newRXData.NumberReceived       := oldRXData.NumberReceived;
+      newRXData.NumberSent           := oldRXData.NumberSent;
+      newRXData.RSTSent              := oldRXData.RSTSent;
+      newRXData.RSTReceived          := oldRXData.RSTReceived;
+      newRXData.QTHString            := oldRXData.QTHString;
+      newRXData.ZERO_10              := oldRXData.ZERO_10;
+      newRXData.RandomCharsSent      := oldRXData.RandomCharsSent;
+      newRXData.TenTenNum            := oldRXData.TenTenNum;
+      newRXData.Chapter              := oldRXData.Chapter;
+      newRXData.ZERO_11              := oldRXData.ZERO_11;
+      newRXData.ceClearDupeSheet     := oldRXData.ceClearDupeSheet;
+      newRXData.ceSearchAndPounce    := oldRXData.ceSearchAndPounce;
+      newRXData.Prefecture           := oldRXData.Prefecture;
+      newRXData.InhibitMults         := oldRXData.InhibitMults;
+      newRXData.Zone                 := oldRXData.Zone;
+      newRXData.NameSent             := oldRXData.NameSent;
+      newRXData.Kids                 := oldRXData.Kids;
+      newRXData.ceContest            := oldRXData.ceContest;
+      newRXData.QSOPoints            := oldRXData.QSOPoints;
+      newRXData.RandomCharsReceived  := oldRXData.RandomCharsReceived;
+      newRXData.ZERO_13              := oldRXData.ZERO_13;
+      newRXData.ceClearMultSheet     := oldRXData.ceClearMultSheet;
+      newRXData.MP3Record            := oldRXData.MP3Record;
+      newRXData.res3                 := oldRXData.res3;
+      newRXData.ceOperator           := oldRXData.ceOperator;
+      newRXData.res15                := oldRXData.res15;
+      newRXData.res16                := oldRXData.res16;
+      newRXData.res17                := oldRXData.res17;
+      newRXData.res18                := oldRXData.res18;
+      newRXData.res19                := oldRXData.res19;
+      newRXData.res20                := oldRXData.res20;
       newRXData.res21                := oldRXData.res21;
       newRXData.res22                := oldRXData.res22;
       newRXData.res23                := oldRXData.res23;
