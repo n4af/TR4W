@@ -1193,7 +1193,7 @@ const
   CallstringLength                      = 13;
 
   ADIFModeString                        : array[ModeType] of PChar = ('CW', 'DIGITAL',  'SSB', 'BTH', 'NON', 'FM');
-  ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG',  'SSB', 'BTH', 'NON', 'FM');
+  ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIGI',  'SSB', 'BTH', 'NON', 'FM');
 
 
   ExtendedModeStringArray               : array[ExtendedModeType] of string =
