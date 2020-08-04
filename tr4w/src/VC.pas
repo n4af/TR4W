@@ -734,7 +734,7 @@ type
   tLogLevels = (llNone, llFatal, llError, llWarn, llInfo, llDebug, llTrace);
   tCategoryAssisted = (caNONASSISTED, caASSISTED);
   tCategoryBand = (cbALL, cb160M, cb80M, cb40M, cb20M, cb15M, cb10M, cb6M, cb2M, cb222, cb432, cb902, cb12G);
-  tCategoryMode = (cmCW, cmRTTY, cmSSB, cmMIXED);
+  tCategoryMode = (cmCW, cmRTTY, cmDIGITAL, cmSSB, cmMIXED);         // 4.90.14
   tCertificate = (Yes, No);
   tCategoryOperator = (coSINGLEOP, coMULTIOP, coCHECKLOG);
   tCategoryPower = (cpHIGH, cpLOW, cpQRP);
@@ -745,7 +745,7 @@ const
   tLogLevelsSA                          : array[tLogLevels] of PChar = ('NONE' ,'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE');
   tCategoryAssistedSA                   : array[tCategoryAssisted] of PChar = ('NON-ASSISTED', 'ASSISTED');
   tCategoryBandSA                       : array[tCategoryBand] of PChar = ('ALL', '160M', '80M', '40M', '20M', '15M', '10M', '6M', '2M', '222', '432', '902', '1.2G');
-  tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'SSB', 'MIXED');
+  tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'DIGITAL', 'SSB', 'MIXED');  // 4.90.14
   tCertificateSA                        : array[tCertificate] of PChar = ('Yes', 'No');
   tCategoryOperatorSA                   : array[tCategoryOperator] of PChar = ('SINGLE-OP', 'MULTI-OP', 'CHECKLOG');
   tCategoryPowerSA                      : array[tCategoryPower] of PChar = ('HIGH', 'LOW', 'QRP');
@@ -1192,8 +1192,8 @@ const
 
   CallstringLength                      = 13;
 
-  ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY', 'SSB', 'BTH', 'NON', 'FM');
-  ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIG', 'SSB', 'BTH', 'NON', 'FM');
+  ADIFModeString                        : array[ModeType] of PChar = ('CW', 'RTTY',  'SSB', 'BTH', 'NON', 'FM');
+  ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIGITAL', 'SSB', 'BTH', 'NON', 'FM');
 
   
   ExtendedModeStringArray               : array[ExtendedModeType] of string =
