@@ -24,7 +24,10 @@ const
   TC_POINTS                             = 'Pct';
   TC_OP                                 = 'Opr';
   TC_NAME                               = 'Nume';
-
+  TC_WAGWARN                            = 'Atentie: Este in afara frecventelor admise de WAG';
+  TC_CANNOTOPENLOG                      = 'Nu pot accesa fisierul de log';
+  TC_LOGNOTPRESENT                      = 'Fisierul de log cautat nu exista';
+  TC_IMPORTFILENOTFOUND                 = 'Fisierul importat nu este disponibil';
   TC_CHECKCALLSIGN                      = 'Verifica indicativ';
 
   TC_FREQUENCYFORCALLINKHZ              = 'frecventa ptr %s in KHz';
