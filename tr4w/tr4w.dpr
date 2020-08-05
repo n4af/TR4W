@@ -324,15 +324,17 @@ begin
     Exit;
   end;
   if GetLastError = ERROR_ALREADY_EXISTS then
-  begin
-  MessageBox(0, Pchar(TC_RUNWARN), tr4w_ClassName, MB_OK or MB_ICONWARNING or MB_SYSTEMMODAL or MB_TOPMOST);   // n4af 4.48.4
-    Exit;
-  end;
+     begin
+     logger.fatal(TC_RUNWARN);
+     MessageBox(0, Pchar(TC_RUNWARN), tr4w_ClassName, MB_OK or MB_ICONWARNING or MB_SYSTEMMODAL or MB_TOPMOST);   // n4af 4.48.4
+     Exit;
+     end;
 
 //{$IF LANG = 'ENG'}
 //  if TryToCheckTheLatestVersion then Exit;
 //{$IFEND}
 
+  wsjtx := TWSJTXServer.Create;
   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
 
  Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
@@ -588,22 +590,31 @@ begin
 {$IF MORSERUNNER}
   GetMorseRunnerWindow;
 {$IFEND}
+    // This was created earlier so it is before the config items are read.
+   //wsjtx := TWSJTXServer.Create;
 
-   wsjtx := TWSJTXServer.Create;
 
    // Send colors for Dupes (QSOB4)
-   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]);
-   wsjtx.SetDupeBackgroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
-   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]);
-   wsjtx.SetDupeForegroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+   //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]);
+   //wsjtx.SetDupeBackgroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+   wsjtx.SetDupeBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]));
+   //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]);
+   //wsjtx.SetDupeForegroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+   wsjtx.SetDupeForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]));
 
    // Send colors for multipliers
-   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]);
-   wsjtx.SetMultBackgroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
-   rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]);
-   wsjtx.SetMultForegroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+   //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]);
+   //wsjtx.SetMultBackgroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+   wsjtx.SetMultBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]));
+   //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]);
+   //wsjtx.SetMultForegroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+   wsjtx.SetMultForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]));
 
-   wsjtx.Start;
+   wsjtx.SendColorization := WSJTXSendColorization;
+   if WSJTXEnabled then     // This boolean is in uCFG (default to true). This is so we start if the parameter is not set.
+      begin
+      wsjtx.Start;
+      end;
     {****************************  Main CallBack  ****************************}
 
   while (GetMessage(Msg, 0, 0, 0)) do

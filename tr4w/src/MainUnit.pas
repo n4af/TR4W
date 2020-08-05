@@ -1827,8 +1827,11 @@ end;
 
 procedure tr4w_ShutDown;
 begin
-   wsjtx.Stop;
-   FreeANdNil(wsjtx);
+   if Assigned(wsjtx) then
+      begin
+      wsjtx.Stop;
+      FreeAndNil(wsjtx);
+      end;
   Windows.UnregisterClass(tr4w_ClassName, hInstance);   // ny4i Issue 145. UnregisterClass was not qualifies and it conflicted with classes.UnregisterClass
   ExitProcess(hInstance);
 end;
@@ -2393,18 +2396,17 @@ begin
 
     if lParam = integer(wh[mweWSJTX]) then
       begin
-      if wsjtx.Connected then
+      if Assigned(wsjtx) then
          begin
-         SetMainWindowText(mweWSJTX,'WSJTX');
-         TempBrush := tr4wBrushArray[trGreen];
-         end
-      else
-         begin
-         //windows.GetWindowText(wh[mweWSJTX],charText,10);
-         //if StrPas(charText) = 'WSJTX' then
-          //  begin
+         if wsjtx.Connected then
+            begin
+            SetMainWindowText(mweWSJTX,'WSJTX');
+            TempBrush := tr4wBrushArray[trGreen];
+            end
+         else
+            begin
             TempBrush := tr4wBrushArray[trRed];
-          //  end;
+            end;
          end;
       end;
 
@@ -4994,7 +4996,6 @@ var
   nNumberOfBytesToWrite                 : Cardinal;
   InitialExchange                       : CallString;
   Callsign                              : CallString;
-  Str1                           : String;
 begin
 //  MakeReportFileName('CUSTOM_INITIAL.EX');
   if not tOpenFileForWrite(h, FileName {@ReportsFilename[1]}) then Exit;
@@ -6258,8 +6259,6 @@ var
   cU: string; // Uppercase version of C for comparison
   theString: string;
   i: integer;
-  freq: real;
-  lpNumberOfBytesWritten: Cardinal;
   contest: ContestType;
   appHQ: string;
   recordFromWSJTX: boolean;
@@ -7737,14 +7736,10 @@ Var
   oldFH: file of ContestExchangev1_5;
   newFH: file of ContestExchange;
   headerFH: file of TLogHeader;
-  i: integer;
   oldRXData: ContestExchangev1_5;
   newRXData: ContestExchange;
-  lpNumberOfBytesWritten: Cardinal;
-  done: boolean;
 begin
    Result := false;
-   done := false;
 
    //ReadVersionBlock; // Just resets points to the start
    // Read the version block to confirm the versions are different. Ask again if they want to convert

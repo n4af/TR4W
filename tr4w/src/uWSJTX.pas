@@ -10,8 +10,8 @@
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
-If not, ref: 
+     Public License along with TR4W in  GPL_License.TXT.
+If not, ref:
 http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit uWSJTX;
@@ -36,9 +36,9 @@ type
   private
       udpServ : TIdUDPServer;
       tcpServ: TIdTCPServer;
-      UFreq, UModeRX, UModeTX, UDXCall, URSTs, UHeureDeb : string;
-      UCall,ULoc : string;
-      UIndex:integer;
+      UModeRX, UModeTX, UDXCall, URSTs, UHeureDeb : string;
+      started: boolean;
+      ULoc : string;
       peerPort: word;
       FUDPPort: integer;
       FTCPPort: integer;
@@ -50,12 +50,12 @@ type
       colorsDupeFore: TColorRec;
       colorsMultBack: TColorRec;
       colorsDupeBack: TColorRec;
-      context: TIdContext;
       buffer: TIdBytes;
       sBuffer: string;
       TXKludge: boolean;
       txKludgeStart: TDateTime;
       RXKludge: boolean;
+      FSendColorization: boolean;
       rxKludgeStart: TDateTime;
       processingCmdSplit: boolean;
       processingCmdSetTXFreq: boolean;
@@ -81,18 +81,26 @@ type
     procedure HighlightCall(sCall: string; color: integer; sId: string);
     procedure ClearColors(sId: string);
     property connected: boolean read isConnected;
-    procedure SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-    procedure SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-    procedure SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+
+    //procedure SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure SetDupeBackgroundColor(rgb: cardinal);
+    //procedure SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure SetMultBackgroundColor(rgb: cardinal);
+
+   //procedure SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure SetDupeForegroundColor(rgb: cardinal);
+
+    //procedure SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+    procedure SetMultForegroundColor(rgb: cardinal);
+
     function ConvertSNRToRST(snr: integer): integer;
-
-    procedure SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-
     procedure Display(p_sender : String; p_message : string);
 
     Property UDPPort: integer read FUDPPort write SetUDPPort;
 
     Property TCPPort: integer read FTCPPort write SetTCPPort;
+
+    Property SendColorization: boolean read FSendColorization write FSendColorization;
 
 
   end;
@@ -118,6 +126,8 @@ uses
 
 constructor TWSJTXServer.Create;
 begin
+   started := false;
+   FSendColorization := true;
    firstTime := true;
    udpServ := TIdUDPServer.Create(nil);
    // udpServ.Binding.SetSockOpt(Id_SOL_SOCKET,Id_SO_REUSEADDR,Id_SO_True);
@@ -173,27 +183,27 @@ end;
 }
 procedure TWSJTXServer.Start;
 begin
-   udpServ.Active := true;
+   if not started then
+      begin
+      udpServ.Active := true;
+      started := true;
 
-   // ... START SERVER:
-
-    // ... clear the Bindings property ( ... Socket Handles )
-   tcpServ.Bindings.Clear;
-    // ... Bindings is a property of class: TIdSocketHandles;
-
-    // ... add listening ports:
-
-    // ... add a port for connections from guest clients.
-   tcpServ.MaxConnections := 1; // Just allow the single client
-   tcpServ.Bindings.Add.Port := FTCPPort;
-   tcpServ.Active := true;
+      tcpServ.Bindings.Clear;
+      tcpServ.MaxConnections := 1; // Just allow the single client
+      tcpServ.Bindings.Add.Port := FTCPPort;
+      tcpServ.Active := true;
+      end;
 end;
 
 procedure TWSJTXServer.Stop;
 begin
-   udpServ.Active := false;
-   tcpServ.IOHandler.Shutdown;
-   tcpServ.Active := false;
+   if started then
+      begin
+      udpServ.Active := false;
+      tcpServ.IOHandler.Shutdown;
+      tcpServ.Active := false;
+      started := false;
+      end;
 end;
 
 destructor TWSJTXServer.Destroy;
@@ -245,11 +255,9 @@ var
   date: TDateTime;
   {Ajout ici}
   slCQMessage: TStringList;
-  Memomessage,locator: string;
-  rst, RXDF, TXDF: integer;
+  Memomessage: string;
+  RXDF, TXDF: integer;
   TempRXData: ContestExchange;
-  lpNumberOfBytesWritten: Cardinal;
-  inx: integer;
   TempMode: ModeType;
   TempBand: BandType;
   grid: string;
@@ -495,23 +503,21 @@ Highlight Callsign In   13                     quint32    Integer
 }
 
 procedure TWSJTXServer.HighlightCall(sCall: string; color: integer; sId: string);
-
 var
-
-   sBuffer: string;
-
    AData: TIdBytes;
-
    messageType, magic, schema: LongInt;
-
-   id, Ip, message: String;
-
+   id: String;
    colorType: byte;
-
 begin
 
+   if not FSendColorization then
+      begin
+      Exit;
+      end;
 // Build a header for a message
 
+   // Send colors for Dupes (QSOB4)
+   
    magic := $ADBCCBDA;
 
    schema := 2;
@@ -535,78 +541,41 @@ begin
       // Background QColor first
 
       Pack(AData,colorType); // RGB
-
       PackFF00(AData);    // Alpha
-
       Pack(AData,Byte(colorsDupeBack.R)); Pack(AData,Byte(0)); // Red
-
       Pack(AData,Byte(colorsDupeBack.G)); Pack(AData,Byte(0)); // Green
-
       Pack(AData,Byte(colorsDupeBack.B)); Pack(AData,Byte(0)); // Blue
-
       PackFF00(AData); //Pack(AData,Word(65280));   // R
-
       Pack(AData,Word(0));     // Padding
-
 
       // foreground
-
       Pack(AData,colorType); // RGB
-
       PackFF00(AData);    // Alpha
-
       Pack(AData,Byte(colorsDupeFore.R)); Pack(AData,Byte(0)); // Red
-
       Pack(AData,Byte(colorsDupeFore.G)); Pack(AData,Byte(0)); // Green
-
       Pack(AData,Byte(colorsDupeFore.B)); Pack(AData,Byte(0)); // Blue
-
       PackFF00(AData); //Pack(AData,Word(65280));   // R
-
       Pack(AData,Word(0));     // Padding
-
       end
 
    else if color = 2 then // multiplier
-
-      begin
-
-      // Background QColor first
-
-
+      begin               // Background QColor first
       Pack(AData,colorType);
-
       PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
-
       Pack(AData,Byte(colorsMultBack.R)); Pack(AData,Byte(0)); // Red
-
       Pack(AData,Byte(colorsMultBack.G)); Pack(AData,Byte(0)); // Green
-
       Pack(AData,Byte(colorsMultBack.B)); Pack(AData,Byte(0)); // Blue
-
       Pack(AData,Word(0));     // Padding
-
-
       Pack(AData,colorType);
-
       PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
-
       Pack(AData,Byte(colorsMultFore.R)); Pack(AData,Byte(0)); // Red
-
       Pack(AData,Byte(colorsMultFore.G)); Pack(AData,Byte(0)); // Green
-
       Pack(AData,Byte(colorsMultFore.B)); Pack(AData,Byte(0)); // Blue
-
       Pack(AData,Word(0));     // Padding
-
       end;
 
-
    Pack(AData,true);        // Highlight last only
-
-
    logger.trace('Sending command to highlight ' + Trim(sCall));
-
    udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
 
 
@@ -616,15 +585,9 @@ end;
 procedure TWSJTXServer.ClearColors(sId: string);
 
 var
-
-   sBuffer: string;
-
    AData: TIdBytes;
-
    messageType, magic, schema: LongInt;
-
-   id, Ip, message: String;
-
+   id: String;
    colorType: byte;
 
 begin
@@ -686,59 +649,77 @@ begin
 end;
 
 
-procedure TWSJTXServer.SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-
+(*procedure TWSJTXServer.SetDupeBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
 begin
-
    Self.colorsDupeBack.R := bRed;
-
    Self.colorsDupeBack.G := bGreen;
-
    Self.colorsDupeBack.B := bBlue;
-
+end;
+*)
+procedure TWSJTXServer.SetDupeBackgroundColor(rgb: cardinal);
+//var rgb: cardinal;
+begin
+   //rgb := ColorToRGB(tc);
+   logger.Debug('Setting DupeBackgroundColor to %d',[rgb]);
+   Self.colorsDupeBack.R := GetRValue(rgb);
+   Self.colorsDupeBack.G := GetGValue(rgb);
+   Self.colorsDupeBack.B := GetBValue(rgb);
 end;
 
-
+{
 procedure TWSJTXServer.SetMultBackgroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-
 begin
-
    Self.colorsMultBack.R := bRed;
-
    Self.colorsMultBack.G := bGreen;
-
    Self.colorsMultBack.B := bBlue;
-
+end;
+}
+procedure TWSJTXServer.SetMultBackgroundColor(rgb: cardinal);
+//var rgb: cardinal;
+begin
+   //rgb := ColorToRGB(tc);
+   logger.Debug('Setting MultBackgroundColor to %d',[rgb]);
+   Self.colorsMultBack.R := GetRValue(rgb);
+   Self.colorsMultBack.G := GetGValue(rgb);
+   Self.colorsMultBack.B := GetBValue(rgb);
 end;
 
-
+{
 procedure TWSJTXServer.SetDupeForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-
 begin
-
    Self.colorsDupeFore.R := bRed;
-
    Self.colorsDupeFore.G := bGreen;
-
    Self.colorsDupeFore.B := bBlue;
-
 end;
-
-
-procedure TWSJTXServer.SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
-
+}
+procedure TWSJTXServer.SetDupeForegroundColor(rgb: cardinal);
+//var rgb: cardinal;
 begin
-
+   //rgb := ColorToRGB(tc);
+   logger.Debug('Setting DupeForegroundColor to %d',[rgb]);
+   Self.colorsDupeFore.R := GetRValue(rgb);
+   Self.colorsDupeFore.G := GetGValue(rgb);
+   Self.colorsDupeFore.B := GetBValue(rgb);
+end;
+{
+procedure TWSJTXServer.SetMultForegroundColor(bRed: byte; bGreen: byte; bBlue: byte);
+begin
    Self.colorsMultFore.R := bRed;
-
    Self.colorsMultFore.G := bGreen;
-
    Self.colorsMultFore.B := bBlue;
-
+end;
+}
+procedure TWSJTXServer.SetMultForegroundColor(rgb: cardinal);
+//var rgb: cardinal;
+begin
+   //rgb := ColorToRGB(tc);
+   logger.Debug('Setting MultForegroundColor to %d',[rgb]);
+   Self.colorsMultFore.R := GetRValue(rgb);
+   Self.colorsMultFore.G := GetGValue(rgb);
+   Self.colorsMultFore.B := GetBValue(rgb);
 end;
 
 procedure TWSJTXServer.IdTCPServer1Execute(AContext: TIdContext);
-
 var
     Port          : Integer;
     PeerPort      : Integer;

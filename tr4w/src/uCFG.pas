@@ -126,6 +126,8 @@ function F_MY_CALL: boolean;
 function F_ZONE_MULTIPLIER: boolean;
 function F_AUTO_SEND_CHARACTER_COUNT: boolean;
 procedure UpdateDebugLogLevel;
+function F_UpdateWSJTXSendColorizations : boolean;
+function F_UpdateWSJTXEnabled: boolean;
 //function F_SETPARALLELPORT: boolean;
 
 const
@@ -181,7 +183,7 @@ const
       );
 
    {crA}
-   AdditionalProcsArray: array[1..22] of Pointer =
+   AdditionalProcsArray: array[1..24] of Pointer =        // These mult be boolean functions
       (
       @F_CONTEST,
       @F_ZONE_MULTIPLIER,
@@ -204,7 +206,9 @@ const
       @F_START_SENDING_NOW_KEY,
       @F_DX_MULTIPLIER,
       @F_MY_ZONE,
-      @F_MY_CONTINENT
+      @F_MY_CONTINENT,
+      @F_UpdateWSJTXEnabled,
+      @F_UpdateWSJTXSendColorizations
       //@F_SETPARALLELPORT
       );
 
@@ -223,6 +227,7 @@ const
       @UpadateMainWindow,
       @SetStationsCallsignMask,
       @UpdateDebugLogLevel
+    //  ,@UpdateWSJTXSendColorizations
       );
 
    {List}
@@ -305,6 +310,8 @@ const
 
 var
    CMD: ShortString;
+   WSJTXSendColorization: boolean = true;
+   WSJTXEnabled: boolean = true;
 
 const
 
@@ -315,7 +322,11 @@ const
    + 1 {WSJTXUDPPort}
    + 1 {Radio TCP Server Port}
    + 1 {DebugLogLevel}
+   + 1 {WSJTXSendColorizations}
+   + 1 {WSJTXEnabled}
    ;
+
+   // Note if crAddress says pointer(NN, then it is callign a function at position NN in the an array
    CFGCA: array[1..CommandsArraySize] of CFGRecord =
       (
     {(*}
@@ -411,7 +422,7 @@ const
  (crCommand: 'CW TONE';                       crAddress: @CWTone;                         crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'DE ENABLE';                     crAddress: @DEEnable;                       crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'DEBUG LOG LEVEL';               crAddress: pointer(52);                     crMin:0;   crMax:0;      crS: csNew; crA: 0; crC:0 ; crP:13; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
-  (crCommand: 'DIGITAL MODE ENABLE';           crAddress: @DigitalModeEnable;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'DIGITAL MODE ENABLE';           crAddress: @DigitalModeEnable;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
 // (crCommand: 'DISPLAY MODE';                  crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctOther),
  (crCommand: 'DISTANCE MODE';                 crAddress: pointer(20);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
  (crCommand: 'DIT DAH RATIO';                 crAddress: pointer(13);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray;   cfFunc: cfAll; crType: ctInteger),
@@ -739,31 +750,33 @@ const
  (crCommand: 'VISIBLE DUPESHEET';             crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'WAIT FOR STRENGTH';             crAddress: @WaitForStrength;                crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'WAKE UP TIME OUT';              crAddress: @WakeUpTimeOut;                  crMin:0;  crMax:MAXBYTE; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
- (crCommand: 'WARC BAND ENABLE';              crAddress: @WARCBandsEnabled;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'WEIGHT';                        crAddress: @Weight;                         crMin:5;  crMax:15;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctReal),
- (crCommand: 'WIDE FREQUENCY DISPLAY';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'WILDCARD PARTIALS';             crAddress: @WildCardPartials;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'WK AUTOSPACE';                  crAddress: @WinKeySettings.wksAutospace;                    crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
- (crCommand: 'WK CT SPACING';                 crAddress: @WinKeySettings.wksCTSpacing;                    crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
+ (crCommand: 'WARC BAND ENABLE';              crAddress: @WARCBandsEnabled;                               crMin:0;  crMax:0;         crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'WEIGHT';                        crAddress: @Weight;                                         crMin:5;  crMax:15;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctReal),
+ (crCommand: 'WIDE FREQUENCY DISPLAY';        crAddress: nil;                                             crMin:0;  crMax:0;         crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'WILDCARD PARTIALS';             crAddress: @WildCardPartials;                               crMin:0;  crMax:0;         crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'WK AUTOSPACE';                  crAddress: @WinKeySettings.wksAutospace;                    crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
+ (crCommand: 'WK CT SPACING';                 crAddress: @WinKeySettings.wksCTSpacing;                    crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
  (crCommand: 'WK DIT DAH RATIO';              crAddress: @WinKeySettings.wksValueList.vlDitDahRatio;      crMin:33; crMax:66;        crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte),
- (crCommand: 'WK ENABLE';                     crAddress: @WinKeySettings.wksWinKey2Enable;                crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
+ (crCommand: 'WK ENABLE';                     crAddress: @WinKeySettings.wksWinKey2Enable;                crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
  (crCommand: 'WK FIRST EXTENSION';            crAddress: @WinKeySettings.wksValueList.vl1stExtension;     crMin:0;  crMax:250;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte),
- (crCommand: 'WK IGNORE SPEED POT';           crAddress: @WinKeySettings.wksIgnoreSpeedSpot;              crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
+ (crCommand: 'WK IGNORE SPEED POT';           crAddress: @WinKeySettings.wksIgnoreSpeedSpot;              crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
  (crCommand: 'WK KEYER COMPENSATION';         crAddress: @WinKeySettings.wksValueList.vlKeyCompensation;  crMin:0;  crMax:250;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte),
  (crCommand: 'WK KEYER MODE';                 crAddress: pointer(47);                                     crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfWK; crType: ctOther),
  (crCommand: 'WK LEADIN TIME';                crAddress: @WinKeySettings.wksValueList.vlLeadInTime;       crMin:0;  crMax:250;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte),
- (crCommand: 'WK PADDLE ONLY SIDETONE';       crAddress: @WinKeySettings.wksPadOnlySideT;                 crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
- (crCommand: 'WK PADDLE SWAP';                crAddress: @WinKeySettings.wksPaddleSwap;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
- (crCommand: 'WK PADDLE SWITCHPOINT';         crAddress: @WinKeySettings.wksValueList.vlPaddleSWPoint;    crMin:10; crMax:90;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte),
+ (crCommand: 'WK PADDLE ONLY SIDETONE';       crAddress: @WinKeySettings.wksPadOnlySideT;                 crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
+ (crCommand: 'WK PADDLE SWAP';                crAddress: @WinKeySettings.wksPaddleSwap;                   crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
+ (crCommand: 'WK PADDLE SWITCHPOINT';         crAddress: @WinKeySettings.wksValueList.vlPaddleSWPoint;    crMin:10; crMax:90;        crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte),
  (crCommand: 'WK PORT';                       crAddress: pointer(46);                                     crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfWK; crType: ctOther),
  (crCommand: 'WK SIDETONE FREQUENCY';         crAddress: pointer(48);                                     crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfWK; crType: ctOther),
- (crCommand: 'WK SIDETONE ENABLE';            crAddress: @WinKeySettings.wksSideTEnable;                  crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
+ (crCommand: 'WK SIDETONE ENABLE';            crAddress: @WinKeySettings.wksSideTEnable;                  crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctBoolean),
  (crCommand: 'WK TAIL TIME';                  crAddress: @WinKeySettings.wksValueList.vlTailTime;         crMin:0;  crMax:250;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte),
  (crCommand: 'WK WEIGHT';                     crAddress: @WinKeySettings.wksValueList.vlWeight;           crMin:10; crMax:90;        crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte),
- (crCommand: 'WINDOW SIZE';                   crAddress: pointer(5);                      crMin:1;  crMax:15;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckArray; cfFunc: cfAppearance; crType: ctInteger),
- (crCommand: 'WSJT-X BROADCAST PORT';         crAddress: @WSJTXUDPPort;                   crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),   // ny4i
- (crCommand: 'YAESU RESPONSE TIMEOUT';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
- (crCommand: 'ZONE MULTIPLIER';               crAddress: pointer(23);                     crMin:0;  crMax:0;       crS: csOld; crA: 2; crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctMultiplier)
+ (crCommand: 'WINDOW SIZE';                   crAddress: pointer(5);                                      crMin:1;  crMax:15;        crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckArray; cfFunc: cfAppearance; crType: ctInteger),
+ (crCommand: 'WSJT-X BROADCAST PORT';         crAddress: @WSJTXUDPPort;                                   crMin:1;  crMax:65535;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),   // ny4i
+ (crCommand: 'WSJT-X ENABLED';                crAddress: @WSJTXEnabled;                                   crMin:0;  crMax:0;         crS: csNew; crA: 23; crC:0;  crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),     // ny4i Issue 438
+ (crCommand: 'WSJT-X SEND HIGHLIGHTS';        crAddress: @WSJTXSendColorization;                          crMin:0;  crMax:0;         crS: csNew; crA: 24; crC:0;  crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),     // ny4i Issue 438
+ (crCommand: 'YAESU RESPONSE TIMEOUT';        crAddress: nil;                                             crMin:0;  crMax:0;         crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
+ (crCommand: 'ZONE MULTIPLIER';               crAddress: pointer(23);                                     crMin:0;  crMax:0;         crS: csOld; crA: 2; crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctMultiplier)
     {*)}
       );
 function CheckCommand(Command: PChar; CustomCMD: ShortString): boolean;
@@ -857,11 +870,12 @@ begin
 
             end;
       end;
-
+   logger.Debug('Searching for %s',[Command]);
    for i := 1 to CommandsArraySize do
-
+      begin
+      logger.trace('Comparing %s to command %s',[Command,CFGCA[i].crCommand]);
       if (StrComp(@Command[1], CFGCA[i].crCommand) = 0) then
-
+         //logger.debug('Found command %s at index %d', [Command, i]);
          begin
             {if (CFGCA[i].crCommand[0] = 'Q') then
                   Result := False;   }
@@ -1006,20 +1020,31 @@ begin
             AdditionalProc:
             if CFGCA[i].crA <> 0 then
                begin
-                  CMD := CustomCMD;
-                  Proc := AdditionalProcsArray[CFGCA[i].crA];
+               CMD := CustomCMD;
+               Proc := AdditionalProcsArray[CFGCA[i].crA];
+               if Assigned(Proc) then
+                  begin
                   asm
-            call Proc
-            mov byte ptr result,al
+                     call Proc
+                     mov byte ptr result,al
+                     end;
+                  end
+               else
+                  begin
+                  logger.debug('AdditionalProc was not assigned in uCFG for command %s - Index = %d',
+                               [CFGCA[i].crCommand, i]);
                   end;
-                  if Result = False then
-                     exit;
+               if Result = False then
+                  begin
+                  logger.debug('Additional proc for %s returned false',[CFGCA[i].crCommand]);
+                  exit;
+                  end;
                end;
 
             Result := True;
             Break;
          end;
-
+      end;
 end;
 
 function F_ADD_DOMESTIC_COUNTRY: boolean;
@@ -1520,6 +1545,39 @@ begin
       else ;
    end;
 
+end;
+
+function F_UpdateWSJTXEnabled: boolean;
+begin
+   Result := true;
+   if assigned(wsjtx) then
+      begin
+      if WSJTXEnabled then
+         begin
+         wsjtx.Start;
+         end
+      else
+         begin
+         wsjtx.Stop;
+         end;
+      end
+   else
+      begin
+      logger.Error('In F_UpdateWSJTXEnabled, wsjtx variable was not assigned');
+      end;
+end;
+
+function F_UpdateWSJTXSendColorizations: boolean; // We do this because we cannot see the wsjtx object in the commandArray declaration
+begin
+   Result := true;
+   if assigned(wsjtx) then
+      begin
+      wsjtx.SendColorization := WSJTXSendColorization;
+      end
+   else
+      begin
+      logger.Error('In F_UpdateWSJTXSendColorizations, wsjtx variable was not assigned');
+      end;
 end;
 
 procedure ProcessTotalScoreMessage(ID, CMD: ShortString);

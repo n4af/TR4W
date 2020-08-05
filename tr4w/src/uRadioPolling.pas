@@ -2194,7 +2194,7 @@ end;
 //-----
 
 procedure pFT891_FT991(rig: RadioPtr);
-   // Stopped here. Just copied this from DX9000. Change frequency bytes and check the rest.
+
 label
    1;
 var
@@ -2230,27 +2230,51 @@ begin
       TempVFO := rig.CurrentStatus.VFO[VFOA];
       rig^.CurrentStatus.VFOStatus := VFOA;
 
-      rig.WritePollRequest('FT;', 3);
-         // This retreives which VFO is different, then we are in split.
-      if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $494F) }) then
+      if rig.RadioModel = FT991 then
          begin
+         rig.WritePollRequest('FT;', 3);         // This retreives which VFO is different, then we are in split.
+         if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $494F) }) then
+            begin
             ClearRadioStatus(rig);
             goto 1;
-         end;
-      if rig.tBuf[3] = '1' then // VFO is the TX
-         begin
+            end;
+         if rig.tBuf[3] = '1' then // VFO is the TX
+            begin
             rig^.CurrentStatus.Split := true;
-         end
-      else if rig.tBuf[3] = '0' then
-         begin
+            end
+         else if rig.tBuf[3] = '0' then
+            begin
             rig^.CurrentStatus.Split := false;
-         end
-      else
-         begin
+            end
+         else
+            begin
             Logger.Error('Yaesu tBuf after FT; command unexpected result (Split set to false)- ' + rig.tBuf);
             rig^.CurrentStatus.Split := false;
+            end;
+         end
+      else if rig.RadioModel = FT891 then // 891 does not have an FT command. Use ST instead
+         begin
+         rig.WritePollRequest('ST;', 3);         // This retreives which VFO is different, then we are in split.
+         if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $494F) }) then
+            begin
+            ClearRadioStatus(rig);
+            goto 1;
+            end;
+         if rig.tBuf[3] = '1' then // VFO is the TX
+            begin
+            rig^.CurrentStatus.Split := true;
+            end
+         else if rig.tBuf[3] = '0' then
+            begin
+            rig^.CurrentStatus.Split := false;
+            end
+         else
+            begin
+            Logger.Error('Yaesu FT891 tBuf after ST; command unexpected result (Split set to false)- ' + rig.tBuf);
+            rig^.CurrentStatus.Split := false;
+            end;
          end;
-
+      //----------------
       rig.WritePollRequest('TX;', 3);
       if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $4649)}) then
          begin

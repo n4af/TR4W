@@ -1621,7 +1621,11 @@ procedure TLogLogger.Debug(const sFormat: string; const Args: array of const);
 begin
    if Self.IsDebugEnabled then
       begin
-      Log(Log4D.Debug,Format(sFormat, Args));
+         try
+            Log(Log4D.Debug,Format(sFormat, Args));
+         except on E : Exception do
+            Log(Log4D.Debug,'Exception in Debug with Format statement = ' + sFormat,E);
+         end;
       end;
 end;
 
@@ -1839,9 +1843,13 @@ end;
 
 procedure TLogLogger.Trace(const sFormat: string; const Args: array of const);
 begin
-   if Self.IsTraceEnabled then     // We do this so we do not spend time formattign a statement we will not use
+   if Self.IsTraceEnabled then     // We do this so we do not spend time formatting a statement we will not use
       begin
-      Log( Log4D.Trace,Format(sFormat, Args));
+         try
+            Log(Log4D.Trace,Format(sFormat, Args));
+         except on E : Exception do
+            Log(Log4D.Trace,'Exception in Trace with Format statement = ' + sFormat,E);
+         end;
       end;
 
 end;

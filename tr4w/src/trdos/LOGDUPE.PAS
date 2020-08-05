@@ -355,7 +355,7 @@ procedure SetUpExchangeInformation(ActiveExchange: ExchangeType;
   var ExchangeInformation: ExchangeInformationRecord
   );
 
-procedure TransferLogEntryInfoToContestExchange(LogEntry: Str80; var RXData: ContestExchange);
+{procedure TransferLogEntryInfoToContestExchange(LogEntry: Str80; var RXData: ContestExchange); }
 {
 procedure SetDupeBit(var b: Byte);
 procedure ResetDupeBit(var b: Byte);
@@ -1038,7 +1038,7 @@ begin
 
 end;
 
-procedure TransferLogEntryInfoToContestExchange(LogEntry: Str80; var RXData: ContestExchange);
+(*procedure TransferLogEntryInfoToContestExchange(LogEntry: Str80; var RXData: ContestExchange);
 
 begin
   ClearContestExchange(RXData);
@@ -1048,7 +1048,7 @@ begin
   GetMultsFromLogEntry(LogEntry, RXData);
   RXData.QTH.Prefix := RXData.Prefix;
 end;
-
+*)
 function DupeAndMultSheet.AddBigCallAddress(BigCall: EightBytes): integer;
 
 { This function will return the proper big call array address for the
