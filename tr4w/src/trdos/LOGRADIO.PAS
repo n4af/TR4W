@@ -1664,7 +1664,7 @@ begin
          end;
       FT891:
          begin
-         // This radio supports split but there is no command documented to set VFO B to TX   ny4i Issue218
+         ActiveRadioPtr.WriteToCATPort('ST1;', 4);
          end;
       FT991:
          begin
@@ -1718,7 +1718,7 @@ begin
          end;
       FT891:
          begin
-          // This radio supports split but there is not a command documented. // ny4i Issue218
+          ActiveRadioPtr.WriteToCATPort('ST0;', 4);
          end;
       FT991:
          begin
@@ -3248,7 +3248,8 @@ begin
          if PTTOn then
             begin
             TempString := 'TX1;';
-            end else
+            end
+         else
             begin
             TempString := 'TX0;';
             end;

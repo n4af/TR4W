@@ -43,7 +43,8 @@ utils_text,
   ZoneCont,
   Windows,
   utils_file,
-  BeepUnit
+  BeepUnit,
+  uGradient
   ;
 
 const
@@ -5417,11 +5418,14 @@ begin
 end;
 
 procedure SetListViewColor(Window: TMainWindowElement);
+var rgb: cardinal;
 begin
   if wh[Window] = 0 then Exit;
   ListView_SetTextBkColor(wh[Window], tr4wColorsArray[TWindows[Window].mweBackG]);
   ListView_SetBkColor(wh[Window], tr4wColorsArray[TWindows[Window].mweBackG]);
   ListView_SetTextColor(wh[Window], tr4wColorsArray[TWindows[Window].mweColor]);
+  
+
 //  Windows.SendMessage(wh[Window], LVM_REDRAWITEMS, 0, LinesInEditableLog - 1);
   Windows.InvalidateRect(wh[Window], nil, True);
 end;

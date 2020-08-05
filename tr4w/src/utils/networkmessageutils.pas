@@ -132,15 +132,13 @@ procedure Unpack(const AData: TIdBytes; var index: Integer; var ADateTime: TDate
 var
   dt: Int64;
   tm: Longword;
-  ts: Byte;
-  temp: Double;
+  //ts: Byte;
 begin
   Unpack(AData,index,dt);
   Unpack(AData,index,tm);
-  ts := AData[index];
+  //ts := AData[index];
   index := index + 1;
   {assume UTC for now}
-  temp := dt;
   ADateTime := Now; {IncMilliSecond(JulianDateToDateTime(temp),tm);  }
 end;
 

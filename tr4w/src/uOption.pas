@@ -35,7 +35,8 @@ uses
   LogWind,
   LogNet,
   Tree,
-  Messages
+  Messages,
+  uGradient
   ;
 
 const
@@ -408,7 +409,7 @@ var
   c                                     : integer;
 //  h                                     :HWND;
   TempColor                             : Ptr4wColors;
-
+  rgb                                   : cardinal;
 begin
 
   Row := SendMessage(SettingshLV, LVM_GETNEXTITEM, -1, 1);
@@ -431,6 +432,25 @@ begin
 //    Windows.FlashWindow(wh[TMainWindowElement(TempInteger)], false);
 
     ListView_SetItemText(SettingshLV, Row, VALUE_FIELD, tr4wColorsSA[TempColor^]);
+
+    if TWindows[TMainWindowElement(TempInteger)].mweName = 'QSO B4' then
+       begin
+       logger.Debug('Change of Foreground QSOB4 color');
+       // Send colors for Dupes (QSOB4)
+       //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]);
+       wsjtx.SetDupeBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]));
+       //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]);
+       wsjtx.SetDupeForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]));
+       end
+    else if TWindows[TMainWindowElement(TempInteger)].mweName = 'MULT' then
+       begin
+       // Send colors for multipliers
+       //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]);
+       wsjtx.SetMultBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]));
+       //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]);
+       wsjtx.SetMultForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]));
+       end;
+
 
 {
     Index2 := integer(CFGCA[Index].crAddress);
