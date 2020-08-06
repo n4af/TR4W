@@ -20,6 +20,10 @@ const
   TC_FREQ                               = 'Freq';
   TC_POINTS                             = 'Pts';
   TC_OP                                 = 'Op';
+  TC_WagWarn                            = ' Upozorenje: izašli ste van WAG dozvoljenog frekventnog opsega ';
+  TC_CANNOTOPENLOG                      = 'Ne mogu da otvorim LOG datoteku';
+  TC_LOGNOTPRESENT                      = 'Izabrana LOG datoteka ne postoji';
+  TC_IMPORTFILENOTFOUND                 = 'Datoteka za uvoz nije dostupna' ;
 
   TC_CHECKCALLSIGN                      = 'Proveri pozivni znak';
 

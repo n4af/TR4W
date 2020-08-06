@@ -6,7 +6,9 @@ const
   TC_TRANSLATION_LANGUAGE               = 'MONGOLIAN';
   TC_TRANSLATION_AUTHOR                 = 'Khosbayar.N JT1CD';
   TC_TRANSLATOR_EMAIL                   = 'jt1cd.khos@gmail.com';
-
+  TC_WAGWarn                            = 'Warning: Out of WAG allowed frequency range';
+  TC_CANNOTOPENLOG                      = 'Cannot open log file';
+  TC_IMPORTFILENOTFOUND                 = 'The import file is not available'; 
   TC_UKEI                               = 'If inside UK/EI check here';
   TC_EnterYourDistrictCode              = 'IF in UK/EI enter District Code';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
