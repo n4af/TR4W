@@ -2012,9 +2012,10 @@ begin
     on a different band?  I put it back in in 6.72 - and clared
     StationInformationCall when logging a QSO }
 
-  if Call^ = StationInformationCall then
+  if Call^ = StationInformationCall then   // This is a flag to show we have been here before ny4i
     Exit;
 
+  logger.trace('>>> Entering ShowStationInformation with call of %s',[Call^]);
   StationInformationCall := Call^;
 
   //  if Copy(Call, 1, 3) = 'CQ-' then Exit;

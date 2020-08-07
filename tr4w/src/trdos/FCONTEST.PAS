@@ -1434,6 +1434,7 @@ begin
       DigitalModeEnable := true;
       QSOByMode := False;
       QSOByBand := True;
+      LiteralDomesticQTH := true;
       end;
 
   end;

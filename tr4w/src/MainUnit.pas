@@ -500,6 +500,7 @@ begin
 
     tElapsedTimeFromLastQSO := Windows.GetTickCount;
     UpdateWindows;
+    // It is not clear to me why we would call SHowStationInformation again.
     ShowStationInformation(@ReceivedData.Callsign);
     ClearContestExchange(ReceivedData);
     LastTwoLettersCrunchedOn := '';
@@ -527,7 +528,7 @@ begin
     if OpMode = SearchAndPounceOpMode then SendSerialNumberChange(sntReserved);
 
     SendSerialNumberChange(sntFree);
-
+    StationInformationCall := ''; // Moved this to the very end of the process to log a contact. ny4i
   end;
 end;
 
@@ -6334,7 +6335,8 @@ begin
                      if Length(exch.QTHString) = 0 then
                          begin
                          if (ActiveDomesticMult = GridSquares) or
-                            (ActiveExchange = RSTAndOrGridExchange)            then
+                               ((ActiveExchange = RSTAndOrGridExchange) or
+                                (ActiveExchange = Grid2Exchange)         ) then
                             begin
                             exch.QTHString := fieldValue; // GRIDSQUARE
                             end;
@@ -6466,7 +6468,7 @@ begin
       except
          DebugMsg('Exception processign ADIF Record ' + sADIF);
       end;
-      DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+     // ****************************** DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
       // fix up operator
       if exch.ceOperator = '' then
          begin

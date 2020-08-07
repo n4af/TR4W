@@ -1910,7 +1910,10 @@ begin
 
          if TempRXData.DomesticMult then           // ny4i Issue 398
             begin
-            WriteADIFFIeld('STATE',TempRXData.QTHString);
+            if not LooksLikeAGrid(TempRXData.QTHString) then
+               begin
+               WriteADIFFIeld('STATE',TempRXData.QTHString);
+               end;
             end;
 
         //if ContestsArray[Contest].DM = DomesticMult
@@ -1962,6 +1965,11 @@ begin
                 nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_HQ:%u>%-7s ', tCallStringLength, p);
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
+            WWDIGI, BATAVIA_FT8:
+               begin
+               nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<GRIDSQUARE:%u>%s ', tCallStringLength, p);
+               sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+               end;
           else
             begin
                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<QTH:%u>%s ',tCallStringLength, p);
@@ -4048,7 +4056,7 @@ begin
 
       {Make Exchanges Strings}
       case ActiveExchange of
-         GridExchange:
+         GridExchange, Grid2Exchange:
             begin
             Result := cMyGrid;
             //Format(CABRILLO_MYEX, '%-11s', cMyGrid);

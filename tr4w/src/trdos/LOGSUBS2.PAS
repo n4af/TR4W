@@ -1284,7 +1284,7 @@ var
   TempMode                              : ModeType;
 begin
   logger.trace('>>>Entering LogContact');
-  StationInformationCall := '';
+ // StationInformationCall := '';    // This might be cleared out too soon - Moved to end of TryLogContact ny4i
   ShowQSOStatusCall := '';
   VisibleDupeSheetChanged := True;
   //if Packet.PacketSerialPort <> NoPort then Packet.DeletePacketEntry(RXData.Callsign, RXData.Band, RXData.Mode);
@@ -1464,6 +1464,8 @@ begin
         SendScoreToUDP;
         end;
      end;
+  //**************************
+  ///StationInformationCall := ''; // ny4i - Moved this to be cleared here.
 end;
 procedure loglastcall;
 

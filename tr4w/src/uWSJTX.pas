@@ -466,17 +466,38 @@ begin
                      SetPrefix(TempRXData);
                      end;
 
-                  CalculateQSOPoints(TempRXData);
+                  //CalculateQSOPoints(TempRXData);
                    if logger.IsDebugEnabled then
                    begin
                    logger.debug('TotalContacts right before update of NumberSent in uWSJTX ADIF UDP message = ' + IntToStr(TotalContacts));
                    end;
-                  TempRXData.NumberSent := TotalContacts;
-                  LogContact(TempRXData, true);
-                  tCleareCallWindow;
+                  //TempRXData.NumberSent := TotalContacts;
+                  //LogContact(TempRXData, true);
+                  if ParametersOkay(TempRXData.Callsign, TempRXData.QTHString, ActiveBand, ActiveMode, ActiveRadioPtr.LastDisplayedFreq {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
+                     begin
+                     ReceivedData.ceSearchAndPounce := OpMode = SearchAndPounceOpMode;
+                     ReceivedData.ceComputerID := ComputerID;
+                     LogContact(TempRXData, True);
+                     tElapsedTimeFromLastQSO := Windows.GetTickCount;
+                     UpdateWindows;
+                     //ShowStationInformation(@TempRXData.Callsign);
+                     ClearContestExchange(TempRXData);
+                     LastTwoLettersCrunchedOn := '';
+                     CallAlreadySent := False;
+                     ExchangeHasBeenSent := False;
+                     EditingCallsignSent := False;
+                     SeventyThreeMessageSent := False;
+                     EscapeDeletedCallEntry := CallWindowString;
+                     tCleareCallWindow;
+                     tCleareExchangeWindow;
+                     tCallWindowSetFocus;
+                     CleanUpDisplay;
+                     end;
+
+                  //tCleareCallWindow;
 
                   //ShowStationInformation(@TempRXData.Callsign);
-                  UpdateWindows;
+                  //UpdateWindows;
                   end;
                end;
             else
