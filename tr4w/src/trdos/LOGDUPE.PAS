@@ -875,6 +875,7 @@ end;
 procedure ClearContestExchange(var Exchange: ContestExchange);
 
 begin
+  logger.Trace('>>> Entering ClearContestExchange');
   Windows.ZeroMemory(@Exchange, SizeOf(ContestExchange));
   Exchange.Band := NoBand;
   Exchange.Mode := NoMode;

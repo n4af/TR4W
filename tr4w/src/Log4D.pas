@@ -357,6 +357,8 @@ type
       overload; virtual;
     procedure Error(const Message: TObject; const Err: Exception = nil);
       overload; virtual;
+    procedure Error(const sFormat: string; const Args: array of const);
+      overload; virtual;
     procedure Fatal(const Message: string; const Err: Exception = nil);
       overload; virtual;
     procedure Fatal(const Message: TObject; const Err: Exception = nil);
@@ -1664,6 +1666,18 @@ begin
   finally
     Event.Free;
   end;
+end;
+
+procedure TLogLogger.Error(const sFormat: string; const Args: array of const);
+begin
+   if Self.IsErrorEnabled then
+      begin
+         try
+            Log(Log4D.Error,Format(sFormat, Args));
+         except on E : Exception do
+            Log(Log4D.Error,'Exception in Debug with Format statement = ' + sFormat,E);
+         end;
+      end;
 end;
 
 procedure TLogLogger.Error(const Message: string; const Err: Exception);

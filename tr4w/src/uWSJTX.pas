@@ -253,7 +253,6 @@ var
   DT: Double;
   DF: Cardinal;
   date: TDateTime;
-  {Ajout ici}
   slCQMessage: TStringList;
   Memomessage: string;
   RXDF, TXDF: integer;
@@ -265,15 +264,15 @@ var
 begin
      //FUDP.IdUDPServer1.Bindings := '127.0.0.1:2237,[::]:2237';
   index := 0;
-  peerPort := ABinding.PeerPort;     {............................................récupération du port d'écoute}
+  peerPort := ABinding.PeerPort;
 
 //  peerPort := 2237;
 
-  //DEBUGMSG('WSJTX >>> Datagram received - length: ' + IntToStr(Length(AData))); { DO NOT DELETE THIS }
+
    while index < Length(AData) do
    begin
       Unpack(AData, index, magic);
-      //DEBUGMSG('WSJTX >>> index:' + IntToStr(index) + ' magic:$' + IntToHex(magic,8)); { DO NOT DELETE THIS }
+      //DEBUGMSG('WSJTX >>> index:' + IntToStr(index) + ' magic:$' + IntToHex(magic,8));
       if (magic = LongInt($ADBCCBDA)) and (index < Length(AData)) then
          begin
          Unpack(AData, index, schema);
@@ -283,12 +282,12 @@ begin
             Unpack(AData,index,id);
             if logger.IsTraceEnabled then
                begin
-               logger.trace('Message type:' + IntToStr(messageType) + ' from:[' + id + ']');   { DO NOT DELETE THIS }
+               logger.trace('Message type:' + IntToStr(messageType) + ' from:[' + id + ']');
                end;
 
             case messageType of
             0: begin
-               logger.trace('WSJTX >>> Heartbeat!');  { DO NOT DELETE THIS }
+               logger.trace('WSJTX >>> Heartbeat!');
                if logger.IsTraceEnabled then
                   begin
                   logger.trace('In UDP Heartbeat, Radio frequency = ' + IntToStr(radio1.CurrentStatus.VFO[VFOA].Frequency));
@@ -302,7 +301,7 @@ begin
                   firstTime := false;
                   end;
                end;
-            1:         {............................................................Status}
+            1:
                begin
                Unpack(AData,index,frequency);
                Unpack(AData,index,mode);
@@ -328,7 +327,7 @@ begin
                   end;
                if transmitting then
                   begin
-                  logger.debug('Calling station ' + DXCall + ' TotalContacts = ' + IntToStr(TotalContacts));
+                  logger.debug('Calling station %s, TotalContacts = %d', [DXCall, TotalContacts]);
                   PutCalltoCallWindow(DXCall);
                   DisplayBeamHeading(DXCall,DXGrid);
                   end;
@@ -400,8 +399,8 @@ begin
                           end;
                         end;
                      except
-                        logger.Error('*** Error in stringList access - sl.Count = ' + IntToStr(slCQMessage.Count));
-                        logger.Error('*** Message = ' + message);
+                        logger.Error('*** Error in stringList access - sl.Count = %d', [slCQMessage.Count]);
+                        logger.Error('*** Message = %s', [message]);
                      end;
                   finally
                      slCQMessage.Free;
@@ -428,11 +427,14 @@ begin
                Unpack(AData,index,comments);
                Unpack(AData,index,DXName);
 
-               logger.Trace('QSO logged: Date:' + FormatDateTime('dd-mmm-yyyy hh:mm:ss',date)
+               if logger.IsTraceEnabled then
+                  begin
+                  logger.Trace('QSO logged: Date:' + FormatDateTime('dd-mmm-yyyy hh:mm:ss',date)
                                + ' DX Call:' + DXCall + ' DX Grid:' + DXGrid
                                + ' Frequency:' + IntToStr(frequency) + ' Mode:' + mode + ' Report sent: ' + report
                                + ' Report received:' + reportReceived + ' TX Power:' + TXPower
                                + ' Comments:' + comments + ' Name:' + DXName);
+                  end;
               end;
             6:
                begin
@@ -467,10 +469,8 @@ begin
                      end;
 
                   //CalculateQSOPoints(TempRXData);
-                   if logger.IsDebugEnabled then
-                   begin
-                   logger.debug('TotalContacts right before update of NumberSent in uWSJTX ADIF UDP message = ' + IntToStr(TotalContacts));
-                   end;
+                   logger.debug('TotalContacts right before update of NumberSent in uWSJTX ADIF UDP message = %d', [TotalContacts]);
+
                   //TempRXData.NumberSent := TotalContacts;
                   //LogContact(TempRXData, true);
                   if ParametersOkay(TempRXData.Callsign, TempRXData.QTHString, ActiveBand, ActiveMode, ActiveRadioPtr.LastDisplayedFreq {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
@@ -502,7 +502,7 @@ begin
                end;
             else
                begin
-               logger.Error('WSJTX >>> Unrecognized message type:' + IntToStr(messageType));
+               logger.Error('WSJTX >>> Unrecognized message type: %d', [messageType]);
                end;
          end;
       end;
@@ -533,12 +533,13 @@ begin
 
    if not FSendColorization then
       begin
+      logger.debug('FSendColorization is false so not highlighting %s',[sCall]);
       Exit;
       end;
 // Build a header for a message
 
    // Send colors for Dupes (QSOB4)
-   
+
    magic := $ADBCCBDA;
 
    schema := 2;
@@ -558,7 +559,7 @@ begin
    if color = 1 then // DUPE  defaults to red - Add code to pull from config if there
 
       begin
-
+      logger.debug('Highlighting call %s as a dupe',[sCall]);
       // Background QColor first
 
       Pack(AData,colorType); // RGB
@@ -581,6 +582,7 @@ begin
 
    else if color = 2 then // multiplier
       begin               // Background QColor first
+      logger.debug('Highlighting call %s as a MULT',[sCall]);
       Pack(AData,colorType);
       PackFF00(AData);   //Pack(AData,Word(65280));     // Alpha
       Pack(AData,Byte(colorsMultBack.R)); Pack(AData,Byte(0)); // Red
@@ -637,32 +639,18 @@ begin
    //
 
    Pack(AData,Byte(0));
-
    Pack(AData,Word(0));
-
    Pack(AData,Word(0));
-
    Pack(AData,Word(0));
-
    Pack(AData,Word(0));
-
-
    Pack(AData,Byte(0));
-
    Pack(AData,Word(0));
-
    Pack(AData,Word(0));
-
    Pack(AData,Word(0));
-
    Pack(AData,Word(0));
-
-
 
    Pack(AData,true);        // Highlight last only
-
-
-   logger.trace('Sending Reset Colors');
+   logger.debug('Sending Reset Colors');
 
    udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
 
@@ -681,7 +669,7 @@ procedure TWSJTXServer.SetDupeBackgroundColor(rgb: cardinal);
 //var rgb: cardinal;
 begin
    //rgb := ColorToRGB(tc);
-   logger.Debug('Setting DupeBackgroundColor to %d',[rgb]);
+   logger.Debug('Setting DupeBackgroundColor to %d:%d:%d',[GetRValue(rgb), GetGValue(rgb), GetBValue(rgb)]);
    Self.colorsDupeBack.R := GetRValue(rgb);
    Self.colorsDupeBack.G := GetGValue(rgb);
    Self.colorsDupeBack.B := GetBValue(rgb);
@@ -699,7 +687,7 @@ procedure TWSJTXServer.SetMultBackgroundColor(rgb: cardinal);
 //var rgb: cardinal;
 begin
    //rgb := ColorToRGB(tc);
-   logger.Debug('Setting MultBackgroundColor to %d',[rgb]);
+   logger.Debug('Setting MultBackgroundColor to %d:%d:%d',[GetRValue(rgb), GetGValue(rgb), GetBValue(rgb)]);
    Self.colorsMultBack.R := GetRValue(rgb);
    Self.colorsMultBack.G := GetGValue(rgb);
    Self.colorsMultBack.B := GetBValue(rgb);
@@ -717,7 +705,7 @@ procedure TWSJTXServer.SetDupeForegroundColor(rgb: cardinal);
 //var rgb: cardinal;
 begin
    //rgb := ColorToRGB(tc);
-   logger.Debug('Setting DupeForegroundColor to %d',[rgb]);
+   logger.Debug('Setting DupeForegroundColor to %d:%d:%d',[GetRValue(rgb), GetGValue(rgb), GetBValue(rgb)]);
    Self.colorsDupeFore.R := GetRValue(rgb);
    Self.colorsDupeFore.G := GetGValue(rgb);
    Self.colorsDupeFore.B := GetBValue(rgb);
@@ -734,7 +722,7 @@ procedure TWSJTXServer.SetMultForegroundColor(rgb: cardinal);
 //var rgb: cardinal;
 begin
    //rgb := ColorToRGB(tc);
-   logger.Debug('Setting MultForegroundColor to %d',[rgb]);
+   logger.Debug('Setting MultForegroundColor to %d:%d:%d',[GetRValue(rgb), GetGValue(rgb), GetBValue(rgb)]);
    Self.colorsMultFore.R := GetRValue(rgb);
    Self.colorsMultFore.G := GetGValue(rgb);
    Self.colorsMultFore.B := GetBValue(rgb);

@@ -3820,6 +3820,8 @@ var
   RST                                   : Word;
 
 begin
+  logger.Trace('>>>Entering ParametersOkay');
+  logger.debug ('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d', [call,BandStringsArray[Band], ModeStringArray[Mode], freq]);
 
   //    RData.QTHString:='';
   ParametersOkay := False;
@@ -4184,6 +4186,7 @@ end;
 
 procedure tCleareCallWindow;
 begin
+   logger.debug('Clearing main call window');
   Windows.SetWindowText(wh[mweCall], nil);
 end;
 
@@ -5684,10 +5687,15 @@ end;
 
 procedure PutCallToCallWindow(Call: CallString);
 begin
-  Call[Ord(Call[0]) + 1] := #0;
-  if call = MyCall then exit;   // n4af issue 158
-  Windows.SetWindowText(wh[mweCall], @Call[1]);
-  PlaceCaretToTheEnd(wh[mweCall]);
+   logger.debug('Putting %s into main call window',[Call]);
+   Call[Ord(Call[0]) + 1] := #0;
+   if call = MyCall then
+      begin
+      logger.debug('Exiting PutCallToCallWindow early because call (%s) = MyCall (%s)',[call, MyCall]);
+      exit;   // n4af issue 158
+      end;
+   Windows.SetWindowText(wh[mweCall], @Call[1]);
+   PlaceCaretToTheEnd(wh[mweCall]);
 end;
 
 procedure SetColumnsWidth;
