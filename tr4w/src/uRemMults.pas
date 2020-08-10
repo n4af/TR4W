@@ -281,9 +281,9 @@ begin
             begin
 //              p := 'Prefixes';
 //              if ActivePrefixMult = CallSignPrefix then
-              tLB_SETCOLUMNWIDTH(hwnddlg, PREFIXCOLUMNWIDTH);
-//              else
-//                tLB_SETCOLUMNWIDTH(hwnddlg, BASECOLUMNWIDTH);
+//              tLB_SETCOLUMNWIDTH(hwnddlg, PREFIXCOLUMNWIDTH)   // 4.91.4
+//               else
+                tLB_SETCOLUMNWIDTH(hwnddlg, BASECOLUMNWIDTH);
             end;
 
           tw_STATIONS_RM_DX:
