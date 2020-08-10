@@ -6015,7 +6015,6 @@ begin
 
   tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_REMMULTSWINDOW_INDEX].WndHandle, Width);
 
-//  tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_STATIONS_RM_DOM].WndHandle, DomWidth);
 
 end;
 

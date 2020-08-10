@@ -181,7 +181,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.91.3' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.91.4' ;  // N4af     New Release
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
@@ -451,8 +451,8 @@ type
 //http://www.w3.org/TR/CSS2/syndata.html#value-def-color
 //http://www.w3schools.com/CSS/css_colorsfull.asp
 const
-  BASECOLUMNWIDTH                       = 45;
-  PREFIXCOLUMNWIDTH                     = 85;    // 4.83.1
+  BASECOLUMNWIDTH                       = 40;     // 4.90.4
+  PREFIXCOLUMNWIDTH                     = 104;    // 4.90.4
 
   tr4wColorsSA                          : array[tr4wColors] of PChar = (
     'LIGHT BLUE',
