@@ -107,7 +107,7 @@ uses
   utils_file in 'src\utils\utils_file.pas',
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas',
-  uGridLookup in 'src\uGridLookup.pas',
+ // uGridLookup in 'src\uGridLookup.pas',   // ny4i THis is not ready yet so no need to include yet.
   Log4D in 'src\Log4D.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}

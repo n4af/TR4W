@@ -1158,7 +1158,6 @@ label
   AddZone, AddDX, AddPrefix, AddDom;
 var
   i: integer;
-  DomWidth: integer;
   rmw: HWND;
   TempMultBand: BandType;
 begin

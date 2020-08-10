@@ -369,6 +369,7 @@ type
     class function GetLogger(const Name: string;
       const Factory: ILogLoggerFactory = nil): TLogLogger; overload;
     class function GetRootLogger: TLogLogger;
+    procedure Info(const sFormat: string; const Args: array of const); overload; virtual;
     procedure Info(const Message: string; const Err: Exception = nil);
       overload; virtual;
     procedure Info(const Message: TObject; const Err: Exception = nil);
@@ -1746,6 +1747,18 @@ begin
     Result := FLevel
   else
     Result := Parent.Level;
+end;
+
+procedure TLogLogger.Info(const sFormat: string; const Args: array of const);
+begin
+   if Self.IsInfoEnabled then
+      begin
+         try
+            Log(Log4D.Info,Format(sFormat, Args));
+         except on E : Exception do
+            Log(Log4D.Info,'Exception in Debug with Format statement = ' + sFormat,E);
+         end;
+      end;
 end;
 
 procedure TLogLogger.Info(const Message: string; const Err: Exception);
