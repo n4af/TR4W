@@ -2487,7 +2487,7 @@ const
    FT847ModeString = CHR(0) + CHR(0) + CHR(0) + CHR(7);
 
 begin
-   // TLogger.GetInstance.Debug(SysUtils.Format('[Enter SetRadioFreq] %s - set frequency to %u',[RadioName,freq]));
+   logger.debug('[SetRadioFreq] set frequency to %u',[freq]);
    skipMode := false;
       try
       case RadioParametersArray[RadioModel].rt of

@@ -6280,7 +6280,7 @@ begin
 
    try
    sADIF_UPPER := ANSIUPPERCASE(sADIF); // For testing without changing original
-  // Log('Parsing ' + sADIF); // <BAND:3>20m <...
+   logger.debug('[ParseADIFRecord] Parsing %s', [sADIF]); // <BAND:3>20m <...
    originalLen := length(sADIF);
 
    for i := 1 to originalLen do
@@ -6309,11 +6309,11 @@ begin
             fieldValue := Trim(theString);
             if length(fieldValue) <> StrToInt(fieldLen) then
                begin
-               DEBUGMSG('[' + fieldName + '] ' + 'field value length = ' + fieldLen + ' but actual length = ' + IntToStr(length(fieldValue)));
+               logger.error('[ParseADIFRecord] fieldName = [%s] field value length = %d but actual length = %d',[fieldName,fieldLen, length(fieldValue)]);
                end
             else
                begin
-               Case AnsiIndexText(AnsiUpperCase(fieldName),    // Be careful addng these.The order matters in the case...
+               Case AnsiIndexText(AnsiUpperCase(fieldName),    // Be careful addng these. The order matters in the case...
                      ['ARRL_SECT', 'BAND','CALL', 'CHECK', 'CLASS', 'CQ_Z',
                       'CONTEST_ID', 'CNTY', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
                       'IOTA', 'ITUZ', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
@@ -6337,7 +6337,7 @@ begin
                         exch.ceContest := contest;
                         end;
                      end;
-                  7: ; //CNTY
+                  7: logger.info('[ParseADIFRecord] CNTY was in record as %s but skipping since no place to put it',[fieldValue]); //CNTY
                   8: begin
                      gridSquare := fieldValue;
                      if Length(exch.QTHString) = 0 then
@@ -6356,6 +6356,7 @@ begin
                      neFreq := StrToFloat(fieldValue);
                      neFreq := neFreq * 1000000;
                      exch.Frequency := Trunc(neFreq);
+                     logger.Trace('[ParseADIFRecord] FREQ = %s', [fieldValue]);
                      end;
                   12: exch.Zone := StrToInt(fieldValue);
                   13:
