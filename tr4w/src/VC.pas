@@ -189,7 +189,7 @@ const
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'August 8, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'August 10, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
