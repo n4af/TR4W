@@ -6008,14 +6008,14 @@ begin
  // 4.71.2 attempt to allow longer column width for long DOM MULTS by setting SHOW DOMESTIC MULTIPLIER NAME to TRUE
 //  windows.ZeroMemory(@RemMultsColumnWidthArray, sizeof(RemMultsColumnWidthArray));
 
-   if (tShowDomesticMultiplierName) or (DoingPrefixMults) then
+    if (tShowDomesticMultiplierName) or (DoingPrefixMults) then
      Width := PREFIXCOLUMNWIDTH
       else
         Width := BASECOLUMNWIDTH;
 
   tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_REMMULTSWINDOW_INDEX].WndHandle, Width);
 
-
+ 
 end;
 
 procedure tEnumeratePorts;
