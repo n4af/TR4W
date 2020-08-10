@@ -747,7 +747,7 @@ var
   MyCall                                : CallString;
   DEPlusMyCall                          : Str160;
   MyCheck                               : Str10; {KK1L: 6.67 Was Str20}
-
+  MultiplierItemWidth                   : integer; // 4.91.4
   MyContinent                           : ContinentType {= UnknownContinent};
   MyCountry                             : Str20;
   MyZone                                : Str20; //ZoneMultiplierString;

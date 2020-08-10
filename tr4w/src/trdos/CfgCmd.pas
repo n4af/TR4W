@@ -1990,6 +1990,13 @@ begin
     ProcessConfigInstructions2 := Result1 = 0;
     Exit;
   end;
+
+  if ID = 'Multiplier Item Width' then
+  begin
+   Val(CMD, MultiplierItemWIdth,Result1);
+   MultiplierItemWidth := StrtoInt(CMD) ;
+   tLB_SETCOLUMNWIDTH(tr4w_WindowsArray[tw_REMMULTSWINDOW_INDEX].WndHandle, MultiplierItemWidth);
+   end;
  {
   if ID = 'FARNSWORTH ENABLE' then
   begin
