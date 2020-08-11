@@ -1434,7 +1434,7 @@ begin
       DigitalModeEnable := true;
       QSOByMode := False;
       QSOByBand := True;
-      LiteralDomesticQTH := true;
+ //     LiteralDomesticQTH := true;    // 4.91.5
       end;
 
   end;

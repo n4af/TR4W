@@ -37,7 +37,6 @@ __history/
 # Castalia statistics file
 *.stat.gitignore
 
-tr4w/target/*
 *.ini
 tr4w/target/tr4w.exe
 tr4w/target/settings/TR4W.INI
