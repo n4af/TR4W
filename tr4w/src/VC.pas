@@ -189,7 +189,7 @@ const
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'August 10, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'August 11, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -455,7 +455,7 @@ type
 //http://www.w3.org/TR/CSS2/syndata.html#value-def-color
 //http://www.w3schools.com/CSS/css_colorsfull.asp
 const
-  BASECOLUMNWIDTH                       = 48;     // 4.90.4
+  BASECOLUMNWIDTH                       = 49;     // 4.90.4
   PREFIXCOLUMNWIDTH                     = 104;    // 4.90.4
 
   tr4wColorsSA                          : array[tr4wColors] of PChar = (
