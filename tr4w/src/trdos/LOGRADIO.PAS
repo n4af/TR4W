@@ -3210,7 +3210,7 @@ begin
    Result := False;
    if not tPTTViaCommand then
       begin
-      DEBUGMSG('**** tPTTVIACAT called but tPTTViaCOmmand is false');
+      logger.debug('**** tPTTVIACAT called but tPTTViaCommand is false');
       Exit;
       end;
    if NoPollDuringPTT then
@@ -3235,10 +3235,10 @@ begin
          if PTTOn then
             begin
             TempString := 'TX;';
-            DEBUGMSG('Setting K3 to TX mode');
+            DEBUGMSG('Setting Kenwood/Flex/K3 to TX mode');
             end else
             begin
-            DEBUGMSG('Setting K3 to RX mode');
+            DEBUGMSG('Setting Kenwood/Flex/K3 to RX mode');
             TempString := 'RX;';
             end;
          end;
@@ -3279,6 +3279,7 @@ begin
 
       FT920, FT767:
          begin
+         logger.debug('FT920 or FT767 do not support PTT via CAT commands');
          Exit;
          end;
   
@@ -3313,7 +3314,7 @@ begin
          end;
       else
          begin
-         DEBUGMSG('Radio model does not support TX/RX commands');
+         logger.warn('Radio model does not support TX/RX commands');
          Exit;
          end;
       end;

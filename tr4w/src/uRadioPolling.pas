@@ -2796,7 +2796,7 @@ begin
                   end
                else
                   begin
-                     showint(Errs);
+                     logger.Error('In ReadFromCOMPort, Errs <> 0 %d', [Errs]);
                      Sleep(100);
                   end;
 

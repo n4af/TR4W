@@ -365,8 +365,17 @@ begin
                   slCQMessage.Clear;
                   slCQMessage.Delimiter := ' ';              // cq ny4i el87     a1   OR cq fd ny4i el87  a1
                   slCQMessage.DelimitedText := message;
+                  logger.debug('[uWSJTX] Processing message %s',[message]);
                   if slCQMessage[0] = 'CQ' then
                      begin
+                     if slCQMessage[slCQMessage.Count-1] = 'a1' then
+                        begin
+                        if slCQMessage[slCQMessage.Count-2] = '?' then
+                           begin
+                           slCQMessage.delete(slCQMessage.Count-1); // Delete last one
+                           end;
+                        slCQMessage.Delete(slCQMessage.Count-1);
+                        end;
                      case slCQMessage.Count of
                         2: begin
                            DXCall := slCQMessage[1];
@@ -397,6 +406,7 @@ begin
                                  end;
                               end;
                            end;
+
                         else
                            begin
                            call := '';
@@ -424,22 +434,18 @@ begin
                            end
                         else
                            begin
-                           if ActiveExchange = Grid2Exchange then
+                           if grid <> '' then        // Even if gridFields (2 digit) grid, the DeterimeIfNewDomesticMult only checks left 2 bytes
                               begin
-                              tempGrid := AnsiLeftStr(grid,2);
-                              end
-                           else
-                              begin
-                              tempGrid := grid;
-                              end;
-                           if tempGrid <> '' then
-                              begin
-                              logger.debug('[uWSJTX] Checking if grid %s is a multiplier (call=%s)', [tempGrid, DXCall]);
-                              VisibleLog.DetermineIfNewDomesticMult(tempGrid,TempBand, TempMode, nResult);
+                              logger.debug('[uWSJTX] Checking if grid %s is a multiplier (call=%s)', [AnsiLeftStr(grid,2), DXCall]);
+                              VisibleLog.DetermineIfNewDomesticMult(grid,TempBand, TempMode, nResult);
                               if nResult = 1 then
                                  begin
-                                 logger.debug('[uWSJTX] %s is a domestic MULT',[tempGrid]);
+                                 logger.debug('[uWSJTX] %s is a domestic MULT',[AnsiLeftStr(grid,2)]);
                                  HighLightCall(message,2, id); // Pass back id as given to us
+                                 end
+                              else
+                                 begin
+                                 logger.debug('[uWSJTX] %s is NOT a domestic MULT',[AnsiLeftStr(grid,2)]);
                                  end;
                               end;
                            end;

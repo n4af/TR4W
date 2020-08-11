@@ -308,15 +308,18 @@ var
   tc: tcolor;
   rgb: cardinal;
 begin
-   appender := TLogRollingFileAppender.Create('name','tr4w.log');
+   appender := TLogRollingFileAppender.Create('name','tr4w-debug.log');
    //appender.Layout := TLogPatternLayout.Create('%d [%5p] %m%n');
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
    //appender.Layout := TLogHTMLLayout.Create;
    TLogBasicConfigurator.Configure(appender);
+
    logLevels := llError; // For after we load config so we can set the value.
    TLogLogger.GetRootLogger.Level := Error;
    logger := TLogLogger.GetLogger('TR4WDebugLog');
-   logger.Trace('trace output');
+
+   logger.debug('trace output');
+
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
   if tMutex = 0 then
