@@ -369,6 +369,7 @@ type
     class function GetLogger(const Name: string;
       const Factory: ILogLoggerFactory = nil): TLogLogger; overload;
     class function GetRootLogger: TLogLogger;
+    procedure Info(const sFormat: string; const Args: array of const); overload; virtual;
     procedure Info(const Message: string; const Err: Exception = nil);
       overload; virtual;
     procedure Info(const Message: TObject; const Err: Exception = nil);
@@ -399,6 +400,7 @@ type
       overload; virtual;
     procedure Warn(const Message: TObject; const Err: Exception = nil);
       overload; virtual;
+      procedure Warn(const sFormat: string; const Args: array of const); overload; virtual;
   end;
 
   { The specialised root logger - cannot have a nil level. }
@@ -1748,6 +1750,18 @@ begin
     Result := Parent.Level;
 end;
 
+procedure TLogLogger.Info(const sFormat: string; const Args: array of const);
+begin
+   if Self.IsInfoEnabled then
+      begin
+         try
+            Log(Log4D.Info,Format(sFormat, Args));
+         except on E : Exception do
+            Log(Log4D.Info,'Exception in Debug with Format statement = ' + sFormat,E);
+         end;
+      end;
+end;
+
 procedure TLogLogger.Info(const Message: string; const Err: Exception);
 begin
   Log(Log4D.Info, Message, Err);
@@ -1893,6 +1907,22 @@ procedure TLogLogger.Warn(const Message: TObject; const Err: Exception);
 begin
   Log(Log4D.Warn, Message, Err);
 end;
+
+procedure TLogLogger.Warn(const sFormat: string; const Args: array of const);
+begin
+   if Self.IsWarnEnabled then     // We do this so we do not spend time formatting a statement we will not use
+      begin
+         try
+            Log(Log4D.Warn,Format(sFormat, Args));
+         except on E : Exception do
+            Log(Log4D.Warn,'Exception in Warn with Format statement = ' + sFormat,E);
+         end;
+      end;
+
+end;
+
+
+
 
 { TLogRoot --------------------------------------------------------------------}
 
@@ -2256,10 +2286,12 @@ end;
 procedure TLogCustomLayout.Init;
 begin
   inherited Init;
-  SetOption(DateFormatOpt,
+  SetOption(DateFormatOpt,'dd mmm yyyy hh:nn:ss.zzz');
+(*  SetOption(DateFormatOpt,
     {$IFDEF DELPHIXE_UP}FormatSettings.{$ENDIF}
     {$IFDEF FPC}FormatSettings.{$ENDIF}
     ShortDateFormat);
+    *)
 end;
 
 { Set a list of options for this layout. }

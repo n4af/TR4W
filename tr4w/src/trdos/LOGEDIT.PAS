@@ -575,7 +575,10 @@ procedure EditableLog.ProcessMultipliers(var RXData: ContestExchange);
 
 begin
   if RXData.InhibitMults then
+    begin
+    logger.Error('ProcessMultipliers called while RXData.InhibitMults is set - Exiting...');
     Exit;
+    end;
 
   Sheet.SetMultFlags(RXData);
 
@@ -776,7 +779,10 @@ var
 begin
 
   if length(DomesticQTH) < 2 then
-    Exit;
+     begin
+     logger.warn('ShowDomesticMultiplierStatus called with DomesticQTH length < 2 %s   Exiting...',[DomesticQTH]);
+     Exit;
+     end;
   DomesticQTHtemp := DomesticQTH;
 
   Format(wsprintfBuffer, TC_MULTNEEDSFOR, PChar(DomesticQTHtemp));
@@ -788,7 +794,10 @@ end;
 procedure EditableLog.ShowMultiplierStatus(Call: CallPtr {CallString});
 begin
   if length(Call^) < 2 then
-    Exit;
+     begin
+     logger.warn('ShowDomesticMultiplierStatus called with DomesticQTH length < 2 %s   Exiting...',[Call^]);
+     Exit;
+     end;
   //  tLB_RESETCONTENT(MultiplierInformationWindowHandle);
   {
     asm
@@ -1158,7 +1167,6 @@ label
   AddZone, AddDX, AddPrefix, AddDom;
 var
   i: integer;
-  DomWidth: integer;
   rmw: HWND;
   TempMultBand: BandType;
 begin

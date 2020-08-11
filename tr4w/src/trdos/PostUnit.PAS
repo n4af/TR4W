@@ -158,7 +158,7 @@ function GoodLookingQSO: boolean;
 //function CorrectContestExchange: boolean;
 
 var
-  tShowFrequencyinLog                   : boolean = False;
+  tShowFrequencyinLog                   : boolean = true;     // Was false but Howie confirmed it should be true de NY4I 9 AUG 2020
   Radio1IDs                             : Str10;
 //  Radio2ID                              : Char = #0;
   RateSheet                             : RateSheetPointer;
@@ -2478,7 +2478,8 @@ begin
        RSTSent := PChar(SysUtils.Format('%d', [TempRXData.RSTSent]));
        end;
 
-    if TempRXData.RSTReceived < 25 then
+    if (TempRXData.ExtMode in [eFT8, eMFSK, eJT65]) and
+       (TempRXData.RSTReceived < 25)                then
        begin
        RSTReceived := PChar(SysUtils.Format('%d', [wsjtx.ConvertSNRToRST(TempRXData.RSTReceived)]));
        end
@@ -2489,14 +2490,30 @@ begin
     
     nrReceived := TempRXData.NumberReceived;
     nrSent := TempRXData.NumberSent;
-    Freq := tCabrilloFreqString[TempRXData.Band];
+    if tShowFrequencyInLog then
+       begin
+       if (TempRXData.Frequency = 0) then                                // Get base frequency from band
+          begin
+          Freq := tCabrilloFreqString[TempRXData.Band];                     // https://wwrof.org/cabrillo/cabrillo-qso-data/
+          end
+       else
+          begin
+          if (TempRXData.Frequency > 0) and (TempRXData.Frequency < 30000000) then
+             begin
+             Freq := inttopchar(TempRXData.Frequency div 1000);
+             end
+          else
+             begin                                                             // Per the Cabrillo spec, if above 30 Mhz, do not use actual frequency
+             Freq := tCabrilloFreqString[TempRXData.Band];                     // https://wwrof.org/cabrillo/cabrillo-qso-data/
+             end;
+          end;
+       end
+    else
+       begin
+       Freq := tCabrilloFreqString[TempRXData.Band];
+       end; 
 
-    if tShowFrequencyinLog then
-    begin
-      if TempRXData.Frequency > 0 then
-        if TempRXData.Frequency < 30000000 then
-          Freq := inttopchar(TempRXData.Frequency div 1000);
-    end;
+
     // This was just assuming any digital contact was RY which is obviously not true.
     if TempRXData.Mode = Digital then
        begin
@@ -4014,7 +4031,6 @@ var
   csPower                               : PChar;
   //hisAge                                : Integer;
   csQTHString                           : PChar;
-  HisZone                               : integer;
   //str1                                  : widestring;
   //nrReceived                            : integer;
   nrSent                                : integer;
@@ -4024,16 +4040,14 @@ var
   //T2                                    : PChar;
   //T3                                    : PChar;
   //T4                                    : PChar;      // 4.73.6
-  cRandomCharsReceived                  : PChar;
   //cKids                                 : PChar;
   TempGrid                              : Str20;
   previousqsonr                         : integer;
-  TransmitterIDPos                      : integer;
   contacts                              : integer;
   PreviousQTHString                     : Str10;
   pnr                                   : integer;
-  hisnr                                 : integer;
-  rxnr                                  : integer;
+  
+
 
 
 begin
