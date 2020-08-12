@@ -133,7 +133,7 @@ label
 var
   TempString {, DString}                : ShortString;
   bt                                    : BandType;
-  mt                                    : ModeType;
+  //mt                                    : ModeType;
   extMode                               : ExtendedModeType;
   IndexInMap                            : integer;
   lpNumberOfBytesRead                   : Cardinal;

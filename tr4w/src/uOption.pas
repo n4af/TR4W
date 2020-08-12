@@ -409,7 +409,6 @@ var
   c                                     : integer;
 //  h                                     :HWND;
   TempColor                             : Ptr4wColors;
-  rgb                                   : cardinal;
 begin
 
   Row := SendMessage(SettingshLV, LVM_GETNEXTITEM, -1, 1);

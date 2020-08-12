@@ -277,6 +277,8 @@ begin
 
         case WindowsType(lParam) of
 
+         tw_STATIONS_RM_DOM: p := 'Domestic'; // 4.91.5
+
           tw_STATIONS_RM_PREFIX:
             begin
 //              p := 'Prefixes';
@@ -292,15 +294,15 @@ begin
               tLB_SETCOLUMNWIDTH(hwnddlg, BASECOLUMNWIDTH);
             end;
 
-//          tw_STATIONS_RM_DOM: p := 'Domestic';
+
           tw_STATIONS_RM_ZONE:
             begin
 //              p := 'Zones';
               tLB_SETCOLUMNWIDTH(hwnddlg, BASECOLUMNWIDTH);
             end;
-//          tw_REMMULTSWINDOW_INDEX: p := 'Remaining mults';
+          tw_REMMULTSWINDOW_INDEX: p := 'Remaining mults';  // 4.91.5
         end;
-//        Windows.SetWindowText(hwnddlg, p);
+         Windows.SetWindowText(hwnddlg, p);    // 4.91.5
 
         SetRemMultsColumnWidth;
 

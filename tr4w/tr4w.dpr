@@ -99,7 +99,7 @@ uses
   uMessagesList in 'src\uMessagesList.pas',
   uRussiaOblasts in 'src\uRussiaOblasts.pas',
   uMenu in 'src\uMenu.pas',
-  winsock2 in '..\include\WinSock2.pas',
+  winsock2 in 'src\include\WinSock2.pas',
   utils_net in 'src\utils\utils_net.pas',
   utils_hw in 'src\utils\utils_hw.pas',
   utils_text in 'src\utils\utils_text.pas',
@@ -107,7 +107,7 @@ uses
   utils_file in 'src\utils\utils_file.pas',
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas',
-  uGridLookup in 'src\uGridLookup.pas',
+ // uGridLookup in 'src\uGridLookup.pas',   // ny4i THis is not ready yet so no need to include yet.
   Log4D in 'src\Log4D.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
@@ -308,15 +308,18 @@ var
   tc: tcolor;
   rgb: cardinal;
 begin
-   appender := TLogRollingFileAppender.Create('name','tr4w.log');
+   appender := TLogRollingFileAppender.Create('name','tr4w-debug.log');
    //appender.Layout := TLogPatternLayout.Create('%d [%5p] %m%n');
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
    //appender.Layout := TLogHTMLLayout.Create;
    TLogBasicConfigurator.Configure(appender);
+
    logLevels := llError; // For after we load config so we can set the value.
    TLogLogger.GetRootLogger.Level := Error;
    logger := TLogLogger.GetLogger('TR4WDebugLog');
-   logger.Trace('trace output');
+
+   logger.debug('trace output');
+
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
   if tMutex = 0 then
