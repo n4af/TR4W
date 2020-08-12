@@ -166,62 +166,11 @@ var
 
 function DVPActive: boolean;
 
-var
-  DVPEntryOffset, DVPEntrySegment       : Word;
+
 
 begin
-  {    DVPActive := False;
-      SBDVPActive := False; //KK1L: 6.65 Added direct support of SBDVP
 
-      DVPEntryOffset  := MemW [0: 4 * $60];
-      DVPEntrySegment := MemW [0: 4 * $60 + 2];
-
-      IF (DVPEntryOffset = 0) OR (DVPEntrySegment < 8) THEN Exit;
-
-  //    {KK1L: 6.65 Changed TSR check to allow for SBDVP unique ID
-  //    {           This looks for ID from K1EA TSR or SBDVP version
-  //    {           1.2 or earlier which had a bug and interpreted
-  //    {           DVPIsActive as DVPStopPlay.
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 8] = Ord ('D') THEN
-        IF Mem [DVPEntrySegment : DVPEntryOffset - 7] = Ord ('V') THEN
-          IF Mem [DVPEntrySegment : DVPEntryOffset - 6] = Ord ('P') THEN
-            IF Mem [DVPEntrySegment : DVPEntryOffset - 5] = Ord ('T') THEN
-              IF Mem [DVPEntrySegment : DVPEntryOffset - 4] = Ord ('S') THEN
-                IF Mem [DVPEntrySegment : DVPEntryOffset - 3] = Ord ('R') THEN
-                  IF Mem [DVPEntrySegment : DVPEntryOffset - 2] = Ord ('0') THEN
-                    IF Mem [DVPEntrySegment : DVPEntryOffset - 1] = Ord ('0') THEN
-                      BEGIN
-                      DVPActive := True;
-                      Exit;
-                      END;
-
-  //    {KK1L: 6.65 Look for SBDVP000. Says SBDVP version 1.02 or greater
-  //    {           by Kevin Schmidt is loaded
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 8] <> Ord ('S') THEN Exit;
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 7] <> Ord ('B') THEN Exit;
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 6] <> Ord ('D') THEN Exit;
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 5] <> Ord ('V') THEN Exit;
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 4] <> Ord ('P') THEN Exit;
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 3] <> Ord ('0') THEN Exit;
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 2] <> Ord ('0') THEN Exit;
-      IF Mem [DVPEntrySegment : DVPEntryOffset - 1] <> Ord ('0') THEN Exit;
-      DVPActive := True;
-      SBDVPActive := True;
-     }
 end;
-{
-procedure SetLength(Seconds: integer);
-
-var
-  TempInt                               : LONGINT;
-  TempString                            : Str80;
-
-begin
-  TempInt := Seconds;
-  TempInt := TempInt * 2 * 9600;
-  SharedMemory^.length := TempInt;
-end;
-}
 
 procedure SetTransmitControl(Bytes: Byte);
 
@@ -237,43 +186,8 @@ end;
 
 procedure DVPCommand(Command: integer; FileName: Str80; UseDVPPath: boolean);
 
-var
-  Count, Offset                         : integer;
-  //    Regs: Registers;
-  TempStr                               : Str80;
-
 begin
-  {    DVPSetFileName (FileName, UseDVPPath);
 
-      Regs.AX := $FF;
-
-      Count := 0;
-
-      MemW [SharedMemorySegment : SharedMemoryOffset + $42] := Command;
-      WHILE Regs.AX <> 0 DO
-          BEGIN
-          MemW [SharedMemorySegment : SharedMemoryOffset + $42] := Command;
-
-          Regs.DI := $FF;
-
-          Intr ($60, Regs);
-          Inc (Count);
-
-          IF Count > 1000 THEN Exit;
-
-          Wait (2);
-          END;
-
-      {IF Command <> 43 THEN
-        BEGIN
-        Str(Command, TempStr);
-        TempStr := 'DVPCommand ' + TempStr + ' press DownArrow';      //”¡–¿ÕŒ Õ≈ ÃÌÓ…!!!!!!!
-        QuickDisplay2(TempStr);
-        REPEAT UNTIL NewReadKey = DownArrow;
-        END
-      ELSE
-
-}
 end;
 
 procedure SetMicGain(Gain: Byte);
@@ -361,106 +275,19 @@ end;
 
 procedure DVPUnInit;
 
-var
-  Key                                   : Char;
-
 begin
 
-  {    IF DVPPath <> '' THEN
-          BEGIN
-          REPEAT
-              Key := UpCase (GetKey ('Save DVP files in ' + DVPPath + ' to the current directory? (Y/N) : '));
-              IF Key = EscapeKey THEN Exit;
-          UNTIL (Key = 'Y') OR (Key = 'N');
-          WriteLn;
 
-          IF Key = 'Y' THEN
-              BEGIN
-              WriteLn ('Copying DVP files from ', DVPPath);
-              CopyFiles (DVPPath, '*.DVP', '');
-              END;
-          END;
-     }
 end;
 
 procedure DVPInit;
-{var
-   devs                            : Cardinal;
-   WAVEINCAPS1                     : PWaveInCapsA;
-   s                               : string;
-  }
+
 begin
-  //DVPSetUp := False;
-  //if MMSystem.waveInGetNumDevs > 0 then
+
   DVPSetUp := True;
-  {   waveInGetDevCaps(0, WAVEINCAPS1, SizeOf(WAVEINCAPS));
-     System.SetLength(s, 31);
-     s := WAVEINCAPS1.szPname;
-     ShowMessage(s);
-  }
-     {    IF NOT DVPActive THEN
-             BEGIN
-             WriteLn ('DVPTSR is not loaded!!');
-             Halt;
-             END;
 
-     //      Determine DVP Path and if it exists, copy messages from the current
-     //      directory to it.
-
-         Write ('1');
-
-         DVPPath := '';
-
-         IF CFGDVPPath <> '' THEN
-             BEGIN
-             Write ('2');
-             DVPPath := CFGDVPPath;
-             WriteLn ('Copying DVP files to ', DVPPath);
-
-             CopyFiles ('', '*.DVP', DVPPath);
-             END
-         ELSE
-             BEGIN
-             Write ('3');
-             FOR Count := 1 TO EnvCount DO
-                 IF StringHas (UpperCase (EnvStr (Count)), 'DVPPATH') THEN
-                     BEGIN
-                     DVPPath := PostcedingString (UpperCase (EnvStr (Count)), '=');
-
-                     WriteLn ('Copying DVP files to ', DVPPath);
-
-                     IF DVPPath [Length (DVPPath)] <> '\' THEN
-                         DVPPath := DVPPath + '\';
-
-                     WriteLn ('Copying DVP files to ', DVPPath);
-                     CopyFiles ('', '*.DVP', DVPPath);
-                     Break;
-                     END;
-             END;
-
-         Write ('4');
-
-         IF NOT SetUpSharedMemoryAddress THEN
-             BEGIN
-             DVPSetUp := False;
-             Exit;
-             END;
-
-         TypicalDVPStartup;
-         DVPOn := True;
-         DVPSetUp := True;
-         IF BackCopyEnable THEN StartBackCopy;
-        }
 end;
-{
-procedure StartBackCopy;
 
-begin
-  if not DVPSetUp then Exit;
-  SetLength(30);
-  DVPCommand(DVPBackCopy, 'BACKCOPY.WAV', True);
-end;
-}
 
 procedure StopBackCopy;
 

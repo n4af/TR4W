@@ -536,7 +536,6 @@ end;
 procedure StartDVK(MemorySwitch: integer);
 
 var
-  BaseAddress                           : Word;
   Image                                 : Byte;
 
 begin
@@ -657,7 +656,6 @@ procedure TurnOffActivePort;
 var
   SerialOff                             : Cardinal;
   hand                                  : HWND;
-  serial_not_parallel                   : boolean;
   TempByte                              : Byte;
 begin
   if ActiveRadioPtr.tKeyerPortHandle = INVALID_HANDLE_VALUE then Exit;
@@ -2026,33 +2024,6 @@ begin
   }
 end;
 
-procedure LetFootSwitchControlPTT;
-
-var
-  Pressed                               : boolean;
-
-begin
-  {    IF PTTForcedOn THEN Exit;
-
-      CASE ActiveFootSwitchPort OF
-          Parallel1: Pressed := (Port [LPT1BaseAddress + ParallelInputAddressOffset] AND $08) <> $08;
-          Parallel2: Pressed := (Port [LPT2BaseAddress + ParallelInputAddressOffset] AND $08) <> $08;
-          Parallel3: Pressed := (Port [LPT3BaseAddress + ParallelInputAddressOffset] AND $08) <> $08;
-          ELSE
-              Exit;
-          END;
-
-      PTTFootSwitch := Pressed;
-
-      IF PTTFootSwitch <> LastFootSwitchStatus THEN
-          BEGIN
-          TurnOffActivePort;
-          LastFootSwitchStatus := PTTFootSwitch;
-          IF PaddlePTTOffTimer > 0 THEN PaddlePTTOffTimer := 1;
-          END;
-     }
-end;
-
 function DVKMessagePlaying: boolean;
 
 begin
@@ -2069,6 +2040,7 @@ begin
 
 end;
 
+(*
 procedure TimerInterrupt(uTimerID, uMessage: UINT; dwUser, dw1, dw2: DWORD) stdcall; //(Flags, CS, IP, ax, BX, cx, DX, SI, DI, DS, ES, BP: Word);
 label
   back;
@@ -2102,247 +2074,7 @@ var
 begin
   back:
 
-  //Decrement or Increment various counts or timers
 
-{   if DelayCount > 0 then Dec(DelayCount); // for Wait Procedure
-
-  if DVKDelay > 0 then Dec(DVKDelay);
-
-  if CountsSinceLastCW <> 0 then inc(CountsSinceLastCW);
-
-  if FootSwitchCount > 0 then Dec(FootSwitchCount);
-
-  if FootSwitchMode = Normal then LetFootSwitchControlPTT;
-
-  //     Check the Beep count and status.
-
-  if BeepCount > 0 then
-     begin
-        Dec(BeepCount);
-
-        if BeepCount = 0 then
-           NoSound
-        else
-           case ActiveBeep of
-              BeepCongrats:
-                 begin
-                    if BeepCount = 210 then Sound(660);
-                    if BeepCount = 180 then Sound(790);
-                    if BeepCount = 150 then Sound(1060);
-                    if BeepCount = 90 then Sound(790);
-                    if BeepCount = 60 then Sound(1060);
-                 end;
-
-              ThreeHarmonics:
-                 begin
-                    if BeepCount = 50 then Sound(2000);
-                    if BeepCount = 25 then Sound(4000);
-                 end;
-
-              Warning:
-                 begin
-                    if (BeepCount = 125) or
-                       (BeepCount = 75) or
-                       (BeepCount = 25) then Sound(1000);
-                    if (BeepCount = 100) or (BeepCount = 50) then Sound(1500);
-                 end;
-
-              PromptBeep:
-                 begin
-                    if (BeepCount = 80) or (BeepCount = 40) then NoSound;
-                    if (BeepCount = 60) or (BeepCount = 20) then Sound(2000);
-                 end;
-
-           end;
-     end;
-}
-  //     First we check the keyer status
-{
-  if DoingPaddle or TuneWithDits then
-     begin
-        if SendStatus = NothingBeingSent then
-           if DitMemory then
-              begin
-                 CPUKeyer.Dit;
-                 SendStatus := DitBeingSent;
-                 DitMemory := False;
-                 PaddlePTTOffTimer := PaddlePTTOffTimerCount;
-              end
-           else
-              if DahMemory then
-                 begin
-                    CPUKeyer.Dah;
-                    SendStatus := DahBeingSent;
-                    DahMemory := False;
-                    PaddlePTTOffTimer := PaddlePTTOffTimerCount;
-                    SendingADah := true;
-                 end;
-
-        if TuneWithDits then
-           if (Mem[$40: $17] and 6) = 6 then // Keys pressed
-              begin
-                 TuningWithDits := true;
-                 RememberCodeSpeed := CPUKeyer.CodeSpeed;
-                 ElementLength := round(ElementLengthConstant / 75);
-                 PaddlePTTOffTimerCount := ElementLength * PaddlePTTHoldCount;
-              end
-           else
-              if TuningWithDits then
-                 begin
-                    TuningWithDits := False;
-                    CPUKeyer.CodeSpeed := RememberCodeSpeed;
-                    ElementLength := round(ElementLengthConstant / CPUKeyer.CodeSpeed);
-                    PaddlePTTOffTimerCount := ElementLength * PaddlePTTHoldCount;
-                 end;
-
-        if DitContact or TuningWithDits then
-           begin
-              case SendStatus of
-                 NothingBeingSent:
-                    begin
-                       CWBufferStart := CWBufferEnd;
-                       if (MonitorTone <> 0) and (BeepCount = 0) then NoSound;
-                       TurnOffActivePort;
-                       MonitorTone := PaddleMonitorTone;
-                       CPUKeyer.Dit;
-                       SendStatus := DitBeingSent;
-                    end;
-
-                 DahBeingSent:
-                    if CPUKeyer.CurtisModeA then
-                       DitMemory := not SendingADah
-                    else
-                       DitMemory := true;
-              end;
-
-              PaddlePTTOffTimer := PaddlePTTOffTimerCount;
-
-              if not PaddleActive then
-                 begin
-                    PaddleActive := true;
-                    if PaddleSpeed <> 0 then CPUKeyer.SetSpeed(PaddleSpeed);
-                 end;
-           end;
-
-        if DahContact then
-           begin
-              if PaddleBug then
-                 begin
-                    if not PaddleBugDahBeingSent then
-                       begin
-                          PaddleBugDahBeingSent := true;
-
-                          CWBufferStart := CWBufferEnd;
-                          if (MonitorTone <> 0) and (BeepCount = 0) then NoSound;
-                          MonitorTone := PaddleMonitorTone;
-                          TurnOffActivePort;
-                          CWElementLength := 0;
-
-                          CWBuffer^[CWBufferEnd].length := 10;
-                          CWBuffer^[CWBufferEnd].Key := true;
-                          CPUKeyer.IncrementBufferEnd;
-
-                          if not PTTAsserted then
-                             begin
-                                PTTAsserted := true;
-                                PTTDelayCount := PTTTurnOnDelay;
-                                TurnOffActivePort;
-                             end;
-                       end;
-                 end
-              else
-                 case SendStatus of
-                    NothingBeingSent:
-                       begin
-                          CWBufferStart := CWBufferEnd;
-                          if (MonitorTone <> 0) and (BeepCount = 0) then NoSound;
-                          TurnOffActivePort;
-                          MonitorTone := PaddleMonitorTone;
-                          CPUKeyer.Dah;
-                          SendStatus := DahBeingSent;
-                          SendingADah := true;
-                       end;
-
-                    DitBeingSent: DahMemory := true;
-                 end;
-}
-              // Runtime error at next line 201 @ 20AD:59C8
-{
-              PaddlePTTOffTimer := PaddlePTTOffTimerCount;
-
-              if not PaddleActive then
-                 begin
-                    PaddleActive := true;
-                    if PaddleSpeed <> 0 then CPUKeyer.SetSpeed(PaddleSpeed);
-                 end;
-           end
-        else
-           if PaddleBug and PaddleBugDahBeingSent then
-              begin
-                 PaddleBugDahBeingSent := False;
-                 TurnOffActivePort;
-                 if (MonitorTone <> 0) and (BeepCount = 0) then NoSound;
-                 CWBufferStart := CWBufferEnd;
-                 SendStatus := NothingBeingSent;
-              end;
-
-     end;
-}
-  //     Now we check the tuning keys
-
-{
-
-  if not TuneWithDits then
-     if Tuning then
-        begin
-           if (Mem[$40: $17] and 6) <> 6 then // Not left shift & control keys
-              begin
-                 Tuning := False;
-                 TurnOffActivePort;
-                 if (MonitorTone <> 0) and (BeepCount = 0) then NoSound;
-                 CWBufferStart := CWBufferEnd;
-                 SendStatus := NothingBeingSent;
-                 RITEnable := RememberRIT;
-                 CPUKeyer.AddStringToCWBuffer('', MonitorTone); //KK1L: 6.73 Restore tone for CW
-              end;
-        end
-     else
-        begin
-           if (Mem[$40: $17] and 6) = 6 then // Left shift and control keys
-              begin
-                 Tuning := true;
-                 RememberRIT := RITEnable;
-                 RITEnable := False;
-
-                 CPUKeyer.AddStringToCWBuffer('', 0); //KK1L: 6.73 Disable tone when tuning without dits (using as PTT)
-
-                 //Abort any CW message
-
-                 CWBufferStart := CWBufferEnd;
-                 if (MonitorTone <> 0) and (BeepCount = 0) then NoSound;
-                 TurnOffActivePort;
-                 CWElementLength := 0;
-
-                 if not CWBufferAvailable then
-                    begin
-                       New(CWBuffer);
-                       CWBufferAvailable := true;
-                    end;
-
-                 CWBuffer^[CWBufferEnd].length := 10;
-                 CWBuffer^[CWBufferEnd].Key := true;
-                 CPUKeyer.IncrementBufferEnd;
-
-                 if not PTTAsserted then
-                    begin
-                       PTTAsserted := true;
-                       PTTDelayCount := PTTTurnOnDelay;
-                       TurnOffActivePort;
-                    end;
-              end;
-        end;
-}
-  //Check PTTDelayCount timer.  If not active, then check CW status
 
   if PTTDelayCount > 0 then
   begin
@@ -2350,17 +2082,7 @@ begin
 
     if FootSwitchMode = CWGrant then
     begin
-          {               case ActiveFootSwitchPort of
-                            Parallel1:
-                               if (port[Lpt1BaseAddress + ParallelInputAddressOffset] and $08) <> $08 then Dec(PTTDelayCount);
 
-                            Parallel2:
-                               if (port[Lpt2BaseAddress + ParallelInputAddressOffset] and $08) <> $08 then Dec(PTTDelayCount);
-
-                            Parallel3:
-                               if (port[Lpt3BaseAddress + ParallelInputAddressOffset] and $08) <> $08 then Dec(PTTDelayCount);
-                         end;
-                     }
     end
     else
       dec(PTTDelayCount);
@@ -2511,7 +2233,7 @@ begin
   Sleep(2);
   goto back;
 end;
-
+*)
 procedure K1EAKeyer.InitializeKeyer;
 
 var
@@ -2921,7 +2643,6 @@ end;
 procedure tCWSleep(millsec, myEvent: Cardinal);
 var
   t                                     : Cardinal;
-  Start                                 : int64;
 begin
   if millsec = 0 then Exit;
 {$IF tDebugMode}

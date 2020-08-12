@@ -297,21 +297,16 @@ var
   TempTLogBrush                         : TLogBrush {= (lbStyle: BS_SOLID; lbHatch: 0)};
   c                                     : Cardinal;
   TempString                            : ShortString;
-     P                                   : Pchar; //n4af
-      P1                                   : boolean; //n4af
-   S1                                   : String; //n4af
+    // P                                   : Pchar; //n4af
+     // P1                                   : boolean; //n4af
+   //S1                                   : String; //n4af
 {$IF not tDebugMode}
   s                                     : string;
 {$IFEND}
-  logBuffer                             : string;
   tempStickyKey                         : STICKYKEYS;
-  tc: tcolor;
-  rgb: cardinal;
 begin
    appender := TLogRollingFileAppender.Create('name','tr4w-debug.log');
-   //appender.Layout := TLogPatternLayout.Create('%d [%5p] %m%n');
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
-   //appender.Layout := TLogHTMLLayout.Create;
    TLogBasicConfigurator.Configure(appender);
 
    logLevels := llError; // For after we load config so we can set the value.

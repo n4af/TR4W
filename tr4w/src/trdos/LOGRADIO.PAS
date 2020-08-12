@@ -1543,9 +1543,7 @@ end; // SendRITFreqCommand;
 
 
 procedure RadioObject.SetICOMRITFrequency(hz: integer);
-var newFreq: integer;
-    absHz : integer;
-    foo : integer;
+
 begin
    {CommandsTempBuffer[0] := Chr(11);
    CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
@@ -2974,11 +2972,8 @@ begin
             begin
             i := Format(tOrionFreq, '*AF%02u.%05u'#13, Freq div 1000000,
                (Freq div 10) mod 100000);
-            //        asm push freq  end;
-            //        i := wsprintf(@tKenwood14Bytes, '*AF%u'#13);
-            //        asm add esp,12 end;
+
             tOrionFreq[1] := VFO;
-            //        WriteToCATPort(tOrionFreq, i);
 
             case Mode of
                CW:

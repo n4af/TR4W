@@ -37,7 +37,6 @@ type
       udpServ : TIdUDPServer;
       tcpServ: TIdTCPServer;
       started: boolean;
-      ULoc : string;
       peerPort: word;
       FUDPPort: integer;
       FTCPPort: integer;
@@ -66,6 +65,7 @@ type
       procedure SetUDPPort(nPort: integer);
       procedure SetTCPPort(nPort: integer);
       function GetNextADIFField(var sBuffer: string; var fieldName: string; var fieldValue: string): boolean;
+      procedure HandleMessage_Clear;
   protected
     procedure OnServerRead(ASender: TIdUDPListenerThread; const AData: TIdBytes; ABinding: TIdSocketHandle);
     procedure OnBeforeBind(AHandle: TIdSocketHandle);
@@ -122,7 +122,8 @@ uses
    ,TF            // for SetMainWindowText
    ,Tree          // for LooksLikeAGrid
    ,utils_text
-   ,LogK1EA       // to access tPTTViaCommand
+   ,LogK1EA       // for tPTTViaCommand
+   ,LogDOM        // for ActiveDomesticMult
    ;
 // {$R *.dfm}
 
@@ -258,13 +259,11 @@ var
   DT: Double;
   DF: Cardinal;
   date: TDateTime;
-  Memomessage: string;
   RXDF, TXDF: integer;
   TempRXData: ContestExchange;
   TempMode: ModeType;
   TempBand: BandType;
   grid: string;
-  tempGrid: string;
   nResult: integer;
   shortStr: shortString;
 
@@ -338,7 +337,17 @@ begin
                   if DXCall <> sCallSentToWindow then
                      begin
                      sCallSentToWindow := DXCall;
+                     VisibleLog.ShowQSOStatus(DXCall);
+                     //ShowStationInformation(@DXCall);
                      PutCalltoCallWindow(DXCall);
+                     if ActiveDomesticMult = GridFields then
+                        begin
+                        VisibleLog.ShowDomesticMultiplierStatus(AnsiLeftStr(DXGrid,2));
+                        end
+                     else
+                        begin
+                        VisibleLog.ShowDomesticMultiplierStatus(DXGrid);
+                        end;
                      DisplayBeamHeading(DXCall,DXGrid);
                      end;
                   end;
@@ -386,7 +395,7 @@ begin
                            grid := slCQMessage[2];
                            end;
                         4: begin
-                           if length(slCQMessage[1]) = 2 then // CQ [RU|WW|FD], etc.
+                           if length(slCQMessage[1]) = 2 then // CQ [RU|WW|FD], etc.     // Handle CQ QRP
                               begin
                               DXCall := slCQMessage[2];
                               grid := slCQMessage[3];
@@ -458,28 +467,22 @@ begin
                   end;
                end;
 
-            3: begin        {............................................................Clear}
-               logger.Trace('[uWSJTX] WSJTX >>> Clear');
-               tCleareCallWindow;
-               tCleareExchangeWindow;
-               tCallWindowSetFocus;
-               CleanUpDisplay;
-               sCallSentToWindow := '';
-
-               end;
+            3: Self.HandleMessage_Clear;
 
             5: begin        {..........I may grab this from the ADIF record so this would not be needed   QSO logged}
-
-               Unpack(AData,index,date);
-               Unpack(AData,index,DXCall);
-               Unpack(AData,index,DXGrid);
-               Unpack(AData,index,frequency);
-               Unpack(AData,index,mode);
-               Unpack(AData,index,report);
-               Unpack(AData,index,reportReceived);
-               Unpack(AData,index,TXPower);
-               Unpack(AData,index,comments);
-               Unpack(AData,index,DXName);
+               if logger.IsTraceEnabled then
+                  begin
+                  Unpack(AData,index,date);
+                  Unpack(AData,index,DXCall);
+                  Unpack(AData,index,DXGrid);
+                  Unpack(AData,index,frequency);
+                  Unpack(AData,index,mode);
+                  Unpack(AData,index,report);
+                  Unpack(AData,index,reportReceived);
+                  Unpack(AData,index,TXPower);
+                  Unpack(AData,index,comments);
+                  Unpack(AData,index,DXName);
+                  end;
 
                if logger.IsTraceEnabled then
                   begin
@@ -1113,7 +1116,7 @@ function TWSJTXServer.GetNextADIFField(var sBuffer: string; var fieldName: strin
 
 var
 
-   i, z, n, x, dataLen: integer;
+   i, z, x, dataLen: integer;
 
    aaa, sLen: string;
 
@@ -1203,6 +1206,17 @@ begin
 end;
 
 (*--------------------------------------------------------------------------------------------------------------------------------*)
+procedure TWSJTXServer.HandleMessage_Clear;
+begin
+
+   logger.Trace('[uWSJTX] WSJTX >>> Clear');
+   tCleareCallWindow;
+   tCleareExchangeWindow;
+   tCallWindowSetFocus;
+   CleanUpDisplay;
+   sCallSentToWindow := '';
+
+end;
 
 
 procedure TWSJTXServer.Display(p_sender : String; p_message : string);

@@ -937,49 +937,7 @@ var
     begin
           //        i1:=
       i1 := PInteger(@TelnetBuffer[i])^;
-{
-      asm
-          mov eax,i1
-          bswap eax
-          cmp eax,'BIG '
-          jz @@loud
-          cmp eax,'5/9 '
-          jz @@loud
-          cmp eax,'LOUD'
-          jz @@loud
-          cmp eax,'59++'
-          jz @@loud
-          cmp eax,'599+'
-          jz @@loud
-          cmp eax,'59+ '
-          jz @@loud
-          cmp eax,' 59 '
-          jz @@loud
-          cmp eax,'5-9 '
-          jz @@loud
-          cmp eax,'59PL'
-          jz @@loud
-          cmp eax,'5/9+'
-          jz @@loud
-          cmp eax,'599 '
-          jz @@loud
-          cmp eax,'STRO'
-          jz @@loud
-          cmp eax,'NICE'
-          jz @@loud
-          cmp eax,'STRN'
-          jz @@loud
-          cmp eax,'GOOD'
-          jz @@loud
-          cmp eax,'EASY'
-          jz @@loud
 
-          jmp @@notloud
-          @@loud:
-          mov TempSpot.FLoudSignal,1
-          @@notloud:
-      end;
-}
 
       if PInteger(@TelnetBuffer[i])^ = 542659409 {QSX } then
       begin

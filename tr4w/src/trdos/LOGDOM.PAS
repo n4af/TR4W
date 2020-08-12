@@ -229,7 +229,6 @@ function DomQTHTableObject.GetDomQTH(InputString: Str20;
 var
   CurrentPrefixRecord                   : PrefixRecPtr;
   Index                                 : integer;
-  PossibleUSACall                       : boolean;
   ContinentString, NumberString         : Str20;
 
 begin
@@ -431,9 +430,6 @@ end;
 function GetNextPrefix(var FileString: ShortString {Str160};
   var PrefixString: ShortString {Str20}): boolean;
 
-var
-  Result1                               : integer;
-
 begin
   GetNextPrefix := False;
 
@@ -470,11 +466,8 @@ label
   AlreadyInList;
 
 var
-  FileRead                              : Text;
-  DomQTHString, DomQTHName, Multiplier, TempString, FileString: ShortString; {: Str40;}
-  RemainingMult, RecordPointer          : integer;
+  RecordPointer          : integer;
   CurrentRecord, NextRecord             : PrefixRecPtr;
-  DomName                               : Str40;
 const incfile                           = 'INCLUDE FILE';
 
 begin
@@ -658,8 +651,6 @@ label
 
 var
   DomQTHString, DomQTHName, Multiplier, TempString: ShortString; {: Str40;}
-  RemainingMult, RecordPointer          : integer;
-  CurrentRecord, NextRecord             : PrefixRecPtr;
   DomName                               : Str40;
   TempFileName                          : FileNameType;
   MultIndex                             : integer;

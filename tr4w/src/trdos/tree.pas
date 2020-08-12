@@ -1306,21 +1306,8 @@ begin
 end;
 
 function BigCompressedCallsAreEqual(Call1, Call2: EightBytes): boolean;
-var
-  i1, i2                                : ^Cardinal;
 begin
   Result := int64(Call1) = int64(Call2);
-  {
-     Result :=
-     (Call1[1] = Call2[1]) and
-        (Call1[2] = Call2[2]) and
-        (Call1[3] = Call2[3]) and
-        (Call1[4] = Call2[4]) and
-        (Call1[5] = Call2[5]) and
-        (Call1[6] = Call2[6]) and
-        (Call1[7] = Call2[7]) and
-        (Call1[8] = Call2[8]);
-       }
 end;
 
 procedure BigCompressFormat(Call: CallString; var CompressedBigCall: EightBytes);

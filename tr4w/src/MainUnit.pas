@@ -1485,6 +1485,7 @@ begin
     SetRadioFreq(ActiveRadio, TempFreq, TempMode, TempVFO);
     tCleareCallWindow;
     Result := True;
+    logger.debug('[TuneOnFreqFromCallWindow] Clearing Mults and QSO Needs Headers');
     SetMainWindowText(mweMultNeedsHeader,PChar(''));
     SetMainWindowText(mweQSONeedsHeader,PChar(''));
   end;
@@ -2364,7 +2365,7 @@ function DrawWindows(lParam: lParam; wParam: wParam): Cardinal;
 var
   TempBrush                             : HBRUSH;
   TempWindowColor                       : integer;
-  charText: array [0..255] of char;
+  //charText: array [0..255] of char;
 const
   DupeInfoCallWindowColorArray          : array[DupeInfoState] of tr4wColors = (trBtnFace, trRed, trYellow, trLightBlue);
 begin
@@ -2458,7 +2459,7 @@ var
   focus                                 : HWND;
   TempCallstring                        : CallString;
    //http : TidHttp;
-  page : String;
+ // page : String;
 begin
   LowordWparam := LoWord(menuID);
 
@@ -5687,11 +5688,11 @@ end;
 
 procedure PutCallToCallWindow(Call: CallString);
 begin
-   logger.debug('Putting %s into main call window',[Call]);
+   logger.debug('[PutCallToCallWindow] Putting %s into main call window',[Call]);
    Call[Ord(Call[0]) + 1] := #0;
    if call = MyCall then
       begin
-      logger.debug('Exiting PutCallToCallWindow early because call (%s) = MyCall (%s)',[call, MyCall]);
+      logger.debug('[PutCallToCallWindow] Exiting early because call (%s) = MyCall (%s)',[call, MyCall]);
       exit;   // n4af issue 158
       end;
    Windows.SetWindowText(wh[mweCall], @Call[1]);
