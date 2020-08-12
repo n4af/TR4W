@@ -4566,8 +4566,7 @@ end;
 
 function ProcessRSTAndQSONumberOrDomesticQTHExchange(Exchange: Str80; var
   RXData: ContestExchange): boolean;
-  var
-  i: integer;
+  
 label
   1;
 
@@ -5609,7 +5608,6 @@ var
   russianRegion1, russianRegion2: RussianRegionType;
   temphour: byte; // 4.58.2
   iotastate: string[10];
-  continent: string;
 begin
   RXData.QSOPoints := 0;
   RXCty := RXData.QTH.CountryID; // 4.67.15

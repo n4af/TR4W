@@ -312,9 +312,7 @@ This adds up the element lengths to use in a calculation to determine how long i
 function CalculateElements(sMsg: string): integer;
 var
    i: integer;
-   inx: integer;
    s: string;
-   v: integer;
    s1: string;
 begin
    Result := 0;
@@ -412,8 +410,6 @@ end;
 
 procedure FinishRTTYTransmission(Msg: Str160);
 
-var
-  CharPointer                           : integer;
 
 begin
   {

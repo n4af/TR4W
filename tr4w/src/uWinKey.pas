@@ -1166,10 +1166,12 @@ procedure wkWriteToDebugFile(b: Char; TX: boolean);
 const
   InOutArray                            : array[boolean] of PChar = ('RX <', 'TX >');
   InOutClassArray                       : array[boolean] of PChar = ('RX', 'TX');
+{$IF K6VVA_WK_DEBUG}
 var
   lpNumberOfBytesWritten                : Cardinal;
   DirectionChar                         : PChar;
   ClassName                             : PChar;
+{$IFEND}
 begin
 {$IF K6VVA_WK_DEBUG}
   inc(wkDebugFileRecordNumber);

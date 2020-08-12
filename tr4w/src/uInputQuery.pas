@@ -42,8 +42,6 @@ function IQDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BO
 label
   1;
 var
-  iqicon                                : integer;
-  TempPchar                             : PChar;
   dwNewLong                             : LONGINT;
 const
   MainStyle                             = WS_CHILD + WS_VISIBLE + WS_TABSTOP + ES_CENTER + ES_AUTOHSCROLL;

@@ -2390,8 +2390,6 @@ function tGenerateLogPortionOfCabrilloFile: boolean;
 label
   1;
 var
-   s                                    : string;
-   i                                    : integer;
   nNumberOfBytesToWrite                 : Cardinal;
   HisCallsign                           : PChar;
   RSTSent                               : PChar;
@@ -2410,9 +2408,7 @@ var
   csPower                               : PChar;
   hisAge                                : Integer;
   csQTHString                           : PChar;
-  csDomesticQTH                         : PChar;
   HisZone                               : integer;
-  str1                                  : widestring;
   nrReceived                            : integer;
   nrSent                                : integer;
   tempcategoryoperator                  : tcategoryoperator;

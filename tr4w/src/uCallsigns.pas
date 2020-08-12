@@ -287,7 +287,7 @@ end;
 
 function TCallsignsList.FindNumber( s: CallString): boolean;         // n4af 4.42.2 reverse lookup member #
 var
-  l, h, i, c                             : integer;
+ i, l, h, c                             : integer;
  lstr                                    : string;
 begin
   Result := False;

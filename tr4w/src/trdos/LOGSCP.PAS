@@ -284,10 +284,6 @@ begin
 end;
 
 procedure CellBufferObject.Initialize(var NumberBytes: LONGINT);
-
-var
-  NumberWordBytes                       : Word;
-
 begin
   if MaximumMemoryToUse = 3 * BufferArraySize then { POST mode }
   begin
@@ -2059,10 +2055,9 @@ procedure CallDatabase.SaveToASCIIFile;
   It will set the variable ASCIIFileIsCurrent to TRUE }
 
 var
-  Address, FileOffset, CellSize         : LONGINT;
+  CellSize         : LONGINT;
   FileRead                              : file;
   FileWrite                             : Text;
-  BytesRead                             : Word;
   X, Y, NextX, NextY, StartingOffset, EndingOffset: LONGINT;
   EntryString                           : ShortString {string};
   KeyString                             : CallString;
@@ -2582,298 +2577,13 @@ begin
 end;
 
 function CallDatabase.OverwriteFlagStatus: boolean;
-
-var
-  Key                                   : Char;
-
 begin
-  {    REPEAT
-          ClrScr;
-          TextColor (Yellow);
-          WriteLnCenter ('OVERWRITE FLAG STATUS');
-          WriteLn;
 
-          TextColor (Yellow);
-          Write ('(A)');
-          TextColor (Cyan);
-          Write ('RRL Section = ', SectionOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('The flags listed determine what will');
-
-          Write ('      CQ');
-          TextColor (Yellow);
-          Write ('(Z)');
-          TextColor (Cyan);
-          Write ('one = ', CQZoneOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('happen if there is data found in the');
-
-          TextColor (Yellow);
-          Write ('         (F)');
-          TextColor (Cyan);
-          Write ('OC = ', FOCOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('file being processed and there is');
-
-          TextColor (Yellow);
-          Write ('        (G)');
-          TextColor (Cyan);
-          Write ('rid = ', GridOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('existing data for the same field');
-
-          TextColor (Yellow);
-          Write ('        (H)');
-          TextColor (Cyan);
-          Write ('its = ', HitsOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('already in the database.  If the flag');
-
-          TextColor (Yellow);
-          Write ('     (I)');
-          TextColor (Cyan);
-          Write ('TUZone = ', ITUZoneOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('is TRUE, the data will be updated to');
-
-          Write ('       Chec');
-          TextColor (Yellow);
-          Write ('(k)');
-          TextColor (Cyan);
-          Write (' = ', CheckOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('value found in the file.  ');
-
-          TextColor (Yellow);
-          Write ('        (N)');
-          TextColor (Cyan);
-          Write ('ame = ', NameOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn;
-
-          TextColor (Yellow);
-          Write ('     (O)');
-          TextColor (Cyan);
-          Write ('ldCall = ', OldCallOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('The H flag determines if the hits count');
-
-          TextColor (Yellow);
-          Write ('         (Q)');
-          TextColor (Cyan);
-          Write ('TH = ', QTHOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('is incremented for each log a call is');
-
-          TextColor (Yellow);
-          Write ('       (S)');
-          TextColor (Cyan);
-          Write ('peed = ', SpeedOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('found in.  You can later filter out the');
-
-          TextColor (Yellow);
-          Write ('      (T)');
-          TextColor (Cyan);
-          Write ('enTen = ', TenTenOverwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('calls that only appear in 1 or 2 logs.');
-
-          TextColor (Cyan);
-          Write ('       User');
-          TextColor (Yellow);
-          Write ('(1)');
-          TextColor (Cyan);
-          Write (' = ', User1Overwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn;
-
-          TextColor (Cyan);
-          Write ('       User');
-          TextColor (Yellow);
-          Write ('(2)');
-          TextColor (Cyan);
-          Write (' = ', User2Overwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('To change the value of one of the flags,');
-
-          TextColor (Cyan);
-          Write ('       User');
-          TextColor (Yellow);
-          Write ('(3)');
-          TextColor (Cyan);
-          Write (' = ', User3Overwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('just press the key of the highlighted');
-
-          TextColor (Cyan);
-          Write ('       User');
-          TextColor (Yellow);
-          Write ('(4)');
-          TextColor (Cyan);
-          Write (' = ', User4Overwrite);
-
-          GoToXY (30, WhereY);
-          WriteLn ('letter.');
-
-          TextColor (Cyan);
-          Write ('       User');
-          TextColor (Yellow);
-          Write ('(5)');
-          TextColor (Cyan);
-          WriteLn (' = ', User5Overwrite);
-
-          WriteLn;
-
-          REPEAT
-              Key := UpCase (GetKey ('Enter field ID to change, RETURN to start or ESCAPE to exit : '));
-
-              IF Key = EscapeKey THEN
-                  BEGIN
-                  OverwriteFlagStatus := False;
-                  Exit;
-                  END;
-
-              IF Key = CarriageReturn THEN
-                  BEGIN
-                  OverwriteFlagStatus := True;
-                  Exit;
-                  END;
-
-          UNTIL (Key = 'S') OR (Key = 'Z') OR (Key = 'F') OR (Key = 'G') OR
-                (Key = 'I') OR (Key = 'K') OR (Key = 'N') OR (Key = 'Q') OR
-                (Key = '1') OR (Key = '2') OR (Key = '3') OR (Key = '4') OR
-                (Key = '5') OR (Key = 'T') OR (Key = 'H') OR (Key = 'A');
-
-          CASE Key OF
-              'A': SectionOverwrite := NOT SectionOverwrite;
-              'Z': CQZoneOverwrite  := NOT CQZoneOverwrite;
-              'F': FOCOverwrite     := NOT FOCOverwrite;
-              'G': GridOverwrite    := NOT GridOverwrite;
-              'H': HitsOverwrite    := NOT HitsOverwrite;
-              'I': ITUZoneOverwrite := NOT ITUZoneOverwrite;
-              'K': CheckOverwrite   := NOT CheckOverwrite;
-              'N': NameOverwrite    := NOT NameOverwrite;
-              'O': OldCallOverwrite := NOT OldCallOverwrite;
-              'Q': QTHOverwrite     := NOT QTHOverwrite;
-              'S': SpeedOverwrite   := NOT SpeedOverwrite;
-              'T': TenTenOverwrite  := NOT TenTenOverwrite;
-              '1': User1Overwrite   := NOT User1Overwrite;
-              '2': User2Overwrite   := NOT User2Overwrite;
-              '3': User3Overwrite   := NOT User3Overwrite;
-              '4': User4Overwrite   := NOT User4Overwrite;
-              '5': User5Overwrite   := NOT User5Overwrite;
-              END;
-
-      UNTIL False;
-     }
 end;
 
 procedure CallDatabase.DeleteLowHitCalls;
-
-var
-  Hits, Threshold, Result               : integer;
-  SaveNames                             : boolean;
-  Key                                   : Char;
-  CallsFound, CallsSaved                : LONGINT;
-  TempString, FileString                : string;
-  FileRead, FileWrite                   : Text;
-
 begin
-  {    ClearScreenAndTitle ('DELETE CALLSIGNS WITH HIT COUNTS BELOW THRESHOLD');
 
-      WriteLn ('This procedure will delete callsigns in the database which have hit values');
-      WriteLn ('less then a certain threshold.  The hit value is normally incremented ');
-      WriteLn ('for each call already in the database when a file that is being loaded into');
-      WriteLn ('the database contains the call.  This purpose of this hit count is to allow');
-      WriteLn ('you to remove calls that may have only appeared in one or two files, so you');
-      WriteLn ('can have a high degree of confidence that the remaining calls are error free.');
-      WriteLn;
-      WriteLn ('You have the option to retain calls with names associated with them,');
-      WriteLn ('regardless of their hit count.');
-      WriteLn;
-
-      REPEAT
-          Key := UpCase (GetKey ('Keep entries with names regardless of hits? (Y/N or escape) : '));
-          IF Key = EscapeKey THEN Exit;
-      UNTIL (Key = 'Y') OR (Key = 'N');
-      WriteLn;
-
-      SaveNames := Key = 'Y';
-
-      Threshold := GetValue ('Enter minimum hits for calls to keep (zero to exit) : ');
-      IF Threshold = 0 THEN Exit;
-
-      IF NOT ASCIIFileIsCurrent THEN SaveToASCIIFile;
-
-      CallsFound := 0;
-      CallsSaved := 0;
-
-      IF OpenFileForRead (FileRead, WorkingDirectory + ActiveASCIIFileName) THEN
-          BEGIN
-          OpenFileForWrite (FileWrite, WorkingDirectory + TempFileName);
-
-          WHILE NOT Eof (FileRead) DO
-              BEGIN
-              ReadLn (FileRead, FileString);
-
-              Inc (CallsFound);
-
-              IF StringHas (FileString, '=H') THEN
-                  BEGIN
-                  TempString := PostcedingString (FileString, '=H');
-                  TempString := RemoveFirstString (TempString);
-                  Val (TempString, Hits, Result);
-
-                  IF (Hits >= Threshold) THEN
-                      BEGIN
-                      WriteLn (FileWrite, FileString);
-                      Inc (CallsSaved);
-                      Continue;
-                      END;
-                  END;
-
-              IF SaveNames AND StringHas (FileString, '=N') THEN
-                  BEGIN
-                  WriteLn (FileWrite, FileString);
-                  Inc (CallsSaved);
-                  END;
-              END;
-
-          Close (FileRead);
-          Close (FileWrite);
-
-          WriteLn ('Out of ', CallsFound, ' database calls, ', CallsSaved, ' calls would be left.');
-
-          REPEAT
-              Key := UpCase (GetKey ('Do you want to build a new database with these changes? (Y/N) : '));
-              IF Key = EscapeKey THEN Exit;
-          UNTIL (Key = 'Y') OR (Key = 'N');
-          WriteLn;
-
-          IF Key = 'Y' THEN
-              BEGIN
-              DeleteFile (WorkingDirectory + ActiveASCIIFileName);
-              RenameFile (WorkingDirectory + TempFileName, WorkingDirectory + ActiveASCIIFileName);
-              BuildNewDatabaseFromASCIIFile (Chr (0));
-              END;
-          END;
- }
 end;
 
 procedure CallDatabase.MovePossibleCallsFromBufferIntoCallList(Call: CallString);
@@ -2929,7 +2639,7 @@ var
   LowestCell, SecondLowestCell, ThirdLowestCell, BytesAtThisPos: LONGINT;
   LowestKeyPos, SecondLowestKeyPos, ThirdLowestKeyPos: integer;
   TempDupe, Change                      : boolean;
-  temp, Range, CallAddress              : integer;
+  Range, CallAddress              : integer;
   TempString                            : CallString;
 
 begin

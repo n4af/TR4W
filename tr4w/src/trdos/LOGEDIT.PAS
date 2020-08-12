@@ -128,7 +128,8 @@ type
     procedure ShowRemMultsInWindow(Window: WindowsType; rmt:
       RemainingMultiplierType);
     //    procedure ShowRemainingMultipliers2;
-    procedure ShowQSOStatus(Call: CallPtr);
+    procedure ShowQSOStatus(Call: CallPtr); overload;
+    procedure ShowQSOStatus(Call: string); overload;
     //    procedure SuperCheckPartial(Call: CallString; Automatic: boolean; Radio: RadioType); {KK1L: 6.73 Added Radio for SO2R}
     function SuperCheckPartial(Call: CallString; Automatic: boolean; Radio:
       RadioPtr {RadioType}): boolean; {KK1L: 6.73 Added Radio for SO2R}
@@ -787,8 +788,10 @@ begin
 
   Format(wsprintfBuffer, TC_MULTNEEDSFOR, PChar(DomesticQTHtemp));
 
+  logger.debug('[ShowDomesticMultiplierStatus] MultNeedsHeader field set to %s',[DomesticQTHtemp]);
   SetMainWindowText(mweMultNeedsHeader, wsprintfBuffer);
   SetMultStatus('', DomesticQTH);
+  logger.debug('[ShowDomesticMultiplierStatus] MultStatus set to DomesticQTH of %s',[DomesticQTH]);
 end;
 
 procedure EditableLog.ShowMultiplierStatus(Call: CallPtr {CallString});
@@ -807,7 +810,7 @@ begin
     end;
   }
   Format(wsprintfBuffer, TC_MULTNEEDSFOR, PChar(integer(Call) + 1));
-
+  logger.debug('[ShowMultiplierStatus] MultNeedsHeader field set to %s',[Call^]);
   SetMainWindowText(mweMultNeedsHeader, wsprintfBuffer);
   SetMultStatus(Call^, '');
 end;
@@ -987,8 +990,12 @@ var
   OutputValue: Cardinal;
   Band: BandType;
 begin
+   logger.debug('[SetMultStatus] Entered with call = %s and TempMult = %s',[Call, TempMult]);
   if NumberDifferentMults = 0 then
+    begin
+    logger.debug('[SetMultStatus] Exiting early because NumberDifferentMults = 0');
     Exit;
+    end;
 
   if MultByMode then
   begin
@@ -1097,6 +1104,43 @@ begin
       }
     end;
   end;
+end;
+
+procedure EditableLog.ShowQSOStatus(Call: string);
+var
+  OutputString: integer;
+  Band: BandType;
+begin
+  logger.debug('[ShowQSOStatus] Called with call of [%s]',[Call]);
+  if length(Call) < 3 then
+    Exit;
+
+  Format(wsprintfBuffer, TC_QSONEEDSFOR, PChar(integer(Call)));
+  SetMainWindowText(mweQSONeedsHeader, wsprintfBuffer);
+  //  tSetWindowText(QIHeaderWindowHandle, ' QSO needs for ' + Call);
+
+  if QSOByMode then
+  begin
+    CreateModeSpecificQSOInfo(Call, CW, OutputString);
+    for Band := Band160 to Band10 do
+      Windows.ShowWindow(QSONeedWindowsHandles1[Band], integer((OutputString and
+        (1 shl integer(Band))) <> 0));
+
+    CreateModeSpecificQSOInfo(Call, Phone, OutputString);
+    for Band := Band160 to Band10 do
+      Windows.ShowWindow(QSONeedWindowsHandles2[Band], integer((OutputString and
+        (1 shl integer(Band))) <> 0));
+
+  end
+  else
+  begin
+    CreateModeSpecificQSOInfo(Call, Both, OutputString);
+    for Band := Band160 to Band10 do
+      Windows.ShowWindow(QSONeedWindowsHandles1[Band], integer((OutputString and
+        (1 shl integer(Band))) <> 0));
+  end;
+
+
 end;
 
 procedure EditableLog.ShowQSOStatus(Call: CallPtr);
@@ -2021,9 +2065,12 @@ begin
     StationInformationCall when logging a QSO }
 
   if Call^ = StationInformationCall then   // This is a flag to show we have been here before ny4i
-    Exit;
+     begin
+     logger.debug('[ShowStationInformation] Exiting early because Call^ = StationInformationCall (%s)',[StationInformationCall]);
+     Exit;
+     end;
 
-  logger.trace('>>> Entering ShowStationInformation with call of %s',[Call^]);
+  logger.debug('>>> Entering ShowStationInformation with call of %s',[Call^]);
   StationInformationCall := Call^;
 
   //  if Copy(Call, 1, 3) = 'CQ-' then Exit;
