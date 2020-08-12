@@ -1,0 +1,8 @@
+Entries for NC QSO Party used by in-state stations
+100 NC Counties + 50 states + DC + 13 Canadian mults + DX
+
+Dx = DX
+
+INCLUDE S50.DOM
+INCLUDE P13.DOM
+INCLUDE FILE NC_CTY.DOM

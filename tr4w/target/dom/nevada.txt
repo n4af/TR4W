@@ -1,0 +1,17 @@
+NVCAR	Carson City
+NVELK	Elko
+NVLAN	Lander
+NVMIN	Mineral
+NVSTO	Storey
+NVCHU	Churchill
+NVESM	Esmeralda
+NVLIN	Lincoln
+NVNYE	Nye
+NWWAS	Washoe
+NVCLA	Clark
+NVEUR	Eurkea
+NVLYO	Lyon
+NVPER	Pershing
+NVWHI	White Pine
+NVDOU	Douglas
+NVHUM	Humboldt
