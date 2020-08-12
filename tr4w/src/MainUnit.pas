@@ -6310,7 +6310,7 @@ begin
             fieldValue := Trim(theString);
             if length(fieldValue) <> StrToInt(fieldLen) then
                begin
-               logger.error('[ParseADIFRecord] fieldName = [%s] field value length = %d but actual length = %d',[fieldName,fieldLen, length(fieldValue)]);
+               logger.error('[ParseADIFRecord] fieldName = [%s] field value length = %s but actual length = %d',[fieldName,fieldLen, length(fieldValue)]);
                end
             else
                begin
@@ -6486,7 +6486,7 @@ begin
          end;
       case contest of
          CWOPS:
-            exch.Age := StrToInt(exch.QTHString);
+            exch.Age := StrToIntDef(exch.QTHString,0);
          IARU:
             exch.QTHString := fieldValue;
          else
@@ -7726,6 +7726,7 @@ function DigitsIn(n: smallInt): byte; // byte is 0 to 255 so more than enough, s
 var
    isNegative : boolean;
 begin
+   isNegative := false;
    if n < 0 then
       begin
       isNegative := true;
