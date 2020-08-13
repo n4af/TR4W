@@ -44,3 +44,10 @@ tr4w/target/settings/TR4W.INI
 *.CFG
 *.map
 tr4w/target/tr4w.map
+tr4w/target/tr4w-debug.log
+tr4w/target/tr4w.log
+!tr4w/target/dom
+!tr4w/target/trcluster.dat
+!tr4w/target/cty.dat
+!tr4w/target/commands*.ini
+tr4w/target/
