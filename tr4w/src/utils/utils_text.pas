@@ -316,7 +316,7 @@ begin
   sStringFloat := stringReplace(sStringFloat, '%', '', [rfIgnoreCase, rfReplaceAll]);
   sStringFloat := stringReplace(sStringFloat, CurrencyString , '', [rfIgnoreCase, rfReplaceAll]);
   sStringFloat := stringReplace(sStringFloat, ' ', '', [rfIgnoreCase, rfReplaceAll]);
-  //sStringFloat := stringReplace(sStringFloat, ',', '', [rfIgnoreCase, rfReplaceAll]);
+  sStringFloat := stringReplace(sStringFloat, ',', '', [rfIgnoreCase, rfReplaceAll]);
   sStringFloat := stringReplace(sStringFloat, ThousandSeparator, '', [rfIgnoreCase, rfReplaceAll]);
   try
     dReturn := strToFloat(sStringFloat);

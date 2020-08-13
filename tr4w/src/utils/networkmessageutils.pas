@@ -37,6 +37,23 @@ interface
 uses
   Classes, SysUtils, DateUtils, {Sockets,} IdGlobal, IdStack, IdWinsock2;
 
+  const WSJTX_MESSAGETYPE_HEARTBEATV    = 0;
+        WSJTX_MESSAGETYPE_STATUSV       = 1;
+        WSJTX_MESSAGETYPE_DECODEV       = 2;
+        WSJTX_MESSAGETYPE_CLEARV        = 3;
+        WSJTX_MESSAGETYPE_REPLYV        = 4;
+        WSJTX_MESSAGETYPE_QSOV          = 5;
+        WSJTX_MESSAGETYPE_CLOSEV        = 6;
+        WSJTX_MESSAGETYPE_REPLAYV       = 7;
+        WSJTX_MESSAGETYPE_HALTTXV       = 8;
+        WSJTX_MESSAGETYPE_FREETEXTV     = 9;
+        WSJTX_MESSAGETYPE_WSPRDECODEV   = 10;
+        WSJTX_MESSAGETYPE_LOCATIONV     = 11;
+        WSJTX_MESSAGETYPE_LOGGEDADIFV   = 12;
+        WSJTX_MESSAGETYPE_HIGHLIGHTV    = 13;
+        WSJTX_MESSAGETYPE_SWITCHCONFIGV = 14;
+        WSJTX_MESSAGETYPE_CONFIGUREV    = 15;
+        
   type
   QWord = packed record      // was Int64Rec
     case Integer of

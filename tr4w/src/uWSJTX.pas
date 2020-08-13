@@ -267,6 +267,7 @@ var
   nResult: integer;
   shortStr: shortString;
 
+
 begin
      //FUDP.IdUDPServer1.Bindings := '127.0.0.1:2237,[::]:2237';
   index := 0;
@@ -292,7 +293,8 @@ begin
                end;
 
             case messageType of
-            0: begin
+            WSJTX_MESSAGETYPE_HEARTBEATV:
+               begin
                logger.trace('[uWSJTX] WSJTX >>> Heartbeat!');
                if logger.IsTraceEnabled then
                   begin
@@ -307,7 +309,7 @@ begin
                   firstTime := false;
                   end;
                end;
-            1:
+            WSJTX_MESSAGETYPE_STATUSV:
                begin
                Unpack(AData,index,frequency);
                Unpack(AData,index,mode);
@@ -353,7 +355,8 @@ begin
                   end;
                end;
 
-            2: begin        {............................................................Decode}
+            WSJTX_MESSAGETYPE_DECODEV:
+               begin        {............................................................Decode}
                            // This is where we need to look for CQ decodes and highlight the call by sending back
                            // a message to the UDP receiver in WSJT-X.
                Unpack(AData,index,isNew);
@@ -467,9 +470,10 @@ begin
                   end;
                end;
 
-            3: Self.HandleMessage_Clear;
+            WSJTX_MESSAGETYPE_CLEARV: Self.HandleMessage_Clear;
 
-            5: begin        {..........I may grab this from the ADIF record so this would not be needed   QSO logged}
+            WSJTX_MESSAGETYPE_QSOV:
+               begin        {..........I may grab this from the ADIF record so this would not be needed   QSO logged}
                if logger.IsTraceEnabled then
                   begin
                   Unpack(AData,index,date);
@@ -493,22 +497,24 @@ begin
                                + ' Comments:' + comments + ' Name:' + DXName);
                   end;
               end;
-            6:
+            WSJTX_MESSAGETYPE_CLOSEV:
                begin
                logger.Info('[uWSJTX] WSJT-X close message received'); // We may want to indicate it somehow on main screen
                SetMainWindowText(mweWSJTX,'');
                Windows.ShowWindow(wh[mweWSJTX], SW_HIDE);
                isConnected := false;
                end;
-            10: begin
-                logger.Trace('[uWSJTX] Received message 10');
-                end;
-            12: begin                         // Note that ParseADIFRecord has some logic to determine where to put the gridsquare
-                if logger.IsDebugEnabled then
-                   begin
-                   logger.debug('[uWSJTX] TotalContacts at start of uWSJTX ADIF UDP message = ' + IntToStr(TotalContacts));
-                   end;
-                Unpack(AData,index,adif);
+            WSJTX_MESSAGETYPE_WSPRDECODEV:
+               begin
+               logger.Trace('[uWSJTX] Received message 10');
+               end;
+            WSJTX_MESSAGETYPE_LOGGEDADIFV:
+               begin                         // Note that ParseADIFRecord has some logic to determine where to put the gridsquare
+               if logger.IsDebugEnabled then
+                  begin
+                  logger.debug('[uWSJTX] TotalContacts at start of uWSJTX ADIF UDP message = ' + IntToStr(TotalContacts));
+                  end;
+               Unpack(AData,index,adif);
                logger.Trace('[uWSJTX] >>> ADIF Record to log: ' + adif);
                ClearContestExchange(TempRXData);
 
@@ -530,7 +536,7 @@ begin
 
                   //TempRXData.NumberSent := TotalContacts;
                   //LogContact(TempRXData, true);
-                  if ParametersOkay(TempRXData.Callsign, TempRXData.QTHString, ActiveBand, ActiveMode, ActiveRadioPtr.LastDisplayedFreq {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
+                  if ParametersOkay(TempRXData.Callsign, TempRXData.QTHString, ActiveBand, Digital, ActiveRadioPtr.LastDisplayedFreq {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
                      begin
                      ReceivedData.ceSearchAndPounce := OpMode = SearchAndPounceOpMode;
                      ReceivedData.ceComputerID := ComputerID;
