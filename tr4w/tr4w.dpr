@@ -138,8 +138,8 @@ begin
 //        ShowMessage(inttopchar(lParam));
 //        if (LoWord(lParam) = NIN_BALLOONTIMEOUT) or (LoWord(lParam) = NIN_BALLOONUSERCLICK) then Balloon_DeleteTrayIcon;
 {
-        if lParam <> 1026 then //появление окна
-          if lParam <> 1028 then //закрытие окна
+        if lParam <> 1026 then //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
+          if lParam <> 1028 then //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
             if lParam <> 512 then //mouse move
 }
 
@@ -397,7 +397,7 @@ begin
 
   LoadTR4WPOSFILE;
 
- 
+
   if not ctyLoadInCountryFile(TR4W_CTY_FILENAME, False, True) then
   begin
     UnableToFindFileMessage(TR4W_CTY_FILENAME);
@@ -417,11 +417,11 @@ begin
 
   UpdateDebugLogLevel;
 
-  
+
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
 
-  
+
 
   if CTY.ctyR150SMode then
   begin
@@ -816,4 +816,3 @@ begin
   end;
 
 end.
-
