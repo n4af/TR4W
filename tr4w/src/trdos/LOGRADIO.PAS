@@ -2696,13 +2696,17 @@ begin
                   tKenwood14Bytes[3] := TempChar;
                   tKenwood14Bytes[4] := ';';
                   WriteToCATPort(tKenwood14Bytes, 5);
+                  end
+               else
+                  begin
+                  logger.Debug('Skipping Yaesu mode change since mode was already DIGITAL');
                   end;
                end;
             end;
 
          rtKenwood:
             begin
-            // TLogger.GetInstance.Debug('In Kenwood code');
+            logger.trace ('In SetRadioFreq, rtKenwood branch');
             Format(@tKenwood14Bytes, 'FA%011u;', Freq);
             tKenwood14Bytes[1] := VFO;
             AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 14);
@@ -2738,11 +2742,21 @@ begin
                      end;
                   end; { USB }
                end;
-            tKenwood14Bytes[0] := 'M';
-            tKenwood14Bytes[1] := 'D';
-            tKenwood14Bytes[2] := CHR(TempByte);
-            tKenwood14Bytes[3] := ';';
-            AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 4);
+            if Mode = Digital then
+               begin
+               if ActiveRadioPtr.CurrentStatus.Mode <> Digital then
+                  begin
+                  tKenwood14Bytes[0] := 'M';
+                  tKenwood14Bytes[1] := 'D';
+                  tKenwood14Bytes[2] := CHR(TempByte);
+                  tKenwood14Bytes[3] := ';';
+                  AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 4);
+                  end
+               else
+                  begin
+                  logger.debug('Skipping Kenwod mode change because MODE was already DIGITAL');
+                  end;
+               end;
 
             if (VFO = 'B') then
                begin
