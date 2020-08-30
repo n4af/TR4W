@@ -44,6 +44,7 @@ type
       frequency: Int64;
       firstTime: boolean;
       isConnected: boolean;
+      saveFastMode: boolean;
       colorsMultFore: TColorRec;
       colorsDupeFore: TColorRec;
       colorsMultBack: TColorRec;
@@ -80,6 +81,7 @@ type
     procedure Stop;
     destructor Destroy;
     procedure HighlightCall(sCall: string; color: integer; sId: string);
+    procedure ClearDXCallandDXGrid;
     procedure ClearColors(sId: string);
     property connected: boolean read isConnected;
 
@@ -124,6 +126,7 @@ uses
    ,utils_text
    ,LogK1EA       // for tPTTViaCommand
    ,LogDOM        // for ActiveDomesticMult
+   ,uRadioPolling // for tempExtendedMode
    ;
 // {$R *.dfm}
 
@@ -249,11 +252,11 @@ procedure TWSJTXServer.OnServerRead(ASender: TIdUDPListenerThread; const AData: 
 var
   index: Integer;
   magic, schema, messageType: LongInt;
-  id, mode, DXCall, report, TXMode, message, DXGrid, DEGrid, DECall, reportReceived: string;
+  id, mode, DXCall, report, TXMode, message, DXGrid, DEGrid, DECall, reportReceived, submode: string;
   call : CallString;
   TXPower, comments, DXName, adif: string;
 
-  isNew, TXEnabled, transmitting, Decoding: Boolean;
+  isNew, TXEnabled, transmitting, Decoding, bTXWatchdog, fastMode: Boolean;
   tm: Longword;
   ztime: TDateTime;
   DT: Double;
@@ -263,6 +266,7 @@ var
   TempRXData: ContestExchange;
   TempMode: ModeType;
   TempBand: BandType;
+  tempExtendedMode: ExtendedModeType;
   grid: string;
   nResult: integer;
   shortStr: shortString;
@@ -325,14 +329,28 @@ begin
                Unpack(AData,index,DECall);
                Unpack(AData,index,DEGrid);
                Unpack(AData,index,DXGrid);
-               if logger.IsTraceEnabled then
+               Unpack(AData,index,bTXWatchdog);
+               Unpack(AData,index,subMode);
+               Unpack(AData,index,fastMode);
+               saveFastMode := fastMode;
+
+
+               logger.debug('[uWSJTX] WSJTX Status>>> Frequency: %d Mode: %s DX Call: %s Report: %s TX Mode: %s TX Enabled: %s Transmitting: %s Decoding: %s RXDF: %d TXDF: %d DECall: %s, DEGrid: %s  DXGrid: %s',
+                               [frequency, Mode, DXCall, report, TXMode, BooleanToStr(TXEnabled), BooleanToStr(transmitting), BooleanToStr(Decoding), RXDF, TXDF, DECall, DEGrid, DXGrid]
+                               );
+               //if not TXEnabled then
+                //  begin
+                //  CallingStation
+
+               if Mode = 'FT8' then
                   begin
-                  logger.trace('[uWSJTX] WSJTX Status>>> Frequency: ' + IntToStr(frequency) + ' Mode: ' + mode + ' DX Call: ' + DXCall
-                                    + ' Report: ' + report + ' TX Mode: ' + TXMode + ' TX Enabled: ' + BooleanToStr(TXEnabled)
-                                    + ' Transmitting: ' + BooleanToStr(transmitting) + ' Decoding: ' + BooleanToStr(Decoding)
-                                    + ' RXDF: ' + intToStr(RXDF) + ' TXDF: ' + intToStr(TXDF) + ' DECall: ' + DECall + ' DEGrid: ' + DEGrid
-                                    + ' DXGrid: ' + DXGrid);
+                  tempExtendedMode := eFT8;
+                  end
+               else if Mode = 'FT4' then
+                  begin
+                  tempExtendedMode := eFT4;
                   end;
+               SetVFOModeExtendedMode(ActiveRadioPtr,0, Digital, tempExtendedMode);
                if transmitting then
                   begin
                   logger.debug('[uWSJTX] Calling station %s, TotalContacts = %d', [DXCall, TotalContacts]);
@@ -439,11 +457,11 @@ begin
                             logger.debug('[uWSJTX] %s is a DUPE', [DXCall]);
                             HighLightCall(message,1,id);
                             end
-                        else if VisibleLog.DetermineIfNewMult(call, TempBand, TempMode) then
+                        {else if VisibleLog.DetermineIfNewMult(call, TempBand, TempMode) then
                            begin
                            logger.debug('[uWSJTX] %s is a MULT (from callsign',[DXCall]);
                            HighLightCall(message,2, id); // Pass back id as given to us
-                           end
+                           end }
                         else
                            begin
                            if grid <> '' then        // Even if gridFields (2 digit) grid, the DeterimeIfNewDomesticMult only checks left 2 bytes
@@ -509,61 +527,86 @@ begin
                logger.Trace('[uWSJTX] Received message 10');
                end;
             WSJTX_MESSAGETYPE_LOGGEDADIFV:
-               begin                         // Note that ParseADIFRecord has some logic to determine where to put the gridsquare
-               if logger.IsDebugEnabled then
+               //begin                         // Note that ParseADIFRecord has some logic to determine where to put the gridsquare
+               try
+                  logger.debug('[uWSJTX] TotalContacts at start of uWSJTX ADIF UDP message = %d', [TotalContacts]);
+                  Unpack(AData,index,adif);
+                  logger.Trace('[uWSJTX] >>> ADIF Record to log: %s', [adif]);
+                  ClearContestExchange(TempRXData);
+
+                  if ParseADIFRecord(adif, TempRXData) then // processed a record if true
+                     begin
+                     ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
+
+                     if DoingDXMults then
+                        begin
+                        GetDXQTH(TempRXData);
+                        end;
+                     if DoingPrefixMults then
+                        begin
+                        SetPrefix(TempRXData);
+                        end;
+
+                     //CalculateQSOPoints(TempRXData);
+                      logger.debug('[uWSJTX] TotalContacts right before update of NumberSent in uWSJTX ADIF UDP message = %d', [TotalContacts]);
+
+                     //TempRXData.NumberSent := TotalContacts;
+                     //LogContact(TempRXData, true);
+                     if ParametersOkay(TempRXData.Callsign, TempRXData.QTHString, ActiveBand, Digital, TempRXData.Frequency, TempRXData) then
+                        begin
+                        ReceivedData.ceSearchAndPounce := (OpMode = SearchAndPounceOpMode);
+                        ReceivedData.ceComputerID := ComputerID;
+                        LogContact(TempRXData, True);
+                        tElapsedTimeFromLastQSO := Windows.GetTickCount;
+                        UpdateWindows;
+                        //ShowStationInformation(@TempRXData.Callsign);
+                        ClearContestExchange(TempRXData);
+                        LastTwoLettersCrunchedOn := '';
+                        CallAlreadySent := False;
+                        ExchangeHasBeenSent := False;
+                        EditingCallsignSent := False;
+                        SeventyThreeMessageSent := False;
+                        EscapeDeletedCallEntry := CallWindowString;
+                        tCleareCallWindow;
+                        tCleareExchangeWindow;
+                        tCallWindowSetFocus;
+                        CleanUpDisplay;
+                        sCallSentToWindow := '';
+                        end;
+
+                        //tCleareCallWindow;
+
+                        //ShowStationInformation(@TempRXData.Callsign);
+                        //UpdateWindows;
+                        Self.ClearDXCallandDXGrid;
+                     end;
+
+                     (* After we log a QSO, send a COnfigure command back to WSJT-X to clear out the DXCall and the DXGrid.
+                        Only do this after the QSO is definetly logged.
+                        Configure      In       15                     quint32
+                       Id (unique key)        utf8
+                       Mode                   utf8
+                       Frequency Tolerance    quint32
+                       Submode                utf8
+                       Fast Mode              bool
+                       T/R Period             quint32
+                       Rx DF                  quint32
+                       DX Call                utf8
+                       DX Grid                utf8
+                       Generate Messages      bool
+
+                       The server  may send  this message at  any time.   The message
+                       specifies  various  configuration  options.  For  utf8  string
+                       fields an empty value implies no change, for the quint32 Rx DF
+                       and  Frequency  Tolerance  fields the  maximum  quint32  value
+                       implies  no change.   Invalid or  unrecognized values  will be
+                       silently ignored.
+                      *)
+               except on E : Exception do
                   begin
-                  logger.debug('[uWSJTX] TotalContacts at start of uWSJTX ADIF UDP message = ' + IntToStr(TotalContacts));
+                  logger.error('[uWSJTX] Exception processing ADIF record for logging contact %s - adif = %s',[E.Message, adif]);
                   end;
-               Unpack(AData,index,adif);
-               logger.Trace('[uWSJTX] >>> ADIF Record to log: ' + adif);
-               ClearContestExchange(TempRXData);
-
-               if ParseADIFRecord(adif, TempRXData) then // processed a record if true
-                  begin
-                  ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
-
-                  if DoingDXMults then
-                     begin
-                     GetDXQTH(TempRXData);
-                     end;
-                  if DoingPrefixMults then
-                     begin
-                     SetPrefix(TempRXData);
-                     end;
-
-                  //CalculateQSOPoints(TempRXData);
-                   logger.debug('[uWSJTX] TotalContacts right before update of NumberSent in uWSJTX ADIF UDP message = %d', [TotalContacts]);
-
-                  //TempRXData.NumberSent := TotalContacts;
-                  //LogContact(TempRXData, true);
-                  if ParametersOkay(TempRXData.Callsign, TempRXData.QTHString, ActiveBand, Digital, ActiveRadioPtr.LastDisplayedFreq {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
-                     begin
-                     ReceivedData.ceSearchAndPounce := OpMode = SearchAndPounceOpMode;
-                     ReceivedData.ceComputerID := ComputerID;
-                     LogContact(TempRXData, True);
-                     tElapsedTimeFromLastQSO := Windows.GetTickCount;
-                     UpdateWindows;
-                     //ShowStationInformation(@TempRXData.Callsign);
-                     ClearContestExchange(TempRXData);
-                     LastTwoLettersCrunchedOn := '';
-                     CallAlreadySent := False;
-                     ExchangeHasBeenSent := False;
-                     EditingCallsignSent := False;
-                     SeventyThreeMessageSent := False;
-                     EscapeDeletedCallEntry := CallWindowString;
-                     tCleareCallWindow;
-                     tCleareExchangeWindow;
-                     tCallWindowSetFocus;
-                     CleanUpDisplay;
-                     sCallSentToWindow := '';
-                     end;
-
-                  //tCleareCallWindow;
-
-                  //ShowStationInformation(@TempRXData.Callsign);
-                  //UpdateWindows;
-                  end;
-               end;
+               end
             else
                begin
                logger.Error('[uWSJTX]  >>> Unrecognized message type: %d', [messageType]);
@@ -662,12 +705,53 @@ begin
       end;
 
    Pack(AData,true);        // Highlight last only
-   logger.trace('[uWSJTX] Sending command to highlight ' + Trim(sCall));
+   logger.trace('[uWSJTX] Sending command to highlight %s', [sCall]);
    udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
 
 
 end;
 
+procedure TWSJTXServer.ClearDXCallandDXGrid;
+var
+   AData: TIdBytes;
+   messageType, magic, schema: LongInt;
+   id: String;
+begin
+   exit;
+
+// Build a header for a message
+
+   // Send colors for Dupes (QSOB4)
+
+   magic := $ADBCCBDA;
+
+   schema := 2;
+   messageType := 15;
+   id := '25';
+
+   pack(AData, magic);            {.............................................Magic number}
+
+   pack(AData, schema);          {..............................................Schema}
+   Pack(AData,messageType);        {............................................MessageType}
+   pack(AData,id);                   {..........................................ID}
+   Pack(AData,'');                { Mode blank so it is ignored...ALl UTF-8 operate the same way  }
+   Pack(AData,932838457459459);  // frequency tolerance (max so ignored)
+   Pack(AData,'');                { subMode blank so it is ignored... }
+   Pack(AData,false);       // fast mode
+   Pack(AData,932838457459459);  // T/R period (max so ignored)
+   Pack(AData,932838457459459);  // Rx DF tolerance (max so ignored)
+   Pack(AData,'      ');          // DXCall
+   Pack(AData,'      ');          // DXGrid
+   Pack(AData, True);             // Generate Messages
+
+
+
+
+   logger.debug('[uWSJTX] Sending command to Clear DXCall and DXGrid');
+   udpServ.SendBuffer('127.0.0.1', PeerPort, AData);
+
+
+end;
 
 procedure TWSJTXServer.ClearColors(sId: string);
 
@@ -877,7 +961,7 @@ begin
             DecimalSeparator := '.';
             ThousandSeparator := ',';
             sFreq := SysUtils.FormatFloat(',0.000',radio1.CurrentStatus.VFO[VFOA].Frequency/1000);
-            logger.Trace('[uWSJTX] Sending VFOA frequency: ' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
+            logger.Trace('[uWSJTX] Sending VFOA frequency: <CmdFreq:%u>%s',[length(sFreq),sFreq]);
             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             DecimalSeparator := SaveDecimalSeparator;
             ThousandSeparator := saveThousandSeparator;
@@ -894,14 +978,14 @@ begin
          logger.trace('[uWSJTX] freq fieldValue = %n',[freq]);
          if processingCmdSetFreq then // Set Main VFO
             begin
-            logger.Trace('[uWSJTX] Setting VFOA to frequency ' + IntToStr(Trunc(freq)));
+            logger.Trace('[uWSJTX] Setting VFOA to frequency %d', [Trunc(freq)]);
             ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
             processingCmdSetFreq := false;
             logger.Trace('[uWSJTX] Resetting processingCmdSetFreq');
             end
          else if processingCmdSetTXFreq then
             begin
-            logger.Trace('[uWSJTX] [processingCmdSetTXFreq] Setting VFOB to frequency ' + IntToStr(Trunc(freq)));
+            logger.Trace('[uWSJTX] [processingCmdSetTXFreq] Setting VFOB to frequency %d', [Trunc(freq)]);
             Self.requestedTXFreq := Trunc(freq * 1000);
             ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
             processingCmdSetTXFreq := false;
@@ -909,7 +993,7 @@ begin
             end
          else if processingCmdQSXSplit then
             begin
-            logger.Trace('[uWSJTX] [processingCmdQSXSplit] Setting VFOB to frequency ' + IntToStr(Trunc(freq)));
+            logger.Trace('[uWSJTX] [processingCmdQSXSplit] Setting VFOB to frequency %d', [Trunc(freq)]);
             Self.requestedTXFreq := Trunc(freq * 1000);
             radio1.SetRadioFreq(Trunc(freq * 1000),Digital,'B');  // B is for VFO B
             ActiveRadioPtr.PutRadioIntoSplit;
@@ -918,9 +1002,14 @@ begin
             end
          else
             begin
-            logger.Debug('[uWSJTX] <***** ERROR ******> Received xcvrfreq to ' + IntToStr(Trunc(freq)) + ' without state variable');
+            logger.Debug('[uWSJTX] <***** ERROR ******> Received xcvrfreq to % d without state variable', [Trunc(freq)]);
             end;
 
+         end
+      else if fieldValue = 'CmdSetFreqMode' then
+         begin
+         processingCmdSetTXFreq := true;
+         logger.Trace('[uWSJTX] Setting processingCmdSetTXFreq due to CmdSetFreqMode message');
          end
       else if fieldValue = 'CmdSetTXFreq' then
          begin
@@ -930,21 +1019,29 @@ begin
       else if fieldName = 'SuppressDual' then
          begin
          end
+      else if fieldName = 'preservesplitanddual' then
+         begin
+         logger.Trace('[uWSJTX] Received preservesplitanddual %s -- no action taken', [sBuffer]);
+         end
+      else if fieldName = 'xcvrmode' then
+         begin
+         logger.Trace('[uWSJTX] xcvrmode received %s - no action taken', [sBuffer]);   // Always DATA-U for WSJTX
+         end
       else if fieldValue = 'CmdSetMode' then
          begin
-         logger.Trace('[uWSJTX] CmdSetMode received ' + sBuffer);
+         logger.Trace('[uWSJTX] CmdSetMode received %s  - no action taken', [sBuffer]);
          end
       else if fieldValue = 'CmdSendSplit' then
          begin
          if ActiveRadioPtr.CurrentStatus.Split then
             begin
             AContext.Connection.IOHandler.Write('<CmdSplit:2>ON');
-            logger.trace('[uWSJTX] Sending ' + '<CmdSplit:2>ON');
+            logger.trace('[uWSJTX] Sending <CmdSplit:2>ON');
             end
          else
             begin
             AContext.Connection.IOHandler.Write('<CmdSplit:3>OFF');
-            logger.trace('[uWSJTX] Sending ' + '<CmdSplit:3>OFF');
+            logger.trace('[uWSJTX] Sending <CmdSplit:3>OFF');
             end;
          end
       else if fieldValue = 'CmdRX' then     // No reply
@@ -990,12 +1087,12 @@ begin
             ePSK31: s := 'DATA-U';
             else
                begin
-               logger.Error('[uWSJTX] <***** ERROR ******> Mode not handled in SENDMODE ' + IntToStr(Ord(ActiveRadioPtr.CurrentStatus.ExtendedMode)));
+               logger.Error('[uWSJTX] <***** ERROR ******> Mode not handled in SENDMODE %d', [Ord(ActiveRadioPtr.CurrentStatus.ExtendedMode)]);
                s := 'DATA-U';
                end;
             end;
          AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
-         logger.Trace('[uWSJTX] Sending ' + SysUtils.Format('<CmdMode:%u>%s',[length(s),s]));
+         logger.Trace('[uWSJTX] Sending <CmdMode:%u>%s',[length(s),s]);
          end
       else if fieldValue = 'CmdSendTx' then
          begin

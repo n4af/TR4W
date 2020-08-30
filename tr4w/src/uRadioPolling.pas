@@ -295,9 +295,16 @@ begin
                                                       end;
                                                    '9':
                                                       begin
-                                                         rig^.CurrentStatus.ExtendedMode := eRTTY_R;
-                                                         rig^.CurrentStatus.Mode
-                                                            := Digital;
+                                                         if rig.RadioModel in [Flex] then
+                                                            begin
+                                                            rig^.CurrentStatus.Mode := Digital;
+                                                            rig^.CurrentStatus.ExtendedMode := eData;
+                                                            end
+                                                         else
+                                                            begin
+                                                            rig^.CurrentStatus.ExtendedMode := eRTTY_R;
+                                                            rig^.CurrentStatus.Mode := Digital;
+                                                            end;
                                                       end;
                                                    'A':
                                                       begin

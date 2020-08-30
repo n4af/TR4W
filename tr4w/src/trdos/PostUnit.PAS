@@ -368,11 +368,12 @@ const
   tCabrilloModeString                   : array[ModeType] of PChar =
     (
     'CW',
-    'RY',
+    'DG',
     'PH',
     nil,
     nil,
-    'FM'
+    'FM',
+    'RY'
     );
 {
   tARRLVESections                       : array[0..NumberSections - 1] of PChar = (
@@ -1567,7 +1568,7 @@ var
   TempInteger                           : integer;
   TempTag                               : CabrilloTags;
 const
-  EDI_ModeCodes                         : array[ModeType] of integer = (2, 7, 1, 0, 0, 6);
+  EDI_ModeCodes                         : array[ModeType] of integer = (2, 7, 1, 0, 0, 6, 7);
   EDI_NewArray                          : array[boolean] of PChar = (nil, 'N');
   EDI_DupeArray                         : array[boolean] of PChar = (nil, 'D');
 begin
@@ -1763,7 +1764,7 @@ begin
   
   // Issue 405 to fix up the header - ny4i
   sWriteFileFromString(tReportFileWrite,'ADIF File'#13#10);
-  sWriteFileFromString(tReportFileWrite,'Created by TR4W version ' + TR4W_CURRENTVERSION + ' on ' + FormatDateTime('nn-mmm-yyyy hh:mm:ss',dtReportTime) + #13#10);
+  sWriteFileFromString(tReportFileWrite,'Created by TR4W version ' + TR4W_CURRENTVERSION + ' on ' + FormatDateTime('dd-mmm-yyyy hh:nn:ss',dtReportTime) + #13#10);
 
   WriteADIFField('ADIF_VER','3.1.0');
   sWriteFile(tReportFileWrite, #13#10, 1);
@@ -2101,6 +2102,9 @@ begin
       sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
 
       sWriteFile(tReportFileWrite, '<EOR>'#13#10, 7);
+      sSubMode := '';
+      sMode := '';
+      sTxString := '';
     end;
     goto 1;
   end;

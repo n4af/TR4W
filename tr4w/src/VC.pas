@@ -1065,7 +1065,7 @@ type
   ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM,
                       eMFSK, eJS8, eUSB, eLSB, eData, eCW_R, eData_R, eRTTY_R, eFM_N, eAM_N,eData_FM, eC4FM, eDStar);
 
-  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
+  ModeType = (CW, Digital, Phone, Both, NoMode, FM, RTTY); { Use for TR }
            //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
   ExtendedRadioModeType = (rNoMode, rCW, rLSB, rUSB, rAM, rFM, rRTTY, rRTTY_R, rAFSK, rDATA_U, rDATA_L, rDIGITAL, rCW_R);
   {    ModeType = (CW, Phone, Both, NoMode, FM, Digital);   { Use for calltest }
@@ -1196,8 +1196,8 @@ const
 
   CallstringLength                      = 13;
 
-  ADIFModeString                        : array[ModeType] of PChar = ('CW', 'DIGITAL',  'SSB', 'BTH', 'NON', 'FM');
-  ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIGI',  'SSB', 'BTH', 'NON', 'FM');
+  ADIFModeString                        : array[ModeType] of PChar = ('CW', 'DIGITAL',  'SSB', 'BTH', 'NON', 'FM', 'RY');
+  ModeStringArray                       : array[ModeType] of PChar = ('CW', 'DIGI',  'SSB', 'BTH', 'NON', 'FM', 'RTTY');
 
 
   ExtendedModeStringArray               : array[ExtendedModeType] of string =
@@ -3290,7 +3290,7 @@ QSOPartiesCount = 15;
  ({Name: 'IN QSO PARTY';               }Email: nil;                      DF: 'in_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 15; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN-QSO-PARTY';   CABName:''),     // 4.88.2
  ({Name: 'OK-OM SSB';                  }Email: nil;                      DF: 'okom';              WA7BNM:  185; {SK3BG: 'okomdxc';    } QRZRUID: 12  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:CQDXCC; QP:OKOMSSBQSOPointMethod; ADIFName:'';   CABName:''),     // 4.80.1
  ({Name: 'BATAVIA-FT8';                }Email: nil;                      DF: nil;                 WA7BNM:  10686;                       QRZRUID: 0   ; Pxm: Prefix;        ZnM: NoZoneMults; AIE: GridInitialExchange; DM: NoDomesticMults; P: 0; AE: GridExchange;                           XM:CQDXCC; QP:YBFT8QP; ADIFName:'';   CABName:'BATAVIA'),    // 4.90.11
- ({Name: 'WWDIGI';                     }Email: 'director@ww-digi.com';   DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridSquares; P: 0; AE: Grid2Exchange;                           XM:NoDXMults; QP:WWDIGIQP; ADIFName:'';   CABName:'WW-DIGI')    // 4.90.11
+ ({Name: 'WWDIGI';                     }Email: 'director@ww-digi.com';   DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridFields; P: 0; AE: Grid2Exchange;                           XM:NoDXMults; QP:WWDIGIQP; ADIFName:'';   CABName:'WW-DIGI')    // 4.90.11
     );
 
 

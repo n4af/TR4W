@@ -249,6 +249,7 @@ type
       tIcomFilterWidth: integer;
 
       tKenwood14Bytes: array[0..14] of char;
+      tFlex16Bytes: array[0..16] of char;
 
       tOrionFreq:   array[0..15] of char;
       tOrionMode:   array[0..07] of char;
@@ -392,7 +393,7 @@ const
       ('OFF', 'ON', 'CW', 'PTT');
 
 type
-   RigType = (rtUnknown, rtICOM, rtKenwood, rtYaesu1, rtYaesu2, rtYaesu3, rtJST, rtOrion);
+   RigType = (rtUnknown, rtICOM, rtKenwood, rtYaesu1, rtYaesu2, rtYaesu3, rtJST, rtOrion, rtFlex);
 
    BaudRateType = (BR1200, BR2400, BR4800, BR9600, BR19200, BR38400, BR57600, BR115200);
 {
@@ -452,7 +453,7 @@ const
     ({Name: 'NONE';       } BR:BR4800;  P: 1; C: 0; S: 0; T:0; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00),
     ({Name: 'K2';         } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'K3';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
-    ({Name: 'FLEX';       } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),     // 4.87.2
+    ({Name: 'FLEX';       } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtFlex),     // Updated to new type rtFlex  NY4I
     ({Name: 'TS140';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS440';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS450';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
@@ -911,7 +912,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, K2, K3 {, FTDX9000}:
+      TS950, TS990, TS2000, K2, K3, FLEX {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RU;');
          end;
@@ -965,7 +966,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, K2, K3 {, FTDX9000}:
+      TS950, TS990, TS2000, K2, K3, FLEX {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RD;');
          end;
@@ -1327,15 +1328,15 @@ begin
             SetString(debugStr,PChar(@Buffer),nNumberOfBytesToWrite);
             nLen := nNumberOfBytesToWrite; //Ord(Buffer[0]);
             BinToHex(@Buffer,Buf,nLen);
-            Buf[(nLen*2) - 2] := #0;
+            Buf[(nLen*2) - 1] := #0;
             logger.trace(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,Buf]));
             end;
          end;
 
       Windows.WriteFile(tCATPortHandle, Buffer, nNumberOfBytesToWrite,
          lpNumberOfBytesWritten, nil);
-      except // on E : Exception do
-      ; // TLogger.GetInstance.Debug(Format('In WriteToCATPort..WriteFile, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
+      except on E : Exception do
+         logger.error('In WriteToCATPort..WriteFile, %s error raised, with message <%s> ',[E.ClassName,E.Message]);
       end;
 {
   if not Windows.WriteFile(tCATPortHandle, Buffer, nNumberOfBytesToWrite, lpNumberOfBytesWritten, pOver) then
@@ -1929,7 +1930,7 @@ begin
    // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
    case RadioParametersArray[RadioModel].rt of
-      rtKenwood:
+      rtFlex, rtKenwood:
          begin
          if Msg = ControlF then// increase speed
             begin
@@ -2237,12 +2238,9 @@ begin
                AddToOutputBuffer('KY0;', 4);
                AddToOutputBuffer('RX;', 3);
                end;
-            FLEX:
-               begin
-               AddToOutputBuffer('ZZSS;', 5);
-               end; // PowerSDR command-no Kenwood equivilent
             end; // case RadioModel
          end;
+      rtFlex: AddToOutputBuffer('ZZSS;', 5);
       rtYaesu1:
          begin
          if RadioModel in [FT100, FT920, FT1000, FT1000MP] then
@@ -2412,7 +2410,7 @@ begin
       end;
 
    case RadioParametersArray[RadioModel].rt of
-      rtKenwood:
+      rtFlex, rtKenwood:
          begin
          // Format(@tKenwood14Bytes, 'KS%003u;', speed);
          // AddToOutputBuffer (tKenwood14Bytes, 6);
@@ -2522,7 +2520,7 @@ begin
                   begin
                   TempByte := RadioParametersArray[RadioModel].LSB;
                   end;
-               if Mode = Digital then
+               if Mode = Digital then  // todo add code here to check exendedMode
                   begin
                   TempByte := RadioParametersArray[RadioModel].DIGL;
                   end;
@@ -2704,6 +2702,59 @@ begin
                end;
             end;
 
+         rtFlex:
+            begin
+            logger.trace('In SetRadioFreq, rtFlex branch');
+            if VFO = 'B' then
+               begin
+               Format(@tFlex16Bytes, 'ZZFB%011u;', Freq);
+               end
+            else
+               begin
+               Format(@tFlex16Bytes, 'ZZFA%011u;', Freq);
+               end;
+            AddToOutputBuffer (tFlex16Bytes, 16);
+            case Mode of
+               CW:
+                  begin
+                  TempByte := Ord('4');
+                  end;
+               Digital:
+                  begin
+                  TempByte := Ord('7');
+                  end;
+               FM:
+                  begin
+                  TempByte := Ord('5');
+                  end;
+
+               else { SSB }
+                  begin
+                  if Freq < 10000000 then
+                     begin
+                     TempByte := Ord('0');
+                     end { LSB }
+                  else
+                     begin
+                     TempByte := Ord('1');
+                     end;
+                  end; { USB }
+               end;
+            if Mode = Digital then
+               begin
+               if ActiveRadioPtr.CurrentStatus.Mode <> Digital then
+                  begin
+                  Format(@tFlex16Bytes, 'ZZMD%02u;', Ord(TempByte));
+
+                  AddToOutputBuffer {WriteToCATPort}(tFlex16Bytes, 7);
+                  logger.Debug('Setting Flex mode to %u', [Ord(TempByte)]);
+                  end
+               else
+                  begin
+                  logger.debug('Skipping Kenwood mode change because MODE was already DIGITAL');
+                  end;
+               end;
+            end;
          rtKenwood:
             begin
             logger.trace ('In SetRadioFreq, rtKenwood branch');
@@ -2751,10 +2802,11 @@ begin
                   tKenwood14Bytes[2] := CHR(TempByte);
                   tKenwood14Bytes[3] := ';';
                   AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 4);
+                  logger.Debug('Setting Kenwood mode to %d', [TempByte]);
                   end
                else
                   begin
-                  logger.debug('Skipping Kenwod mode change because MODE was already DIGITAL');
+                  logger.debug('Skipping Kenwood mode change because MODE was already DIGITAL');
                   end;
                end;
 
@@ -3024,28 +3076,6 @@ begin
                begin
                tOrionMode[2] := 'S';
                end;
-            //        WriteToCATPort(tOrionMode, 6);
-
-{
-        Str(Freq, FreqStr);
-        CPUKeyer.AddSerialPortString(tCATPortType, '*' + VFO + 'F' + FreqStr + CarriageReturn);
-
-        case Mode of
-          CW:
-            if FT1000MPCWReverse then
-              CPUKeyer.AddSerialPortString(tCATPortType, '*RMM3' + CarriageReturn)
-            else
-              CPUKeyer.AddSerialPortString(tCATPortType, '*RMM2' + CarriageReturn);
-
-          Phone:
-            if Freq < 10000000 then
-              CPUKeyer.AddSerialPortString(tCATPortType, '*RMM1' + CarriageReturn)
-            else
-              CPUKeyer.AddSerialPortString(tCATPortType, '*RMM0' + CarriageReturn);
-          FM:
-            CPUKeyer.AddSerialPortString(tCATPortType, '*RMM5' + CarriageReturn);
-        end;
-}
             end;
          end;
       except //on E : Exception do
