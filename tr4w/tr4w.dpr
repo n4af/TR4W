@@ -110,6 +110,8 @@ uses
  // uGridLookup in 'src\uGridLookup.pas',   // ny4i THis is not ready yet so no need to include yet.
   Log4D in 'src\Log4D.pas';
 
+{$E exe}
+
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
 {$IF LANG = 'SER'}{$R res\tr4w_ser.res}{$IFEND}
@@ -397,7 +399,7 @@ begin
 
   LoadTR4WPOSFILE;
 
-
+ 
   if not ctyLoadInCountryFile(TR4W_CTY_FILENAME, False, True) then
   begin
     UnableToFindFileMessage(TR4W_CTY_FILENAME);
@@ -417,11 +419,11 @@ begin
 
   UpdateDebugLogLevel;
 
-
+  
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
 
-
+  
 
   if CTY.ctyR150SMode then
   begin
