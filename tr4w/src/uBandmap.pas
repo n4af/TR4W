@@ -442,7 +442,7 @@ begin
             begin
               TempInt := GetBMSelItemData;
               if TempInt = LB_ERR then Exit;
-              if QSYInactiveRadio and TwoRadioMode then                                   //Gav 4.37.12
+              if QSYInactiveRadio and TwoRadioMode then                  // 4.92.1                 //Gav 4.37.12
                begin
                 TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio);
                end
