@@ -1559,16 +1559,19 @@ begin
   then
     Exit;
 
-  LastDisplayedBand := Band;
-  LastDisplayedMode := Mode;
+ // LastDisplayedBand := Band;         // moved below where we update the main window
+ // LastDisplayedMode := Mode;
   //  LastDisplayedFMMode := FMMode;
 
   UpdateTotals2;
 
   Format(wsprintfBuffer, TWO_STRINGS, BandStringsArray[Band], ModeStringArray[Mode]);
-
+  logger.debug('Band/Mode set to %s', [wsprintfBuffer]);
   SetMainWindowText(mweBandMode, wsprintfBuffer);
 
+  LastDisplayedBand := Band;    // Moved these here in case of any errors above
+  LastDisplayedMode := Mode;
+  
   if MultByBand then MultBand := ActiveBand else MultBand := AllBands;
   if MultByMode then MultMode := ActiveMode else MultMode := Both;
 

@@ -2298,7 +2298,7 @@ begin
          dwFlagsAndAttributes := FILE_FLAG_OVERLAPPED;
          EvtChar := #13;
          end;
-      if RadioModel in [KenwoodRadios, K2, K3] then
+      if RadioModel in [KenwoodRadios, K2, K3, Flex] then
          begin
          dwFlagsAndAttributes := FILE_FLAG_OVERLAPPED;
          EvtChar := ';';
@@ -2324,7 +2324,7 @@ begin
       FreeMem(TimeoutBuffer, sizeof(COMMTIMEOUTS));
 {$IF MASKEVENT}
 
-      if RadioModel in [KenwoodRadios, K2, K3, Orion] then
+      if RadioModel in [KenwoodRadios, K2, K3, Orion, Flex] then
          begin
          if SetCommMask(hand, EV_RXFLAG) then
             begin
@@ -2483,7 +2483,7 @@ const
    FT847ModeString = CHR(0) + CHR(0) + CHR(0) + CHR(7);
 
 begin
-   logger.debug('[SetRadioFreq] set frequency to %u',[freq]);
+   logger.debug('[Entering SetRadioFreq] set frequency to %u, mode to %s',[freq, ModeStringArray[Mode]]);
    skipMode := false;
       try
       case RadioParametersArray[RadioModel].rt of
@@ -2717,42 +2717,45 @@ begin
             case Mode of
                CW:
                   begin
-                  TempByte := Ord('4');
+                  TempByte := 4;
                   end;
                Digital:
                   begin
-                  TempByte := Ord('7');
+                  TempByte := 7;
                   end;
                FM:
                   begin
-                  TempByte := Ord('5');
+                  TempByte := 5;
                   end;
-
-               else { SSB }
+               RTTY:
+                  begin
+                  TempByte := 30;
+                  end;
+               Phone:
                   begin
                   if Freq < 10000000 then
                      begin
-                     TempByte := Ord('0');
+                     TempByte := 0;
                      end { LSB }
                   else
                      begin
-                     TempByte := Ord('1');
+                     TempByte := 1;
                      end;
                   end; { USB }
-               end;
-            if Mode = Digital then
-               begin
-               if ActiveRadioPtr.CurrentStatus.Mode <> Digital then
-                  begin
-                  Format(@tFlex16Bytes, 'ZZMD%02u;', Ord(TempByte));
-
-                  AddToOutputBuffer {WriteToCATPort}(tFlex16Bytes, 7);
-                  logger.Debug('Setting Flex mode to %u', [Ord(TempByte)]);
-                  end
                else
                   begin
-                  logger.debug('Skipping Kenwood mode change because MODE was already DIGITAL');
+                  logger.error('In SetFrequency, mode requested was not an expected mode %u', [Ord(Mode)]);
                   end;
+               end;
+            if Mode <> ActiveRadioPtr.CurrentStatus.Mode then
+               begin
+               Format(@tFlex16Bytes, 'ZZMD%02u;', TempByte);
+               AddToOutputBuffer(tFlex16Bytes, 7);
+               logger.Debug('Setting Flex mode to %02u', [TempByte]);
+               end
+            else
+               begin
+               logger.debug('Skipping mode change because MODE was already requested mode');
                end;
             end;
          rtKenwood:
@@ -3078,10 +3081,10 @@ begin
                end;
             end;
          end;
-      except //on E : Exception do
-      ; // TLogger.GetInstance.Debug(Format('In SetRadioFreq, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
+      except on E : Exception do
+         logger.error('In SetRadioFreq, %s exception raised, with message <%s> ',[E.ClassName,E.Message]);
       end;
-   //TLogger.GetInstance.Debug(SysUtils.Format('[Exit SetRadioFreq] %s',[RadioName]));
+   logger.trace('[Exit SetRadioFreq] %s',[RadioName]);
 end;
 
 procedure RadioObject.UpdateBandOutputInfo(Band: BandType; Mode: ModeType);
@@ -3268,19 +3271,29 @@ begin
       end;
 
    case IntRadioType of
+      FLEX:
+         if PTTOn then
+            begin
+            TempString := 'ZZTX1;';
+            end
+         else
+            begin
+            TempString := 'ZZTX0;';
+            end;
+
+
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
-      TS2000, FLEX, K2, K3:
-         begin
+      TS2000, K2, K3:
          if PTTOn then
             begin
             TempString := 'TX;';
-            DEBUGMSG('Setting Kenwood/Flex/K3 to TX mode');
-            end else
+            DEBUGMSG('Setting Kenwood/K3 to TX mode');
+            end
+         else
             begin
-            DEBUGMSG('Setting Kenwood/Flex/K3 to RX mode');
+            DEBUGMSG('Setting Kenwood/K3 to RX mode');
             TempString := 'RX;';
             end;
-         end;
 
       FT450, FT950, FT891, FT991, FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000:    // Added FT891 ny4i Issue218
          begin
@@ -3321,7 +3334,7 @@ begin
          logger.debug('FT920 or FT767 do not support PTT via CAT commands');
          Exit;
          end;
-  
+
 
     IC78..IC9700:
        begin

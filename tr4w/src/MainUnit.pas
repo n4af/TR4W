@@ -2491,24 +2491,12 @@ begin
     menu_colors:
       RunOptionsDialog(cfCol);
 
-//    tDialogBox(61, @SettingsDlgProc2);
-//      DialogBoxParam(hInstance, MAKEINTRESOURCE(61), tr4whandle, @SettingsDlgProc2, integer(cfAll));
-
     menu_messages: //tDialogBox(71, @MESDlgProc);
       CreateModalDialog(205, 70, tr4whandle, @MESDlgProc, 0);
 
     menu_import_adif:
       begin
       ImportFromADIF;
-        (*Windows.ZeroMemory(@TR4W_ADIF_FILENAME, SizeOf(TR4W_ADIF_FILENAME));
-        if OpenFileDlg(nil, tr4whandle, 'ADIF (*.adi)'#0'*.adi', TR4W_ADIF_FILENAME, OFN_HIDEREADONLY or OFN_ENABLESIZING or OFN_FILEMUSTEXIST) then
-        begin
-          if QSOTotals[All, Both] > 0 then
-            if YesOrNo(tr4whandle, TC_APPENDIMPORTEDQSOSTOCURRENTLOG) = IDno then Exit;
-//          if ImportFromADIFThreadID = 0 then tCreateThread(@ImportFromADIF, ImportFromADIFThreadID);
-          ImportFromADIF;
-        end;
-        *)
       end;
 
     menu_export_notes: MakeNotesList;
@@ -2585,14 +2573,9 @@ begin
     
     menu_alt_autocq:
       begin
-//        if ActiveMode = CW then
-        if tAutoCQMode = False then
-//          tDialogBox(70, @AutoCQDlgProc);
-          CreateModalDialog(145, 60, tr4whandle, @AutoCQDlgProc, 0);
-//QuickDisplay('Enter Time XX:YY GMT:');
-//Readln(junk);
+      if tAutoCQMode = False then
+         CreateModalDialog(145, 60, tr4whandle, @AutoCQDlgProc, 0);
       end;
-
 
     menu_alt_cwspeed:
       SetNewCodeSpeed;

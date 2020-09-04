@@ -340,36 +340,16 @@ begin
 end;
 procedure ToggleModes;
 begin
-  if (MultipleModesEnabled) or (TotalContacts = 0) then
+  if (MultipleModesEnabled) or (TotalContacts = 0) then      // Toggles to CW, [Digital, RTTY], Phone, [FM], CW
   begin
     case ActiveMode of
       CW: if DigitalModeEnable then ActiveMode := Digital else ActiveMode := Phone;
       Phone: if ActiveBand >= Band6 then ActiveMode := FM else ActiveMode := CW;
-      Digital: ActiveMode := Phone;
+      Digital: ActiveMode := RTTY; {Phone;}
+      RTTY: ActiveMode := Phone;
     else ActiveMode := CW;
     end;
-      {      if (ActiveMode = Phone) and (ActiveBand >= Band6) and (not FMMode) then
-              FMMode := True
-            else
-              begin
-                FMMode := False;
-                if DigitalModeEnable then
-                  begin
-                    case ActiveMode of
-                      Phone: ActiveMode := CW;
-                      CW: ActiveMode := Digital;
-                      Digital: ActiveMode := Phone;
-                      else ActiveMode := CW;
-                    end;
-                  end
-                else
-                  case ActiveMode of
-                    Phone: ActiveMode := CW;
-                    CW: ActiveMode := Phone;
-                    else ActiveMode := CW;
-                  end;
-              end;
-      }
+      
     EditingCallsignSent := False;
     DisplayBandMode(
       ActiveBand,

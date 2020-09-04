@@ -109,7 +109,7 @@ const
 
 implementation
 
-procedure pKenwood2(rig: RadioPtr);
+procedure pKenwood2(rig: RadioPtr);  // This is the default for Kenwood and Elecraft unless MASKEVENT is set (not typical)
 label
    NextWait;
 
@@ -121,7 +121,7 @@ var
    Errs: DWORD;
    BytesInBuffer: integer;
    BufferNotChanged: integer;
-   NumberOfSucceffulPolls: integer;
+   NumberOfSuccessfulPolls: integer;
    i: integer;
    TempCommand: tKenwoodCommands;
 const
@@ -138,7 +138,7 @@ begin
    repeat
       inc(rig^.tPollCount);
 
-      NumberOfSucceffulPolls := 0;
+      NumberOfSuccessfulPolls := 0;
 
       for PollNumber := Low(tKenwoodCommands) to High(tKenwoodCommands) do
          begin
@@ -179,7 +179,7 @@ begin
 
             if BytesInBuffer > 0 then
                begin
-                  inc(NumberOfSucceffulPolls);
+                  inc(NumberOfSuccessfulPolls);
 
                   ReadFromSerialPort(BytesInBuffer, rig);
                   if logger.IsTraceEnabled then
@@ -375,7 +375,7 @@ begin
                end;
          end;
 
-      if NumberOfSucceffulPolls = 0 then
+      if NumberOfSuccessfulPolls = 0 then
          begin
             ClearRadioStatus(rig);
             Sleep(500);
@@ -395,7 +395,7 @@ var
    Errs: DWORD;
    BytesInBuffer: integer;
    BufferNotChanged: integer;
-   NumberOfSucceffulPolls: integer;
+   NumberOfSuccessfulPolls: integer;
    i: integer;
 const
    PollsCount = 4;
@@ -421,7 +421,7 @@ begin
             Sleep(200);
          end;
 
-      NumberOfSucceffulPolls := 0;
+      NumberOfSuccessfulPolls := 0;
 
       for PollNumber := 0 to PollsCount - 1 do
          begin
@@ -447,7 +447,7 @@ begin
 
             if BytesInBuffer > 0 then
                begin
-                  inc(NumberOfSucceffulPolls);
+                  inc(NumberOfSuccessfulPolls);
 
                   ReadFromSerialPort(BytesInBuffer, rig);
 
@@ -550,7 +550,7 @@ begin
                end;
          end;
 
-      if NumberOfSucceffulPolls = 0 then
+      if NumberOfSuccessfulPolls = 0 then
          begin
             ClearRadioStatus(rig);
             Sleep(500);
@@ -819,6 +819,368 @@ begin
                begin
                   rig^.CurrentStatus.VFO[TempVFO].Frequency :=
                      BufferToInt(@rig^.tBuf, 3, 11);
+               end;
+      end;
+
+   if Step = 0 then
+      step := KenwoodPollCount;
+
+   UpdateStatus(rig);
+   goto NextPoll;
+end;
+
+
+procedure pFlex(rig: RadioPtr);
+label
+   NextWait;
+
+type
+   tFlexCommands = (kcIF, kcFA, kcFB, kcSW);
+var
+   PollNumber: tFlexCommands;
+   stat: TComStat;
+   Errs: DWORD;
+   BytesInBuffer: integer;
+   BufferNotChanged: integer;
+   NumberOfSuccessfulPolls: integer;
+   i: integer;
+   TempCommand: tFlexCommands;
+   nMOde: integer;
+const
+   FlexPollRequests: array[tFlexCommands] of PChar = ('ZZIF;', 'ZZFA;', 'ZZFB;', 'ZZSW;');  // ZZSW is split because it is not in the IF command
+   FlexPollRequestsAnswerLength: array[tFlexCommands] of integer = (41, 16, 16, 6);
+begin
+   nMode := 0;
+   repeat
+      inc(rig^.tPollCount);
+      NumberOfSuccessfulPolls := 0;
+      for PollNumber := Low(tFlexCommands) to High(tFlexCommands) do
+         begin
+         if PollNumber in [kcFA, kcFB] then
+            begin
+            if rig^.CurrentStatus.VFOStatus = VFOA then
+               if PollNumber = kcFA then
+                  Continue;
+               if rig^.CurrentStatus.VFOStatus = VFOB then
+                  if PollNumber = kcFB then
+                     Continue;
+
+               if rig^.tPollCount mod 10 <> 0 then
+                  Continue;
+            end;
+
+            Sleep(FreqPollRate);
+
+            rig.WritePollRequest(FlexPollRequests[PollNumber]^, 5);
+            BytesInBuffer := 0;
+            BufferNotChanged := 0;
+
+            NextWait:
+            Sleep(10); // 4.73.5 was set to 40
+            ClearCommError(rig^.tCATPortHandle, Errs, @stat);
+            if stat.cbInQue > BytesInBuffer then
+               begin
+               BytesInBuffer := stat.cbInQue;
+               goto NextWait;
+               end
+            else
+               begin
+               inc(BufferNotChanged);
+               if BufferNotChanged < 3 then
+                  goto NextWait;
+               end;
+
+            if BytesInBuffer > 0 then
+               begin
+               inc(NumberOfSuccessfulPolls);
+
+               ReadFromSerialPort(BytesInBuffer, rig);
+               //logger.trace('Read from Flex %s', [rig.tBuf]);
+               for i := 1 to BytesInBuffer - 1 + 1 do
+                  if rig.tBuf[i] = ';' then
+                     begin
+                     for TempCommand := Low(tFlexCommands) to High(tFlexCommands) do
+                         if i >= FlexPollRequestsAnswerLength[TempCommand] then
+                            if rig.tBuf[i - FlexPollRequestsAnswerLength[TempCommand] + 2] = FlexPollRequests[TempCommand][1] then
+                               begin
+                               case TempCommand of
+                                  kcFA:
+                                     begin
+                                     logger.trace('polling: ZZFA %s', [AnsiLeftStr(rig^.tBuf, 16)]);
+                                     rig^.CurrentStatus.VFO[VFOA].Frequency := BufferToInt(@rig^.tBuf[i - 15], 5, 11);
+                                     end;
+                                  kcFB:
+                                     begin
+                                     logger.trace('polling: ZZFB %s', [AnsiLeftStr(rig^.tBuf, 16)]);
+                                     rig^.CurrentStatus.VFO[VFOB].Frequency := BufferToInt(@rig^.tBuf[i - 15], 5, 11);
+                                     end;
+                                  kcSW:
+                                     begin
+                                     logger.trace('polling: ZZSW %s', [AnsiLeftStr(rig^.tBuf, 6)]);
+                                     end;
+                                  kcIF:
+                                     begin
+                                     logger.trace('polling ZZIF %s',[AnsiLeftStr(rig^.tBuf, 41)]);
+                                     rig^.CurrentStatus.Freq := BufferToInt(@rig^.tBuf[i - 40], 5, 11);
+                                     CalculateBandMode(rig^.CurrentStatus.Freq, rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
+
+                                     // Set the extendedMode based on the actual mode ny4i
+                                     nMode := BufferToInt(@rig^.tBuf[i-40],32,2);
+                                     case nMode of
+                                        0: begin
+                                           rig^.CurrentStatus.ExtendedMode := eLSB;
+                                           rig^.CurrentStatus.Mode := Phone;
+                                           end;
+                                        1: begin
+                                           rig^.CurrentStatus.ExtendedMode := eUSB;
+                                           rig^.CurrentStatus.Mode := Phone;
+                                           end;
+                                        3: begin
+                                           rig^.CurrentStatus.ExtendedMode := eCW;
+                                           rig^.CurrentStatus.Mode := CW;
+                                           end;
+                                        4: begin
+                                           rig^.CurrentStatus.ExtendedMode := eCW_R;
+                                           rig^.CurrentStatus.Mode := CW;
+                                           end;
+                                        5: begin
+                                           rig^.CurrentStatus.ExtendedMode := eFM;
+                                           rig^.CurrentStatus.Mode := FM;
+                                           end;
+                                        6: begin
+                                           rig^.CurrentStatus.ExtendedMode := eAM;
+                                           rig^.CurrentStatus.Mode := Phone;
+                                           end;
+                                        7: begin
+                                           rig^.CurrentStatus.ExtendedMode := eDATA;
+                                           rig^.CurrentStatus.Mode := Digital;
+                                           end;
+                                        9: begin
+                                           rig^.CurrentStatus.ExtendedMode := eDATA_R;
+                                           rig^.CurrentStatus.Mode := Digital;
+                                           end;
+                                        11: begin
+                                            rig^.CurrentStatus.ExtendedMode := eFM_N;
+                                            rig^.CurrentStatus.Mode := FM;
+                                            end;
+                                        12: begin
+                                            rig^.CurrentStatus.ExtendedMode := eData_FM;
+                                            rig^.CurrentStatus.Mode := Digital;
+                                            end;
+                                        30: begin
+                                            rig^.CurrentStatus.ExtendedMode := eRTTY;
+                                            rig^.CurrentStatus.Mode := RTTY;
+                                            end;
+                                        40: begin
+                                            rig^.CurrentStatus.ExtendedMode := eDStar;
+                                            rig^.CurrentStatus.Mode := Phone;
+                                            end;
+                                        else
+                                           begin
+                                           logger.debug('Invalid mode received from Flex %s', [nMode]);
+                                           end;
+                                        end;
+
+
+                                     if rig^.tBuf[i-7] = '0' then   // P10
+                                        begin
+                                        rig^.CurrentStatus.VFO[VFOA].Frequency := rig^.CurrentStatus.Freq;
+                                        rig^.CurrentStatus.VFOStatus := VFOA;
+                                        end
+                                     else
+                                        begin
+                                        rig^.CurrentStatus.VFO[VFOB].Frequency := rig^.CurrentStatus.Freq;
+                                        rig^.CurrentStatus.VFOStatus := VFOB;
+                                        end;
+
+                                     rig^.CurrentStatus.RITFreq := BufferToInt(@rig^.tBuf[i-40], 20, 6);
+                                     rig^.CurrentStatus.Split := rig^.tBuf[i-5] <> '0'; // P12
+                                     rig^.CurrentStatus.RIT := rig^.tBuf[i-15] = '1'; // P4
+                                     rig^.CurrentStatus.XIT := rig^.tBuf[i-14] = '1';   // P5
+                                     rig^.CurrentStatus.TXOn := rig^.tBuf[i-10] = '1';  // P8
+                                     if logger.IsTraceEnabled then
+                                        begin
+                                        if rig^.CurrentStatus.Split then
+                                           begin
+                                           logger.trace('Split is enabled');
+                                           end;
+                                        if rig^.CurrentStatus.RIT then
+                                           begin
+                                           logger.trace('RIT is enabled');
+                                           end;
+                                        if rig^.CurrentStatus.XIT then
+                                           begin
+                                           logger.trace('XIT is enabled');
+                                           end;
+                                        if rig^.CurrentStatus.TXOn then
+                                           begin
+                                           logger.trace('Flex says radio is transmitting');
+                                           end
+                                        else
+                                           begin
+                                           logger.trace('Flex says radio is RECEIVING');
+                                           end;
+                                        end;
+
+                                     end;
+                                  end;
+                               end;
+
+                        end;
+                  Windows.ZeroMemory(@rig.tBuf, 128);
+
+               end;
+         end;
+
+      if NumberOfSuccessfulPolls = 0 then
+         begin
+            ClearRadioStatus(rig);
+            Sleep(500);
+         end;
+
+      UpdateStatus(rig);
+   until rig^.tPollCount < 0;
+end;
+
+
+procedure pFlexBad(rig: RadioPtr);
+label
+   NextPoll;
+var
+   Step: integer;
+   TempVFO: ActiveVFOStatusType;
+   nMode: integer;
+const
+   KenwoodVFORequests: array[ActiveVFOStatusType] of PChar = (nil, 'ZZFA;', 'ZZFB;',
+      'ZZMD;');
+   KenwoodPollCount = 10;
+begin
+   nMode := 0;
+   Step := KenwoodPollCount;
+   NextPoll:
+   Sleep(FreqPollRate);
+
+   if rig.CommandsBufferPointer <> 0 then
+      begin
+         rig.WritePollRequest(rig.CommandsBuffer[0], rig.CommandsBufferPointer);
+         Windows.ZeroMemory(@rig.CommandsBuffer[0],
+            SizeOf(rig.CommandsBuffer[0]));
+         rig.CommandsBufferPointer := 0;
+         Sleep(80);
+      end;
+
+   //  if step = KenwoodPollCount then
+   if rig.WritePollRequest('ZZIF;', 5) then
+      begin
+         if not ReadFromCOMPort {OnEvent}(41, rig) then
+            ClearRadioStatus(rig)
+         else
+            begin
+               //      Windows.SetWindowText(tr4whandle, @rig^.tBuf);
+               rig.CurrentStatus.VFOStatus :=
+                  ActiveVFOStatusType(Ord(rig^.tBuf[34]) - Ord('0') + 1);
+
+               rig.CurrentStatus.Freq := BufferToInt(@rig^.tBuf, 5, 11);
+               if rig.CurrentStatus.Freq = rig.PreviousStatus.Freq then
+                  Sleep(200);
+
+               CalculateBandMode(rig^.CurrentStatus.Freq,
+                  rig^.CurrentStatus.Band, rig^.CurrentStatus.Mode);
+
+               // Set the extendedMode based on the actual mode ny4i
+               nMode := BufferToInt(@rig^.tBuf,32,2);
+               case nMode of
+                  0:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eLSB;
+                        rig^.CurrentStatus.Mode := Phone;
+                     end;
+                  1:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eUSB;
+                        rig^.CurrentStatus.Mode := Phone;
+                     end;
+                  3:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eCW;
+                        rig^.CurrentStatus.Mode := CW;
+                     end;
+                  4: begin
+                        rig^.CurrentStatus.ExtendedMode := eCW_R;
+                        rig^.CurrentStatus.Mode := CW;
+                        end;
+                  5:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eFM;
+                        rig^.CurrentStatus.Mode := FM;
+                     end;
+                  6:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eAM;
+                        rig^.CurrentStatus.Mode := Phone;
+                     end;
+                  7:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eDATA;
+                        rig^.CurrentStatus.Mode := Digital;
+                     end;
+                  9:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eDATA_R;
+                        rig^.CurrentStatus.Mode := Digital;
+                     end;
+                  11:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eFM_N;
+                        rig^.CurrentStatus.Mode := FM;
+                     end;
+                  12:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eData_FM;
+                        rig^.CurrentStatus.Mode := Digital;
+                     end;
+                  30:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eRTTY;
+                        rig^.CurrentStatus.Mode := RTTY;
+                     end;
+                  40:
+                     begin
+                        rig^.CurrentStatus.ExtendedMode := eDStar;
+                        rig^.CurrentStatus.Mode := Phone;
+                     end;
+                  else
+                     DEBUGMSG('Invalid mode received from Flex ' +
+                        rig^.tBuf[30]);
+               end;
+
+               rig^.CurrentStatus.RITFreq := BufferToInt(@rig^.tBuf, 20, 6);
+
+               rig^.CurrentStatus.Split := rig^.tBuf[34] <> '0';
+               rig^.CurrentStatus.RIT := rig^.tBuf[26] = '1';
+               rig^.CurrentStatus.XIT := rig^.tBuf[27] = '1';
+
+               rig.CurrentStatus.VFO[rig.CurrentStatus.VFOStatus].Frequency :=
+                  rig.CurrentStatus.Freq;
+               rig.CurrentStatus.VFO[rig.CurrentStatus.VFOStatus].Mode :=
+                  rig.CurrentStatus.Mode;
+               rig.CurrentStatus.VFO[rig.CurrentStatus.VFOStatus].ExtendedMode
+                  := rig.CurrentStatus.ExtendedMode;
+               dec(Step);
+            end;
+      end;
+
+   if step = 0 then
+      begin
+         if rig.CurrentStatus.VFOStatus = VFOA then
+            TempVFO := VFOB
+         else
+            TempVFO := VFOA;
+         if rig.WritePollRequest(KenwoodVFORequests[TempVFO]^, 3) then
+            if ReadFromCOMPort(16, rig) then // on event
+               begin
+                  rig^.CurrentStatus.VFO[TempVFO].Frequency :=
+                     BufferToInt(@rig^.tBuf, 5, 11);
                end;
       end;
 
@@ -2855,9 +3217,10 @@ begin
    Windows.ZeroMemory(@rig.tBuf, SizeOf(rig.tBuf));
 
    case rig^.RadioModel of
+      Flex: pFlex(rig);
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
          TS950, TS990,
-         TS2000, FLEX, K2, K3:
+         TS2000, K2, K3:
          begin
 {$IF MASKEVENT}
             pKenwoodNew(rig);
