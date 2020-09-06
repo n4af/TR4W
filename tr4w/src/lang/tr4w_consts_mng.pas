@@ -6,6 +6,7 @@ const
   TC_TRANSLATION_LANGUAGE               = 'MONGOLIAN';
   TC_TRANSLATION_AUTHOR                 = 'Khosbayar.N JT1CD';
   TC_TRANSLATOR_EMAIL                   = 'jt1cd.khos@gmail.com';
+  TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
   TC_WAGWarn                            = 'Warning: Out of WAG allowed frequency range';
   TC_CANNOTOPENLOG                      = 'Cannot open log file';
   TC_IMPORTFILENOTFOUND                 = 'The import file is not available'; 
