@@ -303,12 +303,11 @@ var
 
    newIcomResponseTimeoutAuto: integer;
    icomCIVTransceiveEnable:    boolean;
-
+   InBandLock:     boolean = True;      // 4.92.1
    TwoRadioMode: boolean;
 
    Radio1:           RadioObject {=
     (
-
     SpeedMemory: InitialCodeSpeed;
     BandMemory: Band160;
     ModeMemory: CW;

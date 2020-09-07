@@ -3238,7 +3238,6 @@ var
   label
    SetFreq;
 begin
-
   TempHWND := Windows.GetFocus;
   if {TempHWND} Windows.GetParent(TempHWND) = TelnetCommandWindow then
   begin
@@ -3295,10 +3294,10 @@ begin
 
    if SwitchNext then                              //4.52.3
    begin
-    if ((CallWindowString <> '') and (ExchangeWindowString = '')) then
+    if (CallWindowString <> '')  then     // 4.92.2
      begin
-       SwitchNext := False;
-       Switch     := False;
+         SwitchNext := False;      // 4.92.2
+         Switch     := False;
        if ((WKBusy) or (CWThreadID <> 0)) then     // 4.52.4 issue 192
        begin
         FlushCWBuffer;
@@ -3307,7 +3306,8 @@ begin
        end;
        if not AutoSendEnable then
        begin                             // end 4.52.4
-         SwapRadios;
+        if ExchangeWindowString <> '' then
+         SwapRadios;           // 4.92.2
          InactiveRigCallingCQ := False;
        end;
          if (AutoSendEnable) and (AutoSendCharacterCount>0) then

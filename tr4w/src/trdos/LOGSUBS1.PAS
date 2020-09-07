@@ -171,32 +171,19 @@ begin // 1
       end; // 2
 
     if TempChar = ControlB then
-      if not SingleRadioMode then
+      if not SingleRadioMode then      
       begin
-        if autosendenable then
+       SetUpToSendOnInactiveRadio;
+       if autosendenable then
           CallWindowKeyUpProc; // n4af 4.44.2
         InactiveRigCallingCQ := True;
         InactiveSwapRadio := True;
         if ExchangeWindowString = '' then // 4.52.1
           Switch := True;
-        SwitchNext := True; // 4.52.3
+          SwitchNext := True; // 4.52.3
       end;
 
-    {   if TempChar = ControlE then           // n4af 4.41.3
-         if not SingleRadioMode then
-         begin    // 3
-          if autosendenable then
-            CallWindowKeyUpProc;  // n4af 4.44.2
-            InactiveRigCallingCQ := True;
-            InactiveSwapRadio := True;
-     //       if ExchangeWindowString = ''   then          // 4.52.1
-              Switch     := True;
-             SwitchNext := True;      //4.56.9
-     //       swapradios;
-         end;   // 2
-    }
-
-    Delete(Message, 1, 1);
+          Delete(Message, 1, 1);
   end; // 1
   //ny4i to fix issue #9
 
