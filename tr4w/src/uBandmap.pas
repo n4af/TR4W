@@ -523,18 +523,21 @@ begin
 
   GetBandMapBandModeFromFrequency(Spot.FFrequency, EntryBand, EntryMode);
   if (EntryBand = NoBand) then exit;
-   if QSYInactiveRadio then
-    if ((InActiveRadioPtr.BandMemory <> EntryBand) and (EntryBand = ActiveRadioPtr.BandMemory)) then
-     begin
-      QuickDisplay(TC_2radio_warn);
-      exit;       // 4.92.1
-     end;
+  if InBandLock then
+   begin
+    if QSYInactiveRadio then
+     if ((InActiveRadioPtr.BandMemory <> EntryBand) and (EntryBand = ActiveRadioPtr.BandMemory)) then
+      begin
+       QuickDisplay(TC_2radio_warn);
+       exit;       // 4.92.1
+      end;
   if not QSYInactiveRadio then
     if ((ActiveBand <> EntryBand) and (EntryBand = InActiveRadioPtr.BandMemory))  then        // 4.92.1
        begin
         QuickDisplay(TC_2radio_warn);
         exit;
        end;
+    end;
   SetRadioFreq(Radio, Spot.FFrequency + QZBOffset, EntryMode, 'A');
   Sleep(100);
   PutRadioOutOfSplit(Radio);
