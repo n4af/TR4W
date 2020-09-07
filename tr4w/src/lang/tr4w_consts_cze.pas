@@ -7,7 +7,7 @@ const
   TC_TRANSLATION_LANGUAGE               = 'ÈESKY';
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
-
+  TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
   TC_UKEI                               = 'Zkontrolovat, je-li UK/EI';
   TC_EnterYourDistrictCode              = 'Je-li UK/EI, zadej kód distriktu';
   TC_YUGOSLAVIA                         = 'Jugoslávie';

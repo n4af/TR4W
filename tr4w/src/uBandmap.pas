@@ -442,8 +442,8 @@ begin
             begin
               TempInt := GetBMSelItemData;
               if TempInt = LB_ERR then Exit;
-              if QSYInactiveRadio and TwoRadioMode then                  // 4.92.1                 //Gav 4.37.12
-               begin
+              if  QSYInactiveRadio and  TwoRadioMode then          // 4.92.1                         //Gav 4.37.12
+                begin
                 TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio);
                end
               else
@@ -522,8 +522,25 @@ begin
   EntryMode := NoMode;
 
   GetBandMapBandModeFromFrequency(Spot.FFrequency, EntryBand, EntryMode);
-  if EntryBand = NoBand then Exit;
-
+  if (EntryBand = NoBand) then exit;
+  if InBandLock then
+   begin
+    if QSYInactiveRadio then
+     if ((InActiveRadioPtr.BandMemory <> EntryBand) and (EntryBand = ActiveRadioPtr.BandMemory)) then
+      begin
+       QuickDisplay(TC_2radio_warn);
+       exit;       // 4.92.1
+      end;
+  if not QSYInactiveRadio then
+    if ((ActiveBand <> EntryBand) and (EntryBand = InActiveRadioPtr.BandMemory))  then        // 4.92.1
+       begin
+        QuickDisplay(TC_2radio_warn);
+        exit;
+       end;
+    end;
+  SetRadioFreq(Radio, Spot.FFrequency + QZBOffset, EntryMode, 'A');
+  Sleep(100);
+  PutRadioOutOfSplit(Radio);
   if (QZBRandomOffsetEnable and (EntryMode = CW)) then
   begin
     QZBOffset := Windows.GetTickCount mod (MAX_QZB_OFFSET * 2);
@@ -548,13 +565,8 @@ begin
         end;
     end;
     PutRadioIntoSplit(Radio);
-  end
-  else
-  begin
-    SetRadioFreq(Radio, Spot.FFrequency + QZBOffset, EntryMode, 'A');
-    Sleep(100);
-    PutRadioOutOfSplit(Radio);
-  end;
+  end ;
+
 
   if Radio = InactiveRadio then
     begin

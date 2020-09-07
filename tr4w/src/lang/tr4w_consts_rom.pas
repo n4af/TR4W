@@ -6,7 +6,7 @@ const
 
   TC_TRANSLATION_LANGUAGE               = 'ROMANIAN';
   TC_TRANSLATION_AUTHOR                 = 'Suli I.Iulius YO2IS';
-
+  TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
   TC_UKEI                               = 'If within UK/EI, check here';
   TC_EnterYourDistrictCode              = 'If within UK/EI, enter your district code';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
