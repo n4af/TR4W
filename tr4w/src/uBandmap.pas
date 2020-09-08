@@ -523,7 +523,7 @@ begin
 
   GetBandMapBandModeFromFrequency(Spot.FFrequency, EntryBand, EntryMode);
   if (EntryBand = NoBand) then exit;
-  if InBandLock then
+  if ((InBandLock) and (TwoRadioMode)) then
    begin
     if QSYInactiveRadio then
      if ((InActiveRadioPtr.BandMemory <> EntryBand) and (EntryBand = ActiveRadioPtr.BandMemory)) then
