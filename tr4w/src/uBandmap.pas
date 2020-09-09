@@ -523,13 +523,20 @@ begin
 
   GetBandMapBandModeFromFrequency(Spot.FFrequency, EntryBand, EntryMode);
   if (EntryBand = NoBand) then exit;
+  if ((radio1.filteredstatus.freq=0) or (radio2.filteredstatus.freq=0)) then
+   begin
+    QSYInActiveRadio := False;
+    InBandLock := False;
+   end
+    else
+     QSYInActiveRadio := True;
   if ((InBandLock) and (TwoRadioMode)) then
    begin
     if QSYInactiveRadio then
      if ((InActiveRadioPtr.BandMemory <> EntryBand) and (EntryBand = ActiveRadioPtr.BandMemory)) then
       begin
        QuickDisplay(TC_2radio_warn);
-       exit;       // 4.92.1
+       exit;
       end;
   if not QSYInactiveRadio then
     if ((ActiveBand <> EntryBand) and (EntryBand = InActiveRadioPtr.BandMemory))  then        // 4.92.1
@@ -567,14 +574,12 @@ begin
     PutRadioIntoSplit(Radio);
   end ;
 
-
   if Radio = InactiveRadio then
     begin
       InActiveRadioPtr.BandMemory := Spot.FBand;       //Gav 4.37
       InActiveRadioPtr.ModeMemory := Spot.FMode;       //Gav 4.37
       Exit;
     end;
-
   tCleareExchangeWindow;
   tCallWindowSetFocus;
   CallAlreadySent := False;

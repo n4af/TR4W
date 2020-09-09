@@ -460,7 +460,7 @@ const
  (crCommand: 'HOUR DISPLAY';                  crAddress: pointer(8);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
 // (crCommand: 'HOUR OFFSET';                   crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
 // (crCommand: 'ICOM COMMAND PAUSE';            crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
- (crCommand: 'ICOM RESPONSE TIMEOUT';         crAddress: @newIcomResponseTimeout{F_ICOM_RESPONSE_TIMEOUT};        crMin:10;crMax:1000;    crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
+ (crCommand: 'ICOM RESPONSE TIMEOUT';         crAddress: @newIcomResponseTimeout{F_ICOM_RESPONSE_TIMEOUT};        crMin:0;crMax:0;    crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'IN BAND LOCKOUT';               crAddress: @InBandLock;                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),      // 4.92.1
  (crCommand: 'INCLUDE F-KEY NUMBER';          crAddress: @tIncludeFKeyNumber;             crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'INCREMENT TIME ENABLE';         crAddress: @IncrementTimeEnable;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
