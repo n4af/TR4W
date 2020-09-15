@@ -545,8 +545,9 @@ begin
         exit;
        end;
     end;
-  SetRadioFreq(Radio, Spot.FFrequency + QZBOffset, EntryMode, 'A');
+
   Sleep(100);
+  SetRadioFreq(Radio, Spot.FFrequency + QZBOffset, EntryMode, 'A');
   PutRadioOutOfSplit(Radio);
   if (QZBRandomOffsetEnable and (EntryMode = CW)) then
   begin

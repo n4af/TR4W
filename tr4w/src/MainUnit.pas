@@ -3303,13 +3303,9 @@ begin
         FlushCWBuffer;
         ReturnInCQOpMode;
         exit;
-       end;
-       if not AutoSendEnable then
-       begin                             // end 4.52.4
-        if ExchangeWindowString <> '' then
-         SwapRadios;           // 4.92.2
-         InactiveRigCallingCQ := False;
-       end;
+       end
+       else
+        swapradios;
          if (AutoSendEnable) and (AutoSendCharacterCount>0) then
         begin                             // end 4.52.4
          SwapRadios;
