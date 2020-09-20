@@ -3020,7 +3020,10 @@ if TempRXData.DomMultQTH = '' then
           if cMyState = 'TRC' then      // 4.63.3
            wsprintf(CABRILLO_MYEX, '%-3s %d%-6s')
            else
-          wsprintf(CABRILLO_MYEX, '%-3s %-4.4d %-6s ');
+            if ContestTitle = 'PGA' then       // 4.92.4
+             wsprintf(CABRILLO_MYEX, '%-3s %3.3d%s     ')
+           else
+               wsprintf(CABRILLO_MYEX, '%-3s %-4.4d %6s      ');
 
             asm add esp,20
             end;
@@ -3052,9 +3055,12 @@ if TempRXData.DomMultQTH = '' then
             if Contest = DARC10M then     // n4af 4.43.7
             wsprintf(CABRILLO_HISEX, '%-3s %4.4d %3s')
             else
-            if csQTHString = 'TRC' then      // 4.63.3
+             if ContestTitle = 'PGA' then           // 4.92.4
+               wsprintf(CABRILLO_HISEX, '%-3s%5.3d%s')
+            else
+             if csQTHString = 'TRC' then      // 4.63.3
               wsprintf(CABRILLO_HISEX, '%-3s%5d%-8s')
-              else
+            else
                wsprintf(CABRILLO_HISEX, '%-3s %4.4d %8s');
             asm add esp,20
             end;
