@@ -841,6 +841,7 @@ var
   Offset                                : integer;
   ct                                    : Cardinal;
  begin
+  Offset := 0;
   Result := False;
   Stringtype := tstReceived;
   Windows.ZeroMemory(@TempSpot, SizeOf(TSpotRecord));
@@ -848,15 +849,16 @@ var
   TempSpot.FMode := NoMode;
 
 //  ShowMessage(@TelnetBuffer[DX + 24]);
-  if TelnetBuffer[DX + 24] = '.' then Offset := 2 else Offset := 0;
-
+  if TelnetBuffer[DX + 24] = '.' then Offset := 3; // 4.92.6
+  if TelnetBuffer[DX + 25] = '.' then Offset := 4;
+  if TelnetBuffer[DX + 26] = '.' then Offset := 5;
+  if TelnetBuffer[Dx + 23] = '.' then Offset := 1 ;
   {Source Callsign}
   for i := DX + 9 to DX + 20 do
   begin
-    if TelnetBuffer[i] = ':' then
+    if ((TelnetBuffer[i] = ' ') or (TelnetBuffer[i] = ':')) then
     begin
-//      if TelnetBuffer[i - 1] = '#' then Offset := 2 else Offset := 0;
-
+      if TelnetBuffer[i + 1] <> ' ' then       // 4.92.6
       SetLength(TempSpot.FSourceCall, i - DX - 6);
       Windows.lstrcpyn(@TempSpot.FSourceCall[1], @TelnetBuffer[DX + 6], i - DX - 5);
       i1 := i;
@@ -866,7 +868,10 @@ var
 
   for i := DX + 10 to DX + 20 do
   begin
-    if TelnetBuffer[i] = ' ' then if TelnetBuffer[i + 1] <> ' ' then
+   // if TelnetBuffer[i] = ' ' then if TelnetBuffer[i + 1] <> ' ' then
+      if (TelnetBuffer[i] = ' ') or (TelnetBuffer[i] = ':') then      // 4.92.6
+       if TelnetBuffer[i + 1] <> ' ' then
+
       begin
         Windows.lstrcpyn(@TempSpot.FFreqString[0], @TelnetBuffer[i + 1], DX + 24 - i + Offset);
 
@@ -915,11 +920,11 @@ var
   {DX}
 
 //  DXCallStart := 25;
-
+   if Offset = 4 then Offset := 3;    // 4.92.7
   for i := DX + 27 to DX + 39 do
   begin
     if TelnetBuffer[i] <> ' ' then
-      if TelnetBuffer[i + 1] = ' ' then
+      if TelnetBuffer[i+1] = ' ' then // 4.92.7
       begin
         SetLength(TempSpot.FCall, i - (DX + 25 + Offset));
         Windows.lstrcpyn(@TempSpot.FCall[1], @TelnetBuffer[DX + 26 + Offset], i - (DX + 24 + Offset));

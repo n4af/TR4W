@@ -509,7 +509,7 @@ var
 const
   MAX_QZB_OFFSET                        = 30;
 begin
-
+  QZBOffset := 0;       // 4.92.4
   if (OpMode = SearchAndPounceOpMode)
     then
   begin
@@ -546,7 +546,7 @@ begin
        end;
     end;
 
-  Sleep(100);
+  // Sleep(100);  4.92.4
   SetRadioFreq(Radio, Spot.FFrequency + QZBOffset, EntryMode, 'A');
   PutRadioOutOfSplit(Radio);
   if (QZBRandomOffsetEnable and (EntryMode = CW)) then
