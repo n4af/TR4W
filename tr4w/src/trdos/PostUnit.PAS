@@ -3175,24 +3175,9 @@ if TempRXData.DomMultQTH = '' then
         RSTQSONumberExchange:
           begin
 
-       {     asm
-            push nrSent
-            push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7d');
-            asm add esp,16
-            end;    }
-             Format(CABRILLO_MYEX, '%-3s %04d ', RSTSent, nrSent);      // issue 177
+            Format(CABRILLO_MYEX, '%-3s %03d ', RSTSent, nrSent);      // issue 177        // 4.92.8
 
-           { asm
-            push nrReceived
-            push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7u');
-            asm add esp,16
-            end;
-          end;   }
-          Format(Cabrillo_HISEX, '%-3s %04.4u',RSTReceived, nrReceived);   // issue 177
+            Format(Cabrillo_HISEX, '%-3s %-03.3u',RSTReceived, nrReceived);   // issue 177    // 4.92.8
           end;
         RSTAndContinentExchange:
           begin
@@ -3436,7 +3421,7 @@ if TempRXData.DomMultQTH = '' then
          if Contest = ARKTIKA_SPRING then
       nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-10s%-10s'#13#10)
      else
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-11s%-10s %-5s'#13#10);
+      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-11s%-10s %-5s'#13#10);   // 4.92.8
       asm add esp,24
       end;
 
@@ -4215,7 +4200,7 @@ begin
             Result := SysUtils.Format('%-3s %-7s ', [ MyFDClass, MySection]);
 
          RSTQSONumberExchange:
-            Result := SysUtils.Format('%-3d %04d ', [TempRXData.RSTSent, nrSent]);      // issue 177
+            Result := SysUtils.Format('%-3d %03d ', [TempRXData.RSTSent, nrSent]);      // issue 177      
 
 
          RSTAndContinentExchange:
