@@ -10,3 +10,8 @@
 20 Sep 2020 11:47:26.238 5 [21236] fatal TR4WDebugLog  - Another instance of TR4W is already running
 25 Sep 2020 12:11:25.988 2 [29436] fatal TR4WDebugLog  - Another instance of TR4W is already running
 25 Sep 2020 12:12:30.593 2 [6748] fatal TR4WDebugLog  - Another instance of TR4W is already running
+10 Oct 2020 09:48:33.870 1 [33588] fatal TR4WDebugLog  - Another instance of TR4W is already running
+10 Oct 2020 09:52:43.603 5196 [6220] error TR4WDebugLog  - ProcessMultipliers called while RXData.InhibitMults is set - Exiting...
+10 Oct 2020 10:13:04.814 36403 [33140] error TR4WDebugLog  - ProcessMultipliers called while RXData.InhibitMults is set - Exiting...
+10 Oct 2020 10:29:47.248 2 [34244] fatal TR4WDebugLog  - Another instance of TR4W is already running
+10 Oct 2020 14:14:48.784 3 [29700] fatal TR4WDebugLog  - Another instance of TR4W is already running

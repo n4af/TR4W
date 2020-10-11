@@ -668,7 +668,16 @@ begin
         AddDomesticCountry('HA');
       end;
 
-    YUDX:                                // 4.57.5
+   IRTS:      // 4.93.1
+    begin
+     ActiveBand := Band80;
+     DIGITALMODEENABLE := FALSE;
+     INITIALEXCHANGECURSORPOS := ATSTART;
+     if (MyCountry <> 'EI') and (MyCountry <> 'GI') then
+      ActiveDXMult := NoDXMults;
+    end;
+
+   YUDX:                                // 4.57.5
       begin
       AddDomesticCountry('YU');
       if MyCountry = 'YU' then
@@ -676,7 +685,7 @@ begin
          ActiveDomesticMult :=  NoDomesticMults  ;       // 4.57.7
          ActiveDXMult := ARRLDXCC;
        end
-      end;
+    end;
 
     UKEI:     // 4.58.2
       begin
@@ -797,6 +806,12 @@ begin
 }
 //        VHFBandsEnabled := True;
       end;
+
+      MWC:
+       begin
+        ActiveBand := Band80;
+        TourDuration := 60;
+       end;
 
     NAQSOCW, NAQSOSSB, NAQSORTTY:
       begin

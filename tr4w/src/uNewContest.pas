@@ -294,7 +294,9 @@ begin
 
               CQWWRTTY, CQ160CW, CQ160SSB:
                 SetCommentAndEnableEditControl(TC_ENTERSTATEFORUSPROVINCEFORCANADA, icmyState);
-             
+
+                  IRTS:
+                   SetCommentAndEnableEditControl(TC_EnterYourCountyCode,icmyState);
 
               RAC_CANADA_DAY, RAC_CANADA_WINTER:
                 SetCommentAndEnableEditControl(TC_ENTERYOURPROVINCEID, icmyState);
@@ -402,7 +404,7 @@ begin
               CQIR: DisplayCheckBox(TC_IRELAND);
               RAC_CANADA_DAY, RAC_CANADA_WINTER: DisplayCheckBox(TC_CANADA);
               REFSSB, REFCW: DisplayCheckBox(TC_FRANCE);
-
+              IRTS: DisplayCheckBox(TC_IRTS);   // 4.93.2
               KINGOFSPAINCW, KINGOFSPAINSSB: DisplayCheckBox(TC_SPAIN);
               JIDXCW, JIDXSSB: DisplayCheckBox(TC_JAPAN);
               HELVETIA: DisplayCheckBox(TC_SWITZERLAND);

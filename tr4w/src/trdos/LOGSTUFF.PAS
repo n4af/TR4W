@@ -4268,22 +4268,22 @@ begin
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
   if not StringIsAllNumbers(FirstString) then
-  begin
-    RXData.QTHString := FirstString;
-    NumberString := SecondString;
-  end
+    begin
+     RXData.QTHString := FirstString;
+     NumberString := SecondString;
+    end
   else if (not StringIsAllNumbers(FirstString)) then
     if SecondString = '' then
     begin
       RXData.QTHString := FirstString;
       NumberString := '';
       Result := False;
-    end
-    else if not StringIsAllNumbers(SecondString) then
-    begin
+    end ;
+    if not StringIsAllNumbers(SecondString) then     // 4,93.2
+     begin
       RXData.QTHString := SecondString;
       NumberString := FirstString;
-    end;
+     end;
 
   if StringIsAllNumbers(NumberString) then
     if RXData.QTHString = '' then
@@ -6671,6 +6671,39 @@ begin
     RXData.QSOPoints := 0;
     RXData.InhibitMults := True;
   end;
+end;
+
+IRTSQSOPointMethod:     // 4.93.2
+begin
+RXData.QSOPoints := 0;
+ if   RXData.Mode =  CW  then
+   RXData.QSOPoints := 0;
+if (MyCountry = 'EI') or (MyCountry = 'GI') then
+if (RXCty = 'EI') or (RXCty = 'GI') then
+  begin
+  RXData.DXQTH := '';
+  if   RXData.Mode =  CW  then
+   RXData.QSOPoints := 8
+    else
+     RXDATA.QSOPoints := 4;
+  end
+   else
+    If RXData.Mode =  CW  then
+     RXData.QSOPoints := 2
+     else RXData.QSOPoints := 1;
+if (MyCountry <> 'EI') and (MyCountry <>'GI') then
+ if (RXCty <> 'EI') and (RXCty <>'GI') then
+  begin
+   RXData.InhibitMults := True;
+   exit;
+  end;
+ if (RXCty = 'EI') or (RXCty = 'GI') then
+  begin
+    if   RXData.Mode =  CW  then
+     RXData.QSOPoints := 8
+      else
+        RXData.QSOPoints := 4;
+   end;
 end;
 
 KCJQSOPointMethod:
