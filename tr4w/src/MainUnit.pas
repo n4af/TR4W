@@ -3864,7 +3864,8 @@ begin
     begin
     RData.Band := Band;
     RData.Mode := Mode;
-    SetExtendedModeFromMode(RData);
+ //   SetExtendedModeFromMode(RData);
+    RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3
     RData.NumberSent := TotalContacts + 1;
     RData.Frequency := Freq;
 
@@ -3908,7 +3909,7 @@ begin
  
   RData.Band := Band;
   RData.Mode := Mode;
-  SetExtendedModeFromMode(RData);
+  Rdata.ExtMode := ActiveRadioptr^.CurrentStatus.ExtendedMode ; // 4.93.3
   RData.NumberSent := TotalContacts + 1;
   RData.Frequency := Freq;
 

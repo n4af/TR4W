@@ -261,7 +261,7 @@ begin
                                                                case rig^.tBuf[i
                                                                   - 3] of
                                                                   '0':
-                                                                     rig^.CurrentStatus.ExtendedMode := eData;
+                                                                     rig^.CurrentStatus.ExtendedMode := eDATA; 
                                                                   '1':
                                                                      rig^.CurrentStatus.ExtendedMode := eRTTY;
                                                                   '2':
@@ -2546,7 +2546,7 @@ begin
                               // n4af 4.46.7  first esc d/n clear call
                            switchnext := False; // n4af issue  230
                         end;
-         if rig.FilteredStatus.TxOn then
+         if rig.CurrentStatus.TxOn then
             begin
                rig.tPTTStatus := PTT_ON;
             end
