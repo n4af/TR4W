@@ -48,8 +48,8 @@ type
   TDXSpotsList = object {class}
 
   private
-    FList: PSpotsList;
-    FCount: integer;
+    FList:  PSpotsList;
+    FCount,j : integer;
     FCurrentCursorFreq: integer;
     FCapacity: integer;
     BList: PSpotsListBuffer;                                        // Gav 4.45.6
@@ -109,32 +109,15 @@ begin
   Grow;
   GrowBuffer;                                       // Gav 4.45.6
 end;
-{
-destructor TDXSpotsList.Destroy;
-begin
-  inherited Destroy;
-  if FCount <> 0 then Finalize(FList^[0], FCount);
-  FCount := 0;
-  SetCapacity(0);
-end;
-}
+
 
 function TDXSpotsList.AddSpot(var Spot: TSpotRecord; SendToNetwork: boolean): integer;
 label
 add;
 var
-  i                                     : integer;
-
+  i                          : integer;
 begin
-
-  if BandMapPreventRefresh then                     // Gav 4.45.6
-    begin
-       InsertSpotBuffer(Bcount , Spot);             // Gav 4.45.6
-    end
-  else
-    begin
       SetCursor;
-
       for i := 0 to FCount - 1 do
       begin
           if FList^[i].FBand = Spot.FBand then
@@ -150,7 +133,7 @@ begin
       InsertSpot(Result, Spot);
       Add:
       FList^[Result] := Spot;
-    end;
+    // end;
 
       if SendToNetwork then
       if PInteger(@Spot.FCall[1])^ <> tCQAsInteger then
@@ -186,8 +169,7 @@ begin
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
   NumberEntriesDisplayed := 0;
-  k := 0;                                                     
-
+  k := 0;
   for i := 0 to FCount - 1 do
   begin
     if not BandMapAllBands then if FList^[i].FBand <> BandmapBand then Continue;       //Gav  ActiveBand changed to BandmapBand
@@ -325,27 +307,7 @@ begin
   dec(FCount);
   if Index < FCount then System.Move(FList^[Index + 1], FList^[Index], (FCount - Index) * SizeOf(TSpotRecord));
 end;
-{
-procedure TCallsignsList.ExchangeItems(Index1, Index2: integer);
-var
-  temp                             : integer;
-  Item1, Item2                     : PStringItem;
-  DI                               : TDupesArray;
-begin
-  Item1 := @FList^[Index1];
-  Item2 := @FList^[Index2];
-  temp := integer(Item1^.FCall);
-  integer(Item1^.FCall) := integer(Item2^.FCall);
-  integer(Item2^.FCall) := temp;
-  //  temp := integer(Item1^.FObject);
-  //  integer(Item1^.FObject) := integer(Item2^.FObject);
-  //  integer(Item2^.FObject) := temp;
 
-  DI := Item1^.FDupesArray;
-  Item1^.FDupesArray := Item2^.FDupesArray;
-  Item2^.FDupesArray := DI;
-end;
-}
 
 function TDXSpotsList.FindSpot(const Spot: TSpotRecord; var Index: integer): boolean;
 var
@@ -469,7 +431,7 @@ begin
       (FCount - Index) * SizeOf(TSpotRecord));
   FList^[Index] := Spot;
   inc(FCount);
-end;
+  end;
 
 
 procedure TDXSpotsList.InsertSpotBuffer(Index: integer; const Spot: TSpotRecord);          // Gav 4.45.6

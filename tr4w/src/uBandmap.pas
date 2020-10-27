@@ -326,14 +326,7 @@ begin
         MoveWindow(BandMapStatusBar, 0, HiWord(lParam), LoWord(lParam), HiWord(lParam), True);
         DisplayBandMap;
       end;
-    {
-        WM_CTLCOLORBTN:
-          begin
-            SetBkMode(hdc(wParam), TRANSPARENT);
-            SetTextColor(hdc(wParam), $000000FF);
-            Result := BOOL(tr4wBrushArray[trGreen]);
-          end;
-    }
+    
         //WM_ERASEBKGND:WINDOWS.TextOut(hdc(WPARAM),50,50,'aaaaaa',6);
     WM_INITDIALOG:
       begin
@@ -356,54 +349,13 @@ begin
         tr4w_WindowsArray[tw_BANDMAPWINDOW_INDEX].WndHandle := hwnddlg;
    //      BandMapListBoxHDC := Windows.GetDC(BandMapListBox);
      //           DoNotAddToBandMap := False;       
-{
-        for TempInt := 0 to BandMapButtonsCount - 1 do
-          begin
-            CreateWindow('BUTTON', BandMapButtonsArray[TempInt].Text,
-              button_style,
-              TempInt * button_width,
-              1,
-              button_width - 1,
-              19,
-              hwnddlg,
-              BandMapButtonsArray[TempInt].Menu, hInstance, nil);
-            asm
-        mov edx,[MSSansSerifFont]
-        call tWM_SETFONT
-            end;
-            if ParameterToString(MenuEntryType(BandMapButtonsArray[TempInt].Menu)) = 'TRUE' then
-              Windows.SendDlgItemMessage(hwnddlg, BandMapButtonsArray[TempInt].Menu, BM_SETCHECK, BST_CHECKED, 0);
-          end;
-}
+
         DisplayBandMap;
       end;
-{                                
-    WM_TIMER:
-      begin
-      if tr4w_NeedToBlink then          //n4af
-        begin
 
-           if Windows.InvertRect(BandMapListBox, tBlinkerRect) then       //n4af
-		   if (Abs(spot.FFrequency = BandMapCursorFrequency)
-            TF.InvertBoolean(tIvertedBlinker)
-          else
-            asm
-            nop
-            end;
-        end;
-
-      end;
-}
     WM_COMMAND:
       begin
-        {
-                if HiWord(wParam) = BN_CLICKED then
-                  begin
-                    ProcessInput(MenuEntryType(LoWord(wParam)));
-                    FrmSetFocus;
-                    Exit;
-                  end;
-        }
+
                 //       if lParam = integer(CPUButtonHandle) then CPUButtonProc;
         case wParam of
           66: InvertBooleanCommand(@BandMapAllBands);

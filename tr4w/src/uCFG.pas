@@ -315,7 +315,7 @@ var
 
 const
 
-   CommandsArraySize = 409 + 1 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}     // 4.91.3
+   CommandsArraySize = 410 + 1 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}     // 4.91.3
    + 1 {RadioOneCWByCAT} + 1 {RadioTwoCWByCAT} //ny4i // 4.44.5
    + 9 {UDPBroadcast Variables}
       //ny4i 4.44.9  - Issue 82 added one more UDP variable   Issue 304 Added UDPBroadcastScore
@@ -369,6 +369,7 @@ const
  (crCommand: 'BAND MAP ITEM HEIGHT';           crAddress: @BandMapItemHeight;              crMin:15; crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'BAND MAP ITEM WIDTH';            crAddress: @BandMapItemWidth;               crMin:100;crMax:200;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'BAND MAP MULTS ONLY';           crAddress: @BandMapMultsOnly;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+ (crCommand: 'BANDMAP REFRESH DELAY';         crAddress: @BMDelay;                        crMin:0; crMax:1000;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'BAND MAP SPLIT MODE';           crAddress: pointer(14);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:1; crJ: 0; crKind: ckList; cfFunc: cfAll; crType: ctOther),
  (crCommand: 'BEEP ENABLE';                   crAddress: @BeepEnable;                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'BEEP EVERY 10 QSOS';            crAddress: @BeepEvery10QSOs;                crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
@@ -562,9 +563,9 @@ const
  (crCommand: 'PACKET SPOTS';                  crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctOther),
  (crCommand: 'PADDLE BUG ENABLE';             crAddress: @PaddleBug;                      crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'PADDLE MONITOR TONE';           crAddress: @PaddleMonitorTone;              crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
- (crCommand: 'PADDLE PORT';                   crAddress: @ActivePaddlePort;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctPortLPT),
  (crCommand: 'PADDLE PTT HOLD COUNT';         crAddress: @PaddlePTTHoldCount;             crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'PADDLE SPEED';                  crAddress: @PaddleSpeed;                    crMin:0;  crMax:99;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
+ (crCommand: 'PADDLE PORT';                   crAddress: @ActivePaddlePort;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctPortLPT),
  (crCommand: 'PARTIAL CALL ENABLE';           crAddress: @PartialCallEnable;              crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'PARTIAL CALL LOAD LOG ENABLE';  crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'PARTIAL CALL MULT INFO ENABLE'; crAddress: nil{@PartialCallMultsEnable};    crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),

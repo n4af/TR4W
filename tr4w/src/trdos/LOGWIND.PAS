@@ -687,7 +687,7 @@ var
 
   FrequencyMemoryEnable                 : boolean = True;
   FreqPollRate                          : integer = 10; {KK1L: 6.71a Frequency Poll Rate in milliseconds}
-
+  BMDelay                               :  integer = 0; // 4.93.3
   GridSquareListShown                   : boolean;
 
   HourDisplay                           : HourDisplayType {= ThisHour};

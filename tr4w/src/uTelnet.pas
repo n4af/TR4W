@@ -66,7 +66,7 @@ type
     fsStyle: Byte;
     bReserved: array[1..2] of Byte;
     dwData: LONGINT;
-    iString: integer;
+    iString  : integer;
   end;
 {$IFDEF AUTOSPOT}
   var first : boolean;
@@ -754,6 +754,7 @@ var
 
   if AddedSpot then
     begin
+      sleep(BMDelay); // So we do not drive the serial port and radio too fast.    // 4.93.4
       if TestSocketBuffer < 1 then DisplayBandMap;             //Gav 4.44.6
 
 {$IFDEF AUTOSPOT}
@@ -777,38 +778,12 @@ var
          //TLogger.GetInstance.Debug(Format('Writing to Radio One: %s',[TempSpot.FFreqString]));
          TuneRadioToSpot(TempSpot, RadioOne);
         //Writeln('Radio One');
+             sleep(100); // So we do not drive the serial port and radio too fast.    // 4.93.beta
         end;
-     sleep(200); // So we do not drive the serial port and radio too fast.
+
 {$ENDIF}
    end;
-{
-  Exit;
-  FirstChar := 0;
-  c := 0;
-  AddedSpot := False;
-  CheckClusterType(ByteReceived);
-  Start:
-  if (PInteger(@TelnetBuffer[c])^ = 1142970436) and (PInteger(@TelnetBuffer[c + 2])^ = 541410336) then
-  begin
-    if (ByteReceived - c) > DXSpotLength then AddedSpot := ProcessDX(c, False);
-    c := c + 74;
-  end;
-  if (TelnetBuffer[c] in [#13]) or (c = ByteReceived - 1) then
-  begin
-    TelnetBuffer[c] := #0;
-//    tLB_ADDSTRING(TelnetListBox, @TelnetBuffer[FirstChar]);
-    if TelnetBuffer[FirstChar] <> #0 then
-      AddStringToTelnetConsole(@TelnetBuffer[FirstChar], trBlack);
-//    if not TelnetFreezeMode then SendMessage(TelnetListBox, WM_VSCROLL, SB_BOTTOM, 0);
-    FirstChar := c + 2;
-  end;
-  inc(c);
-  //  Windows.SetWindowText(tr4whandle, inttopchar(c));
-  //  Windows.SetWindowText(TotalScoreWindowHandle, inttopchar(ByteReceived));
-  if c < ByteReceived then goto Start;
-//  NextFirstChar := 0;
-  if AddedSpot then SpotsList.Display;
-}
+
 end;
 
 
@@ -1038,72 +1013,15 @@ var
 
       Format(QuickDisplayBuffer, 'New DX Cluster spot: %s was spoted by %s on %s', @TempSpot.FCall[1], @TempSpot.FSourceCall[1], TempSpot.FFreqString);
       QuickDisplay(QuickDisplayBuffer);
-{
-      QuickDisplay(PChar(
-        'New DX Cluster spot: ' +
-        TempSpot.FCall +
-        ' was spoted by ' +
-        TempSpot.FSourceCall +
-        ' on ' + string(TempSpot.FFreqString)));
-}
+
       Tree.QuickBeep;
     end;
 
-  {
-    TelnetBuffer[DX + 4] := ' ';
-    if TempSpot.FMult then
-      begin
-        TelnetBuffer[DX + 0] := 'M';
-        TelnetBuffer[DX + 1] := 'U';
-        TelnetBuffer[DX + 2] := 'L';
-        TelnetBuffer[DX + 3] := 'T';
-      end
-    else
-      if TempSpot.FDupe then
-        begin
-          TelnetBuffer[DX + 0] := ' ';
-          TelnetBuffer[DX + 1] := '-';
-          TelnetBuffer[DX + 2] := 'D';
-          TelnetBuffer[DX + 3] := '-';
-        end
-      else
-        begin
-          TelnetBuffer[DX + 0] := ' ';
-          TelnetBuffer[DX + 1] := ' ';
-          TelnetBuffer[DX + 2] := ' ';
-          TelnetBuffer[DX + 3] := ' ';
-        end;
-  }
+
   1:
   Result := True;
 end;
 
-{
-function TelnetListBoxNewProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): UINT; STDCALL;
-begin
-
-  if Msg = WM_KEYUP then
-
-    if wParam = VK_RETURN then
-      begin
-        sm;
-        Exit;
-      end;
-  Result := CallWindowProc(TelnetListBoxOldProc, hwnddlg, Msg, wParam, lParam);
-
-end;
-}
-{
-procedure ShowSpots;
-var
-  i                                     : integer;
-  dc                                    : HDC;
-begin
-  dc := GetDC(tr4w_WindowsArray[tr4w_TELNETWINDOW_INDEX].tr4w_WndHandle);
-  for i := 0 to 20 do
-    textout(dc, 10, i * 20 + 50, PChar(SpotsArray[i]), length(SpotsArray[i]));
-end;
-}
 
 procedure tCreateAndAddNewSpot(Call: CallString; Dupe: boolean; Radio: RadioPtr);
 label
@@ -1176,7 +1094,7 @@ begin
 //  Windows.GetSystemTime(TempSpot.FSysTime);
   TempSpot.FSysTime := UTC.wMinute + UTC.wHour * 60 + UTC.wDay * 60 * 24 + UTC.wMonth * 60 * 24 * 30;
   SpotsList.AddSpot(TempSpot, True);
-
+       sleep(BMDelay);    // 4.93.4
   DisplayBandMap;
 
 end;
@@ -1184,18 +1102,7 @@ end;
 procedure CheckClusterType(ByteReceived: integer);
 
 begin
-{
-  if ClusterTypeDetermined then Exit;
-  for ii := 0 to ByteReceived - 8 do
-  begin
-    if PInteger(@TelnetBuffer[ii])^ = 1347639364  then begin tClusterType := ctDXSpider;//DXSP
-      ClusterTypeDetermined := True;
-    end;
-    if PInteger(@TelnetBuffer[ii])^ = 1127043649  then begin tClusterType := ctARCluster;//AR-C
-      ClusterTypeDetermined := True;
-    end;
-  end;
-} 
+
 end;
 
 procedure SendClientStatus;
