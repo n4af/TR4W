@@ -389,21 +389,7 @@ begin
         AppendTelnetPopupMenu('SHOW/FILTER');
 
         EnumerateLinesInFile('CLUSTER_COMMANDS.TXT', EnumCLUSTERCOMMANDSTXT, True);
-{
-        if OpenFileForRead(TempFile, TR4W_PATH_NAME + 'CLUSTER_COMMANDS.TXT') then
-        begin
-//          TempBkGrColor := 1002;
-          while not Eof(TempFile) do
-          begin
-            Windows.ZeroMemory(@wsprintfBuffer, SizeOf(wsprintfBuffer));
-            ReadLn(TempFile, wsprintfBuffer);
-            if wsprintfBuffer[0] = ';' then Continue;
-            Windows.CharUpper(wsprintfBuffer);
-            AppendTelnetPopupMenu(wsprintfBuffer);
-          end;
-          Close(TempFile);
-        end;
-}
+
 //tLB_ADDSTRING(TelnetListBox,'DX DE SM6WET:    28025.0  G0ORH        SRI, THIS IS CORRECT           0953Z JO68  ');
 //tLB_ADDSTRING(TelnetListBox,'DX DE G4MJS:     14180.0  2DONCG       YOUR TURN TO MAKE A BREW       0953Z JO01  ');
 //tLB_ADDSTRING(TelnetListBox,'DX DE LU6FL:      1845.0  LU6FL        CQ CQ TEST SSB                 0953Z FF97  ');
@@ -754,7 +740,7 @@ var
 
   if AddedSpot then
     begin
-      sleep(BMDelay); // So we do not drive the serial port and radio too fast.    // 4.93.4
+ //     sleep(BMDelay); // So we do not drive the serial port and radio too fast.    // 4.93.beta
       if TestSocketBuffer < 1 then DisplayBandMap;             //Gav 4.44.6
 
 {$IFDEF AUTOSPOT}
@@ -1004,6 +990,7 @@ var
     QuickDisplay(TC_YOUARESPOTTEDBYANOTHERSTATION);
     QuickBeep;
   end;
+  if not TempSpot.FDupe then   // 4.93.4
   SpotsList.AddSpot(TempSpot, True);
 
   if telnet_callsign_alert_list_loaded then
@@ -1094,7 +1081,7 @@ begin
 //  Windows.GetSystemTime(TempSpot.FSysTime);
   TempSpot.FSysTime := UTC.wMinute + UTC.wHour * 60 + UTC.wDay * 60 * 24 + UTC.wMonth * 60 * 24 * 30;
   SpotsList.AddSpot(TempSpot, True);
-       sleep(BMDelay);    // 4.93.4
+ //     sleep(BMDelay);    // 4.93.beta
   DisplayBandMap;
 
 end;

@@ -621,7 +621,7 @@ begin
   begin
       Result := SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
         if Result = LB_ERR then Exit;
-      Result := SendMessage(BandMapListBox, LB_GETITEMDATA, Result , 0);
+        Result := SendMessage(BandMapListBox, LB_GETITEMDATA, Result , 0);
   end;
 
 end;

@@ -832,6 +832,7 @@ var
   SelectedColors                        : ColorRecord;
   SendAltDSpotsToPacket                 : boolean;
   SingleRadioMode                       : boolean;
+  SCount                                : integer = 0;
   SpecialCommand                        : SpecialCommandType {= NoSpecialCommand};
   SplitFreq                             : LONGINT;
 
@@ -4726,7 +4727,7 @@ begin
   if not tWindowsExist(tw_BANDMAPWINDOW_INDEX) then Exit;
   if  BandMapPreventRefresh then  Exit;             // GAV  4.45.6
   SpotsList.Display;
-end;
+  end;
 
  procedure NextBandMapEntry ;
  var
@@ -4815,7 +4816,7 @@ begin
   if not BandMapEnable then Exit;
   if (not DisplayBandMapEnable) then Exit;
 
-  // tr4w_NeedToBlink := False;         //n4af
+  //  tr4w_NeedToBlink := False;         //n4af  4.93.4
 
 
   CurCursorPosData := GetBMSelItemData;
@@ -4870,7 +4871,7 @@ begin
             if not CQLabel(BandMapExpandedString(BandMapEntryRecord^.Call)) then
             begin
             SendMessage(BandMapListBox, LB_GETITEMRECT, wParam(NumberEntriesDisplayed), lParam(@tBlinkerRect));
-         //     tr4w_NeedToBlink := False;     //n4af
+      //         tr4w_NeedToBlink := False;     //n4af 4.93.4
             end;
           end;
 

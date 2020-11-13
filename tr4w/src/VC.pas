@@ -184,12 +184,12 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.93.4' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.94.2' ;  // N4af     New Release
 
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'October `, 2020' ;
+  TR4W_CURRENTVERSIONDATE               = 'November, 2020' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -2061,7 +2061,7 @@ const
   ONE_SECOND_TIMER_HANDLE               = 1;
   QUICK_REPORT_TIMER_HANDLE             = 2;
   BEACONS_ONE_SECOND_TIMER_HANDLE       = 3;
-  BANDMAP_BLINK_TIMER_HANDLE            = 4;
+  // BANDMAP_BLINK_TIMER_HANDLE            = 4;
   REMINDER_ONE_SECOND_TIMER_HANDLE      = 5;
   WAV_PTT_TIMER_HANDLE                  = 6;
   AUTOCQ_TIMER_HANDLE                   = 7;
@@ -2688,7 +2688,6 @@ type
     FistsQSOPointMethod,
     FOCMarathonQSOPointMethod,
     HADXQSOPointMethod,
-    IRTSQSOPointMethod,     // 4.93.1
     YUDXQSOPointMethod,     // 4.57.5
     UKEIQSOPointMethod,    // 4.58.2
     HelvetiaQSOPointMethod,
@@ -2779,8 +2778,8 @@ type
     OKOMRTTY,     // 4.83.4
     SRRQSOPOINTMETHOD, // 4.90.4
     YBFT8QP,              // 4.90.7
-    WWDIGIQP              // 4.90.8
-
+    WWDIGIQP,               // 4.90.8
+    IRTSQSOPointMethod     // 4.93.1
     );
 
 const

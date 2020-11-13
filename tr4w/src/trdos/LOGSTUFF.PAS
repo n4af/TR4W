@@ -415,6 +415,7 @@ var
   DebugFlag: boolean;
   DEEnable: boolean = True;
   DefaultRST: Word;
+  DisplayRefresh: integer=1;
   //  DoingRescore                     : boolean; {KK1L: 6.71}
   DualingCQState: DualingCQStates {= NoDualingCQs};
   DupeCheckSound: DupeCheckSoundType = DupeCheckBeepIfDupe;

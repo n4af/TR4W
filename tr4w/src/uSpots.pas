@@ -117,7 +117,8 @@ add;
 var
   i                          : integer;
 begin
-      SetCursor;
+ 
+     SetCursor;
       for i := 0 to FCount - 1 do
       begin
           if FList^[i].FBand = Spot.FBand then
@@ -128,12 +129,11 @@ begin
             end;
       end;
       if Spot.FBand in [Band30, Band17, Band12] then Spot.FWARCBand := True;
-
-      if FindSpot(Spot, Result) then goto Add;
-      InsertSpot(Result, Spot);
+       FindSpot(Spot, Result)    ;
+             InsertSpot(Result, Spot);
       Add:
       FList^[Result] := Spot;
-    // end;
+
 
       if SendToNetwork then
       if PInteger(@Spot.FCall[1])^ <> tCQAsInteger then
@@ -164,7 +164,8 @@ begin
 //  inc(SpotsDisplayed);
 //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then Exit;
-  if  BandMapPreventRefresh then  Exit;                                       // Gav 4.45.6
+
+                                        // Gav 4.45.6
   TDXSpotsList.UpdateSpotsMultiplierStatus;
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
@@ -180,7 +181,7 @@ begin
     if BandMapMultsOnly then if not ((FList^[i].FMult) or (FList^[i].FCQ)) then Continue;     //Gav added or FCQ to stop CQ spots being trapped by Mult only filter
     if not VHFBandsEnabled then if (FList^[i].FBand > Band12) then Continue;
 
-   // SendMessage(BandMapListBox, LB_ADDSTRING, 0, integer(i));         //GAV original message send
+ //    SendMessage(BandMapListBox, LB_ADDSTRING, 0, integer(i));         //GAV original message send
 
 
    if FList^[i].FFrequency = FCurrentCursorFreq then     CurrentCursorPos := NumberEntriesDisplayed;
@@ -247,20 +248,20 @@ begin
 
      else
       begin
+  //    sleep(BMDelay);
        top := k - 1;
        bottom := 0;
       end;
 
 
-      tSetWindowRedraw(BandMapListBox, False);
+      tSetWindowRedraw(BandMapListBox, True);
       tLB_RESETCONTENT(BandMapListBox);
       SendMessage(BandMapListBox, LB_INITSTORAGE, k , 10000);
 
       for  k := bottom to top  do SendMessage(BandMapListBox, LB_ADDSTRING, 0, FiltSpotIndex[k]);
-
-      tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
-      tSetWindowRedraw(BandMapListBox, True);
-      asm push NumberEntriesDisplayed
+       tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
+       tSetWindowRedraw(BandMapListBox, True);
+       asm push NumberEntriesDisplayed
       end;
       wsprintf(wsprintfBuffer, TC_SPOTS);
       asm add esp,12
@@ -291,15 +292,16 @@ var
 begin
   if BCount <> 0 then
   begin
-    i := BCount;
-    for i := 0 to i - 1 do
-      begin
-         AddSpot(BList^[i],False)
-      end;
-  end;
+   While i < BCount -1  Do
+
+     begin
+         i := i + 1;
+         TDXSpotsList.AddSpot(BList^[i],True);
+
+     end;
   BCount := 0;
 end;
-
+end;
 
 procedure TDXSpotsList.Delete(Index: integer);
 begin
@@ -425,13 +427,23 @@ end;
 
 procedure TDXSpotsList.InsertSpot(Index: integer; const Spot: TSpotRecord);
 begin
+   if SCount = DisplayRefresh then
+   begin
+    BandMapPreventRefresh := False;
+    SCount := 0;
+   end
+   else
+      BandMapPreventRefresh := True;
   if FCount = FCapacity then Grow;
   if Index < FCount then
     System.Move(FList^[Index], FList^[Index + 1],
-      (FCount - Index) * SizeOf(TSpotRecord));
+    (FCount - Index) * SizeOf(TSpotRecord));
   FList^[Index] := Spot;
+  DisplayBandMap;
   inc(FCount);
-  end;
+  inc(SCount);
+
+   end;
 
 
 procedure TDXSpotsList.InsertSpotBuffer(Index: integer; const Spot: TSpotRecord);          // Gav 4.45.6
