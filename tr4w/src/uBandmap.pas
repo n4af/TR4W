@@ -479,9 +479,9 @@ begin
    begin
     QSYInActiveRadio := False;
     InBandLock := False;
-   end
-    else
-     QSYInActiveRadio := True;
+   end ;
+//     else                  // 4.94.2
+ //     QSYInActiveRadio := True;
   if ((InBandLock) and (TwoRadioMode)) then
    begin
     if QSYInactiveRadio then
