@@ -6392,7 +6392,12 @@ begin
                   26: if Length(exch.QTHString) = 0 then
                          begin
                          exch.QTHString := fieldValue;    // STATE
+                         logger.debug('[ParseADIFRecord] Setting exch.QTHString to %s',[exch.QTHString]);
                          //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                         end
+                      else
+                         begin
+                         logger.debug('[ParseADIFRecord] Not setting QTHString to <%s> since it was already <%s>',[fieldValue,exch.QTHString]);
                          end;
                   27: exch.NumberSent := StrToInt(fieldValue);
                   29:
@@ -6494,7 +6499,10 @@ begin
                exch.QTHString := gridSquare;
                end;
          ARRL_RTTY_ROUNDUP:
-            exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
+            if Length(exch.QTHString) = 0 then    // DX with a number should hit this. US stations already had state put into QTHString
+               begin
+               exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
+               end;
          CWOPS:
             exch.Age := StrToIntDef(exch.QTHString,0);
          IARU:

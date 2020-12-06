@@ -1867,9 +1867,12 @@ begin
          sMode := ExtendedModeStringArray[TempRXData.ExtMode];
          end;
        WriteADIFField('MODE',sMode);
+       sMode := '';
+
        if sSubMode <> '' then
           begin
           WriteADIFField('SUBMODE',sSubMode);
+          sSubMode := '';
           end;
 
 
