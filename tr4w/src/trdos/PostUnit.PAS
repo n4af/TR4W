@@ -1848,7 +1848,14 @@ begin
 
       if TempRXData.ExtMode = eNoMode then
          begin
-         sMode := ADIFModeString[TempRXData.mode];
+         if TempRXData.Mode = Digital then
+            begin
+            sMode := 'RTTY';  // Issue 457 Revisited.
+            end
+         else
+            begin
+            sMode := ADIFModeString[TempRXData.mode];
+            end;
          end
       else if TempRXData.ExtMode = eFT4 then    // ??? In MFSKModes[TempRXData.ExtMode]?
          begin
@@ -2513,7 +2520,11 @@ begin
     // This was just assuming any digital contact was RY which is obviously not true.
     if TempRXData.Mode = Digital then
        begin
-       if TempRXData.ExtMode = eRTTY then
+       if TempRXData.ExtMode = eNoMode then
+          begin
+          ModeString := 'RY';
+          end
+       else if TempRXData.ExtMode = eRTTY then
           begin
           ModeString := 'RY';
           end

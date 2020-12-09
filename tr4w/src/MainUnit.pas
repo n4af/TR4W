@@ -3818,7 +3818,7 @@ var
 
 begin
   logger.Trace('>>>Entering ParametersOkay');
-  logger.debug ('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d', [call,BandStringsArray[Band], ModeStringArray[Mode], freq]);
+  logger.debug ('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d, ExchangeString = %s', [call,BandStringsArray[Band], ModeStringArray[Mode], freq, ExchangeString]);
 
   //    RData.QTHString:='';
   ParametersOkay := False;
@@ -3843,7 +3843,11 @@ begin
   Windows.ZeroMemory(@RData.Callsign, SizeOf(RData.Callsign));
   RData.Callsign := Call;
 
-  if (ExchangeString = '') and not (ActiveExchange = RSTNameAndQTHExchange) then Exit;
+  if (ExchangeString = '') and not (ActiveExchange = RSTNameAndQTHExchange) then
+     begin
+     logger.debug('Exiting ParametersOkay early: ExchangeString=<%s>',[ExchangeString]);
+     Exit;
+     end;
 
   RData.Callsign := GetCorrectedCallFromExchangeString(ExchangeString);
   RData.Callsign[Ord(RData.Callsign[0]) + 1] := #0;
@@ -3864,8 +3868,9 @@ begin
     begin
     RData.Band := Band;
     RData.Mode := Mode;
- //   SetExtendedModeFromMode(RData);
-    RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3
+    SetExtendedModeFromMode(RData);
+    // Not the way to do this as the radio does not know the extendedMode--just Mode. NY4I
+    //RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3
     RData.NumberSent := TotalContacts + 1;
     RData.Frequency := Freq;
 
@@ -3909,7 +3914,8 @@ begin
  
   RData.Band := Band;
   RData.Mode := Mode;
-  Rdata.ExtMode := ActiveRadioptr^.CurrentStatus.ExtendedMode ; // 4.93.3
+  SetExtendedModeFromMode(RData);
+ // ny4i Don't do this please - Issue 466 -=> Rdata.ExtMode := ActiveRadioptr^.CurrentStatus.ExtendedMode ; // 4.93.3
   RData.NumberSent := TotalContacts + 1;
   RData.Frequency := Freq;
 
@@ -6480,14 +6486,6 @@ begin
          begin
          exch.ceOperator := currentOperator;
          end;
-      case contest of
-         CWOPS:
-            exch.Age := StrToIntDef(exch.QTHString,0);
-         IARU:
-            exch.QTHString := fieldValue;
-         else
-            ;
-         end; // of case
 
       case exch.ceContest of
          GENERALQSO:
@@ -6495,6 +6493,13 @@ begin
                begin
                exch.QTHString := gridSquare;
                end;
+         ARRL_RTTY_ROUNDUP:
+            exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
+         CWOPS:
+            exch.Age := StrToIntDef(exch.QTHString,0);
+         IARU:
+            exch.QTHString := fieldValue;
+         else ;
          end; // of case
 
       if recordFromWSJTX then
@@ -7958,24 +7963,24 @@ end;
 procedure SetExtendedModeFromMode (RData: ContestExchange);
    begin
    if RData.ExtMode = eNoMode then
-       begin
-       if RData.Mode = PHONE then
-          begin
-          RData.ExtMode := eSSB;
-          end
-       else if RData.Mode = CW then
-          begin
-          RData.ExtMode := eCW;
-          end
-       else if RData.Mode = Digital then
-          begin
-          RData.ExtMode := eDATA;
-          end
-       else if RData.Mode = FM then
-          begin
-          RData.ExtMode := eFM;
-          end;
-       end;
+      begin
+      if RData.Mode = PHONE then
+         begin
+         RData.ExtMode := eSSB;
+         end
+      else if RData.Mode = CW then
+         begin
+         RData.ExtMode := eCW;
+         end
+      else if RData.Mode = Digital then
+         begin
+         RData.ExtMode := eDATA;
+         end
+      else if RData.Mode = FM then
+         begin
+         RData.ExtMode := eFM;
+         end;
+      end;
 
    end;
 

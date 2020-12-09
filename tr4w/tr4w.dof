@@ -94,7 +94,7 @@ OutputDir=target
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;src\include\Indy;D:\newsrc\tr4w\src\include\Indy\Lib\Core;D:\newsrc\tr4w\src\include\Indy\D7;D:\newsrc\tr4w\include
+SearchPath=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;src\include\Indy;D:\newsrc\tr4w\src\include\Indy\Lib\Core;D:\newsrc\tr4w\src\include\Indy\D7;D:\newsrc\tr4w\include;c:\Indy;c:\Indy\lib\core;c:\Indy\d7
 Packages=vcl;rtl;vclx;VclSmp;vclshlctrls
 Conditionals=
 DebugSourceDirs=
@@ -130,3 +130,15 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=4
+Item0=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;src\include\Indy;D:\newsrc\tr4w\src\include\Indy\Lib\Core;D:\newsrc\tr4w\src\include\Indy\D7;D:\newsrc\tr4w\include;c:\Indy;c:\Indy\lib\core;c:\Indy\d7
+Item1=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;src\include\Indy;D:\newsrc\tr4w\src\include\Indy\Lib\Core;D:\newsrc\tr4w\src\include\Indy\D7;D:\newsrc\tr4w\include;c:\Indy;c:\Indy\lib\core;c:\Indy\lib\d7
+Item2=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;src\include\Indy;D:\newsrc\tr4w\src\include\Indy\Lib\Core;D:\newsrc\tr4w\src\include\Indy\D7;D:\newsrc\tr4w\include;c:\Indy;c:\Indy\lib\core
+Item3=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;src\include\Indy;D:\newsrc\tr4w\src\include\Indy\Lib\Core;D:\newsrc\tr4w\src\include\Indy\D7;D:\newsrc\tr4w\include;c:\Indy
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=target
