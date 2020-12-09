@@ -163,7 +163,7 @@ begin
             BufferNotChanged := 0;
 
             NextWait:
-            Sleep(10); // 4.73.5 was set to 40
+            Sleep(80);  // 4.73.5 was set to 40  Revert to 80 to fix K3/Microham (K0TI)
             ClearCommError(rig^.tCATPortHandle, Errs, @stat);
             if stat.cbInQue > BytesInBuffer then
                begin
