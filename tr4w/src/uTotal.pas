@@ -259,7 +259,7 @@ begin
       begin
         if Contest = IARU then WriteLeftColumnText(TC_HQMULTS)
         else
-          if (Contest = RUSSIANDX) or (Contest = RUSSIAN160) then WriteLeftColumnText(TC_OBLASTS)
+          if (Contest = RUSSIANDX) or (Contest = RU3AXMemorial) then WriteLeftColumnText(TC_OBLASTS)
           else
             WriteLeftColumnText(TC_DOMMULTS);
       end;

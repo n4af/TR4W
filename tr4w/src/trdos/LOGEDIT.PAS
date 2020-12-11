@@ -2606,7 +2606,7 @@ begin
     end; { if case }
 
     if TempString = '' then
-      if Contest in [RUSSIANDX, RDA, RUSSIAN160] then
+      if Contest in [RUSSIANDX, RDA, RU3AXMEMORIAL] then
       begin
         ctyLocateCall(Call, TempQTH);
         if RussianID(TempQTH.CountryID) then

@@ -985,7 +985,7 @@ begin
         DomesticMultByBand := dmbbAllBand;
       end;
 
-    RUSSIANDX, RUSSIAN160:
+    RUSSIANDX, RU3AXMEMORIAL:
       begin
         AddRussianDomesticCountrys;
         AddDomesticCountry('CE9');

@@ -604,7 +604,7 @@ begin
 //    EUROPEANHFC, CQWWCW, CQWWSSB, GACWWWSACW, GAGARINCUP: tCQExchange := ' 5NN ' + MyZone;
     {CZECH_ACTIVITY_VHF,}OZHCRVHF, RADIOVHFFD: tCQExchange := ' 5NN # ' + MyGrid;
 
-    NRAUBALTICCW, NRAUBALTICSSB, RUSSIAN160, {WWPMC,} UBACW, UBASSB: tCQExchange := ' 5NN # ' + MyState;
+    NRAUBALTICCW, NRAUBALTICSSB, RU3AXMEMORIAL, {WWPMC,} UBACW, UBASSB: tCQExchange := ' 5NN # ' + MyState;
 
    PCC, IOTA, HELVETIA: if MyState <> '' then tCQExchange := ' 5NN # ' + MyState else tCQExchange := ' 5NN #';
 

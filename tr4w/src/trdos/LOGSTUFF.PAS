@@ -6902,6 +6902,9 @@ begin
     RXData.QSOPoints := 3
   else
     RXData.QSOPoints := 2;
+   if Contest  = RU3AXMEMORIAL then
+    if rxdata.Mode = Phone then
+      RXData.QSOPoints := RXData.QSOPoints * 2;
 end;
 
 SalmonRunQSOPointMethod:

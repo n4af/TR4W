@@ -304,7 +304,7 @@ begin
               REFSSB, REFCW:
                 SetCommentAndEnableEditControl(TC_DEPARTMENT, icmyState);
 
-              UKRAINIAN, RUSSIANDX, UNDX, CIS, RUSSIAN160:
+              UKRAINIAN, RUSSIANDX, UNDX, CIS, RU3AXMEMORIAL:
                 SetCommentAndEnableEditControl(TC_ENTERYOUROBLASTID, icmyState);
 
               KINGOFSPAINCW, KINGOFSPAINSSB, UBACW, UBASSB, PACC, ARI_DX, HELVETIA:
@@ -400,7 +400,7 @@ begin
 
               CQWWRTTY, CQ160CW, CQ160SSB, ARRL10, ARRL160, ARRL_RTTY_ROUNDUP: DisplayCheckBox(TC_NORTHAMERICA);
 
-              RDA, RUSSIANDX, RUSSIAN160: DisplayCheckBox(TC_RUSSIA);
+              RDA, RUSSIANDX, RU3AXMEMORIAL: DisplayCheckBox(TC_RUSSIA);
               CQIR: DisplayCheckBox(TC_IRELAND);
               RAC_CANADA_DAY, RAC_CANADA_WINTER: DisplayCheckBox(TC_CANADA);
               REFSSB, REFCW: DisplayCheckBox(TC_FRANCE);

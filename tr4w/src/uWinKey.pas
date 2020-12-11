@@ -848,14 +848,14 @@ begin
             ActiveRadioPtr.tPTTStatus := PTTStatusType(wkBUSY);
             SendStationStatus(sstPTT);
 
-            if not wkBUSY then
+          if not wkBUSY then
             begin
               wkWaitingBytesInWK := 0;
 //              wkHostBufferIndex := 0;
 //              wkHostBufferSendIndex := 0;
 //              wkWaitingBytesInHost := 0;
               if not tStartAutoCallTerminate(wkThreadID) then tStartAutoCQ;
-              BackToInactiveRadioAfterQSO;
+             BackToInactiveRadioAfterQSO;
             end;
           end
           else
@@ -890,7 +890,7 @@ begin
 {$IFEND}
             end;
         end;
-      Sleep(0);
+
     end;
   end;
 end;
@@ -1011,7 +1011,7 @@ begin
   inc(wkHostBufferIndex);
   if wkHostBufferIndex = SizeOfHostBuffer then wkHostBufferIndex := 0;
   inc(wkWaitingBytesInHost);
-
+ 
 end;
 
 procedure wkAddCWMessageToInternalBuffer(Msg: Str160);
