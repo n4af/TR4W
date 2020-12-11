@@ -110,8 +110,8 @@ const
 implementation
 
 procedure pKenwood2(rig: RadioPtr);
-label
-   NextWait;
+//label
+//   NextWait;
 
 type
    tKenwoodCommands = (kcIF, kcFA, kcFB);
