@@ -110,8 +110,8 @@ const
 implementation
 
 procedure pKenwood2(rig: RadioPtr);
-label
-   NextWait;
+//label
+//   NextWait;
 
 type
    tKenwoodCommands = (kcIF, kcFA, kcFB);
@@ -121,6 +121,9 @@ var
    Errs: DWORD;
    BytesInBuffer: integer;
    BufferNotChanged: integer;
+   RadioWaitTime: integer;
+   RadioTimeoutTime: integer;
+   RadioWaitLoops: integer;
    NumberOfSucceffulPolls: integer;
    i: integer;
    TempCommand: tKenwoodCommands;
@@ -134,6 +137,11 @@ begin
       begin
          SetK3ExtendedCommandMode;
       end;
+
+    // set up the parmeaters for how long we wait for the radio
+   RadioWaitTime := 10; // How often we check for bytes Set to 10
+   RadioTimeoutTime := 1000; // sets the max timeout time for radio
+   RadioWaitLoops := RadioTimeoutTime Div RadioWaitTime; // how may loops to make
 
    repeat
       inc(rig^.tPollCount);
@@ -162,20 +170,37 @@ begin
             BytesInBuffer := 0;
             BufferNotChanged := 0;
 
-            NextWait:
-            Sleep(80);  // 4.73.5 was set to 40  Revert to 80 to fix K3/Microham (K0TI)
-            ClearCommError(rig^.tCATPortHandle, Errs, @stat);
-            if stat.cbInQue > BytesInBuffer then
-               begin
-                  BytesInBuffer := stat.cbInQue;
-                  goto NextWait;
-               end
-            else
-               begin
-                  inc(BufferNotChanged);
-                  if BufferNotChanged < 3 then
-                     goto NextWait;
-               end;
+            // Take in bytes from the radio until either we get the number of
+            // bytes expected or until we time out.
+            // Normally check for new bytes every 10 ms and timeout in 1000 ms.
+            // refactored 12/11/2020 Dan-K0TI
+
+            while BufferNotChanged < RadioWaitLoops do
+              begin
+                Sleep(RadioWaitTime);  // wait a little for some bytes
+                ClearCommError(rig^.tCATPortHandle, Errs, @stat);
+                if stat.cbInQue > BytesInBuffer then
+                  begin
+                    BytesInBuffer := stat.cbInQue;
+                    if BytesInBuffer = KenwoodPollRequestsAnswerLength[PollNumber] then
+                      begin
+                         // log the time it took to get here
+                         logger.trace('Max wait time (ms) -' + inttostr(BufferNotChanged * RadioWaitTime));
+                         // found the correct byte count, go process
+                         break;
+                      end;
+                  end
+                else
+                  begin
+                    // still not enough bytes, try again
+                    inc(BufferNotChanged);
+                  end;
+              end;
+            if BufferNotChanged >= RadioWaitLoops then // we timed out, log it
+              begin
+                logger.warn('Radio Timeout 1000ms');
+                logger.warn('Buffer Bytes -' + inttostr(BytesInBuffer));
+              end;
 
             if BytesInBuffer > 0 then
                begin
