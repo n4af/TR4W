@@ -136,6 +136,7 @@ procedure CheckForNewContestDate(Date: TQSOTime);
 
 procedure WriteADIFField(sFieldName: string; sFieldValue: string);
 function GetOperatorsFromLog: string;
+function DeleteRepeatedSpaces(const s: string): string;
 
 procedure WriteTitleBlockToSummarySheet;
 
@@ -155,6 +156,7 @@ procedure BandChangeReport;
 procedure MakeReportFileName(ShortFileName: PChar);
 procedure MakeNotesList;
 function GoodLookingQSO: boolean;
+function GetStateFromSection(section: string) : string;
 //function CorrectContestExchange: boolean;
 
 var
@@ -1848,7 +1850,14 @@ begin
 
       if TempRXData.ExtMode = eNoMode then
          begin
-         sMode := ADIFModeString[TempRXData.mode];
+         if TempRXData.Mode = Digital then
+            begin
+            sMode := 'RTTY';  // Issue 457 Revisited.
+            end
+         else
+            begin
+            sMode := ADIFModeString[TempRXData.mode];
+            end;
          end
       else if TempRXData.ExtMode = eFT4 then    // ??? In MFSKModes[TempRXData.ExtMode]?
          begin
@@ -1881,7 +1890,7 @@ begin
 
       WriteADIFField('SRX_STRING',TempRXData.ExchString);
       stxString := GetMyExchangeForExport;
-      WriteADIFField('STX_STRING',Trim(stxString));
+      WriteADIFField('STX_STRING',Trim(DeleteRepeatedSpaces(stxString)));
 
       if TempRXData.Precedence <> #0 then
       begin
@@ -1908,12 +1917,18 @@ begin
          else
             tCallStringLength := length(TempRXData.QTHString);
 
-         if TempRXData.DomesticMult then           // ny4i Issue 398
+         //if TempRXData.DomesticMult then           // ny4i Issue 398       // This was not quite right - NY4I 2020-11-22
+         if ContestsArray[Contest].DF = 'arrlsect' then
             begin
-            if not LooksLikeAGrid(TempRXData.QTHString) then
+            sTemp := GetStateFromSection(TempRXData.QTHString);
+            if length(sTemp) > 0 then
                begin
-               WriteADIFFIeld('STATE',TempRXData.QTHString);
+               WriteADIFField('STATE',sTemp);
                end;
+            end
+         else if LooksLikeAState(TempRXData.QTHString) then
+            begin
+            WriteADIFField('STATE',TempRXData.QTHString);
             end;
 
         //if ContestsArray[Contest].DM = DomesticMult
@@ -1931,8 +1946,8 @@ begin
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
 
-            ARRLFIELDDAY, ARRLSSCW, ARRLSSSSB, WINTERFIELDDAY:
-              begin
+            ARRLFIELDDAY, WINTERFIELDDAY:
+                begin
                 if TempRXData.QTHString <> 'DX' then     // Change to validate it is a section
                    begin
                    WriteADIFField('ARRL_SECT',TempRXData.QTHString);
@@ -1943,7 +1958,15 @@ begin
                 nLength := length(MyFDClass) + 1 + length(MySection);
                 sBuffer := SysUtils.Format('<STX_STRING:%u>%s %s ',[nLength, MyFDClass, MySection]);
                 sWriteFileFromString(tReportFileWrite, sBuffer);
-
+                end;
+            ARRLSSCW, ARRLSSSSB:
+               begin
+               if TempRXData.QTHString <> 'DX' then     // Change to validate it is a section
+                   begin
+                   WriteADIFField('ARRL_SECT',TempRXData.QTHString);
+                   //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s ', tCallStringLength, p);
+                   //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+                   end;
 
 
               end;
@@ -2513,7 +2536,11 @@ begin
     // This was just assuming any digital contact was RY which is obviously not true.
     if TempRXData.Mode = Digital then
        begin
-       if TempRXData.ExtMode = eRTTY then
+       if TempRXData.ExtMode = eNoMode then
+          begin
+          ModeString := 'RY';
+          end
+       else if TempRXData.ExtMode = eRTTY then
           begin
           ModeString := 'RY';
           end
@@ -4292,5 +4319,65 @@ begin
    end;
 end;
 (*----------------------------------------------------------------------------*)
+function GetStateFromSection(section: string) : string;
+begin
+   logger.debug ('Entering GetStateFromSection with ' + section);
+   Case AnsiIndexText(AnsiUpperCase(section), ['EMA', 'WMA',                     // 0..1
+                                               'ENY', 'NLI', 'NNY', 'WNY',       // 2..5
+                                               'NNJ', 'SNJ',                     // 6..7
+                                               'EPA', 'WPA',                     // 8..9
+                                               'NFL', 'SFL', 'WCF',              // 10..12
+                                               'NTX', 'WTX', 'STX',
+                                               'EB',  'LAX', 'ORG', 'SB', 'SCV', 'SDG', 'SF', 'SJV', 'SV',
+                                               'PAC',
+                                               'EWA', 'WWA',
+                                               'GTA', 'ONE', 'ONN', 'ONS',
+                                               'MAR'
+                                              ]) of
+
+   0..1: Result := 'MA';
+   2..5: Result := 'NY';
+   6..7: Result := 'NJ';
+   8..9: Result := 'PA';
+   10..12: Result := 'FL';
+   13..15: Result := 'TX';
+   16..24: Result := 'CA';
+   25: Result := 'HI';
+   26..27: Result := 'WA';
+   28..31: Result := 'ON';
+   32: Result := 'NS';
+   else
+      Result := Tree.GetStateFromSection(section); // This is to not return VE providences that do map directly from sections.
+   end;
+
+   logger.debug('Leaving GetSectionFromState with ' + Result);
+end;
+
+function DeleteRepeatedSpaces(const s: string): string;
+  var
+    i, j, State: Integer;
+  begin
+    SetLength(Result, Length(s));
+    j := 0;
+    State := 0;
+
+    for i := 1 to Length(s) do begin
+
+      if s[i] = ' ' then
+        Inc(State)
+      else
+        State := 0;
+
+      if State < 2 then
+        Result[i - j] := s[i]
+      else
+        Inc(j);
+
+    end;
+
+    if j > 0 then
+        SetLength(Result, Length(s) - j);
+  end;
+
 end.
 

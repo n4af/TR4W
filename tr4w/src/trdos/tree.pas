@@ -858,6 +858,7 @@ function LineInput(Prompt: Str160;
 
 function LowerCase(const s: string): string;
 function LooksLikeAGrid(var GridString: ShortString): boolean;
+function LooksLikeAState(state: string): boolean; // NY4I
 function Lpt1BaseAddress: Word;
 function Lpt2BaseAddress: Word;
 function Lpt3BaseAddress: Word;
@@ -4801,6 +4802,36 @@ begin
   end;
 
   GetStateFromSection := '';
+end;
+
+function LooksLikeAState(state: string): boolean;
+
+begin
+  if (state = 'CA') or (state = 'TX') or (state = 'NY') or (state = 'FL') or
+     (state = 'TX') or (state = 'PA') or (state = 'MA') or (state = 'NJ') or
+     (state = 'WA') or (state = 'MD') or (state = 'DC') or
+     (state = 'AK') or (state = 'AL') or (state = 'AR') or
+     (state = 'AZ') or (state = 'CO') or (state = 'CT') or
+     (state = 'DE') or (state = 'GA') or (state = 'IA') or
+     (state = 'ID') or (state = 'IN') or (state = 'IL') or
+     (state = 'KS') or (state = 'KY') or (state = 'LA') or
+     (state = 'ME') or (state = 'MI') or (state = 'MN') or
+     (state = 'MO') or (state = 'MS') or (state = 'MT') or
+     (state = 'NC') or (state = 'ND') or (state = 'NE') or
+     (state = 'NH') or (state = 'NM') or (state = 'NV') or
+     (state = 'OH') or (state = 'OK') or (state = 'OR') or
+     (state = 'RI') or (state = 'SD') or (state = 'TN') or
+     (state = 'UT') or (state = 'VA') or (state = 'VT') or
+     (state = 'WI') or (state = 'WV') or (state = 'WY') or
+     (state = 'SC') or (state = 'HI') or
+     (state = 'NS') or (state = 'QC') or (state = 'ON') or (state = 'MB') or
+     (state = 'SK') or (state = 'AB') or (state = 'BC') or (state = 'NT') or
+     (state = 'NB') or (state = 'NL') or (state = 'YT') or (state = 'PE') or (state = 'NU') then
+     begin
+     Result := true;
+     end;
+
+
 end;
 {
 function ReadFromSerialPort(port: HWND; BytesToRead: Cardinal; WriteDebug: boolean): boolean ;
