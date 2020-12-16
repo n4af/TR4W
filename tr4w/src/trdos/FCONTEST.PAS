@@ -677,6 +677,12 @@ begin
       ActiveDXMult := NoDXMults;
     end;
 
+  {    EUDX:  // 4.95.6
+      begin
+      AddDomesticCountry
+
+      end;
+}
    YUDX:                                // 4.57.5
       begin
       AddDomesticCountry('YU');

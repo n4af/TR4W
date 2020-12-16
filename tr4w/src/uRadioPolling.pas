@@ -139,7 +139,7 @@ begin
       end;
 
     // set up the parmeaters for how long we wait for the radio
-   RadioWaitTime := 10; // How often we check for bytes Set to 10
+   RadioWaitTime := FreqPollRate; // How often we check for bytes Set to 10
    RadioTimeoutTime := 1000; // sets the max timeout time for radio
    RadioWaitLoops := RadioTimeoutTime Div RadioWaitTime; // how may loops to make
 

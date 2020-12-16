@@ -1009,7 +1009,7 @@ begin
 
     if ParametersOkay(CallWindowString, ExchangeWindowString, ActiveBand, ActiveMode, ActiveRadioPtr.LastDisplayedFreq, ReceivedData) then
     begin
-      if ActiveMode = CW then
+       if ActiveMode = CW then
       begin
         if not Send73Message then Exit;
         OpMode2 := CQOpMode;

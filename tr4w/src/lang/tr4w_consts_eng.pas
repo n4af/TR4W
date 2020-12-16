@@ -88,6 +88,7 @@
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Would you like to check for a possible newer version of  TR4W ?';
 
   {NEW CONTEST}
+//  TC_EUDX                               = 'EU country, enter your four character country code';
   TC_IRTS                               = 'EI/GI, enter your County';
   TC_LATEST_CONFIG_FILE                 = 'Latest config file';
   TC_OPENCONFIGURATIONFILE              = ' - Open configuration file or start a new contest';

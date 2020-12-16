@@ -8,7 +8,6 @@ const
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
   TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
-  TC_UKEI                               = 'Zkontrolovat, je-li UK/EI';
   TC_EnterYourDistrictCode              = 'Je-li UK/EI, zadej kód distriktu';
   TC_YUGOSLAVIA                         = 'Jugoslávie';
   RC_BACKUPLOG                          = 'záložní deník';
@@ -97,6 +96,8 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Chceš ovìøit, zda existuje novìjší verze TR4W ?';
 
   {NEW CONTEST}
+//  TC_EUDX                               = 'EU country, enter your four character country code';
+  TC_UKEI                               = 'Zkontrolovat, je-li UK/EI';
   TC_LATEST_CONFIG_FILE                 = 'poslední konfigurace';
   TC_OPENCONFIGURATIONFILE              = ' - Otevøe konfiguraèní soubor nebo deník závodu';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Adresáø "%s" již existuje.'#13'Pøepsat ?';

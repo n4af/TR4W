@@ -5640,7 +5640,7 @@ begin
     Exit;
   end;
   
-  case ActiveQSOPointMethod of
+   case ActiveQSOPointMethod of
 
     AllAsianQSOPointMethod:
       begin
@@ -7637,11 +7637,53 @@ PortugalDay:    // 4.71.4
           RXData.QSOPoints := 1;
   end;
 
+ EUDXQSOPointMethod:                     // 4.95.6
+{  QSO Points
+a. European Union stations:
+QSO with your own country – 1 points,
+QSO with European Union country – 10 points,
+QSO with a different country on your continent – 3 points,
+QSO with another continent – 5 points.
+b. Non- European Union stations:
+QSO with European Union – 10 points,
+QSO with your own country – 1 points,
+QSO with a different country on your continent – 3 points,
+QSO with another continent – 5 points.
+}
+ begin
+   if MyState[4] <> '' then  // I AM IN EUnion
+    begin
+      if (RXData.DomMultQTH[4] <> '') then     // he is in EU
+       if (RXCty = MyCountry) then      // but in my country
+        RXData.QSOPoints := 1
+         else
+          rxdata.qsopoints := 10;     // he is eu but not my country
+   if (RXData.DomMultQTH[4] = '') then     // he is NOT in EU, but I am
+    if (RXData.QTH.Continent <> MyContinent) then     // not eu not my continent
+        RXData.QSOPoints := 5
+         else
+          if (RXCty <> MyCountry) then
+           RXData.QSOPoints := 3;
+           exit;    
+    end;
 
 
+  if MyState[4] = '' then       //  I AM NOT IN EUnion
+   if RXData.DomMultQTH[4] <> '' then   // he is  in EU
+    rxdata.qsopoints := 10
+      else
+       if (RXData.QTH.Continent <> MyContinent) then
+        RXData.QSOPoints := 5
+         else
+          if (RXCty <> MyCountry) then
+           RXData.QSOPoints := 3
+            else
+          RXData.QSOPoints := 1;
+ end;
 
-end; { of c ase }
+ end;
 end;
+
 
 procedure SendMultiInfoMessage(Band: BandType; Mode: ModeType; Message: Str80);
 

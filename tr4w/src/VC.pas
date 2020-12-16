@@ -146,8 +146,8 @@ const
   ICOM_LONG_MODECOMMAND                 = True ;
 
 const
-//         LANG                                  = 'ENG';
-         LANG                                  = 'RUS';
+         LANG                                  = 'ENG';
+//       LANG                                  = 'RUS';
 //       LANG                                  = 'SER';
 //       LANG                                  = 'ESP';
 //        LANG                                  = 'MNG';
@@ -155,6 +155,7 @@ const
 //       LANG                                  = 'CZE';
 //       LANG                                  = 'ROM';
 //       LANG                                  = 'CHN';
+//       LANG                                  = 'GER';
 
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
 {$IF LANG = 'RUS'}{$INCLUDE lang\tr4w_consts_rus.pas} {$IFEND}
@@ -165,6 +166,7 @@ const
 {$IF LANG = 'CZE'}{$INCLUDE lang\tr4w_consts_cze.pas}{$IFEND}
 {$IF LANG = 'ROM'}{$INCLUDE lang\tr4w_consts_rom.pas}{$IFEND}
 {$IF LANG = 'CHN'}{$INCLUDE lang\tr4w_consts_chn.pas}{$IFEND}
+{$IF LANG = 'GER'}{$INCLUDE lang\tr4w_consts_ger.pas}{$IFEND}
 
 {$IF tDebugMode}
 
@@ -184,7 +186,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.95.4' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.95.6' ;  // N4af     New Release
 
 
 
@@ -944,7 +946,8 @@ type
     BATAVIA_FT8, // 4.90.11
     WWDIGI,
     MWC,           // 4.92.8
-    IRTS       // 4.93.1
+    IRTS ,      // 4.93.1
+    EUDX        // 4.95.6
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -2779,7 +2782,8 @@ type
     SRRQSOPOINTMETHOD, // 4.90.4
     YBFT8QP,              // 4.90.7
     WWDIGIQP,               // 4.90.8
-    IRTSQSOPointMethod     // 4.93.1
+    IRTSQSOPointMethod,     // 4.93.1
+    EUDXQSOPointMethod     // 4.95.6
     );
 
 const
@@ -2919,7 +2923,8 @@ const
      'SRRQSOPOINTMETHOD',  // 4.90.4
      'YBFT8QP',               // 4.90.7
      'WWDIGIQP',              // 4.90.8
-     'IRTS'   //  IRTSQSOPointMethod    // 4.93.1
+     'IRTS',   //  IRTSQSOPointMethod    // 4.93.1
+     'EUDX'    // 4.95.6
     );
 
 type
@@ -3295,7 +3300,10 @@ QSOPartiesCount = 15;
  ({Name: 'BATAVIA-FT8';                }Email: nil;                      DF: nil;                 WA7BNM:  10686;                       QRZRUID: 0   ; Pxm: Prefix;        ZnM: NoZoneMults; AIE: GridInitialExchange; DM: NoDomesticMults; P: 0; AE: GridExchange;                           XM:CQDXCC; QP:YBFT8QP; ADIFName:'';   CABName:'BATAVIA'),    // 4.90.11
  ({Name: 'WWDIGI';                     }Email: 'director@ww-digi.com';   DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridSquares; P: 0; AE: Grid2Exchange;                           XM:NoDXMults; QP:WWDIGIQP; ADIFName:'';   CABName:'WW-DIGI'),    // 4.90.11
  ({Name: 'MWC';                        }Email: 'memorial-ok1wc.cz/index.php?page=logs';                      DF: nil;                 WA7BNM:  0;  QRZRUID: 0 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;          XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),     // 4.92.8
- ({Name: 'IRTS ';                      }Email: 'IRTS.contests@gmail.com';             DF: 'ireland';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQSONUMBERAndPossibleDomesticQTHExchange;           XM:CQDXCC; QP:IRTSQSOPointMethod; ADIFName:'';   CABName:'')     // 4.93.1
+ ({Name: 'IRTS ';                      }Email: 'IRTS.contests@gmail.com';             DF: 'ireland';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQSONumberAndPossibleDomesticQTHExchange;           XM:NoDXMults; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:''),     // 4.95.6
+ ({Name: 'EUDX';                       }Email: 'ik6qon@gmail.com';          DF: 'EU';           WA7BNM:  000; {SK3BG: nil;    } QRZRUID: 0   ;         Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneorDomesticQTH;           XM:CQDXCC; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:'')
+
+
     );
 
 
@@ -3477,7 +3485,8 @@ QSOPartiesCount = 15;
       'BATAVIA-FT8',    // 4.90.11
       'WWDIGI',
       'MWC',               // 4.92.8
-      'IRTS'        // 4.93.1
+      'IRTS',        // 4.93.1
+      'EUDX'         // 4.95.6
      );
 
   const
@@ -3692,7 +3701,8 @@ QSOPartiesCount = 15;
       ({Name: 'BATAVIA-FT8';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'WW-DIGI';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'MWC';                        }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),       // 4.92.8
-      ({Name: 'IRTS';                       }ciCDC0+ ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0)      // 4.93.1
+      ({Name: 'IRTS';                       }ciCDC0+ ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0) ,     // 4.93.1
+      ({Name: 'EUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0)     // 4.95.6
       );
 
 
