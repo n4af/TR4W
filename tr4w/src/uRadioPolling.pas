@@ -2554,9 +2554,10 @@ begin
                      end;
                end;
          end;
+   // move location of variable dif assignment so it is used for both active and inactive radios K0TI 12/19/2020
+   dif := Abs(rig.FilteredStatus.Freq - rig.LastDisplayedFreq);
    if rig = ActiveRadioPtr then
       begin
-         dif := Abs(rig.FilteredStatus.Freq - rig.LastDisplayedFreq);
          if rig.LastDisplayedFreq <> 0 then
             if dif > AutoSAPEnableRate then
                if dif <= 10000 then
