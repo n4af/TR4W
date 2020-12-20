@@ -7649,7 +7649,7 @@ QSO with European Union – 10 points,
 QSO with your own country – 1 points,
 QSO with a different country on your continent – 3 points,
 QSO with another continent – 5 points.
-}
+
  begin
    if MyState[4] <> '' then  // I AM IN EUnion
     begin
@@ -7664,7 +7664,7 @@ QSO with another continent – 5 points.
          else
           if (RXCty <> MyCountry) then
            RXData.QSOPoints := 3;
-           exit;    
+           exit;
     end;
 
 
@@ -7680,7 +7680,25 @@ QSO with another continent – 5 points.
             else
           RXData.QSOPoints := 1;
  end;
-
+ }
+ begin
+ if (RXData.DomMultQTH[4] <> '') then     // he is in EU
+      begin
+       if (RXCty <> MyCountry) then      // Not same country as me
+        RXData.QSOPoints := 10 
+        else
+         RXData.QSOPoints := 1;
+        exit;
+      end;
+      // he is not in EUnion -or- is same country
+      if (RXData.QTH.Continent <> MyContinent) then
+            RXData.QSOPoints := 5
+             else
+              if (RXCty <> MyCountry)  then
+               RXData.QSOPoints := 3
+                 else
+                 RXData.QSOPoints := 1;
+ end;
  end;
 end;
 

@@ -2318,7 +2318,7 @@ begin
         ExchangeInformation.RST := True;
         ExchangeInformation.QTH := True;
       end;
-    RSTZoneOrDomesticQTH:
+      RSTZoneOrDomesticQTH:
       begin
         ExchangeInformation.RST := True;
         ExchangeInformation.Zone := True;
@@ -2502,14 +2502,17 @@ begin
       end;
     end;
 
-    if ActiveExchange = RSTZoneOrDomesticQTH then
-     if Exchangeinformation.QTH then
-      TempString := Qstring
-       else
-        TempString := IntToStr(Zone);
+     if ActiveExchange = RSTZoneOrDomesticQTH then           // 4.95.6
+      begin
+       if QTHString <> '' then
+        begin
+         GetInitialExchangeStringFromContestExchange := QTHString;
+        Exit;
+       end;
+    end;
 
     if ExchangeInformation.Zone then
-       
+
       TempString := IntToStr(Zone);
 
     if ExchangeInformation.Name then TempString := Name;
@@ -2531,7 +2534,7 @@ begin
         (ActiveExchange = RSTAndQSONumberOrDomesticQTHExchange) or
         (ActiveExchange = RSTAndOrGridExchange)) then
 }
-      if TempString = '' then
+      if (TempString = '') or (StrToInt(TempString) = 255) then   // 4.85.6
         TempString := QString
       else
         TempString := TempString + ' ' + QString;

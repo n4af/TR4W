@@ -316,7 +316,7 @@ begin
 
               DARC10M, WAG, DARCXMAS: SetCommentAndEnableEditControl(TC_ENTERYOURDOK, icmyState);
 
-              SPDX, OKDX, OKOMSSB, YODX, RSGB18, LZDX{, EUDX}:                // 4.80.1
+              SPDX, OKDX, OKOMSSB, YODX, RSGB18, LZDX, EUDX:                // 4.80.1
                 SetCommentAndEnableEditControl(TC_ENTERYOURDISTRICTABBREVIATION, icmyState);
 
               RDA: SetCommentAndEnableEditControl(TC_ENTERYOURRDAID, icmyState);
@@ -405,8 +405,8 @@ begin
               RAC_CANADA_DAY, RAC_CANADA_WINTER: DisplayCheckBox(TC_CANADA);
               REFSSB, REFCW: DisplayCheckBox(TC_FRANCE);
               IRTS: DisplayCheckBox(TC_IRTS);   // 4.93.2
-           {   EUDX:
-               DisplayCheckBox(TC_EUDX);  // 4.95.6    }
+             EUDX:
+               DisplayCheckBox(TC_EUDX);  // 4.95.6     
               KINGOFSPAINCW, KINGOFSPAINSSB: DisplayCheckBox(TC_SPAIN);
               JIDXCW, JIDXSSB: DisplayCheckBox(TC_JAPAN);
               HELVETIA: DisplayCheckBox(TC_SWITZERLAND);

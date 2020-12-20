@@ -127,14 +127,14 @@ begin
   Result := FList^[Index].FInExchange
 end;
 
-function TCallsignsList.GetIniitialExchange(const Call: CallString): Str14;                     
+function TCallsignsList.GetIniitialExchange(const Call: CallString): Str14;
 var
   Index                                 : integer;
 begin
   if FindCallsign(Call, Index) then
     Result := FList^[Index].FInExchange
-  else
-    Result := '';
+     else
+      Result := '';
 end;
 
 function TCallsignsList.AddIniitialExchange(const Call:CallString; InitialExchangeString: Str14): boolean;

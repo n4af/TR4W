@@ -14,7 +14,7 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General
-     Public License along with TR4W in  GPL_License.TXT. 
+     Public License along with TR4W in  GPL_License.TXT.
 If not, ref http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit exportto_trlog;
@@ -23,7 +23,7 @@ interface
 
 uses
   LogWind,
-//  LogStuff,
+  //  LogStuff,
   PostUnit,
   LogDom,
   TF,
@@ -66,7 +66,6 @@ begin
     Underline := Underline + '----- ';
   end;
 end;
-
 
 procedure TenTenNumReceivedHeader(var LogString: Str80; var Underline: Str80);
 
@@ -157,6 +156,7 @@ begin
   LogString := LogString + 'Rcvd ';
   Underline := Underline + '---- ';
 end;
+
 procedure QSONumberReceivedHeader(var LogString: Str80; var Underline: Str80);
 
 begin
@@ -171,14 +171,16 @@ begin
   Underline := Underline + '---- ';
 end;
 
-procedure RandomCharsSentAndReceivedHeader(var LogString: Str80; var Underline: Str80);
+procedure RandomCharsSentAndReceivedHeader(var LogString: Str80; var Underline:
+  Str80);
 
 begin
   LogString := LogString + 'Sent   Rcvd   ';
   Underline := Underline + '----   ----   ';
 end;
 
-procedure BandModeDateTimeNumberCallNameSentHeader(var LogString: Str80; var Underline: Str80);
+procedure BandModeDateTimeNumberCallNameSentHeader(var LogString: Str80; var
+  Underline: Str80);
 
 begin
   LogString := ' Band    Date    Time  QSO#  Call worked';
@@ -192,7 +194,6 @@ begin
 end;
 
 procedure WriteLogEntry(Entry: Str80);
-
 
 begin
   //Assign(FileWrite, LogFileName);
@@ -235,7 +236,8 @@ begin
     (ActivePrefixMult = NoPrefixMults) and (ActiveZoneMult = NoZoneMults) then
     Exit;
 
-  if ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange then Exit;
+  if ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange then
+    Exit;
 
   while length(LogString) < LogEntryMultAddress - 1 do
     LogString := LogString + ' ';
@@ -250,7 +252,7 @@ end;
 procedure ClassReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  ClassString                           : Str20;
+  ClassString: Str20;
 
 begin
   ClassString := Exchange.ceClass;
@@ -260,10 +262,11 @@ begin
   LogString := LogString + '  ' + ClassString;
 end;
 
-procedure QSONumberReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
+procedure QSONumberReceivedStamp(Exchange: ContestExchange; var LogString:
+  Str80);
 
 var
-  QSONumberString                       : Str80;
+  QSONumberString: Str80;
 
 begin
   QSONumberString := '';
@@ -273,7 +276,8 @@ begin
   {KK1L: 6.70 Sometimes there is just not a pretty way to do it!!}
   {           Keeps the Power and QSO numbers lined up in log.}
   if (ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange) and
-    (length(QSONumberString) = 0) then Exit;
+    (length(QSONumberString) = 0) then
+    Exit;
 
   if (ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange) then {KK1L: 6.70}
     while length(QSONumberString) < 5 do
@@ -289,10 +293,11 @@ begin
   LogString := LogString + QSONumberString;
 end;
 
-procedure RandomCharsSentAndReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
+procedure RandomCharsSentAndReceivedStamp(Exchange: ContestExchange; var
+  LogString: Str80);
 
 var
-  CharsString                           : Str20;
+  CharsString: Str20;
 
 begin
   CharsString := Exchange.RandomCharsSent;
@@ -317,10 +322,11 @@ begin
   Underline := Underline + '--------- ';
 end;
 
-procedure PostalCodeReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
+procedure PostalCodeReceivedStamp(Exchange: ContestExchange; var LogString:
+  Str80);
 
 var
-  CharsString                           : Str20;
+  CharsString: Str20;
 
 begin
   CharsString := Exchange.QTHString; //PostalCode;
@@ -334,7 +340,7 @@ end;
 procedure CheckReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  CheckString                           : Str80;
+  CheckString: Str80;
 
 begin
   CheckString := IntToStr(Exchange.Check) + '     ';
@@ -344,10 +350,11 @@ begin
   LogString := LogString + CheckString;
 end;
 
-procedure PrecedenceReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
+procedure PrecedenceReceivedStamp(Exchange: ContestExchange; var LogString:
+  Str80);
 
 var
-  PrecedenceString                      : Str80;
+  PrecedenceString: Str80;
 
 begin
   PrecedenceString := Exchange.Precedence + '   ';
@@ -363,17 +370,15 @@ procedure QTHReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 {KK1L: 6.70 Except for FISTS Sprint! For this the QTH comes after RST}
 
 var
-  QTHString, PrefectureString           : Str80;
+  QTHString, PrefectureString: Str80;
 
 begin
   {KK1L: 6.70 removed because the QTH is part of the exchange. DUH!}
   {IF ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange THEN Exit; {KK1L: 6.67 Fix for name truncated}
 
-  {ua4wli для российских тестов}
   if (ActiveExchange = QSONumberAndGridSquare) or
     (ActiveExchange = QSONumberAndGeoCoordinates) or
-    (ActiveExchange = QSONumberAndCoordinatesSum)
-    then
+    (ActiveExchange = QSONumberAndCoordinatesSum) then
   begin
     QTHString := Exchange.QTHString + '                      ';
     QTHString := Copy(QTHString, 1, 22);
@@ -384,19 +389,17 @@ begin
   if (ActiveExchange = RSTQTHExchange) or
     (ActiveExchange = QSONumberDomesticOrDXQTHExchange) or
     (ActiveExchange = QSONumberAndGridSquare) or
-    (ActiveExchange = QSONumberAndGeoCoordinates)
-    then
+    (ActiveExchange = QSONumberAndGeoCoordinates) then
   begin
     if (LiteralDomesticQTH) or
       (ActiveExchange = QSONumberAndGeoCoordinates) or
       (ActiveExchange = QSONumberAndGridSquare)
-
-    then
+      then
       QTHString := Exchange.QTHString + '                      '
     else
       QTHString := Exchange.DomesticQTH + '                      ';
 
-      //{WLI}        QTHString [0] := Chr (22);
+    //{WLI}        QTHString [0] := Chr (22);
     QTHString := Copy(QTHString, 1, 22);
 
     LogString := LogString + QTHString;
@@ -406,7 +409,8 @@ begin
   if ActiveExchange = RSTAndContinentExchange then
   begin
     QTHString := Exchange.QTHString;
-    while length(QTHString) < 22 do QTHString := QTHString + ' ';
+    while length(QTHString) < 22 do
+      QTHString := QTHString + ' ';
     LogString := LogString + QTHString;
     Exit;
   end;
@@ -424,7 +428,7 @@ begin
       3: PrefectureString := PrefectureString + ' ';
     else
       if length(PrefectureString) > 4 then
-            //{WLI}                    PrefectureString [0] := Chr (4);
+        //{WLI}                    PrefectureString [0] := Chr (4);
         PrefectureString := Copy(PrefectureString, 1, 4);
 
     end;
@@ -436,7 +440,7 @@ begin
   if ActiveExchange = RSTNameAndQTHExchange then
   begin
     QTHString := Exchange.QTHString + '               ';
-      //{WLI}        QTHString [0] := Chr (10);
+    //{WLI}        QTHString [0] := Chr (10);
     QTHString := Copy(QTHString, 1, 10);
     LogString := LogString + QTHString;
     Exit;
@@ -457,7 +461,7 @@ begin
     LogString := LogString + QTHString;
 
     if length(LogString) > LogEntryMultAddress - 2 then
-        //{WLI}            LogString [0] := Chr (LogEntryMultAddress - 2);
+      //{WLI}            LogString [0] := Chr (LogEntryMultAddress - 2);
       LogString := Copy(LogString, 1, LogEntryMultAddress - 2);
 
     Exit;
@@ -466,7 +470,8 @@ begin
   if ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange then {KK1L: 6.70}
   begin
     QTHString := Exchange.QTHString;
-    while length(QTHString) < 2 do QTHString := QTHString + ' ';
+    while length(QTHString) < 2 do
+      QTHString := QTHString + ' ';
     LogString := LogString + QTHString + '  ';
     Exit;
   end;
@@ -483,10 +488,12 @@ begin
   else
   begin
     GetDXQTH(Exchange); { 6.30 }
-    QTHString := Exchange.DXQTH; {KK1L: 6.72 NOTE this is where DXQTH makes it to the log}
+    QTHString := Exchange.DXQTH;
+      {KK1L: 6.72 NOTE this is where DXQTH makes it to the log}
   end;
 
-  if QTHString = '' then QTHString := Exchange.QTHString;
+  if QTHString = '' then
+    QTHString := Exchange.QTHString;
 
   LogString := LogString + QTHString;
 
@@ -499,7 +506,7 @@ end;
 procedure PowerReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  TempString                            : Str80;
+  TempString: Str80;
 
 begin
   TempString := Exchange.Power;
@@ -507,7 +514,8 @@ begin
   {KK1L: 6.70 Sometimes there is just not a pretty way to do it!!}
   {           Keeps the Power and QSO numbers lined up in log.}
   if (ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange) and
-    (length(TempString) = 0) then Exit;
+    (length(TempString) = 0) then
+    Exit;
 
   if (ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange) then {KK1L: 6.70}
     while length(TempString) < 5 do
@@ -522,24 +530,21 @@ end;
 procedure FOCReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  TempString                            : Str80;
+  TempString: Str80;
 
 begin
   TempString := Exchange.Power;
 
-
-
-    while length(TempString) < 5 do
-      TempString := ' ' + TempString;
+  while length(TempString) < 5 do
+    TempString := ' ' + TempString;
 
   LogString := LogString + TempString + ' ';
 end;
 
-
 procedure ZoneReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  TempString                            : Str80;
+  TempString: Str80;
 
 begin
 
@@ -558,10 +563,11 @@ begin
 
 end;
 
-procedure TenTenNumReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
+procedure TenTenNumReceivedStamp(Exchange: ContestExchange; var LogString:
+  Str80);
 
 var
-  TenTenNumberString                    : Str20;
+  TenTenNumberString: Str20;
 
 begin
   if Exchange.TenTenNum > 0 then
@@ -580,7 +586,7 @@ end;
 procedure AgeReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  TempString                            : Str80;
+  TempString: Str80;
 
 begin
   TempString := IntToStr(Exchange.Age);
@@ -596,7 +602,7 @@ end;
 procedure NameReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  TempString                            : Str80;
+  TempString: Str80;
 
 begin
   TempString := Exchange.Name;
@@ -615,14 +621,15 @@ end;
 procedure ChapterReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  TempString                            : Str20;
+  TempString: Str20;
 
 begin
   TempString := Copy(Exchange.Chapter, 1, 4);
 
   TempString := TempString + ' ';
 
-  while length(TempString) < 4 do TempString := ' ' + TempString;
+  while length(TempString) < 4 do
+    TempString := ' ' + TempString;
 
   LogString := LogString + TempString;
 end;
@@ -643,13 +650,13 @@ end;
 procedure RSTSentStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  RSTString                             : Str80;
+  RSTString: Str80;
 
 begin
 
-//  if ReadInLog then
-//    RSTString := ' ' + ReadInLogRST + '     '
-//  else
+  //  if ReadInLog then
+  //    RSTString := ' ' + ReadInLogRST + '     '
+  //  else
   RSTString := ' ' + IntToStr(Exchange.RSTSent) + '     ';
 
   RSTString[0] := CHR(5);
@@ -658,22 +665,25 @@ begin
 
 end;
 
-procedure BandModeDateTimeNumberCallNameSentStamp(Exchange: ContestExchange; var LogString: Str80);
+procedure BandModeDateTimeNumberCallNameSentStamp(Exchange: ContestExchange; var
+  LogString: Str80);
 
 var
   TimeString, QSONumberString: Str20;
-  TempChar                              : Char;
-  MonthString                           : PChar;
-  Year                                  : Word;
+  TempChar: Char;
+  MonthString: PChar;
+  Year: Word;
 begin
   {
     if Exchange.ceFMMode then
       LogString := string(BandStringsArray[Exchange.Band]) + ModeString[FM]
     else
   }
-  LogString := string(BandStringsArray[Exchange.Band]) + ModeStringArray[Exchange.Mode];
+  LogString := string(BandStringsArray[Exchange.Band]) +
+    ModeStringArray[Exchange.Mode];
 
-  while length(LogString) < LogEntryDayAddress - 1 do LogString := LogString + ' ';
+  while length(LogString) < LogEntryDayAddress - 1 do
+    LogString := LogString + ' ';
 
   //if ReadInLog then
   //LogString := LogString + ReadInLogDateString
@@ -702,7 +712,8 @@ begin
 
   //         LogString := LogString + GetDateString;
 
-  while length(LogString) < LogEntryHourAddress - 1 do LogString := LogString + ' ';
+  while length(LogString) < LogEntryHourAddress - 1 do
+    LogString := LogString + ' ';
   SetLength(TimeString, 5);
   asm
 
@@ -757,7 +768,8 @@ begin
       Band2: Exchange.Frequency := Exchange.Frequency - 144000000;
     end;
 
-    if Exchange.Frequency < 0 then Exchange.Frequency := 0;
+    if Exchange.Frequency < 0 then
+      Exchange.Frequency := 0;
 
     Exchange.Frequency := Exchange.Frequency div 1000;
 
@@ -789,19 +801,17 @@ begin
                  LogString := LogString + Radio2.IDCharacter;
   }
   TempChar := ' ';
-//  if ReadInLog then
-//    TempChar := ReadInLogComputerID
-//  else
+  //  if ReadInLog then
+  //    TempChar := ReadInLogComputerID
+  //  else
   if Exchange.ceComputerID <> CHR(0) then
     TempChar := Exchange.ceComputerID
-  else
-    if (ActiveRadio = RadioOne) and (Radio1.IDCharacter <> CHR(0)) then
-      TempChar := Radio1.IDCharacter
-    else
-      if (ActiveRadio = RadioTwo) and (Radio2.IDCharacter <> CHR(0)) then
-        TempChar := Radio2.IDCharacter;
+  else if (ActiveRadio = RadioOne) and (Radio1.IDCharacter <> CHR(0)) then
+    TempChar := Radio1.IDCharacter
+  else if (ActiveRadio = RadioTwo) and (Radio2.IDCharacter <> CHR(0)) then
+    TempChar := Radio2.IDCharacter;
 
-//  if Exchange.ceComputerID <> CHR(0) then TempChar := Exchange.ceComputerID;
+  //  if Exchange.ceComputerID <> CHR(0) then TempChar := Exchange.ceComputerID;
   LogString := LogString + TempChar;
 
   while length(LogString) < LogEntryCallAddress - 1 do
@@ -830,7 +840,7 @@ procedure MultiplierStamp(Exchange: ContestExchange; var LogString: Str80);
   multiplier string.                                                   }
 
 var
-  MultString, ZoneString                : Str80;
+  MultString, ZoneString: Str80;
 
 begin
 
@@ -838,7 +848,8 @@ begin
     (ActivePrefixMult = NoPrefixMults) and (ActiveZoneMult = NoZoneMults) then
     Exit;
 
-  if ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange then Exit;
+  if ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange then
+    Exit;
 
   if length(LogString) > 20 then
     while length(LogString) < LogEntryMultAddress - 1 do
@@ -883,7 +894,7 @@ end;
 procedure RSTReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  RSTString                             : Str80;
+  RSTString: Str80;
 
 begin
 
@@ -897,7 +908,7 @@ end;
 procedure QSOPointStamp(Exchange: ContestExchange; var LogString: Str80);
 
 var
-  QSOPointString                        : Str80;
+  QSOPointString: Str80;
 
 begin
 
@@ -913,7 +924,8 @@ begin
 
   //     if ShowSearchAndPounce then
   //       if Exchange.ceSearchAndPounce then
-  if Exchange.ceSearchAndPounce then LogString := LogString + '$';
+  if Exchange.ceSearchAndPounce then
+    LogString := LogString + '$';
 
 end;
 
@@ -923,7 +935,7 @@ function MakeLogString(RXData: ContestExchange): Str80;
   passed to it and generate a log entry string from it.  }
 
 var
-  LogString                             : Str80;
+  LogString: Str80;
 
 begin
 
@@ -948,32 +960,50 @@ begin
       Exit;
     end;
 
-      //KK1L: 6.70 Sometimes there is just not a pretty way to do it!!
+    //KK1L: 6.70 Sometimes there is just not a pretty way to do it!!
 
     if ActiveExchange = RSTQTHNameAndFistsNumberOrPowerExchange then
     begin
-      if QTH then QTHReceivedStamp(RXData, LogString);
-      if Name then NameReceivedStamp(RXData, LogString);
-      if QSONumber then QSONumberReceivedStamp(RXData, LogString);
-      if Power then PowerReceivedStamp(RXData, LogString);
-      if Contest = FOCMARATHON then FOCReceivedStamp(RXData, LogString);
+      if QTH then
+        QTHReceivedStamp(RXData, LogString);
+      if Name then
+        NameReceivedStamp(RXData, LogString);
+      if QSONumber then
+        QSONumberReceivedStamp(RXData, LogString);
+      if Power then
+        PowerReceivedStamp(RXData, LogString);
+      if Contest = FOCMARATHON then
+        FOCReceivedStamp(RXData, LogString);
     end
     else
     begin
-      if Kids then KidsReceivedStamp(RXData, LogString);
-      if ClassEI then ClassReceivedStamp(RXData, LogString);
-      if QSONumber then QSONumberReceivedStamp(RXData, LogString);
-//      if PostalCode then PostalCodeReceivedStamp(RXData, LogString);
-      if RandomChars then RandomCharsSentAndReceivedStamp(RXData, LogString);
-      if Power then PowerReceivedStamp(RXData, LogString);
-      if Age then AgeReceivedStamp(RXData, LogString);
-      if Name then NameReceivedStamp(RXData, LogString);
-      if Chapter then ChapterReceivedStamp(RXData, LogString);
-      if Precedence then PrecedenceReceivedStamp(RXData, LogString);
-      if Check then CheckReceivedStamp(RXData, LogString);
-      if Zone then ZoneReceivedStamp(RXData, LogString);
-      if TenTenNum then TenTenNumReceivedStamp(RXData, LogString);
-      if QTH then QTHReceivedStamp(RXData, LogString);
+      if Kids then
+        KidsReceivedStamp(RXData, LogString);
+      if ClassEI then
+        ClassReceivedStamp(RXData, LogString);
+      if QSONumber then
+        QSONumberReceivedStamp(RXData, LogString);
+      //      if PostalCode then PostalCodeReceivedStamp(RXData, LogString);
+      if RandomChars then
+        RandomCharsSentAndReceivedStamp(RXData, LogString);
+      if Power then
+        PowerReceivedStamp(RXData, LogString);
+      if Age then
+        AgeReceivedStamp(RXData, LogString);
+      if Name then
+        NameReceivedStamp(RXData, LogString);
+      if Chapter then
+        ChapterReceivedStamp(RXData, LogString);
+      if Precedence then
+        PrecedenceReceivedStamp(RXData, LogString);
+      if Check then
+        CheckReceivedStamp(RXData, LogString);
+      if Zone then
+        ZoneReceivedStamp(RXData, LogString);
+      if TenTenNum then
+        TenTenNumReceivedStamp(RXData, LogString);
+      if QTH then
+        QTHReceivedStamp(RXData, LogString);
     end;
 
   end;
@@ -987,7 +1017,7 @@ procedure PrintLogHeader;
 
 var
   //   PageNumber                      : integer;
-  LogString, Underline                  : Str80;
+  LogString, Underline: Str80;
 
 begin
   //   PageNumber := (QSOTotals[All, Both] div 50) + 1;
@@ -1010,39 +1040,51 @@ begin
     Underline := Underline + ' ---  --- --- ----      -------';
   end
   else
-  // if ActiveExchange = RSTAndFOCNumberExchange then
-  if Contest = FOCMARATHON then  //n4af 4.32.5
-  begin
-    LogString := LogString + ' TXR  RXR QTH    FOC NUM';
-    Underline := Underline + ' ---  --- ---    -------';
-  end
-  else
-  begin
+    {// if ActiveExchange = RSTAndFOCNumberExchange then} if Contest =
+      FOCMARATHON then //n4af 4.32.5
+    begin
+      LogString := LogString + ' TXR  RXR QTH    FOC NUM';
+      Underline := Underline + ' ---  --- ---    -------';
+    end
+    else
+    begin
       { Very nice generic way of doing things }
 
-    with ExchangeInformation do
-    begin
-      if RST then
+      with ExchangeInformation do
       begin
-        RSTSentHeader(LogString, Underline);
-        RSTReceivedHeader(LogString, Underline);
-      end;
+        if RST then
+        begin
+          RSTSentHeader(LogString, Underline);
+          RSTReceivedHeader(LogString, Underline);
+        end;
 
-      if ClassEI then ClassReceivedHeader(LogString, Underline);
-      if QSONumber then QSONumberReceivedHeader(LogString, Underline);
-//      if PostalCode then PostalCodeReceivedHeader(LogString, Underline);
-      if RandomChars then RandomCharsSentAndReceivedHeader(LogString, Underline);
-     if Power then PowerReceivedHeader(LogString, Underline);
-      if Name then NameReceivedHeader(LogString, Underline);
-      if Chapter then ChapterReceivedHeader(LogString, Underline);
-      if Age then AgeReceivedHeader(LogString, Underline);
-      if Precedence then PrecedenceReceivedHeader(LogString, Underline);
-      if Check then CheckReceivedHeader(LogString, Underline);
-      if Zone then ZoneReceivedHeader(LogString, Underline);
-      if TenTenNum then TenTenNumReceivedHeader(LogString, Underline);
-      if QTH then QTHReceivedHeader(LogString, Underline);
+        if ClassEI then
+          ClassReceivedHeader(LogString, Underline);
+        if QSONumber then
+          QSONumberReceivedHeader(LogString, Underline);
+        //      if PostalCode then PostalCodeReceivedHeader(LogString, Underline);
+        if RandomChars then
+          RandomCharsSentAndReceivedHeader(LogString, Underline);
+        if Power then
+          PowerReceivedHeader(LogString, Underline);
+        if Name then
+          NameReceivedHeader(LogString, Underline);
+        if Chapter then
+          ChapterReceivedHeader(LogString, Underline);
+        if Age then
+          AgeReceivedHeader(LogString, Underline);
+        if Precedence then
+          PrecedenceReceivedHeader(LogString, Underline);
+        if Check then
+          CheckReceivedHeader(LogString, Underline);
+        if Zone then
+          ZoneReceivedHeader(LogString, Underline);
+        if TenTenNum then
+          TenTenNumReceivedHeader(LogString, Underline);
+        if QTH then
+          QTHReceivedHeader(LogString, Underline);
+      end;
     end;
-  end;
 
   MultiplierHeader(LogString, Underline);
   QSOPointHeader(LogString, Underline);
@@ -1051,4 +1093,3 @@ begin
 end;
 
 end.
-
