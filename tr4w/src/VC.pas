@@ -186,7 +186,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.95.6' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.95.7' ;  // N4af     New Release
 
 
 

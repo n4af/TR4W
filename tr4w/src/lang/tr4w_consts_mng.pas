@@ -37,6 +37,7 @@ const
   TC_RADIO2                             = '2-р трансивер';
   TC_DISBALE_CIV                        = 'ICOM-ын Ci-V (CAT)-г салгах';
   {MAIN}
+  TC_EUDX                               = 'EU country, enter your four character country code';
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Та TR4W-ийн шинэ хувилбарыг хэрэглэж байна';
   TC_SET_VALUE_OF_SET_NOW               = '%s байна. Одоо тохируулах уу?';
   TC_CONFIGURATION_FILE                 = 'Тохируулгын файл';

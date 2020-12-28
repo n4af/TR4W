@@ -102,7 +102,7 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Doresti o versiune mai noua a TR4W ?';
 
   {NEW CONTEST}
-//  TC_EUDX                               = 'EU country, enter your four character country code';
+  TC_EUDX                               = 'EU country, enter your four character country code';
   TC_LATEST_CONFIG_FILE                 = 'Ultimul fisier de configurare';
   TC_OPENCONFIGURATIONFILE              = ' - Deschid fisier configurare sau - Incep un nou concurs';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Directorul "%s" exista deja.'#13'Suprascriem ?';

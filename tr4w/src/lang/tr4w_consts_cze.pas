@@ -96,7 +96,7 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Chceš ovìøit, zda existuje novìjší verze TR4W ?';
 
   {NEW CONTEST}
-//  TC_EUDX                               = 'EU country, enter your four character country code';
+  TC_EUDX                               = 'EU country, enter your four character country code';
   TC_UKEI                               = 'Zkontrolovat, je-li UK/EI';
   TC_LATEST_CONFIG_FILE                 = 'poslední konfigurace';
   TC_OPENCONFIGURATIONFILE              = ' - Otevøe konfiguraèní soubor nebo deník závodu';

@@ -5020,7 +5020,8 @@ begin
 //      if tPos(Callsign, '/') = 0 then
       begin
         //if StringHas(InitialExchange, '255 ') then
-  //      InitialExchange := GetLastString(initialexchange);   // 4.90.6
+         if ActiveMode = Phone then                    // 4.95.8
+         InitialExchange := GetLastString(initialexchange);   // 4.90.6
         nNumberOfBytesToWrite := Format(wsprintfBuffer, '%-15s  %s'#13#10, @Callsign[1], @InitialExchange[1]);
         sWriteFile(h, wsprintfBuffer, nNumberOfBytesToWrite);
       end;
