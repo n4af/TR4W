@@ -604,17 +604,18 @@ begin
        tAutoSendMode := False;
 
       FlushCWBufferAndClearPTT; //n4af 4.33.3
-      exit;
+ //     exit;     // 4.5.8
 
-      if DVPOn then
-      begin
-        tExitFromDVPThread := True;
-        sndPlaySound(nil, SND_ASYNC);
-        Windows.SetEvent(tDVP_Event);
-        timeKillEvent(tDVPTimerEventID);
-        DVPOn := False;
-        PTTOff;
-        DisplayCodeSpeed;
+//      else
+       if DVPOn then
+        begin
+          tExitFromDVPThread := True;
+           sndPlaySound(nil, SND_ASYNC);
+            Windows.SetEvent(tDVP_Event);
+             timeKillEvent(tDVPTimerEventID);
+            DVPOn := False;
+           PTTOff;
+         DisplayCodeSpeed;
       end;
      end;
 
@@ -5020,8 +5021,7 @@ begin
 //      if tPos(Callsign, '/') = 0 then
       begin
         //if StringHas(InitialExchange, '255 ') then
-         if ActiveMode = Phone then                    // 4.95.8
-         InitialExchange := GetLastString(initialexchange);   // 4.90.6
+ //        InitialExchange := GetLastString(initialexchange);   // 4.90.6
         nNumberOfBytesToWrite := Format(wsprintfBuffer, '%-15s  %s'#13#10, @Callsign[1], @InitialExchange[1]);
         sWriteFile(h, wsprintfBuffer, nNumberOfBytesToWrite);
       end;
