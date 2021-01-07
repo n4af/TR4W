@@ -112,6 +112,7 @@ uses
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
+{$IF LANG = 'GER'}{$R res\tr4w_ger.res}{$IFEND}
 {$IF LANG = 'SER'}{$R res\tr4w_ser.res}{$IFEND}
 {$IF LANG = 'ESP'}{$R res\tr4w_esp.res}{$IFEND}
 {$IF LANG = 'MNG'}{$R res\tr4w_mng.res}{$IFEND}

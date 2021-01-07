@@ -150,7 +150,7 @@ const
 
   TC_HQ_OR_MEMBER                       = 'HQ ili clan';
   
-
+  TC_IRTS                               = 'EI/GI, enter your County';
   TC_NEWENGLAND                         = 'Nova Engleska';
   TC_CALIFORNIA                         = 'Kaliforniji';
   TC_FLORIDA                            = 'Floridi';

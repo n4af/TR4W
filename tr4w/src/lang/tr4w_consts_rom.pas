@@ -102,12 +102,12 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Doresti o versiune mai noua a TR4W ?';
 
   {NEW CONTEST}
+  TC_IRTS                               = 'EI/GI, enter your County';
   TC_EUDX                               = 'EU country, enter your four character country code';
   TC_LATEST_CONFIG_FILE                 = 'Ultimul fisier de configurare';
   TC_OPENCONFIGURATIONFILE              = ' - Deschid fisier configurare sau - Incep un nou concurs';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Directorul "%s" exista deja.'#13'Suprascriem ?';
   TC_IAMIN                              = '& sunt in %s';
-
   TC_NEWENGLANDSTATEABREVIATION         = 'Inscrie abrevierea statului din New England'#13'(ME, NH, VT, MA, CT, RI):';
   TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Inscrie QTH-ul de unde doresti sa transmiti:';
   TC_ENTERSTATEFORUSPROVINCEFORCANADA   = 'Inscrie statul din U.S., provincia din Canada:';

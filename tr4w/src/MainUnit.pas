@@ -698,6 +698,7 @@ end;
 
 procedure SpaceBarProc2;
 begin
+
   if (DupeInfoCall <> '') and (CallWindowString = '') then
   begin
     ActiveRadioPtr^.StopSendingCW;
@@ -712,14 +713,12 @@ begin
       InActiveRadioPtr^.tTwoRadioMode := TR1;
      
     SwapRadios;
-
     SetOpMode(SearchAndPounceOpMode);
     PutCallToCallWindow(DupeInfoCall);
 
     if TwoRadioMode then
     begin
       Send_DE;
-
       if (length(CallWindowString) >= 3) and (ExchangeWindowString = '') then
       begin
         tExchangeWindowSetFocus;
@@ -1191,8 +1190,8 @@ begin
         Result := SendCrypticMessage(DEPlusMyCall)
       else
         Result := SendCrypticMessage(MyCall);
-   //     Result := SendCrypticMessage('N4AFDOTNET');
-      KeyStamp(F1);
+        DebugMsg('<<<<SendCrypticMessage(MyCall)');
+         KeyStamp(F1);
     end;
     Exit;
   end;

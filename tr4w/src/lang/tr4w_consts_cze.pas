@@ -96,13 +96,13 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Chceš ovìøit, zda existuje novìjší verze TR4W ?';
 
   {NEW CONTEST}
+  TC_IRTS                               = 'EI/GI, enter your County';
   TC_EUDX                               = 'EU country, enter your four character country code';
   TC_UKEI                               = 'Zkontrolovat, je-li UK/EI';
   TC_LATEST_CONFIG_FILE                 = 'poslední konfigurace';
   TC_OPENCONFIGURATIONFILE              = ' - Otevøe konfiguraèní soubor nebo deník závodu';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Adresáø "%s" již existuje.'#13'Pøepsat ?';
   TC_IAMIN                              = '&Moje QTH je %s';
-
   TC_NEWENGLANDSTATEABREVIATION         = 'Zadej zkratku svého státu pro NEQP'#13'(ME, NH, VT, MA, CT, RI):';
   TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Zadej QTH, které budeš vysílat:';
   TC_ENTERSTATEFORUSPROVINCEFORCANADA   = 'Zadej stát v USA, nebo provincii v Kanadì:';
