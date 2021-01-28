@@ -1200,13 +1200,20 @@ begin
     UBACW, UBASSB:
       begin
         AddDomesticCountry('ON');
-//        ActivePrefixMult := BelgiumPrefixes;
+        if MyCountry = 'ON' then          // 4.96.2
+         begin
+          ActiveDXMult := CQDXCC;
+          ActiveDomesticMult := NoDomesticMults;
+          ActiveBand := Band80;
+          ActivePrefixMult := NoPrefixMults;
+          end
+          else
+          ActivePrefixMult := BelgiumPrefixes;
+     //    end;
       end;
 
     UKRAINIAN:
       begin
-//        ContestName := 'Ukrainian DX Contest';
-//        CountDomesticCountries := True; //MyCountry <> 'UR';
         AddDomesticCountry('UR');
         if MyCountry = 'UR' then
           ActiveDomesticMult := NoDomesticMults;

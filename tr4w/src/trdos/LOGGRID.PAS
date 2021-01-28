@@ -26,6 +26,7 @@ unit LogGrid;
 interface
 
 uses
+  StrUtils,
   TF,
   VC,
   Windows,
@@ -294,8 +295,7 @@ var
   ShortHeading, LongHeading, Distance   : REAL;
 
 begin
-
-  if length(Grid1) <> 6 then Grid1 := Grid1 + 'LL';
+   if length(Grid1) <> 6 then Grid1 := Grid1 + 'LL';
   strU(Grid1);
 
   if length(Grid2) <> 6 then Grid2 := Grid2 + 'LL';

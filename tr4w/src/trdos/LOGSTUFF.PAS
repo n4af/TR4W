@@ -2205,6 +2205,41 @@ begin
 
 end;
 
+function ProcessRSTAndGrid3Exchange(Exchange: ShortString {Str80}; var RXData:     // 4.96.3
+  ContestExchange): boolean;
+  var
+  FirstString, SecondString, ThirdString: Str10;
+
+begin
+
+
+  Result := False;
+  if Exchange = '' then
+    Exit;
+
+  ParseExchange(Exchange, FirstString, SecondString,ThirdString);
+  if SecondString  = '' then
+    begin
+     Exchange := FirstString;
+     RXData.RSTReceived := DefaultRST;
+    end
+     else
+      begin
+       RXData.RSTReceived := StrToInt(FirstString);
+       Exchange := SecondString;
+      end;
+
+  if GoodLookingGrid3(Exchange) then
+  begin
+//    if RXData.DomesticQTH = '' then
+       RXData.DomesticQTH := leftstr(Exchange,2);
+
+    RXData.QTHString := Exchange;
+      Result := True;
+
+  end
+
+end;
 
 function ProcessRSTAndGridSquareExchange(Exchange: ShortString {Str80}; var
   RXData: ContestExchange): boolean;
@@ -2404,8 +2439,8 @@ var
   gotWhat: GOT;
 
 begin
-  LooksLikeACallSign := False;
- if contest = PCC then  // 4.83.7
+  LooksLikeACallSign := false;
+ if (contest = PCC) then  // 4.83.7
   begin
    if (length(Call) = 3) and (Call[2] = '/') then
     begin
@@ -6352,8 +6387,11 @@ EuropeanVHFQSOPointMethod:
 //      if MyGrid <> '' then
 //        if RXData.DomesticQTH <> '' then
 begin
-  //  RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-  RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+//    RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+ if ContestName = 'EURASIA' then         // 4.96.3
+  RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.QTHString) // domestic truncated to 2 bytes. need this 6bytes
+  else
+   RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
     //n4af 4.36.11
   if MyCountry = '9A' then
   begin
@@ -7047,6 +7085,17 @@ else
 
 UBAQSOPointMethod:
 begin
+  if MyCountry = 'ON' then
+   begin
+    if RXCty = 'ON' then
+    RXData.QSOPoints := 1
+     else if UBACountry(RXCty) then
+      RXData.QSOPoints := 2
+       else
+        RXData.QSOPoints := 3;
+        exit;
+    end;
+
   if RXCty = 'ON' then
     RXData.QSOPoints := 10
   else if UBACountry(RXCty) then
@@ -8248,6 +8297,9 @@ begin
 
    Grid2Exchange:
       ProcessExchange := ProcessGrid2Exchange(ExchangeString, RData);
+
+   RSTAndGrid3Exchange:
+      ProcessExchange := ProcessRSTAndGrid3Exchange(ExchangeString, RData);        // 4.96.3
 
 
     RSTAndPostalCodeExchange:

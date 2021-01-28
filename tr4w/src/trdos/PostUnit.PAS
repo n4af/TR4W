@@ -2471,7 +2471,7 @@ begin
       slOperators := TStringList.Create;
       slOperators.Duplicates := dupIgnore;
       TempGrid := MyGrid;
-  TempGrid[5] := #0;
+  TempGrid[7] := #0;
   cMyGrid := @TempGrid[1];
 
   cMyName := @MyName[1];
@@ -2563,7 +2563,7 @@ begin
       if LiteralDomesticQTH then
         csQTHString := @TempRXData.QTHString[1]
       else
-       if ContestTitle = 'WWDIGI' then
+       if ContestName = 'WWDIGI' then
         csQTHString := @TempRXData.QTHString[1]
       else
         csQTHString := @TempRXData.DomesticQTH[1] {DomMultQTH};
@@ -2573,6 +2573,9 @@ begin
 
     if Contest in [CUPRFCW, CUPRFSSB] then
       csQTHString := @TempRXData.QTHString[1];
+
+   if ContestNAME = 'EURASIA' then
+      csQTHString := @(TempRXData.QTHString[1]);
 
 
  if Contest in [CALQSOPARTY]  then
@@ -2640,6 +2643,12 @@ if TempRXData.DomMultQTH = '' then
           begin
             Format(CABRILLO_MYEX, '%-11s', cMyGrid);
             Format(CABRILLO_HISEX, '%-11s', csQTHString);
+          end;
+
+        RSTAndGrid3Exchange:                // 4.96.3
+          begin
+            Format(CABRILLO_MYEX, '%-7s%-11s ', RSTSent, cMyGrid);
+            Format(CABRILLO_HISEX, '%-3s %-11s ', RSTReceived, csQTHString);
           end;
 
         RSTNameAndQTHExchange:

@@ -94,7 +94,7 @@ OutputDir=target
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;src\include\Indy;D:\newsrc\tr4w\src\include\Indy\Lib\Core;D:\newsrc\tr4w\src\include\Indy\D7;D:\newsrc\tr4w\include;c:\Indy;c:\Indy\lib\core;c:\Indy\d7
+SearchPath=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;include\Indy;D:\newsrc\tr4w\include;D:\newsrc\tr4w\include\Indy\Lib\Core;D:\newsrc\tr4w\include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas
 Packages=vcl;rtl;vclx;VclSmp;vclshlctrls
 Conditionals=
 DebugSourceDirs=
@@ -130,3 +130,14 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlSearchPath]
+Count=3
+Item0=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;include\Indy;D:\newsrc\tr4w\include;D:\newsrc\tr4w\include\Indy\Lib\Core;D:\newsrc\tr4w\include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas
+Item1=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;include\Indy;D:\newsrc\tr4w\include;D:\newsrc\tr4w\include\Indy\Lib\Core;D:\newsrc\tr4w\include\Indy\D7
+Item2=src\lang;src\trdos;src\utils;src;D:\newsrc\tr4w\src\include\Indy;include\Indy;D:\newsrc\tr4w\include\Indy\Lib\Core;D:\newsrc\tr4w\src\include\Indy\D7;D:\newsrc\tr4w\include;c:\Indy;c:\Indy\lib\core;c:\Indy\d7
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=target

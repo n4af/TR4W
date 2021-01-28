@@ -964,26 +964,7 @@ begin
   DispalayNewMult(nCmndShow);
 end;
 
-{
-function EditableLog.GetInitialExchangeFromEditableLog(Call: CallString): Str40;
 
-var
-  Entry                                 : integer;
-  RData                                 : ContestExchange;
-
-begin
-  GetInitialExchangeFromEditableLog := '';
-
-  if ExchangeMemoryEnable then
-    for Entry := 5 downto 1 do
-      if Call = UpperCase(GetLogEntryCall(VisibleLog.LogEntries[Entry])) then
-      begin
-        if ParseExchangeIntoContestExchange(VisibleLog.LogEntries[Entry], RData) then
-          GetInitialExchangeFromEditableLog := GetInitialExchangeStringFromContestExchange(RData);
-        Exit;
-      end;
-end;
- }
 
 procedure EditableLog.SetMultStatus(Call: CallString; TempMult: Str10);
 var

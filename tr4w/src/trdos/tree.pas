@@ -31,6 +31,7 @@ uses
 
   VC,
   uCallSignRoutines,
+  SysUtils,
   utils_text,
   utils_file,
   TF,
@@ -810,6 +811,7 @@ function GetYearString: PChar {Str20};
 
 function GoodLookingGrid(Grid: Str20): boolean;
 function GoodLookingGrid2(Grid: Str20): boolean;
+function GoodLookingGrid3(Grid: Str20): boolean;
 procedure HexToInteger(InputString: Str80; var OutputInteger: integer; var Result: integer);
 procedure HexToLongInteger(InputString: Str80; var OutputInteger: LONGINT; var Result: integer);
 procedure HexToWord(InputString: Str80; var OutputWord: Word; var Result: integer);
@@ -4568,6 +4570,7 @@ function GoodLookingGrid2(Grid: Str20): boolean;
 
 var
   CharPosition                          : integer;
+//   buf: array[0..4] of char;
 
 begin
   GoodLookingGrid2 := False;
@@ -4594,6 +4597,44 @@ begin
 
   GoodLookingGrid2 := True;
 end;
+
+function GoodLookingGrid3(Grid: Str20): boolean;
+
+{ Verifies that the grid  is legitimate }
+
+var
+  CharPosition                          : integer;
+//   buf: array[0..4] of char;
+
+begin
+  GoodLookingGrid3 := False;
+
+  if not (length(Grid) = 6)  then Exit;
+
+  strU(Grid);
+
+  for CharPosition := 1 to length(Grid) do
+    case CharPosition of
+      1, 2:
+      if (Grid[CharPosition] < 'A') or (Grid[CharPosition] > 'R') then
+        exit;
+        {   if (Grid[CharPosition] > 'R') then
+
+         Exit; }
+
+      3, 4:
+        if (Grid[CharPosition] < '0') or (Grid[CharPosition] > '9') then
+          Exit;
+
+      5, 6:
+        if (Grid[CharPosition] < 'A') or (Grid[CharPosition] > 'Z') then
+          Exit;
+
+    end;
+
+  GoodLookingGrid3 := True;
+end;
+
 
 function GetSCPIntegerFromChar(InputChar: Char): integer;
 

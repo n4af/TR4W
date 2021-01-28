@@ -602,11 +602,8 @@ begin
   begin
       if tAutoSendMode then EditingCallsignSent := True;
        tAutoSendMode := False;
+          FlushCWBufferAndClearPTT; //n4af 4.33.3
 
-      FlushCWBufferAndClearPTT; //n4af 4.33.3
- //     exit;     // 4.5.8
-
-//      else
        if DVPOn then
         begin
           tExitFromDVPThread := True;
@@ -1190,7 +1187,7 @@ begin
         Result := SendCrypticMessage(DEPlusMyCall)
       else
         Result := SendCrypticMessage(MyCall);
-        DebugMsg('<<<<SendCrypticMessage(MyCall)');
+  //      DebugMsg('<<<<SendCrypticMessage(MyCall)');
          KeyStamp(F1);
     end;
     Exit;
@@ -3848,8 +3845,10 @@ begin
      logger.debug('Exiting ParametersOkay early: ExchangeString=<%s>',[ExchangeString]);
      Exit;
      end;
-
-  RData.Callsign := GetCorrectedCallFromExchangeString(ExchangeString);
+ { if length(ExchangeString) > 5 then  // 4.96.3
+   CallsignUpdateEnable := False;}
+   if CallsignUpdateEnable then
+     RData.Callsign := GetCorrectedCallFromExchangeString(ExchangeString);
   RData.Callsign[Ord(RData.Callsign[0]) + 1] := #0;
 
   RST := GetSentRSTFromExchangeString(ExchangeString);
@@ -3969,7 +3968,7 @@ begin
       RData.RSTReceived := LogRSTSent;
 
   RData.ExchString := ExchangeString;
-  CalculateQSOPoints(RData);
+  CalculateQSOPoints(Rdata);
 end;
 
 procedure PossibleCallsProc(PCDRAWITEMSTRUCT: PDrawItemStruct);
@@ -6347,7 +6346,10 @@ begin
                          begin
                          if (ActiveDomesticMult = GridSquares) or
                                ((ActiveExchange = RSTAndOrGridExchange) or
-                                (ActiveExchange = Grid2Exchange)         ) then
+                                (ActiveExchange = Grid2Exchange) or
+                                (ActiveExchange = RSTAndGrid3Exchange)         )   // 4.96.3
+
+                                then
                             begin
                             exch.QTHString := fieldValue; // GRIDSQUARE
                             end;

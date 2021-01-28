@@ -2195,6 +2195,11 @@ begin
         ExchangeInformation.QTH := True;
       end;
 
+      RSTAndGrid3Exchange:      // 4.96.3
+      begin
+        ExchangeInformation.QTH := True;
+      end;
+
        GridExchange:
       begin
         ExchangeInformation.QTH := True;

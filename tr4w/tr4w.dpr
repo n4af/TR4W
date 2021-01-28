@@ -99,7 +99,7 @@ uses
   uMessagesList in 'src\uMessagesList.pas',
   uRussiaOblasts in 'src\uRussiaOblasts.pas',
   uMenu in 'src\uMenu.pas',
-  winsock2 in 'src\include\WinSock2.pas',
+  winsock2 in 'include\WinSock2.pas',
   utils_net in 'src\utils\utils_net.pas',
   utils_hw in 'src\utils\utils_hw.pas',
   utils_text in 'src\utils\utils_text.pas',
@@ -107,12 +107,11 @@ uses
   utils_file in 'src\utils\utils_file.pas',
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas',
- // uGridLookup in 'src\uGridLookup.pas',   // ny4i THis is not ready yet so no need to include yet.
+  uGridLookup in 'src\uGridLookup.pas',
   Log4D in 'src\Log4D.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
-{$IF LANG = 'GER'}{$R res\tr4w_ger.res}{$IFEND}
 {$IF LANG = 'SER'}{$R res\tr4w_ser.res}{$IFEND}
 {$IF LANG = 'ESP'}{$R res\tr4w_esp.res}{$IFEND}
 {$IF LANG = 'MNG'}{$R res\tr4w_mng.res}{$IFEND}
@@ -120,6 +119,7 @@ uses
 {$IF LANG = 'CZE'}{$R res\tr4w_cze.res}{$IFEND}
 {$IF LANG = 'ROM'}{$R res\tr4w_rom.res}{$IFEND}
 {$IF LANG = 'CHN'}{$R res\tr4w_chn.res}{$IFEND}
+{$IF LANG = 'GER'}{$R res\tr4w_ger.res}{$IFEND}
 
 function WindowProc(TRHWND: HWND; Msg: UINT; wParam: wParam; lParam: lParam): longword; stdcall;
 
@@ -298,24 +298,26 @@ var
   TempTLogBrush                         : TLogBrush {= (lbStyle: BS_SOLID; lbHatch: 0)};
   c                                     : Cardinal;
   TempString                            : ShortString;
-    // P                                   : Pchar; //n4af
-     // P1                                   : boolean; //n4af
-   //S1                                   : String; //n4af
+     P                                   : Pchar; //n4af
+      P1                                   : boolean; //n4af
+   S1                                   : String; //n4af
 {$IF not tDebugMode}
   s                                     : string;
 {$IFEND}
+  logBuffer                             : string;
   tempStickyKey                         : STICKYKEYS;
+  tc: tcolor;
+  rgb: cardinal;
 begin
-   appender := TLogRollingFileAppender.Create('name','tr4w-debug.log');
+   appender := TLogRollingFileAppender.Create('name','tr4w.log');
+   //appender.Layout := TLogPatternLayout.Create('%d [%5p] %m%n');
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
+   //appender.Layout := TLogHTMLLayout.Create;
    TLogBasicConfigurator.Configure(appender);
-
    logLevels := llError; // For after we load config so we can set the value.
    TLogLogger.GetRootLogger.Level := Error;
    logger := TLogLogger.GetLogger('TR4WDebugLog');
-
-   logger.debug('trace output');
-
+   logger.Trace('trace output');
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
   if tMutex = 0 then
@@ -398,7 +400,7 @@ begin
 
   LoadTR4WPOSFILE;
 
-
+ 
   if not ctyLoadInCountryFile(TR4W_CTY_FILENAME, False, True) then
   begin
     UnableToFindFileMessage(TR4W_CTY_FILENAME);
@@ -418,11 +420,11 @@ begin
 
   UpdateDebugLogLevel;
 
-
+  
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
 
-
+  
 
   if CTY.ctyR150SMode then
   begin
