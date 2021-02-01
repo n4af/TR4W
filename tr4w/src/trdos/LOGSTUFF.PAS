@@ -5777,7 +5777,7 @@ begin
             else
       }
       begin
-      if RXData.Mode = Phone then
+      if RXData.Mode in [Phone,FM] then
         RXData.QSOPoints := 1
       else
         RXData.QSOPoints := 2;

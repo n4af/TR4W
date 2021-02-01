@@ -2342,7 +2342,14 @@ begin
       begin
       Continue;
       end;
-
+    if Contest = WINTERFIELDDAY then
+       begin
+       if TempTag = ctLocation then
+          begin
+          sWriteFileFromString(tReportFileWrite,'ARRL-SECTION: ' + TempBuffer2 + #13#10);
+          sWriteFileFromString(tReportFileWrite,'CATEGORY: ' + MyFDClass + #13#10);
+          end;
+       end;
     TempPchar := @CabrilloTagsArray[TempTag].ctrTag[1];
     if TempTag = ctOperators then
        begin
@@ -2536,21 +2543,36 @@ begin
     // This was just assuming any digital contact was RY which is obviously not true.
     if TempRXData.Mode = Digital then
        begin
-       if TempRXData.ExtMode = eNoMode then
+       case TempRXData.ExtMode of
+          eNoMode, eRTTY:
+             if Contest = WINTERFIELDDAY then
+                begin
+                ModeString := 'DI'; // Error in WFD's parser they refuse to fix. de NY4I
+                end
+             else
+                begin
+                ModeString := 'RY';
+                end;
+          else
+             if Contest = WINTERFIELDDAY then
+                begin
+                ModeString := 'DI'; // Error in WFD's parser they refuse to fix. de NY4I
+                end
+             else
+                begin
+                ModeString := 'DG';
+                end;
+          end; // case
+       end
+    else if TempRXData.Mode = FM then
+       begin
+       if Contest = WINTERFIELDDAY then
           begin
-          ModeString := 'RY';
-          end
-       else if TempRXData.ExtMode = eRTTY then
-          begin
-          ModeString := 'RY';
+          ModeString := 'PH';
           end
        else
           begin
-          ModeString := 'DG';
-          if Contest = WINTERFIELDDAY then
-             begin
-             ModeString := 'DI'; // Error in WFD's parser they refuse to fix. de NY4I
-             end;
+          ModeString := tCabrilloModeString[TempRXData.Mode];
           end;
        end
     else

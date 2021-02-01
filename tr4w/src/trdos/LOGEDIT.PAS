@@ -2833,6 +2833,16 @@ begin
       end;
     end;
     TotalScore := TotalMults * QPoints;
+    if tCategoryPowerSA[Categorypower] = 'LOW' then
+       begin
+       Result := Result * 2;
+       end
+    else if tCategoryPowerSA[Categorypower] = 'QRP' then
+       begin
+       Result := Result * 5;
+       end;
+
+
     Exit;
   end;
 
