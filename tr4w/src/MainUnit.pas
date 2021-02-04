@@ -614,6 +614,7 @@ begin
            PTTOff;
          DisplayCodeSpeed;
       end;
+      exit;  // 4.97.4
      end;
 
   if ActiveRadioPtr^.tTwoRadioMode = TR2  then
