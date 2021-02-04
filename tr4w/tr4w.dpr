@@ -699,27 +699,17 @@ begin
             if {17} Msg.wParam = VK_CONTROL then
             begin
               ShowFMessages(12);
-{
-              if TuneWithDits then
-                if (Msg.lParam and (1 shl 30)) <> 0 then
-                begin
-                  Windows.SetWindowText(InsertWindowHandle, inttopchar(GetAsyncKeyState(VK_LSHIFT)));
-                  begin
-                    SendStringAndStop('E');
-                  end;
 
-                end;
-}
             end;
   if Msg.wParam = VK_SHIFT  then
             begin
               if ShiftKeyEnable then
               begin
-                if lobyte(HiWord(Msg.lParam)) = 42 then if OpMode = CQOpMode then
+                if lobyte(HiWord(Msg.lParam)) = 42 then {if OpMode = CQOpMode then }     // 4.97.3
                 begin
                 RITBumpDown; VFOBumpDown;
                 end;
-                if lobyte(HiWord(Msg.lParam)) = 54 then if OpMode = CQOpMode then
+                if lobyte(HiWord(Msg.lParam)) = 54 then {if OpMode = CQOpMode then}       // 4.97.3
                 begin
                 RITBumpUp; VFOBumpUp;
                 end;

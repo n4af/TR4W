@@ -631,7 +631,7 @@ begin
 
 //  if tr4w_ExchangeWindowActive then
   if ActiveMainWindow = awExchangeWindow then
-    if ExchangeWindowString <> '' then
+//    if ExchangeWindowString <> '' then  // 4.97.2
     begin
       tCleareExchangeWindow;
       tCallWindowSetFocus;
