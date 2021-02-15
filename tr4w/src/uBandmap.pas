@@ -472,8 +472,13 @@ begin
 //?
   EntryBand := NoBand;
   EntryMode := NoMode;
-
+ // logger.Trace('trace output');
   GetBandMapBandModeFromFrequency(Spot.FFrequency, EntryBand, EntryMode);
+//  logger.Trace('>>>Entering GetBandMapMode freq = %s',[spot.FFrequency]);
+ logger.debug(' Freq = <%s> ',[spot.ffrequency]);
+ // logger.trace( 'Band = <%s>', Entryband);
+  //  logger.debug ('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d, ExchangeString = %s', [call,BandStringsArray[Band], ModeStringArray[Mode], freq, ExchangeString]);
+
   if (EntryBand = NoBand) then exit;
   if ((radio1.filteredstatus.freq=0) or (radio2.filteredstatus.freq=0)) then
    begin

@@ -576,7 +576,6 @@ const
       'FTDX3000',
       'FTDX5000',
       'FTDX9000',
-
       'IC78',
       'IC706',
       'IC706II',
@@ -620,6 +619,7 @@ const
       'ORION'
 
       );
+
 
  {
     const

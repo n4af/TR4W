@@ -1399,7 +1399,7 @@ begin
   BracketedString := Copy(LongString, 1, StopLocation - 1);
 end;
 
-procedure CalculateBandMode(Freq: Cardinal; var Band: BandType; var Mode: ModeType);
+procedure (Freq: Cardinal; var Band: BandType; var Mode: ModeType);
 
 label
   MoreThan10000;
