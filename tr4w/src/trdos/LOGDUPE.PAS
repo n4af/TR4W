@@ -2230,6 +2230,7 @@ begin
       begin
         ExchangeInformation.RST := True;
         ExchangeInformation.QTH := True;
+        ExchangeInformation.QSONumber := True;  // 4.97.5
       end;
 
     QSONumberAndPossibleDomesticQTHExchange, RSTDomesticQTHOrQSONumberExchange:
