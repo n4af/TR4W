@@ -4279,7 +4279,7 @@ begin
                   begin
                   MyState := inttopchar(nrSent);
                   end;
-               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyState]);
+               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, MyState]);
                end;
 
          RSTDomesticOrDXQTHExchange:
