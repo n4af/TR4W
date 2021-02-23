@@ -62,6 +62,7 @@ procedure pFT736R(rig: RadioPtr);
 procedure pFT817_FT847_FT857_FT897(rig: RadioPtr);
 procedure pFT1000MP(rig: RadioPtr);
 procedure pFT100(rig: RadioPtr);
+function ArrayToString(const a: array of Char): string;
 
 procedure pIcom(rig: RadioPtr);
 procedure pIcomNew(rig: RadioPtr);
@@ -2338,6 +2339,7 @@ end;
 function ReadFromSerialPort(BytesToRead: Cardinal; rig: RadioPtr): boolean;
 var
    BytesRead: Cardinal;
+   s: string;
 begin
    Result := False;
    if BytesToRead > SizeOf(rig^.tBuf) then
@@ -2347,6 +2349,8 @@ begin
       {rig^.pOver}) then
       if BytesToRead = BytesRead then
          Result := True;
+   logger.trace('[ReadFromSerialPort] Read %s from serial port',[ArrayToString(rig^.tBuf)]);
+
 end;
 
 procedure ClearRadioStatus(rig: RadioPtr);
@@ -3309,6 +3313,14 @@ begin
          DEBUGMSG('In SetVFOModeExtendedMode, which is not valid ' +
             IntToStr(which));
       end;
+end;
+
+function ArrayToString(const a: array of Char): string;
+begin
+  if Length(a)>0 then
+    SetString(Result, PChar(@a[0]), Length(a))
+  else
+    Result := '';
 end;
 
 end.
