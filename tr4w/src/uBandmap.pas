@@ -393,13 +393,19 @@ begin
           LBN_DBLCLK:
             begin
               TempInt := GetBMSelItemData;
-              if TempInt = LB_ERR then Exit;
+              if TempInt = LB_ERR then
+                 begin
+                 logger.Trace('In BandMap::BandmapDlgProc, GetBMSelItemData = LB_ERR so exiting without changing radio');
+                 Exit;
+                 end;
               if  QSYInactiveRadio and  TwoRadioMode then          // 4.92.1                         //Gav 4.37.12
                 begin
+                logger.trace('[BandMap::BandmapDlgProc] Calling TuneRadioToSpot for Inactive Radio');
                 TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio);
                end
               else
               begin
+                logger.trace('[BandMap::BandmapDlgProc] Calling TuneRadioToSpot for active Radio');
                 TuneRadioToSpot(SpotsList.Get(TempInt), ActiveRadio);
               end;
               KillFocus;                                  // Gav 4.47.4 #141
@@ -472,9 +478,13 @@ begin
 //?
   EntryBand := NoBand;
   EntryMode := NoMode;
-
+  logger.Trace('Entering TuneRadioToSpot %s - %d',[Spot.FCall,Spot.FFrequency]);
   GetBandMapBandModeFromFrequency(Spot.FFrequency, EntryBand, EntryMode);
-  if (EntryBand = NoBand) then exit;
+  if (EntryBand = NoBand) then
+     begin
+     logger.trace('Exiting TuneRadioToSpot due to NoBand');
+     exit;
+     end;
   if ((radio1.filteredstatus.freq=0) or (radio2.filteredstatus.freq=0)) then
    begin
     QSYInActiveRadio := False;
@@ -499,6 +509,7 @@ begin
     end;
 
   // Sleep(100);  4.92.4
+  logger.trace('[TuneRadioToSpot] Calling SetRadioFreq %d',[(Spot.FFrequency + QZBOffset)]);
   SetRadioFreq(Radio, Spot.FFrequency + QZBOffset, EntryMode, 'A');
   PutRadioOutOfSplit(Radio);
   if (QZBRandomOffsetEnable and (EntryMode = CW)) then
