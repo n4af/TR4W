@@ -6360,6 +6360,15 @@ end;
      if RXData.Callsign = 'N4L' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
       if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then rxdata.QSOPoints:= rxdata.qsopoints + 50;
     end;
+    
+   BCQPQSOPointMethod:
+    begin
+    if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
+        else
+          RXDATA.QSOPoints := 4;
+     if RXData.Callsign = 'VA7ODX' then rxdata.QSOPoints:= rxdata.qsopoints + 20;
+    end;
+
 
   PAQSOPointMethod:               // 4.74.3
     begin

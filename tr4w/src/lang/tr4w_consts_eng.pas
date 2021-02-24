@@ -128,7 +128,8 @@
   TC_ENTERYOURSQUAREID                  = 'Enter your square ID:';
   TC_ENTERYOURMEMBERSHIPNUMBER          = 'Enter your membership number:';
   TC_ENTERYOURCONTINENT                 = 'Enter your continent (and possible additional ID, i.e. SA or NAQ)';
-  TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Enter your county if you in %s state. Enter your state, Canadian Province or "DX" if outside of %s:';
+  TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Enter your county if you are in %s state. Enter your state, Canadian Province or "DX" if outside of %s:';
+  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
   TC_PREFECTURE                         = 'Enter your prefecture:';
   TC_STATIONCLASS                       = 'Enter your station class:';
   TC_AGECALLSIGNAGE                     = 'Enter your age (and Silent Key callsign and age):';

@@ -335,6 +335,7 @@ begin
 
               JIDXCW, JIDXSSB:
                 SetCommentAndEnableEditControl(TC_PREFECTURE, icmyState);
+          
             end;
           end;
 
@@ -349,12 +350,16 @@ begin
             Windows.ShowWindow(NewContestCheckBox, SW_HIDE);
             Windows.SendMessage(NewContestCheckBox, BM_SETCHECK, BST_UNCHECKED, 0);
 
-            if ContestsArray[SelectedContest].p <> 0  then
+            if (ContestsArray[SelectedContest].p <> 0) and (SelectedContest <> BCQP)  then
               EnterCountyOrState(QSOParties[ContestsArray[SelectedContest].p].StateName);
 
             case SelectedContest of
+            
+               BCQP:            // 4.97.7
+                 SetCommentAndEnableEditControl(TC_ENTERYOURISTRICTIFINVE7,icmyState);
 
-              COLORADOQSOPARTY, MINNQSOPARTY:
+
+              COLORADOQSOPARTY, MINNQSOPARTY :
                 begin
                    DisplayInitialCommand(icmyName);
                 end;

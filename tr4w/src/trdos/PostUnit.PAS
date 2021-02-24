@@ -530,12 +530,6 @@ begin
   if not tOpenFileForWrite(tReportFileWrite, @ReportsFilename[1]) then Exit;
   WriteTitleBlockToSummarySheet;
   WriteScoreInformationToSummarySheet;
-{
-  if not OpenFileForWrite(ReportFileWrite, ReportsFilename) then Exit;
-  WriteTitleBlockToSummarySheet;
-  WriteScoreInformationToSummarySheet;
-  Close(ReportFileWrite);
-}
   CloseHandle(tReportFileWrite);
   FilePreview;
 end;
@@ -575,20 +569,8 @@ begin
     if TempBuffer2[0] = #0 then Continue;
 
     nNumberOfBytesToWrite := Format(wsprintfBuffer, '%22s: %s'#13#10, @CabrilloTagsArray[TempTag].ctrTag[1], TempBuffer2);
-{
-    Windows.GetDlgItemText(CreateCabrilloWindow, i, @TempBuffer1, SizeOf(TempBuffer1));
-    Windows.GetDlgItemText(CreateCabrilloWindow, i - 30, @TempBuffer2, SizeOf(TempBuffer2));
-    if TempBuffer2[0] = #0 then Continue;
-//    T1 := TempBuffer1;
-//    T2 := TempBuffer2;
-    asm
-    push offset TempBuffer2
-    push offset TempBuffer1
-    end;
-    nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, '%21s: %s'#13#10);
-    asm add esp,16
-    end;
-}
+
+
     sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
   end;
 
@@ -618,15 +600,7 @@ begin
   asm add esp,28
   end;
   sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
-{
-  WriteLn(ReportFileWrite, '   Operating Time : ', OperatingTime div (60), 'h ', OperatingTime mod 60, 'm');
 
-  if tRestartInfo.riCQTotalCounter > 0 then
-    WriteLn(ReportFileWrite, '       CQ Counter : ', IntToStr(tRestartInfo.riCQTotalCounter));
-
-  WriteLn(ReportFileWrite, '  Run/Search QSOs : ', tRestartInfo.riQSOByOpMode[CQOpMode], '/', tRestartInfo.riQSOByOpMode[SearchAndPounceOpMode]);
-  WriteLn(ReportFileWrite, ' Unique callsigns : ', CallsignsList.GetTotalWorkedStations, #13#10);
-  }
 
 end;
 
@@ -678,7 +652,7 @@ begin
           sWriteFile(tReportFileWrite, #13#10, 2);
           TempMode := Both;
           TotalLine := True;
-          BString := 'Totals';
+          BString := 'Total';   // 4.97.8
           MString := nil;
         end;
 
@@ -701,7 +675,8 @@ begin
         push MString
         push BString
         end;
-        nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %s%s %9d %12d %8d');
+      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %s%s %9d %12d %8d');
+
         asm add esp,28
         end;
         sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
@@ -715,14 +690,6 @@ begin
           nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', mo.MTotals[Band, TempMode, m]);
           sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
         end;
-
-{
-        Write(ReportFileWrite, '  ', BandStringsArray[Band], ModeString[Mode]);
-        Write(ReportFileWrite, RawQSOTotals[Band, Mode]: 8);
-        Write(ReportFileWrite, PostQSOTotals[Band, Mode]: 12);
-        Write(ReportFileWrite, QSOPointTotals[Band, Mode]: 11);
-        Write(ReportFileWrite, ' ');
-}
       end;
 //  sWriteFile(tReportFileWrite, breakline, length(breakline));
   if QTCEnable then
@@ -4279,7 +4246,7 @@ begin
                   begin
                   MyState := inttopchar(nrSent);
                   end;
-               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, MyState]);
+               Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, MyState]);   // 4.97.5
                end;
 
          RSTDomesticOrDXQTHExchange:

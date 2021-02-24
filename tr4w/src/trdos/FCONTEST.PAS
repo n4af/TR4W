@@ -340,6 +340,10 @@ begin
 
   case Contest of
 
+  BCQP:
+  if MyCountry = 'VE7' then
+    AddDomesticCountry('VE7');     // 4.97.8
+
     WINTERFIELDDAY:
       begin
         WARCBandsEnabled := False;
@@ -1179,6 +1183,7 @@ begin
 //        ContestName := 'Ten Ten QSO Party';
         Add_KVEKH6KL;
       end;
+   
 
     TEXASQSOPARTY:
       begin
@@ -1269,7 +1274,7 @@ begin
         QTCsEnabled := True;
       end;
 {
-    WISCONSINQSOPARTY:
+    ,QSOPARTY:
       begin
         ActiveDomesticMult := DomesticFile;
         if (PWORD(@MyState[1])^ = $4957) //WI

@@ -186,7 +186,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.97.6' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.97.8' ;  // N4af     New Release
 
 
 
@@ -947,7 +947,8 @@ type
     WWDIGI,
     MWC,           // 4.92.8
     IRTS ,      // 4.93.1
-    EUDX        // 4.95.6
+    EUDX,        // 4.95.6
+    BCQP       // 4.97.7
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -2783,7 +2784,8 @@ type
     YBFT8QP,              // 4.90.7
     WWDIGIQP,               // 4.90.8
     IRTSQSOPointMethod,     // 4.93.1
-    EUDXQSOPointMethod     // 4.95.6
+    EUDXQSOPointMethod,     // 4.95.6
+    BCQPQSOPointMethod      // 4.97.6
     );
 
 const
@@ -2924,7 +2926,8 @@ const
      'YBFT8QP',               // 4.90.7
      'WWDIGIQP',              // 4.90.8
      'IRTS',   //  IRTSQSOPointMethod    // 4.93.1
-     'EUDX'    // 4.95.6
+     'EUDX',    // 4.95.6
+     'BC QSO PARTY'     // 4.97.6
     );
 
 type
@@ -3064,7 +3067,7 @@ type
   end;
 
 const
-QSOPartiesCount = 15;
+QSOPartiesCount = 16;
 
   QSOParties                         : array[1..QSOPartiesCount] of TUSQSOPartyRecord =
   (
@@ -3083,7 +3086,8 @@ QSOPartiesCount = 15;
   (InsideStateDOMFile:'colorado';   {OutsideStateDOMFile:'COLORADO';   }StateName:'CO'),
   (InsideStateDOMFile:'nc';         {OutsideStateDOMFile:'NC';         }StateName:'NC'),
   (InsideStateDOMFile:'pa';         {OutsideStateDOMFile:'PA';         }StateName:'PA'),    // 4.74.3
-  (InsideStateDOMFile:'in';         {OutsideStateDOMFile:'IN';         }StateName:'IN')
+  (InsideStateDOMFile:'in';         {OutsideStateDOMFile:'IN';         }StateName:'IN'),
+  (InsideStateDOMFile:'ve7';        {OutsideStateDOMFile:'VE7';        }StateName: 'VE7')
   );
 {*)}
 
@@ -3184,7 +3188,7 @@ QSOPartiesCount = 15;
  ({Name: 'HA DX';                      }Email: nil;                      DF: 'hungary';           WA7BNM:  228; {SK3BG: '`c';      } QRZRUID: 116 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:CQDXCC; QP:HADXQSOPointMethod; ADIFName:'HA-DX';   CABName:''),     // 4.84.2
  ({Name: 'YUDX ';                      }Email: nil;                      DF: 'yu';                WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:CQDXCC; QP:YUDXQSOPointMethod; ADIFName:'';   CABName:''),     // 4.57.5
  ({Name: 'UKEI ';                      }Email: nil;                      DF: 'uk-ei';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQSONUMBERAndPossibleDomesticQTHExchange;           XM:CQDXCC; QP:UKEIQSOPointMethod; ADIFName:'';   CABName:''),     // 4.58.2
- ({Name: 'HELVETIA';                   }Email: nil;                      DF: 'swiss';             WA7BNM:  326; {SK3BG: 'helvc';      } QRZRUID: 157 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;  XM:ARRLDXCC; QP:HelvetiaQSOPointMethod; ADIFName:'';   CABName:''),          // 4.54.6 issue 214
+ ({Name: 'HELVETIA';                   }Email: nil;                      DF: 'swiss';             WA7BNM:  326; {SK3BG: 'helvc';      } QRZRUID: 157 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;  XM:NoDXMults; QP:HelvetiaQSOPointMethod; ADIFName:'';   CABName:''),          // 4.54.6 issue 214
  ({Name: 'IARU-HF';                    }Email: 'iaruhf@iaru.org';        DF: 'iaruhq';            WA7BNM:   67; {SK3BG: 'iaruhfc';    } QRZRUID: 33  ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTZoneOrSocietyExchange;                    XM:NoDXMults; QP:IARUQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'INTERNET SPRINT';            }Email: nil;                      DF: 's49p13';            WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberNameDomesticOrDXQTHExchange;        XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:AlwaysOnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'RSGB-IOTA';                  }Email: nil;                      DF: nil;                 WA7BNM:   75; {SK3BG: nil;          } QRZRUID: 29  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: IOTADomestic;    P: 0; AE: RSTQSONumberAndPossibleDomesticQTHExchange;  XM:NoDXMults; QP:IOTAQSOPointMethod; ADIFName:'';   CABName:''),
@@ -3303,7 +3307,8 @@ QSOPartiesCount = 15;
  ({Name: 'WWDIGI';                     }Email: 'director@ww-digi.com';   DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridSquares; P: 0; AE: Grid2Exchange;                           XM:NoDXMults; QP:WWDIGIQP; ADIFName:'';   CABName:'WW-DIGI'),    // 4.90.11
  ({Name: 'MWC';                        }Email: 'memorial-ok1wc.cz/index.php?page=logs';                      DF: nil;                 WA7BNM:  0;  QRZRUID: 0 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;          XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),     // 4.92.8
  ({Name: 'IRTS ';                      }Email: 'IRTS.contests@gmail.com';             DF: 'ireland';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:NoDXMults; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:''),     // 4.95.6
- ({Name: 'EUDX';                       }Email: 'log.eudxc@gmail.com';          DF: 'EUDX';           WA7BNM:  000; {SK3BG: nil;    } QRZRUID: 0   ;         Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:CQDXCC; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:'')
+ ({Name: 'EUDX';                       }Email: 'log.eudxc@gmail.com';    DF: 'EUDX';           WA7BNM:  000; {SK3BG: nil;    } QRZRUID: 0   ;         Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:CQDXCC; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:'') ,
+ ({Name: 'BCQP';                       }Email: nil;                      DF: 've7_cty';                 WA7BNM:  473; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 16; AE: RSTDomesticorDXQTHExchange;                      XM:NoDXMults; QP:BCQPQSOPointMethod; ADIFName:'';   CABName:'')      // 4.97.6
 
 
     );
@@ -3488,7 +3493,8 @@ QSOPartiesCount = 15;
       'WWDIGI',
       'MWC',               // 4.92.8
       'IRTS',        // 4.93.1
-      'EUDX'         // 4.95.6
+      'EUDX',         // 4.95.6
+      'BCQP'          // 4.97.6
      );
 
   const
@@ -3704,7 +3710,8 @@ QSOPartiesCount = 15;
       ({Name: 'WW-DIGI';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'MWC';                        }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),       // 4.92.8
       ({Name: 'IRTS';                       }ciCDC0+ ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0) ,     // 4.93.1
-      ({Name: 'EUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0)     // 4.95.6
+      ({Name: 'EUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),     // 4.95.6
+      ({Name: 'BC QSO Party';               }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1)      // 4.97.6
       );
 
 
