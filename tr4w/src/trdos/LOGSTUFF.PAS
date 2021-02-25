@@ -6345,12 +6345,14 @@ begin
   end;
 end;
 
-   NCQSOPointMethod:               // 4.66.1
+   NCQSOPointMethod:               // 4.66.1      // updated 4.97.9
     begin
 
      if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
         else
-          RXDATA.QSOPoints := 3;
+          if RXData.Mode = PHONE then RXDATA.QSOPoints := 3
+           else
+                RXDATA.QSOPoints := 5;  // digital
      if RXData.Callsign = 'N4T' then rxdata.QSOPoints:= rxdata.qsopoints + 50;     // 4.86.3
      if RXData.Callsign = 'N4A' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
      if RXData.Callsign = 'N4R' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
