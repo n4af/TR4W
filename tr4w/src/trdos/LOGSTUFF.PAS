@@ -59,8 +59,8 @@ uses {Dos, Printer,}Tree,
   ;
 
 var
-  MRC                    : Str10 ;
-  MyCo                   : String[14];
+  MRC: Str10;
+  MyCo: string[14];
 
 const
   SSPrec: set of Char = ['A', 'B', 'Q', 'U', 'M', 'S'];
@@ -415,7 +415,7 @@ var
   DebugFlag: boolean;
   DEEnable: boolean = True;
   DefaultRST: Word;
-  DisplayRefresh: integer=1;
+  DisplayRefresh: integer = 1;
   //  DoingRescore                     : boolean; {KK1L: 6.71}
   DualingCQState: DualingCQStates {= NoDualingCQs};
   DupeCheckSound: DupeCheckSoundType = DupeCheckBeepIfDupe;
@@ -440,7 +440,7 @@ var
   FloppyFileSaveFrequency: integer;
   //  FloppyFileSaveName                    : ShortString = 'LOGBACK.TRW';
   ForcedEntry: boolean;
-    {KK1L: 6.70 switch used in JCTRL2 to add comments to LOGCFG}
+  {KK1L: 6.70 switch used in JCTRL2 to add comments to LOGCFG}
 
   GridMapCenter: GridString;
 
@@ -518,7 +518,8 @@ var
   QuickQSL: QuickQSLKeyType; { to indicate a quick QSL is desired }
   QuickQSLKey1: Char = '\';
   QuickQSLKey2: Char = '=';
-  RadioServerTCPPort: integer = 52002; // Commander Interface (inbound for WSJT-X)
+  RadioServerTCPPort: integer = 52002;
+    // Commander Interface (inbound for WSJT-X)
 
   RadioSetFreq: LONGINT;
   RandomCQMode: boolean;
@@ -634,7 +635,7 @@ procedure LogStringToRXData(LogString: Str80; var RXData: ContestExchange);
 function LooksLikeACallSign(Call: Str40): boolean;
 
 function MarineOrAirMobileStation(Call: CallString): boolean;
-  {KK1L: 6.68 Used in WRTC 2002}
+{KK1L: 6.68 Used in WRTC 2002}
 
 procedure NextPage;
 {
@@ -1389,7 +1390,7 @@ begin
   begin
     dx := false;
     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));
-      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
+    // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
     Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
     ParseExchange(Exchange, Str10(RXData.ceClass), RXData.QTHString,
       TempString);
@@ -1413,7 +1414,7 @@ begin
     if not FoundDomesticQTH(RXData) then
     begin
       ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
-        // misspelled in the constants file //ny4i 4.45.3
+      // misspelled in the constants file //ny4i 4.45.3
       Exit; // This was before the above code that flips the values. // ny4i 4.45.3
     end;
     isClassValid := ValidClass(RXData.ceClass);
@@ -1424,7 +1425,7 @@ begin
     dx := true;
     {ParseExchange (Exchange, RXData.Class, RXData.QTHString, TempString);} {pre 6.68 statement}
     Windows.ZeroMemory(@RXData.ceClass, SizeOf(RXData.ceClass));
-      // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
+    // Both ZOT added to prevent errors with bad data in log from corrected entry ny4i
     Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
 
     ParseExchange(Exchange, Str10(RXData.ceClass), TempString, TempString2);
@@ -1437,7 +1438,7 @@ begin
     else
     begin
       Result := length(RXData.ceClass) in [2, 3];
-        // If it is non-Region 2 DX, just make sure it is two or three characters.
+      // If it is non-Region 2 DX, just make sure it is two or three characters.
       if not Result then
       begin
         ExchangeErrorMessage := TC_NOTENOUGHINFOINEXCHANGE;
@@ -1674,7 +1675,7 @@ begin
     RXData.QTHString := ThirdString;
   end
   else
-    {// check for a corrected name} if IsAlpha(ThirdString) then // 4.51.7
+    {// check for a corrected name}if IsAlpha(ThirdString) then // 4.51.7
     begin
       RXData.Name := ThirdString;
       RXData.QTHString := SecondString;
@@ -2184,7 +2185,8 @@ begin
 
 end;
 
-function ProcessGrid2Exchange(Exchange: ShortString {Str80}; var RXData:     // 4.90.11
+function ProcessGrid2Exchange(Exchange: ShortString {Str80}; var RXData:
+  // 4.90.11
   ContestExchange): boolean;
 begin
   Result := False;
@@ -2197,7 +2199,7 @@ begin
   begin
     if RXData.DomesticQTH = '' then
     begin
-      RXData.DomesticQTH := LeftStr(Exchange,2);
+      RXData.DomesticQTH := LeftStr(Exchange, 2);
       RXData.QTHString := Exchange;
       Result := True;
     end;
@@ -2205,37 +2207,37 @@ begin
 
 end;
 
-function ProcessRSTAndGrid3Exchange(Exchange: ShortString {Str80}; var RXData:     // 4.96.3
+function ProcessRSTAndGrid3Exchange(Exchange: ShortString {Str80}; var RXData:
+  // 4.96.3
   ContestExchange): boolean;
-  var
+var
   FirstString, SecondString, ThirdString: Str10;
 
 begin
-
 
   Result := False;
   if Exchange = '' then
     Exit;
 
-  ParseExchange(Exchange, FirstString, SecondString,ThirdString);
-  if SecondString  = '' then
-    begin
-     Exchange := FirstString;
-     RXData.RSTReceived := DefaultRST;
-    end
-     else
-      begin
-       RXData.RSTReceived := StrToInt(FirstString);
-       Exchange := SecondString;
-      end;
+  ParseExchange(Exchange, FirstString, SecondString, ThirdString);
+  if SecondString = '' then
+  begin
+    Exchange := FirstString;
+    RXData.RSTReceived := DefaultRST;
+  end
+  else
+  begin
+    RXData.RSTReceived := StrToInt(FirstString);
+    Exchange := SecondString;
+  end;
 
   if GoodLookingGrid3(Exchange) then
   begin
-//    if RXData.DomesticQTH = '' then
-       RXData.DomesticQTH := leftstr(Exchange,2);
+    //    if RXData.DomesticQTH = '' then
+    RXData.DomesticQTH := leftstr(Exchange, 2);
 
     RXData.QTHString := Exchange;
-      Result := True;
+    Result := True;
 
   end
 
@@ -2440,11 +2442,11 @@ var
 
 begin
   LooksLikeACallSign := false;
- if (contest = PCC) then  // 4.83.7
+  if (contest = PCC) then // 4.83.7
   begin
-   if (length(Call) = 3) and (Call[2] = '/') then
+    if (length(Call) = 3) and (Call[2] = '/') then
     begin
-    LooksLikeACallSign := False;
+      LooksLikeACallSign := False;
       Exit;
     end;
   end;
@@ -2687,7 +2689,8 @@ begin
   end
 
   else
-    { We have four or more entries, use new procedure }if (NumberEntries = 4) then
+    { We have four or more entries, use new procedure }if (NumberEntries = 4)
+      then
     begin
       if StringIsAllNumbers(EntryList[2]) then
       begin
@@ -2711,8 +2714,8 @@ begin
       end
       else
 
-        { Last chance - five or more entries }
-        if StringIsAllNumbers(EntryList[NumberEntries - 2]) then
+        { Last chance - five or more entries }if
+          StringIsAllNumbers(EntryList[NumberEntries - 2]) then
         begin
           Val(EntryList[NumberEntries - 2], RXData.NumberReceived, Result1);
           RXData.Name := EntryList[NumberEntries - 1];
@@ -2933,17 +2936,18 @@ begin
   end;
 end;
 
-function LooksLikeRST(Ex: Str80; var RST: smallInt {Word} {RSTString}; Mode: ModeType):
+function LooksLikeRST(Ex: Str80; var RST: smallInt {Word} {RSTString}; Mode:
+  ModeType):
   boolean;
 
 begin
   LooksLikeRST := False;
-   if Mode = DIGITAL then
-      begin
-      LooksLikeRST := true;
-      RST := StrToIntDef(Ex,-86);
-      Exit;
-      end;
+  if Mode = DIGITAL then
+  begin
+    LooksLikeRST := true;
+    RST := StrToIntDef(Ex, -86);
+    Exit;
+  end;
   if Mode = CW then
   begin
     if length(Ex) <> 3 then
@@ -4132,8 +4136,7 @@ function ProcessRSTQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData:
 var
   NumberString, FirstString, SecondString, ThirdString: Str10;
 
-
- begin
+begin
   ProcessRSTQSONumberOrDomesticQTHExchange := False;
 
   if Exchange = '' then
@@ -4147,8 +4150,7 @@ var
       Result := True;
       exit;
     end;
-  if not StringIsAllNumbers(FirstString)
-    then // n4af 4.42.7
+  if not StringIsAllNumbers(FirstString) then // n4af 4.42.7
   begin
     RXData.QTHString := FirstString;
     RXData.NumberReceived := StrToInt(SecondString);
@@ -4304,22 +4306,22 @@ begin
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
 
   if not StringIsAllNumbers(FirstString) then
-    begin
-     RXData.QTHString := FirstString;
-     NumberString := SecondString;
-    end
+  begin
+    RXData.QTHString := FirstString;
+    NumberString := SecondString;
+  end
   else if (not StringIsAllNumbers(FirstString)) then
     if SecondString = '' then
     begin
       RXData.QTHString := FirstString;
       NumberString := '';
       Result := False;
-    end ;
-    if not StringIsAllNumbers(SecondString) then     // 4,93.2
-     begin
-      RXData.QTHString := SecondString;
-      NumberString := FirstString;
-     end;
+    end;
+  if not StringIsAllNumbers(SecondString) then // 4,93.2
+  begin
+    RXData.QTHString := SecondString;
+    NumberString := FirstString;
+  end;
 
   if StringIsAllNumbers(NumberString) then
     if RXData.QTHString = '' then
@@ -4602,7 +4604,7 @@ end;
 
 function ProcessRSTAndQSONumberOrDomesticQTHExchange(Exchange: Str80; var
   RXData: ContestExchange): boolean;
-  
+
 label
   1;
 
@@ -4615,17 +4617,16 @@ begin
     Exit;
   end;
 
-  if ActiveQSOPointMethod = PCCQSOPointMethod then         // 4.83.2
+  if ActiveQSOPointMethod = PCCQSOPointMethod then // 4.83.2
   begin
- //    if RXData.DomesticQTH <> ''  then
-     if not StringIsAllNumbers(Exchange) then
+    //    if RXData.DomesticQTH <> ''  then
+    if not StringIsAllNumbers(Exchange) then
       ProcessRSTAndQSONumberOrDomesticQTHExchange :=
         ProcessRSTAndDomesticQTHExchange(Exchange, RXData)
-        else
+    else
 
-         ProcessRSTAndQSONumberOrDomesticQTHExchange :=
-         ProcessRSTAndQSONumberExchange(Exchange, RXData)  ;
-
+      ProcessRSTAndQSONumberOrDomesticQTHExchange :=
+        ProcessRSTAndQSONumberExchange(Exchange, RXData);
 
     Exit;
   end;
@@ -5637,7 +5638,7 @@ procedure CalculateQSOPoints(var RXData: ContestExchange);
 var
   PtsMult, Points, MyZoneValue, Result: integer;
   Distance: LONGINT;
-  RRC, MRC, RXCty, TheirID, CountryID: CallString;  // 4.72.5
+  RRC, MRC, RXCty, TheirID, CountryID: CallString; // 4.72.5
   TempOblast: string[2];
   la1, la2, lo1, lo2: integer;
   Grid1, Grid2: GridString;
@@ -5647,7 +5648,8 @@ var
 begin
   RXData.QSOPoints := 0;
   RXCty := RXData.QTH.CountryID; // 4.67.15
-  if (QSOPointsDomesticCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH <>
+  if (QSOPointsDomesticCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH
+    <>
     '') then
   begin
     RXData.QSOPoints := QSOPointsDomesticCW;
@@ -5674,8 +5676,8 @@ begin
     RXData.QSOPoints := QSOPointsDXPhone;
     Exit;
   end;
-  
-   case ActiveQSOPointMethod of
+
+  case ActiveQSOPointMethod of
 
     AllAsianQSOPointMethod:
       begin
@@ -5709,8 +5711,7 @@ begin
 
         end
 
-        else { I am not in Asia }
-          if RXData.QTH.Continent = Asia then
+        else { I am not in Asia }if RXData.QTH.Continent = Asia then
           begin
             case RXData.Band of
               Band160: RXData.QSOPoints := 3;
@@ -5777,16 +5778,16 @@ begin
             else
       }
       begin
-      if RXData.Mode in [Phone,FM] then
-        RXData.QSOPoints := 1
-      else
-        RXData.QSOPoints := 2;
+        if RXData.Mode in [Phone, FM] then
+          RXData.QSOPoints := 1
+        else
+          RXData.QSOPoints := 2;
 
-      if StringHas(UpperCase(MyFDClass), 'D') and
-         StringHas(UpperCase(RXData.ceClass), 'D') then
-         begin
-         RXData.QSOPoints := 0;
-         end;
+        if StringHas(UpperCase(MyFDClass), 'D') and
+          StringHas(UpperCase(RXData.ceClass), 'D') then
+        begin
+          RXData.QSOPoints := 0;
+        end;
       end;
     ARRL160QSOPointMethod:
       if DomesticCountryCall(RXData.Callsign) then
@@ -5951,18 +5952,18 @@ begin
 
       end;
 
-    CQ160QSOPointMethod:   // 4.77.6
-  begin
+    CQ160QSOPointMethod: // 4.77.6
+      begin
 
-  if RXCty = MyCountry then
+        if RXCty = MyCountry then
 
-       RXData.QSOPoints := 2
-        else
-          if (RXCty <> MyCountry) and (RXData.QTH.Continent = MyContinent) then
+          RXData.QSOPoints := 2
+        else if (RXCty <> MyCountry) and (RXData.QTH.Continent = MyContinent)
+          then
           RXData.QSOPoints := 5
-           else
-            RXData.QSOPoints := 10;
-  end;
+        else
+          RXData.QSOPoints := 10;
+      end;
 
     CQMQSOPointMethod:
       begin
@@ -6035,1733 +6036,1727 @@ begin
 
     OQPQSOPointMethod: // 4.70.7
       // 3ODX, 3RAC and 3CCO -   10 points (CW and SSB)
-     begin
-       if RXData.QTH.CountryID = 'VE' then
+      begin
+        if RXData.QTH.CountryID = 'VE' then
         begin
-          if ((pos('3ODX', RXData.Callsign) > 0) or (pos('3RAC', RXData.Callsign) > 0) or (pos('3CCO', RXData.Callsign) > 0)) then
-           begin
-               RXData.QSOPoints := 10;
-               exit;
-           end;
+          if ((pos('3ODX', RXData.Callsign) > 0) or (pos('3RAC', RXData.Callsign)
+            > 0) or (pos('3CCO', RXData.Callsign) > 0)) then
+          begin
+            RXData.QSOPoints := 10;
+            exit;
+          end;
         end;
-      if ActiveMode = CW then RXData.QSOPoints := 2
-      else
-        RXData.QSOPoints := 1;
-     end;
-
-CQWPXQSOPointMethod:
-if RXData.QTH.Continent = MyContinent then
-begin
-  if RXCty = MyCountry then
-    RXData.QSOPoints := 1
-  else
-  begin
-    case RXData.Band of
-      Band160: RXData.QSOPoints := 2;
-      Band80: RXData.QSOPoints := 2;
-      Band40: RXData.QSOPoints := 2;
-      Band20: RXData.QSOPoints := 1;
-      Band15: RXData.QSOPoints := 1;
-      Band10: RXData.QSOPoints := 1;
-    end;
-
-    if MyContinent = NorthAmerica then
-      RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-  end;
-end
-else
-  case RXData.Band of
-    Band160: RXData.QSOPoints := 6;
-    Band80: RXData.QSOPoints := 6;
-    Band40: RXData.QSOPoints := 6;
-    Band20: RXData.QSOPoints := 3;
-    Band15: RXData.QSOPoints := 3;
-    Band10: RXData.QSOPoints := 3;
-  end;
-
-CQWPXRTTYQSOPointMethod:
-begin
-  if RXData.QTH.Continent = MyContinent then
-  begin
-    if RXCty = MyCountry then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 2
-  end
-  else
-    RXData.QSOPoints := 3;
-
-    if (RXData.Band = Band80) or (RXData.Band = Band40) then
-      RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-  end;
-
-
-DLRTTY:
-{ QSO with own country: 5 points.
-QSO with other countries in own continent: 10 points.
-QSO with other continents: 15 points.
-QSO with DL-Station by stations in Europe: 3 additional points
-QSO with DL-Station by stations outside Europe: 5 additional points
-}
-  begin
-  if (MyCountry = '')  or (MyContinent = UnknownContinent) then
-  begin
-    RXData.QSOPoints := 10;
-    exit;
-  end;
-
-     if MyCountry = RxData.QTH.countryid then
-       RXData.QSOPoints := 5
-       else
-        if  rxdata.QTH.Continent = MyContinent then
-          RXData.QSOPoints := 10
-          else
-            RXData.QSOPoints := 15;
-
-      if ContestTitle = 'DL-DX-RTTY' then
-       if RXCty = 'DL' then
-        if  rxdata.QTH.Continent <> MyContinent then
-          RXData.QSOPoints :=  RXData.QSOPoints + 5
-           else
-             RXData.QSOPoints := RXData.QSOPoints +3 ;
-  end;
-
-JAKARTARTTY:                // 4.74.2
- if RXCty = 'YB' then
-  RXData.QSOPoints := 50
-   else
-    if  rxdata.QTH.Continent <> MyContinent then
-     RXData.QSOPoints := 5
-      else
-       RXData.QSOPoints := 3;
-
-
-CQWWQSOPointMethod:
-if RXData.QTH.Continent <> MyContinent then
-  RXData.QSOPoints := 3
-else if RXCty <> MyCountry then
-  if MyContinent <> NorthAmerica then
-    RXData.QSOPoints := 1
-  else
-    RXData.QSOPoints := 2
-else
-  RXData.QSOPoints := 0;
-
-CQWWRTTYQSOPointMethod:
-if RXData.QTH.Continent <> MyContinent then
-  RXData.QSOPoints := 3
-else if RXCty <> MyCountry then
-  RXData.QSOPoints := 2
-else
-  RXData.QSOPoints := 1;
-
-CroatianQSOPointMethod:
-if RXCty = '9A' then
-begin
-  case RXData.Band of
-    Band160: RXData.QSOPoints := 10;
-    Band80: RXData.QSOPoints := 10;
-    Band40: RXData.QSOPoints := 10;
-    Band20: RXData.QSOPoints := 6;
-    Band15: RXData.QSOPoints := 6;
-    Band10: RXData.QSOPoints := 6;
-  end;
-end
-else if RXData.QTH.Continent = MyContinent then
-begin
-  case RXData.Band of
-    Band160: RXData.QSOPoints := 2;
-    Band80: RXData.QSOPoints := 2;
-    Band40: RXData.QSOPoints := 2;
-    Band20: RXData.QSOPoints := 1;
-    Band15: RXData.QSOPoints := 1;
-    Band10: RXData.QSOPoints := 1;
-  end;
-end
-else
-  case RXData.Band of
-    Band160: RXData.QSOPoints := 6;
-    Band80: RXData.QSOPoints := 6;
-    Band40: RXData.QSOPoints := 6;
-    Band20: RXData.QSOPoints := 3;
-    Band15: RXData.QSOPoints := 3;
-    Band10: RXData.QSOPoints := 3;
-  end;
-
-EuropeanFieldDayQSOPointMethod:
-begin
-  RXData.QSOPoints := 1;
-
-  CountryID := MyCountry;
-
-  if (CountryID = 'F') or (CountryID = 'OE') then
-  begin
-    if RXCty = MyCountry then
-    begin
-      if PortableStation(RXData.Callsign) then
-        RXData.QSOPoints := 50
-      else
-        RXData.QSOPoints := 10;
-    end
-    else if RXData.QTH.Continent = Europe then
-    begin
-      if PortableStation(RXData.Callsign) then
-        RXData.QSOPoints := 5
-      else
-        RXData.QSOPoints := 1;
-    end
-    else
-      RXData.QSOPoints := 3;
-
-    Exit;
-  end;
-
-  if CountryID = 'OZ' then
-  begin
-    if RXCty = MyCountry then
-    begin
-      if PortableStation(RXData.Callsign) then
-        RXData.QSOPoints := 10
-      else
-        RXData.QSOPoints := 1;
-    end
-    else if RXData.QTH.Continent = Europe then
-    begin
-      if PortableStation(RXData.Callsign) then
-        RXData.QSOPoints := 5
-      else
-        RXData.QSOPoints := 3;
-    end
-    else
-      RXData.QSOPoints := 6;
-
-    Exit;
-  end;
-
-  if CountryID = 'HB' then
-  begin
-    if PortableStation(RXData.Callsign) then
-      RXData.QSOPoints := 5
-    else if RXData.QTH.Continent = Europe then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 2;
-    Exit;
-  end;
-
-  if CountryID = 'I' then
-  begin
-    if PortableStation(RXData.Callsign) then
-      RXData.QSOPoints := 6
-    else if RXData.QTH.Continent = Europe then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 2;
-
-    if (RXData.Band = Band160) or (RXData.Band = Band80) then
-      RXData.QSOPoints := RXData.QSOPoints * 2;
-    Exit;
-  end;
-
-  { Anywhere else, including DL and PA }
-
-  if PortableStation(RXData.Callsign) then
-  begin
-    if RXData.QTH.Continent = Europe then
-      RXData.QSOPoints := 4
-    else
-      RXData.QSOPoints := 6;
-  end
-  else
-  begin
-    if RXData.QTH.Continent = Europe then
-      RXData.QSOPoints := 2
-    else
-      RXData.QSOPoints := 3;
-  end;
-
-  if CountryID[1] = 'G' then
-    if (RXData.Band = Band160) or (RXData.Band = Band10) then
-      RXData.QSOPoints := RXData.QSOPoints * 2;
-
-end;
-
-EuropeanSprintQSOPointMethod:
-if MyContinent = Europe then
-  RXData.QSOPoints := 1
-else if RXData.QTH.Continent = Europe then
-  RXData.QSOPoints := 1
-else
-  RXData.QSOPoints := 0;
-
-FOCMarathonQSOPointMethod:
-
-if RXData.Callsign = 'G4FOC' then
-  //    if RXData.Callsign = GM4FOC then
-  RXData.QSOPoints := 2
-
-else
-  RXData.QSOPoints := 1;
-
-RadioVHFFDQSOPointMethod {, ChampionshipRFVHFQSOPointMethod}:
-begin
-  if MyGrid <> '' then
-  begin
-    Points := GetDistanceBetweenGrids {GetEuropeanDistanceBetweenGrids}(MyGrid,
-      RXData.DomesticQTH);
-    if RXData.Band = Band2 then
-      RXData.QSOPoints := Points * 1  // 4.60.4
-       else
-        if RXData.Band = Band432 then
-         RXData.QSOPoints := Points * 2  // 4.60.4
-          else
-           if RXData.Band = Band1296 then
-            RXData.QSOPoints := Points * 4 // 4.60.6
-             else
-             if RXData.Band In[Band2304,Band3456,Band5760,Band10G,Band24G,BandLight] then  // 4.81.2
-              RXData.QSOPoints := Points * 6 // 4.60.6
-               else
-                RXData.QSOPoints := 0;
-
-  end;
-end;
-
-MakrothenQSOPointMethod:
-begin
-  if MyGrid <> '' then
-  begin
-    if Copy(MyGrid, 1, 4) = Copy(RXData.DomesticQTH, 1, 4) then
-      RXData.QSOPoints := 100
-    else
-    begin
-      RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-      if RXData.Band = Band40 then
-        RXData.QSOPoints := round(RXData.QSOPoints * 1.5);
-
-      if RXData.Band = Band80 then
-        RXData.QSOPoints := RXData.QSOPoints * 2;
-    end;
-
-  end;
-end;
-
-   NCQSOPointMethod:               // 4.66.1      // updated 4.97.9
-    begin
-
-     if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
-        else
-          if RXData.Mode = PHONE then RXDATA.QSOPoints := 3
-           else
-                RXDATA.QSOPoints := 5;  // digital
-     if RXData.Callsign = 'N4T' then rxdata.QSOPoints:= rxdata.qsopoints + 50;     // 4.86.3
-     if RXData.Callsign = 'N4A' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-     if RXData.Callsign = 'N4R' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-     if RXData.Callsign = 'N4H' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-     if RXData.Callsign = 'N4E' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-     if RXData.Callsign = 'W4E' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-     if RXData.Callsign = 'N4L' then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-      if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then rxdata.QSOPoints:= rxdata.qsopoints + 50;
-    end;
-    
-   BCQPQSOPointMethod:
-    begin
-    if RXData.Mode = PHONE then RXDATA.QSOPoints := 2
-        else
-          RXDATA.QSOPoints := 4;
-     if RXData.Callsign = 'VA7ODX' then rxdata.QSOPoints:= rxdata.qsopoints + 20;
-    end;
-
-
-  PAQSOPointMethod:               // 4.74.3
-    begin
-
-     if RXData.Mode = PHONE then RXDATA.QSOPoints := 1
-        else
-          RXDATA.QSOPoints := 2;
-     END;
-     
-OZHCRVHFQSOPointMethod:
-if MyGrid <> '' then
-begin
-  Points := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-  if RXData.Band = Band2 then
-    RXData.QSOPoints := Points;
-  if RXData.Band = Band432 then
-    RXData.QSOPoints := Points * 2;
-  if RXData.Band = Band1296 then
-    RXData.QSOPoints := Points * 4;
-  if RXData.Band > Band1296 then
-    RXData.QSOPoints := Points * 6;
-end;
-
-EuropeanVHFQSOPointMethod:
-//      if MyGrid <> '' then
-//        if RXData.DomesticQTH <> '' then
-begin
-//    RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
- if ContestName = 'EURASIA' then         // 4.96.3
-  RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.QTHString) // domestic truncated to 2 bytes. need this 6bytes
-  else
-   RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-    //n4af 4.36.11
-  if MyCountry = '9A' then
-  begin
-    if RXData.Band = Band432 then
-      RXData.QSOPoints := RXData.QSOPoints * 5;
-    if RXData.Band = Band1296 then
-      RXData.QSOPoints := RXData.QSOPoints * 10;
-    if RXData.Band = Band2304 then
-      RXData.QSOPoints := RXData.QSOPoints * 20;
-    if RXData.Band in [Band3456, Band5760, Band10G] then
-      RXData.QSOPoints := RXData.QSOPoints * 30;
-    if RXData.Band = Band24G then
-      RXData.QSOPoints := RXData.QSOPoints * 100;
-  end;
-end;
-
-TeslaQSOPointMethod:      // 4.79.1
-//      if MyGrid <> '' then
-//        if RXData.DomesticQTH <> '' then
-begin
-  Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-   Case distance of
-    0 .. 600:             RXData.QSOPoints := 10;
-    601 .. 1200:          RXData.QSOPoints := 13;
-    1201 .. 1800:         RXData.QSOPoints := 16;
-    1801 .. 2400:         RXData.QSOPoints := 20;
-    2401 .. 3600:         RXData.QSOPoints := 24;
-    3601 .. 4800:         RXData.QSOPoints := 28;
-    4801 .. 6000:         RXData.QSOPoints := 32;
-    6001 .. 7200:         RXData.QSOPoints := 36;
-    7201 .. 8400:         RXData.QSOPoints := 40;
-    else
-                          RXData.QSOPoints := 45;
-   end;
-
- { revised points 2019 rules:    // 4.79.1
- Points are calculated based on the distance between the centers of the middle of QTH grids:
-
-
-Up to 600 km = 10 points
-
-
-601 - 1200 km = 13 points
-
-
-1201 - 1800 km = 16 points
-
-
-1801 - 2400 km = 20 points
-
-
-2401 - 3600 km = 24 points
-
-
-3600 - 4800 km = 28 points
-
-
-4801 - 6000 km = 32 points
-
-
-6001 - 7200 km = 36 points
-
-
-7201 - 8400 km = 40 points
-
-
-above 8401 km = 45 points
-
-   //n4af 4.36.11
-  if RXData.DomesticQTH = MyGrid then
-    RXData.QSOPoints := 90; }
-  DisplayTotalScore;
-end;
-
-FistsQSOPointMethod:
-if RXData.NumberReceived > 0 then
-  RXData.QSOPoints := 5
-else
-  RXData.QSOPoints := 2;
-
-HADXQSOPointMethod:    // 4.84.2
-begin
-
-  if RXData.QTH.CountryID = 'HA' then // 4.67.11
-  begin
-      RXData.QSOPoints := 10;
-      exit;
-    end;
-
-
-  if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 5
-  else
-    RXData.QSOPoints := 2;
-end;
-
-TRCDIGITAL:
-begin
- if rxdata.domesticqth = 'TRC' then
-  RXData.QSOPoints := 10
-   else
-    if RXData.QTH.Continent <> MyContinent then
-      RXData.QSOPoints := 2
-       else
-        RXData.QSOPoints := 1;
- if (MyState =  'TRC') and (RXData.DomesticQTH = 'TRC') then      // throw away above & use one point -if- fellow TRC
-       RXData.QSOPoints := 1;
-end;
-
-XERTTY:                                 // 4.77.5
-begin
-  if MyCountry = 'XE' then
-   if RXCty <> 'XE' then
-       RXData.QSOPoints := 3
-        else
-         RXData.QSOPoints := 4 ;
-
-    if RXData.QTH.CountryID = 'XE' then
-     begin
-      RXData.QSOPoints := 4;
-      exit;
-     end;
-    if RXData.QTH.CountryID <> MyCountry then
-      RXData.QSOPoints := 3
-       else
-        RXData.QSOPoints := 2;
-end;
-
-
-YUDXQSOPointMethod: // 4.57.5
-if (MyCountry <> 'YU') and (RXCty = 'YU') then
-  RXData.QSOPoints := 10
-else if RXData.QTH.Continent <> MyContinent then
-  RXData.QSOPoints := 4
-else if RXCty <> MyCountry then
-  RXData.QSOPoints := 2
-else
-  RXData.QSOPoints := 1;
-
-UKEIQSOPointMethod: // 4.58.2
-begin
-  if (MyContinent <> Europe) then // if OOUTSIDE EUROPE
-  begin
-    if UKEIStation(RXData.Callsign) then
-      RXData.QSOPoints := 4
-    else if RxData.QTH.Continent = Europe then
-      RXData.QSOPoints := 2
-    else
-      RXData.QSOPoints := 1;
-  end;
-
-  if ((MyContinent = Europe) and (not UKEIStation(MyCountry))) then
-    // if IN Europe
-  begin
-    if (RxData.QTH.Continent = Europe) and (not UKEIStation(RxData.CallSign))
-      then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 2;
-  end;
-
-  if UKEIStation(MyCountry) then // if IN UK/EI
-  begin
-    if RxData.QTH.Continent = Europe then
-      RXData.QSOPoints := 2
-    else
-      RXData.QSOPoints := 4;
-    tGetSystemTime;
-    TempHour := UTC.wHour;
-    if (TempHour >= 01) and (TempHour < 05) then
-      RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-        // double points if gmthours
-  end;
-
-  case RxData.Band of
-    Band80, Band40: RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-  end;
-
-end;
-
-HelvetiaQSOPointMethod: // issue 214
-if RXCty = 'HB' then
-  RXData.QSOPoints := 10
-else if RXData.QTH.Continent = MyContinent then
-  RXData.QSOPoints := 1
-else
-  RXData.QSOPoints := 3;
-
-BSCIQSOPointMethod:
-begin
-  Val(MyZone, MyZoneValue, Result);
-  if RXData.Zone = MyZoneValue then
-    RXData.QSOPoints := 1
-  else if RXData.QTH.Continent = MyContinent then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 5;
-
-  if (BlackSeaRegionCountry(RXCty)) or (Copy(RXData.QTHString, 1, 2) = 'BS')
-    then
-    RXData.QSOPoints := 10;
-end;
-
-SRRQSOPointMethod:         // 4.90.4
-  if RXData.DomesticQTH = '' then
-   begin
-    Val(MyZone, MyZoneValue, Result);
-
-
-    if RXData.Zone = MyZoneValue then
-     RXData.QSOPoints := 2
-     else
-      RXData.QSOPoints := 3;
-   end
- else
-   RXData.QSOPoints := 1;
-
-IARUQSOPointMethod:
-if RXData.DomesticQTH = '' then
-begin
-  //        Val(RXData.Zone, RXDataZoneValue, RESULT);
-  Val(MyZone, MyZoneValue, Result);
-
-  if RXData.Zone = MyZoneValue then
-    RXData.QSOPoints := 1
-  else if RXData.QTH.Continent = MyContinent then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 5;
-end
-else
-  RXData.QSOPoints := 1;
-{
-  if RXData.DomesticQTH = '' then
-  begin
-    Val(RXData.Zone, RXDataZoneValue, RESULT);
-    Val(MyZone, MyZoneValue, RESULT);
-
-    if RXDataZoneValue = MyZoneValue then
-      RXData.QSOPoints := 1
-    else
-      if RXData.QTH.Continent = MyContinent then
-        RXData.QSOPoints := 3
-      else
-        RXData.QSOPoints := 5;
-  end
-  else
-    RXData.QSOPoints := 1;
-    }
-InternetSixQSOPointMethod:
-begin
-  if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 3
-  else if MyContinent <> NorthAmerica then
-    RXData.QSOPoints := 1
-  else
-  begin
-    TheirID := RXCty;
-    if TheirID = 'VE' then
-      TheirID := 'K';
-
-    if {(MyCounty <> 'K') and}(MyCountry <> 'VE') then
-    begin { I am DX }
-      if TheirID = 'K' then
-        RXData.QSOPoints := 3
-      else
-        RXData.QSOPoints := 1;
-    end
-    else if TheirID <> 'K' then { I am W/VE }
-      RXData.QSOPoints := 3
-    else
-      RXData.QSOPoints := 1;
-  end;
-end;
-
-IOTAQSOPointMethod:
-begin
-  if MyState = '' then // 4.61.3 change points
-  begin
-    if RXData.domesticQTH <> '' then
-      RXData.QSOpoints := 15
-    else
-      RXData.QSOpoints := 2;
-    exit;
-  end;
-  IOTASTATE := RXDATA.DomesticQTH;
-  {   if pos('-',rxdata.domesticqth) > 0 then     // 4.61.4 assumes dash delineates continent from #
-       delete(iotastate,(pos('-',rxdata.domesticqth)),1);       }
-  if ((RXData.DomesticQTH <> '') and (MyState <> IOTAState)) then
-    RXData.QSOPoints := 15
-  else
-    RXData.QSOPoints := 5;
-
-end;
-JapanInternationalDXQSOPointMethod:
-begin
-  case RXData.Band of
-    Band160: RXData.QSOPoints := 4;
-    Band80: RXData.QSOPoints := 2;
-    Band40: RXData.QSOPoints := 1;
-    Band20: RXData.QSOPoints := 1;
-    Band15: RXData.QSOPoints := 1;
-    Band10: RXData.QSOPoints := 2;
-  end;
-
-  if MyCountry = 'JA' then
-  begin
-    if RXCty = 'JA' then
-    begin
-      RXData.QSOPoints := 0;
-      RXData.InhibitMults := True;
-    end;
-  end
-  else if (RXCty <> 'JA') and (Copy(RXCty, 1, 2) <> 'JD') then
-  begin
-    RXData.QSOPoints := 0;
-    RXData.InhibitMults := True;
-  end;
-end;
-
-IRTSQSOPointMethod:     // 4.93.2
-begin
-RXData.QSOPoints := 0;
- if   RXData.Mode =  CW  then
-   RXData.QSOPoints := 0;
-if (MyCountry = 'EI') or (MyCountry = 'GI') then
-if (RXCty = 'EI') or (RXCty = 'GI') then
-  begin
-  RXData.DXQTH := '';
-  if   RXData.Mode =  CW  then
-   RXData.QSOPoints := 8
-    else
-     RXDATA.QSOPoints := 4;
-  end
-   else
-    If RXData.Mode =  CW  then
-     RXData.QSOPoints := 2
-     else RXData.QSOPoints := 1;
-if (MyCountry <> 'EI') and (MyCountry <>'GI') then
- if (RXCty <> 'EI') and (RXCty <>'GI') then
-  begin
-   RXData.InhibitMults := True;
-   exit;
-  end;
- if (RXCty = 'EI') or (RXCty = 'GI') then
-  begin
-    if   RXData.Mode =  CW  then
-     RXData.QSOPoints := 8
-      else
-        RXData.QSOPoints := 4;
-   end;
-end;
-
-KCJQSOPointMethod:
-if MyCountry = 'JA' then
-begin
-  if (RXCty = 'JA') or (RXCty = 'JD1') then
-    RXData.QSOPoints := 1
-  else
-    RXData.QSOPoints := 5;
-end
-else
-begin
-  if (RXCty = 'JA') or (RXCty = 'JD1') then
-    RXData.QSOPoints := 1
-end;
-{
-    MQPQSOPointMethod:
-      if RXData.Callsign = 'W0EF' then
-        RXData.QSOPoints := 10
-      else
-        if RXData.Mode = CW then
+        if ActiveMode = CW then
           RXData.QSOPoints := 2
         else
           RXData.QSOPoints := 1;
-}
-NZFieldDayQSOPointMethod:
-begin
-  if RXCty = 'ZL' then
-  begin
-    if RXData.Mode = CW then
-      RXData.QSOPoints := 5
-    else
-      RXData.QSOPoints := 3;
-  end
-  else
-    RXData.QSOPoints := 10;
+      end;
 
-  if RXData.Zone = StrToInt(MyZone) then
-    RXData.ZoneMult := False;
-
-end;
-
-OKDXQSOPointMethod:
-//      if (MyCountry = 'OK') or (MyCountry = 'OM') then
-if OKOMStation(MyCountry) then
-begin
-  if RXData.QTH.Continent <> Europe then
-    RXData.QSOPoints := 3
-  else
-    {//          if (RXCty <> 'OK') and (RXCty <> 'OM') then} if not
-      OKOMStation(RXCty) then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 0;
-end
-else
-  {//        if (RXCty = 'OK') or (RXCty = 'OM') then} if OKOMStation(RXCty)
-    then
-  begin
-    if MyContinent = Europe then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 3;
-  end
-  else
-    RXData.QSOPoints := 0;
-
-OKOMSSBQSOPointMethod:              // 4.80.1
- 
-if OKOMStation(MyCountry) then
- begin
- if ((MyCountry = 'OK') and  (RXData.QTH.CountryID = 'OM')) or
- ((MyCountry = 'OM') and  (RXData.QTH.CountryID = 'OK')) then
-   RXdata.QSOPoints := 3
-   else
-   if (RXCty = 'OK') or (RXCty = 'OM') then
-    RXData.QSOPoints := 2
-     else
-      if RXData.QTH.Continent = Europe then
-      RXData.QSOPoints := 3
-       else
-        RXData.QSOPoints := 5;
-  end
-    else
-      if (RXCty = 'OK') or (RXCty = 'OM') then
-       RXData.QSOPoints := 10
+    CQWPXQSOPointMethod:
+      if RXData.QTH.Continent = MyContinent then
+      begin
+        if RXCty = MyCountry then
+          RXData.QSOPoints := 1
         else
-          if RXCTY = MyCountry then
-            RXData.QSOPoints := 1
-             else
-              if RXData.QTH.Continent <> MyContinent then
-               RXData.QSOPoints := 5
-              else
-               RXData.QSOPoints := 3;
-
-RAEMQSOPointMethod:
-begin
-
-  if LooksLikeAGeoCoordinates(MyState, la1, lo1) then
-    if LooksLikeAGeoCoordinates(RXData.QTHString, la2, lo2) then
-    begin
-      Distance := Abs(lo1 - lo2);
-      if Distance > 180 then
-        Distance := 360 - Distance;
-      RXData.QSOPoints := 50 + Abs(la2 - la1) + Distance;
-      if RXData.Callsign = 'RAEM' then
-        RXData.QSOPoints := RXData.QSOPoints + 300;
-      if la2 > 65 + 90 then
-        RXData.QSOPoints := RXData.QSOPoints + 100;
-      if la1 > 65 + 90 then
-        RXData.QSOPoints := round(RXData.QSOPoints * 1.1);
-    end;
-end;
-
-RACQSOPointMethod:
-if RXCty = 'VE' then
-begin
-  if pos('RAC', RXData.Callsign) > 0 then
-    RXData.QSOPoints := 20
-  else
-    RXData.QSOPoints := 10;
-end
-else
-  RXData.QSOPoints := 2;
-
-RSGBQSOPointMethod:
-if MyCountry = RXCty then
-  RXData.QSOPoints := 0
-else
-  case RXData.QTH.Continent of
-    Europe: RXData.QSOPoints := 5;
-    Oceania: RXData.QSOPoints := 30;
-  else
-    RXData.QSOPoints := 15;
-  end;
-
-RSGB160Method: // 4.67.1
-begin
-  if (RXData.DomMultQTH <> '') and (mo.isdmmult(rxdata.dommultqth, AllBands, both) =
-    TRUE) then
-    rxdata.qsopoints := 7
-  else if mo.isdxmult(RXData.QTH.Country, AllBands, both) = TRUE then
-    rxdata.qsopoints := 7
-  else
-    rxdata.qsopoints := 2;
-  exit;
-end;
-
-RDAQSOPointMethod:
-begin
-  RXData.QSOPoints := 0;
-  if RussianID(MyCountry) then
-  begin
-    if RussianID(RXCty) then
-    begin
-      if pos('/P', RXData.Callsign) = length(RXData.Callsign) - 1 then
-      begin
-        RXData.QSOPoints := 10;
-        Exit;
-      end;
-      RXData.QSOPoints := 1;
-      if RXData.QTH.Continent <> MyContinent then
-        RXData.QSOPoints := 2;
-      Exit;
-    end;
-    if RXData.QTH.Continent = MyContinent then
-      RXData.QSOPoints := 3
-    else
-      RXData.QSOPoints := 5;
-  end
-  else if RussianID(RXCty) then
-    RXData.QSOPoints := 10;
-end;
-
-RussianDXQSOPointMethod:
-begin
-
-  if RussianID(MyCountry) then
-  begin
-    if RXData.QTH.Continent <> MyContinent then
-      RXData.QSOPoints := 5
-    else if RXCty <> MyCountry then
-      RXData.QSOPoints := 3
-    else
-      RXData.QSOPoints := 2;
-  end
-
-    { I am not in Russia }
-
-  else if RussianID(RXCty) then
-    RXData.QSOPoints := 10
-  else if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 5
-  else if RXCty <> MyCountry then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 2;
-   if Contest  = RU3AXMEMORIAL then
-    if rxdata.Mode = Phone then
-      RXData.QSOPoints := RXData.QSOPoints * 2;
-end;
-
-SalmonRunQSOPointMethod:
-begin
-  if RXData.Mode = CW then
-    RXData.QSOPoints := 4
-  else
-    RXData.QSOPoints := 2;
-end;
-
-ScandinavianQSOPointMethod:
-begin
-  if ScandinavianCountry(MyCountry) then
-  begin
-    if ScandinavianCountry(RXCty) then
-      RXData.QSOPoints := 0
-    else if RXData.QTH.Continent = Europe then
-      RXData.QSOPoints := 2
-    else
-      RXData.QSOPoints := 3;
-  end
-  else
-  begin
-    if ScandinavianCountry(RXCty) then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 0;
-
-    if MyContinent <> Europe then
-      if RXData.Band in [Band80, Band40] then
-        RXData.QSOPoints := RXData.QSOPoints * 3;
-  end;
-  if RXData.Band = Band160 then
-    RXData.QSOPoints := 0;
-end;
-
-IndonesianQSOPointMethod: // 4.64.1
-begin
-  if IndonesianCountry(MyCountry) then
-  begin
-    if IndonesianCountry(RXCty) then
-      RXData.QSOPoints := 0
-    else if RXData.QTH.Continent <> MyContinent then
-      RXData.QSOPoints := 10
-    else
-      RXData.QSOPoints := 5;
-  end
-  else
-  begin
-    if IndonesianCountry(RXCty) then
-      RXData.QSOPoints := 10
-    else if RXData.QTH.Continent <> MyContinent then
-      RXData.QSOPoints := 3
-    else if RXCty <> MyCountry then
-      RXData.QSOPoints := 2
-    else
-      RXData.QSOPoints := 1;
-  end;
-
-end;
-
-YBFT8QP: // 4.90.7
-begin
-  if IndonesianCountry(MyCountry) then
-  begin
-    if IndonesianCountry(RXCty) then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 2 ;
-  end
-  else
-   begin
-    if IndonesianCountry(RXCty) then
-      RXData.QSOPoints := 2
-    else
-     if RXCty <> MyCountry then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 0;
-   end;
-end;
-
-SLFivePointQSOMethod:
-if Copy(RXData.Callsign, 1, 2) = 'SL' then
-  RXData.QSOPoints := 5
-else
-  RXData.QSOPoints := 1;
-
-SouthAmericanWWQSOPointMethod:
-begin
-  if MyContinent = SouthAmerica then
-  begin
-    if RXData.QTH.Continent = SouthAmerica then
-      RXData.QSOPoints := 2
-    else
-      RXData.QSOPoints := 10;
-  end
-  else if RXData.QTH.Continent = SouthAmerica then
-    RXData.QSOPoints := 10
-  else
-    RXData.QSOPoints := 2;
-end;
-
-StewPerryQSOPointMethod:
-begin
-  if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
-  begin
-    Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-    RXData.QSOPoints := (Distance div 500) + 1;
-    if CategoryPower = cpQRP then
-      RXDATA.QSOPoints :=  RXDATA.QSOPoints * 3;
-      if CategoryPower = cpLOW then
-         RXDATA.QSOPoints :=  Round(RXData.QSOPoints * 1.5);
-  end
-  else
-    RXData.QSOPoints := 1;
-end;
-
-WWDigiQP:                       // 4.90.8
-  if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
-  begin
-    Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString);
-    RXData.QSOPoints := (Distance div 3000) + 1;
-   end;
-
-
-TenTenQSOPointMethod:
-if RXData.TenTenNum <> -1 then
-  RXData.QSOPoints := 2
-else
-  RXData.QSOPoints := 1;
-
-TOECQSOPointMethod:
-if RXData.QTH.Continent <> MyContinent then
-  RXData.QSOPoints := 3
-else if StringHas(RXData.Callsign, '/M') then
-  RXData.QSOPoints := 3
-else
-  RXData.QSOPoints := 1;
-
-UBAQSOPointMethod:
-begin
-  if MyCountry = 'ON' then
-   begin
-    if RXCty = 'ON' then
-    RXData.QSOPoints := 1
-     else if UBACountry(RXCty) then
-      RXData.QSOPoints := 2
-       else
-        RXData.QSOPoints := 3;
-        exit;
-    end;
-
-  if RXCty = 'ON' then
-    RXData.QSOPoints := 10
-  else if UBACountry(RXCty) then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 1;
-end;
-
-UkrainianQSOPointMethod:
-begin
-
-  if RXCty = 'UR' then
-    RXData.QSOPoints := 10
-  else if RXCty = MyCountry then
-    RXData.QSOPoints := 1
-  else if RXData.QTH.Continent = MyContinent then
-    RXData.QSOPoints := 2
-  else
-    RXData.QSOPoints := 3;
-  if MyCountry = 'UR' then
-  begin
-    if RXCty = 'UR' then
-      RXData.QSOPoints := 1;
-    RXData.DomesticMult := False;
-  end;
-end;
-
-VKZLQSOPointMethod:
-if ((MyContinent = Oceania) or (RXData.QTH.Continent = Oceania)) then
-begin
-  case RXData.Band of
-    Band160: RXData.QSOPoints := 20;
-    Band80: RXData.QSOPoints := 10;
-    Band40: RXData.QSOPoints := 5;
-    Band20: RXData.QSOPoints := 1;
-    Band15: RXData.QSOPoints := 2;
-    Band10: RXData.QSOPoints := 3;
-  end;
-end
-else
-  RXData.QSOPoints := 0;
-
-WAGQSOPointMethod:
-if MyCountry = 'DL' then
-begin
-  if RXCty = 'DL' then
-    RXData.QSOPoints := 1
-  else if RXData.QTH.Continent = Europe then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 5;
-end
-else
-begin
-  if RXCty = 'DL' then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 0;
-end;
-
-WAEQSOPointMethod:
-if MyContinent = Europe then
-  if (RXData.QTH.Continent <> Europe) and (RXData.Band <> Band160) then
-    RXData.QSOPoints := 1
-  else
-    RXData.QSOPoints := 0
-else if (RXData.QTH.Continent = Europe) and (RXData.Band <> Band160) then
-  RXData.QSOPoints := 1
-else
-  RXData.QSOPoints := 0;
-
-WWLQSOPointMethod:
-begin
-  if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
-  begin
-    Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
-    RXData.QSOPoints := (Distance div 500) + 1;
-
-    if (RXData.Band = Band80) or (RXData.Band = Band160) then
-      RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-
-    if RXData.Band = Band160 then
-      RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
-  end
-  else
-    RXData.QSOPoints := 1;
-end;
-
-YODXQSOPointMethod:
-if RXCty = 'YO' then
-  RXData.QSOPoints := 8
-else
-  if MyCountry <> RXCty then
-    if RXData.QTH.Continent <> MyContinent then
-      RXData.QSOPoints := 4
-    else
-      RXData.QSOPoints := 2
-  else
-    RXData.QSOPoints := 1; {KK1L: 6.71 Same country QSO}
-
-NoQSOPointMethod: RXData.QSOPoints := 0;
-
-AlwaysOnePointPerQSO: RXData.QSOPoints := 1;
-OnePointPerQSO: RXData.QSOPoints := 1;
-TwoPointsPerQSO: RXData.QSOPoints := 2;
-ThreePointsPerQSO: RXData.QSOPoints := 3;
-TenPointsPerQSO: RXData.QSOPoints := 10;
-
-ThreePhoneFiveCWFourRTTY: // 4.55.4
-case RXData.Mode of
-  CW: RXData.QSOPoints := 5;
-  Phone: RXData.QSOPoints := 3;
-else
-  RXData.QSOPoints := 4;
-end;
-
-TwoPhoneFourCW:
-if RXData.Mode = CW then
-  RXData.QSOPoints := 4
-else
-  RXData.QSOPoints := 2;
-
-TwoPhoneThreeCW:
-if RXData.Mode = CW then
-  RXData.QSOPoints := 3
-else
-  RXData.QSOPoints := 2;
-
-OnePhoneTwoCW:
-if RXData.Mode = CW then
-  RXData.QSOPoints := 2
-else
-  RXData.QSOPoints := 1;
-
-ThreePhoneFiveCW:
-if RXData.Mode = CW then
-  RXData.QSOPoints := 5
-else
-  RXData.QSOPoints := 3;
-
-OneEuropeTwoOther: {KK1L: 6.68 Used for WRTC 2002}
-if MarineOrAirMobileStation(RXData.Callsign) then
-  RXData.QSOPoints := 2
-else if RXData.QTH.Continent = Europe then
-  RXData.QSOPoints := 1
-else
-  RXData.QSOPoints := 2;
-
-CupRFMethod:
-begin
-
-  if (MyGrid <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
-  begin
-    Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString {DomesticQTH});
-
-    if Distance > 7000 then
-      RXData.QSOPoints := 62;
-    if Distance <= 7000 then
-      RXData.QSOPoints := 57;
-    if Distance <= 6000 then
-      RXData.QSOPoints := 52;
-    if Distance <= 5000 then
-      RXData.QSOPoints := 47;
-    if Distance <= 4000 then
-      RXData.QSOPoints := 42;
-    if Distance <= 3000 then
-      RXData.QSOPoints := 38;
-    if Distance <= 2000 then
-      RXData.QSOPoints := 35;
-
-  end
-  else
-    RXData.QSOPoints := 1;
-
-end;
-UA4WMethod:
-begin
-  RXData.QSOPoints := 2;
-
-  if GetOblast(MyCall) = '4W' then
-  begin
-    if RXData.DomesticQTH <> MyState then
-      RXData.QSOPoints := 4;
-    Exit;
-  end;
-
-  if RXData.DomesticQTH <> MyState then
-  begin
-    if RXData.Band = Band80 then
-      RXData.QSOPoints := 3;
-    if RXData.Band = Band160 then
-      RXData.QSOPoints := 5;
-
-    if GetOblast(RXData.Callsign) = '4W' then
-    begin
-      if RXData.Band = Band80 then
-        RXData.QSOPoints := 5;
-      if RXData.Band = Band160 then
-        RXData.QSOPoints := 10;
-      MyZoneValue := ctyGetCQZone(MyCall);
-      if MyZoneValue in [18, 19] then
-      begin
-        if RXData.Band = Band80 then
-          RXData.QSOPoints := 10;
-        if RXData.Band = Band160 then
-          RXData.QSOPoints := 20;
-      end;
-    end;
-  end;
-
-end;
-
-ChampionshipRFMethod:
-begin
-  if RussianID(RXCty) then
-  begin
-    RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign);
-    if MyState = '' then
-      Exit;
-    if not (MyState[1] in ['1'..'7']) then
-      Exit;
-    if not (RXData.Zone in [1..7]) then
-      Exit;
-    RXData.QSOPoints := ChampionshipRFPointsArray[Ord(MyState[1]) - 48 +
-      (RXData.Zone - 1) * 7];
-  end;
-end;
-
-ChampionshipUkrMethod:
-begin
-  if RXCty <> 'UR' then
-    Exit;
-  //if (RXData.Band = Band80) or (RXData.Band = Band160) then
-  RXData.QSOPoints := 2;
-end;
-
-
-WWPMCQSOPointMethod:
-begin
-  RXData.QSOPoints := 5;
-  if MyState = '' then
-  begin
-    if RXData.QTHString <> '' then
-      RXData.QSOPoints := 25;
-  end
-  else
-  begin
-    if RXData.QTHString <> '' then
-      if MyState <> RXData.QTHString then
-        RXData.QSOPoints := 10;
-  end;
-end;
-
-JTDXQSOPointMethod:
-begin
-    if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 3
-  else if RXCty <> MyCountry then
-    RXData.QSOPoints := 2
-  else
-    RXData.QSOPoints := 1;
-
-  if RXCty = 'JT' then
-    if MyCountry = 'JT' then
-      RXData.QSOPoints := 0;
-
-end;
-
-MMCQSOPointMethod: //n4af added for marcon memorial contest
-begin
-
-  if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 5
-  else if RXCty = MyCountry then
-    RXData.QSOPoints := 1
-  else
-    RXData.QSOPoints := 3;
-
-end;
-
-LZDXQSOPointMethod:
-begin
-
-  if RXCty = 'LZ' then
-  begin
-    if MyCountry = 'LZ' then
-      RXData.QSOPoints := 1
-    else
-      RXData.QSOPoints := 10;
-  end
-  else
-  begin
-    if MyContinent <> RXData.QTH.Continent then
-      RXData.QSOPoints := 3
-    else
-      RXData.QSOPoints := 1;
-  end;
-end;
-
-OldNewYearQSOPointMethod:
-begin
-  RXData.QSOPoints := RXData.Age {RXData.NumberReceived};
-end;
-
-YouthChampionshipRFMethod:
-begin
-  //        if RussianID(RXCty) then
-  if RXData.Band in [Band40, Band20] then
-  begin
-
-    RXData.QSOPoints := 1;
-    RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign);
-
-  end;
-end;
-
-{   YOKQSOPointMethod:             // 4.55.4
-     RXData.QSOPoints:= 3;  }
-
-ChampionshipRFASMethod:
-if (MyState <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
-  if StringIsAllNumbers(MyState) then
-  begin
-    la1 := StrToInt(RXData.QTHString[1]);
-    lo1 := StrToInt(Copy(RXData.QTHString, 2, 2));
-
-    la2 := StrToInt(MyState[1]);
-    lo2 := StrToInt(Copy(MyState, 2, 2));
-    RXData.QSOPoints := Abs(la1 - la2) + Abs(lo1 - lo2) + 5;
-    if RXData.Mode = CW then
-      RXData.QSOPoints := RXData.QSOPoints + 5;
-  end;
-
-RegionOneFieldDayRCCQSOPointMethod:
-begin
-  if MyContinent = RXData.QTH.Continent then
-    RXData.QSOPoints := 2
-  else
-    RXData.QSOPoints := 3;
-  Result := pos('/P', RXData.Callsign);
-  if Result = 0 then
-    Result := pos('/M', RXData.Callsign);
-  if Result = length(RXData.Callsign) - 1 then
-    RXData.QSOPoints := 4;
-end;
-
-YL_ARCK_YL: // 4.66.3 YL-ARCK-YL
-begin
-  if (RXData.NumberReceived = 88) then // YL # rcvd
-  begin
-    RXData.QSOPoints := 5;
-    exit; // now exit points processing
-  end;
-  RXData.Prefix := ''; // if <> yl # then clear the multiplier
-  if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 1
-end;
-
-GACWWWSACWQSOPointMethod:
-begin
-  
-  if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 3
-  else if RXCty <> MyCountry then
-    RXData.QSOPoints := 1
-  else
-    RXData.QSOPoints := 0; // end YL-ARCK-YL hooks
-  if RXData.QTH.Continent = SouthAmerica then
-    RXData.QSOPoints := 5;
-end;
-
-LQPQSOPointMethod:
-begin
-  RXData.QSOPoints := 1000;
-  if (RXData.Name = 'LOCUST') or (RXData.Callsign = 'K6VVA') then
-    RXData.QSOPoints := 5000;
-end;
-
-ArktikaSpringQSOPointMethod:
-begin
-  if RXData.DomMultQTH <> '' then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 1;
-end;
-
-REFQSOPointMethod:
-begin
-  if not FrenchID(RXData.QTH.CountryID) then
-    Exit;
-
-  if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 1;
-end;
-
-RadioMemoryQSOPointMethod:
-begin
-  RXData.QSOPoints := RXData.Age;
-  Result := pos(' ', RXData.QTHString);
-  if Result <> 0 then
-  begin
-    TheirID := Copy(RXData.QTHString, Result + 1, 3);
-
-    if StringIsAllNumbers(TheirID) then
-      inc(RXData.QSOPoints, StrToInt(TheirID));
-  end;
-end;
-
-PCCQSOPointMethod:             // 4.83.2
-begin
-if RXData.Band in [Band80..Band10] then
-
- RXData.QSOPoints := 0;
- result := length(RXData.QTHString);    // found 'M' in recvd nr ?
-    if RXCty <> MyCountry then
-     RXData.QSOPoints := 2
-      else
-       RXData.QSOPoints := 1;
- 
-  if (RXData.QTHString[result] = 'M') and  (StringIsAllNumbers(MyState)) then
-   inc(RXData.QSOPoints, 6)
-     else
-      if (RXData.QTHString[result] = 'M') and (not StringIsAllNumbers(MyState)) then
-          inc(RXData.QSOPoints, 2);
-
- end;
-                                                                   
-UNDXQSOPointMethod:
-begin
-  if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 5
-  else if RXCty <> MyCountry then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 2;
-
-  if RXCty = 'UN' then
-    if MyCountry <> 'UN' then
-      RXData.QSOPoints := 10;
-end;
-
-KingOfSpainQSOPointMethod:
-begin
-  if not SpanishStation(RXCty) then
-    RXData.QSOPoints := 1
-  else
-  begin
-    if SpanishStation(MyCountry) then
-      RXData.QSOPoints := 2
-    else
-      RXData.QSOPoints := 3;
-  end;
-end;
-
-GagarinCupQSOPointMethod:
-begin
-
-  if RXData.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 4
-  else if RXCty <> MyCountry then
-    RXData.QSOPoints := 3
-  else
-    RXData.QSOPoints := 2;
-
-  if RXData.Band in [Band160, Band80] then
-    RXData.QSOPoints := RXData.QSOPoints * 3;
-  if RXData.Band in [Band40] then
-    RXData.QSOPoints := RXData.QSOPoints * 2;
-  if RXData.Band = Band2 then
-    RXData.QSOPoints := 100;
-end;
-
-CQMMQSOPointMethod:
-begin
-  if RXData.Band in [Band80..Band10] then
-  begin
-    PtsMult := integer(RXData.Band in [Band40, Band80]) + 1;
-    if RXData.QTH.Continent <> MyContinent then
-    begin
-      RXData.QSOPoints := 3 * PtsMult;
-    end
-    else if RXCty <> MyCountry then
-      RXData.QSOPoints := 2 * PtsMult
-    else
-      RXData.QSOPoints := 1;
-
-    if (length(RXData.QTHString) = 3) then
-      if (RXData.QTHString[3] in ['M', 'Q', 'Y']) then
-        RXData.QSOPoints := 10;
-
-  end;
-end;
-
-Radio160QSOPointMethod:
-begin
-  if length(RXData.DomMultQTH) = 2 then
-  begin
-    if RXData.DomMultQTH[1] in ['A'..'Z'] then
-    begin
-      if RXData.DomMultQTH[2] in ['0'..'9'] then
-        if length(MyState) >= 2 then
         begin
-          la1 := Abs(Ord(UpCase(RXData.DomMultQTH[1])) - Ord(MyState[1])) + 1;
-          la2 := Abs(Ord(UpCase(RXData.DomMultQTH[2])) - Ord(MyState[2])) + 1;
-          if la1 >= la2 then
-            RXData.QSOPoints := la1
+          case RXData.Band of
+            Band160: RXData.QSOPoints := 2;
+            Band80: RXData.QSOPoints := 2;
+            Band40: RXData.QSOPoints := 2;
+            Band20: RXData.QSOPoints := 1;
+            Band15: RXData.QSOPoints := 1;
+            Band10: RXData.QSOPoints := 1;
+          end;
+
+          if MyContinent = NorthAmerica then
+            RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+        end;
+      end
+      else
+        case RXData.Band of
+          Band160: RXData.QSOPoints := 6;
+          Band80: RXData.QSOPoints := 6;
+          Band40: RXData.QSOPoints := 6;
+          Band20: RXData.QSOPoints := 3;
+          Band15: RXData.QSOPoints := 3;
+          Band10: RXData.QSOPoints := 3;
+        end;
+
+    CQWPXRTTYQSOPointMethod:
+      begin
+        if RXData.QTH.Continent = MyContinent then
+        begin
+          if RXCty = MyCountry then
+            RXData.QSOPoints := 1
           else
-            RXData.QSOPoints := la2;
+            RXData.QSOPoints := 2
+        end
+        else
+          RXData.QSOPoints := 3;
+
+        if (RXData.Band = Band80) or (RXData.Band = Band40) then
+          RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+      end;
+
+    DLRTTY:
+      { QSO with own country: 5 points.
+      QSO with other countries in own continent: 10 points.
+      QSO with other continents: 15 points.
+      QSO with DL-Station by stations in Europe: 3 additional points
+      QSO with DL-Station by stations outside Europe: 5 additional points
+      }
+      begin
+        if (MyCountry = '') or (MyContinent = UnknownContinent) then
+        begin
+          RXData.QSOPoints := 10;
+          exit;
+        end;
+
+        if MyCountry = RxData.QTH.countryid then
+          RXData.QSOPoints := 5
+        else if rxdata.QTH.Continent = MyContinent then
+          RXData.QSOPoints := 10
+        else
+          RXData.QSOPoints := 15;
+
+        if ContestTitle = 'DL-DX-RTTY' then
+          if RXCty = 'DL' then
+            if rxdata.QTH.Continent <> MyContinent then
+              RXData.QSOPoints := RXData.QSOPoints + 5
+            else
+              RXData.QSOPoints := RXData.QSOPoints + 3;
+      end;
+
+    JAKARTARTTY: // 4.74.2
+      if RXCty = 'YB' then
+        RXData.QSOPoints := 50
+      else if rxdata.QTH.Continent <> MyContinent then
+        RXData.QSOPoints := 5
+      else
+        RXData.QSOPoints := 3;
+
+    CQWWQSOPointMethod:
+      if RXData.QTH.Continent <> MyContinent then
+        RXData.QSOPoints := 3
+      else if RXCty <> MyCountry then
+        if MyContinent <> NorthAmerica then
+          RXData.QSOPoints := 1
+        else
+          RXData.QSOPoints := 2
+      else
+        RXData.QSOPoints := 0;
+
+    CQWWRTTYQSOPointMethod:
+      if RXData.QTH.Continent <> MyContinent then
+        RXData.QSOPoints := 3
+      else if RXCty <> MyCountry then
+        RXData.QSOPoints := 2
+      else
+        RXData.QSOPoints := 1;
+
+    CroatianQSOPointMethod:
+      if RXCty = '9A' then
+      begin
+        case RXData.Band of
+          Band160: RXData.QSOPoints := 10;
+          Band80: RXData.QSOPoints := 10;
+          Band40: RXData.QSOPoints := 10;
+          Band20: RXData.QSOPoints := 6;
+          Band15: RXData.QSOPoints := 6;
+          Band10: RXData.QSOPoints := 6;
+        end;
+      end
+      else if RXData.QTH.Continent = MyContinent then
+      begin
+        case RXData.Band of
+          Band160: RXData.QSOPoints := 2;
+          Band80: RXData.QSOPoints := 2;
+          Band40: RXData.QSOPoints := 2;
+          Band20: RXData.QSOPoints := 1;
+          Band15: RXData.QSOPoints := 1;
+          Band10: RXData.QSOPoints := 1;
+        end;
+      end
+      else
+        case RXData.Band of
+          Band160: RXData.QSOPoints := 6;
+          Band80: RXData.QSOPoints := 6;
+          Band40: RXData.QSOPoints := 6;
+          Band20: RXData.QSOPoints := 3;
+          Band15: RXData.QSOPoints := 3;
+          Band10: RXData.QSOPoints := 3;
+        end;
+
+    EuropeanFieldDayQSOPointMethod:
+      begin
+        RXData.QSOPoints := 1;
+
+        CountryID := MyCountry;
+
+        if (CountryID = 'F') or (CountryID = 'OE') then
+        begin
+          if RXCty = MyCountry then
+          begin
+            if PortableStation(RXData.Callsign) then
+              RXData.QSOPoints := 50
+            else
+              RXData.QSOPoints := 10;
+          end
+          else if RXData.QTH.Continent = Europe then
+          begin
+            if PortableStation(RXData.Callsign) then
+              RXData.QSOPoints := 5
+            else
+              RXData.QSOPoints := 1;
+          end
+          else
+            RXData.QSOPoints := 3;
+
           Exit;
         end;
-      if RXData.DomMultQTH[2] = 'X' then
-        RXData.QSOPoints := 30;
-    end;
-  end;
-end;
 
-R9WUW9WKMemorialQSOPointMethod:
-begin
-  //        if RXData.Callsign = 'R100W' then RXData.QSOPoints := 10
-  //        else
-  case RXData.Zone of
-    1, 2: RXData.QSOPoints := 3;
-    3: RXData.QSOPoints := 4;
-    5: RXData.QSOPoints := 10;
-  end;
-end;
-
-WRTCQSOPointMethod:               // 4.72.10
-if RXData.Band in [Band80..Band10] then
-begin
-
-   if RXData.QTH.Continent = Europe then
-    RXData.QSOPoints := 2
-   else
-    RXData.QSOPoints := 5;
-  
-end;
-
-PortugalDay:    // 4.71.4
- begin
-      if (RXCty = 'CT') and (MyCountry <> 'CT') then
-             RXData.QSOPoints := 10
-             else  if (RXCty = 'CT') and (MyCountry = 'CT') then
-              RXData.QSOPoints := 5
-               else if RXData.QTH.Continent <> MyContinent then
-                RXData.QSOPoints := 2
-                 else  
-                  RXData.QSOPoints := 1;
- end;
-
- RPX:
-  begin
-
-   if (RXCty = 'UA') or (RXCty = 'UA2') or (RXCty = 'UA9')then
-     RXData.QSOPoints := 10
-      else
-        RXData.QSOPoints := 5;
-
-  end;
-
-  UQRQCPM:                      // 4.82.3
-  begin
-   if (RXData.QTH.Continent <> MyContinent) then
-    RXData.QSOPoints := 4
-     else
-      if (RXCty <> MyCountry) then
-       RXData.QSOPoints := 3
-        else
-         RXData.QSOPoints := 2;
-  end;
-
-   OKOMRTTY:        // 4.83.4
-   begin
-    if RXData.Band in [Band80..Band40] then
-     if (RXData.QTH.Continent <> MyContinent) then
-       RXData.QSOPoints := 6
-        else
-         RXData.QSOPoints := 3;
-
-     if RXData.Band in [Band20..Band10] then
-      if (RXData.QTH.Continent <> MyContinent) then
-      RXData.QSOPoints := 2
-        else
-          RXData.QSOPoints := 1;
-  end;
-
- EUDXQSOPointMethod:                     // 4.95.6
-{  QSO Points
-a. European Union stations:
-QSO with your own country – 1 points,
-QSO with European Union country – 10 points,
-QSO with a different country on your continent – 3 points,
-QSO with another continent – 5 points.
-b. Non- European Union stations:
-QSO with European Union – 10 points,
-QSO with your own country – 1 points,
-QSO with a different country on your continent – 3 points,
-QSO with another continent – 5 points.
-
- begin
-   if MyState[4] <> '' then  // I AM IN EUnion
-    begin
-      if (RXData.DomMultQTH[4] <> '') then     // he is in EU
-       if (RXCty = MyCountry) then      // but in my country
-        RXData.QSOPoints := 1
-         else
-          rxdata.qsopoints := 10;     // he is eu but not my country
-   if (RXData.DomMultQTH[4] = '') then     // he is NOT in EU, but I am
-    if (RXData.QTH.Continent <> MyContinent) then     // not eu not my continent
-        RXData.QSOPoints := 5
-         else
-          if (RXCty <> MyCountry) then
-           RXData.QSOPoints := 3;
-           exit;
-    end;
-
-
-  if MyState[4] = '' then       //  I AM NOT IN EUnion
-   if RXData.DomMultQTH[4] <> '' then   // he is  in EU
-    rxdata.qsopoints := 10
-      else
-       if (RXData.QTH.Continent <> MyContinent) then
-        RXData.QSOPoints := 5
-         else
-          if (RXCty <> MyCountry) then
-           RXData.QSOPoints := 3
+        if CountryID = 'OZ' then
+        begin
+          if RXCty = MyCountry then
+          begin
+            if PortableStation(RXData.Callsign) then
+              RXData.QSOPoints := 10
             else
-          RXData.QSOPoints := 1;
- end;
- }
- begin
- if (RXData.DomMultQTH[4] <> '') then     // he is in EU
-      begin
-       if (RXCty <> MyCountry) then      // Not same country as me
-        RXData.QSOPoints := 10 
+              RXData.QSOPoints := 1;
+          end
+          else if RXData.QTH.Continent = Europe then
+          begin
+            if PortableStation(RXData.Callsign) then
+              RXData.QSOPoints := 5
+            else
+              RXData.QSOPoints := 3;
+          end
+          else
+            RXData.QSOPoints := 6;
+
+          Exit;
+        end;
+
+        if CountryID = 'HB' then
+        begin
+          if PortableStation(RXData.Callsign) then
+            RXData.QSOPoints := 5
+          else if RXData.QTH.Continent = Europe then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 2;
+          Exit;
+        end;
+
+        if CountryID = 'I' then
+        begin
+          if PortableStation(RXData.Callsign) then
+            RXData.QSOPoints := 6
+          else if RXData.QTH.Continent = Europe then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 2;
+
+          if (RXData.Band = Band160) or (RXData.Band = Band80) then
+            RXData.QSOPoints := RXData.QSOPoints * 2;
+          Exit;
+        end;
+
+        { Anywhere else, including DL and PA }
+
+        if PortableStation(RXData.Callsign) then
+        begin
+          if RXData.QTH.Continent = Europe then
+            RXData.QSOPoints := 4
+          else
+            RXData.QSOPoints := 6;
+        end
         else
-         RXData.QSOPoints := 1;
+        begin
+          if RXData.QTH.Continent = Europe then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 3;
+        end;
+
+        if CountryID[1] = 'G' then
+          if (RXData.Band = Band160) or (RXData.Band = Band10) then
+            RXData.QSOPoints := RXData.QSOPoints * 2;
+
+      end;
+
+    EuropeanSprintQSOPointMethod:
+      if MyContinent = Europe then
+        RXData.QSOPoints := 1
+      else if RXData.QTH.Continent = Europe then
+        RXData.QSOPoints := 1
+      else
+        RXData.QSOPoints := 0;
+
+    FOCMarathonQSOPointMethod:
+
+      if RXData.Callsign = 'G4FOC' then
+        //    if RXData.Callsign = GM4FOC then
+        RXData.QSOPoints := 2
+
+      else
+        RXData.QSOPoints := 1;
+
+    RadioVHFFDQSOPointMethod {, ChampionshipRFVHFQSOPointMethod}:
+      begin
+        if MyGrid <> '' then
+        begin
+          Points := GetDistanceBetweenGrids
+            {GetEuropeanDistanceBetweenGrids}(MyGrid,
+            RXData.DomesticQTH);
+          if RXData.Band = Band2 then
+            RXData.QSOPoints := Points * 1 // 4.60.4
+          else if RXData.Band = Band432 then
+            RXData.QSOPoints := Points * 2 // 4.60.4
+          else if RXData.Band = Band1296 then
+            RXData.QSOPoints := Points * 4 // 4.60.6
+          else if RXData.Band in [Band2304, Band3456, Band5760, Band10G,
+            Band24G, BandLight] then // 4.81.2
+            RXData.QSOPoints := Points * 6 // 4.60.6
+          else
+            RXData.QSOPoints := 0;
+
+        end;
+      end;
+
+    MakrothenQSOPointMethod:
+      begin
+        if MyGrid <> '' then
+        begin
+          if Copy(MyGrid, 1, 4) = Copy(RXData.DomesticQTH, 1, 4) then
+            RXData.QSOPoints := 100
+          else
+          begin
+            RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid,
+              RXData.DomesticQTH);
+            if RXData.Band = Band40 then
+              RXData.QSOPoints := round(RXData.QSOPoints * 1.5);
+
+            if RXData.Band = Band80 then
+              RXData.QSOPoints := RXData.QSOPoints * 2;
+          end;
+
+        end;
+      end;
+
+    NCQSOPointMethod: // 4.66.1      // updated 4.97.9
+      begin
+
+        if RXData.Mode = PHONE then
+          RXDATA.QSOPoints := 2
+        else if RXData.Mode = CW then
+          RXDATA.QSOPoints := 3
+        else
+          RXDATA.QSOPoints := 5; // digital
+        if RXData.Callsign = 'N4T' then
+          rxdata.QSOPoints := rxdata.qsopoints + 50; // 4.86.3
+        if RXData.Callsign = 'N4A' then
+          rxdata.QSOPoints := rxdata.qsopoints + 50;
+        if RXData.Callsign = 'N4R' then
+          rxdata.QSOPoints := rxdata.qsopoints + 50;
+        if RXData.Callsign = 'N4H' then
+          rxdata.QSOPoints := rxdata.qsopoints + 50;
+        if RXData.Callsign = 'N4E' then
+          rxdata.QSOPoints := rxdata.qsopoints + 50;
+        if RXData.Callsign = 'W4E' then
+          rxdata.QSOPoints := rxdata.qsopoints + 50;
+        if RXData.Callsign = 'N4L' then
+          rxdata.QSOPoints := rxdata.qsopoints + 50;
+        if (RXData.DomesticQTH = 'ALL') or (RXData.DomesticQTH = 'COL') then
+          rxdata.QSOPoints := rxdata.qsopoints + 50;
+      end;
+
+    BCQPQSOPointMethod:
+      begin
+        if RXData.Mode = PHONE then
+          RXDATA.QSOPoints := 2
+        else
+          RXDATA.QSOPoints := 4;
+        if RXData.Callsign = 'VA7ODX' then
+          rxdata.QSOPoints := rxdata.qsopoints + 20;
+      end;
+
+    PAQSOPointMethod: // 4.74.3
+      begin
+
+        if RXData.Mode = PHONE then
+          RXDATA.QSOPoints := 1
+        else
+          RXDATA.QSOPoints := 2;
+      end;
+
+    OZHCRVHFQSOPointMethod:
+      if MyGrid <> '' then
+      begin
+        Points := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+        if RXData.Band = Band2 then
+          RXData.QSOPoints := Points;
+        if RXData.Band = Band432 then
+          RXData.QSOPoints := Points * 2;
+        if RXData.Band = Band1296 then
+          RXData.QSOPoints := Points * 4;
+        if RXData.Band > Band1296 then
+          RXData.QSOPoints := Points * 6;
+      end;
+
+    EuropeanVHFQSOPointMethod:
+      //      if MyGrid <> '' then
+      //        if RXData.DomesticQTH <> '' then
+      begin
+        //    RXData.QSOPoints := GetEuropeanDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+        if ContestName = 'EURASIA' then // 4.96.3
+          RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid, RXData.QTHString)
+            // domestic truncated to 2 bytes. need this 6bytes
+        else
+          RXData.QSOPoints := GetDistanceBetweenGrids(MyGrid,
+            RXData.DomesticQTH);
+        //n4af 4.36.11
+        if MyCountry = '9A' then
+        begin
+          if RXData.Band = Band432 then
+            RXData.QSOPoints := RXData.QSOPoints * 5;
+          if RXData.Band = Band1296 then
+            RXData.QSOPoints := RXData.QSOPoints * 10;
+          if RXData.Band = Band2304 then
+            RXData.QSOPoints := RXData.QSOPoints * 20;
+          if RXData.Band in [Band3456, Band5760, Band10G] then
+            RXData.QSOPoints := RXData.QSOPoints * 30;
+          if RXData.Band = Band24G then
+            RXData.QSOPoints := RXData.QSOPoints * 100;
+        end;
+      end;
+
+    TeslaQSOPointMethod: // 4.79.1
+      //      if MyGrid <> '' then
+      //        if RXData.DomesticQTH <> '' then
+      begin
+        Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+        case distance of
+          0..600: RXData.QSOPoints := 10;
+          601..1200: RXData.QSOPoints := 13;
+          1201..1800: RXData.QSOPoints := 16;
+          1801..2400: RXData.QSOPoints := 20;
+          2401..3600: RXData.QSOPoints := 24;
+          3601..4800: RXData.QSOPoints := 28;
+          4801..6000: RXData.QSOPoints := 32;
+          6001..7200: RXData.QSOPoints := 36;
+          7201..8400: RXData.QSOPoints := 40;
+        else
+          RXData.QSOPoints := 45;
+        end;
+
+        { revised points 2019 rules:    // 4.79.1
+        Points are calculated based on the distance between the centers of the middle of QTH grids:
+
+       Up to 600 km = 10 points
+
+       601 - 1200 km = 13 points
+
+       1201 - 1800 km = 16 points
+
+       1801 - 2400 km = 20 points
+
+       2401 - 3600 km = 24 points
+
+       3600 - 4800 km = 28 points
+
+       4801 - 6000 km = 32 points
+
+       6001 - 7200 km = 36 points
+
+       7201 - 8400 km = 40 points
+
+       above 8401 km = 45 points
+
+          //n4af 4.36.11
+         if RXData.DomesticQTH = MyGrid then
+           RXData.QSOPoints := 90; }
+        DisplayTotalScore;
+      end;
+
+    FistsQSOPointMethod:
+      if RXData.NumberReceived > 0 then
+        RXData.QSOPoints := 5
+      else
+        RXData.QSOPoints := 2;
+
+    HADXQSOPointMethod: // 4.84.2
+      begin
+
+        if RXData.QTH.CountryID = 'HA' then // 4.67.11
+        begin
+          RXData.QSOPoints := 10;
+          exit;
+        end;
+
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 5
+        else
+          RXData.QSOPoints := 2;
+      end;
+
+    TRCDIGITAL:
+      begin
+        if rxdata.domesticqth = 'TRC' then
+          RXData.QSOPoints := 10
+        else if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 1;
+        if (MyState = 'TRC') and (RXData.DomesticQTH = 'TRC') then
+          // throw away above & use one point -if- fellow TRC
+          RXData.QSOPoints := 1;
+      end;
+
+    XERTTY: // 4.77.5
+      begin
+        if MyCountry = 'XE' then
+          if RXCty <> 'XE' then
+            RXData.QSOPoints := 3
+          else
+            RXData.QSOPoints := 4;
+
+        if RXData.QTH.CountryID = 'XE' then
+        begin
+          RXData.QSOPoints := 4;
+          exit;
+        end;
+        if RXData.QTH.CountryID <> MyCountry then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 2;
+      end;
+
+    YUDXQSOPointMethod: // 4.57.5
+      if (MyCountry <> 'YU') and (RXCty = 'YU') then
+        RXData.QSOPoints := 10
+      else if RXData.QTH.Continent <> MyContinent then
+        RXData.QSOPoints := 4
+      else if RXCty <> MyCountry then
+        RXData.QSOPoints := 2
+      else
+        RXData.QSOPoints := 1;
+
+    UKEIQSOPointMethod: // 4.58.2
+      begin
+        if (MyContinent <> Europe) then // if OOUTSIDE EUROPE
+        begin
+          if UKEIStation(RXData.Callsign) then
+            RXData.QSOPoints := 4
+          else if RxData.QTH.Continent = Europe then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 1;
+        end;
+
+        if ((MyContinent = Europe) and (not UKEIStation(MyCountry))) then
+          // if IN Europe
+        begin
+          if (RxData.QTH.Continent = Europe) and (not
+            UKEIStation(RxData.CallSign)) then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 2;
+        end;
+
+        if UKEIStation(MyCountry) then // if IN UK/EI
+        begin
+          if RxData.QTH.Continent = Europe then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 4;
+          tGetSystemTime;
+          TempHour := UTC.wHour;
+          if (TempHour >= 01) and (TempHour < 05) then
+            RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+          // double points if gmthours
+        end;
+
+        case RxData.Band of
+          Band80, Band40: RxData.QSOPoints := RXData.QSOPoints +
+            RXData.QSOPoints;
+        end;
+
+      end;
+
+    HelvetiaQSOPointMethod: // issue 214
+      if RXCty = 'HB' then
+        RXData.QSOPoints := 10
+      else if RXData.QTH.Continent = MyContinent then
+        RXData.QSOPoints := 1
+      else
+        RXData.QSOPoints := 3;
+
+    BSCIQSOPointMethod:
+      begin
+        Val(MyZone, MyZoneValue, Result);
+        if RXData.Zone = MyZoneValue then
+          RXData.QSOPoints := 1
+        else if RXData.QTH.Continent = MyContinent then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 5;
+
+        if (BlackSeaRegionCountry(RXCty)) or (Copy(RXData.QTHString, 1, 2) =
+          'BS') then
+          RXData.QSOPoints := 10;
+      end;
+
+    SRRQSOPointMethod: // 4.90.4
+      if RXData.DomesticQTH = '' then
+      begin
+        Val(MyZone, MyZoneValue, Result);
+
+        if RXData.Zone = MyZoneValue then
+          RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 3;
+      end
+      else
+        RXData.QSOPoints := 1;
+
+    IARUQSOPointMethod:
+      if RXData.DomesticQTH = '' then
+      begin
+        //        Val(RXData.Zone, RXDataZoneValue, RESULT);
+        Val(MyZone, MyZoneValue, Result);
+
+        if RXData.Zone = MyZoneValue then
+          RXData.QSOPoints := 1
+        else if RXData.QTH.Continent = MyContinent then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 5;
+      end
+      else
+        RXData.QSOPoints := 1;
+    {
+      if RXData.DomesticQTH = '' then
+      begin
+        Val(RXData.Zone, RXDataZoneValue, RESULT);
+        Val(MyZone, MyZoneValue, RESULT);
+
+        if RXDataZoneValue = MyZoneValue then
+          RXData.QSOPoints := 1
+        else
+          if RXData.QTH.Continent = MyContinent then
+            RXData.QSOPoints := 3
+          else
+            RXData.QSOPoints := 5;
+      end
+      else
+        RXData.QSOPoints := 1;
+        }
+    InternetSixQSOPointMethod:
+      begin
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 3
+        else if MyContinent <> NorthAmerica then
+          RXData.QSOPoints := 1
+        else
+        begin
+          TheirID := RXCty;
+          if TheirID = 'VE' then
+            TheirID := 'K';
+
+          if {(MyCounty <> 'K') and}(MyCountry <> 'VE') then
+          begin { I am DX }
+            if TheirID = 'K' then
+              RXData.QSOPoints := 3
+            else
+              RXData.QSOPoints := 1;
+          end
+          else if TheirID <> 'K' then { I am W/VE }
+            RXData.QSOPoints := 3
+          else
+            RXData.QSOPoints := 1;
+        end;
+      end;
+
+    IOTAQSOPointMethod:
+      begin
+        if MyState = '' then // 4.61.3 change points
+        begin
+          if RXData.domesticQTH <> '' then
+            RXData.QSOpoints := 15
+          else
+            RXData.QSOpoints := 2;
+          exit;
+        end;
+        IOTASTATE := RXDATA.DomesticQTH;
+        {   if pos('-',rxdata.domesticqth) > 0 then     // 4.61.4 assumes dash delineates continent from #
+             delete(iotastate,(pos('-',rxdata.domesticqth)),1);       }
+        if ((RXData.DomesticQTH <> '') and (MyState <> IOTAState)) then
+          RXData.QSOPoints := 15
+        else
+          RXData.QSOPoints := 5;
+
+      end;
+    JapanInternationalDXQSOPointMethod:
+      begin
+        case RXData.Band of
+          Band160: RXData.QSOPoints := 4;
+          Band80: RXData.QSOPoints := 2;
+          Band40: RXData.QSOPoints := 1;
+          Band20: RXData.QSOPoints := 1;
+          Band15: RXData.QSOPoints := 1;
+          Band10: RXData.QSOPoints := 2;
+        end;
+
+        if MyCountry = 'JA' then
+        begin
+          if RXCty = 'JA' then
+          begin
+            RXData.QSOPoints := 0;
+            RXData.InhibitMults := True;
+          end;
+        end
+        else if (RXCty <> 'JA') and (Copy(RXCty, 1, 2) <> 'JD') then
+        begin
+          RXData.QSOPoints := 0;
+          RXData.InhibitMults := True;
+        end;
+      end;
+
+    IRTSQSOPointMethod: // 4.93.2
+      begin
+        RXData.QSOPoints := 0;
+        if RXData.Mode = CW then
+          RXData.QSOPoints := 0;
+        if (MyCountry = 'EI') or (MyCountry = 'GI') then
+          if (RXCty = 'EI') or (RXCty = 'GI') then
+          begin
+            RXData.DXQTH := '';
+            if RXData.Mode = CW then
+              RXData.QSOPoints := 8
+            else
+              RXDATA.QSOPoints := 4;
+          end
+          else if RXData.Mode = CW then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 1;
+        if (MyCountry <> 'EI') and (MyCountry <> 'GI') then
+          if (RXCty <> 'EI') and (RXCty <> 'GI') then
+          begin
+            RXData.InhibitMults := True;
+            exit;
+          end;
+        if (RXCty = 'EI') or (RXCty = 'GI') then
+        begin
+          if RXData.Mode = CW then
+            RXData.QSOPoints := 8
+          else
+            RXData.QSOPoints := 4;
+        end;
+      end;
+
+    KCJQSOPointMethod:
+      if MyCountry = 'JA' then
+      begin
+        if (RXCty = 'JA') or (RXCty = 'JD1') then
+          RXData.QSOPoints := 1
+        else
+          RXData.QSOPoints := 5;
+      end
+      else
+      begin
+        if (RXCty = 'JA') or (RXCty = 'JD1') then
+          RXData.QSOPoints := 1
+      end;
+    {
+        MQPQSOPointMethod:
+          if RXData.Callsign = 'W0EF' then
+            RXData.QSOPoints := 10
+          else
+            if RXData.Mode = CW then
+              RXData.QSOPoints := 2
+            else
+              RXData.QSOPoints := 1;
+    }
+    NZFieldDayQSOPointMethod:
+      begin
+        if RXCty = 'ZL' then
+        begin
+          if RXData.Mode = CW then
+            RXData.QSOPoints := 5
+          else
+            RXData.QSOPoints := 3;
+        end
+        else
+          RXData.QSOPoints := 10;
+
+        if RXData.Zone = StrToInt(MyZone) then
+          RXData.ZoneMult := False;
+
+      end;
+
+    OKDXQSOPointMethod:
+      //      if (MyCountry = 'OK') or (MyCountry = 'OM') then
+      if OKOMStation(MyCountry) then
+      begin
+        if RXData.QTH.Continent <> Europe then
+          RXData.QSOPoints := 3
+        else
+          {//          if (RXCty <> 'OK') and (RXCty <> 'OM') then}if not
+          OKOMStation(RXCty) then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 0;
+      end
+      else
+        {//        if (RXCty = 'OK') or (RXCty = 'OM') then}if OKOMStation(RXCty)
+          then
+        begin
+          if MyContinent = Europe then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 3;
+        end
+        else
+          RXData.QSOPoints := 0;
+
+    OKOMSSBQSOPointMethod: // 4.80.1
+
+      if OKOMStation(MyCountry) then
+      begin
+        if ((MyCountry = 'OK') and (RXData.QTH.CountryID = 'OM')) or
+          ((MyCountry = 'OM') and (RXData.QTH.CountryID = 'OK')) then
+          RXdata.QSOPoints := 3
+        else if (RXCty = 'OK') or (RXCty = 'OM') then
+          RXData.QSOPoints := 2
+        else if RXData.QTH.Continent = Europe then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 5;
+      end
+      else if (RXCty = 'OK') or (RXCty = 'OM') then
+        RXData.QSOPoints := 10
+      else if RXCTY = MyCountry then
+        RXData.QSOPoints := 1
+      else if RXData.QTH.Continent <> MyContinent then
+        RXData.QSOPoints := 5
+      else
+        RXData.QSOPoints := 3;
+
+    RAEMQSOPointMethod:
+      begin
+
+        if LooksLikeAGeoCoordinates(MyState, la1, lo1) then
+          if LooksLikeAGeoCoordinates(RXData.QTHString, la2, lo2) then
+          begin
+            Distance := Abs(lo1 - lo2);
+            if Distance > 180 then
+              Distance := 360 - Distance;
+            RXData.QSOPoints := 50 + Abs(la2 - la1) + Distance;
+            if RXData.Callsign = 'RAEM' then
+              RXData.QSOPoints := RXData.QSOPoints + 300;
+            if la2 > 65 + 90 then
+              RXData.QSOPoints := RXData.QSOPoints + 100;
+            if la1 > 65 + 90 then
+              RXData.QSOPoints := round(RXData.QSOPoints * 1.1);
+          end;
+      end;
+
+    RACQSOPointMethod:
+      if RXCty = 'VE' then
+      begin
+        if pos('RAC', RXData.Callsign) > 0 then
+          RXData.QSOPoints := 20
+        else
+          RXData.QSOPoints := 10;
+      end
+      else
+        RXData.QSOPoints := 2;
+
+    RSGBQSOPointMethod:
+      if MyCountry = RXCty then
+        RXData.QSOPoints := 0
+      else
+        case RXData.QTH.Continent of
+          Europe: RXData.QSOPoints := 5;
+          Oceania: RXData.QSOPoints := 30;
+        else
+          RXData.QSOPoints := 15;
+        end;
+
+    RSGB160Method: // 4.67.1
+      begin
+        if (RXData.DomMultQTH <> '') and (mo.isdmmult(rxdata.dommultqth,
+          AllBands, both) =
+          TRUE) then
+          rxdata.qsopoints := 7
+        else if mo.isdxmult(RXData.QTH.Country, AllBands, both) = TRUE then
+          rxdata.qsopoints := 7
+        else
+          rxdata.qsopoints := 2;
         exit;
       end;
-      // he is not in EUnion -or- is same country
-      if (RXData.QTH.Continent <> MyContinent) then
-            RXData.QSOPoints := 5
-             else
-              if (RXCty <> MyCountry)  then
-               RXData.QSOPoints := 3
-                 else
-                 RXData.QSOPoints := 1;
- end;
- end;
-end;
 
+    RDAQSOPointMethod:
+      begin
+        RXData.QSOPoints := 0;
+        if RussianID(MyCountry) then
+        begin
+          if RussianID(RXCty) then
+          begin
+            if pos('/P', RXData.Callsign) = length(RXData.Callsign) - 1 then
+            begin
+              RXData.QSOPoints := 10;
+              Exit;
+            end;
+            RXData.QSOPoints := 1;
+            if RXData.QTH.Continent <> MyContinent then
+              RXData.QSOPoints := 2;
+            Exit;
+          end;
+          if RXData.QTH.Continent = MyContinent then
+            RXData.QSOPoints := 3
+          else
+            RXData.QSOPoints := 5;
+        end
+        else if RussianID(RXCty) then
+          RXData.QSOPoints := 10;
+      end;
+
+    RussianDXQSOPointMethod:
+      begin
+
+        if RussianID(MyCountry) then
+        begin
+          if RXData.QTH.Continent <> MyContinent then
+            RXData.QSOPoints := 5
+          else if RXCty <> MyCountry then
+            RXData.QSOPoints := 3
+          else
+            RXData.QSOPoints := 2;
+        end
+
+          { I am not in Russia }
+
+        else if RussianID(RXCty) then
+          RXData.QSOPoints := 10
+        else if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 5
+        else if RXCty <> MyCountry then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 2;
+        if Contest = RU3AXMEMORIAL then
+          if rxdata.Mode = Phone then
+            RXData.QSOPoints := RXData.QSOPoints * 2;
+      end;
+
+    SalmonRunQSOPointMethod:
+      begin
+        if RXData.Mode = CW then
+          RXData.QSOPoints := 4
+        else
+          RXData.QSOPoints := 2;
+      end;
+
+    ScandinavianQSOPointMethod:
+      begin
+        if ScandinavianCountry(MyCountry) then
+        begin
+          if ScandinavianCountry(RXCty) then
+            RXData.QSOPoints := 0
+          else if RXData.QTH.Continent = Europe then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 3;
+        end
+        else
+        begin
+          if ScandinavianCountry(RXCty) then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 0;
+
+          if MyContinent <> Europe then
+            if RXData.Band in [Band80, Band40] then
+              RXData.QSOPoints := RXData.QSOPoints * 3;
+        end;
+        if RXData.Band = Band160 then
+          RXData.QSOPoints := 0;
+      end;
+
+    IndonesianQSOPointMethod: // 4.64.1
+      begin
+        if IndonesianCountry(MyCountry) then
+        begin
+          if IndonesianCountry(RXCty) then
+            RXData.QSOPoints := 0
+          else if RXData.QTH.Continent <> MyContinent then
+            RXData.QSOPoints := 10
+          else
+            RXData.QSOPoints := 5;
+        end
+        else
+        begin
+          if IndonesianCountry(RXCty) then
+            RXData.QSOPoints := 10
+          else if RXData.QTH.Continent <> MyContinent then
+            RXData.QSOPoints := 3
+          else if RXCty <> MyCountry then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 1;
+        end;
+
+      end;
+
+    YBFT8QP: // 4.90.7
+      begin
+        if IndonesianCountry(MyCountry) then
+        begin
+          if IndonesianCountry(RXCty) then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 2;
+        end
+        else
+        begin
+          if IndonesianCountry(RXCty) then
+            RXData.QSOPoints := 2
+          else if RXCty <> MyCountry then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 0;
+        end;
+      end;
+
+    SLFivePointQSOMethod:
+      if Copy(RXData.Callsign, 1, 2) = 'SL' then
+        RXData.QSOPoints := 5
+      else
+        RXData.QSOPoints := 1;
+
+    SouthAmericanWWQSOPointMethod:
+      begin
+        if MyContinent = SouthAmerica then
+        begin
+          if RXData.QTH.Continent = SouthAmerica then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 10;
+        end
+        else if RXData.QTH.Continent = SouthAmerica then
+          RXData.QSOPoints := 10
+        else
+          RXData.QSOPoints := 2;
+      end;
+
+    StewPerryQSOPointMethod:
+      begin
+        if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
+        begin
+          Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+          RXData.QSOPoints := (Distance div 500) + 1;
+          if CategoryPower = cpQRP then
+            RXDATA.QSOPoints := RXDATA.QSOPoints * 3;
+          if CategoryPower = cpLOW then
+            RXDATA.QSOPoints := Round(RXData.QSOPoints * 1.5);
+        end
+        else
+          RXData.QSOPoints := 1;
+      end;
+
+    WWDigiQP: // 4.90.8
+      if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
+      begin
+        Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString);
+        RXData.QSOPoints := (Distance div 3000) + 1;
+      end;
+
+    TenTenQSOPointMethod:
+      if RXData.TenTenNum <> -1 then
+        RXData.QSOPoints := 2
+      else
+        RXData.QSOPoints := 1;
+
+    TOECQSOPointMethod:
+     begin
+      if RXData.QTH.Continent <> MyContinent then
+        RXData.QSOPoints := 3
+      else if StringHas(RXData.Callsign, '/M') then
+        RXData.QSOPoints := 3
+      else
+        RXData.QSOPoints := 1;
+     end;
+
+    UBAQSOPointMethod:
+      begin
+        if MyCountry = 'ON' then
+        begin
+          if RXCty = 'ON' then
+            RXData.QSOPoints := 1
+          else
+           if UBACountry(RXData.DXQTH) then
+            RXData.QSOPoints := 3
+          else
+            RXData.QSOPoints := 1;
+          exit;
+        end;
+
+        if RXCty = 'ON' then
+          RXData.QSOPoints := 10
+        else if UBACountry(RXCty) then       // 4.97.10
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 1;
+      end;
+
+    UkrainianQSOPointMethod:
+      begin
+
+        if RXCty = 'UR' then
+          RXData.QSOPoints := 10
+        else if RXCty = MyCountry then
+          RXData.QSOPoints := 1
+        else if RXData.QTH.Continent = MyContinent then
+          RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 3;
+        if MyCountry = 'UR' then
+        begin
+          if RXCty = 'UR' then
+            RXData.QSOPoints := 1;
+          RXData.DomesticMult := False;
+        end;
+      end;
+
+    VKZLQSOPointMethod:
+      if ((MyContinent = Oceania) or (RXData.QTH.Continent = Oceania)) then
+      begin
+        case RXData.Band of
+          Band160: RXData.QSOPoints := 20;
+          Band80: RXData.QSOPoints := 10;
+          Band40: RXData.QSOPoints := 5;
+          Band20: RXData.QSOPoints := 1;
+          Band15: RXData.QSOPoints := 2;
+          Band10: RXData.QSOPoints := 3;
+        end;
+      end
+      else
+        RXData.QSOPoints := 0;
+
+    WAGQSOPointMethod:
+      if MyCountry = 'DL' then
+      begin
+        if RXCty = 'DL' then
+          RXData.QSOPoints := 1
+        else if RXData.QTH.Continent = Europe then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 5;
+      end
+      else
+      begin
+        if RXCty = 'DL' then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 0;
+      end;
+
+    WAEQSOPointMethod:
+      if MyContinent = Europe then
+        if (RXData.QTH.Continent <> Europe) and (RXData.Band <> Band160) then
+          RXData.QSOPoints := 1
+        else
+          RXData.QSOPoints := 0
+      else if (RXData.QTH.Continent = Europe) and (RXData.Band <> Band160) then
+        RXData.QSOPoints := 1
+      else
+        RXData.QSOPoints := 0;
+
+    WWLQSOPointMethod:
+      begin
+        if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
+        begin
+          Distance := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+          RXData.QSOPoints := (Distance div 500) + 1;
+
+          if (RXData.Band = Band80) or (RXData.Band = Band160) then
+            RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+
+          if RXData.Band = Band160 then
+            RXData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+        end
+        else
+          RXData.QSOPoints := 1;
+      end;
+
+    YODXQSOPointMethod:
+      if RXCty = 'YO' then
+        RXData.QSOPoints := 8
+      else if MyCountry <> RXCty then
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 4
+        else
+          RXData.QSOPoints := 2
+      else
+        RXData.QSOPoints := 1; {KK1L: 6.71 Same country QSO}
+
+    NoQSOPointMethod: RXData.QSOPoints := 0;
+
+    AlwaysOnePointPerQSO: RXData.QSOPoints := 1;
+    OnePointPerQSO: RXData.QSOPoints := 1;
+    TwoPointsPerQSO: RXData.QSOPoints := 2;
+    ThreePointsPerQSO: RXData.QSOPoints := 3;
+    TenPointsPerQSO: RXData.QSOPoints := 10;
+
+    ThreePhoneFiveCWFourRTTY: // 4.55.4
+      case RXData.Mode of
+        CW: RXData.QSOPoints := 5;
+        Phone: RXData.QSOPoints := 3;
+      else
+        RXData.QSOPoints := 4;
+      end;
+
+    TwoPhoneFourCW:
+      if RXData.Mode = CW then
+        RXData.QSOPoints := 4
+      else
+        RXData.QSOPoints := 2;
+
+    TwoPhoneThreeCW:
+      if RXData.Mode = CW then
+        RXData.QSOPoints := 3
+      else
+        RXData.QSOPoints := 2;
+
+    OnePhoneTwoCW:
+      if RXData.Mode = CW then
+        RXData.QSOPoints := 2
+      else
+        RXData.QSOPoints := 1;
+
+    ThreePhoneFiveCW:
+      if RXData.Mode = CW then
+        RXData.QSOPoints := 5
+      else
+        RXData.QSOPoints := 3;
+
+    OneEuropeTwoOther: {KK1L: 6.68 Used for WRTC 2002}
+      if MarineOrAirMobileStation(RXData.Callsign) then
+        RXData.QSOPoints := 2
+      else if RXData.QTH.Continent = Europe then
+        RXData.QSOPoints := 1
+      else
+        RXData.QSOPoints := 2;
+
+    CupRFMethod:
+      begin
+
+        if (MyGrid <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
+        begin
+          Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString
+            {DomesticQTH});
+
+          if Distance > 7000 then
+            RXData.QSOPoints := 62;
+          if Distance <= 7000 then
+            RXData.QSOPoints := 57;
+          if Distance <= 6000 then
+            RXData.QSOPoints := 52;
+          if Distance <= 5000 then
+            RXData.QSOPoints := 47;
+          if Distance <= 4000 then
+            RXData.QSOPoints := 42;
+          if Distance <= 3000 then
+            RXData.QSOPoints := 38;
+          if Distance <= 2000 then
+            RXData.QSOPoints := 35;
+
+        end
+        else
+          RXData.QSOPoints := 1;
+
+      end;
+    UA4WMethod:
+      begin
+        RXData.QSOPoints := 2;
+
+        if GetOblast(MyCall) = '4W' then
+        begin
+          if RXData.DomesticQTH <> MyState then
+            RXData.QSOPoints := 4;
+          Exit;
+        end;
+
+        if RXData.DomesticQTH <> MyState then
+        begin
+          if RXData.Band = Band80 then
+            RXData.QSOPoints := 3;
+          if RXData.Band = Band160 then
+            RXData.QSOPoints := 5;
+
+          if GetOblast(RXData.Callsign) = '4W' then
+          begin
+            if RXData.Band = Band80 then
+              RXData.QSOPoints := 5;
+            if RXData.Band = Band160 then
+              RXData.QSOPoints := 10;
+            MyZoneValue := ctyGetCQZone(MyCall);
+            if MyZoneValue in [18, 19] then
+            begin
+              if RXData.Band = Band80 then
+                RXData.QSOPoints := 10;
+              if RXData.Band = Band160 then
+                RXData.QSOPoints := 20;
+            end;
+          end;
+        end;
+
+      end;
+
+    ChampionshipRFMethod:
+      begin
+        if RussianID(RXCty) then
+        begin
+          RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign);
+          if MyState = '' then
+            Exit;
+          if not (MyState[1] in ['1'..'7']) then
+            Exit;
+          if not (RXData.Zone in [1..7]) then
+            Exit;
+          RXData.QSOPoints := ChampionshipRFPointsArray[Ord(MyState[1]) - 48 +
+            (RXData.Zone - 1) * 7];
+        end;
+      end;
+
+    ChampionshipUkrMethod:
+      begin
+        if RXCty <> 'UR' then
+          Exit;
+        //if (RXData.Band = Band80) or (RXData.Band = Band160) then
+        RXData.QSOPoints := 2;
+      end;
+
+    WWPMCQSOPointMethod:
+      begin
+        RXData.QSOPoints := 5;
+        if MyState = '' then
+        begin
+          if RXData.QTHString <> '' then
+            RXData.QSOPoints := 25;
+        end
+        else
+        begin
+          if RXData.QTHString <> '' then
+            if MyState <> RXData.QTHString then
+              RXData.QSOPoints := 10;
+        end;
+      end;
+
+    JTDXQSOPointMethod:
+      begin
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 3
+        else if RXCty <> MyCountry then
+          RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 1;
+
+        if RXCty = 'JT' then
+          if MyCountry = 'JT' then
+            RXData.QSOPoints := 0;
+
+      end;
+
+    MMCQSOPointMethod: //n4af added for marcon memorial contest
+      begin
+
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 5
+        else if RXCty = MyCountry then
+          RXData.QSOPoints := 1
+        else
+          RXData.QSOPoints := 3;
+
+      end;
+
+    LZDXQSOPointMethod:
+      begin
+
+        if RXCty = 'LZ' then
+        begin
+          if MyCountry = 'LZ' then
+            RXData.QSOPoints := 1
+          else
+            RXData.QSOPoints := 10;
+        end
+        else
+        begin
+          if MyContinent <> RXData.QTH.Continent then
+            RXData.QSOPoints := 3
+          else
+            RXData.QSOPoints := 1;
+        end;
+      end;
+
+    OldNewYearQSOPointMethod:
+      begin
+        RXData.QSOPoints := RXData.Age {RXData.NumberReceived};
+      end;
+
+    YouthChampionshipRFMethod:
+      begin
+        //        if RussianID(RXCty) then
+        if RXData.Band in [Band40, Band20] then
+        begin
+
+          RXData.QSOPoints := 1;
+          RXData.DomMultQTH := GetRussiaOblastID(RXData.Callsign);
+
+        end;
+      end;
+
+    {   YOKQSOPointMethod:             // 4.55.4
+         RXData.QSOPoints:= 3;  }
+
+    ChampionshipRFASMethod:
+      if (MyState <> '') and (RXData.QTHString { .DomesticQTH} <> '') then
+        if StringIsAllNumbers(MyState) then
+        begin
+          la1 := StrToInt(RXData.QTHString[1]);
+          lo1 := StrToInt(Copy(RXData.QTHString, 2, 2));
+
+          la2 := StrToInt(MyState[1]);
+          lo2 := StrToInt(Copy(MyState, 2, 2));
+          RXData.QSOPoints := Abs(la1 - la2) + Abs(lo1 - lo2) + 5;
+          if RXData.Mode = CW then
+            RXData.QSOPoints := RXData.QSOPoints + 5;
+        end;
+
+    RegionOneFieldDayRCCQSOPointMethod:
+      begin
+        if MyContinent = RXData.QTH.Continent then
+          RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 3;
+        Result := pos('/P', RXData.Callsign);
+        if Result = 0 then
+          Result := pos('/M', RXData.Callsign);
+        if Result = length(RXData.Callsign) - 1 then
+          RXData.QSOPoints := 4;
+      end;
+
+    YL_ARCK_YL: // 4.66.3 YL-ARCK-YL
+      begin
+        if (RXData.NumberReceived = 88) then // YL # rcvd
+        begin
+          RXData.QSOPoints := 5;
+          exit; // now exit points processing
+        end;
+        RXData.Prefix := ''; // if <> yl # then clear the multiplier
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 1
+      end;
+
+    GACWWWSACWQSOPointMethod:
+      begin
+
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 3
+        else if RXCty <> MyCountry then
+          RXData.QSOPoints := 1
+        else
+          RXData.QSOPoints := 0; // end YL-ARCK-YL hooks
+        if RXData.QTH.Continent = SouthAmerica then
+          RXData.QSOPoints := 5;
+      end;
+
+    LQPQSOPointMethod:
+      begin
+        RXData.QSOPoints := 1000;
+        if (RXData.Name = 'LOCUST') or (RXData.Callsign = 'K6VVA') then
+          RXData.QSOPoints := 5000;
+      end;
+
+    ArktikaSpringQSOPointMethod:
+      begin
+        if RXData.DomMultQTH <> '' then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 1;
+      end;
+
+    REFQSOPointMethod:
+      begin
+        if not FrenchID(RXData.QTH.CountryID) then
+          Exit;
+
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 1;
+      end;
+
+    RadioMemoryQSOPointMethod:
+      begin
+        RXData.QSOPoints := RXData.Age;
+        Result := pos(' ', RXData.QTHString);
+        if Result <> 0 then
+        begin
+          TheirID := Copy(RXData.QTHString, Result + 1, 3);
+
+          if StringIsAllNumbers(TheirID) then
+            inc(RXData.QSOPoints, StrToInt(TheirID));
+        end;
+      end;
+
+    PCCQSOPointMethod: // 4.83.2
+      begin
+        if RXData.Band in [Band80..Band10] then
+
+          RXData.QSOPoints := 0;
+        result := length(RXData.QTHString); // found 'M' in recvd nr ?
+        if RXCty <> MyCountry then
+          RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 1;
+
+        if (RXData.QTHString[result] = 'M') and (StringIsAllNumbers(MyState))
+          then
+          inc(RXData.QSOPoints, 6)
+        else if (RXData.QTHString[result] = 'M') and (not
+          StringIsAllNumbers(MyState)) then
+          inc(RXData.QSOPoints, 2);
+
+      end;
+    
+      UNDXQSOPointMethod:
+      begin
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 5
+        else if RXCty <> MyCountry then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 2;
+
+        if RXCty = 'UN' then
+          if MyCountry <> 'UN' then
+            RXData.QSOPoints := 10;
+      end;
+
+    KingOfSpainQSOPointMethod:
+      begin
+        if not SpanishStation(RXCty) then
+          RXData.QSOPoints := 1
+        else
+        begin
+          if SpanishStation(MyCountry) then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 3;
+        end;
+      end;
+
+    GagarinCupQSOPointMethod:
+      begin
+
+        if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 4
+        else if RXCty <> MyCountry then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 2;
+
+        if RXData.Band in [Band160, Band80] then
+          RXData.QSOPoints := RXData.QSOPoints * 3;
+        if RXData.Band in [Band40] then
+          RXData.QSOPoints := RXData.QSOPoints * 2;
+        if RXData.Band = Band2 then
+          RXData.QSOPoints := 100;
+      end;
+
+    CQMMQSOPointMethod:
+      begin
+        if RXData.Band in [Band80..Band10] then
+        begin
+          PtsMult := integer(RXData.Band in [Band40, Band80]) + 1;
+          if RXData.QTH.Continent <> MyContinent then
+          begin
+            RXData.QSOPoints := 3 * PtsMult;
+          end
+          else if RXCty <> MyCountry then
+            RXData.QSOPoints := 2 * PtsMult
+          else
+            RXData.QSOPoints := 1;
+
+          if (length(RXData.QTHString) = 3) then
+            if (RXData.QTHString[3] in ['M', 'Q', 'Y']) then
+              RXData.QSOPoints := 10;
+
+        end;
+      end;
+
+    Radio160QSOPointMethod:
+      begin
+        if length(RXData.DomMultQTH) = 2 then
+        begin
+          if RXData.DomMultQTH[1] in ['A'..'Z'] then
+          begin
+            if RXData.DomMultQTH[2] in ['0'..'9'] then
+              if length(MyState) >= 2 then
+              begin
+                la1 := Abs(Ord(UpCase(RXData.DomMultQTH[1])) - Ord(MyState[1]))
+                  + 1;
+                la2 := Abs(Ord(UpCase(RXData.DomMultQTH[2])) - Ord(MyState[2]))
+                  + 1;
+                if la1 >= la2 then
+                  RXData.QSOPoints := la1
+                else
+                  RXData.QSOPoints := la2;
+                Exit;
+              end;
+            if RXData.DomMultQTH[2] = 'X' then
+              RXData.QSOPoints := 30;
+          end;
+        end;
+      end;
+
+    R9WUW9WKMemorialQSOPointMethod:
+      begin
+        //        if RXData.Callsign = 'R100W' then RXData.QSOPoints := 10
+        //        else
+        case RXData.Zone of
+          1, 2: RXData.QSOPoints := 3;
+          3: RXData.QSOPoints := 4;
+          5: RXData.QSOPoints := 10;
+        end;
+      end;
+
+    WRTCQSOPointMethod: // 4.72.10
+      if RXData.Band in [Band80..Band10] then
+      begin
+
+        if RXData.QTH.Continent = Europe then
+          RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 5;
+
+      end;
+
+    PortugalDay: // 4.71.4
+      begin
+        if (RXCty = 'CT') and (MyCountry <> 'CT') then
+          RXData.QSOPoints := 10
+        else if (RXCty = 'CT') and (MyCountry = 'CT') then
+          RXData.QSOPoints := 5
+        else if RXData.QTH.Continent <> MyContinent then
+          RXData.QSOPoints := 2
+        else
+          RXData.QSOPoints := 1;
+      end;
+
+    RPX:
+      begin
+
+        if (RXCty = 'UA') or (RXCty = 'UA2') or (RXCty = 'UA9') then
+          RXData.QSOPoints := 10
+        else
+          RXData.QSOPoints := 5;
+
+      end;
+
+    UQRQCPM: // 4.82.3
+      begin
+        if (RXData.QTH.Continent <> MyContinent) then
+          RXData.QSOPoints := 4
+        else if (RXCty <> MyCountry) then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 2;
+      end;
+
+    OKOMRTTY: // 4.83.4
+      begin
+        if RXData.Band in [Band80..Band40] then
+          if (RXData.QTH.Continent <> MyContinent) then
+            RXData.QSOPoints := 6
+          else
+            RXData.QSOPoints := 3;
+
+        if RXData.Band in [Band20..Band10] then
+          if (RXData.QTH.Continent <> MyContinent) then
+            RXData.QSOPoints := 2
+          else
+            RXData.QSOPoints := 1;
+      end;
+
+    EUDXQSOPointMethod: // 4.95.6
+      {  QSO Points
+      a. European Union stations:
+      QSO with your own country – 1 points,
+      QSO with European Union country – 10 points,
+      QSO with a different country on your continent – 3 points,
+      QSO with another continent – 5 points.
+      b. Non- European Union stations:
+      QSO with European Union – 10 points,
+      QSO with your own country – 1 points,
+      QSO with a different country on your continent – 3 points,
+      QSO with another continent – 5 points.
+
+       begin
+         if MyState[4] <> '' then  // I AM IN EUnion
+          begin
+            if (RXData.DomMultQTH[4] <> '') then     // he is in EU
+             if (RXCty = MyCountry) then      // but in my country
+              RXData.QSOPoints := 1
+               else
+                rxdata.qsopoints := 10;     // he is eu but not my country
+         if (RXData.DomMultQTH[4] = '') then     // he is NOT in EU, but I am
+          if (RXData.QTH.Continent <> MyContinent) then     // not eu not my continent
+              RXData.QSOPoints := 5
+               else
+                if (RXCty <> MyCountry) then
+                 RXData.QSOPoints := 3;
+                 exit;
+          end;
+
+        if MyState[4] = '' then       //  I AM NOT IN EUnion
+         if RXData.DomMultQTH[4] <> '' then   // he is  in EU
+          rxdata.qsopoints := 10
+            else
+             if (RXData.QTH.Continent <> MyContinent) then
+              RXData.QSOPoints := 5
+               else
+                if (RXCty <> MyCountry) then
+                 RXData.QSOPoints := 3
+                  else
+                RXData.QSOPoints := 1;
+       end;
+       }
+      begin
+        if (RXData.DomMultQTH[4] <> '') then // he is in EU
+        begin
+          if (RXCty <> MyCountry) then // Not same country as me
+            RXData.QSOPoints := 10
+          else
+            RXData.QSOPoints := 1;
+          exit;
+        end;
+        // he is not in EUnion -or- is same country
+        if (RXData.QTH.Continent <> MyContinent) then
+          RXData.QSOPoints := 5
+        else if (RXCty <> MyCountry) then
+          RXData.QSOPoints := 3
+        else
+          RXData.QSOPoints := 1;
+      end;
+  end;
+end;
 
 procedure SendMultiInfoMessage(Band: BandType; Mode: ModeType; Message: Str80);
 
@@ -8281,7 +8276,7 @@ begin
 
     RSTAndFOCNumberExchange: //n4af
       ProcessExchange := ProcessRSTAndPowerExchange(ExchangeString, RData);
-        //n4af
+    //n4af
 
     AgeAndQSONumberExchange: ProcessExchange :=
       ProcessAgeAndQSONumberExchange(ExchangeString, RData);
@@ -8306,12 +8301,12 @@ begin
     GridExchange:
       ProcessExchange := ProcessGridSquareExchange(ExchangeString, RData);
 
-   Grid2Exchange:
+    Grid2Exchange:
       ProcessExchange := ProcessGrid2Exchange(ExchangeString, RData);
 
-   RSTAndGrid3Exchange:
-      ProcessExchange := ProcessRSTAndGrid3Exchange(ExchangeString, RData);        // 4.96.3
-
+    RSTAndGrid3Exchange:
+      ProcessExchange := ProcessRSTAndGrid3Exchange(ExchangeString, RData);
+        // 4.96.3
 
     RSTAndPostalCodeExchange:
       ProcessExchange := ProcessRSTAndPostalCodeExchange(ExchangeString, RData);
@@ -8374,16 +8369,18 @@ begin
 
     RSTQSONumberOrDomesticQTHExchange:
       ProcessExchange :=
-        ProcessRSTQSONumberorDomesticQTHExchange(ExchangeString, RData); // 4.53.2
+        ProcessRSTQSONumberorDomesticQTHExchange(ExchangeString, RData);
+          // 4.53.2
 
     RSTQSONumberAndPossibleDomesticQTHExchange:
       ProcessExchange :=
-        ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
+        ProcessRSTQSONumberAndPossibleDomesticQTHExchange(ExchangeString,
+          RData);
 
     QSONumberAndPossibleDomesticQTHExchange:
       ProcessExchange :=
         ProcessQSONumberAndPossibleDomesticQTHExchange(ExchangeString, RData);
-        {KK1L: 6.73}
+    {KK1L: 6.73}
 
     RSTQSONumberAndRandomCharactersExchange:
       ProcessExchange :=
@@ -8415,7 +8412,8 @@ begin
 
     QSONumberPrecedenceCheckDomesticQTHExchange:
       ProcessExchange :=
-        ProcessQSONumberPrecedenceCheckDomesticQTHExchange(ExchangeString, RData);
+        ProcessQSONumberPrecedenceCheckDomesticQTHExchange(ExchangeString,
+          RData);
 
     RSTLongJAPrefectureExchange: {KK1L: 6.72 JA}
       begin
@@ -8425,14 +8423,12 @@ begin
       end;
 
     RSTZoneOrDomesticQTH:
-      if (DomesticCountryCall(RData.Callsign) or (not (StringisAllNumbersorSpaces(exchangestring)))) then       // 4.77.6
+      if (DomesticCountryCall(RData.Callsign) or (not
+        (StringisAllNumbersorSpaces(exchangestring)))) then // 4.77.6
         ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString,
           RData)
       else
         ProcessExchange := ProcessRSTAndZoneExchange(ExchangeString, RData);
-
-
-
 
   end; { of case }
 end;
@@ -8454,9 +8450,9 @@ end;
 procedure ProcessPartialCallAndInitialExchange(RXData: ContestExchange);
 
 begin
-          if PartialCallEnable or ExchangeMemoryEnable then         // n4af 40.40.1
+  if PartialCallEnable or ExchangeMemoryEnable then // n4af 40.40.1
     //     AddCallToPartialList(RXData.Callsign, GetInitialExchangeStringFromContestExchange(RXData));
-     GetInitialExchangeStringFromContestExchange(RXData); // n4af 40.40.1       }
+    GetInitialExchangeStringFromContestExchange(RXData); // n4af 40.40.1       }
 end;
 
 procedure CreateAndSendSAPMultiInfoMessage;
@@ -8552,7 +8548,7 @@ begin
 end;
 
 function DomStringParse(InputString: Str14): Str14;
-  //Gav 4.44.8     Formats DOM from Initial Exchange to be used for Mult Needed display. Most DOM pass through untouched
+//Gav 4.44.8     Formats DOM from Initial Exchange to be used for Mult Needed display. Most DOM pass through untouched
 
 var
   Index: integer;
@@ -8866,7 +8862,7 @@ begin
     else
     begin // ny4i Issue163 There is something else here - Error
       sCategory := '';
-        // Used to force an TC_IMPROPERARRLFIELDDAYCLASS error later
+      // Used to force an TC_IMPROPERARRLFIELDDAYCLASS error later
       break; // jump to next part to evaluate error
     end;
   end;

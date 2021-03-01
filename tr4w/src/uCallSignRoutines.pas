@@ -28,7 +28,7 @@ const
   ARRLSectionCountryString              = ' K VE KC6 KG4 KL KH0 KH1 KH2 KH3 KH4 KH5 KH6 KH7 KH8 KH9 KP1 KP2 KP3 KP4 KP5 ';
   BlackSeaCountriesString               = ' OE ZA EU LZ E7 HA DL 4L I Z3 ER SP UA YO OM S5 TA UR 9A 4O OK HB YU ';
   CISCountries                          = ' UA UA2 UA9 UR EU 4J EK UN EX ER EY EZ UK 4L ';
-  UBAEuroCountryString                  = ' 5B 9H CT CT3 CU DL EA EA6 EA8 EI ES F FG FM FR FY  HA I IS LX LY LZ OE OH OH0 OJ0 OK OM OZ PA S5 SM SP SV SV5 SV9 SY TK YL YO ';   // 4.96.2
+  UBAEuroCountryString                  = ' 5B 9A 9H CT CT3 CU DL EA EA6 EA8 EI ES F FG FM FR FY  HA I IS LX LY LZ OE OH OH0 OJ0 OK OM OZ PA S5 SM SP SV SV5 SV9 SY TK YL YO ';   // 4.96.2
   ScandinavianCountries                 = ' LA JW JX OH OH0 OJ0 OX OY OZ SM TF ';
   IndonesianCountries                   = ' YB YC YD YE YF ';           // 4.64.1
 function ARRLSectionCountry(CountryID: Str20): boolean;

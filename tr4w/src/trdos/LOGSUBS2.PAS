@@ -348,44 +348,16 @@ begin
       Digital: ActiveMode := Phone;
     else ActiveMode := CW;
     end;
-      {      if (ActiveMode = Phone) and (ActiveBand >= Band6) and (not FMMode) then
-              FMMode := True
-            else
-              begin
-                FMMode := False;
-                if DigitalModeEnable then
-                  begin
-                    case ActiveMode of
-                      Phone: ActiveMode := CW;
-                      CW: ActiveMode := Digital;
-                      Digital: ActiveMode := Phone;
-                      else ActiveMode := CW;
-                    end;
-                  end
-                else
-                  case ActiveMode of
-                    Phone: ActiveMode := CW;
-                    CW: ActiveMode := Phone;
-                    else ActiveMode := CW;
-                  end;
-              end;
-      }
+
     EditingCallsignSent := False;
     DisplayBandMode(
       ActiveBand,
       ActiveMode,
-        {
-        (ActiveBand <= Band10) or
-        (ActiveBand = Band30) or
-        (ActiveBand = Band17) or
-        (ActiveBand = Band12)
-        wli
-        }
-      True
+        True
       );
     DisplayCodeSpeed;
       {KK1L: 6.73 This gets done in UpdateTimeAndRateDisplay. Only do if no radio connected.}
-    if (ActiveRadio = RadioOne) and ((Radio1.tCATPortType = NoPort) or (not Radio1.PollingEnable)) then
+    if ((ActiveRadio = RadioOne) and ((Radio1.tCATPortType <> NoPort)) or (not Radio1.PollingEnable)) then
       Radio1.ModeMemory {ModeMemory[RadioOne]} := ActiveMode
     else
       if (ActiveRadio = RadioTwo) and ((Radio2.tCATPortType = NoPort) or (not Radio2.PollingEnable)) then
