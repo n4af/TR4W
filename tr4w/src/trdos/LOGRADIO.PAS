@@ -2710,10 +2710,10 @@ begin
             tKenwood14Bytes[1] := VFO;
             AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 14);
 
-            if VFO = 'B' then
-               begin
-               AddToOutputBuffer {WriteToCATPort}('FR1;FT1;', 8);
-               end; //temporary active vfo is vfo b for set mode
+            //if VFO = 'B' then
+            //   begin
+            //   AddToOutputBuffer {WriteToCATPort}('FR1;FT1;', 8);
+            //   end; //temporary active vfo is vfo b for set mode
 
             case Mode of
                CW:
@@ -2741,26 +2741,23 @@ begin
                      end;
                   end; { USB }
                end;
-            if Mode = Digital then
+            if (Mode = Digital) and (ActiveRadioPtr.CurrentStatus.Mode = Digital) then
                begin
-               if ActiveRadioPtr.CurrentStatus.Mode <> Digital then
-                  begin
-                  tKenwood14Bytes[0] := 'M';
-                  tKenwood14Bytes[1] := 'D';
-                  tKenwood14Bytes[2] := CHR(TempByte);
-                  tKenwood14Bytes[3] := ';';
-                  AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 4);
-                  end
-               else
-                  begin
-                  logger.debug('Skipping Kenwod mode change because MODE was already DIGITAL');
-                  end;
-               end;
+               logger.debug('Skipping Kenwod mode change because MODE was already DIGITAL');
+               end
+            else
+               begin
+               tKenwood14Bytes[0] := 'M';
+               tKenwood14Bytes[1] := 'D';
+               tKenwood14Bytes[2] := CHR(TempByte);
+               tKenwood14Bytes[3] := ';';
+               AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 4);
+               end
 
-            if (VFO = 'B') then
-               begin
-               AddToOutputBuffer {WriteToCATPort}('FR0;FT0;', 8);
-               end; //back to vfo a
+            //if (VFO = 'B') then
+            //   begin
+            //   AddToOutputBuffer {WriteToCATPort}('FR0;FT0;', 8);
+            //   end; //back to vfo a
             // TLogger.GetInstance.Debug('Leaving Kenwood code');
             end;
          end;
@@ -2832,7 +2829,7 @@ begin
                if not skipMode then
                   begin   // Build VFO and frequency into Command $25, mode and filter byte into command $26
                   // Mode - Command $26
-                  CommandsTempBuffer[0] := CHR(10);
+                  CommandsTempBuffer[0] := CHR(11);
                   CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
                   CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
                   CommandsTempBuffer[3] := CHR(ReceiverAddress);
@@ -2846,18 +2843,43 @@ begin
                      begin
                      CommandsTempBuffer[6] := Chr(1);
                      end;
+                  if Mode = FM then
+                     begin
+                     CommandsTempBuffer[7] := Chr(5); //TempChar := #5;
+                     end
+                  else if Mode = CW then
+                     begin
+                     CommandsTempBuffer[7] := Chr(3); //TempChar := #3;
+                     end
+                  else if Mode = Digital then
+                     begin
+                     CommandsTempBuffer[7] := Chr(4); //TempChar := #4;
+                     end
+                  else
+                     begin      //must be phone
+                     if Freq < 10000000 then
+                        begin
+                        CommandsTempBuffer[7] := Chr(0); //TempChar := #0;
+                        end
+                     else
+                        begin
+                        CommandsTempBuffer[7] := Chr(1); //TempChar := #1;
+                        end;
+                     end;
+
+                 // CommandsTempBuffer[7] := Chr(TempByte);
 
                   if mode = Digital then                  // Sets Data mode setting field
                      begin
-                     CommandsTempBuffer[7] := Chr(1);
+                     CommandsTempBuffer[8] := Chr(1);
                      end
                   else
                      begin
-                     CommandsTempBuffer[7] := Chr(0);
+                     CommandsTempBuffer[8] := Chr(0);
                      end;
 
-                  CommandsTempBuffer[8] := CHR(CalculateIcomFilterWidth);
-                  CommandsTempBuffer[9] := ICOM_END_OF_MESSAGE_CODE;
+                  CommandsTempBuffer[9] := CHR(CalculateIcomFilterWidth);
+                  CommandsTempBuffer[10] := ICOM_END_OF_MESSAGE_CODE;
                   AddCommandToBuffer;
                   end;
                   // Now send frequency for selected VFO
