@@ -357,7 +357,7 @@ begin
       );
     DisplayCodeSpeed;
       {KK1L: 6.73 This gets done in UpdateTimeAndRateDisplay. Only do if no radio connected.}
-    if ((ActiveRadio = RadioOne) and ((Radio1.tCATPortType <> NoPort)) or (not Radio1.PollingEnable)) then
+     if ((ActiveRadio = RadioOne)  and ((Radio1.tCATPortType <> NoPort)) or (not Radio1.PollingEnable))  then
       Radio1.ModeMemory {ModeMemory[RadioOne]} := ActiveMode
     else
       if (ActiveRadio = RadioTwo) and ((Radio2.tCATPortType = NoPort) or (not Radio2.PollingEnable)) then

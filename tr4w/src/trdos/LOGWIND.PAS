@@ -1561,7 +1561,7 @@ begin
     Exit;
 
   LastDisplayedBand := Band;
-  LastDisplayedMode := Mode;
+  LastDisplayedMode := Mode;  
   //  LastDisplayedFMMode := FMMode;
 
   UpdateTotals2;
