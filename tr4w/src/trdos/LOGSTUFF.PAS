@@ -6584,6 +6584,11 @@ begin
 
       end;
 
+      MWCQP:               // 4.98.1
+      begin
+       RXData.QSOPoints := 1;
+       RXData.DomMultQTH := RXData.callsign[length(rxdata.callsign)];
+      end;
     HelvetiaQSOPointMethod: // issue 214
       if RXCty = 'HB' then
         RXData.QSOPoints := 10

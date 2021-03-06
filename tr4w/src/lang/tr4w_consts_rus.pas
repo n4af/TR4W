@@ -38,6 +38,7 @@ const
   TC_DISBALE_CIV                        = 'Отключите режим "CI-V Transceive" в трансивере ICOM.';
 
   {MAIN}
+  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
   TC_IRTS                               = 'EI/GI, enter your County';
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Вы используете последнюю версию';
   TC_SET_VALUE_OF_SET_NOW               = 'Необходимо установить значение команды %s. Установить сейчас?';

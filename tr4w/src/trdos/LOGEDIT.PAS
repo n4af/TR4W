@@ -653,6 +653,7 @@ begin
     TempBand := Band;
   OutputValue := GetMultArray(Call, TempMode, '');
   Result := (OutputValue and (1 shl Cardinal(TempBand))) <> 0;
+ 
   //  Exit;
 
   //  ClearContestExchange(TempRXData);

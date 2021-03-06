@@ -2741,7 +2741,7 @@ begin
                      end;
                   end; { USB }
                end;
-            if (Mode = Digital) and (ActiveRadioPtr.CurrentStatus.Mode = Digital) then
+            if (Mode = Digital) and (ActiveRadioPtr.CurrentStatus.Mode = Digital) then  // 4.97.11
                begin
                logger.debug('Skipping Kenwod mode change because MODE was already DIGITAL');
                end

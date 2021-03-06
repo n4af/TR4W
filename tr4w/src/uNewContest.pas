@@ -279,7 +279,8 @@ begin
               Exit;
             end;
             case SelectedContest of
-
+            MWC:
+            ;
               ALRS_UA1DZ_CUP:
                 SetCommentAndEnableEditControl(TC_ENTERYOURRDAIDORGRID, icmyState);
 

@@ -37,6 +37,7 @@ const
   TC_DISBALE_CIV                        = 'vypnout "CI-V Transceive" mód v transceiveru ICOM';
 
   {MAIN}
+  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'používáš poslední (aktuální) verzi';
   TC_SET_VALUE_OF_SET_NOW               = 'nastavit nyní hodnotu %s ?';
   TC_CONFIGURATION_FILE                 = 'Konfiguraèní soubor';

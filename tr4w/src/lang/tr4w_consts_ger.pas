@@ -29,6 +29,7 @@
   TC_DISBALE_CIV                        = 'Disable "CI-V Transceive" Mode in deiner ICOM Rig. Im Benutzerhandbuch zu deinem Transceiver nachsehen.';
 
   {MAIN}
+  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Du benutzt die aktuellste Version';
   TC_SET_VALUE_OF_SET_NOW               = 'Wert setzen auf %s. Jetzt setzen?';
   TC_CONFIGURATION_FILE                 = 'Konfigurationsdatei';

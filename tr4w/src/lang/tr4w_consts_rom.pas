@@ -42,6 +42,7 @@ const
   TC_DISBALE_CIV                        = 'Anulez modul "CI-V Transceive" din statia ICOM. Vezi manualul de operare al statiei.';
 
   {MAIN}
+  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Utilizeaza ultima versiune';
   TC_SET_VALUE_OF_SET_NOW               = 'Inscrie valoarea lui %s. Inscriu acum?';
   TC_CONFIGURATION_FILE                 = 'Fisier de configurare';

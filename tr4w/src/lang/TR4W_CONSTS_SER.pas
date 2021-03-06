@@ -41,6 +41,7 @@ const
   TC_DISBALE_CIV                        = 'Iskljuci "CI-V Transceive" mod u svom ICOM uredjaju. Pogledaj u uputstvu za taj uredjaj.';
 
   {MAIN}
+  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Koristis poslednju verziju';
   TC_SET_VALUE_OF_SET_NOW               = 'Podesi vrednost za %s. Podesiti sada?';
   TC_CONFIGURATION_FILE                 = 'Konfiguraciona datoteka';

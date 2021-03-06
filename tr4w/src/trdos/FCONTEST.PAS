@@ -720,6 +720,7 @@ begin
           AddDomesticCountry('HB');
       end;
 
+
     OZCR_Z:
       begin
         ContestName := 'Очно-заочный чемпионат России - заочные участники';
@@ -821,6 +822,9 @@ begin
        begin
         ActiveBand := Band80;
         TourDuration := 60;
+        AddDomesticCountry('MWC');
+        TempRXData.DomMultQTH :=  TempRXData.Callsign[length(temprxdata.Callsign)]; //[length(call)];
+
        end;
 
     NAQSOCW, NAQSOSSB, NAQSORTTY:
