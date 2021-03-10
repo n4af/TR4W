@@ -5644,7 +5644,8 @@ var
   Grid1, Grid2: GridString;
   russianRegion1, russianRegion2: RussianRegionType;
   temphour: byte; // 4.58.2
-  iotastate: string[10];
+  iotastate,k    : string[10];
+  i,j            : integer;
 begin
   RXData.QSOPoints := 0;
   RXCty := RXData.QTH.CountryID; // 4.67.15
@@ -6377,9 +6378,9 @@ begin
           RXDATA.QSOPoints := 2
         else
           RXDATA.QSOPoints := 4;
-        if RXData.Callsign = 'VA7ODX' then
-          rxdata.QSOPoints := rxdata.qsopoints + 20;
-      end;
+     {   if RXData.Callsign = 'VA7ODX' then
+          rxdata.QSOPoints := rxdata.qsopoints + 20;    }
+        end;
 
     PAQSOPointMethod: // 4.74.3
       begin
@@ -6588,7 +6589,14 @@ begin
       begin
        RXData.QSOPoints := 1;
        RXData.DomMultQTH := RXData.callsign[length(rxdata.callsign)];
+   {    j :=   length(temprxdata.callsign);
+        k := temprxdata.callsign;
+        for i := 1 to j do                         // 4.98.3
+       if ((k[i] = '/') and  (k[i]  in ['A'..'Z'])) then
+               tempRXData.DomMultQTH :=  TempRXData.Callsign[i-1]; //[length(call)];
+        TempRXData.DomMultQTH :=  TempRXData.Callsign[length(temprxdata.Callsign)]; //[length(call)];   // 4.98.     }
       end;
+      
     HelvetiaQSOPointMethod: // issue 214
       if RXCty = 'HB' then
         RXData.QSOPoints := 10
