@@ -6588,15 +6588,17 @@ begin
       MWCQP:               // 4.98.1
       begin
        RXData.QSOPoints := 1;
-       RXData.DomMultQTH := RXData.callsign[length(rxdata.callsign)];
-   {    j :=   length(temprxdata.callsign);
-        k := temprxdata.callsign;
+       j :=   length(rxdata.callsign);     // 4.98.3
+        k := RXdata.callsign;
         for i := 1 to j do                         // 4.98.3
-       if ((k[i] = '/') and  (k[i]  in ['A'..'Z'])) then
-               tempRXData.DomMultQTH :=  TempRXData.Callsign[i-1]; //[length(call)];
-        TempRXData.DomMultQTH :=  TempRXData.Callsign[length(temprxdata.Callsign)]; //[length(call)];   // 4.98.     }
+         if ((k[i] = '/') and  (k[i+1]  in ['A'..'Z'])) then
+           begin
+               RXData.DomMultQTH :=  k[i-1]; //[length(call)];    // throw away all after '/'
+               exit;
+          end;
+        RXData.DomMultQTH :=  k[j]; //[length(call)];   // 4.98.
       end;
-      
+
     HelvetiaQSOPointMethod: // issue 214
       if RXCty = 'HB' then
         RXData.QSOPoints := 10

@@ -186,7 +186,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.98.1' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.98.3' ;  // N4af     New Release
 
 
 
@@ -3310,7 +3310,7 @@ QSOPartiesCount = 16;
  ({Name: 'MWC';                        }Email: 'memorial-ok1wc.cz/index.php?page=logs';                      DF: 'mwc';                 WA7BNM:  0;  QRZRUID: 0 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTQSONumberExchange;          XM:NoDXMults; QP:MWCQP; ADIFName:'';   CABName:''),     // 4.98.1
  ({Name: 'IRTS ';                      }Email: 'IRTS.contests@gmail.com';             DF: 'ireland';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:NoDXMults; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:''),     // 4.95.6
  ({Name: 'EUDX';                       }Email: 'log.eudxc@gmail.com';    DF: 'EUDX';           WA7BNM:  000; {SK3BG: nil;    } QRZRUID: 0   ;         Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:CQDXCC; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:'') ,
- ({Name: 'BCQP';                       }Email: nil;                      DF: 've7_cty';                 WA7BNM:  473; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 16; AE: RSTDomesticorDXQTHExchange;                      XM:NoDXMults; QP:BCQPQSOPointMethod; ADIFName:'';   CABName:'')      // 4.97.6
+ ({Name: 'BCQP';                       }Email: nil;                      DF: 've7_cty';                 WA7BNM:  473; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 16; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:BCQPQSOPointMethod; ADIFName:'';   CABName:'')      // 4.97.6
 
 
     );
@@ -3713,7 +3713,7 @@ QSOPartiesCount = 16;
       ({Name: 'MWC';                        }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),       // 4.92.8
       ({Name: 'IRTS';                       }ciCDC0+ ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0) ,     // 4.93.1
       ({Name: 'EUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),     // 4.95.6
-      ({Name: 'BC QSO Party';               }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1)      // 4.97.6
+      ({Name: 'BC QSO Party';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0)      // 4.97.6
       );
 
 

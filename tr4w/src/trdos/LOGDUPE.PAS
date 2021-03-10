@@ -1809,7 +1809,8 @@ begin
     RXData.DomMultQTH := RXData.DomesticQTH;
 
   SkipDomesticMult:
-
+  if (Contest = BCQP) and (RXData.DomMultQTH = 'dx') then         // 4.98.2
+    exit;   // no mults for dx
   if (RXData.DomMultQTH <> '') and DoingDomesticMults then
     RXData.DomesticMult := mo.IsDmMult(RXData.DomMultQTH, GetAddMultBand(DomesticMultByBand, MultBand), MultMode);
 

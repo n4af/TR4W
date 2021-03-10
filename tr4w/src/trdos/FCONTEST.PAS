@@ -274,7 +274,9 @@ var
 
   TempDomesticQTHDataFileName           : PChar;
   TmpBuf                                : array[0..255] of Char;
-    TempOblast                       : Str2;
+    TempOblast                          : Str2;
+  i,j                                   : integer;
+  k                                     : str10;
 begin
   CTY.ctyCountryMode := ARRLCountryMode;  
 
@@ -341,8 +343,12 @@ begin
   case Contest of
 
   BCQP:
-  if MyCountry = 'VE7' then
-    AddDomesticCountry('VE7');     // 4.97.8
+  begin
+  ActiveDXMult := NoDXMults;
+    if MyCountry = 'VE7' then
+       AddDomesticCountry('VE7');     // 4.97.8
+
+   end;
 
     WINTERFIELDDAY:
       begin
@@ -542,6 +548,8 @@ begin
       QSOByMode := False;
       QSOByBand := True;
       end;
+
+
     CALQSOPARTY:
       begin
 //        if PWORD(@MyState[1])^ = $4143 {CA} then
@@ -821,9 +829,8 @@ begin
       MWC:
        begin
         ActiveBand := Band80;
-        TourDuration := 60;
         AddDomesticCountry('MWC');
-        TempRXData.DomMultQTH :=  TempRXData.Callsign[length(temprxdata.Callsign)]; //[length(call)];
+
 
        end;
 
