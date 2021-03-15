@@ -3299,10 +3299,10 @@ if TempRXData.DomMultQTH = '' then
                 push nrReceived
                 push HisZone
               end;
-//              if Contest = UA4N then
-//                wsprintf(CABRILLO_HISEX, '%02u%03u')
-//              else
-              wsprintf(CABRILLO_HISEX, '  %.4u   %03u');
+
+            wsprintf(CABRILLO_HISEX, '  %-4u   %0.3d');   // 4.98.4
+
+
               asm add esp,16
               end;
 

@@ -6591,7 +6591,7 @@ begin
        j :=   length(rxdata.callsign);     // 4.98.3
         k := RXdata.callsign;
         for i := 1 to j do                         // 4.98.3
-         if ((k[i] = '/') and  (k[i+1]  in ['A'..'Z'])) then
+         if ((k[i] = '/') and  (k[i+1]  in ['A'..'Z'])) then     // rules only speicify mult number following slash
            begin
                RXData.DomMultQTH :=  k[i-1]; //[length(call)];    // throw away all after '/'
                exit;
