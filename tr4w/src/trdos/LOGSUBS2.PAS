@@ -1280,9 +1280,9 @@ begin
   //  if not DDX(VerifyContact) then RXData.QSOPoints := 0;
      //  if not TailEnding then RemoveWindow(PossibleCallWindow);
   //  if Trace then Write('@');
-  if MobileCall(RXData.Callsign) and (ActiveDomesticMult = DomesticFile) then    // n4af 4.41.8 Add Q.P. Rover
+  if MobileCall(RXData.Callsign) and (ActiveDomesticMult = DomesticFile) and (RXData.DomesticQTH <> '')then    // n4af 4.41.8 Add Q.P. Rover  // 4.98.6
      RXData.Callsign := PrecedingString(RXData.Callsign,'/')  + '/' + RXData.DomesticQTH;  // n4af 4.41.7
- 
+
   if VisibleLog.CallIsADupe(RXData.Callsign, RXData.Band, RXData.Mode) or
     ((ActiveDomesticMult = GridSquares) and RoverCall(RXData.Callsign) and (NumberGridSquaresInList > 0)) then
     if not (ActiveQSOPointMethod = AlwaysOnePointPerQSO) then

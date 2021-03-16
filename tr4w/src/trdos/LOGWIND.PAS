@@ -4051,135 +4051,7 @@ begin
       end;
 
 end;
-{
-function TotalNumberQTCsProcessed: integer;
 
-var
-  Total, Station                   : integer;
-
-begin
-  if NumberQTCStations = 0 then
-  begin
-    TotalNumberQTCsProcessed := 0;
-    Exit;
-  end;
-
-  Total := 0;
-
-  for Station := 0 to NumberQTCStations - 1 do
-    Total := Total + QTCDataArray^[Station].NumberQTCs;
-
-  TotalNumberQTCsProcessed := Total;
-end;
-}
-{
-procedure AddQSOToPendingQTCList(Time: integer; Call: CallString; QSONumber: integer);
-
-var
-  TempString                       : Str20;
-
-begin
-  if TotalPendingQTCs >= PendingQTCArraySize - 1 then
-  begin
-    QuickDisplayError('Unable add QTCs.  Please send some and then restart the program.');
-    Exit;
-  end;
-
-  PendingQTCArray^[NextQTCToBeAdded].Time := Time;
-//  BigCompressFormat(Call, PendingQTCArray^[NextQTCToBeAdded].Call);
-  PendingQTCArray^[NextQTCToBeAdded].Call := Call;
-  PendingQTCArray^[NextQTCToBeAdded].QSONumber := QSONumber;
-
-  inc(NextQTCToBeAdded);
-
-  if NextQTCToBeAdded = PendingQTCArraySize then
-    NextQTCToBeAdded := 0;
-
-  if TotalPendingQTCs > PendingQTCArraySize - 30 then
-  begin
-    Str(PendingQTCArraySize, TempString);
-      //      QuickDisplayError('PLEASE send some QTCs!!  You are close to the ' + TempString + ' QTC limit.');
-            //         ReminderPostedCount := 60;
-  end;
-end;
-}
-{
-function TotalPendingQTCs: integer;
-
-begin
-  if NextQTCToBeAdded >= NextQTCToBeSent then
-    TotalPendingQTCs := NextQTCToBeAdded - NextQTCToBeSent
-  else
-    TotalPendingQTCs := (NextQTCToBeAdded + PendingQTCArraySize) - NextQTCToBeSent;
-end;
-}
-
-{
-function PopNextQTCToBeSent(var FullString: string; tQTCNR: integer): Str80;
-
-var
-  TimeString, QSONumberString, CallString: string;
-  CharPointer                      : integer;
-  TempPchar                        : PChar;
-  TempDWORD                        : DWORD;
-begin
-
-  if NextQTCToBeSent = NextQTCToBeAdded then // Nothing available
-  begin
-    PopNextQTCToBeSent := '';
-    Exit;
-  end;
-
-  Str(PendingQTCArray^[NextQTCToBeSent].Time, TimeString);
-
-  CallString := PendingQTCArray^[NextQTCToBeSent].Call;
-
-  if length(CallString) > 0 then
-    for CharPointer := 1 to length(CallString) do
-      if CallString[CharPointer] = ' ' then
-        CallString[CharPointer] := '/';
-
-  Str(PendingQTCArray^[NextQTCToBeSent].QSONumber, QSONumberString);
-
-  while length(TimeString) < 4 do TimeString := '0' + TimeString;
-
-  FullString := TimeString + ' ' + CallString + ' ' + QSONumberString;
-
-  if QTCMinutes then
-  begin
-    if (TimeString[1] = LastQTCTimeSent[1]) and
-      (TimeString[2] = LastQTCTimeSent[2]) then
-    begin
-      LastQTCTimeSent := TimeString;
-      Delete(TimeString, 1, 2);
-    end
-    else
-      LastQTCTimeSent := TimeString;
-  end;
-
-  //  PopNextQTCToBeSent := TimeString + ' ' + CallString + ' ' + QSONumberString;
-
-  //  TempDWORD := NextQTCToBeSent + 1;
-  asm
-            push pchar(QSONumberString)
-
-            push pchar(CallString)
-            push pchar(TimeString)
-            mov eax,dword ptr tQTCNR
-            push eax
-  end;
-  wsprintf(wsprintfBuffer, '%2u: %-5s%-16s%-6s');
-
-  PopNextQTCToBeSent := string(wsprintfBuffer);
-  asm add esp,24
-  end;
-
-  inc(NextQTCToBeSent);
-
-  if NextQTCToBeSent = PendingQTCArraySize then NextQTCToBeSent := 0;
-
-end;
-}
 
 procedure OutputQSOorMultStatusString(OutputString_Milt: ShortString {Str160});
 
@@ -4192,58 +4064,9 @@ begin
   //   FRM.MultiplierInformationWindow.Lines.Add(OutputString_Milt);
 
   //{WLI}    IF WhereX > 1 THEN WriteLn;     { Added in 6.28 }
-  {
-      IF Length (OutputString) <= ((MultiplierInformationWindowRX - MultiplierInformationWindowLX) + 2) - WhereX THEN
 
-  //         There is enough room for the whole string
-
-          Write (OutputString)
-      ELSE
-          BEGIN
-          IF StringHas (OutputString, CarriageReturn) THEN
-              BEGIN
-              WriteLn (PrecedingString (OutputString, CarriageReturn));
-
-              OutputString := PostcedingString (OutputString, CarriageReturn);
-
-              IF Copy (OutputString, 1, 1) = LineFeed THEN
-                  Delete (OutputString, 1, 1);
-
-              Write (OutputString);
-              END
-          ELSE
-              WHILE OutputString <> '' DO
-                  BEGIN
-                  Cursor := (MultiplierInformationWindowRX - MultiplierInformationWindowLX) + 2;
-
-                  IF WhereX > 1 THEN Cursor := (Cursor - WhereX) + 1;
-
-                  WHILE OutputString [Cursor] <> ' ' DO
-                      BEGIN
-                      Dec (Cursor);
-
-                      IF Cursor = 0 THEN
-                          BEGIN
-                          Write (OutputString);
-                          Exit;
-                          END;
-                      END;
-
-                  Write (Copy (OutputString, 1, Cursor - 1));
-                  Delete (OutputString, 1, Cursor);
-                  IF OutputString <> '' THEN WriteLn;
-                  END;
-          END;
- }
 end;
-{
-procedure DisplayPrefixInfo(Prefix: Str20);
 
-begin
-  if PrefixInfoFileName = '' then
-    Exit;
-end;
-}
 
 procedure DisplayUserInfo(Call: CallString);
 
@@ -4652,13 +4475,6 @@ begin
   tNewMultIndicatorPrevState := nCmndShow;
   Windows.ShowWindow(wh[mweNewMultStatus], nCmndShow);
 end;
-
-{
-procedure DisplayQuickMemoryMode;
-begin
-  Windows.EnableWindow(QuickMemoryWindowHandle, not QuickMemoryMode);
-end;
-}
 
 procedure DisplayLocalTime(Country: Word);
 label
