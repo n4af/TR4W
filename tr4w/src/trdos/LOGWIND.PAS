@@ -2773,37 +2773,7 @@ var
 begin
   if not BandMapEnable then Exit;
   tSetStartStopBandMode;
-  {
-    if BandMapAllBands then
-      begin
-        if VHFBandsEnabled then //KK1L: 6.64 Keep band map within contest limits
-          begin
-            StartBand := Band160;
-            StopBand := Band2;
-          end
-        else
-          begin
-            StartBand := Band160;
-            StopBand := Band12; //KK1L: 6.65 fixes WARC display enable
-          end;
-      end
-    else
-      begin
-        StartBand := BandMapBand;
-        StopBand := BandMapBand;
-      end;
 
-    if BandMapAllModes then
-      begin
-        StartMode := CW;
-        StopMode := Phone;
-      end
-    else
-      begin
-        StartMode := BandMapMode;
-        StopMode := BandMapMode;
-      end;
-  }
   for Band := StartBand to StopBand do
     for Mode := StartMode to StopMode do
     begin

@@ -1332,10 +1332,17 @@ begin
 //        ActiveInitialExchange := ZoneInitialExchange;
       end;
 
-    MINITEST:
+    MINITEST, MINI80:
       begin
-//        ActivePrefixMult := CallSignPrefix;
         ActiveBand := Band80;
+        MultipleBandsEnabled := False;
+        MultipleModesEnabled := False;
+        TourDuration := 10;
+      end;
+
+    MINI40:
+      begin
+        ActiveBand := Band40;
         MultipleBandsEnabled := False;
         MultipleModesEnabled := False;
         TourDuration := 10;
