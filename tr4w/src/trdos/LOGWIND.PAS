@@ -55,7 +55,7 @@ var
 
   //   StringInQuickDisplayWindow      : string;
   tBandMapCutoffFrequency               : integer;
-//  tDoubleMult                           : boolean;
+  IE_Switch                             : boolean = False;
   tBandMapPlaceHolder                   : CallString;
   tB4IndicatorPrevState                 : integer;
   tNewMultIndicatorPrevState            : integer;
@@ -5228,23 +5228,7 @@ begin
   DisplayAutoSendCharacterCount;
 end;
 
-{  REMOVECANDIDATE
-function GetInitialExchangeFromString(CMD: pShortString): InitialExchangeType;
-var
-  ie                                   : InitialExchangeType;
-begin
-  CMD^[Ord(CMD^[0]) + 1] := #0;
-  RESULT := NoInitialExchange;
-  for ie := High(NoInitialExchange) downto Low(NoInitialExchange) do
-  begin
-    if Windows.lstrcmp(@CMD^[1], InitialExchangeTypeStringArray[ie]) = 0 then
-    begin
-      RESULT := ie;
-      Break;
-    end;
-  end;
-end;
-}
+
 begin
   WindInit;
 end.

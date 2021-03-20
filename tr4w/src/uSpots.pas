@@ -33,11 +33,11 @@ uses
   Messages,
   LogEdit,
   LogPack,
+  LogSCP,
   Tree;
 
 type
 
-//  PSpotRecord = ^TSpotRecord;
 
   PSpotsList = ^TSpotsList;
   TSpotsList = array[0..1000] of TSpotRecord;
@@ -99,7 +99,6 @@ uses
   MainUnit,
   uNet,
   uBandmap,
-  LogDupe,
   LogWind;
 
 { TStringList }
@@ -116,6 +115,7 @@ label
 add;
 var
   i                          : integer;
+
 begin
       SetCursor;
       for i := 0 to FCount - 1 do
@@ -128,8 +128,11 @@ begin
             end;
       end;
       if Spot.FBand in [Band30, Band17, Band12] then Spot.FWARCBand := True;
-
+       if (InitialExchangeEntry(Spot.FCall) = ' ')  then
+        if (IE_Switch) then
+       exit;
       if FindSpot(Spot, Result) then goto Add;
+
       InsertSpot(Result, Spot);
       Add:
       FList^[Result] := Spot;

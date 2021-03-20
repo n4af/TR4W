@@ -2236,7 +2236,7 @@ begin
     Exit;
   end;
 }
-  //убрать
+  //??????
 {
   if Id = 'ICOM SET MODE' then
      begin

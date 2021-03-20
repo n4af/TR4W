@@ -2294,7 +2294,7 @@ begin
 
     //if TempString = '' then
   TempString := CallsignsList.GetIniitialExchange(Call);
-    // GetInitialExchange(Call);
+  //  GetInitialExchange(Call);
 
   //  if ActiveExchange = RSTPrefectureExchange then TempString := Copy(TempString, 2, 10);
 
