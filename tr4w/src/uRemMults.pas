@@ -90,63 +90,7 @@ begin
         end;
       end;
 }
-{
-    WM_SETCURSOR:
-      begin
-        GetCursorPos(pnt);
-        Windows.GetWindowRect(Windows.GetDlgItem(hwnddlg, 101), temprect);
 
-        Item := Windows.SendDlgItemMessage(hwnddlg, 101, LB_ITEMFROMPOINT, 0, MakeLong(pnt.X - temprect.Left, pnt.Y - temprect.Top));
-        Item := HiWord(Windows.SendDlgItemMessage(hwnddlg, 101, LB_GETITEMDATA, Item, 0));
-        if Item = PrevItem then Exit;
-        PrevItem := Item;
-        if (Item >= 0) and (Item < CTY.ctyNumberCountries) then
-        begin
-
-          Format(wsprintfBuffer, '%s (%s), %s, CQ %u, ITU %u',
-            @CTY.ctyTable[Item].Name,
-            @CTY.ctyTable[Item].ID[1],
-            tContinentArray[CTY.ctyTable[Item].DefaultContinent],
-            CTY.ctyTable[Item].DefaultCQZone,
-            CTY.ctyTable[Item].DefaultITUZone
-            );
-
-          ti.lpszText := wsprintfBuffer;
-          SendMessage(RemMultsDXToolTip, TTM_TRACKPOSITION, 0, MakeLong(pnt.X, pnt.Y + 25));
-        end
-        else
-        begin
-          ti.lpszText := nil;
-        end;
-        SendMessage(RemMultsDXToolTip, TTM_UPDATETIPTEXT, 0, integer(@ti));
-
-//--------------------------------------------
-        if not ShowToolTip then
-        begin
-          SendMessage(hwndTT, TTM_TRACKACTIVATE, 1, integer(@ti));
-          ShowToolTip := True;
-        end;
-
-        GetCursorPos(pnt);
-        Windows.GetWindowRect(Windows.GetDlgItem(hwnddlg, 101), temprect);
-
-        Item := Windows.SendDlgItemMessage(hwnddlg, 101, LB_ITEMFROMPOINT, 0, MakeLong(pnt.X - temprect.Left, pnt.Y - temprect.Top));
-        Item := HiWord(Windows.SendDlgItemMessage(hwnddlg, 101, LB_GETITEMDATA, Item, 0));
-        if (Item > 0) and (Item < CTY.ctyNumberCountries) then
-        begin
-          ti.lpszText := @CTY.ctyTable[Item].Name;
-          SendMessage(hwndTT, TTM_UPDATETIPTEXT, 0, integer(@ti));
-          SendMessage(hwndTT, TTM_TRACKPOSITION, 0, MakeLong(pnt.X, pnt.Y + 25));
-        end
-        else
-        begin
-          SendMessage(hwndTT, TTM_TRACKACTIVATE, 0, integer(@ti));
-          ShowToolTip := False;
-        end;
-//--------------------------------------------
-
-      end;
-}
     WM_DRAWITEM:
       begin
         Result := True;

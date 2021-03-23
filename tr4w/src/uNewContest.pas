@@ -281,6 +281,8 @@ begin
             case SelectedContest of
             MWC:
             ;
+            VAQP:
+            ;
 
               ALRS_UA1DZ_CUP:
                 SetCommentAndEnableEditControl(TC_ENTERYOURRDAIDORGRID, icmyState);

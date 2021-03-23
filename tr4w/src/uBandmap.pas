@@ -341,7 +341,7 @@ begin
         BandMapStatusBar := tWM_SETFONT(CreateWindow(STATUSCLASSNAME, nil, {SBT_NOBORDERS or} CCS_TOP or CCS_NOMOVEY or WS_CHILD or WS_VISIBLE, 100, 100, 100, 100, hwnddlg, 101, hInstance, nil), MainFixedFont);
         Windows.SendMessage(BandMapStatusBar, SB_SETBKCOLOR, 0, $00FFFF00);
 
-//        tLB_SETCOLUMNWIDTH(hwnddlg, BandMapItemWidth);
+        tLB_SETCOLUMNWIDTH(hwnddlg, BandMapItemWidth);           // 4.98.9
 
         BandMapEnable := True;
         SendMessage(BandMapStatusBar, SB_SETPARTS, 6, integer(@BMPanelWidth));

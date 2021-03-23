@@ -2660,7 +2660,8 @@ begin
     end;
     //         curspos := length(Result);
 //    Frm.ExchangeWindow . SetFocus;
-    tExchangeWindowSetFocus;
+  if not ie_check then
+   tExchangeWindowSetFocus;
 
     if InitialExchangeOverwrite then
     begin

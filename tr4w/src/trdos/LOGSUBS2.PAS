@@ -252,36 +252,7 @@ begin
     StationInformationCall := '';
     ShowStationInformation(@CallWindowString);
     DisplayGridSquareStatus(CallWindowString);
-      {
-            if BandMapEnable then
-              if GetRadioParameters(ActiveRadio, '', Frequency, Band, Mode, False, False) then
-                begin
-                  BandMapCursorFrequency := Frequency;
-                  VisibleLog.DetermineIfNewMult(CallWindowString, ActiveBand, ActiveMode, MultString);
-                  Mult := MultString <> '';
-                  NewBandMapEntry(CallWindowString, Frequency, 0, ActiveMode, False, Mult, BandMapDecayTime, True, MyCall);
-                end
-              else
-                if AskForFrequencies then
-                  begin
-                    asm
-                push CallWindowString
-                    end;
-                    wsprintf(wsprintfBuffer, FrequencyForCallInkHz);
-                    asm add esp,12
-                    end;
-                    Frequency := QuickEditFreq(wsprintfBuffer, 10);
-                    //          Frequency := QuickEditFreq(PChar(string('frequency for ' + CallWindowString + ' in kHz')), 10);
-                    if Frequency <> -1 then
-                      begin
-                        VisibleLog.DetermineIfNewMult(CallWindowString, ActiveBand, ActiveMode, MultString);
-                        Mult := MultString <> '';
-                        NewBandMapEntry(CallWindowString, Frequency, 0, ActiveMode, False, Mult, BandMapDecayTime, True, MyCall);
-                        BandMapCursorFrequency := Frequency; //KK1L: 6.68 band map will track manual entry
-                        JustLoadingBandMapWithNoRadio := True; //KK1L: 6.68
-                      end;
-                  end;
-      }
+      
     if DupeCheckSound = DupeCheckGratsIfMult then
     begin
       if VisibleLog.DetermineIfNewMult(CallWindowString, ActiveBand, ActiveMode)

@@ -31,6 +31,7 @@ uses
   WinSock2,
   Windows,
   Messages,
+  LogDupe,
   LogEdit,
   LogPack,
   LogSCP,
@@ -115,9 +116,10 @@ label
 add;
 var
   i                          : integer;
-
+  ie                         : str80;
 begin
       SetCursor;
+      ie_check := False;
       for i := 0 to FCount - 1 do
       begin
           if FList^[i].FBand = Spot.FBand then
@@ -128,14 +130,20 @@ begin
             end;
       end;
       if Spot.FBand in [Band30, Band17, Band12] then Spot.FWARCBand := True;
-       if (InitialExchangeEntry(Spot.FCall) = ' ')  then
-        if (IE_Switch) then
-       exit;
-      if FindSpot(Spot, Result) then goto Add;
+       if (IE_Switch) then
+       begin
+        ie_check := True;
+        if (InitialExchangeEntry(Spot.FCall) = '')  then
+           exit;
+       end;
 
+           if FindSpot(Spot, Result) then goto Add;
       InsertSpot(Result, Spot);
+
       Add:
       FList^[Result] := Spot;
+    //  if CallWinKeyDown then
+    //   Windows.SetFocus(wh[mweCall]);
     // end;
 
       if SendToNetwork then

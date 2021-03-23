@@ -2718,7 +2718,7 @@ if TempRXData.DomMultQTH = '' then
                push RSTSent
              end ;
   //            wsprintf(CABRILLO_MYEX, '%-3s  %-11s') ;      // n4af 4.70.3
-                wsprintf(CABRILLO_MYEX, '%-3s  %-5s') ;        // 4.88.3
+                wsprintf(CABRILLO_MYEX, '%-3s  %-8s') ;        // 4.98.11
  end ;
 
  if cMystate[1] = '' then

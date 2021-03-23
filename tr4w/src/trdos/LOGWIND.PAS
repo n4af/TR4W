@@ -53,7 +53,7 @@ const
 //T1 : Cardinal = 1800000;
 var
 
-  //   StringInQuickDisplayWindow      : string;
+  ie_check                              : boolean = false;
   tBandMapCutoffFrequency               : integer;
   IE_Switch                             : boolean = False;
   tBandMapPlaceHolder                   : CallString;

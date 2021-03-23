@@ -1194,7 +1194,7 @@ begin
 //        ContestName := 'Ten Ten QSO Party';
         Add_KVEKH6KL;
       end;
-   
+
 
     TEXASQSOPARTY:
       begin
