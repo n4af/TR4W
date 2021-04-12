@@ -498,7 +498,7 @@ begin
               UA4WCHAMPIONSHIP:
                 SetCommentAndEnableEditControl('Enter your RDA (for Russian stations) or four digit grid square:', icMyQTH);
 
-              ALLASIANCW, ALLASIANSSB, YOUTHCHAMPIONSHIPRF:
+              ALLASIANCW, ALLASIANSSB, YOUTHCHAMPIONSHIPRF, YOTA:
                 SetCommentAndEnableEditControl(TC_ENTERYOURAGEINMYSTATEFIELD, icmyState);
 
        {       UKRAINECHAMPIONSHIP:

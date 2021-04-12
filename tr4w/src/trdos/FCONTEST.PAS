@@ -419,7 +419,7 @@ begin
           ActivePrefixMult := Prefix;
       end;
 
-    ALLJA:
+    ALLJA, YOTA:
       begin
         ActiveBand := Band80;
 //        VHFBandsEnabled := True;

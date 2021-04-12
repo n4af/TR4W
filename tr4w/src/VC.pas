@@ -186,7 +186,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.99.0' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.99.1' ;  // N4af     New Release
 
 
 
@@ -951,7 +951,8 @@ type
     IRTS ,      // 4.93.1
     EUDX,        // 4.95.6
     BCQP,       // 4.97.7
-    VAQP
+    VAQP,
+    YOTA
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -2790,7 +2791,8 @@ type
     EUDXQSOPointMethod,     // 4.95.6
     BCQPQSOPointMethod,      // 4.97.6
     MWCQP,
-    VAQSOPointMethod
+    VAQSOPointMethod,
+    YOTAQSOPointMethod
     );
 
 const
@@ -2934,7 +2936,8 @@ const
      'EUDX',    // 4.95.6
      'MWCQP',
      'BC QSO PARTY',      // 4.97.6
-     'VA QSO PARTY'
+     'VA QSO PARTY',
+     'YOTA'
     );
 
 type
@@ -3319,7 +3322,8 @@ QSOPartiesCount = 17;
  ({Name: 'IRTS ';                      }Email: 'IRTS.contests@gmail.com';             DF: 'ireland';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:NoDXMults; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:''),     // 4.95.6
  ({Name: 'EUDX';                       }Email: 'log.eudxc@gmail.com';    DF: 'EUDX';           WA7BNM:  000; {SK3BG: nil;    } QRZRUID: 0   ;         Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:CQDXCC; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:'') ,
  ({Name: 'BCQP';                       }Email: nil;                      DF: 've7_cty';                 WA7BNM:  473; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 16; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:BCQPQSOPointMethod; ADIFName:'';   CABName:''),      // 4.97.6
- ({Name: 'VA QSO Party';               }Email: nil;                      DF: 'va_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 17; AE: QSONumberDomesticOrDXQTHExchange;                XM:NoDXMults; QP:VAQSOPointMethod; ADIFName:'VA-QSO-PARTY';   CABName:'')      // 4.88.2
+ ({Name: 'VA QSO Party';               }Email: nil;                      DF: 'va_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 17; AE: QSONumberDomesticOrDXQTHExchange;                XM:NoDXMults; QP:VAQSOPointMethod; ADIFName:'VA-QSO-PARTY';   CABName:''),      // 4.88.2
+ ({Name: 'YOTA';                       }Email: nil;                      DF: 'YOTA';                 WA7BNM:   0; {SK3BG: nil;    } QRZRUID: 0; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:YOTAQSOPointMethod; ADIFName:'YOTA';   CABName:'')
 
     );
 
@@ -3452,7 +3456,7 @@ QSOPartiesCount = 17;
       'UBA-DX-CW',
       'UBA-DX-SSB',
       'UCG',
-      'UKRAINE CHAMPIONSHIP',         
+      'UKRAINE CHAMPIONSHIP',
       'UKRAINIAN',
       'DARC-WAEDC-CW',
       'DARC-WAEDC-SSB',
@@ -3507,7 +3511,8 @@ QSOPartiesCount = 17;
       'IRTS',        // 4.93.1
       'EUDX',         // 4.95.6
       'BCQP',          // 4.97.6
-      'VAQP'
+      'VAQP',
+      'YOTA'
      );
 
   const
@@ -3672,7 +3677,7 @@ QSOPartiesCount = 17;
       ({Name: 'UBA-CW';                     }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'UBA-SSB';                    }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'UCG';                        }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'UKRAINE CHAMPIONSHIP';       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),        
+      ({Name: 'UKRAINE CHAMPIONSHIP';       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'UKRAINIAN';                  }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'DARC-WAEDC-CW';              }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'DARC-WAEDC-SSB';             }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
@@ -3727,7 +3732,9 @@ QSOPartiesCount = 17;
       ({Name: 'IRTS';                       }ciCDC0+ ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0) ,     // 4.93.1
       ({Name: 'EUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),     // 4.95.6
       ({Name: 'BC QSO Party';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),      // 4.97.6
-      ({Name: 'VA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0)
+      ({Name: 'VA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
+      ({Name: 'YOTA';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0)
+
       );
 
 
