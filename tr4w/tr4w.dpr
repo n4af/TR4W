@@ -136,13 +136,6 @@ begin
 //    WM_MOUSEWHEEL: SetStackPointerOnMouseWheel(SHORT(HiWord(Cardinal(wParam))));
     WM_TRAYBALLON:
       begin
-//        ShowMessage(inttopchar(lParam));
-//        if (LoWord(lParam) = NIN_BALLOONTIMEOUT) or (LoWord(lParam) = NIN_BALLOONUSERCLICK) then Balloon_DeleteTrayIcon;
-{
-        if lParam <> 1026 then //��������� ����
-          if lParam <> 1028 then //�������� ����
-            if lParam <> 512 then //mouse move
-}
 
       end;
     WM_TIMECHANGE:
