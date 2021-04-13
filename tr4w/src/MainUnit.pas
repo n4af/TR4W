@@ -2743,8 +2743,8 @@ begin
 
     menu_ctrl_cursorinbandmap:
       begin
- //    TuneRadioToSpot(@tspotrecord,RadioType);
- //   windows.SetFocus(bandmaplistbox);
+        if tWindowsExist(tw_BANDMAPWINDOW_INDEX) then
+          Windows.SetFocus(BandMapListBox);
       end;
 
     menu_ctrl_cursorintelnet:
