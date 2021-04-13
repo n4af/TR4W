@@ -4923,7 +4923,7 @@ Domestic:
 
   if ColumnsArray[logColAge].Enable then
   begin
-    if RXData.Age <> 0 then
+ //   if RXData.Age <> 0 then  // 4.99.3
     begin
       elvi.iSubItem := ColumnsArray[logColAge].pos; //Ord(logColAge);
       elvi.pszText := inttopchar(RXData.Age);

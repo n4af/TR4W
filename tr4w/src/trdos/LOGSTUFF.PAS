@@ -3241,8 +3241,8 @@ begin
     inc(NumberEntries);
   end;
 
-  if (NumberEntries = 1) and ((length(Entries[0]) = 2) or (length(Entries[0]) =
-    3)) then
+  if (NumberEntries = 1) and ((length(Entries[0]) = 1) or (length(Entries[0]) =             // 4.99.3
+    2)) then
   begin
     TempInt := StrToInt(Entries[0]);
     if TempInt > 255 then
@@ -7742,11 +7742,12 @@ begin
       end;
      YOTAQSOPointMethod:
    begin
+   RXData.DomMultQTH := '';
    if rxdata.QTH.Continent <> MyContinent then
     RXData.QSOPoints := 3
      else
       RXData.QSOPoints := 1;
-    if rxdata.Age < 26 then
+    if (RXdata.Age > 0)and (RXData.Age <26) then
     begin
      RXData.DomMultQTH := inttostr(RXData.Age);
      Case RXData.Age  of
