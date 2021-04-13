@@ -7740,16 +7740,18 @@ begin
         else
           RXData.QSOPoints := 1;
       end;
-     YOTAQSOPointMethod:
+
+     YOTAQSOPointMethod:             // 4.99.3
    begin
-   RXData.DomMultQTH := '';
-   if rxdata.QTH.Continent <> MyContinent then
-    RXData.QSOPoints := 3
-     else
-      RXData.QSOPoints := 1;
-    if (RXdata.Age > 0)and (RXData.Age <26) then
-    begin
-     RXData.DomMultQTH := inttostr(RXData.Age);
+    RXData.DomMultQTH := inttostr(RXData.Age);
+    if (RXData.Age > 25) or (RXData.Age = 0) then
+     begin
+      if rxdata.QTH.Continent <> MyContinent then
+       RXData.QSOPoints := 3
+        else
+         RXData.QSOPoints := 1;
+       exit;
+     end;
      Case RXData.Age  of
       1..11   : RXData.QSOPoints := RXData.QSOPoints + 13;
       12..16  : RXData.QSOPoints := RXData.QSOPoints + 12;
@@ -7758,7 +7760,6 @@ begin
      end;
     end;
 
-   end;
 
   end;
 
