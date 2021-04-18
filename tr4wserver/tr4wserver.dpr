@@ -7,10 +7,10 @@ uses
   Windows,
   Messages,
   tr4wserverUnit in 'src\tr4wserverUnit.pas',
-  uCRC32 in '..\tr4w\src\uCRC32.pas',
+  uCRC32 in '..\src\uCRC32.pas',
   winsock2 in '..\include\WinSock2.pas',
-  TF in '..\tr4w\src\TF.pas',
-  VC in '..\tr4w\src\vc.pas';
+  TF in '..\src\TF.pas',
+  VC in '..\src\vc.pas';
 
 {$R res\tr4wserver.res}
 

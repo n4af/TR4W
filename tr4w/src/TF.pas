@@ -24,7 +24,7 @@ interface
 uses
 
   VC,
-utils_text,
+  utils_text,
   Windows,
   Messages;
 
