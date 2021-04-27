@@ -176,7 +176,7 @@ begin
         Offset := SizeOf(Cardinal);
         FirstPacket := False;
         LogSize := PInteger(@SyncNetBuffer)^;
-      end;
+       end;
       sWriteFile(NewServerLogHandle, SyncNetBuffer[Offset], i - Offset);
       TotalBytes := TotalBytes + i - Offset;
       tSetDlgItemIntFalse(GetServerLogWnd, 108, TotalBytes);
