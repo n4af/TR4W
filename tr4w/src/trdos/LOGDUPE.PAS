@@ -1350,34 +1350,7 @@ var
   Mode                                  : ModeType;
 
 begin
-{
-  for Band := Band160 to AllBands do
-    for Mode := CW to Both do
-      QTotals[Band, Mode] := 0;
 
-  if OpenFileForRead(FileRead, LogFileName) then
-  begin
-    while not Eof(FileRead) do
-    begin
-      repeat
-        ReadLn(FileRead, TempString);
-        Band := GetLogEntryBand(TempString);
-      until (Band <> NoBand) or Eof(FileRead);
-
-      Mode := GetLogEntryMode(TempString);
-
-      if (Band <> NoBand) and (Mode <> NoMode) then
-      begin
-        ExpandTabs(TempString);
-        inc(QTotals[Band, Mode]);
-        inc(QTotals[Band, Both]);
-        inc(QTotals[All, Mode]);
-        inc(QTotals[All, Both]);
-      end;
-    end;
-    Close(FileRead);
-  end;
-}
 end;
 
 procedure EnumInitialEx(FileString: PShortString);
@@ -2544,131 +2517,12 @@ begin
       RFChampionchipZones: MaxNumberOfZones := 7;
     else MaxNumberOfZones := 0;
     end;
-{
-    if MaxNumberOfZones > 0 then
-      for Band := StartBand to FinishBand do
-        for Mode := StartMode to FinishMode do
-        begin
-          if RemMultMatrix[Band, Mode, rmZone] = nil then
-                //                        IF MaxAvail > SizeOf (RemainingMultList) THEN
-          begin
 
-            New(RemMultMatrix[Band, Mode, rmZone]);
-            for Address := 0 to MaxNumberOfZones - 1 do
-              RemMultMatrix[Band, Mode, rmZone]^[Address] := True;
-          end;
-
-          CancelOutRemainingMultsWeHaveWorked(Band, Mode, rmZone);
-        end;
-}
   end;
 
-  {IF ActiveDomesticMult = DomesticFile THEN}
-  {KK1L: 6.68 Supports saving dom mults when using a dom mult file at any time}
-{
-  if (DoingDomesticMults and (DomesticQTHDataFileName <> '')) then
-  begin
 
-    if Contest in [RDA, RFCHAMPIONSHIPCW, RFCHAMPIONSHIPSSB] then
-    begin
-      StartBand := All;
-      FinishBand := All;
-    end;
-
-    if DomQTHTable.NumberRemainingMults > 0 then
-      for Band := StartBand to FinishBand do
-        for Mode := StartMode to FinishMode do
-        begin
-          if RemMultMatrix[Band, Mode, rmDomestic] = nil then
-                //                        IF MaxAvail > SizeOf (RemainingMultList) THEN
-          begin
-            New(RemMultMatrix[Band, Mode, rmDomestic]);
-
-            for Address := 0 to DomQTHTable.NumberRemainingMults - 1 do
-              RemMultMatrix[Band, Mode, rmDomestic]^[Address] := True;
-          end;
-          CancelOutRemainingMultsWeHaveWorked(Band, Mode, rmDomestic);
-        end;
-  end;
-}
-end;
-{
-function GetDupeBit(b: Byte): boolean;
-begin
-  Result := boolean(b and ceSETDUPEBITMASK);
 end;
 
-procedure SetDupeBit(var b: Byte);
-begin
-  b := b or ceSETDUPEBITMASK;
-end;
-
-procedure ResetDupeBit(var b: Byte);
-begin
-  b := b and ceRESETDUPEBITMASK;
-end;
-
-function GetDeletedBit(b: Byte): boolean;
-begin
-  Result := boolean(b and ceSETDELETEDBITMASK);
-end;
-
-procedure SetDeletedBit(var b: Byte);
-begin
-  b := b or ceSETDELETEDBITMASK;
-end;
-
-procedure ResetDeletedBit(var b: Byte);
-begin
-  b := b and ceRESETDELETEDBITMASK;
-end;
-
-function GetSPBit(b: Byte): boolean;
-begin
-  Result := boolean(b and ceSETSPBITMASK);
-end;
-
-procedure SetSPBit(var b: Byte);
-begin
-  b := b or ceSETSPBITMASK;
-end;
-
-procedure ResetSPBit(var b: Byte);
-begin
-  b := b and ceRESETSPBITMASK;
-end;
-
-function GetSendBit(b: Byte): boolean;
-begin
-  Result := boolean(b and ceSETSENDEDBITMASK);
-end;
-
-procedure SetSendBit(var b: Byte);
-begin
-  b := b or ceSETSENDEDBITMASK;
-end;
-
-procedure ResetSendBit(var b: Byte);
-begin
-  b := b and ceRESETSENDEDBITMASK;
-end;
-}
-{
-procedure SetStatusBit(var StatusByte: Byte; Bit: CEBits);
-begin
-  StatusByte := StatusByte or (1 shl Ord(Bit));
-end;
-
-procedure ResetStatusBit(var StatusByte: Byte; Bit: CEBits);
-begin
-  StatusByte := StatusByte and not (1 shl Ord(Bit));
-end;
-
-function GetStatusBit(StatusByte: Byte; Bit: CEBits): boolean;
-begin
-  Result := (StatusByte and (1 shl Ord(Bit))) <> 0;
-end;
-}
 begin
   //{WLI}    HeapError := @HeapFunc;
   DupeInit;

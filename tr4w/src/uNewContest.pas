@@ -339,7 +339,7 @@ begin
 
               JIDXCW, JIDXSSB:
                 SetCommentAndEnableEditControl(TC_PREFECTURE, icmyState);
-          
+
             end;
           end;
 
@@ -510,6 +510,11 @@ begin
 
               CUPURAL:
                 SetCommentAndEnableEditControl(TC_ENTERFIRSTTWOLETTERSOFYOURGRID, icmyState);
+
+
+       //        IN7QPNE:
+       //'/}         SetCommentAndEnableEditControl(TC_IN7QPNE, icmyState);
+
             end;
 
           end;

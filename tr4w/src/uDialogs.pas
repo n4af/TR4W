@@ -901,21 +901,7 @@ begin
   1:
   FreeLibrary(CommDlgLibHandle);
 end;
-{
-procedure OpenPathDlg(hOpenFile: HWND; hControl: HWND; FilterString: PChar);
-begin
-   ofn.lStructSize := SizeOf(TOpenFileName);
-   ofn.hwndOwner := hOpenFile;
-   ofn.hInstance := hInstance;
-   ofn.lpstrFilter := FilterString;
-   ofn.lpstrFile := wsprintfBuffer //Lenin_Buffer;
-   ofn.nMaxFile := MAXSIZE;
-   ofn.Flags := OFN_FILEMUSTEXIST or OFN_PATHMUSTEXIST or OFN_LONGNAMES or OFN_HIDEREADONLY;
-   if GetOpenFileName(ofn)
-      then SendMessage(hControl, WM_SETTEXT, 0, integer(ofn.lpstrFile))
-   else SendMessage(hControl, EM_SETSEL, 0, 0);
-end;
-}
+
 
 procedure SaveFileDlg(hSaveFile: HWND; hControl: {THandle wli} HWND; FilterString: PChar);
 begin
@@ -975,44 +961,9 @@ begin
     FreeLibrary(Shell32LibHandle);
   end;
 
-{
-  FillChar(BrowseInfo, SizeOf(TBrowseInfo), #0);
-  BrowseInfo.hwndOwner := tr4whandle;
-  BrowseInfo.pszDisplayName := DisplayName;
-  BrowseInfo.ulFlags := BIF_RETURNONLYFSDIRS;
-  lpItemID := SHBrowseForFolder(BrowseInfo);
-  if lpItemId <> nil then
-  begin
-    SHGetPathFromIDList(lpItemID, Folder);
-    GlobalFreePtr(lpItemID);
-  end;
-}
+
 end;
 
-{
-function ShowProperties(hwndOwner: HWND; const FileName: string): boolean;
-var
-  Info                                  : _SHELLEXECUTEINFOA;
-begin
-//   Fill in the SHELLEXECUTEINFO structure
-  with Info do
-  begin
-    cbSize := SizeOf(Info);
-    fMask := SEE_MASK_NOCLOSEPROCESS or SEE_MASK_INVOKEIDLIST or SEE_MASK_FLAG_NO_UI;
-    wnd := hwndOwner;
-    lpVerb := 'properties';
-    lpFile := PChar(FileName);
-    lpParameters := nil;
-    lpDirectory := nil;
-    nShow := 0;
-    hInstApp := 0;
-    lpIDList := nil;
-  end;
-   //Call Windows to display the properties dialog
-  Result := ShellExecuteEx(@Info);
-end;
-}
-//function ShellExecuteEx; external shell32 Name 'ShellExecuteExA';
 
 end.
 

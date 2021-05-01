@@ -1,5 +1,6 @@
-Domestic template for Indiana stations in IN QSO Party
+;Domestic template for Indiana stations in IN QSO Party
 
 INCLUDE FILE in_cty.dom
 INCLUDE FILE S50.DOM
 INCLUDE FILE P13.DOM
+DX = DX

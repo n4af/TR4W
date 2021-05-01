@@ -227,7 +227,8 @@ begin
 end;
 
 procedure SetUpGlobalsAndInitialize;
-
+var
+FileName : str40;
 begin
 
 
@@ -239,6 +240,9 @@ begin
 
   if DomQTHDataFileName[0] <> #0 then
   begin
+   if fileexists(TR4W_DOM_FILENAME) then                       // 4.100.2
+    Format(wsprintfBuffer, '%s', TR4W_DOM_FILENAME)
+    else
     Format(wsprintfBuffer, '%sdom\%s', TR4W_PATH_NAME, DomQTHDataFileName);
     Windows.ZeroMemory(@DomQTHDataFileName, SizeOf(DomQTHDataFileName));
     Windows.lstrcat(DomQTHDataFileName, wsprintfBuffer);
@@ -533,28 +537,7 @@ var
   Grid                                  : ShortString;
 begin
 
-{
-  case ActiveExchange of
-    NameAndDomesticOrDXQTHExchange: SetUpNameAndStateExchange;
 
-    RSTQSONumberExchange: SetUpRSTQSONumberExchange;
-
-    RSTDomesticQTHExchange,
-      RSTAndContinentExchange,
-      RSTAndQSONumberOrFrenchDepartmentExchange,
-      RSTAndQSONumberOrDomesticQTHExchange,
-      RSTDomesticQTHOrQSONumberExchange:
-
-      if MyState = '' then SetUpRSTQSONumberExchange else SetUpRSTMyStateExchange;
-
-    RSTZoneExchange:
-      if not (Contest in [JIDXCW, JIDXSSB]) then SetUpRSTMyZoneExchange;
-
-    RSTZoneOrSocietyExchange:
-      if MyState = '' then SetUpRSTMyZoneExchange else SetUpRSTMyStateExchange;
-
-  end;
-}
   tSPExchange := '';
   tCQExchange := '';
   Grid := Copy(MyGrid, 1, 4);

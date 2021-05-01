@@ -185,7 +185,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.99.6' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.100.1' ;  // N4af     New Release
 
 
 
@@ -951,7 +951,8 @@ type
     EUDX,        // 4.95.6
     BCQP,       // 4.97.7
     VAQP,
-    YOTA
+    YOTA,
+    IN7QPNE
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -2507,6 +2508,7 @@ var
   TR4W_PATH_NAME                        : FileNameType;
   TR4W_LOG_PATH_NAME                    : FileNameType;
   TR4W_LOG_FILENAME                     : FileNameType;
+  TR4W_DOM_FILENAME                     : FileNameType;   // 4.100.2
   TR4W_CFG_FILENAME                     : FileNameType;
   TR4W_RST_FILENAME                     : FileNameType;
   TR4W_SYN_FILENAME                     : FileNameType;
@@ -3076,7 +3078,7 @@ type
   end;
 
 const
-QSOPartiesCount = 17;
+QSOPartiesCount = 18;
 
   QSOParties                         : array[1..QSOPartiesCount] of TUSQSOPartyRecord =
   (
@@ -3097,7 +3099,8 @@ QSOPartiesCount = 17;
   (InsideStateDOMFile:'pa';         {OutsideStateDOMFile:'PA';         }StateName:'PA'),    // 4.74.3
   (InsideStateDOMFile:'in';         {OutsideStateDOMFile:'IN';         }StateName:'IN'),
   (InsideStateDOMFile:'ve7';        {OutsideStateDOMFile:'VE7';        }StateName: 'VE7'),
-  (InsideStateDOMFile:'va';         {OutsideStateDOMFile:'VA';         }StateName:'VA')
+  (InsideStateDOMFile:'va';         {OutsideStateDOMFile:'VA';         }StateName:'VA'),
+  (InsideStateDOMFile:'in7qpne';    {OutsideStateDOMFile:'IN7QPNE';    }StateName:'IN7QPNE')
   );
 {*)}
 
@@ -3322,12 +3325,9 @@ QSOPartiesCount = 17;
  ({Name: 'EUDX';                       }Email: 'log.eudxc@gmail.com';    DF: 'EUDX';           WA7BNM:  000; {SK3BG: nil;    } QRZRUID: 0   ;         Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:CQDXCC; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:'') ,
  ({Name: 'BCQP';                       }Email: nil;                      DF: 've7_cty';                 WA7BNM:  473; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 16; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:BCQPQSOPointMethod; ADIFName:'';   CABName:''),      // 4.97.6
  ({Name: 'VA QSO Party';               }Email: nil;                      DF: 'va_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 17; AE: QSONumberDomesticOrDXQTHExchange;                XM:NoDXMults; QP:VAQSOPointMethod; ADIFName:'VA-QSO-PARTY';   CABName:''),      // 4.88.2
- ({Name: 'YOTA';                       }Email: nil;                      DF: 'YOTA';                 WA7BNM:   0; {SK3BG: nil;    } QRZRUID: 0; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:YOTAQSOPointMethod; ADIFName:'YOTA';   CABName:'')
-
+ ({Name: 'YOTA';                       }Email: nil;                      DF: 'YOTA';                 WA7BNM:   0; {SK3BG: nil;    } QRZRUID: 0; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:YOTAQSOPointMethod; ADIFName:'YOTA';   CABName:'') ,
+ ({Name: 'IN7QPNE';                    }Email: nil;                      DF: 'in7qpne_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 18; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN7QPNE-QSO-PARTY';   CABName:'')     // 4.88.2
     );
-
-
-
 
 
 
@@ -3511,7 +3511,8 @@ QSOPartiesCount = 17;
       'EUDX',         // 4.95.6
       'BCQP',          // 4.97.6
       'VAQP',
-      'YOTA'
+      'YOTA',
+      'IN7QPNE'
      );
 
   const
@@ -3732,9 +3733,9 @@ QSOPartiesCount = 17;
       ({Name: 'EUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),     // 4.95.6
       ({Name: 'BC QSO Party';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),      // 4.97.6
       ({Name: 'VA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
-      ({Name: 'YOTA';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0)
-
-      );
+      ({Name: 'YOTA';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
+      ({Name: 'IN7QPNE     ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0)     // 4.99.7
+            );
 
 
 
