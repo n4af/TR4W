@@ -3232,7 +3232,8 @@ if TempRXData.DomMultQTH = '' then
                     push csQTHString
                     push RSTReceived
               end;
-              wsprintf(CABRILLO_HISEX, '%-3s %-7s');
+               wsprintf(CABRILLO_HISEX, '%-3s %-7s');
+          //    wsprintf(CABRILLO_HISEX, '%-13s %-15s');    // 4.100.3
               asm add esp,16
               end;
 
@@ -3254,9 +3255,8 @@ if TempRXData.DomMultQTH = '' then
                     push csQTHString
                     push RSTReceived
               end;
-              wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-              asm add esp,16
-              end;
+         wsprintf(CABRILLO_HISEX, '%-3s %-7s');
+       //         wsprintf(CABRILLO_HISEX, '%-3s %-20s'); // 4.100.3
 
               asm
                     push cMyState
@@ -3446,7 +3446,8 @@ if TempRXData.DomMultQTH = '' then
          if Contest = ARKTIKA_SPRING then
       nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-10s%-10s'#13#10)
      else
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-11s%-10s %-5s'#13#10);   // 4.92.8
+//      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-11s%-10s %-5s'#13#10);   // 4.92.8
+        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-15s%-10s %-5s'#13#10);   // 4.100.3
       asm add esp,24
       end;
 
