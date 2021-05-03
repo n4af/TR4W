@@ -185,7 +185,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.100.3' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.100.4' ;  // N4af     New Release
 
 
 
@@ -2212,7 +2212,7 @@ const
   menu_ctrl_viewlogdat                  = 10403;
   menu_ctrl_note                        = 10404;
   menu_ctrl_missmultsreport             = 10405;
-  menu_ctrl_ptt                         = 10406;    // 4.53.9
+  menu_ctrl_trpath                      = 10406;    // 4.53.9
   menu_ctrl_qtcfunctions                = 10407;
   menu_ctrl_recalllastentry             = 10408;
   menu_ctrl_viewpacketspots             = 10409;
