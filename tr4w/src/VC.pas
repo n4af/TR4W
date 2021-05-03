@@ -185,7 +185,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.100.4' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.100.5' ;  // N4af     New Release
 
 
 
@@ -2207,12 +2207,13 @@ const
   menu_ctrl_j                           = 10338;
 
   menu_ctrl_sendkeyboardinput           = 10400;
+  menu_ctrl_trpath                      = 10605;
   menu_ctrl_commtopacket                = 10401;
   menu_ctrl_cleardupesheet              = 10402;
   menu_ctrl_viewlogdat                  = 10403;
   menu_ctrl_note                        = 10404;
   menu_ctrl_missmultsreport             = 10405;
-  menu_ctrl_trpath                      = 10406;    // 4.53.9
+  menu_ctrl_ptt                         = 10406;    // 4.53.9
   menu_ctrl_qtcfunctions                = 10407;
   menu_ctrl_recalllastentry             = 10408;
   menu_ctrl_viewpacketspots             = 10409;
@@ -2256,7 +2257,7 @@ const
 
   menu_inactiveradio_cwspeedup          = 10513;
   menu_inactiveradio_cwspeeddown        = 10514;
-  //  menu_dupecheck_or_sp                  = 10507;
+
  // menu_alt_transfreq                    = 10311;   // 4.47.3 remove
   menu_home_page                        = 10606;
 //  menu_send_bug                         = 10605;

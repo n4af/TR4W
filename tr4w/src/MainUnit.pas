@@ -2656,7 +2656,12 @@ begin
         ShowFMessages(0);
       end;
 
-    menu_ctrl_ptt:         // 4.53.9
+     menu_ctrl_trpath:
+     begin
+      quickdisplay(tr4w_path_name);
+     end;
+    
+     menu_ctrl_ptt:         // 4.53.9
       begin
        if PTT_Set then
         begin
@@ -2669,7 +2674,7 @@ begin
           PTT_Set := True;
         end;
        end;
-       
+
     menu_ctrl_sendkeyboardinput:
       //         if (ActiveMode = CW) or (ActiveMode = Digital) then
       begin

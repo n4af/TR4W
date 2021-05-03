@@ -88,7 +88,7 @@
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Would you like to check for a possible newer version of  TR4W ?';
 
   {NEW CONTEST}
- // TC_IN7QPNE                            = 'Enter your IN/7QP/NE County or enter your state';
+
   TC_EUDX                               = 'EU country, enter your four character country code';
   TC_IRTS                               = 'EI/GI, enter your County';
   TC_LATEST_CONFIG_FILE                 = 'Latest config file';
@@ -550,6 +550,7 @@
   RC_DUPECHECKOAR                       = 'Dupe Check On Inactive Radio';
 
   RC_MEMPROGFUNC                        = 'Memory program function';
+  RC_TRPATH                             = 'Display TR4W execution path';
   RC_PRESS_C                            = 'Press &C to program a CQ function key.';
   RC_PRESS_E                            = 'Press &E to program an exchange/search and pounce function key.';
   RC_PRESS_O                            = 'Press &O to program the other non function key messages.';
