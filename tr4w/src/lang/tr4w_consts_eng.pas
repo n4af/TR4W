@@ -550,7 +550,7 @@
   RC_DUPECHECKOAR                       = 'Dupe Check On Inactive Radio';
 
   RC_MEMPROGFUNC                        = 'Memory program function';
-  RC_TRPATH                             = 'Display TR4W execution path';
+  RC_TRPAT                             = 'Display TR4W execution path';
   RC_PRESS_C                            = 'Press &C to program a CQ function key.';
   RC_PRESS_E                            = 'Press &E to program an exchange/search and pounce function key.';
   RC_PRESS_O                            = 'Press &O to program the other non function key messages.';
