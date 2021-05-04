@@ -490,6 +490,7 @@ const
     ({Name: 'FTDX5000';   } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
     ({Name: 'FTDX9000';   } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
     ({Name: 'IC78';       } BR:BR1200;  P: 1; C: 0; S: 0; T:0; RA: $62; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
+    ({Name: 'IC705';      } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $A4; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC706';      } BR:BR1200;  P: 1; C: 0; S: 0; T:0; RA: $48; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC706II';    } BR:BR1200;  P: 1; C: 0; S: 0; T:0; RA: $4E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'IC706IIG';   } BR:BR1200;  P: 1; C: 0; S: 0; T:0; RA: $58; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
@@ -576,8 +577,8 @@ const
       'FTDX3000',
       'FTDX5000',
       'FTDX9000',
-
       'IC78',
+      'IC705',
       'IC706',
       'IC706II',
       'IC706IIG',
@@ -3389,16 +3390,16 @@ const
    ra: array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
    RadioSupportsCWByCAT := [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000,
-                            FLEX, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
+                            FLEX, IC705, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
                             IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
       [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000, FLEX, FT450, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
-      IC756PROIII, IC910, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
+      IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
       IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
-   IcomRadiosThatSupportRIT := [IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
-   IcomRadiosThatSupportVFOB := [IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
+   IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
+   IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
    ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];

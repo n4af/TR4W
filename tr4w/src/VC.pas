@@ -999,6 +999,7 @@ type
     FTDX5000,
     FTDX9000,
     IC78,
+    IC705,
     IC706,
     IC706II,
     IC706IIG,
