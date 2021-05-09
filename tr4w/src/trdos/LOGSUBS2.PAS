@@ -119,7 +119,8 @@ uses
   //OZCHR,
   uProcessCommand,
   MainUnit,
-  uRadioPolling;
+  uRadioPolling,
+  StrUtils;
 procedure CreateAndSendPacketSpot(PacketSpotCall: CallString; PacketSpotFreq: LONGINT);
 
 begin
@@ -2661,6 +2662,7 @@ begin
                  '</dynamicresults>' + sLineBreak;
   udp.BroadcastEnabled := true;
   udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+  logger.Debug('UDP Score = %s',[sBuf]);
   end;
 end;
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
@@ -2684,9 +2686,11 @@ begin
             #9 + '<call>' + RXData.Callsign + '</call>' + sLineBreak +
             #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
+            #9 + '<ID>' + Format('%d',[Ord(RXData.ceQSOID1)]) + Format('%d',[Ord(RXData.ceQSOID2)]) + '</ID>' + sLineBreak +
       '</contactdelete>'+ sLineBreak ;
       udp.BroadcastEnabled := true;
       udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+      logger.Debug('UDP Deleted QSO = %s',[sBuf]);
       end;
 end;
 procedure LogContactToUDP(RXData: ContestExchange);
@@ -2736,6 +2740,7 @@ begin
                sMode := ExtendedModeStringArray[RXData.extMode];
                end;
        end; // of case
+    sMode := ExtendedModeStringArray[RXData.extMode];  // ExtendedMode isgetting clobbered somewhere and set to NoMode.
     if RxData.ceComputerID = #0 then
        begin
        sComputerID := ' ';
@@ -2753,7 +2758,7 @@ begin
        sOperator := CurrentOperator;
        end;
     nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
-    sBuf := '<?xml version="1.0"?>' + sLineBreak +
+    sBuf := '<?xml version="1.0 encoding="utf-8"?>' + sLineBreak +
             '<contactinfo>' +  sLineBreak +
             #9 + '<app>TR4W</app>' + sLineBreak +
             #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
@@ -2794,9 +2799,9 @@ begin
             #9 + '<zone>' + Format('%d',[RxData.QTH.Zone]) + '</zone>' + sLineBreak +
             #9 + '<prec>' + {sPrecedence +} '</prec>' + sLineBreak +
             #9 + '<ck>' + Format('%d',[RxData.Check]) + '</ck>' + sLineBreak +                // TODO
-            #9 + '<ismultiplier1>0</ismultiplier1>' + sLineBreak +
-            #9 + '<ismultiplier2>0</ismultiplier2>' + sLineBreak +
-            #9 + '<ismultiplier3>0</ismultiplier3>' + sLineBreak +
+            #9 + '<ismultiplier1>' + Format('%d',[IfThen(RxData.DomesticMult,1,0)]) + '</ismultiplier1>' + sLineBreak +
+            #9 + '<ismultiplier2>' + Format('%d',[IfThen(RxData.DXMult,1,0)]) + '</ismultiplier2>' + sLineBreak +
+            #9 + '<ismultiplier3>' + Format('%d',[IfThen(RxData.ZoneMult,1,0)]) + '</ismultiplier3>' + sLineBreak +
             #9 + '<points>' + Format('%d',[RXData.QSOPoints]) + '</points>' + sLineBreak +
             #9 + '<radionr>' + Format('%d',[Ord(RxData.ceRadio)]) + '</radionr>' + sLineBreak +
             #9 + '<RoverLocation></RoverLocation>' + sLineBreak +
@@ -2806,11 +2811,13 @@ begin
             #9 + '<NetBiosName>' + GetLocalComputerName + '</NetBiosName>' + sLineBreak +
             #9 + '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' + sLineBreak +
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
+            #9 + '<ID>' + Format('%d',[Ord(RXData.ceQSOID1)]) + Format('%d',[Ord(RXData.ceQSOID2)]) + '</ID>' + sLineBreak +
+            #9 + '<IsClaimedQSO>' + Format('%s',[StrUtils.IfThen(RxData.ceQSO_Deleted,'True','False')]) + '</IsRunQSO>' + sLineBreak +
       '</contactinfo>'+ sLineBreak ;
   // SetLength(msg,Length(sBuf));
    //msg := RawToBytes(sBuf[1], Length(sBuf));
    udp.BroadcastEnabled := true;
-   logger.Trace('Sending UDP Broadcast data: ' + sBuf);
+   logger.Debug('Sending UDP Broadcast ContactInfo: %s',[sBuf]);
    udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
    //udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
 end;

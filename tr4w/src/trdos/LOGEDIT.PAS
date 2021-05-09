@@ -2048,11 +2048,11 @@ begin
 
   if Call^ = StationInformationCall then   // This is a flag to show we have been here before ny4i
      begin
-     logger.debug('[ShowStationInformation] Exiting early because Call^ = StationInformationCall (%s)',[StationInformationCall]);
+     //logger.debug('[ShowStationInformation] Exiting early because Call^ = StationInformationCall (%s)',[StationInformationCall]);
      Exit;
      end;
 
-  logger.debug('>>> Entering ShowStationInformation with call of %s',[Call^]);
+ // logger.debug('>>> Entering ShowStationInformation with call of %s',[Call^]);
   StationInformationCall := Call^;
 
   //  if Copy(Call, 1, 3) = 'CQ-' then Exit;

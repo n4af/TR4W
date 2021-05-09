@@ -110,6 +110,7 @@ const
 
 implementation
 
+Uses Math;
 procedure pKenwood2(rig: RadioPtr);
 //label
 //   NextWait;
@@ -855,6 +856,7 @@ var
    F1, TempFreq: LONGINT;
    TempBand: BandType;
    TempMode: ModeType;
+   TempExtendedMode: ExtendedModeType;
 begin
    repeat
       inc(rig^.tPollCount);
@@ -881,10 +883,34 @@ begin
             CalculateBandMode(Freq, Band, Mode);
 
             case Ord(rig^.tBuf[8]) of
-               0, 1, 3: Mode := Phone;
-               2: Mode := CW;
-               4: Mode := FM;
-               5, 6: Mode := Digital;
+               0: begin
+                  Mode := Phone;
+                  ExtendedMode := eLSB;
+                  end;
+               1: begin
+                  Mode := Phone;
+                  ExtendedMode := eUSB;
+                  end;
+               3: begin
+                  Mode := Phone;
+                  ExtendedMode := eAM;
+                  end;
+               2: begin
+                  Mode := CW;
+                  ExtendedMode := eCW;
+                  end;
+               4: begin
+                  Mode := FM;
+                  ExtendedMode := eFM;
+                  end;
+               5: begin
+                  Mode := Digital;
+                  ExtendedMode := eRTTY;
+                  end;
+               6: begin
+                  Mode := Digital;
+                  ExtendedMode := eData;
+                  end;
             end;
          end;
 
@@ -898,29 +924,79 @@ begin
                CalculateBandMode(TempFreq, TempBand, TempMode);
 
                case Ord(rig^.tBuf[8]) of
-                  0, 1, 3: TempMode := Phone;
-                  2: TempMode := CW;
-                  4: TempMode := FM;
-                  5, 6: TempMode := Digital;
+                  0: begin
+                     TempMode := Phone;
+                     TempExtendedMode := eLSB;
+                     end;
+                  1: begin
+                     TempMode := Phone;
+                     TempExtendedMode := eUSB;
+                     end;
+                  3: begin
+                     TempMode := Phone;
+                     TempExtendedMode := eAM;
+                     end;
+                  2: begin
+                     TempMode := CW;
+                     TempExtendedMode := eCW;
+                     end;
+                  4: begin
+                     TempMode := FM;
+                     TempExtendedMode := eFM;
+                     end;
+                  5: begin
+                     TempMode := Digital;
+                     TempExtendedMode := eRTTY;
+                     end;
+                  6: begin
+                     TempMode := Digital;
+                     TempExtendedMode := eData;
+                     end;
                end;
 
                VFO[VFOA].Frequency := TempFreq;
                VFO[VFOA].Band := TempBand;
                VFO[VFOA].Mode := TempMode;
+               VFO[VFOA].ExtendedMode := TempExtendedMode;
 
                TempFreq := GetFrequencyForYaesu3(@rig^.tBuf[17 + 1]);
                CalculateBandMode(TempFreq, TempBand, TempMode);
 
                case Ord(rig^.tBuf[24]) of
-                  0, 1, 3: TempMode := Phone;
-                  2: TempMode := CW;
-                  4: TempMode := FM;
-                  5, 6: TempMode := Digital;
+                  0: begin
+                     TempMode := Phone;
+                     TempExtendedMode := eLSB;
+                     end;
+                  1: begin
+                     TempMode := Phone;
+                     TempExtendedMode := eUSB;
+                     end;
+                  3: begin
+                     TempMode := Phone;
+                     TempExtendedMode := eAM;
+                     end;
+                  2: begin
+                     TempMode := CW;
+                     TempExtendedMode := eCW;
+                     end;
+                  4: begin
+                     TempMode := FM;
+                     TempExtendedMode := eFM;
+                     end;
+                  5: begin
+                     TempMode := Digital;
+                     TempExtendedMode := eRTTY;
+                     end;
+                  6: begin
+                     TempMode := Digital;
+                     TempExtendedMode := eData;
+                     end;
                end;
 
                VFO[VFOB].Frequency := TempFreq;
                VFO[VFOB].Band := TempBand;
                VFO[VFOB].Mode := TempMode;
+               VFO[VFOB].ExtendedMode := TempExtendedMode;
             end;
 
       rig.WritePollRequest(FT1000MPPoll3String, length(FT1000MPPoll3String));
@@ -1324,10 +1400,13 @@ begin
                                        + 5]), Digital, eRTTY);
                                     5: SetVFOModeExtendedMode(rig, Ord(rig.tBuf[i
                                        + 5]), FM, eFM);
+                                    6: SetVFOModeExtendedMode(rig, Ord(rig.tBuf[i
+                                       + 5]), FM, eFM); // Really wide Fm but FM is good for us
                                     7: SetVFOModeExtendedMode(rig, Ord(rig.tBuf[i
                                        + 5]), CW, eCW_R);
                                     8: SetVFOModeExtendedMode(rig, Ord(rig.tBuf[i
                                        + 5]), Digital, eRTTY_R);
+                                    17,23: SetVFOModeExtendedMode(rig,Ord(rig.tbuf[i+5]),FM,eDStar);  // Book says 17 but rig returns 23
                                     else
                                        DEBUGMSG('Unknown Mode command from Icom '
                                           + IntToStr(Ord(rig.tBuf[i + 6])));
@@ -2504,25 +2583,103 @@ var
 begin
    StatusChanged := False;
    //  CompareString(LOCALE_SYSTEM_DEFAULT, 0, @rig.CurrentStatus, SizeOf(RadioStatusRecord), @rig.PreviousStatus, SizeOf(RadioStatusRecord)) <> 2;
+   if rig.CurrentStatus.Freq <> rig.PreviousStatus.Freq then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = Freq');
+      end
+   else if rig.CurrentStatus.Mode <> rig.PreviousStatus.Mode then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = Mode');
+      end
+   else if rig.CurrentStatus.ExtendedMode <> rig.PreviousStatus.ExtendedMode then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = ExtendedMode');
+      end
+   else if rig.CurrentStatus.Band <> rig.PreviousStatus.Band then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = Band');
+      end
+   else if rig.CurrentStatus.Split <> rig.PreviousStatus.Split then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = Split');
+      end
+   else if rig.CurrentStatus.VFO[VFOA].Frequency <> rig.PreviousStatus.VFO[VFOA].Frequency then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = VFOA Freq');
+      end
+   else if rig.CurrentStatus.VFO[VFOA].Band <> rig.PreviousStatus.VFO[VFOA].Band then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = VFO A Band');
+      end
+   else if rig.CurrentStatus.VFO[VFOA].Mode <> rig.PreviousStatus.VFO[VFOA].Mode then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = VFOA Mode');
+      end
+   else if rig.CurrentStatus.VFO[VFOA].ExtendedMode <> rig.PreviousStatus.VFO[VFOA].ExtendedMode then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = VFOA ExtendedMode');
+      end
+   else if rig.CurrentStatus.VFO[VFOB].Frequency <> rig.PreviousStatus.VFO[VFOB].Frequency then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = VFOB Freq');
+      end
+   else if rig.CurrentStatus.VFO[VFOB].Band <> rig.PreviousStatus.VFO[VFOB].Band then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = VFOB band');
+      end
+   else if rig.CurrentStatus.VFO[VFOB].Mode <> rig.PreviousStatus.VFO[VFOB].Mode then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = VFOB Mode');
+      end
+   else if rig.CurrentStatus.VFO[VFOB].ExtendedMode <> rig.PreviousStatus.VFO[VFOB].ExtendedMode then
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = VFOB ExtendedMode');
+      logger.debug('VFOB ExtendedMode = %s, VFOB Previous ExtendedMode = %s',[ExtendedModeStringArray[rig.CurrentStatus.VFO[VFOB].ExtendedMode],ExtendedModeStringArray[rig.PreviousStatus.VFO[VFOB].ExtendedMode]]);
+      end
+   else if rig.CurrentStatus.TXOn <> rig.PreviousStatus.TXOn then        // ny4i  // 4.44.5
+      begin
+      StatusChanged := true;
+      logger.debug('Changed = TXOn');
+      end;
+
    for TempInteger := 0 to SizeOf(RadioStatusRecord) - 1 do
       begin
          if PChar(@rig.CurrentStatus)[TempInteger] <>
             PChar(@rig.PreviousStatus)[TempInteger] then
             begin
+             //  logger.debug('In UpdateStatus, item %d changed %s',[TempInteger,PChar(@rig.CurrentStatus)[TempInteger]]);
                StatusChanged := True;
                Break;
             end;
       end;
-
+   
    if StatusChanged = True then
       begin
-         DisplayCurrentStatus(rig); // Updte the Radio Window only
+      if UDPBroadcastRadio then
+         begin
+         SendRadioInfoToUDP(rig); // ny4i 4.44.9 // Broadcast Radio Info if set
+         end;
+      DisplayCurrentStatus(rig); // Updte the Radio Window only
          rig.FilteredStatusChanged := True;
       end
    else
       begin
          if rig.FilteredStatusChanged then
             begin
+               logger.Debug('Radio filtered status changed');
                rig.FilteredStatus := rig.CurrentStatus;
                ProcessFilteredStatus(rig);
                rig.FilteredStatusChanged := False;
@@ -2670,10 +2827,7 @@ var
 begin
    if rig = ActiveRadioPtr then
       SendStationStatus(sstBandModeFreq);
-   if UDPBroadcastRadio then
-      begin
-         SendRadioInfoToUDP(rig); // ny4i 4.44.9 // Broadcast Radio Info if set
-      end;
+   
    //Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
    h := rig.tRadioInterfaceWndHandle;
    //if h = 0 then Exit;
@@ -3263,23 +3417,30 @@ begin
             begin
                sMode := 'USB';
             end;
-      Digital: sMode := 'RTTY';
+      Digital: sMode := 'RTTY';   // TODO Fix this for USB-D versus FSK mode from radio object.
       else
          sMode := ' ';
    end; // of case
-   sBuf := '<?xml version="1.0"?>' +
-      '<RadioInfo>' +
+   sMode := ExtendedModeStringArray[rig.currentStatus.ExtendedMode];
+   sBuf := '<?xml version="1.0" encoding="utf-8"?>' + sLineBreak +
+      '<RadioInfo>' + sLineBreak +
       #9 + '<app>TR4W</app>' + sLineBreak +
-      #9 + '<RadioNr>' + '1' + '</RadioNr>' +
-      #9 + '<Freq>' + Format('%d', [freq div 10]) + '</Freq>' +
-      #9 + '<TXFreq>' + Format('%d', [txFreq div 10]) + '</TXFreq>' +
-      #9 + '<Mode>' + sMode + '</Mode>' +
-      #9 + '<OpCall>' + '' + '</OpCall>' +
-      #9 + '<IsRunning>' + 'False' + '</IsRunning>' +
-      #9 + '<FocusEntry>0</FocusEntry>' +
-      #9 + '<Antenna>-1</Antenna>' +
-      #9 + '<Rotors>-1</Rotors>' +
-      #9 + '<FocusRadioNr>1</FocusRadioNr>' +
+      #9 + '<RadioNr>' + Format('%d',[Math.IfThen(ActiveRadio = RadioOne,1,2)]) + '</RadioNr>' + sLineBreak +
+      #9 + '<Freq>' + Format('%d', [freq div 10]) + '</Freq>' + sLineBreak +
+      #9 + '<TXFreq>' + Format('%d', [txFreq div 10]) + '</TXFreq>' + sLineBreak +
+      #9 + '<Mode>' + sMode + '</Mode>' +  sLineBreak +
+      #9 + '<OpCall>' + CurrentOperator + '</OpCall>' +  sLineBreak +
+      #9 + '<IsRunning>' + StrUtils.IfThen(OpMode = SearchAndPounceOpMode,'False','True') + '</IsRunning>' + sLineBreak +
+      #9 + '<FocusEntry>0</FocusEntry>' + sLineBreak +
+      #9 + '<Antenna>-1</Antenna>' + sLineBreak +
+      #9 + '<Rotors>-1</Rotors>' + sLineBreak +
+      #9 + '<FocusRadioNr>1</FocusRadioNr>' + sLineBreak +
+      #9 + '<IsStereo>' + 'False' + '</IsStereo>' + sLineBreak +
+      #9 + '<IsSplit>' + StrUtils.IfThen(rig.CurrentStatus.Split,'True','False') + '</IsSplit>' + sLineBreak +
+      #9 + '<ActiveRadioNr>' + '1' + '</ActiveRadioNr>' + sLineBreak +
+      #9 + '<IsTransmitting>' + StrUtils.IfThen(rig.CurrentStatus.TXOn,'True','False') + '</IsTransmitting>' + sLineBreak +
+      #9 + '<FunctionKeyCaption>' + '' + '</FunctionKeyCaption>' + sLineBreak +
+      #9 + '<RadioName>' + rig.RadioName + '</RadioName>' + sLineBreak +
       '</RadioInfo>';
 
    //SetLength(msg,Length(sBuf));
@@ -3287,6 +3448,7 @@ begin
    try
       udp.BroadcastEnabled := true;
       udp.Send(UDPBroadcastAddress, UDPBroadcastPort, sBuf); // ny4i 4.44.9
+      logger.debug('UDP RadioInfo: %s',[sBuf]);
    except
       on E: Exception do
          // ShowMessage(PChar('Exception in SendRadioInfoToUDP. Message = '));
@@ -3299,9 +3461,10 @@ begin
    if which = 0 then
       begin
          rig.CurrentStatus.VFO[VFOA].Mode := mode;
-         rig.CurrentStatus.VFO[VFOB].ExtendedMode := em;
+         rig.CurrentStatus.VFO[VFOA].ExtendedMode := em;
          rig.CurrentStatus.Mode := mode;
          rig.CurrentStatus.ExtendedMode := em;
+        // logger.debug('Setting VFOA ExtendedMode to %s',[ExtendedModeStringArray[em]]);
       end
    else if which = 1 then
       begin

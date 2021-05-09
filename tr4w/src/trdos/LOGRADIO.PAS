@@ -279,7 +279,7 @@ type
       //    procedure StartNextPoll;
       //    function TimeToGiveUp: boolean;
       procedure UpdateBandOutputInfo(Band: BandType; Mode: ModeType);
-      procedure UpdateRadioStatus;
+      {procedure UpdateRadioStatus;}
       function ConvertBCDStringToFreq(BCDString: Str20): longint;
 
       procedure FreqToBCD(Freq: longint; Swap: boolean; OpCode: byte);
@@ -1731,89 +1731,6 @@ begin
    //TLogger.GetInstance.Debug(Format('      Leaving PutRadioOutOfSplit: %s',[RadioName]));
 end;
 
-procedure RadioObject.UpdateRadioStatus;
-
-{ Updates the filtered radio status } // This is not called anymore
-
-begin
-   if CurrentStatus.Freq = PreviousStatus.Freq then
-      begin
-      FilteredStatus.Freq := CurrentStatus.Freq;
-      end;
-
-   if CurrentStatus.Mode = PreviousStatus.Mode then
-      begin
-      FilteredStatus.Mode := CurrentStatus.Mode;
-      end;
-
-      if CurrentStatus.ExtendedMode = PreviousStatus.ExtendedMode then
-      begin
-      FilteredStatus.ExtendedMode := CurrentStatus.ExtendedMode;
-      end;
-
-   if CurrentStatus.Band = PreviousStatus.Band then
-      begin
-      FilteredStatus.Band := CurrentStatus.Band;
-      end;
-
-   if CurrentStatus.Split = PreviousStatus.Split then
-      begin
-      FilteredStatus.Split := CurrentStatus.Split;
-      end;
-
-   if CurrentStatus.VFO[VFOA].Frequency = PreviousStatus.VFO[VFOA].Frequency then
-      begin
-      FilteredStatus.VFO[VFOA].Frequency := CurrentStatus.VFO[VFOA].Frequency;
-      end;
-
-   if CurrentStatus.VFO[VFOA].Band = PreviousStatus.VFO[VFOA].Band then
-      begin
-      FilteredStatus.VFO[VFOA].Band := CurrentStatus.VFO[VFOA].Band;
-      end;
-
-   if CurrentStatus.VFO[VFOA].Mode = PreviousStatus.VFO[VFOA].Mode then
-      begin
-      FilteredStatus.VFO[VFOA].Mode := CurrentStatus.VFO[VFOA].Mode;
-      end;
-
-   if CurrentStatus.VFO[VFOA].ExtendedMode = PreviousStatus.VFO[VFOA].ExtendedMode then
-      begin
-      FilteredStatus.VFO[VFOA].ExtendedMode := CurrentStatus.VFO[VFOA].ExtendedMode;
-      end;
-
-   //   if CurrentStatus.VFOA.TXRX = PreviousStatus.VFOA.TXRX then
-   //      FilteredStatus.VFOA.TXRX := CurrentStatus.VFOA.TXRX;
-
-   if CurrentStatus.VFO[VFOB].Frequency = PreviousStatus.VFO[VFOB].Frequency then
-      begin
-      FilteredStatus.VFO[VFOB].Frequency := CurrentStatus.VFO[VFOB].Frequency;
-      end;
-
-   if CurrentStatus.VFO[VFOB].Band = PreviousStatus.VFO[VFOB].Band then
-      begin
-      FilteredStatus.VFO[VFOB].Band := CurrentStatus.VFO[VFOB].Band;
-      end;
-
-   if CurrentStatus.VFO[VFOB].Mode = PreviousStatus.VFO[VFOB].Mode then
-      begin
-      FilteredStatus.VFO[VFOB].Mode := CurrentStatus.VFO[VFOB].Mode;
-      end;
-
-   if CurrentStatus.VFO[VFOB].ExtendedMode = PreviousStatus.VFO[VFOB].ExtendedMode then
-      begin
-      FilteredStatus.VFO[VFOB].ExtendedMode := CurrentStatus.VFO[VFOB].ExtendedMode;
-      end;
-
-   //   if CurrentStatus.VFOB.TXRX = PreviousStatus.VFOB.TXRX then
-   //      FilteredStatus.VFOB.TXRX := CurrentStatus.VFOB.TXRX;
-
-   if CurrentStatus.TXOn = PreviousStatus.TXOn then        // ny4i  // 4.44.5
-      begin
-      FilteredStatus.TXOn := CurrentStatus.TXOn;
-      end;
-
-   PreviousStatus := CurrentStatus;
-end;
 
 procedure RadioObject.OnCWByCATTimeEvent(Sender :TObject);
 begin

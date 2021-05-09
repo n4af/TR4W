@@ -3873,9 +3873,16 @@ begin
     begin
     RData.Band := Band;
     RData.Mode := Mode;
-    SetExtendedModeFromMode(RData);
-    // Not the way to do this as the radio does not know the extendedMode--just Mode. NY4I
-    //RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3
+    if ActiveRadioptr.CurrentStatus.ExtendedMode = eNoMode then
+       begin
+       SetExtendedModeFromMode(RData);
+       logger.debug('ActiveRadioptr.CurrentStatus.ExtendedMode was not set so setting from Mode');
+       end
+    else
+       begin
+       RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3   // todo
+       end;
+    logger.Debug('ExtendedMode set to %s',[ExtendedModeStringArray[RData.ExtMode]]);
     RData.NumberSent := TotalContacts + 1;
     RData.Frequency := Freq;
 
@@ -3919,8 +3926,16 @@ begin
  
   RData.Band := Band;
   RData.Mode := Mode;
-  SetExtendedModeFromMode(RData);
- // ny4i Don't do this please - Issue 466 -=> Rdata.ExtMode := ActiveRadioptr^.CurrentStatus.ExtendedMode ; // 4.93.3
+  if ActiveRadioptr.CurrentStatus.ExtendedMode = eNoMode then
+       begin
+       SetExtendedModeFromMode(RData);
+       logger.debug('ActiveRadioptr.CurrentStatus.ExtendedMode was not set so setting from Mode');
+       end
+    else
+       begin
+       RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3   // todo
+       end;
+  logger.Debug('ExtendedMode set to %s',[ExtendedModeStringArray[RData.ExtMode]]);
   RData.NumberSent := TotalContacts + 1;
   RData.Frequency := Freq;
 
