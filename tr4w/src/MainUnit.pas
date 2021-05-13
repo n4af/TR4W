@@ -28,6 +28,7 @@ interface
 uses
   //IdHTTP,
   ShellAPI,
+  Logstuff,
   uMenu,
   uAltD,
   uMessagesList,
@@ -122,7 +123,6 @@ uses
   LogPack,
   LogRadio,
   LogSCP,
-  LogStuff,
   LOGSUBS1,
   LOGSUBS2,
   LOGWAE,
@@ -161,6 +161,9 @@ uses
   saveLastContest                       : ContestType;
   logger                                : TLogLogger;
   appender                              :TLogFileAppender;
+  s1,s2,s3,s4: str20;
+  Exchw : str20;
+  Callw : str20;
   function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 
@@ -1054,8 +1057,15 @@ begin
 end;
 
 procedure ReturnInSAPOpMode;
+label
+loop;
+
 begin
   DebugMsg('>>>>Entering   ReturnInSAPOpMode');
+  Exchw := ExchangeWindowString;
+  Callw := CallWindowString;
+  ParseFourFields(ExchangeWindowString,s1,s2,s3,s4);
+  loop:
   if (ExchangeWindowString = '') and (CallWindowString = '') then
     if AutoReturnToCQMode then
     begin
@@ -1129,11 +1139,25 @@ begin
        SendMessageToMixW('<TX>');
        end;
 
+ if (ActiveExchange = RSTDomesticQTHExchange) then
+  begin
+   if (S3 <> '') then
+    ExchangeWindowString := S3
+     else
+     if ((S3 = '')and (S2 <> '')) then
+      ExchangeWindowString := S2
+       else
+        ExchangeWindowString := S1;
+   end;
     if ActiveMode in [CW, Digital] then
+  {   if ActiveExchange = RSTDomesticQTHExchange then
+      begin
+       ParseFourFields(ExchangeWindowString,s1, s2, s3, s4);
+       if s2 <> '' then
+        rxdata.exchangestring := S2;
+      end;   }
        if not SendCrypticMessage(SearchAndPounceExchange) then
-          begin
-          Exit;
-          end;
+         Exit;
 
     if ActiveMode = Digital then
        begin
@@ -1166,12 +1190,23 @@ begin
       if OpMode = SearchAndPounceOpMode then SetOpMode(CQOpMode);
     end;
   end;
+ if S3 <> '' then
+  begin
+   S3 := '';
+   CallWindowString := callw ;
+   exchangewindowstring := s2;
+   BeSilent := True;
+   goto loop;
+  end;
+ if S2 <> '' then
+  begin
+  S2 := '';
+  CallWindowString := callw ;
+  exchangewindowstring := s1;
+  BeSilent := True;
+ goto loop;
+  end;
 
- { if IsCWByCATActive then
-     begin
-     BackToInactiveRadioAfterQSO;  // ny4i Issue153 Commented all
-     end;
-     }
   DebugMsg('>>>>Exiting   ReturnInSAPOpMode');
 end;
 
@@ -3818,7 +3853,7 @@ function ParametersOkay(Call: CallString;
 
 var
   RST                                   : Word;
-
+  s1,s2,s3,s4 : str20;
 begin
   logger.Trace('>>>Entering ParametersOkay');
   logger.debug ('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d, ExchangeString = %s', [call,BandStringsArray[Band], ModeStringArray[Mode], freq, ExchangeString]);
@@ -3915,8 +3950,8 @@ begin
     Exit;
   end;
 
- 
- 
+
+
   RData.Band := Band;
   RData.Mode := Mode;
   SetExtendedModeFromMode(RData);

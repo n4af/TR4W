@@ -592,7 +592,7 @@ var
   WindowDupeCheckCall: CallString;
 
   WSJTXUDPPort: integer = 2237;
-
+  psw: integer = 0;
   tPreviousDupeQSOsShowed: boolean;
   tPreviousDupeQSOsWndHandle: HWND;
   //const  tr4w_StartSendingNowKey                    : ;
@@ -653,6 +653,7 @@ function NumberQTCsThisStation(Call: CallString): integer;
 //procedure NameReceivedStamp(Exchange: ContestExchange; var LogString: Str80);
 //procedure NameReceivedHeader(var LogString: Str80; var Underline: Str80);
 
+procedure ParseFourFields(sExch: Str80; var s1, s2, s3, s4: Str20);
 procedure PassStationToCTNetwork;
 
 //procedure PrintLogHeader;
@@ -3575,8 +3576,6 @@ begin
     ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
 
 end;
-
-{KK1L: 6.72}
 
 function ProcessRSTAndJAPrefectureExchange(Exchange: ShortString {Str80}; var
   RXData: ContestExchange): boolean;
@@ -6777,13 +6776,16 @@ begin
         if (RXCty = 'JA') or (RXCty = 'JD1') then
           RXData.QSOPoints := 1
         else
-          RXData.QSOPoints := 5;
+          RXData.QSOPoints := 2;
       end
       else
       begin
         if (RXCty = 'JA') or (RXCty = 'JD1') then
-          RXData.QSOPoints := 1
-      end;
+          RXData.QSOPoints := 2
+           else
+            RXData.QSOPoints := 1
+
+      end ;
     {
         MQPQSOPointMethod:
           if RXData.Callsign = 'W0EF' then

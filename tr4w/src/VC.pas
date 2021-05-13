@@ -185,12 +185,12 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.100.5' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.100.7' ;  // N4af     New Release
 
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'April, 2021' ;
+  TR4W_CURRENTVERSIONDATE               = 'May, 2021' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -3211,7 +3211,7 @@ QSOPartiesCount = 18;
  ({Name: 'JIDX-SSB';                   }Email: nil;                      DF: 'jidx';              WA7BNM:  184; {SK3BG: 'jaintdx';    } QRZRUID: 57  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:JapanInternationalDXQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'JA LONG PREFECT';            }Email: nil;                      DF: 'jacg3';             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTLongJAPrefectureExchange;                 XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'JT DX';                      }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: MongolianCallSignPrefix; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:ARRLDXCCWithNoJT;    QP:JTDXQSOPointMethod; ADIFName:'';   CABName:''),
- ({Name: 'KCJ';                        }Email: nil;                      DF: 'japref';            WA7BNM:   89; {SK3BG: 'kcjc';       } QRZRUID: 169 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:KCJQSOPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'KCJ';                        }Email: nil;                      DF: 'japref';            WA7BNM:   89; {SK3BG: 'kcjc';       } QRZRUID: 169 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZONEORDOMESTICQTH;                      XM:NoDXMults; QP:KCJQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'KIDS DAY';                   }Email: nil;                      DF: nil;                 WA7BNM:  224; {SK3BG: 'kidsday';    } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: KidsDayExchange;                             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'KVP';                        }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: EUHFCYear;   AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'';   CABName:''),
  ({Name: 'LZ DX';                      }Email: nil;                      DF: 'lz';                WA7BNM:  187; {SK3BG: 'lzdxc';      } QRZRUID: 53  ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                        XM:NoDXMults; QP:LZDXQSOPointMethod; ADIFName:'';   CABName:''),

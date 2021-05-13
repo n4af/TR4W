@@ -779,10 +779,7 @@ begin
       begin
 
         if (MyCountry = 'JA') or (MyCountry = 'JD1') then
-          TempDomesticQTHDataFileName := 'JAPREFCT'
-        else
-          TempDomesticQTHDataFileName := 'JAPREF';
-//        ContestName := 'KCJ Single Op Contest';
+       ActiveZoneMult := CQZones;
       end;
 
     KIDSDAY:
