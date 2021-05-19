@@ -1190,14 +1190,16 @@ begin
       if OpMode = SearchAndPounceOpMode then SetOpMode(CQOpMode);
     end;
   end;
- if S3 <> '' then
+  if ActiveExchange = RSTDomesticQTHExchange then
   begin
-   S3 := '';
-   CallWindowString := callw ;
-   exchangewindowstring := s2;
-   BeSilent := True;
-   goto loop;
-  end;
+   if S3 <> '' then
+    begin
+      S3 := '';
+      CallWindowString := callw ;
+      exchangewindowstring := s2;
+      BeSilent := True;
+      goto loop;
+    end;
  if S2 <> '' then
   begin
   S2 := '';
@@ -1206,7 +1208,7 @@ begin
   BeSilent := True;
  goto loop;
   end;
-
+ end;
   DebugMsg('>>>>Exiting   ReturnInSAPOpMode');
 end;
 
