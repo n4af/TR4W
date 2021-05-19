@@ -7758,7 +7758,7 @@ begin
       1..11   : RXData.QSOPoints := RXData.QSOPoints + 13;
       12..16  : RXData.QSOPoints := RXData.QSOPoints + 12;
       17..21  : RXData.QSOPoints := RXData.QSOPoints + 11;
-      22..25  : RXData.QSOPoints := RXData.QSOPoints + 12;
+      22..25  : RXData.QSOPoints := RXData.QSOPoints + 10;
      end;
     end;
 
