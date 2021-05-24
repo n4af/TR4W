@@ -44,7 +44,8 @@ uses
    idUDPClient, // ny4i 4.44.9
    idGlobal, // ny4i 4.44.9
    Windows,
-   StrUtils;
+   StrUtils,
+   DateUtils;
 
 type
    DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
@@ -104,6 +105,7 @@ procedure PTTStatusChanged;
 procedure SendRadioInfoToUDP(rig: RadioPtr);
 var
    saveVFOAFreq: integer;
+   LastRadioUDPSent: TDateTime;
 const
    POLLINGDEBUG = False;
    ICOM_DEBUG = False;
@@ -1080,9 +1082,26 @@ begin
             CalculateBandMode(Freq, Band, Mode);
 
             case Ord(rig^.tBuf[22] {?!}) of
-               1: Mode := FM;
-               2, 8, 16: Mode := Phone;
-               4: Mode := CW;
+               1: begin
+                  Mode := FM;
+                  ExtendedMode := eFM;
+                  end;
+               2: begin
+                  Mode := Phone;
+                  ExtendedMode := eAM;
+                  end;
+               8: begin
+                  Mode := Phone;
+                  ExtendedMode := eUSB;
+                  end;
+               16: begin
+                   Mode := Phone;
+                   ExtendedMode := eLSB;
+                   end;
+               4: begin
+                  Mode := CW;
+                  ExtendedMode := eCW;
+                  end;
             end;
 
          end;
@@ -2666,7 +2685,7 @@ begin
             end;
       end;
    
-   if StatusChanged = True then
+   if (StatusChanged or (SecondsBetween(Now, LastRadioUDPSent) > 10)) then
       begin
       if UDPBroadcastRadio then
          begin
@@ -3448,6 +3467,7 @@ begin
    try
       udp.BroadcastEnabled := true;
       udp.Send(UDPBroadcastAddress, UDPBroadcastPort, sBuf); // ny4i 4.44.9
+      LastRadioUDPSent := Now;
       logger.debug('UDP RadioInfo: %s',[sBuf]);
    except
       on E: Exception do
