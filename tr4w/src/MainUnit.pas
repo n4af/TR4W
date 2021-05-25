@@ -133,6 +133,7 @@ uses
   Dialogs,
   ZoneCont, 
   classes,
+  IdGlobal,
   uWSJTX,
   Math,
   Log4D,
@@ -1192,7 +1193,7 @@ begin
   end;
   if ActiveExchange = RSTDomesticQTHExchange then
   begin
-   if ((not StringhasNumber(s3)) and (S3 <> '')) then
+    if (IsAlpha(S3)) and (S3 <> '') then
      begin
       S3 := '';
       CallWindowString := callw ;
@@ -1200,7 +1201,7 @@ begin
       BeSilent := True;
       goto loop;
     end;
- if ((S2 <> '') and (not StringhasNumber(S2))) then
+ if (S2 <> '') and (IsAlpha(S2)) then
   begin
   S2 := '';
   CallWindowString := callw ;

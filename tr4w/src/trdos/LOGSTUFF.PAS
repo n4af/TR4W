@@ -7665,16 +7665,26 @@ begin
 
       end;
 
-    PortugalDay: // 4.71.4
+    PortugalDay: // 4.71.4   4.100.11
       begin
-        if (RXCty = 'CT') and (MyCountry <> 'CT') then
-          RXData.QSOPoints := 10
-        else if (RXCty = 'CT') and (MyCountry = 'CT') then
-          RXData.QSOPoints := 5
-        else if RXData.QTH.Continent <> MyContinent then
-          RXData.QSOPoints := 2
-        else
-          RXData.QSOPoints := 1;
+
+        if (MyCountry <> 'CT') or (MyCountry <> 'CT3') or (MyCountry <> 'CU') then
+         begin
+          if (RXCty = 'CT') or (RXCty = 'CT3') or (RXCty = 'CU') then
+           RXData.QSOPoints := 10
+            else
+             if (RXData.QTH.Continent <> MyContinent) then
+               RXData.QSOPoints := 2
+                   else
+                    RXData.QSOPoints := 1;
+         end;
+         if (MyCountry = 'CT') or (MyCountry = 'CT3') or (MyCountry = 'CU') then
+          begin
+              if (RXCty = 'CT') or (RXCty = 'CT3') or (RXCty = 'CU') then
+                RXdata.QSOPoints := 5
+                 else
+                  RXData.QSOPoints := 1;
+          end;
       end;
 
     RPX:
