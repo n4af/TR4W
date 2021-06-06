@@ -137,8 +137,8 @@ begin
            exit;
        end;
 
-           if FindSpot(Spot, Result) then goto Add;
-      InsertSpot(Result, Spot);
+          if FindSpot(Spot, Result) then goto Add;
+          InsertSpot(Result, Spot);
 
       Add:
       FList^[Result] := Spot;

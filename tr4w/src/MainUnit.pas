@@ -2147,7 +2147,8 @@ begin
   EditableLogHeight := temprect.Bottom - temprect.Top;
 
   Windows.GetWindowRect(tr4whandle, temprect);
-  Windows.SetWindowPos(tr4whandle, HWND_TOP, 0, 0, ws * 46, 6 + MainWindowCaptionAndHeader + EditableLogHeight + ws * 14, {SWP_SHOWWINDOW or } SWP_NOMOVE);
+  Windows.SetWindowPos(tr4whandle, HWND_TOP, 0, 0, ws * 46, 6
+   + MainWindowCaptionAndHeader + EditableLogHeight + ws * 14, {SWP_SHOWWINDOW or } SWP_NOMOVE);
 
   for e := Low(TMainWindowElement) to High(TMainWindowElement) do
   begin

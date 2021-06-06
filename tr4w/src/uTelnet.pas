@@ -277,7 +277,6 @@ begin
 
     WM_SOCK:
       begin
-
         i := recv(TelnetSock, TelnetBuffer, SizeOf(TelnetBuffer) - 1, 0);
         if i < 1  then
           if WindowsOSversion = VER_PLATFORM_WIN32_NT then
@@ -372,7 +371,7 @@ begin
             mov edx,[LucidaConsoleFont]
             call tWM_SETFONT
         end;
-
+        
         TelnetCommandWindow := GetDlgItem(hwnddlg, 106);
 
         //        TelnetListBoxOldProc := Pointer(Windows.SetWindowLong(TelnetListBox, GWL_WNDPROC, integer(@TelnetListBoxNewProc)));
@@ -741,7 +740,7 @@ var
   if AddedSpot then
     begin
  //     sleep(BMDelay); // So we do not drive the serial port and radio too fast.    // 4.93.beta
-      if TestSocketBuffer < 1 then DisplayBandMap;             //Gav 4.44.6
+        if TestSocketBuffer < 1 then DisplayBandMap;             //Gav 4.44.6
 
 {$IFDEF AUTOSPOT}
      if TwoRadioMode then
@@ -763,8 +762,6 @@ var
         begin
          //TLogger.GetInstance.Debug(Format('Writing to Radio One: %s',[TempSpot.FFreqString]));
          TuneRadioToSpot(TempSpot, RadioOne);
-        //Writeln('Radio One');
-             sleep(100); // So we do not drive the serial port and radio too fast.    // 4.93.beta
         end;
 
 {$ENDIF}
@@ -1081,9 +1078,8 @@ begin
 //  Windows.GetSystemTime(TempSpot.FSysTime);
   TempSpot.FSysTime := UTC.wMinute + UTC.wHour * 60 + UTC.wDay * 60 * 24 + UTC.wMonth * 60 * 24 * 30;
   SpotsList.AddSpot(TempSpot, True);
- //     sleep(BMDelay);    // 4.93.beta
+  //  sleep(BMDelay);    // 4.93.beta
   DisplayBandMap;
-
 end;
 
 procedure CheckClusterType(ByteReceived: integer);

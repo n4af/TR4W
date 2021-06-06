@@ -409,6 +409,7 @@ begin
                 TuneRadioToSpot(SpotsList.Get(TempInt), ActiveRadio);
               end;
               KillFocus;                                  // Gav 4.47.4 #141
+              Windows.SetFocus(wh[mweCall]);             // 4.100.12
             end;
         end;
       end;
