@@ -44,7 +44,9 @@ uses
    idUDPClient, // ny4i 4.44.9
    idGlobal, // ny4i 4.44.9
    Windows,
-   StrUtils;
+   StrUtils,
+   Math,
+   DateUtils;
 
 type
    DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
@@ -104,6 +106,7 @@ procedure PTTStatusChanged;
 procedure SendRadioInfoToUDP(rig: RadioPtr);
 var
    saveVFOAFreq: integer;
+   dtLastUDPRadio: TDateTime;
 const
    POLLINGDEBUG = False;
    ICOM_DEBUG = False;
@@ -2514,9 +2517,11 @@ begin
             end;
       end;
 
-   if StatusChanged = True then
+   //if StatusChanged = True then
+   if (StatusChanged) or
+      ((UDPBroadcastRadio) and (SecondsBetween(Now, dtLastUDPRadio) > 10) ) then
       begin
-         DisplayCurrentStatus(rig); // Updte the Radio Window only
+         DisplayCurrentStatus(rig); // Update the Radio Window only
          rig.FilteredStatusChanged := True;
       end
    else
@@ -2668,11 +2673,12 @@ var
    h: HWND;
    //fa: integer;
 begin
+   logger.Debug('Entering DisplayCurrentStatus');
    if rig = ActiveRadioPtr then
       SendStationStatus(sstBandModeFreq);
    if UDPBroadcastRadio then
       begin
-         SendRadioInfoToUDP(rig); // ny4i 4.44.9 // Broadcast Radio Info if set
+      SendRadioInfoToUDP(rig); // ny4i 4.44.9 // Broadcast Radio Info if set
       end;
    //Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(rig.CurrentStatus.Freq));
    h := rig.tRadioInterfaceWndHandle;
@@ -3267,19 +3273,26 @@ begin
       else
          sMode := ' ';
    end; // of case
-   sBuf := '<?xml version="1.0"?>' +
-      '<RadioInfo>' +
+   sMode := ExtendedModeStringArray[rig.currentStatus.ExtendedMode];
+   sBuf := '<?xml version="1.0" encoding="utf-8"?>' + sLineBreak +
+      '<RadioInfo>' + sLineBreak +
       #9 + '<app>TR4W</app>' + sLineBreak +
-      #9 + '<RadioNr>' + '1' + '</RadioNr>' +
-      #9 + '<Freq>' + Format('%d', [freq div 10]) + '</Freq>' +
-      #9 + '<TXFreq>' + Format('%d', [txFreq div 10]) + '</TXFreq>' +
-      #9 + '<Mode>' + sMode + '</Mode>' +
-      #9 + '<OpCall>' + '' + '</OpCall>' +
-      #9 + '<IsRunning>' + 'False' + '</IsRunning>' +
-      #9 + '<FocusEntry>0</FocusEntry>' +
-      #9 + '<Antenna>-1</Antenna>' +
-      #9 + '<Rotors>-1</Rotors>' +
-      #9 + '<FocusRadioNr>1</FocusRadioNr>' +
+      #9 + '<RadioNr>' + Format('%d',[Math.IfThen(ActiveRadio = RadioOne,1,2)]) + '</RadioNr>' + sLineBreak +
+      #9 + '<Freq>' + Format('%d', [freq div 10]) + '</Freq>' + sLineBreak +
+      #9 + '<TXFreq>' + Format('%d', [txFreq div 10]) + '</TXFreq>' + sLineBreak +
+      #9 + '<Mode>' + sMode + '</Mode>' +  sLineBreak +
+      #9 + '<OpCall>' + CurrentOperator + '</OpCall>' +  sLineBreak +
+      #9 + '<IsRunning>' + StrUtils.IfThen(OpMode = SearchAndPounceOpMode,'False','True') + '</IsRunning>' + sLineBreak +
+      #9 + '<FocusEntry>0</FocusEntry>' + sLineBreak +
+      #9 + '<Antenna>-1</Antenna>' + sLineBreak +
+      #9 + '<Rotors>-1</Rotors>' + sLineBreak +
+      #9 + '<FocusRadioNr>1</FocusRadioNr>' + sLineBreak +
+      #9 + '<IsStereo>' + 'False' + '</IsStereo>' + sLineBreak +
+      #9 + '<IsSplit>' + StrUtils.IfThen(rig.CurrentStatus.Split,'True','False') + '</IsSplit>' + sLineBreak +
+      #9 + '<ActiveRadioNr>' + '1' + '</ActiveRadioNr>' + sLineBreak +
+      #9 + '<IsTransmitting>' + StrUtils.IfThen(rig.CurrentStatus.TXOn,'True','False') + '</IsTransmitting>' + sLineBreak +
+      #9 + '<FunctionKeyCaption>' + '' + '</FunctionKeyCaption>' + sLineBreak +
+      #9 + '<RadioName>' + rig.RadioName + '</RadioName>' + sLineBreak +
       '</RadioInfo>';
 
    //SetLength(msg,Length(sBuf));
@@ -3287,6 +3300,7 @@ begin
    try
       udp.BroadcastEnabled := true;
       udp.Send(UDPBroadcastAddress, UDPBroadcastPort, sBuf); // ny4i 4.44.9
+      dtLastUDPRadio := Now;
    except
       on E: Exception do
          // ShowMessage(PChar('Exception in SendRadioInfoToUDP. Message = '));
