@@ -54,6 +54,7 @@ uses {Dos, Printer,}Tree,
   idGlobal, // ny4i 4.44.9
   SysUtils, // ny4i 4.44.9
   StrUtils, // 4.90.11
+  PerlRegEx,
   uMults,
   Windows
   ;
@@ -623,6 +624,7 @@ function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}):
   smallInt {Word};
 
 procedure IncrementQTCCount(Call: CallString);
+function IsValidCallsign(const callsign : string): boolean;
 
 function KeyRecentlyPressed(Key: Char; MaxElaspedSec100: LONGINT): boolean;
 procedure KeyStamp(Key: Char);
@@ -8910,6 +8912,29 @@ begin
   // Result := (StrToInt(sXmit) in [1..99]) and (length(sCategory) = 1);
 end;
 
+// Add Uses PerlRegEx to unit and code from https://regular-expressions.mobi/delphi.html?wlr=1
+function IsValidCallsign(const callsign : string): boolean;
+var
+   regex : TPerlRegEx;
+begin
+// create our regex instance, and we want to do a case insensitive search, in multiline mode
+   Result := false;
+  regex := TPerlRegEx.Create;
+  try
+     logger.debug('Checking if %s is a valid call',[callsign]);
+   regex.RegEx := '^(?:\w{1,2}\d\/|\d\w\/|\w{1,2}\/)?+\w+[0-9]+\w+\/?\w*\s*$';  // Valid against all of LOTW file
+
+     regex.Subject := callsign;
+
+     Result := regex.MatchAgain;
+   finally
+      regex.Free;
+   end;
+   if Result then
+      begin
+      logger.debug('%s is a valid call',[callsign]);
+      end;
+end;
 begin
   CD.CellBuffer.MaximumMemoryToUse := 40000 * ua4wliscpconst {*4 - ua4wli};
   StuffInit;
