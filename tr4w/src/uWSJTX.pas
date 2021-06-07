@@ -189,8 +189,16 @@ procedure TWSJTXServer.Start;
 begin
    if not started then
       begin
-      udpServ.Active := true;
-      started := true;
+      try
+         udpServ.Active := true;
+         started := true;
+      except
+         on E: Exception do
+            begin
+            logger.Error('Exception when making UDP servr active - Is JT-Alert runnng?: %s',[E.Message]);
+            QuickDisplay('Error linking to WSJT-X. Is JT-Alert active?');
+            end;
+      end;
 
       tcpServ.Bindings.Clear;
       tcpServ.MaxConnections := 1; // Just allow the single client
@@ -252,6 +260,9 @@ var
   id, mode, DXCall, report, TXMode, message, DXGrid, DEGrid, DECall, reportReceived: string;
   call : CallString;
   TXPower, comments, DXName, adif: string;
+  i: integer;
+  foundCall: boolean;
+  foundGrid: boolean;
 
   isNew, TXEnabled, transmitting, Decoding: Boolean;
   tm: Longword;
@@ -380,52 +391,36 @@ begin
                   logger.debug('[uWSJTX] Processing message %s',[message]);
                   if slCQMessage[0] = 'CQ' then
                      begin
-                     if slCQMessage[slCQMessage.Count-1] = 'a1' then
+                     for i := 1 to slCQMessage.Count-1 do  // We start at one to skip the CQ
                         begin
-                        if slCQMessage[slCQMessage.Count-2] = '?' then
+                        if not foundCall then
                            begin
-                           slCQMessage.delete(slCQMessage.Count-1); // Delete last one
-                           end;
-                        slCQMessage.Delete(slCQMessage.Count-1);
-                        end;
-                     case slCQMessage.Count of
-                        2: begin
-                           DXCall := slCQMessage[1];
-                           grid := '';
-                           end;
-                        3: begin  // standard CQ CALL GRID
-                           DXCall := slCQMessage[1];
-                           grid := slCQMessage[2];
-                           end;
-                        4: begin
-                           if length(slCQMessage[1]) = 2 then // CQ [RU|WW|FD], etc.     // Handle CQ QRP
+                           if IsValidCallsign(slCQMessage[i]) then
                               begin
-                              DXCall := slCQMessage[2];
-                              grid := slCQMessage[3];
-                              end
-                           else if slCQMessage[3] = 'a1' then // Deep decoding?
+                              foundCall := true;
+                              DXCall := slCQMessage[i];
+                              logger.debug('Found callsign %s',[DXCall]);
+                              end;
+                           end
+                        else if not foundGrid then
+                           begin
+                           shortStr := slCQMessage[i];
+                           if LooksLikeAGrid(shortStr) then
                               begin
-                              DXCall := slCQMessage[2];
-                              grid := slCQMessage[3];
-                              end
-                           else
-                              begin
-                              shortStr := slCQMessage[2];
-                              if LooksLikeAGrid(ShortStr) then
-                                 begin
-                                 DXCall := slCQMessage[1];
-                                 grid := slCQMessage[2];
-                                 end;
+                              foundGrid := true;
+                              grid := slCQMessage[i];
+                              logger.debug('Found grid %s',[grid]);
                               end;
                            end;
-
-                        else
+                        if (foundCall) and (foundGrid) then
                            begin
-                           call := '';
-                           grid := '';
+                           Break;
                            end;
-                        end; // of case
-
+                        end;
+                     if (not foundCall) or (not foundGrid) then
+                        begin
+                        logger.Warn('Either DXCall (%s) or grid (%s) was not present in CQ message: %s',[DXCall, grid, message]);
+                        end;
                      call := DXCall;
                      if call <> '' then
                         begin
