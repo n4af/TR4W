@@ -3230,18 +3230,18 @@ if TempRXData.DomMultQTH = '' then
             begin
               asm
                     push csQTHString
-                    push RSTReceived
+             //       push RSTReceived
               end;
-               wsprintf(CABRILLO_HISEX, '%-3s %-7s');
+               wsprintf(CABRILLO_HISEX, ' %-7s');
           //    wsprintf(CABRILLO_HISEX, '%-13s %-15s');    // 4.100.3
               asm add esp,16
               end;
 
               asm
                     push cMyGrid
-                    push RSTSent
+             //       push RSTSent
               end;
-              wsprintf(CABRILLO_MYEX, '%-3s %-7s');
+              wsprintf(CABRILLO_MYEX, '%-7s');
               asm add esp,16
               end;
             end

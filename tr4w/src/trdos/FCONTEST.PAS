@@ -516,6 +516,7 @@ begin
 //        ContestName := 'VHF QSO Party';
         HFBandEnable := False;
 //        VHFBandsEnabled := True;
+          MyState := MyGrid; //Copy(MyGrid, 1, 4);
       end;
 
     ARRLVHFSS:
