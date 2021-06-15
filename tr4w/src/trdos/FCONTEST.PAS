@@ -510,23 +510,16 @@ begin
         Add_KVE;
       end;
 }
-    ARRLVHFQSO:
+    ARRLVHFJUN,ARRLVHFSEP:
       begin
         ActiveBand := Band6;
-//        ContestName := 'VHF QSO Party';
+        ContestName := 'VHF QSO JUNE';
         HFBandEnable := False;
 //        VHFBandsEnabled := True;
-          MyState := MyGrid; //Copy(MyGrid, 1, 4);
+ //         MyState := MyGrid; //Copy(MyGrid, 1, 4);
       end;
 
-    ARRLVHFSS:
-      begin
-        ActiveBand := Band6;
-//        ContestName := 'ARRL VHF SWEEPSTAKES';
-        HFBandEnable := False;
-//        VHFBandsEnabled := True;
-        MyState := MyGrid; //Copy(MyGrid, 1, 4);
-      end;
+ 
 
     APSPRINT:
       begin

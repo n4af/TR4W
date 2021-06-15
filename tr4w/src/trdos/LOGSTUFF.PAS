@@ -5812,7 +5812,8 @@ begin
       else
         RXData.QSOPoints := 2;
 
-    ARRLVHFQSOPointMethod:
+    ARRLVHFJUNPointMethod:
+     
       case RXData.Band of
         Band6: RXData.QSOPoints := 1;
         Band2: RXData.QSOPoints := 1;

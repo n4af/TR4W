@@ -6397,6 +6397,7 @@ begin
                                 then
                             begin
                             exch.QTHString := fieldValue; // GRIDSQUARE
+                            exch.DomesticQTH := fieldvalue;
                             end;
                          end;
                      end;
@@ -6438,7 +6439,7 @@ begin
                      ;
                   26: if Length(exch.QTHString) = 0 then
                          begin
-                         exch.QTHString := fieldValue;    // STATE
+                          exch.QTHString := fieldValue;    // STATE
                          //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                          end;
                   27: exch.NumberSent := StrToInt(fieldValue);
@@ -6546,7 +6547,8 @@ begin
             exch.Age := StrToIntDef(exch.QTHString,0);
          IARU:
             exch.QTHString := fieldValue;
-         else ;
+         else
+         ;
          end; // of case
 
       if recordFromWSJTX then

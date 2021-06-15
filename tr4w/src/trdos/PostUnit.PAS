@@ -3226,7 +3226,7 @@ if TempRXData.DomMultQTH = '' then
 
         RSTDomesticQTHExchange:
           begin
-            if Contest in [ARRLVHFQSO, ARRLVHFSS, CQVHF {, MMAA}] then
+            if Contest in [ CQVHF {, MMAA}] then
             begin
               asm
                     push csQTHString
@@ -4233,7 +4233,7 @@ begin
             Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyState]);
 
          RSTDomesticQTHExchange:
-            if Contest in [ARRLVHFQSO, ARRLVHFSS, CQVHF {, MMAA}] then
+            if Contest in [CQVHF {, MMAA}] then
                begin
                Result := SysUtils.Format('%-3d %-7s', [TempRXData.RSTSent, cMyGrid]);
                end
