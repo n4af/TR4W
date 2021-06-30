@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 175{$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 176 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -260,6 +260,7 @@ const
     (mrText: RC_SWAPMULTVIEW + RC_SWAPMULTVIEW_HK; mrId: menu_alt_swapmults),
     (mrText: RC_INCNUMBER + RC_INCNUMBER_HK; mrId: menu_alt_incnumber),
     (mrText: RC_TOOGLEMB + RC_TOOGLEMB_HK; mrId: menu_alt_multbell),
+    (mrText: RC_KILLCW + RC_KILLCW_HK; mrID: menu_alt_killcw),
     (mrText: RC_SEARCHLOG + RC_SEARCHLOG_HK; mrId: menu_alt_searchlog),
     (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
 
