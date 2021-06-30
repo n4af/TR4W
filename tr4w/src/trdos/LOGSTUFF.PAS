@@ -659,7 +659,8 @@ procedure ParseFourFields(sExch: Str80; var s1, s2, s3, s4: Str20);
 procedure PassStationToCTNetwork;
 
 //procedure PrintLogHeader;
-
+function ProcessClassAndDomesticOrDXQTHExchange(Exchange: string {Str80}; var
+  RXData: ContestExchange): boolean;
 function ProcessExchange(ExchangeString: Str80; var RData: ContestExchange):
   boolean;
 function ParseArray(e: Str80): boolean;
