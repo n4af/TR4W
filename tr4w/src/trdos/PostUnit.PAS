@@ -1918,6 +1918,7 @@ begin
                 if TempRXData.QTHString <> 'DX' then     // Change to validate it is a section
                    begin
                    WriteADIFField('ARRL_SECT',TempRXData.QTHString);
+                   WriteADIFField('CLASS',TempRXData.ceClass);
                    //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s ', tCallStringLength, p);
                    //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
                    end;

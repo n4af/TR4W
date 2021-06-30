@@ -1,7 +1,7 @@
 {
  Copyright Dmitriy Gulyaev UA4WLI 2015.
 
- This file is part of TR4W  (SRC)
+ This file is part of TR4W  (SRC)                                                          4
 
  TR4W is free software: you can redistribute it and/or
  modify it under the terms of the GNU General Public License as
@@ -198,6 +198,7 @@ procedure RunExplorer(Command: PChar);
 procedure RunOptionsDialog(f: CFGFunc);
 procedure OpenUrl(url: PChar);
 function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
+procedure ProcessImportedSRX_String(fieldValue: string; var exch: ContestExchange);
 function GetContestByADIFName(sADIFName: string): ContestType;
 procedure SetExtendedModeFromMode (RData: ContestExchange);
 
@@ -6435,8 +6436,7 @@ begin
                   22: exch.RSTSent := StrToIntDef(fieldValue,599); //fieldValue;   // Same for ADIF RST Sent...
                   23: exch.Power := fieldValue;
                   24: exch.NumberReceived := StrToInt(fieldValue);
-                  25: // SRX_STRING    // Call a function passing my contest type and break this out based on exchange. Sweepstakes will be fun :)
-                     ;
+                  25: ProcessImportedSRX_String(fieldValue, exch);
                   26: if Length(exch.QTHString) = 0 then
                          begin
                           exch.QTHString := fieldValue;    // STATE
@@ -8032,6 +8032,18 @@ procedure SetExtendedModeFromMode (RData: ContestExchange);
       end;
 
    end;
+procedure ProcessImportedSRX_String(fieldValue: string; var exch: ContestExchange);
+begin
+   case exch.ceContest of
+      ARRLFIELDDAY, WINTERFIELDDAY:
+         // parse SRX_STRING of 1A EPA into class 1A and QTHString of EPA
+         ProcessClassAndDomesticOrDXQTHExchange(fieldValue, exch);
+
+      end; // case
+
+
+
+end;
 
 
 
