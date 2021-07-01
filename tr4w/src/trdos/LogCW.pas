@@ -2112,15 +2112,17 @@ procedure ToggleCW(DisplayPrompt: boolean);
 begin
   if ActiveMode = CW then
   begin
-    if CWEnabled then
+    if CWEnabled or CWEnable then
     begin
       if DisplayPrompt then QuickDisplay(TC_CWDISABLEDWITHALTK);
       FlushCWBufferAndClearPTT;
       CWEnabled := False;
+      CWEnable := false;
     end
     else
     begin
       CWEnabled := True;
+      CWEnable := true;
       QuickDisplay(nil);
     end;
   end

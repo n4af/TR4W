@@ -5897,45 +5897,77 @@ end;
 
 function CheckCommandInCallsignWindow: boolean;
 begin
-
-  Result := True;
-
-  if length(CallWindowString) = 3 then
-  begin
-    {COL}
-    if PInteger(@CallWindowString[0])^ = 1280262915 then
-    begin
-      ProcessMenu(menu_colors);
+   Result := true;
+   Case AnsiIndexText(AnsiUpperCase(CallWindowString),
+                      ['ADIF','CAB','CMD','COL','CWOFF','CWON','EXIT','NOTE','OPON','SUM','WCY','WWV']) of
+      0: ProcessMenu(menu_adif);
+      1: ProcessMenu(menu_cabrillo);
+      2: WinExec('cmd.exe', SW_SHOW);
+      3: ProcessMenu(menu_colors);
+      4: begin
+         if CWEnabled or CWEnable then
+            begin
+            QuickDisplay('CW Off');
+            FlushCWBufferAndClearPTT;
+            CWEnabled := False;
+            CWEnable := false;
+            DisplayCodeSpeed;
+            end;
+         end;
+      5: begin
+         CWEnabled := True;
+         CWEnable := true;
+         QuickDisplay('CW On');
+         DisplayCodeSpeed;
+         SetSpeed(CodeSpeed);
+         end;
+      6: ProcessMenu(menu_exit);
+      7: ProcessMenu(menu_ctrl_note);
+      8: ProcessMenu(menu_login);
+      9: ProcessMenu(menu_summary);
+      10:SendViaTelnetSocket('SH/WCY');
+      11:SendViaTelnetSocket('SH/WWV');
+      else
+         Result := false;  // False result does not clear call window
+      end; // case
       Exit;
-    end;
+
+
+      (*
+     {COL}
+        if PInteger(@CallWindowString[0])^ = 1280262915 then
+           begin
+           ProcessMenu(menu_colors);
+           Exit;
+           end;
 
 {$IF tDebugMode}
 //    showint(PInteger(@CallWindowString[0])^);
 {$IFEND}
 
-    {CMD}
-    if PInteger(@CallWindowString[0])^ = 1145914115 then
-    begin
-      WinExec('cmd.exe', SW_SHOW);
-      Exit;
-    end;
+        {CMD}
+        if PInteger(@CallWindowString[0])^ = 1145914115 then
+           begin
+           WinExec('cmd.exe', SW_SHOW);
+           Exit;
+           end;
 
-    {WWV}
-    if PInteger(@CallWindowString[0])^ = $56575703 then
-    begin
-      SendViaTelnetSocket('SH/WWV');
-      Exit;
-    end;
+        {WWV}
+        if PInteger(@CallWindowString[0])^ = $56575703 then
+           begin
+           SendViaTelnetSocket('SH/WWV');
+           Exit;
+           end;
 
-    {WCY}
-    if PInteger(@CallWindowString[0])^ = $59435703 then
-    begin
-      SendViaTelnetSocket('SH/WCY');
-      Exit;
-    end;
+        {WCY}
+        if PInteger(@CallWindowString[0])^ = $59435703 then
+           begin
+           SendViaTelnetSocket('SH/WCY');
+           Exit;
+           end;
 
-    {CAB}
-    if PInteger(@CallWindowString[0])^ = $42414303 then
+        {CAB}
+        if PInteger(@CallWindowString[0])^ = $42414303 then
     begin
       ProcessMenu(menu_cabrillo);
       Exit;
@@ -5962,6 +5994,12 @@ begin
       Exit;
     end;
 
+    {CWON}
+    if CallWindowString = 'CWON' then
+       begin
+       CWEnabled := true;
+       Exit;
+       end;
     {CALC}
 {
     if PInteger(@CallWindowString[1])^ = $434C4143 then
@@ -5977,6 +6015,12 @@ begin
       Exit;
     end;
 
+    {OPON}
+    if CallWindowString = 'OPON' then
+       begin
+       ProcessMenu(menu_login);
+       Exit;
+       end;
     {EXIT}
     if PInteger(@CallWindowString[1])^ = $54495845 then
     begin
@@ -5987,6 +6031,7 @@ begin
   end;
 
   Result := False;
+  *)
 end;
 
 procedure ClearMultSheet_CtrlC;

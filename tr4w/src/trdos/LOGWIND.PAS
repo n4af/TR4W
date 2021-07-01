@@ -1607,7 +1607,7 @@ begin
   DisplayedCodeSpeed := CodeSpeed;
   if ActiveMode = CW then
   begin
-    if CWEnable {CWEnabled} then tPChar := '%u WPM' else tPChar := '%u NO CW';
+    if CWEnable or CWEnabled {CWEnabled} then tPChar := '%u WPM' else tPChar := '%u NO CW';
     Format(wsprintfBuffer, tPChar, CodeSpeed);
     SetMainWindowText(mweCodeSpeed, wsprintfBuffer);
     ActiveRadioPtr.SpeedMemory := CodeSpeed;
