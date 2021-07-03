@@ -5899,7 +5899,7 @@ function CheckCommandInCallsignWindow: boolean;
 begin
    Result := true;
    Case AnsiIndexText(AnsiUpperCase(CallWindowString),
-                      ['ADIF','CAB','CMD','COL','CWOFF','CWON','EXIT','NOTE','OPON','SUM','WCY','WWV']) of
+                      ['ADIF','CAB','CMD','COL','CWOFF','CWON','EXIT','NOTE','OPON','SUM','UDP','WCY','WWV']) of
       0: ProcessMenu(menu_adif);
       1: ProcessMenu(menu_cabrillo);
       2: WinExec('cmd.exe', SW_SHOW);
@@ -5925,8 +5925,9 @@ begin
       7: ProcessMenu(menu_ctrl_note);
       8: ProcessMenu(menu_login);
       9: ProcessMenu(menu_summary);
-      10:SendViaTelnetSocket('SH/WCY');
-      11:SendViaTelnetSocket('SH/WWV');
+      10:SendFullLogToUDP;
+      11:SendViaTelnetSocket('SH/WCY');
+      12:SendViaTelnetSocket('SH/WWV');
       else
          Result := false;  // False result does not clear call window
       end; // case
@@ -6671,7 +6672,7 @@ begin
 
    AssignFile(adif, adifFileName);
    //ReWrite(adif);
-
+   QSOCounter := 0;
    Reset(adif);
    while not Eof(adif) do
       begin
@@ -8081,9 +8082,11 @@ procedure ProcessImportedSRX_String(fieldValue: string; var exch: ContestExchang
 begin
    case exch.ceContest of
       ARRLFIELDDAY, WINTERFIELDDAY:
+         begin
          // parse SRX_STRING of 1A EPA into class 1A and QTHString of EPA
          ProcessClassAndDomesticOrDXQTHExchange(fieldValue, exch);
-
+         exch.exchString := fieldValue;
+         end;
       end; // case
 
 

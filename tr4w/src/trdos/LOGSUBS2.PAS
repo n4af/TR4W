@@ -91,8 +91,33 @@ uses
   ZoneCont
   ;
   var TimeLastScoreBroadcast : TDateTime;
+  const BandTypeToUDPContactBand  : array[Band160..BandLight] of PChar =
+    (
+    '1.8',
+    '3.5',
+    '7',
+    '14',
+    '21',
+    '28',
+    '30',
+    '17',
+    '12',
+    '50',
+    '144',
+    '222',
+    '420',
+    '902',
+    '1.2G',
+    '2.3G',
+    '3.4G',
+    '5.7G',
+    '10G',
+    '24G',
+    'LIGHT'
+    );
 procedure SendScoreToUDP;
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
+procedure SendFullLogToUDP;
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
 procedure ToggleModes;
 procedure ToggleStereoPin; {KK1L: 6.71}
@@ -2705,6 +2730,11 @@ begin
    // Band is in Mhz, not meters.
    // ny4i Issue 82 - Added code to check if there is a radio interfaced and if not,
    // generate the base frequency from the band. This uses an array that was used for Cabrillo files.
+
+   // This is actually wrong. We should send the info from the Contact not the actual radio. NY4I 2021 July 1
+   freq := RXData.Frequency;
+   txFreq := RXData.Frequency;
+
    if ActiveRadioPtr.RadioModel <> NoInterfacedRadio then
       begin
       if ActiveRadioPtr.CurrentStatus.Split then
@@ -2744,6 +2774,7 @@ begin
        begin
        sComputerID := RxData.ceComputerID;
        end;
+
        if CurrentOperator[0] = #0 then
        begin
        sOperator := MyCall;
@@ -2768,12 +2799,13 @@ begin
                       RxData.tSysTime.qtSecond]) +
             '</timestamp>' + sLineBreak +
             #9 + '<mycall>' + MyCall + '</mycall>' + sLineBreak +
-            #9 + '<band>' + Format('%d',[freq div 1000000]) + '</band>' + sLineBreak +     // Not 20M but 14 -- Odd.
+            #9 + '<band>' + BandTypeToUDPContactBand[RXData.Band] + '</band>' + sLineBreak +
+           // #9 + '<band>' + Format('%d',[freq div 1000000]) + '</band>' + sLineBreak +     // Not 20M but 14 -- Odd.
          // #9 +   '<band>' + BandStringsArrayWithOutSpaces[RxData.Band] + '</band>' + sLineBreak +
             #9 + '<rxfreq>' + Format('%d',[freq div 10]) + '</rxfreq>' + sLineBreak + // 1420100
             #9 + '<txfreq>' + Format('%d',[txFreq div 10]) + '</txfreq>' + sLineBreak +
-            #9 + '<operator>' + sOperator + '</operator>' + sLineBreak +
-            #9 + '<mode>' + sMode + '</mode>' + sLineBreak +
+            #9 + '<operator>' + RXData.ceOperator + '</operator>' + sLineBreak +
+            #9 + '<mode>' + ExtendedModeStringArray[RXData.ExtMode] + '</mode>' + sLineBreak +
             #9 + '<call>' + RXData.Callsign + '</call>' + sLineBreak +
             #9 + '<countryprefix>' + RxData.QTH.CountryID + '</countryprefix>' + sLineBreak +
             #9 + '<wpxprefix>' + RxData.QTH.Prefix + '</wpxprefix>' + sLineBreak +
@@ -2784,7 +2816,7 @@ begin
             #9 + '<rcv>' + Format('%d',[RxData.RSTReceived]) + '</rcv>' + sLineBreak +
             #9 + '<rcvnr>' + Format('%d',[nNumberReceived]) + '</rcvnr>' + sLineBreak +
             #9 + '<gridsquare></gridsquare>' + sLineBreak +
-            #9 + '<exchange1>' + ExchangeWindowString + '</exchange1>' + sLineBreak +
+            #9 + '<exchange1>' + RXData.ExchString + '</exchange1>' + sLineBreak +
             #9 + '<section>' + RxData.QTHString + '</section>' + sLineBreak +    // Issue 262
             #9 + '<comment></comment>' + sLineBreak +
             #9 + '<qth>' + RxData.QTHString + '</qth>' + sLineBreak +
@@ -2814,4 +2846,38 @@ begin
    udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
    //udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
 end;
+
+procedure SendFullLogToUDP;
+var nCount: integer;
+begin
+   nCount := 0;
+   if not OpenLogFile then
+      begin
+      logger.error('[SendFullLogToUDP] Could not open log file');
+      CloseHandle(tReportFileWrite);
+      Exit;
+      end;
+
+   DecimalSeparator := '.'; // Set this so we use . as reqired by ADIF and not localized separator ny4i
+  
+   ReadVersionBlock;
+   while ReadLogFile do  // This reads the log into TempRXData global (bad design)
+      begin
+      if GoodLookingQSO then
+         begin
+         inc(nCount);
+         logger.Debug('[SendFullLogToUDP] (%d) Read contact for callsign %s',[nCount,TempRXData.Callsign]);
+         //SendDeletedContactToUDP(TempRXData);
+         LogContactToUDP(TempRXData);
+         end
+      else
+         begin
+         logger.error('[SendFullLogToUDP] Was not valid QSO %s',[TempRXData.Callsign]);
+         end;
+      end;
+   Logger.Info('%d records sent to UDP',[nCount]);
+   Format(QuickDisplayBuffer, '%d log records sent to UDP', nCount);
+   QuickDisplay(QuickDisplayBuffer);
+end;
+
 end.
