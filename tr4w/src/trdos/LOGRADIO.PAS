@@ -383,6 +383,7 @@ var
    RadioSupportsCWSpeedSync: InterfacedRadioTypeSet;
    IcomRadiosThatSupportRIT: InterfacedRadioTypeSet;
    IcomRadiosThatSupportVFOB: InterfacedRadioTypeSet;
+   IcomRadiosThatSupportPSKMode: InterfacedRadioTypeSet;  // For data, radio uses PSK mode instead of USB-D.
    ICOMRadios:       ICOMRadioTypes;
    KenwoodRadios:    KenwoodRadioTypes;
 
@@ -2744,7 +2745,7 @@ begin
                end;
             if (Mode = Digital) and (ActiveRadioPtr.CurrentStatus.Mode = Digital) then  // 4.97.11
                begin
-               logger.debug('Skipping Kenwod mode change because MODE was already DIGITAL');
+               logger.debug('Skipping Kenwood mode change because MODE was already DIGITAL');
                end
             else
                begin
@@ -2854,7 +2855,7 @@ begin
                      end
                   else if Mode = Digital then
                      begin
-                     CommandsTempBuffer[7] := Chr(4); //TempChar := #4;
+                     CommandsTempBuffer[7] := Chr(1); //TempChar := #4;  // Icom uses mode USB with Digital flag enabled.
                      end
                   else
                      begin      //must be phone
@@ -3400,6 +3401,7 @@ begin
       IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
    IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
    IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
+   //IcomRadiosThatSupportPSKMode := [IC7610];
    ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];

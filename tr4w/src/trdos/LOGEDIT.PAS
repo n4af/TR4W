@@ -2720,7 +2720,7 @@ begin
       else if ActiveExchange = RSTPrefectureExchange then
       begin
         TempExchange.QTHString := 'p' + RemoveFirstString(TempString);
-
+        logger.debug('Calling FoundDomesticQTH from InitialExchangeEntry');
         if FoundDomesticQTH(TempExchange) then
           VisibleLog.ShowDomesticMultiplierStatus(TempExchange.DomesticQTH);
         Exit;

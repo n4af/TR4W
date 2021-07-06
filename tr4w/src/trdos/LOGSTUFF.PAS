@@ -1389,7 +1389,7 @@ var
   dx: boolean;
 begin
   ProcessClassAndDomesticOrDXQTHExchange := False;
-
+  logger.debug('Entered ProcessClassAndDomesticOrDXQTHExchange with Exchange of (%s)',[Exchange]);
   if DomesticCountryCall(RXData.Callsign) then
   begin
     dx := false;
@@ -1415,9 +1415,11 @@ begin
       RXData.QTHString := TempString;
     end;
     // if I enter 999D wtx, then correct it to 99d wtx, then length is of class is still 4. Fix that.
+    logger.debug('Calling FoundDomesticQTH from ProcessClassAndDomesticOrDXQTHExchange - QTHString = (%s)',[RXData.QTHString]);
     if not FoundDomesticQTH(RXData) then
     begin
       ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+      logger.error('[ProcessClassAndDomesticOrDXQTHExchange] Improper Domestic QTH = Exchange = (%s), DomesticQTH = (%s)',[Exchange, RXData.QTHString]);
       // misspelled in the constants file //ny4i 4.45.3
       Exit; // This was before the above code that flips the values. // ny4i 4.45.3
     end;
@@ -1468,10 +1470,11 @@ begin
     //if TempString <> '' then RXData.QTHString := TempString;
   end;
 
-  // Result is set in one of two patchs above...
+  // Result is set in one of two paths above...
 
   //  ProcessClassAndDomesticOrDXQTHExchange :=
    // ProcessClassAndDomesticOrDXQTHExchange := (length(RXData.ceClass) in [2, 3]) and ((RxData.ceClass = 'A') or (RxData.ceClass = 'B') or (RxData.ceClass = 'C') or (RxData.ceClass = 'D') or (RxData.ceClass = 'E') or (RxData.ceClass = 'F'));
+   logger.debug('Leaving ProcessClassAndDomesticOrDXQTHExchange with ceClass = (%s) and QTHString = (%s)',[RXData.ceclass, RXData.QTHString]);
 end;
 
 function ProcessRSTAgeAndPossibleSK(Exchange: ShortString; var RXData:
@@ -1692,7 +1695,10 @@ begin
   if not DomesticCountryCall(RXData.Callsign) then
     ProcessNameAndDomesticOrDXQTHExchange := True
   else
-    ProcessNameAndDomesticOrDXQTHExchange := FoundDomesticQTH(RXData);
+     begin
+     logger.debug('Calling FoundDomesticQTH from ProcessNameAndDomesticOrDXQTHExchange');
+     ProcessNameAndDomesticOrDXQTHExchange := FoundDomesticQTH(RXData);
+     end;
   if Result = False then
     ExchangeErrorMessage := TC_IMPROPERDOMESITCQTHORMISSINGNAME;
 
@@ -1764,7 +1770,10 @@ begin
     Exit;
   ProcessQSONumberAndDomesticQTHExchange := FoundDomesticQTH(RXData);
   if not Result then
-    ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+     begin
+     ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+     logger.error('[ProcessQSONumberAndDomesticQTHExchange] Improper Domestic QTH');
+     end;
   {
     Exit;
 
@@ -1843,41 +1852,6 @@ begin
     ProcessQSONumberAndDomesticQTHExchange := FoundDomesticQTH(RXData);
   }
 end;
-{
-function ProcessQSONumberAndGridSquareExchange(Exchange: string; var RXData: ContestExchange): boolean;
-var
-  TempString, NumberString         : Str40;
-  GridString                       : Str20;
-  Result1                          : integer;
-
-begin
-  NumberString := '';
-  GridString := '';
-
-  Result := False;
-
-  while (Exchange <> '') and ((NumberString = '') or (GridString = '')) do
-    begin
-      TempString := RemoveLastString(Exchange);
-
-      if StringIsAllNumbers(TempString) then
-        NumberString := TempString
-      else
-        GridString := TempString;
-
-    end;
-
-  if (NumberString = '') or (GridString = '') then Exit;
-  if not GoodLookingGrid(GridString) then Exit;
-
-  RXData.QTHString := GridString;
-
-  Val(NumberString, RXData.NumberReceived, Result1);
-
-  if Result1 <> 0 then Exit;
-  Result := FoundDomesticQTH(RXData);
-end;
-}
 
 function ProcessQSONumberAndGridSquareExchange(Exchange: ShortString; var
   RXData: ContestExchange): boolean;
@@ -1922,6 +1896,7 @@ begin
 
   if Result1 <> 0 then
     Exit;
+
   Result := FoundDomesticQTH(RXData);
 end;
 
@@ -3536,7 +3511,10 @@ begin
     else
       Result := False;
     if Result = False then
-      ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+       begin
+       logger.Error('[ProcessRSTAndDomesticQTHExchange] Improper DOmestic QTH');
+       ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+       end;
     {WLI}
 //    if ActiveExchange = RSTZoneOrSocietyExchange then
 //      if CONTEST <> IARU then RXData.Zone := CountryTable.GetITUZone(RXData.Callsign);
@@ -3576,7 +3554,10 @@ begin
     //      Exit;
   end
   else
-    ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+     begin
+     logger.error('[ProcessRSTAndDomesticQTHExchange] Improper Domestic QTH - Exchange = (%s)',[Exchange]);
+     ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+     end;
 
 end;
 
@@ -8239,12 +8220,13 @@ begin
         RData);
 
     CheckAndChapterOrQTHExchange:
-      ProcessExchange := ProcessCheckAndChapterOrQTHExchange(ExchangeString,
-        RData);
+      ProcessExchange := ProcessCheckAndChapterOrQTHExchange(ExchangeString, RData);
 
     ClassDomesticOrDXQTHExchange:
-      ProcessExchange := ProcessClassAndDomesticOrDXQTHExchange(ExchangeString,
-        RData);
+       begin
+       logger.debug('Calling ProcessClassAndDomesticOrDXQTHExchange from ProcessExchange');
+       ProcessExchange := ProcessClassAndDomesticOrDXQTHExchange(ExchangeString, RData);
+       end;
 
     KidsDayExchange:
       ProcessExchange := ProcessKidsExchange(ExchangeString, RData);
@@ -8467,7 +8449,7 @@ begin
 
   if ExchangeInformation.RST then
     RemoveFirstString(ExchangeString);
-
+  logger.debug('Calling ProcessExchange from LogStringToRXData - LogString = (%s)',[LogString]);
   ProcessExchange(ExchangeString, RXData);
 end;
 

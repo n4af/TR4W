@@ -420,6 +420,14 @@ type
 
   Ttr4wGetPlugin = function(): PChar; stdcall;
 
+  Type TADIF_Fields = (tAdifARRL_SECT=0,tAdifBAND, tAdifCALL, tAdifCHECK, tAdifCLASS, tAdifCQ_Z,
+                       tAdifCONTEST_ID, tAdifCNTY, tAdifGRIDSQUARE, tAdifFREQ, tAdifFREQ_RX,
+                       tAdifIOTA, tAdifITUZ, tAdifMODE, tAdifNAME, tAdifOPERATOR, tAdifPRECEDENCE,
+                       tAdifQSO_DATE, tAdifQSO_DATE_OFF, tAdifTIME_ON, tAdifTIME_OFF,
+                       tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
+                       tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
+                       tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN, tAdifQTH, tAdifPROGRAMID
+                      );
 var
   FreeMemCount                          : integer;
   ReallocMemCount                       : integer;
@@ -1916,7 +1924,7 @@ begin
 //      if ActiveDomesticMult = RDADistrict then
 //        if length(TestString) <> 4 then TestString := '';
         if TestString = '' then Exit;
-
+        logger.debug('[ExchangeWindowChange] Setting TempExchange.QTHString to (%)',[TestString]);
         TempExchange.QTHString := TestString;
         DQTH := FoundDomesticQTH(TempExchange);
         if not DQTH then
@@ -3326,6 +3334,7 @@ begin
   if TuneOnFreqFromCallWindow then Exit;
   if CallWindowString = 'TXON' then
      begin
+     logger.debug('Calling tPTTVIACAT with true');
      tPTTVIACAT(true);
      end
   else if CallWindowString = 'TXOFF' then
@@ -3860,7 +3869,7 @@ var
   RST                                   : Word;
   s1,s2,s3,s4 : str20;
 begin
-  logger.Trace('>>>Entering ParametersOkay');
+  logger.debug('>>>Entering ParametersOkay');
   logger.debug ('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d, ExchangeString = %s', [call,BandStringsArray[Band], ModeStringArray[Mode], freq, ExchangeString]);
 
   //    RData.QTHString:='';
@@ -3906,7 +3915,7 @@ begin
   else
   begin
   end;
-
+  logger.debug('[ParametersOkay] Setting RData.QTHString to zero');
   Windows.ZeroMemory(@RData.QTHString, SizeOf(RData.QTHString));
 
   if ParameterOkayMode = QSLAndLog then
@@ -3941,7 +3950,7 @@ begin
 
     ParametersOkay := True;
     LogBadQSOString := ExchangeString;
-
+    logger.debug('Calling ProcessExchange from ParametersOkay QSLAndLog');
     ProcessExchange(ExchangeString, RData); {wli}
     CalculateQSOPoints(RData);
     Exit;
@@ -4000,7 +4009,7 @@ begin
 
   GetRidOfPrecedingSpaces(ExchangeString);
   GetRidOfPostcedingSpaces(ExchangeString);
-
+  logger.debug('Calling ProcessExchange from ParametersOkay');
   ParametersOkay := ProcessExchange(ExchangeString, RData);
 
   if ExchangeErrorMessage <> nil then QuickDisplayError(ExchangeErrorMessage);
@@ -5220,17 +5229,6 @@ begin
       if RescoredRXData^.ceQSO_Deleted = False then
         if RescoredRXData^.ceQSO_Skiped = False then
         begin
-//        RescoredRXData^.ceOperator := 'K6VVA';
-{
-          if DoingDomesticMults then
-          begin
-            FoundDomesticQTH(RescoredRXData^);
-          end;
-}
-
-//          if RescoredRXData^.NumberSent <= 587 then
-//            RescoredRXData^.tSysTime.qtHour := RescoredRXData^.tSysTime.qtHour - 1;
-
           if DoingPrefixMults then
           begin
             Windows.ZeroMemory(@RescoredRXData.QTH, SizeOf(RescoredRXData.QTH));
@@ -6366,6 +6364,10 @@ var
   appHQ: string;
   recordFromWSJTX: boolean;
   gridSquare: string;
+  tempSRX_String: string;
+  tempState : string;
+  tempVE_Prov : string;
+  tempARRL_Sect: string;
 
 begin
    lookingForFieldName := false;
@@ -6407,48 +6409,37 @@ begin
                end
             else
                begin
-               Case AnsiIndexText(AnsiUpperCase(fieldName),    // Be careful addng these. The order matters in the case...
+               Case TADIF_Fields(AnsiIndexText(AnsiUpperCase(fieldName),    // Be careful addng these. The order matters in the case...
                      ['ARRL_SECT', 'BAND','CALL', 'CHECK', 'CLASS', 'CQ_Z',
                       'CONTEST_ID', 'CNTY', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
                       'IOTA', 'ITUZ', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
                       'QSO_DATE', 'QSO_DATE_OFF' ,'TIME_ON', 'TIME_OFF',
                       'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                       'STATE', 'STX', 'STX_STRING', 'SUBMODE','TEN_TEN',
-                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN', 'QTH', 'PROGRAMID']) of
-                  0: exch.QTHString := fieldValue;
-                  1:
+                      'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN', 'QTH', 'PROGRAMID'])) of
+                  tAdifARRL_SECT: tempARRL_Sect := fieldValue; //exch.QTHString := fieldValue;
+                  tAdifBAND:
                      begin
                      exch.Band := GetADIFBand(fieldValue);
                      end;
-                  2: exch.Callsign := AnsiUpperCase(fieldValue);
-                  3: exch.Check := StrToInt(fieldValue);
-                  4: exch.ceClass := AnsiUpperCase(fieldValue);
-                  5: exch.Zone := StrToInt(fieldValue);
-                  6: begin // CONTEST_ID
+                  tAdifCALL: exch.Callsign := AnsiUpperCase(fieldValue);
+                  tAdifCHECK: exch.Check := StrToInt(fieldValue);
+                  tAdifCLASS: exch.ceClass := AnsiUpperCase(fieldValue);
+                  tAdifCQ_Z: exch.Zone := StrToInt(fieldValue);
+                  tAdifCONTEST_ID:
+                     begin // CONTEST_ID
                      contest := GetContestByADIFNAme(fieldValue);
                      if ContestsArray[contest].ADIFName = fieldValue then
                         begin
                         exch.ceContest := contest;
                         end;
                      end;
-                  7: logger.info('[ParseADIFRecord] CNTY was in record as %s but skipping since no place to put it',[fieldValue]); //CNTY
-                  8: begin
+                  tAdifCNTY: logger.info('[ParseADIFRecord] CNTY was in record as %s but skipping since no place to put it',[fieldValue]); //CNTY
+                  tAdifGRIDSQUARE:
+                     begin
                      gridSquare := fieldValue;
-                     if Length(exch.QTHString) = 0 then
-                         begin
-                         if (ActiveDomesticMult = GridSquares) or
-                               ((ActiveExchange = RSTAndOrGridExchange) or
-                                (ActiveExchange = Grid2Exchange) or
-                                (ActiveExchange = RSTAndGrid3Exchange)         )   // 4.96.3
-
-                                then
-                            begin
-                            exch.QTHString := fieldValue; // GRIDSQUARE
-                            exch.DomesticQTH := fieldvalue;
-                            end;
-                         end;
                      end;
-                  9:
+                  tAdifFREQ:
                      begin
                      DecimalSeparator := '.';
                      neFreq := StrToFloat(fieldValue);
@@ -6456,8 +6447,8 @@ begin
                      exch.Frequency := Trunc(neFreq);
                      logger.Trace('[ParseADIFRecord] FREQ = %s', [fieldValue]);
                      end;
-                  12: exch.Zone := StrToInt(fieldValue);
-                  13:
+                  tAdifITUZ: exch.Zone := StrToInt(fieldValue);
+                  tAdifMODE:
                      begin
                      if exch.Mode = NoMode then
                         begin
@@ -6466,58 +6457,67 @@ begin
                         exch.ExtMode := msm.msmExtendedMode;
                         end;
                      end;
-                  14: exch.Name := fieldValue;
-                  15: StrPLCopy(exch.ceOperator, fieldValue, High(exch.ceOperator));
-                  17: //QSO_DATE
+                  tAdifNAME: exch.Name := fieldValue;
+                  tAdifOPERATOR: StrPLCopy(exch.ceOperator, fieldValue, High(exch.ceOperator));
+                  tAdifQSO_DATE:
                      if not ADIFDateStringToQSOTime(fieldValue,exch.tSysTime) then
                         begin
                         ; //exit;
                         end;
-                  19: // time_on
+                  tAdifTIME_ON:
                      if not ADIFTimeStringToQSOTime(fieldValue,exch.tSysTime) then
                         begin
                         ; //exit;
                         end;
-                  21: exch.RSTReceived := StrToIntDef(fieldValue,599); // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
-                  22: exch.RSTSent := StrToIntDef(fieldValue,599); //fieldValue;   // Same for ADIF RST Sent...
-                  23: exch.Power := fieldValue;
-                  24: exch.NumberReceived := StrToInt(fieldValue);
-                  25: ProcessImportedSRX_String(fieldValue, exch);
-                  26: if Length(exch.QTHString) = 0 then
-                         begin
-                          exch.QTHString := fieldValue;    // STATE
-                         //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
-                         end;
-                  27: exch.NumberSent := StrToInt(fieldValue);
-                  29:
+                  tAdifRST_RCVD: exch.RSTReceived := StrToIntDef(fieldValue,599); // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
+                  tAdifRST_SENT: exch.RSTSent := StrToIntDef(fieldValue,599); //fieldValue;   // Same for ADIF RST Sent...
+                  tAdifRX_PWR: exch.Power := fieldValue;
+                  tAdifSRX: exch.NumberReceived := StrToInt(fieldValue);
+                  tAdifSRX_STRING: tempSRX_String := fieldValue;
+                     (*begin
+                     if not recordFromWSJTX then
+                        begin
+                        ProcessImportedSRX_String(fieldValue, exch);
+                        end;
+                     end; *)
+                  tAdifSTATE:
+                     tempState := fieldValue;
+                     (*if Length(exch.QTHString) = 0 then
+                        begin
+                        exch.QTHString := fieldValue;
+                        //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
+                        end; *)
+                  tAdifSTX: exch.NumberSent := StrToInt(fieldValue);
+                  tAdifSUBMODE:
                      begin
                      msm := GetADIFSubmode(fieldValue);
                      exch.Mode := msm.msmMode;
                      exch.ExtMode := msm.msmExtendedMode;
                      end;
-                  30: exch.TenTenNum := StrToInt(fieldValue);
-                  31: if Length(exch.QTHString) = 0 then
+                  tAdifTEN_TEN: exch.TenTenNum := StrToInt(fieldValue);
+                  tAdifVE_PROV: tempVE_Prov := fieldValue;
+                   (*  if Length(exch.QTHString) = 0 then
                          begin
-                         exch.QTHString := fieldValue; // VE_Prov
-                         end;
-                  32, 33: // APP_TR4W_HQ or APP_N1MM_HQ
+                         exch.QTHString := fieldValue;
+                         end;   *)
+                  tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ:
                      appHQ := fieldValue;
-                  34: ; // STATION_CALLSIGN
-                  35: begin      // QTH
+                  tAdifSTATION_CALLSIGN:
+                     ;
+                  tAdifQTH: begin
                       exch.QTHString := fieldValue;
                       end;
-                  36: begin
+                  tAdifPROGRAMID: begin
                       if fieldValue = 'WSJT-X' then
                          begin
                          recordFromWSJTX := true;
                          end;
                       end;
-                  -1: if MidStr(fieldName,1,4) <> 'APP_' then
-                         begin
-                         DebugMsg('ADIF ' + fieldName + ' is not present in this list');
-                         end;
                   else
-                     DebugMsg('ADIF ' + fieldName + ' is present but no handler');
+                     if MidStr(fieldName,1,4) <> 'APP_' then
+                         begin
+                         DebugMsg('ADIF ' + fieldName + ' is present but no handler');
+                         end;
                   end;
                //Log('Found field: [' + fieldName + '], [' + fieldLen + '], [' + fieldValue + ']');
                end;
@@ -6580,12 +6580,16 @@ begin
          begin
          exch.ceOperator := currentOperator;
          end;
-
+      if length(tempSRX_String) > 0 then
+         begin
+         exch.ExchString := tempSRX_String;
+         end;
       case exch.ceContest of
          GENERALQSO:
             if recordFromWSJTX then
                begin
                exch.QTHString := gridSquare;
+               exch.DomesticQTH := gridSquare;
                end;
          ARRL_RTTY_ROUNDUP:
             exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
@@ -6593,14 +6597,38 @@ begin
             exch.Age := StrToIntDef(exch.QTHString,0);
          IARU:
             exch.QTHString := fieldValue;
+         ARRLFIELDDAY, WINTERFIELDDAY:
+            //if recordFromWSJTX then
+            //   begin
+               exch.ExchString := tempSRX_String; //exch.QTHString;
+               
+            //   end;
+         WWDIGI:
+            begin
+            exch.ExchString := gridSquare;
+            exch.DomesticQTH := gridSquare;
+            end;
          else
-         ;
+            if (ActiveDomesticMult = GridSquares) or
+               ((ActiveExchange = RSTAndOrGridExchange) or
+                (ActiveExchange = Grid2Exchange) or
+                (ActiveExchange = RSTAndGrid3Exchange)            // 4.96.3
+               ) then
+               begin
+               exch.QTHString := gridSquare;
+               exch.DomesticQTH := gridSquare;
+               exch.ExchString := IntToStr(exch.RSTReceived) + ' ' + gridSquare;
+               end
+            else
+               begin
+               exch.ExchString := tempSRX_String;
+               end;
          end; // of case
 
-      if recordFromWSJTX then
+     { if recordFromWSJTX then
          begin
          exch.DomesticQTH := gridSquare;
-         end;
+         end;     }
    end; // of ParseADIFRecord
 (*----------------------------------------------------------------------------*)
 procedure ImportFromADIF;
@@ -7534,6 +7562,7 @@ var
   TempPortInterface                     : PortInterface;
   TempByte                              : Byte;
 begin
+  logger.debug('Entering PTTOn');
   if not PTTEnable then
   begin
 
@@ -8084,8 +8113,13 @@ begin
       ARRLFIELDDAY, WINTERFIELDDAY:
          begin
          // parse SRX_STRING of 1A EPA into class 1A and QTHString of EPA
+         logger.debug('Calling ProcessClassAndDomesticOrDXQTHExchange from ProcessImportedSRX_String');
          ProcessClassAndDomesticOrDXQTHExchange(fieldValue, exch);
          exch.exchString := fieldValue;
+         if length(exch.DomesticQTH) = 0 then
+            begin
+            exch.DomesticQTH := exch.QTHString;
+            end;
          end;
       end; // case
 

@@ -472,7 +472,11 @@ var
 begin
   FoundDomesticQTH := False;
 
-   if RXData.QTHString = '' then Exit;
+   if RXData.QTHString = '' then
+      begin
+      logger.error('[FoundDomesticQTH] RXData.QTHString is blank');
+      Exit;
+      end;
 
   QTHString := UpperCase(RXData.QTHString);
 
@@ -2132,6 +2136,7 @@ var
 
 begin
   ParseExchangeIntoContestExchange := False;
+  logger.debug('Entering ParseEchangeIntoCOntestExchange with LogEntry = (%s)',[LogEntry]);
 
   ClearContestExchange(RXData);
 
