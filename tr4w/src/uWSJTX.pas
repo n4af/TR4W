@@ -60,6 +60,7 @@ type
       processingCmdQSXSplit: boolean;
       processingCmdSetFreq: boolean;
       requestedTXFreq: extended;
+      processingCmdSetFreqMode: boolean;
       slCQMessage: TStringList;
       sCallSentToWindow: string;
       procedure SetUDPPort(nPort: integer);
@@ -531,8 +532,9 @@ begin
 
                   //TempRXData.NumberSent := TotalContacts;
                   //LogContact(TempRXData, true);
-                  if ParametersOkay(TempRXData.Callsign, TempRXData.QTHString, ActiveBand, Digital, ActiveRadioPtr.LastDisplayedFreq {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
+                  if ParametersOkay(TempRXData.Callsign, {TempRXData.QTHString} TempRXData.ExchString, ActiveBand, Digital, ActiveRadioPtr.LastDisplayedFreq {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
                      begin
+                     TempRXData.DomesticQTH := TempRXData.QTHString;
                      ReceivedData.ceSearchAndPounce := OpMode = SearchAndPounceOpMode;
                      ReceivedData.ceComputerID := ComputerID;
                      LogContact(TempRXData, True);
@@ -883,6 +885,11 @@ begin
          processingCmdSetFreq := true;
          logger.Trace('[uWSJTX] Setting processingCmdSetFreq');
          end
+      else if fieldValue = 'CmdSetFreqMode' then
+         begin
+         processingCmdSetFreqMode := true;
+         logger.Trace('[uWSJTX] Setting processingCmdSetFreqMode');
+         end
       else if fieldName = 'xcvrfreq' then
          begin
          freq := SafeFloat(fieldValue);
@@ -893,6 +900,11 @@ begin
             ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
             processingCmdSetFreq := false;
             logger.Trace('[uWSJTX] Resetting processingCmdSetFreq');
+            end
+         else if processingCmdSetFreqMode then
+            begin
+            logger.Trace('[uWSJTX] Setting VFOA to frequency ' + IntToStr(Trunc(freq)));
+            ActiveRadioPtr.SetRadioFreq(Trunc(freq * 1000),Digital,'A');  // A is for VFO A
             end
          else if processingCmdSetTXFreq then
             begin
@@ -1046,6 +1058,18 @@ begin
             sFreq := SysUtils.FormatFloat(',0.000',ActiveRadioPtr.CurrentStatus.VFO[VFOB].Frequency/1000);
             logger.Trace('[uWSJTX] Sending VFOB frequency as ' + SysUtils.Format('<CmdFreq:%u>%s',[length(sFreq),sFreq]));
             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdTXFreq:%u>%s',[length(sFreq),sFreq]));
+            end;
+         end
+      else if fieldValue = 'xcvrmode' then
+         begin
+         if processingCmdSetFreqMode then
+            begin
+            processingCmdSetFreqMode := false;
+            logger.Trace('[uWSJTX] Resetting processingCmdSetFreqMode');
+            end
+         else
+            begin
+            logger.debug('[uWSJTX] Received unexpected xcvrmode');
             end;
          end
       else if fieldValue = 'CmdQSXSplit' then

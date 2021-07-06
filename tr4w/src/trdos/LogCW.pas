@@ -242,6 +242,7 @@ begin
     if ActiveRadioPtr.tPTTStatus = PTT_OFF then
       if PTTEnable then
       begin
+        logger.debug('Calling PTTOn from AddStringToBuffer');
         PTTOn;
         PostMmttyMessage(RXM_PTT, RXM_PTT_SWITCH_TO_TX);
       end;

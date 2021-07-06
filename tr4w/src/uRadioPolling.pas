@@ -2673,7 +2673,7 @@ var
    h: HWND;
    //fa: integer;
 begin
-   logger.Debug('Entering DisplayCurrentStatus');
+   //logger.Debug('Entering DisplayCurrentStatus');
    if rig = ActiveRadioPtr then
       SendStationStatus(sstBandModeFreq);
    if UDPBroadcastRadio then
