@@ -6438,19 +6438,6 @@ begin
                   tAdifGRIDSQUARE:
                      begin
                      gridSquare := fieldValue;
-                     if Length(exch.QTHString) = 0 then
-                         begin
-                         if (ActiveDomesticMult = GridSquares) or
-                               ((ActiveExchange = RSTAndOrGridExchange) or
-                                (ActiveExchange = Grid2Exchange) or
-                                (ActiveExchange = RSTAndGrid3Exchange)         )   // 4.96.3
-
-                                then
-                            begin
-                            exch.QTHString := fieldValue; // GRIDSQUARE
-                            exch.DomesticQTH := fieldvalue;
-                            end;
-                         end;
                      end;
                   tAdifFREQ:
                      begin
@@ -6617,7 +6604,20 @@ begin
                
             //   end;
          else
-         ;
+            if (ActiveDomesticMult = GridSquares) or
+               ((ActiveExchange = RSTAndOrGridExchange) or
+                (ActiveExchange = Grid2Exchange) or
+                (ActiveExchange = RSTAndGrid3Exchange)            // 4.96.3
+               ) then
+               begin
+               exch.QTHString := gridSquare;
+               exch.DomesticQTH := gridSquare;
+               exch.ExchString := IntToStr(exch.RSTReceived) + ' ' + gridSquare;
+               end
+            else
+               begin
+               exch.ExchString := tempSRX_String;
+               end;
          end; // of case
 
      { if recordFromWSJTX then
