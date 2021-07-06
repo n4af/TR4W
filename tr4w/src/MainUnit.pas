@@ -6603,6 +6603,11 @@ begin
                exch.ExchString := tempSRX_String; //exch.QTHString;
                
             //   end;
+         WWDIGI:
+            begin
+            exch.ExchString := gridSquare;
+            exch.DomesticQTH := gridSquare;
+            end;
          else
             if (ActiveDomesticMult = GridSquares) or
                ((ActiveExchange = RSTAndOrGridExchange) or
