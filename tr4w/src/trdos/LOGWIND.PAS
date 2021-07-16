@@ -4530,10 +4530,11 @@ begin
   d  : pChar;
   label
   next;
- begin
- if not BandMapEnable then exit;
-   BandMapPreventRefresh := True;
-  // SpotsList.Display;
+
+  begin
+   if not BandMapEnable then exit;
+//   BandMapPreventRefresh := True;
+   SpotsList.Display;
 
  i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
  //if i = -1 then
@@ -4545,7 +4546,11 @@ Next:
 
    i := i + 1  ;
  if i = CursorCount then
- exit ;
+  begin
+   i := 0;
+   goto next;
+  end;
+
 
   Windows.SendMessage(BandMapListBox, LB_SETCURSEL, i, 0);
 
@@ -4556,7 +4561,7 @@ Next:
      Band := InActiveRadioPtr.BandMemory;
        if Spot.FBand = BandmapBand then
 
-                       TuneRadioToSpot(SpotsList.Get(i), InActiveRadio) 
+                       TuneRadioToSpot(SpotsList.Get(i), InActiveRadio)
 
                        else
                        GoTo Next;

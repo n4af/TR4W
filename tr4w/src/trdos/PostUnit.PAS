@@ -675,7 +675,7 @@ begin
         push MString
         push BString
         end;
-      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %s%s %9d %12d %8d');
+      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %s%s %9d  %12d %8d');
 
         asm add esp,28
         end;

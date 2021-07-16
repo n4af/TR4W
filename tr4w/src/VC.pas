@@ -145,7 +145,7 @@ const
   ICOM_LONG_MODECOMMAND                 = True ;
 
 const
-        LANG                                  = 'ENG';
+         LANG                                  = 'ENG';
 //       LANG                                  = 'RUS';
 //       LANG                                  = 'SER';
 //       LANG                                  = 'ESP';
@@ -185,12 +185,12 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.101.7' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.102.3' ;  // N4af     New Release
 
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'June, 2021' ;
+  TR4W_CURRENTVERSIONDATE               = 'July, 2021' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
