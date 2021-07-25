@@ -708,10 +708,18 @@ end;
 
 procedure SpaceBarProc2;
 begin
+<<<<<<< HEAD
    if (DupeInfoCall = '') and (CallWindowString = '') and (OpMode = SearchAndPounceOpMode) then    // 4.102.3
    If Not DEEnable then SendStringAndStop(MyCall)
     else
      SendStringAndStop(DEPlusMyCall);
+=======
+  if (DupeInfoCall = '') and (CallWindowString = '') and (OpMode = SearchAndPounceOpMode) then    // 4.102.3
+   If Not DEEnable then SendStringAndStop(MyCall)
+    else
+     SendStringAndStop(DEPlusMyCall);
+
+>>>>>>> 751df3fd7bfeadda240871b8f9ea08e0ca11ace3
   if (DupeInfoCall <> '') and (CallWindowString = '') then
   begin
     ActiveRadioPtr^.StopSendingCW;

@@ -4557,6 +4557,16 @@ for i:=0 to CursorCount do
 
    exit ;
 
+<<<<<<< HEAD
+=======
+   i := i + 1  ;
+ if i = CursorCount then
+  begin
+   i := 0;
+   goto next;
+  end;
+
+>>>>>>> 751df3fd7bfeadda240871b8f9ea08e0ca11ace3
 
 
  // Windows.SendMessage(BandMapListBox, LB_SETCURSEL, j, 0);
@@ -4565,6 +4575,7 @@ for i:=0 to CursorCount do
    if QSYInactiveRadio and TwoRadioMode then
    begin
 
+<<<<<<< HEAD
      Band := InActiveRadioPtr.BandMemory ;
    end
       else
@@ -4574,6 +4585,12 @@ for i:=0 to CursorCount do
            begin
                        Windows.SendMessage(BandMapListBox, LB_SETCURSEL, ja, 0);
                        TuneRadioToSpot(SpotsList.Get(ja), InActiveRadio) ;
+=======
+     Band := InActiveRadioPtr.BandMemory;
+       if Spot.FBand = BandmapBand then
+
+                       TuneRadioToSpot(SpotsList.Get(i), InActiveRadio)
+>>>>>>> 751df3fd7bfeadda240871b8f9ea08e0ca11ace3
 
             end
                        else

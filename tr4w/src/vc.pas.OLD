@@ -185,16 +185,12 @@ const
 
 
 
-<<<<<<< HEAD
-  TR4W_CURRENTVERSION_NUMBER            = '4.102.5' ;  // N4af     New Release
-=======
-  TR4W_CURRENTVERSION_NUMBER            = '4.102.3' ;  // N4af     New Release
->>>>>>> 751df3fd7bfeadda240871b8f9ea08e0ca11ace3
+  TR4W_CURRENTVERSION_NUMBER            = '4.99.4' ;  // N4af     New Release
 
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-  TR4W_CURRENTVERSIONDATE               = 'July, 2021' ;
+  TR4W_CURRENTVERSIONDATE               = 'April, 2021' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 
@@ -795,9 +791,8 @@ type
     ARRLDXSSB,
     ARRLSSCW,
     ARRLSSSSB,
-    ARRLVHFJAN,
-    ARRLVHFJUN,
-    ARRLVHFSEP,
+    ARRLVHFQSO,
+    ARRLVHFSS,
     BALTIC,
     BWQP,
     CIS,
@@ -956,8 +951,7 @@ type
     EUDX,        // 4.95.6
     BCQP,       // 4.97.7
     VAQP,
-    YOTA,
-    IN7QPNE
+    YOTA
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -1005,7 +999,6 @@ type
     FTDX5000,
     FTDX9000,
     IC78,
-    IC705,
     IC706,
     IC706II,
     IC706IIG,
@@ -2213,7 +2206,6 @@ const
   menu_ctrl_j                           = 10338;
 
   menu_ctrl_sendkeyboardinput           = 10400;
-  menu_ctrl_trpath                      = 10605;
   menu_ctrl_commtopacket                = 10401;
   menu_ctrl_cleardupesheet              = 10402;
   menu_ctrl_viewlogdat                  = 10403;
@@ -2263,7 +2255,7 @@ const
 
   menu_inactiveradio_cwspeedup          = 10513;
   menu_inactiveradio_cwspeeddown        = 10514;
-
+  //  menu_dupecheck_or_sp                  = 10507;
  // menu_alt_transfreq                    = 10311;   // 4.47.3 remove
   menu_home_page                        = 10606;
 //  menu_send_bug                         = 10605;
@@ -2515,7 +2507,6 @@ var
   TR4W_PATH_NAME                        : FileNameType;
   TR4W_LOG_PATH_NAME                    : FileNameType;
   TR4W_LOG_FILENAME                     : FileNameType;
-  TR4W_DOM_FILENAME                     : FileNameType;   // 4.100.2
   TR4W_CFG_FILENAME                     : FileNameType;
   TR4W_RST_FILENAME                     : FileNameType;
   TR4W_SYN_FILENAME                     : FileNameType;
@@ -2684,7 +2675,7 @@ type
     ARRL160QSOPointMethod,
     ARRL10QSOPointMethod,
     ARRLDXQSOPointMethod,
-    ARRLVHFJUNPointMethod,
+    ARRLVHFQSOPointMethod,
     ARRLVHFSSPointMethod,
     BalticQSOPointMethod,
     BWQPQSOPointMethod,
@@ -2828,7 +2819,7 @@ const
     'ARRL 160', //    ARRL160QSOPointMethod,
     'ARRL 10', //    ARRL10QSOPointMethod,
     'ARRL DX', //    ARRLDXQSOPointMethod,
-    'ARRL VHF JUN', //    ARRLVHFQSOPointMethod,
+    'ARRL VHF', //    ARRLVHFQSOPointMethod,
     'ARRL VHF SS', //    ARRLVHFSSPointMethod,
     'BALTIC', //    BalticQSOPointMethod,
     'BWQP', // BWQPQSOPointMethod,
@@ -3085,7 +3076,7 @@ type
   end;
 
 const
-QSOPartiesCount = 18;
+QSOPartiesCount = 17;
 
   QSOParties                         : array[1..QSOPartiesCount] of TUSQSOPartyRecord =
   (
@@ -3106,8 +3097,7 @@ QSOPartiesCount = 18;
   (InsideStateDOMFile:'pa';         {OutsideStateDOMFile:'PA';         }StateName:'PA'),    // 4.74.3
   (InsideStateDOMFile:'in';         {OutsideStateDOMFile:'IN';         }StateName:'IN'),
   (InsideStateDOMFile:'ve7';        {OutsideStateDOMFile:'VE7';        }StateName: 'VE7'),
-  (InsideStateDOMFile:'va';         {OutsideStateDOMFile:'VA';         }StateName:'VA'),
-  (InsideStateDOMFile:'in7qpne';    {OutsideStateDOMFile:'IN7QPNE';    }StateName:'IN7QPNE')
+  (InsideStateDOMFile:'va';         {OutsideStateDOMFile:'VA';         }StateName:'VA')
   );
 {*)}
 
@@ -3171,9 +3161,8 @@ QSOPartiesCount = 18;
  ({Name: 'ARRL-DX-SSB';                }Email: 'DXPhone@arrl.org';       DF: nil;                 WA7BNM:  289; {SK3BG: 'arrlidx';    } QRZRUID: 334 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTPowerExchange;                            XM:NoDXMults; QP:ARRLDXQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'ARRL-SS-CW';                 }Email: 'SSCW@arrl.org';          DF: 'arrlsect';          WA7BNM:  177; {SK3BG: 'arrlnoss';   } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: CheckSectionInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberPrecedenceCheckDomesticQTHExchange; XM:NoDXMults; QP:TwoPointsPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'ARRL-SS-SSB';                }Email: 'SSPhone@arrl.org';       DF: 'arrlsect';          WA7BNM:  178; {SK3BG: 'arrlnoss';   } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: CheckSectionInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberPrecedenceCheckDomesticQTHExchange; XM:NoDXMults; QP:TwoPointsPerQSO; ADIFName:'';   CABName:''),
- ({Name: 'ARRL VHF JAN';              }Email: nil;                      DF: nil;                 WA7BNM:   43; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE:GridExchange;                      XM:NoDXMults; QP:ARRLVHFJUNPointMethod; ADIFName:'ARRL-VHF-JAN';   CABName:''),
- ({Name: 'ARRL VHF JUN';               }Email: nil;                      DF: nil;                 WA7BNM:   43; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE:GridExchange;                      XM:NoDXMults; QP:ARRLVHFJUNPointMethod; ADIFName:'ARRL-VHF-JUN';   CABName:''),
- ({Name: 'ARRL VHF SEP';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: GridExchange;                      XM:NoDXMults; QP:ARRLVHFJUNPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'ARRL VHF QSO';               }Email: nil;                      DF: nil;                 WA7BNM:   43; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:ARRLVHFQSOPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'ARRL VHF SS';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:ARRLVHFSSPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'BALTIC';                     }Email: nil;                      DF: nil;                 WA7BNM:   28; {SK3BG: nil;          } QRZRUID: 161 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:BalticQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'BWQP';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000;      {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults;    P: 0; AE: RSTNameAndQTHExchange;              XM:NoDXMults; QP:BWQPQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'CIS';                        }Email: nil;                      DF: 'cis';               WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 500 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:CISQSOPointMethod; ADIFName:'';   CABName:''),
@@ -3182,7 +3171,7 @@ QSOPartiesCount = 18;
  ({Name: 'CQ-160-CW';                  }Email: '160CW@kkn.net';          DF: 's48p14dc';          WA7BNM:  232; {SK3BG: 'cqww160';    } QRZRUID: 311 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE:RSTZoneOrDomesticQTH;                          XM:CQDXCCWithNoUSAOrCanada; QP:CQ160QSOPointMethod; ADIFName:'';   CABName:''),     // 4.77.6
  ({Name: 'CQ-160-SSB';                 }Email: '160SSB@kkn.net';         DF: 's48p14dc';          WA7BNM:  259; {SK3BG: 'cqww160';    } QRZRUID: 312 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                         XM:CQDXCCWithNoUSAOrCanada; QP:CQ160QSOPointMethod; ADIFName:'';   CABName:''),           // 4.77.6
   ({Name: 'CQ-M';                       }Email: nil;                      DF: nil;                 WA7BNM:   14; {SK3BG: 'cqmidxc';    } QRZRUID: 126 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:CQDXCC{ARRLDXCC};  QP:CQMQSOPointMethod; ADIFName:'';   CABName:''),
- ({Name: 'CQ-VHF';                     }Email: nil;                      DF: nil;                 WA7BNM:   73; {SK3BG: 'cqwwvhf';    } QRZRUID: 363 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM:  GridSquares;     P: 0; AE: RSTandorGridExchange;                      XM:NoDXMults; QP:CQVHFQSOPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'CQ-VHF';                     }Email: nil;                      DF: nil;                 WA7BNM:   73; {SK3BG: 'cqwwvhf';    } QRZRUID: 363 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:CQVHFQSOPointMethod; ADIFName:'';   CABName:''),
 // ({Name: 'WWDIGI';                     }Email: 'director@ww-digi.com';   DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridSquares; P: 0; AE: Grid2Exchange;
  ({Name: 'CQ-WPX-CW';                  }Email: 'cw@cqwpx.com';           DF: nil;                 WA7BNM:   29; {SK3BG: nil;          } QRZRUID: 18  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:CQWPXQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'CQ-WPX-SSB';                 }Email: 'ssb@cqwpx.com';          DF: nil;                 WA7BNM:  291; {SK3BG: nil;          } QRZRUID: 6   ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:CQWPXQSOPointMethod; ADIFName:'';   CABName:''),
@@ -3217,7 +3206,7 @@ QSOPartiesCount = 18;
  ({Name: 'JIDX-SSB';                   }Email: nil;                      DF: 'jidx';              WA7BNM:  184; {SK3BG: 'jaintdx';    } QRZRUID: 57  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:JapanInternationalDXQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'JA LONG PREFECT';            }Email: nil;                      DF: 'jacg3';             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTLongJAPrefectureExchange;                 XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'JT DX';                      }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: MongolianCallSignPrefix; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:ARRLDXCCWithNoJT;    QP:JTDXQSOPointMethod; ADIFName:'';   CABName:''),
- ({Name: 'KCJ';                        }Email: nil;                      DF: 'japref';            WA7BNM:   89; {SK3BG: 'kcjc';       } QRZRUID: 169 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZONEORDOMESTICQTH;                      XM:NoDXMults; QP:KCJQSOPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'KCJ';                        }Email: nil;                      DF: 'japref';            WA7BNM:   89; {SK3BG: 'kcjc';       } QRZRUID: 169 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:KCJQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'KIDS DAY';                   }Email: nil;                      DF: nil;                 WA7BNM:  224; {SK3BG: 'kidsday';    } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: KidsDayExchange;                             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'KVP';                        }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: EUHFCYear;   AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'';   CABName:''),
  ({Name: 'LZ DX';                      }Email: nil;                      DF: 'lz';                WA7BNM:  187; {SK3BG: 'lzdxc';      } QRZRUID: 53  ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                        XM:NoDXMults; QP:LZDXQSOPointMethod; ADIFName:'';   CABName:''),
@@ -3333,9 +3322,12 @@ QSOPartiesCount = 18;
  ({Name: 'EUDX';                       }Email: 'log.eudxc@gmail.com';    DF: 'EUDX';           WA7BNM:  000; {SK3BG: nil;    } QRZRUID: 0   ;         Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:CQDXCC; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:'') ,
  ({Name: 'BCQP';                       }Email: nil;                      DF: 've7_cty';                 WA7BNM:  473; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 16; AE: RSTDomesticQTHExchange;                      XM:NoDXMults; QP:BCQPQSOPointMethod; ADIFName:'';   CABName:''),      // 4.97.6
  ({Name: 'VA QSO Party';               }Email: nil;                      DF: 'va_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 17; AE: QSONumberDomesticOrDXQTHExchange;                XM:NoDXMults; QP:VAQSOPointMethod; ADIFName:'VA-QSO-PARTY';   CABName:''),      // 4.88.2
- ({Name: 'YOTA';                       }Email: nil;                      DF: 'YOTA';                 WA7BNM:   0; {SK3BG: nil;    } QRZRUID: 0; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:YOTAQSOPointMethod; ADIFName:'YOTA';   CABName:'') ,
- ({Name: 'IN7QPNE';                    }Email: nil;                      DF: 'in7qpne_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 18; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN7QPNE-QSO-PARTY';   CABName:'')     // 4.88.2
+ ({Name: 'YOTA';                       }Email: nil;                      DF: 'YOTA';                 WA7BNM:   0; {SK3BG: nil;    } QRZRUID: 0; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:YOTAQSOPointMethod; ADIFName:'YOTA';   CABName:'')
+
     );
+
+
+
 
 
 
@@ -3359,9 +3351,8 @@ QSOPartiesCount = 18;
       'ARRL-DX-SSB',
       'ARRL-SS-CW',
       'ARRL-SS-SSB',
-      'ARRL-VHF-JAN',
-      'ARRL-VHF-JUN',
-      'ARRL-VHF-SEP',
+      'ARRL-VHF-QSO',
+      'ARRL-VHF-SS',
       'BALTIC',
       'BWQP',
       'CIS',
@@ -3520,8 +3511,7 @@ QSOPartiesCount = 18;
       'EUDX',         // 4.95.6
       'BCQP',          // 4.97.6
       'VAQP',
-      'YOTA',
-      'IN7QPNE'
+      'YOTA'
      );
 
   const
@@ -3582,9 +3572,8 @@ QSOPartiesCount = 18;
       ({Name: 'ARRL-DX-SSB';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'ARRL-SS-CW';                 }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'ARRL-SS-SSB';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
-      ({Name: 'ARRL VHF JAN';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'ARRL VHF JUN';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'ARRL VHF SEP';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
+      ({Name: 'ARRL VHF QSO';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
+      ({Name: 'ARRL VHF SS';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'BALTIC';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'BWQP';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),        //n4af
       ({Name: 'CIS';                        }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
@@ -3743,9 +3732,9 @@ QSOPartiesCount = 18;
       ({Name: 'EUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),     // 4.95.6
       ({Name: 'BC QSO Party';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),      // 4.97.6
       ({Name: 'VA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
-      ({Name: 'YOTA';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
-      ({Name: 'IN7QPNE     ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0)     // 4.99.7
-            );
+      ({Name: 'YOTA';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0)
+
+      );
 
 
 
