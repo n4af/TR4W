@@ -75,7 +75,8 @@ var
   Start                                 : boolean = False;
   Save                                  : cardinal = 0;
   d1                                  : cardinal = 0;
-const
+  JA :integer=0;
+  const
   PendingQTCArraySize                   = 600;
 
   Blink                                 = 128;
@@ -4525,62 +4526,81 @@ begin
   CursorCount                           : integer;
   CurCursorPosData                      : integer;
   numberbandentries                     : integer;
-  i                                     : integer;
+  i,j                                     : integer;
   Spot                                  : TSpotRecord;
   d  : pChar;
   label
   next;
- begin
- if not BandMapEnable then exit;
-   BandMapPreventRefresh := True;
-  // SpotsList.Display;
+
+  begin
+   if not BandMapEnable then exit;
+//   BandMapPreventRefresh := True;
+   SpotsList.Display;
 
  i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
- //if i = -1 then
+ if i = -1 then
+ exit;
  //tLB_SETCURSEL(BandMapListBox, 0);
 //  CurrentCursorPos := GetBMSelItemData;
+
 Next:
  CursorCount := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
  if CursorCount = LB_ERR then Exit;
+for i:=0 to CursorCount do
+ if spotslist.get(i).FBand = InactiveRadioPtr.BandMemory  then  break  ;
+ if (i =  CursorCount) or (i > CursorCount) then
+   exit;
 
-   i := i + 1  ;
- if i = CursorCount then
- exit ;
+   ja:= ja+1;  // next entry
 
-  Windows.SendMessage(BandMapListBox, LB_SETCURSEL, i, 0);
+ if (ja = CursorCount) or (ja > CursorCount) then
 
- spot := spotslist.get(i);
+   exit ;
+
+
+
+ // Windows.SendMessage(BandMapListBox, LB_SETCURSEL, j, 0);
+
+ spot := spotslist.get(ja);
    if QSYInactiveRadio and TwoRadioMode then
    begin
 
      Band := InActiveRadioPtr.BandMemory;
-       if Spot.FBand = BandmapBand then
+       if Spot.FBand = Band then
+           begin
+                       Windows.SendMessage(BandMapListBox, LB_SETCURSEL, ja, 0);
+                       TuneRadioToSpot(SpotsList.Get(ja), InActiveRadio) ;
 
-                       TuneRadioToSpot(SpotsList.Get(i), InActiveRadio) 
-
+            end
                        else
-                       GoTo Next;
-                       exit;
+                        begin
+                        if (spotslist.get(ja).FBand = Band) and (spotslist.get(ja+1).FBand <> Band) then
+                         exit
+                          else
+                           GoTo Next;
+                        end;
                        end;
-
+                       exit;
+       end;
+ {
       spot := spotslist.get(i);
       Band := ActiveRadioPtr.BandMemory;
             if (not QSYInactiveRadio) and (Spot.FBand = Band) then
             begin
                TuneRadioToSpot(SpotsList.Get(i), ActiveRadio);
-          
+                tLB_SETCURSEL(BandMapListBox, i);
              end
 
                  else
                  goto next;
-             
+
           end;
-  
+  }
 
 procedure BMFirst;
 begin
 
-              
+              JA:=0;
               tLB_SETCURSEL(BandMapListBox, 0);
 
 end;
