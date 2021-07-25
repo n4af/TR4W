@@ -185,7 +185,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.102.4' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.102.5' ;  // N4af     New Release
 
 
 

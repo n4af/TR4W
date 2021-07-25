@@ -388,7 +388,7 @@ begin
   Str(InActiveRadioPtr.SpeedMemory, SpeedString);
   BandMapBand := InActiveRadioPtr.BandMemory {BandMemory[InactiveRadio]};
   BandMapMode := InActiveRadioPtr.ModeMemory {ModeMemory[InactiveRadio]};
-  DisplayBandMap; { Do we always want to do this?  What if already up? }
+ // DisplayBandMap; { Do we always want to do this?  What if already up? }    // 4.102.5
   
   if K5KA.AltDString <> '' then
   begin

@@ -2619,7 +2619,7 @@ begin
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
                BandMapBand := ActiveBand;
                BandMapMode := ActiveMode;
-               DisplayBandMap;
+               DisplayBandMap;         
             end;
       end
    else
@@ -2647,7 +2647,7 @@ begin
                BandMapMode := rig.FilteredStatus.Mode;
                VisibleDupeSheetChanged := True;
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
-               DisplayBandMap;
+               DisplayBandMap;     
             end;
 
          //GAV End of added

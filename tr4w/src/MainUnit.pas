@@ -367,7 +367,6 @@ procedure PossibleCallsProc(PCDRAWITEMSTRUCT: PDrawItemStruct);
 procedure CreateTotalWindow;
 procedure ChangeCaret(h: HWND);
 procedure EditableLogWindowDblClick;
-
 procedure tClearDupeInfoCall;
 procedure tCleareCallWindow;
 procedure tCleareExchangeWindow;
@@ -1025,6 +1024,7 @@ begin
     begin
        if ActiveMode = CW then
       begin
+
         if not Send73Message then Exit;
         OpMode2 := CQOpMode;
         ShowFMessages(0);
@@ -1045,13 +1045,12 @@ begin
           {................phone.....................}
 
       if DualingCQState = DualGettingExchange then DualingCQState := DualSendingQSL;
-
       BeSilent := False;
 
       if not TailEnding then
       begin
               //        ReceivedData.ceSearchAndPounce := False;
-        TryLogContact;
+       TryLogContact;
         ShowStationInformation(@ReceivedData.Callsign);
         UpdateTotals2;
 
@@ -1063,6 +1062,8 @@ begin
         tCallWindowSetFocus;
               //        sendmessage(CallWindowHandle,wm_setfocus,0,0);
                                    //        CallWindow . SetFocus;
+    if OnDeckCall <> '' then               // 4.102.4
+     PutCallToCallWindow(OnDeckCall);
         Exit;
        end;
     end;
@@ -1832,7 +1833,7 @@ begin
   CallsignsList.DisplayDupeSheet(@Radio2 {ActiveBand, ActiveMode});      // n4af 4.38.7
   SpotsList.ResetSpotsDupes;
   //  ResetBandMapDupes;
-  DisplayBandMap;
+   DisplayBandMap;    
   UpdateAllStationsList;
   
   ShowInformation;
@@ -4202,6 +4203,7 @@ begin
   FrmSetFocus;
 
 end;
+
 
 procedure tWinHelp(WindowHelpID: Byte);
 begin

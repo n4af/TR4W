@@ -477,7 +477,10 @@ begin
     if ActiveMode in [Phone, FM] then
       Result := SendCrypticMessage(s + QSLPhoneMessage)
     else
-      Result := SendCrypticMessage(s + QSLMessage);
+      if OnDeckCall <> '' then
+       Result := SendCrypticMessage(s + QuickQSLMessage1)
+        else
+         Result := SendCrypticMessage(s + QSLMessage);
   end;
 
   //    if ActiveMode = Digital then SendMessageToMixW('<RXANDCLEAR>');

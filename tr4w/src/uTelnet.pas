@@ -739,7 +739,7 @@ var
 
   if AddedSpot then
     begin
- //     sleep(BMDelay); // So we do not drive the serial port and radio too fast.    // 4.93.beta
+        sleep(BMDelay); // So we do not drive the serial port and radio too fast.    // 4.93.beta       // 4.102.5
         if TestSocketBuffer < 1 then DisplayBandMap;             //Gav 4.44.6
 
 {$IFDEF AUTOSPOT}

@@ -122,6 +122,14 @@ begin
       ie_check := False;
       for i := 0 to FCount - 1 do
       begin
+      // 4.102.5 - filter the added spots to match the actual bm display
+    if not BandMapAllBands then if FList^[i].FBand <> BandmapBand then Continue;       //Gav  ActiveBand changed to BandmapBand
+    if not BandMapAllModes then if FList^[i].FMode <> BandmapMode then Continue;        //Gav  ActiveMode changed to BandmapMode
+    if not BandMapDupeDisplay then if FList^[i].FDupe then Continue;
+    if not BandMapDisplayCQ then if FList^[i].FCQ then Continue;
+    if not WARCBandsEnabled then if FList^[i].FWARCBand then Continue;
+    if BandMapMultsOnly then if not ((FList^[i].FMult) or (FList^[i].FCQ)) then Continue;     //Gav added or FCQ to stop CQ spots being trapped by Mult only filter
+    if not VHFBandsEnabled then if (FList^[i].FBand > Band12) then Continue;
           if FList^[i].FBand = Spot.FBand then
           if FList^[i].FCall = Spot.FCall then
             begin

@@ -712,6 +712,8 @@ begin
         end;
       WM_KEYUP:
         begin
+      {    if (Msg.wParam = VK_SPACE) and (Msg.HWND = wh[mweCall]) then           //   4.102.4
+          tailend;       }
           if (Msg.wParam = VK_CONTROL) or (Msg.wParam = VK_MENU) then ShowFMessages(0);
           if Msg.wParam < 40 then goto TransMess;
 
