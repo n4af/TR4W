@@ -185,13 +185,8 @@ const
 
 
 
-<<<<<<< HEAD
-  TR4W_CURRENTVERSION_NUMBER            = '4.102.5' ;  // N4af     New Release
-=======
-  TR4W_CURRENTVERSION_NUMBER            = '4.102.3' ;  // N4af     New Release
->>>>>>> 751df3fd7bfeadda240871b8f9ea08e0ca11ace3
 
-
+  TR4W_CURRENTVERSION_NUMBER            = '4.102.6' ;  // N4af     New Release
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
   TR4W_CURRENTVERSIONDATE               = 'July, 2021' ;

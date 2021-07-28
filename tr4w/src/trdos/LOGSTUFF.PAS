@@ -5173,6 +5173,19 @@ begin
     ThisMessageIsForMe := True;
 end;
 
+function Trim(const s: string; c: Char): string;
+var
+  First, Last: Integer;
+begin
+  First := 1;
+  Last := Length(s);
+  while (First <= Last) and (s[First] = c) do
+    Inc(First);
+  while (First < Last) and (s[Last] = c) do
+    Dec(last);
+  Result := Copy(s, First, Last - First + 1);
+end;
+
 function WeHaveProcessedThisMessage(Message: string): boolean;
 
 { This function will look at the message passed to it and see if we have
@@ -6677,25 +6690,95 @@ begin
         end;
       end;
 
-    IOTAQSOPointMethod:
+    IOTAQSOPointMethod:      // 4.102.6
       begin
-        if MyState = '' then // 4.61.3 change points
+     if MyState = '' then // 4.61.3 change points
         begin
           if RXData.domesticQTH <> '' then
             RXData.QSOpoints := 15
           else
             RXData.QSOpoints := 2;
-          exit;
-        end;
+            exit;
+          end;
         IOTASTATE := RXDATA.DomesticQTH;
-        {   if pos('-',rxdata.domesticqth) > 0 then     // 4.61.4 assumes dash delineates continent from #
-             delete(iotastate,(pos('-',rxdata.domesticqth)),1);       }
-        if ((RXData.DomesticQTH <> '') and (MyState <> IOTAState)) then
+            if pos('-',MyState) > 0 then
+             if (MyState = IOTAState) or (RXData.DomesticQTH = '') then
+              RXData.QSOPoints := 5
+               else
+                RXData.QSOPoints := 15;
+
+
+
+        if (RXData.DomesticQTH <> '') and (MyState <> RXData.DomesticQTH) then
           RXData.QSOPoints := 15
         else
           RXData.QSOPoints := 5;
 
       end;
+  {    if length(mystate)> 3 then
+         i := pos('-',MyState);
+
+         j := length(MyState)-i; // length of #
+         inc(i); // point to begin of numbers
+         k := copy(mystate,i,j);
+         if k[1] <> '0' then
+          exit
+           else
+        k := copy(k,2,j);
+          if k[1] <> '0' then
+           exit
+
+           else
+            begin
+              k := copy(k,2,1);
+
+            end;
+
+        if k[i+1] <> '0' then
+         MyState := copy(MyState,i,j);
+   //        inc(i);
+           while (MyState[i] = '0') do
+            begin
+            copy(MyState,i ,j);
+            inc(i);
+            j := j -1;
+            if MyState[i] <> '0' then break;
+            end;
+             exit;
+
+       //   end;
+       //  MyState:=StringReplace(MyState,'0' , '', [rfReplaceAll]);
+       //  RXData.DomesticQTH := StringReplace(RXData.DomesticQTH,'0','',[rfreplaceall]);
+         if length(MyState) > 3  then
+         begin
+         if   (RXData.DomesticQTH = MyState)  then
+          RXData.QSOpoints := 5
+           else
+            if (RXData.DomesticQTH <> '') and (MyState <> RXData.DomesticQTH) then
+            RXData.QSOPoints := 15
+             else
+              RXData.QSOPoints := 5;
+          exit;
+          end;
+
+
+           if length(MyState) < 3 then
+            begin
+             if (RXData.DomesticQTH = '') then
+              RXData.QSOpoints := 2
+               else
+                RXData.QSOPoints := 15;
+           end;
+       end;
+
+            if pos('-',rxdata.domesticqth) > 0 then     // 4.61.4 assumes dash delineates continent from #
+             delete(iotastate,(pos('-',rxdata.domesticqth)),1);
+        if ((RXData.DomesticQTH <> '') and (MyState <> IOTAState)) then
+          RXData.QSOPoints := 15
+        else
+          RXData.QSOPoints := 5;
+
+      end;     }
     JapanInternationalDXQSOPointMethod:
       begin
         case RXData.Band of

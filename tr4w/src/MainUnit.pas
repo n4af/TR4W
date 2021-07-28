@@ -708,18 +708,11 @@ end;
 
 procedure SpaceBarProc2;
 begin
-<<<<<<< HEAD
    if (DupeInfoCall = '') and (CallWindowString = '') and (OpMode = SearchAndPounceOpMode) then    // 4.102.3
    If Not DEEnable then SendStringAndStop(MyCall)
     else
      SendStringAndStop(DEPlusMyCall);
-=======
-  if (DupeInfoCall = '') and (CallWindowString = '') and (OpMode = SearchAndPounceOpMode) then    // 4.102.3
-   If Not DEEnable then SendStringAndStop(MyCall)
-    else
-     SendStringAndStop(DEPlusMyCall);
 
->>>>>>> 751df3fd7bfeadda240871b8f9ea08e0ca11ace3
   if (DupeInfoCall <> '') and (CallWindowString = '') then
   begin
     ActiveRadioPtr^.StopSendingCW;
@@ -3508,6 +3501,7 @@ begin
     begin
      FlushCWBuffer;
       SwapRadios;
+       logger.trace('[CallWindowKeyDownProc] SwapExit');
      exit;
     end;
   //  CallsignsList.CreatePartialsList(CallWindowString);
@@ -3518,14 +3512,18 @@ begin
    begin
     Switch := False;
     SwitchNext := False;
-    InactiveRigCallingCQ := False;
+    InactiveRigCallingCQ := False;                        
     InactiveSwapRadio := False;
    end;
 
   itempos := SendMessage(p, LB_GETCURSEL, 0, 0);
-
+   logger.trace('[CallWindowKeyDownProc] itemrpos');
   if Key = PossibleCallLeftKey then dec(itempos);
-  if Key = PossibleCallRightKey then inc(itempos);
+      if Key = PossibleCallRightKey then
+      begin
+       inc(itempos);
+       logger.trace('[CallWindowKeyDownProc] itemright set ' + Key);
+      end;
   if itempos = -1 then itempos := 0;
   SendMessage(p, LB_SETCURSEL, itempos, 0);
 
@@ -3535,6 +3533,7 @@ begin
 
     if SendMessage(p, LB_GETCOUNT, 0, 0) > 0 then
        begin
+       logger.trace('[CallWindowKeyDownProc] PutCallToCallWindow ' + Key);
        PutCallToCallWindow(LogSCP.PossibleCallList.List[itempos].Call);
        end;
 
