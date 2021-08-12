@@ -276,7 +276,7 @@ end;
 procedure UpdateRemainingMultsWindows;
 begin
   SetRemMultsColumnWidth;
-  VisibleLog.ShowRemainingMultipliers
+  VisibleLog.ShowRemainingMultipliers ;
 end;
 
 end.

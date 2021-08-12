@@ -632,7 +632,7 @@ begin
                end
             else if Msg.HWND = wh[mweExchange] then       // ny4i Issue 87
                begin
-               //ExchangeWindowKeyDownProc(Msg.wParam);     // ny4i Issue 87 Uncomment when ready
+               ExchangeWindowKeyDownProc(Msg.wParam);     // 4.102.7
                end;
             if KeyboardCallsignChar(Msg.wParam, boolean(ActiveMainWindow) {tr4w_ExchangeWindowActive}) = False then
                begin

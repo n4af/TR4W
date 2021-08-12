@@ -74,8 +74,8 @@ var
  // d4                                    : cardinal = 0;
   Start                                 : boolean = False;
   Save                                  : cardinal = 0;
-  d1                                  : cardinal = 0;
-  JA :integer=0;
+  d1                                    : cardinal = 0;
+  BMp                                   : integer = 0;
   const
   PendingQTCArraySize                   = 600;
 
@@ -4534,22 +4534,57 @@ begin
 
   begin
    if not BandMapEnable then exit;
-//   BandMapPreventRefresh := True;
-//   SpotsList.Display;
+   CursorCount := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+    if CursorCount = LB_ERR then Exit;
+     if TwoRadioMode and QSYInactiveRadio then
+      Band := InactiveRadioptr.BandMemory
+       else
+        Band := ActiveRadioptr.BandMemory;
+    CursorCount := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+    if CursorCount = LB_ERR then Exit;
+    SpotsList.Display;
 
-// i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
-// if i = -1 then
-// exit;
-tLB_SETCURSEL(BandMapListBox, 0);
-//  CurrentCursorPos := GetBMSelItemData;
- CursorCount := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
- if CursorCount = LB_ERR then Exit;
-   if TwoRadioMode and QSYInactiveRadio then
-    Band := InactiveRadioptr.BandMemory
-     else
-      Band := ActiveRadioptr.BandMemory;
+  i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
+  if i = 0 then
+   begin
+    for i := 0 to CursorCount do
+     if spotslist.get(i).FBand = Band then
+      break  ;
+   end
+   else
+    begin
+      i := BMp;
+      inc(i);
+      inc(BMp);
+     end;
+    i := BMp;
+    BMp := i +1;
+ // Windows.SendMessage(BandMapListBox, LB_SETCURSEL, j, 0);
 
-next:
+ spot := spotslist.get(i);
+
+
+
+       if (Spot.FBand = Band) and (QSYInactiveRadio) and (Spot.FMode = ActiveMode)  then
+        begin
+         TuneRadioToSpot(Spot, InActiveRadio);
+         tLB_SETCURSEL(BandMapListBox, i);
+        end
+        else
+         if (Spot.FBand = Band) and (not QSYInactiveRadio) then
+          begin
+           TuneRadioToSpot(Spot, ActiveRadio);
+            tLB_SETCURSEL(BandMapListBox, i);
+          end;
+
+    {       if  (spotslist.get(i+1).FBand <> Band) then
+          begin
+           BMFirst;
+           exit;
+          end   }
+ end;
+ {
+ {next:
 i := tLB_GETCURSEL(BandMapListBox);
 i := i + 1;
 for i := i to CursorCount do
@@ -4558,44 +4593,19 @@ for i := i to CursorCount do
  break  ;
  if (i =  CursorCount) or (i > CursorCount) then
    exit;
+//   BandMapPreventRefresh := True;
+//   SpotsList.Display;
 
-
+// i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
+// if i = -1 then
+// exit;
+next:
  // Windows.SendMessage(BandMapListBox, LB_SETCURSEL, j, 0);
 
  spot := spotslist.get(i);
 
 
 
-       if (Spot.FBand = Band) and (QSYInactiveRadio) then
-        begin
-         TuneRadioToSpot(Spot, InActiveRadio);
-         tLB_SETCURSEL(BandMapListBox, i);
-
-        end
-        else
-         if (Spot.FBand = Band) and (not QSYInactiveRadio) then
-        begin
-         TuneRadioToSpot(Spot, ActiveRadio);
-         tLB_SETCURSEL(BandMapListBox, i);
-
-        end
-        else
-          if  (spotslist.get(i+1).FBand <> Band) then
-          begin
-           tLB_SETCURSEL(BandMapListBox, 0);
-           exit;
-          end
-            else
-            goto next;
-
-
-
-
-
-
- end;
-
- {
       spot := spotslist.get(i);
       Band := ActiveRadioPtr.BandMemory;
             if (not QSYInactiveRadio) and (Spot.FBand = Band) then
@@ -4612,8 +4622,7 @@ for i := i to CursorCount do
 
 procedure BMFirst;
 begin
-
-              JA:=0;
+              BMp := 0;
               tLB_SETCURSEL(BandMapListBox, 0);
 
 end;

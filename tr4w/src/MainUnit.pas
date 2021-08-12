@@ -3554,7 +3554,32 @@ end;
 
 {------------------------------------------------------------------------------}
 procedure ExchangeWindowKeyDownProc(wParam: integer);
+var
+p : hwnd;
+c : hwnd;
+itempos : integer;
+key     : char;
+
 begin
+ p  := wh[mwePossibleCall];
+  c := wh[mweExchange];
+   Key := Char(wParam);
+  itempos := SendMessage(p, LB_GETCURSEL, 0, 0);
+  if Key = PossibleCallLeftKey then dec(itempos);
+      if Key = PossibleCallRightKey then
+       inc(itempos);
+  if itempos = -1 then itempos := 0;
+  SendMessage(p, LB_SETCURSEL, itempos, 0);
+
+  itempos := SendMessage(p, LB_GETCURSEL, 0, 0);
+
+  if Key = PossibleCallAcceptKey then
+
+    if SendMessage(p, LB_GETCOUNT, 0, 0) > 0 then
+       PutCallToCallWindow(LogSCP.PossibleCallList.List[itempos].Call);
+
+
+  
 // If the contest type uses sections and we see a section starting to be typed,
 // start pre-filling the fields where the cals are placed for SCP
 // This code is a shell at the moment for implementation of Issue 87
@@ -4295,7 +4320,16 @@ end;
 function tCreateStaticWindow(lpWindowName: PChar;
   dwStyle: DWORD; X, Y, nWidth, nHeight: integer; hwndParent: HWND;
   HMENU: HMENU): HWND;
+  var x1,y1,x2,y2,x3,y3 : integer;
 begin
+x1 := 20;
+y1 := 20;
+x2 := 160;
+y2 := 200;
+x3 := 3;
+y3 := 3;
+
+  //Result := CreateRoundRectRgn(x1,y1,x2,y2,x3,y3);
   Result := CreateWindowEx(0 {WS_EX_DLGMODALFRAME}, StaticPChar, lpWindowName, dwStyle, X, Y, nWidth, nHeight, hwndParent, HMENU, hInstance, nil);
   tWM_SETFONT(Result, MSSansSerifFont);
 end;
@@ -6609,6 +6643,12 @@ begin
             exch.Age := StrToIntDef(exch.QTHString,0);
          IARU:
             exch.QTHString := fieldValue;
+         NAQSOCW, NAQSOSSB:        // 4.103.1
+          begin
+            exch.QTHString := tempState;
+            exch.DomesticQTH := tempState;
+            exch.ExchString := tempState;
+          end;
          ARRLFIELDDAY, WINTERFIELDDAY:
             //if recordFromWSJTX then
             //   begin
