@@ -186,7 +186,7 @@ const
 
 
 
-  TR4W_CURRENTVERSION_NUMBER            = '4.103.1' ;  // N4af     New Release
+  TR4W_CURRENTVERSION_NUMBER            = '4.103.2' ;  // N4af     New Release
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
   TR4W_CURRENTVERSIONDATE               = 'August, 2021' ;
@@ -3322,7 +3322,7 @@ QSOPartiesCount = 18;
  ({Name: 'IN QSO PARTY';               }Email: nil;                      DF: 'in_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 15; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN-QSO-PARTY';   CABName:''),     // 4.88.2
  ({Name: 'OK-OM SSB';                  }Email: nil;                      DF: 'okom';              WA7BNM:  185; {SK3BG: 'okomdxc';    } QRZRUID: 12  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:CQDXCC; QP:OKOMSSBQSOPointMethod; ADIFName:'';   CABName:''),     // 4.80.1
  ({Name: 'BATAVIA-FT8';                }Email: nil;                      DF: nil;                 WA7BNM:  10686;                       QRZRUID: 0   ; Pxm: Prefix;        ZnM: NoZoneMults; AIE: GridInitialExchange; DM: NoDomesticMults; P: 0; AE: GridExchange;                           XM:CQDXCC; QP:YBFT8QP; ADIFName:'';   CABName:'BATAVIA'),    // 4.90.11
- ({Name: 'WWDIGI';                     }Email: 'director@ww-digi.com';   DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridSquares; P: 0; AE: Grid2Exchange;                           XM:NoDXMults; QP:WWDIGIQP; ADIFName:'';   CABName:'WW-DIGI'),    // 4.90.11
+ ({Name: 'WWDIGI';                     }Email: 'director@ww-digi.com';   DF: nil;                 WA7BNM:  650;                         QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridFields; P: 0; AE: Grid2Exchange;                           XM:NoDXMults; QP:WWDIGIQP; ADIFName:'';   CABName:'WW-DIGI'),    // 4.90.11
  ({Name: 'MWC';                        }Email: 'memorial-ok1wc.cz/index.php?page=logs';                      DF: 'mwc';                 WA7BNM:  0;  QRZRUID: 0 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTQSONumberExchange;          XM:NoDXMults; QP:MWCQP; ADIFName:'';   CABName:''),     // 4.98.1
  ({Name: 'IRTS ';                      }Email: 'IRTS.contests@gmail.com';             DF: 'ireland';             WA7BNM:  000; {SK3BG:  nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:NoDXMults; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:''),     // 4.95.6
  ({Name: 'EUDX';                       }Email: 'log.eudxc@gmail.com';    DF: 'EUDX';           WA7BNM:  000; {SK3BG: nil;    } QRZRUID: 0   ;         Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;           XM:CQDXCC; QP:EUDXQSOPointMethod; ADIFName:'';   CABName:'') ,
