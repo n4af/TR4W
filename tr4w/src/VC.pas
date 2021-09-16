@@ -1074,7 +1074,7 @@ type
   PBandType = ^BandType;
   (* ****** If you add any new non-Data extended modes, please update MainUnit.GetModeFromExtendedMode *)
   ExtendedModeType = (eNoMode, eCW, eRTTY, eFT8, eFT4, eJT65, ePSK31, ePSK63, eSSB, eFM, eAM,
-                      eMFSK, eJS8, eUSB, eLSB, eData, eCW_R, eData_R, eRTTY_R, eFM_N, eAM_N,eData_FM, eC4FM, eDStar);
+                      eMFSK, eJS8, eUSB, eLSB, eData, eCW_R, eData_R, eRTTY_R, eFM_N, eAM_N,eData_FM, eC4FM, eDStar, ePSK_R, eWFM);
 
   ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
            //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
@@ -1214,7 +1214,7 @@ const
   ExtendedModeStringArray               : array[ExtendedModeType] of string =
                                               ('NoMode', 'CW', 'RTTY', 'FT8', 'FT4', 'JT65', 'PSK31', 'PSK63', 'SSB', 'FM', 'AM',
                                                'MFSK', 'JS8', 'USB', 'LSB', 'DATA', 'CW-R', 'DATA-R', 'RTTY-R', 'FM-N', 'AM-N',
-                                               'DATA-FM', 'C4FM', 'D-STAR');
+                                               'DATA-FM', 'C4FM', 'D-STAR', 'PSK-R', 'WFM');
 
   BandStringsArray                      : array[BandType] of PChar {string} =
     (

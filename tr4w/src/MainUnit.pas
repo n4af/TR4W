@@ -7893,7 +7893,7 @@ begin
       eCW, eCW_R: Result := CW;
       eSSB, eAM, eAM_N, eUSB, eLSB:
          Result := Phone;
-      eFM, eFM_N, eDstar, eC4FM: Result := FM;
+      eFM, eFM_N, eDstar, eC4FM, eWFM: Result := FM;
       else
          Result := Digital;
       end;

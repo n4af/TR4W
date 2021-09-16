@@ -1000,6 +1000,7 @@ procedure WriteLnVarCenter(var FileWrite: Text; Prompt: Str80);
 procedure WriteLnLstCenter(Prompt: Str80);
 function FoundDirectory(FileName: string; Path: string; var Directory: string): boolean;
 function FindDirectory(FileName: Str80): Str80;
+function String2Hex(const Buffer: Ansistring): string;
 
 var
   Beat                                  : integer = 500;
@@ -5299,6 +5300,15 @@ begin
   Beat := OldBeat;
 end;
 }
+
+function String2Hex(const Buffer: Ansistring): string;
+   var
+     n: Integer;
+   begin
+     Result := '';
+     for n := 1 to Length(Buffer) do
+       Result := UpperCase(Result + IntToHex(Ord(Buffer[n]), 2)) + ' ';
+   end;
 
 end.
 

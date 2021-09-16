@@ -71,6 +71,8 @@ const
    ICOM_GET_EXTENDEDVFO = #$25;
    ICOM_GET_EXTENDEDMODE = #$26;
    //ICOM_SET_RIT_FREQ   =
+   ICOM_STATE            = #$1A;
+   ICOM_STATE_DATA_MODE  = #$06;
 
    ICOM_SET_VFO_A_COMMAND = #$00;
    ICOM_SET_VFO_B_COMMAND = #$01;
@@ -253,6 +255,8 @@ type
       tOrionFreq:   array[0..15] of char;
       tOrionMode:   array[0..07] of char;
       CommandPause: integer;
+      saveMode : integer;
+      nextExtendedMode : ExtendedModeType;
       tmrCWByCAT: TTimer;
       EventHandlers : TEventHandlers;
       procedure AddCommandToBuffer;
@@ -268,11 +272,14 @@ type
       procedure SendIcomExtendedMode(bVFO: boolean);
       procedure SendRITStatusCommand;
       procedure SendRITFreqCommand;
+      procedure GetIcomDataStateCommand;
       procedure SetICOMRITFrequency(hz: integer);
+      procedure ProcessIcomMode(mode: integer);
       procedure SendIcomClearRITCommand;
       function CalculateIcomFilterWidth: integer;
       procedure SetRadioCWSpeed(speed: longint);
-      procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
+      procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char); overload;
+      procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char; extendedMode: ExtendedModeType); overload;
       procedure SendCW(Msg: Str160);
       procedure SetUpRadioInterface;
       procedure StopSendingCW;
@@ -701,6 +708,7 @@ function GenerateStatusString(var StatusRecord: RadioStatusRecord): Str80;
 procedure PutRadioIntoSplit(Radio: RadioType);
 procedure PutRadioOutOfSplit(Radio: RadioType);
 procedure SetRadioFreq(Radio: RadioType; Freq: longint; Mode: ModeType; VFO: char);
+
 
 { These work on the ActiveRadio }
 
@@ -1518,6 +1526,18 @@ begin
    WriteToCATPort(tIcom7Bytes, 7);
 end; // SendXMITStatusCommand;
  //------------------------------------------------------------------------------
+ procedure RadioObject.GetIcomDataStateCommand;
+begin
+   tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[2] := ReceiverAddress;
+   tIcom7Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom7Bytes[4] := Ord(ICOM_STATE);
+   tIcom7Bytes[5] := (Ord(ICOM_STATE_DATA_MODE));
+   tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom7Bytes, 7);
+end; // GetDatyaStateCommand;
+//---------------------------------------------------------------------------
  procedure RadioObject.SendRITStatusCommand;
 begin
    tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
@@ -1578,6 +1598,75 @@ begin
    AddCommandToBuffer;
    }
 end;
+
+procedure RadioObject.ProcessIcomMode(mode: integer);
+begin
+   case mode of
+   0:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eLSB;
+      end;
+   1:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eUSB;
+      end;
+   2:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eAM;
+      end;
+   3:
+      begin
+      Self.CurrentStatus.Mode := CW;
+      Self.CurrentStatus.ExtendedMode := eCW;
+      end;
+   4:
+      begin
+      Self.CurrentStatus.Mode := Digital;
+      Self.CurrentStatus.ExtendedMode := eRTTY;
+      end;
+   5:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eFM;
+      end;
+   6:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eWFM;
+      end;
+   7:
+      begin
+      Self.CurrentStatus.Mode := CW;
+      Self.CurrentStatus.ExtendedMode := eCW_R;
+      end;
+   8:
+      begin
+      Self.CurrentStatus.Mode := Digital;
+      Self.CurrentStatus.ExtendedMode := eRTTY_R;
+      end;
+   12:
+      begin
+      Self.CurrentStatus.Mode := Digital;
+      Self.CurrentStatus.ExtendedMode := ePSK31;
+      end;
+   13:
+      begin
+      Self.CurrentStatus.Mode := Digital;
+      Self.CurrentStatus.ExtendedMode := ePSK_R;
+      end;
+   17:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eDSTAR;
+      end;
+   else
+      DEBUGMSG('Unknown Mode command from Icom ' + IntToStr(mode));
+   end;
+end;
+
 
 procedure RadioObject.SendIcomClearRITCommand;
 begin
@@ -2468,6 +2557,12 @@ begin
       end;
 end;
 //------------------------------------------------------------------------------
+procedure RadioObject.SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char; extendedMode: ExtendedModeType);
+begin
+   Self.nextExtendedMode := extendedMode;
+   Self.SetRadioFreq(Freq, Mode, VFO);
+end;
+
 procedure RadioObject.SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
 
 var
@@ -2482,6 +2577,7 @@ var
 //   p: PChar;
    tempFilterWidth: integer;
    skipMode : boolean;
+   bStateDataModeRequired : boolean;
 const
    FT847ModeString = CHR(0) + CHR(0) + CHR(0) + CHR(7);
 
@@ -2763,7 +2859,9 @@ begin
             // TLogger.GetInstance.Debug('Leaving Kenwood code');
             end;
          end;
-
+      (*************************************************************************
+           I C O M        I C O M       I C O M      I C O M     I C O M
+       ************************************************************************)
       case RadioModel of
       (* Older Icom radios could not directly change VFO B. The code had to make VFO B active and then change things.
          This is now different for radios that support VFOB. IcomRadiosThatSupportVFOB is a radio group that supports this command.
@@ -2812,7 +2910,22 @@ begin
                end
             else if Mode = Digital then
                begin
-               TempChar := #4;
+               if nextExtendedMode <> eNoMode then
+                  begin
+                  if nextExtendedMode = eRTTY then
+                     begin
+                     TempChar := #4;
+                     end
+                  else if RadioModel in IcomRadiosThatSupportPSKMode then
+                     begin
+                     TempChar := #12; // PSK
+                     end
+                  else // all others
+                     begin
+                     TempChar := #1; // USB for Icom
+                     bStateDataModeRequired := true;
+                     end;
+                  end;
                end
             else
                begin      //must be phone
@@ -2955,7 +3068,23 @@ begin
                         CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
                         end;
                      AddCommandToBuffer;
+
+                     if bStateDataModeRequired then
+                        begin
+                        CommandsTempBuffer[0]  := CHR(9);
+                        CommandsTempBuffer[1]  := ICOM_PREAMBLE_CODE;
+                        CommandsTempBuffer[2]  := ICOM_PREAMBLE_CODE;
+                        CommandsTempBuffer[3]  := CHR(ReceiverAddress);
+                        CommandsTempBuffer[4]  := ICOM_CONTROLLER_ADDRESS;
+                        CommandsTempBuffer[5]  := ICOM_STATE;
+                        CommandsTempBuffer[6]  := ICOM_STATE_DATA_MODE;
+                        CommandsTempBuffer[7]  := CHR(1);
+                        CommandsTempBuffer[8]  := ICOM_END_OF_MESSAGE_CODE;
+                        AddCommandToBuffer;
+                        bStateDataModeRequired := false;
+                        end;
                      end; // if not skipMode
+
 
                   CommandsTempBuffer[0]  := CHR(12);
                   CommandsTempBuffer[1]  := ICOM_PREAMBLE_CODE;
@@ -3400,8 +3529,8 @@ begin
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
       IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
    IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
-   IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
-   //IcomRadiosThatSupportPSKMode := [IC7610];
+   IcomRadiosThatSupportVFOB := [IC705, {Removed for testing - IC7100,} {Removed for testing - IC7300,} IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
+   IcomRadiosThatSupportPSKMode := [IC7600, IC7610];
    ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];

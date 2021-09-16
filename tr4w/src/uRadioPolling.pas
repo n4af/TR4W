@@ -1348,71 +1348,37 @@ begin
                                     //------------------00.01.02.03.04.05.06.07
                                     //FE.FE.ra.E0.04.FD.FE.FE.E0.ra.04.00.00.FD + IF passband width data (06)
                                     //FE.FE.ra.E0.04.FD.FE.FE.E0.ra.04.00.FD
-                                    case Ord(rig.tBuf[i + 5]) of
-                                       0:
-                                          begin
-                                             rig.CurrentStatus.Mode := Phone;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eLSB;
-                                          end;
-                                       1:
-                                          begin
-                                             rig.CurrentStatus.Mode := Phone;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eUSB;
-                                          end;
-                                       2:
-                                          begin
-                                             rig.CurrentStatus.Mode := Phone;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eAM;
-                                          end;
-                                       3:
-                                          begin
-                                             rig.CurrentStatus.Mode := CW;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eCW;
-                                          end;
-                                       4:
-                                          begin
-                                             rig.CurrentStatus.Mode := Digital;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eRTTY;
-                                          end;
-                                       5:
-                                          begin
-                                             rig.CurrentStatus.Mode := Phone;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eFM;
-                                          end;
-                                       7:
-                                          begin
-                                             rig.CurrentStatus.Mode := CW;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eCW_R;
-                                          end;
-                                       8:
-                                          begin
-                                             rig.CurrentStatus.Mode := Digital;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eRTTY_R;
-                                          end;
-                                       else
-                                          DEBUGMSG('Unknown Mode command from Icom '
-                                             + IntToStr(Ord(rig.tBuf[i + 5])));
-                                    end;
-                                    {case Ord(rig.tBuf[i + 5]) of
-                                      5: rig.CurrentStatus.Mode := FM;
-                                      3, 7: rig.CurrentStatus.Mode := CW;
-                                      4, 8: rig.CurrentStatus.Mode := Digital;
-                                    else rig.CurrentStatus.Mode := Phone;
-                                    end;}
+                                    rig.saveMode := Ord(rig.tBuf[i + 5]);
+                                    //rig.ProcessIcomMode(Ord(rig.tBuf[i + 5]));
+
 
                                     if (Ord(rig.tBuf[i + 6]) > 0) then
                                        // n4af 4.43.4
                                        Icom_Filter_Width := Ord(rig.tBuf[i + 6]);
                                           // 4.43.4
                                     UpdateStatus(rig);
+                                 end;
+                           ICOM_STATE:
+                              if rig.tBuf[i + 5] = ICOM_STATE_DATA_MODE then
+                                 begin
+                                 if Ord(rig.tBuf[i + 6]) = 1 then  // Only set Digital if it is on as we would not know what mode is when data mode is reported off. ny4i
+                                    begin
+                                    if rig.currentStatus.Mode <> Digital then
+                                       begin
+                                       rig.CurrentStatus.Mode := Digital;
+                                       Icom_Filter_Width := Ord(rig.tBuf[i+7]);
+                                       logger.Trace('Setting Icom mode to DATA based on 1A06 command');
+                                       UpdateStatus(rig);
+                                       end;
+                                    end
+                                 else
+                                    begin
+                                    if rig.saveMode > 0 then
+                                       begin
+                                       rig.ProcessIcomMode(rig.saveMode);
+                                       UpdateStatus(rig);
+                                       end;
+                                    end;
                                  end;
                            ICOM_XMIT_SETTINGS:
                               if Ord(rig.tBuf[i + 4 + 1]) = 0 then
@@ -1501,24 +1467,6 @@ begin
    //  sleep(200);
    Sleep(FreqPollRate);
 
-   { rig.SendIcomCommand(Ord(ICOM_GET_MODE));
-    if not icomCheckBuffer(rig) then
-    begin
-      ClearRadioStatus(rig);
-      UpdateStatus(rig);
-      Sleep(1000);
-      goto NextPoll;
-    end;
-
-    rig.SendIcomCommand(Ord(ICOM_GET_FREQ));
-    if not icomCheckBuffer(rig) then
-    begin
-      ClearRadioStatus(rig);
-      UpdateStatus(rig);
-      Sleep(1000);
-      goto NextPoll;
-    end;
-   }
    if rig^.RadioModel in IcomRadiosThatSupportVFOB then
       begin
 
@@ -1563,7 +1511,7 @@ begin
             end;
 
       end
-   else
+   else      // else if for radios that do not support VFOB command
       begin
          rig.SendIcomCommand(Ord(ICOM_GET_MODE));
          if not icomCheckBuffer(rig) then
@@ -1575,6 +1523,16 @@ begin
             end;
 
          rig.SendIcomCommand(Ord(ICOM_GET_FREQ));
+         if not icomCheckBuffer(rig) then
+            begin
+               ClearRadioStatus(rig);
+               UpdateStatus(rig);
+               Sleep(1000);
+               goto NextPoll;
+            end;
+
+         // Add the 1A06 command
+         rig.GetIcomDataStateCommand;
          if not icomCheckBuffer(rig) then
             begin
                ClearRadioStatus(rig);
@@ -2352,7 +2310,10 @@ begin
       {rig^.pOver}) then
       if BytesToRead = BytesRead then
          Result := True;
-   logger.trace('[ReadFromSerialPort] Read %s from serial port',[ArrayToString(rig^.tBuf)]);
+   if logger.IsTraceEnabled then
+      begin
+      logger.trace('[ReadFromSerialPort] Read %s from serial port',[String2Hex(AnsiLeftStr(ArrayToString(rig^.tBuf),BytesRead))]);
+      end;
 
 end;
 
