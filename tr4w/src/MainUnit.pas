@@ -2588,10 +2588,10 @@ begin
 
     menu_alt_WkMode:     // 4.60.1
           begin
-            wkClose;
+             wkClose;
             wkOpen;
           end;
-
+       
     //alt
     menu_alt_dupecheck: DupeCheckOnInactiveRadio(False);
 
@@ -6664,7 +6664,8 @@ begin
             if (ActiveDomesticMult = GridSquares) or
                ((ActiveExchange = RSTAndOrGridExchange) or
                 (ActiveExchange = Grid2Exchange) or
-                (ActiveExchange = RSTAndGrid3Exchange)            // 4.96.3
+                (ActiveExchange = RSTAndGrid3Exchange) or
+                (ActiveExchange = GridExchange)  // 4.104.2    // 4.96.3
                ) then
                begin
                exch.QTHString := gridSquare;
