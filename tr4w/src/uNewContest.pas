@@ -501,9 +501,9 @@ begin
               ALLASIANCW, ALLASIANSSB, YOUTHCHAMPIONSHIPRF, YOTA:
                 SetCommentAndEnableEditControl(TC_ENTERYOURAGEINMYSTATEFIELD, icmyState);
 
-       {       UKRAINECHAMPIONSHIP:
+               UKRAINECHAMPIONSHIP:
                 SetCommentAndEnableEditControl(TC_ENTERYOUROBLASTID, icmyState);
-        }
+         
               ARRLDXCW,
                 ARRLDXSSB:
                 SetCommentAndEnableEditControl(TC_ENTERYOURQTHORPOWER, icmyState);
