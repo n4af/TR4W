@@ -2292,8 +2292,8 @@ begin
 
   //  TempString := VisibleLog.GetInitialExchangeFromEditableLog(Call);
 
-    //if TempString = '' then
-  TempString := CallsignsList.GetIniitialExchange(Call);
+    if ((TempString = '') and (not ReverseInitialEx)) then
+   TempString := CallsignsList.GetIniitialExchange(Call);
   //  GetInitialExchange(Call);
 
   //  if ActiveExchange = RSTPrefectureExchange then TempString := Copy(TempString, 2, 10);
@@ -2405,9 +2405,10 @@ begin
                 Exchange := Exchange + data.TENTEN + ' ';
 
           end;
-
-          InitialExchangeEntry := '' + Exchange; // Issue151
-
+          if Exchange <> '' then
+          InitialExchangeEntry := '' + Exchange // Issue151
+            else
+            InitialExchangeEntry := CallsignsList.GetIniitialExchange(Call);
           CheckAndSetInitialExchangeCursorPos;
           //          if InitialExchangeOverwrite then Windows.SendMessage(ExchangeWindowHandle, EM_SETSEL, 0, -1);
           //                                      InitialExchangePutUp := True; {KK1L: 6.70 For custom typing any character overwrites the whole exchange.}
@@ -2594,8 +2595,11 @@ begin
         if RussianID(TempQTH.CountryID) then
           TempString := GetRussiaOblastID(Call);
       end;
+    if ReverseInitialEx then
+     TempString := CallsignsList.GetIniitialExchange(Call)
+      else
+       InitialExchangeEntry := ' ' + TempString;
 
-    InitialExchangeEntry := ' ' + TempString;
       {KK1L: 6.73 Added ' '. K9PG forgets to add it when cursor at start.}
 
     {        IF InitialExchangeOverwrite THEN

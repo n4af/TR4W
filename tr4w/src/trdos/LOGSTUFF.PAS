@@ -7096,8 +7096,10 @@ begin
 
       end;
 
-    YBFT8QP: // 4.90.7
+
+    YBFT8QP: // 4.90.7    4.104.4
       begin
+
         if IndonesianCountry(MyCountry) then
         begin
           if IndonesianCountry(RXCty) then
@@ -7114,6 +7116,10 @@ begin
           else
             RXData.QSOPoints := 0;
         end;
+          if ContestTitle = 'YBDXDI-FT8' then
+           if RXCty = 'XYZ' then
+                   RXData.QSOPoints := 5;
+
       end;
 
     SLFivePointQSOMethod:
