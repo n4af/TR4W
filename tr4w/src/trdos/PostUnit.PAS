@@ -4086,8 +4086,8 @@ begin
       case ActiveExchange of
          GridExchange, Grid2Exchange:
             begin
-            Result := cMyGrid;
-            //Format(CABRILLO_MYEX, '%-11s', cMyGrid);
+           Result := cMyGrid;
+        //  Format(CABRILLO_MYEX, '%-11s', cMyGrid);
             end;
 
          RSTNameAndQTHExchange:

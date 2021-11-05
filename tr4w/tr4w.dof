@@ -3,7 +3,7 @@ Version=7.0
 [Compiler]
 A=8
 B=0
-C=1
+C=0
 D=1
 E=0
 F=0
@@ -94,7 +94,7 @@ OutputDir=target
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=$(DELPHI)\Lib\Debug;src;src\lang;src\trdos;src\utils;D:\newsrc\tr4w\include;include\Indy;include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas;C:\Program Files (x86)\Borland\Delphi7\Lib
+SearchPath=src;src\lang;src\trdos;src\utils;D:\newsrc\tr4w\include;include\Indy;include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas;C:\Program Files (x86)\Borland\Delphi7\Lib
 Packages=vcl;rtl;vclx;VclSmp;vclshlctrls
 Conditionals=
 DebugSourceDirs=
@@ -135,8 +135,8 @@ Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=17
-Item0=$(DELPHI)\Lib\Debug;src;src\lang;src\trdos;src\utils;D:\newsrc\tr4w\include;include\Indy;include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas;C:\Program Files (x86)\Borland\Delphi7\Lib
-Item1=src;src\lang;src\trdos;src\utils;D:\newsrc\tr4w\include;include\Indy;include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas;C:\Program Files (x86)\Borland\Delphi7\Lib
+Item0=src;src\lang;src\trdos;src\utils;D:\newsrc\tr4w\include;include\Indy;include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas;C:\Program Files (x86)\Borland\Delphi7\Lib
+Item1=$(DELPHI)\Lib\Debug;src;src\lang;src\trdos;src\utils;D:\newsrc\tr4w\include;include\Indy;include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas;C:\Program Files (x86)\Borland\Delphi7\Lib
 Item2=src;src\lang;src\trdos;src\utils;src\include;include\Indy;include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas;C:\Program Files (x86)\Borland\Delphi7\Lib
 Item3=src;src\lang;src\trdos;src\utils;src\include;include\Indy;include\Indy\D7;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas
 Item4=src;src\lang;src\trdos;src\utils;src\include;include\Indy;C:\Users\mainuser\Delphi7_Personal\Install\program files\Borland\Delphi7\Source\Rtl\Win\WinSock.pas

@@ -397,7 +397,7 @@ begin
 
               CUPRFCW, CUPRFSSB, CUPRFDIG: SetCommentAndEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE, icmyGrid);
               RFASCHAMPIONSHIPCW: SetCommentAndEnableEditControl(TC_RFAS, icMyQTH);
-              MAKROTHEN, CQVHF,ARRLVHFJAN,ARRLVHFJUN, ARRLVHFSEP,STEWPERRY, BATAVIA_FT8, WWDIGI: SetCommentAndEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE, icmyGrid);
+               CQVHF,ARRLVHFJAN,ARRLVHFJUN, ARRLVHFSEP,STEWPERRY, BATAVIA_FT8, WWDIGI, MAKROTHEN: SetCommentAndEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE, icmyGrid);
 
               OZHCRVHF, EUROPEANVHF, RADIOVHFFD: SetCommentAndEnableEditControl(TC_ENTERYOURSIXDIGITGRIDSQUARE, icmyGrid);
 
@@ -501,9 +501,9 @@ begin
               ALLASIANCW, ALLASIANSSB, YOUTHCHAMPIONSHIPRF, YOTA:
                 SetCommentAndEnableEditControl(TC_ENTERYOURAGEINMYSTATEFIELD, icmyState);
 
-       {       UKRAINECHAMPIONSHIP:
+               UKRAINECHAMPIONSHIP:
                 SetCommentAndEnableEditControl(TC_ENTERYOUROBLASTID, icmyState);
-        }
+         
               ARRLDXCW,
                 ARRLDXSSB:
                 SetCommentAndEnableEditControl(TC_ENTERYOURQTHORPOWER, icmyState);
