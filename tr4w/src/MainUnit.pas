@@ -6411,6 +6411,7 @@ var
   recordFromWSJTX: boolean;
   gridSquare: string;
   tempSRX_String: string;
+  tempSTX_String: string;
   tempState : string;
   tempVE_Prov : string;
   tempARRL_Sect: string;
@@ -6505,12 +6506,18 @@ begin
                      end;
                   tAdifNAME: exch.Name := fieldValue;
                   tAdifOPERATOR: StrPLCopy(exch.ceOperator, fieldValue, High(exch.ceOperator));
+                  tAdifPRECEDENCE: exch.Precedence := fieldValue[1];       // 4.105.2
                   tAdifQSO_DATE:
                      if not ADIFDateStringToQSOTime(fieldValue,exch.tSysTime) then
                         begin
                         ; //exit;
                         end;
                   tAdifTIME_ON:
+                     if not ADIFTimeStringToQSOTime(fieldValue,exch.tSysTime) then
+                        begin
+                        ; //exit;
+                        end;
+                  tAdifTIME_OFF:          // 4.105.2
                      if not ADIFTimeStringToQSOTime(fieldValue,exch.tSysTime) then
                         begin
                         ; //exit;
@@ -6534,6 +6541,7 @@ begin
                         //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                         end; *)
                   tAdifSTX: exch.NumberSent := StrToInt(fieldValue);
+                  tAdifSTX_STRING: tempSTX_String := fieldValue;     // 4.105.2
                   tAdifSUBMODE:
                      begin
                      msm := GetADIFSubmode(fieldValue);
@@ -6639,6 +6647,8 @@ begin
                end;
          ARRL_RTTY_ROUNDUP:
             exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
+         ARRLSSCW, ARRLSSSSB:      // 4.105.2
+          exch.DomesticQTH := tempARRL_Sect;
          CWOPS:
             exch.Age := StrToIntDef(exch.QTHString,0);
          IARU:
