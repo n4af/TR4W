@@ -1,7 +1,7 @@
 {
  Copyright Dmitriy Gulyaev UA4WLI 2015.
 
- This file is part of TR4W  (SRC)                                                          4
+ This file is part of TR4W  (SRC)                                                         
 
  TR4W is free software: you can redistribute it and/or
  modify it under the terms of the GNU General Public License as
@@ -6665,6 +6665,10 @@ begin
                exch.ExchString := tempSRX_String; //exch.QTHString;
                
             //   end;
+         UKRAINIAN:      // 4.105.4
+         if IsAlpha(tempSRX_String) then
+          exch.DomesticQTH := tempSRX_String;
+
          WWDIGI:
             begin
             exch.ExchString := gridSquare;
