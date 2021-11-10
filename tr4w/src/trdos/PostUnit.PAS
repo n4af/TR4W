@@ -1913,6 +1913,10 @@ begin
                 sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
 
+            ARRL160:              // 4.105.5
+             if TempRXData.QTH.CountryID = 'K' then
+              WriteADIFField('ARRL_SECT',TempRXData.QTHString);
+
             ARRLFIELDDAY, WINTERFIELDDAY:
                 begin
                 if TempRXData.QTHString <> 'DX' then     // Change to validate it is a section
@@ -1935,9 +1939,8 @@ begin
                    //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s ', tCallStringLength, p);
                    //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
                    end;
+               end;
 
-
-              end;
             CQ160CW, CQ160SSB, NASPRINTCW, SPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
               begin
                 //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s ', tCallStringLength, p);  // Removed NY4I Issue 398 as we use CE.DomesticMult but whazt happens if Italy works Italy?

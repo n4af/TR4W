@@ -2591,7 +2591,7 @@ begin
              wkClose;
             wkOpen;
           end;
-       
+
     //alt
     menu_alt_dupecheck: DupeCheckOnInactiveRadio(False);
 
@@ -6645,6 +6645,12 @@ begin
                exch.QTHString := gridSquare;
                exch.DomesticQTH := gridSquare;
                end;
+         ARRL160:
+          begin
+           exch.QTHString := tempSRX_String;
+           exch.DomesticQTH := tempARRL_Sect;
+          end;
+          
          ARRL_RTTY_ROUNDUP:
             exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
          ARRLSSCW, ARRLSSSSB:      // 4.105.2
