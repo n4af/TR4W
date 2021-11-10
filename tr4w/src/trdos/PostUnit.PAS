@@ -1914,7 +1914,7 @@ begin
               end;
 
             ARRL160:              // 4.105.5
-             if TempRXData.QTH.CountryID = 'K' then
+             if (TempRXData.QTH.CountryID = 'K') or (TempRXData.QTH.CountryID = 'VE') then
               WriteADIFField('ARRL_SECT',TempRXData.QTHString);
 
             ARRLFIELDDAY, WINTERFIELDDAY:
