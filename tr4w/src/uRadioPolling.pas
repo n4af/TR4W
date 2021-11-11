@@ -364,7 +364,6 @@ begin
                                                 rig^.CurrentStatus.RITFreq :=
                                                    BufferToInt(@rig^.tBuf[i - 37],
                                                    19, 5);
-
                                                 rig^.CurrentStatus.Split :=
                                                    rig^.tBuf[i - 5] <> '0';
                                                 rig^.CurrentStatus.RIT :=

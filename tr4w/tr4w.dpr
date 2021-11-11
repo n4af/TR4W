@@ -700,11 +700,11 @@ begin
               begin
                 if lobyte(HiWord(Msg.lParam)) = 42 then {if OpMode = CQOpMode then }     // 4.97.3
                 begin
-                RITBumpDown; VFOBumpDown;
+                {RITBumpDown;} VFOBumpDown;        // 4.105.6
                 end;
                 if lobyte(HiWord(Msg.lParam)) = 54 then {if OpMode = CQOpMode then}       // 4.97.3
                 begin
-                RITBumpUp; VFOBumpUp;
+               { RITBumpUp;} VFOBumpUp;            // 4.105.6
                 end;
               end;
             end;
