@@ -690,26 +690,32 @@ begin
             end;
             if {18} Msg.wParam = VK_MENU then ShowFMessages(24);
             if {17} Msg.wParam = VK_CONTROL then
-            begin
+
               ShowFMessages(12);
 
-            end;
+
   if Msg.wParam = VK_SHIFT  then
             begin
-              if ShiftKeyEnable then
+              if ShiftKeyEnable then    // 4.105.6
+                {*in S&P the shift key tunes the K3 VFO with the RIT or XIT on, but RIT/XIT do not change
+                  ?In RUN mode the shift key should tune the RIT and not the xmit VFO...  but the VFO DISPLAY must change to show the RX frequency
+                *}
               begin
-                if lobyte(HiWord(Msg.lParam)) = 42 then {if OpMode = CQOpMode then }     // 4.97.3
-                begin
-                {RITBumpDown;} VFOBumpDown;        // 4.105.6
-                end;
-                if lobyte(HiWord(Msg.lParam)) = 54 then {if OpMode = CQOpMode then}       // 4.97.3
-                begin
-               { RITBumpUp;} VFOBumpUp;            // 4.105.6
+                if lobyte(HiWord(Msg.lParam)) = 42 then  
+                if OpMode = CQOpMode then      // 4.97.3
+                {RITBumpDown;} RITBumpDown
+                  else        // 4.105.6
+                   VFOBumpDown;
+                if lobyte(HiWord(Msg.lParam)) = 54 then
+                 if OpMode = CQOpMode then       // 4.97.3
+                 {RITBumpUp;} RITBumpUp
+                  else
+                   VFOBumpUP;
                 end;
               end;
             end;
           end;
-        end;
+
       WM_KEYUP:
         begin
       {    if (Msg.wParam = VK_SPACE) and (Msg.HWND = wh[mweCall]) then           //   4.102.4
