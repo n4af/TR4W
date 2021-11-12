@@ -1322,14 +1322,21 @@ begin
       try
       if logger.IsTraceEnabled then
          begin
-         if not (nNumberOfBytesToWrite in [3,6,7]) then
+         if true then //not (nNumberOfBytesToWrite in [3,6,7]) then
             begin
             logger.trace('>>>>Enter WriteToCATPort');
             SetString(debugStr,PChar(@Buffer),nNumberOfBytesToWrite);
             nLen := nNumberOfBytesToWrite; //Ord(Buffer[0]);
-            BinToHex(@Buffer,Buf,nLen);
-            Buf[(nLen*2) - 2] := #0;
-            logger.trace(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,Buf]));
+            if Self.RadioModel in IcomRadios then
+               begin
+               BinToHex(@Buffer,Buf,nLen);
+               Buf[(nLen*2) - 2] := #0;
+               logger.trace(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,Buf]));
+               end
+            else
+               begin
+               logger.trace(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,debugStr]));
+               end;
             end;
          end;
 
