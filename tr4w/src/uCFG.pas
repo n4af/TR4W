@@ -1544,10 +1544,23 @@ begin
       llFatal: logger.level := Fatal;
       llError: logger.Level := Error;
       llWarn: logger.Level := Warn;
+      llInfo: logger.Level := Info;
       llDebug: logger.Level := Debug;
       llTrace: logger.Level := Trace;
       else ;
    end;
+
+   // Log the version of the program under debug
+   if logger.IsInfoEnabled then
+      begin
+      logger.Info('TR4W Program Version %s (%s)',[ TR4W_CURRENTVERSION, TR4W_CURRENTVERSIONDATE]);
+      if MainUnit.IsWin64 then
+         begin
+         logger.Info('Running on 64 bit Windows');
+         end;
+      logger.info('Windows version: %d',[tr4w_osverinfo.dwPlatformId]);
+      end;
+
 
 end;
 

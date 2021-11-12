@@ -177,6 +177,7 @@ function DeviceIoControlHandler
   ULONG; pOutputLength: PULONG
   ): Cardinal;
 
+function IsWin64: Boolean;
 function GetLocalComputerName : string;
 procedure CheckNumber;
 procedure RunPlugin(PluginNumber: integer);
@@ -8195,10 +8196,24 @@ begin
             end;
          end;
       end; // case
-
-
-
 end;
+
+function IsWin64: Boolean;
+var
+  IsWow64Process : function(hProcess : THandle; var Wow64Process : BOOL): BOOL; stdcall;
+  Wow64Process : BOOL;
+begin
+  Result := False;
+  IsWow64Process := GetProcAddress(GetModuleHandle(Kernel32), 'IsWow64Process');
+  if Assigned(IsWow64Process) then begin
+    if IsWow64Process(GetCurrentProcess, Wow64Process) then begin
+      Result := Wow64Process;
+    end;
+  end;
+end;
+
+
+
 
 
 
