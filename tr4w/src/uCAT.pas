@@ -92,7 +92,6 @@ begin
 
         for I2 := 122 to 123 do
         begin
-
           tCB_ADDSTRING(hwnddlg, I2, 'NONE');
           for i := 1 to 20 do
           begin
@@ -101,7 +100,8 @@ begin
           end;
 
         end;
-
+       // Format(@TempBuffer1, 'TCP/IP');
+        tCB_AddSTRING_PCHAR(hwnddlg,122,'TCP/IP');
         for i := 1 to 3 do
           begin
             Format(@TempBuffer1, 'PARALLEL %u',i);
@@ -138,6 +138,17 @@ begin
 
         {cat port}
         tCB_SETCURSEL(hwnddlg, 122, Ord(CATWTR^.tCATPortType));
+        if (CATWTR^.tCATPortType = NETWORK) then
+           begin
+           EnableWindowTrue(hwnddlg, 130);
+           EnableWindowTrue(hwnddlg, 131);
+           end
+        else
+           begin
+           EnableWindowTrue(hwnddlg, 124);
+           EnableWindowTrue(hwnddlg, 125);
+           EnableWindowTrue(hwnddlg, 128);
+           end;
 
         {keyer_rts}
         tCB_SETCURSEL(hwnddlg, 126, Ord(CATWTR^.tr4w_keyer_rts_state) - 1);
@@ -202,6 +213,7 @@ begin
           116:
 
             begin
+            
               for i := 121 to 128 do tCB_SETCURSEL(hwnddlg, i, 0);
               tCB_SETCURSEL(hwnddlg, 128, 2);
               tCB_SETCURSEL(hwnddlg, 126, 3);

@@ -137,7 +137,7 @@ const
    KenwoodPollRequestsAnswerLength: array[tKenwoodCommands] of integer = (38,
       14, 14);
 begin
-   if rig.RadioModel in [K3] then
+   if rig.RadioModel in [K3,K4] then
       begin
          SetK3ExtendedCommandMode;
       end;
@@ -285,7 +285,7 @@ begin
                                                    '6':
                                                       begin
                                                          if rig^.RadioModel in
-                                                            [K3] then
+                                                            [K3, K4] then
                                                             begin
                                                                case rig^.tBuf[i
                                                                   - 3] of
@@ -299,7 +299,7 @@ begin
                                                                      rig^.CurrentStatus.ExtendedMode := ePSK31;
                                                                   else
                                                                      begin
-                                                                        logger.info('Unknown value from K3 ExtendedMode response' + rig^.tBuf);
+                                                                        logger.info('Unknown value from K3/K4 ExtendedMode response' + rig^.tBuf);
                                                                      end;
                                                                end;
                                                             end
@@ -376,11 +376,11 @@ begin
                                                    rig^.tBuf[i - 9] = '1';
                                                 if rig^.tBuf[i - 9] = '1' then
                                                    begin
-                                                      logger.trace('K3/Kenwood2 says radio is transmitting');
+                                                      logger.trace('K3/K4/Kenwood2 says radio is transmitting');
                                                    end
                                                 else
                                                    begin
-                                                      logger.trace('K3/Kenwood2 says radio is RECEIVING');
+                                                      logger.trace('K3/K4/Kenwood2 says radio is RECEIVING');
                                                    end;
                                                 if radio1.CurrentStatus.TXOn
                                                    then
@@ -2847,7 +2847,7 @@ begin
    case rig^.RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
          TS950, TS990,
-         TS2000, FLEX, K2, K3:
+         TS2000, FLEX, K2, K3, K4:
          begin
 {$IF MASKEVENT}
             pKenwoodNew(rig);

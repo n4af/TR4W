@@ -459,6 +459,7 @@ const
     ({Name: 'NONE';       } BR:BR4800;  P: 1; C: 0; S: 0; T:0; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00),
     ({Name: 'K2';         } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'K3';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
+    ({Name: 'K4';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'FLEX';       } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),     // 4.87.2
     ({Name: 'TS140';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS440';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
@@ -547,6 +548,7 @@ const
       'NONE',
       'K2',
       'K3',
+      'K4',
       'FLEX',
       'TS440',
       'TS450',
@@ -863,7 +865,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, FLEX, K2, K3, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
+      TS950, TS990, TS2000, FLEX, K2, K3, K4, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
       FTDX5000, FTDX9000:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RC;');
@@ -920,7 +922,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, K2, K3 {, FTDX9000}:
+      TS950, TS990, TS2000, K2, K3, K4 {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RU;');
          end;
@@ -974,7 +976,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, K2, K3 {, FTDX9000}:
+      TS950, TS990, TS2000, K2, K3, K4 {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RD;');
          end;
@@ -1033,7 +1035,7 @@ begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('UP;', 3);
          end;
 
-      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3:
+      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3, K4:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('UP;');
          end;
@@ -1100,7 +1102,7 @@ begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('DN;', 3);
          end;
 
-      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3:
+      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3, K4:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('DN;');
          end;
@@ -1714,7 +1716,7 @@ begin
    //TLogger.GetInstance.Debug(Format('      In PutRadioIntoSplit: %s',[RadioName]));
    case RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
-      TS2000, FLEX, K2, K3:
+      TS2000, FLEX, K2, K3, K4:
          begin
          AddToOutputBuffer('FR0;FT1;', 8);
 
@@ -1773,7 +1775,7 @@ begin
    //TLogger.GetInstance.Debug(Format('      In PutRadioOutOfSplit: %s',[RadioName]));
    case RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
-      TS2000, FLEX, K2, K3:
+      TS2000, FLEX, K2, K3, K4:
          begin
          //ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('FR0;FT0;', 8);
          AddToOutputBuffer('FR0;FT0;', 8);
@@ -2042,7 +2044,7 @@ begin
             end
          else if Msg = '!' then   // SN
             begin
-            if not (RadioModel in [K2, K3]) then   // No SN on Elecraft
+            if not (RadioModel in [K2, K3, K4]) then   // No SN on Elecraft
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '%';
                end;
@@ -2050,7 +2052,7 @@ begin
             end
          {else if Msg = '&' then // AS      // & is really MYSTATE but documented as AS
             begin
-            if RadioModel in [K2, K3] then
+            if RadioModel in [K2, K3, K4] then
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '%'; //Elecraft AS
                end
@@ -2062,7 +2064,7 @@ begin
             end}
          else if Msg = '+' then // AR
             begin
-            if RadioModel in [K2, K3] then
+            if RadioModel in [K2, K3, K4] then
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '+'; //Elecraft AR
                end
@@ -2074,7 +2076,7 @@ begin
             end
          else if Msg = '<' then // SK
             begin
-            if RadioModel in [K2, K3] then
+            if RadioModel in [K2, K3, K4] then
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '*'; //Elecraft SK
                end
@@ -2086,7 +2088,7 @@ begin
             end
          else if Msg = '=' then // BT
             begin
-            if RadioModel in [K2, K3] then
+            if RadioModel in [K2, K3, K4] then
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '='; //Elecraft BT
                end
@@ -2109,7 +2111,7 @@ begin
                   maxLen := 24;
                   pad := true;
                   end;
-               K2, K3:
+               K2, K3, K4:
                   begin
                   maxLen := 22; //28;
                   pad := false;
@@ -2318,7 +2320,7 @@ begin
                begin
                AddToOutputBuffer('KY @;RX;', 8);   // Stops the K2 // ny4i Issue 157
                end;
-            K3:
+            K3, K4:
                begin
               AddToOutputBuffer('KY ' + Chr(4) + ';RX;', 8); // Chr(4) stops the K3 // ny4i Issue 157
                end;
@@ -2390,7 +2392,7 @@ begin
          dwFlagsAndAttributes := FILE_FLAG_OVERLAPPED;
          EvtChar := #13;
          end;
-      if RadioModel in [KenwoodRadios, K2, K3] then
+      if RadioModel in [KenwoodRadios, K2, K3, K4] then
          begin
          dwFlagsAndAttributes := FILE_FLAG_OVERLAPPED;
          EvtChar := ';';
@@ -2416,7 +2418,7 @@ begin
       FreeMem(TimeoutBuffer, sizeof(COMMTIMEOUTS));
 {$IF MASKEVENT}
 
-      if RadioModel in [KenwoodRadios, K2, K3, Orion] then
+      if RadioModel in [KenwoodRadios, K2, K3, K4, Orion] then
          begin
          if SetCommMask(hand, EV_RXFLAG) then
             begin
@@ -3391,15 +3393,15 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
-      TS2000, FLEX, K2, K3:
+      TS2000, FLEX, K2, K3, K4:
          begin
          if PTTOn then
             begin
             TempString := 'TX;';
-            DEBUGMSG('Setting Kenwood/Flex/K3 to TX mode');
+            DEBUGMSG('Setting Kenwood/Flex/K3/K4 to TX mode');
             end else
             begin
-            DEBUGMSG('Setting Kenwood/Flex/K3 to RX mode');
+            DEBUGMSG('Setting Kenwood/Flex/K3/K4 to RX mode');
             TempString := 'RX;';
             end;
          end;
@@ -3519,12 +3521,12 @@ var
 const
    ra: array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
-   RadioSupportsCWByCAT := [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000,
+   RadioSupportsCWByCAT := [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000,
                             FLEX, IC705, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
                             IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
-      [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000, FLEX, FT450, FT891, FT950, FT991,
+      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FT450, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
       IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120

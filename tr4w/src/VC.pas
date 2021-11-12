@@ -66,6 +66,7 @@ type
     Serial18,
     Serial19,
     Serial20,
+    Network,
     Parallel1,
     Parallel2,
     Parallel3
@@ -960,6 +961,7 @@ type
     NoInterfacedRadio,
     K2,
     K3,
+    K4,
     FLEX,       // 4.87.2
     TS140,
     TS440,

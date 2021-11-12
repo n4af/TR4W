@@ -114,6 +114,7 @@ const
     'SERIAL 18',
     'SERIAL 19',
     'SERIAL 20',
+    'TCP/IP',
     'PARALLEL 1',
     'PARALLEL 2',
     'PARALLEL 3'
