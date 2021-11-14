@@ -324,6 +324,7 @@ const
    + 1 {DebugLogLevel}
    + 1 {WSJTXSendColorizations}
    + 1 {WSJTXEnabled}
+   + 2 {Radio Startup Commands for Radio 1 and Radio 2}
    ;
 
    // Note if crAddress says pointer(NN, then it is callign a function at position NN in the an array
@@ -638,7 +639,8 @@ const
  (crCommand: 'RADIO ONE TRACKING ENABLE';     crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfRadio1; crType: ctBoolean),
  (crCommand: 'RADIO ONE TYPE';                crAddress: pointer(26);                     crMin:0;  crMax:0;       crS: csOld; crA: 9; crC:0 ; crP:0; crJ: 0; crKind: ckList; cfFunc: cfRadio1; crType: ctOther),
  (crCommand: 'RADIO ONE UPDATE SECONDS';      crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfRadio1; crType: ctInteger),
- (crCommand: 'RADIO ONE WIDE CW FILTER';      crAddress: @Radio1.WideCWFilter;       crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctBoolean),
+ (crCommand: 'RADIO ONE WIDE CW FILTER';      crAddress: @Radio1.WideCWFilter;            crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctBoolean),
+ (crCommand: 'RADIO ONE STARTUP COMMAND';     crAddress: @Radio1.StartupCommand;          crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctString),
  (crCommand: 'RADIO TWO BAND OUTPUT PORT';    crAddress: @Radio2.BandOutputPort;          crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfRadio2; crType: ctPortLPT),
  (crCommand: 'RADIO TWO BAUD RATE';           crAddress: pointer(12);                     crMin:0;  crMax:57600;   crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckArray; cfFunc: cfRadio2; crType: ctInteger),
  (crCommand: 'RADIO TWO CAT DTR';             crAddress: pointer(33);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther),
@@ -649,7 +651,7 @@ const
  (crCommand: 'RADIO TWO CW SPEED SYNC';       crAddress: @Radio2.CWSpeedSync;             crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean),    // ny4i 4.44.5
  (crCommand: 'RADIO TWO FREQUENCY ADDER';     crAddress: @Radio2.FrequencyAdder;          crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfRadio2; crType: ctInteger),
  (crCommand: 'RADIO TWO FT1000MP CW REVERSE'; crAddress: @Radio2.FT1000MPCWReverse;       crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'RADIO TWO ICOM FILTER BYTE';    crAddress: pointer(16);          crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger),
+ (crCommand: 'RADIO TWO ICOM FILTER BYTE';    crAddress: pointer(16);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'RADIO TWO ID CHARACTER';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctChar),
  (crCommand: 'RADIO TWO KEYER DTR';           crAddress: pointer(35);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther),
  (crCommand: 'RADIO TWO KEYER RTS';           crAddress: pointer(34);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther),
@@ -658,13 +660,14 @@ const
  (crCommand: 'RADIO TWO TRACKING ENABLE';     crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'RADIO TWO TYPE';                crAddress: pointer(27);                     crMin:0;  crMax:0;       crS: csOld; crA: 10;crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfRadio2; crType: ctOther),
  (crCommand: 'RADIO TWO UPDATE SECONDS';      crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
- (crCommand: 'RADIO TWO WIDE CW FILTER';      crAddress: @Radio2.WideCWFilter;       crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctBoolean),
+ (crCommand: 'RADIO TWO WIDE CW FILTER';      crAddress: @Radio2.WideCWFilter;            crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctBoolean),
+ (crCommand: 'RADIO TWO STARTUP COMMAND';     crAddress: @Radio2.StartupCommand;          crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctString),
  (crCommand: 'RADIUS OF EARTH';               crAddress: @RadiusOfEarth;                  crMin:0;  crMax:MAXWORD;   crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctReal),
  (crCommand: 'RANDOM CQ MODE';                crAddress: @RandomCQMode;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'RATE DISPLAY';                  crAddress: pointer(0);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList; cfFunc: cfAll; crType: ctOther),
  (crCommand: 'RELAY CONTROL PORT';            crAddress: @RelayControlPort;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfRadio1; crType: ctPortLPT),
  (crCommand: 'REMAINING MULT DISPLAY MODE';   crAddress: pointer(16);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:2; crJ: 0; crKind: ckList; cfFunc: cfAll; crType: ctOther),
- (crCommand: 'REMINDER';                      crAddress: pointer(51);                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAppearance; crType: ctOther),
+ (crCommand: 'REMINDER';                      crAddress: pointer(51);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAppearance; crType: ctOther),
  (crCommand: 'REPEAT S&P CW EXCHANGE';        crAddress: @RepeatSearchAndPounceExchange;  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),
  (crCommand: 'REPEAT S&P EXCHANGE';           crAddress: @RepeatSearchAndPounceExchange;  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),
  (crCommand: 'REPEAT S&P SSB EXCHANGE';       crAddress: @RepeatSearchAndPouncePhoneExchange; crMin:0;  crMax:0;   crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage),

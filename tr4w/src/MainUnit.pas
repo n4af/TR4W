@@ -1885,6 +1885,12 @@ begin
       wsjtx.Stop;
       FreeAndNil(wsjtx);
       end;
+
+  if Assigned(logger) then
+     begin
+     logger.Info('------------------------------Program shutdown----------------------------');
+     FreeAndNil(logger);
+     end;
   Windows.UnregisterClass(tr4w_ClassName, hInstance);   // ny4i Issue 145. UnregisterClass was not qualifies and it conflicted with classes.UnregisterClass
   ExitProcess(hInstance);
 end;
