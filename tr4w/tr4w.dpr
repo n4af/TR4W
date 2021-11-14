@@ -108,7 +108,8 @@ uses
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas',
   uGridLookup in 'src\uGridLookup.pas',
-  Log4D in 'src\Log4D.pas';
+  Log4D in 'src\Log4D.pas',
+  version in 'src\version.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -702,7 +703,7 @@ begin
                   ?In RUN mode the shift key should tune the RIT and not the xmit VFO...  but the VFO DISPLAY must change to show the RX frequency
                 *}
               begin
-                if lobyte(HiWord(Msg.lParam)) = 42 then  
+                if lobyte(HiWord(Msg.lParam)) = 42 then
                 if OpMode = CQOpMode then      // 4.97.3
                 {RITBumpDown;} RITBumpDown
                   else        // 4.105.6

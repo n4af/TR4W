@@ -27,7 +27,8 @@ uses
 
   Windows,
   Messages,
-  Log4D;
+  Log4D,
+  Version;
 
 {$INCLUDE w.pas}
 
