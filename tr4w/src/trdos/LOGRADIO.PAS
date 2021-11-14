@@ -165,6 +165,7 @@ type
 
       FreqWindowHandle: HWND;
       RadioName:        Str20;
+      StartupCommand  : Str50;
       //    lpOverlapped: TOverlapped;
       //    pOver: POverlapped;
 
@@ -2402,7 +2403,20 @@ begin
       Mode := NoMode;
       Freq := 0;
       end;
-
+   logger.debug('[RadioObject.SetUpRadioInterface] Startup command length = %d, startup command = %s',[length(Self.StartupCommand),Self.StartupCommand]);
+   if length(Self.StartupCommand) > 0 then
+      begin
+      case RadioParametersArray[RadioModel].rt of
+      rtKenwood: AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+      rtYaesu2,
+      rtYaesu3:  AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+      rtIcom: logger.Warn('Startup command not yet implemented for Icom');
+      //rtOrion: WriteToCATPort(addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+      else
+         begin
+         end;
+      end;
+      end;
    { Enable polling }
 
    //  PollingEnable := True;

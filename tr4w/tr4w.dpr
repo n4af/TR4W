@@ -310,6 +310,7 @@ begin
    logLevels := llError; // For after we load config so we can set the value.
    TLogLogger.GetRootLogger.Level := Error;
    logger := TLogLogger.GetLogger('TR4WDebugLog');
+   logger.info('******************** PROGRAM STARTUP ************************');
    logger.Trace('trace output');
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
