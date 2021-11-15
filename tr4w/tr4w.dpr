@@ -56,6 +56,7 @@ uses
   uAutoCQ in 'src\uAutoCQ.pas',
   uCAT in 'src\uCAT.pas',
   uDialogs in 'src\uDialogs.pas',
+  Version in 'src\Version.pas',
   VC in 'src\VC.pas',
   uCommctrl in 'src\uCommctrl.pas',
   uGradient in 'src\uGradient.pas',

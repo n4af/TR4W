@@ -36,6 +36,7 @@ uses
   StrUtils,
   Classes,
   Tree,
+  Version,
   VC,
 //  Help,
   uMults,

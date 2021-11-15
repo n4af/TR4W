@@ -25,6 +25,7 @@ uses
 //  spectrum_vis,
   LogK1EA,
   TF,
+  Version,
   VC,
   LogWind,
   PostUnit,

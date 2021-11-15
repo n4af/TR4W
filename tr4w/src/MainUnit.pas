@@ -83,7 +83,7 @@ uses
   uWinManager,
   uBandmap,
   TF,
-  Ver,
+  Version,
   VC,
   uGradient,
   uNet,

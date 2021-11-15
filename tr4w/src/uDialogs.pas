@@ -25,6 +25,7 @@ interface
 uses
 //  shellapi,
   TF,
+  Version,
   VC,
   utils_file,
   Windows,
