@@ -6679,9 +6679,12 @@ begin
                exch.ExchString := tempSRX_String; //exch.QTHString;
        }
             //   end;
-         UKRAINIAN, OKDX:      // 4.105.4      // 4.105.11
+         UKRAINIAN, OKDX, LZDX:      // 4.105.4      // 4.105.11
          if IsAlpha(tempSRX_String) then
-          exch.DomesticQTH := tempSRX_String;
+          exch.DomesticQTH := tempSRX_String
+           else                                // 4.105.12
+            exch.QTHString := tempSRX_String;
+
 
          WWDIGI:
             begin
