@@ -6671,13 +6671,15 @@ begin
             exch.DomesticQTH := tempState;
             exch.ExchString := tempState;
           end;
-         ARRLFIELDDAY, WINTERFIELDDAY:
+
+      // below commented as it already defaults
+     {    ARRLFIELDDAY, WINTERFIELDDAY:
             //if recordFromWSJTX then
             //   begin
                exch.ExchString := tempSRX_String; //exch.QTHString;
-               
+       }
             //   end;
-         UKRAINIAN:      // 4.105.4
+         UKRAINIAN, OKDX:      // 4.105.4      // 4.105.11
          if IsAlpha(tempSRX_String) then
           exch.DomesticQTH := tempSRX_String;
 
