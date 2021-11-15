@@ -1554,7 +1554,7 @@ begin
    end;
 
    // Log the version of the program under debug
-   if logger.IsInfoEnabled then
+{   if logger.IsInfoEnabled then
       begin
       logger.Info('TR4W Program Version %s (%s)',[ TR4W_CURRENTVERSION, TR4W_CURRENTVERSIONDATE]);
       if MainUnit.IsWin64 then
@@ -1564,7 +1564,7 @@ begin
       logger.info('Windows version: %d',[tr4w_osverinfo.dwPlatformId]);
       end;
 
-
+  }
 end;
 
 function F_UpdateWSJTXEnabled: boolean;

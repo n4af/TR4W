@@ -26,7 +26,6 @@ unit MainUnit;
 interface
 
 uses
-  //IdHTTP,
   ShellAPI,
   Logstuff,
   uMenu,
@@ -84,6 +83,7 @@ uses
   uWinManager,
   uBandmap,
   TF,
+  Ver,
   VC,
   uGradient,
   uNet,
@@ -462,7 +462,6 @@ uses
 //  uDocumentation,
 {$IFEND}
 
-  //OZCHR,
   uRadioPolling,
   LogCfg,
   LogCW,

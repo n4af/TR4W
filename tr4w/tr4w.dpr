@@ -108,8 +108,7 @@ uses
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas',
   uGridLookup in 'src\uGridLookup.pas',
-  Log4D in 'src\Log4D.pas',
-  version in 'src\version.pas';
+  Log4D in 'src\Log4D.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}

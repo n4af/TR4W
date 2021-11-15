@@ -1,18 +1,15 @@
+
 {
  Copyright Dmitriy Gulyaev UA4WLI 2015.
-
  This file is part of TR4W  (SRC)
-
  TR4W is free software: you can redistribute it and/or
  modify it under the terms of the GNU General Public License as
  published by the Free Software Foundation, either version 2 of the
  License, or (at your option) any later version.
-
  TR4W is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
-
  You should have received a copy of the GNU General
      Public License along with TR4W in  GPL_License.TXT.
 If not, ref:
@@ -27,8 +24,8 @@ uses
 
   Windows,
   Messages,
-  Log4D,
-  Version;
+  Log4D;
+ // Version;
 
 {$INCLUDE w.pas}
 
@@ -3775,7 +3772,6 @@ QSOPartiesCount = 18;
       lhWarningString: array[0..35] of Char;
    //   lhDummy: array[0..(SIZEOFCONTEXTEXCHANGE-60-1)] of Char;  // three fields above are 60 bytes
    //   lhDummy: array[0..(SizeOfContestExchange-SizeOfTLogHeader-1)] of Char;  // three fields above are 60 bytes
-
     end;
   *)
 
@@ -3802,3 +3798,16 @@ begin
 //  Windows.CopyMemory(@TR4W_FLOPPY_FILENAME, PChar('LOGBACK.TRW'), 11);
 //  tr4wColorsArray[trSelected] := GetSysColor(COLOR_ACTIVECAPTION);
 end.
+© 2021 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Loading complete
