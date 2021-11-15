@@ -56,6 +56,7 @@ uses
   uAutoCQ in 'src\uAutoCQ.pas',
   uCAT in 'src\uCAT.pas',
   uDialogs in 'src\uDialogs.pas',
+  Version in 'src\Version.pas',
   VC in 'src\VC.pas',
   uCommctrl in 'src\uCommctrl.pas',
   uGradient in 'src\uGradient.pas',
@@ -312,6 +313,7 @@ begin
    logLevels := llError; // For after we load config so we can set the value.
    TLogLogger.GetRootLogger.Level := Error;
    logger := TLogLogger.GetLogger('TR4WDebugLog');
+   logger.info('******************** PROGRAM STARTUP ************************');
    logger.Trace('trace output');
 
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
@@ -692,26 +694,32 @@ begin
             end;
             if {18} Msg.wParam = VK_MENU then ShowFMessages(24);
             if {17} Msg.wParam = VK_CONTROL then
-            begin
+
               ShowFMessages(12);
 
-            end;
+
   if Msg.wParam = VK_SHIFT  then
             begin
-              if ShiftKeyEnable then
+              if ShiftKeyEnable then    // 4.105.6
+                {*in S&P the shift key tunes the K3 VFO with the RIT or XIT on, but RIT/XIT do not change
+                  ?In RUN mode the shift key should tune the RIT and not the xmit VFO...  but the VFO DISPLAY must change to show the RX frequency
+                *}
               begin
-                if lobyte(HiWord(Msg.lParam)) = 42 then {if OpMode = CQOpMode then }     // 4.97.3
-                begin
-                RITBumpDown; VFOBumpDown;
-                end;
-                if lobyte(HiWord(Msg.lParam)) = 54 then {if OpMode = CQOpMode then}       // 4.97.3
-                begin
-                RITBumpUp; VFOBumpUp;
+                if lobyte(HiWord(Msg.lParam)) = 42 then
+                if OpMode = CQOpMode then      // 4.97.3
+                {RITBumpDown;} RITBumpDown
+                  else        // 4.105.6
+                   VFOBumpDown;
+                if lobyte(HiWord(Msg.lParam)) = 54 then
+                 if OpMode = CQOpMode then       // 4.97.3
+                 {RITBumpUp;} RITBumpUp
+                  else
+                   VFOBumpUP;
                 end;
               end;
             end;
           end;
-        end;
+
       WM_KEYUP:
         begin
       {    if (Msg.wParam = VK_SPACE) and (Msg.HWND = wh[mweCall]) then           //   4.102.4

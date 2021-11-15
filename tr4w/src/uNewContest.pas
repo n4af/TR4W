@@ -24,6 +24,7 @@ interface
 
 uses
   TF,
+  Version,
   VC,
   Windows,
   Tree,
@@ -503,7 +504,7 @@ begin
 
                UKRAINECHAMPIONSHIP:
                 SetCommentAndEnableEditControl(TC_ENTERYOUROBLASTID, icmyState);
-         
+
               ARRLDXCW,
                 ARRLDXSSB:
                 SetCommentAndEnableEditControl(TC_ENTERYOURQTHORPOWER, icmyState);

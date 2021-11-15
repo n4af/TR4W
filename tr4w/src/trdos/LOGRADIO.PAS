@@ -167,6 +167,7 @@ type
 
       FreqWindowHandle: HWND;
       RadioName:        Str20;
+      StartupCommand  : Str50;
       //    lpOverlapped: TOverlapped;
       //    pOver: POverlapped;
 
@@ -1332,14 +1333,21 @@ begin
       try
       if logger.IsTraceEnabled then
          begin
-         if not (nNumberOfBytesToWrite in [3,6,7]) then
+         if true then //not (nNumberOfBytesToWrite in [3,6,7]) then
             begin
             logger.trace('>>>>Enter WriteToCATPort');
             SetString(debugStr,PChar(@Buffer),nNumberOfBytesToWrite);
             nLen := nNumberOfBytesToWrite; //Ord(Buffer[0]);
-            BinToHex(@Buffer,Buf,nLen);
-            Buf[(nLen*2) - 2] := #0;
-            logger.trace(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,Buf]));
+            if Self.RadioModel in IcomRadios then
+               begin
+               BinToHex(@Buffer,Buf,nLen);
+               Buf[(nLen*2) - 2] := #0;
+               logger.trace(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,Buf]));
+               end
+            else
+               begin
+               logger.trace(Format('[%s] Calling WriteFile to write %u bytes <%s>',[RadioName,nNumberOfBytesToWrite,debugStr]));
+               end;
             end;
          end;
 
@@ -2486,7 +2494,20 @@ begin
       Mode := NoMode;
       Freq := 0;
       end;
-
+   logger.debug('[RadioObject.SetUpRadioInterface] Startup command length = %d, startup command = %s',[length(Self.StartupCommand),Self.StartupCommand]);
+   if length(Self.StartupCommand) > 0 then
+      begin
+      case RadioParametersArray[RadioModel].rt of
+      rtKenwood: AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+      rtYaesu2,
+      rtYaesu3:  AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+      rtIcom: logger.Warn('Startup command not yet implemented for Icom');
+      //rtOrion: WriteToCATPort(addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+      else
+         begin
+         end;
+      end;
+      end;
    { Enable polling }
 
    //  PollingEnable := True;

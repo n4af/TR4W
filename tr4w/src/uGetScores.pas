@@ -25,6 +25,7 @@ interface
 uses
 
   TF,
+  Version,
   VC,
 //  ShellAPI,
   uMults,

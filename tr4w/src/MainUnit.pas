@@ -1,7 +1,7 @@
 {
  Copyright Dmitriy Gulyaev UA4WLI 2015.
 
- This file is part of TR4W  (SRC)                                                          4
+ This file is part of TR4W  (SRC)                                                         
 
  TR4W is free software: you can redistribute it and/or
  modify it under the terms of the GNU General Public License as
@@ -26,7 +26,6 @@ unit MainUnit;
 interface
 
 uses
-  //IdHTTP,
   ShellAPI,
   Logstuff,
   uMenu,
@@ -84,6 +83,7 @@ uses
   uWinManager,
   uBandmap,
   TF,
+  Version,
   VC,
   uGradient,
   uNet,
@@ -177,6 +177,7 @@ function DeviceIoControlHandler
   ULONG; pOutputLength: PULONG
   ): Cardinal;
 
+function IsWin64: Boolean;
 function GetLocalComputerName : string;
 procedure CheckNumber;
 procedure RunPlugin(PluginNumber: integer);
@@ -461,7 +462,6 @@ uses
 //  uDocumentation,
 {$IFEND}
 
-  //OZCHR,
   uRadioPolling,
   LogCfg,
   LogCW,
@@ -1884,6 +1884,12 @@ begin
       wsjtx.Stop;
       FreeAndNil(wsjtx);
       end;
+
+  if Assigned(logger) then
+     begin
+     logger.Info('------------------------------Program shutdown----------------------------');
+     FreeAndNil(logger);
+     end;
   Windows.UnregisterClass(tr4w_ClassName, hInstance);   // ny4i Issue 145. UnregisterClass was not qualifies and it conflicted with classes.UnregisterClass
   ExitProcess(hInstance);
 end;
@@ -2591,7 +2597,7 @@ begin
              wkClose;
             wkOpen;
           end;
-       
+
     //alt
     menu_alt_dupecheck: DupeCheckOnInactiveRadio(False);
 
@@ -6411,6 +6417,7 @@ var
   recordFromWSJTX: boolean;
   gridSquare: string;
   tempSRX_String: string;
+  tempSTX_String: string;
   tempState : string;
   tempVE_Prov : string;
   tempARRL_Sect: string;
@@ -6505,12 +6512,18 @@ begin
                      end;
                   tAdifNAME: exch.Name := fieldValue;
                   tAdifOPERATOR: StrPLCopy(exch.ceOperator, fieldValue, High(exch.ceOperator));
+                  tAdifPRECEDENCE: exch.Precedence := fieldValue[1];       // 4.105.2
                   tAdifQSO_DATE:
                      if not ADIFDateStringToQSOTime(fieldValue,exch.tSysTime) then
                         begin
                         ; //exit;
                         end;
                   tAdifTIME_ON:
+                     if not ADIFTimeStringToQSOTime(fieldValue,exch.tSysTime) then
+                        begin
+                        ; //exit;
+                        end;
+                  tAdifTIME_OFF:          // 4.105.2
                      if not ADIFTimeStringToQSOTime(fieldValue,exch.tSysTime) then
                         begin
                         ; //exit;
@@ -6534,6 +6547,7 @@ begin
                         //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
                         end; *)
                   tAdifSTX: exch.NumberSent := StrToInt(fieldValue);
+                  tAdifSTX_STRING: tempSTX_String := fieldValue;     // 4.105.2
                   tAdifSUBMODE:
                      begin
                      msm := GetADIFSubmode(fieldValue);
@@ -6637,8 +6651,16 @@ begin
                exch.QTHString := gridSquare;
                exch.DomesticQTH := gridSquare;
                end;
+         ARRL160:
+          begin
+           exch.QTHString := tempSRX_String;
+           exch.DomesticQTH := tempARRL_Sect;
+          end;
+          
          ARRL_RTTY_ROUNDUP:
             exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
+         ARRLSSCW, ARRLSSSSB:      // 4.105.2
+          exch.DomesticQTH := tempARRL_Sect;
          CWOPS:
             exch.Age := StrToIntDef(exch.QTHString,0);
          IARU:
@@ -6649,12 +6671,21 @@ begin
             exch.DomesticQTH := tempState;
             exch.ExchString := tempState;
           end;
-         ARRLFIELDDAY, WINTERFIELDDAY:
+
+      // below commented as it already defaults
+     {    ARRLFIELDDAY, WINTERFIELDDAY:
             //if recordFromWSJTX then
             //   begin
                exch.ExchString := tempSRX_String; //exch.QTHString;
-               
+       }
             //   end;
+         UKRAINIAN, OKDX, LZDX:      // 4.105.4      // 4.105.11
+         if IsAlpha(tempSRX_String) then
+          exch.DomesticQTH := tempSRX_String
+           else                                // 4.105.12
+            exch.QTHString := tempSRX_String;
+
+
          WWDIGI:
             begin
             exch.ExchString := gridSquare;
@@ -8175,10 +8206,24 @@ begin
             end;
          end;
       end; // case
-
-
-
 end;
+
+function IsWin64: Boolean;
+var
+  IsWow64Process : function(hProcess : THandle; var Wow64Process : BOOL): BOOL; stdcall;
+  Wow64Process : BOOL;
+begin
+  Result := False;
+  IsWow64Process := GetProcAddress(GetModuleHandle(Kernel32), 'IsWow64Process');
+  if Assigned(IsWow64Process) then begin
+    if IsWow64Process(GetCurrentProcess, Wow64Process) then begin
+      Result := Wow64Process;
+    end;
+  end;
+end;
+
+
+
 
 
 

@@ -40,7 +40,7 @@ uses
   //uEditQSO,  // Issue 165 NY4I Removed this fromhere as there was a circular reference. It did not appear tobe needed.
   uTelnet,
   TF,
-//  DLPortIO,
+  Version,
   VC,
   //TR,
   uSpots,
@@ -141,7 +141,6 @@ procedure GoToNextMultDisplayedBandMapFrequency;
 function tAddQSOToLog(RXData: ContestExchange): boolean;
 implementation
 uses
-  //OZCHR,
   uProcessCommand,
   MainUnit,
   uRadioPolling;

@@ -24,6 +24,7 @@ interface
 
 uses
   TF,
+  Version,
   VC,
   LogSCP,
   LogWind,
