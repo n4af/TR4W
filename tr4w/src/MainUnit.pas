@@ -6665,7 +6665,7 @@ begin
             exch.Age := StrToIntDef(exch.QTHString,0);
          IARU:
             exch.QTHString := fieldValue;
-         NAQSOCW, NAQSOSSB:        // 4.103.1
+         NAQSOCW, NAQSOSSB, NCCCSPRINT:        // 4.103.1    // 4.105.13
           begin
             exch.QTHString := tempState;
             exch.DomesticQTH := tempState;
