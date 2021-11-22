@@ -123,7 +123,9 @@ begin
 
       SetCursor;
       ie_check := False;
-       if ((ActiveBand <> Spot.Fband)and (InactiveRadioptr.BandMemory <> Spot.Fband)) then exit; // 4.105.14
+      if BandMapSO2RDisplay then
+       if ((Radio1.FilteredStatus.Freq <> 0) and (Radio2.FilteredStatus.Freq <> 0)) then
+         if ((ActiveBand <> Spot.Fband)and (InactiveRadioptr.BandMemory <> Spot.Fband)) then exit; // 4.105.14
       for i := 0 to FCount - 1 do
       begin
       // 4.102.5 - filter the added spots to match the actual bm display

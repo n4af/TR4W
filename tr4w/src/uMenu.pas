@@ -396,7 +396,7 @@ const
 
     );
 
-  B_MENU_ARRAY_SIZE                     = 9;
+  B_MENU_ARRAY_SIZE                     = 10;
   B_MENU_ARRAY                          : array[0..B_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: 'BAND MAP ALL BANDS'#9'B'; mrId: 66),
     (mrText: 'BAND MAP ALL MODES'#9'M'; mrId: 77),
@@ -407,7 +407,8 @@ const
     (mrText: RC_DELETESELSPOT; mrId: 203),
     (mrText: RC_REMOVEALLSP; mrId: 204),
     (mrText: '-'; mrId: 0),
-    (mrText: RC_SENDINRIG; mrId: 205)
+    (mrText: RC_SENDINRIG; mrId: 205),
+    (mrText: 'BAND MAP SO2R DISPLAY'; mrId: 206)
     );
 
   E_MENU_ARRAY_SIZE                     = 7;
