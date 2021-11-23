@@ -30,7 +30,9 @@ uses
   TF,
   VC,
   uTelnet,
+  uWinkey,
   Windows,
+  LogCW,
   LogEdit,
   uGradient,
   uCallsigns,
@@ -492,12 +494,19 @@ begin
     QSYInActiveRadio := False;
     InBandLock := False;
    end ;
-//     else                  // 4.94.2
- //     QSYInActiveRadio := True;
+   if BandMapSO2RDisplay then
+    if (ActiveBand = Spot.FBand) and (not WKBusy)  then         // 4.105.15
+     begin
+      Radio := ActiveRadio;
+      QSYInactiveRadio := False;
+     end
+     else
+      begin
+       QSYInactiveRadio := True;
+       Radio := InactiveRadio;
+      end;
   if ((InBandLock) and (TwoRadioMode)) then
    begin
-    if BandMapSO2RDisplay then
-      BandMapSO2RDisplay := True;
     if QSYInactiveRadio then
      if ((InActiveRadioPtr.BandMemory <> EntryBand) and (EntryBand = ActiveRadioPtr.BandMemory)) then
       begin
