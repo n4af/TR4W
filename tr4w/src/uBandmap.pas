@@ -30,7 +30,9 @@ uses
   TF,
   VC,
   uTelnet,
+  uWinkey,
   Windows,
+  LogCW,
   LogEdit,
   uGradient,
   uCallsigns,
@@ -370,7 +372,7 @@ begin
               KillFocus;                                         // Gav 4.47.4 #141
             end;
           205: If TwoRadioMode then InvertBooleanCommand(@QSYInactiveRadio);   // Gav     4.37.12
-
+          206: If TwoRadioMode then InvertBooleanCommand(@BandMapSO2RDisplay);  // 4.105.14
         end;
 
         case HiWord(wParam) of
@@ -444,7 +446,7 @@ begin
   if BandMapDupeDisplay then Windows.CheckMenuItem(BandMapMenu, 68, MF_CHECKED);
   if BandMapMultsOnly then Windows.CheckMenuItem(BandMapMenu, 69, MF_CHECKED);
   if QSYInactiveRadio and TwoRadioMode then Windows.CheckMenuItem(BandMapMenu, 205, MF_CHECKED); //GAV  4.37.12
-
+  if BandMapSO2RDisplay and TwoRadioMode then Windows.CheckMenuItem(BandMapMenu, 206, MF_CHECKED); // 4.105.14
   //  SetMenuItemBitmaps(tr4w_main_menu, menu_alt_swapmults, MF_BYCOMMAND,
   //    LoadImage(GetModuleHandle('comctl32.dll'), PChar(140), IMAGE_BITMAP, 0, 0, LR_DEFAULTCOLOR), 0);
 
@@ -488,11 +490,21 @@ begin
      end;
   if ((radio1.filteredstatus.freq=0) or (radio2.filteredstatus.freq=0)) then
    begin
+    BandMapSO2RDisplay := False;
     QSYInActiveRadio := False;
     InBandLock := False;
    end ;
-//     else                  // 4.94.2
- //     QSYInActiveRadio := True;
+   if BandMapSO2RDisplay then
+    if (ActiveBand = Spot.FBand) and (not WKBusy)  then         // 4.105.15
+     begin
+      Radio := ActiveRadio;
+      QSYInactiveRadio := False;
+     end
+     else
+      begin
+       QSYInactiveRadio := True;
+       Radio := InactiveRadio;
+      end;
   if ((InBandLock) and (TwoRadioMode)) then
    begin
     if QSYInactiveRadio then

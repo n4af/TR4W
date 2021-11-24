@@ -516,6 +516,7 @@ var
   AutoTimeIncrementQSOs                 : integer;
   AutoTimeQSOCount                      : Byte;
 
+  BandMapSO2RDisplay                    : boolean;
   BandMapAllBands                       : boolean;
   BandMapAllModes                       : boolean;
   BandMapBand                           : BandType {= Band160};
@@ -4564,7 +4565,8 @@ begin
 
  spot := spotslist.get(i);
 
-
+       if (BandMapSO2RDisplay) and (TwoRadioMode) then   // 4.105.14
+        tLB_SETCURSEL(BandMapListBox,i);
 
        if (Spot.FBand = Band) and (QSYInactiveRadio) and (Spot.FMode = ActiveMode)  then
         begin
@@ -4577,49 +4579,8 @@ begin
            TuneRadioToSpot(Spot, ActiveRadio);
             tLB_SETCURSEL(BandMapListBox, i);
           end;
-
-    {       if  (spotslist.get(i+1).FBand <> Band) then
-          begin
-           BMFirst;
-           exit;
-          end   }
  end;
- {
- {next:
-i := tLB_GETCURSEL(BandMapListBox);
-i := i + 1;
-for i := i to CursorCount do
-
- if spotslist.get(i).FBand = Band then
- break  ;
- if (i =  CursorCount) or (i > CursorCount) then
-   exit;
-//   BandMapPreventRefresh := True;
-//   SpotsList.Display;
-
-// i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
-// if i = -1 then
-// exit;
-next:
- // Windows.SendMessage(BandMapListBox, LB_SETCURSEL, j, 0);
-
- spot := spotslist.get(i);
-
-
-
-      spot := spotslist.get(i);
-      Band := ActiveRadioPtr.BandMemory;
-            if (not QSYInactiveRadio) and (Spot.FBand = Band) then
-            begin
-               TuneRadioToSpot(SpotsList.Get(i), ActiveRadio);
-                tLB_SETCURSEL(BandMapListBox, i);
-             end
-
-                 else
-                 goto next;
-
-          end;
-  }
+ 
 
 procedure BMFirst;
 begin

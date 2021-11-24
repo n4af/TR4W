@@ -34,6 +34,7 @@ uses
   LogDupe,
   LogEdit,
   LogPack,
+  LogRadio,
   LogSCP,
   Tree;
 
@@ -117,17 +118,25 @@ add;
 var
   i                          : integer;
   ie                         : str80;
+
 begin
+
       SetCursor;
       ie_check := False;
+      if BandMapSO2RDisplay then
+       if ((Radio1.FilteredStatus.Freq <> 0) and (Radio2.FilteredStatus.Freq <> 0)) then
+         if ((ActiveBand <> Spot.Fband)and (InactiveRadioptr.BandMemory <> Spot.Fband)) then exit; // 4.105.14
       for i := 0 to FCount - 1 do
       begin
       // 4.102.5 - filter the added spots to match the actual bm display
+
     if not BandMapAllBands then if FList^[i].FBand <> BandmapBand then Continue;       //Gav  ActiveBand changed to BandmapBand
     if not BandMapAllModes then if FList^[i].FMode <> BandmapMode then Continue;        //Gav  ActiveMode changed to BandmapMode
     if not BandMapDupeDisplay then if FList^[i].FDupe then Continue;
     if not BandMapDisplayCQ then if FList^[i].FCQ then Continue;
     if not WARCBandsEnabled then if FList^[i].FWARCBand then Continue;
+    //if TwoRadioMode then
+     if ((ActiveBand <> Spot.Fband)and (InactiveRadioptr.BandMemory <> Spot.Fband)) then Continue; // 4.105.14
     if BandMapMultsOnly then if not ((FList^[i].FMult) or (FList^[i].FCQ)) then Continue;     //Gav added or FCQ to stop CQ spots being trapped by Mult only filter
     if not VHFBandsEnabled then if (FList^[i].FBand > Band12) then Continue;
           if FList^[i].FBand = Spot.FBand then

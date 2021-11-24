@@ -745,13 +745,15 @@ begin
           begin
             if Msg.wParam = VK_DELETE then DeleteSpotFromBandmap;
 { $ I F  O L DCTRLJ}
-            if Msg.wParam in [66, 77, 68, 80] then
+            if Msg.wParam in [66, 77, 68, 80, 206] then
             begin
               if Msg.wParam = 66 then InvertBoolean(BandMapAllBands);
               DisplayBandMap; //ProcessInput(BAB);
              if Msg.wParam = 77 then InvertBoolean(BandMapAllModes) ;
               DisplayBandMap; //ProcessInput(BAM);
               if Msg.wParam = 68 then InvertBoolean(BandMapDupeDisplay);
+              DisplayBandMap; //ProcessInput(BDD);
+              if Msg.wParam = 206 then InvertBoolean(BandMapSO2RDisplay);
               DisplayBandMap; //ProcessInput(BDD);
             end;
 { $ I F END}
