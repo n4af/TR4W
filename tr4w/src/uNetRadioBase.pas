@@ -27,10 +27,15 @@ Type TRadioVFO = class(TObject)
       priorBand: TRadioBand;
       filterWidth: TRadioFilter;
       filterHz: integer;
+      RITState: boolean;
+      XITState: boolean;
+      RITOffset: integer;
+      XITOffset: integer;
       IFShift: integer;
-      NR: boolean;
-      NRLevel: integer;   // Are things like notch and NR set per VFO or radio wide?
-      Notch: integer;
+      filterWidthHz: integer;
+     // NR: boolean;
+     // NRLevel: integer;   // Are things like notch and NR set per VFO or radio wide?
+     // Notch: integer;
 end;
 
 TReadingThread = class(TThread)
@@ -48,6 +53,7 @@ var
    logger: TLogLogger;
       appender: TLogFileAppender; 
 
+function BoolToString(b: boolean): string;
 function IntegerBetween(v: integer; i: integer; k: integer): boolean;
 
 // Add telnet client to this base class
@@ -72,8 +78,13 @@ Type TNetRadioBase = class(TObject)
       function GetIsReceiving: boolean;
       function GetISConnected: boolean;
       function GetFrequency: integer;
+      function GetIsRITOn: boolean;
+      function GetIsXITOn: boolean;
       function GetMode: TRadioMode;
       function GetDataMode: TRadioMode;
+      function GetSplitEnabled: boolean;
+      function GetVFO(Index: Integer): TRadioVFO;
+
       procedure SetPTTviaCAT(Value: boolean);
       function  GetPTTviaCAT: boolean;
       procedure OnRadioConnected(Sender:TObject);
@@ -84,13 +95,15 @@ Type TNetRadioBase = class(TObject)
    protected
       socket: TIdTCPClient;
       localCWSpeed: integer;
-      RITState: TBinary;
-      XITState: TBinary;
+      RITState: boolean;
+      XITState: boolean;
       vfo: array[1..2] of TRadioVFO;
       radioState: TRadioState;
       localMode: TRadioMode;
       localDataMode: TRadioMode;
       localSplitEnabled: boolean;
+      localRITOffset: integer;
+      localXITOffset: integer;
       bandIndependence: boolean;
       procRef: TProcessMsgRef;
 
@@ -115,9 +128,17 @@ Type TNetRadioBase = class(TObject)
       property IsTransmitting: boolean read GetIsTransmitting;
       property IsReceiving: boolean read GetIsReceiving;
       property IsConnected: boolean read GetIsConnected;
+      property IsRITOn: boolean read GetIsRITOn;
+      property IsXITOn: boolean read GetIsXITOn;
+      property IsSplitEnabled: boolean read GetSplitEnabled;
       property frequency: integer read GetFrequency;
       property mode: TRadioMode read GetMode;
       property dataMode: TRadioMode read GetDataMode;
+      property RITOffset: integer read localRITOffset;
+      property XITOffset: integer read localXITOffset;
+      // property Fields[Index: Integer]: TFieldSpec read GetField;
+      property FVFO[Index: integer]: TRadioVFO read GetVFO;
+
 
    published
 
@@ -368,6 +389,17 @@ begin
 Result := Self.localCWSpeed;
 end;
 
+function TNetRadioBase.GetIsRITOn: boolean;
+begin
+   Result := Self.RITState;
+   //logger.debug('In GetIsRITON, result = %s',[BoolToString(Result)]);
+end;
+
+function TNetRadioBase.GetIsXITOn: boolean;
+begin
+   Result := Self.XITState;
+end;
+
 function TNetRadioBase.GetIsConnected: boolean;
 begin
    Result := socket.Connected;
@@ -386,6 +418,20 @@ end;
 function TNetRadioBase.GetDataMode: TRadioMode;
 begin
    Result := Self.vfo[1].dataMode;
+end;
+
+function TNetRadioBase.GetSplitEnabled: boolean;
+begin
+   Result := Self.localSplitEnabled;
+end;
+
+function TNetRadioBase.GetVFO(Index: Integer): TRadioVFO;
+begin
+   if Assigned(Self.vfo[Index]) then
+      begin
+      Result := Self.vfo[Index];
+      end;
+  
 end;
 
 function TNetRadioBase.ModeToString(mode: TRadioMode): string;
@@ -449,6 +495,9 @@ begin
   inherited;
 end;
 
-
+function BoolToString(b: boolean): string;
+begin
+   Result := IfThen(b,'True','False');
+end;
 
 end.

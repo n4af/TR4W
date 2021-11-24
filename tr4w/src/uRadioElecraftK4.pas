@@ -1,7 +1,7 @@
 unit uRadioElecraftK4;
 
 interface
-uses uNetRadioBase, StrUtils, SysUtils;
+uses uNetRadioBase, StrUtils, SysUtils, Math;
 
 Type TK4Radio = class(TNetRadioBase)
    private
@@ -54,6 +54,7 @@ begin
    if Self.IsConnected then
       begin
       Self.SetAIMode(5);
+      Self.SendToRadio('RT;XT;RO;FT;ID;MD;DT;');
       end;
 end;
 procedure TK4Radio.Transmit;
@@ -160,11 +161,11 @@ procedure TK4Radio.Split(splitOn: boolean);
 begin
    if splitOn then
       begin
-      Self.SendToRadio('FT0;');
+      Self.SendToRadio('FT1;');
       end
    else
       begin
-      Self.SendToRadio('FT1;');
+      Self.SendToRadio('FT0;');
       end;
 end;
 procedure TK4Radio.SetRITFreq(hz: integer);
@@ -257,8 +258,8 @@ function TK4Radio.ParseIFCommand(cmd: string): boolean;
 var
    s: string;
    hz: integer;
-   ritMultipler: integer;
-   xitMultipler: integer;
+   ritMultiplier: integer;
+   xitMultiplier: integer;
    ritOffset: integer;
    xitOffset: integer;
    sVFO: string;
@@ -309,13 +310,13 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
    Delete(s,1,5); // Remove 5 blanks          // *****+yyyyrx*00tmvspbd1*;
    if AnsiLeftStr(s,1) = '-' then
       begin
-      ritMultipler := -1;
-      xitMultipler := -1;
+      ritMultiplier := -1;
+      xitMultiplier := -1;
       end
    else if AnsiLeftStr(s,1) = '+' then
       begin
-      ritMultipler := 1;
-      xitMultipler := 1;
+      ritMultiplier := 1;
+      xitMultiplier := 1;
       end;
    Delete(s,1,1);                      // yyyyrx*00tmvspbd1*;
    ritOffset := StrToIntDef(AnsiLeftStr(s,4),-999);
@@ -324,25 +325,18 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
       logger.Error('[ParseIFCommand] RIT offset returned in IF command was not a number %s',[AnsiLeftStr(s,4)]);
       Exit;
       end;
+
+   Self.localRITOffset := (ritOffset * ritMultiplier);
+   Self.localXITOffset := (Self.localRITOffset); // Because on K4, these are the same
+   logger.debug('[ParseIFCommand] RITOffset = %d',[Self.localRITOffset]);
+   
    Delete(s,1,4);                      // rx*00tmvspbd1*;
-   if AnsiLeftStr(s,1) = '1' then
-      begin
-      Self.RITState := bOn;
-      end
-   else
-      begin
-      Self.RITState := bOff;
-      end;
+   Self.RITState := AnsiLeftStr(s,1) = '1';
+   logger.Debug('In IF processor, RIT is %s',[AnsiLeftStr(s,1)]);
 
    Delete(s,1,1);                      // x*00tmvspbd1*;
-   if AnsiLeftStr(s,1) = '1' then
-      begin
-      Self.XITState := bOn;
-      end
-   else
-      begin
-      Self.XITState := bOff;
-      end;
+   Self.XITState := AnsiLeftStr(s,1) = '1';
+   logger.Debug('In IF processor, XIT is %s',[AnsiLeftStr(s,1)]);
 
    Delete(s,1,1);
    Delete(s,1,1); // Skip space       // *00tmvspbd1*;
@@ -357,17 +351,18 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
       Self.RadioState := rsReceive;
       end;
    Delete(s,1,1);
+   logger.debug('[ParseIFCommand] string at mode = %s',[s]);
    sMode := AnsiLeftStr(s,1);          // mvspbd1*;
 
    Delete(s,1,1);
+   logger.debug('[ParseIFCommand] string at vfo = %s',[s]);
    sVFO := AnsiLeftStr(s,1);           // vspbd1*;
 
-   Delete(s,1,1); // Skip s as we do not care if scanning  // spbd1*;
+   Delete(s,1,2); // Skip s as we do not care if scanning  // spbd1*;
+   logger.debug('[ParseIFComand] Checking split command in %s',[s]);
+   Self.localSplitEnabled := AnsiLeftStr(s,1) = '1';           // pbd1*;
 
-   if AnsiLeftStr(s,1) = '1' then           // pbd1*;
-      begin
-      Self.localSplitEnabled := true;
-      end;
+
    Delete(s,1,1);
 
    Delete(s,1,1); // Skip the b // bd1*;
@@ -376,6 +371,7 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
 
    sDataMode := AnsiLeftStr(s,1);
 
+   // Post processing from gathered variables to the right VFO
    if sVFO = '0' then // VFO A
       begin
       vfo := Self.vfo[1];
@@ -387,6 +383,7 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
 
    vfo.frequency := hz;
    vfo.mode := ModeStrToMode(sMode,sDataMode);
+
 
 
 end;
@@ -452,16 +449,34 @@ procedure TK4Radio.ProcessMessage(sMessage: string);
 var
    sCommand: string;
    sData: string;
+   sMode: string;
    hz: integer;
    i: integer;
+   RITSign: integer;
+   ritHz : integer;
+   sDataMode: string;
+   vfo: TRadioVFO;
+   vfoBCommand: boolean;
 begin
 // This is called by the process that receives data on the socket - Event
 // K4 messages are seperated by semi-colons (;) but each message should not have the ; as that is the ReadLn delimiter.
 // This is a command that has been parsed into its parts. For example, if the radio
 // sends RX;DT5;, this procedure is called once with RX; and once with DT5;
    sCommand := AnsiLeftStr(sMessage,2);
-   sData := AnsiMidStr(sMessage,3,length(sMessage));
-   Case AnsiIndexText(AnsiUppercase(sCommand), ['AI','BI','BN','DT','FA','FB','FT','IF','KS','MA','MD','RT','RX','TX']) of
+   if AnsiMidStr(sMessage,3,1) = '$' then
+      begin
+      vfoBCommand := true;
+      sData := ANsiMidStr(sMessage,4,length(sMessage));
+      vfo := Self.vfo[2];
+      end
+   else
+      begin
+      vfoBCommand := false;
+      sData := AnsiMidStr(sMessage,3,length(sMessage));
+      vfo := Self.vfo[1];
+      end;
+
+   Case AnsiIndexText(AnsiUppercase(sCommand), ['AI','BI','BN','DT','FA','FB','FT','IF','KS','MA','MD','RT','RX','TX','XT','RO']) of
       0: begin                                     // AI
          logger.info('[ProcessMessage] AI command set to %s',[sData]);
          end;
@@ -472,20 +487,28 @@ begin
             end;
          end;
       2: begin              // BN
-         if Self.BandNumToBand(sData) <> Self.vfo[1].band then
+         if Self.BandNumToBand(sData) <> vfo.band then
             begin    // band change so prime RIT, MD settings
-            Self.SendToRadio('MD;DT;IF');
+            Self.SendToRadio('MD;MD$;DT;DT$;FA;FB;IF;');
             end;
-         Self.vfo[1].band := Self.BandNumToBand(sData);
-         logger.debug('Received band number of %s',[sData]);
+         vfo.band := Self.BandNumToBand(sData);
+         logger.debug('[ProcessMessage] Received band number of %s',[sData]);
          end;
       3: begin             // DT
-         case StrToIntDef(AnsiMidStr(sData,2,1),-9) of
-            0: Self.vfo[1].datamode := rmData;
-            1: Self.vfo[1].datamode := rmAFSK;
-            2: Self.vfo[1].datamode := rmFSK;
-            3: Self.vfo[1].datamode := rmPSK;
-            -9:logger.error('Non-numeric passed with DT command (%s)',[AnsiLeftStr(sData,1)]);
+         if vfoBCommand then
+            begin
+            sDataMode := AnsiMidStr(sData,2,1);
+            end
+         else
+            begin
+            sDataMode := AnsiLeftStr(sData,1);
+            end;
+         case StrToIntDef(sDataMode,-9) of
+            0: vfo.datamode := rmData;
+            1: vfo.datamode := rmAFSK;
+            2: vfo.datamode := rmFSK;
+            3: vfo.datamode := rmPSK;
+            -9:logger.error('[ProcessMessage] Non-numeric passed with DT command (%s)',[sData]);
             end;
          end;
       4: begin             // FA
@@ -496,7 +519,7 @@ begin
             end
          else
             begin
-            logger.error('non-numeric passed in sData with FA command (%s)',[AnsiLeftStr(sData,11)]);
+            logger.error('[ProcessMessage] non-numeric passed in sData with FA command (%s)',[AnsiLeftStr(sData,11)]);
             end;
          end;
       5: begin             // FB
@@ -507,11 +530,12 @@ begin
             end
          else
             begin
-            logger.error('non-numeric passed in sData with FB command (%s)',[AnsiLeftStr(sData,11)]);
+            logger.error('[ProcessMessage] non-numeric passed in sData with FB command (%s)',[AnsiLeftStr(sData,11)]);
             end;
          end;
       6: begin             // FT
          Self.localSplitEnabled := AnsiLeftStr(sData,1) = '1';
+         logger.debug('[ProcessMessage] FT (Split) received - Split is %s',[AnsiLeftStr(sData,1)]);
          end;
       7: begin             // IF
          Self.ParseIFCommand(sData);
@@ -524,21 +548,55 @@ begin
             end
          else
             begin
-            logger.Warn('Invalid CW speed received in KS command (%s)',[AnsiLeftStr(sData,3)]);
+            logger.Warn('[ProcessMessage] Invalid CW speed received in KS command (%s)',[AnsiLeftStr(sData,3)]);
             end;
          end;
       9: begin             // MA
          end;
       10:begin             // MD
-         Self.vfo[1].mode := Self.ModeStrToMode(AnsiLeftStr(sData,1),' ');
+         vfo.mode := Self.ModeStrToMode(AnsiLeftStr(sData,1),' ');
          logger.trace('[ProcessMessage] Mode data = %s',[sData]);
          end;
       11:begin              // RT
+         vfo.RITState := AnsiLeftStr(sData,1) = '1';
+         //Self.RITState := AnsiLeftStr(sData,1) = '1';
+         logger.debug('[ProcessMsg] RIT Enabled is %s',[AnsiLeftStr(sData,1)]);
          end;
       12:Self.radioState := rsReceive; // RX
-      13:Self.radioState := rsReceive; // TX
+      13:Self.radioState := rsTransmit; // TX
+      14:begin              // XT
+         vfo.XITState := AnsiLeftStr(sData,1) = '1';
+         //Self.XITState := AnsiLeftStr(sData,1) = '1';
+         logger.debug('[ProcessMessage] XIT Enabled is %s',[AnsiLeftStr(sData,1)]);
+         end;
+      15:begin    // RO
+         RITSign := IfThen(AnsiLeftStr(sData,1) = '-',-1,1);
+         {if AnsiLeftStr(sData,1) = '-' then
+            begin
+            RITSign := -1;
+            end
+         else
+            begin
+            RITSign := 1;
+            end;}
+         ritHz := StrToIntDef(AnsiMidStr(sData,2,4),99999);
+         if ritHz = 99999 then
+            begin
+            ritHz := 0;
+            logger.error('[ProcessMessage] Invalid value passed in RO command: %s',[sData]);
+            end
+         else
+            begin
+            ritHz := ritHz * ritSign;
+            vfo.RITOffset := ritHz;
+            vfo.XITOffset := ritHz;
+            //Self.localRITOffset := ritHz;
+            //Self.localXITOffset := ritHz; // Because on K4, this is the same value
+            end;
+
+         end;
    end; // of case
-   
+
 end;
 
 function TK4Radio.BandNumToBand(sBand: string): TRadioBand;
