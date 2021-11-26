@@ -8,7 +8,15 @@ uses
 
 Type TProcessMsgRef = procedure (sMessage: string) of Object;
 Type TBinary = (bOn, bOff);
-Type TVFO = (VFOA, VFOB);
+Type TVFO = (VFOA, VFOB);  // Keep in sync with vfoNames in var section below
+
+(* A question yet to resolve in this generalization is how to handle multiple
+   slices in Flex radios. Should there be a VFOA and VFOB for each slice? Or should
+   there be a radio object for each (but with a common connection). Once the K4
+   is completed, I can experiment with the FLex 6600 and see what makes sense.
+   NY4I 26-Nov-2021
+*)
+
 Type TRadioMode = (rmNone,rmCW, rmCWRev, rmLSB, rmUSB, rmFM, rmAM,
                    rmData, rmDataRev, rmFSK, rmFSKRev, rmPSK, rmPSKRev,
                    rmAFSK, rmAFSKRev);
@@ -33,6 +41,7 @@ Type TRadioVFO = class(TObject)
       XITOffset: integer;
       IFShift: integer;
       filterWidthHz: integer;
+      filter: integer;
      // NR: boolean;
      // NRLevel: integer;   // Are things like notch and NR set per VFO or radio wide?
      // Notch: integer;
@@ -48,10 +57,13 @@ TReadingThread = class(TThread)
     constructor Create(AConn: TIdTCPConnection; proc: TProcessMsgRef); reintroduce;
   end;
 
-
+//tr4w_ClassName                        : array[0..4] of Char = ('T', 'R', '4', 'W', #0);
+const
+   vfoNames: array[Low(TVFO)..High(TVFO)] of string = ('VFOA','VFOB');
 var
    logger: TLogLogger;
-      appender: TLogFileAppender; 
+   appender: TLogFileAppender;
+
 
 function BoolToString(b: boolean): string;
 function IntegerBetween(v: integer; i: integer; k: integer): boolean;
@@ -77,13 +89,17 @@ Type TNetRadioBase = class(TObject)
       function GetIsTransmitting: boolean;
       function GetIsReceiving: boolean;
       function GetISConnected: boolean;
-      function GetFrequency: integer;
-      function GetIsRITOn: boolean;
-      function GetIsXITOn: boolean;
-      function GetMode: TRadioMode;
-      function GetDataMode: TRadioMode;
+      function GetFrequency(whichVFO: TVFO): integer;
+      function GetIsRITOn(whichVFO: TVFO): boolean;
+      function GetRITOffset(whichVFO: TVFO): integer;
+      function GetIsXITOn(whichVFO: TVFO): boolean;
+      function GetXITOffset(whichVFO: TVFO): integer;
+      function GetMode(whichVFO: TVFO): TRadioMode;
+      function GetDataMode(whichVFO: TVFO): TRadioMode;
+      function GetIFShift(whichVFO: TVFO): integer;
+      function GetFilter(whichVFO: TVFO): integer;
       function GetSplitEnabled: boolean;
-      function GetVFO(Index: Integer): TRadioVFO;
+      function GetVFO(whichVFO: TVFO): TRadioVFO;
 
       procedure SetPTTviaCAT(Value: boolean);
       function  GetPTTviaCAT: boolean;
@@ -97,7 +113,7 @@ Type TNetRadioBase = class(TObject)
       localCWSpeed: integer;
       RITState: boolean;
       XITState: boolean;
-      vfo: array[1..2] of TRadioVFO;
+      vfo: array[Low(TVFO)..High(TVFO)] of TRadioVFO;
       radioState: TRadioState;
       localMode: TRadioMode;
       localDataMode: TRadioMode;
@@ -113,7 +129,7 @@ Type TNetRadioBase = class(TObject)
 
    public
 
-      procedure SendToRadio(s: string);
+      procedure SendToRadio(s: string); overload;
       constructor Create(ProcRef: TProcessMsgRef); overload;
       constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
       Destructor Destroy; overload;
@@ -124,20 +140,23 @@ Type TNetRadioBase = class(TObject)
       property CWSpeed: integer read GetCWSpeed;
       function Connect: integer; overload;
       function Connect (address: string; port: integer): integer; overload;
+      function VFOToString(whichVFO: TVFO): string;
       procedure Disconnect; overload;
       property IsTransmitting: boolean read GetIsTransmitting;
       property IsReceiving: boolean read GetIsReceiving;
       property IsConnected: boolean read GetIsConnected;
-      property IsRITOn: boolean read GetIsRITOn;
-      property IsXITOn: boolean read GetIsXITOn;
+      property IsRITOn[whichVFO: TVFO]: boolean read GetIsRITOn;
+      property IsXITOn[whichVFO: TVFO]: boolean read GetIsXITOn;
       property IsSplitEnabled: boolean read GetSplitEnabled;
-      property frequency: integer read GetFrequency;
-      property mode: TRadioMode read GetMode;
-      property dataMode: TRadioMode read GetDataMode;
-      property RITOffset: integer read localRITOffset;
-      property XITOffset: integer read localXITOffset;
+      property frequency[whichVFO: TVFO]: integer read GetFrequency;
+      property mode[whichVFO: TVFO]: TRadioMode read GetMode;
+      property dataMode[whichVFO: TVFO]: TRadioMode read GetDataMode;
+      property RITOffset[whichVFO: TVFO]: integer read GetRITOffset;
+      property XITOffset[whichVFO: TVFO]: integer read GetXITOffset;
+      property IFShift[whichVFO: TVFO]: integer read GetIFShift;
+      property filter[whichVFO: TVFO]: integer read GetFilter;
       // property Fields[Index: Integer]: TFieldSpec read GetField;
-      property FVFO[Index: integer]: TRadioVFO read GetVFO;
+      //property FVFO[whichVFO: TVFO]: TRadioVFO read GetVFO;
 
 
    published
@@ -176,6 +195,7 @@ Uses Unit1; //MainUnit;
 //var
 //   rt: TReadingThread = nil;
 Constructor TNetRadioBase.Create(ProcRef: TProcessMsgRef);
+var iVFO: TVFO;
 begin
    appender := TLogRollingFileAppender.Create('name','K4Test.log');
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
@@ -187,11 +207,13 @@ begin
    logger.Trace('trace output');
 
    baseProcMsg := ProcRef;
-   Self.vfo[1] := TRadioVFO.Create;
-   Self.vfo[1].ID := VFOA;
-
-   Self.vfo[2] := TRadioVFO.Create;
-   Self.vfo[2].ID := VFOB;
+   for iVFO := Low(TVFO) to High(TVFO) do
+      begin
+      Self.vfo[iVFO] := TRadioVFO.Create;
+      Self.vfo[iVFO].ID := iVFO;
+      end;
+   //Self.vfo[VFOB] := TRadioVFO.Create;
+   //Self.vfo[VFOB].ID := VFOB;
    
    socket := TIdTCPClient.Create();
    socket.ConnectTimeout := 5000;  // TODO Make this a property
@@ -215,6 +237,7 @@ begin
 end;
 
 Destructor TNetRadioBase.Destroy;
+var iVFO: TVFO;
 begin
 
    if socket <> nil then
@@ -226,8 +249,12 @@ begin
       FreeAndNil(socket);
       end;
 
-   FreeAndNil(Self.vfo[1]);
-   FreeAndNil(Self.vfo[2]);
+   for iVFO := Low(TVFO) to High(TVFO) do
+      begin
+      FreeAndNil(Self.vfo[iVFO]);
+      end;
+   //FreeAndNil(Self.vfo[1]);
+   //FreeAndNil(Self.vfo[2]);
 end;
 
 // Events
@@ -369,7 +396,12 @@ procedure TNetRadioBase.SendToRadio(s: string);
 begin
    if socket.Connected then
       begin
+      logger.Trace('[SendToRadio] Sending to radio: (%s)',[s]);
       socket.IOHandler.Write(s);
+      end
+   else
+      begin
+      logger.error('[SendToRadio] Cannot send command (%s) to radio as not connected',[s]);
       end;
 
 end;
@@ -389,15 +421,26 @@ begin
 Result := Self.localCWSpeed;
 end;
 
-function TNetRadioBase.GetIsRITOn: boolean;
+function TNetRadioBase.GetIsRITOn(whichVFO: TVFO): boolean;
 begin
-   Result := Self.RITState;
+   Result := Self.vfo[whichVFO].RITState;
    //logger.debug('In GetIsRITON, result = %s',[BoolToString(Result)]);
 end;
 
-function TNetRadioBase.GetIsXITOn: boolean;
+function TNetRadioBase.GetRITOffset(whichVFO: TVFO): integer;
 begin
-   Result := Self.XITState;
+   Result := Self.vfo[whichVFO].RITOffset;
+end;
+
+
+function TNetRadioBase.GetIsXITOn(whichVFO: TVFO): boolean;
+begin
+   Result := Self.vfo[whichVFO].XITState;
+end;
+
+function TNetRadioBase.GetXITOffset(whichVFO: TVFO): integer;
+begin
+   Result := Self.vfo[whichVFO].XITOffset;
 end;
 
 function TNetRadioBase.GetIsConnected: boolean;
@@ -405,19 +448,30 @@ begin
    Result := socket.Connected;
 end;
 
-function TNetRadioBase.GetFrequency: integer;
+function TNetRadioBase.GetFrequency(whichVFO: TVFO) : integer;
 begin
-   Result := Self.vfo[1].frequency;
+
+   Result := Self.vfo[whichVFO].frequency;
 end;
 
-function TNetRadioBase.GetMode: TRadioMode;
+function TNetRadioBase.GetMode(whichVFO: TVFO): TRadioMode;
 begin
-   Result := Self.vfo[1].mode;
+   Result := Self.vfo[whichVFO].mode;
 end;
 
-function TNetRadioBase.GetDataMode: TRadioMode;
+function TNetRadioBase.GetDataMode(whichVFO: TVFO): TRadioMode;
 begin
-   Result := Self.vfo[1].dataMode;
+   Result := Self.vfo[whichVFO].dataMode;
+end;
+
+function TNetRadioBase.GetIFShift(whichVFO: TVFO): integer;
+begin
+   Result := Self.vfo[whichVFO].IFShift;
+end;
+
+function TNetRadioBase.GetFilter(whichVFO: TVFO): integer;
+begin
+   Result := Self.vfo[whichVFO].filter;
 end;
 
 function TNetRadioBase.GetSplitEnabled: boolean;
@@ -425,13 +479,18 @@ begin
    Result := Self.localSplitEnabled;
 end;
 
-function TNetRadioBase.GetVFO(Index: Integer): TRadioVFO;
+function TNetRadioBase.GetVFO(whichVFO: TVFO): TRadioVFO;
 begin
-   if Assigned(Self.vfo[Index]) then
+   if Assigned(Self.vfo[whichVFO]) then
       begin
-      Result := Self.vfo[Index];
+      Result := Self.vfo[whichVFO];
       end;
   
+end;
+
+function TNetRadioBase.VFOToString(whichVFO: TVFO): string;
+begin
+   Result := vfoNames[whichVFO];
 end;
 
 function TNetRadioBase.ModeToString(mode: TRadioMode): string;
@@ -501,3 +560,5 @@ begin
 end;
 
 end.
+
+
