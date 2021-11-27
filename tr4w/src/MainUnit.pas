@@ -1884,6 +1884,15 @@ begin
       wsjtx.Stop;
       FreeAndNil(wsjtx);
       end;
+  if Radio1.tNetObject <> nil then
+     begin
+     FreeAndNil(Radio1.tNetObject);
+     end;
+
+  if Radio2.tNetObject <> nil then
+     begin
+     FreeAndNil(Radio2.tNetObject);
+     end;
 
   if Assigned(logger) then
      begin

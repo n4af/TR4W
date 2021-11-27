@@ -325,9 +325,10 @@ const
    + 1 {WSJTXSendColorizations}
    + 1 {WSJTXEnabled}
    + 2 {Radio Startup Commands for Radio 1 and Radio 2}
+   + 4 {Radio IP Address and TCP Port for Radio 1 and Radio 2}
    ;
 
-   // Note if crAddress says pointer(NN, then it is callign a function at position NN in the an array
+   // Note if crAddress says pointer(NN), then it is callign a function at position NN in the an array
    CFGCA: array[1..CommandsArraySize] of CFGRecord =
       (
     {(*}
@@ -633,11 +634,13 @@ const
  (crCommand: 'RADIO ONE FT1000MP CW REVERSE'; crAddress: @Radio1.FT1000MPCWReverse;       crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'RADIO ONE ICOM FILTER BYTE';    crAddress: pointer(15);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'RADIO ONE ID CHARACTER';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctChar),
+ (crCommand: 'RADIO ONE IP ADDRESS';          crAddress: @Radio1.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctString),
  (crCommand: 'RADIO ONE KEYER DTR';           crAddress: pointer(31);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther),
  (crCommand: 'RADIO ONE KEYER RTS';           crAddress: pointer(30);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther),
  (crCommand: 'RADIO ONE NAME';                crAddress: @Radio1.RadioName;               crMin:0;  crMax:20;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'RADIO ONE RECEIVER ADDRESS';    crAddress: @Radio1.ReceiverAddress;         crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfRadio1; crType: ctInteger),
  (crCommand: 'RADIO ONE TRACKING ENABLE';     crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfRadio1; crType: ctBoolean),
+ (crCommand: 'RADIO ONE TCP PORT';            crAddress: @Radio1.RadioTCPPort;            crMin:1;  crMax:65535;   crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfRadio1; crType: ctInteger),   // ny4i
  (crCommand: 'RADIO ONE TYPE';                crAddress: pointer(26);                     crMin:0;  crMax:0;       crS: csOld; crA: 9; crC:0 ; crP:0; crJ: 0; crKind: ckList; cfFunc: cfRadio1; crType: ctOther),
  (crCommand: 'RADIO ONE UPDATE SECONDS';      crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfRadio1; crType: ctInteger),
  (crCommand: 'RADIO ONE WIDE CW FILTER';      crAddress: @Radio1.WideCWFilter;            crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctBoolean),
@@ -654,12 +657,14 @@ const
  (crCommand: 'RADIO TWO FT1000MP CW REVERSE'; crAddress: @Radio2.FT1000MPCWReverse;       crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'RADIO TWO ICOM FILTER BYTE';    crAddress: pointer(16);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'RADIO TWO ID CHARACTER';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctChar),
+ (crCommand: 'RADIO TWO IP ADDRESS';          crAddress: @Radio1.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctString),
  (crCommand: 'RADIO TWO KEYER DTR';           crAddress: pointer(35);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther),
  (crCommand: 'RADIO TWO KEYER RTS';           crAddress: pointer(34);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther),
  (crCommand: 'RADIO TWO NAME';                crAddress: @Radio2.RadioName;               crMin:0;  crMax:20;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'RADIO TWO RECEIVER ADDRESS';    crAddress: @Radio2.ReceiverAddress;         crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfRadio2; crType: ctInteger),
  (crCommand: 'RADIO TWO TRACKING ENABLE';     crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'RADIO TWO TYPE';                crAddress: pointer(27);                     crMin:0;  crMax:0;       crS: csOld; crA: 10;crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfRadio2; crType: ctOther),
+ (crCommand: 'RADIO TWO TCP PORT';            crAddress: @Radio2.RadioTCPPort;            crMin:1;  crMax:65535;   crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfRadio2; crType: ctInteger),   // ny4i
+  (crCommand: 'RADIO TWO TYPE';                crAddress: pointer(27);                     crMin:0;  crMax:0;       crS: csOld; crA: 10;crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfRadio2; crType: ctOther),
  (crCommand: 'RADIO TWO UPDATE SECONDS';      crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'RADIO TWO WIDE CW FILTER';      crAddress: @Radio2.WideCWFilter;            crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctBoolean),
  (crCommand: 'RADIO TWO STARTUP COMMAND';     crAddress: @Radio2.StartupCommand;          crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctString),

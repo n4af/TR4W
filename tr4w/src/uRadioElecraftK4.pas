@@ -3,13 +3,13 @@ unit uRadioElecraftK4;
 interface
 uses uNetRadioBase, StrUtils, SysUtils, Math;
 
+
 Type TK4Radio = class(TNetRadioBase)
    private
       function ParseIFCommand(cmd: string): boolean;
       function ModeStrToMode(sMode: string; sDataMode: string): TRadioMode;
       function BandNumToBand(sBand: string): TRadioBand;
       //procedure ProcessMessage(sMessage: string);
-      function Connect: integer; overload;
       procedure Initialize;
       procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload;
       function ModeTypeToInteger(mode: TRadioMode; var dataModeInt: integer): integer;
@@ -17,6 +17,7 @@ Type TK4Radio = class(TNetRadioBase)
 
    public
       Constructor Create;
+      function Connect: integer; overload;
       procedure Transmit;
       procedure Receive;
       procedure SendCW(cwChars: string);
@@ -46,6 +47,8 @@ end;
 var
    firstProcessMessage: boolean = true;
 implementation
+
+Uses MainUnit;
 
 Constructor TK4Radio.Create;
 begin
@@ -91,8 +94,8 @@ procedure TK4Radio.SetFrequency(freq: longint; vfo: TVFO);
 var sCmd: string;
 begin
    case vfo of
-      VFOA: sCmd := 'FA';
-      VFOB: sCmd := 'FB';
+      nrVFOA: sCmd := 'FA';
+      nrVFOB: sCmd := 'FB';
       else
          begin
          logger.error('[SetFrequency] Invalid VFO passed');
@@ -252,11 +255,11 @@ begin
    if IntegerBetween(filter, 1, 5) then
       begin
       logger.Info('[SetFilter] Setting filter on VFO %s to %d',[VFOToString(whichVFO),filter]);
-      if whichVFO = VFOA then
+      if whichVFO = nrVFOA then
          begin
          Self.SendToRadio(Format('FP%d;',[filter]));
          end
-      else if whichVFO = VFOB then
+      else if whichVFO = nrVFOB then
          begin
          Self.SendToRadio(Format('FP$%d;',[filter]));
          end;
@@ -398,11 +401,11 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
    // Post processing from gathered variables to the right VFO
    if sVFO = '0' then // VFO A
       begin
-      vfo := Self.vfo[VFOA];
+      vfo := Self.vfo[nrVFOA];
       end
    else
       begin
-      vfo := Self.vfo[VFOB];
+      vfo := Self.vfo[nrVFOB];
       end;
 
    vfo.frequency := hz;
@@ -485,13 +488,13 @@ begin
       logger.Info('[ProcessMessage] VFO B message received %s',[sMessage]);
       vfoBCommand := true;
       sData := AnsiMidStr(sMessage,4,length(sMessage));
-      vfo := Self.vfo[VFOB];
+      vfo := Self.vfo[nrVFOB];
       end
    else
       begin
       vfoBCommand := false;
       sData := AnsiMidStr(sMessage,3,length(sMessage));
-      vfo := Self.vfo[VFOA];
+      vfo := Self.vfo[nrVFOA];
       end;
 
    Case AnsiIndexText(AnsiUppercase(sCommand), ['AI','BI','BN','DT','FA','FB','FT','IF','KS','MA','MD','RT','RX','TX','XT','RO', 'FP']) of
@@ -526,7 +529,7 @@ begin
          hz := StrToIntDef(AnsiLeftStr(sData,11),-9);
          if hz >= 0 then
             begin
-            Self.vfo[VFOA].frequency := hz;
+            Self.vfo[nrVFOA].frequency := hz;
             end
          else
             begin
@@ -537,7 +540,7 @@ begin
          hz := StrToIntDef(AnsiLeftStr(sData,11),-9);
          if hz >= 0 then
             begin
-            Self.vfo[VFOB].frequency := hz;
+            Self.vfo[nrVFOB].frequency := hz;
             end
          else
             begin
@@ -664,11 +667,11 @@ end;
 
 procedure TK4Radio.SendToRadio(whichVFO: TVFO; sCmd: string; sData: string);
 begin
-   if whichVFO = VFOB then
+   if whichVFO = nrVFOB then
       begin
       Inherited SendToRadio(Format('%s$%s;',[sCmd,sData]));
       end
-   else if whichVFO = VFOA then
+   else if whichVFO = nrVFOA then
       begin
       Inherited SendToRadio(Format('%s%s;',[sCmd,sData]));
       end

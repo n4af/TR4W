@@ -8,10 +8,10 @@ uses
 
 Type TProcessMsgRef = procedure (sMessage: string) of Object;
 Type TBinary = (bOn, bOff);
-Type TVFO = (VFOA, VFOB);  // Keep in sync with vfoNames in var section below
+Type TVFO = (nrVFOA, nrVFOB);  // Keep in sync with vfoNames in var section below
 
 (* A question yet to resolve in this generalization is how to handle multiple
-   slices in Flex radios. Should there be a VFOA and VFOB for each slice? Or should
+   slices in Flex radios. Should there be a nrVFOA and VFOB for each slice? Or should
    there be a radio object for each (but with a common connection). Once the K4
    is completed, I can experiment with the FLex 6600 and see what makes sense.
    NY4I 26-Nov-2021
@@ -60,10 +60,10 @@ TReadingThread = class(TThread)
 //tr4w_ClassName                        : array[0..4] of Char = ('T', 'R', '4', 'W', #0);
 const
    vfoNames: array[Low(TVFO)..High(TVFO)] of string = ('VFOA','VFOB');
-var
+{var
    logger: TLogLogger;
    appender: TLogFileAppender;
-
+}
 
 function BoolToString(b: boolean): string;
 function IntegerBetween(v: integer; i: integer; k: integer): boolean;
@@ -129,10 +129,12 @@ Type TNetRadioBase = class(TObject)
 
    public
 
-      procedure SendToRadio(s: string); overload;
+
       constructor Create(ProcRef: TProcessMsgRef); overload;
       constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
       Destructor Destroy; overload;
+      procedure SendToRadio(s: string); overload;
+      procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload; Virtual; Abstract;
       function ModeToString(mode: TRadioMode): string;
       property radioPort: integer read GetRadioPort write SetRadioPort;
       property radioAddress: string read GetRadioAddress write SetRadioAddress;
@@ -169,16 +171,16 @@ Type TNetRadioBase = class(TObject)
       procedure SetMode(mode:TRadioMode); Virtual; Abstract;
       function  ToggleMode: TRadioMode; Virtual; Abstract;
       procedure SetCWSpeed(speed: integer); Virtual; Abstract;
-      procedure RITClear;  Virtual; Abstract;
-      procedure XITClear; Virtual; Abstract;
-      procedure RITOn; Virtual; Abstract;
-      procedure RITOff; Virtual; Abstract;
-      procedure XITOn; Virtual; Abstract;
-      procedure XITOff; Virtual; Abstract;
+      procedure RITClear(vfo: TVFO);  Virtual; Abstract;
+      procedure XITClear(vfo: TVFO); Virtual; Abstract;
+      procedure RITOn(vfo: TVFO); Virtual; Abstract;
+      procedure RITOff(vfo: TVFO); Virtual; Abstract;
+      procedure XITOn(vfo: TVFO); Virtual; Abstract;
+      procedure XITOff(vfo: TVFO); Virtual; Abstract;
       procedure Split(splitOn: boolean); Virtual; Abstract;
-      procedure SetRITFreq(hz: integer); Virtual; Abstract;
-      procedure SetXITFreq(hz: integer); Virtual; Abstract;
-      procedure SetBand(band: TRadioBand); Virtual; Abstract;
+      procedure SetRITFreq(vfo: TVFO; hz: integer); Virtual; Abstract;
+      procedure SetXITFreq(vfo: TVFO; hz: integer); Virtual; Abstract;
+      procedure SetBand(vfo: TVFO; band: TRadioBand); Virtual; Abstract;
       function  ToggleBand: TRadioBand; Virtual; Abstract;
       procedure SetFilter(filter:TRadioFilter); Virtual; Abstract;
       function  SetFilterHz(hz: integer): integer; Virtual; Abstract;
@@ -190,14 +192,15 @@ end;
 
 implementation
 
-Uses Unit1; //MainUnit;
+//Uses Unit1;
+Uses MainUnit, LogRadio;
 
 //var
 //   rt: TReadingThread = nil;
 Constructor TNetRadioBase.Create(ProcRef: TProcessMsgRef);
 var iVFO: TVFO;
 begin
-   appender := TLogRollingFileAppender.Create('name','K4Test.log');
+   {appender := TLogRollingFileAppender.Create('name','K4Test.log');
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
 
    TLogBasicConfigurator.Configure(appender);
@@ -205,15 +208,15 @@ begin
    logger := TLogLogger.GetLogger('K4TestDebugLog');
    logger.info('******************** uNetRadioBase STARTUP ******************');
    logger.Trace('trace output');
-
+   }
    baseProcMsg := ProcRef;
    for iVFO := Low(TVFO) to High(TVFO) do
       begin
       Self.vfo[iVFO] := TRadioVFO.Create;
       Self.vfo[iVFO].ID := iVFO;
       end;
-   //Self.vfo[VFOB] := TRadioVFO.Create;
-   //Self.vfo[VFOB].ID := VFOB;
+   //Self.vfo[nrVFOB] := TRadioVFO.Create;
+   //Self.vfo[nrVFOB].ID := nrVFOB;
    
    socket := TIdTCPClient.Create();
    socket.ConnectTimeout := 5000;  // TODO Make this a property
@@ -263,13 +266,11 @@ procedure TNetRadioBase.OnRadioConnected(Sender: TObject);
 begin
    logger.Info('Network Radio connected');
    rt := TReadingThread.Create(socket, baseProcMsg);
-   Form1.memoStatus.Lines.Add('Radio Connected');
 end;
 
 procedure TNetRadioBase.OnRadioDisconnected(Sender: TObject);
 begin
-   logger.Info('Network Radio disconnected');
-   Form1.memoStatus.Lines.Add('Radio disconnected');
+   logger.Info('<<<<<<<<<<<<<< Network Radio disconnected');
    if rt <> nil then
       begin
       rt.Terminate;
@@ -281,7 +282,6 @@ end;
 procedure TNetRadioBase.OnRadioStatus(Sender: TObject; const Status: TIdStatus; const AStatusText: string);
 begin
    logger.trace('Received text from radio: [%s]',[AStatusText]);
-   Form1.memoStatus.Lines.Add('[OnRadioStatus] Received ' + AStatusText);
 end;
 
 {procedure TNetRadioBase.IdThreadComponentRun(Sender: TIdThreadComponent);
@@ -333,6 +333,7 @@ end;
 
 function TNetRadioBase.Connect: integer;
 begin
+   logger.Info('[TNetRadioBase.Connect] Connecting to network radio at address %s, port = %d',[Self.radioAddress,Self.radioPort]);
     if Self.radioPort = 0 then
        begin
        logger.Error('Called connect with port = 0. result = -1');
@@ -356,6 +357,7 @@ begin
 
     try
         socket.Connect;
+        logger.Info('[TNetRadioBase.Connect] COnnected successfully to network radio');
     except
         on E: Exception do begin
            logger.Error('Exception when connecting to radio: %s', [E.Message]);
@@ -522,7 +524,7 @@ end;
 
 constructor TReadingThread.Create(AConn: TIdTCPConnection; proc: TProcessMsgRef);
 begin
-  logger.debug('DEBUG: TReadingThread.Create');
+  logger.debug('************* DEBUG: TReadingThread.Create');
   FConn := AConn;
 
   msgHandler := proc;
@@ -540,12 +542,17 @@ begin
       begin
       if FConn.Connected then
          begin
+         logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
          cmd := FConn.IOHandler.ReadLn(';');
          logger.debug('DEBUG: TReadingThread.Execute. Cmd: %s',[cmd]);
          Self.msgHandler(cmd);
+         end
+      else
+         begin
+         logger.Trace('[TReadingThread.Execute] socket is not connected');
          end;
       end;
-
+   logger.info('<<<<<<<<<<<< Leaving TReadingThread.Execute');
 end;
 
 procedure TReadingThread.DoTerminate;

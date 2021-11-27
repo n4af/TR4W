@@ -46,13 +46,16 @@ uses
    Windows,
    StrUtils,
    Math,
-   DateUtils;
+   DateUtils,
+   uNetRadioBase,
+   uRadioElecraftK4;
 
 type
    DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
 
 function ReadFromSerialPort(BytesToRead: Cardinal; rig: RadioPtr): boolean;
 function ReadFromCOMPort(b: Cardinal; rig: RadioPtr): boolean;
+procedure pNetworkRadio(rig: RadioPtr);
 procedure pKenwood2(rig: RadioPtr);
 procedure pKenwoodNew(rig: RadioPtr);
 procedure pFT990_FT1000(rig: RadioPtr);
@@ -708,6 +711,104 @@ begin
       UpdateStatus(rig);
    until rig^.tPollCount < 0;
 end;
+
+procedure pNetworkRadio(rig: RadioPtr); // Network classes (K4 network, Flex 6000 series network, etc)
+var ro: TNetRadioBase;
+begin
+
+   { Unlike the other polling procedures, all we have to do here is grab the
+     radio parameters we need from network classes. We do not need to send any
+     commands as the network class keeps up to date when anything on the radio
+     changes. This is at least the way the K4 works. If other future network
+     interfaces do not work that way, then the network class should poll on a
+     timer so the net effect it appears that the network class just "has" the info.
+     NY4I 27-Nov-2021
+   }
+   logger.Trace('[pNetworkRadio] Entering polling procedure');
+   ro := rig^.tNetObject;
+   while true do
+      begin
+      Sleep(FreqPollRate);
+      //rig.CurrentStatus.VFOStatus := // This returns VFOA or VFOB. Not sure how this applies to net radio
+      //               ActiveVFOStatusType(Ord(rig^.tBuf[31]) - Ord('0') + 1);
+      rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
+      // rig.CurrentStatus.Freq := BufferToInt(@rig^.tBuf, 3, 11);
+      //            if rig.CurrentStatus.Freq = rig.PreviousStatus.Freq then
+      //               Sleep(200);
+
+      case ro.mode[nrVFOA] of
+         rmLSB:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eLSB;
+            rig^.CurrentStatus.Mode := Phone;
+            end;
+         rmUSB:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eUSB;
+            rig^.CurrentStatus.Mode := Phone;
+            end;
+         rmCW:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eCW;
+            rig^.CurrentStatus.Mode := CW;
+            end;
+         rmFM:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eFM;
+            rig^.CurrentStatus.Mode := FM;
+            end;
+         rmAM:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eAM;
+            rig^.CurrentStatus.Mode := Phone;
+            end;
+         rmData:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eRTTY;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+         rmCWRev:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eCW_R;
+            rig^.CurrentStatus.Mode := CW;
+            end;
+         rmDATARev:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eRTTY_R;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+         rmFSK:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eRTTY;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+         rmAFSK:
+            begin
+            rig^.CurrentStatus.ExtendedMode := eDATA;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+         rmPSK:
+            begin
+            rig^.CurrentStatus.ExtendedMode := ePSK31;
+            rig^.CurrentStatus.Mode := Digital;
+            end;
+         else
+            begin
+            logger.Warn('Unhandled rmMode from Net Object - Ord = %d',[Ord(ro.mode[nrVFOA])]);
+            end;
+         end; // of case
+
+      rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
+      rig^.CurrentStatus.Split := ro.IsSplitEnabled;
+      rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
+      rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].Frequency := rig.CurrentStatus.Freq;
+      rig.CurrentStatus.VFO[VFOA].Mode := rig.CurrentStatus.Mode;
+      rig.CurrentStatus.VFO[VFOA].ExtendedMode := rig.CurrentStatus.ExtendedMode;
+      UpdateStatus(rig);
+      end;
+end;
+
 
 procedure pKenwoodNew(rig: RadioPtr); // K3 is here
 label
@@ -2839,9 +2940,24 @@ end;
 procedure BeginPolling(rig: RadioPtr); stdcall;
 begin
    Sleep(100);
+
+   { If the radio is a network interface, we do not care what type of radio as
+     the same class gets all the information from the derived radio class type.
+     This BeginPolling procedure is fired up as a thread so it may cause some
+     strange issues since we have a thread in the network class. TBD
+   }
+   if rig.tNetObject <> nil then
+      begin
+      pNetworkRadio(rig);
+      Exit;   // Nothing else is done here so exit
+      end;
+
+   // The rest is for serial radio interfaces
+
    PurgeComm(rig^.tCATPortHandle, PURGE_RXCLEAR or PURGE_RXABORT);
 
    Windows.ZeroMemory(@rig.tBuf, SizeOf(rig.tBuf));
+
 
    case rig^.RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,

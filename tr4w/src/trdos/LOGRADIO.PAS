@@ -38,7 +38,9 @@ uses
    VC,
    Windows,
    utils_text,
-   ExtCtrls;
+   ExtCtrls,
+   uNetRadioBase,
+   uRadioElecraftK4;
 
 var
    Icom_Filter_Width: integer;     // n4af 4.43.4
@@ -164,7 +166,7 @@ type
       SpeedMemory:       integer;
       BandMemory:        BandType;
       ModeMemory:        ModeType;
-
+      tNetObject:        TK4Radio;
       FreqWindowHandle: HWND;
       RadioName:        Str20;
       StartupCommand  : Str50;
@@ -214,6 +216,7 @@ type
       WideCWFilter:    boolean;
       IcomFilterByte:  byte;
       IDCharacter:     char;
+      IPAddress:       str50;
       CWByCATBuffer:   string;                  // ny4i 4.44.5
       //    PartialRadioResponse: string;
       PollingEnable:   boolean;
@@ -225,6 +228,7 @@ type
       RadioNumberBits: integer;
       RadioStopBits:   integer;
       RadioParity:     ParityType;
+      RadioTCPPort:    integer;
       RadioTimeout:    integer;
       ReceiverAddress: integer; { Used for Icom interfaces }
       WaitingForCommandPause: boolean;
@@ -851,8 +855,24 @@ procedure RITClear;
 var
    IntRadioType: InterfacedRadioType;
 //   SerialPort: PortType;
+   netRadio: TNetRadioBase;
 
 begin
+   //netRadio := GetNetRadioObject(Radio1);
+   if Radio1.tNetObject <> nil then
+      begin
+      case Radio1.RadioModel of
+         K4: netRadio := TK4Radio(Radio1.tNetObject);
+         else
+            begin
+            logger.Error('tNetObject is not supported by a Network connection %s',[Radio1.RadioName]);
+            Exit;
+            end;
+         end; // of case
+      netRadio.RITClear(nrVFOA);
+      Exit;
+      end;
+
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
@@ -1374,6 +1394,7 @@ begin
 {$IFEND}
 end;
 
+{ The initializtion of BeginPolling is in this procedure so if we are not using serial ports, it has to be setup somewhere else.}
 procedure RadioObject.CheckAndInitializeSerialPorts_ForThisRadio;
 begin
    if RadioModel = NoInterfacedRadio then
@@ -1390,7 +1411,8 @@ begin
       end;
    SetUpRadioInterface;
 
-   if tCATPortHandle <> INVALID_HANDLE_VALUE then
+   if (tCATPortHandle <> INVALID_HANDLE_VALUE) or
+      (Self.tNetObject <> nil)                 then
       begin
       if PollingEnable then
          begin
@@ -2461,6 +2483,21 @@ begin
          //      OpenCATDebugFile(tCATPortType);
          end;
 
+      end
+   else if tCATPortType = Network then
+      begin
+      Self.tNetObject := TK4Radio.Create;    // TODO: First this to use some sort of factory so we instantiate the right radio class type (THamLib, TFlex6000, TOmniRig, etc.)
+      if length(Self.IPAddress) > 0 then
+         begin
+         tNetObject.radioAddress := Self.IPAddress;
+         tNetObject.radioPort := Self.RadioTCPPort;
+         tNetObject.Connect;
+         end
+      else
+         begin
+         logger.error('[RadioObject.SetUpRadioInterface] Radio IP address is not set for a radio type of TCP/IP');
+         Exit;
+         end;
       end;
 
    { Initialize the radio variables }
@@ -2497,14 +2534,21 @@ begin
    logger.debug('[RadioObject.SetUpRadioInterface] Startup command length = %d, startup command = %s',[length(Self.StartupCommand),Self.StartupCommand]);
    if length(Self.StartupCommand) > 0 then
       begin
-      case RadioParametersArray[RadioModel].rt of
-      rtKenwood: AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
-      rtYaesu2,
-      rtYaesu3:  AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
-      rtIcom: logger.Warn('Startup command not yet implemented for Icom');
-      //rtOrion: WriteToCATPort(addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+      if Self.tNetObject <> nil then
+         begin
+         TK4Radio(Self.tNetObject).SendToRadio(Self.StartupCommand);
+         end
       else
          begin
+         case RadioParametersArray[RadioModel].rt of
+         rtKenwood: AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+         rtYaesu2,
+         rtYaesu3:  AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+         rtIcom: logger.Warn('Startup command not yet implemented for Icom');
+         //rtOrion: WriteToCATPort(addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+         else
+            begin
+            end;
          end;
       end;
       end;
@@ -3374,6 +3418,7 @@ function tPTTVIACAT(PTTOn: boolean): boolean;
 
 var
    IntRadioType: InterfacedRadioType;
+   ro: TK4Radio;
 //   SerialPort: PortType;
    TempString: Str80;
    WaitAnswer: cardinal;
@@ -3404,14 +3449,28 @@ begin
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
+      ro := Radio1.tNetObject;
 //      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
       IntRadioType := Radio2.RadioModel;
+      ro := Radio2.tNetObject;
  //     SerialPort := Radio2.tCATPortType;
       end;
-
+   if ro <> nil then
+      begin
+      if PTTOn then
+         begin
+         ro.Transmit;
+         end
+      else
+         begin
+         ro.Receive;
+         end;
+      Result := true;
+      Exit;
+      end;
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, K4:
