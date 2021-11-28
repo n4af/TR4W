@@ -89,6 +89,7 @@ Type TNetRadioBase = class(TObject)
       function GetIsTransmitting: boolean;
       function GetIsReceiving: boolean;
       function GetISConnected: boolean;
+      function GetBand(whichVFO: TVFO): TRadioBand;
       function GetFrequency(whichVFO: TVFO): integer;
       function GetIsRITOn(whichVFO: TVFO): boolean;
       function GetRITOffset(whichVFO: TVFO): integer;
@@ -150,6 +151,7 @@ Type TNetRadioBase = class(TObject)
       property IsRITOn[whichVFO: TVFO]: boolean read GetIsRITOn;
       property IsXITOn[whichVFO: TVFO]: boolean read GetIsXITOn;
       property IsSplitEnabled: boolean read GetSplitEnabled;
+      property band[whichVFO: TVFO]: TRadioBand read GetBand;
       property frequency[whichVFO: TVFO]: integer read GetFrequency;
       property mode[whichVFO: TVFO]: TRadioMode read GetMode;
       property dataMode[whichVFO: TVFO]: TRadioMode read GetDataMode;
@@ -456,6 +458,11 @@ begin
    Result := Self.vfo[whichVFO].frequency;
 end;
 
+function TNetRadioBase.GetBand(whichVFO: TVFO): TRadioBand;
+begin
+   Result := Self.vfo[whichVFO].band;
+end;
+
 function TNetRadioBase.GetMode(whichVFO: TVFO): TRadioMode;
 begin
    Result := Self.vfo[whichVFO].mode;
@@ -542,9 +549,9 @@ begin
       begin
       if FConn.Connected then
          begin
-         logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
+         //logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
          cmd := FConn.IOHandler.ReadLn(';');
-         logger.debug('DEBUG: TReadingThread.Execute. Cmd: %s',[cmd]);
+         //logger.trace('[TReadingThread.Execute] Cmd received: (%s)',[cmd]);
          Self.msgHandler(cmd);
          end
       else

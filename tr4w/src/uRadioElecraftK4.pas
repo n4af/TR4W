@@ -78,7 +78,11 @@ end;
 procedure TK4Radio.SendCW(cwChars: string);
 var s: string;
 begin
-   if length(cwChars) > 60 then
+   if length(cwChars) = 0 then  //Stop Sending
+      begin
+      s := Chr(4) + ';RX';  // The chr(4) tells K4 to stop sending
+      end
+   else if length(cwChars) > 60 then
       begin
       s := AnsiLeftStr(cwChars,60);
       logger.Info('Cannot send more than 60 characters to a K4 - Truncating to %s',[s]);
@@ -102,7 +106,7 @@ begin
          Exit;
          end;
       end;
-   Self.SendToRadio(Format('%2s%11d',[sCmd,freq]));
+   Self.SendToRadio(Format('%2s%.11d;',[sCmd,freq]));
 end;
 
 procedure TK4Radio.SetMode(mode:TRadioMode; vfo: TVFO);
@@ -496,6 +500,10 @@ begin
       sData := AnsiMidStr(sMessage,3,length(sMessage));
       vfo := Self.vfo[nrVFOA];
       end;
+   if AnsiRightStr(sData,1) = ';' then      // Remove ; at end.
+      begin
+      SetLength(sData,length(sData)-1);
+      end;
 
    Case AnsiIndexText(AnsiUppercase(sCommand), ['AI','BI','BN','DT','FA','FB','FT','IF','KS','MA','MD','RT','RX','TX','XT','RO', 'FP']) of
       0: begin                                     // AI
@@ -510,7 +518,7 @@ begin
       2: begin              // BN
          if Self.BandNumToBand(sData) <> vfo.band then
             begin    // band change so prime RIT, MD settings
-            Self.SendToRadio('MD;MD$;DT;DT$;FA;FB;IF;');
+            Self.SendToRadio('BN;MD;MD$;DT;DT$;FA;FB;IF;');
             end;
          vfo.band := Self.BandNumToBand(sData);
          logger.debug('[ProcessMessage] Received band number of %s',[sData]);
@@ -549,7 +557,7 @@ begin
          end;
       6: begin             // FT
          Self.localSplitEnabled := AnsiLeftStr(sData,1) = '1';
-         logger.debug('[ProcessMessage] FT (Split) received - Split is %s',[AnsiLeftStr(sData,1)]);
+         logger.debug('[ProcessMessage] FT (Split) received - Split is %s - localSplitEnabled = %s',[AnsiLeftStr(sData,1),BoolToString(Self.localSplitEnabled)]);
          end;
       7: begin             // IF
          Self.ParseIFCommand(sData);
@@ -632,7 +640,7 @@ function TK4Radio.BandNumToBand(sBand: string): TRadioBand;
 var
    iBand: integer;
 begin
-   iBand := StrToIntDef(AnsiLeftStr(sBand,1),-9);
+   iBand := StrToIntDef(sBand,-9);
    case iBand of
       0: Result := rb160m;
       1: Result := rb80m;
@@ -661,8 +669,8 @@ end;
 procedure TK4Radio.Initialize;
 begin
    Self.SetAIMode(5);
-   Self.SendToRadio('RT;XT;RO;FT;ID;MD;DT$;IF;FP;');
-   Self.SendToRadio('RT$;XT$;RO$;MD$;DT$;IF$;FP$;');
+   Self.SendToRadio('BN;RT;XT;RO;FT;ID;MD;DT$;IF;FP;');
+   Self.SendToRadio('BN$;RT$;XT$;RO$;MD$;DT$;IF$;FP$;');
 end;
 
 procedure TK4Radio.SendToRadio(whichVFO: TVFO; sCmd: string; sData: string);

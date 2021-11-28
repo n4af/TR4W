@@ -694,6 +694,7 @@ const
 
 function IntegerToBCD(Value: DWORD): integer; // ny4i  // 4.44.5
 function Integer4ToBCD(Value: DWORD): integer; // ny4i  // 4.44.5
+function ModeTypeToNetMode(mode: ModeType): TRadioMode;
 procedure InitRadios;
 function OpenCATDebugFile(port: PortType): boolean;
 //procedure CloseCATDebugFile(port: PortType);
@@ -820,6 +821,25 @@ begin
       Result := (Result shl 4) or ((Value div Dividers[j]) mod 10);
       end;
 end;//Integer4ToBCD
+
+function ModeTypeToNetMode(mode: ModeType): TRadioMode; // TRadioMode is the Network mode type
+begin
+{Type TRadioMode = (rmNone,rmCW, rmCWRev, rmLSB, rmUSB, rmFM, rmAM,
+                   rmData, rmDataRev, rmFSK, rmFSKRev, rmPSK, rmPSKRev,
+                   rmAFSK, rmAFSKRev);
+                   }
+   case mode of
+      CW: Result := rmCW;
+      Digital: Result := rmData;
+      Phone: Result := rmUSB;
+      FM: Result := rmFM;
+   end;
+ //  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
+           //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
+  //ExtendedRadioModeType = (rNoMode, rCW, rLSB, rUSB, rAM, rFM, rRTTY, rRTTY_R, rAFSK, rDATA_U, rDATA_L, rDIGITAL, rCW_R);
+
+
+end;
 
 
 function BufToStr(var buf; bufSize: integer): string;
@@ -1744,6 +1764,14 @@ procedure RadioObject.PutRadioIntoSplit;
 
 begin
    //TLogger.GetInstance.Debug(Format('      In PutRadioIntoSplit: %s',[RadioName]));
+   if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.Split(true);
+      Exit;
+      end;
+
+
+
    case RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, K4:
@@ -1803,6 +1831,12 @@ procedure RadioObject.PutRadioOutOfSplit;
 
 begin
    //TLogger.GetInstance.Debug(Format('      In PutRadioOutOfSplit: %s',[RadioName]));
+      if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.Split(false);
+      Exit;
+      end;
+
    case RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, K4:
@@ -2050,6 +2084,13 @@ begin
       end;
    // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
+
+   if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.SendCW(msg);
+      Exit;
+      end;
+
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
@@ -2341,6 +2382,11 @@ procedure RadioObject.StopSendingCW;
 
 //   localMsg: string;
 begin
+   if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.SendCW('');   // Empty string stops sending
+      Exit;
+      end;
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
@@ -2568,6 +2614,12 @@ begin
       exit;
       end;
 
+   if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.SetCWSpeed(speed);
+      Exit;
+      end;
+
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
@@ -2645,11 +2697,52 @@ var
    tempFilterWidth: integer;
    skipMode : boolean;
    bStateDataModeRequired : boolean;
+   tNetMode: TRadioMode;
 const
    FT847ModeString = CHR(0) + CHR(0) + CHR(0) + CHR(7);
 
 begin
    logger.debug('[SetRadioFreq] set frequency to %u',[freq]);
+
+   if Self.tNetObject <> nil then
+      begin
+      if VFO = 'B' then
+         begin
+         Self.tNetObject.SetFrequency(freq,nrVFOB);
+         tNetMode := ModeTypeToNetMode(mode);
+         if tNetMode in [rmLSB,rmUSB] then
+            begin
+            if freq < 8000000 then
+               begin
+               tNetMode := rmLSB;
+               end
+            else
+               begin
+               tNetMode := rmUSB;
+               end;
+            end;
+         Self.tNetObject.SetMode(tNetmode,nrVFOB);
+         end
+      else
+         begin
+         Self.tNetObject.SetFrequency(freq,nrVFOA);
+         tNetMode := ModeTypeToNetMode(mode);
+         if tNetMode in [rmLSB,rmUSB] then
+            begin
+            if freq < 8000000 then
+               begin
+               tNetMode := rmLSB;
+               end
+            else
+               begin
+               tNetMode := rmUSB;
+               end;
+            end;
+         Self.tNetObject.SetMode(tNetmode,nrVFOA);
+         end;
+      Exit;
+      end;
+
    skipMode := false;
       try
       case RadioParametersArray[RadioModel].rt of

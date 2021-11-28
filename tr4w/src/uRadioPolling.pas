@@ -729,82 +729,31 @@ begin
    while true do
       begin
       Sleep(FreqPollRate);
-      //rig.CurrentStatus.VFOStatus := // This returns VFOA or VFOB. Not sure how this applies to net radio
-      //               ActiveVFOStatusType(Ord(rig^.tBuf[31]) - Ord('0') + 1);
       rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
-      // rig.CurrentStatus.Freq := BufferToInt(@rig^.tBuf, 3, 11);
-      //            if rig.CurrentStatus.Freq = rig.PreviousStatus.Freq then
-      //               Sleep(200);
-
-      case ro.mode[nrVFOA] of
-         rmLSB:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eLSB;
-            rig^.CurrentStatus.Mode := Phone;
-            end;
-         rmUSB:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eUSB;
-            rig^.CurrentStatus.Mode := Phone;
-            end;
-         rmCW:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eCW;
-            rig^.CurrentStatus.Mode := CW;
-            end;
-         rmFM:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eFM;
-            rig^.CurrentStatus.Mode := FM;
-            end;
-         rmAM:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eAM;
-            rig^.CurrentStatus.Mode := Phone;
-            end;
-         rmData:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eRTTY;
-            rig^.CurrentStatus.Mode := Digital;
-            end;
-         rmCWRev:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eCW_R;
-            rig^.CurrentStatus.Mode := CW;
-            end;
-         rmDATARev:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eRTTY_R;
-            rig^.CurrentStatus.Mode := Digital;
-            end;
-         rmFSK:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eRTTY;
-            rig^.CurrentStatus.Mode := Digital;
-            end;
-         rmAFSK:
-            begin
-            rig^.CurrentStatus.ExtendedMode := eDATA;
-            rig^.CurrentStatus.Mode := Digital;
-            end;
-         rmPSK:
-            begin
-            rig^.CurrentStatus.ExtendedMode := ePSK31;
-            rig^.CurrentStatus.Mode := Digital;
-            end;
-         else
-            begin
-            logger.Warn('Unhandled rmMode from Net Object - Ord = %d',[Ord(ro.mode[nrVFOA])]);
-            end;
-         end; // of case
-
+      rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
       rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
       rig^.CurrentStatus.Split := ro.IsSplitEnabled;
       rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
       rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
-      rig.CurrentStatus.VFO[VFOA].Frequency := rig.CurrentStatus.Freq;
-      rig.CurrentStatus.VFO[VFOA].Mode := rig.CurrentStatus.Mode;
-      rig.CurrentStatus.VFO[VFOA].ExtendedMode := rig.CurrentStatus.ExtendedMode;
+      rig^.CurrentStatus.TXOn := ro.IsTransmitting;
+
+      // VFO A
+      rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig.CurrentStatus.VFO[VFOA].Mode,rig.CurrentStatus.VFO[VFOA].ExtendedMode);
+      rig.CurrentStatus.VFO[VFOA].RIT := ro.IsRITOn[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+
+      // VFO B
+      rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOB],rig.CurrentStatus.VFO[VFOB].Mode,rig.CurrentStatus.VFO[VFOB].ExtendedMode);
+      rig.CurrentStatus.VFO[VFOB].RIT := ro.IsRITOn[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].XIT := ro.IsXITOn[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
+
       UpdateStatus(rig);
       end;
 end;

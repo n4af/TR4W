@@ -137,7 +137,8 @@ uses
   uWSJTX,
   Math,
   Log4D,
-  Controls
+  Controls,
+  uNetRadioBase
   ;
 
   var
@@ -202,7 +203,8 @@ function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
 procedure ProcessImportedSRX_String(fieldValue: string; var exch: ContestExchange);
 function GetContestByADIFName(sADIFName: string): ContestType;
 procedure SetExtendedModeFromMode (RData: ContestExchange);
-
+function GetTR4WBandFromNetworkBand(band:TRadioBand): BandType;
+procedure GetTRModeAndExtendedModeFromNetworkMode(netMode:TRadioMode; var mode:ModeType; var extMode:extendedModeType);
 
 {$IF MORSERUNNER}
 function GetMorseRunnerWindow: boolean;
@@ -2024,9 +2026,14 @@ var
   nCmdShow                              : integer;
 begin
 
- if    ActiveRadioPtr.CurrentStatus.Split Then QuickDisplay(TC_Split_Warn)      //N4AF  4.31.3
+if ActiveRadioPtr.CurrentStatus.Split Then
+   begin
+   QuickDisplay(TC_Split_Warn);                                                          //N4AF  4.31.3    // NY4I reformatted
+   end
 else                                                                                     //N4AF   4.31.3
- QuickDisplay(nil);
+   begin
+   QuickDisplay(nil);
+   end;
 //  SetMainWindowText(mweName, nil);
 // CallDataBase.ClearDataEntry;
 SetMainWindowText(mweName, '');
@@ -7926,6 +7933,102 @@ begin
       Result := false;
       end;
    end;
+
+function GetTR4WBandFromNetworkBand(band:TRadioBand): BandType;
+begin
+   case band of
+      rbNone: Result := NoBand;
+      rb160m: Result := Band160;
+      rb80m: Result := Band80;
+      rb60m: Result := NoBand;
+      rb40m: Result := Band40;
+      rb30m: Result := Band30;
+      rb20m: Result := Band20;
+      rb17m: Result := Band17;
+      rb15m: Result := Band15;
+      rb12m: Result := Band12;
+      rb10m: Result := Band10;
+      rb6m:  Result := Band6;
+      rb4m:  Result := NoBand;
+      rb2m:  Result := Band2;
+      rb70cm: Result := Band432;
+      else
+         begin
+         logger.Error('[GetTR4WBandFromNetworkBand] band is invalid - Ord is %d',[Ord(band)]);
+         end;
+      end; // of case
+
+
+end;
+
+procedure GetTRModeAndExtendedModeFromNetworkMode(netMode:TRadioMode; var mode:ModeType; var extMode:extendedModeType);
+begin
+   case netMode of
+      rmNone:
+         begin
+         end;
+      rmLSB:
+         begin
+         extMode := eLSB;
+         mode := Phone;
+         end;
+      rmUSB:
+         begin
+         extMode := eUSB;
+         mode := Phone;
+         end;
+      rmCW:
+         begin
+         extMode := eCW;
+         mode := CW;
+         end;
+      rmFM:
+         begin
+         extMode := eFM;
+         mode := FM;
+         end;
+      rmAM:
+         begin
+         extMode := eAM;
+         mode := Phone;
+         end;
+      rmData:
+         begin
+         extMode := eRTTY;
+         mode := Digital;
+         end;
+      rmCWRev:
+         begin
+         extMode := eCW_R;
+         mode := CW;
+         end;
+      rmDATARev:
+         begin
+         extMode := eRTTY_R;
+         mode := Digital;
+         end;
+      rmFSK:
+         begin
+         extMode := eRTTY;
+         mode := Digital;
+         end;
+      rmAFSK:
+         begin
+         extMode := eDATA;
+         mode := Digital;
+         end;
+      rmPSK:
+         begin
+         extMode := ePSK31;
+         mode := Digital;
+         end;
+      else
+         begin
+         logger.Warn('[GetTRModeAndExtendedModeFromNetworkMode] Unhandled netMode from Net Object - Ord = %d',[Ord(netMode)]);
+         end;
+      end; // of case
+end;
+
 
 function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
 begin
