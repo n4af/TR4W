@@ -6663,6 +6663,12 @@ begin
           exch.DomesticQTH := tempARRL_Sect;
          CWOPS:
             exch.Age := StrToIntDef(exch.QTHString,0);
+         CQWWCW,CQWWSSB:  // 4.105.16
+          begin
+           exch.QTHString := fieldValue;
+          //  tAdifCQ_Z: exch.Zone := StrToInt(fieldValue);
+           exch.zone := strtoint(tempSRX_String);
+          end;
          IARU:
             exch.QTHString := fieldValue;
          NAQSOCW, NAQSOSSB, NCCCSPRINT:        // 4.103.1    // 4.105.13
