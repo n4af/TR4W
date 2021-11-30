@@ -47,7 +47,8 @@ Type TRadioVFO = class(TObject)
      // Notch: integer;
 end;
 
-TReadingThread = class(TThread)
+Type TSimpleEventProc = procedure(const aStrParam:string) of object;
+Type TReadingThread = class(TThread)
   protected
     FConn: TIdTCPConnection;
     msgHandler: TProcessMsgRef;
@@ -134,6 +135,7 @@ Type TNetRadioBase = class(TObject)
       constructor Create(ProcRef: TProcessMsgRef); overload;
       constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
       Destructor Destroy; overload;
+
       procedure SendToRadio(s: string); overload;
       procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload; Virtual; Abstract;
       function ModeToString(mode: TRadioMode): string;
@@ -144,6 +146,7 @@ Type TNetRadioBase = class(TObject)
       function Connect: integer; overload;
       function Connect (address: string; port: integer): integer; overload;
       function VFOToString(whichVFO: TVFO): string;
+
       procedure Disconnect; overload;
       property IsTransmitting: boolean read GetIsTransmitting;
       property IsReceiving: boolean read GetIsReceiving;
@@ -164,7 +167,6 @@ Type TNetRadioBase = class(TObject)
 
 
    published
-
       procedure ProcessMsg(msg: string); Virtual; Abstract;
       procedure Transmit; Virtual; Abstract;
       procedure Receive; Virtual; Abstract;
@@ -221,7 +223,7 @@ begin
    //Self.vfo[nrVFOB].ID := nrVFOB;
    
    socket := TIdTCPClient.Create();
-   socket.ConnectTimeout := 5000;  // TODO Make this a property
+   socket.ConnectTimeout := 10000;  // TODO Make this a property
    socket.OnDisconnected := Self.OnRadioDisconnected;
    socket.OnConnected := Self.OnRadioConnected;
    socket.OnStatus := Self.OnRadioStatus;
@@ -335,6 +337,7 @@ end;
 
 function TNetRadioBase.Connect: integer;
 begin
+
    logger.Info('[TNetRadioBase.Connect] Connecting to network radio at address %s, port = %d',[Self.radioAddress,Self.radioPort]);
     if Self.radioPort = 0 then
        begin
@@ -356,10 +359,11 @@ begin
        
     socket.Port := Self.radioPort;
     socket.Host := Self.radioAddress;
+    socket.ConnectTimeout := 5;
 
     try
         socket.Connect;
-        logger.Info('[TNetRadioBase.Connect] COnnected successfully to network radio');
+        logger.Info('[TNetRadioBase.Connect] Connected successfully to network radio');
     except
         on E: Exception do begin
            logger.Error('Exception when connecting to radio: %s', [E.Message]);
@@ -380,13 +384,14 @@ begin
       begin
       try
          logger.debug('Calling Disconnect - user request');
+         // Disconnect the socket to pull it off the ReadLn so the thread in Execute sees that it is Terminated.
+         socket.Disconnect;
          if rt <> nil then
             begin
             rt.Terminate;
-            //rt.WaitFor;
-            //FreeAndNil(rt);
+            rt.WaitFor;
+            FreeAndNil(rt);
             end;
-         socket.Disconnect;
       except
          on E: Exception do
             begin
@@ -559,7 +564,7 @@ begin
          logger.Trace('[TReadingThread.Execute] socket is not connected');
          end;
       end;
-   logger.info('<<<<<<<<<<<< Leaving TReadingThread.Execute');
+   logger.info('<<<<<<<<<<<< Leaving TReadingThread.Execute >>>>>>>>>>>>>>>>>>');
 end;
 
 procedure TReadingThread.DoTerminate;

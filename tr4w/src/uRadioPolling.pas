@@ -726,9 +726,10 @@ begin
    }
    logger.Trace('[pNetworkRadio] Entering polling procedure');
    ro := rig^.tNetObject;
-   while true do
+   while ro.IsConnected do
       begin
       Sleep(FreqPollRate);
+
       rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
       rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
       GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
@@ -756,6 +757,11 @@ begin
 
       UpdateStatus(rig);
       end;
+
+      logger.Info('Exiting pNetworkRadio');
+      rig.CurrentStatus.VFO[VFOA].Frequency := 0;
+      rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+
 end;
 
 

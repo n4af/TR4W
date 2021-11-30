@@ -883,10 +883,10 @@ begin
 
             end;
       end;
-   logger.Debug('Searching for %s',[Command]);
+   logger.trace('Searching for %s',[Command]);
    for i := 1 to CommandsArraySize do
       begin
-      logger.trace('Comparing %s to command %s',[Command,CFGCA[i].crCommand]);
+      //logger.trace('Comparing %s to command %s',[Command,CFGCA[i].crCommand]);
       if (StrComp(@Command[1], CFGCA[i].crCommand) = 0) then
          //logger.debug('Found command %s at index %d', [Command, i]);
          begin
@@ -1559,18 +1559,6 @@ begin
       else ;
    end;
 
-   // Log the version of the program under debug
-{   if logger.IsInfoEnabled then
-      begin
-      logger.Info('TR4W Program Version %s (%s)',[ TR4W_CURRENTVERSION, TR4W_CURRENTVERSIONDATE]);
-      if MainUnit.IsWin64 then
-         begin
-         logger.Info('Running on 64 bit Windows');
-         end;
-      logger.info('Windows version: %d',[tr4w_osverinfo.dwPlatformId]);
-      end;
-
-  }
 end;
 
 function F_UpdateWSJTXEnabled: boolean;
