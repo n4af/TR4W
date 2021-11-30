@@ -1855,8 +1855,7 @@ begin
 
 
       end;
-
-      WriteADIFField('SRX_STRING',TempRXData.ExchString);
+      WriteADIFField('SRX_STRING', TempRXData.ExchString);
       stxString := GetMyExchangeForExport;
       WriteADIFField('STX_STRING',Trim(DeleteRepeatedSpaces(stxString)));
 
