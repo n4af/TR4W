@@ -562,8 +562,6 @@ begin
        begin
         InactiveRadioPtr^.StopSendingCW;
        end;
-      SetSpeed(DisplayedCodeSpeed);   // 4.49.3
-
     end;
 
    //   SetOpMode(CQOpMode);  // n4af 4.46.12
@@ -988,8 +986,10 @@ begin
 //       CheckInactiveRigCallingCQ;
        if not tAutoSendMode then
         if MessageEnable then
+         begin
+          SetSpeed(DisplayedCodeSpeed);  // 4.106.1
           if not SendCrypticMessage(CallWindowString) then Exit;
-
+         end;
       tAutoSendMode := False;
       CallAlreadySent := True;
       ExchangeHasBeenSent := True;

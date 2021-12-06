@@ -283,7 +283,8 @@ begin
     if CWThreadID = 0 then
     begin
          wkBusy := False;            //  4.90.5
-    //   ExitFromCWThread := False;
+    //     wkSendAdminCommand(wkRESET);
+        //   ExitFromCWThread := False;
     //    inc(CWThreadCounter);
     //   windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));
 
