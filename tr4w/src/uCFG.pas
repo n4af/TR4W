@@ -315,7 +315,7 @@ var
 
 const
 
-   CommandsArraySize = 412 + 1 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}     // 4.91.3
+   CommandsArraySize = 411 + 1 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}     // 4.91.3
    + 1 {RadioOneCWByCAT} + 1 {RadioTwoCWByCAT} //ny4i // 4.44.5
    + 9 {UDPBroadcast Variables}
       //ny4i 4.44.9  - Issue 82 added one more UDP variable   Issue 304 Added UDPBroadcastScore
@@ -342,7 +342,7 @@ const
  (crCommand: 'AUTO ALT-D ENABLE';             crAddress: @AutoAltDEnable;                 crMin:0;  crMax:0;        crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'AUTO CALL TERMINATE';           crAddress: @AutoCallTerminate;              crMin:0;  crMax:0;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'AUTO DISPLAY DUPE QSO';         crAddress: @AutoDisplayDupeQSO;             crMin:0;  crMax:0;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
- (crCommand: 'AUTO DUPE ENABLE CQ';           crAddress: @AutoDupeEnableCQ;               crMin:0;  crMax:0;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
+// (crCommand: 'AUTO DUPE ENABLE CQ';           crAddress: @AutoDupeEnableCQ;               crMin:0;  crMax:0;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),  // 4.106.2
  (crCommand: 'AUTO DUPE ENABLE S AND P';      crAddress: @AutoDupeEnableSandP;            crMin:0;  crMax:0;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'AUTO QSL INTERVAL';             crAddress: pointer(3);                      crMin:0;  crMax:6;        crS: csOld; crA: 6; crC:0 ; crP:0; crJ: 0; crKind: ckArray;  cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'AUTO QSO NUMBER DECREMENT';     crAddress: @AutoQSONumberDecrement;         crMin:0;  crMax:0;        crS: csOld; crA: 0; crC:0 ; crP:5; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),

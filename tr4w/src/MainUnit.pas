@@ -961,7 +961,7 @@ begin
 
   if AutoDupeEnableCQ and tCallWindowStringIsDupe then
   begin
-
+ { 4.106.2
 //   ShowFMessages(0);
 //    FlashCallWindow;
 //    EscapeDeletedCallEntry := CallWindowString;
@@ -971,9 +971,9 @@ begin
     tAutoSendMode := False;
     SendB4;
     DispalayDupe;
-//    tCleareCallWindow;
-  end
-  else
+//    tCleareCallWindow;  }
+  end ;
+ // else
   begin
     if CallAlreadySent = False then
     begin
@@ -1293,10 +1293,10 @@ begin
     end
     else
       if MessageEnable and not BeSilent then
-        if CallAlreadySent = False then
+    {    if CallAlreadySent = False then
           SendCrypticMessage(CallWindowString + ' ' + QSOBeforeMessage)
         else
-          SendCrypticMessage(QSOBeforeMessage);
+          SendCrypticMessage(QSOBeforeMessage); }
     if DualingCQState <> NoDualingCQs then DualingCQState := SendingDupeMessage;
   end;
 
