@@ -238,7 +238,7 @@ var
   ActiveDXMult                          : DXMultType {= NoDXMults};
   ActivePrefixMult                      : PrefixMultType {= NoPrefixMults};
 
-  AutoDupeEnableCQ                      : boolean = True;
+  AutoDupeEnableCQ                      : boolean = False;
   AutoDupeEnableSandP                   : boolean = True;
 
   tConnectionAtStartup                  : boolean;
