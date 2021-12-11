@@ -449,8 +449,10 @@ begin
     ARRL10:
       begin
         ActiveBand := Band10;
+         ActiveExchange := RSTDomesticOrDXQTHExchange;  
+          ActiveDXMult := ARRLDXCCWithNoARRLSections;
 //        ContestName := 'ARRL Ten Meter Contest';
-        ExchangeMemoryEnable := False;
+ //       ExchangeMemoryEnable := False;      // 4.106.4
         MultipleBandsEnabled := False;
         Add_KVEKH6KL;
         AddDomesticCountry('XE');

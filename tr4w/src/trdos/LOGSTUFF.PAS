@@ -7181,7 +7181,7 @@ begin
         RXData.QSOPoints := 1;
      end;
 
-    UBAQSOPointMethod:
+    UBAQSOPointMethod:        // 4.106.3
       begin
         if MyCountry = 'ON' then
         begin
@@ -7189,9 +7189,9 @@ begin
             RXData.QSOPoints := 1
           else
            if UBACountry(RXData.DXQTH) then
-            RXData.QSOPoints := 3
+            RXData.QSOPoints := 2
           else
-            RXData.QSOPoints := 1;
+            RXData.QSOPoints := 3;
           exit;
         end;
 
