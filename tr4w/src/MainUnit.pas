@@ -6651,10 +6651,9 @@ begin
                exch.QTHString := gridSquare;
                exch.DomesticQTH := gridSquare;
                end;
-         ARRL160:
+         ARRL160, UBACW, UBASSB:          // 4.106.7
           begin
-           exch.QTHString := tempSRX_String;
-           exch.DomesticQTH := tempARRL_Sect;
+           exch.DomesticQTH := tempSRX_String;
           end;
           
          ARRL_RTTY_ROUNDUP:
