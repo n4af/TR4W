@@ -484,6 +484,11 @@ begin
 
   GetRidOfPrecedingSpaces(QTHString);
   GetRidOfPostcedingSpaces(QTHString);
+  if QTHString = 'XXX' then
+   begin
+    FoundDomesticQTH := True;
+    exit;
+   end;
   FoundDomesticQTH := DomQTHTable.GetDomQTH(QTHString, RXData.DomMultQTH, RXData.DomesticQTH);
 
 

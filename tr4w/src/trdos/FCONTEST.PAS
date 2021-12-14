@@ -449,7 +449,7 @@ begin
     ARRL10:
       begin
         ActiveBand := Band10;
-         ActiveExchange := RSTDomesticOrDXQTHExchange;  
+ //        ActiveExchange := RSTDomesticOrDXQTHExchange;    4.106.6
           ActiveDXMult := ARRLDXCCWithNoARRLSections;
 //        ContestName := 'ARRL Ten Meter Contest';
  //       ExchangeMemoryEnable := False;      // 4.106.4
@@ -1208,7 +1208,7 @@ begin
 
     UBACW, UBASSB:
       begin
-        AddDomesticCountry('ON');
+        LiteralDomesticQTH := True;
         if MyCountry = 'ON' then          // 4.96.2
          begin
           ActiveDXMult := CQDXCC;
@@ -1217,8 +1217,10 @@ begin
           ActivePrefixMult := NoPrefixMults;
           end
           else
-          ActivePrefixMult := BelgiumPrefixes;
-     //    end;
+          begin
+           ActivePrefixMult := BelgiumPrefixes;
+           ActiveDomesticMult := DomesticFile;
+          end;
       end;
 
     UKRAINIAN:

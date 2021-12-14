@@ -7181,28 +7181,46 @@ begin
         RXData.QSOPoints := 1;
      end;
 
-    UBAQSOPointMethod:        // 4.106.3
+    UBAQSOPointMethod:        // 4.106.5
       begin
+      {  if RXData.QTHString = 'XXX' then
+         begin
+          RXData.DomesticMult := False;
+          if MyCountry <> 'ON' then
+           RXData.QSOPoints := 10
+            else
+              RXData.QSOPoints := 1;
+            exit;
+        end;   }
         if MyCountry = 'ON' then
-        begin
+         begin
           if RXCty = 'ON' then
-            RXData.QSOPoints := 1
-          else
-           if UBACountry(RXData.DXQTH) then
-            RXData.QSOPoints := 2
-          else
+           begin
+            RXData.QSOPoints := 1 ;
+            if RXData.QTHString = 'XXX' then
+             RXData.DomesticMult := False ;
+           end
+           else
+            if UBACountry(RXData.DXQTH) then
+             RXData.QSOPoints := 2
+           else
             RXData.QSOPoints := 3;
           exit;
         end;
 
         if RXCty = 'ON' then
-          RXData.QSOPoints := 10
+         begin
+         { if (RXData.DXMult) and (RXData.PrefixMult) then
+            MultString := MultString + MULT_DX; //TempRXData.DXQTH + ' ';   }
+           RXData.QSOPoints := 10;
+          end
         else if UBACountry(RXCty) then       // 4.97.10
           RXData.QSOPoints := 3
         else
           RXData.QSOPoints := 1;
-      end;
 
+
+    end;
     UkrainianQSOPointMethod:
       begin
 
