@@ -7513,7 +7513,7 @@ begin
 
     OldNewYearQSOPointMethod:
       begin
-        RXData.QSOPoints := RXData.Age {RXData.NumberReceived};
+        RXData.QSOPoints := StrToInt(RXData.Power);
       end;
 
     YouthChampionshipRFMethod:

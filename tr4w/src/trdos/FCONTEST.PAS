@@ -350,6 +350,7 @@ begin
 
    end;
 
+
     WINTERFIELDDAY:
       begin
         WARCBandsEnabled := False;
@@ -1366,7 +1367,11 @@ begin
 
       end;
 
-    OLDNEWYEAR: ActiveBand := Band80;
+    OLDNEWYEAR:
+    begin
+     ActiveBand := Band80;
+     ExchangeMemoryEnable := True;
+    end;
 
     CQWPXRTTY, WRTC:
       ActiveBand := Band80;
