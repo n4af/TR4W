@@ -7511,6 +7511,9 @@ begin
         end;
       end;
 
+ //     NCCCQP:
+  //     if rxdata.
+
     OldNewYearQSOPointMethod:
       begin
         RXData.QSOPoints := StrToInt(RXData.Power);

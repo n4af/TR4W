@@ -234,7 +234,7 @@ var
   InitialExCallsigns                    : integer;
   InitialExDupes                        : integer;
 
-  tAllowDupeQSOs                        : boolean;
+  tAllowDupeQSOs                        : boolean = False;
   ActiveDXMult                          : DXMultType {= NoDXMults};
   ActivePrefixMult                      : PrefixMultType {= NoPrefixMults};
 

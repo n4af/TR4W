@@ -1421,14 +1421,14 @@ begin
 
     LQP, NCCCSPRINT:
       begin
-        AutoDupeEnableCQ := False;
-        AutoDupeEnableSandP := False;
+        AutoDupeEnableCQ := True;
+        AutoDupeEnableSandP := True;
         AddDomesticCountry('KH6');
         Add_KVE;
         ExchangeMemoryEnable := True; //(turns on the Exchange Memory for Initial Exchange pre - fill)
 //        ActiveInitialExchange := NameQTHInitialExchange; //(turns on Initial Exchange pre - fill using TRMASTER.DTA)
         SprintQSYRule := True;
-        tAllowDupeQSOs := True;
+        tAllowDupeQSOs := False;
       end;
 
 //    UA4N: TourDuration := 15;
