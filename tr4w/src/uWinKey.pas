@@ -412,16 +412,7 @@ begin
   wkSendTwoBytes(wkCMD_SETWPMSPEED, Speed);
   wkCWSpeed := Speed;
 end;
-{
-procedure wkChangeSpeedBuffered;
-begin
-  wkInternalCWBuffer[wkBytesInHost] := CHR(wkCMD_CHANGESPEEDBUFFERED);
-  inc(wkBytesInHost);
-  wkInternalCWBuffer[wkBytesInHost] := CHR(wkCWSpeed);
-  inc(wkBytesInHost);
-  wkSpeedChanged := False;
-end;
-}
+
 
 function wkRead(nNumberOfBytesToRead: DWORD): boolean;
 var
@@ -1038,7 +1029,8 @@ procedure wkAddCWMessageToInternalBuffer(Msg: Str160);
 var
   i                                     : integer;
 begin
-  if length(Msg) = 0 then Exit;
+  if length(Msg) = 0 then
+  Exit;
 
   for i := 1 to length(Msg) do
   begin
@@ -1143,7 +1135,6 @@ begin
 {$IFEND}
 
     if wkWaitingBytesInHost > 0 then dec(wkWaitingBytesInHost);
-
     inc(BytesSendNow);
     inc(wkHostBufferSendIndex);
     if wkHostBufferSendIndex >= SizeOfHostBuffer then wkHostBufferSendIndex := 0;

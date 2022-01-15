@@ -350,6 +350,7 @@ begin
 
    end;
 
+
     WINTERFIELDDAY:
       begin
         WARCBandsEnabled := False;
@@ -449,8 +450,10 @@ begin
     ARRL10:
       begin
         ActiveBand := Band10;
+ //        ActiveExchange := RSTDomesticOrDXQTHExchange;    4.106.6
+          ActiveDXMult := ARRLDXCCWithNoARRLSections;
 //        ContestName := 'ARRL Ten Meter Contest';
-        ExchangeMemoryEnable := False;
+ //       ExchangeMemoryEnable := False;      // 4.106.4
         MultipleBandsEnabled := False;
         Add_KVEKH6KL;
         AddDomesticCountry('XE');
@@ -1206,7 +1209,7 @@ begin
 
     UBACW, UBASSB:
       begin
-        AddDomesticCountry('ON');
+        LiteralDomesticQTH := True;
         if MyCountry = 'ON' then          // 4.96.2
          begin
           ActiveDXMult := CQDXCC;
@@ -1215,8 +1218,10 @@ begin
           ActivePrefixMult := NoPrefixMults;
           end
           else
-          ActivePrefixMult := BelgiumPrefixes;
-     //    end;
+          begin
+           ActivePrefixMult := BelgiumPrefixes;
+           ActiveDomesticMult := DomesticFile;
+          end;
       end;
 
     UKRAINIAN:
@@ -1362,7 +1367,11 @@ begin
 
       end;
 
-    OLDNEWYEAR: ActiveBand := Band80;
+    OLDNEWYEAR:
+    begin
+     ActiveBand := Band80;
+     ExchangeMemoryEnable := True;
+    end;
 
     CQWPXRTTY, WRTC:
       ActiveBand := Band80;
@@ -1412,14 +1421,14 @@ begin
 
     LQP, NCCCSPRINT:
       begin
-        AutoDupeEnableCQ := False;
-        AutoDupeEnableSandP := False;
+        AutoDupeEnableCQ := True;
+        AutoDupeEnableSandP := True;
         AddDomesticCountry('KH6');
         Add_KVE;
         ExchangeMemoryEnable := True; //(turns on the Exchange Memory for Initial Exchange pre - fill)
 //        ActiveInitialExchange := NameQTHInitialExchange; //(turns on Initial Exchange pre - fill using TRMASTER.DTA)
         SprintQSYRule := True;
-        tAllowDupeQSOs := True;
+        tAllowDupeQSOs := False;
       end;
 
 //    UA4N: TourDuration := 15;

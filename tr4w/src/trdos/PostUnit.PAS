@@ -2614,7 +2614,7 @@ if TempRXData.DomMultQTH = '' then
             push ModeString
             push Freq
       end;
-      wsprintf(CABRILLO_FIRST_PART, 'QSO: %5s %s %d-%02d-%02d %02d%02d %-14s');
+      wsprintf(CABRILLO_FIRST_PART, 'QSO: %5s %s %d-%02d-%02d %02d%02d %-8s');
       asm add esp,40
       end;
 {
@@ -3090,7 +3090,7 @@ if TempRXData.DomMultQTH = '' then
              if csQTHString = 'TRC' then      // 4.63.3
               wsprintf(CABRILLO_HISEX, '%-3s%5d%-8s')
             else
-               wsprintf(CABRILLO_HISEX, '%-3s %4.4d %8s');
+               wsprintf(CABRILLO_HISEX, '%-3s %4.4d %4s');
             asm add esp,20
             end;
           end;

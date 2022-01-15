@@ -564,8 +564,6 @@ begin
        begin
         InactiveRadioPtr^.StopSendingCW;
        end;
-      SetSpeed(DisplayedCodeSpeed);   // 4.49.3
-
     end;
 
    //   SetOpMode(CQOpMode);  // n4af 4.46.12
@@ -965,7 +963,7 @@ begin
 
   if AutoDupeEnableCQ and tCallWindowStringIsDupe then
   begin
-
+ { 4.106.2
 //   ShowFMessages(0);
 //    FlashCallWindow;
 //    EscapeDeletedCallEntry := CallWindowString;
@@ -975,9 +973,9 @@ begin
     tAutoSendMode := False;
     SendB4;
     DispalayDupe;
-//    tCleareCallWindow;
-  end
-  else
+//    tCleareCallWindow;  }
+  end ;
+ // else
   begin
     if CallAlreadySent = False then
     begin
@@ -990,8 +988,10 @@ begin
 //       CheckInactiveRigCallingCQ;
        if not tAutoSendMode then
         if MessageEnable then
+         begin
+          SetSpeed(DisplayedCodeSpeed);  // 4.106.1
           if not SendCrypticMessage(CallWindowString) then Exit;
-
+         end;
       tAutoSendMode := False;
       CallAlreadySent := True;
       ExchangeHasBeenSent := True;
@@ -1295,10 +1295,10 @@ begin
     end
     else
       if MessageEnable and not BeSilent then
-        if CallAlreadySent = False then
+    {    if CallAlreadySent = False then
           SendCrypticMessage(CallWindowString + ' ' + QSOBeforeMessage)
         else
-          SendCrypticMessage(QSOBeforeMessage);
+          SendCrypticMessage(QSOBeforeMessage); }
     if DualingCQState <> NoDualingCQs then DualingCQState := SendingDupeMessage;
   end;
 
@@ -6667,10 +6667,9 @@ begin
                exch.QTHString := gridSquare;
                exch.DomesticQTH := gridSquare;
                end;
-         ARRL160:
+         ARRL160, UBACW, UBASSB:          // 4.106.7
           begin
-           exch.QTHString := tempSRX_String;
-           exch.DomesticQTH := tempARRL_Sect;
+           exch.DomesticQTH := tempSRX_String;
           end;
           
          ARRL_RTTY_ROUNDUP:
