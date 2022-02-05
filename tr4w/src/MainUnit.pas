@@ -6673,7 +6673,21 @@ begin
           end;
           
          ARRL_RTTY_ROUNDUP:
-            exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
+            begin
+            // This code was RST and Number received for Roundup but that is only for DX stations.
+            // For US stations, it is RST and State.
+            // Find out when this changed as it messed up WSJTX Roundup processing
+            logger.Debug('[uWSJTX] exch.QTH.CountryID = %s',[exch.QTH.CountryID]);
+            if (exch.QTH.CountryID = 'K') or (exch.QTH.CountryID = 'VE') then
+               begin
+               exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + tempState;
+               end
+            else
+               begin
+               exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + IntToStr(exch.NumberReceived);
+               end;
+            exch.ExchString := exch.QTHString;
+            end;
          ARRLSSCW, ARRLSSSSB:      // 4.105.2
           exch.DomesticQTH := tempARRL_Sect;
          CWOPS:

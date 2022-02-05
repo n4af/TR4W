@@ -545,6 +545,7 @@ begin
               if ParseADIFRecord(adif, TempRXData) then
                 // processed a record if true
               begin
+                 logger.Debug('[uWSJTX] QTHString is %s',[TempRXData.QTHString]);
                 ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
 
                 if DoingDXMults then
