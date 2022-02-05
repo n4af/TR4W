@@ -6667,7 +6667,7 @@ begin
                exch.QTHString := gridSquare;
                exch.DomesticQTH := gridSquare;
                end;
-         ARRL160, UBACW, UBASSB:          // 4.106.7
+         ARRL160, CQ160CW, CQ160SSB, UBACW, UBASSB:          // 4.106.7
           begin
            exch.DomesticQTH := tempSRX_String;
           end;

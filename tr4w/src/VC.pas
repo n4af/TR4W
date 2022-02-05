@@ -144,20 +144,20 @@ const
   ICOM_LONG_MODECOMMAND                 = True ;
 
 const
-       LANG                                  = 'ENG';
+        LANG                                  = 'ENG';
 //       LANG                                  = 'RUS';
 //       LANG                                  = 'MNG';
-//       LANG                                  = 'POL';
 //       LANG                                  = 'CZE';
+//       LANG                                  = 'SER';
 //       LANG                                  = 'ROM';
 //       LANG                                  = 'GER';
 
 // not implemented
 
-//       LANG                                  = 'SER';
+
 //       LANG                                  = 'ESP';
 //       LANG                                  = 'CHN';
-
+//       LANG                                  = 'POL';
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
 {$IF LANG = 'RUS'}{$INCLUDE lang\tr4w_consts_rus.pas} {$IFEND}
 {$IF LANG = 'SER'}{$INCLUDE lang\tr4w_consts_ser.pas}{$IFEND}
