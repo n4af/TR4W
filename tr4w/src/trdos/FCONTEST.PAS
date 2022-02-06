@@ -374,6 +374,7 @@ begin
         SearchAndPounceExchange := MyFDClass + ' ' + MySection;
         QSLMessage := '73 \ FD';
         AddARRLSectionDomesticCountries;
+        LiteralDomesticQTH := True;
       end;
 
     JIDXSSB, JIDXCW:
