@@ -480,6 +480,7 @@ const
     ({Name: 'TS990';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS2000';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'FT100';      } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $02; LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $05; DIGU: $05; rt: rtYaesu1),
+    ({Name: 'FTDX101';    } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu3),
     ({Name: 'FT450';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
     ({Name: 'FT736R';     } BR:BR4800;  P: 0; C: 0; S: 0; T:0; RA: $00; SW: 0; SFOC: $01; SMOC: $07; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $02; LSB: $00; USB: $01; FM: $08; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu1),
     ({Name: 'FT747GX';    } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $05; DIGL: $00; DIGU: $00; rt: rtYaesu1),
@@ -569,6 +570,7 @@ const
       'TS990',
       'TS2000',
       'FT100',
+      'FTDX101',
       'FT450',
       'FT736R',
       'FT747GX',
@@ -906,7 +908,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, FLEX, K2, K3, K4, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
+      TS950, TS990, TS2000, FLEX, K2, K3, K4, FTDX101, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
       FTDX5000, FTDX9000:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RC;');
@@ -1814,7 +1816,7 @@ begin
          begin
          ActiveRadioPtr.WriteToCATPort('ST1;', 4);
          end;
-      FT991:
+      FTDX101, FT991:
          begin
          ActiveRadioPtr.WriteToCATPort('FT3;', 4);
          end;
@@ -1874,7 +1876,7 @@ begin
          begin
           ActiveRadioPtr.WriteToCATPort('ST0;', 4);
          end;
-      FT991:
+      FTDX101, FT991:
          begin
          ActiveRadioPtr.WriteToCATPort('FT2;', 4);
          end;
@@ -2887,7 +2889,7 @@ begin
             end;
 
          rtYaesu2,
-         rtYaesu3:        // FT991 FT891
+         rtYaesu3:        // FTDX101 FT991 FT891
             begin
             if RadioParametersArray[RadioModel].rt = rtYaesu3 then  //ny4i Issue 218 - Only change to this command if the freq is 9 bytes long.
                begin
@@ -3579,7 +3581,7 @@ begin
             end;
          end;
 
-      FT450, FT950, FT891, FT991, FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000:    // Added FT891 ny4i Issue218
+      FTDX101, FT450, FT950, FT891, FT991, FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000:    // Added FT891 ny4i Issue218
          begin
          if PTTOn then
             begin
@@ -3699,7 +3701,7 @@ begin
                             IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
-      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FT450, FT891, FT950, FT991,
+      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX101, FT450, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
       IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120

@@ -2813,6 +2813,7 @@ begin
             #9 + '<snt>' + Format('%d',[RxData.RSTSent]) + '</snt>' + sLineBreak +
             #9 + '<sntnr>' + Format('%d',[RxData.NumberSent]) + '</sntnr>' + sLineBreak +
             #9 + '<rcv>' + Format('%d',[RxData.RSTReceived]) + '</rcv>' + sLineBreak +
+
             #9 + '<rcvnr>' + Format('%d',[nNumberReceived]) + '</rcvnr>' + sLineBreak +
             #9 + '<gridsquare></gridsquare>' + sLineBreak +
             #9 + '<exchange1>' + RXData.ExchString + '</exchange1>' + sLineBreak +

@@ -2272,7 +2272,7 @@ begin
       TempVFO := rig.CurrentStatus.VFO[VFOA];
       rig^.CurrentStatus.VFOStatus := VFOA;
 
-      if rig.RadioModel = FT991 then
+      if rig.RadioModel in [FTDX101, FT991] then
          begin
          rig.WritePollRequest('FT;', 3);         // This retreives which VFO is different, then we are in split.
          if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $494F) }) then
@@ -2946,7 +2946,7 @@ begin
          pFT100(rig);
       FT450, FT950, FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000:
          pFTDX9000(rig);
-      FT891, FT991:
+      FTDX101, FT891, FT991:
          pFT891_FT991(rig); // ny4i Issue218 9 byte frequency
       IC78..IC9700, OMNI6:
          pIcomNew(rig);
