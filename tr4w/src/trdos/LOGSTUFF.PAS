@@ -1435,7 +1435,10 @@ begin
     Windows.ZeroMemory(@RXData.QTHString, SizeOf(RXData.QTHString));
 
     ParseExchange(Exchange, Str10(RXData.ceClass), TempString, TempString2);
-    if RxData.QTH.Continent in [NorthAmerica, SouthAmerica] then
+    // It used to be that only IARu Region 2 send a class butr the current ARRL FD rules simpl;y
+    // state the following:
+    //  DX stations send operating class and the term DX (i.e. 2A DX).
+    if true {RxData.QTH.Continent in [NorthAmerica, SouthAmerica] }then
       // If IARU Region 2 then we get class (most likely 1D if they are home).
     begin
       isClassValid := ValidClass(RxData.ceClass);
