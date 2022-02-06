@@ -2804,7 +2804,7 @@ begin
             #9 + '<rxfreq>' + Format('%d',[freq div 10]) + '</rxfreq>' + sLineBreak + // 1420100
             #9 + '<txfreq>' + Format('%d',[txFreq div 10]) + '</txfreq>' + sLineBreak +
             #9 + '<operator>' + RXData.ceOperator + '</operator>' + sLineBreak +
-            #9 + '<mode>' + ExtendedModeStringArray[RXData.ExtMode] + '</mode>' + sLineBreak +
+            #9 + '<mode>' + sMode + '</mode>' + sLineBreak +
             #9 + '<call>' + RXData.Callsign + '</call>' + sLineBreak +
             #9 + '<countryprefix>' + RxData.QTH.CountryID + '</countryprefix>' + sLineBreak +
             #9 + '<wpxprefix>' + RxData.QTH.Prefix + '</wpxprefix>' + sLineBreak +
