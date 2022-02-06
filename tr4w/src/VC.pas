@@ -965,6 +965,7 @@ type
     TS990,
     TS2000,
     FT100,
+    FTDX10,
     FTDX101,
     FT450,
     FT736R,

@@ -404,7 +404,7 @@ const
       ('OFF', 'ON', 'CW', 'PTT');
 
 type
-   RigType = (rtUnknown, rtICOM, rtKenwood, rtYaesu1, rtYaesu2, rtYaesu3, rtJST, rtOrion);
+   RigType = (rtUnknown, rtICOM, rtKenwood, rtYaesu1, rtYaesu2, rtYaesu3, rtYaesu4, rtJST, rtOrion);
 
    BaudRateType = (BR1200, BR2400, BR4800, BR9600, BR19200, BR38400, BR57600, BR115200);
 {
@@ -480,7 +480,8 @@ const
     ({Name: 'TS990';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS2000';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'FT100';      } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $02; LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $05; DIGU: $05; rt: rtYaesu1),
-    ({Name: 'FTDX101';    } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu3),
+    ({Name: 'FTDX10';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu4),
+    ({Name: 'FTDX101';    } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu4),
     ({Name: 'FT450';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
     ({Name: 'FT736R';     } BR:BR4800;  P: 0; C: 0; S: 0; T:0; RA: $00; SW: 0; SFOC: $01; SMOC: $07; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $02; LSB: $00; USB: $01; FM: $08; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu1),
     ({Name: 'FT747GX';    } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $05; DIGL: $00; DIGU: $00; rt: rtYaesu1),
@@ -571,6 +572,7 @@ const
       'TS990',
       'TS2000',
       'FT100',
+      'FTDX10',
       'FTDX101',
       'FT450',
       'FT736R',
@@ -911,7 +913,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, FLEX, K2, K3, K4, FTDX101, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
+      TS950, TS990, TS2000, FLEX, K2, K3, K4, FTDX10, FTDX101, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
       FTDX5000, FTDX9000:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RC;');
@@ -1081,7 +1083,7 @@ begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('UP;', 3);
          end;
 
-      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3, K4:
+      FTDX10, FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3, K4:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('UP;');
          end;
@@ -1819,7 +1821,7 @@ begin
          begin
          ActiveRadioPtr.WriteToCATPort('ST1;', 4);
          end;
-      FTDX101, FT991:
+      FTDX10, FTDX101, FT991:
          begin
          ActiveRadioPtr.WriteToCATPort('FT3;', 4);
          end;
@@ -1879,7 +1881,7 @@ begin
          begin
           ActiveRadioPtr.WriteToCATPort('ST0;', 4);
          end;
-      FTDX101, FT991:
+      FTDX10, FTDX101, FT991:
          begin
          ActiveRadioPtr.WriteToCATPort('FT2;', 4);
          end;
@@ -2594,7 +2596,8 @@ begin
          case RadioParametersArray[RadioModel].rt of
          rtKenwood: AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
          rtYaesu2,
-         rtYaesu3:  AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+         rtYaesu3,
+         rtYaesu4:  AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
          rtIcom: logger.Warn('Startup command not yet implemented for Icom');
          //rtOrion: WriteToCATPort(addr(Self.StartupCommand[1]), length(Self.StartupCommand));
          else
@@ -2634,7 +2637,8 @@ begin
          AddToOutputBuffer {WriteToCATPort}(tKenwood14Bytes, 6);
          end;
       rtYaesu2,
-      rtYaesu3:  // Yaesu1 does not support this command
+      rtYaesu3,
+      rtYaesu4:  // Yaesu1 does not support this command
          begin
          Format(@tKenwood14Bytes, 'KS%003u;', speed);
          AddToOutputBuffer(tKenwood14Bytes, 6);
@@ -2892,9 +2896,10 @@ begin
             end;
 
          rtYaesu2,
-         rtYaesu3:        // FTDX101 FT991 FT891
+         rtYaesu3,
+         rtYaesu4:        // FTDX101 FT991 FT891
             begin
-            if RadioParametersArray[RadioModel].rt = rtYaesu3 then  //ny4i Issue 218 - Only change to this command if the freq is 9 bytes long.
+            if RadioParametersArray[RadioModel].rt in [rtYaesu3, rtYaesu4] then  //ny4i Issue 218 - Only change to this command if the freq is 9 bytes long.
                begin
                if VFO = 'B' then
                   begin
