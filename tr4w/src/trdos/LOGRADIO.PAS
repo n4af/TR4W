@@ -38,7 +38,9 @@ uses
    VC,
    Windows,
    utils_text,
-   ExtCtrls;
+   ExtCtrls,
+   uNetRadioBase,
+   uRadioElecraftK4;
 
 var
    Icom_Filter_Width: integer;     // n4af 4.43.4
@@ -71,6 +73,8 @@ const
    ICOM_GET_EXTENDEDVFO = #$25;
    ICOM_GET_EXTENDEDMODE = #$26;
    //ICOM_SET_RIT_FREQ   =
+   ICOM_STATE            = #$1A;
+   ICOM_STATE_DATA_MODE  = #$06;
 
    ICOM_SET_VFO_A_COMMAND = #$00;
    ICOM_SET_VFO_B_COMMAND = #$01;
@@ -162,7 +166,7 @@ type
       SpeedMemory:       integer;
       BandMemory:        BandType;
       ModeMemory:        ModeType;
-
+      tNetObject:        TK4Radio;
       FreqWindowHandle: HWND;
       RadioName:        Str20;
       StartupCommand  : Str50;
@@ -212,6 +216,7 @@ type
       WideCWFilter:    boolean;
       IcomFilterByte:  byte;
       IDCharacter:     char;
+      IPAddress:       str50;
       CWByCATBuffer:   string;                  // ny4i 4.44.5
       //    PartialRadioResponse: string;
       PollingEnable:   boolean;
@@ -223,6 +228,7 @@ type
       RadioNumberBits: integer;
       RadioStopBits:   integer;
       RadioParity:     ParityType;
+      RadioTCPPort:    integer;
       RadioTimeout:    integer;
       ReceiverAddress: integer; { Used for Icom interfaces }
       WaitingForCommandPause: boolean;
@@ -254,6 +260,8 @@ type
       tOrionFreq:   array[0..15] of char;
       tOrionMode:   array[0..07] of char;
       CommandPause: integer;
+      saveMode : integer;
+      nextExtendedMode : ExtendedModeType;
       tmrCWByCAT: TTimer;
       EventHandlers : TEventHandlers;
       procedure AddCommandToBuffer;
@@ -269,11 +277,14 @@ type
       procedure SendIcomExtendedMode(bVFO: boolean);
       procedure SendRITStatusCommand;
       procedure SendRITFreqCommand;
+      procedure GetIcomDataStateCommand;
       procedure SetICOMRITFrequency(hz: integer);
+      procedure ProcessIcomMode(mode: integer);
       procedure SendIcomClearRITCommand;
       function CalculateIcomFilterWidth: integer;
       procedure SetRadioCWSpeed(speed: longint);
-      procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
+      procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char); overload;
+      procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char; extendedMode: ExtendedModeType); overload;
       procedure SendCW(Msg: Str160);
       procedure SetUpRadioInterface;
       procedure StopSendingCW;
@@ -453,6 +464,7 @@ const
     ({Name: 'NONE';       } BR:BR4800;  P: 1; C: 0; S: 0; T:0; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00),
     ({Name: 'K2';         } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'K3';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
+    ({Name: 'K4';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'FLEX';       } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),     // 4.87.2
     ({Name: 'TS140';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS440';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
@@ -541,6 +553,7 @@ const
       'NONE',
       'K2',
       'K3',
+      'K4',
       'FLEX',
       'TS440',
       'TS450',
@@ -681,6 +694,7 @@ const
 
 function IntegerToBCD(Value: DWORD): integer; // ny4i  // 4.44.5
 function Integer4ToBCD(Value: DWORD): integer; // ny4i  // 4.44.5
+function ModeTypeToNetMode(mode: ModeType): TRadioMode;
 procedure InitRadios;
 function OpenCATDebugFile(port: PortType): boolean;
 //procedure CloseCATDebugFile(port: PortType);
@@ -702,6 +716,7 @@ function GenerateStatusString(var StatusRecord: RadioStatusRecord): Str80;
 procedure PutRadioIntoSplit(Radio: RadioType);
 procedure PutRadioOutOfSplit(Radio: RadioType);
 procedure SetRadioFreq(Radio: RadioType; Freq: longint; Mode: ModeType; VFO: char);
+
 
 { These work on the ActiveRadio }
 
@@ -807,6 +822,25 @@ begin
       end;
 end;//Integer4ToBCD
 
+function ModeTypeToNetMode(mode: ModeType): TRadioMode; // TRadioMode is the Network mode type
+begin
+{Type TRadioMode = (rmNone,rmCW, rmCWRev, rmLSB, rmUSB, rmFM, rmAM,
+                   rmData, rmDataRev, rmFSK, rmFSKRev, rmPSK, rmPSKRev,
+                   rmAFSK, rmAFSKRev);
+                   }
+   case mode of
+      CW: Result := rmCW;
+      Digital: Result := rmData;
+      Phone: Result := rmUSB;
+      FM: Result := rmFM;
+   end;
+ //  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
+           //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
+  //ExtendedRadioModeType = (rNoMode, rCW, rLSB, rUSB, rAM, rFM, rRTTY, rRTTY_R, rAFSK, rDATA_U, rDATA_L, rDIGITAL, rCW_R);
+
+
+end;
+
 
 function BufToStr(var buf; bufSize: integer): string;
 begin
@@ -841,8 +875,24 @@ procedure RITClear;
 var
    IntRadioType: InterfacedRadioType;
 //   SerialPort: PortType;
+   netRadio: TNetRadioBase;
 
 begin
+   //netRadio := GetNetRadioObject(Radio1);
+   if Radio1.tNetObject <> nil then
+      begin
+      case Radio1.RadioModel of
+         K4: netRadio := TK4Radio(Radio1.tNetObject);
+         else
+            begin
+            logger.Error('tNetObject is not supported by a Network connection %s',[Radio1.RadioName]);
+            Exit;
+            end;
+         end; // of case
+      netRadio.RITClear(nrVFOA);
+      Exit;
+      end;
+
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
@@ -856,7 +906,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, FLEX, K2, K3, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
+      TS950, TS990, TS2000, FLEX, K2, K3, K4, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
       FTDX5000, FTDX9000:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RC;');
@@ -913,7 +963,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, K2, K3 {, FTDX9000}:
+      TS950, TS990, TS2000, K2, K3, K4 {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RU;');
          end;
@@ -967,7 +1017,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, K2, K3 {, FTDX9000}:
+      TS950, TS990, TS2000, K2, K3, K4 {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RD;');
          end;
@@ -1026,7 +1076,7 @@ begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('UP;', 3);
          end;
 
-      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3:
+      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3, K4:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('UP;');
          end;
@@ -1093,7 +1143,7 @@ begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('DN;', 3);
          end;
 
-      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3:
+      FT450, FT891, FT991, FT950, FT2000, FTDX9000, K2, K3, K4:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('DN;');
          end;
@@ -1364,6 +1414,7 @@ begin
 {$IFEND}
 end;
 
+{ The initializtion of BeginPolling is in this procedure so if we are not using serial ports, it has to be setup somewhere else.}
 procedure RadioObject.CheckAndInitializeSerialPorts_ForThisRadio;
 begin
    if RadioModel = NoInterfacedRadio then
@@ -1380,7 +1431,8 @@ begin
       end;
    SetUpRadioInterface;
 
-   if tCATPortHandle <> INVALID_HANDLE_VALUE then
+   if (tCATPortHandle <> INVALID_HANDLE_VALUE) or
+      (Self.tNetObject <> nil)                 then
       begin
       if PollingEnable then
          begin
@@ -1526,6 +1578,18 @@ begin
    WriteToCATPort(tIcom7Bytes, 7);
 end; // SendXMITStatusCommand;
  //------------------------------------------------------------------------------
+ procedure RadioObject.GetIcomDataStateCommand;
+begin
+   tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[1] := Ord(ICOM_PREAMBLE_CODE);
+   tIcom7Bytes[2] := ReceiverAddress;
+   tIcom7Bytes[3] := Ord(ICOM_CONTROLLER_ADDRESS);
+   tIcom7Bytes[4] := Ord(ICOM_STATE);
+   tIcom7Bytes[5] := (Ord(ICOM_STATE_DATA_MODE));
+   tIcom7Bytes[6] := Ord(ICOM_END_OF_MESSAGE_CODE);
+   WriteToCATPort(tIcom7Bytes, 7);
+end; // GetDatyaStateCommand;
+//---------------------------------------------------------------------------
  procedure RadioObject.SendRITStatusCommand;
 begin
    tIcom7Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
@@ -1587,6 +1651,75 @@ begin
    }
 end;
 
+procedure RadioObject.ProcessIcomMode(mode: integer);
+begin
+   case mode of
+   0:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eLSB;
+      end;
+   1:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eUSB;
+      end;
+   2:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eAM;
+      end;
+   3:
+      begin
+      Self.CurrentStatus.Mode := CW;
+      Self.CurrentStatus.ExtendedMode := eCW;
+      end;
+   4:
+      begin
+      Self.CurrentStatus.Mode := Digital;
+      Self.CurrentStatus.ExtendedMode := eRTTY;
+      end;
+   5:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eFM;
+      end;
+   6:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eWFM;
+      end;
+   7:
+      begin
+      Self.CurrentStatus.Mode := CW;
+      Self.CurrentStatus.ExtendedMode := eCW_R;
+      end;
+   8:
+      begin
+      Self.CurrentStatus.Mode := Digital;
+      Self.CurrentStatus.ExtendedMode := eRTTY_R;
+      end;
+   12:
+      begin
+      Self.CurrentStatus.Mode := Digital;
+      Self.CurrentStatus.ExtendedMode := ePSK31;
+      end;
+   13:
+      begin
+      Self.CurrentStatus.Mode := Digital;
+      Self.CurrentStatus.ExtendedMode := ePSK_R;
+      end;
+   17:
+      begin
+      Self.CurrentStatus.Mode := Phone;
+      Self.CurrentStatus.ExtendedMode := eDSTAR;
+      end;
+   else
+      DEBUGMSG('Unknown Mode command from Icom ' + IntToStr(mode));
+   end;
+end;
+
+
 procedure RadioObject.SendIcomClearRITCommand;
 begin
    tIcom11Bytes[0] := Ord(ICOM_PREAMBLE_CODE);
@@ -1631,9 +1764,17 @@ procedure RadioObject.PutRadioIntoSplit;
 
 begin
    //TLogger.GetInstance.Debug(Format('      In PutRadioIntoSplit: %s',[RadioName]));
+   if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.Split(true);
+      Exit;
+      end;
+
+
+
    case RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
-      TS2000, FLEX, K2, K3:
+      TS2000, FLEX, K2, K3, K4:
          begin
          AddToOutputBuffer('FR0;FT1;', 8);
 
@@ -1690,9 +1831,15 @@ procedure RadioObject.PutRadioOutOfSplit;
 
 begin
    //TLogger.GetInstance.Debug(Format('      In PutRadioOutOfSplit: %s',[RadioName]));
+      if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.Split(false);
+      Exit;
+      end;
+
    case RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
-      TS2000, FLEX, K2, K3:
+      TS2000, FLEX, K2, K3, K4:
          begin
          //ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('FR0;FT0;', 8);
          AddToOutputBuffer('FR0;FT0;', 8);
@@ -1937,6 +2084,13 @@ begin
       end;
    // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
+
+   if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.SendCW(msg);
+      Exit;
+      end;
+
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
@@ -1961,7 +2115,7 @@ begin
             end
          else if Msg = '!' then   // SN
             begin
-            if not (RadioModel in [K2, K3]) then   // No SN on Elecraft
+            if not (RadioModel in [K2, K3, K4]) then   // No SN on Elecraft
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '%';
                end;
@@ -1969,7 +2123,7 @@ begin
             end
          {else if Msg = '&' then // AS      // & is really MYSTATE but documented as AS
             begin
-            if RadioModel in [K2, K3] then
+            if RadioModel in [K2, K3, K4] then
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '%'; //Elecraft AS
                end
@@ -1981,7 +2135,7 @@ begin
             end}
          else if Msg = '+' then // AR
             begin
-            if RadioModel in [K2, K3] then
+            if RadioModel in [K2, K3, K4] then
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '+'; //Elecraft AR
                end
@@ -1993,7 +2147,7 @@ begin
             end
          else if Msg = '<' then // SK
             begin
-            if RadioModel in [K2, K3] then
+            if RadioModel in [K2, K3, K4] then
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '*'; //Elecraft SK
                end
@@ -2005,7 +2159,7 @@ begin
             end
          else if Msg = '=' then // BT
             begin
-            if RadioModel in [K2, K3] then
+            if RadioModel in [K2, K3, K4] then
                begin
                Self.CWByCATBuffer := Self.CWByCATBuffer + '='; //Elecraft BT
                end
@@ -2028,7 +2182,7 @@ begin
                   maxLen := 24;
                   pad := true;
                   end;
-               K2, K3:
+               K2, K3, K4:
                   begin
                   maxLen := 22; //28;
                   pad := false;
@@ -2228,6 +2382,11 @@ procedure RadioObject.StopSendingCW;
 
 //   localMsg: string;
 begin
+   if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.SendCW('');   // Empty string stops sending
+      Exit;
+      end;
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
@@ -2237,7 +2396,7 @@ begin
                begin
                AddToOutputBuffer('KY @;RX;', 8);   // Stops the K2 // ny4i Issue 157
                end;
-            K3:
+            K3, K4:
                begin
               AddToOutputBuffer('KY ' + Chr(4) + ';RX;', 8); // Chr(4) stops the K3 // ny4i Issue 157
                end;
@@ -2309,7 +2468,7 @@ begin
          dwFlagsAndAttributes := FILE_FLAG_OVERLAPPED;
          EvtChar := #13;
          end;
-      if RadioModel in [KenwoodRadios, K2, K3] then
+      if RadioModel in [KenwoodRadios, K2, K3, K4] then
          begin
          dwFlagsAndAttributes := FILE_FLAG_OVERLAPPED;
          EvtChar := ';';
@@ -2335,7 +2494,7 @@ begin
       FreeMem(TimeoutBuffer, sizeof(COMMTIMEOUTS));
 {$IF MASKEVENT}
 
-      if RadioModel in [KenwoodRadios, K2, K3, Orion] then
+      if RadioModel in [KenwoodRadios, K2, K3, K4, Orion] then
          begin
          if SetCommMask(hand, EV_RXFLAG) then
             begin
@@ -2370,6 +2529,21 @@ begin
          //      OpenCATDebugFile(tCATPortType);
          end;
 
+      end
+   else if tCATPortType = Network then
+      begin
+      Self.tNetObject := TK4Radio.Create;    // TODO: First this to use some sort of factory so we instantiate the right radio class type (THamLib, TFlex6000, TOmniRig, etc.)
+      if length(Self.IPAddress) > 0 then
+         begin
+         tNetObject.radioAddress := Self.IPAddress;
+         tNetObject.radioPort := Self.RadioTCPPort;
+         tNetObject.Connect;
+         end
+      else
+         begin
+         logger.error('[RadioObject.SetUpRadioInterface] Radio IP address is not set for a radio type of TCP/IP');
+         Exit;
+         end;
       end;
 
    { Initialize the radio variables }
@@ -2406,14 +2580,21 @@ begin
    logger.debug('[RadioObject.SetUpRadioInterface] Startup command length = %d, startup command = %s',[length(Self.StartupCommand),Self.StartupCommand]);
    if length(Self.StartupCommand) > 0 then
       begin
-      case RadioParametersArray[RadioModel].rt of
-      rtKenwood: AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
-      rtYaesu2,
-      rtYaesu3:  AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
-      rtIcom: logger.Warn('Startup command not yet implemented for Icom');
-      //rtOrion: WriteToCATPort(addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+      if Self.tNetObject <> nil then
+         begin
+         TK4Radio(Self.tNetObject).SendToRadio(Self.StartupCommand);
+         end
       else
          begin
+         case RadioParametersArray[RadioModel].rt of
+         rtKenwood: AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+         rtYaesu2,
+         rtYaesu3:  AddToOutputBuffer (addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+         rtIcom: logger.Warn('Startup command not yet implemented for Icom');
+         //rtOrion: WriteToCATPort(addr(Self.StartupCommand[1]), length(Self.StartupCommand));
+         else
+            begin
+            end;
          end;
       end;
       end;
@@ -2431,6 +2612,12 @@ begin
       begin
       DebugMsg('Current radio model does not support CWSpeedSync');
       exit;
+      end;
+
+   if Self.tNetObject <> nil then
+      begin
+      Self.tNetObject.SetCWSpeed(speed);
+      Exit;
       end;
 
    case RadioParametersArray[RadioModel].rt of
@@ -2489,6 +2676,12 @@ begin
       end;
 end;
 //------------------------------------------------------------------------------
+procedure RadioObject.SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char; extendedMode: ExtendedModeType);
+begin
+   Self.nextExtendedMode := extendedMode;
+   Self.SetRadioFreq(Freq, Mode, VFO);
+end;
+
 procedure RadioObject.SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
 
 var
@@ -2503,11 +2696,53 @@ var
 //   p: PChar;
    tempFilterWidth: integer;
    skipMode : boolean;
+   bStateDataModeRequired : boolean;
+   tNetMode: TRadioMode;
 const
    FT847ModeString = CHR(0) + CHR(0) + CHR(0) + CHR(7);
 
 begin
    logger.debug('[SetRadioFreq] set frequency to %u',[freq]);
+
+   if Self.tNetObject <> nil then
+      begin
+      if VFO = 'B' then
+         begin
+         Self.tNetObject.SetFrequency(freq,nrVFOB);
+         tNetMode := ModeTypeToNetMode(mode);
+         if tNetMode in [rmLSB,rmUSB] then
+            begin
+            if freq < 8000000 then
+               begin
+               tNetMode := rmLSB;
+               end
+            else
+               begin
+               tNetMode := rmUSB;
+               end;
+            end;
+         Self.tNetObject.SetMode(tNetmode,nrVFOB);
+         end
+      else
+         begin
+         Self.tNetObject.SetFrequency(freq,nrVFOA);
+         tNetMode := ModeTypeToNetMode(mode);
+         if tNetMode in [rmLSB,rmUSB] then
+            begin
+            if freq < 8000000 then
+               begin
+               tNetMode := rmLSB;
+               end
+            else
+               begin
+               tNetMode := rmUSB;
+               end;
+            end;
+         Self.tNetObject.SetMode(tNetmode,nrVFOA);
+         end;
+      Exit;
+      end;
+
    skipMode := false;
       try
       case RadioParametersArray[RadioModel].rt of
@@ -2784,7 +3019,9 @@ begin
             // TLogger.GetInstance.Debug('Leaving Kenwood code');
             end;
          end;
-
+      (*************************************************************************
+           I C O M        I C O M       I C O M      I C O M     I C O M
+       ************************************************************************)
       case RadioModel of
       (* Older Icom radios could not directly change VFO B. The code had to make VFO B active and then change things.
          This is now different for radios that support VFOB. IcomRadiosThatSupportVFOB is a radio group that supports this command.
@@ -2833,7 +3070,22 @@ begin
                end
             else if Mode = Digital then
                begin
-               TempChar := #4;
+               if nextExtendedMode <> eNoMode then
+                  begin
+                  if nextExtendedMode = eRTTY then
+                     begin
+                     TempChar := #4;
+                     end
+                  else if RadioModel in IcomRadiosThatSupportPSKMode then
+                     begin
+                     TempChar := #12; // PSK
+                     end
+                  else // all others
+                     begin
+                     TempChar := #1; // USB for Icom
+                     bStateDataModeRequired := true;
+                     end;
+                  end;
                end
             else
                begin      //must be phone
@@ -2976,7 +3228,23 @@ begin
                         CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
                         end;
                      AddCommandToBuffer;
+
+                     if bStateDataModeRequired then
+                        begin
+                        CommandsTempBuffer[0]  := CHR(9);
+                        CommandsTempBuffer[1]  := ICOM_PREAMBLE_CODE;
+                        CommandsTempBuffer[2]  := ICOM_PREAMBLE_CODE;
+                        CommandsTempBuffer[3]  := CHR(ReceiverAddress);
+                        CommandsTempBuffer[4]  := ICOM_CONTROLLER_ADDRESS;
+                        CommandsTempBuffer[5]  := ICOM_STATE;
+                        CommandsTempBuffer[6]  := ICOM_STATE_DATA_MODE;
+                        CommandsTempBuffer[7]  := CHR(1);
+                        CommandsTempBuffer[8]  := ICOM_END_OF_MESSAGE_CODE;
+                        AddCommandToBuffer;
+                        bStateDataModeRequired := false;
+                        end;
                      end; // if not skipMode
+
 
                   CommandsTempBuffer[0]  := CHR(12);
                   CommandsTempBuffer[1]  := ICOM_PREAMBLE_CODE;
@@ -3243,6 +3511,7 @@ function tPTTVIACAT(PTTOn: boolean): boolean;
 
 var
    IntRadioType: InterfacedRadioType;
+   ro: TK4Radio;
 //   SerialPort: PortType;
    TempString: Str80;
    WaitAnswer: cardinal;
@@ -3273,25 +3542,39 @@ begin
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
+      ro := Radio1.tNetObject;
 //      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
       IntRadioType := Radio2.RadioModel;
+      ro := Radio2.tNetObject;
  //     SerialPort := Radio2.tCATPortType;
       end;
-
+   if ro <> nil then
+      begin
+      if PTTOn then
+         begin
+         ro.Transmit;
+         end
+      else
+         begin
+         ro.Receive;
+         end;
+      Result := true;
+      Exit;
+      end;
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
-      TS2000, FLEX, K2, K3:
+      TS2000, FLEX, K2, K3, K4:
          begin
          if PTTOn then
             begin
             TempString := 'TX;';
-            DEBUGMSG('Setting Kenwood/Flex/K3 to TX mode');
+            DEBUGMSG('Setting Kenwood/Flex/K3/K4 to TX mode');
             end else
             begin
-            DEBUGMSG('Setting Kenwood/Flex/K3 to RX mode');
+            DEBUGMSG('Setting Kenwood/Flex/K3/K4 to RX mode');
             TempString := 'RX;';
             end;
          end;
@@ -3411,18 +3694,18 @@ var
 const
    ra: array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
-   RadioSupportsCWByCAT := [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000,
+   RadioSupportsCWByCAT := [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000,
                             FLEX, IC705, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
                             IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
-      [TS850, K2, K3, TS480, TS570, TS590, TS990, TS2000, FLEX, FT450, FT891, FT950, FT991,
+      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FT450, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
       IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
    IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
    IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
-   //IcomRadiosThatSupportPSKMode := [IC7610];
+   IcomRadiosThatSupportPSKMode := [IC7600, IC7610];
    ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];

@@ -92,7 +92,6 @@ begin
 
         for I2 := 122 to 123 do
         begin
-
           tCB_ADDSTRING(hwnddlg, I2, 'NONE');
           for i := 1 to 20 do
           begin
@@ -101,7 +100,8 @@ begin
           end;
 
         end;
-
+       // Format(@TempBuffer1, 'TCP/IP');
+        tCB_AddSTRING_PCHAR(hwnddlg,122,'TCP/IP');
         for i := 1 to 3 do
           begin
             Format(@TempBuffer1, 'PARALLEL %u',i);
@@ -120,11 +120,11 @@ begin
         for BRT := BR1200 to BR115200 do
           tCB_ADDSTRING_PCHAR(hwnddlg, 128, inttopchar(CAT_BAUDRATE_ARRAY[integer(BRT)]));
 
-        for i := 101 to 109 do
+        for i := 101 to 111 do
         begin
           tCB_SETCURSEL(hwnddlg, i + 20, 0);
           Windows.GetDlgItemText(hwnddlg, i, TempBuffer1, SizeOf(TempBuffer1));
-          Format(wsprintfBuffer, '%s%s', TempPchar, TempBuffer1);
+          Format(wsprintfBuffer, '%s%s', TempPchar, TempBuffer1);         // This prepends RADIO ONE or RADIO TWO.
           if i = 103 then
             Format(wsprintfBuffer, 'KEYER %s%s', TempPchar, TempBuffer1);
           Windows.SetDlgItemText(hwnddlg, i, wsprintfBuffer);
@@ -138,6 +138,22 @@ begin
 
         {cat port}
         tCB_SETCURSEL(hwnddlg, 122, Ord(CATWTR^.tCATPortType));
+        if (CATWTR^.tCATPortType = NETWORK) then
+           begin
+           EnableWindowTrue(hwnddlg, 130);
+           EnableWindowTrue(hwnddlg, 131);
+           EnableWindowFalse(hwnddlg, 124);
+           EnableWindowFalse(hwnddlg, 125);
+           EnableWindowFalse(hwnddlg, 128);
+           end
+        else
+           begin
+           EnableWindowTrue(hwnddlg, 124);
+           EnableWindowTrue(hwnddlg, 125);
+           EnableWindowTrue(hwnddlg, 128);
+           EnableWindowFalse(hwnddlg, 130);
+           EnableWindowFalse(hwnddlg, 131);
+           end;
 
         {keyer_rts}
         tCB_SETCURSEL(hwnddlg, 126, Ord(CATWTR^.tr4w_keyer_rts_state) - 1);
@@ -159,6 +175,8 @@ begin
 //        Windows.SetDlgItemInt(hwnddlg, 129, TempRadio^.FrequencyAdder, False);
         Windows.SetDlgItemText(hwnddlg, 129, PChar(string(CATWTR^.RadioName)));
 
+        Windows.SetDlgItemText(hwnddlg, 130, PChar(string(CATWTR^.IPAddress)));
+        Windows.SetDlgItemInt(hwnddlg, 131, CATWTR^.RadioTCPPort, False);
         EnableWindowFalse(hwnddlg, 117);
         EnableWindowFalse(hwnddlg, 118);
       end;
@@ -170,7 +188,26 @@ begin
           then
         begin
           ButtonsEnable;
-
+          if LoWord(wParam) = 122 then   // 122 is port type (serial, network, etc).
+             begin
+             i := tCB_GETCURSEL(hwnddlg, 122);
+             if i = 21 then     // Network
+                begin
+                EnableWindowTrue(hwnddlg, 130);
+                EnableWindowTrue(hwnddlg, 131);
+                EnableWindowFalse(hwnddlg,124);
+                EnableWindowFalse(hwnddlg,125);
+                EnableWindowFalse(hwnddlg,128);
+                end
+             else
+                begin
+                EnableWindowTrue(hwnddlg, 124);
+                EnableWindowTrue(hwnddlg, 125);
+                EnableWindowTrue(hwnddlg, 128);
+                EnableWindowFalse(hwnddlg,130);
+                EnableWindowFalse(hwnddlg,131);
+               end;
+             end;
           if LoWord(wParam) = 121 then
           begin
             i := tCB_GETCURSEL(hwnddlg, 121);
@@ -202,6 +239,7 @@ begin
           116:
 
             begin
+            
               for i := 121 to 128 do tCB_SETCURSEL(hwnddlg, i, 0);
               tCB_SETCURSEL(hwnddlg, 128, 2);
               tCB_SETCURSEL(hwnddlg, 126, 3);
@@ -220,11 +258,20 @@ begin
   IcomResponseTimeout := 0;
   {Close CAT Port}
   if CATWTR^.tCATPortType in [Serial1..Serial20] then
-    if CPUKeyer.SerialPortConfigured_Handle[CATWTR^.tCATPortType] <> INVALID_HANDLE_VALUE then
-    begin
-      Windows.CloseHandle(CPUKeyer.SerialPortConfigured_Handle[CATWTR^.tCATPortType]);
-      CPUKeyer.SerialPortConfigured_Handle[CATWTR^.tCATPortType] := INVALID_HANDLE_VALUE;
-    end;
+     begin
+     if CPUKeyer.SerialPortConfigured_Handle[CATWTR^.tCATPortType] <> INVALID_HANDLE_VALUE then
+        begin
+        Windows.CloseHandle(CPUKeyer.SerialPortConfigured_Handle[CATWTR^.tCATPortType]);
+        CPUKeyer.SerialPortConfigured_Handle[CATWTR^.tCATPortType] := INVALID_HANDLE_VALUE;
+        end;
+     end
+  else if CATWTR^.tCATPortType = Network then
+     begin
+     if CATWTR^.tNetObject.IsConnected then
+        begin
+        CATWTR^.tNetObject.Disconnect;
+        end;
+     end;
   CATWTR^.tCATPortHandle := INVALID_HANDLE_VALUE;
 
   {Close Keyer Port}
@@ -246,29 +293,34 @@ var
   i                                     : integer;
   ID, CMD                               : ShortString;
 begin
-  if CATWTR^.tCATPortHandle <> INVALID_HANDLE_VALUE then
-  begin
-{
-    if CATWTR^.lpOverlapped.hEvent <> 0 then
-    begin
-      Windows.CloseHandle(CATWTR^.lpOverlapped.hEvent);
-      Windows.ZeroMemory(@CATWTR^.lpOverlapped, SizeOf(TOverlapped));
-      CATWTR^.pOver := nil;
-    end;
+
+{ TODO: The radio settings changed so restart the thread. If there was a network connection, we have to disconnect and clean that up.
+Otherwise, we have to start that up.
 }
+
+if (CATWTR^.tCATPortHandle <> INVALID_HANDLE_VALUE) or
+   (CATWTR^.tCATPortType = Network)                 then
+  begin
+
     GetExitCodeThread(CATWTR^.tRadioInterfaceThreadHandle, lpExitCode);
     Windows.TerminateThread(CATWTR^.tRadioInterfaceThreadHandle, lpExitCode);
 //    if CPUKeyer.SerialPortDebug then CloseCATDebugFile(CATWTR^.tCATPortType);
     CloseCATAndKeyerForThisRadio;
   end;
 
-  for i := 101 to 109 do
+  { In the resource file, the labels are 101 - 111. The value controls have an ID of 20 greater.
+    This code loops around based on the ID of the label and grabs the value to store it to the INI file.
+
+    The plot thickens... I found out that the name of the label on the form is added to RADIO ONE|TWO and that is what creates
+    the name that is written to the config file.
+    }
+  for i := 101 to 111 do
   begin
     Windows.ZeroMemory(@ID, SizeOf(ID));
     Windows.ZeroMemory(@CMD, SizeOf(CMD));
-
     ID := GetDialogItemText(CATWndHWND, i);
     CMD := GetDialogItemText(CATWndHWND, i + 20);
+    logger.Trace('[RestartPollingThread] ID = %s, CMD = %s',[ID, CMD]);
     Windows.WritePrivateProfileString('Radio', @ID[1], @CMD[1], TR4W_INI_FILENAME);
 //    if not
     CheckCommand(@ID, CMD)

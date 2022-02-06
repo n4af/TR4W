@@ -46,13 +46,16 @@ uses
    Windows,
    StrUtils,
    Math,
-   DateUtils;
+   DateUtils,
+   uNetRadioBase,
+   uRadioElecraftK4;
 
 type
    DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
 
 function ReadFromSerialPort(BytesToRead: Cardinal; rig: RadioPtr): boolean;
 function ReadFromCOMPort(b: Cardinal; rig: RadioPtr): boolean;
+procedure pNetworkRadio(rig: RadioPtr);
 procedure pKenwood2(rig: RadioPtr);
 procedure pKenwoodNew(rig: RadioPtr);
 procedure pFT990_FT1000(rig: RadioPtr);
@@ -137,7 +140,7 @@ const
    KenwoodPollRequestsAnswerLength: array[tKenwoodCommands] of integer = (38,
       14, 14);
 begin
-   if rig.RadioModel in [K3] then
+   if rig.RadioModel in [K3,K4] then
       begin
          SetK3ExtendedCommandMode;
       end;
@@ -285,7 +288,7 @@ begin
                                                    '6':
                                                       begin
                                                          if rig^.RadioModel in
-                                                            [K3] then
+                                                            [K3, K4] then
                                                             begin
                                                                case rig^.tBuf[i
                                                                   - 3] of
@@ -299,7 +302,7 @@ begin
                                                                      rig^.CurrentStatus.ExtendedMode := ePSK31;
                                                                   else
                                                                      begin
-                                                                        logger.info('Unknown value from K3 ExtendedMode response' + rig^.tBuf);
+                                                                        logger.info('Unknown value from K3/K4 ExtendedMode response' + rig^.tBuf);
                                                                      end;
                                                                end;
                                                             end
@@ -375,11 +378,11 @@ begin
                                                    rig^.tBuf[i - 9] = '1';
                                                 if rig^.tBuf[i - 9] = '1' then
                                                    begin
-                                                      logger.trace('K3/Kenwood2 says radio is transmitting');
+                                                      logger.trace('K3/K4/Kenwood2 says radio is transmitting');
                                                    end
                                                 else
                                                    begin
-                                                      logger.trace('K3/Kenwood2 says radio is RECEIVING');
+                                                      logger.trace('K3/K4/Kenwood2 says radio is RECEIVING');
                                                    end;
                                                 if radio1.CurrentStatus.TXOn
                                                    then
@@ -708,6 +711,59 @@ begin
       UpdateStatus(rig);
    until rig^.tPollCount < 0;
 end;
+
+procedure pNetworkRadio(rig: RadioPtr); // Network classes (K4 network, Flex 6000 series network, etc)
+var ro: TNetRadioBase;
+begin
+
+   { Unlike the other polling procedures, all we have to do here is grab the
+     radio parameters we need from network classes. We do not need to send any
+     commands as the network class keeps up to date when anything on the radio
+     changes. This is at least the way the K4 works. If other future network
+     interfaces do not work that way, then the network class should poll on a
+     timer so the net effect it appears that the network class just "has" the info.
+     NY4I 27-Nov-2021
+   }
+   logger.Trace('[pNetworkRadio] Entering polling procedure');
+   ro := rig^.tNetObject;
+   while ro.IsConnected do
+      begin
+      Sleep(FreqPollRate);
+
+      rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
+      rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
+      rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
+      rig^.CurrentStatus.Split := ro.IsSplitEnabled;
+      rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
+      rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
+      rig^.CurrentStatus.TXOn := ro.IsTransmitting;
+
+      // VFO A
+      rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig.CurrentStatus.VFO[VFOA].Mode,rig.CurrentStatus.VFO[VFOA].ExtendedMode);
+      rig.CurrentStatus.VFO[VFOA].RIT := ro.IsRITOn[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+
+      // VFO B
+      rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOB],rig.CurrentStatus.VFO[VFOB].Mode,rig.CurrentStatus.VFO[VFOB].ExtendedMode);
+      rig.CurrentStatus.VFO[VFOB].RIT := ro.IsRITOn[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].XIT := ro.IsXITOn[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
+
+      UpdateStatus(rig);
+      end;
+
+      logger.Info('Exiting pNetworkRadio');
+      rig.CurrentStatus.VFO[VFOA].Frequency := 0;
+      rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+
+end;
+
 
 procedure pKenwoodNew(rig: RadioPtr); // K3 is here
 label
@@ -1347,71 +1403,37 @@ begin
                                     //------------------00.01.02.03.04.05.06.07
                                     //FE.FE.ra.E0.04.FD.FE.FE.E0.ra.04.00.00.FD + IF passband width data (06)
                                     //FE.FE.ra.E0.04.FD.FE.FE.E0.ra.04.00.FD
-                                    case Ord(rig.tBuf[i + 5]) of
-                                       0:
-                                          begin
-                                             rig.CurrentStatus.Mode := Phone;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eLSB;
-                                          end;
-                                       1:
-                                          begin
-                                             rig.CurrentStatus.Mode := Phone;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eUSB;
-                                          end;
-                                       2:
-                                          begin
-                                             rig.CurrentStatus.Mode := Phone;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eAM;
-                                          end;
-                                       3:
-                                          begin
-                                             rig.CurrentStatus.Mode := CW;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eCW;
-                                          end;
-                                       4:
-                                          begin
-                                             rig.CurrentStatus.Mode := Digital;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eRTTY;
-                                          end;
-                                       5:
-                                          begin
-                                             rig.CurrentStatus.Mode := Phone;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eFM;
-                                          end;
-                                       7:
-                                          begin
-                                             rig.CurrentStatus.Mode := CW;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eCW_R;
-                                          end;
-                                       8:
-                                          begin
-                                             rig.CurrentStatus.Mode := Digital;
-                                             rig.CurrentStatus.ExtendedMode :=
-                                                eRTTY_R;
-                                          end;
-                                       else
-                                          DEBUGMSG('Unknown Mode command from Icom '
-                                             + IntToStr(Ord(rig.tBuf[i + 5])));
-                                    end;
-                                    {case Ord(rig.tBuf[i + 5]) of
-                                      5: rig.CurrentStatus.Mode := FM;
-                                      3, 7: rig.CurrentStatus.Mode := CW;
-                                      4, 8: rig.CurrentStatus.Mode := Digital;
-                                    else rig.CurrentStatus.Mode := Phone;
-                                    end;}
+                                    rig.saveMode := Ord(rig.tBuf[i + 5]);
+                                    //rig.ProcessIcomMode(Ord(rig.tBuf[i + 5]));
+
 
                                     if (Ord(rig.tBuf[i + 6]) > 0) then
                                        // n4af 4.43.4
                                        Icom_Filter_Width := Ord(rig.tBuf[i + 6]);
                                           // 4.43.4
                                     UpdateStatus(rig);
+                                 end;
+                           ICOM_STATE:
+                              if rig.tBuf[i + 5] = ICOM_STATE_DATA_MODE then
+                                 begin
+                                 if Ord(rig.tBuf[i + 6]) = 1 then  // Only set Digital if it is on as we would not know what mode is when data mode is reported off. ny4i
+                                    begin
+                                    if rig.currentStatus.Mode <> Digital then
+                                       begin
+                                       rig.CurrentStatus.Mode := Digital;
+                                       Icom_Filter_Width := Ord(rig.tBuf[i+7]);
+                                       logger.Trace('Setting Icom mode to DATA based on 1A06 command');
+                                       UpdateStatus(rig);
+                                       end;
+                                    end
+                                 else
+                                    begin
+                                    if rig.saveMode > 0 then
+                                       begin
+                                       rig.ProcessIcomMode(rig.saveMode);
+                                       UpdateStatus(rig);
+                                       end;
+                                    end;
                                  end;
                            ICOM_XMIT_SETTINGS:
                               if Ord(rig.tBuf[i + 4 + 1]) = 0 then
@@ -1500,24 +1522,6 @@ begin
    //  sleep(200);
    Sleep(FreqPollRate);
 
-   { rig.SendIcomCommand(Ord(ICOM_GET_MODE));
-    if not icomCheckBuffer(rig) then
-    begin
-      ClearRadioStatus(rig);
-      UpdateStatus(rig);
-      Sleep(1000);
-      goto NextPoll;
-    end;
-
-    rig.SendIcomCommand(Ord(ICOM_GET_FREQ));
-    if not icomCheckBuffer(rig) then
-    begin
-      ClearRadioStatus(rig);
-      UpdateStatus(rig);
-      Sleep(1000);
-      goto NextPoll;
-    end;
-   }
    if rig^.RadioModel in IcomRadiosThatSupportVFOB then
       begin
 
@@ -1562,7 +1566,7 @@ begin
             end;
 
       end
-   else
+   else      // else if for radios that do not support VFOB command
       begin
          rig.SendIcomCommand(Ord(ICOM_GET_MODE));
          if not icomCheckBuffer(rig) then
@@ -1574,6 +1578,16 @@ begin
             end;
 
          rig.SendIcomCommand(Ord(ICOM_GET_FREQ));
+         if not icomCheckBuffer(rig) then
+            begin
+               ClearRadioStatus(rig);
+               UpdateStatus(rig);
+               Sleep(1000);
+               goto NextPoll;
+            end;
+
+         // Add the 1A06 command
+         rig.GetIcomDataStateCommand;
          if not icomCheckBuffer(rig) then
             begin
                ClearRadioStatus(rig);
@@ -2351,7 +2365,10 @@ begin
       {rig^.pOver}) then
       if BytesToRead = BytesRead then
          Result := True;
-   logger.trace('[ReadFromSerialPort] Read %s from serial port',[ArrayToString(rig^.tBuf)]);
+   if logger.IsTraceEnabled then
+      begin
+      logger.trace('[ReadFromSerialPort] Read %s from serial port',[String2Hex(AnsiLeftStr(ArrayToString(rig^.tBuf),BytesRead))]);
+      end;
 
 end;
 
@@ -2878,14 +2895,29 @@ end;
 procedure BeginPolling(rig: RadioPtr); stdcall;
 begin
    Sleep(100);
+
+   { If the radio is a network interface, we do not care what type of radio as
+     the same class gets all the information from the derived radio class type.
+     This BeginPolling procedure is fired up as a thread so it may cause some
+     strange issues since we have a thread in the network class. TBD
+   }
+   if rig.tNetObject <> nil then
+      begin
+      pNetworkRadio(rig);
+      Exit;   // Nothing else is done here so exit
+      end;
+
+   // The rest is for serial radio interfaces
+
    PurgeComm(rig^.tCATPortHandle, PURGE_RXCLEAR or PURGE_RXABORT);
 
    Windows.ZeroMemory(@rig.tBuf, SizeOf(rig.tBuf));
 
+
    case rig^.RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
          TS950, TS990,
-         TS2000, FLEX, K2, K3:
+         TS2000, FLEX, K2, K3, K4:
          begin
 {$IF MASKEVENT}
             pKenwoodNew(rig);
