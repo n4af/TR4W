@@ -244,7 +244,11 @@ begin
   begin
     Self.udpServ.active := false;
     udpServ.DefaultPort := Self.FUDPPort;
-    udpServ.Active := true;
+    try
+       udpServ.Active := true;
+    except
+       logger.warn('Exception trying to make udpServ active');
+    end;
   end;
 end;
 

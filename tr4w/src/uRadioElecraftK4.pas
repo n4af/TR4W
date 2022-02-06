@@ -489,7 +489,7 @@ begin
    sCommand := AnsiLeftStr(sMessage,2);
    if AnsiMidStr(sMessage,3,1) = '$' then
       begin
-      logger.Info('[ProcessMessage] VFO B message received %s',[sMessage]);
+      logger.trace('[ProcessMessage] VFO B message received %s',[sMessage]);
       vfoBCommand := true;
       sData := AnsiMidStr(sMessage,4,length(sMessage));
       vfo := Self.vfo[nrVFOB];
