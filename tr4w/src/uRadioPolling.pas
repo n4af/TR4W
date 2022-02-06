@@ -2932,7 +2932,7 @@ begin
          pFT736R(rig);
       FT747GX:
          pFT747GX(rig);
-      FT817, FT847, FT857, FT897:
+      FT817, FT818, FT847, FT857, FT897:
          pFT817_FT847_FT857_FT897(rig);
       FT840, FT890, FT900:
          pFT840_FT890_FT900(rig);

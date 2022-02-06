@@ -486,6 +486,7 @@ const
     ({Name: 'FT747GX';    } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $05; DIGL: $00; DIGU: $00; rt: rtYaesu1),
     ({Name: 'FT767';      } BR:BR4800;  P: 1; C: 1; S: 1; T:0; RA: $00; SW: 1; SFOC: $08; SMOC: $0A; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $12; LSB: $10; USB: $11; FM: $14; AM: $13; DIGL: $15; DIGU: $15; rt: rtYaesu1),
     ({Name: 'FT817';      } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 0; SFOC: $01; SMOC: $07; SPOC: $00; RX: $88; TX: $08; MB: 0; CW: $02; LSB: $00; USB: $01; FM: $08; AM: $04; DIGL: $0C; DIGU: $0A; rt: rtYaesu1),
+    ({Name: 'FT818';      } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 0; SFOC: $01; SMOC: $07; SPOC: $00; RX: $88; TX: $08; MB: 0; CW: $02; LSB: $00; USB: $01; FM: $08; AM: $04; DIGL: $0C; DIGU: $0A; rt: rtYaesu1),
     ({Name: 'FT840';      } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $05; DIGL: $FF; DIGU: $FF; rt: rtYaesu1),
     ({Name: 'FT847';      } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 0; SFOC: $01; SMOC: $07; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $02; LSB: $00; USB: $01; FM: $08; AM: $04; DIGL: $FF; DIGU: $FF; rt: rtYaesu1),
     ({Name: 'FT857';      } BR:BR4800;  P: 1; C: 0; S: 0; T:0; RA: $00; SW: 0; SFOC: $01; SMOC: $07; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $02; LSB: $00; USB: $01; FM: $08; AM: $04; DIGL: $FF; DIGU: $0A; rt: rtYaesu1),
@@ -576,6 +577,7 @@ const
       'FT747GX',
       'FT767',
       'FT817',
+      'FT818',
       'FT840',
       'FT847',
       'FT857',
@@ -650,6 +652,7 @@ const
     'FT736R',
     'FT767',
     'FT817',
+    'FT818',
     'FT840',
     'FT847',
     'FT857',
@@ -2802,7 +2805,7 @@ begin
                begin
                TempByte := RadioParametersArray[RadioModel].CW;
 
-               if RadioModel in [FT100, FT817, FT847, FT857, FT897, FT920, FT1000MP] then
+               if RadioModel in [FT100, FT817, FT818, FT847, FT857, FT897, FT920, FT1000MP] then
                   begin
                   if FT1000MPCWReverse then
                      begin
@@ -3604,7 +3607,7 @@ begin
             end;
          end;
 
-      FT736R, FT817, FT847 {, FT857, FT897}:
+      FT736R, FT817, FT818, FT847 {, FT857, FT897}:
          begin
          if PTTOn then
             begin

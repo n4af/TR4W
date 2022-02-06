@@ -971,6 +971,7 @@ type
     FT747GX,
     FT767,
     FT817, { Behaves like FT847 }
+    FT818,
     FT840,
     FT847,
     FT857, {UA3DPX}
