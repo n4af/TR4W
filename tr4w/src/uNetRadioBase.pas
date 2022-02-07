@@ -359,14 +359,14 @@ begin
        
     socket.Port := Self.radioPort;
     socket.Host := Self.radioAddress;
-    socket.ConnectTimeout := 5;
+    socket.ConnectTimeout := 10;
 
     try
         socket.Connect;
         logger.Info('[TNetRadioBase.Connect] Connected successfully to network radio');
     except
         on E: Exception do begin
-           logger.Error('Exception when connecting to radio: %s', [E.Message]);
+           logger.Error('[TNetRadioBase.Connect] Exception when connecting to radio (%s:%d]: %s', [socket.Host, socket.Port, E.Message]);
         end;
     end;
 end;
