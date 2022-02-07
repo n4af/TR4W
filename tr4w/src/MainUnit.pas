@@ -1850,6 +1850,7 @@ begin
   tInputDialogLowerCase := True;
   s := QuickEditResponse(TC_NOTE, 80);
   i := length(s);
+  logger.info('******* User added note: [%s]',[s]);
   if i = 0 then Exit
   else if i > 80 then i := 80;
   Windows.ZeroMemory(@TempRXData, SizeOf(ContestExchange));
