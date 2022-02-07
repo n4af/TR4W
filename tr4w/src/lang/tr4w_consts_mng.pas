@@ -578,6 +578,7 @@ const
   RC_GRID                               = 'Гридлокатор';
   RC_CALCULATOR                         = 'Тооны машин';
   RC_LC                                 = 'LC-г тооцоолох';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_NET                                = 'Сvлжээ';
   RC_TIMESYN                            = 'Цаг тохируулж байна';
   RC_SENDMESSAGE                        = 'Мессэж явуулах';

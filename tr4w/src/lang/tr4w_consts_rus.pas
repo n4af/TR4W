@@ -661,6 +661,7 @@ const
   RC_GRID                               = 'Квадрат';
   RC_CALCULATOR                         = 'Калькулятор';
   RC_LC                                 = 'Расчет LC-контура';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_NET                                = 'Сеть';
   RC_TIMESYN                            = 'Синхр. время на всех компьютерах';
   RC_SENDMESSAGE                        = 'Послать сообщение';

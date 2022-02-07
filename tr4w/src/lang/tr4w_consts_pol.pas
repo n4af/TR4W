@@ -651,6 +651,7 @@ const
   RC_GRID                               = 'Lokator';
   RC_CALCULATOR                         = 'Kalkulator';
   RC_LC                                 = 'LC';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_NET                                = 'Sieö';
   RC_TIMESYN                            = 'Synchronizowanie czasu';
   RC_SENDMESSAGE                        = 'WyÜlij wiadomoÜö';

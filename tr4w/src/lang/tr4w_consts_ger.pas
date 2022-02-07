@@ -573,6 +573,7 @@
   RC_GRID                               = 'Grid';
   RC_CALCULATOR                         = 'Kalkulator';
   RC_LC                                 = 'LC';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
 
   RC_GETOFFSET                          = '&Differenz holen';
   RC_LOCALOFFSET                        = 'Differenz lokale Uhr';

@@ -578,6 +578,7 @@ const
   RC_GRID                               = 'Odredjivanje lokatora';
   RC_CALCULATOR                         = 'Digitron';
   RC_LC                                 = 'LC';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
 
   RC_GETOFFSET                          = 'Uzmi razliku';
   RC_LOCALOFFSET                        = 'Razlika u lokalnom vremenu';

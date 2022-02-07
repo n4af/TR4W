@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 176 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND};
+    T_MENU_ARRAY_SIZE                     = 176 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS and separator};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -361,6 +361,8 @@ const
     (mrText: ''; mrId: menu_qrzru_calendar),
     (mrText: '-'; mrId: 0),
     (mrText: RC_CALCULATOR; mrId: item_calculator),
+    (mrText: '-'; mrId: 0),
+    (mrText: RC_RESET_RADIO_PORTS; mrId: menu_reset_radio_ports),
  //}
     (mrText: '-'; mrId: 0),
     (mrText: RC_3830; mrId: menu_3830_scores_posting),

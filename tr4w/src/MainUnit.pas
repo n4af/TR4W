@@ -3021,6 +3021,34 @@ begin
 
     item_calculator: WinExec('calc.exe', SW_SHOW);
 
+    menu_reset_radio_ports:
+       begin
+       logger.info('Resetting radio ports');
+       if ActiveRadioPtr.tNetObject <> nil then
+          begin
+          ActiveRadioPtr.tNetObject.Disconnect;
+          ActiveRadioPtr.tNetObject.Connect;
+          end
+       else
+          begin // Active radio is using a serial port
+          ActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
+          end;
+       //
+       // Handle radio two
+       //
+       if InActiveRadioPtr.tNetObject <> nil then
+          begin
+          InActiveRadioPtr.tNetObject.Disconnect;
+          InActiveRadioPtr.tNetObject.Connect;
+          end
+       else
+          begin
+          InActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
+          end;
+       //
+       end;
+
+
     menu_pingserver:
       begin
         Format(wsprintfBuffer, 'ping %s -w 2000 -n 10', @ServerAddress[1]);

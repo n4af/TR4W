@@ -1295,6 +1295,7 @@ const
   RC_DISTANCE                           = 'Distancia';
   RC_GRID                               = 'Locator';
   RC_CALCULATOR                         = 'Calculadora';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_LC                                 = 'LC';
   RC_NET                                = 'Red';
   RC_TIMESYN                            = 'Sincronizacion tiempo';
