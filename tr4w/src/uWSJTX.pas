@@ -326,10 +326,10 @@ begin
               Windows.ShowWindow(wh[mweWSJTX], SW_SHOW);
               isConnected := true;
               if firstTime then
-              begin
+                 begin
                 ClearColors(id);
                 firstTime := false;
-              end;
+                end;
             end;
           WSJTX_MESSAGETYPE_STATUSV:
             begin
@@ -348,7 +348,7 @@ begin
               Unpack(AData, index, DEGrid);
               Unpack(AData, index, DXGrid);
               if logger.IsTraceEnabled then
-              begin
+                begin
                 logger.trace('[uWSJTX] WSJTX Status>>> Frequency: ' +
                   IntToStr(frequency) + ' Mode: ' + mode + ' DX Call: ' + DXCall
                   + ' Report: ' + report + ' TX Mode: ' + TXMode +
@@ -358,30 +358,30 @@ begin
                   + ' RXDF: ' + intToStr(RXDF) + ' TXDF: ' + intToStr(TXDF) +
                     ' DECall: ' + DECall + ' DEGrid: ' + DEGrid
                   + ' DXGrid: ' + DXGrid);
-              end;
+                end;
               if transmitting then
-              begin
+                begin
                 logger.debug('[uWSJTX] Calling station %s, TotalContacts = %d',
                   [DXCall, TotalContacts]);
                 if DXCall <> sCallSentToWindow then
-                begin
+                  begin
                   sCallSentToWindow := DXCall;
                   VisibleLog.ShowQSOStatus(DXCall);
                   //ShowStationInformation(@DXCall);
                   PutCalltoCallWindow(DXCall);
                   if ActiveDomesticMult = GridFields then
-                  begin
+                    begin
                     VisibleLog.ShowDomesticMultiplierStatus(AnsiLeftStr(DXGrid,
                       2));
-                  end
+                    end
                   else
-                  begin
+                    begin
                     VisibleLog.ShowDomesticMultiplierStatus(DXGrid);
-                  end;
+                    end;
                   DisplayBeamHeading(DXCall, DXGrid);
+                  end;
                 end;
               end;
-            end;
 
           WSJTX_MESSAGETYPE_DECODEV:
             begin {............................................................Decode}
