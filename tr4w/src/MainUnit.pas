@@ -3021,6 +3021,34 @@ begin
 
     item_calculator: WinExec('calc.exe', SW_SHOW);
 
+    menu_reset_radio_ports:
+       begin
+       logger.info('Resetting radio ports');
+       if ActiveRadioPtr.tNetObject <> nil then
+          begin
+          ActiveRadioPtr.tNetObject.Disconnect;
+          ActiveRadioPtr.tNetObject.Connect;
+          end
+       else
+          begin // Active radio is using a serial port
+          ActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
+          end;
+       //
+       // Handle radio two
+       //
+       if InActiveRadioPtr.tNetObject <> nil then
+          begin
+          InActiveRadioPtr.tNetObject.Disconnect;
+          InActiveRadioPtr.tNetObject.Connect;
+          end
+       else
+          begin
+          InActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
+          end;
+       //
+       end;
+
+
     menu_pingserver:
       begin
         Format(wsprintfBuffer, 'ping %s -w 2000 -n 10', @ServerAddress[1]);
@@ -6424,6 +6452,7 @@ var
   fieldLen: string;
   fieldValue: string;
   testStr: string;
+  tempRST: string;
   originalLen: integer;
   c: string;
   cU: string; // Uppercase version of C for comparison
@@ -6545,8 +6574,30 @@ begin
                         begin
                         ; //exit;
                         end;
-                  tAdifRST_RCVD: exch.RSTReceived := StrToIntDef(fieldValue,599); // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
-                  tAdifRST_SENT: exch.RSTSent := StrToIntDef(fieldValue,599); //fieldValue;   // Same for ADIF RST Sent...
+                  tAdifRST_RCVD:
+                     begin
+                     tempRST := fieldValue;
+                     if recordFromWSJTX then
+                        begin // Check for + in ther string and remove
+                        if Pos('+',fieldValue) > 0 then
+                           begin
+                           tempRST := AnsiMidStr(fieldValue,2,length(fieldValue));
+                           end;
+                        end;
+                     exch.RSTReceived := StrToIntDef(tempRST,599); // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
+                     end;
+                  tAdifRST_SENT:
+                     begin
+                     tempRST := fieldValue;
+                     if recordFromWSJTX then
+                        begin // Check for + in ther string and remove
+                        if Pos('+',fieldValue) > 0 then
+                           begin
+                           tempRST := AnsiMidStr(fieldValue,2,length(fieldValue));
+                           end;
+                        end;
+                     exch.RSTSent := StrToIntDef(tempRST,599); // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
+                     end;
                   tAdifRX_PWR: exch.Power := fieldValue;
                   tAdifSRX: exch.NumberReceived := StrToInt(fieldValue);
                   tAdifSRX_STRING: tempSRX_String := fieldValue;
@@ -6665,6 +6716,7 @@ begin
          GENERALQSO:
             if recordFromWSJTX then
                begin
+               exch.ExchString := gridSquare;
                exch.QTHString := gridSquare;
                exch.DomesticQTH := gridSquare;
                end;
@@ -6678,7 +6730,7 @@ begin
             // This code was RST and Number received for Roundup but that is only for DX stations.
             // For US stations, it is RST and State.
             // Find out when this changed as it messed up WSJTX Roundup processing
-            logger.Debug('[uWSJTX] exch.QTH.CountryID = %s',[exch.QTH.CountryID]);
+            logger.Debug('[ParseADIF] exch.QTH.CountryID = %s',[exch.QTH.CountryID]);
             if (exch.QTH.CountryID = 'K') or (exch.QTH.CountryID = 'VE') then
                begin
                exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + tempState;

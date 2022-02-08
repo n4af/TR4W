@@ -2099,7 +2099,7 @@ var
 begin
   ProcessRSTAndOrGridSquareExchange := False;
   RXData.DomesticQTH := '';
-  RXData.RSTReceived := 0;
+  //RXData.RSTReceived := 0;  // This seems like it should not be here. If it is set, why would we zero it out?   // ny4i
 
   if length(Exchange) = 0 then
     Exit;
@@ -3767,7 +3767,10 @@ begin
 
   if Exchange = '' then
   begin
-    RXData.RSTReceived := DefaultRST;
+    if RXData.RSTReceived = 0 then
+       begin
+       RXData.RSTReceived := DefaultRST;
+       end;
     Exit;
   end;
 

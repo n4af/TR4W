@@ -957,6 +957,11 @@ var
 //   SerialPort: PortType;
 
 begin
+   if Radio1.tNetObject <> nil then
+      begin
+      Radio1.tNetObject.RITBumpUp;
+      Exit;
+      end;
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
@@ -1009,8 +1014,15 @@ procedure RITBumpDown;
 var
    IntRadioType: InterfacedRadioType;
 //   SerialPort: PortType;
+   netRadio: TNetRadioBase;
 
 begin
+   if Radio1.tNetObject <> nil then
+      begin
+      Radio1.tNetObject.RITBumpDown;
+      Exit;
+      end;
+
    if ActiveRadio = RadioOne then
       begin
       IntRadioType := Radio1.RadioModel;
@@ -1064,13 +1076,24 @@ var
 //   SerialPort: PortType;
 
 begin
+
    if ActiveRadio = RadioOne then
       begin
+      if Radio1.tNetObject <> nil then
+         begin
+         Radio1.tNetObject.VFOBumpUp(nrVFOA);
+         Exit;
+         end;
       IntRadioType := Radio1.RadioModel;
 //      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
+      if Radio2.tNetObject <> nil then
+         begin
+         Radio2.tNetObject.VFOBumpUp(nrVFOA);
+         Exit;
+         end;
       IntRadioType := Radio2.RadioModel;
 //      SerialPort := Radio2.tCATPortType;
       end;
@@ -1133,11 +1156,21 @@ var
 begin
    if ActiveRadio = RadioOne then
       begin
+      if Radio1.tNetObject <> nil then
+         begin
+         Radio1.tNetObject.VFOBumpDown(nrVFOA);
+         Exit;
+         end;
       IntRadioType := Radio1.RadioModel;
 //      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
+      if Radio2.tNetObject <> nil then
+         begin
+         Radio1.tNetObject.VFOBumpDown(nrVFOA);
+         Exit;
+         end;
       IntRadioType := Radio2.RadioModel;
 //      SerialPort := Radio2.tCATPortType;
       end;

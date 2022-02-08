@@ -576,6 +576,7 @@
   RC_GRID                               = 'Grid';
   RC_CALCULATOR                         = 'Calculator';
   RC_LC                                 = 'LC';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
 
   RC_GETOFFSET                          = '&Get offset';
   RC_LOCALOFFSET                        = 'Local clock offset';

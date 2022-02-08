@@ -177,6 +177,8 @@ Type TNetRadioBase = class(TObject)
       procedure SetCWSpeed(speed: integer); Virtual; Abstract;
       procedure RITClear(vfo: TVFO);  Virtual; Abstract;
       procedure XITClear(vfo: TVFO); Virtual; Abstract;
+      procedure RITBumpDown; Virtual; Abstract;
+      procedure RITBumpUp; Virtual; Abstract;
       procedure RITOn(vfo: TVFO); Virtual; Abstract;
       procedure RITOff(vfo: TVFO); Virtual; Abstract;
       procedure XITOn(vfo: TVFO); Virtual; Abstract;
@@ -189,6 +191,8 @@ Type TNetRadioBase = class(TObject)
       procedure SetFilter(filter:TRadioFilter); Virtual; Abstract;
       function  SetFilterHz(hz: integer): integer; Virtual; Abstract;
       procedure MemoryKeyer(mem: integer); Virtual; Abstract;
+      procedure VFOBumpDown(whichVFO: TVFO); Virtual; Abstract;
+      procedure VFOBumpUp(whichVFO: TVFO); Virtual; Abstract;
 
 
 end;

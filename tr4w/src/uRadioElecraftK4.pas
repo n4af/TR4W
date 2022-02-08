@@ -28,6 +28,8 @@ Type TK4Radio = class(TNetRadioBase)
       procedure RITClear(whichVFO: TVFO);
       procedure XITClear(whichVFO: TVFO);
 
+      procedure RITBumpDown;
+      procedure RITBumpUp;
       procedure RITOn(whichVFO: TVFO);
       procedure RITOff(whichVFO: TVFO);
       procedure XITOn(whichVFO: TVFO);
@@ -42,6 +44,8 @@ Type TK4Radio = class(TNetRadioBase)
       procedure MemoryKeyer(mem: integer);
       procedure SetAIMode(i: integer);
       procedure ProcessMessage(sMessage: string);
+      procedure VFOBumpDown(whichVFO: TVFO);
+      procedure VFOBumpUp(whichVFO: TVFO);
 end;
 
 var
@@ -160,6 +164,16 @@ begin
    Self.SendToRadio(whichVFO,'RC','');
 end;
 
+procedure TK4Radio.RITBumpDown;
+begin
+   Self.SendToRadio('RD;');
+end;
+
+procedure TK4Radio.RITBumpUp;
+begin
+   Self.SendToRadio('RU;');
+end;
+
 procedure TK4Radio.RITOn (whichVFO: TVFO);
 begin
    Self.SendToRadio(whichVFO,'RT','1');
@@ -243,6 +257,37 @@ begin
    Self.SendToRadio(Format('BN%2d;',[Ord(band)]));
 end;
 
+procedure TK4Radio.VFOBumpDown(whichVFO: TVFO);
+begin
+   if whichVFO = nrVFOA then
+      begin
+      Self.SendToRadio('DN;');
+      end
+   else if whichVFO = nrVFOB then
+      begin
+      Self.SendToRadio('DNB;');
+      end
+   else
+      begin
+      logger.Warn('[TK4Radio.VFOBumpDown] Invalid vfo passed in whichVFO');
+      end;
+end;
+
+procedure TK4Radio.VFOBumpUp(whichVFO: TVFO);
+begin
+   if whichVFO = nrVFOA then
+      begin
+      Self.SendToRadio('UP;');
+      end
+   else if whichVFO = nrVFOB then
+      begin
+      Self.SendToRadio('UPB;');
+      end
+   else
+      begin
+      logger.Warn('[TK4Radio.VFOBumpUp] Invalid vfo passed in whichVFO');
+      end;
+end;
 
 function  TK4Radio.ToggleBand(vfo: TVFO): TRadioBand;
 var newBand: TRadioBand;

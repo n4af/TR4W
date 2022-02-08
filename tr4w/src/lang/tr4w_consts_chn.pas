@@ -654,6 +654,7 @@ const
   RC_GRID                               = 'ק-Ñצא-';
   RC_CALCULATOR                         = 'רמבקמ×ץÙט';
   RC_LC                                 = 'LC';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_NET                                = 'ק-Ñק¬Ü';
   RC_TIMESYN                            = 'ץÐÌצםוצÉÀצÜÉרמבקמ×צÜ¦צ×¦ש×+&a';
   RC_SENDMESSAGE                        = 'ץÏÑשÀÁצ¦ÈצÁן';

@@ -2096,6 +2096,7 @@ const
   menu_wa7bnm_calendar                  = 10568;
   menu_3830_scores_posting              = 10569;     //4.51.8
   menu_arrl_submit                      = 10570;     //4.53.3
+  menu_reset_radio_ports                = 10571;     // NY4I Issue #533
   //  menu_addonlinerdxcresults         = 10564;
 
   menu_escape                           = 10502;
