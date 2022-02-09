@@ -5786,11 +5786,11 @@ begin
         else
           RXData.QSOPoints := 2;
 
-        if StringHas(UpperCase(MyFDClass), 'D') and
+        {if StringHas(UpperCase(MyFDClass), 'D') and
           StringHas(UpperCase(RXData.ceClass), 'D') then
         begin
           RXData.QSOPoints := 0;
-        end;
+        end;} // Removed this restriction at it continues for 2022 and perhaps beyond. // Issue 575
       end;
     ARRL160QSOPointMethod:
       if DomesticCountryCall(RXData.Callsign) then
