@@ -35,6 +35,7 @@ uses {Dos, Printer,}Tree,
   uCommctrl,
   TF,
   VC,
+  Math,
   utils_file,
   //Country9,
   ZoneCont,
@@ -5792,6 +5793,20 @@ begin
           RXData.QSOPoints := 0;
         end;
       end;
+    ARRLDIGIQSOPointMethod: // Issue 577
+      if (MyGrid <> '') and (RXData.DomesticQTH <> '') then
+         begin
+         if AnsiCompareStr(MyGrid,RXData.QTHString) = 0 then
+            begin
+            RXData.QSOPoints := 2;
+            end
+         else
+            begin
+            Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString);
+            RXData.QSOPoints := Ceil((Distance / 500)) + 1;
+            end;
+      end;
+
     ARRL160QSOPointMethod:
       if DomesticCountryCall(RXData.Callsign) then
         RXData.QSOPoints := 2

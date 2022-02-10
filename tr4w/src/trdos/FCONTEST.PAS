@@ -514,6 +514,14 @@ begin
         Add_KVE;
       end;
 }
+   WWDIGI:
+      begin
+      DigitalModeEnable := true;
+      QSOByMode := False;
+      QSOByBand := True;
+ //     LiteralDomesticQTH := true;    // 4.91.5
+      end;
+
     ARRLVHFJUN,ARRLVHFSEP:
       begin
         ActiveBand := Band6;
@@ -1481,7 +1489,7 @@ begin
     INITIALEXCHANGEOVERWRITE := TRUE;
    end;
 
-   WWDIGI:
+   ARRLDIGI:
       begin
       DigitalModeEnable := true;
       QSOByMode := False;
