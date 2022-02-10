@@ -962,24 +962,25 @@ begin
     end;
 
   if AutoDupeEnableCQ and tCallWindowStringIsDupe then
+ // if tAutoSendMode and (AutoSendCharacterCount = 0) then
   begin
- { 4.106.2
+     CallAlreadySent := False;
 //   ShowFMessages(0);
 //    FlashCallWindow;
 //    EscapeDeletedCallEntry := CallWindowString;
-    if tAutoSendMode = True then CallAlreadySent := True;
+//    if tAutoSendMode = True then CallAlreadySent := True;
 //    if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
     if tAutoSendMode = True then CallAlreadySent := True;
     tAutoSendMode := False;
     SendB4;
     DispalayDupe;
-//    tCleareCallWindow;  }
-  end ;
- // else
+//    tCleareCallWindow;
+//  end
+//   else
   begin
     if CallAlreadySent = False then
     begin
-      if ActiveMode in [CW, Digital] then  // WLI  
+      if ActiveMode in [CW, Digital] then  // WLI
       begin
         OpMode2 := SearchAndPounceOpMode;
         ShowFMessages(0);
@@ -1007,7 +1008,7 @@ begin
         tSetExchWindInitExchangeEntry; // 4.83.9
         CheckAndSetInitialExchangeCursorPos;
       end;
-
+     end;
       if not LogWithSingleEnter then Exit;
     end;
       //            IF K5KA.ModeEnabled THEN DupeCheckOnInactiveRadio;
