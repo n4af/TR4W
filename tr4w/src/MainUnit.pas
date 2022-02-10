@@ -961,7 +961,7 @@ begin
      VisibleLog.DoPossibleCalls(CallWindowString);
     end;
 
-  if AutoDupeEnableCQ and tCallWindowStringIsDupe then
+ { if AutoDupeEnableCQ and tCallWindowStringIsDupe then
  // if tAutoSendMode and (AutoSendCharacterCount = 0) then
   begin
      CallAlreadySent := False;
@@ -976,7 +976,7 @@ begin
     DispalayDupe;
 //    tCleareCallWindow;
 //  end
-//   else
+//   else     }
   begin
     if CallAlreadySent = False then
     begin
@@ -1072,7 +1072,7 @@ begin
        end;
     end;
   end;
-end;
+
 
 procedure ReturnInSAPOpMode;
 label
