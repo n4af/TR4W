@@ -961,8 +961,7 @@ begin
      VisibleLog.DoPossibleCalls(CallWindowString);
     end;
 
- { if AutoDupeEnableCQ and tCallWindowStringIsDupe then
- // if tAutoSendMode and (AutoSendCharacterCount = 0) then
+   if AutoDupeEnableCQ and tCallWindowStringIsDupe then
   begin
      CallAlreadySent := False;
 //   ShowFMessages(0);
@@ -970,14 +969,12 @@ begin
 //    EscapeDeletedCallEntry := CallWindowString;
 //    if tAutoSendMode = True then CallAlreadySent := True;
 //    if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
-    if tAutoSendMode = True then CallAlreadySent := True;
-    tAutoSendMode := False;
+//    if tAutoSendMode = True then CallAlreadySent := True;
+ //   tAutoSendMode := False;
     SendB4;
-    DispalayDupe;
+ //   DispalayDupe;         //  4.108.6
 //    tCleareCallWindow;
-//  end
-//   else     }
-  begin
+  end;
     if CallAlreadySent = False then
     begin
       if ActiveMode in [CW, Digital] then  // WLI
@@ -1008,9 +1005,10 @@ begin
         tSetExchWindInitExchangeEntry; // 4.83.9
         CheckAndSetInitialExchangeCursorPos;
       end;
-     end;
+
       if not LogWithSingleEnter then Exit;
     end;
+
       //            IF K5KA.ModeEnabled THEN DupeCheckOnInactiveRadio;
 
     if ExchangeHasBeenSent = False then
@@ -3854,8 +3852,8 @@ procedure CheckAndSetInitialExchangeCursorPos;
 begin
   if InitialExchangeCursorPos = AtEnd then PlaceCaretToTheEnd(wh[mweExchange]);
   if InitialExchangeCursorPos = AtStart then
-  SetCursorPos(0,1); // n4af 4.42.7
-  // SendMessage(wh[mweExchange], EM_SETSEL, 1, 1);
+//  SetCursorPos(0,1); // n4af 4.42.7
+    SendMessage(wh[mweExchange], EM_SETSEL, 0, 0);        // 4.108.8
 
   if InitialExchangeOverwrite then Windows.SendMessage(wh[mweExchange], EM_SETSEL, 0, -1);
 end;
