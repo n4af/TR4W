@@ -699,9 +699,9 @@ begin
     sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
   end;
   if Contest <> ARRLFIELDDAY then
-  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Final Score = %d points.', TotalScore)
+  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', TotalScore)      // 4.108.9
   else
-  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Final Score = %d points.', SumInteger);
+  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', SumInteger);     // 4.108.9
   sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
 end;
 
