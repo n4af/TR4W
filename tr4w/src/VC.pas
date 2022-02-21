@@ -3800,16 +3800,3 @@ begin
 //  Windows.CopyMemory(@TR4W_FLOPPY_FILENAME, PChar('LOGBACK.TRW'), 11);
 //  tr4wColorsArray[trSelected] := GetSysColor(COLOR_ACTIVECAPTION);
 end.
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Loading complete

@@ -111,7 +111,8 @@ uses
   uGridLookup in 'src\uGridLookup.pas',
   Log4D in 'src\Log4D.pas',
   uNetRadioBase in 'src\uNetRadioBase.pas',
-  uRadioElecraftK4 in 'src\uRadioElecraftK4.pas';
+  uRadioElecraftK4 in 'src\uRadioElecraftK4.pas',
+  GetWinVersionInfo in 'src\GetWinVersionInfo.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -124,6 +125,7 @@ uses
 {$IF LANG = 'CHN'}{$R res\tr4w_chn.res}{$IFEND}
 {$IF LANG = 'GER'}{$R res\tr4w_ger.res}{$IFEND}
 
+{$R 'Win11.res'}
 function WindowProc(TRHWND: HWND; Msg: UINT; wParam: wParam; lParam: lParam): longword; stdcall;
 
 label
@@ -529,10 +531,12 @@ begin
   mov  [tNet_Event],eax
   end;
 
-
-  DEBUGMSG('Current program version = ' + TR4W_CURRENTVERSION);
-  DEBUGMSG('Current TR4W Server version = ' + TR4WSERVER_CURRENTVERSION);
-  DEBUGMSG('Current log version = ' + LOGVERSION);
+  logger.debug('**************** Program Startuip ************************');
+  logger.debug('Current program version = %s',[TR4W_CURRENTVERSION]);
+  logger.debug('Current TR4W Server version = %s',[TR4WSERVER_CURRENTVERSION]);
+  logger.debug('Current log version = %s',[LOGVERSION]);
+  logger.debug('Windows version = %d.%d Build %d',[tr4w_osverinfo.dwMajorVersion, tr4w_osverinfo.dwMinorVersion, tr4w_osverinfo.dwBuildNumber]);
+  logger.debug('%s',[GetOSInfo]);
 
   if not tHandLogMode then
      begin
