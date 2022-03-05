@@ -882,21 +882,12 @@ procedure RITClear;
 var
    IntRadioType: InterfacedRadioType;
 //   SerialPort: PortType;
-   netRadio: TNetRadioBase;
 
 begin
    //netRadio := GetNetRadioObject(Radio1);
    if Radio1.tNetObject <> nil then
       begin
-      case Radio1.RadioModel of
-         K4: netRadio := TK4Radio(Radio1.tNetObject);
-         else
-            begin
-            logger.Error('tNetObject is not supported by a Network connection %s',[Radio1.RadioName]);
-            Exit;
-            end;
-         end; // of case
-      netRadio.RITClear(nrVFOA);
+      Radio1.tNetObject.RITClear(nrVFOA);
       Exit;
       end;
 
@@ -1014,7 +1005,6 @@ procedure RITBumpDown;
 var
    IntRadioType: InterfacedRadioType;
 //   SerialPort: PortType;
-   netRadio: TNetRadioBase;
 
 begin
    if Radio1.tNetObject <> nil then
