@@ -884,20 +884,24 @@ var
 //   SerialPort: PortType;
 
 begin
-   //netRadio := GetNetRadioObject(Radio1);
-   if Radio1.tNetObject <> nil then
-      begin
-      Radio1.tNetObject.RITClear(nrVFOA);
-      Exit;
-      end;
 
    if ActiveRadio = RadioOne then
       begin
+      if Radio1.tNetObject <> nil then
+         begin
+         Radio1.tNetObject.RITClear(nrVFOA);
+         Exit;
+         end;
       IntRadioType := Radio1.RadioModel;
 //      SerialPort := Radio1.tCATPortType;
       end
    else
       begin
+      if Radio2.tNetObject <> nil then
+         begin
+         Radio2.tNetObject.RITClear(nrVFOA);
+         Exit;
+         end;
       IntRadioType := Radio2.RadioModel;
 //      SerialPort := Radio2.tCATPortType;
       end;
