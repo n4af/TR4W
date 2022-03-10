@@ -1374,8 +1374,16 @@ begin
       nNumberOfBytesToWrite);
    Inc(CommandsBufferPointer, nNumberOfBytesToWrite);
 {$ELSE}
-  WriteToCATPort(Buffer^, nNumberOfBytesToWrite);
-  DebugMsg(Buffer);
+  if Self.tNetObject <> nil then
+     begin
+     logger.Trace('[AddToOutputBuffer-Network] %s',[Buffer]);
+     Self.tNetObject.SendToRadio(Buffer);
+     end
+  else
+     begin
+     logger.Trace('[AddToOutputBuffer-Serial] %s',[Buffer]);
+     WriteToCATPort(Buffer^, nNumberOfBytesToWrite);
+     end;
 {$IFEND}
    //TLogger.GetInstance.Debug('Exiting AddToOutputBuffer');
 end;
@@ -2119,12 +2127,13 @@ begin
    // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
 
+   (* Removed network code as AddToOutputBuffer will send to net radio // ny4i
    if Self.tNetObject <> nil then
       begin
       Self.tNetObject.SendCW(msg);
       Exit;
       end;
-
+   *)
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
