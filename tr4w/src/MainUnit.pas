@@ -2389,12 +2389,14 @@ begin
   18, 0, 0, 0,
   FW_DONTCARE,
   0, 0, 0,
-
-{$IF LANG = 'RUS'}
-  RUSSIAN_CHARSET
-{$ELSE}
+  {$IF LANG = 'UKR'}
+   EastEurope_Charset
+ {$ELSEIF LANG = 'RUS'}
+  russian_charset
+ {$ELSE}
   DEFAULT_CHARSET
 {$IFEND}
+
 ,
   OUT_DEFAULT_PRECIS,
   Clip_Default_Precis,

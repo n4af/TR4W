@@ -144,14 +144,14 @@ const
   ICOM_LONG_MODECOMMAND                 = True ;
 
 const
-        LANG                                  = 'ENG';
+//         LANG                                  = 'ENG';
 //       LANG                                  = 'RUS';
 //       LANG                                  = 'MNG';
 //       LANG                                  = 'CZE';
 //       LANG                                  = 'SER';
 //       LANG                                  = 'ROM';
 //       LANG                                  = 'GER';
-
+       LANG                                  = 'UKR';
 // not implemented
 
 
@@ -168,6 +168,7 @@ const
 {$IF LANG = 'ROM'}{$INCLUDE lang\tr4w_consts_rom.pas}{$IFEND}
 {$IF LANG = 'CHN'}{$INCLUDE lang\tr4w_consts_chn.pas}{$IFEND}
 {$IF LANG = 'GER'}{$INCLUDE lang\tr4w_consts_ger.pas}{$IFEND}
+{$IF LANG = 'UKR'}{$INCLUDE lang\tr4w_consts_ukr.pas}{$IFEND}
 
 {$IF tDebugMode}
 

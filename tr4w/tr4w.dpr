@@ -124,6 +124,7 @@ uses
 {$IF LANG = 'ROM'}{$R res\tr4w_rom.res}{$IFEND}
 {$IF LANG = 'CHN'}{$R res\tr4w_chn.res}{$IFEND}
 {$IF LANG = 'GER'}{$R res\tr4w_ger.res}{$IFEND}
+{$IF LANG = 'UKR'}{$R res\tr4w_ukr.res}{$IFEND}
 
 {$R 'Win11.res'}
 function WindowProc(TRHWND: HWND; Msg: UINT; wParam: wParam; lParam: lParam): longword; stdcall;
