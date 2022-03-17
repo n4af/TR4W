@@ -3527,7 +3527,7 @@ begin
    //msg := RawToBytes(sBuf[1], Length(sBuf));
    try
       udp.BroadcastEnabled := true;
-      udp.Send(UDPBroadcastAddress, UDPBroadcastPort, sBuf); // ny4i 4.44.9
+      udp.Send(UDPBroadcastAddress, UDPBroadcastPortRadio, sBuf); // ny4i 4.44.9
       dtLastUDPRadio := Now;
    except
       on E: Exception do

@@ -2684,7 +2684,7 @@ begin
                  #9 + '<timestamp>' + SystemTimeToString(UTC) + '</timestamp>' + sLineBreak +
                  '</dynamicresults>' + sLineBreak;
   udp.BroadcastEnabled := true;
-  udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+  udp.Send(UDPBroadcastAddress,UDPBroadcastPortScore,sBuf);
   end;
 end;
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
@@ -2710,7 +2710,7 @@ begin
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
       '</contactdelete>'+ sLineBreak ;
       udp.BroadcastEnabled := true;
-      udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+      udp.Send(UDPBroadcastAddress,UDPBroadcastPortContact,sBuf);
       end;
 end;
 procedure LogContactToUDP(RXData: ContestExchange);
@@ -2843,7 +2843,7 @@ begin
    //msg := RawToBytes(sBuf[1], Length(sBuf));
    udp.BroadcastEnabled := true;
    logger.Trace('Sending UDP Broadcast data: ' + sBuf);
-   udp.Send(UDPBroadcastAddress,UDPBroadcastPort,sBuf);
+   udp.Send(UDPBroadcastAddress,UDPBroadcastPortContact,sBuf);
    //udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
 end;
 
