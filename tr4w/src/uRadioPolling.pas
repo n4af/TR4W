@@ -3505,6 +3505,7 @@ begin
    sBuf := '<?xml version="1.0" encoding="utf-8"?>' + sLineBreak +
       '<RadioInfo>' + sLineBreak +
       #9 + '<app>TR4W</app>' + sLineBreak +
+      #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak +
       #9 + '<RadioNr>' + Format('%d',[Math.IfThen(ActiveRadio = RadioOne,1,2)]) + '</RadioNr>' + sLineBreak +
       #9 + '<Freq>' + Format('%d', [freq div 10]) + '</Freq>' + sLineBreak +
       #9 + '<TXFreq>' + Format('%d', [txFreq div 10]) + '</TXFreq>' + sLineBreak +
@@ -3512,6 +3513,7 @@ begin
       #9 + '<OpCall>' + CurrentOperator + '</OpCall>' +  sLineBreak +
       #9 + '<IsRunning>' + StrUtils.IfThen(OpMode = SearchAndPounceOpMode,'False','True') + '</IsRunning>' + sLineBreak +
       #9 + '<FocusEntry>0</FocusEntry>' + sLineBreak +
+      #9 + '<EntryWindowHwnd>' +'</EntryWindowHwnd>' + sLineBreak +
       #9 + '<Antenna>-1</Antenna>' + sLineBreak +
       #9 + '<Rotors>-1</Rotors>' + sLineBreak +
       #9 + '<FocusRadioNr>1</FocusRadioNr>' + sLineBreak +
