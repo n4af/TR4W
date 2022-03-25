@@ -24,7 +24,7 @@ const
   TC_OP                                 = 'Оператор';
   TC_NAME                               = 'Ім`я';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
-  TC_CHECKCALLSIGN                      = 'Перевірити позывний';
+  TC_CHECKCALLSIGN                      = 'Перевірити позивний';
   TC_FREQUENCYFORCALLINKHZ              = 'частоту в кГц для %s';
   TC_DIFVERSION                         = '%s з другої версії программы.'#13'TR4W ожидает версию %s.'#13'Файл, який ви намагаєтесь відкрити має версію %s.';
   
@@ -46,8 +46,8 @@ const
   TC_CONFIGURATION_FILE                 = 'Файл конфігурації';
   TC_CURRENT_OPERATOR_CALLSIGN          = 'Позивний поточного оператора';
   TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'Додати імпортовані зв`язки до поточного лога?';
-  TC_QSO_IMPORTED                       = 'зв`язки імпортовано.'; // - '345 Qs importad.'
-  TC_ISADUPE                            = 'зв`язок з %s вже був!!';
+  TC_QSO_IMPORTED                       = 'Зв`язки імпортовано.'; // - '345 Qs importad.'
+  TC_ISADUPE                            = 'Зв`язок з %s вже був!!';
   TC_ERRORINLOGFILE                     = 'Помилка у файлі лога!';
   TC_HASIMPROPERSYNTAX                  = 'Позивний %s має неправильний синтаксис!!';
   TC_SORRYNOLOG                         = 'Вибачте!! Параметр NO LOG = TRUE забороняє вводити зв`язки на цьому комп`ютері';
@@ -67,19 +67,19 @@ const
   TC_YESTOCLEARTHEDUPESHEET             = '"YES" для очищення таблиці повторів';
   TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" для очищення таблиці множників'; 
 
-  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
-  TC_LOGFILENOTFOUND                    = 'Log file not found';
-  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
-  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
-  TC_BACKUPCREATED                      = 'Log file backup created';
-  TC_CANNOTRENAME                       = 'Can not rename';
+  TC_WANTTOCONVERTLOG                   = 'Ви бажаєте конвертувати цей журнал в найновіший формат?';
+  TC_LOGFILENOTFOUND                    = 'Файл журналу не знайдено';
+  TC_CANNOTBACKUPLOG                    = 'Не вдалося створити резервну копію';
+  TC_CANNOTCOPYLOGREADONLY              = 'Неможливо скопіювати файл журналу - цільовий файл існує і доступний лише для читання';
+  TC_BACKUPCREATED                      = 'Створена резервна копія файлу журналу';
+  TC_CANNOTRENAME                       = 'Неможливо перейменувати'; 
 
   TC_TRANSMITFREQUENCYKILOHERTZ         = 'передавану частоту (у кГц):';
   TC_SPRINTQSYRULE                      = 'Правило SPRINT QSY!!!';
   TC_PADDLE                             = 'Маніпулятор';
   TC_FOOTSW                             = 'Педаль';
   TC_LOG_NOTE                           = 'замітку';
-  TC_LOG_DELETED                        = 'Видалена';
+  TC_LOG_DELETED                        = 'Видалено';
 
   TC_SUN                                = 'Нед';
   TC_MON                                = 'Пнд';
@@ -101,7 +101,7 @@ const
   {NEW CONTEST}
   TC_EUDX                               = '«Країна ЄС, введіть чотиризначний код країни»;';
   TC_LATEST_CONFIG_FILE                 = 'Останній файл конфігурації';
-  TC_OPENCONFIGURATIONFILE              = ' - Відкрити файли конфігурації або розмістити новий конкурс';
+  TC_OPENCONFIGURATIONFILE              = ' - Відкрити файли конфігурації або розмістити новий контест';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Каталог "%s" уже існує.'#13' Переписати його?';
   TC_NEWENGLANDSTATEABREVIATION         = 'Введіть скорочення для штатів Нової Англії (Нова Англія)'#13'(ME, NH, VT, MA, CT, RI):'; 
   TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Введіть QTH, який Ви хочете передати:';
@@ -125,7 +125,7 @@ const
   TC_RFAS                               = 'Введіть географічні координати (широта і довгота), округлені до десятків градусів:';
   TC_ENTERYOURSIXDIGITGRIDSQUARE        = 'Введіть шестизначний номер вашого локатора:'; 
   TC_ISLANDSTATION                      = 'Острівна станція';
-  TC_ENTERYOURNAMEANDSTATE              = 'Введіть ваше ім`я (та штат якщо ви у Північній Америці):';
+  TC_ENTERYOURNAMEANDSTATE              = 'Введіть ваше ім`я (та штат, якщо ви у Північній Америці):';
   TC_ENTERYOURNAMEANDQTH                = 'Введіть ваше ім`я та QTH (штат США, Канадську провінцію або країну DX):';
 
   TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Введіть вашу підгрупу (MY PREC: A, B, M, Q, S або U), число - останні дві цифри року видачі вашої ліцензії та ARRL секцію:'; 
@@ -164,7 +164,7 @@ const
   TC_CZECHREPUBLICORINSLOVAKIA          = 'Чехії або Словаччині';
   TC_BULGARIA                           = 'Болгарії';
   TC_ROMANIA                            = 'Румунії';
-  TC_HUNGARY                            = 'Угорщиниі';
+  TC_HUNGARY                            = 'Угорщині';
   TC_BELGIUM                            = 'Бельгії';
   TC_NETHERLANDS                        = 'Нідерландах';
   TC_STPETERSBURGOBLAST                 = 'Санкт-Петербурзі / області';
@@ -178,14 +178,14 @@ const
   TC_HQ                                 = 'HQ (HQ станція)';
   TC_CIS                                = 'СНД';
   TC_SPAIN                              = 'Іспанії';
-  TC_JAPAN                              = 'японії';
+  TC_JAPAN                              = 'Японії';
   TC_CANADA                             = 'Канаді';
   TC_FRANCE                             = 'Франції';
   TC_HQ_OR_MEMBER                       = 'HQ або член клубу'; 
 
   {UTELNET}
 
-  TC_TELNET                             = 'З`єднання'#0'Відключення'#0'Команди'#0'Заморозити'#0'Очистити'#0'100'#0;
+  TC_TELNET                             = 'З`єднання'#0'Відключення'#0'Команди'#0'Заморозити'#0'Очистити'#0'100'#0';
   TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'ВИ НЕ ПІДКЛЮЧЕНІ ДО ІНТЕРНЕТУ!';
   TC_GETHOST                            = 'ВИЗНАЧЕННЯ ХОСТУ..';
   TC_SERVER                             = 'СЕРВЕР: %s';
@@ -197,7 +197,7 @@ const
   {UNET}
 
   TC_CONNECTIONTOTR4WSERVERLOST         = 'З`єднання з TR4WSERVER %s:%d втрачено.';
-  TC_COMPUTERCLOCKISSYNCHRONIZED        = 'комп`ютерний час синхронізовано.';
+  TC_COMPUTERCLOCKISSYNCHRONIZED        = 'Комп`ютерний час синхронізовано.';
   TC_CONNECTINGTO                       = 'З`єднання з';
   TC_CONNECTTOTR4WSERVERFAILED          = 'З`єднання з TR4WSERVER не вдалося. Перевірте значення команди SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'З`єднано з';
@@ -242,14 +242,14 @@ const
 
   {LOGEDIT}
 
-  TC_QSONEEDSFOR                        = ' зв`язок з %s:';
-  TC_MULTNEEDSFOR                       = ' Множники для %s :';
+  TC_QSONEEDSFOR                        = 'Зв`язок з %s:';
+  TC_MULTNEEDSFOR                       = 'Множники для %s :';
   TC_MISSINGMULTSREPORT                 = 'Інформація про множники: %u країн на %u, але не на всіх діапазонах.';
 
   {LOGDUPE}
 
   TC_THEREWERECALLS                     = 'Знайдено %u позивних у файлі початкових обмінних номерів.'#13'+%u повторів';
-  TC_RESTARTBINISFORADIFFERENTCONTEST   = 'Файл RESTART.BIN від іншого змагання.';
+  TC_RESTARTBINISFORADIFFERENTCONTEST   = 'Файл RESTART.BIN від іншого контесту.';
 
   {LOGSTUFF}
   TC_IMPROPERZONENUMBER                 = 'Неправильний номер зони';
@@ -331,11 +331,11 @@ const
 'Для програмування спец. знаків, натисніть сполучення Control-P перед спецсимволом.'; 
 
 
-  TC_CQFUNCTIONKEYMEMORYSTATUS          = 'ВМІСТ ПАМ`яТІ ФУНКЦІОНАЛЬНИХ КЛАВІШІВ В РЕЖИМІ CQ';
-  TC_EXCHANGEFUNCTIONKEYMEMORYSTATUS    = 'ВМІСТ ПАМ`яТІ ФУНКЦІОНАЛЬНИХ КЛАВІШІВ В РЕЖИМІ S&P';
-  TC_OTHERCWMESSAGEMEMORYSTATUS         = 'Вміст пам`ятіінших CW повідомлень';
+  TC_CQFUNCTIONKEYMEMORYSTATUS          = 'ВМІСТ ПАМ`ЯТІ ФУНКЦІОНАЛЬНИХ КЛАВІШІВ В РЕЖИМІ CQ';
+  TC_EXCHANGEFUNCTIONKEYMEMORYSTATUS    = 'ВМІСТ ПАМ`ТІ ФУНКЦІОНАЛЬНИХ КЛАВІШІВ В РЕЖИМІ S&P';
+  TC_OTHERCWMESSAGEMEMORYSTATUS         = 'Вміст пам`яті інших CW повідомлень';
   TC_OTHERSSBMESSAGEMEMORYSTATUS        = 'Вміст пам`яті інших SSB-повідомлень';
-  TC_PRESSCQFUNCTIONKEYTOPROGRAM        = 'Натисніть функціональну клавішу (F1, AltF1, CtrlF1) для програмування режиму "CQ" або ESCAPE для виходу) : ';
+  TC_PRESSCQFUNCTIONKEYTOPROGRAM        = 'Натисніть функціональну клавішу (F1, AltF1, CtrlF1) для програмування режиму "CQ" або ESCAPE для виходу):';
   TC_PRESSEXFUNCTIONKEYTOPROGRAM        = 'Натисніть функціональну клавішу (F3-F12, Alt/Ctrl F1-F12) для програмування обміну в режимі S&P або ESCAPE для виходу:'; 
 
   TC_NUMBERORLETTEROFMESSAGETOBEPROGRAM = 'Цифра або літера повідомлення для програмування (1-9, A-C або ESCAPE для виходу):';
@@ -362,20 +362,20 @@ const
 
   {LOGSUBS2}
 
-  TC_WASADUPE                           = 'зв`язок з %s вже був.';
+  TC_WASADUPE                           = 'Зв`язок з %s вже був.';
   TC_ALTDCOMMANDDISABLED                = 'Alt-D команда вимкнена відповідно до рядка SINGLE RADIO MODE = TRUE';
-  TC_YOUHAVERESTOREDTHELASTDELETED      = 'Ви відновили останній віддалений зв`язок!!';
+  TC_YOUHAVERESTOREDTHELASTDELETED      = 'Ви відновили останній видалений зв`язок!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Ви видалили останній зв`язок!! Використовуйте Alt-Y для відновлення.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Ви дійсно хочете вийти з програми?';
   TC_YOUARENOWTALKINGTOYOURPACKETPORT   = 'Зараз ви розмовляєте з портом пакетного зв`язку. Використовуйте Control-B для виходу.';
   TC_YOUALREADYWORKEDIN                 = 'Ви вже працювали з %s з %s!!';
-  TC_ISADUPEANDWILLBELOGGEDWITHZERO     = 'зв`язок із %s - повтор. зв`язок буде занесено в лог без нарахування очок.';
+  TC_ISADUPEANDWILLBELOGGEDWITHZERO     = 'Зв`язок із %s - повтор. Зв`язок буде занесено в лог без нарахування очок.';
   TC_LOGFILESIZECHECKFAILED             = 'НЕ ВДАЛОСЯ ПЕРЕВІРИТИ РОЗМІР ФАЙЛУ ЛОГУ!!!!';
 
   {JCTRL2}
 
   TC_NEWAUTOSAPENABLESENSITIVITYINHZSEC = 'нове значення чутливості команди AUTO S&P ENABLE у Гц/сек)';
-  TC_NEWBANDMAPDECAYTIMEMINUTES         = 'новий час оновлення картки діапазону (у хвилинах)';
+  TC_NEWBANDMAPDECAYTIMEMINUTES         = 'новий час оновлення карти діапазону (у хвилинах)';
   TC_NEWBANDMAPGUARDBANDHERTZ           = 'нову межу захоплення карти діапазону (у Герцах)';
   TC_COMMANDWHICHWILLBESENDATTELNETCON  = 'команду, яка буде відправлена під час встановлення telnet з`єднання';
   TC_COMPUTERNAME                       = 'ім`я комп`ютера (максимум 7 знаків)';
@@ -513,7 +513,7 @@ const
   TC_MS                                 = ' мс'; //milliseconds
 
   {ULOGSEARCH}
-  TC_ENTRIESPERMS                       = 'Знайдено %u запису за %u мс';
+  TC_ENTRIESPERMS                       = 'Знайдено %u записів за %u мс';
 
   {ULOGCOMPARE}
   TC_SIZEBYTES                          = 'Розмір, байт';
@@ -537,7 +537,6 @@ const
   HELP_WORD                             = 'Допомога';
   OK_WORD                               = 'ОК';
   EXIT_WORD                             = 'Вихід';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_CALLSIGN                           = 'Позивний';
   RC_OPERATOR                           = 'Оператор';
   RC_MODE                               = 'Вид випром.';
@@ -568,7 +567,7 @@ const
   RC_FCC                                = 'Перший позивний у кожній країні';
   RC_FCZ                                = 'Перший позивний у кожній зоні';
   RC_POSSBADZONE                        = 'Можливі неправильні зони';
-  RC_QSOBYCOUNTRY                       = 'зв`язки по країнах та діапазонах';
+  RC_QSOBYCOUNTRY                       = 'Зв`язки по країнах та діапазонах';
   RC_SCOREBYHOUR                        = 'Очки по годинам';
   RC_SUMMARY                            = 'Підсумковий результат';
   RC_EXIT                               = 'Вихід із програми';

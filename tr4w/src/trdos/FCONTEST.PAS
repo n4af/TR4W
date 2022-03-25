@@ -1240,6 +1240,8 @@ begin
           ActiveDomesticMult := NoDomesticMults;
       end;
 
+    VAQP:
+      tAllowDupeQSOs := TRUE;
 {
     REFCW:
       begin
