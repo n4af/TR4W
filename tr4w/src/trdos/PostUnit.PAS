@@ -50,8 +50,9 @@ uses
   ZoneCont,
   Messages,
   LogCW, // 4.53.2
-  Windows
-  ;
+  Windows,
+  uSuperCheckPartialFileUpload,
+  Dialogs;
 
 type
   RateSheetType = array[1..3, 0..23, BandType, CW..Both] of integer;
@@ -486,6 +487,7 @@ label
   1;
 var
   SetTransmittersId                     : boolean;
+  scp: TSCPUpload;
 begin
 
   SetTransmittersId := False;
@@ -511,6 +513,26 @@ begin
   PreviewFileNameAddress := tReportsFilename;
   PreviewFileIsCabrillo := True;
   FilePreview;
+  // Ask if user wants to upload the Cabrillo file to SCP
+  If YesOrNo(0,'Do you want to upload your Cabrillo file to SuperChecklPartial?' {TC_WANTTOCONVERTLOG}) = IDYES then
+     begin
+     scp := TSCPUpload.Create(true,logger);
+     scp.trace := true;
+     try
+        if scp.SendFile(tReportsFileName) then
+           begin
+           logger.Info('%s file uploaded to SCP',[tReportsFileName]);
+           end
+        else
+           begin
+           logger.Error('Error sending %s to SCP',[tReportsFileName]);
+           logger.Error(scp.errorResult);
+           end;
+     finally
+        scp.Free;
+     end;
+  end;
+
 end;
 
 function CheckLog: boolean;
