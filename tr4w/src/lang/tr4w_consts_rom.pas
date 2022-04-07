@@ -576,6 +576,7 @@ const
   RC_SETTINGS                           = 'Setari';
   RC_OPTIONS                            = 'Comenzi de configurare';
   RC_CFG_COMMANDS                       = 'Comenzi de configurare';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_PROGRAMMES                         = 'Mesaje ale programului';
   RC_CATANDCW                           = 'CAT si manipularea CW';
   RC_RADIOONE                           = 'Statia 1';

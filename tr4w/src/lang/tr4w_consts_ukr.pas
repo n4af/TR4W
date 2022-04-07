@@ -185,7 +185,7 @@ const
 
   {UTELNET}
 
-  TC_TELNET                             = 'З`єднання'#0'Відключення'#0'Команди'#0'Заморозити'#0'Очистити'#0'100'#0';
+  TC_TELNET                             = 'З`єднання'#0'Відключення'#0'Команди'#0'Заморозити'#0'Очистити'#0'100'#0'';
   TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'ВИ НЕ ПІДКЛЮЧЕНІ ДО ІНТЕРНЕТУ!';
   TC_GETHOST                            = 'ВИЗНАЧЕННЯ ХОСТУ..';
   TC_SERVER                             = 'СЕРВЕР: %s';
@@ -252,6 +252,7 @@ const
   TC_RESTARTBINISFORADIFFERENTCONTEST   = 'Файл RESTART.BIN від іншого контесту.';
 
   {LOGSTUFF}
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   TC_IMPROPERZONENUMBER                 = 'Неправильний номер зони';
   TC_NOTENOUGHINFOINEXCHANGE            = 'Недостатньо інформації в обмінному номері!!';
   TC_IMPROPERDOMESITCQTH                = 'Неправильний внутрішній QTH!!';

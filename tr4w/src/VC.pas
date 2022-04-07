@@ -144,8 +144,8 @@ const
   ICOM_LONG_MODECOMMAND                 = True ;
 
 const
-         LANG                                  = 'ENG';
-//       LANG                                  = 'RUS';
+          LANG                                  = 'ENG';
+//         LANG                                  = 'RUS';
 //       LANG                                  = 'MNG';
 //       LANG                                  = 'CZE';
 //       LANG                                  = 'SER';
@@ -3168,7 +3168,7 @@ QSOPartiesCount = 18;
  ({Name: 'ARRL VHF JUN';               }Email: nil;                      DF: nil;                 WA7BNM:   43; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE:GridExchange;                      XM:NoDXMults; QP:ARRLVHFJUNPointMethod; ADIFName:'ARRL-VHF-JUN';   CABName:''),
  ({Name: 'ARRL VHF SEP';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: GridExchange;                      XM:NoDXMults; QP:ARRLVHFJUNPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'BALTIC';                     }Email: nil;                      DF: nil;                 WA7BNM:   28; {SK3BG: nil;          } QRZRUID: 161 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:BalticQSOPointMethod; ADIFName:'';   CABName:''),
- ({Name: 'BWQP';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000;      {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults;    P: 0; AE: RSTNameAndQTHExchange;              XM:NoDXMults; QP:BWQPQSOPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'BWQP';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000;      {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults;    P: 0; AE: RSTNAMEANDPOSSIBLEFOCNUMBER;              XM:NoDXMults; QP:BWQPQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'CIS';                        }Email: nil;                      DF: 'cis';               WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 500 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:CISQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'CQP';                        }Email: nil;                      DF: 'california_cty';    WA7BNM:  0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;   P: 6 ;AE: QSONumberDomesticOrDXQTHExchange;                    XM:NoDXMults; QP:TwoPhoneThreeCW; ADIFName:'';   CABName:''),           //n4af
  ({Name: 'COUNTY HUNTER';              }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQTHExchange;                              XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),

@@ -575,7 +575,7 @@ const
   RC_GRID                               = 'Ètverec (lokátor)';
   RC_CALCULATOR                         = 'Kalkulaèka';
   RC_LC                                 = 'Výpoèet LC';
-
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_GETOFFSET                          = 'Udej rozdíl';
   RC_LOCALOFFSET                        = 'Chyba místních hodin';
   RC_NTPSERVER                          = 'NTP Server';
