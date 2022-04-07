@@ -213,8 +213,8 @@ begin
             AppendMenu(Menu, MF_CHECKED + MF_STRING, 105, wsprintfBuffer);
           end;
 
-          if Contest in [DARCWAEDCCW, DARCWAEDCSSB, RUSSIANDX, IARU, ARRL160, ARRL10, ARRLSSCW, ARRLSSSSB, ARRLDXCW, ARRLDXSSB, CQ160CW, CQ160SSB, CQWPXCW, CQWPXSSB, CQWWCW, CQWWSSB, CQWWRTTY] then
-            AppendMenu(Menu, MF_STRING, 106, 'Contribute log for SCP database');
+          //if Contest in [DARCWAEDCCW, DARCWAEDCSSB, RUSSIANDX, IARU, ARRL160, ARRL10, ARRLSSCW, ARRLSSSSB, ARRLDXCW, ARRLDXSSB, CQ160CW, CQ160SSB, CQWPXCW, CQWPXSSB, CQWWCW, CQWWSSB, CQWWRTTY] then
+           // AppendMenu(Menu, MF_STRING, 106, 'Contribute log for SCP database');
         end;
 //        RichEditViewer := Get101Window(hwnddlg);
         SetWindowText(hwnddlg, PreviewFileNameAddress);

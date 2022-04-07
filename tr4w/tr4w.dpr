@@ -112,7 +112,8 @@ uses
   Log4D in 'src\Log4D.pas',
   uNetRadioBase in 'src\uNetRadioBase.pas',
   uRadioElecraftK4 in 'src\uRadioElecraftK4.pas',
-  GetWinVersionInfo in 'src\GetWinVersionInfo.pas';
+  GetWinVersionInfo in 'src\GetWinVersionInfo.pas',
+  uSuperCheckPartialFileUpload;
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
