@@ -517,16 +517,19 @@ begin
   If YesOrNo(0,'Do you want to upload your Cabrillo file to SuperChecklPartial?' {TC_WANTTOCONVERTLOG}) = IDYES then
      begin
      scp := TSCPUpload.Create(true,logger);
-     scp.trace := true;
      try
         if scp.SendFile(tReportsFileName) then
            begin
            logger.Info('%s file uploaded to SCP',[tReportsFileName]);
+           //ShowMessage('Log file successfully uploaded to SuperCheckPartial');
+           MessageBox(tr4whandle, 'Log file successfully uploaded to SuperCheckPartial', nil, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
            end
         else
            begin
            logger.Error('Error sending %s to SCP',[tReportsFileName]);
            logger.Error(scp.errorResult);
+           //ShowMessage(PChar('Error uploading log file to SuperCheckPartial' + #13#10 + scp.errorResult));
+           MessageBox(tr4whandle, PChar('Error uploading log file to SuperCheckPartial' + #13#10 + scp.errorResult), nil, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
            end;
      finally
         scp.Free;
