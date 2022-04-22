@@ -20,7 +20,7 @@ interface
 
 
 const
- TR4W_CURRENTVERSION_NUMBER            = '4.110.2' ;  // N4af     New Release
+ TR4W_CURRENTVERSION_NUMBER            = '4.110.4' ;  // N4af     New Release
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
   TR4W_CURRENTVERSIONDATE               = 'April, 2022' ;
