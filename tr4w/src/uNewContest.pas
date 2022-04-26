@@ -452,7 +452,7 @@ begin
                   DisplayInitialCommand(icmyName);
                 end;
 
-              CWOPEN:
+              CWOPEN, MST:
                 begin
                   SetCommentAndEnableEditControl(TC_ENTERYOURNAME, icmyName);
                 end;

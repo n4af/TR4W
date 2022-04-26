@@ -119,8 +119,8 @@ begin
         end;
     }
  if Not ColumnDupeSheetEnable then   // n4af 4.36.12
-  bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
-  else
+   { bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
+  { else
       bgColor := -1;
       {$RangeChecks OFF}
         if Left <> 0 then
@@ -131,12 +131,15 @@ begin
           tr4wColorsArray[VDColorsArray[bgColor]],
           gdHorizontal
           )
-          {$RangeChecks ON} 
+          {$RangeChecks ON}
+
+
+
       else
          begin
       //     GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict]], tr4wColorsArray[VDColorsArray[VDCurrentCallDistrict + 1]], gdVertical);
            GradientRect(VDDRAWITEMSTRUCT^.HDC, VDDRAWITEMSTRUCT^.rcItem, clWhite, clwhite, gdVertical);
-          inc(VDCurrentCallDistrict);     
+          inc(VDCurrentCallDistrict);
           if VDCurrentCallDistrict = Ord('9') + 1 then VDCurrentCallDistrict := Ord('0');
           end ;
 
