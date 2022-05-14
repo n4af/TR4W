@@ -6775,7 +6775,7 @@ begin
             exch.QTHString := tempSRX_String;
 
 
-         WWDIGI:
+         WWDIGI, ARRLDIGI:
             begin
             exch.ExchString := gridSquare;
             exch.DomesticQTH := gridSquare;
