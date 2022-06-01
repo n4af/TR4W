@@ -177,7 +177,7 @@ const
   tKeyerDebug                           = False;
 
   CWDEBUG                               = False;
-  SCPDEBUG                              = False;
+  SCPDEBUG                              =  False;
   MAKE_DEFAULT_VALUES                   = True;
 {$IFEND}
 
@@ -732,6 +732,7 @@ type
   tCategoryOperator = (coSINGLEOP, coMULTIOP, coCHECKLOG);
   tCategoryPower = (cpHIGH, cpLOW, cpQRP);
   tCategoryTransmitter = (ctONE, ctTWO, ctLIMITED, ctUNLIMITED, ctSWL);
+  tCategoryOverlay = (cvNONE, cvCLASSIC, cvROOKIE, cvNOVICETECH, cvTBWIRES, cvOVER50);
 
 const
                                             // Use uppercase
@@ -743,7 +744,8 @@ const
   tCategoryOperatorSA                   : array[tCategoryOperator] of PChar = ('SINGLE-OP', 'MULTI-OP', 'CHECKLOG');
   tCategoryPowerSA                      : array[tCategoryPower] of PChar = ('HIGH', 'LOW', 'QRP');
   tCategoryTransmitterSA                : array[tCategoryTransmitter] of PChar = ('ONE', 'TWO', 'LIMITED', 'UNLIMITED', 'SWL');
-
+  tCategoryOverlaySA                    : array[tCategoryOverlay] of PCHAR = ('NONE', 'CLASSIC', 'ROOKIE', 'NOVICE-TECH', 'TB-WIRES', 'OVER 50');           // 4.111.3
+  
 var
   CategoryAssisted                      : tCategoryAssisted;
   CategoryBand                          : tCategoryBand;
@@ -752,6 +754,7 @@ var
   CategoryOperator                      : tCategoryOperator;
   CategoryPower                         : tCategoryPower;
   CategoryTransmitter                   : tCategoryTransmitter;
+  CategoryOverlay                       : tCategoryOverlay;              // 4.111.3
   logLevels                             : tLogLevels;
 type
 
