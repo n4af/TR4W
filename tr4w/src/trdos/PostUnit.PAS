@@ -1758,7 +1758,8 @@ begin
   
   // Issue 405 to fix up the header - ny4i
   sWriteFileFromString(tReportFileWrite,'ADIF File'#13#10);
-  sWriteFileFromString(tReportFileWrite,'Created by TR4W version ' + TR4W_CURRENTVERSION + ' on ' + FormatDateTime('nn-mmm-yyyy hh:mm:ss',dtReportTime) + #13#10);
+
+   sWriteFileFromString(tReportFileWrite,'Created by TR4W version ' + TR4W_CURRENTVERSION + ' on ' + FormatDateTime('mmm-dd-yyyy hh:mm:ss',dtReportTime) + #13#10);
 
   WriteADIFField('ADIF_VER','3.1.0');
   sWriteFile(tReportFileWrite, #13#10, 1);
