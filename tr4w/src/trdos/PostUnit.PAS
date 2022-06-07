@@ -137,6 +137,7 @@ procedure CreateCabrilloFile;
 procedure CheckForNewContestDate(Date: TQSOTime);
 
 procedure WriteADIFField(sFieldName: string; sFieldValue: string);
+function SLOperatorsSortProc(List: TStringList; Index1, Index2: Integer): Integer;
 function GetOperatorsFromLog: string;
 function DeleteRepeatedSpaces(const s: string): string;
 
@@ -1988,6 +1989,7 @@ begin
             ARRLDIGI, WWDIGI, BATAVIA_FT8:
                begin
                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<GRIDSQUARE:%u>%s ', tCallStringLength, p);
+               logger.Debug('CabDetail] Writing gridsquare as (%s) - Writing %d bytes',[CABRILLO_BUFFER,nNumberOfBytesToWrite]);
                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
                end;
           else
@@ -2339,6 +2341,7 @@ begin
       begin
       Continue;
       end;
+
     if Contest = WINTERFIELDDAY then
        begin
        if TempTag = ctLocation then
@@ -2362,6 +2365,11 @@ begin
     sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
   end;
 
+  if MyGrid <> '' then
+     begin
+     sWriteFileFromString(tReportFileWrite,'GRID-LOCATOR: ' + MyGrid + #13#10);
+     end;
+     
   if ErmakSpecification then
     for Operator := 1 to 10 do
       for TempErmakField := Low(TErmakFields) to High(TErmakFields) do
@@ -2465,6 +2473,7 @@ begin
   contacts := 0;
   Result := False;
 
+  logger.Info('In tGenerateLogPortionOfCabrilloFile');
 
   if not OpenLogFile then Exit;
 
@@ -2488,7 +2497,8 @@ begin
   if ReadLogFile then
   begin
     inc(contacts);
-    slOperators.Add(TempRXData.ceOperator);
+    //slOperators.Add(TempRXData.ceOperator);
+
 
     HisCallsign := @TempRXData.Callsign[1];
 
@@ -2650,17 +2660,21 @@ if TempRXData.DomMultQTH = '' then
       Windows.lstrcat(CABRILLO_RST_RCVD, '599');
 }
           {Make Exchanges Strings}
+      Windows.ZeroMemory(@CABRILLO_MYEX,SizeOf(CABRILLO_MYEX));
+      Windows.ZeroMemory(@CABRILLO_HISEX,SizeOf(CABRILLO_HISEX));
       case ActiveExchange of
 
         GridExchange:
           begin
             Format(CABRILLO_MYEX, '%-11s', cMyGrid);
+            logger.debug('[CabDetail-GridExchange] MyExchange = (%s)',[CABRILLO_MYEX]);
             Format(CABRILLO_HISEX, '%-11s', csQTHString);
           end;
 
         Grid2Exchange:
           begin
             Format(CABRILLO_MYEX, '%-11s', cMyGrid);
+            logger.debug('[CabDetail-Grid2Exchange] MyExchange = (%s)',[CABRILLO_MYEX]);
             Format(CABRILLO_HISEX, '%-11s', csQTHString);
           end;
 
@@ -4322,6 +4336,7 @@ begin
 function GetOperatorsFromLog: string;
 var
   slOperators                           : TStringList;
+  Index: integer;
 begin
   Result := '';
   if not OpenLogFile then Exit;
@@ -4332,13 +4347,31 @@ begin
       try
          slOperators := TStringList.Create;
          slOperators.Duplicates := dupIgnore;
-	      slOperators.Sorted := true;
+	      slOperators.Sorted := false;
+
          while ReadLogFile do
             begin
-            slOperators.Add(TempRXData.ceOperator);
+            //slOperators.Add(TempRXData.ceOperator);
+            slOperators.Values[TempRXData.ceOperator] := IntToStr(StrToInt(slOperators.Values[TempRXData.ceOperator]) + 1);
             end;
          CloseLogFile;
-         Result := slOperators.DelimitedText;
+         logger.debug('Before operators sort');
+         for Index := 0 to slOperators.Count-1 do
+            begin
+            logger.debug('   %s',[slOperators.Names[Index]]);
+            end;
+         slOperators.CustomSort(SLOperatorsSortProc);
+         //Result := slOperators.DelimitedText;
+         logger.debug('After operators sort');
+         for Index := 0 to slOperators.Count-1 do
+            begin
+            logger.debug('[%d]   %s',[Index,slOperators.Names[Index]]);
+            Result := Result + slOperators.Names[Index];
+            if Index < (slOperators.Count-1) then
+               begin
+               Result := Result + ', ';
+               end;
+            end;
       except
       on E: Exception do
          logger.error('Exception in GetOperatorsFromLog ',E);
@@ -4347,6 +4380,17 @@ begin
       FreeAndNil(slOperators);
    end;
 end;
+
+function SLOperatorsSortProc(List: TStringList; Index1, Index2: Integer): Integer;
+var
+  i1, i2: Integer;
+begin
+  i1 := StrToInt(List.ValueFromIndex[Index1]);
+  i2 := StrToInt(List.ValueFromIndex[Index2]);
+  Result := i2 - i1;    // This sorts in ascending count order
+  /////Result := i1 - i2;    // This sorts in descendiong count order
+end;
+
 (*----------------------------------------------------------------------------*)
 function GetStateFromSection(section: string) : string;
 begin
