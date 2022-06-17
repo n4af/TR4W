@@ -119,8 +119,8 @@ begin
         end;
     }
  if Not ColumnDupeSheetEnable then   // n4af 4.36.12
-   { bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
-  { else
+     bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
+    else
       bgColor := -1;
       {$RangeChecks OFF}
         if Left <> 0 then
