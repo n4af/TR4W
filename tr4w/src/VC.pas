@@ -144,9 +144,9 @@ const
   ICOM_LONG_MODECOMMAND                 = True ;
 
 const
-          LANG                                  = 'ENG';
-//         LANG                                  = 'RUS';
-//       LANG                                  = 'MNG';
+         LANG                                  = 'ENG';
+//       LANG                                  = 'RUS';
+//        LANG                                  = 'MNG';
 //       LANG                                  = 'CZE';
 //       LANG                                  = 'SER';
 //       LANG                                  = 'ROM';

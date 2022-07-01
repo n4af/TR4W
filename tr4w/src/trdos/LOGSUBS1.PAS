@@ -520,7 +520,6 @@ begin
     //      Wait(3000); {KK1L: 6.71}
     Exit;
   end;
-
   TryKillAutoCQ;
   if ActiveMode = CW then
     FlushCWBufferAndClearPTT;
