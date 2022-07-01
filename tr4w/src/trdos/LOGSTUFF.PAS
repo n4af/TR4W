@@ -408,7 +408,7 @@ var
   CallsignICameBackTo: CallString;
   CheckLogFileSize: boolean;
   ColumnDupeSheetColor: boolean;
-  ColumnDupeSheetEnable: boolean = False;
+  ColumnDupeSheetEnable: boolean;
   ComputerID: Char { = CHR(0)};
   ComputerName: Str10 = 'New';
   ControlBreakStatus: boolean;

@@ -4109,7 +4109,6 @@ begin
       RData.RSTReceived := LogRSSent
     else
       RData.RSTReceived := LogRSTSent;
-
   RData.ExchString := ExchangeString;
   CalculateQSOPoints(Rdata);
 end;

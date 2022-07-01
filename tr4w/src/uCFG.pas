@@ -231,7 +231,7 @@ const
       );
 
    {List}
-   ListParamArray: array[0..52] of ListParamRecord =
+   ListParamArray: array[0..53] of ListParamRecord =
       (
     {(*}
     (lpArray: @RateDisplayTypeStringArray;        lpLength: Byte(High(RateDisplayType));        lpVar: @RateDisplay; ),
@@ -262,40 +262,33 @@ const
     (lpArray: @BandStringsArrayWithOutSpaces;     lpLength: Byte(High(BandType));               lpVar: @SingleBand; ),
     (lpArray: @InterfacedRadioTypeSA;             lpLength: Byte(High(InterfacedRadioType));    lpVar: @Radio1.RadioModel; ),
     (lpArray: @InterfacedRadioTypeSA;             lpLength: Byte(High(InterfacedRadioType));    lpVar: @Radio2.RadioModel; ),
-
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_cat_rts_state; ),
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_cat_dtr_state; ),
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_keyer_rts_state; ),
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_keyer_DTR_state; ),
-
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio2.tr4w_cat_rts_state; ),
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio2.tr4w_cat_dtr_state; ),
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio2.tr4w_keyer_rts_state; ),
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio2.tr4w_keyer_DTR_state; ),
-
     (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @Radio1.tCATPortType; ),
     (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @Radio2.tCATPortType; ),
-
     (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @Radio1.tKeyerPort; ),
     (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @Radio2.tKeyerPort; ),
-
     (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @ActiveRotatorPort; ),
     (lpArray: @MP3RecorderDurationSA;             lpLength: Byte(High(TMP3RecorderDuration));   lpVar: @RecorderDuration; ),
-
     (lpArray: @tCategoryBandSA;                   lpLength: Byte(High(tCategoryBand));          lpVar: @CategoryBand; ),
     (lpArray: @tCategoryModeSA;                   lpLength: Byte(High(tCategoryMode));          lpVar: @CategoryMode; ),
     (lpArray: @tCategoryOperatorSA;               lpLength: Byte(High(tCategoryOperator));      lpVar: @CategoryOperator; ),
     (lpArray: @tCategoryPowerSA;                  lpLength: Byte(High(tCategoryPower));         lpVar: @CategoryPower; ),
-
     (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @WinKeySettings.wksWinKey2Port; ),
     (lpArray: @KeyerModeSA;                       lpLength: Byte(High(TWK2KeyerMode));          lpVar: @WinKeySettings.wksKeyerMode; ),
     (lpArray: @SidetoneFrequencySA;               lpLength: Byte(High(TWKSidetoneFrequency));   lpVar: @WinKeySettings.wksValueList.vlSidetoneFrequency; ),
-
     (lpArray: @tCategoryTransmitterSA;            lpLength: Byte(High(tCategoryTransmitter));   lpVar: @CategoryTransmitter;),
     (lpArray: @tCategoryAssistedSA;               lpLength: Byte(High(tCategoryAssisted));      lpVar: @CategoryAssisted;),
     (lpArray: @tCertificateSA;                    lpLength: Byte(High(tCertificate));           lpVar: @Certificate;),
+    (lpArray: @tLogLevelsSA;                      lpLength: Byte(High(tLogLevels));             lpVar: @logLevels;),
+    (lpArray: @tCategoryOverlaySA;                lpLength: Byte(High(tCategoryOverlay));       lpVar: @CategoryOverlay; )
 
-    (lpArray: @tLogLevelsSA;                         lpLength: Byte(High(tLogLevels));           lpVar: @logLevels;)
     {*)}
       );
 
@@ -315,7 +308,7 @@ var
 
 const
 
-   CommandsArraySize = 412 + 1 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}     // 4.91.3
+   CommandsArraySize = 413 + 1 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}     // 4.91.3
    + 1 {RadioOneCWByCAT} + 1 {RadioTwoCWByCAT} //ny4i // 4.44.5
    + 9 {UDPBroadcast Variables} + 4 {New UDP Broadcasst Ports}
       //ny4i 4.44.9  - Issue 82 added one more UDP variable   Issue 304 Added UDPBroadcastScore
@@ -390,6 +383,7 @@ const
  (crCommand: 'CATEGORY-OPERATOR';             crAddress: pointer(44);                     crMin:0;  crMax:0;       crS: csNew; crA:0; crC:1 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
  (crCommand: 'CATEGORY-POWER';                crAddress: pointer(45);                     crMin:0;  crMax:0;       crS: csNew; crA:0; crC:1 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
  (crCommand: 'CATEGORY-TRANSMITTER';          crAddress: pointer(49);                     crMin:0;  crMax:0;       crS: csNew; crA:0; crC:1 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
+ (crCommand: 'CATEGORY-OVERLAY';              crAddress: pointer(53);                     crMin:0;  crMax:0;       crS: csNew; crA:0; crC:1 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),     // 4.111.3
  (crCommand: 'CHECK LOG FILE SIZE';           crAddress: @CheckLogFileSize;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'CLEAR DUPE SHEET';              crAddress: @ClearDupeSheetCommandGiven;     crMin:0;  crMax:0;       crS: csOld; crA: 4; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'CODE SPEED';                    crAddress: @CodeSpeed;                      crMin:0;  crMax:99;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),

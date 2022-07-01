@@ -40,7 +40,7 @@ type
   InitialCommands =
     (icmyCheck, icmyFDClass, icmyGrid, icmyFOC, icmyIOTA, icmyName, icmyPrec, icmyQTH, icmySection, icmyState, icmyZone, icmyPostalCode);
 
-function NewContestDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
+function  NewContestDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 procedure BeginNewContest(h: HWND);
 procedure ClearFields;
 procedure SaveNewContest(h: HWND);
@@ -58,7 +58,7 @@ uses MainUnit;
 
 const
 
-  CSAS                                  = 9;
+  CSAS                                  = 10;
   InitialCommandsSA2                    : array[1..CSAS] of PChar = (
     nil,
     nil,
@@ -68,7 +68,9 @@ const
     'CATEGORY-MODE',
     'CATEGORY-OPERATOR',
     'CATEGORY-POWER',
-    'CATEGORY-TRANSMITTER');
+    'CATEGORY-TRANSMITTER',
+    'CATEGORY-OVERLAY'
+    );
 
   InitialCommandsSA                     : array[InitialCommands] of PChar =
     (
@@ -125,7 +127,7 @@ var
   TempCategoryOperator                  : tCategoryOperator;
   TempCategoryPower                     : tCategoryPower;
   TempCategoryTransmitter               : tCategoryTransmitter;
-  
+  TempCategoryOverlay                   : tCategoryOverlay;
 
 //  TempActiveExchange                    : ExchangeType;
 //  TempExchangeInformation               : ExchangeInformationRecord;
@@ -226,6 +228,9 @@ begin
 
         for TempCategoryTransmitter := Low(tCategoryTransmitter) to High(tCategoryTransmitter) do
           SendMessage(InitialCommandsHWNDArray[9, 2], CB_ADDSTRING, 0, integer(tCategoryTransmitterSA[TempCategoryTransmitter]));
+
+        for TempCategoryOverlay := Low(tCategoryOverlay) to High(tCategoryOverlay) do
+          SendMessage(InitialCommandsHWNDArray[10, 2], CB_ADDSTRING, 0, integer(tCategoryOverlaySA[TempCategoryOverlay]));
 
         for TempCardinal := 4 to CSAS do
           SendMessage(InitialCommandsHWNDArray[TempCardinal, 2], CB_SETCURSEL, 0, 0);

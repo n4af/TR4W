@@ -345,6 +345,12 @@ begin
   mov  eax,[eax*4+tCategoryModeSA]
   push eax
 
+//  push pOverlay           // 4.111.3
+    xor  eax,eax
+  mov  al,[CategoryOverlay]
+  mov  eax,[eax*4+tCategoryOverlaySA]
+  push eax
+
 //  push pOps
 
   xor  eax,eax

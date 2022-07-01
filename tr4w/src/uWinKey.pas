@@ -1040,7 +1040,7 @@ begin
       wkAddCharToHostBuffer(Msg[i]);
 
     end;
-
+  DebugMsg('msg[i] = [' + msg[i] + ']');
     if Msg[i] = '^' then wkAddCharToHostBuffer('|');
     if Msg[i] = #$06 then inc(wkSpeedUp);
     if Msg[i] = #$13 then inc(wkSpeedDown);
