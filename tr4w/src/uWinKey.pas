@@ -559,16 +559,7 @@ begin
   Result := False;
   case Msg of
     //    WM_HELP: tWinHelp(49);
-{
-    WM_HSCROLL:
-      begin
-        for c := WEIGHTING_SLIDER to TAIL_SLIDER do
-        begin
-          TempInteger := Windows.SendDlgItemMessage(hwnddlg, c, TBM_GETPOS, 0, 0);
-          tSetDlgItemIntFalse(hwnddlg, c + length(WK2SliderLabelArray), TempInteger);
-        end;
-      end;
-}
+
     WM_INITDIALOG:
       begin
 //        Windows.SendDlgItemMessage(hwnddlg, 300, TBM_SETTHUMBLENGTH , 10, 0);
@@ -644,40 +635,6 @@ begin
           tCB_ADDSTRING_PCHAR(hwnddlg, FREQ_CB, inttopchar(wkSidetoneFrequencyArray[TempInteger]));
         end;
         tCB_SETCURSEL(hwnddlg, FREQ_CB, Byte(WinKeySettings.wksValueList.vlSidetoneFrequency) - 1);
-{
-        for c := 1 to 4 do
-        begin
-          tCB_ADDSTRING_PCHAR(hwnddlg, HANG_CB, WK2HangTimeArray[c]);
-        end;
-        tCB_SETCURSEL(hwnddlg, HANG_CB, WinKeySettings.wksValueList.vlSidetoneFrequency - 1);
-}
-
- {       for c := 1 to wkBool do
-          Windows.SendDlgItemMessage(hwnddlg, 100 + c, BM_SETCHECK, integer(WK2BoolValue[c]^), 0);
-
-
-        Windows.SendDlgItemMessage(hwnddlg, 101, BM_SETCHECK, integer(WinKeySettings.wksWinKey2Enable), 0);
-        Windows.SendDlgItemMessage(hwnddlg, 102, BM_SETCHECK, integer(WinKeySettings.wksAutospace), 0);
-        Windows.SendDlgItemMessage(hwnddlg, 103, BM_SETCHECK, integer(WinKeySettings.wksCTSpacing), 0);
-        Windows.SendDlgItemMessage(hwnddlg, 104, BM_SETCHECK, integer(WinKeySettings.wksSidetone), 0);
-        Windows.SendDlgItemMessage(hwnddlg, 105, BM_SETCHECK, integer(WinKeySettings.wksPaddleSwap), 0);
-         Windows.SendDlgItemMessage(hwnddlg, 106, BM_SETCHECK, integer(WinKeySettings.wkIgnoreSpeedSpot), 0);
-
-
-        Windows.SendDlgItemMessage(hwnddlg, WEIGHTING_SLIDER, TBM_SETRANGE, 1, MakeLong(10, 90));
-        Windows.SendDlgItemMessage(hwnddlg, WEIGHTING_SLIDER, TBM_SETPOS, 1, WinKeySettings.wkWeighting);
-
-        Windows.SendDlgItemMessage(hwnddlg, DITDAH_RATIO_SLIDER, TBM_SETRANGE, 1, MakeLong(33, 66));
-        Windows.SendDlgItemMessage(hwnddlg, DITDAH_RATIO_SLIDER, TBM_SETPOS, 1, WinKeySettings.wkDitDahRatio);
-
-        Windows.SendDlgItemMessage(hwnddlg, LEADIN_SLIDER, TBM_SETRANGE, 1, MakeLong(0, 100));
-        Windows.SendDlgItemMessage(hwnddlg, LEADIN_SLIDER, TBM_SETPOS, 1, WinKeySettings.wksLeadIn);
-
-        Windows.SendDlgItemMessage(hwnddlg, TAIL_SLIDER, TBM_SETRANGE, 1, MakeLong(0, 100));
-        Windows.SendDlgItemMessage(hwnddlg, TAIL_SLIDER, TBM_SETPOS, 1, WinKeySettings.wkTail);
-}
-//        Windows.PostMessage(hwnddlg, WM_HSCROLL, 0, 0);
-
         goto 1;
       end;
     WM_COMMAND:
@@ -692,14 +649,7 @@ begin
           for c := 1 to wkBool do
             WK2BoolValue[c]^ := boolean(TF.SendDlgItemMessage(hwnddlg, 100 + c, BM_GETCHECK));
 
-{
-          WinKeySettings.wksWinKey2Enable := BOOL(Windows.SendDlgItemMessage(hwnddlg, 101, BM_GETCHECK, 0, 0));
-          WinKeySettings.wksAutospace := BOOL(Windows.SendDlgItemMessage(hwnddlg, 102, BM_GETCHECK, 0, 0));
-          WinKeySettings.wksCTSpacing := BOOL(Windows.SendDlgItemMessage(hwnddlg, 103, BM_GETCHECK, 0, 0));
-          WinKeySettings.wksSidetone := BOOL(Windows.SendDlgItemMessage(hwnddlg, 104, BM_GETCHECK, 0, 0));
-          WinKeySettings.wksPaddleSwap := BOOL(Windows.SendDlgItemMessage(hwnddlg, 105, BM_GETCHECK, 0, 0));
-          WinKeySettings.wkIgnoreSpeedSpot := BOOL(Windows.SendDlgItemMessage(hwnddlg, 106, BM_GETCHECK, 0, 0));
-}
+
           WinKeySettings.wksWinKey2Port := PortType(tCB_GETCURSEL(hwnddlg, PORT_CB));
 
 //          if Windows.SendDlgItemMessage(hwnddlg, 104, BM_GETCHECK, 0, 0) = BST_CHECKED then WinKeySettings.wksValueList.vlSidetoneFrequency := WinKeySettings.wksValueList.vlSidetoneFrequency or (1 shl 7);
@@ -725,15 +675,7 @@ begin
               if TempInteger >= WK2UpDownLowerValue[c] then
                 WK2UpDownValue[c]^ := Byte(TempInteger);
           end;
-{
-          WinKeySettings.wkWeighting := Windows.GetDlgItemInt(hwnddlg, WEIGHTING_SLIDER + length(WK2SliderLabelArray), lpTranslated, False);
-          WinKeySettings.wkDitDahRatio := Windows.GetDlgItemInt(hwnddlg, DITDAH_RATIO_SLIDER + length(WK2SliderLabelArray), lpTranslated, False);
-          WinKeySettings.wksLeadIn := Windows.GetDlgItemInt(hwnddlg, LEADIN_SLIDER + length(WK2SliderLabelArray), lpTranslated, False);
-          WinKeySettings.wkTail := Windows.GetDlgItemInt(hwnddlg, TAIL_SLIDER + length(WK2SliderLabelArray), lpTranslated, False);
-}
-//          WinKeySettings.wkDitDahRatio := tCB_GETCURSEL(hwnddlg, 116) + 34;
 
-//          wkSaveSettings;
           wkClose;
           wkOpen;
           goto ExitAndClose;
@@ -760,30 +702,6 @@ begin
 
   end;
 end;
-{
-procedure wkSaveSettings;
-var
-  h                                     : HWND;
-begin
-  if not Tree.tOpenFileForWrite(h, TR4W_WINKEYINI_FILENAME) then Exit;
-  sWriteFile(h, WinKeySettings, SizeOf(TWinKeySettings));
-  CloseHandle(h);
-end;
-
-procedure wkLoadSettings;
-label
-  1;
-var
-  h                                     : HWND;
-  pNumberOfBytesRead                    : Cardinal;
-begin
-  if not Tree.tOpenFileForRead(h, TR4W_WINKEYINI_FILENAME) then Exit;
-  if Windows.GetFileSize(h, nil) <> SizeOf(TWinKeySettings) then goto 1;
-  Windows.ReadFile(h, WinKeySettings, SizeOf(TWinKeySettings), pNumberOfBytesRead, nil);
-  1:
-  CloseHandle(h);
-end;
-}
 
 procedure wkReadThreadProc;
 label
@@ -837,10 +755,14 @@ begin
 {$IFEND}
 
             ActiveRadioPtr.tPTTStatus := PTTStatusType(wkBUSY);
+            logger.debug('PTTStatus=WKBUSY');
+            // logger.debug('Exiting ParametersOkay early: ExchangeString=<%s>',[ExchangeString]);
+
             SendStationStatus(sstPTT);
 
           if not wkBUSY then
             begin
+              logger.debug('PTTStatus=WK-NOT-BUSY');
               wkWaitingBytesInWK := 0;
 //              wkHostBufferIndex := 0;
 //              wkHostBufferSendIndex := 0;
@@ -864,15 +786,7 @@ begin
             end
             else
             begin
-            {it must be an echo back byte}
-{
-              if wkBREAKIN then
-              begin
-                CID_TWO_BYTES[0] := CHR(wkThreadReadBuffer[I]);
-                Windows.SetWindowText(tr4whandle, CID_TWO_BYTES);
-              end
-              else
-}
+
               begin
                 if wkWaitingBytesInWK > 0 then dec(wkWaitingBytesInWK);
               end;
@@ -910,11 +824,7 @@ begin
 {$IF WINKEYDEBUG}
       if wkThreadReadBuffer[i] >= $C0 then
       begin
-{
-        sWriteFile(wkDebugFileRX, wkDebu1310^, 2);
-        sWriteFile(wkDebugFileRX, wkThreadReadBuffer[I], 1);
-        sWriteFile(wkDebugFileRX, wkDebu1310^, 2);
-}
+
       end
       else
 //        sWriteFile(wkDebugFileRX, wkThreadReadBuffer[I], 1);

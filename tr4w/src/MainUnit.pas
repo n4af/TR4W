@@ -1881,6 +1881,9 @@ end;
 
 procedure tr4w_ShutDown;
 begin
+ { PTTOff;             // 4.113.1
+  scWK_RESET;        // 4.113.1
+  WkClose;          // 4.113.1    }
    if Assigned(wsjtx) then
       begin
       wsjtx.Stop;
@@ -1903,6 +1906,7 @@ begin
      end;
   Windows.UnregisterClass(tr4w_ClassName, hInstance);   // ny4i Issue 145. UnregisterClass was not qualifies and it conflicted with classes.UnregisterClass
   ExitProcess(hInstance);
+
 end;
 
 procedure ShowBeamAndHeadingInVHFContest(WindowString: CallString);
@@ -7735,7 +7739,7 @@ var
   TempPortInterface                     : PortInterface;
   TempByte                              : Byte;
 begin
-  logger.debug('Entering PTTOn');
+  DebugMsg('Enter MainUnit.PTTOn');
   if not PTTEnable then
   begin
 
@@ -7781,7 +7785,7 @@ begin
       SetPortByte(ActiveRadioPtr.tKeyerPortHandle, otControl, TempByte);
 
       DrawPTTLabel:
-
+      logger.debug('Entering Main.PTTOn');
       ActiveRadioPtr.tPTTStatus := PTT_ON;
       PTTStatusChanged;
 

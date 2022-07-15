@@ -661,12 +661,7 @@ begin
   if ActiveRadioPtr.tKeyerPortHandle = INVALID_HANDLE_VALUE then Exit;
 //  ActivePortOn := (PTTAsserted or PTTForcedOn or PTTFootSwitch) and PTTEnable;
 
-  {
-  if (PTTAsserted or PTTForcedOn or PTTFootSwitch) and PTTEnable then
-  !!! убрал но надо понять для чего это нужно
-  }
-
-  if ActiveRadioPtr.tKeyerPort in [Serial1..Serial20] then
+   if ActiveRadioPtr.tKeyerPort in [Serial1..Serial20] then
   begin
     SerialOff := 0;
     if ActiveRadioPtr.tr4w_keyer_DTR_state = RtsDtr_CW then SerialOff := CLRDTR;

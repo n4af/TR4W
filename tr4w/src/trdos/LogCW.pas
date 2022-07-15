@@ -187,18 +187,7 @@ type
   {SendingOnRadioTwo: BOOLEAN; {KK1L: 6.72 Moved to global (INTERFACE section) for use in LOGSUBS}
 
 //   NEWCW                           : TCW;
-{
-procedure ClearPTTForceOn;
-begin
-  if CWEnable then CPUKeyer.PTTUnForce;
-end;
 
-procedure PTTForceOn;
-
-begin
-  if CWEnable and CWEnabled then CPUKeyer.PTTForceOn;
-end;
-}
 
 procedure AddStringToBuffer(Msg: Str160; Tone: integer);
 var

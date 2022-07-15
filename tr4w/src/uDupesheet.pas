@@ -119,10 +119,10 @@ begin
         end;
     }
  if Not ColumnDupeSheetEnable then   // n4af 4.36.12
-   { bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
-  { else
-      bgColor := -1;
-      {$RangeChecks OFF}
+     bgColor := SendMessage(VDDRAWITEMSTRUCT^.hwndItem, LB_GETITEMDATA, VDDRAWITEMSTRUCT^.ItemID, 0)
+    else
+      bgColor := -1;       // 4.113.1
+      {$RangeChecks OFF}   // 4.113.1
         if Left <> 0 then
         GradientRect(
           VDDRAWITEMSTRUCT^.HDC,
