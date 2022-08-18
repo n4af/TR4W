@@ -2488,7 +2488,6 @@ begin
   cMyGrid := @TempGrid[1];
 
   cMyName := @MyName[1];
-
   cMyZone := StrToInt(MyZone);
   cMyState := @MyState[1];
 
