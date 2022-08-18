@@ -195,7 +195,7 @@ var
   //localMsg                              : string;
 begin
 
-   //localMsg := Format('Adding %s to CW Buffer', [Msg]);
+   //localMsg                                               := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
    if ( (Msg = CWByCATBufferTerminator) or
         ((CWEnable and CWEnabled and IsCWByCATActive )) ) then   // ny4i 4.44.5    + Issue 111
@@ -237,8 +237,8 @@ begin
       end;
 
 //    if MMTTY_FIRST_TX_CHAR then ProcessMMTTYMessage(TXM_CHAR, 13);
-//    MMTTY_FIRST_TX_CHAR := False;
-    for i := 1 to length(Msg) do
+//    MMTTY_FIRST_TX_CHAR                                   := False;
+    for i                                                   := 1 to length(Msg) do
       PostMmttyMessage(RXM_CHAR, integer(Msg[i]));
 
     if not ControlAMode then
@@ -251,14 +251,14 @@ begin
   if CWEnable and CWEnabled then
   begin
 {$IF OZCR2008}
-    CWMessageToNetwork := CWMessageToNetwork + Msg;
+    CWMessageToNetwork                                      := CWMessageToNetwork + Msg;
 {$IFEND}
 
     if wkActive then
     begin
    //  if not WKbusy then flushcwbuffer;  // ny4i winkeyer
       wkAddCWMessageToInternalBuffer(Msg);
-   //   wkBUSY := True;   // 4.88.2      remove 4.90.5
+   //   wkBUSY                                              := True;   // 4.88.2      remove 4.90.5
      Exit;
     end;
 
@@ -267,17 +267,17 @@ begin
        PTTOn;
       end;
    CPUKeyer.AddStringToCWBuffer(Msg, Tone);
-//    CountsSinceLastCW := 0;
+//    CountsSinceLastCW                                     := 0;
 
     if CWThreadID = 0 then
     begin
-         wkBusy := False;            //  4.90.5
+         wkBusy                                             := False;            //  4.90.5
     //     wkSendAdminCommand(wkRESET);
-        //   ExitFromCWThread := False;
+        //   ExitFromCWThread                               := False;
     //    inc(CWThreadCounter);
     //   windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));
 
-      CWThreadHandle := tCreateThread(@CWThreadProc, CWThreadID);
+      CWThreadHandle                                        := tCreateThread(@CWThreadProc, CWThreadID);
      //                  THREAD_PRIORITY_ABOVE_NORMAL
       asm
 
@@ -306,31 +306,31 @@ var
    s: string;
    s1: string;
 begin
-   Result := 0;
+   Result                                                   := 0;
    if not assigned(slElements) then
       begin
       exit;
       end;
    DebugMsg('Calculating elements for ' + sMsg);
-   for i := 1 to (length(sMsg)) do
+   for i                                                    := 1 to (length(sMsg)) do
       begin
-      s := Copy(sMsg,i,1);
+      s                                                     := Copy(sMsg,i,1);
       if s = ' ' then
          begin
-         Result := Result + 7;
+         Result                                             := Result + 7;
          end
       else
          begin
-         s1 := slElements.Values[s];
+         s1                                                 := slElements.Values[s];
          if length(s1) > 0 then
             begin
-            Result := Result + StrToInt(s1);
+            Result                                          := Result + StrToInt(s1);
             DebugMsg('CW Element ' + s + ' = ' + s1 + ' elements');
             end
          else
             begin
             DebugMsg('Missing CW element for ' + s);
-            Result := Result + 5; // average 5
+            Result                                          := Result + 5; // average 5
             end;
          end;
       end;
@@ -341,15 +341,15 @@ function CWStillBeingSent: boolean;
 begin
   if ISCWByCATActive then
      begin
-     Result := ActiveRadioPtr.CWByCAT_Sending;
+     Result                                                 := ActiveRadioPtr.CWByCAT_Sending;
      end
   else if wkActive then
      begin
-     Result := wkBUSY;
+     Result                                                 := wkBUSY;
      end
   else
      begin
-     Result := CPUKeyer.CWStillBeingSent;   // ny4i Issue 149 With CWBC, it was possible to miss we were still sending
+     Result                                                 := CPUKeyer.CWStillBeingSent;   // ny4i Issue 149 With CWBC, it was possible to miss we were still sending
      end;
 end;
 
@@ -357,14 +357,14 @@ function DeleteLastCharacter: boolean;
 begin
   if ISCWByCATActive then
      begin
-     Result := ActiveRadioPtr.DeleteLastCWCharacter; // ny4i Added Issue 149 (general stability of CWBC)
+     Result                                                 := ActiveRadioPtr.DeleteLastCWCharacter; // ny4i Added Issue 149 (general stability of CWBC)
      end
   else if wkActive then
   begin
     wkSendByte(wkCMD_BACKSPACE);   // ny4i Just a note...Result is not set here...
     Exit;
   end;
-  DeleteLastCharacter := CPUKeyer.DeleteLastCharacter;
+  DeleteLastCharacter                                       := CPUKeyer.DeleteLastCharacter;
 end;
 
 procedure FlushCWBuffer;
@@ -375,20 +375,20 @@ begin
   if IsCWByCATActive(ActiveRadioPtr) then
      begin
      DebugMsg('Flushing CWBuffer - Stop Sending on ActiveRadio CWBC');
-     ActiveRadioPtr.CWByCATBuffer := '';
+     ActiveRadioPtr.CWByCATBuffer                           := '';
      ActiveRadioPtr.StopSendingCW;
      end;
   if InactiveRadioPtr.CurrentStatus.Mode = CW then
   if IsCWByCATActive(InactiveRadioPtr) then
      begin
      DebugMsg('Flushing CWBuffer - Stop Sending on InactiveRadio CWBC');
-     InactiveRadioPtr.CWByCATBuffer := '';
+     InactiveRadioPtr.CWByCATBuffer                         := '';
      InactiveRadioPtr.StopSendingCW;
      end;
 
-  tAutoSendMode := False;
+  tAutoSendMode                                             := False;
   CPUKeyer.FlushCWBuffer;
-  WKBusy := False; // 4.90.5
+  WKBusy                                                    := False; // 4.90.5
 //  if wkActive then wkClearBuffer;    // Gav    remove
 end;
 
@@ -409,16 +409,16 @@ begin
       while not CPUKeyer.SerialPortOutputBuffer[ActiveRTTYPort].FreeSpace >= length(Msg) + 1 do ;
  
       if length(Msg) > 0 then
-        for CharPointer := 1 to length(Msg) do
+        for CharPointer                                     := 1 to length(Msg) do
           CPUKeyer.SerialPortOutputBuffer[ActiveRTTYPort].AddEntry(ord(Msg[CharPointer]));
  
       if length(RTTYReceiveString) > 0 then
-        for CharPointer := 1 to length(RTTYReceiveString) do
+        for CharPointer                                     := 1 to length(RTTYReceiveString) do
           CPUKeyer.SerialPortOutputBuffer[ActiveRTTYPort].AddEntry(ord(RTTYReceiveString[CharPointer]));
  
     end;
  
-    RTTYTransmissionStarted := False;
+    RTTYTransmissionStarted                                 := False;
    }
 end;
 {-------------------------------------------------------------------------------
@@ -427,7 +427,7 @@ Helper function to easily refer to the number of dot and dashes in a character
 }
 function ElementLength(dots: integer; dashes: integer): integer;
 begin
-   Result := (dots * 1) + (dashes*3) +
+   Result                                                   := (dots * 1) + (dashes*3) +
              ((dots + dashes) - 1)   + // Internel element space
              3; //space ater character
 end;
@@ -438,8 +438,8 @@ procedure LoadElements(sl: TStringList);
 begin
    if Assigned(sl) then
       begin
-      sl.Sorted := false;
-      sl.CommaText := 'A=' + IntToStr(ElementLength(1,1)) +
+      sl.Sorted                                             := false;
+      sl.CommaText                                          := 'A=' + IntToStr(ElementLength(1,1)) +
                      ',B=' + IntToStr(ElementLength(3,1)) +
                      ',C=' + IntToStr(ElementLength(2,2)) +
                      ',D=' + IntToStr(ElementLength(2,1)) +
@@ -481,7 +481,7 @@ begin
                    + ',%=' + IntToStr(ElementLength(4,1)) // K3 AS
                    + ',*=' + IntToStr(ElementLength(4,2)) // K3 SK
                      ;
-      sl.Sorted := true;
+      sl.Sorted                                             := true;
       end;
 
 end;
@@ -526,14 +526,14 @@ begin
       while not CPUKeyer.SerialPortOutputBuffer[ActiveRTTYPort].FreeSpace >= length(Msg) + 2 do ;
  
       if length(RTTYSendString) > 0 then
-        for CharPointer := 1 to length(RTTYSendString) do
+        for CharPointer                                     := 1 to length(RTTYSendString) do
           CPUKeyer.SerialPortOutputBuffer[ActiveRTTYPort].AddEntry(ord(RTTYSendString[CharPointer]));
  
-      for CharPointer := 1 to length(Msg) do
+      for CharPointer                                       := 1 to length(Msg) do
         CPUKeyer.SerialPortOutputBuffer[ActiveRTTYPort].AddEntry(ord(Msg[CharPointer]));
  
       if length(RTTYReceiveString) > 0 then
-        for CharPointer := 1 to length(RTTYReceiveString) do
+        for CharPointer                                     := 1 to length(RTTYReceiveString) do
           CPUKeyer.SerialPortOutputBuffer[ActiveRTTYPort].AddEntry(ord(RTTYReceiveString[CharPointer]));
  
       CPUKeyer.SerialPortOutputBuffer[ActiveRTTYPort].AddEntry(ord(CarriageReturn));
@@ -545,12 +545,12 @@ end;
 procedure SetSpeed(Speed: integer {byte});
 
 begin
-  DisplayedCodeSpeed := Speed;
+  DisplayedCodeSpeed                                        := Speed;
   //
   
   if Speed > 0 then
   begin
-    CodeSpeed := Speed;
+    CodeSpeed                                               := Speed;
     CPUKeyer.SetSpeed(Speed);
     if ActiveRadioPtr.CWSpeedSync then
        begin
@@ -575,7 +575,7 @@ var
   WPM                                   : integer;
 
 begin
-  WPM := QuickEditInteger(TC_WPMCODESPEED, 2);
+  WPM                                                       := QuickEditInteger(TC_WPMCODESPEED, 2);
   if WPM <> -1 then
   begin
     SetSpeed(WPM);
@@ -599,13 +599,13 @@ begin
     Exit;
   end;
 
-  BufferAddress := BufferStart;
+  BufferAddress                                             := BufferStart;
 
   while BufferAddress <> BufferEnd do
   begin
     Write(Buffer[BufferAddress]);
     inc(BufferAddress);
-    if BufferAddress = 256 then BufferAddress := 0;
+    if BufferAddress = 256 then BufferAddress               := 0;
   end;
 end;
 
@@ -621,14 +621,14 @@ var
   BufferStart, BufferEnd                : integer;
 
 begin
-  BufferStart := 0;
-  BufferEnd := 0;
+  BufferStart                                               := 0;
+  BufferEnd                                                 := 0;
 
   if not CWEnable then Exit;
 
   SetUpToSendOnActiveRadio;
 
-  CWEnabled := True;
+  CWEnabled                                                 := True;
   DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
 
 //  CPUKeyer.PTTForceOn;
@@ -657,19 +657,19 @@ begin
         begin
           CPUKeyer.AddCharacterToCWBuffer(Buffer[BufferStart]);
           inc(BufferStart);
-          if BufferStart = 256 then BufferStart := 0;
+          if BufferStart = 256 then BufferStart             := 0;
           DisplayBuffer(Buffer, BufferStart, BufferEnd);
         end;
 
     until NewKeyPressed;
-    Key := UpCase(NewReadKey);
+    Key                                                     := UpCase(NewReadKey);
 
     if Key >= ' ' then
     begin
         //            IF BufferStart = BufferEnd THEN ClrScr;
-      Buffer[BufferEnd] := Key;
+      Buffer[BufferEnd]                                     := Key;
       inc(BufferEnd);
-      if BufferEnd = 256 then BufferEnd := 0;
+      if BufferEnd = 256 then BufferEnd                     := 0;
       Write(Key);
     end
     else
@@ -678,10 +678,10 @@ begin
           begin
             while BufferStart <> BufferEnd do
             begin
-              InactiveRigCallingCQ := False; // n4af 4.42.11
+              InactiveRigCallingCQ                          := False; // n4af 4.42.11
               CPUKeyer.AddCharacterToCWBuffer(Buffer[BufferStart]);
               inc(BufferStart);
-              if BufferStart = 256 then BufferStart := 0;
+              if BufferStart = 256 then BufferStart         := 0;
             end;
 
 //            CPUKeyer.PTTUnForce;
@@ -693,7 +693,7 @@ begin
           if BufferEnd <> BufferStart then
           begin
             dec(BufferEnd);
-            if BufferEnd < 0 then BufferEnd := 255;
+            if BufferEnd < 0 then BufferEnd                 := 255;
             DisplayBuffer(Buffer, BufferStart, BufferEnd);
           end;
 
@@ -733,7 +733,7 @@ begin
               if BufferEnd <> BufferStart then
               begin
                 dec(BufferEnd);
-                if BufferEnd < 0 then BufferEnd := 255;
+                if BufferEnd < 0 then BufferEnd             := 255;
                 DisplayBuffer(Buffer, BufferStart, BufferEnd);
               end;
 
@@ -749,7 +749,7 @@ begin
   tGetSystemTime;
   Windows.ZeroMemory(@Result, SizeOf(Result));
   Format(@Result[1], '%.2hu%.2hu', UTC.wHour, UTC.wMinute);
-  Result[0] := #4;
+  Result[0]                                                 := #4;
 end;
 
 function QSONumberString(QSONumber: integer): Str80;
@@ -757,7 +757,7 @@ var
   TempString                            : Str80;
 begin
   Str(QSONumber, TempString);
-  QSONumberString := TempString;
+  QSONumberString                                           := TempString;
 end;
 
 procedure DisplayCrypticCWMenu;
@@ -787,23 +787,23 @@ begin
       begin
         //            WriteLnCenter ('CQ FUNCTION KEY MEMORY STATUS');
 
-        for Key := F1 to F12 do
+        for Key                                             := F1 to F12 do
         begin
           Str(Ord(Key) - Ord(F1) + 1, TempString);
-          TempString := 'F' + TempString + ' - ';
+          TempString                                        := 'F' + TempString + ' - ';
 
           if (ActiveMode = CW) or (ActiveMode = Digital) then
           begin
             if GetCQMemoryString(CW, Key) <> '' then {KK1L: 6.73 Added Mode}
-              TempString := TempString + GetCQMemoryString(CW, Key); {KK1L: 6.73 Added Mode}
+              TempString                                    := TempString + GetCQMemoryString(CW, Key); {KK1L: 6.73 Added Mode}
 
           end
           else
             if GetCQMemoryString(Phone, Key) <> '' then
-              TempString := TempString {+ DVPPath} + GetCQMemoryString(Phone, Key); {KK1L: 6.73 Added Mode}
+              TempString                                    := TempString {+ DVPPath} + GetCQMemoryString(Phone, Key); {KK1L: 6.73 Added Mode}
 
           if length(TempString) > 79 then
-            TempString := Copy(TempString, 1, 78) + '+';
+            TempString                                      := Copy(TempString, 1, 78) + '+';
 //          Windows.SetWindowText(MessagesValues[Ord(Key)], PChar(string(TempString)));
             //                ClrEol;
             //                WriteLn (TempString);
@@ -814,16 +814,16 @@ begin
       begin
         //            WriteLnCenter ('ALT-CQ FUNCTION KEY MEMORY STATUS');
 
-        for Key := AltF1 to AltF12 do
+        for Key                                             := AltF1 to AltF12 do
         begin
           Str(Ord(Key) - Ord(AltF1) + 1, TempString);
-          TempString := 'Alt-F' + TempString + ' - ';
+          TempString                                        := 'Alt-F' + TempString + ' - ';
 
           if GetCQMemoryString(ActiveMode, Key) <> '' then {KK1L: 6.73 Added Mode}
-            TempString := TempString + GetCQMemoryString(ActiveMode, Key); {KK1L: 6.73 Added Mode}
+            TempString                                      := TempString + GetCQMemoryString(ActiveMode, Key); {KK1L: 6.73 Added Mode}
 
           if length(TempString) > 79 then
-            TempString := Copy(TempString, 1, 78) + '+';
+            TempString                                      := Copy(TempString, 1, 78) + '+';
 //          Windows.SetWindowText(MessagesValues[Ord(Key) - 24], PChar(string(TempString)));
             //                ClrEol;
             //                WriteLn (TempString);
@@ -834,16 +834,16 @@ begin
       begin
         //            WriteLnCenter ('CONTROL-CQ FUNCTION KEY MEMORY STATUS');
 
-        for Key := ControlF1 to ControlF12 do
+        for Key                                             := ControlF1 to ControlF12 do
         begin
           Str(Ord(Key) - Ord(ControlF1) + 1, TempString);
-          TempString := 'Ctrl-F' + TempString + ' - ';
+          TempString                                        := 'Ctrl-F' + TempString + ' - ';
 
           if GetCQMemoryString(ActiveMode, Key) <> '' then {KK1L: 6.73 Added mode}
-            TempString := TempString + GetCQMemoryString(ActiveMode, Key); {KK1L: 6.73 Added mode}
+            TempString                                      := TempString + GetCQMemoryString(ActiveMode, Key); {KK1L: 6.73 Added mode}
 
           if length(TempString) > 79 then
-            TempString := Copy(TempString, 1, 78) + '+';
+            TempString                                      := Copy(TempString, 1, 78) + '+';
 //          Windows.SetWindowText(MessagesValues[Ord(Key) - 12], PChar(string(TempString)));
             //                ClrEol;
             //                WriteLn (TempString);
@@ -874,34 +874,34 @@ begin
             //                  WriteLn('F1 - Set by the MY CALL statement in config file');
             //                  WriteLn('F2 - Set by S&P EXCHANGE and REPEAT S&P EXCHANGE');
 
-          for Key := F3 to F12 do
+          for Key                                           := F3 to F12 do
           begin
             Str(Ord(Key) - Ord(F1) + 1, TempString);
-            TempString := 'F' + TempString + ' - ';
+            TempString                                      := 'F' + TempString + ' - ';
 
                 {KK1L: 6.73 Added mode to GetExMemoryString}
             if GetEXMemoryString(ActiveMode, Key) <> '' then
-              TempString := TempString + GetEXMemoryString(ActiveMode, Key);
+              TempString                                    := TempString + GetEXMemoryString(ActiveMode, Key);
 
             if length(TempString) > 79 then
-              TempString := Copy(TempString, 1, 78) + '+';
+              TempString                                    := Copy(TempString, 1, 78) + '+';
 //            Windows.SetWindowText(MessagesValues[Ord(Key)], PChar(string(TempString)));
                 //                    ClrEol;
                 //                    WriteLn (TempString);
           end;
         end
         else
-          for Key := F1 to F12 do
+          for Key                                           := F1 to F12 do
           begin
             Str(Ord(Key) - Ord(F1) + 1, TempString);
-            TempString := 'F' + TempString + ' - ';
+            TempString                                      := 'F' + TempString + ' - ';
 
               {KK1L: 6.73 Added mode to GetExMemoryString}
             if GetEXMemoryString(ActiveMode, Key) <> '' then
-              TempString := TempString {+ DVPPath} + GetEXMemoryString(ActiveMode, Key);
+              TempString                                    := TempString {+ DVPPath} + GetEXMemoryString(ActiveMode, Key);
 
             if length(TempString) > 79 then
-              TempString := Copy(TempString, 1, 78) + '+';
+              TempString                                    := Copy(TempString, 1, 78) + '+';
 //            Windows.SetWindowText(MessagesValues[Ord(Key)], PChar(string(TempString)));
               //                    ClrEol;
               //                    WriteLn (TempString);
@@ -912,17 +912,17 @@ begin
       begin
         //            WriteLnCenter ('ALT-EXCHANGE FUNCTION KEY MEMORY STATUS');
 
-        for Key := AltF1 to AltF12 do
+        for Key                                             := AltF1 to AltF12 do
         begin
           Str(Ord(Key) - Ord(AltF1) + 1, TempString);
-          TempString := 'Alt-F' + TempString + ' - ';
+          TempString                                        := 'Alt-F' + TempString + ' - ';
 
             {KK1L: 6.73 Added mode to GetExMemoryString}
           if GetEXMemoryString(ActiveMode, Key) <> '' then
-            TempString := TempString + GetEXMemoryString(ActiveMode, Key);
+            TempString                                      := TempString + GetEXMemoryString(ActiveMode, Key);
 
           if length(TempString) > 79 then
-            TempString := Copy(TempString, 1, 78) + '+';
+            TempString                                      := Copy(TempString, 1, 78) + '+';
             //                 ClrEol;
             //                WriteLn (TempString);
         end;
@@ -932,17 +932,17 @@ begin
       begin
         //            WriteLnCenter ('CONTROL-EXCHANGE FUNCTION KEY MEMORY STATUS');
 
-        for Key := ControlF1 to ControlF12 do
+        for Key                                             := ControlF1 to ControlF12 do
         begin
           Str(Ord(Key) - Ord(ControlF1) + 1, TempString);
-          TempString := 'Ctrl-F' + TempString + ' - ';
+          TempString                                        := 'Ctrl-F' + TempString + ' - ';
 
             {KK1L: 6.73 Added mode to GetExMemoryString}
           if GetEXMemoryString(ActiveMode, Key) <> '' then
-            TempString := TempString + GetEXMemoryString(ActiveMode, Key);
+            TempString                                      := TempString + GetEXMemoryString(ActiveMode, Key);
 
           if length(TempString) > 79 then
-            TempString := Copy(TempString, 1, 78) + '+';
+            TempString                                      := Copy(TempString, 1, 78) + '+';
             //    ClrEol;
              //  WriteLn (TempString);
         end;
@@ -966,53 +966,53 @@ begin
 //    Windows.SetWindowText(MemProgHWND, TC_OTHERCWMESSAGEMEMORYSTATUS);
 
       //         ClrEol;
-//         TempString := ' 1. Call Okay Now - ' + CorrectedCallMessage;
-//         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
+//         TempString                                       := ' 1. Call Okay Now - ' + CorrectedCallMessage;
+//         if length(TempString) > 79 then TempString       := Copy(TempString, 1, 78) + '+';
 //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[112], PChar(string('Call Okay Now - ' + CorrectedCallMessage)));
       //         ClrEol;
-      //         TempString := ' 2. CQ Exchange   - ' + CQExchange;
+      //         TempString                                 := ' 2. CQ Exchange   - ' + CQExchange;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[113], PChar(string('CQ Exchange   - ' + CQExchange)));
 
       //         ClrEol;
-      //         TempString := ' 3. CQ Ex Name    - ' + CQExchangeNameKnown;
+      //         TempString                                 := ' 3. CQ Ex Name    - ' + CQExchangeNameKnown;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[114], PChar(string('CQ Ex Name    - ' + CQExchangeNameKnown)));
 
       //         ClrEol;
-      //         TempString := ' 4. QSL Message   - ' + QSLMessage;
+      //         TempString                                 := ' 4. QSL Message   - ' + QSLMessage;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[115], PChar(string('QSL Message   - ' + QSLMessage)));
       //         ClrEol;
-      //         TempString := ' 5. QSO Before    - ' + QSOBeforeMessage;
+      //         TempString                                 := ' 5. QSO Before    - ' + QSOBeforeMessage;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[116], PChar(string('QSO Before    - ' + QSOBeforeMessage)));
 
       //         ClrEol;
-      //         TempString := ' 6. Quick QSL     - ' + QuickQSLMessage1;
+      //         TempString                                 := ' 6. Quick QSL     - ' + QuickQSLMessage1;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[117], PChar(string('Quick QSL     - ' + QuickQSLMessage1)));
 
       //         ClrEol;
-      //         TempString := ' 7. Repeat S&P Ex - ' + RepeatSearchAndPounceExchange;
+      //         TempString                                 := ' 7. Repeat S&P Ex - ' + RepeatSearchAndPounceExchange;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[118], PChar(string('Repeat S&P Ex - ' + RepeatSearchAndPounceExchange)));
 
       //         ClrEol;
-      //         TempString := ' 8. S&P Exchange  - ' + SearchAndPounceExchange;
+      //         TempString                                 := ' 8. S&P Exchange  - ' + SearchAndPounceExchange;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[119], PChar(string('S&P Exchange  - ' + SearchAndPounceExchange)));
 
       //         ClrEol;
-      //         TempString := ' 9. Tail end msg  - ' + TailEndMessage;
+      //         TempString                                 := ' 9. Tail end msg  - ' + TailEndMessage;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[120], PChar(string('Tail end msg  - ' + TailEndMessage)));
@@ -1033,48 +1033,48 @@ begin
       //         WriteLnCenter('OTHER SSB MESSAGE MEMORY STATUS');
 //    Windows.SetWindowText(MemProgHWND, TC_OTHERSSBMESSAGEMEMORYSTATUS);
       //         ClrEol;
-      //         TempString := ' 1. Call Okay Now - ' + DVPPath + CorrectedCallPhoneMessage;
+      //         TempString                                 := ' 1. Call Okay Now - ' + DVPPath + CorrectedCallPhoneMessage;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[112], PChar(string('Call Okay Now - ' + CorrectedCallPhoneMessage)));
 
       //         ClrEol;
-      //         TempString := ' 2. CQ Exchange   - ' + DVPPath + CQPhoneExchange;
+      //         TempString                                 := ' 2. CQ Exchange   - ' + DVPPath + CQPhoneExchange;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[113], PChar(string('CQ Exchange   - ' + CQPhoneExchange)));
       //         ClrEol;
-      //         TempString := ' 3. CQ Ex Name    - ' + DVPPath + CQPhoneExchangeNameKnown;
+      //         TempString                                 := ' 3. CQ Ex Name    - ' + DVPPath + CQPhoneExchangeNameKnown;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[114], PChar(string('CQ Ex Name    - ' + CQPhoneExchangeNameKnown)));
       //         ClrEol;
-      //         TempString := ' 4. QSL Message   - ' + DVPPath + QSLPhoneMessage;
+      //         TempString                                 := ' 4. QSL Message   - ' + DVPPath + QSLPhoneMessage;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[115], PChar(string('QSL Message   - ' + QSLPhoneMessage)));
       //         ClrEol;
-      //         TempString := ' 5. QSO Before    - ' + DVPPath + QSOBeforePhoneMessage;
+      //         TempString                                 := ' 5. QSO Before    - ' + DVPPath + QSOBeforePhoneMessage;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[116], PChar(string('QSO Before    - ' + QSOBeforePhoneMessage)));
       //         ClrEol;
-      //         TempString := ' 6. Quick QSL     - ' + DVPPath + QuickQSLPhoneMessage;
+      //         TempString                                 := ' 6. Quick QSL     - ' + DVPPath + QuickQSLPhoneMessage;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[117], PChar(string('Quick QSL     - ' + QuickQSLPhoneMessage)));
       //         ClrEol;
-      //         TempString := ' 7. Repeat S&P Ex - ' + DVPPath + RepeatSearchAndPouncePhoneExchange;
+      //         TempString                                 := ' 7. Repeat S&P Ex - ' + DVPPath + RepeatSearchAndPouncePhoneExchange;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[118], PChar(string('Repeat S&P Ex - ' + RepeatSearchAndPouncePhoneExchange)));
       //         ClrEol;
-      //         TempString := ' 8. S&P Exchange  - ' + DVPPath + SearchAndPouncePhoneExchange;
+      //         TempString                                 := ' 8. S&P Exchange  - ' + DVPPath + SearchAndPouncePhoneExchange;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[119], PChar(string('S&P Exchange  - ' + SearchAndPouncePhoneExchange)));
       //         ClrEol;
-      //         TempString := ' 9. Tail end msg  - ' + DVPPath + TailEndPhoneMessage;
+      //         TempString                                 := ' 9. Tail end msg  - ' + DVPPath + TailEndPhoneMessage;
       //         if length(TempString) > 79 then TempString := Copy(TempString, 1, 78) + '+';
       //         WriteLn(TempString);
 //    Windows.SetWindowText(MessagesValues[120], PChar(string('Tail end msg  - ' + TailEndPhoneMessage)));
@@ -1101,9 +1101,9 @@ end;
 procedure DVKLIstenMessage(MemoryString: Str20);
 
 begin
-  DVPOn := True;
+  DVPOn                                                     := True;
 
-  MemoryString := UpperCase(MemoryString);
+  MemoryString                                              := UpperCase(MemoryString);
   if MemoryString = 'DVK1' then StartDVK(1);
   if MemoryString = 'DVK2' then StartDVK(2);
   if MemoryString = 'DVK3' then StartDVK(3);
@@ -1116,9 +1116,9 @@ end;
 procedure DVKRecordMessage(MemoryString: Str20);
 
 begin
-  DVPOn := True;
+  DVPOn                                                     := True;
 
-  MemoryString := UpperCase(MemoryString);
+  MemoryString                                              := UpperCase(MemoryString);
 
   if Copy(MemoryString, 1, 3) <> 'DVK' then Exit;
 
@@ -1148,8 +1148,8 @@ var
 
 begin
   case ActiveMode of
-    Phone: FirstExchangeFunctionKey := F1;
-    CW, Digital: FirstExchangeFunctionKey := F3;
+    Phone: FirstExchangeFunctionKey                         := F1;
+    CW, Digital: FirstExchangeFunctionKey                   := F3;
   end;
 
   //  RemoveWindow(QuickCommandWindow);
@@ -1165,7 +1165,7 @@ begin
 
   repeat
     repeat until NewKeyPressed;
-    Key := UpCase(NewReadKey);
+    Key                                                     := UpCase(NewReadKey);
 
     //      if ActiveMultiPort <> NoPort then
     if ElaspedSec100(TimeMark) > 3000 then
@@ -1188,9 +1188,9 @@ begin
   else
     DisplayCrypticSSBMenu;
 
-  VisibleDupeSheetRemoved := True;
+  VisibleDupeSheetRemoved                                   := True;
 
-  KeyStatus := NormalKeys;
+  KeyStatus                                                 := NormalKeys;
 
   case Key of
     'C': repeat
@@ -1210,7 +1210,7 @@ begin
             end;
 
           until NewKeyPressed;
-          FunctionKey := UpCase(NewReadKey);
+          FunctionKey                                       := UpCase(NewReadKey);
 
         until (FunctionKey = NullKey) or (FunctionKey = EscapeKey);
 
@@ -1220,7 +1220,7 @@ begin
           Exit;
         end;
 
-        FunctionKey := NewReadKey;
+        FunctionKey                                         := NewReadKey;
 
         if ((FunctionKey >= F1) and (FunctionKey <= F10)) or
           ((FunctionKey >= ControlF1) and (FunctionKey <= ControlF10)) or
@@ -1231,7 +1231,7 @@ begin
           begin
             if KeyStatus <> AltKeys then
             begin
-              KeyStatus := AltKeys;
+              KeyStatus                                     := AltKeys;
               ShowCQFunctionKeyStatus;
             end;
           end
@@ -1240,21 +1240,21 @@ begin
             begin
               if KeyStatus <> ControlKeys then
               begin
-                KeyStatus := ControlKeys;
+                KeyStatus                                   := ControlKeys;
                 ShowCQFunctionKeyStatus;
               end;
             end
             else
               if KeyStatus <> NormalKeys then
               begin
-                KeyStatus := NormalKeys;
+                KeyStatus                                   := NormalKeys;
                 ShowCQFunctionKeyStatus;
               end;
 
             //                            SaveSetAndClearActiveWindow(QuickCommandWindow);
 
           repeat
-            TempString := LineInput('Msg = ',
+            TempString                                      := LineInput('Msg = ',
               GetCQMemoryString(ActiveMode, FunctionKey), {KK1L: 6.73 Added mode}
               True,
               (ActiveMode = Phone) and (DVKEnable or (ActiveDVKPort <> NoPort)));
@@ -1316,7 +1316,7 @@ begin
             end;
 
           until NewKeyPressed;
-          FunctionKey := UpCase(NewReadKey);
+          FunctionKey                                       := UpCase(NewReadKey);
         until (FunctionKey = NullKey) or (FunctionKey = EscapeKey);
 
         if FunctionKey = EscapeKey then
@@ -1325,7 +1325,7 @@ begin
           Exit;
         end;
 
-        FunctionKey := NewReadKey;
+        FunctionKey                                         := NewReadKey;
 
         if ((FunctionKey >= FirstExchangeFunctionKey) and (FunctionKey <= F10)) or
           ((FunctionKey >= ControlF1) and (FunctionKey <= ControlF10)) or
@@ -1336,7 +1336,7 @@ begin
           begin
             if KeyStatus <> AltKeys then
             begin
-              KeyStatus := AltKeys;
+              KeyStatus                                     := AltKeys;
               ShowExFunctionKeyStatus;
             end;
           end
@@ -1345,21 +1345,21 @@ begin
             begin
               if KeyStatus <> ControlKeys then
               begin
-                KeyStatus := ControlKeys;
+                KeyStatus                                   := ControlKeys;
                 ShowExFunctionKeyStatus;
               end;
             end
             else
               if KeyStatus <> NormalKeys then
               begin
-                KeyStatus := NormalKeys;
+                KeyStatus                                   := NormalKeys;
                 ShowExFunctionKeyStatus;
               end;
 
             //          SaveSetAndClearActiveWindow(QuickCommandWindow);
 
           repeat
-            TempString := LineInput('Msg = ',
+            TempString                                      := LineInput('Msg = ',
                 {KK1L: 6.73 Added mode to GetExMemoryString}
               GetEXMemoryString(ActiveMode, FunctionKey),
               True,
@@ -1416,7 +1416,7 @@ begin
             end;
 
           until NewKeyPressed;
-          //                     FunctionKey := Upcase (ReadKey);
+          //                     FunctionKey                := Upcase (ReadKey);
         until ((FunctionKey >= '1') and (FunctionKey <= '9')) or
           ((FunctionKey >= 'A') and (FunctionKey <= 'D')) or
           (FunctionKey = EscapeKey);
@@ -1434,21 +1434,21 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ',
+                TempString                                  := LineInput('Msg = ',
                   CorrectedCallMessage,
                   True,
                   False);
 
                 if TempString <> EscapeKey then
                 begin
-                  CorrectedCallMessage := TempString;
+                  CorrectedCallMessage                      := TempString;
                   AppendConfigFile('CALL OK NOW MESSAGE = ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     CorrectedCallPhoneMessage,
                     True,
                     True);
@@ -1473,7 +1473,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  CorrectedCallPhoneMessage := TempString;
+                  CorrectedCallPhoneMessage                 := TempString;
                   AppendConfigFile('CALL OK NOW SSB MESSAGE = ' + TempString);
                 end;
               end;
@@ -1483,17 +1483,17 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ', CQExchange, True, False);
+                TempString                                  := LineInput('Msg = ', CQExchange, True, False);
                 if TempString <> EscapeKey then
                 begin
-                  CQExchange := TempString;
+                  CQExchange                                := TempString;
                   AppendConfigFile('CQ EXCHANGE = ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     CQPhoneExchange,
                     True,
                     True);
@@ -1517,7 +1517,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  CQPhoneExchange := TempString;
+                  CQPhoneExchange                           := TempString;
                   AppendConfigFile('CQ SSB EXCHANGE = ' + TempString);
                 end;
               end;
@@ -1527,17 +1527,17 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ', CQExchangeNameKnown, True, False);
+                TempString                                  := LineInput('Msg = ', CQExchangeNameKnown, True, False);
                 if TempString <> EscapeKey then
                 begin
-                  CQExchangeNameKnown := TempString;
+                  CQExchangeNameKnown                       := TempString;
                   AppendConfigFile('CQ EXCHANGE NAME KNOWN = ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     CQPhoneExchangeNameKnown,
                     True,
                     True);
@@ -1560,7 +1560,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  CQPhoneExchangeNameKnown := TempString;
+                  CQPhoneExchangeNameKnown                  := TempString;
                   AppendConfigFile('CQ SSB EXCHANGE NAME KNOWN = ' + TempString);
                 end;
               end;
@@ -1570,17 +1570,17 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ', QSLMessage, True, False);
+                TempString                                  := LineInput('Msg = ', QSLMessage, True, False);
                 if TempString <> EscapeKey then
                 begin
-                  QSLMessage := TempString;
+                  QSLMessage                                := TempString;
                   AppendConfigFile('QSL MESSAGE = ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     QSLPhoneMessage,
                     True, True);
 
@@ -1602,7 +1602,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  QSLPhoneMessage := TempString;
+                  QSLPhoneMessage                           := TempString;
                   AppendConfigFile('QSL SSB MESSAGE = ' + TempString);
                 end;
               end;
@@ -1612,17 +1612,17 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ', QSOBeforeMessage, True, False);
+                TempString                                  := LineInput('Msg = ', QSOBeforeMessage, True, False);
                 if TempString <> EscapeKey then
                 begin
-                  QSOBeforeMessage := TempString;
+                  QSOBeforeMessage                          := TempString;
                   AppendConfigFile('QSO BEFORE MESSAGE = ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     QSOBeforePhoneMessage,
                     True, True);
 
@@ -1644,7 +1644,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  QSOBeforePhoneMessage := TempString;
+                  QSOBeforePhoneMessage                     := TempString;
                   AppendConfigFile('QSO BEFORE SSB MESSAGE = ' + TempString);
                 end;
               end;
@@ -1654,17 +1654,17 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ', QuickQSLMessage1, True, False);
+                TempString                                  := LineInput('Msg = ', QuickQSLMessage1, True, False);
                 if TempString <> EscapeKey then
                 begin
-                  QuickQSLMessage1 := TempString;
+                  QuickQSLMessage1                          := TempString;
                   AppendConfigFile('QUICK QSL MESSAGE= ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     QuickQSLPhoneMessage,
                     True, True);
 
@@ -1686,7 +1686,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  QuickQSLPhoneMessage := TempString;
+                  QuickQSLPhoneMessage                      := TempString;
                   AppendConfigFile('QUICK QSL SSB MESSAGE = ' + TempString);
                 end;
               end;
@@ -1696,17 +1696,17 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ', RepeatSearchAndPounceExchange, True, False);
+                TempString                                  := LineInput('Msg = ', RepeatSearchAndPounceExchange, True, False);
                 if TempString <> EscapeKey then
                 begin
-                  RepeatSearchAndPounceExchange := TempString;
+                  RepeatSearchAndPounceExchange             := TempString;
                   AppendConfigFile('REPEAT S&P EXCHANGE = ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     RepeatSearchAndPouncePhoneExchange,
                     True, True);
 
@@ -1728,7 +1728,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  RepeatSearchAndPouncePhoneExchange := TempString;
+                  RepeatSearchAndPouncePhoneExchange        := TempString;
                   AppendConfigFile('REPEAT S&P SSB EXCHANGE = ' + TempString);
                 end;
               end;
@@ -1738,17 +1738,17 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ', SearchAndPounceExchange, True, False);
+                TempString                                  := LineInput('Msg = ', SearchAndPounceExchange, True, False);
                 if TempString <> EscapeKey then
                 begin
-                  SearchAndPounceExchange := TempString;
+                  SearchAndPounceExchange                   := TempString;
                   AppendConfigFile('S&P EXCHANGE = ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     SearchAndPouncePhoneExchange,
                     True, True);
 
@@ -1770,7 +1770,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  SearchAndPouncePhoneExchange := TempString;
+                  SearchAndPouncePhoneExchange              := TempString;
                   AppendConfigFile('S&P SSB EXCHANGE = ' + TempString);
                 end;
               end;
@@ -1780,17 +1780,17 @@ begin
             begin
               if ActiveMode <> Phone then
               begin
-                TempString := LineInput('Msg = ', TailEndMessage, True, False);
+                TempString                                  := LineInput('Msg = ', TailEndMessage, True, False);
                 if TempString <> EscapeKey then
                 begin
-                  TailEndMessage := TempString;
+                  TailEndMessage                            := TempString;
                   AppendConfigFile('TAIL END MESSAGE = ' + TempString);
                 end;
               end
               else
               begin
                 repeat
-                  TempString := LineInput('Msg = ',
+                  TempString                                := LineInput('Msg = ',
                     TailEndPhoneMessage,
                     True, True);
 
@@ -1812,7 +1812,7 @@ begin
 
                 if TempString <> EscapeKey then
                 begin
-                  TailEndPhoneMessage := TempString;
+                  TailEndPhoneMessage                       := TempString;
                   AppendConfigFile('TAIL END SSB MESSAGE = ' + TempString);
                 end;
               end;
@@ -1821,10 +1821,10 @@ begin
           'A':
             if ActiveMode <> Phone then
             begin
-              TempString := LineInput('Enter character for short zeros : ', '', True, False);
+              TempString                                    := LineInput('Enter character for short zeros : ', '', True, False);
               if (TempString <> EscapeKey) and (TempString <> '') then
               begin
-                Short0 := TempString[1];
+                Short0                                      := TempString[1];
                 AppendConfigFile('SHORT 0 = ' + Short0);
               end;
             end;
@@ -1832,10 +1832,10 @@ begin
           'B':
             if ActiveMode <> Phone then
             begin
-              TempString := LineInput('Enter character for short ones : ', '', True, False);
+              TempString                                    := LineInput('Enter character for short ones : ', '', True, False);
               if (TempString <> EscapeKey) and (TempString <> '') then
               begin
-                Short1 := TempString[1];
+                Short1                                      := TempString[1];
                 AppendConfigFile('SHORT 1 = ' + Short1);
               end;
             end;
@@ -1843,10 +1843,10 @@ begin
           'C':
             if ActiveMode <> Phone then
             begin
-              TempString := LineInput('Enter character for short twos : ', '', True, False);
+              TempString                                    := LineInput('Enter character for short twos : ', '', True, False);
               if (TempString <> EscapeKey) and (TempString <> '') then
               begin
-                Short2 := TempString[1];
+                Short2                                      := TempString[1];
                 AppendConfigFile('SHORT 2 = ' + Short2);
               end;
             end;
@@ -1854,10 +1854,10 @@ begin
           'D':
             if ActiveMode <> Phone then
             begin
-              TempString := LineInput('Enter character for short nines : ', '', True, False);
+              TempString                                    := LineInput('Enter character for short nines : ', '', True, False);
               if (TempString <> EscapeKey) and (TempString <> '') then
               begin
-                Short9 := TempString[1];
+                Short9                                      := TempString[1];
                 AppendConfigFile('SHORT 9 = ' + Short9);
               end;
             end;
@@ -1874,14 +1874,14 @@ function GetCQMemoryString(Mode: ModeType; Key: Char): ShortString; {KK1L: 6.73 
 {VAR Mode: ModeType;}{KK1L: 6.73 Removed}
 
 begin
-  {Mode := ActiveMode;}{KK1L: 6.73 Removed}
+  {Mode                                                     := ActiveMode;}{KK1L: 6.73 Removed}
 
-  if Mode = Digital then Mode := CW;
+  if Mode = Digital then Mode                               := CW;
 
-  GetCQMemoryString := '';
+  GetCQMemoryString                                         := '';
   if Mode < Both then
      if CQMemory[Mode, Key] <> nil then
-      GetCQMemoryString := CQMemory[Mode, Key]^;
+      GetCQMemoryString                                     := CQMemory[Mode, Key]^;
 
     
 end;
@@ -1891,63 +1891,63 @@ function GetEXMemoryString(Mode: ModeType; Key: Char): ShortString; {KK1L: 6.73 
 {VAR Mode: ModeType;}{KK1L: 6.73 Removed}
 
 begin
-  {Mode := ActiveMode;}{KK1L: 6.73 Removed}
+  {Mode                                                     := ActiveMode;}{KK1L: 6.73 Removed}
 
-  if Mode = Digital then Mode := CW;
+  if Mode = Digital then Mode                               := CW;
 
   if EXMemory[Mode, Key] <> nil then
-    GetEXMemoryString := EXMemory[Mode, Key]^
+    GetEXMemoryString                                       := EXMemory[Mode, Key]^
   else
-    GetEXMemoryString := ''
+    GetEXMemoryString                                       := ''
 end;
 
 procedure SetCQCaptionMemoryString(Mode: ModeType; Key: Char; MemoryString: ShortString);
 
 begin
-  if Mode = Digital then Mode := CW;
+  if Mode = Digital then Mode                               := CW;
 
   if CQCaptionMemory[Mode, Key] = nil then New(CQCaptionMemory[Mode, Key]);
-  CQCaptionMemory[Mode, Key]^ := MemoryString;
-  CQCaptionMemory[Mode, Key]^[length(MemoryString) + 1] := #0;
+  CQCaptionMemory[Mode, Key]^                               := MemoryString;
+  CQCaptionMemory[Mode, Key]^[length(MemoryString) + 1]     := #0;
 end;
 
 procedure SetEXCaptionMemoryString(Mode: ModeType; Key: Char; MemoryString: ShortString);
 
 begin
-  if Mode = Digital then Mode := CW;
+  if Mode = Digital then Mode                               := CW;
   if EXCaptionMemory[Mode, Key] = nil then New(EXCaptionMemory[Mode, Key]);
-  EXCaptionMemory[Mode, Key]^ := MemoryString;
-  EXCaptionMemory[Mode, Key]^[length(MemoryString) + 1] := #0;
+  EXCaptionMemory[Mode, Key]^                               := MemoryString;
+  EXCaptionMemory[Mode, Key]^[length(MemoryString) + 1]     := #0;
 end;
 
 procedure SetCQMemoryString(Mode: ModeType; Key: Char; MemoryString: ShortString {Str80});
 
 begin
-  if Mode = Digital then Mode := CW;
+  if Mode = Digital then Mode                               := CW;
 
   if CQMemory[Mode, Key] = nil then New(CQMemory[Mode, Key]);
   {KK1L: 6.72 NOTE This is where I should interpret the string just as if it were being read from LOGCFG.DAT}
   SniffOutControlCharacters(MemoryString); {KK1L: 6.72}
-  CQMemory[Mode, Key]^ := MemoryString;
-  CQMemory[Mode, Key]^[length(MemoryString) + 1] := #0;
+  CQMemory[Mode, Key]^                                      := MemoryString;
+  CQMemory[Mode, Key]^[length(MemoryString) + 1]            := #0;
 end;
 
 procedure SetEXMemoryString(Mode: ModeType; Key: Char; MemoryString: ShortString {Str80});
 
 begin
-  if Mode = Digital then Mode := CW;
+  if Mode = Digital then Mode                               := CW;
 
   if EXMemory[Mode, Key] = nil then New(EXMemory[Mode, Key]);
   {KK1L: 6.72 NOTE This is where I should interpret the string just as if it were being read from LOGCFG.DAT}
   SniffOutControlCharacters(MemoryString); {KK1L: 6.72}
-  EXMemory[Mode, Key]^ := MemoryString;
-  EXMemory[Mode, Key]^[length(MemoryString) + 1] := #0;
+  EXMemory[Mode, Key]^                                      := MemoryString;
+  EXMemory[Mode, Key]^[length(MemoryString) + 1]            := #0;
 end;
 
 procedure InitializeKeyer;
 begin
-//  ActiveKeyerPort := Radio1.tKeyerPort;
-  SerialInvert := Radio1SerialInvert;
+//  ActiveKeyerPort                                         := Radio1.tKeyerPort;
+  SerialInvert                                              := Radio1SerialInvert;
   CPUKeyer.InitializeKeyer;
 end;
 
@@ -1968,7 +1968,7 @@ begin
   {
     if (ActiveMode = Phone) and DVKEnable and DVPActive and DVPMessagePlaying then
       begin
-        TimeOut := 0;
+        TimeOut                                             := 0;
  
         DVPStopPlayback;
  
@@ -1983,18 +1983,18 @@ begin
     if not SendingOnRadioOne then
     begin
       FlushCWBufferAndClearPTT; { Clear CW sent on Inactive Radio}
-//      ActiveKeyerPort := Radio1.tKeyerPort;
-//      tActiveKeyerHandle := Radio1.tKeyerPortHandle;
-      SerialInvert := Radio1SerialInvert;
-          {CodeSpeed := RadioOneSpeed;}
-      CodeSpeed := Radio1.SpeedMemory; {KK1L: 6.73}
+//      ActiveKeyerPort                                     := Radio1.tKeyerPort;
+//      tActiveKeyerHandle                                  := Radio1.tKeyerPortHandle;
+      SerialInvert                                          := Radio1SerialInvert;
+          {CodeSpeed                                        := RadioOneSpeed;}
+      CodeSpeed                                             := Radio1.SpeedMemory; {KK1L: 6.73}
       SetSpeed(CodeSpeed);
           {KK1L: 6.71 Need to set mode to that of ModeMemory [RadioOne] for split mode SO2R}
           {KK1L: 6.72 Moved this to SendCrypticMessage to only handle CTRL-A requests      }
           {           SwapRadios is run prior to coming here for SO2R and that hoses things}
-          {ActiveMode := ModeMemory [RadioOne]; {KK1L: 6.71 for split mode SO2R}
-      SendingOnRadioOne := True;
-      SendingOnRadioTwo := False;
+          {ActiveMode                                       := ModeMemory [RadioOne]; {KK1L: 6.71 for split mode SO2R}
+      SendingOnRadioOne                                     := True;
+      SendingOnRadioTwo                                     := False;
       SetRelayForActiveRadio(ActiveRadio);
     end;
   end
@@ -2005,18 +2005,18 @@ begin
     begin
       FlushCWBufferAndClearPTT; { Clear CW sent on Inactive Radio}
 
-//      ActiveKeyerPort := Radio2.tKeyerPort;
-//      tActiveKeyerHandle := Radio2.tKeyerPortHandle;
-      SerialInvert := Radio2SerialInvert;
-        {CodeSpeed := RadioTwoSpeed;}
-      CodeSpeed := Radio2.SpeedMemory; {KK1L: 6.73}
+//      ActiveKeyerPort                                     := Radio2.tKeyerPort;
+//      tActiveKeyerHandle                                  := Radio2.tKeyerPortHandle;
+      SerialInvert                                          := Radio2SerialInvert;
+        {CodeSpeed                                          := RadioTwoSpeed;}
+      CodeSpeed                                             := Radio2.SpeedMemory; {KK1L: 6.73}
       SetSpeed(CodeSpeed);
         {KK1L: 6.71 Need to set mode to that of ModeMemory [RadioTwo] for split mode SO2R}
         {KK1L: 6.72 Moved this to SendCrypticMessage to only handle CTRL-A requests      }
         {           SwapRadios is run prior to coming here for SO2R and that hoses things}
-        {ActiveMode := ModeMemory [RadioTwo]; {KK1L: 6.71 for split mode SO2R}
-      SendingOnRadioOne := False;
-      SendingOnRadioTwo := True;
+        {ActiveMode                                         := ModeMemory [RadioTwo]; {KK1L: 6.71 for split mode SO2R}
+      SendingOnRadioOne                                     := False;
+      SendingOnRadioTwo                                     := True;
       SetRelayForActiveRadio(ActiveRadio);
     end;
     // If this line really wantsa to send F1 upon if CWByCat, it would beed to call IsActiveCWByCAT
@@ -2025,8 +2025,8 @@ begin
 //if cwbycat then ActiveRadioPtr.SendCW(F1);  // ny4i - This does not do anything. This is not the right variable to check.
   wkSetKeyerOutput(ActiveRadioPtr);
 
-  KeyersSwapped := False;
- // InactiveRigCallingCQ := False; // n4af 4.44.7
+  KeyersSwapped                                             := False;
+ // InactiveRigCallingCQ                                    := False; // n4af 4.44.7
 end;
 
 procedure SetUpToSendOnInactiveRadio;
@@ -2044,7 +2044,7 @@ begin
 {
   if (ActiveMode = Phone) and DVKEnable and DVPActive and DVPMessagePlaying then
   begin
-    TimeOut := 0;
+    TimeOut                                                 := 0;
 
       DVPStopPlayback;
 
@@ -2060,17 +2060,17 @@ begin
     if not SendingOnRadioTwo then
     begin
       FlushCWBufferAndClearPTT; { Clear CW being sent on Active Radio}
-//      ActiveKeyerPort := Radio2.tKeyerPort;
-//      tActiveKeyerHandle := Radio2.tKeyerPortHandle;
-      SerialInvert := Radio2SerialInvert;
-          {CodeSpeed := RadioTwoSpeed;}
-      CodeSpeed := Radio2.SpeedMemory; {KK1L: 6.73}
+//      ActiveKeyerPort                                     := Radio2.tKeyerPort;
+//      tActiveKeyerHandle                                  := Radio2.tKeyerPortHandle;
+      SerialInvert                                          := Radio2SerialInvert;
+          {CodeSpeed                                        := RadioTwoSpeed;}
+      CodeSpeed                                             := Radio2.SpeedMemory; {KK1L: 6.73}
       SetSpeed(CodeSpeed);
       SetRelayForActiveRadio(RadioTwo);
           {KK1L: 6.71 Need to set mode to that of ModeMemory [RadioTwo] for split mode SO2R}
-          {ActiveMode := ModeMemory [RadioTwo]; {KK1L: 6.71 for split mode SO2R}
-      SendingOnRadioOne := False;
-      SendingOnRadioTwo := True;
+          {ActiveMode                                       := ModeMemory [RadioTwo]; {KK1L: 6.71 for split mode SO2R}
+      SendingOnRadioOne                                     := False;
+      SendingOnRadioTwo                                     := True;
     end;
   end
 
@@ -2079,22 +2079,22 @@ begin
     if not SendingOnRadioOne then
     begin
       FlushCWBufferAndClearPTT; { Clear CW being sent on Active Radio}
-//      ActiveKeyerPort := Radio1.tKeyerPort;
-//      tActiveKeyerHandle := Radio1.tKeyerPortHandle;
-      SerialInvert := Radio1SerialInvert;
-        {CodeSpeed := RadioOneSpeed;}
-      CodeSpeed := Radio1.SpeedMemory; {KK1L: 6.73}
+//      ActiveKeyerPort                                     := Radio1.tKeyerPort;
+//      tActiveKeyerHandle                                  := Radio1.tKeyerPortHandle;
+      SerialInvert                                          := Radio1SerialInvert;
+        {CodeSpeed                                          := RadioOneSpeed;}
+      CodeSpeed                                             := Radio1.SpeedMemory; {KK1L: 6.73}
       SetSpeed(CodeSpeed);
       SetRelayForActiveRadio(RadioOne);
         {KK1L: 6.71 Need to set mode to that of ModeMemory [RadioOne] for split mode SO2R}
-        {ActiveMode := ModeMemory [RadioOne]; {KK1L: 6.71 for split mode SO2R}
-      SendingOnRadioOne := True;
-      SendingOnRadioTwo := False;
+        {ActiveMode                                         := ModeMemory [RadioOne]; {KK1L: 6.71 for split mode SO2R}
+      SendingOnRadioOne                                     := True;
+      SendingOnRadioTwo                                     := False;
     end;
 
   wkSetKeyerOutput(InActiveRadioPtr);
 
-  KeyersSwapped := True;
+  KeyersSwapped                                             := True;
   DebugMsg('<<<<< EXIT SetUpToSendOnInactiveRadio');
 end;
 
@@ -2107,13 +2107,13 @@ begin
     begin
       if DisplayPrompt then QuickDisplay(TC_CWDISABLEDWITHALTK);
       FlushCWBufferAndClearPTT;
-      CWEnabled := False;
-      CWEnable := false;
+      CWEnabled                                             := False;
+      CWEnable                                              := false;
     end
     else
     begin
-      CWEnabled := True;
-      CWEnable := true;
+      CWEnabled                                             := True;
+      CWEnable                                              := true;
       QuickDisplay(nil);
     end;
   end
@@ -2144,7 +2144,7 @@ begin
 
 //  SetEXCaptionMemoryString(Digital, F1, 'DE+Cl');
 //  SetEXCaptionMemoryString(Digital, F2, 'S&P EXCHANGE');
-    slElements := TStringList.Create;
+    slElements                                              := TStringList.Create;
     LoadElements(slElements);
 end;
 
