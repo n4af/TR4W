@@ -781,13 +781,6 @@ begin
         AddDomesticCountry('KL');
       end;
 
-    KCJ:
-      begin
-
-        if (MyCountry = 'JA') or (MyCountry = 'JD1') then
-       ActiveZoneMult := CQZones;
-      end;
-
     KIDSDAY:
       begin
         AutoDupeEnableCQ := False;

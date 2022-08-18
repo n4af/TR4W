@@ -469,6 +469,11 @@ begin
              SetCommentAndEnableEditControl(TC_ENTERYOURFOCNUMBER,icmyFOC);
              end;
 
+             KCJ:
+             begin
+             SetCommentAndEnableEditControl(TC_PREF_OR_CQZONE,icMyState);    // 4.114.1
+             end;
+
              WINTERFIELDDAY:
                 begin
                   DisplayInitialCommand(icmyFDClass);

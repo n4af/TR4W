@@ -38,6 +38,7 @@
   TC_ISADUPE                            = '%s is a dupe!!';
   TC_ERRORINLOGFILE                     = 'Error in log file!';
   TC_HASIMPROPERSYNTAX                  = '%s has improper syntax!!';
+  TC_PREF_OR_CQZONE                     = 'Enter your CQ ZONE or JA PREFECTURE';
   TC_SORRYNOLOG                         = 'Sorry!! NO LOG = TRUE which prohibits logging QSOs on this computer';
   TC_SETCOMPUTERIDVALUE                 = 'Set COMPUTER ID value.';
 
