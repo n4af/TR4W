@@ -49,7 +49,7 @@ const
   TC_HASIMPROPERSYNTAX                  = '%s СИНТАКС алдаа!!';
   TC_SORRYNOLOG                         = 'Уучлаарай!! NO LOG = TRUE холбоог компьютер луу оруулах боломжгvй';
   TC_SETCOMPUTERIDVALUE                 = 'Компьютерийн ID -г тохируулна уу';
-
+  TC_PREF_OR_CQZONE                     = 'Enter your CQ ZONE or JA PREFECTURE';
   TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
   TC_LOGFILENOTFOUND                    = 'Log file not found';
   TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';

@@ -781,6 +781,13 @@ begin
         AddDomesticCountry('KL');
       end;
 
+      KCJ:
+      begin
+       ActiveInitialExchange := ZoneInitialExchange;   // 4.114.1
+       InitialExchangeOverwrite := True;
+      end;
+
+
     KIDSDAY:
       begin
         AutoDupeEnableCQ := False;

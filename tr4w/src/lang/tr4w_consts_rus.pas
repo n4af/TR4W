@@ -49,6 +49,7 @@ const
   TC_ISADUPE                            = 'Связь с %s уже была!!';
   TC_ERRORINLOGFILE                     = 'Ошибка в файле лога!';
   TC_HASIMPROPERSYNTAX                  = 'Позывной %s имеет неправильный синтаксис!!';
+  TC_PREF_OR_CQZONE                     = 'Введите вашу CQ ZONE или JA Префектуру';
   TC_SORRYNOLOG                         = 'Извините!! Параметр NO LOG = TRUE запрещает вводить связи на этом компьютере';
   TC_SETCOMPUTERIDVALUE                 = 'Установите значение команды COMPUTER ID.';
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" для очистки всех логов в сети';
@@ -801,4 +802,4 @@ const
   RC_SPLITOFF                           = 'Режим работы на разнесенных частотах ВКЛ/ВЫКЛ';
  TC_SPLIT_WARN                          = 'ПРЕДУПРЕЖДЕНИЕ: Вы работаете в режиме РАБОТА НА РАЗНЕСЕННЫХ ЧАСТОТАХ!!!';
  TC_RUNWARN                             = 'Программа TR4W на вашем компьютере уже работает ';
- RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1
+ RC_wkMode                              = 'Re-initialize WinKeyer';      // 4.60.1

@@ -8,6 +8,7 @@ const
   TC_TRANSLATION_AUTHOR                 = 'Dragan Acimovic YT3W';
   TC_TRANSLATOR_EMAIL                   = 'dragan.acimovic@gmail.com';
   TC_EnterYourDistrictCode              = 'IF in UK/EI, enter your district code';
+  TC_PREF_OR_CQZONE                     = 'Enter your CQ ZONE or JA PREFECTURE';
   TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
   TC_UKEI                               = 'Check IF you are within UK/EI';
   TC_YUGOSLAVIA                         = 'Yugoslavia';

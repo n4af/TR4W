@@ -7,6 +7,7 @@
   TC_TRANSLATION_LANGUAGE               = 'GERMAN';
   TC_TRANSLATION_AUTHOR                 = 'DL4BBH';
   TC_TRANSLATOR_EMAIL                   = 'dl4bbh@darc.de';
+  TC_PREF_OR_CQZONE                     = 'Enter your CQ ZONE or JA PREFECTURE';
   TC_WAGWarn                            = 'Warnung: Ausserhalb des erlaubten WAG Frequenzbereichs';
   TC_FREQ                               = 'Freq';
   TC_POINTS                             = 'Pkt';

@@ -50,6 +50,7 @@ const
   TC_ISADUPE                            = 'Зв`язок з %s вже був!!';
   TC_ERRORINLOGFILE                     = 'Помилка у файлі лога!';
   TC_HASIMPROPERSYNTAX                  = 'Позивний %s має неправильний синтаксис!!';
+  TC_PREF_OR_CQZONE                     = 'Введіть вашу CQ ZONE або JA Префектуру';
   TC_SORRYNOLOG                         = 'Вибачте!! Параметр NO LOG = TRUE забороняє вводити зв`язки на цьому комп`ютері';
   TC_SETCOMPUTERIDVALUE                 = 'Встановіть COMPUTER ID.';
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" для очищення всіх логів у мережі';
@@ -185,7 +186,8 @@ const
 
   {UTELNET}
 
-  TC_TELNET                             = 'З`єднання'#0'Відключення'#0'Команди'#0'Заморозити'#0'Очистити'#0'100'#0'';
+//  TC_TELNET                             = 'З`єднання'#0'Відключення'#0'Команди'#0'Заморозити'#0'Очистити'#0'100'#0';
+TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Freeze'#0'Clear'#0'100'#0#0;
   TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'ВИ НЕ ПІДКЛЮЧЕНІ ДО ІНТЕРНЕТУ!';
   TC_GETHOST                            = 'ВИЗНАЧЕННЯ ХОСТУ..';
   TC_SERVER                             = 'СЕРВЕР: %s';
@@ -252,7 +254,6 @@ const
   TC_RESTARTBINISFORADIFFERENTCONTEST   = 'Файл RESTART.BIN від іншого контесту.';
 
   {LOGSTUFF}
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   TC_IMPROPERZONENUMBER                 = 'Неправильний номер зони';
   TC_NOTENOUGHINFOINEXCHANGE            = 'Недостатньо інформації в обмінному номері!!';
   TC_IMPROPERDOMESITCQTH                = 'Неправильний внутрішній QTH!!';
@@ -545,6 +546,7 @@ const
   RC_FREQUENCY                          = 'Частота';
   RC_APPLY                              = 'Застосувати';
   RC_RESET                              = 'Скидання';
+  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
   RC_START                              = 'Старт';
   RC_SHOW                               = 'Показати';
   RC_SAVE                               = 'Зберегти';

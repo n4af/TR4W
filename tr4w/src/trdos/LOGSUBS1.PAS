@@ -142,6 +142,9 @@ begin // 1
   InactiveRigCallingCQ := False;
   tWaitForNextChar := True;
 
+  if (Copy(Message,1,3) = 'E E') then
+   TryLogContact;
+
   if not (Copy(Message, 1, 1) = ControlA) then
   begin // I think we want to make sure we swap radios once. I tried caling SwapRadios here but it got called again.
       SetUpToSendOnActiveRadio;
@@ -239,18 +242,7 @@ var
   TempMode: ModeType;
 begin
 
-  //  if K5KA.ModeEnabled and (Key = F1) and (OpMode = CQOpMode) then
-  //    K5KA.State := KAMessageStarted;
-    {
-        IF ((Key >= F1)         AND (Key <= F10)) OR
-           ((Key >= F11)        AND (Key <= F12)) OR
-           ((Key >= ShiftF1)    AND (Key <= ShiftF10)) OR
-           ((Key >= ShiftF11)   AND (Key <= ShiftF12)) OR
-           ((Key >= ControlF1)  AND (Key <= ControlF10)) OR
-           ((Key >= ControlF11) AND (Key <= ControlF12)) OR
-           ((Key >= AltF1)      AND (Key <= AltF10)) OR
-           ((Key >= AltF11)     AND (Key <= AltF12)) THEN
-              }
+
   begin
     SwitchNext := False;
     Switch := False;
