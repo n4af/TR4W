@@ -2309,7 +2309,7 @@ begin
   if (pos('CQ-WW', ContestTypeSA[Contest]) <> 0) or (pos('IARU-HF', ContestTypeSA[Contest]) <> 0) then    //n4af 4.35.5    // 4.115.4
   T1  := 3600000                                 // 60 min break criteria
   else
-  T1  := 60000;                                 // normal 30min break
+  T1  := 1800000;                                 // normal 30min break
   if ContestsArray[Contest].QRZRUID = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_qrzru_calendar, MF_BYCOMMAND or MF_GRAYED);
   if ContestsArray[Contest].WA7BNM = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND or MF_GRAYED);
   if Contest = WRTC then
