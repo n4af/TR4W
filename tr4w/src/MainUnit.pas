@@ -2306,7 +2306,7 @@ begin
 
   Format(wsprintfBuffer, TC_RULESONSM3CER, ContestTypeSA[Contest]);
   ModifyMenu(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND + MF_STRING, menu_sk3bg_calendar, wsprintfBuffer);
-  if (pos('CQ-WW', ContestTypeSA[Contest]) <> 0)  then    //n4af 4.35.5   
+  if (pos('CQ-WW', ContestTypeSA[Contest]) <> 0) or (pos('IARU-HF', ContestTypeSA[Contest]) <> 0) then    //n4af 4.35.5    // 4.115.4
   T1  := 3600000                                 // 60 min break criteria
   else
   T1  := 60000;                                 // normal 30min break
