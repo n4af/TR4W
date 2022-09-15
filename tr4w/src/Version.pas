@@ -22,23 +22,16 @@ interface
 const
 
 
-<<<<<<< HEAD
- TR4W_CURRENTVERSION_NUMBER            = '4.115.1' ;  // N4af     New Release
+
+ TR4W_CURRENTVERSION_NUMBER            = '4.115.3' ;  // N4af     New Release
 
 
-
-=======
- TR4W_CURRENTVERSION_NUMBER            = '4.114.1' ;  // N4af     New Release
->>>>>>> 409c166c804feb7fcc388df512c45c35e05f191e
 
 
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
-<<<<<<< HEAD
+
   TR4W_CURRENTVERSIONDATE               = 'September, 2022' ;
-=======
-  TR4W_CURRENTVERSIONDATE               = 'August, 2022' ;
->>>>>>> 409c166c804feb7fcc388df512c45c35e05f191e
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 

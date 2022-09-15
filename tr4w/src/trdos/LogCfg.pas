@@ -231,7 +231,7 @@ var
 FileName : str40;
 begin
 
-
+  StartCPU := GetTickCount;
   udp := TIdUDPClient.Create(nil); // ny4i Issue #99
   if QTCsEnabled then New(QTCDataArray); //LoadQTCDataFile;
 

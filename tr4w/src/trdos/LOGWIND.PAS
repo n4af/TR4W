@@ -2450,7 +2450,9 @@ begin
     inc(MinutesSinceLastBMUpdate); {KK1L: 6.65}
 
       {if tDupesInteval > 0 then RefreshOZHRBandMap;}
-    if ActiveBand in [Band160..Band10] then inc(TimeSpentByBand[ActiveBand]);
+   if ActiveBand in [Band160..Band10] then
+         inc(TimeSpentByBand[ActiveBand]);
+
     AutoTimeQSOCount := 0;
       {KK1L: 6.65 Added this check to allow for > 63 minute BM decay}
     if MinutesSinceLastBMUpdate >= BandMapDecayMultiplier then
@@ -4957,21 +4959,27 @@ end;
 
 procedure tDispalyOnAirTime;
 var
-d              : integer;
+d              : Cardinal;
 OperatingTime                        : integer;
   PreviousQSOTime                       : TQSOTime;
-begin
-{  REMOVECANDIDATE
-if tElapsedTimeFromLastQSO <= 0  then
-tElapsedTimeFromLastQSO := 0
-else
-begin
+  Switch : boolean;
 
-d := numberminutesprogramrunning  ;
- if (d div 1000) mod 5 = 0 then
-SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d, False));
-end  ;
- }
+ begin
+  if (CallWinKeyDown) and (not Begin_QSO) then              // 4.115.3   dont start timeer until first entry
+   begin
+    Begin_QSO := True;
+    StartCPU := Windows.GetTickCount;
+   end;
+
+if (T2 > 0)  then
+ begin
+   d := Windows.GetTickCount;
+    if (d div 1000) mod 2 = 0 then
+     SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d - StartCPU, False)) ;     //  4.115.3
+ end
+   else
+     SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(0, False))
+//  SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False));
 end;
 
 
@@ -4981,17 +4989,18 @@ Procedure modified by N4AF to also display total OFF TIME.
 If it total elapsed drops, enter was pressed so
  save into var d2 contents of tElapsedTimeFromLastQSO on procedure exit to compare to value on entry.
 set Constant T1 to length of break time
-normally onairtime = elapse since first qso. But when elapsed > break, we must save the elapsed time and
+normally onairtime = elapse since firstSetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(Windows.GetTickCount-StartCPU, False));  qso. But when elapsed > break, we must save the elapsed time and
 subtract break time from it.
 Then when elapsed next drops below break length, add saved elapsed to current elapsed.
 }
 var
   d                                    : Cardinal;
   k                                    : Cardinal;
+  l                                    : Cardinal;
   TimeDifference                       : Integer;
  //n4af 4.35.5
  begin
-{ if not Start then      REMOVECANDIDATE
+ // 4.115.2 remove commented code below
  begin
  T2 := tElapsedTimeFromLastQSO;  // T2 = initial elapsed
  Start := True;
@@ -5002,9 +5011,9 @@ var
  k := Windows.GetTickCount - tElapsedTimeFromLastQSO;     // time from last qso
 
   if (k div 1000) mod 2 = 0 then         // if 5 seconds elapsed
-    SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(k, False));     // display elapsed since last qso
-
-    if (k < T1) then
+     SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(k, False));     // display elapsed since last qso
+     tDispalyOnAirTime;
+{    if (k < T1) then
   begin
   if K < B then
   begin
@@ -5020,7 +5029,8 @@ var
 
 
   if (d1 div 1000) mod 2 = 0 then         // if 2 seconds elapsed
-    SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(d1, False));     // display elapsed since last qso
+  //       // display elapsed since last qso
+      SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False));
    b := K;  // last value of K before enter pressed
 
   end;
@@ -5035,7 +5045,9 @@ var
    end;
   
  C := A;       // c points to the last K
-end;   }
+
+end;
+}
 end;
 
 procedure tDispalyMyComputerID;

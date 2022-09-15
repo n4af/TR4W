@@ -142,13 +142,15 @@ uses
   ;
 
   var
+  Begin_QSO                             : boolean = False; // 4.115.3
   JA_Switch                             : boolean = False; // 4.72.5
   VK_Switch                             : boolean = False; // 4.72.5
   K_Switch                              : boolean = False; // 4.72.5
   VE_Switch                             : boolean = False; // 4.72.5
   PTT_SET                               : boolean = False; //4.53.9
   InSplit                               : boolean = False;
-  STString                              : Str10;           // 4.56.7
+  StartCPU                              :DWORD;
+  STString                              : Str10;               // 4.56.7
   Switch                                : boolean = False;
   SwitchNext                            : boolean = False; // 4.52.3
   CallWinKeyDown                        : boolean = False; // 4.52.4
@@ -2304,10 +2306,10 @@ begin
 
   Format(wsprintfBuffer, TC_RULESONSM3CER, ContestTypeSA[Contest]);
   ModifyMenu(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND + MF_STRING, menu_sk3bg_calendar, wsprintfBuffer);
-  if pos('CQ-WW', ContestTypeSA[Contest]) <> 0 then  //n4af 4.35.5
-  T1                                                                                                        := 3600000                                 // 60 min break criteria
+  if (pos('CQ-WW', ContestTypeSA[Contest]) <> 0)  then    //n4af 4.35.5   
+  T1  := 3600000                                 // 60 min break criteria
   else
-  T1                                                                                                        := 60000;                                 // normal 30min break
+  T1  := 60000;                                 // normal 30min break
   if ContestsArray[Contest].QRZRUID = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_qrzru_calendar, MF_BYCOMMAND or MF_GRAYED);
   if ContestsArray[Contest].WA7BNM = 0 then Windows.EnableMenuItem(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND or MF_GRAYED);
   if Contest = WRTC then
@@ -3350,6 +3352,7 @@ var
   label
    SetFreq;
 begin
+  tDispalyOnAirTime;
   TempHWND                                                                                                  := Windows.GetFocus;
   if {TempHWND} Windows.GetParent(TempHWND) = TelnetCommandWindow then
   begin
@@ -4696,11 +4699,11 @@ start:
           CallsignsList.AddCallsign(TempRXData.Callsign, TempMode, TempRXData.Band, TempRXData.ceClearDupeSheet);
           if not IntitialExLoaded then CallsignsList.AddIniitialExchange(TempRXData.Callsign, GetInitialExchangeStringFromContestExchange(TempRXData));
 
-//          if TempRXData.Band in [Band160..Band10] then
+           if TempRXData.Band in [Band160..Band10] then        // 4.115.3
           begin
             inc(ContinentQSOCount[TempRXData.Band, TempRXData.QTH.Continent]);
             inc(ContinentQSOCount[AllBands, TempRXData.QTH.Continent]);
-//            inc(TimeSpentByBand[TempRXData.Band]);
+             inc(TimeSpentByBand[TempRXData.Band]);
 //            PreviousBand                                                                                  := TempRXData.Band;
           end;
         end;

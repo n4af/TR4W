@@ -292,7 +292,6 @@ end;
 label
   NoTransMess, TransMess, CommandLine;
 var
-
   TempHDC                               : HDC;
   TempColor                             : tr4wColors;
   TempTLogBrush                         : TLogBrush {= (lbStyle: BS_SOLID; lbHatch: 0)};
@@ -487,7 +486,6 @@ begin
   SetStereoPin(StereoControlPin, StereoPinState);
   DisplayRadio(ActiveRadio);
   DisplayBandMode(ActiveBand, ActiveMode, False);
-  tDispalyOnAirTime;
   tDisplayCQTotal;
   ClearContestExchange(ReceivedData);
   SetUpToSendOnActiveRadio;
