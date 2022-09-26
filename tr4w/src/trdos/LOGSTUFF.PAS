@@ -5654,7 +5654,11 @@ var
   temphour: byte; // 4.58.2
   iotastate,k    : string[10];
   i,j            : integer;
-begin
+  Str1: string[4];
+  Str2: string[2];
+  Str3: string[4];
+  Str4: string[2];
+  begin
   RXData.QSOPoints := 0;
   RXCty := RXData.QTH.CountryID; // 4.67.15
   if (QSOPointsDomesticCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH
@@ -7807,6 +7811,43 @@ begin
                   RXData.QSOPoints := 1;
           end;
       end;
+
+      HamSpirit:              // 4.115.5
+       Begin
+        if length(RXData.DomesticQTH) < 3 then exit;
+        if length(RXData.DomesticQTH) = 3 then
+         begin
+          Str1 := '0' + Copy(RXData.DomesticQTH,1,1)  ;
+          str2 := Copy(RXData.DomesticQTH,2,2);
+         end
+         else
+           begin
+             Str1 := Copy(RXData.DomesticQTH,1,2)  ;
+             str2 := Copy(RXData.DomesticQTH,3,2);
+         end ;
+       if length(MyState) < 3 then exit;
+       If length(MyState) = 3 then
+        begin
+         Str3 := '0' + Copy(MyState,1,1);
+         Str4 := Copy(MyState,2,2);
+        end
+       else
+        begin
+         Str3 := Copy(MyState,1,2);
+         Str4 := Copy(MyState,3,2);
+        end;
+        if Str1 = Str3 then
+           RXData.QSOPoints := 1;
+         if MyContinent <> RXData.QTH.Continent then
+         begin
+          RXData.QSOPoints := 5;
+          exit;
+         end
+         else
+         if Str1 <> Str3 then
+          RXData.QSOPoints := 3;
+
+       end;
 
     RPX:
       begin

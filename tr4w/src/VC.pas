@@ -2792,7 +2792,8 @@ type
     BCQPQSOPointMethod,      // 4.97.6
     MWCQP,
     VAQSOPointMethod,
-    YOTAQSOPointMethod
+    YOTAQSOPointMethod,
+    HAMSPIRIT
     );
 
 const
@@ -2938,7 +2939,8 @@ const
      'MWCQP',
      'BC QSO PARTY',      // 4.97.6
      'VA QSO PARTY',
-     'YOTA'
+     'YOTA',
+     'HAMSPIRIT' // 4.115.5
     );
 
 type
