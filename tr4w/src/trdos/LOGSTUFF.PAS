@@ -7013,6 +7013,18 @@ var
         exit;
       end;
 
+      RSGBDXMethod: // 4.67.1
+       begin
+        if MyCountry = RXCty then
+        RXData.QSOPoints := 1
+         else
+          if MyContinent <>  RXData.QTH.Continent then
+           RXData.QSOPoints := 6
+         else
+          RXData.QSOPoints := 2;
+        end;
+
+
     RDAQSOPointMethod:
       begin
         RXData.QSOPoints := 0;
