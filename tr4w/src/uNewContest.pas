@@ -499,7 +499,8 @@ begin
                   DisplayInitialCommand(icmyName);
                 end;
 
-
+          //    RSGBDX:
+          //    DisplayCheckBox(TC_UKRSGB);
 
               UA4WCHAMPIONSHIP:
                 SetCommentAndEnableEditControl('Enter your RDA (for Russian stations) or four digit grid square:', icMyQTH);

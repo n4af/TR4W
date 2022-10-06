@@ -226,7 +226,7 @@ const
     'NORTH AMERICAN ARRL DXCC WITH NO USA CANADA OR KL7', //    NorthAmericanARRLDXCCWithNoUSACanadaOrkL7,
     'NON SOUTH AMERICAN COUNTRIES', //    NonSouthAmericanCountries,
     'PACC COUNTRIES AND PREFIXES', //    PACCCountriesAndPrefixes,
-//    'CQ NON EUROPEAN COUNTRIES AND WAE', //    CQNonEuropeanCountriesAndWAECallRegions
+ //   'CQ NON EUROPEAN COUNTRIES AND WAE', //    CQNonEuropeanCountriesAndWAECallRegions
     'BLACK SEA COUNTRIES'
     );
 var
@@ -842,7 +842,6 @@ begin
   else
     RXData.DXQTH := RXData.QTH.CountryID;
   end;
-
 end;
 
 procedure GetMultsFromLogEntry(LogEntry: Str80; var RXData: ContestExchange);

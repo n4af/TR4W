@@ -7013,17 +7013,55 @@ var
         exit;
       end;
 
-      RSGBDXMethod: // 4.67.1
-       begin
-        if MyCountry = RXCty then
-        RXData.QSOPoints := 1
-         else
-          if MyContinent <>  RXData.QTH.Continent then
-           RXData.QSOPoints := 6
-         else
-          RXData.QSOPoints := 2;
-        end;
+      RSGBDXMethod: // 4.116.1
+      {The same station may be contacted on each band and both modes for points and multipliers.
 
+       UK&CD stations - 1 point per contact with UK&CD stations on any band, 2 points per contact for UK&CD to EU contacts on any band and
+       6 points per contact for UK&CD to other continents.
+       Multipliers are the countries of the DXCC list, on each band and each mode,
+       except that JA, W, VE, VK, ZL and ZS call areas count as separate countries, and the UK call areas do not count for multiplier credit.
+
+       Non-UK stations - 1 point per contact with the same counitry, 2 points per contact with the same continent
+       and 6 points per contact with a different continent. A multiplier for the first contact with each UK&CD prefix,
+       for example, G3, GJ0, MM0 etc., on each band and each mode.
+      }
+
+    //               if ((copy(RXData.QTH.CountryID,1,1) <> 'G') and  (copy(RXData.QTH.CountryID,1,1) <> 'M')) then
+          begin
+              if (MyCountry[1] = 'G') or  (MyCountry[1] = 'M') then       // ukorcd
+              begin
+               ActiveDXMult := CQDXCC;
+                if (RXCty[1] = 'G') or (RXCty[1] = 'M') then
+                 begin
+                  ActiveDXMult := NoDXMults;
+                  RXData.QSOPoints := 1 ;
+                 end
+                else
+                 if MyContinent <>  RXData.QTH.Continent then
+                   RXData.QSOPoints := 6
+                  else
+                   RXData.QSOPoints := 2;
+                 end
+             else       // my country not uk
+              begin
+              if ((RXData.Callsign[1] = 'G') or (RXData.Callsign[1] = 'M')) then
+                begin
+                 ActivePrefixMult := Prefix;
+                 RXData.QSOPoints := 1 ;
+                end
+                 else               // QSO is not UK
+                 begin
+                  rxdata.Prefix := '';
+                  if RXData.QTH.Continent <> MyContinent then
+                    RXData.QSOPoints := 6
+                 else
+                  if (RXData.QTH.Continent = MyContinent) and (MyCountry <> RXCty) then
+                  RXData.QSOPoints := 2
+                 else
+                  RXData.QSOPoints := 1;
+                end;
+             end;
+         end;
 
     RDAQSOPointMethod:
       begin

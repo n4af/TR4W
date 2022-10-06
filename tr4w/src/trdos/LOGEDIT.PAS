@@ -580,7 +580,7 @@ begin
     logger.Error('ProcessMultipliers called while RXData.InhibitMults is set - Exiting...');
     Exit;
     end;
-
+ 
   Sheet.SetMultFlags(RXData);
 
   //  CancelOutMultsThatAreInEditableWindow(RXData);
@@ -642,7 +642,6 @@ var
   TempBand: BandType;
 begin
   OutputValue := 0;
-
   if not MultByMode then
     TempMode := Both
   else
@@ -2867,7 +2866,7 @@ begin
     //    TotalMults := TotalMults + MTotals[SingleBand, Both].NumberPrefixMults;
     //    TotalMults := TotalMults + MTotals[SingleBand, Both].NumberZoneMults;
   end
-  else if ActiveQSOPointMethod = WAEQSOPointMethod then
+  else if (ActiveQSOPointMethod = WAEQSOPointMethod) or (ActiveQSOPointMethod = RSGBDXMETHOD) then               // 4.116.1
   begin
 
     if ActiveDXMult = CQEuropeanCountries then

@@ -342,6 +342,19 @@ begin
 
   case Contest of
 
+  RSGBDX:
+   begin
+    if (myCountry[1] = 'G') or (myCountry[1] = 'M') then
+     begin
+      ActiveDXMult :=  CQDXCC;
+      ActivePrefixMult := CQNonEuropeanCountriesAndWAECallRegions;
+     end
+      else
+       begin
+        ActiveDXMult := NoDXMults;
+       end;;
+   end;
+
   BCQP:
   begin
   ActiveDXMult := NoDXMults;

@@ -97,6 +97,7 @@
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Folder "%s" already exists.'#13'Overwrite ?';
   TC_IAMIN                              = '&I am in %s';
 
+//  TC_UKRSGB                             =  'UK/CD and RSGB member';
   TC_NEWENGLANDSTATEABREVIATION         = 'Enter your New England state abreviation'#13'(ME, NH, VT, MA, CT, RI):';
   TC_ENTERTHEQTHTHATYOUWANTTOSEND       = 'Enter the QTH that you want to send:';
   TC_ENTERSTATEFORUSPROVINCEFORCANADA   = 'Enter state for U.S., province for Canada:';
