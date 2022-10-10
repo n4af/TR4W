@@ -3482,7 +3482,7 @@ QSOPartiesCount = 18;
       'LOCUST QSO PARTY',
       'ARKTIKA-SPRING',
       'UN DX',
-      'NEW YORK QSO PARTY',
+      'NY-QSO-PARTY',
       'KING-OF-SPAIN-CW',
       'KING-OF-SPAIN-SSB',
       'WRTC',
