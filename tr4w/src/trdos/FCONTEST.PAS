@@ -342,6 +342,12 @@ begin
 
   case Contest of
 
+  NYQP:
+  begin
+   ActiveDxMult := NoDXMults;
+   ActiveDomesticMult := DomesticFile;
+  end;
+
   RSGBDX:
    begin
     if (myCountry[1] = 'G') or (myCountry[1] = 'M') then
@@ -571,13 +577,12 @@ begin
 
     CALQSOPARTY:
       begin
-//        if PWORD(@MyState[1])^ = $4143 {CA} then
+
         if FoundMyStateInDomFile then
         begin
-//          DomesticQTHDataFileName := 'CALQSOW6';
-//          ActiveDXMult := NoCountDXMults;
+
           ActiveExchange := QSONumberDomesticOrDXQTHExchange;
-//          CQP := True;
+
         end
         else
         begin
@@ -1057,7 +1062,6 @@ begin
           ActiveDXMult := ARRLDXCC
         else
           ActivePrefixMult := SACDistricts;
-        ActiveBand := Band80;
       end;
 
       YBDX:                   // 4.64.1

@@ -3,3 +3,4 @@ Domestic template for Ohio stations in PA QSO Party
 INCLUDE FILE pa_cty.dom
 INCLUDE FILE S50.DOM
 INCLUDE FILE P13.DOM
+dx = dx

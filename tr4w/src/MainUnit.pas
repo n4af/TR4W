@@ -1077,9 +1077,12 @@ begin
 procedure ReturnInSAPOpMode;
 label
 loop;
-
+var
+n : integer;
+TempString : Str10;
 begin
   DebugMsg('>>>>Entering   ReturnInSAPOpMode');
+  ExchangeHasBeenSent := False;
   Exchw                                                                                                     := ExchangeWindowString;
   Callw                                                                                                     := CallWindowString;
   ParseFourFields(ExchangeWindowString,s1,s2,s3,s4);
@@ -1159,21 +1162,19 @@ begin
 
  if (ActiveExchange = RSTDomesticQTHExchange) then
   begin
-   if ((not StringhasNumber(s3)) and (S3 <> '')) then
-    ExchangeWindowString                                                                                    := S3
-     else
-     if ((S3 = '')and (S2 <> '') and (not StringhasNumber (S2))) then
-      ExchangeWindowString                                                                                  := S2
-       else
-        ExchangeWindowString                                                                                := S1;
+   if pos('/',S1)  > 0 then
+    begin
+     n := pos('/',S1);
+     TempString := leftstr(s1,n-1);
+     CallWindowString := Callw + '/' + TempString;
+     ExchangeWindowString := TempString;
+    end;
+   if n > 0 then
+    S2 := rightstr(s1,length(s1)-n);
    end;
+
     if ActiveMode in [CW, Digital] then
-  {   if ActiveExchange = RSTDomesticQTHExchange then
-      begin
-       ParseFourFields(ExchangeWindowString,s1, s2, s3, s4);
-       if s2 <> '' then
-        rxdata.exchangestring                                                                               := S2;
-      end;   }
+
        if not SendCrypticMessage(SearchAndPounceExchange) then
          Exit;
 
@@ -1210,26 +1211,21 @@ begin
   end;
   if ActiveExchange = RSTDomesticQTHExchange then
   begin
-    if (IsAlpha(S3)) and (S3 <> '') then
+    if (IsAlpha(S2)) and (S2 <> '') then
      begin
-      S3                                                                                                    := '';
-      CallWindowString                                                                                      := callw ;
-      exchangewindowstring                                                                                  := s2;
-      BeSilent                                                                                              := True;
+
+       CallWindowString := callw + '/' + S2;
+  //    S3 := '';
+      exchangewindowstring := s2;
+      BeSilent  := True;
+      S2 := '';
       goto loop;
+
     end;
- if (S2 <> '') and (IsAlpha(S2)) then
-  begin
-  S2                                                                                                        := '';
-  CallWindowString                                                                                          := callw ;
-  exchangewindowstring                                                                                      := s1;
-  BeSilent                                                                                                  := True;
- goto loop;
-  end;
- end;
+
+      end;
   DebugMsg('>>>>Exiting   ReturnInSAPOpMode');
 end;
-
 function Send_DE: boolean;
 begin
   Result                                                                                                    := True;
