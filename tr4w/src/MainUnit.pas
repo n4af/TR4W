@@ -1160,7 +1160,7 @@ begin
        SendMessageToMixW('<TX>');
        end;
 
- if (ActiveExchange = RSTDomesticQTHExchange) then
+ if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange = RSTQTHExchange) then
   begin
    if pos('/',S1)  > 0 then
     begin
