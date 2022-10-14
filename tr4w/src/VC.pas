@@ -2795,7 +2795,8 @@ type
     VAQSOPointMethod,
     YOTAQSOPointMethod,
     HAMSPIRIT ,
-    RSGBDXMethod
+    RSGBDXMethod,
+    NYQPQP
     );
 
 const
@@ -2854,6 +2855,7 @@ const
     'KCJ', //    KCJQSOPointMethod,
     'LQP',//    'MQP', //    MQPQSOPointMethod,
   	'MARCONI MEMORIAL', // MMCQsoPointMethod,      //n4af
+    'NYQPQP',
     'NZ FIELD DAY', //    NZFieldDayQSOPointMethod,
     'OK DX', //    OKDXQSOPointMethod,
     'RAEM', //    RAEMQSOPointMethod,

@@ -1209,7 +1209,7 @@ begin
       if OpMode = SearchAndPounceOpMode then SetOpMode(CQOpMode);
     end;
   end;
-  if ActiveExchange = RSTDomesticQTHExchange then
+  if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange = RSTQTHEXCHANGE) then
   begin
     if (IsAlpha(S2)) and (S2 <> '') then
      begin
