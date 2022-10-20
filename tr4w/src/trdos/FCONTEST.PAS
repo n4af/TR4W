@@ -344,7 +344,7 @@ begin
 
   NYQP:
   begin
-   ActiveDxMult := NoDXMults;
+   //ActiveDxMult := NoDXMults;
    ActiveDomesticMult := DomesticFile;
   end;
 

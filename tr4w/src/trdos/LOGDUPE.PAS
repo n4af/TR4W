@@ -1606,6 +1606,10 @@ begin
   SkipDomesticMult:
   if (Contest = BCQP) and (RXData.DomMultQTH = 'dx') then         // 4.98.2
     exit;   // no mults for dx
+  if (Contest = NYQP) and (RXData.DomMultQTH = 'DX') then         // 4.116.5
+    exit;
+   if (Contest = INQSOPARTY) and (RXData.DomMultQTH = 'DX') then         // 4.116.5
+     exit;
   if (RXData.DomMultQTH <> '') and DoingDomesticMults then
     RXData.DomesticMult := mo.IsDmMult(RXData.DomMultQTH, GetAddMultBand(DomesticMultByBand, MultBand), MultMode);
 

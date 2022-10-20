@@ -485,8 +485,7 @@ const
     );
 var
 
-//  tr4wBandMapArray                      : BandMapArray;
-
+  k                                     : integer;
   //  BMDrawCounter                    : integer;
 
   ActiveBackground                      : Byte;
@@ -4520,69 +4519,82 @@ begin
   SpotsList.Display;
   end;
 
- procedure NextBandMapEntry ;
- var
- Result                                : Integer;
- BandMapEntryRecord                    : BandMapEntryPointer;
+ procedure NextBandMapEntry;
+var
+BandMapEntryRecord                    : BandMapEntryPointer;
   NumberEntriesDisplayed                : integer;
   Band                                  : BandType;
   Mode                                  : ModeType;
-  CursorCount                           : integer;
+  CC                                    : integer;
   CurCursorPosData                      : integer;
   numberbandentries                     : integer;
-  i,j                                     : integer;
+  i,j                                  : integer;
   Spot                                  : TSpotRecord;
   d  : pChar;
-  label
-  next;
-
-  begin
-   if not BandMapEnable then exit;
-   CursorCount := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
-    if CursorCount = LB_ERR then Exit;
+begin
+              BMp := 0;
+  //            tLB_SETCURSEL(BandMapListBox, 0);
+  CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+    if CC = LB_ERR then Exit;
      if TwoRadioMode and QSYInactiveRadio then
       Band := InactiveRadioptr.BandMemory
        else
         Band := ActiveRadioptr.BandMemory;
-    CursorCount := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
-    if CursorCount = LB_ERR then Exit;
-    SpotsList.Display;
 
-  i :=  Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
-  if i = 0 then
-   begin
-    for i := 0 to CursorCount do
-     if spotslist.get(i).FBand = Band then
-      break  ;
-   end
-   else
-    begin
-      i := BMp;
-      inc(i);
-      inc(BMp);
-     end;
-    i := BMp;
-    BMp := i +1;
- // Windows.SendMessage(BandMapListBox, LB_SETCURSEL, j, 0);
+  //k := Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);   // K contains real cursor displacement from top (0)
+ //  i := GetBMSelItemData; //SendMessage(BandMapListBox, LB_GETITEMDATA, tLB_GETCURSEL(BandMapListBox), 0);
+//  if k = LB_ERR then Exit;
 
- spot := spotslist.get(i);
+//  Spot := SpotsList.Get(j);
 
-       if (BandMapSO2RDisplay) and (TwoRadioMode) then   // 4.105.14
-        tLB_SETCURSEL(BandMapListBox,i);
 
-       if (Spot.FBand = Band) and (QSYInactiveRadio) and (Spot.FMode = ActiveMode)  then
-        begin
-         TuneRadioToSpot(Spot, InActiveRadio);
-         tLB_SETCURSEL(BandMapListBox, i);
-        end
-        else
-         if (Spot.FBand = Band) and (not QSYInactiveRadio) then
-          begin
-           TuneRadioToSpot(Spot, ActiveRadio);
-            tLB_SETCURSEL(BandMapListBox, i);
-          end;
- end;
- 
+
+if (K = -1) or (k > CC) then
+k := 0;
+    for j := k to CC do      // loop thru bm entries looking for match to band and mode
+     begin
+     CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);     // Current Cursor
+      Spot := SpotsList.Get(j);                                       // get current spot
+      CallWindowString := Spot.FCall;
+      SetOpMode(SEARCHAndPOUNCEOpMode);
+      if (Spot.FBand =  InactiveRadioptr.BandMemory) and (Spot.FMode = ActiveMode) and (QSYInactiveRadio) then
+       begin
+        PutCallToCallWindow(OnDeckCall);
+        TuneRadioToSpot(Spotslist.Get(k), InActiveRadio);
+        inc(k);
+        break;
+       end
+       else
+      if (Spot.FBand = ActiveRadioptr.BandMemory) and (Spot.FMode = ActiveMode) then
+      if not (QSYInactiveRadio) then
+     begin
+         PutCallToCallWindow(CallWindowString);
+         TuneRadioToSpot(Spotslist.Get(j), ActiveRadio);
+         inc(k);
+         break;
+     end ;
+
+
+       if j = k then
+       inc(k);
+
+   //      BM_Begin := j + 1;
+     //     if (Spotslist.get(BM_Begin).FBand <> Band)  then
+      //    BM_Begin := 0;
+
+           if k > CC-1 then
+           begin
+             k := 0;
+             CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+           end;
+       end;     // end loop
+           if k > CC-1 then
+           begin
+             k := 0;
+             CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+           end;
+
+end;     // end procedure
 
 procedure BMFirst;
 begin

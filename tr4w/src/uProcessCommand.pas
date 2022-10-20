@@ -106,7 +106,7 @@ const
 
 
  // sCommands                             =  67  {$IF MMTYMODE} + 5  {$IFEND};
-  sCommands                             =  74;  // 4.72.9
+  sCommands                             =  73;  // 4.72.9
 
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
@@ -152,7 +152,7 @@ const
     (caCommand: 'WK_SWAPTUNE'; caAddress: @scWK_SWAPTUNE),
     (caCommand: 'WK_RESET'; caAddress: @scWK_RESET),
     (caCommand: 'NEXTBANDMAP'; caAddress: @NEXTBANDMAPENTRY),
-    (caCommand: 'BMFIRST'; caAddress: @BMFIRST),
+ //   (caCommand: 'BMFIRST'; caAddress: @BMFIRST),
     (caCommand: 'SENDTOCLUSTER'; caAddress: @scSENDTOCLUSTER),
     (caCommand: 'LASTCQFREQ'; caAddress: @scLASTCQFREQ),
     (caCommand: 'LASTSPFREQ'; caAddress: @scLASTSPFREQ),
