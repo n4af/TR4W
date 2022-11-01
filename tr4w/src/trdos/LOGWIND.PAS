@@ -4530,8 +4530,11 @@ BandMapEntryRecord                    : BandMapEntryPointer;
   numberbandentries                     : integer;
   i,j                                  : integer;
   Spot                                  : TSpotRecord;
-  d  : pChar;
+  d                                     : pChar;
+  str1                                   : str10;
+
 begin
+   TempSpot.FBand := NoBand;
               BMp := 0;
   //            tLB_SETCURSEL(BandMapListBox, 0);
   CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
@@ -4555,10 +4558,15 @@ k := 0;
      begin
      CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);     // Current Cursor
       Spot := SpotsList.Get(j);                                       // get current spot
+   //   GetBandMapBandModeFromFrequency(TempSpot.FFrequency, TempSpot.FBand, TempSpot.FMode);
       CallWindowString := Spot.FCall;
       SetOpMode(SEARCHAndPOUNCEOpMode);
+      logger.info('[NEXTBM] CALL = '+ SPOT.FCALL);
+      logger.info('Freq = ' + IntToStr(Spot.ffrequency));
       if (Spot.FBand =  InactiveRadioptr.BandMemory) and (Spot.FMode = ActiveMode) and (QSYInactiveRadio) then
        begin
+        logger.Info('Enter NextBandMap INACTIVE-Radio: ' + spot.fcall );
+        LOGGER.INFO('Freq = ' + IntToStr(Spot.ffrequency));
         PutCallToCallWindow(OnDeckCall);
         TuneRadioToSpot(Spotslist.Get(k), InActiveRadio);
         inc(k);
@@ -4567,7 +4575,9 @@ k := 0;
        else
       if (Spot.FBand = ActiveRadioptr.BandMemory) and (Spot.FMode = ActiveMode) then
       if not (QSYInactiveRadio) then
-     begin
+       begin
+         logger.info('[NEXTBM-Active] CALL = '+ SPOT.FCALL);
+         LOGGER.INFO('Freq = ' + IntToStr(Spot.ffrequency));
          PutCallToCallWindow(CallWindowString);
          TuneRadioToSpot(Spotslist.Get(j), ActiveRadio);
          inc(k);
@@ -4578,11 +4588,7 @@ k := 0;
        if j = k then
        inc(k);
 
-   //      BM_Begin := j + 1;
-     //     if (Spotslist.get(BM_Begin).FBand <> Band)  then
-      //    BM_Begin := 0;
-
-           if k > CC-1 then
+          if k > CC then
            begin
              k := 0;
              CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
