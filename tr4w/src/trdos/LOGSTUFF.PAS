@@ -7947,22 +7947,45 @@ var
 
 
      EUDXQSOPOINTMETHOD:
+     { 3. QSO Points
+a. European Union stations:
+QSO with your own country – 2 point,
+QSO with another European Union country – 10 points,
+QSO with a non-European Union country on your continent – 3 points,
+QSO with another continent – 5 points.
+b. Non- European Union stations:
+QSO with European Union – 10 points,
+QSO with your own country – 2 points,
+QSO with a different country on your continent – 3 points,
+QSO with another continent – 5 points.
+    }
       begin
-        if (RXData.DomMultQTH[4] <> '') then // he is in EU
-        begin
-          if (RXCty <> MyCountry) then // Not same country as me
-            RXData.QSOPoints := 10
-          else
-            RXData.QSOPoints := 1;
-          exit;
-        end;
-        // he is not in EUnion -or- is same country
-        if (RXData.QTH.Continent <> MyContinent) then
-          RXData.QSOPoints := 5
-        else if (RXCty <> MyCountry) then
-          RXData.QSOPoints := 3
-        else
-          RXData.QSOPoints := 1;
+       if length(MyState) = 4 then        // i am in EU region
+         begin
+          if (RXData.DomMultQTH[4] <> '') then // he is in EU
+           begin
+            If (RXCty <> MyCountry) then // Not same country as me
+             RXData.QSOPoints := 10
+              else
+                RXData.QSOPoints := 2;
+                 exit;
+           end
+           else  // i am eu and he is not
+               if (RXData.QTH.Continent <> MyContinent) then
+                RXData.QSOPoints := 5
+                 else
+                  RXData.QSOPoints := 3;
+          end
+        else   // I am not in EU region
+         if (RXData.DomMultQTH[4] <> '') then // he is in EU
+          RXData.QSOPoints := 10
+           else
+            if (RXData.QTH.Continent <> MyContinent) then
+             RXData.QSOPoints := 5
+            else if (RXCty <> MyCountry) then
+             RXData.QSOPoints := 3
+           else
+           RXData.QSOPoints := 2;
       end;
 
      YOTAQSOPointMethod:             // 4.99.3
