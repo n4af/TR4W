@@ -7382,6 +7382,7 @@ var
       end;
 
     YODXQSOPointMethod:
+     begin
       if RXCty = 'YO' then
         RXData.QSOPoints := 8
       else if MyCountry <> RXCty then
@@ -7391,7 +7392,7 @@ var
           RXData.QSOPoints := 2
       else
         RXData.QSOPoints := 1; {KK1L: 6.71 Same country QSO}
-
+     end;
     NoQSOPointMethod: RXData.QSOPoints := 0;
 
     AlwaysOnePointPerQSO: RXData.QSOPoints := 1;
@@ -8006,8 +8007,6 @@ QSO with another continent – 5 points.
       22..25  : RXData.QSOPoints := RXData.QSOPoints + 10;
      end;
     end;
-
-
   end;
 
 

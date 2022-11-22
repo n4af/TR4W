@@ -2855,7 +2855,6 @@ const
     'KCJ', //    KCJQSOPointMethod,
     'LQP',//    'MQP', //    MQPQSOPointMethod,
   	'MARCONI MEMORIAL', // MMCQsoPointMethod,      //n4af
-    'NYQPQP',
     'NZ FIELD DAY', //    NZFieldDayQSOPointMethod,
     'OK DX', //    OKDXQSOPointMethod,
     'RAEM', //    RAEMQSOPointMethod,
@@ -2945,7 +2944,8 @@ const
      'VA QSO PARTY',
      'YOTA',
      'HAMSPIRIT', // 4.115.5
-     'RSGC-DX'
+     'RSGB-DX',
+      'NYQPQP'
     );
 
 type
