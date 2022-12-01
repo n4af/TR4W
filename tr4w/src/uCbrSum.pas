@@ -105,7 +105,7 @@ const
     (ctrTag: '_CATEGORY-STATION';       ctrCFG:False; ctrSave: True; ctrList: False),
     (ctrTag: '_CATEGORY-TIME';          ctrCFG:True;  ctrSave: False; ctrList: True),
     (ctrTag: '_CATEGORY-TRANSMITTER';   ctrCFG:False; ctrSave: True; ctrList: False),
-    (ctrTag: '_CATEGORY-OVERLAY';       ctrCFG:True;  ctrSave: False; ctrList: True),
+    (ctrTag: '_CATEGORY-OVERLAY';       ctrCFG:True;  ctrSave: False; ctrList:  True),
     (ctrTag: '_CERTIFICATE';            ctrCFG:True;  ctrSave: True; ctrList: False),
     (ctrTag: '_OPERATORS';              ctrCFG:True;  ctrSave: True; ctrList: False),
     (ctrTag: '_CLUB';                   ctrCFG:False; ctrSave: True;  ctrList: False),

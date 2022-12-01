@@ -79,8 +79,8 @@ begin
           CreateStatic(l[i], 5 + i * 170, 5, 50+10, hwnddlg, 0);
           if i in [1..2] then
             tCreateComboBoxWindow(CBS_DROPDOWNLIST or WS_CHILD or WS_VISIBLE or WS_TABSTOP, 55+10 + i * 170, 5, 100, hwnddlg, 200 + i)
-          else
-            CreateEdit(ES_UPPERCASE, 55+10 + i * 170, 5, 100, 23, hwnddlg, 200 + i);
+              else
+               CreateEdit(ES_UPPERCASE, 55+10 + i * 170, 5, 100, 23, hwnddlg, 200 + i);
         end;
 
         CreateButton(BS_DEFPUSHBUTTON, RC_SEARCH, 690, 5, 60, hwnddlg, 103);

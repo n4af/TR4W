@@ -62,7 +62,7 @@ const
   InitialCommandsSA2                    : array[1..CSAS] of PChar = (
     nil,
     nil,
-    nil,
+    'CATEGORY-OVERLAY',
     'CATEGORY-ASSISTED',
     'CATEGORY-BAND',
     'CATEGORY-MODE',

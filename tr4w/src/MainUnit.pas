@@ -4368,7 +4368,8 @@ end;
 
 function tCreateComboBoxWindow(dwStyle: DWORD; X, Y, nWidth, {nHeight: integer;} hwndParent: HWND; HMENU: HMENU): HWND;
 begin
-  Result                                                                                                    := CreateWindowEx(WS_EX_NOPARENTNOTIFY {WS_EX_STATICEDGE}, COMBOBOX, nil, dwStyle, X, Y, nWidth, 300 {nHeight}, hwndParent, HMENU, hInstance, nil);
+//  Result := CreateWindowEx(WS_EX_NOPARENTNOTIFY {WS_EX_STATICEDGE}, COMBOBOX, nil, dwStyle, X, Y, nWidth, 300 {nHeight}, hwndParent, HMENU, hInstance, nil);
+Result := CreateWindowEx(WS_EX_NOPARENTNOTIFY {WS_EX_STATICEDGE}, COMBOBOX, nil, dwStyle, X, Y, nWidth, 340 {nHeight}, hwndParent, HMENU, hInstance, nil); // 4.117.3
   tWM_SETFONT(Result, MSSansSerifFont);
 end;
 
