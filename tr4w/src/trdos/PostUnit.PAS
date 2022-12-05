@@ -1926,6 +1926,12 @@ begin
             end;
 
         //if ContestsArray[Contest].DM = DomesticMult
+
+   {    case activeexchange of
+         'rstandgridexchange'
+         else
+          exit;    }
+
       if (LooksLikeAGrid(TempRXData.DomesticQTH) and (ActiveDomesticMult <> RDADistrict)) then
          begin
           nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<GRIDSQUARE:%u>%s ', tCallStringLength, p);
