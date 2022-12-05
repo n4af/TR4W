@@ -1926,9 +1926,8 @@ begin
             end;
 
         //if ContestsArray[Contest].DM = DomesticMult
-
-        if (LooksLikeAGrid(TempRXData.DomesticQTH) and (ActiveDomesticMult <> RDADistrict)) then
-        begin
+      if (LooksLikeAGrid(TempRXData.DomesticQTH) and (ActiveDomesticMult <> RDADistrict)) then
+         begin
           nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<GRIDSQUARE:%u>%s ', tCallStringLength, p);
           sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
         end

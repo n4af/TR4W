@@ -3297,7 +3297,11 @@ begin
 
   LooksLikeAGrid := False;
   TestString := UpperCase(GridString);
-
+   if ((ActiveExchange = RSTAndOrGridExchange) or        // 4.118.1
+                (ActiveExchange = Grid2Exchange) or
+                (ActiveExchange = RSTAndGrid3Exchange) or
+                (ActiveExchange = GridExchange)) then
+  begin
   if (length(TestString) <> 4) and (length(TestString) <> 6) then Exit;
 
   //   if (TestString[1] < 'A') or (TestString[1] > 'R') then Exit;
@@ -3316,6 +3320,7 @@ begin
     if GridString[i] > 'Z' then GridString[i] := CHR(Ord(GridString[i]) - Ord('a') + Ord('A'));
 
   LooksLikeAGrid := True;
+  end;
 end;
 
 function LowerCase(const s: string): string;
