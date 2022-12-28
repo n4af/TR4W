@@ -3293,11 +3293,11 @@ function LooksLikeAGrid(var GridString: ShortString): boolean;
 var
   TestString                            : Str20;
   i                                     : integer;
-  pAE                                   : pchar;
+  p                                  : pchar;
 begin
 
   LooksLikeAGrid := False;
-  pAE := ActiveExchange;
+ 
   TestString := UpperCase(GridString);
     if          ((ActiveExchange = RSTAndOrGridExchange) or        // 4.118.1
                 (ActiveExchange = Grid2Exchange) or
