@@ -643,13 +643,15 @@ var
   SumInteger                            : integer;
   m                                     : RemainingMultiplierType;
   TotalLine                             : boolean;
+  totalMults                            : integer;
 const
   h                                     = #13#10'  BAND   Raw QSOs   Valid QSOs   Points';
   mn                                    :array[RemainingMultiplierType] of PChar = ('','Mults', 'Countries', 'Zones', 'Prefixes');
-  breakline                             = #13#10' __________________________________________________________';
+  breakline                             = #13#10' __________________________________________________________________';
 begin
   TotalLine := False;
-  sWriteFile(tReportFileWrite, h, length(h));
+  totalMults := -1;  // To accomodate the totals line that will add one too many
+  sWriteFile(tReportFileWrite, h, length(h));    // QSO part of header
 
   for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
   begin
@@ -702,7 +704,11 @@ begin
         push MString
         push BString
         end;
-      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %s%s %9d  %12d %8d');
+      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %3s%4s %9d  %12d %8d');
+      if contest = WINTERFIELDDAY then
+         begin
+         inc(totalMults);
+         end;
 
         asm add esp,28
         end;
@@ -714,7 +720,21 @@ begin
              begin
              Continue;
              end;
-          nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', mo.MTotals[Band, TempMode, m]);
+          if contest = WINTERFIELDDAY then     // or any contest where it is one mults if QSOs on this band/mode
+             begin
+             if totalLine then
+                begin
+                nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', totalMults);
+                end
+             else
+                begin
+                nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', 1);
+                end;
+             end
+          else
+             begin
+             nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', mo.MTotals[Band, TempMode, m]);
+             end;
           sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
         end;
       end;
@@ -725,9 +745,9 @@ begin
     sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
   end;
   if Contest <> ARRLFIELDDAY then
-  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', TotalScore)      // 4.108.9
+     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', TotalScore)      // 4.108.9
   else
-  nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', SumInteger);     // 4.108.9
+     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', SumInteger);     // 4.108.9
   sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
 end;
 
@@ -2294,7 +2314,7 @@ const
 begin
   Result := False;
 
-  if Contest = ARRL10 then
+  if (Contest = ARRL10) or (Contest = WINTERFIELDDAY) then
     if Windows.GetDlgItemText(CreateCabrilloWindow, integer(ctLocation) + 200, @TempBuffer2, SizeOf(TempBuffer2)) = 0 then
     begin
       showwarning('LOCATION field is empty.');

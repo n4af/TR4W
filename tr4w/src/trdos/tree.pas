@@ -3297,7 +3297,7 @@ var
 begin
 
   LooksLikeAGrid := False;
-  pAE := ActiveExchange;
+  //pAE := ActiveExchange;
   TestString := UpperCase(GridString);
     if          ((ActiveExchange = RSTAndOrGridExchange) or        // 4.118.1
                 (ActiveExchange = Grid2Exchange) or

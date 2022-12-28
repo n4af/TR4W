@@ -1470,6 +1470,10 @@ begin
         // Set this to DX
         RXData.QTHString := 'DX';
       end
+      else if ( (contest = WINTERFIELDDAY) and (TempString = 'MX')) then
+         begin
+         RxData.QTHString := 'MX';
+         end
       else
       begin
         Result := False;
@@ -9100,7 +9104,7 @@ begin
       sXmit := sXmit + sClass[i];
     end
     else if (((contest = ARRLFIELDDAY) and (sClass[i] in ['A'..'F'])) or
-      ((contest = WINTERFIELDDAY) and (sClass[i] in ['I', 'O', 'H']))) then
+      ((contest = WINTERFIELDDAY) and (sClass[i] in ['I', 'O', 'H', 'M']))) then
 
     begin
       if classSet then
