@@ -2953,6 +2953,7 @@ type
   UnknownExchange,
     NoExchangeReceived,
     AgeAndQSONumberExchange, //WLI
+    QSONumberAndAgeExchange,   // 4.119.1
     CheckAndChapterOrQTHExchange,
     ClassDomesticOrDXQTHExchange,
     KidsDayExchange,
@@ -3018,6 +3019,7 @@ const
      'UNKNOWN',
     'NONE',
   	'AGE AND QSO NUMBER',
+    'QSO NUMBER AND AGE', // 4.119.1
     'CHECK AND CHAPTER OR QTH EXCHANGE',
     'CLASS DOMESTIC OR DX QTH',
     'KIDS DAY EXCHANGE',

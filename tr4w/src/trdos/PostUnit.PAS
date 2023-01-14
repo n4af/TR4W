@@ -3006,6 +3006,40 @@ if TempRXData.DomMultQTH = '' then
             end;
           end;
 
+         QSONumberAndAgeExchange:      // 4.119.1
+          begin
+            asm
+                push cMyState
+                push nrSent
+
+
+            xor eax,eax
+           mov ax, word ptr TempRXData.RSTSent
+
+           push eax
+           end;
+            wsprintf(CABRILLO_MYEX, '%-3d %03d %-2s      ');
+            asm add esp,20
+            end;
+
+
+            hisAge := TempRXData.Age ;
+            nrreceived := TempRXData.NumberReceived;          // n4af 04.42.4
+            asm
+            push  hisAge
+            end;
+            asm
+            push nrReceived
+            xor eax,eax
+            mov ax, word ptr TempRXData.RSTSent
+            push eax
+            end;
+
+            wsprintf(CABRILLO_HISEX, ' %-3d %3d %02d');       // n4af 4.42.4
+            asm add esp,20
+            end;
+          end;
+
         RSTPowerExchange:
         begin
          csPower := @TempRXData.Power[1];

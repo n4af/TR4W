@@ -3498,6 +3498,35 @@ begin
   Result := True;
 end;
 
+Function ProcessQSONumberAndAgeExchange(Exchange: ShortString; var RXData:
+  ContestExchange): boolean;
+var
+  firststring, secondstring, thirdstring: str10;
+
+begin
+  ParseExchange(exchange, FirstString, SecondString, ThirdString);
+  Result := False;
+  if (SecondString = '')  then
+    exit; //
+  if length(Exchange) < 3 then
+    Exit;
+  if (not StringIsAllNumbers(FirstString)) or  (not StringIsAllNumbers(SecondString))then
+    Exit;
+    RXData.NumberReceived := StrToInt(FirstString);
+    RXData.Age := StrToInt(SecondString);
+   if (ActiveMode = CW) or (ActiveMode = Digital) then
+  begin
+    RXData.RSTReceived := 599;
+    RXData.RSTSent := 599;
+  end
+  else
+  begin
+    RXData.RSTReceived := 59;
+    RXData.RSTSent := 59;
+  end;
+  Result := True;
+end;
+
 function ProcessRSTAndDomesticQTHExchange(Exchange: ShortString {Str80}; var
   RXData: ContestExchange): boolean;
 
@@ -8539,6 +8568,9 @@ begin
 
     AgeAndQSONumberExchange: ProcessExchange :=
       ProcessAgeAndQSONumberExchange(ExchangeString, RData);
+
+    QSONumberAndAgeExchange: ProcessExchange :=
+     ProcessQSONumberAndAgeExchange(ExchangeString,Rdata);
 
     RSTAgeAndPossibleSK:
       ProcessExchange := ProcessRSTAgeAndPossibleSK(ExchangeString, RData);

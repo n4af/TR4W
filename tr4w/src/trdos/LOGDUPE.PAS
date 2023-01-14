@@ -1963,6 +1963,12 @@ begin
         ExchangeInformation.Age := True;
       end;
 
+    QSONumberAndAgeExchange:             // 4.119.1
+      begin
+        ExchangeInformation.QSONumber := True;
+        ExchangeInformation.Age := True;
+      end;
+
     RSTAgeAndPossibleSK:
       begin
         ExchangeInformation.RST := True;
