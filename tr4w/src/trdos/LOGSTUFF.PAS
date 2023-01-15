@@ -3485,7 +3485,7 @@ begin
     RXData.NumberReceived := StrToInt(SecondString);
     RXData.DomesticQTH := '';
   end;
-  if (ActiveMode = CW) or (ActiveMode = Digital) then
+ { if (ActiveMode = CW) or (ActiveMode = Digital) then  // 4.1193
   begin
     RXData.RSTReceived := 599;
     RXData.RSTSent := 599;
@@ -3494,7 +3494,7 @@ begin
   begin
     RXData.RSTReceived := 59;
     RXData.RSTSent := 59;
-  end;
+  end;  }
   Result := True;
 end;
 
@@ -7625,9 +7625,12 @@ var
         end;
       end;
 
- //     NCCCQP:
-  //     if rxdata.
+   ONY:
 
+    begin
+       RXData.QSOPoints := RXData.Age;
+    end;
+    
     OldNewYearQSOPointMethod:
       begin
         RXData.QSOPoints := StrToInt(RXData.Power);
@@ -7727,6 +7730,7 @@ var
         else
           RXData.QSOPoints := 1;
       end;
+
 
     RadioMemoryQSOPointMethod:
       begin

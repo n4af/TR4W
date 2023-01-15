@@ -2697,6 +2697,7 @@ type
     FistsQSOPointMethod,
     FOCMarathonQSOPointMethod,
     HADXQSOPointMethod,
+    ONY,
     YUDXQSOPointMethod,     // 4.57.5
     UKEIQSOPointMethod,    // 4.58.2
     HelvetiaQSOPointMethod,
@@ -2845,6 +2846,7 @@ const
     'FISTS', //    FistsQSOPointMethod,
     'FOC MARATHON' , // FOCMarathonPointMethod,
     'HA DX', //    HADXQSOPointMethod,
+    'ONY',
     'YUDX', //     YUDXQSOPointMethod,        // 4.57.5
     'UKEI', //    UK-EIQSOPointMethod,       // 4.58.2
     'HELVETIA', //    HelvetiaQSOPointMethod,

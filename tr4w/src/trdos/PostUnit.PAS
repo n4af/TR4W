@@ -2979,12 +2979,12 @@ if TempRXData.DomMultQTH = '' then
                 push cMyState
 
 
-            xor eax,eax
+      {      xor eax,eax         // 4.119.3
            mov ax, word ptr TempRXData.RSTSent
 
-           push eax
+           push eax  }
            end;
-            wsprintf(CABRILLO_MYEX, '%-3d %-2s %03d      ');
+            wsprintf(CABRILLO_MYEX, '%-2s %03d ');
             asm add esp,20
             end;
 
@@ -2996,12 +2996,12 @@ if TempRXData.DomMultQTH = '' then
             end;
             asm
             push hisAge
-            xor eax,eax
+       {     xor eax,eax                      // 4.119.3
             mov ax, word ptr TempRXData.RSTSent
-            push eax
+            push eax   }
             end;
 
-            wsprintf(CABRILLO_HISEX, ' %-3d %-3d %04d');       // n4af 4.42.4
+            wsprintf(CABRILLO_HISEX, ' %-3d %04d');       // n4af 4.42.4
             asm add esp,20
             end;
           end;
