@@ -2875,6 +2875,7 @@ end;
          logger.error('[SendFullLogToUDP] Was not valid QSO %s',[TempRXData.Callsign]);
          end;
       end;
+   CloseLogFile;
    Logger.Info('%d records sent to UDP',[nCount]);
    Format(QuickDisplayBuffer, '%d log records sent to UDP', nCount);
    QuickDisplay(QuickDisplayBuffer);
