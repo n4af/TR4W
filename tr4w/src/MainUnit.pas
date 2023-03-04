@@ -6761,7 +6761,7 @@ var
 begin
   sModeUpper := ANSIUPPERCASE(sMode);
   case AnsiIndexText(AnsiUpperCase(sMode), ['CW', 'SSB', 'AM', 'FM', 'FT8',
-    'RTTY', 'MFSK']) of
+    'RTTY', 'MFSK', 'PSK31', 'PSK']) of
     0: // CW
       begin
         Result.msmMode := CW;
@@ -6798,6 +6798,11 @@ begin
         Result.msmMode := Digital;
         Result.msmExtendedMode := eMFSK;
       end;
+    7, 8:
+      begin
+        Result.msmMode := Digital;
+        Result.msmExtendedMode := ePSK31;
+      end;
     -1:
       Result.msmMode := NoMode;
   else
@@ -6811,8 +6816,8 @@ var
   sModeUpper: string;
 begin
   sModeUpper := ANSIUPPERCASE(sSubMode);
-  case AnsiIndexText(AnsiUpperCase(sSubMode), ['FT4', 'JS8', 'USB', 'LSB']) of
-    0: // CW
+  case AnsiIndexText(AnsiUpperCase(sSubMode), ['FT4', 'JS8', 'USB', 'LSB', 'PSK31']) of
+    0:
       begin
         Result.msmMode := Digital;
         Result.msmExtendedMode := eFT4;
@@ -6831,6 +6836,11 @@ begin
       begin
         Result.msmMode := Phone;
         Result.msmExtendedMode := eLSB;
+      end;
+     4:
+      begin
+        Result.msmMode := Digital;
+        Result.msmExtendedMode := ePSK31;
       end;
     -1:
       Result.msmMode := NoMode;
@@ -7184,8 +7194,11 @@ begin
         end;
         exch.ExchString := exch.QTHString;
       end;
-    ARRLSSCW, ARRLSSSSB: // 4.105.2
-      exch.DomesticQTH := tempARRL_Sect;
+    ARRLSSCW, ARRLSSSSB, WINTERFIELDDAY, ARRLFIELDDAY: // 4.105.2
+       begin
+       exch.DomesticQTH := tempARRL_Sect;
+       exch.QTHString := tempARRL_SECT;
+       end;
     CWOPS:
       exch.Age := StrToIntDef(exch.QTHString, 0);
     CQWWCW, CQWWSSB: // 4.105.16

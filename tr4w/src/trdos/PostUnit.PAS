@@ -1820,14 +1820,14 @@ begin
       tBandStringLength := Windows.lstrlen(tBandString);
     //   if contest =  RADIOVHFFD  then       // added 4.61.1
         begin                              // 4.61.1
-        if tBandString = '432' then
+        if tBandString = '432' then        // NY4I made CM to cm per ADIF spec
          begin
-           tBandString := '70CM';
+           tBandString := '70cm';
            tBandStringLength := 4;
          end;
         if tBandString = '1GH' then
          begin
-           tBandString := '23CM';
+           tBandString := '23cm';
            tBandStringLength := 4;
          end;
         end;
@@ -2132,6 +2132,12 @@ begin
         end;
         Windows.lstrlen(TempRXData.ceOperator);
         asm push eax end;
+        if TempRXData.ceOperator <> MyCall then
+           begin           // Add STATION_CALLSIGN because operator is different
+           nLength := length(MyCall);
+           sBuffer := SysUtils.Format('<STATION_CALLSIGN:%u>%s ',[nLength, MyCall]);
+           sWriteFileFromString(tReportFileWrite, sBuffer);
+           end;
       end
 
       else
@@ -2146,6 +2152,7 @@ begin
       nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<OPERATOR:%u>%s ');
       asm add esp,16 end;
       sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+
 
       sWriteFile(tReportFileWrite, '<EOR>'#13#10, 7);
     end;
