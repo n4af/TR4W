@@ -182,7 +182,8 @@ const
   TC_CANADA                             = 'Канаде';
   TC_FRANCE                             = 'Франции';
   TC_HQ_OR_MEMBER                       = 'HQ или член клуба';
-
+  TC_GC                                 = 'special two character designator'  ;
+  TC_GAGARIN                            = 'special two char ID';
   {UTELNET}
 
   TC_TELNET                             = 'Соединение'#0'Отключение'#0'Команды'#0'Заморозить'#0'Очистить'#0'100'#0;

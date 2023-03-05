@@ -493,8 +493,8 @@ begin
 //        DomesticQTHDataFileName := 'ARRLSECT';
         AddARRLSectionDomesticCountries;
       end;
- 
-    ARRLDXCW, ARRLDXSSB:
+
+      ARRLDXCW, ARRLDXSSB:
       begin
         if (MyCountry = 'K') or (MyCountry = 'VE') then
         begin
@@ -758,11 +758,13 @@ begin
         ContestName := '????-??????? ????????? ?????? - ??????? ?????????';
       end;
 
-    GAGARINCUP:
+   GagarinCup:
       begin
         CTY.ctyR150SMode := True;
         ContestName := 'Yuri Gagarin International DX Contest';
-      end;
+        QSOBYMODE := TRUE;
+        INITIALEXCHANGEOVERWRITE := TRUE;
+             end;
 
     INTERNETSPRINT:
       begin

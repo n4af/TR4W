@@ -178,7 +178,8 @@
   TC_FRANCE                             = 'France';
   TC_HQ_OR_MEMBER                       = 'HQ or member';
   TC_IRELAND                            = 'Ireland';
-
+  TC_GC                                 = 'special two character designator'  ;
+  TC_GAGARIN                            = 'special two char ID';
   {UTELNET}
 
   TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Freeze'#0'Clear'#0'100'#0#0;

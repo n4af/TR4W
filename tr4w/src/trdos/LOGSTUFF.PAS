@@ -7808,6 +7808,11 @@ var
           RXData.QSOPoints := RXData.QSOPoints * 2;
         if RXData.Band = Band2 then
           RXData.QSOPoints := 100;
+        if RXData.Band = Band2304 then
+          RXData.QSOPoints := 50;
+          if RXData.Mode = PHONE then
+          RXDATA.QSOPoints := RXData.QSOPoints * 2;
+
       end;
 
     CQMMQSOPointMethod:

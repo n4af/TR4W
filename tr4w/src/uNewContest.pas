@@ -317,6 +317,8 @@ begin
 
               CQIR, HADX, YUDX: SetCommentAndEnableEditControl(TC_ENTERYOURCOUNTYCODE, icmyState);
 
+              GagarinCup: SetCommentAndEnableEditControl(TC_Gagarin, icmystate);
+
               UKEI: SetCommentAndEnableEditControl(TC_EnterYourDistrictCode, icmyState);
 
               DARC10M, WAG, DARCXMAS: SetCommentAndEnableEditControl(TC_ENTERYOURDOK, icmyState);
@@ -404,8 +406,7 @@ begin
 
               TESLA:
                SetCommentandEnableEditControl(TC_ENTERYOURFOURDIGITGRIDSQUARE,icmyGrid);
-         
-
+              
               NEWENGLANDQSO: DisplayCheckBox(TC_NEWENGLAND);
 
               CQWWRTTY, CQ160CW, CQ160SSB, ARRL10, ARRL160, ARRL_RTTY_ROUNDUP: DisplayCheckBox(TC_NORTHAMERICA);
@@ -429,6 +430,7 @@ begin
               HADX: DisplayCheckBox(TC_HUNGARY);
               YUDX: DisplayCheckBox(TC_YUGOSLAVIA);
               UKEI: DisplayCheckBox(TC_UKEI);
+              GagarinCup: DisplayCheckBox(TC_GC);
             //  UKEI: SetCommentAndEnableEditControl(TC_EnterYourDistrictCode, icmyState);
               UBACW, UBASSB: DisplayCheckBox(TC_BELGIUM);
               PACC: DisplayCheckBox(TC_NETHERLANDS);
