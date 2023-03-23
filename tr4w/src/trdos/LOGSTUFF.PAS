@@ -6084,16 +6084,37 @@ var
       end;
 
     HolyLand: // 4.69.1
-      begin
-        case RXData.Band of
-          Band160: RXData.QSOPoints := 2;
-          Band80: RXData.QSOPoints := 2;
-          Band40: RXData.QSOPoints := 2;
-          Band20: RXData.QSOPoints := 1;
-          Band15: RXData.QSOPoints := 1;
-          Band10: RXData.QSOPoints := 1;
-        end;
-      end;
+    begin
+     if MyCountry = '4X' then
+     begin
+         if RXCTY = '4X' then
+          begin
+            RXData.QSOPoints := 1;
+            exit;
+          end;
+         if RXData.QTH.Continent = MyContinent then
+            RXData.QSOPoints := 2
+             else
+              RXData.QSOPoints := 8;
+      end
+       else      // outside of 4X
+         begin
+         if MyCountry = RXCTY then         // 4x to 4x qso
+          begin
+           RXData.QSOPoints := 1;
+           exit;
+          end;
+          if RXCTY = '4X' then     // DX to 4X
+           begin
+            RXData.QSOPoints := 8;
+            exit;
+           end;
+          if RXData.QTH.Continent <> MyContinent then
+            RXData.QSOPoints := 4
+             else
+              RXData.QSOPoints := 2;
+          end;
+       end;
 
     OQPQSOPointMethod: // 4.70.7
       // 3ODX, 3RAC and 3CCO -   10 points (CW and SSB)

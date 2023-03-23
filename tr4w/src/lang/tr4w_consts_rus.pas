@@ -145,7 +145,8 @@ const
   TC_ENTERYOURRDAIDORGRID               = 'Введите ваш номер RDA ID (для UA1A станций) или 4-х значный локатор:';
   TC_ENTERYOURBRANCHNUMBER              = 'Введите ваш Branch номер:';
   TC_ENTERYOURPOSTCODE                  = 'Введите ваш почтовый индекс:';
-
+  TC_GC                                 = 'Вам необходим ввод специального двухбуквенного сочетания?'  ;
+    
   TC_IAMIN                              = '&Я нахожусь в %s';
 
   TC_NEWENGLAND                         = 'штате New England';
@@ -182,8 +183,8 @@ const
   TC_CANADA                             = 'Канаде';
   TC_FRANCE                             = 'Франции';
   TC_HQ_OR_MEMBER                       = 'HQ или член клуба';
-  TC_GC                                 = 'special two character designator'  ;
-  TC_GAGARIN                            = 'special two char ID';
+  TC_GAGARIN                            = 'Введите две буквы';
+  
   {UTELNET}
 
   TC_TELNET                             = 'Соединение'#0'Отключение'#0'Команды'#0'Заморозить'#0'Очистить'#0'100'#0;
