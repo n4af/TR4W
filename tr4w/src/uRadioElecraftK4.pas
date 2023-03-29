@@ -41,7 +41,7 @@ Type TK4Radio = class(TNetRadioBase)
       function  ToggleBand(vfo: TVFO): TRadioBand;
       procedure SetFilter(whichVFO: TVFO; filter:integer);
       function  SetFilterHz(whichVFO: TVFO; hz: integer): integer;
-      procedure MemoryKeyer(mem: integer);
+      function MemoryKeyer(mem: integer): boolean;
       procedure SetAIMode(i: integer);
       procedure ProcessMessage(sMessage: string);
       procedure VFOBumpDown(whichVFO: TVFO);
@@ -323,11 +323,29 @@ end;
 
 function  TK4Radio.SetFilterHz(whichVFO: TVFO; hz: integer): integer;
 begin
+   logger.Warn('SetFilterHz is not yet implemented on the K4');
 end;
 
-procedure TK4Radio.MemoryKeyer(mem: integer);
+function TK4Radio.MemoryKeyer(mem: integer): boolean;
 begin
-   logger.Warn('Memory keying is not yet implemented on the K4');
+   Result := true; // True is an error...default to that value to fail closed
+   if mem = 0 then
+      begin
+      logger.debug('[K4-MemoryKeyer] Stopping DVK');
+      Self.SendToRadio('DA0;');  // DA0; Stops all DVK activity
+      Result := false;
+      end
+   else if IntegerBetween(mem,1,8) then
+      begin
+      logger.debug('[K4-MemoryKeyer] Playing memory %d',[mem]);
+      Self.SendToRadio(Format('DAMP%d00000;',[mem]));  // DAMPmnnnnn; where m is mem number and nnnnn is repeat in ms (set to 00000)
+      Result := false;
+      end
+   else
+      begin
+      logger.error('Memory value (%d) out of range for a K4 in MemoryKeyer',[mem]);
+      Result := true;
+      end;
 end;
 
 function TK4Radio.ParseIFCommand(cmd: string): boolean;

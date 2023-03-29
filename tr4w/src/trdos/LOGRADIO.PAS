@@ -72,6 +72,7 @@ const
    ICOM_GET_RIT_FREQ   = #$21;
    ICOM_GET_EXTENDEDVFO = #$25;
    ICOM_GET_EXTENDEDMODE = #$26;
+   ICOM_SET_DVK = #$28;     // Command 28 plays voice memories
    //ICOM_SET_RIT_FREQ   =
    ICOM_STATE            = #$1A;
    ICOM_STATE_DATA_MODE  = #$06;
@@ -279,6 +280,7 @@ type
       procedure SendRITFreqCommand;
       procedure GetIcomDataStateCommand;
       procedure SetICOMRITFrequency(hz: integer);
+      function MemoryKeyer(mem: integer): boolean;
       procedure ProcessIcomMode(mode: integer);
       procedure SendIcomClearRITCommand;
       function CalculateIcomFilterWidth: integer;
@@ -393,11 +395,13 @@ var
    InActiveRadioPtr: RadioPtr = @Radio2;
    RadioSupportsCWByCAT: InterfacedRadioTypeSet;
    RadioSupportsCWSpeedSync: InterfacedRadioTypeSet;
+   RadioSupportsPlayDVK: InterfacedRadioTypeSet;
    IcomRadiosThatSupportRIT: InterfacedRadioTypeSet;
    IcomRadiosThatSupportVFOB: InterfacedRadioTypeSet;
    IcomRadiosThatSupportPSKMode: InterfacedRadioTypeSet;  // For data, radio uses PSK mode instead of USB-D.
    ICOMRadios:       ICOMRadioTypes;
    KenwoodRadios:    KenwoodRadioTypes;
+   YaesuRadios:      YaesuRadioTypes;
 
 const
    RTS_DTR_Values_Array: array[1..4] of PChar =
@@ -483,6 +487,7 @@ const
     ({Name: 'FTDX10';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu4),
     ({Name: 'FTDX101';    } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu4),
     ({Name: 'FT450';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
+    ({Name: 'FT710';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu4),   // Issue 640 ny4i
     ({Name: 'FT736R';     } BR:BR4800;  P: 0; C: 0; S: 0; T:0; RA: $00; SW: 0; SFOC: $01; SMOC: $07; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $02; LSB: $00; USB: $01; FM: $08; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu1),
     ({Name: 'FT747GX';    } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $05; DIGL: $00; DIGU: $00; rt: rtYaesu1),
     ({Name: 'FT767';      } BR:BR4800;  P: 1; C: 1; S: 1; T:0; RA: $00; SW: 1; SFOC: $08; SMOC: $0A; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $12; LSB: $10; USB: $11; FM: $14; AM: $13; DIGL: $15; DIGU: $15; rt: rtYaesu1),
@@ -575,6 +580,7 @@ const
       'FTDX10',
       'FTDX101',
       'FT450',
+      'FT710',
       'FT736R',
       'FT747GX',
       'FT767',
@@ -1693,6 +1699,133 @@ begin
    }
 end;
 
+function RadioObject.MemoryKeyer(mem: integer): boolean;
+var localMsg:string;
+    hiMem: integer;
+begin
+   if Self.tNetObject <> nil then
+      begin
+      Result := Self.tNetObject.MemoryKeyer(mem);
+      Exit;
+      end;
+
+   if not (RadioModel in RadioSupportsPlayDVK) then
+      begin
+      logger.Warn('Radio does not support playing a voice keyer memory');
+      Result := true;
+      Exit;
+      end;
+
+   case RadioModel of
+      K3:
+         begin
+         if IntegerBetween(mem,0,4) then
+            begin
+            logger.debug('[K3-MemoryKeyer] Playing memory %d',[mem]);
+            localMsg := 'SWT0' + IntToStr(mem) + ';';
+            AddToOutputBuffer(addr(localMsg[1]),length(localMsg));
+            Result := false;
+            end
+         else
+            begin
+            logger.error('Memory value (%d) out of range for a K3 in MemoryKeyer',[mem]);
+            Result := true;
+            end;
+         end;
+      K4:
+         begin
+         if mem = 0 then
+            begin
+            logger.debug('[K4-Serial-MemoryKeyer] Stopping DVK');
+            localMsg := 'DA0;';  // DA0; Stops all DVK activity
+            AddToOutputBuffer(addr(localMsg[1]),length(localMsg));
+            Result := false;
+            end
+         else if IntegerBetween(mem,1,8) then
+            begin
+            logger.debug('[K4-MemoryKeyer] Playing memory %d',[mem]);
+            localMsg := Format('DAMP%d00000;',[mem]);  // DAMPmnnnnn; where m is mem number and nnnnn is repeat in ms (set to 00000)
+            AddToOutputBuffer(addr(localMsg[1]),length(localMsg));
+            Result := false;
+            end
+         else
+            begin
+            logger.error('Memory value (%d) out of range for a K4 in MemoryKeyer',[mem]);
+            Result := true;
+            end;
+         end;
+
+      IC705, IC7300, IC7610, IC7850, IC7851, IC9100, IC9700:
+         begin
+         if IntegerBetween(mem,0,8) then
+            begin
+            logger.debug('[Icom-MemoryKeyer] Playing memory %d',[mem]);
+            CommandsTempBuffer[0] := CHR(8);
+            CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+            CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+            CommandsTempBuffer[3] := CHR(ReceiverAddress);
+            CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+            CommandsTempBuffer[5] := ICOM_SET_DVK;
+            CommandsTempBuffer[6] := CHR(0);  // sub command
+            CommandsTempBuffer[7] := CHR(0); // Zero of memory number
+            CommandsTempBuffer[7] := Chr(mem);
+            CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
+            AddCommandToBuffer;
+            Result := false;
+            end
+         else
+            begin
+            logger.error('Memory value (%d) out of range for an Icom in MemoryKeyer',[mem]);
+            Result := true;
+            end;
+         end;
+      TS480, TS570, TS590, TS850, TS950, TS990, TS2000:
+         begin
+         case RadioModel of
+            TS590: hiMem := 3;
+            TS990: hiMem := 6;
+            else hiMem := 3;
+         end;
+         if IntegerBetween(mem,0,hiMem) then
+            begin
+            logger.debug('[Kenwood-MemoryKeyer] Playing memory %d',[mem]);
+            localMsg := Format('PB%d;',[mem]);
+
+            ActiveRadioPtr.WriteToCATPort(localMsg[1],length(localMsg));
+            Result := false;
+            end
+         else
+            begin
+            logger.error('Memory value (%d) out of range for a Kenwood in MemoryKeyer',[mem]);
+            Result := true;
+            end;
+         end;
+      FT710, FT991, FTDX10, FTDX101, FT1200, FTDX3000, FTDX5000, FTDX9000: 
+         begin
+         if IntegerBetween(mem,0,5) then
+            begin
+            logger.debug('[Yaesu-MemoryKeyer] Playing memory %d',[mem]);
+            localMsg := Format('PB0%d;',[mem]);
+
+            ActiveRadioPtr.WriteToCATPort(localMsg[1],length(localMsg));
+            Result := false;
+            end
+         else
+            begin
+            logger.error('Memory value (%d) out of range for a Yaesu in MemoryKeyer',[mem]);
+            Result := true;
+            end;
+         end;
+      else
+         begin
+         logger.Warn('[MemoryKeyer] Memory playbacdk not yet implemented for this radio');
+         Result := true;
+         end;
+      end;
+   //TLogger.GetInstance.Debug(Format('      Leaving PutRadioOutOfSplit: %s',[RadioName]));
+end;
+
+
 procedure RadioObject.ProcessIcomMode(mode: integer);
 begin
    case mode of
@@ -2411,7 +2544,7 @@ begin
       rtOrion:     // Add special character processing to Orion routines.
          begin
          localMsg := Format('/%s#13', [Msg]);   // ny4i Issue 112
-         WriteToCATPort(localMsg, length(localMsg));
+         WriteToCATPort(localMsg[1], length(localMsg));
          Self.CWByCAT_Sending := true;
          DebugMsg('Self.CWByCAT_Sending set to TRUE - Orion');
          end;
@@ -3745,16 +3878,26 @@ begin
                             IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
-      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX101, FT450, FT891, FT950, FT991,
+      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX10, FTDX101, FT450, FT710, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
       IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
+
+   RadioSupportsPlayDVK := [ K2, K3, K4 // We do not support the KX2 and KX3? I guess not a lot of call for it.
+                            ,IC705, IC7300, IC7610, IC7850, IC7851, IC9100, IC9700
+                            ,FT710, FT991, FT1200, FTDX3000, FTDX5000, FTDX9000, FTDX10, FTDX101
+                            ,TS480, TS570, TS590, TS850, TS950, TS990, TS2000
+                            ]; // NY4I Issue 639
    IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
    IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
    IcomRadiosThatSupportPSKMode := [IC7600, IC7610];
    ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];
+   YaesuRadios := [FTDX10, FTDX101, FT450, FT710, FT736R, FT747GX, FT767, FT817,
+                   FT818, FT840, FT847, FT857, FT890, FT891, FT897, FT900, FT920,
+                   FT950, FT990, FT991, FT1000, FT1000MP, FT1200, FT2000,
+                   FTDX3000, FTDX5000, FTDX9000];
    for i := 1 to 2 do
       begin
       TempRadio := ra[i];
