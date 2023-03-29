@@ -6083,7 +6083,7 @@ var
         //        if (RXData.Mode = CW) and (RXData.QSOPoints > 0) then inc(RXData.QSOPoints);
       end;
 
-    HolyLand: // 4.69.1
+    HolyLand: // 4.120.3
     begin
      if MyCountry = '4X' then
      begin
