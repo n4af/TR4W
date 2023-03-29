@@ -190,7 +190,7 @@ Type TNetRadioBase = class(TObject)
       function  ToggleBand: TRadioBand; Virtual; Abstract;
       procedure SetFilter(filter:TRadioFilter); Virtual; Abstract;
       function  SetFilterHz(hz: integer): integer; Virtual; Abstract;
-      procedure MemoryKeyer(mem: integer); Virtual; Abstract;
+      function  MemoryKeyer(mem: integer): boolean; Virtual; Abstract;
       procedure VFOBumpDown(whichVFO: TVFO); Virtual; Abstract;
       procedure VFOBumpUp(whichVFO: TVFO); Virtual; Abstract;
 

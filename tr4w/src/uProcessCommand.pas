@@ -47,7 +47,8 @@ utils_text,
   LogCW,
   LogK1EA,
   CFGCMD,
-  LogStuff;
+  LogStuff,
+  SysUtils;
 
 type
   TsCommandsArrayType = packed record
@@ -83,6 +84,8 @@ procedure scSAPMODE;
 procedure scCQMODE;
 procedure scCWENABLETOGGLE;
 procedure scEXECUTE;
+procedure scPlayMessageActive;
+procedure scPlayMessageInActive;
 procedure scRADIOONELPTMASK;
 procedure scCABRILLO;
 procedure scFLUSHINITIALEX;
@@ -106,7 +109,7 @@ const
 
 
  // sCommands                             =  67  {$IF MMTYMODE} + 5  {$IFEND};
-  sCommands                             =  72;  // 4.72.9
+  sCommands                             =  72 + 2;  // 4.72.9    // Added PlayMessageActive and PlayMessageInactive
 
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
@@ -181,6 +184,8 @@ const
     (caCommand: 'INITIALIZEQSO'; caAddress: @InitializeQSO),
     (caCommand: 'AUTOCQ'; caAddress: @RunAutoCQ),
     (caCommand: 'SPACEBAR'; caAddress: @SpaceBarProc2),
+    (caCommand: 'PLAYMESSAGE_ACTIVE'; caAddress: @scPlayMessageActive),
+    (caCommand: 'PLAYMESSAGE_INACTIVE'; caAddress: @scPlayMessageInActive),
     (caCommand: 'SRS'; caAddress: @scSRS),
     (caCommand: 'SRSI'; caAddress: @scSRSI),
     (caCommand: 'SRS1'; caAddress: @scSRS1),
@@ -254,116 +259,7 @@ begin
 
       end;
     end;
-{
-    if CommandString = 'WINEXEC' then
-    begin
-      if Windows.WinExec(@scFileName[1], SW_SHOWMINIMIZED) < 31 then
-        ShowSysErrorMessage('WINEXEC');
-    end;
-}
-{
-    if CommandString = 'SRS' then
-    begin
-      if ActiveRadioPtr.RadioModel in [IC78..IC9700, OMNI6] then
-        ActiveRadioPtr.ICOM_COMMAND_CUSTOM := scFileName
-      else
-        WriteToSerialCATPort(scFileName, ActiveRadioPtr.tCATPortHandle);
-    end;
 
-    if CommandString = 'SRSI' then
-    begin
-      if InActiveRadioPtr.RadioModel in [IC78..IC9700, OMNI6] then
-        InActiveRadioPtr.ICOM_COMMAND_CUSTOM := scFileName
-      else
-        WriteToSerialCATPort(scFileName, InActiveRadioPtr.tCATPortHandle);
-    end;
-
-    if CommandString = 'SRS1' then
-    begin
-      if Radio1.RadioModel in [IC78..IC9700, OMNI6] then
-        Radio1.ICOM_COMMAND_CUSTOM := scFileName
-      else
-        WriteToSerialCATPort(scFileName, Radio1.tCATPortHandle);
-    end;
-
-    if CommandString = 'SRS2' then
-    begin
-      if Radio2.RadioModel in [IC78..IC9700, OMNI6] then
-        Radio2.ICOM_COMMAND_CUSTOM := scFileName
-      else
-        WriteToSerialCATPort(scFileName, Radio2.tCATPortHandle);
-    end;
-}
-//    if CommandString = 'MEMORYIN' then PushFrequencyToStack;
-//    if CommandString = 'MEMORYREAD' then PopFrequencyFromStack;
-//    if CommandString = 'ADDMULTFREQ' then AddFrequencyToMFArray;
-{
-    if (CommandString = 'COMPLETECALL') or (CommandString = 'COMPLETECALLSIGN') then
-    begin
-      CompleteCallsign;
-    end;
-
-
-    if CommandString = 'ENTER' then ProcessReturn;  }     // n4af 4.50.2
-    if CommandString = 'ESCAPE' then Escape_proc;
-
-{
-    if CommandString = 'BANDUP' then
-    begin
-          //WLI             RememberFrequency; KK1L: 6.72 Added to match all other calls. Needed for loss of coms
-      BandDownOrUp(DirectionUp);
-    end;
-
-    if CommandString = 'BANDDOWN' then
-    begin
-          //             RememberFrequency; //KK1L: 6.72 Added to match all other calls. Needed for loss of coms
-      BandDownOrUp(DirectionDown);
-    end;
-}
-//    if CommandString = 'CONTROLENTER' then CWMessageCommand := CWCommandControlEnter;
-
-//    if CommandString = 'CWENABLETOGGLE' then CWEnable := not CWEnable;
-{
-    if CommandString = 'CWMONITORON' then
-    begin
-      if OldCWTone = 0 then OldCWTone := 700;
-      CWTone := OldCWTone;
-      AddStringToBuffer('', CWTone);
-    end;
-}
-{
-    if CommandString = 'DVKDELAY' then
-      if StringIsAllNumbers(scFileName) then
-      begin
-        Val(scFileName, TempInt, Result1);
-        SetDVKDelay(TempInt);
-      end;
-}
-{
-    if CommandString = 'CWMONITOROFF' then
-      if CWTone <> 0 then
-      begin
-        OldCWTone := CWTone;
-        CWTone := 0;
-        AddStringToBuffer('', CWTone);
-      end;
-}
-//    if CommandString = 'DISABLECW' then CWEnable := False;
-      //      if CommandString = 'DUPECHECK' then DupeCheckOnInactiveRadio;
-
-//    if CommandString = 'ENABLECW' then CWEnable := True;
-
-      //{WLI}         IF CommandString = 'EXCHANGERADIOS' THEN ExchangeRadios; {KK1L: 6.71}
-{
-    if CommandString = 'EXECUTE' then
-    begin
-      RunningConfigFile := True;
-      ClearDupeSheetCommandGiven := False;
-
-      FirstCommand := False;
-
-//      if FileExists(FileName) then        LoadInSeparateConfigFile(FileName, FirstCommand, MyCall);
-  }
       if ClearDupeSheetCommandGiven then
       begin
          tClearDupesheet;
@@ -565,6 +461,85 @@ begin
 //    WriteToSerialCATPort(scFileName, Radio2.tCATPortHandle);
     Radio2.WriteToCATPort(scFileName[1], length(scFileName));
 end;
+
+procedure scPlayMessageActive;
+var bError: boolean;
+    nMemoryNum: integer;
+begin
+   if ActiveRadioPtr.tNetObject <> nil then
+      begin
+      if StrToIntDef(scFileName,-1) <> -1 then
+         begin
+         bError := ActiveRadioPtr.tNetObject.MemoryKeyer(StrToInt(scFileName));
+         end
+      else
+         begin
+         bError := true;
+         logger.Error('Command to PlayMessageActive must be a memory number (%s)',[scFileName]);
+         end;
+      if bError then
+         begin
+         QuickDisplay('Error playing voice memory');
+         end;
+      end
+   else
+      begin
+      if StrToIntDef(scFileName,-1) <> -1 then
+         begin
+         bError := ActiveRadioPtr.MemoryKeyer(StrToInt(scFileName));
+         end
+      else
+         begin
+         logger.Error('Command to PlayMessageActive must be a memory number (%s)',[scFileName]);
+         bError := true;
+         end;
+
+      if bError then
+         begin
+         QuickDisplay('Error playing voice memory');
+         end;
+      end;
+end;
+
+procedure scPlayMessageInActive;
+var bError: boolean;
+    nMemoryNum: integer;
+begin
+   if InActiveRadioPtr.tNetObject <> nil then
+      begin
+      if StrToIntDef(scFileName,-1) <> -1 then
+         begin
+         bError := InActiveRadioPtr.tNetObject.MemoryKeyer(StrToInt(scFileName));
+         end
+      else
+         begin
+         bError := true;
+         logger.Error('Command to PlayMessageInActive must be a memory number (%s)',[scFileName]);
+         end;
+      if bError then
+         begin
+         QuickDisplay('Error playing voice memory');
+         end;
+      end
+   else
+      begin
+      if StrToIntDef(scFileName,-1) <> -1 then
+         begin
+         bError := InActiveRadioPtr.MemoryKeyer(StrToInt(scFileName));
+         end
+      else
+         begin
+         logger.Error('Command to PlayMessageInActive must be a memory number (%s)',[scFileName]);
+         bError := true;
+         end;
+
+      if bError then
+         begin
+         QuickDisplay('Error playing voice memory');
+         end;
+      end;
+end;
+
 
 procedure scRADIOONELPTMASK;
 var

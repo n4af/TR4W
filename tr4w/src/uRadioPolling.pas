@@ -2354,7 +2354,8 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure pFTDX10_FTDX101(rig: RadioPtr);
-
+     // Even thought htis was a poor choice of names for a procedure, this procedure
+     // does handle other radios--typically newer than the DX10 and DX101 like the FT710
 label
    1;
 var
@@ -3043,7 +3044,7 @@ begin
          pFTDX9000(rig);
       FT891, FT991:
          pFT891_FT991(rig); // ny4i Issue218 9 byte frequency
-      FTDX10, FTDX101:
+      FTDX10, FTDX101, FT710:
          pFTDX10_FTDX101(rig);
       IC78..IC9700, OMNI6:
          pIcomNew(rig);

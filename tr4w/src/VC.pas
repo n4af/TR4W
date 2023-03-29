@@ -972,6 +972,7 @@ type
     FTDX10,
     FTDX101,
     FT450,
+    FT710,
     FT736R,
     FT747GX,
     FT767,
@@ -1040,6 +1041,7 @@ type
 
   ICOMRadioTypes = set of InterfacedRadioType;
   KenwoodRadioTypes = set of InterfacedRadioType;
+  YaesuRadioTypes = set of InterfacedRadioType;
   InterfacedRadioTypeSet = set of InterfacedRadioType;
 
   BandType = (

@@ -588,6 +588,15 @@ begin
   else
     Call_Found := False;
 
+  if ActiveMode in [Phone, FM] then
+     begin
+     if (ActiveRadioPtr^.RadioModel in RadioSupportsPlayDVK) { and
+        (ActiveRadioPtr^.tPTTStatus = PTT_ON)                }then
+        begin
+        ActiveRadioPtr^.MemoryKeyer(0); // Playing memory 0 stops the message.
+        end;
+     end;
+
   if (ActiveMode = CW) then
     // ny4i Issue 130 and (IsCWByCATActive) then      // n4af 4.45.5   proposed to allow
   begin
