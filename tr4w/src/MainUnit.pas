@@ -590,8 +590,8 @@ begin
 
   if ActiveMode in [Phone, FM] then
      begin
-     if (ActiveRadioPtr^.RadioModel in RadioSupportsPlayDVK) and
-        (ActiveRadioPtr^.tPTTStatus = PTT_ON)                then
+     if (ActiveRadioPtr^.RadioModel in RadioSupportsPlayDVK) { and
+        (ActiveRadioPtr^.tPTTStatus = PTT_ON)                }then
         begin
         ActiveRadioPtr^.MemoryKeyer(0); // Playing memory 0 stops the message.
         end;

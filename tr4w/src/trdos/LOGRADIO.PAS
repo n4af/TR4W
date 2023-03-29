@@ -919,7 +919,10 @@ begin
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RC;');
          end;
-
+      FT710:
+         begin
+         ActiveRadioPtr.WriteBufferToCATPort('CF001+0000;'); // Set frequency to +0
+         end;
       FT747GX, FT890, FT920, FT990, FT1000, FT1000MP:
          begin
          ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR($FF) + CHR($09), 5);
@@ -1760,14 +1763,13 @@ begin
          if IntegerBetween(mem,0,8) then
             begin
             logger.debug('[Icom-MemoryKeyer] Playing memory %d',[mem]);
-            CommandsTempBuffer[0] := CHR(8);
+            CommandsTempBuffer[0] := CHR(9);
             CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
             CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
             CommandsTempBuffer[3] := CHR(ReceiverAddress);
             CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
             CommandsTempBuffer[5] := ICOM_SET_DVK;
             CommandsTempBuffer[6] := CHR(0);  // sub command
-            CommandsTempBuffer[7] := CHR(0); // Zero of memory number
             CommandsTempBuffer[7] := Chr(mem);
             CommandsTempBuffer[8] := ICOM_END_OF_MESSAGE_CODE;
             AddCommandToBuffer;
@@ -1993,6 +1995,10 @@ begin
          begin
          ActiveRadioPtr.WriteToCATPort('FT3;', 4);
          end;
+      FT710:
+         begin
+         ActiveRadioPtr.WriteToCATPort('FT1;', 4);
+         end;
       Orion:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('*KVABB' + CarriageReturn);
@@ -2052,6 +2058,10 @@ begin
       FTDX10, FTDX101, FT991:
          begin
          ActiveRadioPtr.WriteToCATPort('FT2;', 4);
+         end;
+      FT710:
+         begin
+         ActiveRadioPtr.WriteToCATPort('FT0;', 4);
          end;
       Orion:
          begin
@@ -3066,7 +3076,7 @@ begin
 
          rtYaesu2,
          rtYaesu3,
-         rtYaesu4:        // FTDX101 FT991 FT891
+         rtYaesu4:
             begin
             if RadioParametersArray[RadioModel].rt in [rtYaesu3, rtYaesu4] then  //ny4i Issue 218 - Only change to this command if the freq is 9 bytes long.
                begin
@@ -3758,7 +3768,8 @@ begin
             end;
          end;
 
-      FTDX101, FT450, FT950, FT891, FT991, FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000:    // Added FT891 ny4i Issue218
+      FTDX10, FTDX101, FT710, FT450, FT950, FT891, FT991, FT1200, FT2000,
+      FTDX3000, FTDX5000, FTDX9000:
          begin
          if PTTOn then
             begin
