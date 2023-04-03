@@ -1630,6 +1630,7 @@ begin
           TempString[0] := CHR(LineSize);
           Windows.CopyMemory(@TempString[1], @MapBase[StartPos], LineSize);
           if UpperCase then strU(TempString);
+          logger.debug('[TF.EnumerateLinesInFile] Reading config line %s',[TempString]);
           Func(@TempString);
         end;
       end;

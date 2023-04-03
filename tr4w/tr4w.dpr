@@ -419,8 +419,13 @@ begin
   ReadInConfigFile(cfgCommMes);      //common messages gets precedence - n4af
 
   UpdateDebugLogLevel;
+  logger.debug('**************** Program Startup ************************');
+  logger.debug('Current program version = %s',[TR4W_CURRENTVERSION]);
+  logger.debug('Current TR4W Server version = %s',[TR4WSERVER_CURRENTVERSION]);
+  logger.debug('Current log version = %s',[LOGVERSION]);
+  logger.debug('Windows version = %d.%d Build %d',[tr4w_osverinfo.dwMajorVersion, tr4w_osverinfo.dwMinorVersion, tr4w_osverinfo.dwBuildNumber]);
+  logger.debug('%s',[GetOSInfo]);
 
-  
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
 
@@ -531,13 +536,14 @@ begin
   mov  [tNet_Event],eax
   end;
 
-  logger.debug('**************** Program Startuip ************************');
+  {
+  logger.debug('**************** Program Startup ************************');
   logger.debug('Current program version = %s',[TR4W_CURRENTVERSION]);
   logger.debug('Current TR4W Server version = %s',[TR4WSERVER_CURRENTVERSION]);
   logger.debug('Current log version = %s',[LOGVERSION]);
   logger.debug('Windows version = %d.%d Build %d',[tr4w_osverinfo.dwMajorVersion, tr4w_osverinfo.dwMinorVersion, tr4w_osverinfo.dwBuildNumber]);
   logger.debug('%s',[GetOSInfo]);
-
+   }
   if not tHandLogMode then
      begin
      SetTimer(tr4whandle, ONE_SECOND_TIMER_HANDLE, 1000, @OneSecTimerProc);

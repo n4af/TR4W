@@ -2752,19 +2752,30 @@ begin
       freq := StrToInt(tCabrilloFreqString[RxData.Band]) * 1000; //14000 in array but needs to be 14000000
       txFreq := freq;
       end;
-    case RXData.Mode of
-         CW: sMode := 'CW';
-         Phone: sMode := 'SSB';
-         Digital:
-            if RXData.ExtMode = eRTTY then
+   if RXData.ExtMode <> eNoMode then
+      begin
+      sMode := ExtendedModeStringArray[RXData.extMode];
+      end
+   else
+      begin
+         case RXData.Mode of
+            CW: sMode := 'CW';
+            Phone:
                begin
-               sMode := 'RTTY';
-               end
-            else
-               begin
-               sMode := ExtendedModeStringArray[RXData.extMode];
+               if freq < 8000000 then
+                  begin
+                  sMode := 'LSB';
+                  end
+               else
+                  begin
+                  sMode := 'USB';
+                  end;
                end;
-       end; // of case
+            Digital: sMode := 'RTTY';
+            FM: sMode := 'FM';
+            else sMode := 'CW';
+          end; // of case
+      end;
     if RxData.ceComputerID = #0 then
        begin
        sComputerID := ' ';

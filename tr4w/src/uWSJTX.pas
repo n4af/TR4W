@@ -171,8 +171,10 @@ begin
   colorsMultFore.R := $00;
   colorsMultFore.G := $00;
   colorsMultFore.B := $00;
+  logger.Debug('[WSJT-X]Creating tcpServ on port %d',[FTCPPort]);
 
   tcpServ := TIdTCPServer.Create(nil);
+  logger.Debug('[WSJT-X] Created tcpServ on port %d',[FTCPPort]);
   tcpServ.OnExecute := Self.IdTCPServer1Execute;
   tcpServ.OnConnect := Self.IdTCPServer1Connect;
   tcpServ.OnDisconnect := Self.IdTCPServer1Disconnect;
@@ -201,7 +203,7 @@ begin
     except
       on E: Exception do
       begin
-        logger.Error('Exception when making UDP servr active - Is JT-Alert runnng?: %s', [E.Message]);
+        logger.Error('Exception when making UDP servr active - Is JT-Alert runnng?: exception=%s', [E.Message]);
         QuickDisplay('Error linking to WSJT-X. Is JT-Alert active?');
       end;
     end;
@@ -209,7 +211,15 @@ begin
     tcpServ.Bindings.Clear;
     tcpServ.MaxConnections := 1; // Just allow the single client
     tcpServ.Bindings.Add.Port := FTCPPort;
-    tcpServ.Active := true;
+    try
+       tcpServ.Active := true;
+    except
+      on E: Exception do
+         begin
+         logger.Error('Exception when making TCP server active - Is DX Commander running?: exception=%s', [E.Message]);
+         QuickDisplay('Error offering Commander proxy TCP Port');
+         end;
+      end;
   end;
 end;
 

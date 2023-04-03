@@ -2354,7 +2354,7 @@ begin
 end;
 //------------------------------------------------------------------------------
 procedure pFTDX10_FTDX101(rig: RadioPtr);
-     // Even thought htis was a poor choice of names for a procedure, this procedure
+     // Even though this was a poor choice of names for a procedure, this procedure
      // does handle other radios--typically newer than the DX10 and DX101 like the FT710
 label
    1;

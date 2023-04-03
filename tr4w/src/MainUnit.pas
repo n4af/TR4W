@@ -4272,7 +4272,10 @@ begin
   begin
     RData.Band := Band;
     RData.Mode := Mode;
-    SetExtendedModeFromMode(RData);
+    if ActiveRadioPtr^.nextExtendedMode = eNoMode then
+       begin
+       SetExtendedModeFromMode(RData);
+       end;
     // Not the way to do this as the radio does not know the extendedMode--just Mode. NY4I
     //RData.ExtMode                                                                                         := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3
     RData.NumberSent := TotalContacts + 1;
@@ -4318,7 +4321,14 @@ begin
 
   RData.Band := Band;
   RData.Mode := Mode;
-  SetExtendedModeFromMode(RData);
+  if ActiveRadioPtr^.CurrentStatus.ExtendedMode = eNoMode then   // This should have been set by radio object but what is nextExtendedMode
+     begin
+     SetExtendedModeFromMode(RData);
+     end
+  else
+     begin
+     Rdata.ExtMode := ActiveRadioPtr^.CurrentStatus.ExtendedMode;
+     end;
   // ny4i Don't do this please - Issue 466 -=> Rdata.ExtMode                                                 := ActiveRadioptr^.CurrentStatus.ExtendedMode ; // 4.93.3
   RData.NumberSent := TotalContacts + 1;
   RData.Frequency := Freq;
@@ -8878,9 +8888,9 @@ procedure SetExtendedModeFromMode(RData: ContestExchange);
 begin
   if RData.ExtMode = eNoMode then
   begin
-    if RData.Mode = PHONE then
+    if RData.Mode = PHONE then        // We cannot really pick eUSB here. It depends upon the radio mode
     begin
-      RData.ExtMode := eSSB;
+      RData.ExtMode := eSSB;   // Maybe call someting to guess based on the freqwuency but set it ahead of time
     end
     else if RData.Mode = CW then
     begin
