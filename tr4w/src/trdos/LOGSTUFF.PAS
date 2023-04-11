@@ -630,6 +630,7 @@ function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}):
   smallInt {Word};
 
 procedure IncrementQTCCount(Call: CallString);
+function IsValidPOTAPark(const park : string): boolean;
 function IsValidCallsign(const callsign : string): boolean;
 
 function KeyRecentlyPressed(Key: Char; MaxElaspedSec100: LONGINT): boolean;
@@ -4679,6 +4680,58 @@ begin
       ProcessRSTAndQSONumberExchange(Exchange, RXData);
 end;
 
+function ProcessRSTAndPOTAPark(Exchange: ShortString; var RXData: ContestExchange): boolean;
+var FirstString, SecondString, ThirdString: Str10;
+begin
+
+   ProcessRSTAndPOTAPark := true;
+   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
+   if IsValidPOTAPark(FirstString) then
+      begin
+      RXData.QTHString := FirstString;
+      if StringIsAllNumbers(SecondString) then
+         begin
+         RxData.RSTSent := StrToIntDef(SecondString,DefaultRST);
+         if StringIsAllNumbers(ThirdString) then
+            begin
+            RXData.RSTReceived := StrToIntDef(ThirdString,DefaultRST);
+            end
+         else
+            begin
+            RXData.RSTReceived := DefaultRST;
+            end;
+         end
+      else
+         begin
+         RXData.RSTSent := DefaultRST;
+         end;
+      end
+   else
+      begin
+      if StringIsAllNumbers(FirstString) then //Most likely RS(T)
+         begin
+         if StringIsAllNumbers(SecondString) then // Both RST Sent and Received
+            begin
+            RxData.RSTSent := StrToIntDef(FirstString,DefaultRST);
+            RXData.RSTReceived := StrToIntDef(SecondString,DefaultRST);
+            if IsValidPOTAPark(ThirdString) then
+               begin
+               RXData.QTHString := thirdString;
+               end;
+            end
+         else
+            begin
+            If IsValidPOTAPark(SecondString) then
+               begin
+               RXData.RSTSent := StrToIntDef(FirstString,DefaultRST);
+               RXData.RSTReceived := DefaultRST;
+               RXData.QTHString := SecondString;
+               end;
+            end;
+         end;
+      end;
+end;
+
 function ProcessRSTZoneAndPossibleDomesticQTHExchange(Exchange: Str80; var
   RXData: ContestExchange): boolean;
 
@@ -8632,6 +8685,9 @@ begin
     RSTAndPostalCodeExchange:
       ProcessExchange := ProcessRSTAndPostalCodeExchange(ExchangeString, RData);
 
+    RSTAndPOTAPark:
+       ProcessExchange := ProcessRSTAndPOTAPark(ExchangeString, RData);
+
     RSTAndQSONumberOrDomesticQTHExchange:
       ProcessExchange :=
         ProcessRSTAndQSONumberOrDomesticQTHExchange(ExchangeString, RData);
@@ -9234,6 +9290,32 @@ begin
       logger.debug('%s is a valid call',[callsign]);
       end;
 end;
+
+function IsValidPOTAPark(const park : string): boolean;
+var
+   regex : TPerlRegEx;
+begin
+// create our regex instance, and we want to do a case insensitive search, in multiline mode
+   Result := false;
+  regex := TPerlRegEx.Create;
+  try
+     logger.debug('Checking if %s is a valid park',[park]);
+     regex.RegEx := '^([A-Z]|[a-z])-{0,1}\d{1,5}';
+   //regex.RegEx := '^(?:\w{1,2}\d\/|\d\w\/|\w{1,2}\/)?+\w+[0-9]+\w+\/?\w*\s*$';  // Valid against all of LOTW file
+
+     regex.Subject := park;
+
+     Result := regex.MatchAgain;
+   finally
+      regex.Free;
+   end;
+   if Result then
+      begin
+      logger.debug('%s is a valid park',[park]);
+      end;
+end;
+
+
 begin
   CD.CellBuffer.MaximumMemoryToUse := 40000 * ua4wliscpconst {*4 - ua4wli};
   StuffInit;

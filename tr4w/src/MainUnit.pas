@@ -1092,7 +1092,8 @@ begin
     end
 
     else
-      {................phone.....................}if MessageEnable and not
+      {................phone.....................}
+      if MessageEnable and not
         BeSilent then
       begin
         if QuickQSL <> NoQuickQSLKey then
@@ -1233,6 +1234,21 @@ begin
         S2 := rightstr(s1, length(s1) - n);
     end;
 
+    if ActiveExchange = RSTAndPOTAPark then
+       begin
+       if pos('/', S1) > 0 then
+          begin
+          n := pos('/', S1);
+          TempString := leftstr(s1, n - 1);
+          CallWindowString := Callw{ + '/' + TempString};
+          ExchangeWindowString := TempString;
+          end;
+       if n > 0 then
+          begin
+          S2 := rightstr(s1, length(s1) - n);
+          end;
+       end;
+
     if ActiveMode in [CW, Digital] then
 
       if not SendCrypticMessage(SearchAndPounceExchange) then
@@ -1289,6 +1305,19 @@ begin
     end;
 
   end;
+
+  if ActiveExchange = RSTAndPOTAPark then
+     begin
+        if (StringIsAllAlphaNumericOrDash(S2)) and (S2 <> '') then
+           begin
+           CallWindowString := callw{ + '/' + S2};
+           //    S3 := '';
+           exchangewindowstring := s2;
+           BeSilent := True;
+           S2 := '';
+           goto loop;
+           end;
+        end;
   DebugMsg('>>>>Exiting   ReturnInSAPOpMode');
 end;
 
@@ -3677,6 +3706,11 @@ begin
     if TryKillAutoCQ then
       Escape_proc;
 
+  if key = '-' then
+     begin
+     tr4w_alt_n_transmit_frequency;    // Note this is a toggle
+     Exit;
+     end;
   // start sending now code
   if Key = StartSendingNowKey then
     if tAutoSendMode = False then

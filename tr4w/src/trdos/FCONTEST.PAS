@@ -980,6 +980,15 @@ begin
 
       end;
 
+    POTA:
+       begin
+       tAllowDupeQSOs := TRUE;
+       AutoDupeEnableCQ := False;
+       AutoDupeEnableSandP := False;
+       ContestName := 'POTA';
+       WARCBandsEnabled := True;
+       end;
+
     QCWA:
       begin
         AddDomesticCountry('K');

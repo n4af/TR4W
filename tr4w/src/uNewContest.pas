@@ -38,7 +38,7 @@ uses
   ;
 type
   InitialCommands =
-    (icmyCheck, icmyFDClass, icmyGrid, icmyFOC, icmyIOTA, icmyName, icmyPrec, icmyQTH, icmySection, icmyState, icmyZone, icmyPostalCode);
+    (icmyCheck, icmyFDClass, icmyGrid, icmyFOC, icmyIOTA, icmyName, icmyPark, icmyPrec, icmyQTH, icmySection, icmyState, icmyZone, icmyPostalCode);
 
 function NewContestDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 procedure BeginNewContest(h: HWND);
@@ -78,6 +78,7 @@ const
     'My FOC NUMBER',
     'MY IOTA',
     'MY NAME',
+    'MY PARK',
     'MY PREC',
     'MY QTH',
     'MY SECTION',
@@ -336,7 +337,8 @@ begin
 
               WWPMC:
                 SetCommentAndEnableEditControl(TC_ENTERYOURCITYIDENTIFIER, icmyState);
-
+              POTA:
+                 SetCommentAndEnableEditControl(TC_ENTERYOURIOTAREFERENCEDESIGNATOR, icmyPark);
               PCC, ARKTIKA_SPRING:
                 SetCommentAndEnableEditControl(TC_ENTERYOURMEMBERSHIPNUMBER, icmyState);
 
@@ -476,6 +478,11 @@ begin
              SetCommentAndEnableEditControl(TC_PREF_OR_CQZONE,icMyState);    // 4.114.1
              end;
 
+             POTA:
+                begin
+                 Windows.SetWindowText(NewContestCheckBox, 'Activator');
+                 Windows.ShowWindow(NewContestCheckBox, SW_SHOW);
+                end;
              WINTERFIELDDAY:
                 begin
                   DisplayInitialCommand(icmyFDClass);

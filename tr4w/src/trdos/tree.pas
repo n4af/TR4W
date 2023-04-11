@@ -5190,7 +5190,7 @@ function KeyboardCallsignChar(var Key: integer; ExChWin: boolean): boolean;
 begin
   Result := False;
 
-  if Key in [Ord('0')..Ord('9'), Ord('a')..Ord('z'), Ord('A')..Ord('Z'), 191, Ord('/'), Ord('?'), VK_BACK] then Result := True;
+  if Key in [Ord('0')..Ord('9'), Ord('a')..Ord('z'), Ord('A')..Ord('Z'), 191, Ord('/'), Ord('?'), VK_BACK, Ord('-')] then Result := True;
 
   if ExChWin then
   begin

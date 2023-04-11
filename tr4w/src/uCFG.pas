@@ -326,6 +326,7 @@ const
    + 1 {WSJTXEnabled}
    + 2 {Radio Startup Commands for Radio 1 and Radio 2}
    + 4 {Radio IP Address and TCP Port for Radio 1 and Radio 2}
+   + 1 {my Park}
    ;
 
    // Note if crAddress says pointer(NN), then it is callign a function at position NN in the an array
@@ -536,6 +537,7 @@ const
  (crCommand: 'MY GRID';                       crAddress: @MyGrid;                         crMin:0;  crMax:7;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'MY IOTA';                       crAddress: @MyIOTA;                         crMin:0;  crMax:20;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'MY NAME';                       crAddress: @MyName;                         crMin:0;  crMax:20;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
+ (crCommand: 'MY PARK';                       crAddress: @MyPark;                         crMin:0;  crMax:10;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'MY POSTAL CODE';                crAddress: @MyPostalCode;                   crMin:0;  crMax:20;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'MY PREC';                       crAddress: @MyPrec;                         crMin:0;  crMax:10;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),
  (crCommand: 'MY QTH';                        crAddress: @MyState;                        crMin:0;  crMax:20;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfAll; crType: ctString),

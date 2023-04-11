@@ -6,6 +6,7 @@ uses VC, SysUtils;
 function UpperCase(const s: ShortString): ShortString;
 
 function tCharIsNumbers(c: Char): boolean;
+function tCharIsAlphaNumericOrDash(c: Char): boolean;
 
 function safeFloat(sStringFloat : AnsiString) : double;
 function StringHas(LongString: Str160; SearchString: Str80): boolean;
@@ -14,6 +15,7 @@ function StringHasLowerCase(InputString: Str160): boolean;
 function StringIsAllNumbers(InputString: Str160): boolean;
 function StringIsAllNumbersOrSpaces(InputString: Str160): boolean;
 function StringIsAllNumbersOrDecimal(InputString: Str160): boolean;
+function StringIsAllAlphanumericOrDash(InputString: Str160): boolean;
 function StringHasLetters(InputString: Str160): boolean;
 function StringWithFirstWordDeleted(InputString: Str160): Str160;
 
@@ -62,6 +64,27 @@ function StringHas(LongString: Str160; SearchString: Str80): boolean;
 begin
   StringHas := pos(SearchString, LongString) <> 0;
 end;
+
+function StringIsAllAlphanumericOrDash(InputString: Str160): boolean;
+var
+  CharPos                               : integer;
+begin
+   StringIsAllAlphanumericOrDash := False;
+   if InputString = '' then Exit;
+
+   for CharPos := 1 to length(InputString) do
+      begin
+      if not tCharIsAlphanumericOrDash(InputString[CharPos]) then
+         begin
+         Exit;
+         end;
+      end;
+
+  StringIsAllAlphanumericOrDash := True;
+end;
+
+
+
 
 function StringHasLetters(InputString: Str160): boolean;
 
@@ -133,6 +156,13 @@ end;
 function tCharIsNumbers(c: Char): boolean;
 begin
   Result := c in ['0'..'9'];
+end;
+
+function tCharIsAlphaNumericOrDash(c: Char): boolean;
+begin
+   Result := (c in ['0'..'9']) or
+             (c in ['A'..'Z']) or
+             (c in ['-']);
 end;
 
 function StringIsAllNumbersOrSpaces(InputString: Str160): boolean;

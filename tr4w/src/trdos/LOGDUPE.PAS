@@ -1968,7 +1968,12 @@ begin
         ExchangeInformation.QSONumber := True;
         ExchangeInformation.Age := True;
       end;
-
+    RSTAndPOTAPark:
+       begin
+       ExchangeInformation.RST := true;
+       ExchangeInformation.QTH := true;
+       end;
+       
     RSTAgeAndPossibleSK:
       begin
         ExchangeInformation.RST := True;

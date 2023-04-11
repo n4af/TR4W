@@ -648,7 +648,7 @@ begin
                begin
                ExchangeWindowKeyDownProc(Msg.wParam);     // 4.102.7
                end;
-            if KeyboardCallsignChar(Msg.wParam, boolean(ActiveMainWindow) {tr4w_ExchangeWindowActive}) = False then
+              if KeyboardCallsignChar(Msg.wParam, boolean(ActiveMainWindow) {tr4w_ExchangeWindowActive}) = False then
                begin
                goto NoTransMess;
                end;

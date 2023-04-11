@@ -855,6 +855,7 @@ type
     OZCR_O,
     OZCR_Z,
     PACC,
+    POTA,
     QCWA,
     QCWAGOLDEN,
     RAC_CANADA_WINTER,
@@ -2987,6 +2988,7 @@ type
     RSTAndFOCNumberExchange, //n4af
     RSTAndGridExchange,
     RSTAndOrGridExchange,
+    RSTAndPOTAPark,
     RSTAndQSONumberOrDomesticQTHExchange,
     RSTAndSerialNumberAndGridandPossibleMemberNumber,  // 4.88.3
     RSTAndPostalCodeExchange,
@@ -3053,6 +3055,7 @@ const
   	'RST AND FOC NUMBER',
     'RST AND GRID',
     'RST AND OR GRID',
+    'RST AND POTA PARK',
     'RST AND QSO NUMBER OR DOMESTIC QTH',
     'RST QSO NUMBER AND GRID AND POSSIBLE NUMBER', // 4.88.3
     'RST AND POSTAL CODE',
@@ -3254,6 +3257,7 @@ QSOPartiesCount = 18;
  ({Name: 'OZCR-O';                     }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 182 ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneOrSocietyExchange;                    XM:CQDXCC{ARRLDXCC}; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'OZCR-Z';                     }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 182 ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: WYSIWYGDomestic; P: 0; AE: RSTZoneOrSocietyExchange;                    XM:NoDXMults; QP:IARUQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'PACC';                       }Email: nil;                      DF: 'pacc';              WA7BNM:  249; {SK3BG: 'pacc';       } QRZRUID: 66  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
+ ({Name: 'POTA';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTAndPOTAPark;                         XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'QCWA';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberNameChapterAndQTHExchange;          XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'';   CABName:''),
  ({Name: 'QCWA GOLDEN';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberNameChapterAndQTHExchange;          XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'';   CABName:''),
  ({Name: 'RAC_CANADA_WINTER';          }Email: nil;                      DF: 'p13';               WA7BNM:  205; {SK3BG: 'canday';     } QRZRUID: 101 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTAndQSONumberOrDomesticQTHExchange;        XM:NoDXMults; QP:RACQSOPointMethod; ADIFName:'';   CABName:''),
@@ -3395,7 +3399,7 @@ QSOPartiesCount = 18;
       'EUROPEAN HFC',
       'EUROPEAN VHF',
       'TESLA',
-      'ARRL-FD',    // The internal name is ARRL-FD. If we change it here, it breaks old files so leave as ARRL-FD. I use the ADIFNAME fiels int he ContestSA array for the right value// 4.89.6
+      'ARRL-FD',    // The internal name is ARRL-FD. If we change it here, it breaks old files so leave as ARRL-FD. I use the ADIFNAME fiels in the ContestSA array for the right value// 4.89.6
       'FISTS',
       'FOC MARATHON',  //n4af
       'FLORIDA QSO PARTY',
@@ -3444,6 +3448,7 @@ QSOPartiesCount = 18;
       'OZCHR-TEAMS',
       'OZCHR',
       'PACC',
+      'POTA',
       'QCWA',
       'QCWA GOLDEN',
       'RAC CANADA WINTER',
@@ -3669,7 +3674,8 @@ QSOPartiesCount = 18;
       ({Name: 'OZCR-O';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'OZCR-Z';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak1 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'PACC';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
-      ({Name: 'QCWA';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
+      ({Name: 'POTA';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
+      ({Name: 'QCWA';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'QCWA GOLDEN';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RAC CANADA WINTER';          }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),
       ({Name: 'RF-VHF-FD';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),

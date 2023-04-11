@@ -1998,7 +1998,11 @@ begin
                 //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s ', tCallStringLength, p);  // Removed NY4I Issue 398 as we use CE.DomesticMult but whazt happens if Italy works Italy?
                 //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
               end;
-
+            POTA:
+               begin
+               WriteADIFField('MY_SIG','POTA');
+               WriteADIFField('MY_SIG_INFO',myPark);
+               end;
             IOTA:
               begin
                 strU(TempRXData.DomesticQTH);
@@ -4143,6 +4147,7 @@ var
   //HisCallsign                           : PChar;
   cMyZone                               : integer;
   cMyState                              : string;
+  cMyPark                               : string;
   cMyName                               : PChar;
   //csName                                : PChar;
   cMyFOCNumber                          : PChar;
@@ -4183,6 +4188,7 @@ begin
 
    cMyZone := StrToInt(MyZone);
    cMyState := MyState;
+   cMyPark := MyPark;
 
    previousqsonr := 0;
    nrSent := TempRXData.NumberSent;
@@ -4274,6 +4280,9 @@ begin
 
          AgeAndQSONumberExchange:      // 4.55.4
             Result := SysUtils.Format('%-3d %-2s %03d      ', [cMyState, nrSent]);
+
+         RSTAndPOTAPark:
+            Result := cMyPark;
 
          RSTPowerExchange:
             begin
