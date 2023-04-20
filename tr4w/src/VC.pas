@@ -2801,7 +2801,7 @@ type
     HAMSPIRIT ,
     RSGBDXMethod,
     NYQPQP,
-    RCCVHFQPMETHOD
+    RCCVHFQP
     );
 
 const
@@ -2952,7 +2952,7 @@ const
      'HAMSPIRIT', // 4.115.5
      'RSGB-DX',
       'NYQPQP',
-      'RCCVHFQPMETHOD'
+      'RCCVHFQP'
     );
 
 type
