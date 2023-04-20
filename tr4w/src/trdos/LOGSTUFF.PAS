@@ -6525,6 +6525,22 @@ var
           RXDATA.QSOPoints := 2;
       end;
 
+    RCCVHFQPMETHOD:
+     begin
+      if MyGrid <> '' then
+       begin
+        Points := GetDistanceBetweenGrids(MyGrid, RXData.DomesticQTH);
+        if RXData.Band = Band2 then
+          RXData.QSOPoints := Points;
+        if RXData.Band = Band432 then
+          RXData.QSOPoints := 2;
+        if RXData.Band = Band1296 then
+          RXData.QSOPoints := 4
+          else
+           RXData.QSOPoints := 6;
+      end;
+       end;
+
     OZHCRVHFQSOPointMethod:
       if MyGrid <> '' then
       begin

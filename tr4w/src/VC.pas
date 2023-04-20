@@ -2800,7 +2800,8 @@ type
     YOTAQSOPointMethod,
     HAMSPIRIT ,
     RSGBDXMethod,
-    NYQPQP
+    NYQPQP,
+    RCCVHFQPMETHOD
     );
 
 const
@@ -2950,7 +2951,8 @@ const
      'YOTA',
      'HAMSPIRIT', // 4.115.5
      'RSGB-DX',
-      'NYQPQP'
+      'NYQPQP',
+      'RCCVHFQPMETHOD'
     );
 
 type
