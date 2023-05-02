@@ -1842,7 +1842,7 @@ begin
       //if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
       //if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
 
-      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%d <RST_RCVD:%u>%d <CONTEST_ID:%u>%s '
+      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%d <RST_RCVD:%u>%d '  // Moved CONTEST_ID below to make it copnditional
                   ,[length(TempRXData.Callsign), TempRXData.Callsign
                   ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
                  // ,length(ExtendedModeStringArray[TempRXData.Mode]), ExtendedModeStringArray[TempRXData.Mode]
@@ -1858,11 +1858,15 @@ begin
                   ,TempRXData.tSysTime.qtSecond
                   ,tRSTSendStringLength, TempRXData.RSTSent
                   ,tRSTRcvdStringLength, TempRXData.RSTReceived
-                  ,tContestNamelength, StrPas(tContestName)
+                 // ,tContestNamelength, StrPas(tContestName)     // Moved below to make this conditional--not everything is a contest
                   ]
                   );
       sWriteFileFromString(tReportFileWrite, sBuffer);
 
+      if not (Contest in [POTA,GENERALQSO]) then
+         begin
+         WriteADIFField('CONTEST_ID',StrPas(tContestName));
+         end;
       if TempRXData.ExtMode = eNoMode then
          begin
          if TempRXData.Mode = Digital then
@@ -1902,6 +1906,12 @@ begin
 
 
       end;
+
+      if Contest = POTA then
+         begin
+         WriteADIFField('MY_SIG','POTA');
+         WriteADIFField('MY_SIG_INFO',myPark);
+         end;
       WriteADIFField('SRX_STRING', TempRXData.ExchString);
       stxString := GetMyExchangeForExport;
       WriteADIFField('STX_STRING',Trim(DeleteRepeatedSpaces(stxString)));
@@ -2000,8 +2010,8 @@ begin
               end;
             POTA:
                begin
-               WriteADIFField('MY_SIG','POTA');
-               WriteADIFField('MY_SIG_INFO',myPark);
+               WriteADIFField('SIG','POTA');
+               WriteADIFField('SIG_INFO',TempRXData.QTHString);
                end;
             IOTA:
               begin

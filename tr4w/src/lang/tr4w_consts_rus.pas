@@ -113,6 +113,7 @@ const
   TC_ENTERYOURDISTRICTABBREVIATION      = '¬ведите сокращение вашего района:';
   TC_ENTERYOURRDAID                     = '¬ведите ¬аш номер RDA:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = '¬ведите номер острова IOTA:';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = '¬ведите номер острова POTA:';
   TC_ENTERYOURCITYIDENTIFIER            = '¬ведите идентификатор вашего города:';
   TC_ENTERYOURNAME                      = '¬введите ¬аше им€:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = '¬ведите последние 2 знака года, когда вы впервые получили радиолюбительскую лицензию:';

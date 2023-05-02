@@ -102,6 +102,7 @@ const
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Wpisz skrót Twojego regionu administracyjnego:';
   TC_ENTERYOURRDAID                     = 'Wpisz Twój kod RDA:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Wpisz Twój numer IOTA:';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = 'Wpisz Twój numer POTA:';
   TC_ENTERYOURCITYIDENTIFIER            = 'Wpisz identyfikator Twojego miasta:';
   TC_ENTERYOURNAME                      = 'Wpisz swojej imiê:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Wpisz ostatnie dwie cyfry roku wydania Twojej pierwszej licencji amatorskiej:';

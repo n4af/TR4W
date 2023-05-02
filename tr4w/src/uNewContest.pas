@@ -338,7 +338,7 @@ begin
               WWPMC:
                 SetCommentAndEnableEditControl(TC_ENTERYOURCITYIDENTIFIER, icmyState);
               POTA:
-                 SetCommentAndEnableEditControl(TC_ENTERYOURIOTAREFERENCEDESIGNATOR, icmyPark);
+                 SetCommentAndEnableEditControl(TC_ENTERYOURPARKREFERENCEDESIGNATOR, icmyPark);
               PCC, ARKTIKA_SPRING:
                 SetCommentAndEnableEditControl(TC_ENTERYOURMEMBERSHIPNUMBER, icmyState);
 
@@ -599,7 +599,15 @@ begin
 
       {Contest Name}
     Windows.GetDlgItemText(h, NC_CONTEST_COMBOBOX, TempBuffer2, SizeOf(TempBuffer2));
-    Format(wsprintfBuffer, '%s%s %s %s\', TR4W_PATH_NAME, GetYearString, TempBuffer2, TempBuffer1);
+
+    if TempBuffer2 = 'POTA' then
+       begin
+       Format(wsprintfBuffer, '%s%s %s %s %s\', TR4W_PATH_NAME, GetYearString, TempBuffer2, GetDateString, TempBuffer1);
+       end
+    else
+       begin
+       Format(wsprintfBuffer, '%s%s %s %s\', TR4W_PATH_NAME, GetYearString, TempBuffer2, TempBuffer1);
+       end;
 
     Windows.CreateDirectory(wsprintfBuffer, nil);
   end;

@@ -107,6 +107,7 @@
   TC_ENTERYOURFOCNUMBER                 = 'Gib deine FOC Nummer ein:';
   TC_ENTERYOURRDAID                     = 'Gib deine RDA ID ein:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Gib deine IOTA-Referenz ein (Beispiel im Format  EU-123)';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = 'Gib deine POTA-Referenz ein (Beispiel im Format  K-1234)';
   TC_ENTERYOURCITYIDENTIFIER            = 'Gib den Bezeichner fuer deinen Ort ein:';
   TC_ENTERYOURNAME                      = 'Gib deinen Namen ein:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Gib die letzten beiden Zahlen des Jahres ein, in dem du deine Lizenz erhalten hast:';

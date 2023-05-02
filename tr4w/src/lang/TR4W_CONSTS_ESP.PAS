@@ -99,6 +99,7 @@ const
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Entre su distrito abreviacion:';
   TC_ENTERYOURRDAID                     = 'Entre su RDA ID:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Entre su referencia IOTA:';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = 'Entre su referencia POTA (e.j. K-1234):';
   TC_ENTERYOURCITYIDENTIFIER            = 'Entre su identificador ciudad:';
   TC_ENTERYOURNAME                      = 'Entre su nombre:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Entre los dos ultimos digitos del año de su primera licencia:';

@@ -115,6 +115,7 @@ const
   TC_ENTERYOURFOCNUMBER                 = 'Zadej své èíslo FOC:';
   TC_ENTERYOURRDAID                     = 'Zadej svùj RDA ID:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Zadej své referenèní èíslo IOTA (vèetnì oddìlovací pomlèky, napø. EU-123):';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = 'Zadej své referenèní èíslo POTA (napø K-1234)';
   TC_ENTERYOURCITYIDENTIFIER            = 'Zadej identifikátor svého mìsta:';
   TC_ENTERYOURNAME                      = 'Zadej své jméno:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Zadej poslední dvì èíslice roku vydání své první oficiální radioamatérské licence:';

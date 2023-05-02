@@ -4684,7 +4684,14 @@ function ProcessRSTAndPOTAPark(Exchange: ShortString; var RXData: ContestExchang
 var FirstString, SecondString, ThirdString: Str10;
 begin
 
-   ProcessRSTAndPOTAPark := true;
+   ProcessRSTAndPOTAPark := false;
+   if length(Exchange) = 0 then
+      begin
+      RXData.RSTReceived := DefaultRST;
+      RXData.RSTSent := DefaultRST;
+      Result := true;
+      Exit;
+      end;
    ParseExchange(Exchange, FirstString, SecondString, ThirdString);
    if IsValidPOTAPark(FirstString) then
       begin
@@ -4705,6 +4712,7 @@ begin
          begin
          RXData.RSTSent := DefaultRST;
          end;
+         Result := true;
       end
    else
       begin
@@ -4717,6 +4725,7 @@ begin
             if IsValidPOTAPark(ThirdString) then
                begin
                RXData.QTHString := thirdString;
+               Result := true;
                end;
             end
          else
@@ -4726,6 +4735,7 @@ begin
                RXData.RSTSent := StrToIntDef(FirstString,DefaultRST);
                RXData.RSTReceived := DefaultRST;
                RXData.QTHString := SecondString;
+               Result := true;
                end;
             end;
          end;
@@ -8592,7 +8602,7 @@ function ProcessExchange(ExchangeString: Str80; var RData: ContestExchange):
 begin
   Result := False;
   if not ParseArray(ExchangeString) then
-    if ActiveExchange <> RSTNameAndQTHExchange then
+    if not (ActiveExchange in [RSTNameAndQTHExchange,RSTAndPOTAPark]) then
       Exit;
 
   case ActiveExchange of

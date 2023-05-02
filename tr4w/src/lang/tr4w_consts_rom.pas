@@ -120,6 +120,7 @@ const
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Inscrie abrevierea districtului propriu:';
   TC_ENTERYOURRDAID                     = 'Inscrie RDA ID propriu:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Inscrie IOTA Reference Designator:';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = 'Inscrie POTA Reference Designator:';
   TC_ENTERYOURCITYIDENTIFIER            = 'Inscrie identificatorul orasului:';
   TC_ENTERYOURNAME                      = 'Inscrie numele:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Inscrie ultimii doi digiti ai anului primei tale autorizari in emisie:';

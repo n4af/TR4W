@@ -119,6 +119,7 @@ const
   TC_ENTERYOURFOCNUMBER                 = 'Upisi svoj FOC broj:';
   TC_ENTERYOURRDAID                     = 'Upisi svoj broj RDA:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Upisi svoju IOTA referencu:';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = 'Upisi svoju POTA referencu:';
   TC_ENTERYOURCITYIDENTIFIER            = 'Upisi identifikator svog grada:';
   TC_ENTERYOURNAME                      = 'Upisi svoje ime:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Upisi poslednja dva broja godine, kada si prvi put dobio licencu:';

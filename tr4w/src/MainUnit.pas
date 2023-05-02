@@ -4277,7 +4277,7 @@ begin
   Windows.ZeroMemory(@RData.Callsign, SizeOf(RData.Callsign));
   RData.Callsign := Call;
 
-  if (ExchangeString = '') and not (ActiveExchange = RSTNameAndQTHExchange) then
+  if (ExchangeString = '') and not (ActiveExchange in [RSTNameAndQTHExchange,RSTAndPOTAPark]) then  // These two exchanges allow blank exchanges
   begin
     logger.debug('Exiting ParametersOkay early: ExchangeString=<%s>',
       [ExchangeString]);
@@ -4286,9 +4286,11 @@ begin
   { if length(ExchangeString) > 5 then  // 4.96.3
     CallsignUpdateEnable                                                                                     := False;}
   if CallsignUpdateEnable then
-    RData.Callsign := GetCorrectedCallFromExchangeString(ExchangeString);
-  RData.Callsign[Ord(RData.Callsign[0]) + 1] := #0;
-
+     begin // This looks like the secxond line should be under IF but it was not.
+     RData.Callsign := GetCorrectedCallFromExchangeString(ExchangeString);
+     RData.Callsign[Ord(RData.Callsign[0]) + 1] := #0;
+     end;
+     
   RST := GetSentRSTFromExchangeString(ExchangeString);
 
   if RST <> 0 then

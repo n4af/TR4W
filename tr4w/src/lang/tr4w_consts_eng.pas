@@ -109,6 +109,7 @@
   TC_ENTERYOURFOCNUMBER                 = 'Enter your FOC number:';
   TC_ENTERYOURRDAID                     = 'Enter your RDA ID:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'Enter your IOTA Reference Designator (WITH DASH and no leading zeros delimiting # e.g. EU-5)';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = 'Enter your POTA Park Reference Designator (WITH DASH e.g. K-1234)';
   TC_ENTERYOURCITYIDENTIFIER            = 'Enter your city identifier:';
   TC_ENTERYOURNAME                      = 'Enter your name:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Enter the last two digits of the year of your first official amateur radio license:';

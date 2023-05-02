@@ -212,6 +212,7 @@ function Format(Output: PChar; Format: PChar; c: Char): integer; overload; cdecl
 
 function Format(Output: PChar; Format: PChar; s1: PChar; u1: integer; u2: integer; u3: integer; u4: integer; u5: integer; u6: integer; s2: PChar; s3: PChar): integer; overload; cdecl; overload;
 function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar; p4: PChar): integer; overload; cdecl; overload;
+function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar; p4: PChar; p5: PChar): integer; overload; cdecl; overload;
 function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar): integer; overload; cdecl; overload;
 function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar; i: integer): integer; overload; cdecl; overload;
 function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar; i: integer; i2: integer): integer; overload; cdecl; overload;
@@ -246,6 +247,7 @@ function Format(Output: PChar; Format: PChar; c: Char): integer; external user32
 
 function Format(Output: PChar; Format: PChar; s1: PChar; u1: integer; u2: integer; u3: integer; u4: integer; u5: integer; u6: integer; s2: PChar; s3: PChar): integer; external user32 Name 'wsprintfA';
 function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar; p4: PChar): integer; external user32 Name 'wsprintfA';
+function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar; p4: PChar; p5: pChar): integer; external user32 Name 'wsprintfA';
 function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar): integer; external user32 Name 'wsprintfA';
 function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar; i: integer): integer; external user32 Name 'wsprintfA';
 function Format(Output: PChar; Format: PChar; p: PChar; P2: PChar; p3: PChar; i: integer; i2: integer): integer; external user32 Name 'wsprintfA';

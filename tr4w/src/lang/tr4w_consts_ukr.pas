@@ -114,6 +114,7 @@ const
   TC_ENTERYOURDISTRICTABBREVIATION      = '¬вед≥ть скороченн€ вашого району:';
   TC_ENTERYOURRDAID                     = '¬вед≥ть номер RDA:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = '¬вед≥ть номер острова IOTA:';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = '¬вед≥ть номер острова POTA:';
   TC_ENTERYOURCITYIDENTIFIER            = '¬вед≥ть ≥дентиф≥катор вашого м≥ста:';
   TC_ENTERYOURNAME                      = '¬вед≥ть ¬аше ≥м`€:'; 
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = '¬вед≥ть останн≥ 2 знаки року, коли ви вперше отримали рад≥оаматорську л≥ценз≥ю:';

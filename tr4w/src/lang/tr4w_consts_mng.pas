@@ -106,6 +106,7 @@ const
   TC_ENTERYOURDISTRICTABBREVIATION      = 'Дистриктийнхээ товчлолыг оруулна уу:';
   TC_ENTERYOURRDAID                     = 'RDA -ийн ID -г оруулна уу:';
   TC_ENTERYOURIOTAREFERENCEDESIGNATOR   = 'IOTA Reference Designator-ийг оруулна уу:';
+  TC_ENTERYOURPARKREFERENCEDESIGNATOR   = 'POTA Reference Designator-ийг оруулна уу:';
   TC_ENTERYOURCITYIDENTIFIER            = 'Танай хотын товчилсон нэр:';
   TC_ENTERYOURNAME                      = 'Нэрээ оруулна уу:';
   TC_ENTERTHELASTTWODIGITSOFTHEYEAR     = 'Анх лиценз авсан оныхоо сvvлийн хоёр оронг оруулна уу:';
