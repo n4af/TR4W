@@ -148,7 +148,7 @@ const
 //          LANG                                  = 'RUS';
 //       LANG                                  = 'MNG';
 //       LANG                                  = 'CZE';
-//      LANG                                  = 'SER';
+//        LANG                                  = 'SER';
 //       LANG                                  = 'ROM';
 //       LANG                                  = 'GER';
 //       LANG                                  = 'UKR';
