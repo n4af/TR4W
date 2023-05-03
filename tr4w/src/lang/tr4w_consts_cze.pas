@@ -182,7 +182,7 @@ const
   TC_FRANCE                             = 'Francie';
   TC_HQ_OR_MEMBER                       = 'HQ nebo èlen';
   TC_IRELAND                            = 'Irsko';
-   TC_GC                                 = 'special two character designator'  ;
+  TC_GC                                 = 'special two character designator'  ;
   TC_GAGARIN                            = 'special two char ID';
 
   {UTELNET}

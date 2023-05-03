@@ -184,7 +184,8 @@ const
   TC_CANADA                             = 'Canada';
   TC_FRANCE                             = 'Franta';
   TC_HQ_OR_MEMBER                       = 'HQ sau membru';
-
+  TC_GC                                 = 'special two character designator'  ;
+  TC_GAGARIN                            = 'special two char ID';
   {UTELNET}
 
   TC_TELNET                             = 'Conectat'#0'Deconectat'#0'Comenzi'#0'Opreste'#0'Sterge'#0'100'#0#0;

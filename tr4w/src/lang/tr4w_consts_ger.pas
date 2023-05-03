@@ -187,7 +187,8 @@
   TC_CONNECT                            = 'CONNECT..';
   TC_CONNECTED                          = 'CONNECTED';
   TC_YOUARESPOTTEDBYANOTHERSTATION      = 'Du bist von einer anderen Station gespottet worden.';
-
+  TC_GC                                 = 'special two character designator'  ;
+  TC_GAGARIN                            = 'special two char ID';
   {UNET}
 
   TC_CONNECTIONTOTR4WSERVERLOST         = 'Verbindung zum TR4WSERVER %s:%d verloren.';

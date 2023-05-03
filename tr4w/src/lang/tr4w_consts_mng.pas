@@ -180,6 +180,8 @@ const
   TC_CONNECT                            = '...тэй холбогдох';
   TC_CONNECTED                          = 'Холбогдлоо';
   TC_YOUARESPOTTEDBYANOTHERSTATION      = 'Таныг оор станц споттоллоо';
+  TC_GC                                 = 'special two character designator' ;
+  TC_GAGARIN                            = 'special two char ID';
   {UNET}
   TC_CONNECTIONTOTR4WSERVERLOST         = 'TR4WSERVER %s:%d -ийн холболт тасарлаа.';
   TC_COMPUTERCLOCKISSYNCHRONIZED        = 'Компьютерийн цагийг тохируулав';

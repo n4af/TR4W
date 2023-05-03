@@ -187,7 +187,8 @@ const
   TC_CANADA                             = 'Kanadi';
   TC_FRANCE                             = 'Francuskoj';
   TC_IRELAND                            = 'Irskoj';
-
+  TC_GC                                 = 'special two character designator'  ;
+  TC_GAGARIN                            = 'special two char ID';
   {UTELNET}
 
   TC_TELNET                             = 'Konekcija'#0'Diskonekcija'#0'Komande'#0'Zaustavljanje'#0'Brisanje'#0'Korisnici'#0'100'#0'WWV'#0'Filter'#0;
