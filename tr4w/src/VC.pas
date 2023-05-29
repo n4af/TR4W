@@ -634,6 +634,9 @@ var
 //  tR150SMode                            : boolean;
 //  OrionWaitTime                         : integer = 50;
    ReverseInitialex                     : boolean = False;
+   FontSize                             : integer = 2;
+//   BandMapItemWidth                     : integer = 120;
+//   BandMapItemHeight                    : integer = 14;
   QZBRandomOffsetEnable                 : boolean;
 //  QZBFixedOffset                        : real;
 

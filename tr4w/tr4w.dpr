@@ -187,7 +187,7 @@ begin
       end;
     WM_MEASUREITEM: if wParam = MainWindowPCLID then
         PMeasureItemStruct(lParam).itemHeight := ws;
-
+       
     WM_DRAWITEM:
       begin
         if wParam = MainWindowPCLID then

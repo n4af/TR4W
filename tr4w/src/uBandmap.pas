@@ -106,8 +106,8 @@ var
   BMWSBUFFER                            : array[0..16] of Char;
   PreviousDisplayedBandmapBand          : BandType {= NoBand};
   BandColor                             : Cardinal;
-  BandMapItemHeight                     : integer = CheckRectWidth;
-  BandMapItemWidth                      : integer = 150;
+  BandMapItemHeight                     : integer = 14{CheckRectWidth};
+  BandMapItemWidth                      : integer = 135;
   BandMapFreqWidthCalculated            : boolean;
   BandMapDisplayGhz                     : boolean;
   
