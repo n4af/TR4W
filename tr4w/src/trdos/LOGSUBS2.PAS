@@ -454,32 +454,7 @@ begin
     rmZone: if not DoingZoneMults then goto Next;
     rmPrefix: if not DoingPrefixMults then goto Next;
   end;
-{
-  case RemainingMultDisplay of
-    rmDomestic:
-      if DoingDXMults then
-        RemainingMultDisplay := rmDX
-      else
-        if DoingZoneMults then
-          RemainingMultDisplay := rmZone;
-    rmDX:
-      if DoingZoneMults then
-        RemainingMultDisplay := rmZone
-      else
-            //IF DoingDomesticMults AND (ActiveDomesticMult <> WYSIWYGDomestic) THEN
-        if (DoingDomesticMults and (DomesticQTHDataFileName <> '')) then
-              //KK1L: 6.68 changed above to allow domestic mults to be displayed if there is a dom file
-          RemainingMultDisplay := rmDomestic;
-    rmZone:
-          //IF DoingDomesticMults AND (ActiveDomesticMult = DomesticFile)
-      if (DoingDomesticMults and (DomesticQTHDataFileName <> '')) then
-            //KK1L: 6.68 changed above to allow domestic mults to be displayed if there is a dom file
-        RemainingMultDisplay := rmDomestic
-      else
-        if DoingDXMults then
-          RemainingMultDisplay := rmDX;
-  end;
-}
+
   SetRemMultsColumnWidth;
   VisibleLog.ShowRemainingMultipliers;
 end;
@@ -537,13 +512,7 @@ end;
 procedure PlayLastSeconds(Seconds: integer);
 
 begin
-{
-  SaveBackCopyFile(DVPPath + 'TEMP.BCP', Seconds);
-  repeat until OpenFileForRead(FileRead, DVPPath + 'TEMP.BCP');
-  Sleep(100);
-  Close(FileRead);
-  DVPListenMessage('TEMP.BCP', True);
-}
+
 end;
 procedure ExitProgram(Ask: boolean);
 begin

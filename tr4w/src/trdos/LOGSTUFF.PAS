@@ -4238,7 +4238,6 @@ function ProcessRSTQSONumberAndPossibleDomesticQTHExchange(Exchange: Str80; var
 
 var
   NumberString, FirstString, SecondString, ThirdString: Str10;
-
 begin
 
   ProcessRSTQSONumberAndPossibleDomesticQTHExchange := False;
@@ -4255,6 +4254,10 @@ begin
         exit;
       end;
   end;
+ {  if Contest = '
+     if pos(SecondString,'/') > 0 then
+      SecondString[1] := ' ';
+ }
   if not stringisallnumbers(FirstString) then //   n4af 4.42.9
     if not stringisallnumbers(SecondString) then
       if not stringisallnumbers(ThirdString) then
