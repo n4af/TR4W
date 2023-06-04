@@ -4164,7 +4164,7 @@ function ProcessRSTQSONumberOrDomesticQTHExchange(Exchange: Str80; var RXData:
   ContestExchange): boolean;
 var
   NumberString, FirstString, SecondString, ThirdString: Str10;
-
+  n : integer;
 begin
   ProcessRSTQSONumberOrDomesticQTHExchange := False;
 
@@ -4172,6 +4172,14 @@ begin
     Exit;
 
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
+  { n := pos('/',SecondString) ;
+   if n > 0 then
+
+     RXData.QTHString := Rightstr(SecondString,n+1)
+     else
+      rxdata.QTHString := SecondString;
+
+  }
   if not StringIsAllNumbers(FirstString) then // n4af 4.40.5
     if SecondString = '' then
     begin
@@ -5753,6 +5761,7 @@ var
   temphour: byte; // 4.58.2
   iotastate,k    : string[10];
   i,j            : integer;
+  s1,s2,s3,s4    : string[10];
   Str1: string[4];
   Str2: string[2];
   Str3: string[4];
