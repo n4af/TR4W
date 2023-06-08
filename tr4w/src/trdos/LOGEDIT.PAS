@@ -2866,7 +2866,7 @@ begin
     //    TotalMults := TotalMults + MTotals[SingleBand, Both].NumberPrefixMults;
     //    TotalMults := TotalMults + MTotals[SingleBand, Both].NumberZoneMults;
   end
-  else if (ActiveQSOPointMethod = WAEQSOPointMethod) or (ActiveQSOPointMethod = RSGBDXMETHOD) then               // 4.116.1
+  else if (ActiveQSOPointMethod = WAEQSOPointMethod)  then               // 4.116.1
   begin
 
     if ActiveDXMult = CQEuropeanCountries then

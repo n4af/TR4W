@@ -53,7 +53,7 @@ const
     (1000, 3000, 7000, 14000, 21000, 28000, 10000, 18000, 24000);
 //T1 : Cardinal = 1800000;
 var
-
+  BufLine                               : integer = 0;
   ie_check                              : boolean = false;
   tBandMapCutoffFrequency               : integer;
   IE_Switch                             : boolean = False;

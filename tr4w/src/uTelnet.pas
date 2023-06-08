@@ -711,6 +711,7 @@ var
   StringType                            : TelnetStringType;
   d                                     : integer;
 
+
  begin
 //  Windows.CharUpperBuff(TelnetBuffer, ByteReceived);
   AddedSpot := False;
@@ -732,8 +733,10 @@ var
           AddedSpot := ProcessDX(pr, False, StringType);
 
         AddStringToTelnetConsole(@TelnetBuffer[pr], StringType);
+       
     //     SetUpBandMapEntry(@BandMapEntryRecord, ActiveRadio);   // remove hh
         pr := -1;
+   //   end;
       end;
   end;
 

@@ -348,7 +348,7 @@ begin
    ActiveDomesticMult := DomesticFile;
   end;
 
-  RSGBDX:
+ { RSGBDX:
    begin
     if (myCountry[1] = 'G') or (myCountry[1] = 'M') then
      begin
@@ -360,7 +360,7 @@ begin
         ActiveDXMult := NoDXMults;
        end;;
    end;
-
+ }
   BCQP:
   begin
   ActiveDXMult := NoDXMults;
@@ -740,7 +740,8 @@ begin
        AddDomesticCountry('GW');
        AddDomesticCountry('GU');
        AddDomesticCountry('EI');
-
+       if not UKEIStation(mycountry) then
+        SetUpRSTQSONumberExchange;
 
       end;
 

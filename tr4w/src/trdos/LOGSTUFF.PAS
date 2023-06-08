@@ -7159,7 +7159,7 @@ var
         exit;
       end;
 
-      RSGBDXMethod: // 4.116.1
+  {    RSGBDXMethod: // 4.116.1
       {The same station may be contacted on each band and both modes for points and multipliers.
 
        UK&CD stations - 1 point per contact with UK&CD stations on any band, 2 points per contact for UK&CD to EU contacts on any band and
@@ -7173,8 +7173,7 @@ var
       }
 
     //               if ((copy(RXData.QTH.CountryID,1,1) <> 'G') and  (copy(RXData.QTH.CountryID,1,1) <> 'M')) then
-          begin
-              if (MyCountry[1] = 'G') or  (MyCountry[1] = 'M') then       // ukorcd
+    {          if (MyCountry[1] = 'G') or  (MyCountry[1] = 'M') then       // ukorcd
               begin
                ActiveDXMult := CQDXCC;
                 if (RXCty[1] = 'G') or (RXCty[1] = 'M') then
@@ -7208,7 +7207,7 @@ var
                 end;
              end;
          end;
-
+      }
     RDAQSOPointMethod:
       begin
         RXData.QSOPoints := 0;
