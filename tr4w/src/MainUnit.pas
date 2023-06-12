@@ -735,8 +735,8 @@ begin
   if Call_Found = False then
   begin
     ClearMasterListBox;
-    // ClearAltD; // n4af 4.65.2
-    // tClearDupeInfoCall; //n4af 4.65.2
+      ClearAltD; // n4af 4.65.2
+      tClearDupeInfoCall; //n4af 4.65.2
   end;
   if TwoRadioState = CallReady then
     TwoRadioState := Idle;
@@ -2552,7 +2552,7 @@ function tCreateFont(nHeight, fnWeight: integer; lpszFace: PChar): HFONT;
 Begin
   Result := Windows.CreateFont
     (
-    nHeight + FontSize ,
+    nHeight + FontSize -1 ,
     0,
     0,
     0,
@@ -2577,8 +2577,8 @@ begin
  if LuconSZLoadded then lcfn := 'Lucida Console SZ' else lcfn := 'Lucida Console';
 
  DeleteObject(MainFixedFont);
- MainFixedFont := tCreateFont(15,FW_BOLD * Ord(BoldFont), @MainFontName[1]);
- MainFont := tCreateFont(ws - 2, FW_BOLD * ord(BoldFont), @MainFontName[1]);
+ MainFixedFont := tCreateFont(12+BandMapSize-2,FW_BOLD * Ord(BoldFont), @MainFontName[1]);
+ MainFont := tCreateFont(ws - 2+FontSize, FW_BOLD * ord(BoldFont), @MainFontName[1]);
  CATWindowFont := tCreateFont(22, FW_EXTRABOLD, 'Lucida Console');
 
  MainWindowEditFont := tCreateFont(ws + 3, FW_EXTRABOLD, lcfn);
