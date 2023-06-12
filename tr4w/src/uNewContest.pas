@@ -450,7 +450,7 @@ begin
               WWPMC: DisplayCheckBox('PMC');
               PCC,ARKTIKA_SPRING: DisplayCheckBox(TC_ARKTIKACLUB);
 
-              NAQSOCW, NAQSOSSB, NAQSORTTY:
+              NAQSOCW, NAQSOSSB, NAQSORTTY, SST:
                 begin
                   SetCommentAndEnableEditControl(TC_ENTERYOURNAMEANDSTATE, icmyState);
                   DisplayInitialCommand(icmyName);
