@@ -740,8 +740,8 @@ begin
   if Call_Found = False then
   begin
     ClearMasterListBox;
-    // ClearAltD; // n4af 4.65.2
-    // tClearDupeInfoCall; //n4af 4.65.2
+      ClearAltD; // n4af 4.65.2
+      tClearDupeInfoCall; //n4af 4.65.2
   end;
   if TwoRadioState = CallReady then
     TwoRadioState := Idle;
@@ -2557,7 +2557,11 @@ function tCreateFont(nHeight, fnWeight: integer; lpszFace: PChar): HFONT;
 begin
   Result := Windows.CreateFont
     (
+<<<<<<< HEAD
     nHeight + FontSize - 1,
+=======
+    nHeight + FontSize -1 ,
+>>>>>>> origin/4.123.2
     0,
     0,
     0,
