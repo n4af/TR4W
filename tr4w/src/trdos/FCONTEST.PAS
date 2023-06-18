@@ -858,6 +858,15 @@ begin
 
        end;
 
+       SST:
+        begin
+         ContestName := 'Slow Speed Test';
+         ActiveDomesticMult := DomesticFile;
+         Add_KVE;
+         CQExchange := ' ' + MyName + ' ' + MyState;
+         SearchAndPounceExchange := MyName + ' ' + MyState;
+        end;
+
     NAQSOCW, NAQSOSSB, NAQSORTTY:
       begin
 //        ActiveInitialExchange := NameInitialExchange;

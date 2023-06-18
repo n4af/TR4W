@@ -90,7 +90,7 @@ var
   AltWnd                                : HWND;
 
 const
-  CQCWMEMORYF                           = 'CQ CW MEMORY F%u';
+  CQCWMEMORYF                           = 'CQ CW MEMORY F %u';
   CQCWMEMORYALTF                        = 'CQ CW MEMORY ALTF%u';
   CQCWMEMORYCONTROLF                    = 'CQ CW MEMORY CONTROLF%u';
 

@@ -566,6 +566,7 @@ begin
   for Index := 0 to FCount - 1 do
   begin
     a := Abs(FList^[Index].FFrequency - Freq);
+    if a=0 then exit;
     if (a < BandMapGuardBand) and (PInteger(@FList^[Index].FCall[1])^ <> tCQAsInteger) then
     begin
       if (a < d) then

@@ -474,24 +474,7 @@ begin
     Windows.AppendMenu(CurrMenu, uFlags, TempMenuRecord.mrId, TempMenuRecord.mrText);
   end;
 
-{
-  TempMenu := Result;
 
-  for i := 0 to s do
-  begin
-    TempMenuRecord := PMenuRecord(integer(m) + (SizeOf(MenuRecord) * i))^;
-    uFlags := MF_STRING;
-    if TempMenuRecord.mrText[0] = '-' then uFlags := MF_SEPARATOR;
-
-    if TempMenuRecord.mrId = MAXWORD then
-    begin
-      TempMenu := CreatePopupMenu;
-      Windows.AppendMenu(Result, MF_STRING + MF_POPUP, TempMenu, TempMenuRecord.mrText);
-    end
-    else
-      Windows.AppendMenu(TempMenu, uFlags, TempMenuRecord.mrId, TempMenuRecord.mrText);
-  end;
-}
 end;
 
 end.

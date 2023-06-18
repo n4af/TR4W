@@ -635,6 +635,7 @@ var
 //  OrionWaitTime                         : integer = 50;
    ReverseInitialex                     : boolean = False;
    FontSize                             : integer = 2;
+   BandMapSize                          : integer = 125;
 //   BandMapItemWidth                     : integer = 120;
 //   BandMapItemHeight                    : integer = 14;
   QZBRandomOffsetEnable                 : boolean;
@@ -947,8 +948,8 @@ type
     VAQP,
     YOTA,
     IN7QPNE,
-    MST         // 4.110.5
- //   RSGBDX
+    MST ,        // 4.110.5
+    SST
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -2953,7 +2954,6 @@ const
      'VA QSO PARTY',
      'YOTA',
      'HAMSPIRIT', // 4.115.5
- //    'RSGB-DX',
       'NYQPQP',
       'RCCVHFQP'
     );
@@ -3351,13 +3351,12 @@ QSOPartiesCount = 18;
  ({Name: 'VA QSO Party';               }Email: nil;                      DF: 'va_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 17; AE: QSONumberDomesticOrDXQTHExchange;                XM:NoDXMults; QP:VAQSOPointMethod; ADIFName:'VA-QSO-PARTY';   CABName:''),      // 4.88.2
  ({Name: 'YOTA';                       }Email: nil;                      DF: 'YOTA';                 WA7BNM:   0; {SK3BG: nil;    } QRZRUID: 0; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:YOTAQSOPointMethod; ADIFName:'YOTA';   CABName:'') ,
  ({Name: 'IN7QPNE';                    }Email: nil;                      DF: 'in7qpne_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 18; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN7QPNE-QSO-PARTY';   CABName:''),     // 4.88.2
- ({Name: 'MST';                        }Email: nil;                      DF: nil;                 WA7BNM:  3146; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix;        ZnM: NoZoneMults; AIE: NameInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberandNameExchange;             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'MST';   CABName:'')          // 4.110.5
-// ({Name: 'RSGB-DX';                   }Email: nil;                      DF: nil;              WA7BNM: 0000; {SK3BG: 'rsgb1-8';    } QRZRUID: 44  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults;    P: 0; AE: RSTQSONumberExchange;  XM:nodxmults; QP:RSGBDXMethod; ADIFName:'';   CABName:'')                // 5.115.6
-    );
+ ({Name: 'MST';                        }Email: nil;                      DF: nil;                 WA7BNM:  3146; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix;        ZnM: NoZoneMults; AIE: NameInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberandNameExchange;             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'MST';   CABName:''),          // 4.110.5
+ ({Name: 'SST';                        }Email: 'k1usn.radioclub.sst@gmail.com';   DF: 'naqp';              WA7BNM:  218; {SK3BG: 'naqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange;              XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO; ADIFName:'';   CABName:'')
+ );
 
 
 
- //({Name: 'CQ-WPX-CW';                  }Email: 'cw@cqwpx.com';           DF: nil;                 WA7BNM:   29; {SK3BG: nil;          } QRZRUID: 18  ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:CQWPXQSOPointMethod; ADIFName:'';   CABName:''),
 
   // Warning - Do not change names here without careful consideration. If you do, it will break old config files. Better to use the ADIFName or CABName fields if needed. In a perfect world, these would all be the ADIFNAME.
     ContestTypeSA                       : array[ContestType] of PChar =
@@ -3542,8 +3541,8 @@ QSOPartiesCount = 18;
       'VAQP',
       'YOTA',
       'IN7QPNE',
-      'MST'           // 4.110.5
-  //    'RSGB-DX'
+      'MST',           // 4.110.5
+      'SST'
      );
 
   const
@@ -3768,8 +3767,8 @@ QSOPartiesCount = 18;
       ({Name: 'VA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'YOTA';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'IN7QPNE     ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),     // 4.99.7
-      ({Name: 'MST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0)        // 4.110.5
-//      ({Name: 'RSGB-DX';                    }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1)
+      ({Name: 'MST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),        // 4.110.5
+      ({Name: 'SST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0)
 
         );
 

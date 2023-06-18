@@ -154,7 +154,7 @@ var
   Switch: boolean = False;
   SwitchNext: boolean = False; // 4.52.3
   CallWinKeyDown: boolean = False; // 4.52.4
-  FontS: integer ;
+  FontS: integer;
   FirstQSO: Cardinal;
   T1: Cardinal;
   Esc_Counter: integer = 0;
@@ -169,6 +169,11 @@ var
   s1, s2, s3, s4: str20;
   Exchw: str20;
   Callw: str20;
+   Act_Freq                              : Cardinal = 0;
+  Act_Band                              : BandType;
+  Inact_Freq                            : Cardinal = 0;
+  Inact_Band                            : BandType;
+  so2r_swap                             : boolean = false;
 function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 function DeviceIoControlHandler
@@ -529,7 +534,7 @@ begin
 
   if ParametersOkay(CallWindowString, ExchangeWindowString, ActiveBand,
     ActiveMode, ActiveRadioPtr.LastDisplayedFreq
-      {LastDisplayedFreq[ActiveRadio]},
+    {LastDisplayedFreq[ActiveRadio]},
     ReceivedData) then
   begin
 {$IF MORSERUNNER}
@@ -1093,7 +1098,7 @@ begin
 
     else
       {................phone.....................}if MessageEnable and not
-        BeSilent then
+      BeSilent then
       begin
         if QuickQSL <> NoQuickQSLKey then
           SendCrypticMessage(QuickQSLPhoneMessage)
@@ -1129,7 +1134,7 @@ begin
 end;
 
 procedure ReturnInSAPOpMode;
-label
+ label
   loop;
 var
   n: integer;
@@ -2266,7 +2271,7 @@ begin
   begin
     QSONeedWindowsHandles1[Band] := CreateTR4WStaticWindow(MainWindowChildsWidth
       - RightTopWidth + (integer(Band) + 1) * w, ws, w - 2,
-        QSOMULTSWINDOWSTYLE);
+      QSOMULTSWINDOWSTYLE);
     Windows.SetWindowText(QSONeedWindowsHandles1[Band], BandStringsArray[Band])
   end;
   QSONeedWindowHandle1 := CreateTR4WStaticWindow(MainWindowChildsWidth -
@@ -2549,10 +2554,10 @@ begin
 end;
 
 function tCreateFont(nHeight, fnWeight: integer; lpszFace: PChar): HFONT;
-Begin
+begin
   Result := Windows.CreateFont
     (
-    nHeight + FontSize ,
+    nHeight + FontSize - 1,
     0,
     0,
     0,
@@ -2577,8 +2582,8 @@ begin
  if LuconSZLoadded then lcfn := 'Lucida Console SZ' else lcfn := 'Lucida Console';
 
  DeleteObject(MainFixedFont);
- MainFixedFont := tCreateFont(15,FW_BOLD * Ord(BoldFont), @MainFontName[1]);
- MainFont := tCreateFont(ws - 2, FW_BOLD * ord(BoldFont), @MainFontName[1]);
+ MainFixedFont := tCreateFont(12+BandMapSize-2,FW_BOLD * Ord(BoldFont), @MainFontName[1]);
+ MainFont := tCreateFont(ws - 2+FontSize, FW_BOLD * ord(BoldFont), @MainFontName[1]);
  CATWindowFont := tCreateFont(22, FW_EXTRABOLD, 'Lucida Console');
 
  MainWindowEditFont := tCreateFont(ws + 3, FW_EXTRABOLD, lcfn);
@@ -2839,7 +2844,12 @@ begin
     menu_alt_autocqresume:
       RunAutoCQ;
 
-    menu_alt_edit: tAltE;
+    menu_alt_edit:
+    begin
+     tAltE ;
+     if SO2R_Swap then
+     processreturn;
+    end;
 
     menu_alt_savetofloppy:
       SaveLogFileToFloppy;
@@ -3507,7 +3517,7 @@ begin
       begin
         if OpenFileDlg(nil, tr4whandle, TC_CONFIGURATION_FILE +
           ' (*.cfg)'#0'*.cfg'#0#0, TR4W_EXECONFIGFILE_FILENAME, OFN_HIDEREADONLY
-            or
+          or
           OFN_ENABLESIZING) then
           ExecuteConfigurationFile(ShortString(TR4W_EXECONFIGFILE_FILENAME));
       end;
@@ -4582,7 +4592,7 @@ begin
   CPUButtonHandle := tCreateButtonWindow(0, nil, BS_FLAT + WS_CHILD or BS_TEXT
     or
     BS_PUSHLIKE or WS_VISIBLE, X, ws * 4, MainWindowChildsWidth - RightTopWidth
-      -
+    -
     X, ws * 2, tr4whandle, 0);
 {$IFEND}
 
@@ -4716,7 +4726,7 @@ begin
   // Result := CreateWindowEx(WS_EX_NOPARENTNOTIFY {WS_EX_STATICEDGE}, COMBOBOX, nil, dwStyle, X, Y, nWidth, 300 {nHeight}, hwndParent, HMENU, hInstance, nil);
   Result := CreateWindowEx(WS_EX_NOPARENTNOTIFY {WS_EX_STATICEDGE}, COMBOBOX,
     nil, dwStyle, X, Y, nWidth, 340 {nHeight}, hwndParent, HMENU, hInstance,
-      nil);
+    nil);
   // 4.117.3
   tWM_SETFONT(Result, MSSansSerifFont);
 end;
@@ -5128,7 +5138,7 @@ var
 const
   style1 = WS_CHILD or WS_VISIBLE or LVS_REPORT or LVS_NOSORTHEADER or
     LVS_NOSCROLL or {LVS_NOCOLUMNHEADER or }LVS_SINGLESEL
-      {or LVS_NOCOLUMNHEADER};
+  {or LVS_NOCOLUMNHEADER};
   style2 = WS_CHILD or WS_VISIBLE or LVS_REPORT or LVS_NOSORTHEADER or
     WS_TABSTOP;
 begin
@@ -5139,7 +5149,7 @@ begin
   Factor := ws;
   Result := CreateWindowEx(Cardinal(not NoBorder) * WS_EX_STATICEDGE,
     WC_LISTVIEW, nil, Style + integer(NoColumnHeader) * LVS_NOCOLUMNHEADER, X,
-      Y,
+    Y,
     Width, Height, Parent, 0, hInstance, nil);
   asm
  mov edx,[MainFont];
@@ -5640,13 +5650,25 @@ begin
 end;
 
 procedure tAltE;
+ label
+ 1;
 begin
   if tPreviousDupeQSOsShowed then
     Exit;
+  Act_Freq := ActiveRadioPtr.filteredstatus.freq;
+  Act_Band := ActiveBand;
+  if InactiveRadioptr.LastDisplayedFreq = 0 then
+  goto 1;
+  inAct_Band := InActiveRadioPtr.BandMemory;
+
+  InAct_Freq := InactiveRadioptr.LastDisplayedFreq;
+  so2r_swap := true;
+  1:
   Windows.SetFocus(wh[mweEditableLog]);
   ListView_SetItemState(wh[mweEditableLog], tLogIndex - 1, LVIS_FOCUSED or
     LVIS_SELECTED, LVIS_FOCUSED or LVIS_SELECTED);
-  // LogEnsureVisible;
+//   processreturn;
+      // LogEnsureVisible;
 end;
 
 procedure SetWindowSize;
@@ -6473,8 +6495,8 @@ begin
   Result := true;
   case AnsiIndexText(AnsiUpperCase(CallWindowString),
     ['ADIF', 'CAB', 'CMD', 'COL', 'CWOFF', 'CWON', 'EXIT', 'NOTE', 'OPON',
-      'SUM',
-    'UDP', 'WCY', 'WWV']) of
+    'SUM',
+      'UDP', 'WCY', 'WWV']) of
     0: ProcessMenu(menu_adif);
     1: ProcessMenu(menu_cabrillo);
     2: WinExec('cmd.exe', SW_SHOW);
@@ -8100,7 +8122,7 @@ const
 begin
   Result := CreateWindow(TOOLTIPS_CLASS, nil, WS_POPUP or TTS_NOPREFIX
     {or TTS_BALLOON } or TTS_ALWAYSTIP, 100, 100, 100, 100, Control, 0,
-      hInstance,
+    hInstance,
     nil);
   if Result <> 0 then
   begin
@@ -8940,7 +8962,7 @@ begin
       // We cannot really pick eUSB here. It depends upon the radio mode
     begin
       RData.ExtMode := eSSB;
-        // Maybe call someting to guess based on the freqwuency but set it ahead of time
+      // Maybe call someting to guess based on the freqwuency but set it ahead of time
     end
     else if RData.Mode = CW then
     begin
