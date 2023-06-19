@@ -704,7 +704,7 @@ begin
         push MString
         push BString
         end;
-      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %3s%4s %9d  %12d %8d');
+      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %5s%4s %8d  %12d %8d');
       if contest = WINTERFIELDDAY then
          begin
          inc(totalMults);
@@ -747,7 +747,7 @@ begin
   if Contest <> ARRLFIELDDAY then
      nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', TotalScore)      // 4.108.9
   else
-     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', SumInteger);     // 4.108.9
+     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'     Claimed Score = %d points.', SumInteger);     // 4.108.9
   sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
 end;
 

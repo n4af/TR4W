@@ -206,13 +206,13 @@ begin
               ID[0] := Char(Windows.GetDlgItemText(hwnddlg, 101, @ID[1], 80));
               CMD[0] := Char(Windows.GetDlgItemText(hwnddlg, 102, @CMD[1],
                 255));
-                if (pos(CHR(1),CMD)= 0) then
+                if (pos('1',CMD)= 0) then
                  begin
-                  if (pos(CHR(2),CMD) = 0) then
+                  if (pos('2',CMD) = 0) then
                    begin
-                    if (pos(CHR(3),CMD)= 0) then
+                    if (pos('3',CMD)= 0) then
                      begin
-                      if(pos(CHR(6),CMD) = 0) then
+                      if(pos('6',CMD) = 0) then
                        begin
                         if(pos('_',CMD) =0)     then
                          CMD := '_' + CMD;

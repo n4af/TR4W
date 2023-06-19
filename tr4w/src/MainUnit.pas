@@ -2557,11 +2557,7 @@ function tCreateFont(nHeight, fnWeight: integer; lpszFace: PChar): HFONT;
 begin
   Result := Windows.CreateFont
     (
-<<<<<<< HEAD
-    nHeight + FontSize - 1,
-=======
     nHeight + FontSize -1 ,
->>>>>>> origin/4.123.2
     0,
     0,
     0,
@@ -2617,33 +2613,6 @@ begin
  LucidaConsoleFont := tCreateFont(13, FW_BOLD * ord(BoldFont){FW_DONTCARE}, 'Lucida Console');
 {*)}
 end;
-{
-function DrawEdit(lParam: lParam; wParam: wParam): Cardinal;
-label
- DrawWindow;
-var
- TempBrush : HBRUSH;
- TempWindowColor : integer;
-begin
- Result := 0;
- TempWindowColor := 0;
-
- if lParam = integer(ExchangeWindowHandle) then
- begin
- if OpMode <> CQOpMode then TempBrush := tr4wBrushArray[trGreen];
- goto DrawWindow;
- end;
-
- Exit;
-
- DrawWindow:
- SetBkMode(HDC(wParam), TRANSPARENT);
- SetTextColor(HDC(wParam), TempWindowColor);
-
- Result := TempBrush;
-
-end;
-}
 
 function DrawWindows(lParam: lParam; wParam: wParam): Cardinal;
 label
