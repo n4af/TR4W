@@ -622,7 +622,7 @@ begin
     #13#10'            CQ COUNTER: %d' +
     #13#10'            RUN/SEARCH: %d/%d Qs' +
     #13#10'      UNIQUE CALLSIGNS: %d'#13#10 +
-    #13#10'              SOFTWARE: ' + TR4W_CURRENTVERSION + ' http://www.tr4w.net'#13#10
+    #13#10'            SOFTWARE: ' + TR4W_CURRENTVERSION + ' http://www.tr4w.net'#13#10
     );
   asm add esp,28
   end;

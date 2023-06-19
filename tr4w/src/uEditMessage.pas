@@ -79,7 +79,7 @@ uses uCFG,
 function EditMessageDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam:
   lParam): BOOL; stdcall;
 label
-  1 {, 2};
+  1 , 2;
 var
   i: Cardinal;
   ID: Str80;
@@ -206,21 +206,26 @@ begin
               ID[0] := Char(Windows.GetDlgItemText(hwnddlg, 101, @ID[1], 80));
               CMD[0] := Char(Windows.GetDlgItemText(hwnddlg, 102, @CMD[1],
                 255));
-                if (pos('1',CMD)= 0) then
+                if (pos(#1,CMD)<> 0) then  goto 2
+                 else
                  begin
-                  if (pos('2',CMD) = 0) then
+                  if (pos(#2,CMD) <> 0) then  goto 2
+                   else
                    begin
-                    if (pos('3',CMD)= 0) then
+                    if (pos(#3,CMD) <> 0) then goto 2
+                     else
                      begin
-                      if(pos('6',CMD) = 0) then
+                      if(pos(#6,CMD) <> 0) then goto 2
+                       else
                        begin
-                        if(pos('_',CMD) =0)     then
+                        if(pos('_',CMD) <> 0) then goto 2
+                         else
                          CMD := '_' + CMD;
                     end;
                       end;
                        end;
                         end;
-               DeleteEscapeChars(CMD);
+         2:  DeleteEscapeChars(CMD);
               Windows.WritePrivateProfileString(m, @ID[1], @CMD{@CMD[1]},
                 @TR4W_CFG_FILENAME);
               CheckCommand(@ID, CMD);
