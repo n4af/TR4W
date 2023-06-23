@@ -780,7 +780,7 @@ begin
     SwapRadios;
     SetOpMode(SearchAndPounceOpMode);
     PutCallToCallWindow(DupeInfoCall);
-
+  
     if TwoRadioMode then
     begin
       Send_DE;
@@ -6799,18 +6799,7 @@ begin
       Break;
     end;
   end;
-  {
-  for i := 1 to WindowsColorArraySize do
-  begin
-  if Window = WindowsColorArray[i].wcWindow^ then
-  begin
-  Brush := tr4wBrushArray[WindowsColorArray[i].wcbackground^];
-  Color := tr4wColorsArray[WindowsColorArray[i].wcColor^];
-  Result := True;
-  Break;
-  end;
-  end;
-  }
+  
 end;
 
 (*----------------------------------------------------------------------------*)

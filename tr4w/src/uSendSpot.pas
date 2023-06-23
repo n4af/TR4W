@@ -112,7 +112,7 @@ begin
 
         case wParam of
 {$IF LANG = 'RUS'}
-          110: ShowHelp('ru_dxcluster'); //#отправка_спота');
+          110: ShowHelp('ru_dxcluster'); 
 {$IFEND}
 
            2: goto 1;

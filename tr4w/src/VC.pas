@@ -2805,7 +2805,8 @@ type
     HAMSPIRIT ,
  //   RSGBDXMethod,
     NYQPQP,
-    RCCVHFQP
+    RCCVHFQP,
+    CFOQP
     );
 
 const
@@ -2955,7 +2956,8 @@ const
      'YOTA',
      'HAMSPIRIT', // 4.115.5
       'NYQPQP',
-      'RCCVHFQP'
+      'RCCVHFQP',
+      'CFOQP'
     );
 
 type

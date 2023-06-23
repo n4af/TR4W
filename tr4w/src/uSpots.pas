@@ -595,18 +595,7 @@ begin
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
   end  ;
- {   else
-    if d = BandMapGuardBand then exit // n4af 4.49.4 issue 171
-  else
-  begin
-    DupeInfoCallWindowState := diNone;
-    if not DupeInfoCallWindowCleared then
- //   ClearAltD;
- // DupeInfoCallWindowCleared := True;
-    tClearDupeInfoCall;       // issue 172       // 4.53.5
-  end;
-}
-end;
+ end;
 
 procedure TDXSpotsList.DisplayCallsignOnThisFreq(Freq: integer);
 var
@@ -644,19 +633,7 @@ begin
 //    LOGSUBS2.DoAltZ();
     Exit;
   end;
-{
-  for Index := 0 to FCount - 1 do
-  begin
-    if (Abs(FList^[Index].FFrequency - Freq) < BandMapGuardBand) and (PInteger(@FList^[Index].FCall[1])^ <> tCQAsInteger) then
-    begin
-      PutCallToCallWindow(FList^[Index].FCall);
-      SendMessage(CallWindowHandle, EM_SETSEL, 0, -1);
-      CallsignIsPasted := True;
-//      LOGSUBS2.DoAltZ();
-      Exit;
-    end;
-  end;
-}
+
   if not CallWindowEmpty then
     if CallsignIsPastedFromBandMap then
     begin
