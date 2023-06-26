@@ -635,7 +635,7 @@ var
 //  OrionWaitTime                         : integer = 50;
    ReverseInitialex                     : boolean = False;
    FontSize                             : integer = 2;
-   BandMapSize                          : integer = 125;
+   BandMapSize                          : integer = 2;
 //   BandMapItemWidth                     : integer = 120;
 //   BandMapItemHeight                    : integer = 14;
   QZBRandomOffsetEnable                 : boolean;
@@ -2805,7 +2805,8 @@ type
     HAMSPIRIT ,
  //   RSGBDXMethod,
     NYQPQP,
-    RCCVHFQP
+    RCCVHFQP,
+    CFOQP
     );
 
 const
@@ -2955,7 +2956,8 @@ const
      'YOTA',
      'HAMSPIRIT', // 4.115.5
       'NYQPQP',
-      'RCCVHFQP'
+      'RCCVHFQP',
+      'CFOQP'
     );
 
 type
