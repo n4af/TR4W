@@ -204,7 +204,13 @@ begin
           1: //if not PutCommandFromHintListBox then
             begin
               ID[0] := Char(Windows.GetDlgItemText(hwnddlg, 101, @ID[1], 80));
+
               CMD[0] := Char(Windows.GetDlgItemText(hwnddlg, 102, @CMD[1], 255));
+           {   if (ord(CMD[1]) > 32) then
+               if (ord(CMD[1]) <  122) then
+                begin
+                 CMD[1] := '_';
+                end;    }
               DeleteEscapeChars(CMD);
               Windows.WritePrivateProfileString(m, @ID[1], @CMD{@CMD[1]},
                 @TR4W_CFG_FILENAME);

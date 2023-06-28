@@ -653,44 +653,6 @@ begin
   OutputValue := GetMultArray(Call, TempMode, '');
   Result := (OutputValue and (1 shl Cardinal(TempBand))) <> 0;
  
-  //  Exit;
-
-  //  ClearContestExchange(TempRXData);
-  //  LocateCall(Call, TempRXData.QTH, True);
-  //  TempRXData.Band := Band;
-  //  TempRXData.Mode := Mode;
-
-  //  MultString := 0 {''};
-  //  if MarineOrAirMobileStation(Call) and (NoMultMarineMobile) then Exit; {KK1L: 6.68 Brute force no count /MM or /AM}
-  //  if DoingDXMults {and (ActiveDXMult <> NoCountDXMults)} then GetDXQTH(TempRXData);
-  //  if DoingPrefixMults then SetPrefix(TempRXData);
-
-  //  GetDomesticQTHFromCallsign
-  //  if Contest = RUSSIANDX then
-  //    if RussianID(TempRXData.QTH.CountryID) then
-  //      TempRXData.DomMultQTH := GetRussiaOblastID(Call);
-  {
-    if Contest = UKRAINIAN then
-      if TempRXData.QTH.Country = URCountry then
-        TempRXData.DomMultQTH := 'KV';
-  }
-  //  if Contest = CUPURAL then
-  //  begin
-  //    TempRXData.DomMultQTH := CountryTable.GetGrid(Call, CountryID);
-  //    TempRXData.DomMultQTH[0] := #2;
-  //    PWORD(@TempRXData.DomMultQTH[1])^ := LoWord(TempCardinal);
-  //  end;
-
-  //  if DoingZoneMults then TempRXData.Zone := TempRXData.QTH.Zone;
-
-  //  Sheet.SetMultFlags(TempRXData);
-
-  //  if TempRXData.DXMult then MultString := MultString + MULT_DX; //TempRXData.DXQTH + ' ';
-  //  if TempRXData.PrefixMult then MultString := MultString + MULT_PREFIX; //TempRXData.Prefix + ' ';
-  //  if TempRXData.ZoneMult then MultString := MultString + MULT_ZONE; //IntToStr(TempRXData.Zone);
-
-  //  if Contest in [RUSSIANDX, CUPURAL, UKRAINIAN] then
-  //  if TempRXData.DomesticMult then MultString := MultString + MULT_DOM;
 
 end;
 
@@ -910,11 +872,7 @@ begin
         YODX:
           if Call[1] = 'Y' then
             TempDomMult := CallsignsList.GetIniitialExchange(Call);
-        {
-                WAG:
-                  if Call[1] = 'D' then
-                    TempDomMult := CallsignsList.GetIniitialExchange(Call);
-        }
+        
       end;
     end;
 
