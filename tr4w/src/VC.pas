@@ -746,7 +746,7 @@ const
   tCertificateSA                        : array[tCertificate] of PChar = ('Yes', 'No');
   tCategoryOperatorSA                   : array[tCategoryOperator] of PChar = ('SINGLE-OP', 'MULTI-OP', 'CHECKLOG');
   tCategoryPowerSA                      : array[tCategoryPower] of PChar = ('HIGH', 'LOW', 'QRP');
-  tCategoryTransmitterSA                : array[tCategoryTransmitter] of PChar = ('ONE', 'TWO', 'LIMITED', 'UNLIMITED', 'SWL');
+  tCategoryTransmitterSA                : array[tCategoryTransmitter] of PChar = ('ONE', 'M/S', 'LIMITED', 'UNLIMITED', 'SWL');
 
 var
   CategoryAssisted                      : tCategoryAssisted;

@@ -2313,7 +2313,7 @@ begin
 
             if Command = 'USER1' then
               if CD.GetEntry(Call, data) and (data.User1 <> '') then
-                Exchange := Exchange + data.User1 + ' ';
+                Exchange := Exchange + data.User1 ; // hh
 
             if Command = 'USER2' then
               if CD.GetEntry(Call, data) and (data.User2 <> '') then
@@ -2363,13 +2363,15 @@ begin
 
           end;
           if Exchange <> '' then
-          InitialExchangeEntry := '' + Exchange // Issue151
+          begin
+             getridofpostcedingspaces(Exchange);    // 4.123.9
+          InitialExchangeEntry := '' + Exchange; // Issue151
+          end
             else
             InitialExchangeEntry := CallsignsList.GetIniitialExchange(Call);
           CheckAndSetInitialExchangeCursorPos;
           //          if InitialExchangeOverwrite then Windows.SendMessage(ExchangeWindowHandle, EM_SETSEL, 0, -1);
           //                                      InitialExchangePutUp := True; {KK1L: 6.70 For custom typing any character overwrites the whole exchange.}
-
           Exit;
         end;
 
@@ -2626,16 +2628,13 @@ begin
 
     if InitialExchangeOverwrite then
     begin
-      Windows.SendMessage(wh[mweExchange], EM_SETSEL, 0, -1);
+      Windows.SendMessage(wh[mweExchange], EM_SETSEL, 0, -1);     //hh
       InitialExchangePutUp := ExchangeWindowString <> '';
     end;
 
   end;
 
-  { In 6.40 - made this work all of the time instead of only with
-    above }
-
-  while TempString <> '' do
+ while TempString <> '' do
   begin
     { was FirstString before 6.43 }
 

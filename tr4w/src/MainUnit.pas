@@ -169,11 +169,11 @@ var
   s1, s2, s3, s4: str20;
   Exchw: str20;
   Callw: str20;
-   Act_Freq                              : Cardinal = 0;
-  Act_Band                              : BandType;
-  Inact_Freq                            : Cardinal = 0;
-  Inact_Band                            : BandType;
-  so2r_swap                             : boolean = false;
+  Act_Freq: Cardinal = 0;
+  Act_Band: BandType;
+  Inact_Freq: Cardinal = 0;
+  Inact_Band: BandType;
+  so2r_swap: boolean = false;
 function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 function DeviceIoControlHandler
@@ -740,8 +740,8 @@ begin
   if Call_Found = False then
   begin
     ClearMasterListBox;
-      ClearAltD; // n4af 4.65.2
-      tClearDupeInfoCall; //n4af 4.65.2
+    ClearAltD; // n4af 4.65.2
+    tClearDupeInfoCall; //n4af 4.65.2
   end;
   if TwoRadioState = CallReady then
     TwoRadioState := Idle;
@@ -780,7 +780,7 @@ begin
     SwapRadios;
     SetOpMode(SearchAndPounceOpMode);
     PutCallToCallWindow(DupeInfoCall);
-  
+
     if TwoRadioMode then
     begin
       Send_DE;
@@ -1134,7 +1134,7 @@ begin
 end;
 
 procedure ReturnInSAPOpMode;
- label
+label
   loop;
 var
   n: integer;
@@ -2342,13 +2342,6 @@ begin
     hInstance, nil);
   tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndHandle := tr4whandle;
   wh[mweWholeScreen] := tr4whandle;
-  {
-  v1.dwICC := ICC_LISTVIEW_CLASSES;
-  v1.dwSize := SizeOf(TInitCommonControlsEx);
-  INITCOMMONCONTROLSEX(v1);
-  v1.dwICC := ICC_PROGRESS_CLASS;
-  INITCOMMONCONTROLSEX(v1);
-  }
   wh[mweEditableLog] := CreateEditableLog(tr4whandle, 0, ws * 7,
     MainWindowChildsWidth, 0 {EditableLogWindowHeight}, False);
   SetListViewColor(mweEditableLog);
@@ -2386,51 +2379,9 @@ begin
     if TWindows[e].mweText <> nil then
       SetMainWindowText(e, TWindows[e].mweText)
   end;
-  // Exit;
-
-  // FullTimeWindowHandle := CreateTR4WStaticWindow(1, 0, ws2 * 20, defStyle);
-  // TenMinutsWindow := CreateTR4WStaticWindow(1, StaticWindowHeight, ws2 * 20, defStyle);
-
-  // TotalScoreWindowHandle := CreteTR4WStaticWindow(375, 0, 170, defStyle);
-
-  // QIHeaderWindowHandle := CreateTR4WStaticWindow(MainWindowChildsWidth - RightTopWidth, 0, RightTopWidth, LeftVisNoSunStyle);
-  // MIHeaderWindowHandle := CreateTR4WStaticWindow(MainWindowChildsWidth - RightTopWidth, ws * 3, RightTopWidth, LeftVisNoSunStyle);
-
-  // BeamHeadingWindowHandle :=
-  // CreateTR4WStaticWindow(MainWindowChildsWidth - RightTopWidth, StaticWindowHeight * 6 + 1, RightTopWidth, defStyle);
-
-  // LocalTimeWindowHandle := CreateTR4WStaticWindow(col9, line1, 4 * ws, defStyle);
-
-  // tPreviousDupeQSOsWndHandle := CreateEditableLog(tr4whandle, col1, ws * 7, MainWindowChildsWidth, EditableLogHeight, False);
-  tPreviousDupeQSOsWndHandle := CreateEditableLog(tr4whandle, 0, ws * 7, 0, 0,
-    False);
-  // Windows.SetWindowLong(tPreviousDupeQSOsWndHandle, GWL_STYLE, $4000C005);
-
-  //--------------------------
-  // AutoSendCountWindowHandle := tCreateStaticWindow(#175, WS_CHILD or SS_NOTIFY or SS_CENTER, col4, line1, ws, ws, tr4whandle, 0);
-  asm
-// mov edx,[SymbolFont]
-// call tWM_SETFONT
-  end;
 
   tWM_SETFONT(wh[mweAutoSendCount], SymbolFont);
   DisplayAutoSendCharacterCount;
-
-  // QSOsWithThisStationWindowHandle := CreateTR4WStaticWindow(col5 - 2 * ws, line1, 2 * ws, defStyle);
-
-  // B4StatusWindowHandle := nfCreateTR4WStaticWindow('QSO B4', 11 * ws, Line3, 4 * ws, uVisStyle);
-  // MasterStatusWindowHandle := nfCreateTR4WStaticWindow('MASTER', 11 * ws, Line4, 4 * ws, uVisStyle);
-  // NewMultIndicatorWindowHandle := nfCreateTR4WStaticWindow('MULT', 11 * ws, Line5, 4 * ws, uVisStyle);
-
-  // CountryNameWindowHandle := CreateTR4WStaticWindow(col6, line1, 10 * ws, defStyle);
-  //--------------------------
-
-  // BandModeWindowHandle := CreateTR4WStaticWindow(col1, line1, ColumnsArray[logColBand].Width * ws, DefStyleNoSun);
-  // DateWindowHandle := CreateTR4WStaticWindow(ColumnsArray[logColBand].Width * ws, line1, ColumnsArray[logColDate].Width * ws, DefStyleNoSun);
-  // ClockWindowHandle := CreateTR4WStaticWindow((ColumnsArray[logColDate].Width + ColumnsArray[logColBand].Width) * ws, line1, ColumnsArray[logColTime].Width * ws, DefStyleNoSun);
-
-  // QSONumberWindowHandle := //CreateTR4WStaticWindow((ColumnsArray[logColDate].Width + ColumnsArray[logColBand].Width + ColumnsArray[logColTime].Width) * ws, line1, ColumnsArray[logColNumberSent].Width * ws, defStyle);
-  // tCreateStaticWindow(nil, defStyle {RightStyle}, (ColumnsArray[logColDate].Width + ColumnsArray[logColBand].Width + ColumnsArray[logColTime].Width) * ws, line1, 4 {ColumnsArray[logColNumberSent].Width} * ws, ws * 2, tr4whandle, 0);
 
   tWM_SETFONT(wh[mweQSONumber], MainWindowEditFont {QSONumberFont});
 
@@ -2478,7 +2429,7 @@ begin
     0, EditableLogHeight + ws * 13 {line6}, MainWindowChildsWidth, ws,
     tr4whandle, MainWindowPCLID, hInstance, nil);
   asm
- mov edx,[MainFont]
+ mov edx,[MainFixedFont] //hh
  call tWM_SETFONT
   end;
   SendMessage(wh[mwePossibleCall], LB_SETCOLUMNWIDTH, 5 * ws {19 * ws2}, 0);
@@ -2557,7 +2508,7 @@ function tCreateFont(nHeight, fnWeight: integer; lpszFace: PChar): HFONT;
 begin
   Result := Windows.CreateFont
     (
-    nHeight + FontSize -1 ,
+    nHeight + FontSize - 1,
     0,
     0,
     0,
@@ -2818,11 +2769,11 @@ begin
       RunAutoCQ;
 
     menu_alt_edit:
-    begin
-     tAltE ;
-     if SO2R_Swap then
-     processreturn;
-    end;
+      begin
+        tAltE;
+        if SO2R_Swap then
+          processreturn;
+      end;
 
     menu_alt_savetofloppy:
       SaveLogFileToFloppy;
@@ -4676,7 +4627,6 @@ var
 begin
   Windows.ZeroMemory(@ie, SizeOf(ie));
   ie := InitialExchangeEntry(CallWindowString);
-  // issue151 caused cursor to stay in call window
   SetMainWindowText(mweExchange, @ie[1]);
   if LeaveCursorInCallWindow then
     tCallWindowSetFocus;
@@ -5623,15 +5573,15 @@ begin
 end;
 
 procedure tAltE;
- label
- 1;
+label
+  1;
 begin
   if tPreviousDupeQSOsShowed then
     Exit;
   Act_Freq := ActiveRadioPtr.filteredstatus.freq;
   Act_Band := ActiveBand;
   if InactiveRadioptr.LastDisplayedFreq = 0 then
-  goto 1;
+    goto 1;
   inAct_Band := InActiveRadioPtr.BandMemory;
 
   InAct_Freq := InactiveRadioptr.LastDisplayedFreq;
@@ -5640,8 +5590,8 @@ begin
   Windows.SetFocus(wh[mweEditableLog]);
   ListView_SetItemState(wh[mweEditableLog], tLogIndex - 1, LVIS_FOCUSED or
     LVIS_SELECTED, LVIS_FOCUSED or LVIS_SELECTED);
-//   processreturn;
-      // LogEnsureVisible;
+  //   processreturn;
+        // LogEnsureVisible;
 end;
 
 procedure SetWindowSize;
@@ -6172,8 +6122,8 @@ end;
 
 procedure PlaceCaretToTheEnd(wnd: HWND);
 begin
-  SendMessage(wnd, EM_SETSEL, 255, 255);
-end;
+  SendMessage(wnd, EM_SETSEL, 255, 255); // hh
+  end;
 
 {
 function TryToCheckTheLatestVersion: boolean;
@@ -6799,7 +6749,7 @@ begin
       Break;
     end;
   end;
-  
+
 end;
 
 (*----------------------------------------------------------------------------*)
