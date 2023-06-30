@@ -448,7 +448,7 @@ const
  (crCommand: 'EXCHANGE WINDOW S&P BACKGROUND';crAddress: pointer(48);                      crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:10; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther),
  (crCommand: 'FARNSWORTH ENABLE';             crAddress: @FarnsworthEnable;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean),
  (crCommand: 'FARNSWORTH SPEED';              crAddress: @FarnsworthSpeed;                crMin:0;  crMax:99;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),
- (crCommand: 'FONT SIZE';                     crAddress: @fontsize;                       crMin:0;  crMax:5;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger),
+ (crCommand: 'FONT SIZE';                     crAddress: @fontsize;                       crMin:0;  crMax:2;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger),
  (crCommand: 'FOOT SWITCH MODE';              crAddress: pointer(9);                      crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList; cfFunc: cfAll; crType: ctOther),
  (crCommand: 'FOOT SWITCH PORT';              crAddress: @ActiveFootSwitchPort;           crMin:0;  crMax:0;       crS: csRem; crA:0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctPortLPT),
  (crCommand: 'FREQUENCY ADDER RADIO ONE';     crAddress: @Radio1.FrequencyAdder;          crMin:0;  crMax:MAXWORD-1; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger),

@@ -2356,7 +2356,7 @@ begin
     + MainWindowCaptionAndHeader + EditableLogHeight + ws * 14,
     {SWP_SHOWWINDOW or }SWP_NOMOVE);
 
-  for e := Low(TMainWindowElement) to High(TMainWindowElement) do
+  for e := Low(TMainWindowElement) to High(TMainWindowElement) do  
   begin
     if TWindows[e].mweiStyle <= 2 then
       Continue;
@@ -2429,7 +2429,7 @@ begin
     0, EditableLogHeight + ws * 13 {line6}, MainWindowChildsWidth, ws,
     tr4whandle, MainWindowPCLID, hInstance, nil);
   asm
- mov edx,[MainFixedFont] //hh
+ mov edx,[MainFont] //hh
  call tWM_SETFONT
   end;
   SendMessage(wh[mwePossibleCall], LB_SETCOLUMNWIDTH, 5 * ws {19 * ws2}, 0);
@@ -2537,7 +2537,7 @@ begin
  MainFont := tCreateFont(ws - 2+FontSize, FW_BOLD * ord(BoldFont), @MainFontName[1]);
  CATWindowFont := tCreateFont(22, FW_EXTRABOLD, 'Lucida Console');
 
- MainWindowEditFont := tCreateFont(ws + 3, FW_EXTRABOLD, lcfn);
+ MainWindowEditFont := tCreateFont(ws + 3, FW_EXTRABOLD, lcfn);   
 
  {AutoSend}
  SymbolFont := tCreateFont(ws, FW_SEMIBOLD, 'Symbol');
@@ -2768,7 +2768,7 @@ begin
     menu_alt_autocqresume:
       RunAutoCQ;
 
-    menu_alt_edit:
+    menu_alt_SO2R_edit:
       begin
         tAltE;
         if SO2R_Swap then
@@ -3573,9 +3573,9 @@ begin
   begin
     tPTTVIACAT(false);
   end;
+
   if OpMode = CQOpMode then
   begin
-
     if SwitchNext then //4.52.3
     begin
       if (CallWindowString <> '') then // 4.92.2

@@ -2173,7 +2173,7 @@ const
   menu_alt_wkmode                       = 10300;
   menu_alt_autocqresume                 = 10301;
   menu_alt_dupecheck                    = 10302;
-  menu_alt_edit                         = 10303;
+  menu_alt_SO2R_edit                         = 10303;
   menu_alt_savetofloppy                   = 10304;
   menu_alt_swapmults                    = 10305;
   menu_alt_incnumber                    = 10306;

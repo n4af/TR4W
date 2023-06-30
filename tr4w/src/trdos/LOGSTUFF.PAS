@@ -3915,7 +3915,13 @@ var
 
 begin
   ProcessRSTAndQSONumberExchange := False;
-
+         if (CallWindowString <> '') then       // 4.123.10
+          if ((contest =  SACCW ) or (contest =  SACSSB )) then
+           if (rxdata.qth.countryid = 'UA') or (rxdata.qth.countryid = 'EU') then
+            begin
+                initializeqso;
+                exit;
+            end;
   LookForCutNumbers(Exchange);
 
   if StringIsAllNumbers(Exchange) then
@@ -3931,7 +3937,7 @@ begin
     Exchange := RemoveFirstString(Exchange);
     Val(Exchange, RXData.NumberReceived, code);
     if code <> 0 then
-      Exit;
+      exit;
     ProcessRSTAndQSONumberExchange := True;
   end
   else

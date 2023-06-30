@@ -57,7 +57,7 @@ const
   RC_WKmode_HK                          = #9'Alt+A';   // 4.60.1
   RC_AUTOCQRESUME_HK                    = #9'Alt+C';
   RC_DUPECHECK_HK                       = #9'Alt+D';
-  RC_EDIT_HK                            = #9'Alt+E';
+  RC_EDIT_SO2R_HK                       = #9'Alt+E';
   RC_BACKUPLOG_HK                       = #9'Alt+F';    // 4.56.11
   RC_SWAPMULTVIEW_HK                    = #9'Alt+G';
   RC_INCNUMBER_HK                       = #9'Alt+I';
@@ -255,7 +255,7 @@ const
     (mrText: RC_BANDUP + RC_BANDUP_HK; mrId: menu_alt_bandup),
     (mrText: RC_AUTOCQRESUME + RC_AUTOCQRESUME_HK; mrId: menu_alt_autocqresume),
     (mrText: RC_DUPECHECK + RC_DUPECHECK_HK; mrId: menu_alt_dupecheck),
-    (mrText: RC_EDIT + RC_EDIT_HK; mrId: menu_alt_edit),
+    (mrText: RC_EDIT + RC_EDIT_SO2R_HK; mrId: menu_alt_SO2R_edit),
     (mrText:  RC_BACKUPLOG + RC_BACKUPLOG_HK;mrId: menu_alt_savetofloppy),
     (mrText: RC_SWAPMULTVIEW + RC_SWAPMULTVIEW_HK; mrId: menu_alt_swapmults),
     (mrText: RC_INCNUMBER + RC_INCNUMBER_HK; mrId: menu_alt_incnumber),

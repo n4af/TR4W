@@ -179,7 +179,7 @@ begin
 
         //        MakeEditWindows;
         //        EditabledLogFocused := True;
-        for IndexInMap := 180 to 184 do
+        for IndexInMap := 180 to 184 do            
           Windows.SendDlgItemMessage(hwnddlg, IndexInMap, EM_SETLIMITTEXT, 2,
             0);
         {ComputerID}
