@@ -3573,7 +3573,6 @@ begin
   begin
     tPTTVIACAT(false);
   end;
-
   if OpMode = CQOpMode then
   begin
     if SwitchNext then //4.52.3
@@ -4212,7 +4211,6 @@ begin
   { Need this in case we exit soon }
   Windows.ZeroMemory(@RData.Callsign, SizeOf(RData.Callsign));
   RData.Callsign := Call;
-
   if (ExchangeString = '') and not (ActiveExchange in [RSTNameAndQTHExchange,
     RSTAndPOTAPark]) then // These two exchanges allow blank exchanges
   begin

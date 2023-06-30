@@ -3917,7 +3917,7 @@ begin
   ProcessRSTAndQSONumberExchange := False;
          if (CallWindowString <> '') then       // 4.123.10
           if ((contest =  SACCW ) or (contest =  SACSSB )) then
-           if (rxdata.qth.countryid = 'UA') or (rxdata.qth.countryid = 'EU') then
+           if (rxdata.qth.countryid = 'UA') or (rxdata.qth.countryid = 'EU') or (rxdata.qth.countryid = 'UA9') or (rxdata.qth.countryid = 'UA2') then
             begin
                 initializeqso;
                 exit;
