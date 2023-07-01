@@ -3575,6 +3575,7 @@ begin
   end;
   if OpMode = CQOpMode then
   begin
+    ctyGetCountryID(callwindowstring);
     if SwitchNext then //4.52.3
     begin
       if (CallWindowString <> '') then // 4.92.2

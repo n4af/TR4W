@@ -659,6 +659,7 @@
   RC_DUPECHECK                          = 'Dupe check';
   RC_EDIT                               = 'Edit';
   RC_BACKUPLOG                         = 'Backup Log';
+//  RC_EDIT_SO2R                          = 'Edit SO2R';
   RC_SWAPMULTVIEW                       = 'Swap mult view';
   RC_INCNUMBER                          = 'Increment number';
   RC_TOOGLEMB                           = 'Toogle multiplier bell';

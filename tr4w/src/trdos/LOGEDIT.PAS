@@ -2364,8 +2364,8 @@ begin
           end;
           if Exchange <> '' then
           begin
-             getridofpostcedingspaces(Exchange);    // 4.123.9
-          InitialExchangeEntry := '' + Exchange; // Issue151
+    //         getridofpostcedingspaces(Exchange);    // 4.123.9
+   //       InitialExchangeEntry := '' + Exchange + ' '; // Issue151
           end
             else
             InitialExchangeEntry := CallsignsList.GetIniitialExchange(Call);
