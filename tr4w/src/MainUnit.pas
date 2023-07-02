@@ -2101,7 +2101,7 @@ begin
         // if length(TestString) <> 4 then TestString := '';
         if TestString = '' then
           Exit;
-        logger.debug('[ExchangeWindowChange] Setting TempExchange.QTHString to (%)', [TestString]);
+        logger.debug('[ExchangeWindowChange] Setting TempExchange.QTHString to (%s)', [TestString]);
         TempExchange.QTHString := TestString;
         DQTH := FoundDomesticQTH(TempExchange);
         if not DQTH then
