@@ -24,11 +24,11 @@ const
 
 
 
-<<<<<<< HEAD
- TR4W_CURRENTVERSION_NUMBER            = '4.124.0' ;  // N4af     New Release
-=======
- TR4W_CURRENTVERSION_NUMBER            = '4.123.7' ;  // N4af     New Release
->>>>>>> origin/4.123.7
+
+ TR4W_CURRENTVERSION_NUMBER            = '4.124.1:' ;  // N4af     New Release
+
+
+
 
 
 
