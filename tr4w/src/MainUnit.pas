@@ -780,7 +780,7 @@ begin
     SwapRadios;
     SetOpMode(SearchAndPounceOpMode);
     PutCallToCallWindow(DupeInfoCall);
-
+  
     if TwoRadioMode then
     begin
       Send_DE;
@@ -6748,7 +6748,11 @@ begin
       Break;
     end;
   end;
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> origin/4.123.7
 end;
 
 (*----------------------------------------------------------------------------*)
