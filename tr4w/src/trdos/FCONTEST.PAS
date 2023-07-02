@@ -1014,7 +1014,7 @@ begin
         InitialExchangeCursorPos := AtStart;
       end;
 
-    RAC_CANADA_DAY, RAC_CANADA_WINTER:
+   CANADA_DAY, CANADA_WINTER:
       begin
       if MyCountry <> 'VE' then      // 4.82.1
          MyState := '';

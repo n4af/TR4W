@@ -304,7 +304,7 @@ begin
                   IRTS:
                    SetCommentAndEnableEditControl(TC_EnterYourCountyCode,icmyState);
 
-              RAC_CANADA_DAY, RAC_CANADA_WINTER:
+              CANADA_DAY, CANADA_WINTER:
                 SetCommentAndEnableEditControl(TC_ENTERYOURPROVINCEID, icmyState);
 
               REFSSB, REFCW:
@@ -415,7 +415,7 @@ begin
 
               RDA, RUSSIANDX, RU3AXMEMORIAL: DisplayCheckBox(TC_RUSSIA);
               CQIR: DisplayCheckBox(TC_IRELAND);
-              RAC_CANADA_DAY, RAC_CANADA_WINTER: DisplayCheckBox(TC_CANADA);
+              CANADA_DAY, CANADA_WINTER: DisplayCheckBox(TC_CANADA);
               REFSSB, REFCW: DisplayCheckBox(TC_FRANCE);
               IRTS: DisplayCheckBox(TC_IRTS);   // 4.93.2
              EUDX:
