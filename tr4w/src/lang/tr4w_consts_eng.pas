@@ -657,7 +657,7 @@
   RC_CTRLJ                             = 'Open Configuration commands';
   RC_AUTOCQRESUME                       = 'Auto-CQ resume';
   RC_DUPECHECK                          = 'Dupe check';
-  RC_EDIT                               = 'Edit';
+  RC_EDIT                               = 'SO1R-Edit or SO2R-SWAP';
   RC_BACKUPLOG                         = 'Backup Log';
 //  RC_EDIT_SO2R                          = 'Edit SO2R';
   RC_SWAPMULTVIEW                       = 'Swap mult view';
