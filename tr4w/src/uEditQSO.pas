@@ -107,6 +107,7 @@ const
   FLD_NAME = 158;
   FLD_QTHSTRING = 160;
   FLD_POSTALCODE = 162;
+  FLD_OPERATOR = 167;
   {
     FLD_HOUR                              = 180;
     FLD_MINUTE                            = 181;
@@ -340,6 +341,8 @@ begin
         if EditableQSORXData.ceRadio = RadioTwo then
           Windows.SetDlgItemText(hwnddlg, FLD_RADIO, 'RADIO TWO');
 
+        SetDlgItemText(hwnddlg, FLD_OPERATOR, @EditableQSORXData.ceOperator);  // Issue 601 NY4I
+
         EnableWindowTrue(hwnddlg, FLD_SAVE_BUTTON);
         Windows.SetFocus(GetDlgItem(hwnddlg, FLD_CALLSIGN));
         SendDlgItemMessage(hwnddlg, FLD_CALLSIGN, EM_SETSEL, 16, 16); //в конец
@@ -452,6 +455,7 @@ var
   IndexInMap: integer;
   lpNumberOfBytesWritten: Cardinal;
   TempInteger: integer;
+  tempOperator: string;
   lpTranslated: LongBool;
   //  TempString                            : ShortString;
   TempWord: Word;
@@ -664,6 +668,19 @@ begin
       SizeOf(EditableQSORXData.RSTReceived));
     EditableQSORXData.RSTReceived := TempInteger {TempWord};
   end;
+
+  {Operator}
+
+  Windows.ZeroMemory(@EditableQSORXData.ceOperator,Windows.lstrlen(EditableQSORXData.ceOperator));
+  tempOperator := GetDialogItemText(eq_handle, FLD_OPERATOR);
+  Move(tempOperator[1], EditableQSORXData.ceOperator[0], length(TempOperator) * sizeof(char));
+  //EditableQSORXData.ceOperator[1] := Char(Windows.GetDlgItemText(eq_handle,
+  //  FLD_OPERATOR, @EditableQSORXData.ceOperator,
+  //  Windows.lstrlen(EditableQSORXData.ceOperator) - 1));
+
+  //EditableQSORXData.ceOperator[0] := Char(Windows.GetDlgItemText(eq_handle,
+  //  FLD_OPERATOR, @EditableQSORXData.ceOperator[1],
+   // Windows.lstrlen(EditableQSORXData.ceOperator) - 1));
 
   IndexInMap := IndexOfItemInLogForEdit;
   {SAP}
