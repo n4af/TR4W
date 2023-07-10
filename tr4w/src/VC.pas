@@ -635,7 +635,7 @@ var
 //  OrionWaitTime                         : integer = 50;
    ReverseInitialex                     : boolean = False;
    FontSize                             : integer = 2;
-   BandMapSize                          : integer = 2;
+   BandMapSize                          : integer = 3;
 //   BandMapItemWidth                     : integer = 120;
 //   BandMapItemHeight                    : integer = 14;
   QZBRandomOffsetEnable                 : boolean;
