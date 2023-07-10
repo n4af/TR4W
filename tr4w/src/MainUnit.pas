@@ -3343,10 +3343,31 @@ begin
         Windows.ZeroMemory(@TempCallstring, SizeOf(TempCallstring));
         TempCallstring := QuickEditResponse(TC_CURRENT_OPERATOR_CALLSIGN, 6);
         if length(TempCallstring) > 0 then
-        begin
-          Windows.CopyMemory(@CurrentOperator, @TempCallstring[1], 6);
-          SetMainWindowText(mweCurrentOperator, CurrentOperator);
-        end;
+           begin
+           if IsValidUSPrefix(TempCallString) then
+              begin
+              if IsValidUSCallsign(TempCallString) then
+                 begin
+                 Windows.CopyMemory(@CurrentOperator, @TempCallstring[1], 6);
+                 SetMainWindowText(mweCurrentOperator, CurrentOperator);
+                 Sheet.SaveRestartFile;  // Issue 661 ny4i
+                 end
+              else
+                 begin
+                 ShowMessage('Login call does not look like a callsign');
+                 end;
+              end
+           else if IsValidCallsign(TempCallString) then
+              begin
+              Windows.CopyMemory(@CurrentOperator, @TempCallstring[1], 6);
+              SetMainWindowText(mweCurrentOperator, CurrentOperator);
+              Sheet.SaveRestartFile;     // Issue 661 ny4i
+              end
+           else
+              begin
+              ShowMessage('Login call does not look like a callsign');
+              end;
+           end;
         // ShowMessage(CurrentOperator);
       end;
 
@@ -3573,6 +3594,8 @@ begin
   begin
     tPTTVIACAT(false);
   end;
+
+
   if OpMode = CQOpMode then
   begin
     ctyGetCountryID(callwindowstring);
@@ -4244,10 +4267,14 @@ begin
   begin
     RData.Band := Band;
     RData.Mode := Mode;
-    if ActiveRadioPtr^.nextExtendedMode = eNoMode then
-    begin
-      SetExtendedModeFromMode(RData);
-    end;
+    if RData.ExtMode = eNoMode then
+       begin
+       if ActiveRadioPtr^.nextExtendedMode = eNoMode then
+          begin
+          SetExtendedModeFromMode(RData);
+          end;
+       end;
+  
     // Not the way to do this as the radio does not know the extendedMode--just Mode. NY4I
     //RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3
     RData.NumberSent := TotalContacts + 1;
@@ -4293,15 +4320,17 @@ begin
 
   RData.Band := Band;
   RData.Mode := Mode;
-  if ActiveRadioPtr^.CurrentStatus.ExtendedMode = eNoMode then
-    // This should have been set by radio object but what is nextExtendedMode
-  begin
-    SetExtendedModeFromMode(RData);
-  end
-  else
-  begin
-    Rdata.ExtMode := ActiveRadioPtr^.CurrentStatus.ExtendedMode;
-  end;
+  if RData.ExtMode = eNoMode then    // if ExtMode was already set, no reason to look to the radio for it. WSJT-X sets it for example ny4i Issue 658
+     begin
+     if ActiveRadioPtr^.CurrentStatus.ExtendedMode = eNoMode then     // This should have been set by radio object but what is nextExtendedMode
+        begin
+        SetExtendedModeFromMode(RData);
+        end
+     else
+        begin
+        Rdata.ExtMode := ActiveRadioPtr^.CurrentStatus.ExtendedMode;
+        end;
+     end;
   // ny4i Don't do this please - Issue 466 -=> Rdata.ExtMode := ActiveRadioptr^.CurrentStatus.ExtendedMode ; // 4.93.3
   RData.NumberSent := TotalContacts + 1;
   RData.Frequency := Freq;
@@ -6454,105 +6483,7 @@ begin
   end; // case
   Exit;
 
-  (*
-  {COL}
-  if PInteger(@CallWindowString[0])^ = 1280262915 then
-  begin
-  ProcessMenu(menu_colors);
-  Exit;
-  end;
-
- {$IF tDebugMode}
- // showint(PInteger(@CallWindowString[0])^);
- {$IFEND}
-
-  {CMD}
-  if PInteger(@CallWindowString[0])^ = 1145914115 then
-  begin
-  WinExec('cmd.exe', SW_SHOW);
-  Exit;
-  end;
-
-  {WWV}
-  if PInteger(@CallWindowString[0])^ = $56575703 then
-  begin
-  SendViaTelnetSocket('SH/WWV');
-  Exit;
-  end;
-
-  {WCY}
-  if PInteger(@CallWindowString[0])^ = $59435703 then
-  begin
-  SendViaTelnetSocket('SH/WCY');
-  Exit;
-  end;
-
-  {CAB}
-  if PInteger(@CallWindowString[0])^ = $42414303 then
- begin
-  ProcessMenu(menu_cabrillo);
-  Exit;
- end;
-
- {SUM}
- if PInteger(@CallWindowString[0])^ = $4D555303 then
- begin
-  ProcessMenu(menu_summary);
-  Exit;
- end;
- end;
-
- if length(CallWindowString) = 4 then
- begin
- {$IF tDebugMode}
- // showint(PInteger(@CallWindowString[1])^);
- {$IFEND}
-
- {ADIF}
- if PInteger(@CallWindowString[1])^ = $46494441 then
- begin
-  ProcessMenu(menu_adif);
-  Exit;
- end;
-
- {CWON}
- if CallWindowString = 'CWON' then
-  begin
-  CWEnabled := true;
-  Exit;
-  end;
- {CALC}
- {
- if PInteger(@CallWindowString[1])^ = $434C4143 then
- begin
-  ProcessMenu(item_calculator);
-  Exit;
- end;
- }
- {NOTE}
- if PInteger(@CallWindowString[1])^ = $45544F4E then
- begin
-  ProcessMenu(menu_ctrl_note);
-  Exit;
- end;
-
- {OPON}
- if CallWindowString = 'OPON' then
-  begin
-  ProcessMenu(menu_login);
-  Exit;
-  end;
- {EXIT}
- if PInteger(@CallWindowString[1])^ = $54495845 then
- begin
-  ProcessMenu(menu_exit);
-  Exit;
- end;
-
- end;
-
- Result := False;
- *)
+  
 end;
 
 procedure ClearMultSheet_CtrlC;

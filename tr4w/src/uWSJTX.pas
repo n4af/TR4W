@@ -298,12 +298,17 @@ var
   grid: string;
   nResult: integer;
   shortStr: shortString;
+  len: integer;
+  newMessage: string;
+  n: integer;
+  callIndex: integer;
+  gridIndex: integer;
 
 begin
   //FUDP.IdUDPServer1.Bindings := '127.0.0.1:2237,[::]:2237';
   index := 0;
   peerPort := ABinding.PeerPort;
-
+  newMessage := '';
   //  peerPort := 2237;
 
   while index < Length(AData) do
@@ -411,91 +416,97 @@ begin
               //                DF,mode, message,timeToStr(ztime), FloatToStr(DT), tm]);
 
               if MidStr(message, 1, 2) = 'CQ' then
-              begin
-                slCQMessage.Clear;
-                slCQMessage.Delimiter := ' ';
-                  // cq ny4i el87     a1   OR cq fd ny4i el87  a1
-                slCQMessage.DelimitedText := message;
-                logger.debug('[uWSJTX] Processing message %s', [message]);
-                if slCQMessage[0] = 'CQ' then
-                begin
-                  for i := 1 to slCQMessage.Count - 1 do
-                    // We start at one to skip the CQ
-                  begin
-                    if not foundCall then
+                 begin
+                 slCQMessage.Clear;
+                 slCQMessage.Delimiter := ' ';
+                 // cq ny4i el87     a1   OR cq fd ny4i el87  a1
+                 slCQMessage.DelimitedText := message;
+                 logger.debug('[uWSJTX] Processing message %s', [message]);
+                 if slCQMessage[0] = 'CQ' then
                     begin
-                      if IsValidCallsign(slCQMessage[i]) then
-                      begin
-                        foundCall := true;
-                        DXCall := slCQMessage[i];
-                        logger.debug('Found callsign %s', [DXCall]);
-                      end;
-                    end
-                    else if not foundGrid then
-                    begin
-                      shortStr := slCQMessage[i];
-                      if LooksLikeAGrid(shortStr) then
-                      begin
-                        foundGrid := true;
-                        grid := slCQMessage[i];
-                        logger.debug('Found grid %s', [grid]);
-                      end;
+                    for i := 1 to slCQMessage.Count - 1 do
+                       // We start at one to skip the CQ
+                       begin
+                       if not foundCall then
+                          begin
+                          if IsValidCallsign(slCQMessage[i]) then
+                             begin
+                             foundCall := true;
+                             CallIndex := i;
+                             DXCall := slCQMessage[i];
+                             logger.debug('Found callsign %s', [DXCall]);
+                             end;
+                         end
+                       else if not foundGrid then
+                          begin
+                          shortStr := slCQMessage[i];
+                          if LooksLikeAGridIgnoreAE(shortStr) then
+                             begin
+                             foundGrid := true;
+                             gridIndex := i;
+                             grid := slCQMessage[i];
+                             logger.debug('Found grid %s', [grid]);
+                             end;
+                       end;
+
+                       
+                       if (foundCall) and (foundGrid) then
+                          begin
+                          Break;
+                          end;
                     end;
-                    if (foundCall) and (foundGrid) then
+                 if (not foundCall) or (not foundGrid) then
                     begin
-                      Break;
-                    end;
-                  end;
-                  if (not foundCall) or (not foundGrid) then
-                  begin
                     logger.Warn('Either DXCall (%s) or grid (%s) was not present in CQ message: %s', [DXCall, grid, message]);
-                  end;
-                  call := DXCall;
-                  if call <> '' then
-                  begin
+                    end;
+                 call := DXCall;
+                 if call <> '' then
+                    begin
                     // Here we cheat a little bit on Frequency. The idea is that the status command is sent enough that it gives
                     // us the frequency. So turn the frequency into the band.
                     // We could also use the radio object to check
                     GetBandMapBandModeFromFrequency(frequency, TempBand,
-                      TempMode);
+                                                     TempMode);
                     TempMode := Digital;
-                      // override TempMode since we know it is digital. Until a contest differentiates between FT8 and FT4 that is ok
+                     // override TempMode since we know it is digital. Until a contest differentiates between FT8 and FT4 that is ok
                     if VisibleLog.CallIsADupe(call, TempBand, TempMode) then
-                    begin
-                      logger.debug('[uWSJTX] %s is a DUPE', [DXCall]);
-                      HighLightCall(message, 1, id);
-                    end
+                       begin
+                       logger.debug('[uWSJTX] %s is a DUPE', [DXCall]);
+                       HighLightCall(DXCall, 1, id);
+                       end
                     else if VisibleLog.DetermineIfNewMult(call, TempBand,
-                      TempMode) then
-                    begin
-                      logger.debug('[uWSJTX] %s is a MULT (from callsign',
-                        [DXCall]);
-                      HighLightCall(message, 2, id);
-                        // Pass back id as given to us
-                    end
+                                                           TempMode) then
+                       begin
+                       logger.debug('[uWSJTX] %s is a MULT (from callsign',
+                                                             [DXCall]);
+                       
+                       HighlightCall(grid, 2, id);
+                        // Pass back id as given to us but without ? or a1..a7, etc.
+                       end
                     else
-                    begin
-                      if grid <> '' then
+                       begin
+                       if grid <> '' then
                         // Even if gridFields (2 digit) grid, the DeterimeIfNewDomesticMult only checks left 2 bytes
-                      begin
-                        logger.debug('[uWSJTX] Checking if grid %s is a multiplier (call=%s)', [AnsiLeftStr(grid, 2), DXCall]);
-                        VisibleLog.DetermineIfNewDomesticMult(grid, TempBand,
-                          TempMode, nResult);
-                        if nResult = 1 then
-                        begin
-                          logger.debug('[uWSJTX] %s is a domestic MULT',
-                            [AnsiLeftStr(grid, 2)]);
-                          HighLightCall(message, 2, id);
-                            // Pass back id as given to us
-                        end
-                        else
-                        begin
+                          begin
+                          logger.debug('[uWSJTX] Checking if grid %s is a multiplier (call=%s)', [AnsiLeftStr(grid, 2), DXCall]);
+                          VisibleLog.DetermineIfNewDomesticMult(grid, TempBand,
+                                                                TempMode, nResult);
+                          if nResult = 1 then
+                             begin
+                             logger.debug('[uWSJTX] %s is a domestic MULT',
+                                           [AnsiLeftStr(grid, 2)]);
+                             HighLightCall(grid, 2, id);
+                             // Pass back id as given to us
+                             end
+
+                       else
+                          begin
                           logger.debug('[uWSJTX] %s is NOT a domestic MULT',
-                            [AnsiLeftStr(grid, 2)]);
-                        end;
-                      end;
-                    end;
-                  end // if call <> ...
+                                       [AnsiLeftStr(grid, 2)]);
+                          end;
+                       end;
+                     end;
+                     end // if call <> ...
                   else
                   begin
                     logger.warn('[uWSJTX] Call is blank for message = ' +
@@ -670,56 +681,55 @@ begin
   if color = 1 then
     // DUPE  defaults to red - Add code to pull from config if there
 
-  begin
-    logger.debug('[uWSJTX] Highlighting call %s as a dupe with RGB colors %3d:%3d:%3d', [sCall, colorsDupeBack.R, colorsDupeBack.G, colorsDupeBack.B]);
-    // Background QColor first
+     begin
+     logger.debug('[uWSJTX] Highlighting call %s as a dupe with RGB colors %3d:%3d:%3d', [sCall, colorsDupeBack.R, colorsDupeBack.G, colorsDupeBack.B]);
+     // Background QColor first
 
-    Pack(AData, colorType); // RGB
-    PackFF00(AData); // Alpha
-    Pack(AData, Byte(colorsDupeBack.R));
-    Pack(AData, Byte(0)); // Red
-    Pack(AData, Byte(colorsDupeBack.G));
-    Pack(AData, Byte(0)); // Green
-    Pack(AData, Byte(colorsDupeBack.B));
-    Pack(AData, Byte(0)); // Blue
-    PackFF00(AData); //Pack(AData,Word(65280));   // R
-    Pack(AData, Word(0)); // Padding
+     Pack(AData, colorType); // RGB
+     PackFF00(AData); // Alpha
+     Pack(AData, Byte(colorsDupeBack.R));
+     Pack(AData, Byte(0)); // Red
+     Pack(AData, Byte(colorsDupeBack.G));
+     Pack(AData, Byte(0)); // Green
+     Pack(AData, Byte(colorsDupeBack.B));
+     Pack(AData, Byte(0)); // Blue
+     PackFF00(AData); //Pack(AData,Word(65280));   // R
+     Pack(AData, Word(0)); // Padding
 
-    // foreground
-    Pack(AData, colorType); // RGB
-    PackFF00(AData); // Alpha
-    Pack(AData, Byte(colorsDupeFore.R));
-    Pack(AData, Byte(0)); // Red
-    Pack(AData, Byte(colorsDupeFore.G));
-    Pack(AData, Byte(0)); // Green
-    Pack(AData, Byte(colorsDupeFore.B));
-    Pack(AData, Byte(0)); // Blue
-    PackFF00(AData); //Pack(AData,Word(65280));   // R
-    Pack(AData, Word(0)); // Padding
-  end
-
+     // foreground
+     Pack(AData, colorType); // RGB
+     PackFF00(AData); // Alpha
+     Pack(AData, Byte(colorsDupeFore.R));
+     Pack(AData, Byte(0)); // Red
+     Pack(AData, Byte(colorsDupeFore.G));
+     Pack(AData, Byte(0)); // Green
+     Pack(AData, Byte(colorsDupeFore.B));
+     Pack(AData, Byte(0)); // Blue
+     PackFF00(AData); //Pack(AData,Word(65280));   // R
+     Pack(AData, Word(0)); // Padding
+     end
   else if color = 2 then // multiplier
-  begin // Background QColor first
-    logger.debug('[uWSJTX] Highlighting call %s as a MULT with RGB colors %3d:%3d:%3d', [sCall, colorsMultBack.R, colorsMultBack.G, colorsMultBack.B]);
-    Pack(AData, colorType);
-    PackFF00(AData); //Pack(AData,Word(65280));     // Alpha
-    Pack(AData, Byte(colorsMultBack.R));
-    Pack(AData, Byte(0)); // Red
-    Pack(AData, Byte(colorsMultBack.G));
-    Pack(AData, Byte(0)); // Green
-    Pack(AData, Byte(colorsMultBack.B));
-    Pack(AData, Byte(0)); // Blue
-    Pack(AData, Word(0)); // Padding
-    Pack(AData, colorType);
-    PackFF00(AData); //Pack(AData,Word(65280));     // Alpha
-    Pack(AData, Byte(colorsMultFore.R));
-    Pack(AData, Byte(0)); // Red
-    Pack(AData, Byte(colorsMultFore.G));
-    Pack(AData, Byte(0)); // Green
-    Pack(AData, Byte(colorsMultFore.B));
-    Pack(AData, Byte(0)); // Blue
-    Pack(AData, Word(0)); // Padding
-  end;
+     begin // Background QColor first
+     logger.debug('[uWSJTX] Highlighting call %s as a MULT with RGB colors %3d:%3d:%3d', [sCall, colorsMultBack.R, colorsMultBack.G, colorsMultBack.B]);
+     Pack(AData, colorType);
+     PackFF00(AData); //Pack(AData,Word(65280));     // Alpha
+     Pack(AData, Byte(colorsMultBack.R));
+     Pack(AData, Byte(0)); // Red
+     Pack(AData, Byte(colorsMultBack.G));
+     Pack(AData, Byte(0)); // Green
+     Pack(AData, Byte(colorsMultBack.B));
+     Pack(AData, Byte(0)); // Blue
+     Pack(AData, Word(0)); // Padding
+     Pack(AData, colorType);
+     PackFF00(AData); //Pack(AData,Word(65280));     // Alpha
+     Pack(AData, Byte(colorsMultFore.R));
+     Pack(AData, Byte(0)); // Red
+     Pack(AData, Byte(colorsMultFore.G));
+     Pack(AData, Byte(0)); // Green
+     Pack(AData, Byte(colorsMultFore.B));
+     Pack(AData, Byte(0)); // Blue
+     Pack(AData, Word(0)); // Padding
+     end;
 
   Pack(AData, true); // Highlight last only
   logger.trace('[uWSJTX] Sending command to highlight ' + Trim(sCall));

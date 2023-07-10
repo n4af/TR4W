@@ -861,6 +861,7 @@ function LineInput(Prompt: Str160;
 
 function LowerCase(const s: string): string;
 function LooksLikeAGrid(var GridString: ShortString): boolean;
+function LooksLikeAGridIgnoreAE(var GridString: ShortString): boolean;
 function LooksLikeAState(state: string): boolean; // NY4I
 function Lpt1BaseAddress: Word;
 function Lpt2BaseAddress: Word;
@@ -3299,35 +3300,102 @@ begin
   LooksLikeAGrid := False;
 
   TestString := UpperCase(GridString);
-    if          ((ActiveExchange = RSTAndOrGridExchange) or        // 4.118.1
-                (ActiveExchange = Grid2Exchange) or
-                (ActiveExchange = RSTAndGrid3Exchange) or
-                (ActiveExchange = GridExchange) or
-                (ActiveExchange = RSTQSONumberAndGridSquareExchange) or
-                (ActiveExchange = GridExchange)  or
-                (ActiveExchange = RSTAndGridExchange)) then
+  if ((ActiveExchange = RSTAndOrGridExchange) or        // 4.118.1
+      (ActiveExchange = Grid2Exchange) or
+      (ActiveExchange = RSTAndGrid3Exchange) or
+      (ActiveExchange = GridExchange) or
+      (ActiveExchange = RSTQSONumberAndGridSquareExchange) or
+      (ActiveExchange = GridExchange)  or
+      (ActiveExchange = RSTAndGridExchange)) then
 
-  begin
-  if (length(TestString) <> 4) and (length(TestString) <> 6) then Exit;
-
+     begin
+     if (length(TestString) <> 4) and (length(TestString) <> 6) then
+        begin
+        Exit;
+        end;
   //   if (TestString[1] < 'A') or (TestString[1] > 'R') then Exit;
   //   if (TestString[2] < 'A') or (TestString[2] > 'R') then Exit;
-  for i := 1 to 2 do
-    if (TestString[i] < 'A') or (TestString[i] > 'R') then Exit;
-
+     for i := 1 to 2 do
+        begin
+        if (TestString[i] < 'A') or (TestString[i] > 'R') then
+           begin
+           Exit;
+           end;
+        end;
   //if (TestString[3] < '0') or (TestString[3] > '9') then Exit;
   //if (TestString[4] < '0') or (TestString[4] > '9') then Exit;
-  for i := 3 to 4 do
-    if (TestString[i] < '0') or (TestString[i] > '9') then Exit;
-
+     for i := 3 to 4 do
+        begin
+        if (TestString[i] < '0') or (TestString[i] > '9') then
+           begin
+           Exit;
+           end;
+        end;
   //   if GridString[1] > 'Z' then GridString[1] := CHR(Ord(GridString[1]) - Ord('a') + Ord('A'));
   //   if GridString[2] > 'Z' then GridString[2] := CHR(Ord(GridString[2]) - Ord('a') + Ord('A'));
-  for i := 1 to 2 do
-    if GridString[i] > 'Z' then GridString[i] := CHR(Ord(GridString[i]) - Ord('a') + Ord('A'));
-
-  LooksLikeAGrid := True;
-  end;
+     for i := 1 to 2 do
+        begin
+        if GridString[i] > 'Z' then
+           begin
+           GridString[i] := CHR(Ord(GridString[i]) - Ord('a') + Ord('A'));
+           end;
+        end;
+     LooksLikeAGrid := True;
+     end
+  else
+     begin
+     logger.debug('Exiting LooksLikeAGrid because ActiveExchange not related to a grid');
+     end;
 end;
+
+
+function LooksLikeAGridIgnoreAE(var GridString: ShortString): boolean;
+
+{ If it does look like a grid, it will make the first two letters lower
+  case so it looks like a domestic QTH. }
+
+var
+  TestString                            : Str20;
+  i                                     : integer;
+  p                                  : pchar;
+begin
+
+  LooksLikeAGridIgnoreAE := False;
+
+  TestString := UpperCase(GridString);
+  if (length(TestString) <> 4) and (length(TestString) <> 6) then
+     begin
+     Exit;
+     end;
+
+  for i := 1 to 2 do
+     begin
+     if (TestString[i] < 'A') or (TestString[i] > 'R') then
+        begin
+        Exit;
+        end;
+     end;
+
+  for i := 3 to 4 do
+     begin
+     if (TestString[i] < '0') or (TestString[i] > '9') then
+        begin
+        Exit;
+        end;
+     end;
+
+  for i := 1 to 2 do
+     begin
+     if GridString[i] > 'Z' then
+        begin
+        GridString[i] := CHR(Ord(GridString[i]) - Ord('a') + Ord('A'));
+        end;
+     end;
+
+  LooksLikeAGridIgnoreAE := True;
+
+end;
+
 
 function LowerCase(const s: string): string;
 var
