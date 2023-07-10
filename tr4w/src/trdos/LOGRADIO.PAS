@@ -1724,8 +1724,24 @@ begin
          begin
          if IntegerBetween(mem,0,4) then
             begin
-            logger.debug('[K3-MemoryKeyer] Playing memory %d',[mem]);
-            localMsg := 'SWT0' + IntToStr(mem) + ';';
+            if logger.IsDebugEnabled then
+               begin
+               if mem = 0 then
+                  begin
+                  logger.debug('[K3-MemoryKeyer] Stopping playback of DVK message');
+                  end
+               else
+                  begin
+                  logger.debug('[K3-MemoryKeyer] Playing memory %d',[mem]);
+                  end;
+               end;
+            case mem of
+            0: localMsg := 'SWT37;'; // RECD button to cancel playback
+            1: localMsg := 'SWT21;';
+            2: localMsg := 'SWT31;';
+            3: localMsg := 'SWT35;';
+            4: localMsg := 'SWT39;';
+            end;
             AddToOutputBuffer(addr(localMsg[1]),length(localMsg));
             Result := false;
             end

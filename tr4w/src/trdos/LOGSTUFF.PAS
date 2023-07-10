@@ -633,6 +633,8 @@ function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}):
 procedure IncrementQTCCount(Call: CallString);
 function IsValidPOTAPark(const park: string): boolean;
 function IsValidCallsign(const callsign: string): boolean;
+function IsValidUSCallsign(const callsign: string): boolean;
+function IsValidUSPrefix(const callsign: string): boolean;
 
 function KeyRecentlyPressed(Key: Char; MaxElaspedSec100: LONGINT): boolean;
 procedure KeyStamp(Key: Char);
@@ -9329,6 +9331,57 @@ begin
     Result := true;
   end;
   // Result := (StrToInt(sXmit) in [1..99]) and (length(sCategory) = 1);
+end;
+
+
+// ^[AaWaKkNn][a-zA-Z]?[0-9][a-zA-Z]{1,3}$/
+
+function IsValidUSPrefix(const callsign: string): boolean;
+var
+  regex: TPerlRegEx;
+begin
+  // create our regex instance, and we want to do a case insensitive search, in multiline mode
+  Result := false;
+  regex := TPerlRegEx.Create;
+  try
+    logger.debug('Checking if %s is a valid US prefix', [callsign]);
+    regex.RegEx := '^[AaWaKkNn][a-zA-Z]?';
+      // Valid against all of LOTW file
+
+    regex.Subject := callsign;
+
+    Result := regex.MatchAgain;
+  finally
+    regex.Free;
+  end;
+  if Result then
+     begin
+     logger.debug('%s is a valid US prefix', [callsign]);
+     end;
+end;
+
+function IsValidUSCallsign(const callsign: string): boolean;
+var
+  regex: TPerlRegEx;
+begin
+  // create our regex instance, and we want to do a case insensitive search, in multiline mode
+  Result := false;
+  regex := TPerlRegEx.Create;
+  try
+    logger.debug('Checking if %s is a valid US call', [callsign]);
+    regex.RegEx := '^[AaWaKkNn][a-zA-Z]?[0-9][a-zA-Z]{1,3}$';
+      // Valid against all of LOTW file
+
+    regex.Subject := callsign;
+
+    Result := regex.MatchAgain;
+  finally
+    regex.Free;
+  end;
+  if Result then
+  begin
+    logger.debug('%s is a valid US call', [callsign]);
+  end;
 end;
 
 // Add Uses PerlRegEx to unit and code from https://regular-expressions.mobi/delphi.html?wlr=1
