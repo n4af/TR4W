@@ -77,6 +77,7 @@ var
   LISTBOX                               : PChar = 'LISTBOX';
 
   wsprintfBuffer                        : array[0..4096 - 1] of Char;
+  tempprintfBuffer                      : array[0..4096 - 1] of Char;   // To use with wsPrintfBuffer Issue 601 ny4i
   MillisecondsBuffer                    : array[0..31] of Char;
   QuickDisplayBuffer                    : array[0..255] of Char;
   TempBuffer1                           : array[0..255] of Char;

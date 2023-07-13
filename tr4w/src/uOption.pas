@@ -739,6 +739,7 @@ procedure ShowHelpMessageForCommand;
 var
   Row                                   : integer;
   Index                                 : integer;
+  returnLen                             : integer;
 begin
   Row := SendMessage(SettingshLV, LVM_GETNEXTITEM, -1, LVNI_SELECTED or LVNI_FOCUSED);
   if Row = -1 then Exit;
@@ -748,8 +749,19 @@ begin
   Windows.EnableWindow(GetDlgItem(settingswindowhandle, 203), (NetSocket <> 0) and (CFGCA[Index].crJ <> 2));
   Windows.EnableWindow(GetDlgItem(settingswindowhandle, 201), Changed[Row] = True);
 
+  // Changes here are Issue 610 to show if parameter is sent to network or not
   ListView_GetItemText(SettingshLV, Row, COMMAND_FIELD, @TempBuffer1, SizeOf(TempBuffer1));
-  GetPrivateProfileString(TempBuffer1, 'DESCRIPTION', nil, wsprintfBuffer, SizeOf(wsprintfBuffer), TR4W_COMM_HELP_FILENAME);
+  //GetPrivateProfileString(TempBuffer1, 'DESCRIPTION', nil, wsprintfBuffer, SizeOf(wsprintfBuffer), TR4W_COMM_HELP_FILENAME);
+  GetPrivateProfileString(TempBuffer1, 'DESCRIPTION', nil, tempprintfBuffer, SizeOf(tempprintfBuffer), TR4W_COMM_HELP_FILENAME);
+
+  if CFGCA[Index].crNetwork = 0 then
+     begin
+     Format(wsprintfBuffer, '%s %s %s', tempprintfBuffer, #13#10#13#10, 'NOT sent to network');
+     end
+  else
+     begin
+     Format(wsprintfBuffer, '%s %s %s', tempprintfBuffer, #13#10#13#10, 'Sent to Network');
+     end;
   Windows.SetDlgItemText(settingswindowhandle, 105, wsprintfBuffer);
   GetPrivateProfileString(TempBuffer1, 'DEFAULT', nil, wsprintfBuffer, SizeOf(wsprintfBuffer), TR4W_COMM_HELP_FILENAME);
   Windows.SetDlgItemText(settingswindowhandle, 104, wsprintfBuffer);
@@ -763,8 +775,13 @@ begin
   if NetSocket = 0 then Exit;
   Row := ListView_GetNextItem(SettingshLV, -1, LVNI_SELECTED);
   if CommandsFilter <> cfCol then
-    if CFGCA[IndexArray[Row + 1]].crJ = 2 then Exit;
+    if CFGCA[IndexArray[Row + 1]].crJ = 2 then Exit; // 2 is read-only
 
+  if CFGCA[IndexArray[Row + 1]].crNetwork = 0 then     // Issue 601 ny4i
+     begin
+     logger.debug('[SendParameterToNetwork] Exiting before network send for command %s due to crNetwork = 0',[CFGCA[IndexArray[Row + 1]].crCommand]);
+     Exit;
+     end;
   Windows.ZeroMemory(@ParameterToNetwork.pnCommand, SizeOf(ParameterToNetwork.pnCommand) + SizeOf(ParameterToNetwork.pnValue));
 {(*}
   ParameterToNetwork.pnCommand[0] := Char(ListView_GetItemText(SettingshLV, Row, COMMAND_FIELD, @ParameterToNetwork.pnCommand[1], SizeOf(ParameterToNetwork.pnCommand)));
