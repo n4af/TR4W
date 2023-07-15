@@ -130,6 +130,7 @@ uses
   , utils_text
   , LogK1EA // for tPTTViaCommand
   , LogDOM // for ActiveDomesticMult
+  , uCFG // for WSJTXRadioControlEnabled
   ;
 // {$R *.dfm}
 
@@ -173,11 +174,14 @@ begin
   colorsMultFore.B := $00;
   logger.Debug('[WSJT-X]Creating tcpServ on port %d',[FTCPPort]);
 
-  tcpServ := TIdTCPServer.Create(nil);
-  logger.Debug('[WSJT-X] Created tcpServ on port %d',[FTCPPort]);
-  tcpServ.OnExecute := Self.IdTCPServer1Execute;
-  tcpServ.OnConnect := Self.IdTCPServer1Connect;
-  tcpServ.OnDisconnect := Self.IdTCPServer1Disconnect;
+  if WSJTXRadioControlEnabled then
+     begin
+     tcpServ := TIdTCPServer.Create(nil);
+     logger.Debug('[WSJT-X] Created tcpServ on port %d',[FTCPPort]);
+     tcpServ.OnExecute := Self.IdTCPServer1Execute;
+     tcpServ.OnConnect := Self.IdTCPServer1Connect;
+     tcpServ.OnDisconnect := Self.IdTCPServer1Disconnect;
+     end;
 end;
 
 constructor TWSJTXServer.Create(nUDPPort: integer; nTCPPort: integer);
@@ -195,32 +199,35 @@ end;
 }
 procedure TWSJTXServer.Start;
 begin
-  if not started then
-  begin
-    try
-      udpServ.Active := true;
-      started := true;
-    except
-      on E: Exception do
+   if not started then
       begin
-        logger.Error('Exception when making UDP servr active - Is JT-Alert runnng?: exception=%s', [E.Message]);
-        QuickDisplay('Error linking to WSJT-X. Is JT-Alert active?');
-      end;
-    end;
+         try
+            udpServ.Active := true;
+            started := true;
+         except
+            on E: Exception do
+               begin
+               logger.Error('Exception when making UDP servr active - Is JT-Alert runnng?: exception=%s', [E.Message]);
+               QuickDisplay('Error linking to WSJT-X. Is JT-Alert active?');
+               end;
+         end;
 
-    tcpServ.Bindings.Clear;
-    tcpServ.MaxConnections := 1; // Just allow the single client
-    tcpServ.Bindings.Add.Port := FTCPPort;
-    try
-       tcpServ.Active := true;
-    except
-      on E: Exception do
+      if tcpServ <> nil then
          begin
-         logger.Error('Exception when making TCP server active - Is DX Commander running?: exception=%s', [E.Message]);
-         QuickDisplay('Error offering Commander proxy TCP Port');
+         tcpServ.Bindings.Clear;
+         tcpServ.MaxConnections := 1; // Just allow the single client
+         tcpServ.Bindings.Add.Port := FTCPPort;
+            try
+               tcpServ.Active := true;
+            except
+               on E: Exception do
+                  begin
+                  logger.Error('Exception when making TCP server active - Is DX Commander running?: exception=%s', [E.Message]);
+                  QuickDisplay('Error offering Commander proxy TCP Port');
+                  end;
+             end;
          end;
       end;
-  end;
 end;
 
 procedure TWSJTXServer.Stop;
@@ -228,8 +235,11 @@ begin
   if started then
   begin
     udpServ.Active := false;
-    tcpServ.IOHandler.Shutdown;
-    tcpServ.Active := false;
+    if tcpServ <> nil then
+       begin
+       tcpServ.IOHandler.Shutdown;
+       tcpServ.Active := false;
+       end;
     started := false;
   end;
 end;
@@ -239,9 +249,12 @@ begin
   udpServ.Active := false;
   FreeAndNil(udpServ);
 
-  tcpServ.IOHandler.Shutdown;
-  tcpServ.Active := false;
-  FreeAndNil(tcpServ);
+  if tcpServ <> nil then
+     begin
+     tcpServ.IOHandler.Shutdown;
+     tcpServ.Active := false;
+     FreeAndNil(tcpServ);
+     end;
 
   FreeAndNil(slCQMessage);
 
