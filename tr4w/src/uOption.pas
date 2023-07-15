@@ -777,7 +777,7 @@ begin
   if CommandsFilter <> cfCol then
     if CFGCA[IndexArray[Row + 1]].crJ = 2 then Exit; // 2 is read-only
 
-  if CFGCA[IndexArray[Row + 1]].crNetwork = 0 then     // Issue 601 ny4i
+  if CFGCA[IndexArray[Row + 1]].crNetwork = 0 then     // Issue 610 ny4i
      begin
      logger.debug('[SendParameterToNetwork] Exiting before network send for command %s due to crNetwork = 0',[CFGCA[IndexArray[Row + 1]].crCommand]);
      Exit;
