@@ -746,7 +746,7 @@ begin
   if Row = PreviousHelpRow then Exit;
   PreviousHelpRow := Row;
   Index := IndexArray[Row + 1];
-  Windows.EnableWindow(GetDlgItem(settingswindowhandle, 203), (NetSocket <> 0) and (CFGCA[Index].crJ <> 2));
+  Windows.EnableWindow(GetDlgItem(settingswindowhandle, 203), (NetSocket <> 0) and (CFGCA[Index].crJ <> 2) and (CFGCA[Index].crNetwork <> 0));  // Issue 610 ny4i
   Windows.EnableWindow(GetDlgItem(settingswindowhandle, 201), Changed[Row] = True);
 
   // Changes here are Issue 610 to show if parameter is sent to network or not
