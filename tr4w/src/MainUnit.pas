@@ -7139,7 +7139,7 @@ begin
       end;
     IARU:
       exch.QTHString := fieldValue;
-    NAQSOCW, NAQSOSSB, NCCCSPRINT: // 4.103.1 // 4.105.13
+    NAQSOCW, NAQSOSSB, NAQSORTTY, NCCCSPRINT: // 4.103.1 // 4.105.13
       begin
         exch.QTHString := tempState;
         exch.DomesticQTH := tempState;
