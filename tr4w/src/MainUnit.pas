@@ -843,6 +843,11 @@ begin
         StartSendingNow(True)
       else
         WindowDupeCheck;
+        tempRXData.Callsign := CallWindowString;
+        if UDPBroadcastLookup then
+           begin
+           LookupInfoToUDP(tempRXData);
+           end;
     end;
   end;
 end;

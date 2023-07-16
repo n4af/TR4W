@@ -37,7 +37,7 @@ uses
   uCallsigns,
   uCommctrl,
   //  uMMTTY,
-  //uEditQSO,  // Issue 165 NY4I Removed this fromhere as there was a circular reference. It did not appear tobe needed.
+  //uEditQSO,  // Issue 165 NY4I Removed this from here as there was a circular reference. It did not appear to be needed.
   uTelnet,
   TF,
   Version,
@@ -117,6 +117,8 @@ uses
     );
 procedure SendScoreToUDP;
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
+procedure LookupInfoToUDP(RXData: ContestExchange); // Issue 612 ny4i
+function BuildUDPContact(RXData: ContestExchange; whichUDP: UDPType): string; // Issue 612 ny4i
 procedure SendFullLogToUDP;
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
 procedure ToggleModes;
@@ -2682,16 +2684,18 @@ begin
       udp.Send(UDPBroadcastAddress,UDPBroadcastPortContact,sBuf);
       end;
 end;
-procedure LogContactToUDP(RXData: ContestExchange);
+
+function BuildUDPContact(RXData: ContestExchange; whichUDP: UDPType): string;
 var
   // msg: TIdBytes;
-   sBuf: AnsiString;
+  // sBuf: AnsiString;
    sMode : AnsiString;
    nNumberReceived : integer;
    sComputerID : AnsiString;
    freq : integer;
    txFreq : integer;
    sOperator : AnsiString;
+   sRecType: AnsiString;
 begin
    // if operator is blank, use mycall
    // Add CR to output
@@ -2699,6 +2703,15 @@ begin
    // ny4i Issue 82 - Added code to check if there is a radio interfaced and if not,
    // generate the base frequency from the band. This uses an array that was used for Cabrillo files.
 
+   case whichUDP of
+      
+      udpContactInfo: sRecType := 'contactinfo';
+      udpLookupInfo: sRecType := 'lookupinfo';
+      else
+         sRecType := 'contactinfo';
+      end;
+
+   
    // This is actually wrong. We should send the info from the Contact not the actual radio. NY4I 2021 July 1
    freq := RXData.Frequency;
    txFreq := RXData.Frequency;
@@ -2758,25 +2771,25 @@ begin
        begin
        sOperator := MyCall;
        end
-    else
-       begin
-       sOperator := CurrentOperator;
-       end;
-    nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
-    sBuf := '<?xml version="1.0"?>' + sLineBreak +
-            '<contactinfo>' +  sLineBreak +
-            #9 + '<app>TR4W</app>' + sLineBreak +
-            #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
-            #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
-            #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
-               SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
-                      RxData.tSysTime.qtYear,
-                      RxData.tSysTime.qtMonth,
-                      RxData.tSysTime.qtDay,
-                      RxData.tSysTime.qtHour,
-                      RxData.tSysTime.qtMinute,
-                      RxData.tSysTime.qtSecond]) +
-            '</timestamp>' + sLineBreak +
+   else
+      begin
+      sOperator := CurrentOperator;
+      end;
+   nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
+   Result := '<?xml version="1.0"?>' + sLineBreak +
+             '<' + sRecType + '>' + sLineBreak +
+             #9 + '<app>TR4W</app>' + sLineBreak +
+             #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
+             #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
+             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
+             SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
+                             RxData.tSysTime.qtYear,
+                             RxData.tSysTime.qtMonth,
+                             RxData.tSysTime.qtDay,
+                             RxData.tSysTime.qtHour,
+                             RxData.tSysTime.qtMinute,
+                             RxData.tSysTime.qtSecond]) +
+                 '</timestamp>' + sLineBreak +
             #9 + '<mycall>' + MyCall + '</mycall>' + sLineBreak +
             #9 + '<band>' + BandTypeToUDPContactBand[RXData.Band] + '</band>' + sLineBreak +
            // #9 + '<band>' + Format('%d',[freq div 1000000]) + '</band>' + sLineBreak +     // Not 20M but 14 -- Odd.
@@ -2818,14 +2831,32 @@ begin
             #9 + '<NetBiosName>' + GetLocalComputerName + '</NetBiosName>' + sLineBreak +
             #9 + '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' + sLineBreak +
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
-      '</contactinfo>'+ sLineBreak ;
-  // SetLength(msg,Length(sBuf));
-   //msg := RawToBytes(sBuf[1], Length(sBuf));
+      '</' + sRecType + '>'+ sLineBreak ;
+end;
+
+
+procedure LogContactToUDP(RXData: ContestExchange);
+var
+   sBuf: AnsiString;
+begin
+
    udp.BroadcastEnabled := true;
+   sBuf := BuildUDPContact(RXData, udpContactInfo);
    logger.Trace('Sending UDP Broadcast data: ' + sBuf);
    udp.Send(UDPBroadcastAddress,UDPBroadcastPortContact,sBuf);
-   //udp.Broadcast(msg, UDPBroadcastPort);     // ny4i 4.44.9
 end;
+
+procedure LookupInfoToUDP(RXData: ContestExchange);
+var
+   sBuf: AnsiString;
+begin
+
+   udp.BroadcastEnabled := true;
+   sBuf := BuildUDPContact(RXData, udpLookupInfo);
+   logger.Trace('Sending UDP Broadcast data: ' + sBuf);
+   udp.Send(UDPBroadcastAddress,UDPBroadcastPortLookup,sBuf);
+end;
+
 
 procedure SendFullLogToUDP;
 var nCount: integer;

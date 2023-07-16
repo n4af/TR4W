@@ -584,12 +584,14 @@ var
   UDPBroadcastScore: boolean; // ny4i Issue 304
   UDPBroadcastRadio: boolean; // ny4i 4.44.8
   UDPBroadcastRotor: boolean; // ny4i 4.44.8
+  UDPBroadcastLookup: boolean;  // ny4i Issue 612
   UDPBroadcastPort: integer = 12060;
     // ny4i 4.44.9   // Kept for backward compatibilty - no longer used
   UDPBroadcastPortApp: integer = 12060; // ny4i Issue 590
   UDPBroadcastPortContact: integer = 12060; // ny4i Issue 590
   UDPBroadcastPortRadio: integer = 12060; // ny4i Issue 590
   UDPBroadcastPortScore: integer = 12060; // ny4i Issue 590
+  UDPBroadcastPortLookup: integer = 12060; // ny4i Issue 612
 
   UDPBroadcastAddress: string[255] = '127.0.0.1'; // ny4i 4.44.9
   UDPBroadcastRotorPort: integer = 12040; // ny4i 4.44.9

@@ -76,6 +76,7 @@ type
     ARRLCountryMode //DXCC ONLY
     );
 
+  UDPType = (udpContactInfo, udpContactReplace, udpContactDelete, udpLookupInfo);
   LastEntryType = (letCallsign, letQTHString);
 
   TR4WDLGTEMPLATE = {packed } record
