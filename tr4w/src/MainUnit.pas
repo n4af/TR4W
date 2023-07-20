@@ -780,7 +780,7 @@ begin
     SwapRadios;
     SetOpMode(SearchAndPounceOpMode);
     PutCallToCallWindow(DupeInfoCall);
-  
+
     if TwoRadioMode then
     begin
       Send_DE;
@@ -843,11 +843,11 @@ begin
         StartSendingNow(True)
       else
         WindowDupeCheck;
-        tempRXData.Callsign := CallWindowString;
-        if UDPBroadcastLookup then
-           begin
-           LookupInfoToUDP(tempRXData);
-           end;
+      tempRXData.Callsign := CallWindowString;
+      if UDPBroadcastLookup then
+      begin
+        LookupInfoToUDP(tempRXData);
+      end;
     end;
   end;
 end;
@@ -1144,13 +1144,15 @@ label
 var
   n: integer;
   TempString: Str10;
+
 begin
+
   DebugMsg('>>>>Entering ReturnInSAPOpMode');
   ExchangeHasBeenSent := False;
   Exchw := ExchangeWindowString;
   Callw := CallWindowString;
   ParseFourFields(ExchangeWindowString, s1, s2, s3, s4);
-  loop:
+   loop:
   if (ExchangeWindowString = '') and (CallWindowString = '') then
     if AutoReturnToCQMode then
     begin
@@ -1184,8 +1186,7 @@ begin
       (not AutoDupeEnableSandP)) then
 
     begin
-      // ExchangeHasBeenSent := False;
-      if GoodCallSyntax(CallWindowString) then
+     if GoodCallSyntax(CallWindowString) then
       begin
         if not Send_DE then
           Exit;
@@ -1199,7 +1200,6 @@ begin
   if tCallWindowStringIsDupe and {not }AutoDupeEnableSandP then
   begin
     DispalayDupe;
-    // if WindowDupeCheck then
     Exit;
   end;
 
@@ -1215,34 +1215,36 @@ begin
   end;
 
   VisibleLog.DoPossibleCalls(CallWindowString);
-  // DDX(MaybeRespondToMyCall);
 
- // if TwoRadioState = StationCalled then CheckTwoRadioState(ReturnPressed)
- // else
-  if MessageEnable and (not ExchangeHasBeenSent) and (not BeSilent) and
-    MessageEnable then
-
-  begin
+  if MessageEnable and (not ExchangeHasBeenSent) and (not BeSilent) then
+   begin
     if ActiveMode = Digital then
       // ny4i Issue153 Just reformatted these few 'IFs' for readability
-    begin
       SendMessageToMixW('<TX>');
-    end;
 
-    if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange =
-      RSTQTHExchange) then
+    if (ActiveExchange = RSTDomesticQTHExchange) then
     begin
-      if pos('/', S1) > 0 then
+      if (Isalpha(S3))  then
       begin
-        n := pos('/', S1);
-        TempString := leftstr(s1, n - 1);
-        CallWindowString := Callw + '/' + TempString;
-        ExchangeWindowString := TempString;
+       CallWindowString := CallW {+ '/' + S3};
+        ExchangeWindowString := S3;
+        BeSilent := True;
+      end
+      else if ((S3 = '') and  (IsAlpha(S2))) then
+       begin
+        ExchangeWindowString := S2;
+         CallWindowString := callw {+ '/' + s2};
+        BeSilent := True;
+       end
+      else   if (s3 = '') and (S2 = '') and (S1 <> '') and (IsAlpha(s1)) then
+       begin
+        ExchangeWindowString := S1;
+          CallWindowString := callw {+ '/' + s1};
+           ExchangeHasBeenSent := True;
+       end;
       end;
-      if n > 0 then
-        S2 := rightstr(s1, length(s1) - n);
-    end;
 
+    
     if ActiveExchange = RSTAndPOTAPark then
     begin
       if pos('/', S1) > 0 then
@@ -1259,19 +1261,20 @@ begin
     end;
 
     if ActiveMode in [CW, Digital] then
-
-      if not SendCrypticMessage(SearchAndPounceExchange) then
+     if not besilent then
+      begin
+       if not SendCrypticMessage(SearchAndPounceExchange) then
         Exit;
-
+       end;
     if ActiveMode = Digital then
-    begin
+
       SendMessageToMixW('<RXANDCLEAR>');
-    end;
+
 
     if ActiveMode in [Phone, FM] then
-    begin
+
       SendCrypticMessage(SearchAndPouncePhoneExchange);
-    end;
+
 
     ExchangeHasBeenSent := True;
 
@@ -1298,34 +1301,17 @@ begin
         SetOpMode(CQOpMode);
     end;
   end;
-  if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange =
-    RSTQTHEXCHANGE) then
+  if (S3 <> '') then
+   begin
+    S3 := '';
+    exchangewindowstring := s2;
+    goto loop;
+   end;
+  if (S3 = '') and (S2 <> '')  then
   begin
-    if (IsAlpha(S2)) and (S2 <> '') then
-    begin
-
-      CallWindowString := callw + '/' + S2;
-      // S3 := '';
-      exchangewindowstring := s2;
-      BeSilent := True;
-      S2 := '';
-      goto loop;
-
-    end;
-
-  end;
-
-  if ActiveExchange = RSTAndPOTAPark then
-  begin
-    if (StringIsAllAlphaNumericOrDash(S2)) and (S2 <> '') then
-    begin
-      CallWindowString := callw { + '/' + S2};
-      // S3 := '';
-      exchangewindowstring := s2;
-      BeSilent := True;
-      S2 := '';
-      goto loop;
-    end;
+    exchangewindowstring := s1;
+    S2 := '';
+    goto loop;
   end;
   DebugMsg('>>>>Exiting ReturnInSAPOpMode');
 end;
@@ -2361,7 +2347,7 @@ begin
     + MainWindowCaptionAndHeader + EditableLogHeight + ws * 14,
     {SWP_SHOWWINDOW or }SWP_NOMOVE);
 
-  for e := Low(TMainWindowElement) to High(TMainWindowElement) do  
+  for e := Low(TMainWindowElement) to High(TMainWindowElement) do
   begin
     if TWindows[e].mweiStyle <= 2 then
       Continue;
@@ -2542,7 +2528,7 @@ begin
  MainFont := tCreateFont(ws - 2+FontSize, FW_BOLD * ord(BoldFont), @MainFontName[1]);
  CATWindowFont := tCreateFont(22, FW_EXTRABOLD, 'Lucida Console');
 
- MainWindowEditFont := tCreateFont(ws + 3, FW_EXTRABOLD, lcfn);   
+ MainWindowEditFont := tCreateFont(ws + 3, FW_EXTRABOLD, lcfn);
 
  {AutoSend}
  SymbolFont := tCreateFont(ws, FW_SEMIBOLD, 'Symbol');
@@ -3348,31 +3334,31 @@ begin
         Windows.ZeroMemory(@TempCallstring, SizeOf(TempCallstring));
         TempCallstring := QuickEditResponse(TC_CURRENT_OPERATOR_CALLSIGN, 6);
         if length(TempCallstring) > 0 then
-           begin
-           if IsValidUSPrefix(TempCallString) then
-              begin
-              if IsValidUSCallsign(TempCallString) then
-                 begin
-                 Windows.CopyMemory(@CurrentOperator, @TempCallstring[1], 6);
-                 SetMainWindowText(mweCurrentOperator, CurrentOperator);
-                 Sheet.SaveRestartFile;  // Issue 661 ny4i
-                 end
-              else
-                 begin
-                 ShowMessage('Login call does not look like a callsign');
-                 end;
-              end
-           else if IsValidCallsign(TempCallString) then
-              begin
+        begin
+          if IsValidUSPrefix(TempCallString) then
+          begin
+            if IsValidUSCallsign(TempCallString) then
+            begin
               Windows.CopyMemory(@CurrentOperator, @TempCallstring[1], 6);
               SetMainWindowText(mweCurrentOperator, CurrentOperator);
-              Sheet.SaveRestartFile;     // Issue 661 ny4i
-              end
-           else
-              begin
+              Sheet.SaveRestartFile; // Issue 661 ny4i
+            end
+            else
+            begin
               ShowMessage('Login call does not look like a callsign');
-              end;
-           end;
+            end;
+          end
+          else if IsValidCallsign(TempCallString) then
+          begin
+            Windows.CopyMemory(@CurrentOperator, @TempCallstring[1], 6);
+            SetMainWindowText(mweCurrentOperator, CurrentOperator);
+            Sheet.SaveRestartFile; // Issue 661 ny4i
+          end
+          else
+          begin
+            ShowMessage('Login call does not look like a callsign');
+          end;
+        end;
         // ShowMessage(CurrentOperator);
       end;
 
@@ -3538,6 +3524,7 @@ procedure ProcessReturn;
 var
   TempHWND: HWND;
   revnr: string[6];
+
 label
   SetFreq;
 begin
@@ -3599,8 +3586,14 @@ begin
   begin
     tPTTVIACAT(false);
   end;
+  if (ActiveExchange = RSTDomesticQTHExchange) then
+    if (CallWindowString <> '') and (ExchangeWindowString <> '') then
+      ParseFourFields(ExchangeWindowString, s1, s2, s3, s4);
+  {    if S3 <> '' then
+       begin
+        ExchangeWindowString := S3
 
-
+      }
   if OpMode = CQOpMode then
   begin
     ctyGetCountryID(callwindowstring);
@@ -4273,13 +4266,13 @@ begin
     RData.Band := Band;
     RData.Mode := Mode;
     if RData.ExtMode = eNoMode then
-       begin
-       if ActiveRadioPtr^.nextExtendedMode = eNoMode then
-          begin
-          SetExtendedModeFromMode(RData);
-          end;
-       end;
-  
+    begin
+      if ActiveRadioPtr^.nextExtendedMode = eNoMode then
+      begin
+        SetExtendedModeFromMode(RData);
+      end;
+    end;
+
     // Not the way to do this as the radio does not know the extendedMode--just Mode. NY4I
     //RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3
     RData.NumberSent := TotalContacts + 1;
@@ -4325,17 +4318,19 @@ begin
 
   RData.Band := Band;
   RData.Mode := Mode;
-  if RData.ExtMode = eNoMode then    // if ExtMode was already set, no reason to look to the radio for it. WSJT-X sets it for example ny4i Issue 658
-     begin
-     if ActiveRadioPtr^.CurrentStatus.ExtendedMode = eNoMode then     // This should have been set by radio object but what is nextExtendedMode
-        begin
-        SetExtendedModeFromMode(RData);
-        end
-     else
-        begin
-        Rdata.ExtMode := ActiveRadioPtr^.CurrentStatus.ExtendedMode;
-        end;
-     end;
+  if RData.ExtMode = eNoMode then
+    // if ExtMode was already set, no reason to look to the radio for it. WSJT-X sets it for example ny4i Issue 658
+  begin
+    if ActiveRadioPtr^.CurrentStatus.ExtendedMode = eNoMode then
+      // This should have been set by radio object but what is nextExtendedMode
+    begin
+      SetExtendedModeFromMode(RData);
+    end
+    else
+    begin
+      Rdata.ExtMode := ActiveRadioPtr^.CurrentStatus.ExtendedMode;
+    end;
+  end;
   // ny4i Don't do this please - Issue 466 -=> Rdata.ExtMode := ActiveRadioptr^.CurrentStatus.ExtendedMode ; // 4.93.3
   RData.NumberSent := TotalContacts + 1;
   RData.Frequency := Freq;
@@ -6156,7 +6151,7 @@ end;
 procedure PlaceCaretToTheEnd(wnd: HWND);
 begin
   SendMessage(wnd, EM_SETSEL, 255, 255); // hh
-  end;
+end;
 
 {
 function TryToCheckTheLatestVersion: boolean;
@@ -6488,7 +6483,6 @@ begin
   end; // case
   Exit;
 
-  
 end;
 
 procedure ClearMultSheet_CtrlC;
