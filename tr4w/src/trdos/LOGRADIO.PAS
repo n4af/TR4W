@@ -214,6 +214,7 @@ type
       CWByCAT:         boolean;                    // ny4i 4.44.5
       CWSpeedSync:     boolean;
       CWByCAT_Sending: boolean;                    // ny4i Issue 129
+      UseHamLib:       boolean;
       WideCWFilter:    boolean;
       IcomFilterByte:  byte;
       IDCharacter:     char;
@@ -408,7 +409,7 @@ const
       ('OFF', 'ON', 'CW', 'PTT');
 
 type
-   RigType = (rtUnknown, rtICOM, rtKenwood, rtYaesu1, rtYaesu2, rtYaesu3, rtYaesu4, rtJST, rtOrion);
+   RigType = (rtUnknown, rtICOM, rtKenwood, rtYaesu1, rtYaesu2, rtYaesu3, rtYaesu4, rtJST, rtOrion, rtHamlib);
 
    BaudRateType = (BR1200, BR2400, BR4800, BR9600, BR19200, BR38400, BR57600, BR115200);
 {
@@ -553,7 +554,7 @@ const
     ({Name: 'IC9700';     } BR:BR38400; P: 1; C: 0; S: 0; T:0; RA: $A2; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'OMNI6';      } BR:BR9600;  P: 1; C: 1; S: 1; T:0; RA: $04; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtIcom),
     ({Name: 'ORION';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt:rtOrion)
-    );
+   );
 {*)}
 const
    InterfacedRadioTypeSA: array[InterfacedRadioType] of PChar = (
