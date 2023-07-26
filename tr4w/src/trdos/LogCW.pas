@@ -197,6 +197,7 @@ begin
 
    //localMsg                                               := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
+   logger.Debug('[AddStringToBuffer] Adding %s to CW Buffer',[Msg]);
    if ( (Msg = CWByCATBufferTerminator) or
         ((CWEnable and CWEnabled and IsCWByCATActive )) ) then   // ny4i 4.44.5    + Issue 111
       begin

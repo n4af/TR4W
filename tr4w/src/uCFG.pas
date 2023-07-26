@@ -156,6 +156,7 @@ const
    DITDAHRATIO_ARRAY: array[0..03] of integer = (3, 4, 5, 6);
    LEADING_ZEROS_ARRAY: array[0..03] of integer = (0, 1, 2, 3);
 
+   // Integer commnand pointers
    ArrayRecordArray: array[1..16] of ArrayRecord =
       (
     {(*}
@@ -330,6 +331,7 @@ const
    + 1 {WSJTXRadioControlEnabled}
    + 2 {UDPLookupInfo} // Issue 612 ny4i
    + 2 {Radio1 & Radio2 UseHamLib} // Issue 676 ny4i
+   + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
    ;
 
    // Note if crAddress says pointer(NN), then it is callign a function at position NN in the an array
@@ -625,9 +627,7 @@ const
  (crCommand: 'QZB RANDOM OFFSET ENABLE';      crAddress: @QZBRandomOffsetEnable;          crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'R150S MODE';                    crAddress: @CTY.ctyR150SMode;               crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'RFOBL MODE';                    crAddress: @CTY.ctyRFOBLMode;               crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
- // RadioServerTCPPort
  (crCommand: 'RADIO TCP SERVER PORT';         crAddress: @RadioServerTCPPort;             crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // ny4i
-
  (crCommand: 'RADIO ONE BAND OUTPUT PORT';    crAddress: @Radio1.BandOutputPort;          crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfRadio1; crType: ctPortLPT; crNetwork: 0),
  (crCommand: 'RADIO ONE BAUD RATE';           crAddress: pointer(11);                     crMin:0;  crMax:57600;   crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfRadio1; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO ONE CAT DTR';             crAddress: pointer(29);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther; crNetwork: 0),
@@ -643,6 +643,7 @@ const
  (crCommand: 'RADIO ONE IP ADDRESS';          crAddress: @Radio1.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctString; crNetwork: 0),
  (crCommand: 'RADIO ONE KEYER DTR';           crAddress: pointer(31);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther; crNetwork: 0),
  (crCommand: 'RADIO ONE KEYER RTS';           crAddress: pointer(30);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther; crNetwork: 0),
+ (crCommand: 'RADIO ONE KEYER STOP BITS';     crAddress: @Radio1.RadioKeyerStopBits;      crMin:0;  crMax:2;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // ny4i
  (crCommand: 'RADIO ONE NAME';                crAddress: @Radio1.RadioName;               crMin:0;  crMax:20;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 0),
  (crCommand: 'RADIO ONE RECEIVER ADDRESS';    crAddress: @Radio1.ReceiverAddress;         crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfRadio1; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO ONE TRACKING ENABLE';     crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfRadio1; crType: ctBoolean; crNetwork: 0),
@@ -667,6 +668,7 @@ const
  (crCommand: 'RADIO TWO IP ADDRESS';          crAddress: @Radio2.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctString; crNetwork: 0),
  (crCommand: 'RADIO TWO KEYER DTR';           crAddress: pointer(35);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther; crNetwork: 0),
  (crCommand: 'RADIO TWO KEYER RTS';           crAddress: pointer(34);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther; crNetwork: 0),
+ (crCommand: 'RADIO TWO KEYER STOP BITS';     crAddress: @Radio2.RadioKeyerStopBits;      crMin:0;  crMax:2;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // ny4i
  (crCommand: 'RADIO TWO NAME';                crAddress: @Radio2.RadioName;               crMin:0;  crMax:20;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 0),
  (crCommand: 'RADIO TWO RECEIVER ADDRESS';    crAddress: @Radio2.ReceiverAddress;         crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfRadio2; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO TWO TRACKING ENABLE';     crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),

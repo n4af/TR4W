@@ -755,7 +755,11 @@ var
   hand                                  : HWND;
   TempByte                              : Byte;
 begin
-  if ActiveRadioPtr.tKeyerPortHandle = INVALID_HANDLE_VALUE then Exit;
+  if ActiveRadioPtr.tKeyerPortHandle = INVALID_HANDLE_VALUE then
+     begin
+     logger.debug('[TurnOnActivePort] Exiting early due to ActiveRadioPtr.tKeyerPortHandle = INVALID_HANDLE_VALUE');
+     Exit;
+     end;
 //  ActivePortOn := True;
 //  CountsSinceLastCW := 0;
 
@@ -1324,7 +1328,7 @@ begin
     exit;
   end;
 }
-
+  logger.debug('[CWThreadProc] AddCharacterToCWBuffer');
 {$IF tDebugMode}
   AddStringToTelnetConsole('AddCharacterToCWBuffer',tstReceived);
 {$IFEND}
@@ -1932,7 +1936,8 @@ begin
     dec(CWBufferStart);
     if CWBufferStart = -1 then CWBufferStart := CWBufferSize;
   end;
-{$IF tDebugMode}
+  logger.debug('[CWThreadProc] CWBufferStart := CWBuferEnd');
+  {$IF tDebugMode}
   AddStringToTelnetConsole('CWBufferStart := CWBufferEnd', tstReceived);
 {$IFEND}
 //  tAllowIncrementCWBufferStart := False;
@@ -2258,7 +2263,7 @@ begin
   begin
     hand := CPUKeyer.SerialPortConfigured_Handle[Radio1.tKeyerPort {ActiveKeyerPort}];
     if hand = INVALID_HANDLE_VALUE then
-      hand := InitializeSerialPort(Radio1.tKeyerPort, Radio1.RadioBaudRate, 8, Tree.tNoParity, 2, FILE_ATTRIBUTE_NORMAL, #0);
+      hand := InitializeSerialPort(Radio1.tKeyerPort, Radio1.RadioBaudRate, 8, Tree.tNoParity, Radio1.RadioKeyerStopBits, FILE_ATTRIBUTE_NORMAL, #0);
     if hand <> INVALID_HANDLE_VALUE then
     begin
       if hand <> INVALID_HANDLE_VALUE then
@@ -2284,7 +2289,9 @@ begin
   begin
     hand := CPUKeyer.SerialPortConfigured_Handle[Radio2.tKeyerPort {Radio2.tr4w_KeyerPort}];
     if hand = INVALID_HANDLE_VALUE then
-      hand := InitializeSerialPort(Radio2.tKeyerPort, Radio2.RadioBaudRate, 8, Tree.tNoParity, 2, FILE_ATTRIBUTE_NORMAL, #0);
+       begin
+       hand := InitializeSerialPort(Radio2.tKeyerPort, Radio2.RadioBaudRate, 8, Tree.tNoParity, Radio2.RadioKeyerStopBits, FILE_ATTRIBUTE_NORMAL, #0);
+       end;
     if hand <> INVALID_HANDLE_VALUE then
     begin
       if hand <> INVALID_HANDLE_VALUE then
@@ -2473,6 +2480,7 @@ begin
   end;
 
   ExitAndPTTof:
+  logger.debug('[CWThreadProc] ExitAndPTTof');
 {$IF tDebugMode}
   AddStringToTelnetConsole('ExitAndPTTof', tstReceived);
 {$IFEND}
@@ -2516,6 +2524,7 @@ end;
 
 procedure tStartAutoCQ;
 begin
+   logger.debug('[CWThreadProc] In tStartAutoCQ');
 {$IF tDebugMode}
   AddStringToTelnetConsole('In tStartAutoCQ', tstReceived);
 {$IFEND}
