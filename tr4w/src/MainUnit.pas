@@ -1139,8 +1139,6 @@ begin
 end;
 
 procedure ReturnInSAPOpMode;
-label
-  loop;
 var
   n: integer;
   TempString: Str10;
@@ -1152,7 +1150,7 @@ begin
   Exchw := ExchangeWindowString;
   Callw := CallWindowString;
   ParseFourFields(ExchangeWindowString, s1, s2, s3, s4);
-   loop:
+  
   if (ExchangeWindowString = '') and (CallWindowString = '') then
     if AutoReturnToCQMode then
     begin
@@ -1244,7 +1242,7 @@ begin
        end;
       end;
 
-    
+
     if ActiveExchange = RSTAndPOTAPark then
     begin
       if pos('/', S1) > 0 then
@@ -1301,18 +1299,7 @@ begin
         SetOpMode(CQOpMode);
     end;
   end;
-  if (S3 <> '') then
-   begin
-    S3 := '';
-    exchangewindowstring := s2;
-    goto loop;
-   end;
-  if (S3 = '') and (S2 <> '')  then
-  begin
-    exchangewindowstring := s1;
-    S2 := '';
-    goto loop;
-  end;
+
   DebugMsg('>>>>Exiting ReturnInSAPOpMode');
 end;
 
