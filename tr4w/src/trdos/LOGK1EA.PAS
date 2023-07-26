@@ -1328,7 +1328,7 @@ begin
     exit;
   end;
 }
-  logger.debug('[CWThraedProc] AddCharacterToCWBuffer');
+  logger.debug('[CWThreadProc] AddCharacterToCWBuffer');
 {$IF tDebugMode}
   AddStringToTelnetConsole('AddCharacterToCWBuffer',tstReceived);
 {$IFEND}
@@ -1936,7 +1936,7 @@ begin
     dec(CWBufferStart);
     if CWBufferStart = -1 then CWBufferStart := CWBufferSize;
   end;
-  logger.debug('[CWThredProc] CWBufferStart := CWBuferEnd');
+  logger.debug('[CWThreadProc] CWBufferStart := CWBuferEnd');
   {$IF tDebugMode}
   AddStringToTelnetConsole('CWBufferStart := CWBufferEnd', tstReceived);
 {$IFEND}
@@ -2263,7 +2263,7 @@ begin
   begin
     hand := CPUKeyer.SerialPortConfigured_Handle[Radio1.tKeyerPort {ActiveKeyerPort}];
     if hand = INVALID_HANDLE_VALUE then
-      hand := InitializeSerialPort(Radio1.tKeyerPort, Radio1.RadioBaudRate, 8, Tree.tNoParity, { 2 } 0, FILE_ATTRIBUTE_NORMAL, #0);
+      hand := InitializeSerialPort(Radio1.tKeyerPort, Radio1.RadioBaudRate, 8, Tree.tNoParity, Radio1.RadioKeyerStopBits, FILE_ATTRIBUTE_NORMAL, #0);
     if hand <> INVALID_HANDLE_VALUE then
     begin
       if hand <> INVALID_HANDLE_VALUE then
@@ -2290,7 +2290,7 @@ begin
     hand := CPUKeyer.SerialPortConfigured_Handle[Radio2.tKeyerPort {Radio2.tr4w_KeyerPort}];
     if hand = INVALID_HANDLE_VALUE then
        begin
-       hand := InitializeSerialPort(Radio2.tKeyerPort, Radio2.RadioBaudRate, 8, Tree.tNoParity, 2, FILE_ATTRIBUTE_NORMAL, #0);
+       hand := InitializeSerialPort(Radio2.tKeyerPort, Radio2.RadioBaudRate, 8, Tree.tNoParity, Radio2.RadioKeyerStopBits, FILE_ATTRIBUTE_NORMAL, #0);
        end;
     if hand <> INVALID_HANDLE_VALUE then
     begin
@@ -2480,7 +2480,7 @@ begin
   end;
 
   ExitAndPTTof:
-  logger.debug('[CWThredProc] ExitAndPTTof');
+  logger.debug('[CWThreadProc] ExitAndPTTof');
 {$IF tDebugMode}
   AddStringToTelnetConsole('ExitAndPTTof', tstReceived);
 {$IFEND}
@@ -2524,7 +2524,7 @@ end;
 
 procedure tStartAutoCQ;
 begin
-   logger.debug('[CWThredProc] In tStartAutoCQ');
+   logger.debug('[CWThreadProc] In tStartAutoCQ');
 {$IF tDebugMode}
   AddStringToTelnetConsole('In tStartAutoCQ', tstReceived);
 {$IFEND}

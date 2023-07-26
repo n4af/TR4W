@@ -229,6 +229,7 @@ type
       RadioBaudRate:   cardinal;
       RadioNumberBits: integer;
       RadioStopBits:   integer;
+      RadioKeyerStopBits: integer;
       RadioParity:     ParityType;
       RadioTCPPort:    integer;
       RadioTimeout:    integer;
