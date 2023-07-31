@@ -2263,7 +2263,16 @@ begin
   begin
     hand := CPUKeyer.SerialPortConfigured_Handle[Radio1.tKeyerPort {ActiveKeyerPort}];
     if hand = INVALID_HANDLE_VALUE then
-      hand := InitializeSerialPort(Radio1.tKeyerPort, Radio1.RadioBaudRate, 8, Tree.tNoParity, Radio1.RadioKeyerStopBits, FILE_ATTRIBUTE_NORMAL, #0);
+       begin
+       if logger.IsErrorEnabled then
+          begin
+          if (radio1.RadioModel in YaesuRadios) and (radio1.RadioKeyerStopBits <> 0) then
+             begin
+             logger.Error('***** Keyer stop bits not set to 0 for a Yaesu radio');
+             end;
+          end;
+       hand := InitializeSerialPort(Radio1.tKeyerPort, Radio1.RadioBaudRate, 8, Tree.tNoParity, Radio1.RadioKeyerStopBits, FILE_ATTRIBUTE_NORMAL, #0);
+       end;
     if hand <> INVALID_HANDLE_VALUE then
     begin
       if hand <> INVALID_HANDLE_VALUE then
@@ -2290,6 +2299,13 @@ begin
     hand := CPUKeyer.SerialPortConfigured_Handle[Radio2.tKeyerPort {Radio2.tr4w_KeyerPort}];
     if hand = INVALID_HANDLE_VALUE then
        begin
+       if logger.IsErrorEnabled then
+          begin
+          if (radio2.RadioModel in YaesuRadios) and (radio2.RadioKeyerStopBits <> 0) then
+             begin
+             logger.Error('***** Keyer stop bits not set to 0 for a Yaesu radio');
+             end;
+          end;
        hand := InitializeSerialPort(Radio2.tKeyerPort, Radio2.RadioBaudRate, 8, Tree.tNoParity, Radio2.RadioKeyerStopBits, FILE_ATTRIBUTE_NORMAL, #0);
        end;
     if hand <> INVALID_HANDLE_VALUE then

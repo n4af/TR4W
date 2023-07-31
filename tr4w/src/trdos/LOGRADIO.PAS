@@ -3150,21 +3150,18 @@ begin
                   TempChar := '4';
                   end;
                end;
-            if Mode = Digital then
+            if (Mode = Digital) and (ActiveRadioPtr.CurrentStatus.Mode = Digital) then  // Issue 681 ny4i Used code from Kenwood branch below.
                begin
-               if ActiveRadioPtr.CurrentStatus.Mode <> Digital then
-                  begin
-                  tKenwood14Bytes[0] := 'M';
-                  tKenwood14Bytes[1] := 'D';
-                  tKenwood14Bytes[2] := '0'; //Ord(VFO) - 17;
-                  tKenwood14Bytes[3] := TempChar;
-                  tKenwood14Bytes[4] := ';';
-                  WriteToCATPort(tKenwood14Bytes, 5);
-                  end
-               else
-                  begin
-                  logger.Debug('Skipping Yaesu mode change since mode was already DIGITAL');
-                  end;
+               logger.debug('Skipping Yaesu mode change because MODE was already DIGITAL');
+               end
+            else
+               begin
+               tKenwood14Bytes[0] := 'M';
+               tKenwood14Bytes[1] := 'D';
+               tKenwood14Bytes[2] := '0'; //Ord(VFO) - 17;
+               tKenwood14Bytes[3] := TempChar;
+               tKenwood14Bytes[4] := ';';
+               WriteToCATPort(tKenwood14Bytes, 5);
                end;
             end;
 
