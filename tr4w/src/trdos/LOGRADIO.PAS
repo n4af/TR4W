@@ -40,7 +40,8 @@ uses
    utils_text,
    ExtCtrls,
    uNetRadioBase,
-   uRadioElecraftK4;
+   uRadioElecraftK4{,
+   uRadioHamLib};  {TODO HAMLIB}
 
 var
    Icom_Filter_Width: integer;     // n4af 4.43.4
@@ -168,6 +169,7 @@ type
       BandMemory:        BandType;
       ModeMemory:        ModeType;
       tNetObject:        TK4Radio;
+      //tHamLibObject:     THamLib;   {TODO HAMLIB}
       FreqWindowHandle: HWND;
       RadioName:        Str20;
       StartupCommand  : Str50;
@@ -446,6 +448,7 @@ type
       DIGL: byte; //DigLOpCode
       DIGU: byte; //DigUOpCode
 
+     { hamlibID: integer; }  {TODO HAMLIB}
       rt: RigType;
    end;
 
@@ -505,7 +508,7 @@ const
     ({Name: 'FT920';      } BR:BR4800;  P: 1; C: 0; S: 0; T:0; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $02; LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $08; DIGU: $0A; rt: rtYaesu1),
     ({Name: 'FT950';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
     ({Name: 'FT990';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $05; DIGL: $08; DIGU: $09; rt: rtYaesu1),
-    ({Name: 'FT991';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu3),
+    ({Name: 'FT991';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; {hamlibID: 1035;} rt: rtYaesu3),
     ({Name: 'FT1000';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $08; DIGU: $09; rt: rtYaesu1),
     ({Name: 'FT1000MP';   } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $02; LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $08; DIGU: $09; rt: rtYaesu1),
     ({Name: 'FT1200';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
@@ -2658,9 +2661,18 @@ var
    dwFlagsAndAttributes: DWORD;
    EvtChar: char;
 begin
-   { Setup the serial port }
 
-   if tCATPortType in [Serial1..Serial20] then
+  { if Self.UseHamLib then
+      begin
+      Self.tHamLibObject := THamLib.Create; // TODO Add serial port parameters to the create and pass here
+      if length(Self.IPAddress) > 0 then
+         begin
+         tHamLibObject.radioAddress := Self.IPAddress;
+         tHamLibObject.radioPort := Self.RadioTCPPort;
+         end;
+      logger.Debug('Setting hamlib connection for radio');
+      end
+   else} if tCATPortType in [Serial1..Serial20] then
       begin
 
       dwFlagsAndAttributes := FILE_ATTRIBUTE_NORMAL;
@@ -3503,71 +3515,54 @@ begin
             i := Format(tOrionFreq, '*AF%02u.%05u'#13, Freq div 1000000,
                (Freq div 10) mod 100000);
 
-            tOrionFreq[1] := VFO;
-
+            tOrionFreq[1] := VFO; // Changed AF to BF if VFO 2.
+            WriteToCATPort(tOrionFreq, i);
+            
             case Mode of
                CW:
                   begin
                   if FT1000MPCWReverse then
                      begin
                      TempChar := '3';
-                     end //  WriteToCATPort('*RMM3'#13, 6)
+                     end
                   else
                      begin
                      TempChar := '2';
                      end;
-                  end; //WriteToCATPort('*RMM2'#13, 6);
+                  end;
                Phone:
                   begin
                   if Freq < 10000000 then
                      begin
                      TempChar := '1';
-                     end //WriteToCATPort('*RMM1'#13, 6)
+                     end
                   else
                      begin
                      TempChar := '0';
                      end;
-                  end; //WriteToCATPort('*RMM0'#13, 6);
+                  end;
+               Digital:
+                  begin
+                  TempChar := '6';        // FSK Mode
+                  end;
                FM:
                   begin
                   TempChar := '5';
-                  end; //WriteToCATPort('*RMM5'#13, 6);
+                  end;
                end;
             Windows.ZeroMemory(@tOrionMode, SizeOf(tOrionMode));
-            Windows.lstrcat(tOrionMode, '*RMM?'#13);
+            Windows.lstrcat(tOrionMode, '*RMM?'#13);    // The ? is replaced with the tempChar for mode.
             tOrionMode[4] := TempChar;
             if VFO = 'B' then
                begin
-               tOrionMode[2] := 'S';
+               tOrionMode[2] := 'S';                  // If VFO B, the first M changes to S to become *RS...
                end;
-            //        WriteToCATPort(tOrionMode, 6);
-
-{
-        Str(Freq, FreqStr);
-        CPUKeyer.AddSerialPortString(tCATPortType, '*' + VFO + 'F' + FreqStr + CarriageReturn);
-
-        case Mode of
-          CW:
-            if FT1000MPCWReverse then
-              CPUKeyer.AddSerialPortString(tCATPortType, '*RMM3' + CarriageReturn)
-            else
-              CPUKeyer.AddSerialPortString(tCATPortType, '*RMM2' + CarriageReturn);
-
-          Phone:
-            if Freq < 10000000 then
-              CPUKeyer.AddSerialPortString(tCATPortType, '*RMM1' + CarriageReturn)
-            else
-              CPUKeyer.AddSerialPortString(tCATPortType, '*RMM0' + CarriageReturn);
-          FM:
-            CPUKeyer.AddSerialPortString(tCATPortType, '*RMM5' + CarriageReturn);
-        end;
-}
+            WriteToCATPort(tOrionMode, 6);   // This was commented out for some reason. Issue 683
             end;
          end;
       except //on E : Exception do
       ; // TLogger.GetInstance.Debug(Format('In SetRadioFreq, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
       end;
-   //TLogger.GetInstance.Debug(SysUtils.Format('[Exit SetRadioFreq] %s',[RadioName]));
 end;
 
 procedure RadioObject.UpdateBandOutputInfo(Band: BandType; Mode: ModeType);
