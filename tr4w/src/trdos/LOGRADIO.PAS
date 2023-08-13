@@ -40,8 +40,8 @@ uses
    utils_text,
    ExtCtrls,
    uNetRadioBase,
-   uRadioElecraftK4{,
-   uRadioHamLib};  {TODO HAMLIB}
+   uRadioElecraftK4,
+   uRadioHamLib;
 
 var
    Icom_Filter_Width: integer;     // n4af 4.43.4
@@ -169,7 +169,7 @@ type
       BandMemory:        BandType;
       ModeMemory:        ModeType;
       tNetObject:        TK4Radio;
-      //tHamLibObject:     THamLib;   {TODO HAMLIB}
+      tHamLibObject:     THamLib;   
       FreqWindowHandle: HWND;
       RadioName:        Str20;
       StartupCommand  : Str50;
@@ -448,7 +448,7 @@ type
       DIGL: byte; //DigLOpCode
       DIGU: byte; //DigUOpCode
 
-     { hamlibID: integer; }  {TODO HAMLIB}
+      hamlibID: integer;
       rt: RigType;
    end;
 
@@ -472,8 +472,8 @@ const
 {(*}
     ({Name: 'NONE';       } BR:BR4800;  P: 1; C: 0; S: 0; T:0; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00),
     ({Name: 'K2';         } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
-    ({Name: 'K3';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
-    ({Name: 'K4';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
+    ({Name: 'K3';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2029; rt: rtKenwood),
+    ({Name: 'K4';         } BR:BR38400; P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2047; rt: rtKenwood),
     ({Name: 'FLEX';       } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),     // 4.87.2
     ({Name: 'TS140';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
     ({Name: 'TS440';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtKenwood),
@@ -508,7 +508,7 @@ const
     ({Name: 'FT920';      } BR:BR4800;  P: 1; C: 0; S: 0; T:0; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $02; LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $08; DIGU: $0A; rt: rtYaesu1),
     ({Name: 'FT950';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
     ({Name: 'FT990';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $05; DIGL: $08; DIGU: $09; rt: rtYaesu1),
-    ({Name: 'FT991';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; {hamlibID: 1035;} rt: rtYaesu3),
+    ({Name: 'FT991';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1035; rt: rtYaesu3),
     ({Name: 'FT1000';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $03; LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $08; DIGU: $09; rt: rtYaesu1),
     ({Name: 'FT1000MP';   } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $02; LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $08; DIGU: $09; rt: rtYaesu1),
     ({Name: 'FT1200';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu2),
@@ -902,6 +902,11 @@ begin
          begin
          Radio1.tNetObject.RITClear(nrVFOA);
          Exit;
+         end
+      else if Radio1.tHamLibObject <> nil then
+         begin
+         Radio1.tHamLibObject.RITClear(nrVFOA);
+         Exit;
          end;
       IntRadioType := Radio1.RadioModel;
 //      SerialPort := Radio1.tCATPortType;
@@ -911,6 +916,11 @@ begin
       if Radio2.tNetObject <> nil then
          begin
          Radio2.tNetObject.RITClear(nrVFOA);
+         Exit;
+         end
+      else if Radio2.tHamLibObject <> nil then
+         begin
+         Radio2.tHamLibObject.RITClear(nrVFOA);
          Exit;
          end;
       IntRadioType := Radio2.RadioModel;
@@ -969,6 +979,11 @@ begin
    if Radio1.tNetObject <> nil then
       begin
       Radio1.tNetObject.RITBumpUp;
+      Exit;
+      end
+   else if Radio1.tHamLibObject <> nil then
+      begin
+      Radio1.tHamLibObject.RITBumpUp;
       Exit;
       end;
    if ActiveRadio = RadioOne then
@@ -1488,7 +1503,8 @@ begin
    SetUpRadioInterface;
 
    if (tCATPortHandle <> INVALID_HANDLE_VALUE) or
-      (Self.tNetObject <> nil)                 then
+      (Self.tNetObject <> nil)                 or
+      (Self.tHamLibObject <> nil)              then
       begin
       if PollingEnable then
          begin
@@ -1714,6 +1730,11 @@ begin
    if Self.tNetObject <> nil then
       begin
       Result := Self.tNetObject.MemoryKeyer(mem);
+      Exit;
+      end;
+   if Self.tHamLibObject <> nil then
+      begin
+      Result := Self.tHamLibObject.MemoryKeyer(mem);
       Exit;
       end;
 
@@ -1968,6 +1989,11 @@ begin
       Exit;
       end;
 
+   if Self.tHamLibObject <> nil then
+      begin
+      Self.tHamLibObject.Split(true);
+      Exit;
+      end;
 
 
    case RadioModel of
@@ -2033,9 +2059,14 @@ procedure RadioObject.PutRadioOutOfSplit;
 
 begin
    //TLogger.GetInstance.Debug(Format('      In PutRadioOutOfSplit: %s',[RadioName]));
-      if Self.tNetObject <> nil then
+   if Self.tNetObject <> nil then
       begin
       Self.tNetObject.Split(false);
+      Exit;
+      end
+   else if Self.tHamLibObject <> nil then
+      begin
+      Self.tHamLibObject.Split(false);
       Exit;
       end;
 
@@ -2594,6 +2625,11 @@ begin
       Self.tNetObject.SendCW('');   // Empty string stops sending
       Exit;
       end;
+   if Self.tHamLibObject <> nil then
+      begin
+      Self.tHamLibObject.SendCW('');   // Empty string stops sending
+      Exit;
+      end;
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
@@ -2662,17 +2698,15 @@ var
    EvtChar: char;
 begin
 
-  { if Self.UseHamLib then
+   if Self.UseHamLib then
       begin
       Self.tHamLibObject := THamLib.Create; // TODO Add serial port parameters to the create and pass here
-      if length(Self.IPAddress) > 0 then
-         begin
-         tHamLibObject.radioAddress := Self.IPAddress;
-         tHamLibObject.radioPort := Self.RadioTCPPort;
-         end;
+      tHamLibObject.radioAddress := '127.0.0.1'; {TODO HAMLIB Make this a parameter to allow overriding if neededSelf.IPAddress;  }
+      tHamLibObject.radioPort := 4532; // Self.RadioTCPPort;
+      tHamLibObject.Connect;
       logger.Debug('Setting hamlib connection for radio');
       end
-   else} if tCATPortType in [Serial1..Serial20] then
+   else if tCATPortType in [Serial1..Serial20] then
       begin
 
       dwFlagsAndAttributes := FILE_ATTRIBUTE_NORMAL;
@@ -2837,6 +2871,12 @@ begin
       Exit;
       end;
 
+   if Self.tHamLibObject <> nil then
+      begin
+      Self.tHamLibObject.SetCWSpeed(speed);
+      Exit;
+      end;
+
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
@@ -2957,6 +2997,47 @@ begin
                end;
             end;
          Self.tNetObject.SetMode(tNetmode,nrVFOA);
+         end;
+      Exit;
+      end;
+
+   if Self.tHamLibObject <> nil then
+      begin
+      if VFO = 'B' then
+         begin
+         //Self.tHamLibObject.SetFrequency(freq,nrVFOB);
+         tNetMode := ModeTypeToNetMode(mode);
+         if tNetMode in [rmLSB,rmUSB] then
+            begin
+            if freq < 8000000 then
+               begin
+               tNetMode := rmLSB;
+               end
+            else
+               begin
+               tNetMode := rmUSB;
+               end;
+            end;
+         Self.tHamLibObject.SetMode(tNetmode,nrVFOB);
+         Self.tHamLibObject.SetFrequency(freq,nrVFOB);
+         end
+      else
+         begin
+         //Self.tHamLibObject.SetFrequency(freq,nrVFOA);
+         tNetMode := ModeTypeToNetMode(mode);
+         if tNetMode in [rmLSB,rmUSB] then
+            begin
+            if freq < 8000000 then
+               begin
+               tNetMode := rmLSB;
+               end
+            else
+               begin
+               tNetMode := rmUSB;
+               end;
+            end;
+         Self.tHamLibObject.SetMode(tNetmode,nrVFOA);
+         Self.tHamLibObject.SetFrequency(freq,nrVFOA);
          end;
       Exit;
       end;

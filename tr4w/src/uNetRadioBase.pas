@@ -4,7 +4,7 @@ interface
 
 uses
    IdTCPClient, IdComponent, IdTCPConnection,IdThreadComponent, SysUtils,
-   Classes, StrUtils, Log4D;
+   Classes, StrUtils, Log4D, VC;
 
 Type TProcessMsgRef = procedure (sMessage: string) of Object;
 Type TBinary = (bOn, bOff);
@@ -79,6 +79,7 @@ Type TNetRadioBase = class(TObject)
       //idThreadComponent   : TIdThreadComponent;
       localAddress: string;
       localPort: integer;
+      localSerialPort: portType;
       rt: TReadingThread;
       baseProcMsg: TProcessMsgRef;
 
@@ -86,6 +87,8 @@ Type TNetRadioBase = class(TObject)
       procedure SetRadioPort(Value: Integer);
       function GetRadioAddress: string;
       procedure SetRadioAddress(Value: string);
+      function GetSerialPort: portType;
+      procedure SetSerialPort (Value: portType);
       function GetCWSpeed: integer;
       function GetIsTransmitting: boolean;
       function GetIsReceiving: boolean;
@@ -141,6 +144,7 @@ Type TNetRadioBase = class(TObject)
       function ModeToString(mode: TRadioMode): string;
       property radioPort: integer read GetRadioPort write SetRadioPort;
       property radioAddress: string read GetRadioAddress write SetRadioAddress;
+      property serialPort: portType read GetSerialPort write SetSerialPort;
       property PTTviaCAT: boolean read GetPTTviaCAT write SetPTTviaCAT;
       property CWSpeed: integer read GetCWSpeed;
       function Connect: integer; overload;
@@ -317,6 +321,18 @@ begin
 
 end;
 
+function TNetRadioBase.GetSerialPort: portType;
+begin
+   Result := Self.localSerialPort;
+end;
+
+procedure TNetRadioBase.SetSerialPort(Value: portType);
+begin
+   Self.localSerialPort := Value;
+   // Since the port was changed, disconnect? Or just wait until next time?
+
+end;
+
 function TNetRadioBase.GetPTTviaCAT: boolean;
 begin
    Result := Self.PTTviaCAT;
@@ -406,16 +422,23 @@ begin
 end;
 
 procedure TNetRadioBase.SendToRadio(s: string);
+var nLen: integer;
 begin
-   if socket.Connected then
-      begin
-      logger.Trace('[SendToRadio] Sending to radio: (%s)',[s]);
-      socket.IOHandler.Write(s);
-      end
-   else
-      begin
-      logger.error('[SendToRadio] Cannot send command (%s) to radio as not connected',[s]);
-      end;
+   try
+      if socket.Connected then
+         begin
+         logger.Trace('[SendToRadio] Sending to radio: (%s)',[s]);
+         nLen := length(s);
+         socket.IOHandler.WriteLn(s);
+         //socket.IOHandler.Write(s,nLen,0);
+         end
+      else
+         begin
+         logger.error('[SendToRadio] Cannot send command (%s) to radio as not connected',[s]);
+         end;
+   except
+      logger.error('Exception caught on TNetRadioBase.SendToRadio - Command to send was %s',[s]);
+   end;
 
 end;
 
@@ -458,7 +481,15 @@ end;
 
 function TNetRadioBase.GetIsConnected: boolean;
 begin
-   Result := socket.Connected;
+   if Assigned(Self.socket) then
+      begin
+      Result := socket.Connected;
+      end
+   else
+      begin
+      logger.debug('In TNetRadioBase.GetIsConnected, socket is nil');
+      Result := false;
+      end;
 end;
 
 function TNetRadioBase.GetFrequency(whichVFO: TVFO) : integer;
@@ -559,8 +590,8 @@ begin
       if FConn.Connected then
          begin
          //logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
-         cmd := FConn.IOHandler.ReadLn(';');
-         //logger.trace('[TReadingThread.Execute] Cmd received: (%s)',[cmd]);
+         cmd := FConn.IOHandler.ReadLn(); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
+         logger.trace('[TReadingThread.Execute] Cmd received: (%s)',[cmd]);
          Self.msgHandler(cmd);
          end
       else
