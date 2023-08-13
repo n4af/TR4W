@@ -131,11 +131,11 @@ begin
           Windows.SetDlgItemText(hwnddlg, i, wsprintfBuffer);
         end;
 
-        {i := 1000;
+        i := 1000;
         Windows.GetDlgItemText(hwnddlg, i, TempBuffer1, SizeOf(TempBuffer1));
         Format(wsprintfBuffer, '%s%s', TempPchar, TempBuffer1);         // This prepends RADIO ONE or RADIO TWO.
         Windows.SetDlgItemText(hwnddlg, i, wsprintfBuffer);
-        }
+
 
         {radio type}
         tCB_SETCURSEL(hwnddlg, 121, Ord(CATWTR^.RadioModel));
@@ -184,10 +184,10 @@ begin
 
         Windows.SetDlgItemText(hwnddlg, 130, PChar(string(CATWTR^.IPAddress)));
         Windows.SetDlgItemInt(hwnddlg, 131, CATWTR^.RadioTCPPort, False);
-        //hamLibCheckBoxWind := GetDlgItem(hwnddlg, 1000);
+        hamLibCheckBoxWind := GetDlgItem(hwnddlg, 1000);
         if CATWTR^.UseHamLib then
            begin
-  // Comment for now until done         Windows.SendDlgItemMessage(hwnddlg, 1000, BM_SETCHECK, BST_CHECKED, 0);
+           Windows.SendDlgItemMessage(hwnddlg, 1000, BM_SETCHECK, BST_CHECKED, 0);
            end;
         EnableWindowFalse(hwnddlg, 117);
         EnableWindowFalse(hwnddlg, 118);
@@ -345,7 +345,7 @@ if (CATWTR^.tCATPortHandle <> INVALID_HANDLE_VALUE) or
     ;
   end;
   // This handles a checkbox for USE HAMLIB but could be used for any checkbox configuration item. ny4i
-  {i := 1000;
+  i := 1000;
   Windows.ZeroMemory(@ID, SizeOf(ID));
   Windows.ZeroMemory(@CMD, SizeOf(CMD));
   ID := GetDialogItemText(CATWndHWND, i);
@@ -357,7 +357,7 @@ if (CATWTR^.tCATPortHandle <> INVALID_HANDLE_VALUE) or
      begin
      CMD := 'FALSE';
      end;
-  }
+
   logger.Trace('[RestartPollingThread] ID = %s, CMD = %s',[ID, CMD]);
   Windows.WritePrivateProfileString('Radio', @ID[1], @CMD[1], TR4W_INI_FILENAME);
   CheckCommand(@ID, CMD);

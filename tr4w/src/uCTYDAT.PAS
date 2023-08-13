@@ -270,6 +270,8 @@ var
 
 implementation
 
+Uses MainUnit;
+
 procedure ctyAddNewPrefixRecord(pr: PrefixRecPtr; CheckDupe: boolean);
 var
   TempIndex                             : integer;
@@ -662,10 +664,17 @@ begin
 
 //  l := 0;
 //  h := CTY.ctyPrefixesTableRecords - 1;
+   if s = '-' then
+      begin
+      logger.Debug('Exiting ctyFindCallsign early because s = -');
+      Exit;
+      end;
+
 
   l := CTY.ctyIndexArray[s[0]];
   h := CTY.ctyIndexArray[CHR(Ord(s[0]) + 1)];
 
+  try
   while l <= h do
   begin
     i := (l + h) shr 1;
@@ -680,6 +689,9 @@ begin
         l := i;
       end;
     end;
+  end;
+  except
+     logger.error('Exception in ctyFindCallsign s = %s',[s]);
   end;
   Index := l;
 end;

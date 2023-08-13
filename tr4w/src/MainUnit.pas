@@ -212,6 +212,7 @@ procedure ProcessImportedSRX_String(fieldValue: string; var exch:
 function GetContestByADIFName(sADIFName: string): ContestType;
 procedure SetExtendedModeFromMode(RData: ContestExchange);
 function GetTR4WBandFromNetworkBand(band: TRadioBand): BandType;
+function GetRadioBandFromBandType(band: BandType): TRadioBand;
 procedure GetTRModeAndExtendedModeFromNetworkMode(netMode: TRadioMode; var mode:
   ModeType; var extMode: extendedModeType);
 
@@ -2027,6 +2028,8 @@ begin
     wsjtx.Stop;
     FreeAndNil(wsjtx);
   end;
+
+
   if Radio1.tNetObject <> nil then
   begin
     FreeAndNil(Radio1.tNetObject);
@@ -2037,6 +2040,16 @@ begin
     FreeAndNil(Radio2.tNetObject);
   end;
 
+  if Radio1.tHamLibObject <> nil then
+  begin
+    FreeAndNil(Radio1.tHamLibObject);
+  end;
+
+  if Radio2.tHamLibObject <> nil then
+  begin
+    FreeAndNil(Radio2.tHamLibObject);
+  end;
+  
   if Assigned(logger) then
   begin
     logger.Info('------------------------------Program shutdown----------------------------');
@@ -3173,26 +3186,36 @@ begin
       begin
         logger.info('Resetting radio ports');
         if ActiveRadioPtr.tNetObject <> nil then
-        begin
-          ActiveRadioPtr.tNetObject.Disconnect;
-          ActiveRadioPtr.tNetObject.Connect;
-        end
+           begin
+           ActiveRadioPtr.tNetObject.Disconnect;
+           ActiveRadioPtr.tNetObject.Connect;
+           end
+        else if ActiveRadioPtr.tHamLibObject <> nil then
+           begin
+           ActiveRadioPtr.tHamLibObject.Disconnect;
+           ActiveRadioPtr.tHamLibObject.Connect;
+           end
         else
-        begin // Active radio is using a serial port
-          ActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
-        end;
+           begin // Active radio is using a serial port
+           ActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
+           end;
         //
         // Handle radio two
         //
         if InActiveRadioPtr.tNetObject <> nil then
-        begin
-          InActiveRadioPtr.tNetObject.Disconnect;
-          InActiveRadioPtr.tNetObject.Connect;
-        end
+           begin
+           InActiveRadioPtr.tNetObject.Disconnect;
+           InActiveRadioPtr.tNetObject.Connect;
+           end
+        else if InActiveRadioPtr.tNetObject <> nil then
+           begin
+           InActiveRadioPtr.tNetObject.Disconnect;
+           InActiveRadioPtr.tNetObject.Connect;
+           end
         else
-        begin
-          InActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
-        end;
+           begin
+           InActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
+           end;
         //
       end;
 
@@ -3668,6 +3691,7 @@ begin
   if key = '-' then
   begin
     tr4w_alt_n_transmit_frequency; // Note this is a toggle
+    tCleareCallWindow;
     Exit;
   end;
   // start sending now code
@@ -8469,6 +8493,30 @@ begin
 
 end;
 
+function GetRadioBandFromBandType(band: BandType): TRadioBand;
+begin
+
+   case band of
+      NoBand: Result := rbNone;
+      Band160: Result := rb160m;
+      Band80: Result := rb80m;
+      Band40: Result := rb40m;
+      Band30: Result := rb30m;
+      Band20: Result := rb20m;
+      Band17: Result := rb17m;
+      Band15: Result := rb15m;
+      Band12: Result := rb12m;
+      Band10: Result := rb10m;
+      Band6: Result := rb6m;
+      Band2: Result := rb2m;
+      Band432: Result := rb70cm;
+   else
+      begin
+      logger.Error('[GetRadioBandFromBandType] band is invalid - Ord is %d',[Ord(band)]);
+      end;
+  end; // of case
+
+end;
 procedure GetTRModeAndExtendedModeFromNetworkMode(netMode: TRadioMode; var mode:
   ModeType; var extMode: extendedModeType);
 begin

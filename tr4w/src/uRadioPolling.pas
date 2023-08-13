@@ -69,6 +69,8 @@ procedure pFT1000MP(rig: RadioPtr);
 procedure pFT100(rig: RadioPtr);
 function ArrayToString(const a: array of Char): string;
 
+procedure pHamLib(rig: RadioPtr);
+
 procedure pIcom(rig: RadioPtr);
 procedure pIcomNew(rig: RadioPtr);
 function icomCheckBuffer(rig: RadioPtr): boolean;
@@ -765,6 +767,67 @@ begin
       rig.CurrentStatus.VFO[VFOA].Frequency := 0;
       rig.CurrentStatus.VFO[VFOB].Frequency := 0;
 
+end;
+
+procedure pHamLib(rig: RadioPtr);
+var ro: TNetRadioBase;
+begin
+
+{ To do a full poll, we need to request the following:
+
+   Active VFO
+   Frequency
+   Mode
+   RIT Offset
+   XIT Offset
+   Split status
+   RIT On/Off status
+   XIT On/Off status
+   Transmit status
+
+   Since these are calls to hamlib, we just send the reuiests here.
+   The TCP socket receive event will process the result when it comes back
+
+   }
+
+   logger.Trace('[pHamLib] Entering polling procedure');
+   ro := rig^.tHamLibObject;
+   while ro.IsConnected do
+      begin
+      rig^.tHamLibObject.SendPollRequests;
+      Sleep(FreqPollRate);
+      rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
+      rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
+      rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
+      rig^.CurrentStatus.Split := ro.IsSplitEnabled;
+      rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
+      rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
+      rig^.CurrentStatus.TXOn := ro.IsTransmitting;
+
+      // VFO A
+      rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig.CurrentStatus.VFO[VFOA].Mode,rig.CurrentStatus.VFO[VFOA].ExtendedMode);
+      rig.CurrentStatus.VFO[VFOA].RIT := ro.IsRITOn[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
+      rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+
+      // VFO B
+      rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
+      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOB],rig.CurrentStatus.VFO[VFOB].Mode,rig.CurrentStatus.VFO[VFOB].ExtendedMode);
+      rig.CurrentStatus.VFO[VFOB].RIT := ro.IsRITOn[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].XIT := ro.IsXITOn[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
+      rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
+
+      UpdateStatus(rig);
+      end;
+
+      logger.Info('Exiting pHamlib');
+      rig.CurrentStatus.VFO[VFOA].Frequency := 0;
+      rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+   
 end;
 
 
@@ -3003,7 +3066,12 @@ begin
       Exit;   // Nothing else is done here so exit
       end;
 
-   // The rest is for serial radio interfaces
+   if rig.tHamLibObject <> nil then
+      begin
+      pHamLib(rig);    // For hamlib testing, TODO HAMLIB uncomment this
+      Exit;   // Nothing else is done here so exit
+      end;
+   // The rest is for direct (non-hamlib) serial radio interfaces
 
    PurgeComm(rig^.tCATPortHandle, PURGE_RXCLEAR or PURGE_RXABORT);
 
