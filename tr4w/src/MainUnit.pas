@@ -186,6 +186,7 @@ function DeviceIoControlHandler
   ): Cardinal;
 
 function IsWin64: Boolean;
+function ConvertPortTypeToCOMString(port: PortType): string;
 function GetLocalComputerName: string;
 procedure CheckNumber;
 procedure RunPlugin(PluginNumber: integer);
@@ -2042,11 +2043,13 @@ begin
 
   if Radio1.tHamLibObject <> nil then
   begin
+    Radio1.tHamLibObject.CleanUp;
     FreeAndNil(Radio1.tHamLibObject);
   end;
 
   if Radio2.tHamLibObject <> nil then
   begin
+    Radio2.tHamLibObject.CleanUp;
     FreeAndNil(Radio2.tHamLibObject);
   end;
   
@@ -8905,6 +8908,22 @@ begin
   end;
 end;
 
+function ConvertPortTypeToCOMString(port: PortType): string;
+begin
+   Result := '';
+   if IntegerBetween(Ord(port),1,20) then
+      begin
+      Result := 'COM' + IntToStr(Ord(port));
+      end
+   else if Ord(port) = 21 then
+      begin
+      Result := 'socket';
+      end
+   else if IntegerBetween(Ord(port),22,25) then
+      begin
+      Result := 'LPT' + IntToStr(Ord(port)-21);
+      end;
+end;
 {
 procedure SelectFileOfFolder(Parent: HWND; FileName: PChar; Mask: PChar; SelectType: CFGType);
 begin
