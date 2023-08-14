@@ -137,7 +137,7 @@ Type TNetRadioBase = class(TObject)
 
       constructor Create(ProcRef: TProcessMsgRef); overload;
       constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
-      Destructor Destroy; overload;
+      Destructor Destroy; overload; Virtual;
 
       procedure SendToRadio(s: string); overload;
       procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload; Virtual; Abstract;
