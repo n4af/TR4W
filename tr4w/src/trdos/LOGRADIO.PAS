@@ -173,6 +173,7 @@ type
       FreqWindowHandle: HWND;
       RadioName:        Str20;
       StartupCommand  : Str50;
+      HamLibID:          integer;
       //    lpOverlapped: TOverlapped;
       //    pOver: POverlapped;
 
@@ -2705,8 +2706,8 @@ begin
       tHamLibObject.radio_useIPAddress := false;
       tHamLibObject.radio_HamLibID := RadioParametersArray[Self.RadioModel].hamlibID; //1035;   RadioParametersArray[RadioModel].SFOC)
    
-      tHamLibObject.radioAddress := '127.0.0.1'; {TODO HAMLIB Make this a parameter to allow overriding if neededSelf.IPAddress;  }
-      tHamLibObject.radioPort := 4532; // Self.RadioTCPPort;
+      tHamLibObject.radioAddress := TR4W_HAMLIBIPADDRESS; // '127.0.0.1'; {TODO HAMLIB Make this a parameter to allow overriding if neededSelf.IPAddress;  }
+      tHamLibObject.radioPort := TR4W_HAMLIBPORT; // 4532; // Self.RadioTCPPort;
       tHamLibObject.Connect;
       logger.Debug('Setting hamlib connection for radio');
       end

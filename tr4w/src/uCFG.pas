@@ -332,6 +332,7 @@ const
    + 2 {UDPLookupInfo} // Issue 612 ny4i
    + 2 {Radio1 & Radio2 UseHamLib} // Issue 676 ny4i
    + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
+   + 5 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTL PORT}
    ;
 
    // Note if crAddress says pointer(NN), then it is callign a function at position NN in the an array
@@ -465,7 +466,10 @@ const
  (crCommand: 'FREQUENCY POLL RATE';           crAddress: @FreqPollRate;                   crMin:10; crMax:1000;    crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
  (crCommand: 'FT1000MP CW REVERSE';           crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'GRID MAP CENTER';               crAddress: @GridMapCenter;                  crMin:0;  crMax:6;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
- (crCommand: 'HAND LOG MODE';                 crAddress: @tHandLogMode;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:1 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
+ (crCommand: 'HAMLIB PATH';                   crAddress: @TR4W_HAMLIBPATH;                crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctFileName; crNetwork: 0),
+ (crCommand: 'HAMLIB RIGCTLD PORT';           crAddress: @TR4W_HAMLIBPORT;                crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // ny4i 4.44.9
+ (crCommand: 'HAMLIB RIGCTLD IP ADDRESS';     crAddress: @TR4W_HAMLIBIPADDRESS;           crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 0),  // ny4i 4.44.9
+ (crCommand: 'HAND LOG MODE';                 crAddress: @tHandLogMode;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:1 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HF BAND ENABLE';                crAddress: @HFBandEnable;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'HOUR DISPLAY';                  crAddress: pointer(8);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther; crNetwork: 1),
 // (crCommand: 'HOUR OFFSET';                   crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
@@ -509,7 +513,7 @@ const
  (crCommand: 'MESSAGE ENABLE';                crAddress: @MessageEnable;                  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'MINITOUR DURATION';             crAddress: @TourDuration;                   crMin:5;  crMax:60;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
  (crCommand: 'MISSINGCALLSIGNS FILE ENABLE';  crAddress: @tMissCallsFileEnable;           crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
- (crCommand: 'MMTTY ENGINE';                  crAddress: @TR4W_MMTTYPATH;                 crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctFileName; crNetwork: 1),
+ (crCommand: 'MMTTY ENGINE';                  crAddress: @TR4W_MMTTYPATH;                 crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctFileName; crNetwork: 0),
  (crCommand: 'MODE';                          crAddress: pointer(5);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckList; cfFunc: cfAll; crType: ctOther; crNetwork: 1),
  (crCommand: 'MODEM PORT BAUD RATE';          crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'MODEM PORT';                    crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctOther; crNetwork: 0),
@@ -638,6 +642,7 @@ const
  (crCommand: 'RADIO ONE CW SPEED SYNC';       crAddress: @Radio1.CWSpeedSync;             crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'RADIO ONE FREQUENCY ADDER';     crAddress: @Radio1.FrequencyAdder;          crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfRadio1; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO ONE FT1000MP CW REVERSE'; crAddress: @Radio1.FT1000MPCWReverse;       crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
+ (crCommand: 'RADIO ONE HAMLIB ID';           crAddress: @Radio1.HamLibID;                crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfRadio1; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO ONE ICOM FILTER BYTE';    crAddress: pointer(15);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO ONE ID CHARACTER';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctChar; crNetwork: 0),
  (crCommand: 'RADIO ONE IP ADDRESS';          crAddress: @Radio1.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctString; crNetwork: 0),
@@ -663,6 +668,7 @@ const
  (crCommand: 'RADIO TWO CW SPEED SYNC';       crAddress: @Radio2.CWSpeedSync;             crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),    // ny4i 4.44.5
  (crCommand: 'RADIO TWO FREQUENCY ADDER';     crAddress: @Radio2.FrequencyAdder;          crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal;  cfFunc: cfRadio2; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO TWO FT1000MP CW REVERSE'; crAddress: @Radio2.FT1000MPCWReverse;       crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
+ (crCommand: 'RADIO TWO HAMLIB ID';           crAddress: @Radio2.HamLibID;                crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfRadio1; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO TWO ICOM FILTER BYTE';    crAddress: pointer(16);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO TWO ID CHARACTER';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctChar; crNetwork: 0),
  (crCommand: 'RADIO TWO IP ADDRESS';          crAddress: @Radio2.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctString; crNetwork: 0),
