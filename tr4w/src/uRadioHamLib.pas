@@ -2,7 +2,7 @@ unit uRadioHamLib;
 
 interface
 uses uNetRadioBase, StrUtils, SysUtils, Math, Classes {for TStringList},
-ShellAPI, Windows;
+ShellAPI, Windows, TF;
 
 type
   THamLib = class(TNetRadioBase)
@@ -106,7 +106,6 @@ var
   hamLibRigParams: string;
 begin
    Result := false;
-   //shResult := ShellExecute(tr4whandle, 'open', PChar('c:\hamlib\bin\rigctld'), PChar('-m 1035 -vvvvv  -s 38400 -r COM12 -o'), nil, 5{SW_SHOW - SW_HIDE=0});
   ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
   StartupInfo.cb := SizeOf(StartupInfo);
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;     // These two lines torun minimized
@@ -136,6 +135,7 @@ var
   WorkingDirP: PChar;
   CMDLine: string;
   hamLibRigParams: string;
+  sHamLibPath: string;
 begin
   ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
   StartupInfo.cb := SizeOf(StartupInfo);
@@ -152,8 +152,17 @@ begin
                       ' --civaddr=' + Self.radio_CIVAddress +  ' ';
      end;
 
+  sHamLibPath := ArrayToString(TR4W_HAMLIBPATH);
+  sHamLibPath := Trim(sHamLibPath);
+  if length(sHamLibPath) = 0 then
+     begin
+     logger.error('HAMLIBPATH does not appear to be set');
+     Exit;
+     end;
 
-  CmdLine := '"' + 'c:\hamlib\bin\rigctld' + '" ' + hamLibRigParams + ' ' +
+
+
+  CmdLine := '"' + sHamLibPath + '" ' + hamLibRigParams + ' ' +
     {  '-m 1035 -s 38400 -r COM12} ' -o -T 127.0.0.1';
   if not CreateProcess(nil, PChar(CmdLine), nil, nil, false, 0, nil,
                        WorkingDirP, StartupInfo, ProcessInfo) then
