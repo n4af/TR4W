@@ -61,6 +61,7 @@ end;
 
 function TK4Radio.Connect: integer;
 begin
+   Self.readTerminator := ';';
    Result := Inherited Connect;
    if Self.IsConnected then
       begin

@@ -1043,13 +1043,23 @@ type
     IC9100,
     IC9700,
     OMNI6,
-    Orion);
+    Orion,
+    FLRIG,
+    TRXMANAGER,
+    FT757GXII,
+    TS890,
+    EXPERTTCI,
+    ACLOG,
+    HAMLIBANY);
 
+
+    
   ICOMRadioTypes = set of InterfacedRadioType;
   KenwoodRadioTypes = set of InterfacedRadioType;
   YaesuRadioTypes = set of InterfacedRadioType;
   InterfacedRadioTypeSet = set of InterfacedRadioType;
-
+  HamLib_ONLY_RadioTypes = set of InterfacedRadioType;
+    
   BandType = (
     Band160,
     Band80,

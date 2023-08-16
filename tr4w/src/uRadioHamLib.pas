@@ -105,29 +105,6 @@ var
   CMDLine: string;
   hamLibRigParams: string;
 begin
-   Result := false;
-  ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
-  StartupInfo.cb := SizeOf(StartupInfo);
-  StartupInfo.dwFlags := STARTF_USESHOWWINDOW;     // These two lines torun minimized
-  StartupInfo.wShowWindow := SW_SHOWMINIMIZED;
-
-  WorkingDirP := nil;
-  hamLibRigParams :=  ' --model=' + IntToStr(Self.radio_HamLibID) +
-                      ' --serial-speed=' + IntToStr(Self.radio_BaudRate) +
-                      ' --rig-file=' + Self.radio_COMPort +
-                      ' --civaddr=' + Self.radio_CIVAddress +
-                      ' '
-                     ;
-  CmdLine := '"' + 'c:\hamlib\bin\rigctld' + '" ' + hamLibRigParams +
-    {  '-m 1035 -s 38400 -r COM12} ' -o -T 127.0.0.1';
-  if not CreateProcess(nil, PChar(CmdLine), nil, nil, false, 0, nil,
-    WorkingDirP, StartupInfo, ProcessInfo) then
-  begin
-    logger.Error('Cound not run rigctld - Error = %s'[GetLastError]);
-  end;
-
-  sleep(500);
-  CloseHandle(ProcessInfo.hProcess); // This allows the task to continue
 end;
 function THamLib.Connect: integer;
 var
@@ -137,15 +114,25 @@ var
   hamLibRigParams: string;
   sHamLibPath: string;
 begin
+  Self.readTerminator := '';
   ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
   StartupInfo.cb := SizeOf(StartupInfo);
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;     // These two lines to run minimized
   StartupInfo.wShowWindow := SW_SHOWMINIMIZED;     // --------------------------------
 
   WorkingDirP := nil;
-  hamLibRigParams :=  ' --model=' + IntToStr(Self.radio_HamLibID) +
-                      ' --serial-speed=' + IntToStr(Self.radio_BaudRate) +
-                      ' --rig-file=' + Self.radio_COMPort;
+  hamLibRigParams :=  ' --model=' + IntToStr(Self.radio_HamLibID);
+  if length(Self.radioAddress) > 0 then
+     begin
+     hamLibRigParams := hamLibRigParams + ' -r ' + Self.radio_IPAddress +
+                                           ':' + IntToStr(Self.radio_Port) + ' ';
+     end
+  else
+     begin
+     hamLibRigParams := hamLibRigParams +
+                        ' --serial-speed=' + IntToStr(Self.radio_BaudRate) +
+                        ' --rig-file=' + Self.radio_COMPort;
+     end;
   if length(Self.radio_CIVAddress) > 0 then
      begin
      hamLibRigParams := hamLibRigParams +
@@ -169,7 +156,7 @@ begin
      begin
      logger.Error('Cound not run rigctld - Error = %s'[GetLastError]);
      end;
-
+  logger.Info('[%s] rigctld started with parameters [%s]',[Self.radioModel,CmdLine]);
   sleep(500);
   CloseHandle(ProcessInfo.hProcess); // This allows the task to continue
   Result := inherited Connect;
@@ -708,7 +695,7 @@ begin
   // sends RX;DT5;, this procedure is called once with RX; and once with DT5;
   try
     slHamLibCommand := TStringList.Create;
-    logger.Trace('[ProcessMessage] Received from radio: (%s)', [sMessage]);
+    logger.Trace('[%s ProcessMessage] Received from radio: (%s)', [Self.radioModel,sMessage]);
     // Exit;
      //slHamLibCommand.Delimiter := ',';
      //slHamLibCommand.QuoteChar := #0;
@@ -716,17 +703,17 @@ begin
     logger.trace('slHamLibCommand.Count = %d', [slHamLibCommand.Count]);
     for i := 0 to slHamLibCommand.Count - 1 do
     begin
-      logger.Trace('slHamLibCommand[%d] = %s', [i, slHamLibCommand[i]]);
+      logger.Trace('[%s] slHamLibCommand[%d] = %s', [Self.radioModel, i, slHamLibCommand[i]]);
     end;
     if slHamLibCommand.Count < 3 then
     begin
-      logger.error('slHamLibCount too small (%d) - sMessage = %s',
-        [slHamLibCommand.Count, sMessage]);
+      logger.error('[%s] slHamLibCount too small (%d) - sMessage = %s',
+        [Self.radioModel, slHamLibCommand.Count, sMessage]);
       Exit;
     end;
     if Trim(slHamLibCommand[slHamLibCommand.Count - 2]) <> 'RPRT' then
     begin
-      logger.Debug('hamLib message missing RPRT code - %s', [sMessage]);
+      logger.Debug('%s hamLib message missing RPRT code - %s', [Self.radioModel,sMessage]);
       // If this is a get_func/get_level message, process it. There is a Hamlib bug where the RPRT is on the next line
       if (AnsiLeftStr(sMessage, 13) = 'get_func: VFO') or
         (AnsiLeftStr(sMessage, 14) = 'get_level: VFO') then
@@ -744,13 +731,13 @@ begin
     end
     else if sResultCode <> '0' then
     begin
-      logger.error('Error response received from hamlib %s - Whole message = %s',
-        [sResultCode, sMessage]);
+      logger.error('[%s] Error response received from hamlib %s - Whole message = %s',
+        [Self.radioModel,sResultCode, sMessage]);
       Exit;
     end
     else
     begin
-      logger.trace('Good response from hamlib (%s)', [sMessage]);
+      logger.trace('[%s] Good response from hamlib (%s)', [Self.radioModel,sMessage]);
     end;
     if slHamLibCommand[1] = 'VFOB' then
     begin

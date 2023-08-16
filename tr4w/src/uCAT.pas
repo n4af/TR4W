@@ -185,6 +185,16 @@ begin
         Windows.SetDlgItemText(hwnddlg, 130, PChar(string(CATWTR^.IPAddress)));
         Windows.SetDlgItemInt(hwnddlg, 131, CATWTR^.RadioTCPPort, False);
         hamLibCheckBoxWind := GetDlgItem(hwnddlg, 1000);
+
+        if RadioType in HAMLibONLYRadios then
+           begin
+           if not CATWTR^.UseHamLib then
+              begin
+              logger.Info('Setting UseHamLib to true because radioModel is a Hamlib only radio');
+              CATWTR^.UseHamLib := true;
+              end;
+           end;
+
         if CATWTR^.UseHamLib then
            begin
            Windows.SendDlgItemMessage(hwnddlg, 1000, BM_SETCHECK, BST_CHECKED, 0);
