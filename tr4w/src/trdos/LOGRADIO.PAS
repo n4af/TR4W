@@ -407,6 +407,7 @@ var
    ICOMRadios:       ICOMRadioTypes;
    KenwoodRadios:    KenwoodRadioTypes;
    YaesuRadios:      YaesuRadioTypes;
+   HAMLIbONLYRadios: HamLib_ONLY_RadioTypes;
 
 const
    RTS_DTR_Values_Array: array[1..4] of PChar =
@@ -457,7 +458,7 @@ type
 //  YaesuReplyRigs                        : array[0..1] of InterfacedRadioType = (FT857, FT897);
 {
  When adding an item here, you have to
-    1. Add a type to the InterfacedRadioType around line 920 in VC.pas
+    1. Add a type to the InterfacedRadioType around line 1060 in VC.pas
     2. Each new radio requires the type in InterfacedRadioType, the entry
        below in the RadioParametersArray array and the literal name of the
        radio in InterfacedRadioTypeSA below.  // Issue 120
@@ -558,8 +559,15 @@ const
     ({Name: 'IC9100';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $7C; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3068; rt: rtIcom),
     ({Name: 'IC9700';     } BR:BR38400; P: 1; C: 0; S: 0; T:0; RA: $A2; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3081; rt: rtIcom),
     ({Name: 'OMNI6';      } BR:BR9600;  P: 1; C: 1; S: 1; T:0; RA: $04; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3051; rt: rtIcom),
-    ({Name: 'ORION';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtOrion)
-   );
+    ({Name: 'ORION';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtOrion),
+    ({Name: 'FLRIG';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtHamlib),
+    ({Name: 'TRXMANAGER';} BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtHamlib),
+    ({Name: 'FT757GXII';  } BR:BR4800;  P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtHamlib),
+    ({Name: 'TS890';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtHamlib),
+    ({Name: 'EXPERTTCI'; } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtHamlib),
+    ({Name: 'ACLOG';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtHamlib),
+    ({Name: 'HAMLIBANY';  } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 16008; rt:rtHamlib)
+);
 {*)}
 const
    InterfacedRadioTypeSA: array[InterfacedRadioType] of PChar = (
@@ -651,8 +659,14 @@ const
       'IC9100',
       'IC9700',
       'OMNI6',
-      'ORION'
-
+      'ORION',
+      'FLRIG',          // HamLib Only
+      'TRX-MANAGER',    // HamLib Only
+      'FT757GXII',      // HamLib Only
+      'TS890',          // HamLib Only
+      'EXPERT-TCI',     // HamLib Only
+      'ACLOG',          // HamLib Only
+      'HAMLIB-ANY'      // HamLib Only
       );
 
  {
@@ -2705,9 +2719,11 @@ begin
       tHamLibObject.radio_BaudRate := Self.RadioBaudRate;   //38400;
       tHamLibObject.radio_useIPAddress := false;
       tHamLibObject.radio_HamLibID := RadioParametersArray[Self.RadioModel].hamlibID; //1035;   RadioParametersArray[RadioModel].SFOC)
-   
-      tHamLibObject.radioAddress := TR4W_HAMLIBIPADDRESS; // '127.0.0.1'; {TODO HAMLIB Make this a parameter to allow overriding if neededSelf.IPAddress;  }
-      tHamLibObject.radioPort := TR4W_HAMLIBPORT; // 4532; // Self.RadioTCPPort;
+      tHamLibObject.radioModel := Self.RadioName;
+      tHamLIbObject.radioAddress := TR4W_HAMLIBIPADDRESS;
+      tHamLibObject.radioPort := TR4W_HAMLIBPORT; {TODO Find out why this is not getting set like it does in K4Radio}
+      tHamLibObject.radio_IPAddress := self.IPAddress;
+      tHamLIbObject.radio_port := Self.RadioTCPPort;
       tHamLibObject.Connect;
       logger.Debug('Setting hamlib connection for radio');
       end
@@ -4005,6 +4021,7 @@ begin
                    FT818, FT840, FT847, FT857, FT890, FT891, FT897, FT900, FT920,
                    FT950, FT990, FT991, FT1000, FT1000MP, FT1200, FT2000,
                    FTDX3000, FTDX5000, FTDX9000];
+   HamLibONLYRadios := [FLRIG,TRXMANAGER,FT757GXII,TS890,EXPERTTCI,ACLOG,HAMLIBANY];
    for i := 1 to 2 do
       begin
       TempRadio := ra[i];

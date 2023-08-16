@@ -50,6 +50,7 @@ end;
 Type TSimpleEventProc = procedure(const aStrParam:string) of object;
 Type TReadingThread = class(TThread)
   protected
+    readTerminator: string;
     FConn: TIdTCPConnection;
     msgHandler: TProcessMsgRef;
     procedure Execute; override;
@@ -114,6 +115,7 @@ Type TNetRadioBase = class(TObject)
       //procedure IdThreadComponentRun(Sender: TIdThreadComponent);
 
    protected
+      readTerminator: string;
       socket: TIdTCPClient;
       localCWSpeed: integer;
       RITState: boolean;
@@ -133,7 +135,7 @@ Type TNetRadioBase = class(TObject)
 
 
    public
-
+      radioModel: string;
 
       constructor Create(ProcRef: TProcessMsgRef); overload;
       constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
@@ -171,6 +173,7 @@ Type TNetRadioBase = class(TObject)
 
 
    published
+
       procedure ProcessMsg(msg: string); Virtual; Abstract;
       procedure Transmit; Virtual; Abstract;
       procedure Receive; Virtual; Abstract;
@@ -278,6 +281,7 @@ procedure TNetRadioBase.OnRadioConnected(Sender: TObject);
 begin
    logger.Info('Network Radio connected');
    rt := TReadingThread.Create(socket, baseProcMsg);
+   rt.readTerminator := Self.readTerminator;
 end;
 
 procedure TNetRadioBase.OnRadioDisconnected(Sender: TObject);
@@ -358,7 +362,7 @@ end;
 function TNetRadioBase.Connect: integer;
 begin
 
-   logger.Info('[TNetRadioBase.Connect] Connecting to network radio at address %s, port = %d',[Self.radioAddress,Self.radioPort]);
+   logger.Info('[TNetRadioBase.Connect] Connecting to network radio at address %s, port = %d',[Self.radioAddress,Self.radioPort]);   // radioaddress here should be 127.0.0.1 to connect to the rigctld. This are getting mixed up.
     if Self.radioPort = 0 then
        begin
        logger.Error('Called connect with port = 0. result = -1');
@@ -584,13 +588,13 @@ var
   cmd: string;
 begin
   logger.trace('DEBUG: TReadingThread.Execute');
-
+   logger.info('In ReadingThread.Execute, readTerminator is [%s]',[Self.readTerminator]);
    while not Terminated do
       begin
       if FConn.Connected then
          begin
          //logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
-         cmd := FConn.IOHandler.ReadLn(); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
+         cmd := FConn.IOHandler.ReadLn(Self.readTerminator); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
          logger.trace('[TReadingThread.Execute] Cmd received: (%s)',[cmd]);
          Self.msgHandler(cmd);
          end
