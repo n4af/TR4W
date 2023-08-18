@@ -177,7 +177,9 @@ Type TNetRadioBase = class(TObject)
       procedure ProcessMsg(msg: string); Virtual; Abstract;
       procedure Transmit; Virtual; Abstract;
       procedure Receive; Virtual; Abstract;
-      procedure SendCW(cwChars: string); Virtual; Abstract;
+      procedure BufferCW(msg: string); Virtual; Abstract;
+      procedure SendCW; Virtual; Abstract;
+      procedure StopCW; Virtual; Abstract;
       procedure SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode); Virtual; Abstract;
       procedure SetMode(mode:TRadioMode); Virtual; Abstract;
       function  ToggleMode: TRadioMode; Virtual; Abstract;

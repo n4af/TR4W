@@ -1418,7 +1418,12 @@ begin
       nNumberOfBytesToWrite);
    Inc(CommandsBufferPointer, nNumberOfBytesToWrite);
 {$ELSE}
-  if Self.tNetObject <> nil then
+  if Self.tHamLibObject <> nil then
+     begin
+     logger.Trace('[AddToOutputBuffer-HamLib] %s',[Buffer]);
+     Self.tHamLibObject.SendToRadio(Buffer);
+     end
+  else if Self.tNetObject <> nil then
      begin
      logger.Trace('[AddToOutputBuffer-Network] %s',[Buffer]);
      Self.tNetObject.SendToRadio(Buffer);
@@ -2337,7 +2342,19 @@ begin
    // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
 
-   (* Removed network code as AddToOutputBuffer will send to net radio // ny4i
+   if Self.tHamLibObject <> nil then
+      begin
+      if Msg[1] = CWByCATBufferTerminator then
+         begin
+         Self.tHamLibObject.SendCW;
+         end
+      else
+         begin
+         Self.tHamLibObject.BufferCW(msg);
+         end;
+      Exit;
+      end;
+   (* Removed network code as AddToOutputBuffer will send to net radio // ny4i  This is a bad kludge. We should call a new procedure to handle CW for networked radios
    if Self.tNetObject <> nil then
       begin
       Self.tNetObject.SendCW(msg);
@@ -2637,12 +2654,12 @@ procedure RadioObject.StopSendingCW;
 begin
    if Self.tNetObject <> nil then
       begin
-      Self.tNetObject.SendCW('');   // Empty string stops sending
+      Self.tNetObject.StopCW;
       Exit;
       end;
    if Self.tHamLibObject <> nil then
       begin
-      Self.tHamLibObject.SendCW('');   // Empty string stops sending
+      Self.tHamLibObject.StopCW;
       Exit;
       end;
    case RadioParametersArray[RadioModel].rt of
@@ -2717,13 +2734,14 @@ begin
       Self.tHamLibObject := THamLib.Create(); // TODO Add serial port parameters to the create and pass here
       tHamLibObject.radio_COMPort :=  ConvertPortTypeToCOMString(Self.tCATPortType);    //  'COM12';
       tHamLibObject.radio_BaudRate := Self.RadioBaudRate;   //38400;
-      tHamLibObject.radio_useIPAddress := false;
+      tHamLibObject.radio_useIPAddress := ConvertPortTypeToCOMString(Self.tCATPortType) = 'TCP/IP';
       tHamLibObject.radio_HamLibID := RadioParametersArray[Self.RadioModel].hamlibID; //1035;   RadioParametersArray[RadioModel].SFOC)
       tHamLibObject.radioModel := Self.RadioName;
       tHamLIbObject.radioAddress := TR4W_HAMLIBIPADDRESS;
       tHamLibObject.radioPort := TR4W_HAMLIBPORT; {TODO Find out why this is not getting set like it does in K4Radio}
       tHamLibObject.radio_IPAddress := self.IPAddress;
       tHamLIbObject.radio_port := Self.RadioTCPPort;
+      Sleep(1000);
       tHamLibObject.Connect;
       logger.Debug('Setting hamlib connection for radio');
       end

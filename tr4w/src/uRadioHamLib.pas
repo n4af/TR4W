@@ -8,6 +8,7 @@ type
   THamLib = class(TNetRadioBase)
   private
     nErrorCode: integer;
+    CWBuffer: string;
     StartupInfo: TStartupInfo;
     ProcessInfo: TProcessInformation;
     //slHamLibCommand: TStringList;
@@ -43,7 +44,9 @@ type
     function Connect: integer; overload;
     procedure Transmit;
     procedure Receive;
-    procedure SendCW(cwChars: string);
+    procedure BufferCW(cwChars: string);
+    procedure SendCW;
+    procedure StopCW;
     procedure SetFrequency(freq: longint; vfo: TVFO);
     procedure SetMode(mode: TRadioMode; vfo: TVFO);
     function ToggleMode(vfo: TVFO): TRadioMode;
@@ -122,7 +125,7 @@ begin
 
   WorkingDirP := nil;
   hamLibRigParams :=  ' --model=' + IntToStr(Self.radio_HamLibID);
-  if length(Self.radioAddress) > 0 then
+  if Self.radio_useIPAddress then
      begin
      hamLibRigParams := hamLibRigParams + ' -r ' + Self.radio_IPAddress +
                                            ':' + IntToStr(Self.radio_Port) + ' ';
@@ -179,24 +182,31 @@ begin
   Self.SendToRadio(nrVFOA, 'T', '0');
 end;
 
-procedure THamLib.SendCW(cwChars: string);
+procedure THamLib.BufferCW(cwChars: string);
+begin
+   Self.CWBuffer := Self.CWBuffer + cwChars;
+end;
+
+procedure THamLib.StopCW;
+var s: string;
+begin
+   s := Chr(187); // 0xBB stops sending when sent to hamlib send_morse
+   Self.SendToRadio(s);
+end;
+
+procedure THamLib.SendCW;
 var
   s: string;
 begin
-  if length(cwChars) = 0 then //Stop Sending
-  begin
-    s := '#bb'; {TODFO HAMLIB} //find right code to stop sending CW
-  end
-  else if length(cwChars) > 60 then
-  begin
-    s := AnsiLeftStr(cwChars, 60);
-    logger.Info('Cannot send more than 60? characters to hamlib - Truncating to %s', [s]);
-  end
-  else
-  begin
-    s := cwChars;
-  end;
-  Self.SendToRadio('b' + s);
+   if length(Self.CWBuffer) > 24 then
+      begin
+      logger.error('Hamlib send_morse command is limited to 24 characters - Skipping send');
+      end
+   else
+      begin
+      Self.SendToRadio('b ' + Self.CWBuffer);
+      end;
+  Self.CWBuffer := '';
 end;
 
 procedure THamLib.SetFrequency(freq: longint; vfo: TVFO);
@@ -668,6 +678,34 @@ begin
   end;
 end;
 
+
+{ RPRT return codes
+
+
+enum rig_errcode_e {
+>      RIG_OK = 0,     /*!< 0 No error, operation completed successfully */
+>      RIG_EINVAL,     /*!< 1 invalid parameter */
+>      RIG_ECONF,      /*!< 2 invalid configuration (serial,..) */
+>      RIG_ENOMEM,     /*!< 3 memory shortage */
+>      RIG_ENIMPL,     /*!< 4 function not implemented, but will be */
+>      RIG_ETIMEOUT,   /*!< 5 communication timed out */
+>      RIG_EIO,        /*!< 6 IO error, including open failed */
+>      RIG_EINTERNAL,  /*!< 7 Internal Hamlib error, huh! */
+>      RIG_EPROTO,     /*!< 8 Protocol error */
+>      RIG_ERJCTED,    /*!< 9 Command rejected by the rig */
+>      RIG_ETRUNC,     /*!< 10 Command performed, but arg truncated */
+>      RIG_ENAVAIL,    /*!< 11 Function not available */
+>      RIG_ENTARGET,   /*!< 12 VFO not targetable */
+>      RIG_BUSERROR,   /*!< 13 Error talking on the bus */
+>      RIG_BUSBUSY,    /*!< 14 Collision on the bus */
+>      RIG_EARG,       /*!< 15 NULL RIG handle or any invalid pointer parameter in get arg */
+>      RIG_EVFO,       /*!< 16 Invalid VFO */
+>      RIG_EDOM,       /*!< 17 Argument out of domain of func */
+>      RIG_EDEPRECATED,/*!< 18 Function deprecated */
+>      RIG_ESECURITY,  /*!< 19 Security error */
+>      RIG_EPOWER      /*!< 20 Rig not powered on */
+> }
+
 procedure THamLib.ProcessMessage(sMessage: string);
 var
   sCommand: string;
@@ -1094,14 +1132,31 @@ begin
 end;
 
 procedure THamLib.Cleanup;
+var bRslt: longBool;
+   nError: integer;
 begin
    if Self.IsConnected then
       begin
       Self.socket.Disconnect;
       end;
-   logger.debug('Terminating rigctld process');
-   TerminateProcess(ProcessInfo.hProcess, nErrorCode);
-   logger.Debug('Errorcode after TerminateProcess %d', [nErrorCode]);
+   logger.Info('*********************************************');
+   logger.info('Terminating rigctld process - processId = %d',[ProcessInfo.dwProcessId]);
+   if not TerminateProcess(ProcessInfo.hProcess, nErrorCode) then
+      begin
+      nError := GetLastError;
+      logger.error('Error terminating rigctld %d - Using taskkill via ShellExecute', [nError]);
+      if tr4w_osverinfo.dwMajorVersion >= 11 then
+         begin
+         nError := ShellExecute(0, 'open', PChar('taskkill'), PChar('/PID ' + IntToStr(ProcessInfo.dwProcessId)), nil, // taskkill is on Win10 and 11
+                                                   SW_HIDE);
+         end
+      else
+         begin
+         nError := ShellExecute(0, 'open', PChar('Powershell.exe'), PChar('-Command "& {Stop-Process -ID ' + IntToStr(ProcessInfo.dwProcessId) + ' -Force"}'), nil, // taskkill is on Win10 and 11
+                                                   SW_HIDE);
+         end;
+      end;
+   logger.Info('********************************************');
 end;
 
 end.
