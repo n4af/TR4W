@@ -6,6 +6,7 @@ uses uNetRadioBase, StrUtils, SysUtils, Math;
 
 Type TK4Radio = class(TNetRadioBase)
    private
+      CWBuffer: string;
       function ParseIFCommand(cmd: string): boolean;
       function ModeStrToMode(sMode: string; sDataMode: string): TRadioMode;
       function BandNumToBand(sBand: string): TRadioBand;
@@ -20,7 +21,9 @@ Type TK4Radio = class(TNetRadioBase)
       function Connect: integer; overload;
       procedure Transmit;
       procedure Receive;
-      procedure SendCW(cwChars: string);
+      procedure BufferCW(cwChars: string);
+      procedure SendCW;
+      procedure StopCW;
       procedure SetFrequency(freq: longint; vfo: TVFO);
       procedure SetMode(mode:TRadioMode; vfo: TVFO);
       function  ToggleMode(vfo: TVFO): TRadioMode;
@@ -80,23 +83,21 @@ begin
    Self.SendToRadio('RX;');
 end;
 
-procedure TK4Radio.SendCW(cwChars: string);
+procedure TK4Radio.StopCW;
+begin
+   Self.SendToRadio(Chr(4) + ';RX;');
+end;
+
+procedure TK4Radio.SendCW;
 var s: string;
 begin
-   if length(cwChars) = 0 then  //Stop Sending
-      begin
-      s := Chr(4) + ';RX';  // The chr(4) tells K4 to stop sending
-      end
-   else if length(cwChars) > 60 then
-      begin
-      s := AnsiLeftStr(cwChars,60);
-      logger.Info('Cannot send more than 60 characters to a K4 - Truncating to %s',[s]);
-      end
-   else
-      begin
-      s := cwChars;
-      end;
-   Self.SendToRadio('KY ' + s + ';');
+   Self.SendToRadio('KY ' + Self.CWBuffer + ';');
+   Self.CWBuffer := '';
+end;
+
+procedure TK4Radio.BufferCW(cwChars: string);
+begin
+   Self.CWBuffer := Self.CWBuffer + cwChars;
 end;
 
 procedure TK4Radio.SetFrequency(freq: longint; vfo: TVFO);
