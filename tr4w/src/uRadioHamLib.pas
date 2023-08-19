@@ -191,7 +191,7 @@ var s: string;
 begin
    s := Chr(187); // 0xBB stops sending when sent to hamlib send_morse
    logger.Debug('[HamLib StopCW] Stopping CW with bb code');
-   Self.SendToRadio(s);
+   Self.SendToRadio(nrVFOA,'\stop_morse');
 end;
 
 procedure THamLib.SendCW;
@@ -465,14 +465,14 @@ begin
   Result := true; // True is an error...default to that value to fail closed        // 0x94 hex (148 decimal) is used as command
   if mem = 0 then
   begin
-    logger.debug('[HamLib-MemoryKeyer] Stopping DVK');   // Use hex AB => Chr(171)
-    Self.SendToRadio(Chr(171));
+    logger.debug('[HamLib-MemoryKeyer] Stopping DVK');
+    Self.SendToRadio(nrVFOA,'\stop_voice_mem');
     Result := false;
   end
   else if IntegerBetween(mem, 1, 8) then       // Use hex 94 => Chr(148)
   begin
     logger.debug('[HamLib-MemoryKeyer] Playing memory %d', [mem]);
-    Self.SendToRadio(CHR(148) + ' ' + IntToStr(mem));
+    Self.SendToRadio(nrVFOA,'\send_voice_mem',IntToStr(mem));
     Result := false;
   end
   else
@@ -726,6 +726,7 @@ var
   slHamLibCommand: TStringList;
   tempBand: BandType;
   tempMode: ModeType;
+  vfoIndex: integer;
 begin
   // This is called by the process that receives data on the socket - Event
   // K4 messages are seperated by semi-colons (;) but each message should not have the ; as that is the ReadLn delimiter.
@@ -763,8 +764,7 @@ begin
       end;
     end;
     sResultCode := Trim(slHamLibCommand[slHamLibCommand.Count - 1]);
-    if (AnsiLeftStr(sMessage, 13) = 'get_func: VFO') or
-      (AnsiLeftStr(sMessage, 14) = 'get_level: VFO') then
+    if (AnsiLeftStr(sMessage, 4) = 'test') then
     begin
     end
     else if sResultCode <> '0' then
@@ -777,7 +777,9 @@ begin
     begin
       logger.trace('[%s] Good response from hamlib (%s)', [Self.radioModel,sMessage]);
     end;
-    if slHamLibCommand[1] = 'VFOB' then
+    
+    vfoIndex := 1;
+    if slHamLibCommand[vfoIndex] = 'VFOB' then
     begin
       vfoBCommand := true;
       vfo := Self.vfo[nrVFOB];
@@ -796,7 +798,7 @@ begin
     //sData := AnsiRightStr(sData,length(sData) - length(sCommand));
     case AnsiIndexText(AnsiUppercase(sCommand), ['set_freq', 'get_freq',
       'get_band', 'get_level', 'get_mode', 'get_func', 'get_ptt', 'get_xit',
-      'get_rit', 'get_split_vfo']) of
+      'get_rit', 'get_split_vfo', 'get_vfo_info']) of
       0:
         begin // set_freq
           logger.trace('[ProcessMessage] set_freq command set to %s',
@@ -804,9 +806,9 @@ begin
         end;
       1:
         begin // get_freq
-          vfo.frequency := StrToIntDef(slHamLibCommand[3], 0);
+          {vfo.frequency := StrToIntDef(slHamLibCommand[3], 0);
           CalculateBandMode(vfo.frequency, TempBand, TempMode);
-          vfo.band := GetRadioBandFromBandType(TempBand);
+          vfo.band := GetRadioBandFromBandType(TempBand);}
         end;
       2:
         begin // get_band
@@ -826,9 +828,9 @@ begin
         end;
       4:
         begin // get_mode
-          vfo.mode := Self.ModeStrToMode(slHamLibCommand[3], vfo.datamode);
+          {vfo.mode := Self.ModeStrToMode(slHamLibCommand[3], vfo.datamode);
           logger.trace('[HamLib ProcessMessage] Mode data = %s',
-            [slHamLibCommand[3]]);
+            [slHamLibCommand[3]]); }
         end;
       5:
         begin // get_func
@@ -902,6 +904,21 @@ begin
         begin // get_split_vfo
           Self.localSplitEnabled := slHamLibCommand[3] = '1';
         end;
+      10: begin     // get_vfo_info
+          if slHamLibCommand[2] = 'VFOB' then
+             begin
+             vfo := Self.vfo[nrVFOB];
+             end
+          else
+             begin
+             vfo := Self.vfo[nrVFOA];
+             end;
+          vfo.frequency := StrToIntDef(slHamLibCommand[4], 0);
+          CalculateBandMode(vfo.frequency, TempBand, TempMode);
+          vfo.band := GetRadioBandFromBandType(TempBand);
+          vfo.mode := Self.ModeStrToMode(slHamLibCommand[6], vfo.datamode);
+          logger.trace('[HamLib ProcessMessage] Mode data = %s',[slHamLibCommand[6]]);
+          end;
     end; // of case
     if firstProcessMessage then
     begin
@@ -1063,15 +1080,17 @@ begin
 
      }
   logger.debug('Sending polling request to HamLib');
-  Self.SendToRadio('v'); // Get current VFO
-  //  cmd := socket.IOHandler.ReadLn('\n');
 
-  Self.SendToRadio(nrVFOA, 'f'); // Get frequency
-  sleep(100);
-  Self.SendToRadio(nrVFOB, 'f'); // Get frequency
-  sleep(100);
-  Self.SendToRadio(nrVFOA, 'm'); // Get mode
-  sleep(100);
+  //Self.SendToRadio('v'); // Get current VFO
+  //  cmd := socket.IOHandler.ReadLn('\n');
+  Self.SendToRadio(nrVFOA, '\get_vfo_info');
+  Self.SendToRadio(nrVFOB, '\get_vfo_info');
+  //Self.SendToRadio(nrVFOA, 'f'); // Get frequency
+  //sleep(100);
+  //Self.SendToRadio(nrVFOB, 'f'); // Get frequency
+  //sleep(100);
+  //Self.SendToRadio(nrVFOA, 'm'); // Get mode
+  //sleep(100);
   //Self.SendToRadio(nrVFOB,'m'); // Get mode
   //sleep(100);
   Self.SendToRadio(nrVFOA, 'j'); // Get RIT offset
