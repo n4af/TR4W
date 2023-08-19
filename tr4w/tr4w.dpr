@@ -315,7 +315,7 @@ begin
    //appender.Layout := TLogHTMLLayout.Create;
    TLogBasicConfigurator.Configure(appender);
    logLevels := llError; // For after we load config so we can set the value.
-   TLogLogger.GetRootLogger.Level := Error;
+   TLogLogger.GetRootLogger.Level := Trace;   // This is because to debug the CFG part, we need top set this since the level has not been read yet.
    logger := TLogLogger.GetLogger('TR4WDebugLog');
    logger.info('******************** PROGRAM STARTUP ************************');
    logger.Trace('trace output');

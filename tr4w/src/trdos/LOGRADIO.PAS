@@ -2734,7 +2734,7 @@ begin
       Self.tHamLibObject := THamLib.Create(); // TODO Add serial port parameters to the create and pass here
       tHamLibObject.radio_COMPort :=  ConvertPortTypeToCOMString(Self.tCATPortType);    //  'COM12';
       tHamLibObject.radio_BaudRate := Self.RadioBaudRate;   //38400;
-      tHamLibObject.radio_useIPAddress := ConvertPortTypeToCOMString(Self.tCATPortType) = 'TCP/IP';
+      tHamLibObject.radio_useIPAddress := ConvertPortTypeToCOMString(Self.tCATPortType) = 'socket';
       tHamLibObject.radio_HamLibID := RadioParametersArray[Self.RadioModel].hamlibID; //1035;   RadioParametersArray[RadioModel].SFOC)
       tHamLibObject.radioModel := Self.RadioName;
       tHamLIbObject.radioAddress := TR4W_HAMLIBIPADDRESS;
