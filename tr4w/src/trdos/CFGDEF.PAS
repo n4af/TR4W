@@ -413,6 +413,7 @@ begin
 //  SendQSOImmediately := True;
 
   TR4W_HAMLIBIPADDRESS := '127.0.0.1';
+  TR4W_HAMLIBRUNRIGCTLD := true;
   TR4W_HAMLIBPORT := 4532;
   SetCQMemoryString(CW, F1, 'CQ TEST \  \ TEST');
   SetCQMemoryString(CW, F2, 'CQ TEST CQ TEST CQ TEST \  \ TEST');

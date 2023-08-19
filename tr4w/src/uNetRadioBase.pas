@@ -4,7 +4,7 @@ interface
 
 uses
    IdTCPClient, IdComponent, IdTCPConnection,IdThreadComponent, SysUtils,
-   Classes, StrUtils, Log4D, VC;
+   Classes, StrUtils, Log4D, VC, Tree;
 
 Type TProcessMsgRef = procedure (sMessage: string) of Object;
 Type TBinary = (bOn, bOff);
@@ -433,7 +433,7 @@ begin
    try
       if socket.Connected then
          begin
-         logger.Trace('[SendToRadio] Sending to radio: (%s)',[s]);
+         logger.Trace('[SendToRadio] Sending to radio: (%s) Hex:[%s]',[s,String2Hex(s)]);
          nLen := length(s);
          socket.IOHandler.WriteLn(s);
          //socket.IOHandler.Write(s,nLen,0);

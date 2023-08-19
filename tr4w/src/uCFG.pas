@@ -332,7 +332,7 @@ const
    + 2 {UDPLookupInfo} // Issue 612 ny4i
    + 2 {Radio1 & Radio2 UseHamLib} // Issue 676 ny4i
    + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
-   + 5 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTL PORT}
+   + 6 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTL PORT, TR4W_HAMLIBRUNRIGCTLD}
    ;
 
    // Note if crAddress says pointer(NN), then it is callign a function at position NN in the an array
@@ -468,7 +468,8 @@ const
  (crCommand: 'GRID MAP CENTER';               crAddress: @GridMapCenter;                  crMin:0;  crMax:6;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
  (crCommand: 'HAMLIB PATH';                   crAddress: @TR4W_HAMLIBPATH;                crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctFileName; crNetwork: 0),
  (crCommand: 'HAMLIB RIGCTLD PORT';           crAddress: @TR4W_HAMLIBPORT;                crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // ny4i 4.44.9
- (crCommand: 'HAMLIB RIGCTLD IP ADDRESS';     crAddress: @TR4W_HAMLIBIPADDRESS;           crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 0),  // ny4i 4.44.9
+ (crCommand: 'HAMLIB RIGCTLD IP ADDRESS';     crAddress: @TR4W_HAMLIBIPADDRESS;           crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctString; crNetwork: 0),  // ny4i 4.44.9
+ (crCommand: 'HAMLIB RIGCTLD RUN AT STARTUP'; crAddress: @TR4W_HAMLIBRUNRIGCTLD;          crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HAND LOG MODE';                 crAddress: @tHandLogMode;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:1 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HF BAND ENABLE';                crAddress: @HFBandEnable;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'HOUR DISPLAY';                  crAddress: pointer(8);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther; crNetwork: 1),

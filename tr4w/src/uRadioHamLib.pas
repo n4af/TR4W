@@ -102,13 +102,10 @@ begin
 end;
 
 function THamLib.Start: boolean;
-var
-  shResult: integer;
-  WorkingDirP: PChar;
-  CMDLine: string;
-  hamLibRigParams: string;
 begin
 end;
+
+
 function THamLib.Connect: integer;
 var
   shResult: integer;
@@ -118,58 +115,60 @@ var
   sHamLibPath: string;
 begin
   Self.readTerminator := '';
-  ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
-  StartupInfo.cb := SizeOf(StartupInfo);
-  StartupInfo.dwFlags := STARTF_USESHOWWINDOW;     // These two lines to run minimized
-  StartupInfo.wShowWindow := SW_SHOWMINIMIZED;     // --------------------------------
-
-  WorkingDirP := nil;
-  hamLibRigParams :=  ' --model=' + IntToStr(Self.radio_HamLibID);
-  if Self.radio_useIPAddress then
+  if TR4W_HAMLIBRUNRIGCTLD then
      begin
-     hamLibRigParams := hamLibRigParams + ' -r ' + Self.radio_IPAddress +
-                                           ':' + IntToStr(Self.radio_Port) + ' ';
+     ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
+     StartupInfo.cb := SizeOf(StartupInfo);
+     //StartupInfo.dwFlags := STARTF_USESHOWWINDOW;     // These two lines to run minimized
+     //StartupInfo.wShowWindow := SW_SHOWMINIMIZED;     // --------------------------------
+
+     WorkingDirP := nil;
+     hamLibRigParams :=  ' --model=' + IntToStr(Self.radio_HamLibID) { + ' -vvvvv '};
+     if Self.radio_useIPAddress then
+        begin
+        hamLibRigParams := hamLibRigParams + ' -r ' + Self.radio_IPAddress +
+                                              ':' + IntToStr(Self.radio_Port) + ' ';
+        end
+     else
+        begin
+        hamLibRigParams := hamLibRigParams +
+                           ' --serial-speed=' + IntToStr(Self.radio_BaudRate) +
+                           ' --rig-file=' + Self.radio_COMPort;
+        end;
+     if length(Self.radio_CIVAddress) > 0 then
+        begin
+        hamLibRigParams := hamLibRigParams +
+                         ' --civaddr=' + Self.radio_CIVAddress +  ' ';
+        end;
+
+
+     sHamLibPath := ArrayToString(TR4W_HAMLIBPATH);
+     sHamLibPath := Trim(sHamLibPath);
+     if length(sHamLibPath) = 0 then
+        begin
+        logger.error('HAMLIBPATH does not appear to be set');
+        Exit;
+        end;
+
+
+
+     CmdLine := '"' + sHamLibPath + '" ' + hamLibRigParams + ' ' +
+       {  '-m 1035 -s 38400 -r COM12} ' -o -T 127.0.0.1';
+
+     if not CreateProcess(nil, PChar(CmdLine), nil, nil, false, 0, nil,
+                          WorkingDirP, StartupInfo, ProcessInfo) then
+        begin
+        logger.Error('Cound not run rigctld - Error = %s'[GetLastError]);
+        end;
+     logger.Info('[%s] rigctld started with parameters [%s]',[Self.radioModel,CmdLine]);
+     sleep(2000);
+     CloseHandle(ProcessInfo.hProcess); // This allows the task to continue
      end
   else
      begin
-     hamLibRigParams := hamLibRigParams +
-                        ' --serial-speed=' + IntToStr(Self.radio_BaudRate) +
-                        ' --rig-file=' + Self.radio_COMPort;
+     logger.warn('For HamLib, rigctld not started due toi TR4W_HAMLIBRUNRIGCTLD set to %s',[BooleanToStr(TR4W_HAMLIBRUNRIGCTLD)]);
      end;
-  if length(Self.radio_CIVAddress) > 0 then
-     begin
-     hamLibRigParams := hamLibRigParams +
-                      ' --civaddr=' + Self.radio_CIVAddress +  ' ';
-     end;
-
-  sHamLibPath := ArrayToString(TR4W_HAMLIBPATH);
-  sHamLibPath := Trim(sHamLibPath);
-  if length(sHamLibPath) = 0 then
-     begin
-     logger.error('HAMLIBPATH does not appear to be set');
-     Exit;
-     end;
-
-
-
-  CmdLine := '"' + sHamLibPath + '" ' + hamLibRigParams + ' ' +
-    {  '-m 1035 -s 38400 -r COM12} ' -o -T 127.0.0.1';
-  if not CreateProcess(nil, PChar(CmdLine), nil, nil, false, 0, nil,
-                       WorkingDirP, StartupInfo, ProcessInfo) then
-     begin
-     logger.Error('Cound not run rigctld - Error = %s'[GetLastError]);
-     end;
-  logger.Info('[%s] rigctld started with parameters [%s]',[Self.radioModel,CmdLine]);
-  sleep(500);
-  CloseHandle(ProcessInfo.hProcess); // This allows the task to continue
   Result := inherited Connect;
-  {if Self.IsConnected then
-     begin
-     Self.SetAIMode(5);
-     Self.SendToRadio('RT;XT;RO;FT;ID;MD;DT$;IF;');
-     Self.SendToRadio('RT$;XT$;RO$;MD$;DT$;IF$;');
-     end;
-     }
 end;
 
 procedure THamLib.Transmit;
@@ -191,6 +190,7 @@ procedure THamLib.StopCW;
 var s: string;
 begin
    s := Chr(187); // 0xBB stops sending when sent to hamlib send_morse
+   logger.Debug('[HamLib StopCW] Stopping CW with bb code');
    Self.SendToRadio(s);
 end;
 
@@ -204,7 +204,8 @@ begin
       end
    else
       begin
-      Self.SendToRadio('b ' + Self.CWBuffer);
+      logger.debug('[HamLib SendCW] Sending buffer %s', [Self.CWBuffer]);
+      Self.SendToRadio('b' + Trim(Self.CWBuffer));
       end;
   Self.CWBuffer := '';
 end;
@@ -269,7 +270,7 @@ begin
   if IntegerBetween(speed, 8, 60) then
   begin
     Self.localCWSpeed := speed;
-    Self.SendToRadio(nrVFOA, 'L', Format('KEYSPD %3d;', [speed]));
+    Self.SendToRadio(nrVFOA, 'L', Format('KEYSPD %3d', [speed]));
   end
   else
   begin
@@ -461,23 +462,22 @@ end;
 
 function THamLib.MemoryKeyer(mem: integer): boolean;
 begin
-  Result := true; // True is an error...default to that value to fail closed
+  Result := true; // True is an error...default to that value to fail closed        // 0x94 hex (148 decimal) is used as command
   if mem = 0 then
   begin
-    logger.debug('[K4-MemoryKeyer] Stopping DVK');
-    Self.SendToRadio('DA0;'); // DA0; Stops all DVK activity
+    logger.debug('[HamLib-MemoryKeyer] Stopping DVK');   // Use hex AB => Chr(171)
+    Self.SendToRadio(Chr(171));
     Result := false;
   end
-  else if IntegerBetween(mem, 1, 8) then
+  else if IntegerBetween(mem, 1, 8) then       // Use hex 94 => Chr(148)
   begin
-    logger.debug('[K4-MemoryKeyer] Playing memory %d', [mem]);
-    Self.SendToRadio(Format('DAMP%d00000;', [mem]));
-      // DAMPmnnnnn; where m is mem number and nnnnn is repeat in ms (set to 00000)
+    logger.debug('[HamLib-MemoryKeyer] Playing memory %d', [mem]);
+    Self.SendToRadio(CHR(148) + ' ' + IntToStr(mem));
     Result := false;
   end
   else
   begin
-    logger.error('Memory value (%d) out of range for a K4 in MemoryKeyer',
+    logger.error('Memory value (%d) out of range for a HamLib in MemoryKeyer',
       [mem]);
     Result := true;
   end;
@@ -1139,24 +1139,27 @@ begin
       begin
       Self.socket.Disconnect;
       end;
-   logger.Info('*********************************************');
-   logger.info('Terminating rigctld process - processId = %d',[ProcessInfo.dwProcessId]);
-   if not TerminateProcess(ProcessInfo.hProcess, nErrorCode) then
+   if TR4W_HAMLIBRUNRIGCTLD then
       begin
-      nError := GetLastError;
-      logger.error('Error terminating rigctld %d - Using taskkill via ShellExecute', [nError]);
-      if tr4w_osverinfo.dwMajorVersion >= 11 then
+      logger.Info('*********************************************');
+      logger.info('Terminating rigctld process - processId = %d',[ProcessInfo.dwProcessId]);
+      if not TerminateProcess(ProcessInfo.hProcess, nErrorCode) then
          begin
-         nError := ShellExecute(0, 'open', PChar('taskkill'), PChar('/PID ' + IntToStr(ProcessInfo.dwProcessId)), nil, // taskkill is on Win10 and 11
-                                                   SW_HIDE);
-         end
-      else
-         begin
-         nError := ShellExecute(0, 'open', PChar('Powershell.exe'), PChar('-Command "& {Stop-Process -ID ' + IntToStr(ProcessInfo.dwProcessId) + ' -Force"}'), nil, // taskkill is on Win10 and 11
-                                                   SW_HIDE);
+         nError := GetLastError;
+         logger.error('Error terminating rigctld %d - Using taskkill via ShellExecute', [nError]);
+         if tr4w_osverinfo.dwMajorVersion >= 11 then
+            begin
+            nError := ShellExecute(0, 'open', PChar('taskkill'), PChar('/PID ' + IntToStr(ProcessInfo.dwProcessId)), nil, // taskkill is on Win10 and 11
+                                                      SW_HIDE);
+            end
+         else
+            begin
+            nError := ShellExecute(0, 'open', PChar('Powershell.exe'), PChar('-Command "& {Stop-Process -ID ' + IntToStr(ProcessInfo.dwProcessId) + ' -Force"}'), nil, // taskkill is on Win10 and 11
+                                                      SW_HIDE);
+            end;
          end;
+      logger.Info('********************************************');
       end;
-   logger.Info('********************************************');
 end;
 
 end.

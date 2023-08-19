@@ -2565,8 +2565,9 @@ var
   TR4W_MMTTYPATH                        : FileNameType;
 
   TR4W_HAMLIBPATH                       : FileNameType;
-  TR4W_HAMLIBIPADDRESS                  : string;
+  TR4W_HAMLIBIPADDRESS                  : str50;
   TR4W_HAMLIBPORT                       : integer;
+  TR4W_HAMLIBRUNRIGCTLD                 : boolean;
   
   TR4W_LC_FILENAME                      : PChar = 'LUCONSZ.TTF';
 
