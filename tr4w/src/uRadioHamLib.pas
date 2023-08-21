@@ -187,11 +187,8 @@ begin
 end;
 
 procedure THamLib.StopCW;
-var s: string;
 begin
-   s := Chr(187); // 0xBB stops sending when sent to hamlib send_morse
-   logger.Debug('[HamLib StopCW] Stopping CW with bb code');
-   Self.SendToRadio(nrVFOA,'\stop_morse');
+   Self.SendToRadio('\stop_morse');
 end;
 
 procedure THamLib.SendCW;
@@ -204,7 +201,7 @@ begin
       end
    else
       begin
-      logger.debug('[HamLib SendCW] Sending buffer %s', [Self.CWBuffer]);
+      logger.debug('[%s HamLib SendCW] Sending buffer %s', [Self.radioModel,Self.CWBuffer]);
       Self.SendToRadio('b' + Trim(Self.CWBuffer));
       end;
   Self.CWBuffer := '';
@@ -214,15 +211,7 @@ procedure THamLib.SetFrequency(freq: longint; vfo: TVFO);
 var
   sCmd: string;
 begin
-  case vfo of
-    nrVFOA: sCmd := 'F VFOA';
-    nrVFOB: sCmd := 'F VFOB';
-  else
-    begin
-      logger.error('[SetFrequency] Invalid VFO passed');
-      Exit;
-    end;
-  end;
+logger.debug('[%s THamLib.SetFrequency] SetFrequency to %d',[Self.radioModel,freq]);
   Self.SendToRadio(vfo, 'F', Format('%d', [freq]));
 end;
 
@@ -324,11 +313,12 @@ procedure THamLib.Split(splitOn: boolean);
 begin
   if splitOn then
   begin
+    logger.debug('Turning on SPLIT');
     Self.SendToRadio(nrVFOA, 'S', '1 VFOB');
   end
   else
   begin
-    Self.SendToRadio(nrVFOA, 'S', '0 VFOA');
+    Self.SendToRadio(nrVFOA, 'S', '0 VFOB');
   end;
 end;
 
@@ -351,7 +341,7 @@ begin
   end
   else
   begin
-    logger.Error('[SetRITFreq] RIT frequency must be between -9999 and 9999 (%d)', [hz]);
+    logger.Error('[%s SetRITFreq] RIT frequency must be between -9999 and 9999 (%d)', [Self.radioModel, hz]);
   end;
 end;
 
@@ -457,7 +447,17 @@ end;
 
 function THamLib.SetFilterHz(whichVFO: TVFO; hz: integer): integer;
 begin
-  logger.Warn('SetFilterHz is not yet implemented on the K4');
+ { TODO HAMLIB Implement the setfilter with the mode command where we pass the
+    current mode but the passband in hz requested
+ 
+ M, set_mode 'Mode' 'Passband'
+Set 'Mode' and 'Passband'.
+
+Mode is a token: ‘USB’, ‘LSB’, ‘CW’, ‘CWR’, ‘RTTY’, ‘RTTYR’, ‘AM’, ‘FM’, ‘WFM’, ‘AMS’, ‘PKTLSB’, ‘PKTUSB’, ‘PKTFM’, ‘ECSSUSB’, ‘ECSSLSB’, ‘FA’, ‘SAM’, ‘SAL’, ‘SAH’, ‘DSB’.
+
+Passband is in Hz as an integer, -1 for no change, or ‘0’ for the radio backend default.
+}
+  logger.Warn('SetFilterHz is not yet implemented in TR4W HamLib code');
 end;
 
 function THamLib.MemoryKeyer(mem: integer): boolean;
@@ -465,20 +465,19 @@ begin
   Result := true; // True is an error...default to that value to fail closed        // 0x94 hex (148 decimal) is used as command
   if mem = 0 then
   begin
-    logger.debug('[HamLib-MemoryKeyer] Stopping DVK');
-    Self.SendToRadio(nrVFOA,'\stop_voice_mem');
+    logger.debug('[%s HamLib-MemoryKeyer] Stopping DVK', [Self.radioModel]);
+    Self.SendToRadio('\stop_voice_mem');
     Result := false;
   end
   else if IntegerBetween(mem, 1, 8) then       // Use hex 94 => Chr(148)
   begin
-    logger.debug('[HamLib-MemoryKeyer] Playing memory %d', [mem]);
-    Self.SendToRadio(nrVFOA,'\send_voice_mem',IntToStr(mem));
+    logger.debug('[%s HamLib-MemoryKeyer] Playing memory %d', [Self.radioModel, mem]);
+    Self.SendToRadio(Format('\send_voice_mem %d',[mem]));
     Result := false;
   end
   else
   begin
-    logger.error('Memory value (%d) out of range for a HamLib in MemoryKeyer',
-      [mem]);
+    logger.error('[%s] Memory value (%d) out of range for a HamLib in MemoryKeyer',[Self.radioModel, mem]);
     Result := true;
   end;
 end;
@@ -971,9 +970,6 @@ end;
 
 procedure THamLib.Initialize;
 begin
-  //Self.SetAIMode(5);
-  //Self.SendToRadio('BN;RT;XT;RO;FT;ID;MD;DT$;IF;FP;');
-  //Self.SendToRadio('BN$;RT$;XT$;RO$;MD$;DT$;IF$;FP$;');
 end;
 
 procedure THamLib.SendToRadio(sCmd: string);
@@ -1079,12 +1075,19 @@ begin
      The TCP socket receive event will process the result when it comes back
 
      }
-  logger.debug('Sending polling request to HamLib');
+  if not Self.IsConnected then
+     begin
+	 logger.debug('Skipping poll commands send as not connected');
+	 Exit;
+	 end;
+  logger.debug('[%s] Sending polling request to HamLib',[Self.RadioModel]);
 
   //Self.SendToRadio('v'); // Get current VFO
   //  cmd := socket.IOHandler.ReadLn('\n');
   Self.SendToRadio(nrVFOA, '\get_vfo_info');
+  sleep(50);
   Self.SendToRadio(nrVFOB, '\get_vfo_info');
+  sleep(50);
   //Self.SendToRadio(nrVFOA, 'f'); // Get frequency
   //sleep(100);
   //Self.SendToRadio(nrVFOB, 'f'); // Get frequency
@@ -1097,6 +1100,7 @@ begin
   Self.SendToRadio(nrVFOB, 'j'); // Get RIT offset
   Self.SendToRadio(nrVFOA, 'z'); // Get XIT offset
   Self.SendToRadio(nrVFOB, 'z'); // Get XIT offset
+  sleep(50);
   Self.SendToRadio(nrVFOA, 's'); // Get split status
   Self.SendToRadio(nrVFOB, 's'); // Get split status
 
@@ -1106,17 +1110,12 @@ begin
   Self.SendToRadio(nrVFOB, 'u', 'XIT'); // Get XIT status
   Self.SendToRadio(nrVFOA, 't'); // Get PTT (transmit) status
   Self.SendToRadio(nrVFOA, 'l', 'KEYSPD'); // Get PTT (transmit) status
-
+  sleep(50);
 end;
 
 function THamLib.ExecuteProcess(const FileName, Params: string; Folder: string;
   WaitUntilTerminated, WaitUntilIdle, RunMinimized: boolean;
   var ErrorCode: integer): boolean;
-var
-  CmdLine: string;
-  WorkingDirP: PChar;
-  StartupInfo: TStartupInfo;
-  ProcessInfo: TProcessInformation;
 begin
   {
     Result := true;
@@ -1165,14 +1164,16 @@ begin
       if not TerminateProcess(ProcessInfo.hProcess, nErrorCode) then
          begin
          nError := GetLastError;
-         logger.error('Error terminating rigctld %d - Using taskkill via ShellExecute', [nError]);
-         if tr4w_osverinfo.dwMajorVersion >= 11 then
+         
+         if tr4w_osverinfo.dwMajorVersion >= 10 then
             begin
+			logger.warn('Error terminating rigctld %d - Using taskkill via ShellExecute', [nError]);
             nError := ShellExecute(0, 'open', PChar('taskkill'), PChar('/PID ' + IntToStr(ProcessInfo.dwProcessId)), nil, // taskkill is on Win10 and 11
                                                       SW_HIDE);
             end
          else
             begin
+			logger.warn('Error terminating rigctld %d - Using PowerShell Stop-Process on Windows %d via ShellExecute', [nError, tr4w_osverinfo.dwMajorVersion]);
             nError := ShellExecute(0, 'open', PChar('Powershell.exe'), PChar('-Command "& {Stop-Process -ID ' + IntToStr(ProcessInfo.dwProcessId) + ' -Force"}'), nil, // taskkill is on Win10 and 11
                                                       SW_HIDE);
             end;
