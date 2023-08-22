@@ -1043,7 +1043,7 @@ type
     IC9100,
     IC9700,
     OMNI6,
-    Orion,
+    ORION,
     FLRIG,
     TRXMANAGER,
     FT757GXII,
