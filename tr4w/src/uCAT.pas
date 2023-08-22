@@ -88,7 +88,8 @@ begin
         SetWindowText(hwnddlg, TempPchar);
 
         {radio}
-        for RadioType := NoInterfacedRadio to Orion do
+		for RadioType := Low(InterfacedRadioType) to High(InterfacedRadioType) do
+        //for RadioType := NoInterfacedRadio to Orion do
           tCB_ADDSTRING(hwnddlg, 121, InterfacedRadioTypeSA[RadioType]);
 
         for I2 := 122 to 123 do
