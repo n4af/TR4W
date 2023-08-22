@@ -119,8 +119,8 @@ begin
      begin
      ZeroMemory(@StartupInfo, SizeOf(StartupInfo));
      StartupInfo.cb := SizeOf(StartupInfo);
-     //StartupInfo.dwFlags := STARTF_USESHOWWINDOW;     // These two lines to run minimized
-     //StartupInfo.wShowWindow := SW_SHOWMINIMIZED;     // --------------------------------
+     StartupInfo.dwFlags := STARTF_USESHOWWINDOW;     // These two lines to run minimized
+     StartupInfo.wShowWindow := SW_SHOWMINIMIZED;     // --------------------------------
 
      WorkingDirP := nil;
      hamLibRigParams :=  ' --model=' + IntToStr(Self.radio_HamLibID) { + ' -vvvvv '};
