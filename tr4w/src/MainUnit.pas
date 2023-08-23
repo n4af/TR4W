@@ -1141,18 +1141,19 @@ begin
 end;
 
 procedure ReturnInSAPOpMode;
+label
+  loop;
 var
   n: integer;
   TempString: Str10;
-
 begin
-
+  n := 0;
   DebugMsg('>>>>Entering ReturnInSAPOpMode');
   ExchangeHasBeenSent := False;
   Exchw := ExchangeWindowString;
   Callw := CallWindowString;
   ParseFourFields(ExchangeWindowString, s1, s2, s3, s4);
-  
+  loop:
   if (ExchangeWindowString = '') and (CallWindowString = '') then
     if AutoReturnToCQMode then
     begin
@@ -1186,7 +1187,8 @@ begin
       (not AutoDupeEnableSandP)) then
 
     begin
-     if GoodCallSyntax(CallWindowString) then
+      // ExchangeHasBeenSent := False;
+      if GoodCallSyntax(CallWindowString) then
       begin
         if not Send_DE then
           Exit;
@@ -1200,6 +1202,7 @@ begin
   if tCallWindowStringIsDupe and {not }AutoDupeEnableSandP then
   begin
     DispalayDupe;
+    // if WindowDupeCheck then
     Exit;
   end;
 
@@ -1215,36 +1218,36 @@ begin
   end;
 
   VisibleLog.DoPossibleCalls(CallWindowString);
+  // DDX(MaybeRespondToMyCall);
 
-  if MessageEnable and (not ExchangeHasBeenSent) and (not BeSilent) then
-   begin
+ // if TwoRadioState = StationCalled then CheckTwoRadioState(ReturnPressed)
+ // else
+  if MessageEnable and (not ExchangeHasBeenSent) and (not BeSilent) and
+    MessageEnable then
+
+  begin
     if ActiveMode = Digital then
       // ny4i Issue153 Just reformatted these few 'IFs' for readability
-      SendMessageToMixW('<TX>');
-
-    if (ActiveExchange = RSTDomesticQTHExchange) then
     begin
-      if (Isalpha(S3))  then
+      SendMessageToMixW('<TX>');
+    end;
+
+    if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange =
+      RSTQTHExchange) then
+    begin
+      if pos('/', S1) > 0 then
       begin
-       CallWindowString := CallW {+ '/' + S3};
-        ExchangeWindowString := S3;
-        BeSilent := True;
-      end
-      else if ((S3 = '') and  (IsAlpha(S2))) then
-       begin
-        ExchangeWindowString := S2;
-         CallWindowString := callw {+ '/' + s2};
-        BeSilent := True;
-       end
-      else   if (s3 = '') and (S2 = '') and (S1 <> '') and (IsAlpha(s1)) then
-       begin
-        ExchangeWindowString := S1;
-          CallWindowString := callw {+ '/' + s1};
-           ExchangeHasBeenSent := True;
-       end;
+        n := pos('/', S1);
+        TempString := leftstr(s1, n - 1);
+        CallWindowString := Callw + '/' + TempString;
+        ExchangeWindowString := TempString;
       end;
-
-
+      if n > 0 then
+        S2 := rightstr(s1, length(s1) - n);
+    end;
+    if (ActiveExchange = RSTDomesticQTHExchange) then
+     if (IsAlpha(S2)) then
+       ExchangeWindowString := S2;
     if ActiveExchange = RSTAndPOTAPark then
     begin
       if pos('/', S1) > 0 then
@@ -1261,20 +1264,19 @@ begin
     end;
 
     if ActiveMode in [CW, Digital] then
-     if not besilent then
-      begin
-       if not SendCrypticMessage(SearchAndPounceExchange) then
+
+      if not SendCrypticMessage(SearchAndPounceExchange) then
         Exit;
-       end;
+
     if ActiveMode = Digital then
-
+    begin
       SendMessageToMixW('<RXANDCLEAR>');
-
+    end;
 
     if ActiveMode in [Phone, FM] then
-
+    begin
       SendCrypticMessage(SearchAndPouncePhoneExchange);
-
+    end;
 
     ExchangeHasBeenSent := True;
 
@@ -1301,9 +1303,21 @@ begin
         SetOpMode(CQOpMode);
     end;
   end;
+  if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange =
+    RSTQTHEXCHANGE) then
+  begin
+    if (IsAlpha(S2)) and (S2 <> '') then
+    begin
 
-  DebugMsg('>>>>Exiting ReturnInSAPOpMode');
-end;
+    CallWindowString := callw;
+      // S3 := '';
+      exchangewindowstring := s1;
+      BeSilent := True;
+      S2 := '';
+      goto loop;
+    end;
+   end;
+  end;
 
 function Send_DE: boolean;
 begin

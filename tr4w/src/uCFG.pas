@@ -332,7 +332,7 @@ const
    + 2 {UDPLookupInfo} // Issue 612 ny4i
    + 2 {Radio1 & Radio2 UseHamLib} // Issue 676 ny4i
    + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
-   + 6 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTL PORT, TR4W_HAMLIBRUNRIGCTLD}
+   + 6 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTLD PORT, HAMLIB RIGCTLD RUN AT STARTUP}
    ;
 
    // Note if crAddress says pointer(NN), then it is callign a function at position NN in the an array
