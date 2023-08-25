@@ -146,8 +146,8 @@ begin
      sHamLibPath := Trim(sHamLibPath);
      if length(sHamLibPath) = 0 then
         begin
-        logger.error('HAMLIBPATH does not appear to be set');
-        Exit;
+        logger.warn('HAMLIBPATH does not appear to be set - will look for rigctld.exe in TARGET directory');
+        sHamLibPath := 'rigctld.exe';
         end;
 
 
@@ -166,7 +166,7 @@ begin
      end
   else
      begin
-     logger.warn('For HamLib, rigctld not started due toi TR4W_HAMLIBRUNRIGCTLD set to %s',[BooleanToStr(TR4W_HAMLIBRUNRIGCTLD)]);
+     logger.warn('For HamLib, rigctld not started due to TR4W_HAMLIBRUNRIGCTLD set to %s',[BooleanToStr(TR4W_HAMLIBRUNRIGCTLD)]);
      end;
   Result := inherited Connect;
 end;

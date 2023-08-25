@@ -3,7 +3,7 @@ unit uNetRadioBase;
 interface
 
 uses
-   IdTCPClient, IdComponent, IdTCPConnection,IdThreadComponent, SysUtils,
+   IdTCPClient, IdComponent, IdTCPConnection,IdThreadComponent, IdExceptionCore, SysUtils,
    Classes, StrUtils, Log4D, VC, Tree;
 
 Type TProcessMsgRef = procedure (sMessage: string) of Object;
@@ -433,7 +433,7 @@ begin
    try
       if socket.Connected then
          begin
-         logger.Trace('[SendToRadio] Sending to radio: (%s) Hex:[%s]',[s,String2Hex(s)]);
+         logger.Trace('[%s SendToRadio] Sending to radio: (%s) Hex:[%s]',[Self.radioModel,String2Hex(s)]);
          nLen := length(s);
          socket.IOHandler.WriteLn(s);
          //socket.IOHandler.Write(s,nLen,0);
@@ -589,20 +589,29 @@ procedure TReadingThread.Execute;
 var
   cmd: string;
 begin
-  logger.trace('DEBUG: TReadingThread.Execute');
+   logger.trace('DEBUG: TReadingThread.Execute');
    logger.info('In ReadingThread.Execute, readTerminator is [%s]',[Self.readTerminator]);
    while not Terminated do
       begin
-      if FConn.Connected then
-         begin
-         //logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
-         cmd := FConn.IOHandler.ReadLn(Self.readTerminator); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
-         logger.trace('[TReadingThread.Execute] Cmd received: (%s)',[cmd]);
-         Self.msgHandler(cmd);
-         end
-      else
-         begin
-         logger.Trace('[TReadingThread.Execute] socket is not connected');
+      try
+         if FConn.Connected then
+            begin
+            //logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
+            cmd := FConn.IOHandler.ReadLn(Self.readTerminator); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
+            logger.trace('[TReadingThread.Execute] Cmd received: (%s)',[cmd]);
+            Self.msgHandler(cmd);
+            end
+         else
+            begin
+            logger.Trace('[TReadingThread.Execute] socket is not connected');
+            end;
+         except
+            on EIdNotConnected do
+               logger.info('Socket exception on TReadingThread.Execute');
+            else
+               begin
+               logger.debug('Unknown exception on TReadingThread.Execute');
+               end;
          end;
       end;
    logger.info('<<<<<<<<<<<< Leaving TReadingThread.Execute >>>>>>>>>>>>>>>>>>');
