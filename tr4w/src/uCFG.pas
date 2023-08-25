@@ -335,7 +335,7 @@ const
    + 6 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTLD PORT, HAMLIB RIGCTLD RUN AT STARTUP}
    ;
 
-   // Note if crAddress says pointer(NN), then it is callign a function at position NN in the an array
+   // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
    CFGCA: array[1..CommandsArraySize] of CFGRecord =
       (
     {(*}
@@ -1572,6 +1572,11 @@ end;
 
 procedure UpdateDebugLogLevel; // This is called when changed in the Config dialog
 begin
+   if not Assigned(logger) then
+      begin
+      // UpdateLogLevel called before logger object has been created
+      Exit;
+      end;
    case logLevels of
       llNone: logger.Level := Off;
       llFatal: logger.level := Fatal;

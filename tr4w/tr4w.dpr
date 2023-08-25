@@ -5,6 +5,7 @@ uses
   Messages,
   MMSystem,
   Windows,
+  iniFiles,
   MainUnit in 'src\MainUnit.pas',
   BeepUnit in 'src\trdos\BeepUnit.pas',
   CFGCMD in 'src\trdos\CfgCmd.pas',
@@ -306,17 +307,36 @@ var
 {$IFEND}
   logBuffer                             : string;
   tempStickyKey                         : STICKYKEYS;
-  tc: tcolor;
-  rgb: cardinal;
+  tc                                    : tcolor;
+  sDebugLevel                           : string;
+  i                                     : tLogLevels;
+  rgb                                   : cardinal;
+  iniFile                               : TINIFile;                    // Used to simply find the DEBUG setting so we can set it when the logger object is created.
+                                                                       // This way we can log before we read the DEBUG LOG LEVEL the legacy method in uCFG. // ny4i
 begin
+   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
+   Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
+   iniFile := TINIFile.create(TR4W_INI_FILENAME);
+   try
    appender := TLogRollingFileAppender.Create('name','tr4w.log');
    //appender.Layout := TLogPatternLayout.Create('%d [%5p] %m%n');
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
    //appender.Layout := TLogHTMLLayout.Create;
    TLogBasicConfigurator.Configure(appender);
-   logLevels := llError; // For after we load config so we can set the value.
-   TLogLogger.GetRootLogger.Level := Trace;   // This is because to debug the CFG part, we need top set this since the level has not been read yet.
    logger := TLogLogger.GetLogger('TR4WDebugLog');
+   //logLevels := llError; // For after we load config so we can set the value.
+   sDebugLevel := iniFile.ReadString('COMMANDS','DEBUG LOG LEVEL', 'ERROR');
+   for i := Low(tLogLevelsSA) to High(tLogLevelsSA) do
+      begin
+      if sDebugLevel = tLogLevelsSA[i] then
+         begin
+         logLevels := tLogLevels(i);
+         break;
+         end;
+      end;
+   UpdateDebugLogLevel;
+   //TLogLogger.GetRootLogger.Level := Error;   // This is because to debug the CFG part, we need top set this since the level has not been read yet.
+
    logger.info('******************** PROGRAM STARTUP ************************');
    logger.Trace('trace output');
 
@@ -401,7 +421,7 @@ begin
 
   LoadTR4WPOSFILE;
 
- 
+
   if not ctyLoadInCountryFile(TR4W_CTY_FILENAME, False, True) then
   begin
     UnableToFindFileMessage(TR4W_CTY_FILENAME);
@@ -430,7 +450,7 @@ begin
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
 
-  
+
 
   if CTY.ctyR150SMode then
   begin
@@ -537,14 +557,7 @@ begin
   mov  [tNet_Event],eax
   end;
 
-  {
-  logger.debug('**************** Program Startup ************************');
-  logger.debug('Current program version = %s',[TR4W_CURRENTVERSION]);
-  logger.debug('Current TR4W Server version = %s',[TR4WSERVER_CURRENTVERSION]);
-  logger.debug('Current log version = %s',[LOGVERSION]);
-  logger.debug('Windows version = %d.%d Build %d',[tr4w_osverinfo.dwMajorVersion, tr4w_osverinfo.dwMinorVersion, tr4w_osverinfo.dwBuildNumber]);
-  logger.debug('%s',[GetOSInfo]);
-   }
+
   if not tHandLogMode then
      begin
      SetTimer(tr4whandle, ONE_SECOND_TIMER_HANDLE, 1000, @OneSecTimerProc);
@@ -599,24 +612,16 @@ begin
 {$IF MORSERUNNER}
   GetMorseRunnerWindow;
 {$IFEND}
-    // This was created earlier so it is before the config items are read.
-   //wsjtx := TWSJTXServer.Create;
+
 
 
    // Send colors for Dupes (QSOB4)
-   //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]);
-   //wsjtx.SetDupeBackgroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
+
    wsjtx.SetDupeBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]));
-   //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]);
-   //wsjtx.SetDupeForegroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
    wsjtx.SetDupeForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]));
 
    // Send colors for multipliers
-   //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]);
-   //wsjtx.SetMultBackgroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
    wsjtx.SetMultBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]));
-   //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]);
-   //wsjtx.SetMultForegroundColor(GetRValue(rgb), GetGValue(rgb), GetBValue(rgb));
    wsjtx.SetMultForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]));
 
    wsjtx.SendColorization := WSJTXSendColorization;
@@ -825,5 +830,12 @@ begin
     NoTransMess:
 //  except sm end;
   end;
+  finally
+     if Assigned(iniFile) then
+        begin
+        iniFile.Free;
+        //Pointer(TINIFile(iniFile)) := nil;
+        end;
+  end; // of Try...finally
 
 end.
