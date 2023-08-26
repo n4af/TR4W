@@ -89,10 +89,10 @@ const
   RC_VIEWEDITLOG_HK                     = #9'Ctrl+L';
   RC_NOTE_HK                            = #9'Ctrl+N';
   RC_MISSMULTSREP_HK                    = #9'Ctrl+O';
-  RC_PTT_HK                             = #9'Ctrl+P';      // 4.53.9
+//  RC_PTT_HK                             = #9'Ctrl+P';      // remove 4.125.4
   RC_QTCFUNCTIONS_HK                    = #9'Ctrl+Q';
   RC_RECALLLASTENT_HK                   = #9'Ctrl+R';
-  RC_Redoposscalls_HK                   = #9'CTRL+ALT+R'; // 4.53.9
+  RC_Redoposscalls_HK                   = #9'CTRL+P'; // 4.53.9
 //  RC_TRANSFREQ_HK                       = #9'Ctrl+T';
   RC_VIEWPAKSPOTS_HK                    = #9'Ctrl+U';
   RC_EXECONFIGFILE_HK                   = #9'Ctrl+V' ;
@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 176 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS and separator};
+    T_MENU_ARRAY_SIZE                     = 175 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS and separator};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -295,8 +295,8 @@ const
     (mrText: RC_VIEWEDITLOG + RC_VIEWEDITLOG_HK; mrId: menu_ctrl_viewlogdat),
     (mrText: RC_NOTE + RC_NOTE_HK; mrId: menu_ctrl_note),
 //    (mrText: RC_MISSMULTSREP + RC_MISSMULTSREP_HK; mrId: menu_ctrl_missmultsreport),  //n4af 04/37.10
-    (mrText:  'PTT' + RC_PTT_HK ; mrId: menu_ctrl_ptt),
-    (mrText:  'REDO Possible Calls' + RC_redoposscalls_HK ; mrId: menu_ctrl_redoposscalls),  // 4.54.5
+//    (mrText:  'PTT' + RC_PTT_HK ; mrId: menu_ctrl_ptt),
+    (mrText:  'Redo Possible Calls' + RC_redoposscalls_HK ; mrId: menu_ctrl_redoposscalls),  // 4.54.5
     (mrText: RC_QTCFUNCTIONS + RC_QTCFUNCTIONS_HK; mrId: menu_ctrl_qtcfunctions),
     (mrText: RC_RECALLLASTENT + RC_RECALLLASTENT_HK; mrId: menu_ctrl_recalllastentry),
     (mrText: RC_SHDX_CALLSIGN + RC_SHDX_CALLSIGN_HK; mrId: menu_ctrl_shdxcallsign),

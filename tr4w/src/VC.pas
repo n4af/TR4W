@@ -2229,7 +2229,7 @@ const
   menu_ctrl_viewlogdat                  = 10403;
   menu_ctrl_note                        = 10404;
   menu_ctrl_missmultsreport             = 10405;
-  menu_ctrl_ptt                         = 10406;    // 4.53.9
+  menu_ctrl_ptt                         = 10427;    // 4.53.9
   menu_ctrl_qtcfunctions                = 10407;
   menu_ctrl_recalllastentry             = 10408;
   menu_ctrl_viewpacketspots             = 10409;
@@ -2252,7 +2252,7 @@ const
   menu_ctrl_clearmultsheet              = 10424;
   menu_ctrl_shdxcallsign                = 10425;
   menu_ctrl_execute_config              = 10426;
-  menu_ctrl_redoposscalls               = 10427; // 4.53.9
+  menu_ctrl_redoposscalls               = 10406; // 4.53.9
 
   menu_mainwindow_setfocus              = 10500;
   menu_insertmode                       = 10501;
