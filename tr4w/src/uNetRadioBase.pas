@@ -433,7 +433,7 @@ begin
    try
       if socket.Connected then
          begin
-         logger.Trace('[%s SendToRadio] Sending to radio: (%s) Hex:[%s]',[Self.radioModel,String2Hex(s)]);
+         logger.Trace('[%s SendToRadio] Sending to radio: (%s) Hex:[%s]',[Self.radioModel,s, String2Hex(s)]);
          nLen := length(s);
          socket.IOHandler.WriteLn(s);
          //socket.IOHandler.Write(s,nLen,0);
