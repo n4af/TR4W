@@ -296,7 +296,7 @@ const
     (mrText: RC_NOTE + RC_NOTE_HK; mrId: menu_ctrl_note),
 //    (mrText: RC_MISSMULTSREP + RC_MISSMULTSREP_HK; mrId: menu_ctrl_missmultsreport),  //n4af 04/37.10
 //    (mrText:  'PTT' + RC_PTT_HK ; mrId: menu_ctrl_ptt),
-    (mrText:  'Redo Possible Calls' + RC_redoposscalls_HK ; mrId: menu_ctrl_redoposscalls),  // 4.54.5
+    (mrText:  'Rotor control' + RC_redoposscalls_HK ; mrId: menu_ctrl_redoposscalls),  // 4.54.5
     (mrText: RC_QTCFUNCTIONS + RC_QTCFUNCTIONS_HK; mrId: menu_ctrl_qtcfunctions),
     (mrText: RC_RECALLLASTENT + RC_RECALLLASTENT_HK; mrId: menu_ctrl_recalllastentry),
     (mrText: RC_SHDX_CALLSIGN + RC_SHDX_CALLSIGN_HK; mrId: menu_ctrl_shdxcallsign),

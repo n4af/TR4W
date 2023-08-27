@@ -1345,7 +1345,7 @@ begin
 
     YODX:
       begin
-//        ContestName := 'YO DX Contest';
+        ContestName := 'YO-DX-HF Contest';
         AddDomesticCountry('YO');
       end;
 
