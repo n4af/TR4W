@@ -1157,7 +1157,8 @@ begin
   if (ExchangeWindowString = '') and (CallWindowString = '') then
     if AutoReturnToCQMode then
     begin
-      tClearDupeInfoCall; // 4.55.6
+ //     tClearDupeInfoCall; // 4.126.1
+ //     clearAltD;         //4.126.1
       NameCallsignPutUp := '';
       CleanUpDisplay;
       if ActiveRadioPtr^.tTwoRadioMode = TR1 then
@@ -1246,8 +1247,8 @@ begin
         S2 := rightstr(s1, length(s1) - n);
     end;
     if (ActiveExchange = RSTDomesticQTHExchange) then
-     if (IsAlpha(S2)) then
-       ExchangeWindowString := S2;
+      if (IsAlpha(S2)) then
+        ExchangeWindowString := S2;
     if ActiveExchange = RSTAndPOTAPark then
     begin
       if pos('/', S1) > 0 then
@@ -1309,15 +1310,15 @@ begin
     if (IsAlpha(S2)) and (S2 <> '') then
     begin
 
-    CallWindowString := callw;
+      CallWindowString := callw;
       // S3 := '';
       exchangewindowstring := s1;
       BeSilent := True;
       S2 := '';
       goto loop;
     end;
-   end;
   end;
+end;
 
 function Send_DE: boolean;
 begin
@@ -2030,7 +2031,6 @@ begin
     FreeAndNil(wsjtx);
   end;
 
-
   if Radio1.tNetObject <> nil then
   begin
     FreeAndNil(Radio1.tNetObject);
@@ -2052,7 +2052,7 @@ begin
     Radio2.tHamLibObject.CleanUp;
     FreeAndNil(Radio2.tHamLibObject);
   end;
-  
+
   if Assigned(logger) then
   begin
     logger.Info('------------------------------Program shutdown----------------------------');
@@ -3189,36 +3189,36 @@ begin
       begin
         logger.info('Resetting radio ports');
         if ActiveRadioPtr.tNetObject <> nil then
-           begin
-           ActiveRadioPtr.tNetObject.Disconnect;
-           ActiveRadioPtr.tNetObject.Connect;
-           end
+        begin
+          ActiveRadioPtr.tNetObject.Disconnect;
+          ActiveRadioPtr.tNetObject.Connect;
+        end
         else if ActiveRadioPtr.tHamLibObject <> nil then
-           begin
-           ActiveRadioPtr.tHamLibObject.Disconnect;
-           ActiveRadioPtr.tHamLibObject.Connect;
-           end
+        begin
+          ActiveRadioPtr.tHamLibObject.Disconnect;
+          ActiveRadioPtr.tHamLibObject.Connect;
+        end
         else
-           begin // Active radio is using a serial port
-           ActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
-           end;
+        begin // Active radio is using a serial port
+          ActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
+        end;
         //
         // Handle radio two
         //
         if InActiveRadioPtr.tNetObject <> nil then
-           begin
-           InActiveRadioPtr.tNetObject.Disconnect;
-           InActiveRadioPtr.tNetObject.Connect;
-           end
+        begin
+          InActiveRadioPtr.tNetObject.Disconnect;
+          InActiveRadioPtr.tNetObject.Connect;
+        end
         else if InActiveRadioPtr.tNetObject <> nil then
-           begin
-           InActiveRadioPtr.tNetObject.Disconnect;
-           InActiveRadioPtr.tNetObject.Connect;
-           end
+        begin
+          InActiveRadioPtr.tNetObject.Disconnect;
+          InActiveRadioPtr.tNetObject.Connect;
+        end
         else
-           begin
-           InActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
-           end;
+        begin
+          InActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
+        end;
         //
       end;
 
@@ -8499,27 +8499,29 @@ end;
 function GetRadioBandFromBandType(band: BandType): TRadioBand;
 begin
 
-   case band of
-      NoBand: Result := rbNone;
-      Band160: Result := rb160m;
-      Band80: Result := rb80m;
-      Band40: Result := rb40m;
-      Band30: Result := rb30m;
-      Band20: Result := rb20m;
-      Band17: Result := rb17m;
-      Band15: Result := rb15m;
-      Band12: Result := rb12m;
-      Band10: Result := rb10m;
-      Band6: Result := rb6m;
-      Band2: Result := rb2m;
-      Band432: Result := rb70cm;
-   else
-      begin
-      logger.Error('[GetRadioBandFromBandType] band is invalid - Ord is %d',[Ord(band)]);
-      end;
+  case band of
+    NoBand: Result := rbNone;
+    Band160: Result := rb160m;
+    Band80: Result := rb80m;
+    Band40: Result := rb40m;
+    Band30: Result := rb30m;
+    Band20: Result := rb20m;
+    Band17: Result := rb17m;
+    Band15: Result := rb15m;
+    Band12: Result := rb12m;
+    Band10: Result := rb10m;
+    Band6: Result := rb6m;
+    Band2: Result := rb2m;
+    Band432: Result := rb70cm;
+  else
+    begin
+      logger.Error('[GetRadioBandFromBandType] band is invalid - Ord is %d',
+        [Ord(band)]);
+    end;
   end; // of case
 
 end;
+
 procedure GetTRModeAndExtendedModeFromNetworkMode(netMode: TRadioMode; var mode:
   ModeType; var extMode: extendedModeType);
 begin
@@ -8910,19 +8912,19 @@ end;
 
 function ConvertPortTypeToCOMString(port: PortType): string;
 begin
-   Result := '';
-   if IntegerBetween(Ord(port),1,20) then
-      begin
-      Result := 'COM' + IntToStr(Ord(port));
-      end
-   else if Ord(port) = 21 then
-      begin
-      Result := 'socket';
-      end
-   else if IntegerBetween(Ord(port),22,25) then
-      begin
-      Result := 'LPT' + IntToStr(Ord(port)-21);
-      end;
+  Result := '';
+  if IntegerBetween(Ord(port), 1, 20) then
+  begin
+    Result := 'COM' + IntToStr(Ord(port));
+  end
+  else if Ord(port) = 21 then
+  begin
+    Result := 'socket';
+  end
+  else if IntegerBetween(Ord(port), 22, 25) then
+  begin
+    Result := 'LPT' + IntToStr(Ord(port) - 21);
+  end;
 end;
 {
 procedure SelectFileOfFolder(Parent: HWND; FileName: PChar; Mask: PChar; SelectType: CFGType);

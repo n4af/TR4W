@@ -549,7 +549,7 @@ var
   BandMapFileVersion                    : Char = '1';
   {KK1L: 6.65 Expanded array to cover all cases to keep BM from going whacko when tuning out of band}
   BandMapFirstEntryList                 : array[Band160..NoBand, CW..FM] of BandMapEntryPointer;
-  BandMapGuardBand                      : integer = 200;
+  BandMapGuardBand                      : integer; // = 200;
   BandMapDisplayLimit                   : integer = 164;   //GAV added for centred   bandmap
   BandMapMultsOnly                      : boolean; {KK1L: 6.68}
   BandMapSplitMode                      : BandMapSplitModeType {= ByCutoffFrequency}; {KK1L: 6.64}
