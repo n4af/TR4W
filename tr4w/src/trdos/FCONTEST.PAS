@@ -564,8 +564,8 @@ begin
         ActiveBand := Band80;
       end;
       
- //    BWQP:
-   //   ActiveExchange := RSTPowerExchange;
+  //    BWQP:
+  //    ActiveExchange := RSTPowerExchange;
 
     BATAVIA_FT8:
       begin

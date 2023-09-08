@@ -3717,9 +3717,9 @@ begin
     end;
   end;
 end;
-{
+ {
 function ProcessRSTAndFOCNumberExchange(Exchange:Str80; var RXData:ContestExchange):boolean;     //n4af function added 4.32.5
-//    ProcessExchange := ProcessRSTNAMEAndPossibleFOCNumber(ExchangeString, RData);             //n4af add foc marathon
+ //    ProcessExchange := ProcessRSTNAMEAndNumber(ExchangeString, RData);             //n4af add foc marathon
 var
  NumberEntries,  Result1       : integer;
    EntryList                             : EntryArray;
@@ -3748,7 +3748,7 @@ ProcessRSTAndFOCNumberExchange := RXData.FOCNumber <> '';
 
   ProcessRSTAndFOCNumberExchange := True;
   end;
-
+  }
   {
   if StringIsAllNumbers(FirstString) then
   FirstString := StrToInt(FirstString);
