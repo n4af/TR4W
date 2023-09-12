@@ -281,8 +281,8 @@ begin
   if QTCsInCurrentGroup <> QTCsReceived then
     if YesOrNo(QTCRWindow, TC_DOYOUREALLYWANTTOSAVETHISQTC) = IDno then Exit;
   if YesOrNo(QTCRWindow, TC_EDITQTCPRESSYESTOEDITQTCORNOTOLOG) = IDYES then Exit;
-  IF QTCsReceived > QTCsInCurrentGroup then
-     QTCsReceived := QTCsReceived - 1;
+  IF QTCsReceived > QTCsInCurrentGroup then   // 4.126.3
+     QTCsReceived := QTCsInCurrentGroup;
   for i := 1 to QTCsReceived do
   begin
     IncrementQTCCount(QTCCallsign);
