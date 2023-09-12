@@ -281,7 +281,7 @@ begin
 
 
       tSetWindowRedraw(BandMapListBox, False);
-      tLB_RESETCONTENT(BandMapListBox);
+     tLB_RESETCONTENT(BandMapListBox);
       SendMessage(BandMapListBox, LB_INITSTORAGE, k , 10000);
       for  k := bottom to top  do SendMessage(BandMapListBox, LB_ADDSTRING, 0, FiltSpotIndex[k]);
       tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
@@ -650,5 +650,6 @@ begin
 
 
 end.
+
 
 

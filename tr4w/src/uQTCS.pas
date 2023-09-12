@@ -275,8 +275,7 @@ begin
                 if YesOrNo2(tr4whandle, wsprintfBuffer) <> IDOK then Exit;
                 SaveQTCS;
                 Exit;
-              end;
-
+              end ;
               inc(QTCWasSend);
 
               EnableWindowTrue(hwnddlg, QTCWasSend + 200);
@@ -405,7 +404,7 @@ var
   QTCRXData                             : ContestExchange;
 
 begin
-  for I := 1 to QTCWasSend do
+  for I := 1 to QTCWasSend do 
   begin
     IncrementQTCCount(QTCCallsign);
     Windows.ZeroMemory(@QTCRXData, SizeOf(ContestExchange));
