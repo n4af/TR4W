@@ -2740,7 +2740,11 @@ begin
       tHamLIbObject.radioAddress := TR4W_HAMLIBIPADDRESS;
       tHamLibObject.radioPort := TR4W_HAMLIBPORT; {TODO Find out why this is not getting set like it does in K4Radio}
       tHamLibObject.radio_IPAddress := self.IPAddress;
-      tHamLIbObject.radio_port := Self.RadioTCPPort;
+      tHamLibObject.radio_port := Self.RadioTCPPort;
+      if Self.ReceiverAddress > 0 then
+         begin
+         tHamLibObject.radio_CIVAddress := IntToStr(Self.ReceiverAddress);
+         end;
       Sleep(1000);
       tHamLibObject.Connect;
       logger.Debug('Setting hamlib connection for radio');
