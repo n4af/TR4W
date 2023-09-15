@@ -1063,6 +1063,7 @@ type
   BandType = (
     Band160,
     Band80,
+    Band60,
     Band40,
     Band20,
     Band15,
@@ -1124,7 +1125,7 @@ type
     frMode: ModeType;
   end;
 const
-  FreqModeArraySize                     = 25;
+  FreqModeArraySize                     = 26;
   FreqModeArray                         : array[1..FreqModeArraySize] of FreqRecord =
 {(*}
     (
@@ -1133,7 +1134,7 @@ const
     (frMin: 3490000;    frMax: 3600000;    frBand:Band80;   frMode: CW),
 //    (frMin: 3530000;    frMax: 3600000;    frBand:Band80;   frMode: NoMode),
     (frMin: 3600000;    frMax: 4000000;    frBand:Band80;   frMode: Phone),
-
+    (frMin: 5350000;    frMax: 5405000;    frBand:Band60;   frMode: NoMode),
     (frMin: 6990000;    frMax: 7040000;    frBand:Band40;   frMode: CW),
     (frMin: 7040000;    frMax: 7100000;    frBand:Band40;   frMode: NoMode),
     (frMin: 7100000;    frMax: 7300000;    frBand:Band40;   frMode: Phone),
@@ -1234,6 +1235,7 @@ const
     (
     '160',
     ' 80',
+    ' 60',
     ' 40',
     ' 20',
     ' 15',
@@ -1261,6 +1263,7 @@ const
     (
     '160',
     '80',
+    '60',
     '40',
     '20',
     '15',
@@ -1288,6 +1291,7 @@ const
     (
     '160m',
     '80m',
+    '60m',
     '40m',
     '20m',
     '15m',
@@ -1315,6 +1319,7 @@ const
     (
     '160',
     '80',
+    '60',
     '40',
     '20',
     '15',
@@ -3222,7 +3227,7 @@ QSOPartiesCount = 18;
  ({Name: 'CQ-WPX-RTTY';                }Email: 'rtty@cqwpx.com';         DF: nil;                 WA7BNM:  245; {SK3BG: nil;          } QRZRUID: 6   ; Pxm: Prefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:CQWPXRTTYQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'CQ-WW-CW';                   }Email: 'cw@cqww.com';            DF: nil;                 WA7BNM:  192; {SK3BG: 'cqwwdxc';    } QRZRUID: 5   ; Pxm: NoPrefixMults; ZnM: CQZones; AIE: CustomInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:CQDXCC; QP:CQWWQSOPointMethod; ADIFName:'';   CABName:''), // 4.105.17
  ({Name: 'CQ-WW-SSB';                  }Email: 'ssb@cqww.com';           DF: nil;                 WA7BNM:  172; {SK3BG: 'cqwwdxc';    } QRZRUID: 4   ; Pxm: NoPrefixMults; ZnM: CQZones; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:CQDXCC; QP:CQWWQSOPointMethod; ADIFName:'';   CABName:''),
- ({Name: 'CROATIAN';                   }Email: nil;                      DF: nil;                 WA7BNM:  206; {SK3BG: '9acwc';      } QRZRUID: 91  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:CQDXCC; QP:CroatianQSOPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'CROATIAN';                  }Email: nil;                       DF: 'croat';            WA7BNM:  206; {SK3BG: '9acwc';      } QRZRUID: 91  ; Pxm: NoPrefixMults; ZnM:ITUZones; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTQSONUMBERORDOMESTICQTHExchange;                XM:CQDXCC; QP:CroatianQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'RF-CUP-CW';                  }Email: nil;                      {DF: 'grids';}           WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 27  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridFields;    P: 0; AE: QSONumberAndGridSquare;                      XM:NoDXMults; QP:CupRFMethod; ADIFName:'';   CABName:''),
  ({Name: 'RF-CUP-SSB';                 }Email: nil;                      {DF: 'grids';}           WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 24  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridFields;    P: 0; AE: QSONumberAndGridSquare;                      XM:NoDXMults; QP:CupRFMethod; ADIFName:'';   CABName:''),
  ({Name: 'RF-CUP-DIG';                 }Email: nil;                      DF: 'grids';             WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 86  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: QSONumberAndGridSquare;                      XM:NoDXMults; QP:CupRFMethod; ADIFName:'';   CABName:''),
