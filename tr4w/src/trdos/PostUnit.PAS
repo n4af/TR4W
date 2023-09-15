@@ -348,6 +348,7 @@ const
   tCabrilloFreqString                   : array[Band160..BandLight] of PChar =
     (
     '1800',
+    '5402',
     '3500',
     '7000',
     '14000',

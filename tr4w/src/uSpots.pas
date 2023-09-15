@@ -146,7 +146,7 @@ begin
               Break;
             end;
       end;
-      if Spot.FBand in [Band30, Band17, Band12] then Spot.FWARCBand := True;
+      if Spot.FBand in [Band60,Band30, Band17, Band12] then Spot.FWARCBand := True;
        if (IE_Switch) then
        begin
         ie_check := True;

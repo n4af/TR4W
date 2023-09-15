@@ -768,12 +768,13 @@ procedure BandChange(var ActiveBand: BandType; Direction: DirectionType);
 label
   NextBand;
 const
-  MAXBANDS = 21;
+  MAXBANDS = 22;
   BandChangeArray: array[1..MAXBANDS] of BandChangeType =
     (
 
     (bcBand: Band160; bcWARC: False; bcVHF: False),
     (bcBand: Band80; bcWARC: False; bcVHF: False),
+    (bcBand: Band60; bcWARC: False; bcVHF: False),
     (bcBand: Band40; bcWARC: False; bcVHF: False),
     (bcBand: Band30; bcWARC: True; bcVHF: False),
     (bcBand: Band20; bcWARC: False; bcVHF: False),
