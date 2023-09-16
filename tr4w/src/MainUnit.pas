@@ -1910,7 +1910,7 @@ begin
     if (Freq > 1000) and (Freq < 1000000) then
       case RadioToSet.BandMemory {BandMemory[RadioToSet]} of
         Band80: Freq := Freq + 3000000;
-        Band60: Freq := Freq  +5300000;
+  //      Band60: Freq := Freq  +5300000;
         Band40: Freq := Freq + 7000000;
         Band20: Freq := Freq + 14000000;
         Band15: Freq := Freq + 21000000;
@@ -8476,7 +8476,7 @@ begin
     rbNone: Result := NoBand;
     rb160m: Result := Band160;
     rb80m: Result := Band80;
-    rb60m: Result := NoBand;
+    rb60m: Result := Band60;
     rb40m: Result := Band40;
     rb30m: Result := Band30;
     rb20m: Result := Band20;
@@ -8504,6 +8504,7 @@ begin
     NoBand: Result := rbNone;
     Band160: Result := rb160m;
     Band80: Result := rb80m;
+    Band60: Result := rb60m;
     Band40: Result := rb40m;
     Band30: Result := rb30m;
     Band20: Result := rb20m;

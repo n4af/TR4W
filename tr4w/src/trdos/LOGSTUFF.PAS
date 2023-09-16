@@ -774,7 +774,7 @@ const
 
     (bcBand: Band160; bcWARC: False; bcVHF: False),
     (bcBand: Band80; bcWARC: False; bcVHF: False),
-    (bcBand: Band60; bcWARC: False; bcVHF: False),
+    (bcBand: Band60; bcWARC: True; bcVHF: False),
     (bcBand: Band40; bcWARC: False; bcVHF: False),
     (bcBand: Band30; bcWARC: True; bcVHF: False),
     (bcBand: Band20; bcWARC: False; bcVHF: False),
@@ -846,141 +846,7 @@ begin
       goto NextBand;
   end;
 
-  {
-    if Direction = DirectionUp then
-    begin
-      case ActiveBand of
-        Band160: ActiveBand := Band80;
-        Band80: ActiveBand := Band40;
 
-        Band40:
-          if WARCBandsEnabled then
-            ActiveBand := Band30
-          else
-            ActiveBand := Band20;
-
-        Band30: ActiveBand := Band20;
-
-        Band20:
-          if WARCBandsEnabled then
-            ActiveBand := Band17
-          else
-            ActiveBand := Band15;
-
-        Band17: ActiveBand := Band15;
-
-        Band15:
-          if WARCBandsEnabled then
-            ActiveBand := Band12
-          else
-            ActiveBand := Band10;
-
-        Band12: ActiveBand := Band10;
-
-        Band10:
-          if VHFBandsEnabled then
-            ActiveBand := Band6
-          else
-            ActiveBand := Band160;
-
-        Band6: ActiveBand := Band2;
-        Band2: ActiveBand := Band222;
-        Band222: ActiveBand := Band432;
-        Band432: ActiveBand := Band902;
-        Band902: ActiveBand := Band1296;
-        Band1296: ActiveBand := Band2304;
-        Band2304: ActiveBand := Band3456;
-        Band3456: ActiveBand := Band5760;
-        Band5760: ActiveBand := Band10G;
-        Band10G: ActiveBand := Band24G;
-        Band24G: ActiveBand := BandLight;
-        BandLight:
-          if HFBandEnable then
-            ActiveBand := Band160
-          else
-            ActiveBand := Band6;
-
-      else ActiveBand := Band160;
-
-        BandChange(ActiveBand, Direction);
-      end;
-
-      if SkipActiveBand and ((Radio1.BandMemory
-  //        BandMemory[RadioOne]
-        = ActiveBand) or
-        (Radio2.BandMemory
-  //          BandMemory[RadioTwo]
-        = ActiveBand)) then
-        BandChange(ActiveBand, Direction);
-    end
-
-    else
-  //      KK1l: 6.72 Note Direction = DirectionDown
-    begin
-      case ActiveBand of
-        Band160:
-          if VHFBandsEnabled then
-            ActiveBand := BandLight
-          else
-            ActiveBand := Band10;
-
-        Band80: ActiveBand := Band160;
-        Band40: ActiveBand := Band80;
-
-        Band30: ActiveBand := Band40;
-
-        Band20:
-          if WARCBandsEnabled then
-            ActiveBand := Band30
-          else
-            ActiveBand := Band40;
-
-        Band17: ActiveBand := Band20;
-
-        Band15:
-          if WARCBandsEnabled then
-            ActiveBand := Band17
-          else
-            ActiveBand := Band20;
-
-        Band12: ActiveBand := Band15;
-
-        Band10:
-          if WARCBandsEnabled then
-            ActiveBand := Band12
-          else
-            ActiveBand := Band15;
-
-        Band6:
-          if HFBandEnable then
-            ActiveBand := Band10
-          else
-            ActiveBand := BandLight;
-
-        Band2: ActiveBand := Band6;
-        Band222: ActiveBand := Band2;
-        Band432: ActiveBand := Band222;
-        Band902: ActiveBand := Band432;
-        Band1296: ActiveBand := Band902;
-        Band2304: ActiveBand := Band1296;
-        Band3456: ActiveBand := Band2304;
-        Band5760: ActiveBand := Band3456;
-        Band10G: ActiveBand := Band5760;
-        Band24G: ActiveBand := Band10G;
-        BandLight: ActiveBand := Band24G;
-
-      else ActiveBand := Band160;
-      end;
-
-      if SkipActiveBand and ((Radio1.BandMemory
-  //        BandMemory[RadioOne]
-        = ActiveBand) or
-        (Radio2.BandMemory
-  //          BandMemory[RadioTwo]
-        = ActiveBand)) then
-        BandChange(ActiveBand, Direction);
-    end;
-  }
   SendStationStatus(sstBandModeFreq);
 
   //{WLI}

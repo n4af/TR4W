@@ -50,7 +50,7 @@ utils_text,
 
 const
   tBaseFrequencys                       : array[Band160..Band12] of integer =
-    (1000, 3000, 5332, 7000, 14000, 21000, 28000, 10000, 18000, 24000);
+    (1000, 3000,  7000, 14000, 21000, 28000,5332, 10000, 18000, 24000);
 //T1 : Cardinal = 1800000;
 var
   BufLine                               : integer = 0;
@@ -529,11 +529,11 @@ var
     (
     1840000,
     3700000,
-    53320000,
     7100000,
     14100000,
     21150000,
     28300000,
+    5332000,
     10150000,
     18110000,
     24930000,
@@ -665,11 +665,11 @@ var
     (
     (0001820000, 1840000, 0001840000),
     (0003525000, 3580000, 0003850000),
-    (0005332000, 5405000, 0005405000),
     (0007025000, 7040000, 0007070000),
     (0014025000, 14080000, 0014225000),
     (0021025000, 21080000, 0021300000),
     (0028050000, 28080000, 0028400000),
+    (0005300000, 05351500, 0005350000),
     (0010105000, 10125000, 0010105000),
     (0018068000, 18110000, 0018110000),
     (0024890000, 24920000, 0024930000),
@@ -2974,7 +2974,7 @@ begin
     begin
 
       if (not WARCBandsEnabled) and
-        ((Band = Band30) or (Band = Band17) or (Band = Band12)) then
+        ((Band = Band60) or (Band =Band30) or (Band = Band17) or (Band = Band12)) then
         Continue; {KK1L: 6.64 Keep band map within contest limits}
 
       BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
@@ -3080,7 +3080,7 @@ begin
     begin
 
       if (not WARCBandsEnabled) and
-        ((Band = Band30) or (Band = Band17) or (Band = Band12)) then
+        ((Band = Band60) or (Band = Band30) or (Band = Band17) or (Band = Band12)) then
         Continue; {KK1L: 6.64 Keep band map within contest limits}
 
       BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
