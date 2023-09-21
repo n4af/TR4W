@@ -1154,7 +1154,7 @@ const
     (frMin: 24890000;   frMax: 24930000;   frBand:Band12;   frMode: CW),
     (frMin: 24930000;   frMax: 24990000;   frBand:Band12;   frMode: Phone),
 
-    (frMin: 27990000;   frMax: 28300000;   frBand:Band10;   frMode: CW),
+    (frMin: 28000000;   frMax: 28300000;   frBand:Band10;   frMode: CW),
     (frMin: 28300000;   frMax: 29700000;   frBand:Band10;   frMode: Phone),
 
     (frMin: 50000000;   frMax: 50100000;   frBand:Band6;    frMode: CW),

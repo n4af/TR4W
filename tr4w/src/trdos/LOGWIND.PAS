@@ -2706,7 +2706,7 @@ begin
   end;
   DisplayHour;
   DisplayRate(Rate);
-end;
+end;                          
 
 procedure IncrementTime(Count: integer);
 
@@ -2787,7 +2787,7 @@ begin
     begin
 
       if (not WARCBandsEnabled) and
-        ((Band = Band30) or (Band = Band17) or (Band = Band12)) then
+        ((Band = Band60) or (Band = Band30) or (Band = Band17) or (Band = Band12)) then
         Continue; {KK1L: 6.64 Keep band map within contest limits}
 
       PreviousBandEntryRecord := nil;
@@ -4664,7 +4664,7 @@ begin
     for Mode := StartMode to StopMode do
     begin
 
-      if (not WARCBandsEnabled) and ((Band = Band30) or (Band = Band17) or (Band = Band12)) then Continue;
+      if (not WARCBandsEnabled) and ((Band = Band60) or (Band = Band30) or (Band = Band17) or (Band = Band12)) then Continue;
 
       BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
 

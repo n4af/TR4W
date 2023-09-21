@@ -385,7 +385,7 @@ begin
     QuickDisplay(TC_ALTDCOMMANDDISABLED);
     Exit;
   end;
-  RITEnable := False;
+   RITEnable := False;
   { VER6.73 - Make up a string of the inactive CW Speed for display }
   Str(InActiveRadioPtr.SpeedMemory, SpeedString);
   BandMapBand := InActiveRadioPtr.BandMemory {BandMemory[InactiveRadio]};
@@ -417,8 +417,8 @@ begin
       Format(wsprintfBuffer, '%s DUPE!! on %s%s', @DupeInfoCall[1], BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
       SetMainWindowText(mweDupeInfoCall, wsprintfBuffer {DupeInfoCall + ' DUPE!! on ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory]});
       if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
-      tClearDupeInfoCall;
-       clearaltd; // 4.53.11  // 4.126.1
+ //      tClearDupeInfoCall;
+  //      clearaltd; // 4.53.11  // 4.126.1
      end
     else
     begin

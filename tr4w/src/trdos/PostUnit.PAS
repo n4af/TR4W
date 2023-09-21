@@ -348,12 +348,12 @@ const
   tCabrilloFreqString                   : array[Band160..BandLight] of PChar =
     (
     '1800',
-    '5402',
     '3500',
     '7000',
     '14000',
     '21000',
     '28000',
+    '05220',
     '10100',
     '18100',
     '24900',
@@ -1384,7 +1384,7 @@ begin
     begin
       AllBandTotal := 0;
 
-      for Band := Band160 to Band12 do
+      for Band := Band160 to Band10 do
       begin
         Write(FileWrite, ContTotals[Band, Cont]: 6);
         AllBandTotal := ContTotals[Band, Cont] + AllBandTotal;
@@ -1416,7 +1416,7 @@ begin
 
   WriteLn(FileWrite);
 
-  for Band := Band160 to Band12 do
+  for Band := Band160 to Band10 do
     if ContTotals[Band, UK] > 0 then
     begin
         //      TempString := BandString[Band];
