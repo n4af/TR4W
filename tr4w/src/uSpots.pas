@@ -126,8 +126,8 @@ begin
 
   SetCursor;
   ie_check := False;
-  if BandMapPreventRefresh then
-    exit;
+//  if BandMapPreventRefresh then
+//    exit;
   if BandMapSO2RDisplay then
     if ((Radio1.FilteredStatus.Freq <> 0) and (Radio2.FilteredStatus.Freq <> 0))
       then
@@ -180,7 +180,8 @@ begin
   end;
 
   if FindSpot(Spot, Result) then
-    goto Add;
+    goto Add
+    else
   InsertSpot(Result, Spot);
 
   Add:
@@ -220,8 +221,8 @@ begin
   //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then
     Exit;
-  if BandMapPreventRefresh then
-    Exit; // Gav 4.45.6
+ // if BandMapPreventRefresh then
+//    Exit; // Gav 4.45.6
   TDXSpotsList.UpdateSpotsMultiplierStatus;
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
@@ -322,7 +323,7 @@ begin
     top := k - 1;
     bottom := 0;
   end;
-   if (k mod 3 = 0) then
+//   if (k mod 3 = 0) then
   begin
     tSetWindowRedraw(BandMapListBox, False);
     tLB_RESETCONTENT(BandMapListBox);

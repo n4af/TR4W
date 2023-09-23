@@ -590,7 +590,7 @@ begin
   begin
     InActiveRadioPtr.BandMemory := Spot.FBand; //Gav 4.37
     InActiveRadioPtr.ModeMemory := Spot.FMode; //Gav 4.37
-    Exit;
+ //   Exit;  // .126.8
   end;
   tCleareExchangeWindow;
   tCallWindowSetFocus;

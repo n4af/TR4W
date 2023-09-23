@@ -4519,7 +4519,7 @@ procedure DisplayBandMap;
 begin
   if not BandMapEnable then Exit;
   if not tWindowsExist(tw_BANDMAPWINDOW_INDEX) then Exit;
-  if  BandMapPreventRefresh then  Exit;             // GAV  4.45.6
+//  if  BandMapPreventRefresh then  Exit;             // GAV  4.45.6
   SpotsList.Display;
   end;
 

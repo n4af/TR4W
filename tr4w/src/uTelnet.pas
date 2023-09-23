@@ -1130,7 +1130,12 @@ begin
   TempSpot.FSysTime := UTC.wMinute + UTC.wHour * 60 + UTC.wDay * 60 * 24 +
     UTC.wMonth * 60 * 24 * 30;
   SpotsList.AddSpot(TempSpot, True);
-  //  sleep(BMDelay);    // 4.93.beta
+ { if BandMapPreventRefresh then
+  begin
+   sleep(2000);    // 4.93.beta
+   BandMapPreventRefresh := False;
+  end;   }
+  sleep(900);
   DisplayBandMap;
 end;
 
