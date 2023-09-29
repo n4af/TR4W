@@ -3603,7 +3603,7 @@ begin
     end;
   end;
   SetFreq:
-  if TuneOnFreqFromCallWindow then
+   if TuneOnFreqFromCallWindow then
     Exit;
   if CallWindowString = 'TXON' then
   begin

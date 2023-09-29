@@ -1135,7 +1135,7 @@ begin
    sleep(2000);    // 4.93.beta
    BandMapPreventRefresh := False;
   end;   }
-  sleep(900);
+//  sleep(900);
   DisplayBandMap;
 end;
 

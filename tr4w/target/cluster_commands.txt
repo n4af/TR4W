@@ -18,7 +18,7 @@ SET/FILTER DXBANDMODE/PASS 10-CW
 SET/FILTER DXBANDMODE/PASS 10-SSB
 set/dx/filter call=N4AF or (not skimmer and spottercont=NA) or ((skimmer and unique>2) and  not skimbusted and (spotterstate=[WV,MD,VA,PA,NC]))
 set/dx/filter call=N4AF or (not skimmer and spottercont=NA) or ((skimmer and unique>2) and skimvalid and (spotterstate=[WV,MD,VA,PA,NC]))
-.
+set/dx/filter call=N4AF or (not skimmer and spottercont=NA) or ((skimmer and not skimbusted) and skimvalid)
 -
 #DXSPIDER CLUSTER COMMANDS:
 >ACCEPT

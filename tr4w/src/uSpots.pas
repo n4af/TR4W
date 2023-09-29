@@ -116,18 +116,17 @@ end;
 
 function TDXSpotsList.AddSpot(var Spot: TSpotRecord; SendToNetwork: boolean):
   integer;
-label
-  add;
 var
   i: integer;
   ie: str80;
-
+label
+add;
 begin
 
   SetCursor;
   ie_check := False;
-//  if BandMapPreventRefresh then
-//    exit;
+  //  if BandMapPreventRefresh then
+  //    exit;
   if BandMapSO2RDisplay then
     if ((Radio1.FilteredStatus.Freq <> 0) and (Radio2.FilteredStatus.Freq <> 0))
       then
@@ -163,12 +162,11 @@ begin
     if not VHFBandsEnabled then
       if (FList^[i].FBand > Band12) then
         Continue;
-    if FList^[i].FBand = Spot.FBand then
-      if FList^[i].FCall = Spot.FCall then
-      begin
-        Delete(i);
-        Break;
-      end;
+    if FList^[i].FCall = Spot.FCall then
+    begin
+      Delete(i);
+      Break;
+    end;
   end;
   if Spot.FBand in [Band60, Band30, Band17, Band12] then
     Spot.FWARCBand := True;
@@ -178,17 +176,11 @@ begin
     if (InitialExchangeEntry(Spot.FCall) = '') then
       exit;
   end;
-
-  if FindSpot(Spot, Result) then
-    goto Add
-    else
-  InsertSpot(Result, Spot);
-
-  Add:
-  FList^[Result] := Spot;
-  //  if CallWinKeyDown then
-  //   Windows.SetFocus(wh[mweCall]);
-  // end;
+  
+  if FindSpot(Spot, Result) then  goto add;
+    FList^[Result] := Spot ;
+    add:
+      InsertSpot(Result, Spot);
 
   if SendToNetwork then
     if PInteger(@Spot.FCall[1])^ <> tCQAsInteger then
@@ -211,7 +203,6 @@ var
   centre: integer;
   centrefound: boolean;
   CurrentCursorPos: integer;
-  //    CurCursorPosData                     : integer;
   NumberEntriesDisplayed: integer;
 begin
   bottom := 0;
@@ -221,8 +212,8 @@ begin
   //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then
     Exit;
- // if BandMapPreventRefresh then
-//    Exit; // Gav 4.45.6
+  // if BandMapPreventRefresh then
+ //    Exit; // Gav 4.45.6
   TDXSpotsList.UpdateSpotsMultiplierStatus;
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
@@ -230,6 +221,10 @@ begin
   k := 0;
   for i := 0 to FCount - 1 do
   begin
+   if (Flist^[i].FCall = Flist^[i+1].FCall) and (i < FCount-1) then
+    delete(i);
+    if Flist^[i].FFrequency = 0  then
+     delete(i);
     if not BandMapAllBands then
       if FList^[i].FBand <> BandmapBand then
         Continue; //Gav  ActiveBand changed to BandmapBand
@@ -281,35 +276,37 @@ begin
       bottom := FilteredSpotCount - BandMapDisplayLimit;
       centrefound := true;
     end;
-
     for k := 0 to k - 1 do
     begin
-      if FList^[FiltSpotIndex[k]].FFrequency > BandMapCursorFrequency then
+   //   if (k mod 8 <> 0) then
+   //     break;
       begin
-        centre := k;
-        if (centre >= (BandMapDisplayLimit div 2)) and (centre <=
-          (FilteredSpotCount - (BandMapDisplayLimit div 2))) then
+        if FList^[FiltSpotIndex[k]].FFrequency > BandMapCursorFrequency then
         begin
-          top := centre + ((BandMapDisplayLimit div 2) - 1);
-          bottom := centre - (BandMapDisplayLimit div 2);
-          centrefound := true;
+          centre := k;
+          if (centre >= (BandMapDisplayLimit div 2)) and (centre <=
+            (FilteredSpotCount - (BandMapDisplayLimit div 2))) then
+          begin
+            top := centre + ((BandMapDisplayLimit div 2) - 1);
+            bottom := centre - (BandMapDisplayLimit div 2);
+            centrefound := true;
+          end;
+          if centre > (FilteredSpotCount - (BandMapDisplayLimit div 2)) then
+          begin
+            top := FilteredSpotCount - 1;
+            bottom := FilteredSpotCount - BandMapDisplayLimit;
+            centrefound := true;
+          end;
+          if centre < (BandMapDisplayLimit div 2) then
+          begin
+            top := BandMapDisplayLimit - 1;
+            bottom := 0;
+            centrefound := true;
+          end;
+          break;
         end;
-        if centre > (FilteredSpotCount - (BandMapDisplayLimit div 2)) then
-        begin
-          top := FilteredSpotCount - 1;
-          bottom := FilteredSpotCount - BandMapDisplayLimit;
-          centrefound := true;
-        end;
-        if centre < (BandMapDisplayLimit div 2) then
-        begin
-          top := BandMapDisplayLimit - 1;
-          bottom := 0;
-          centrefound := true;
-        end;
-        break;
       end;
     end;
-
     if (centrefound <> true) then
     begin
       centre := abs((k - 1) div 2);
@@ -323,24 +320,27 @@ begin
     top := k - 1;
     bottom := 0;
   end;
-//   if (k mod 3 = 0) then
-  begin
-    tSetWindowRedraw(BandMapListBox, False);
-    tLB_RESETCONTENT(BandMapListBox);
-    SendMessage(BandMapListBox, LB_INITSTORAGE, k, 10000);
-    for k := bottom to top do
-      SendMessage(BandMapListBox, LB_ADDSTRING, 0, FiltSpotIndex[k]);
-    tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
-    tSetWindowRedraw(BandMapListBox, True);
-    asm push NumberEntriesDisplayed
-    end;
-    wsprintf(wsprintfBuffer, TC_SPOTS);
-    asm add esp,12
-    end;
-    SetTextInBMSB(5, wsprintfBuffer);
-    if NumberEntriesDisplayed = 0 then
-      ClearSpotInfo;
+
+  tSetWindowRedraw(BandMapListBox, False);
+  tLB_RESETCONTENT(BandMapListBox);
+  SendMessage(BandMapListBox, LB_INITSTORAGE, k, 10000);
+  for k := bottom to top do
+
+    SendMessage(BandMapListBox, LB_ADDSTRING, 0, FiltSpotIndex[k]);
+//    if k div 4 =0 then sleep(5);
+   
+
+  tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
+  tSetWindowRedraw(BandMapListBox, True);
+  asm push NumberEntriesDisplayed
   end;
+  wsprintf(wsprintfBuffer, TC_SPOTS);
+  asm add esp,12
+  end;
+  SetTextInBMSB(5, wsprintfBuffer);
+  if NumberEntriesDisplayed = 0 then
+    ClearSpotInfo;
+
 end;
 
 // Gav end of section added

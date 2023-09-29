@@ -1016,7 +1016,7 @@ begin
   Windows.ZeroMemory(@wklpCommTimeouts, SizeOf(TCommTimeouts));
   wklpCommTimeouts.ReadTotalTimeoutConstant := 250;
   SetCommTimeouts(WinKeyHandle, wklpCommTimeouts);
-  Sleep(400);
+  Sleep(200);
   PurgeComm(WinKeyHandle, PURGE_RXCLEAR);
   Result := True;
 end;
