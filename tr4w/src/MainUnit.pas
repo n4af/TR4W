@@ -3465,12 +3465,12 @@ begin
 
     menu_sk3bg_calendar:
       begin
-        Format(TempBuffer1,
-          'http://www.hornucopia.com/contestcal/contestdetails.php?ref=%u',
+       Format(TempBuffer1,
+          'https://contestcalendar.com/contestdetails.php?ref=%u',      // 4.127.1',
           ContestsArray[Contest].WA7BNM);
-        OpenUrl(TempBuffer1);
-        //Shellexecute(0, 'open', 'http://www.hornucopia.com/contestcal/weeklycont.php', nil, nil, SW_NORMAL); // 4.75.3
-        // Shellexecute(0, 'open', SysUtils.Format('https://www.hornucopia.com/contestcal/contestdetails.php?ref=%u',[ContestsArray[Contest]^.WA7BNM]), nil, nil, SW_NORMAL);
+     //   OpenUrl(TempBuffer1);
+        Shellexecute(0, 'open', tempbuffer1, nil, nil, SW_NORMAL);  // 4.127.1
+
       end;
 
     menu_run_devicemanager:
