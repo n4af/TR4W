@@ -2450,8 +2450,8 @@ begin
     menu_qrzru_calendar, wsprintfBuffer);
 
   Format(wsprintfBuffer, TC_RULESONSM3CER, ContestTypeSA[Contest]);
-  ModifyMenu(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND + MF_STRING,
-    menu_sk3bg_calendar, wsprintfBuffer);
+  ModifyMenu(tr4w_main_menu, menu_WA7BNM_calendar, MF_BYCOMMAND + MF_STRING,
+    menu_WA7BNM_calendar, wsprintfBuffer);
   if (pos('CQ-WW', ContestTypeSA[Contest]) <> 0) or (pos('IARU-HF',
     ContestTypeSA[Contest]) <> 0) then //n4af 4.35.5 // 4.115.4
     T1 := 3600000 // 60 min break criteria
@@ -2461,7 +2461,7 @@ begin
     Windows.EnableMenuItem(tr4w_main_menu, menu_qrzru_calendar, MF_BYCOMMAND or
       MF_GRAYED);
   if ContestsArray[Contest].WA7BNM = 0 then
-    Windows.EnableMenuItem(tr4w_main_menu, menu_sk3bg_calendar, MF_BYCOMMAND or
+    Windows.EnableMenuItem(tr4w_main_menu, menu_WA7BNM_calendar, MF_BYCOMMAND or
       MF_GRAYED);
   if Contest = WRTC then
   begin
@@ -3433,7 +3433,7 @@ begin
 
     // menu_compare_logs: SendToNet(NET_LOGINFO_MESSAGE, SizeOf(NET_LOGINFO_MESSAGE));
 
-    menu_wa7bnm_calendar:
+  {  menu_wa7bnm_calendar:
       OpenUrl('http://www.hornucopia.com/contestcal/weeklycont.php');
     // Shellexecute(0, 'open', 'http://www.hornucopia.com/contestcal/weeklycont.php', nil, nil, SW_NORMAL); // 4.75.3
     {begin
@@ -3463,7 +3463,7 @@ begin
         Shellexecute(0, 'open', TempBuffer1, nil, nil, SW_NORMAL); // 4.75.3
       end;
 
-    menu_sk3bg_calendar:
+    menu_WA7BNM_calendar:
       begin
        Format(TempBuffer1,
           'https://contestcalendar.com/contestdetails.php?ref=%u',      // 4.127.1',
@@ -8946,4 +8946,3 @@ begin
 {$IFEND}
 
 end.
-

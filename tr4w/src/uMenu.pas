@@ -357,7 +357,7 @@ const
     (mrText: RC_DVKVOLCONTROL; mrId: menu_volume_control),
     (mrText: RC_RECCONTROL; mrId: menu_recording_control),
     (mrText: '-'; mrId: 0),
-    (mrText: ''; mrId: menu_sk3bg_calendar),
+    (mrText: ''; mrId: menu_WA7BNM_calendar),
     (mrText: ''; mrId: menu_qrzru_calendar),
     (mrText: '-'; mrId: 0),
     (mrText: RC_CALCULATOR; mrId: item_calculator),
@@ -478,4 +478,3 @@ begin
 end;
 
 end.
-
