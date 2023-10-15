@@ -68,7 +68,6 @@ const
 }
 
 function BoolToString(b: boolean): string;
-function IntegerBetween(v: integer; i: integer; k: integer): boolean;
 
 // Add telnet client to this base class
 // Add property for IP address, port, type (tcp or udp but just implement tcp right now).
@@ -569,12 +568,12 @@ begin
       end;
   // logger.trace('In ModeToString, %d converted to %s',[Ord(mode), Result]);
 end;
-
+{ Moved to TF
 function IntegerBetween(v: integer; i: integer; k: integer): boolean;
 begin
    Result := (v >= i) and (v <= k);
 end;
-
+ }
 constructor TReadingThread.Create(AConn: TIdTCPConnection; proc: TProcessMsgRef);
 begin
   logger.debug('************* DEBUG: TReadingThread.Create');

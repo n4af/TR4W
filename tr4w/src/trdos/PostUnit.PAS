@@ -345,6 +345,7 @@ const
     'YES',
     'NO');
 
+    // NOTE - The following array is used by LOGContactToUDP so the BandType enumeration on ContestExchange and this array need to be aligned.
   tCabrilloFreqString                   : array[Band160..BandLight] of PChar =
     (
     '1800',
@@ -353,7 +354,7 @@ const
     '14000',
     '21000',
     '28000',
-    '05220',
+    '5220',
     '10100',
     '18100',
     '24900',
@@ -1762,6 +1763,7 @@ var
   stxString                             : string;
   sMode                                 : string;
   sSubMode                              : string;
+  saveDecimalSeparator                  : char;
 //  IOTAstring                            : Str10;
 begin
   dtReportTime := Now;
@@ -1769,15 +1771,19 @@ begin
   tReportsFilename[Windows.lstrlen(tReportsFilename) - 3] := #0;
   lstrcat(tReportsFilename, 'ADI');
   if not tOpenFileForWrite(tReportFileWrite, tReportsFilename) then Exit;
-
+  //saveDecimalSeperator := DecimalSeperator;
   if not OpenLogFile then
   begin
     CloseHandle(tReportFileWrite);
     Exit;
   end;
 
+  {
+  saveDecimalSeparator := DecimalSeparator;
   DecimalSeparator := '.'; // Set this so we use . as reqired by ADIF and not localized separator ny4i
-  
+  } // This code wasd commented so the specific functions that use StrFloat do this work to ensure the window is very small where we change the DecimalSeparator.
+  // Otherwise an exception in this procedure could cause DecimalSeparator to be set incorrectly.
+
   // Issue 405 to fix up the header - ny4i
   sWriteFileFromString(tReportFileWrite,'ADIF File'#13#10);
 
@@ -1900,10 +1906,15 @@ begin
       if TempRXData.Frequency <> 0 then //14149280  or 7025000
          begin
          // Making this simpler...
-         DecimalSeparator := '.';
-         sTemp := FloatToStr((TempRXData.Frequency/1000000));
-         sBuffer := SysUtils.Format('<FREQ:%u>%s',[length(sTemp),sTemp]);
-         sWriteFileFromString(tReportFileWrite, sBuffer);
+         saveDecimalSeparator := DecimalSeparator;
+         try
+            DecimalSeparator := '.';
+            sTemp := FloatToStr((TempRXData.Frequency/1000000));
+            sBuffer := SysUtils.Format('<FREQ:%u>%s',[length(sTemp),sTemp]);
+            sWriteFileFromString(tReportFileWrite, sBuffer);
+         finally
+            DecimalSeparator := saveDecimalSeparator;
+         end;
 
 
       end;
@@ -2177,6 +2188,7 @@ begin
   CloseLogFile;
   PreviewFileNameAddress := tReportsFilename;
   FilePreview;
+  //DecimalSeparator :=  saveDecimalSeparator;
 end;
 
 

@@ -6867,6 +6867,7 @@ var
   tempState: string;
   tempVE_Prov: string;
   tempARRL_Sect: string;
+  saveDecimalSeparator: char;
 
 begin
   lookingForFieldName := false;
@@ -6944,11 +6945,16 @@ begin
                 end;
               tAdifFREQ:
                 begin
-                  DecimalSeparator := '.';
-                  neFreq := StrToFloat(fieldValue);
-                  neFreq := neFreq * 1000000;
-                  exch.Frequency := Trunc(neFreq);
-                  logger.Trace('[ParseADIFRecord] FREQ = %s', [fieldValue]);
+                  saveDecimalSeparator := DecimalSeparator;
+                  try
+                     DecimalSeparator := '.';
+                     neFreq := StrToFloat(fieldValue);
+                     neFreq := neFreq * 1000000;
+                     exch.Frequency := Trunc(neFreq);
+                     logger.Trace('[ParseADIFRecord] FREQ = %s', [fieldValue]);
+                  finally
+                     DecimalSeparator :=  saveDecimalSeparator;
+                  end;
                 end;
               tAdifITUZ: exch.Zone := StrToInt(fieldValue);
               tAdifMODE:

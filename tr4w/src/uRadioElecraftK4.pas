@@ -1,7 +1,7 @@
 unit uRadioElecraftK4;
 
 interface
-uses uNetRadioBase, StrUtils, SysUtils, Math;
+uses uNetRadioBase, StrUtils, SysUtils, Math, TF;
 
 
 Type TK4Radio = class(TNetRadioBase)

@@ -954,16 +954,21 @@ begin
         else
         begin
           // Commander interface forces . as decimal for Get
-          DecimalSeparator := '.';
-          ThousandSeparator := ',';
-          sFreq := SysUtils.FormatFloat(',0.000',
-            radio1.CurrentStatus.VFO[VFOA].Frequency / 1000);
-          logger.Trace('[uWSJTX] Sending VFOA frequency: ' +
-            SysUtils.Format('<CmdFreq:%u>%s', [length(sFreq), sFreq]));
-          AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',
-            [length(sFreq), sFreq]));
-          DecimalSeparator := SaveDecimalSeparator;
-          ThousandSeparator := saveThousandSeparator;
+          saveDecimalSeparator := DecimalSeparator;
+          saveThousandSeparator := ThousandSeparator;
+          try
+             DecimalSeparator := '.';
+             ThousandSeparator := ',';
+             sFreq := SysUtils.FormatFloat(',0.000',
+             radio1.CurrentStatus.VFO[VFOA].Frequency / 1000);
+             logger.Trace('[uWSJTX] Sending VFOA frequency: ' +
+                          SysUtils.Format('<CmdFreq:%u>%s', [length(sFreq), sFreq]));
+             AContext.Connection.IOHandler.Write(SysUtils.Format('<CmdFreq:%u>%s',
+                                                 [length(sFreq), sFreq]));
+          finally
+             DecimalSeparator := SaveDecimalSeparator;
+             ThousandSeparator := saveThousandSeparator;
+          end;
         end;
       end
       else if fieldValue = 'CmdSetFreq' then

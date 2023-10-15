@@ -95,11 +95,11 @@ uses
     (
     '1.8',
     '3.5',
-    '5.4',
     '7',
     '14',
     '21',
     '28',
+    '5.4',
     '30',
     '17',
     '12',
@@ -142,6 +142,7 @@ procedure GoToNextMultBandMapFrequency;
 procedure GoToNextDisplayedBandMapFrequency;
 procedure GoToNextMultDisplayedBandMapFrequency;
 function tAddQSOToLog(RXData: ContestExchange): boolean;
+function ConvertBandTypeToUDPContactBand(band: BandType): string;
 implementation
 uses
   uProcessCommand,
@@ -2745,7 +2746,11 @@ begin
             CW: sMode := 'CW';
             Phone:
                begin
-               if freq < 8000000 then
+               if IntegerBetween(freq,5300000,5500000) then
+                  begin
+                  sMode := 'USB'; // 60m band is USB
+                  end
+               else if freq < 8000000 then
                   begin
                   sMode := 'LSB';
                   end
@@ -2792,9 +2797,7 @@ begin
                              RxData.tSysTime.qtSecond]) +
                  '</timestamp>' + sLineBreak +
             #9 + '<mycall>' + MyCall + '</mycall>' + sLineBreak +
-            #9 + '<band>' + BandTypeToUDPContactBand[RXData.Band] + '</band>' + sLineBreak +
-           // #9 + '<band>' + Format('%d',[freq div 1000000]) + '</band>' + sLineBreak +     // Not 20M but 14 -- Odd.
-         // #9 +   '<band>' + BandStringsArrayWithOutSpaces[RxData.Band] + '</band>' + sLineBreak +
+            #9 + '<band>' + ConvertBandTypeToUDPContactBand(RXData.Band) + '</band>' + sLineBreak +
             #9 + '<rxfreq>' + Format('%d',[freq div 10]) + '</rxfreq>' + sLineBreak + // 1420100
             #9 + '<txfreq>' + Format('%d',[txFreq div 10]) + '</txfreq>' + sLineBreak +
             #9 + '<operator>' + RXData.ceOperator + '</operator>' + sLineBreak +
@@ -2850,6 +2853,7 @@ end;
 procedure LookupInfoToUDP(RXData: ContestExchange);
 var
    sBuf: AnsiString;
+   saveDecimalSeparator: char;
 begin
 
    udp.BroadcastEnabled := true;
@@ -2861,6 +2865,7 @@ end;
 
 procedure SendFullLogToUDP;
 var nCount: integer;
+   saveDecimalSeparator: char;
 begin
    nCount := 0;
    if not OpenLogFile then
@@ -2870,27 +2875,47 @@ end;
       Exit;
       end;
 
-   DecimalSeparator := '.'; // Set this so we use . as reqired by ADIF and not localized separator ny4i
-  
-   ReadVersionBlock;
-   while ReadLogFile do  // This reads the log into TempRXData global (bad design)
-      begin
-      if GoodLookingQSO then
+   saveDecimalSeparator := DecimalSeparator;
+   try
+      //DecimalSeparator := '.'; // Set this so we use . as reqired by ADIF and not localized separator ny4i
+
+      ReadVersionBlock;
+      while ReadLogFile do  // This reads the log into TempRXData global (bad design)
          begin
-         inc(nCount);
-         logger.Debug('[SendFullLogToUDP] (%d) Read contact for callsign %s',[nCount,TempRXData.Callsign]);
-         //SendDeletedContactToUDP(TempRXData);
-         LogContactToUDP(TempRXData);
-         end
-      else
-         begin
-         logger.error('[SendFullLogToUDP] Was not valid QSO %s',[TempRXData.Callsign]);
+         if GoodLookingQSO then
+            begin
+            inc(nCount);
+            logger.Debug('[SendFullLogToUDP] (%d) Read contact for callsign %s',[nCount,TempRXData.Callsign]);
+            //SendDeletedContactToUDP(TempRXData);
+            LogContactToUDP(TempRXData);
+            end
+         else
+            begin
+            logger.error('[SendFullLogToUDP] Was not valid QSO %s',[TempRXData.Callsign]);
+            end;
          end;
-      end;
-   CloseLogFile;
-   Logger.Info('%d records sent to UDP',[nCount]);
-   Format(QuickDisplayBuffer, '%d log records sent to UDP', nCount);
-   QuickDisplay(QuickDisplayBuffer);
+      CloseLogFile;
+      Logger.Info('%d records sent to UDP',[nCount]);
+      Format(QuickDisplayBuffer, '%d log records sent to UDP', nCount);
+      QuickDisplay(QuickDisplayBuffer);
+   finally
+      DecimalSeparator := SaveDecimalSeparator;
+   end;
 end;
+
+function ConvertBandTypeToUDPContactBand(band: BandType): string;
+begin
+   if DecimalSeparator <> '.' then
+      begin
+      // Convert the . in BandTypeToUDPContactBand to the DecimalSeperator
+      result := StringReplace(BandTypeToUDPContactBand[band],'.',DecimalSeparator,[rfReplaceAll]);
+      end
+   else
+      begin
+      result := BandTypeToUDPContactBand[band];
+      end;
+
+end;
+
 
 end.

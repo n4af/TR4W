@@ -6,6 +6,7 @@ uses
   MMSystem,
   Windows,
   iniFiles,
+  SysUtils,
   MainUnit in 'src\MainUnit.pas',
   BeepUnit in 'src\trdos\BeepUnit.pas',
   CFGCMD in 'src\trdos\CfgCmd.pas',
@@ -339,7 +340,7 @@ begin
 
    logger.info('******************** PROGRAM STARTUP ************************');
    logger.Trace('trace output');
-
+   logger.Info('DecimalSeparator = ' + DecimalSeparator);
   tMutex := CreateMutex(nil, False, tr4w_ClassName);
   if tMutex = 0 then
   begin
@@ -364,7 +365,6 @@ begin
   LuconSZLoadded := AddFontResource(TR4W_LC_FILENAME) <> 0;
   MainFixedFont := tCreateFont(15, FW_BOLD * Ord(BoldFont), @MainFontName[1]);
   MSSansSerifFont := tCreateFont(15, FW_DONTCARE, 'MS Sans Serif');
-
   CreateDirectoryIfNotExist;
 
 {$IF tDebugMode}
@@ -441,6 +441,7 @@ begin
 
   UpdateDebugLogLevel;
   logger.debug('**************** Program Startup ************************');
+  logger.info('DecimalSeparator = ' + DecimalSeparator);
   logger.debug('Current program version = %s',[TR4W_CURRENTVERSION]);
   logger.debug('Current TR4W Server version = %s',[TR4WSERVER_CURRENTVERSION]);
   logger.debug('Current log version = %s',[LOGVERSION]);

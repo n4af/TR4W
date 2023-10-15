@@ -132,6 +132,7 @@ function BooleanToStr(b: boolean): string;
 //function CenterString(s: string; count: byte): string;
 procedure strU(Str: ShortString) assembler;
 procedure SetMainWindowText(Window: TMainWindowElement; Text: PChar);
+function IntegerBetween(v: integer; i: integer; k: integer): boolean;
 
 function ValExt(Source: PChar; var code: integer): extended;
 
@@ -1894,6 +1895,11 @@ end;
 function SendDlgItemMessage(hDlg: HWND; nIDDlgItem: integer; Msg: UINT): LONGINT; stdcall;
 begin
   Result := Windows.SendDlgItemMessage(hDlg, nIDDlgItem, Msg, 0, 0);
+end;
+
+function IntegerBetween(v: integer; i: integer; k: integer): boolean;
+begin
+   Result := (v >= i) and (v <= k);
 end;
 
 procedure GetTime(var Hour, Minute, Second, Sec100: Word);
