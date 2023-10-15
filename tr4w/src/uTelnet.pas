@@ -1062,7 +1062,8 @@ var
   TempFrequency: LONGINT;
   Mult: boolean;
 begin
-  //  if not BandMapEnable then Exit;
+   if not BandMapEnable then Exit;
+   IF bandmappreventrefresh then exit;
   if StringIsAllNumbers(Call) then
     Exit;
   //  if ActiveRadio = RadioOne then TempFrequency := Radio1.FilteredStatus.Freq;

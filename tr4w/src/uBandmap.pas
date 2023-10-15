@@ -401,7 +401,7 @@ begin
         case HiWord(wParam) of
           LBN_SETFOCUS:
             begin
-        //      BandMapPreventRefresh := True; // Gav     4.37.12
+            BandMapPreventRefresh := True; // Gav     4.37.12
               SpotsList.SetCursor;
               ShowSpotInfo;
             end;
