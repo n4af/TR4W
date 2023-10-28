@@ -685,30 +685,7 @@ begin
       OutputString := OutputString or (1 shl integer(Band))
     else
       OutputString := OutputString and not (1 shl integer(Band));
-    {
-        if Mult <> '' then
-        begin
-          if Band <= Band10 then
-            OutputString := OutputString + BandStringsArray[Band]
-          else
-            if Band = Band6 then
-              OutputString := OutputString + '6 '
-            else
-              if Band = Band2 then
-                OutputString := OutputString + '2 '
-              else
-                OutputString := OutputString + BandStringsArray[Band] + ' ';
-
-        end
-        else
-          if Band <= Band10 then
-            OutputString := OutputString + '   '
-          else
-            if (Band = Band6) or (Band = Band2) then
-              OutputString := OutputString + '  '
-            else
-              OutputString := OutputString + '    ';
-    }
+    
     case Band of
       AllBands: Exit;
       Band160: Band := Band80;

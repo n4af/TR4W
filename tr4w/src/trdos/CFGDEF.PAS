@@ -514,6 +514,7 @@ begin
   {
     StartingFrequencies[Band160] := 1800000;
     StartingFrequencies[Band80] := 3500000;
+    StartingFrequencies[Band60] := 5330000; // 4.127.5
     StartingFrequencies[Band40] := 7000000;
     StartingFrequencies[Band30] := 10000000;
     StartingFrequencies[Band20] := 14000000;

@@ -1642,9 +1642,8 @@ begin
     begin
       TempFreq := TempFreq * 1000 + StartingFrequencies[TempBand];
     end
-    else
-      TempFreq := TempFreq * 1000 + (StartingFrequencies[TempBand] div 1000000)
-        * 1000000;
+    else  
+      TempFreq := TempFreq * 1000 + (StartingFrequencies[TempBand] div 1000000) * 1000000;
   end
   else
     TempFreq := TempFreq * 1000;
