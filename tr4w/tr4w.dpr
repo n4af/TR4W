@@ -116,7 +116,9 @@ uses
   uRadioElecraftK4 in 'src\uRadioElecraftK4.pas',
   GetWinVersionInfo in 'src\GetWinVersionInfo.pas',
   uSuperCheckPartialFileUpload,
-  uRadioHamLib in 'src\uRadioHamLib.pas';
+  uRadioHamLib in 'src\uRadioHamLib.pas',
+  uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
+  uExternalLogger in 'src\uExternalLogger.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -358,6 +360,7 @@ begin
 //{$IFEND}
 
   wsjtx := TWSJTXServer.Create;
+  externalLogger := TExternalLogger.Create('DXKEEPER');
   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
 
  Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
@@ -439,6 +442,8 @@ begin
   ReadInConfigFile(cfgCFG);          //n4af 4.31.5
   ReadInConfigFile(cfgCommMes);      //common messages gets precedence - n4af
 
+  externalLogger.loggerPort := externalLoggerPort;
+  externalLOgger.loggerAddress := externalLoggerAddress;
   UpdateDebugLogLevel;
   logger.debug('**************** Program Startup ************************');
   logger.info('DecimalSeparator = ' + DecimalSeparator);

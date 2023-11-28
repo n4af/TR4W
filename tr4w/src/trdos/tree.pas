@@ -3113,6 +3113,7 @@ begin
       (ActiveExchange = GridExchange) or
       (ActiveExchange = RSTQSONumberAndGridSquareExchange) or
       (ActiveExchange = GridExchange)  or
+      (ActiveExchange = RSTNameAndQTHExchange) or // ny4i - Added for GeneralQSo to check if there is a grid in the exchange
       (ActiveExchange = RSTAndGridExchange)) then
 
      begin

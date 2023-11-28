@@ -1303,6 +1303,10 @@ begin
        begin
        LogContactToUDP(RXData);
        end;
+    if ExternalLoggerEnabled then
+       begin
+       externalLogger.LogQSO(RXData);
+       end
     end
   else
     begin     // ny4i issue 82 - If the option is set, broadcast contacts received from the Network

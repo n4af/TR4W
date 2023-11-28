@@ -138,7 +138,8 @@ uses
   Math,
   Log4D,
   Controls,
-  uNetRadioBase
+  uNetRadioBase,
+  uExternalLogger
   ;
 
 var
@@ -162,6 +163,7 @@ var
   Second: Boolean = False;
   Third: Boolean = False;
   wsjtx: TWSJTXServer;
+  externalLogger: TExternalLogger;
   saveLastADIFName: string; // ny4i to save for ContestByADIFName cache
   saveLastContest: ContestType;
   logger: TLogLogger;
@@ -2030,6 +2032,11 @@ begin
     wsjtx.Stop;
     FreeAndNil(wsjtx);
   end;
+
+  if assigned(externalLogger) then
+     begin
+     FreeAndNil(externalLogger);
+     end;
 
   if Radio1.tNetObject <> nil then
   begin
