@@ -1,0 +1,14 @@
+Canadian provinces (13): AB, BC, MB,NB, NL, NT, NS, NU, ON, PE, QC, SK, YT
+
+NL = NL,^New Labrador
+NB = NB
+NS = NS
+PE = PE
+QC = QC
+ON = ON
+MB = MB
+SK = SK
+AB = AB
+BC = BC
+YT = YT
+NU = NU
