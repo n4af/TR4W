@@ -3,11 +3,8 @@ ARRL SECTIONS
 
 Bc = BC, BR, VE7
 Ab = AB, ALB, ALT, VE6
-Mar = MAR
 Ns = NS,^ Nova Scotia
 Mb = MB, MAN, VE4
-Nt = NW, NWT
-Gta = GTA,^Greater Toronto Area
 One = ONE,^Ontario East
 Onn = ONN,^Ontario North
 Gh = GH, ^Ontario Golden Horse Shoe
@@ -15,7 +12,7 @@ Ons = ONS,^Ontario South
 PE = PEI,PE
 Sk = SK, VE5, SAS
 Qc = PQ, QU, VE2, QC
-Nb = NB
+Nb = NB,^New Brunswick
 Nl = NL
 Ter = TER
 
