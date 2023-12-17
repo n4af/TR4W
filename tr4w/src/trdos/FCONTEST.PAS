@@ -396,6 +396,12 @@ begin
         LiteralDomesticQTH := True;
       end;
 
+      CROATIAN:
+       begin
+        if MyCountry = '9A' then
+         ACTIVEDXMULT := CQDXCC;
+       end;
+
     JIDXSSB, JIDXCW:
       begin
         if MyCountry = 'JA' then
