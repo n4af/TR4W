@@ -575,6 +575,7 @@ begin
        d := a;
        Index2 := Index; end;
        DupeInfoCall := FList^[Index2].FCall;
+       break;    // stop search on match 4.130.1
      end;
   end;
  if (d >= BandMapGuardBand) or (Pos(MyCall,Flist^[Index2].FCall)>0) then       // 4.57.8  // 4.72.1
