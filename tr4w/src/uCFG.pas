@@ -129,6 +129,7 @@ function F_AUTO_SEND_CHARACTER_COUNT: boolean;
 procedure UpdateDebugLogLevel;
 function F_UpdateWSJTXSendColorizations : boolean;
 function F_UpdateWSJTXEnabled: boolean;
+function F_UpdateExternalLoggerEnabled: boolean;
 //function F_SETPARALLELPORT: boolean;
 
 const
@@ -210,6 +211,7 @@ const
       @F_MY_ZONE,
       @F_MY_CONTINENT,
       @F_UpdateWSJTXEnabled,
+      //@F_UpdateExternalLoggerEnabled,
       @F_UpdateWSJTXSendColorizations
       //@F_SETPARALLELPORT
       );
@@ -312,7 +314,7 @@ var
    CMD: ShortString;
    WSJTXSendColorization: boolean = true;
    WSJTXEnabled: boolean = true;
-   WSJTXRadioControlEnabled: boolean = true;
+   WSJTXRadioControlEnabled: boolean = false;
 
 const
 
@@ -333,6 +335,7 @@ const
    + 2 {Radio1 & Radio2 UseHamLib} // Issue 676 ny4i
    + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
    + 6 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTLD PORT, HAMLIB RIGCTLD RUN AT STARTUP}
+   + 3 {ExternalLoggerAddress & ExernalLoggerPort & ExternalLoggerEnabled}
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -453,7 +456,10 @@ const
  (crCommand: 'EX MENU';                       crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctString; crNetwork: 1),
  (crCommand: 'EXCHANGE MEMORY ENABLE';        crAddress: @ExchangeMemoryEnable;           crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'EXCHANGE RECEIVED';             crAddress: pointer(10);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctOther; crNetwork: 1),
- (crCommand: 'EXCHANGE WINDOW S&P BACKGROUND';crAddress: pointer(48);                      crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:10; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther; crNetwork: 1),
+ (crCommand: 'EXCHANGE WINDOW S&P BACKGROUND';crAddress: pointer(48);                     crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:10; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther; crNetwork: 1),
+ (crCommand: 'EXTERNAL LOGGER ADDRESS';       crAddress: @ExternalLoggerAddress;          crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 0),
+ (crCommand: 'EXTERNAL LOGGER ENABLED';       crAddress: @ExternalLoggerEnabled;          crMin:0;  crMax:0;         crS: csNew; crA: 23; crC:0; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
+ (crCommand: 'EXTERNAL LOGGER PORT';          crAddress: @ExternalLoggerPort;             crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'FARNSWORTH ENABLE';             crAddress: @FarnsworthEnable;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'FARNSWORTH SPEED';              crAddress: @FarnsworthSpeed;                crMin:0;  crMax:99;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
  (crCommand: 'FONT SIZE';                     crAddress: @fontsize;                       crMin:0;  crMax:2;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
@@ -1588,6 +1594,27 @@ begin
       else ;
    end;
 
+end;
+
+function F_UpdateExternalLoggerEnabled: boolean;
+begin
+   Result := true;
+  { if assigned(externalLogger) then
+      begin
+      if ExternalLoggerEnabled then
+         begin
+         externalLogger.Start;
+         end
+      else
+         begin
+         externalLogger.Stop;
+         end;
+      end
+   else
+      begin
+      logger.Error('In F_UpdateExternalLoggerEnabled, externalLogger variable was not assigned');
+      end;
+      }
 end;
 
 function F_UpdateWSJTXEnabled: boolean;

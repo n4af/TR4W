@@ -10,7 +10,7 @@ const
   TC_2RADIO_WARN                        = 'ПОМИЛКА: 2 радіо на одному діапазоні'; 
   TC_WAGWarn                            = 'Попередження: поза дозволеним діапазоном частот WAG';
   RC_BACKUPLOG                          = 'Резервне копіювання логу';
-  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Класи в Winter Field Day повинні бути H, I або O.'; 
+  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Класи в Winter Field Day повинні бути H, I, M або O.'; 
   TC_INVALID                            = 'Невірний ввод';
   TC_FREQ_ZERO                          = 'ПОМИЛКА: недопустиме значення частоти для регістрациї';
   TC_FREQ_OFF                           = 'Запис значення частоти САТ в лог відключена';

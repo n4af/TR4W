@@ -434,7 +434,10 @@ var
   ExchangeErrorMessage: PChar;
   ExchangeMemoryFileEnable: boolean;
   ExchangeWindowString: Str40;
-
+  ExternalLoggerAddress: string[255] = '127.0.0.1';
+  ExternalLoggerEnabled: boolean = false;
+  ExternalLoggerPort: integer = 52001; // In DXKeeper case, it is 52000 base port + 1
+  
   FakePacket: boolean;
   FakeBandMap: boolean;
   FirstHelloRecord: HelloRecPtr;
