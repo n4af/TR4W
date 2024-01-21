@@ -819,7 +819,7 @@
 
 TC_IMPROPERTRANSMITTERCOUNT = 'FD Transmitter muessen zwischen 1 und 99 sein.';
 TC_IMPROPERARRLFIELDDAYCLASS = 'Field Day Klassen muessen A, B, C, D, E oder F sein.';
-TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day Klasse muss H, I oder O sein.';
+TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day Klasse muss H, I, M oder O sein.';
 TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'DX Stations Angabe muss "DX" sein.';
 
 RC_SPLITOFF                       = 'Split Mode Tx setzen';

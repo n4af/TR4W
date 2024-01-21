@@ -244,7 +244,7 @@ const
   TC_FILESAVEDTOSUCCESSFULLY            = 'File saved to %s successfully';
   TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
   TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
-  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I or O.';
+  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I, O or M.';
   TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
 
   {LOGSEND}

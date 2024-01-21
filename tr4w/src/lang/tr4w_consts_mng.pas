@@ -14,7 +14,7 @@ const
   TC_EnterYourDistrictCode              = 'IF in UK/EI enter District Code';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
   RC_BACKUPLOG                          = 'Backup Log';
-  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I or O.';
+  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I, O or M.';
   RC_3830                               =  '3830 Score posting';
   RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
   TC_INVALID                            = 'Invalid Entry';
