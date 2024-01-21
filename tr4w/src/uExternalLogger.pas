@@ -3,12 +3,19 @@ unit uExternalLogger;
 interface
 uses uExternalLoggerBase, StrUtils, SysUtils, Math, TF, VC, LOGSUBS2, LogWind, Tree, uCFG;
 
+
 Type TExternalLogger = class(TExternalLoggerBase)
    private
+      localCE: ContestExchange;
       procedure Initialize;
       procedure SendToLogger(sCmd: string; sData: string); overload;
       function AddADIFField(sFieldName: string; sValue: string): string; overload;
       function AddADIFField(sFieldName: string; nValue: integer): string; overload;
+      function LogQSOToDXKeeper(ce: ContestExchange): integer;
+
+      // Add a QueueQSO to copy the record then return to the caller. THis allows the actual sending of th eTCP message ot be done from a different thread to not slow down the program.
+
+      // I could also generalize this into postQSOProcessing and let the UDP happen from the thread too. Worth exploring the actual amont of time per QSO to send to UDP and TCP. If it is very fast, this complicatyion may not be necessary.
    public
       Constructor Create(sLoggerType: string);
       function Connect: integer; overload;
@@ -161,6 +168,18 @@ begin
 end;
 
 function TExternalLogger.LogQSO(ce: ContestExchange): integer;
+begin
+   if Self.loggerID = 'DXKEEPER' then
+      begin
+      Result := Self.LogQSOToDXKeeper(ce);
+      end
+   else
+      begin
+      logger.Warn('[LogQSO] Called LogQSO without an expected loggerID (%s)',[Self.loggerID]);
+      end;
+end;
+
+function TExternalLogger.LogQSOToDXKeeper(ce: ContestExchange): integer;
 var sCoreADIF: string;
     n: integer;
     sMode: string;
@@ -271,7 +290,7 @@ This is all we need to send as we DO NOT want to send every contact to any of th
               + AddADIFField('UploadeQSL','N')
               + AddADIFField('UploadLoTW','N')
               + AddADIFField('UploadClubLog','N')
-              + AddADIFField('UploadQRZ','N')
+              + AddADIFField('UploadQRZ','N')     // Note if the AutoUpload options in DXkeeper are checked, this is not honored.
               ;
   nOptionsLength := length(sOptions);
   sMessage := '<command:11>externallog<parameters:' + IntToStr(nCoreADIFLength + nOptionsLength) + '>' + sCoreADIF + sOptions;

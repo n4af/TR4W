@@ -13,7 +13,7 @@ const
   TC_UKEI                               = 'Check IF you are within UK/EI';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
   RC_BACKUPLOG                         = 'Backup Log';
-  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I or O.';
+  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I, O or M.';
   TC_INVALID                            = 'Invalid Entry';
   TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
   TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';

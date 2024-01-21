@@ -10,7 +10,7 @@ const
   TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
   TC_WAGWarn                            = 'Warning: Out of WAG allowed frequency range';
   RC_BACKUPLOG                         = 'Резервное копирование лога';
-  TC_IMPROPERWINTERFIELDDAYCLASS = 'Классы в Winter Field Day должны быть H, I или O.';
+  TC_IMPROPERWINTERFIELDDAYCLASS = 'Классы в Winter Field Day должны быть H, I, M или O.';
   TC_INVALID                            = 'Неверный ввод';
   TC_FREQ_ZERO                          = 'ОШИБКА: недопустимое значение частоты для регистрации';
   TC_FREQ_OFF                           = 'Запись значения частоты САТ в лог отключена';

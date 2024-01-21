@@ -11,7 +11,7 @@ const
   TC_EnterYourDistrictCode              = 'Je-li UK/EI, zadej kód distriktu';
   TC_YUGOSLAVIA                         = 'Jugoslávie';
   RC_BACKUPLOG                          = 'záložní deník';
-  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class musí být H, I nebo O.';
+  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class musí být H, I, M nebo O.';
   TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'soutìž. kód DX stanic musí být "DX".';
   RC_3830                               =  'zaslání skóre na 3830';
   RC_3830_ARRL                          =  'odeslat deník ARRL';  // 4.53.3

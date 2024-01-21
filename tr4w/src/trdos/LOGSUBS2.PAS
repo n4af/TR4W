@@ -1222,6 +1222,7 @@ var
   Address                               : integer;
 
   TempMode                              : ModeType;
+  perfTimeStart, perfTimeStop: TDateTime;
 begin
   logger.trace('>>>Entering LogContact');
  // StationInformationCall := '';    // This might be cleared out too soon - Moved to end of TryLogContact ny4i
@@ -1299,6 +1300,7 @@ begin
       if SaveLastQSOToMP3File(@RXData) then
         RXData.MP3Record := True;
     if not SendRecordToServer(NET_QSOINFO_ID, RXData) then inc(tUSQ);
+    perfTimeStart := Now;
     if UDPBroadcastContact then
        begin
        LogContactToUDP(RXData);
@@ -1306,7 +1308,9 @@ begin
     if ExternalLoggerEnabled then
        begin
        externalLogger.LogQSO(RXData);
-       end
+       end;
+    perfTimeStop := Now;
+    logger.Debug('Milliseconds to send UDP and TCP to external logger = %d',[DateUtils.MilliSecondsBetween(perfTimeStop, perfTimeStart)]);
     end
   else
     begin     // ny4i issue 82 - If the option is set, broadcast contacts received from the Network
@@ -2702,6 +2706,7 @@ var
    txFreq : integer;
    sOperator : AnsiString;
    sRecType: AnsiString;
+   sExchange: AnsiString;
 begin
    // if operator is blank, use mycall
    // Add CR to output
@@ -2789,7 +2794,8 @@ begin
    Result := '<?xml version="1.0"?>' + sLineBreak +
              '<' + sRecType + '>' + sLineBreak +
              #9 + '<app>TR4W</app>' + sLineBreak +
-             #9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak +
+             #9 + '<contestname>' + ContestsArray[Contest].CABName + '</contestname>' + sLineBreak +
+             {#9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak + }
              #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
              #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
              SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
@@ -2816,8 +2822,27 @@ begin
             #9 + '<rcv>' + Format('%d',[RxData.RSTReceived]) + '</rcv>' + sLineBreak +
 
             #9 + '<rcvnr>' + Format('%d',[nNumberReceived]) + '</rcvnr>' + sLineBreak +
-            #9 + '<gridsquare></gridsquare>' + sLineBreak +
-            #9 + '<exchange1>' + RXData.ExchString + '</exchange1>' + sLineBreak +
+            #9 + '<gridsquare></gridsquare>' + sLineBreak;
+   {case Contest of         // This should perhaps case off of the exchange instead of contest.
+      ARRLFIELDDAY, WINTERFIELDDAY:
+         sExchange := RXData.ceClass;
+      NAQSOCW, NAQSOSSB, NAQSORTTY:
+         sExchange := RXData.Name;
+      else
+         sExchange := RXData.ExchString;
+      end;}
+   case ActiveExchange of
+      NameAndDomesticOrDXQTHExchange:
+         sExchange := RXData.Name;
+      ClassDomesticOrDXQTHExchange:
+         sExchange := RXData.ceClass;
+      else
+         sExchange := RXData.ExchString;
+      end;
+
+
+   Result := Result + #9 + '<exchange1>' + sExchange + '</exchange1>' + sLineBreak;
+   Result := Result +
             #9 + '<section>' + RxData.QTHString + '</section>' + sLineBreak +    // Issue 262
             #9 + '<comment></comment>' + sLineBreak +
             #9 + '<qth>' + RxData.QTHString + '</qth>' + sLineBreak +
