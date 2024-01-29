@@ -54,3 +54,6 @@ tr4w/target/
 tr4w/tr4w.cfg
 tr4w/tr4w.dof
 tr4w/COMPILER.LOG
+tr4w/tr4w.log
+*.RST
+*.TRW
