@@ -2406,7 +2406,7 @@ begin
        if TempTag = ctLocation then
           begin
           sWriteFileFromString(tReportFileWrite,'ARRL-SECTION: ' + TempBuffer2 + #13#10);
-          sWriteFileFromString(tReportFileWrite,'CATEGORY: ' + MyFDClass + #13#10);
+          sWriteFileFromString(tReportFileWrite,'X-EXCHANGE: ' + MyFDClass + #13#10);
           end;
        end;
     TempPchar := @CabrilloTagsArray[TempTag].ctrTag[1];
@@ -2428,7 +2428,7 @@ begin
      begin
      sWriteFileFromString(tReportFileWrite,'GRID-LOCATOR: ' + MyGrid + #13#10);
      end;
-     
+
   if ErmakSpecification then
     for Operator := 1 to 10 do
       for TempErmakField := Low(TErmakFields) to High(TErmakFields) do
