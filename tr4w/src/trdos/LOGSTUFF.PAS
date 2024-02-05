@@ -3587,7 +3587,7 @@ begin
     end;
   end;
 end;
- {
+  {
 function ProcessRSTAndFOCNumberExchange(Exchange:Str80; var RXData:ContestExchange):boolean;     //n4af function added 4.32.5
  //    ProcessExchange := ProcessRSTNAMEAndNumber(ExchangeString, RData);             //n4af add foc marathon
 var

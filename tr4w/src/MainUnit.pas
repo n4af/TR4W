@@ -454,9 +454,9 @@ type
 type
   TADIF_Fields = (tAdifARRL_SECT = 0, tAdifBAND, tAdifCALL, tAdifCHECK,
     tAdifCLASS, tAdifCQ_Z,
-    tAdifCONTEST_ID, tAdifCNTY, tAdifGRIDSQUARE, tAdifFREQ, tAdifFREQ_RX,
+    tAdifCONTEST_ID, tAdifCNTY,tadifFOC_NUM, tAdifGRIDSQUARE, tAdifFREQ, tAdifFREQ_RX,
     tAdifIOTA, tAdifITUZ, tAdifMODE, tAdifNAME, tAdifOPERATOR, tAdifPRECEDENCE,
-    tAdifQSO_DATE, tAdifQSO_DATE_OFF, tAdifTIME_ON, tAdifTIME_OFF,
+    tAdifQSO_DATE, tAdifQSO_DATE_OFF,  tAdifTIME_ON, tAdifTIME_OFF,
     tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
     tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
     tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
@@ -6868,6 +6868,7 @@ var
   appHQ: string;
   recordFromWSJTX: boolean;
   gridSquare: string;
+  foc_num : string;
   tempSRX_String: string;
   tempSTX_String: string;
   tempState: string;
@@ -6918,7 +6919,7 @@ begin
             case TADIF_Fields(AnsiIndexText(AnsiUpperCase(fieldName),
               // Be careful addng these. The order matters in the case...
               ['ARRL_SECT', 'BAND', 'CALL', 'CHECK', 'CLASS', 'CQ_Z',
-              'CONTEST_ID', 'CNTY', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
+              'CONTEST_ID', 'CNTY', 'FOC_NUM', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
                 'IOTA', 'ITUZ', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
                 'QSO_DATE', 'QSO_DATE_OFF', 'TIME_ON', 'TIME_OFF',
                 'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
@@ -6945,6 +6946,10 @@ begin
                 end;
               tAdifCNTY:
                 logger.info('[ParseADIFRecord] CNTY was in record as %s but skipping since no place to put it', [fieldValue]); //CNTY
+              tAdifFOC_NUM:
+               begin
+                foc_num := fieldvalue;
+               end;
               tAdifGRIDSQUARE:
                 begin
                   gridSquare := fieldValue;
@@ -7176,6 +7181,10 @@ begin
         exch.QTHString := fieldValue;
         // tAdifCQ_Z: exch.Zone := StrToInt(fieldValue);
         exch.zone := strtoint(tempSRX_String);
+      end;
+      FOCMARATHON:
+      begin
+      exch.Power:= foc_num;
       end;
     IARU:
       exch.QTHString := fieldValue;
