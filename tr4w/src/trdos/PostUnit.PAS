@@ -1849,7 +1849,7 @@ begin
       //if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
       //if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
 
-      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%d <RST_RCVD:%u>%d '  // Moved CONTEST_ID below to make it copnditional
+      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%d <RST_RCVD:%u>%d '  // Moved CONTEST_ID below to make it conditional
                   ,[length(TempRXData.Callsign), TempRXData.Callsign
                   ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
                  // ,length(ExtendedModeStringArray[TempRXData.Mode]), ExtendedModeStringArray[TempRXData.Mode]
@@ -1884,6 +1884,21 @@ begin
             begin
             sMode := ADIFModeString[TempRXData.mode];
             end;
+         end
+      else if TempRXData.ExtMode = eUSB then
+         begin
+         sMode := 'SSB';
+         sSubMode := 'USB';
+         end
+      else if TempRXData.ExtMode = eLSB then
+         begin
+         sMode := 'SSB';
+         sSubMode := 'LSB';
+         end
+      else if TempRXData.ExtMode = ePSK31 then
+         begin
+         sMode := 'PSK';
+         sSubMode := ExtendedModeStringArray[TempRXData.ExtMode];
          end
       else if TempRXData.ExtMode = eFT4 then    // ??? In MFSKModes[TempRXData.ExtMode]?
          begin
