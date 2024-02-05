@@ -460,7 +460,7 @@ type
     tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
     tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
     tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
-    tAdifQTH, tAdifPROGRAMID
+    tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1
     );
 var
   FreeMemCount: integer;
@@ -6925,7 +6925,7 @@ begin
                 'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                 'STATE', 'STX', 'STX_STRING', 'SUBMODE', 'TEN_TEN',
                 'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN',
-                'QTH', 'PROGRAMID'])) of
+                'QTH', 'PROGRAMID', 'APP_N1MM_EXCHANGE1'])) of
               tAdifARRL_SECT: tempARRL_Sect := fieldValue;
               //exch.QTHString := fieldValue;
               tAdifBAND:
@@ -7067,6 +7067,16 @@ begin
                     recordFromWSJTX := true;
                   end;
                 end;
+              tAdifAPP_N1MM_EXCHANGE1:   // N1MM puts the CLASS in APP_N1MM_EXCHANGE1 instead of CLASS. I submitted a ticket but they will not fix it.
+                 if exch.ceContest in [ARRLFIELDDAY, WINTERFIELDDAY] then
+                    begin
+                    exch.ceClass := AnsiUpperCase(fieldValue);
+                    end
+                 else if exch.ceContest in [FOCMARATHON] then
+                    begin
+                    exch.Power := fieldValue;
+                    end;
+
             else
               if MidStr(fieldName, 1, 4) <> 'APP_' then
               begin
