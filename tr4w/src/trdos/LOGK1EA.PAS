@@ -2540,7 +2540,7 @@ end;
 
 procedure tStartAutoCQ;
 begin
-   logger.debug('[CWThreadProc] In tStartAutoCQ');
+   logger.trace('[CWThreadProc] In tStartAutoCQ');
 {$IF tDebugMode}
   AddStringToTelnetConsole('In tStartAutoCQ', tstReceived);
 {$IFEND}

@@ -312,7 +312,7 @@ begin
       begin
       exit;
       end;
-   DebugMsg('Calculating elements for ' + sMsg);
+   logger.trace('Calculating elements for %s',[sMsg]);
    for i                                                    := 1 to (length(sMsg)) do
       begin
       s                                                     := Copy(sMsg,i,1);
@@ -326,11 +326,11 @@ begin
          if length(s1) > 0 then
             begin
             Result                                          := Result + StrToInt(s1);
-            DebugMsg('CW Element ' + s + ' = ' + s1 + ' elements');
+            logger.trace('CW Element %s = %s elements',[s, s1]);
             end
          else
             begin
-            DebugMsg('Missing CW element for ' + s);
+            logger.trace('Missing CW element for %s',[s]);
             Result                                          := Result + 5; // average 5
             end;
          end;

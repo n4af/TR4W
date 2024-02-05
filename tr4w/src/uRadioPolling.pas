@@ -2720,12 +2720,11 @@ begin
          begin
             if not rig.FilteredStatus.TXOn then
                begin
-                  if rig.CWByCAT_Sending then
-                     // ny4i Moved under this If to only perform when we are sending
-                     begin
-                        DebugMsg('rig.CWByCAT_Sending set to FALSE - ' +
-                           rig.RadioName + ' (' +
-                           InterfacedRadioTypeSA[rig.RadioModel] + ')');
+               if rig.CWByCAT_Sending then
+                  // ny4i Moved under this If to only perform when we are sending
+                  begin
+                  logger.trace('rig.CWByCAT_Sending set to FALSE - %s (%s)',
+                           [rig.RadioName, InterfacedRadioTypeSA[rig.RadioModel]]);
                         rig.tmrCWByCAT.Enabled := false;
                            // ny4i Issue 153 Disable timer so we do not fire if we get the this event here
                         //BackToInactiveRadioAfterQSO; // Moved to Timer event // ny4i Issue 153 We have to try here as WK and Serial do it in their threads when not busy
@@ -3487,9 +3486,8 @@ begin
                   ActiveRadioPtr.CWByCAT_Sending := false;
                      // If we were sending but the PTT goes off, now reset this.
                   BackToInactiveRadioAfterQSO; // ny4i Issue 153 We have to try here as WK and Serial do it in their threads when not busy
-                  DebugMsg('[Active] CWByCAT_Sending set to FALSE - ' +
-                     ActiveRadioPtr.RadioName + ' (' +
-                     InterfacedRadioTypeSA[ActiveRadioPtr.RadioModel] + ')');
+                  logger.trace('[Active] CWByCAT_Sending set to FALSE - %s (%s)',
+                     [ActiveRadioPtr.RadioName, InterfacedRadioTypeSA[ActiveRadioPtr.RadioModel]]);
                   tStartAutoCQ; // this is totally bizzare but the way autocqresume works is you call this and it checks.
                end;
          if tr4w_PTTStartTime <> 0 then
