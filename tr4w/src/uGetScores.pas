@@ -430,12 +430,14 @@ var
   RequestBody                           : array[0..10000] of Char;
   Index                                 : integer;
 //  h                                     : HWND;
+  nTotal                                : integer;
+  nQSOs                                 : integer;
 const
   GetScoresMults                        : array[RemainingMultiplierType] of PChar = (nil, 'state', 'country', 'zone', 'prefix');
   GetScoresModesArray                   : array[ModeType] of PChar = ('CW', 'DIG', 'PH', 'ALL', nil, nil);
 
 begin
-
+  nTotal := 0;
   Index := Format(RequestBody,
 
    'xml=<?xml version="1.0"?><dynamicresults>' +
@@ -452,21 +454,41 @@ begin
     tCategoryBandSA[CategoryBand],
     tCategoryTransmitterSA[CategoryTransmitter]
     );
+
+    { QSOTotals is set to the high number even after contacts are deleted. That is not the right score so add up the totals each time  // ny4i
+
+
+    **** NOTE ****
+    You cannot use QSOTotals[TempBand, TempMode] for an accurate score for the total QSOs. QSOTotals[TempBand, TempMode] is not decremented for ALL as that is the log's total QSO count including deleted contacts.
+    QSOTotals[TempBand, TempMode] is accurate for the individual bands so just sum those values to calculate the total     ny4i
+  }
+    
   for TempBand := Band160 to AllBands do
-    for TempMode := CW to Both do
+    for TempMode := CW to {Both} Phone do  // ModeType goes CW, Digital, Phone
     begin
       if QSOTotals[TempBand, TempMode] = 0 then Continue;
 
       BandPchar := BandStringsArrayWithOutSpaces[TempBand];
       if TempBand = AllBands then
-        BandPchar := 'total';
+         begin
+         BandPchar := 'total';
+         nQSOs := nTotal;
+         end
+      else
+         begin
+         nQSOs := QSOTotals[TempBand, TempMode];
+         end;
 
+      nTotal := nTotal + QSOTotals[TempBand, TempMode];
       Index := Index + Format(@RequestBody[Index],
         GSCR + '<qso band="%s" mode="%s">%u</qso>',
         BandPchar,
         GetScoresModesArray[TempMode],
-        QSOTotals[TempBand, TempMode]);
+        nQSOs {QSOTotals[TempBand, TempMode]});
     end;
+    Index := Index + Format(@RequestBody[Index],
+        GSCR + '<qso band="total" mode="ALL">%u</qso>',
+        nQSOs {QSOTotals[TempBand, TempMode]});
 
   for TempBand := Band160 to AllBands do
     for TempMode := CW to Both do
@@ -498,6 +520,7 @@ begin
 //  ShowMessage(GetScoresBuffer);
   Windows.lstrcat(GetScoresBuffer, RequestBody);
 //  ShowMessage(GetScoresBuffer);
+   logger.Debug('[MakePOSTRequestNew] %s',[GetScoresBuffer]);
   Result := Windows.lstrlen(GetScoresBuffer);
 {
   if not Tree.tOpenFileForWrite(h, 'GetScoresAnswerFileName') then Exit;
