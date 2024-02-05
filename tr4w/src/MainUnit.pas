@@ -6480,9 +6480,8 @@ function CheckCommandInCallsignWindow: boolean;
 begin
   Result := true;
   case AnsiIndexText(AnsiUpperCase(CallWindowString),
-    ['ADIF', 'CAB', 'CMD', 'COL', 'CWOFF', 'CWON', 'EXIT', 'NOTE', 'OPON',
-    'SUM',
-      'UDP', 'WCY', 'WWV']) of
+    ['ADIF', 'CAB', 'CMD', 'COL', 'CWOFF', 'CWON', 'EXIT', 'NOTE', 'OPON','SCORE',
+    'SUM', 'UDP', 'WCY', 'WWV']) of
     0: ProcessMenu(menu_adif);
     1: ProcessMenu(menu_cabrillo);
     2: WinExec('cmd.exe', SW_SHOW);
@@ -6509,10 +6508,11 @@ begin
     6: ProcessMenu(menu_exit);
     7: ProcessMenu(menu_ctrl_note);
     8: ProcessMenu(menu_login);
-    9: ProcessMenu(menu_summary);
-    10: SendFullLogToUDP;
-    11: SendViaTelnetSocket('SH/WCY');
-    12: SendViaTelnetSocket('SH/WWV');
+    9: SendScoreToUDP;
+    10: ProcessMenu(menu_summary);
+    11: SendFullLogToUDP;
+    12: SendViaTelnetSocket('SH/WCY');
+    13: SendViaTelnetSocket('SH/WWV');
   else
     Result := false; // False result does not clear call window
   end; // case

@@ -2251,7 +2251,7 @@ begin
       end
    else }
       begin
-      DebugMsg('Setting tmrCWByCAT timer to ' + IntToStr(ms) + ' mS.');
+      logger.trace('Setting tmrCWByCAT timer to %d ms',[ms]);
       Self.tmrCWByCAT.interval := ms;
       Self.tmrCWByCat.enabled := true;
       end;
@@ -2500,13 +2500,13 @@ begin
                   formatStr := 'KY %s;';
                   end;
                elements := CalculateElements(sMsg);  // ny4i Issue 153
-               DebugMsg('Total CW Elements for ' + sMsg + ' = ' + IntToStr(elements));
+               logger.trace('Total CW Elements for %s = %d',[sMsg,elements]);
                localMsg := Format(formatStr, [sMsg]);
                Self.EnableCWBYCATTimer( Round(1200 / DisplayedCodeSpeed) * elements); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
                AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
-               DebugMsg('Adding K/E/F radio CW string to buffer');
+               logger.trace('Adding K/E/F radio CW string to buffer');
                Self.CWByCAT_Sending := true;
-               DebugMsg('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
+               logger.trace('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
                tempLen := length(Msg);
                end;
             CWByCATBuffer := ''; // Clear the buffer
@@ -2579,7 +2579,7 @@ begin
                Self.EnableCWBYCATTimer(Round(( (1200 / DisplayedCodeSpeed) * elements) * 1.25)); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
                AddCommandToBuffer;
                Self.CWByCAT_Sending := true;
-               DebugMsg('Self.CWByCAT_Sending set to TRUE - Icom');
+               logger.trace('Self.CWByCAT_Sending set to TRUE - Icom');
                CWByCATBuffer := '';
                end
             else
@@ -2640,7 +2640,7 @@ begin
          localMsg := Format('/%s#13', [Msg]);   // ny4i Issue 112
          WriteToCATPort(localMsg[1], length(localMsg));
          Self.CWByCAT_Sending := true;
-         DebugMsg('Self.CWByCAT_Sending set to TRUE - Orion');
+         logger.trace('Self.CWByCAT_Sending set to TRUE - Orion');
          end;
       else
          begin

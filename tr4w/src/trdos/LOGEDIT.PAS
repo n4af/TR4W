@@ -279,10 +279,16 @@ begin
   end;
 
   if QSONumberByBand then
-    Result := QSOTotals[ActiveBand, Both]
+     begin
+     logger.debug('In TotalContacts, (QSONumberByBand is true) returning ' + IntToStr(Result));
+     Result := QSOTotals[ActiveBand, Both];
+     end
   else
-    Result := QSOTotals[AllBands, Both];
-  logger.debug('In TotalContacts, returning ' + IntToStr(Result));
+     begin
+     logger.debug('In TotalContacts, (QSONumberByBand is false so AllBands) returning ' + IntToStr(Result));
+     Result := QSOTotals[AllBands, Both];
+     end;
+
 end;
 
 procedure BandDownOrUp(Direction: DirectionType);

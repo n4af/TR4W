@@ -2569,6 +2569,8 @@ var
     TempMode                              : ModeType;
     m                                     : RemainingMultiplierType;
     BandPchar                             : PChar;
+    nQSOs                                 : integer;
+    nTotal                                : integer;
 const
   GetScoresMults                        : array[RemainingMultiplierType] of PChar = (nil, 'state', 'country', 'zone', 'prefix');
   GetScoresMultsIARU                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'country', 'zone', 'prefix');
@@ -2598,7 +2600,12 @@ begin
 	<score>4</score>
 	<timestamp>2018-01-19 17:23:51</timestamp>
 </dynamicresults>
+
+**** NOTE ****
+You cannot use QSOTotals[TempBand, TempMode] for an accurate score for the total QSOs. QSOTotals[TempBand, TempMode] is not decremented for ALL as that is the log's total QSO count including deleted contacts.
+QSOTotals[TempBand, TempMode] is accurate for the individual bands so just sum those values to calculate the total
 }
+   nTotal := 0;
    if UDPBroadcastScore then                // Issue 304 NY4I
      begin
      CalculateTotals;    // This reads the log so be careful how often it is done.
@@ -2616,19 +2623,25 @@ begin
             #9 + '<breakdown>' + sLineBreak;
   for TempBand := Band160 to AllBands do
      begin
-     for TempMode := CW to Both do // Was Phone for a test do
+     for TempMode := CW to Phone do {Both do} // Was Phone for a test do
         begin
         if QSOTotals[TempBand, TempMode] = 0 then Continue;
         BandPchar := BandStringsArrayWithOutSpaces[TempBand];
         if TempBand = AllBands then
            begin
            BandPchar := 'total';
+           nQSOs := nTotal;
+           end
+        else
+           begin
+           nQSOs := QSOTotals[TempBand, TempMode];
            end;
+        nTotal := nTotal + QSOTotals[TempBand, TempMode];
         if GetScoresModesArray[TempMode] <> 'ALL' then
            begin
            sBuf := sBuf + #9#9 + '<qso band="' + BandPChar +
                               '" mode="' + GetScoresModesArray[TempMode] +
-                              '">' + IntToStr(QSOTotals[TempBand, TempMode]) + '</qso>' + sLineBreak;
+                              '">' + IntToStr(nQSOs) + '</qso>' + sLineBreak;
            end;
         if Contest <> WRTC then
            begin
@@ -2665,6 +2678,7 @@ begin
                  #9 + '<timestamp>' + SystemTimeToString(UTC) + '</timestamp>' + sLineBreak +
                  '</dynamicresults>' + sLineBreak;
   udp.BroadcastEnabled := true;
+  logger.debug('[SendScoreToUDP] \n %s',[sBuf]);
   udp.Send(UDPBroadcastAddress,UDPBroadcastPortScore,sBuf);
   end;
 end;
@@ -2920,7 +2934,14 @@ end;
             end
          else
             begin
-            logger.error('[SendFullLogToUDP] Was not valid QSO %s',[TempRXData.Callsign]);
+            if TempRXData.ceQSO_Deleted  then
+               begin
+               logger.trace('[SendFullLogToUDP] Contact for %s not sent to UDP as it was DELETED',[TempRXData.Callsign]);
+               end
+            else
+               begin
+               logger.error('[SendFullLogToUDP] Was not valid GoodLookingQSO %s',[TempRXData.Callsign]);
+               end;
             end;
          end;
       CloseLogFile;
