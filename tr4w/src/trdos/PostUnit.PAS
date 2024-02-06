@@ -4211,7 +4211,7 @@ var
   contacts                              : integer;
   PreviousQTHString                     : Str10;
   pnr                                   : integer;
-  
+
 
 
 
@@ -4230,6 +4230,31 @@ begin
 
    previousqsonr := 0;
    nrSent := TempRXData.NumberSent;
+
+
+   // Exchanges yet to be added...
+   {
+    CheckAndChapterOrQTHExchange:
+    KidsDayExchange:
+    NameQTHAndPossibleTenTenNumber:
+    NameAndPossibleGridSquareExchange:
+    NZFieldDayExchange:
+    RSTAndGrid3Exchange:
+    QSONumberNameChapterAndQTHExchange:
+    RSTALLJAPrefectureAndPrecedenceExchange:
+    RSTAndDOMESTICQTH:       //n4af
+    RSTAndFOCNumberExchange: //n4af
+    RSTAndGridExchange:
+    RSTAndSerialNumberAndGridandPossibleMemberNumber:
+    RSTNameAndPossibleFOCNumber:
+    RSTPossibleDomesticQTHAndPower:
+    RSTQSONumberAndRandomCharactersExchange:
+    RSTQSONumberOrDomesticQTHExchange:
+    RSTQTHNameAndFistsNumberOrPowerExchange:
+    RSTQTHExchange:
+    RSTLongJAPrefectureExchange:
+    RSTAndGridSquareOrRDAExchange:
+   }
 
    if GoodLookingQSO then
       begin
@@ -4309,6 +4334,10 @@ begin
             if TempRXData.QTHString = '' then csQTHString := 'DX';
             Result := SysUtils.Format('%-4d %-7s %-8s', [nrSent, cMyNAme, cMyState]);
             end;
+         QSONumberAndAgeExchange:
+            begin
+            Result := SysUtils.Format('%-4d %-8s', [nrSent, cMyState]);
+            end;
 
          RSTAgeAndPossibleSK:
             Result := SysUtils.Format('%-3d %-16s', [TempRXData.RSTSent, cMyState]);
@@ -4377,12 +4406,14 @@ begin
 
          QSONumberAndCoordinatesSum: {RFASCHAMPIONSHIP}
             Result := SysUtils.Format('%-3s %03d    ', [cMyState, nrSent]);
+         QSONumberAndGeoCoordinates:
+            Result := cMyState;
 
          ClassDomesticOrDXQTHExchange:
             Result := SysUtils.Format('%-3s %-7s ', [ MyFDClass, MySection]);
 
          RSTQSONumberExchange:
-            Result := SysUtils.Format('%-3d %03d ', [TempRXData.RSTSent, nrSent]);      // issue 177      
+            Result := SysUtils.Format('%-3d %03d ', [TempRXData.RSTSent, nrSent]);      // issue 177
 
 
          RSTAndContinentExchange:
@@ -4439,6 +4470,32 @@ begin
                Result := SysUtils.Format('%-4d %03u   ', [TempRXData.RSTSent, nrSent]);
                end;
             end;
+         // Exchanges not yet implemented
+         CheckAndChapterOrQTHExchange,
+         KidsDayExchange,
+         NameQTHAndPossibleTenTenNumber,
+         NameAndPossibleGridSquareExchange,
+         NZFieldDayExchange,
+         RSTAndGrid3Exchange,
+         QSONumberNameChapterAndQTHExchange,
+         RSTALLJAPrefectureAndPrecedenceExchange,
+         RSTAndDOMESTICQTH,       //n4af
+         RSTAndFOCNumberExchange, //n4af
+         RSTAndGridExchange,
+         RSTAndSerialNumberAndGridandPossibleMemberNumber,
+         RSTNameAndPossibleFOCNumber,
+         RSTPossibleDomesticQTHAndPower,
+         RSTQSONumberAndRandomCharactersExchange,
+         //RSTQSONumberOrDomesticQTHExchange,
+         RSTQTHNameAndFistsNumberOrPowerExchange,
+         RSTQTHExchange,
+         RSTLongJAPrefectureExchange,
+         RSTAndGridSquareOrRDAExchange:
+            begin
+            Result := 'None';
+            logger.error('[] MyExchange ADIF not yet implemented for exchange %s',[ActiveExchangeArray[ActiveExchange]]);
+            end;
+
          end; // of case ActiveExchange
       end;
    except
