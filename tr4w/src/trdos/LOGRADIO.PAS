@@ -1139,7 +1139,7 @@ begin
    case IntRadioType of
 
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, FLEX:
+      TS950, TS990, TS2000:
          begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('UP;', 3);
          end;
@@ -1161,7 +1161,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($02));
          end;
 
-      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6, FLEX:
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1216,7 +1216,7 @@ begin
    case IntRadioType of
 
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, FLEX:
+      TS950, TS990, TS2000:
          begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('DN;', 3);
          end;
@@ -1238,7 +1238,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($03));
          end;
 
-      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6, FLEX:
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
