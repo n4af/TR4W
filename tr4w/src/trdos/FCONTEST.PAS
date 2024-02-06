@@ -1294,6 +1294,17 @@ begin
 }
     DARC10M:
       begin
+        ActiveBand := Band10;
+        AddDomesticCountry('DL');
+        QSOByMode := True;
+         if MyCountry = 'DL' then
+       
+          ActiveDXMult := CQDXCC
+
+        else
+          ActiveDomesticMult := DOKCodes;
+
+        LiteralDomesticQTH := True;
         AddDomesticCountry('DL');
       end;
 
