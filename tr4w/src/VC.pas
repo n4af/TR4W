@@ -2981,6 +2981,9 @@ const
       'CFOQP'
     );
 
+{ When adding a new ExchangeType, please add a handler in the case statement in GetMyExchangeForExport
+  in PostUnit for the ADIF export as well as in tGenerateLogPortionOfCabrilloFile in PostUnit for the Cabrillo file.
+  ny4i }
 type
   ExchangeType = (
   UnknownExchange,
