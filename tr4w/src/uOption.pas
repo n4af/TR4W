@@ -437,17 +437,23 @@ begin
        logger.Debug('Change of Foreground QSOB4 color');
        // Send colors for Dupes (QSOB4)
        //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]);
-       wsjtx.SetDupeBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]));
+       if assigned(wsjtx) then
+          begin
+          wsjtx.SetDupeBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]));
        //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]);
-       wsjtx.SetDupeForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]));
+          wsjtx.SetDupeForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweColor]));
+          end;
        end
     else if TWindows[TMainWindowElement(TempInteger)].mweName = 'MULT' then
        begin
        // Send colors for multipliers
        //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]);
-       wsjtx.SetMultBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]));
+       if assigned(wsjtx) then
+          begin
+          wsjtx.SetMultBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweBackG]));
        //rgb := ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]);
-       wsjtx.SetMultForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]));
+          wsjtx.SetMultForegroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweNewMultStatus].mweColor]));
+          end;
        end;
 
 

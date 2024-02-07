@@ -469,7 +469,8 @@ implementation
 
 uses
   uCbrSum,
-  MainUnit;
+  MainUnit,
+  uCFG;
 
 procedure WriteADIFField(sFieldName: string; sFieldValue: string);
 var sBuffer: string;
@@ -2577,7 +2578,15 @@ begin
 
     if TempRXData.RSTSent < 25 then
        begin
-       RSTSent := PChar(SysUtils.Format('%d', [wsjtx.ConvertSNRToRST(TempRXData.RSTSent)]));
+       if WSJTXEnabled then
+          begin
+          RSTSent := PChar(SysUtils.Format('%d', [wsjtx.ConvertSNRToRST(TempRXData.RSTSent)]));
+          end
+       else
+          begin
+          RSTSent := PChar(SysUtils.Format('%d',[599]));
+          logger.info('RSTSent was less than 25 but WSJTXEnabled is FALSE');
+          end;
        end
     else
        begin
@@ -2587,7 +2596,14 @@ begin
     if (TempRXData.ExtMode in [eFT8, eMFSK, eJT65]) and
        (TempRXData.RSTReceived < 25)                then
        begin
-       RSTReceived := PChar(SysUtils.Format('%d', [wsjtx.ConvertSNRToRST(TempRXData.RSTReceived)]));
+       if WSJTXEnabled then
+          begin
+          RSTReceived := PChar(SysUtils.Format('%d', [wsjtx.ConvertSNRToRST(TempRXData.RSTReceived)]));
+          end
+       else
+          begin
+          RSTReceived := '599';
+          end;
        end
     else
        begin

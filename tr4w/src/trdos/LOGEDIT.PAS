@@ -280,13 +280,13 @@ begin
 
   if QSONumberByBand then
      begin
-     logger.debug('In TotalContacts, (QSONumberByBand is true) returning ' + IntToStr(Result));
      Result := QSOTotals[ActiveBand, Both];
+     logger.debug('In TotalContacts, (QSONumberByBand is true) returning ' + IntToStr(Result));
      end
   else
      begin
-     logger.debug('In TotalContacts, (QSONumberByBand is false so AllBands) returning ' + IntToStr(Result));
      Result := QSOTotals[AllBands, Both];
+     logger.debug('In TotalContacts, (QSONumberByBand is false so AllBands) returning ' + IntToStr(Result));
      end;
 
 end;
