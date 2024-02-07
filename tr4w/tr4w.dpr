@@ -359,7 +359,10 @@ begin
 //  if TryToCheckTheLatestVersion then Exit;
 //{$IFEND}
 
-  wsjtx := TWSJTXServer.Create;
+  {if WSJTXEnabled then
+     begin
+     wsjtx := TWSJTXServer.Create;
+     end;   }               // Moved after we read the config file
   externalLogger := TExternalLogger.Create('DXKEEPER');
   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
 
@@ -442,6 +445,10 @@ begin
   ReadInConfigFile(cfgCFG);          //n4af 4.31.5
   ReadInConfigFile(cfgCommMes);      //common messages gets precedence - n4af
 
+  if WSJTXEnabled then
+     begin
+     wsjtx := TWSJTXServer.Create;
+     end;
   externalLogger.loggerPort := externalLoggerPort;
   externalLOgger.loggerAddress := externalLoggerAddress;
   UpdateDebugLogLevel;
@@ -620,7 +627,8 @@ begin
 {$IFEND}
 
 
-
+   if WSJTXEnabled then
+      begin
    // Send colors for Dupes (QSOB4)
 
    wsjtx.SetDupeBackgroundColor(ColorToRGB(tr4wColorsArray[TWindows[mweQSOB4Status].mweBackG]));
@@ -635,6 +643,7 @@ begin
       begin
       wsjtx.Start;
       end;
+   end;
     {****************************  Main CallBack  ****************************}
 
   while (GetMessage(Msg, 0, 0, 0)) do
