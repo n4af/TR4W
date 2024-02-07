@@ -172,10 +172,11 @@ begin
   colorsMultFore.R := $00;
   colorsMultFore.G := $00;
   colorsMultFore.B := $00;
-  logger.Debug('[WSJT-X]Creating tcpServ on port %d',[FTCPPort]);
+
 
   if WSJTXRadioControlEnabled then
      begin
+     logger.Debug('[WSJT-X]Creating tcpServ on port %d',[FTCPPort]);
      tcpServ := TIdTCPServer.Create(nil);
      logger.Debug('[WSJT-X] Created tcpServ on port %d',[FTCPPort]);
      tcpServ.OnExecute := Self.IdTCPServer1Execute;
