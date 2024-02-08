@@ -336,6 +336,7 @@ const
    + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
    + 6 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTLD PORT, HAMLIB RIGCTLD RUN AT STARTUP}
    + 3 {ExternalLoggerAddress & ExernalLoggerPort & ExternalLoggerEnabled}
+   + 3 {SO2RBoxAddress, SO2RBoxEnabled, SO2RBoxPort} 
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -742,6 +743,12 @@ const
  (crCommand: 'SINGLE RADIO MODE';             crAddress: @SingleRadioMode;                crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'SKIP ACTIVE BAND';              crAddress: @SkipActiveBand;                 crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'SLASH MARK CHAR';               crAddress: @SlashMarkChar;                  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctChar; crNetwork: 1),
+
+ (crCommand: 'SO2R BOX ADDRESS';              crAddress: @SO2RBoxAddress;                 crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 0),
+ (crCommand: 'SO2R BOX ENABLED';              crAddress: @SO2RBoxEnabled;                 crMin:0;  crMax:0;         crS: csNew; crA: 23; crC:0; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
+ (crCommand: 'SO2R BOX PORT';                 crAddress: @SO2RBoxPort;                    crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
+
+
  (crCommand: 'SPACE BAR DUPE CHECK ENABLE';   crAddress: @SpaceBarDupeCheckEnable;        crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'SPRINT QSY RULE';               crAddress: @SprintQSYRule;                  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'START SENDING NOW KEY';         crAddress: @StartSendingNowKey;             crMin:0;  crMax:0;       crS: csOld; crA: 19;crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctChar; crNetwork: 1),

@@ -567,6 +567,10 @@ var
   //  ShowSearchAndPounce                   : boolean;
   SingleRadioMode: boolean;
   SkipActiveBand: boolean;
+
+  SO2RBoxAddress: string[255] = '127.0.0.1';
+  SO2RBoxEnabled: boolean = false;
+  SO2RBoxPort: integer = 17701;
   SpaceBarDupeCheckEnable: boolean = True;
   StartSendingNowKey: Char = '''';
 

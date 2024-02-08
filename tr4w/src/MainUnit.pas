@@ -139,7 +139,8 @@ uses
   Log4D,
   Controls,
   uNetRadioBase,
-  uExternalLogger
+  uExternalLogger,
+  uSO2RBox
   ;
 
 var
@@ -157,6 +158,7 @@ var
   CallWinKeyDown: boolean = False; // 4.52.4
   FontS: integer;
   FirstQSO: Cardinal;
+  so2rbox: TSO2RBox;
   T1: Cardinal;
   Esc_Counter: integer = 0;
   Call_Found: Boolean = False;

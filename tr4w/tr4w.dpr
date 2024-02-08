@@ -118,7 +118,8 @@ uses
   uSuperCheckPartialFileUpload,
   uRadioHamLib in 'src\uRadioHamLib.pas',
   uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
-  uExternalLogger in 'src\uExternalLogger.pas';
+  uExternalLogger in 'src\uExternalLogger.pas',
+  uSO2RBox in 'src\uSO2RBox.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -192,7 +193,7 @@ begin
       end;
     WM_MEASUREITEM: if wParam = MainWindowPCLID then
         PMeasureItemStruct(lParam).itemHeight := ws;
-       
+
     WM_DRAWITEM:
       begin
         if wParam = MainWindowPCLID then
@@ -449,8 +450,16 @@ begin
      begin
      wsjtx := TWSJTXServer.Create;
      end;
+
+  if SO2RBoxEnabled then
+     begin
+     so2rbox := TSO2RBox.Create;
+     so2rbox.SO2RBoxAddress := SO2RBoxAddress;
+     so2rbox.SO2RBoxPort := SO2RBoxPort;
+     so2rbox.Connect;
+     end;
   externalLogger.loggerPort := externalLoggerPort;
-  externalLOgger.loggerAddress := externalLoggerAddress;
+  externalLogger.loggerAddress := externalLoggerAddress;
   UpdateDebugLogLevel;
   logger.debug('**************** Program Startup ************************');
   logger.info('DecimalSeparator = ' + DecimalSeparator);
