@@ -44,10 +44,11 @@ Type TSO2RBox = class(TObject)
       readTerminator: string;
       socket: TIdTCPClient;
    public
-      constructor Create(ProcRef: TProcessMsgRef); overload;
-      constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
+      constructor Create(ProcRef: TProcessMsgRef); overload; virtual;
+      constructor Create(address: string; port: integer{;ProcRef: TProcessMsgRef}); overload; virtual;
       Destructor Destroy; overload; Virtual;
       procedure Connect;
+      function Send(s: string): boolean;
       procedure ProcessMessage(sMessage: string);
       property SO2RBoxPort: integer read GetSO2RBoxPort write SetSO2RBoxPort;
       property SO2RBoxAddress: string read GetSO2RBoxAddress write SetSO2RBoxAddress;
@@ -74,11 +75,11 @@ begin
 
 end;
 
-Constructor TSO2RBox.Create(address: string; port: integer; ProcRef: TProcessMsgRef);
+Constructor TSO2RBox.Create(address: string; port: integer{; ProcRef: TProcessMsgRef});
 begin
-   Self.SO2RBoxAddress := address;
-   Self.SO2RBoxPort := port;
-   Self.Create(ProcRef);
+   Self.localAddress := address;
+   Self.localPort := port;
+   Self.Create(ProcessMessage);
 end;
 
 Destructor TSO2RBox.Destroy;
@@ -98,7 +99,10 @@ procedure TSO2RBox.Connect;
 begin
    if socket <> nil then
       begin
+      socket.Host := Self.localAddress;
+      socket.Port := Self.localPort;
       Self.socket.Connect;
+      Self.Send('TX?');
       end;
 end;
 
@@ -143,20 +147,36 @@ end;
 
 procedure TSO2RBox.OnSO2RBoxStatus(Sender: TObject; const Status: TIdStatus; const AStatusText: string);
 begin
-   logger.trace('Received text from SO2R Box: [%s]',[AStatusText]);
+   logger.trace('Received status from SO2R Box: [%s]',[AStatusText]);
 end;
 
+function TSO2RBox.Send(s: string): boolean;
+var nLen: integer;
+begin
+   Result := false;
+   try
+      if socket.Connected then
+         begin
+         logger.Trace('[SO2RBox::Send] Sending to SO2RBox: (%s)',[s]);
+         nLen := length(s);
+         socket.IOHandler.WriteLn(s);
+         //socket.IOHandler.Write(s,nLen,0);
+         Result := true;
+         end
+      else
+         begin
+         logger.error('[SO2RBox::Send] Cannot send command (%s) to SO2RBox as not connected',[s]);
+         Result := false;
+         end;
+   except
+      logger.error('Exception caught on TSO2RBox::Send - Command to send was %s',[s]);
+      Result := false;
+   end;
+
+end;
 procedure TSO2RBox.ProcessMessage(sMessage: string);
 var
    sCommand: string;
-   sData: string;
-   sMode: string;
-   hz: integer;
-   i: integer;
-   RITSign: integer;
-   ritHz : integer;
-   sDataMode: string;
-   vfoBCommand: boolean;
 begin
 // This is called by the process that receives data on the socket - Event
    logger.Trace('[SO2RBox.ProcessMessage] Received from SO2R Box: (%s)',[sMessage]);
@@ -185,7 +205,7 @@ begin
          if FConn.Connected then
             begin
             //logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
-            cmd := FConn.IOHandler.ReadLn(Self.readTerminator); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
+            cmd := FConn.IOHandler.ReadLn('\n'); // OTRSP docuent states on page 5 that CR is the delimiter
             logger.trace('[TReadingThread.Execute] Cmd received: (%s)',[cmd]);
             Self.msgHandler(cmd);
             end

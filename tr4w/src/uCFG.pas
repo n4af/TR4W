@@ -313,7 +313,7 @@ const
 var
    CMD: ShortString;
    WSJTXSendColorization: boolean = true;
-   WSJTXEnabled: boolean = true;
+   WSJTXEnabled: boolean = false;
    WSJTXRadioControlEnabled: boolean = false;
 
 const

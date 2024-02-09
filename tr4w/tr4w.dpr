@@ -453,7 +453,7 @@ begin
 
   if SO2RBoxEnabled then
      begin
-     so2rbox := TSO2RBox.Create;
+     so2rbox := TSO2RBox.Create(SO2RBoxAddress, SO2RBoxPort );
      so2rbox.SO2RBoxAddress := SO2RBoxAddress;
      so2rbox.SO2RBoxPort := SO2RBoxPort;
      so2rbox.Connect;
