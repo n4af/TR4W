@@ -38,6 +38,7 @@ uses
   uCallsigns,
   Messages,
   LogStuff,
+  LogSubs2,
   LogK1EA,
   LogWind,
   LogRadio,
@@ -602,6 +603,14 @@ begin
     Exit;
   if PInteger(@Spot.FCall[1])^ = tNEWAsInteger then
     Exit;
+    if TwoRadioMode then
+    begin
+     DupeInfoCall := Spot.Fcall;
+     DupeCheckOnInactiveRadio(True);
+     SetOpMode(CQOpMode);
+     exit;
+    end
+    else
   PutCallToCallWindow(Spot.FCall);
 
   if not QSOByMode then
