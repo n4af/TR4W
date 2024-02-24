@@ -784,7 +784,7 @@ begin
     SwapRadios;
     SetOpMode(SearchAndPounceOpMode);
     PutCallToCallWindow(DupeInfoCall);
-
+    ShowStationInformation(@DupeInfoCall);
     if TwoRadioMode then
     begin
       Send_DE;

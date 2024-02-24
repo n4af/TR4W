@@ -38,6 +38,7 @@ uses
   uCallsigns,
   Messages,
   LogStuff,
+  LogSubs2,
   LogK1EA,
   LogWind,
   LogRadio,
@@ -526,17 +527,19 @@ begin
     QSYInActiveRadio := False;
     InBandLock := False;
   end;
-  if BandMapSO2RDisplay then
+//  if BandMapSO2RDisplay then
+    if TwoRadioMode then
     if (ActiveBand = Spot.FBand) and (not WKBusy) then // 4.105.15
     begin
       Radio := ActiveRadio;
       QSYInactiveRadio := False;
     end
-    else
-    begin
-      QSYInactiveRadio := True;
-      Radio := InactiveRadio;
+     else
+   begin
+   //   QSYInactiveRadio := True;
+   //   Radio := InactiveRadio;
     end;
+
   if ((InBandLock) and (TwoRadioMode)) then
   begin
     if QSYInactiveRadio then
@@ -602,6 +605,15 @@ begin
     Exit;
   if PInteger(@Spot.FCall[1])^ = tNEWAsInteger then
     Exit;
+    if TwoRadioMode then   //4.131.9
+    begin
+     tClearDupeInfoCall;
+     DupeInfoCall := Spot.Fcall;
+     DupeCheckOnInactiveRadio(True);
+     SetOpMode(CQOpMode);
+     exit;
+    end
+    else
   PutCallToCallWindow(Spot.FCall);
 
   if not QSOByMode then
