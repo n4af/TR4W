@@ -27,6 +27,10 @@ function BoolToString(b: boolean): string;
 // Add property for IP address, port, type (tcp or udp but just implement tcp right now).
 // Add a connect and disconnect method
 
+Type ExternalLoggerType = (lt_NoExternalLogger, lt_DXKeeper, lt_ACLog, lt_HRD);
+
+const ExternalLoggerTypeSA                     : array[ExternalLoggerType] of PChar = ('NONE', 'DXKEEPER', 'ACLOG', 'HRD');
+
 Type TExternalLoggerBase = class(TObject)
    private
       //socket: TIdTCPClient;
@@ -43,7 +47,7 @@ Type TExternalLoggerBase = class(TObject)
       procedure SetLoggerID (Value: string);
       function GetLoggerAddress: string;
       procedure SetLoggerAddress(Value: string);
-      function GetISConnected: boolean;
+      function GetIsConnected: boolean;
       procedure OnLoggerConnected(Sender:TObject);
       procedure OnLoggerDisconnected(Sender: TObject);
       procedure OnLoggerStatus(Sender: TObject; const Status: TIdStatus; const AStatusText: string);
@@ -52,6 +56,8 @@ Type TExternalLoggerBase = class(TObject)
       readTerminator: string;
       socket: TIdTCPClient;
       procRef: TProcessMsgRef;
+      logTypeSet: boolean;
+      logType: ExternalLoggerType;
 
    public
       constructor Create(ProcRef: TProcessMsgRef); overload;
@@ -75,10 +81,11 @@ Type TExternalLoggerBase = class(TObject)
 
 end;
 
-
+var elLogType: ExternalLoggerType;
 implementation
 
 Uses MainUnit;
+
 
 Constructor TExternalLoggerBase.Create(ProcRef: TProcessMsgRef);
 begin

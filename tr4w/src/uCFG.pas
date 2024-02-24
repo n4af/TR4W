@@ -61,7 +61,8 @@ uses
    VC,
    idUDPClient,
    idGlobal,
-   Log4D
+   Log4D,
+   uExternalLoggerBase
    ;
 
 type
@@ -234,7 +235,7 @@ const
       );
 
    {List}
-   ListParamArray: array[0..52] of ListParamRecord =
+   ListParamArray: array[0..53] of ListParamRecord =
       (
     {(*}
     (lpArray: @RateDisplayTypeStringArray;        lpLength: Byte(High(RateDisplayType));        lpVar: @RateDisplay; ),
@@ -247,7 +248,7 @@ const
     (lpArray: @InitialExchangeTypeStringArray;    lpLength: Byte(High(InitialExchangeType));    lpVar: @ActiveInitialExchange; ),
     (lpArray: @HourDisplayTypeSA;                 lpLength: Byte(High(HourDisplayType));        lpVar: @HourDisplay; ),
     (lpArray: @FootSwitchModeTypeStringArray;     lpLength: Byte(High(FootSwitchModeType));     lpVar: @FootSwitchMode; ),
-    (lpArray: @ActiveExchangeArray;               lpLength: Byte(High(ExchangeType));           lpVar: @ActiveExchange; ),
+{10}(lpArray: @ActiveExchangeArray;               lpLength: Byte(High(ExchangeType));           lpVar: @ActiveExchange; ),
     (lpArray: @DXMultTypenameArray;               lpLength: Byte(High(DXMultType));             lpVar: @ActiveDXMult; ),
     (lpArray: @DupeCheckSoundTypeSA;              lpLength: Byte(High(DupeCheckSoundType));     lpVar: @DupeCheckSound; ),
     (lpArray: @DomesticMultStringArray;           lpLength: Byte(High(DomesticMultType));       lpVar: @ActiveDomesticMult; ),
@@ -257,7 +258,7 @@ const
     (lpArray: @RotatorTypeSA;                     lpLength: Byte(High(RotatorType));            lpVar: @ActiveRotatorType; ),
     (lpArray: @TenMinuteRuleTypeSA;               lpLength: Byte(High(TenMinuteRuleType));      lpVar: @TenMinuteRule; ),
     (lpArray: @UserInfoTypeSA;                    lpLength: Byte(High(UserInfoType));           lpVar: @UserInfoShown; ),
-    (lpArray: @DistanceDisplayTypeSA;             lpLength: Byte(High(DistanceDisplayType));    lpVar: @DistanceMode; ),
+{20}(lpArray: @DistanceDisplayTypeSA;             lpLength: Byte(High(DistanceDisplayType));    lpVar: @DistanceMode; ),
     (lpArray: @ContinentTypeSA;                   lpLength: Byte(High(ContinentType));          lpVar: @MyContinent; ),
     (lpArray: @ContestTypeSA;                     lpLength: Byte(High(ContestType));            lpVar: @Contest; ),
     (lpArray: @ZoneMultTypeSA;                    lpLength: Byte(High(ZoneMultType));           lpVar: @ActiveZoneMult; ),
@@ -268,7 +269,7 @@ const
 
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_cat_rts_state; ),
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_cat_dtr_state; ),
-    (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_keyer_rts_state; ),
+{30}(lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_keyer_rts_state; ),
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio1.tr4w_keyer_DTR_state; ),
 
     (lpArray: @tr4w_RTSDTRTypeSA;                 lpLength: Byte(High(tr4w_RTSDTRType));        lpVar: @Radio2.tr4w_cat_rts_state; ),
@@ -282,7 +283,7 @@ const
     (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @Radio1.tKeyerPort; ),
     (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @Radio2.tKeyerPort; ),
 
-    (lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @ActiveRotatorPort; ),
+{40}(lpArray: @PortTypeSA;                        lpLength: Byte(High(PortType));               lpVar: @ActiveRotatorPort; ),
     (lpArray: @MP3RecorderDurationSA;             lpLength: Byte(High(TMP3RecorderDuration));   lpVar: @RecorderDuration; ),
 
     (lpArray: @tCategoryBandSA;                   lpLength: Byte(High(tCategoryBand));          lpVar: @CategoryBand; ),
@@ -295,9 +296,10 @@ const
     (lpArray: @SidetoneFrequencySA;               lpLength: Byte(High(TWKSidetoneFrequency));   lpVar: @WinKeySettings.wksValueList.vlSidetoneFrequency; ),
 
     (lpArray: @tCategoryTransmitterSA;            lpLength: Byte(High(tCategoryTransmitter));   lpVar: @CategoryTransmitter;),
-    (lpArray: @tCategoryAssistedSA;               lpLength: Byte(High(tCategoryAssisted));      lpVar: @CategoryAssisted;),
+{50}(lpArray: @tCategoryAssistedSA;               lpLength: Byte(High(tCategoryAssisted));      lpVar: @CategoryAssisted;),
     (lpArray: @tCertificateSA;                    lpLength: Byte(High(tCertificate));           lpVar: @Certificate;),
-    (lpArray: @tLogLevelsSA;                         lpLength: Byte(High(tLogLevels));           lpVar: @logLevels;)
+    (lpArray: @tLogLevelsSA;                      lpLength: Byte(High(tLogLevels));             lpVar: @logLevels;),
+    (lpArray: @ExternalLoggerTypeSA;              lplength: Byte(High(ExternalLoggerType));     lpVar: @elLogType;)
     {*)}
       );
 
@@ -336,6 +338,7 @@ const
    + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
    + 6 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTLD PORT, HAMLIB RIGCTLD RUN AT STARTUP}
    + 3 {ExternalLoggerAddress & ExernalLoggerPort & ExternalLoggerEnabled}
+   + 1 {ExternalLogger}
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -457,6 +460,10 @@ const
  (crCommand: 'EXCHANGE MEMORY ENABLE';        crAddress: @ExchangeMemoryEnable;           crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'EXCHANGE RECEIVED';             crAddress: pointer(10);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctOther; crNetwork: 1),
  (crCommand: 'EXCHANGE WINDOW S&P BACKGROUND';crAddress: pointer(48);                     crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:10; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther; crNetwork: 1),
+
+ (crCommand: 'EXTERNAL LOGGER';               crAddress: pointer(53);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:2; crJ: 0; crKind: ckList; cfFunc: cfAll; crType: ctOther; crNetwork: 0),
+
+
  (crCommand: 'EXTERNAL LOGGER ADDRESS';       crAddress: @ExternalLoggerAddress;          crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 0),
  (crCommand: 'EXTERNAL LOGGER ENABLED';       crAddress: @ExternalLoggerEnabled;          crMin:0;  crMax:0;         crS: csNew; crA: 23; crC:0; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'EXTERNAL LOGGER PORT';          crAddress: @ExternalLoggerPort;             crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),

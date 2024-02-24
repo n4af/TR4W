@@ -36,6 +36,7 @@ utils_text,
 type
 
   RemainingMultDisplayModeType = (NoRemainingMults, Erase, HiLight);
+ // ExternalLogType = (NoExternalLogger, DXKeeper, ACLog, HRD);
 
   PrefixRecPtr = ^PrefixRec;
 
@@ -78,6 +79,7 @@ type
 procedure EnumDOMFILE(FileString: PShortString);
 const
   RemainingMultDisplayModeTypeSA        : array[RemainingMultDisplayModeType] of PChar = ('NONE', 'ERASE', 'HILIGHT');
+//  ExternalLogTypeSA                     : array[ExternalLogType] of PChar( = ('None', 'DXKeeper', 'ACLog', 'HRD');
 
 var
   ActiveDomesticMult                    : DomesticMultType {= NoDomesticMults};

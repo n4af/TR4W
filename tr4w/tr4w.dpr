@@ -363,7 +363,7 @@ begin
      begin
      wsjtx := TWSJTXServer.Create;
      end;   }               // Moved after we read the config file
-  externalLogger := TExternalLogger.Create('DXKEEPER');
+  //externalLogger := TExternalLogger.Create('DXKEEPER');
   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
 
  Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
@@ -449,8 +449,12 @@ begin
      begin
      wsjtx := TWSJTXServer.Create;
      end;
-  externalLogger.loggerPort := externalLoggerPort;
-  externalLOgger.loggerAddress := externalLoggerAddress;
+  if elLogType <> lt_NoExternalLogger then
+     begin
+     externalLogger := TExternalLogger.Create(elLogType);
+     externalLogger.loggerPort := externalLoggerPort;
+     externalLogger.loggerAddress := externalLoggerAddress;
+     end;
   UpdateDebugLogLevel;
   logger.debug('**************** Program Startup ************************');
   logger.info('DecimalSeparator = ' + DecimalSeparator);

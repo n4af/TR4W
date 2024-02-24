@@ -1307,7 +1307,10 @@ begin
        end;
     if ExternalLoggerEnabled then
        begin
-       externalLogger.LogQSO(RXData);
+       if Assigned(externalLogger) then
+          begin
+          externalLogger.LogQSO(RXData);
+          end;
        end;
     perfTimeStop := Now;
     logger.Debug('Milliseconds to send UDP and TCP to external logger = %d',[DateUtils.MilliSecondsBetween(perfTimeStop, perfTimeStart)]);

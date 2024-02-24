@@ -12,12 +12,16 @@ Type TExternalLogger = class(TExternalLoggerBase)
       function AddADIFField(sFieldName: string; sValue: string): string; overload;
       function AddADIFField(sFieldName: string; nValue: integer): string; overload;
       function LogQSOToDXKeeper(ce: ContestExchange): integer;
+      function LogQSOToACLog(ce: ContestExchange): integer;
+      function LogQSOToHRD(ce: ContestExchange): integer;
 
-      // Add a QueueQSO to copy the record then return to the caller. THis allows the actual sending of th eTCP message ot be done from a different thread to not slow down the program.
+      // Add a QueueQSO to copy the record then return to the caller. This allows the actual sending of the TCP message ot be done from a different thread to not slow down the program.
 
-      // I could also generalize this into postQSOProcessing and let the UDP happen from the thread too. Worth exploring the actual amont of time per QSO to send to UDP and TCP. If it is very fast, this complicatyion may not be necessary.
+      // I could also generalize this into post QSO Processing and let the UDP happen from the thread too. Worth exploring the actual amont of time per QSO to send to UDP and TCP. If it is very fast, this complication may not be necessary.
    public
-      Constructor Create(sLoggerType: string);
+      Constructor Create(); overload;
+      Constructor Create(logType: ExternalLoggerType{sLoggerType: string}); overload;
+
       function Connect: integer; overload;
       procedure ProcessMessage(sMessage: string);
       function LogQSO(ce: ContestExchange): integer;
@@ -30,10 +34,17 @@ implementation
 
 Uses MainUnit;
 
-Constructor TExternalLogger.Create(sLoggerType: string);
+Constructor TExternalLogger.Create();
 begin
-   Self.loggerID := sLoggerType;
    inherited Create(ProcessMessage);
+end;
+
+Constructor TExternalLogger.Create(logType: ExternalLoggerType) {sLoggerType: string)};
+begin
+  // Self.loggerID := sLoggerType;
+  Self.logType := logType;
+  Self.logTypeSet := true;
+   Self.Create(ProcessMessage);
 end;
 
 function TExternalLogger.Connect: integer;
@@ -169,6 +180,17 @@ end;
 
 function TExternalLogger.LogQSO(ce: ContestExchange): integer;
 begin
+   case Self.logType of
+      lt_NoExternalLogger:
+         begin
+         Result := -1;
+         logger.Error('Within TExternalLogger.LogQSO, logType set to NoExternalLogger');
+         end;
+      lt_DxKeeper: Result := Self.LogQSOToDXKeeper(ce);
+      lt_ACLog: Result := Self.LogQSOToACLog(ce);
+      lt_HRD: Result := Self.LogQSOToHRD(ce);
+   end;
+   {
    if Self.loggerID = 'DXKEEPER' then
       begin
       Result := Self.LogQSOToDXKeeper(ce);
@@ -177,6 +199,7 @@ begin
       begin
       logger.Warn('[LogQSO] Called LogQSO without an expected loggerID (%s)',[Self.loggerID]);
       end;
+      }
 end;
 
 function TExternalLogger.LogQSOToDXKeeper(ce: ContestExchange): integer;
@@ -297,6 +320,16 @@ This is all we need to send as we DO NOT want to send every contact to any of th
   logger.Debug('[TExternalLogger.LogQSO] Sending message to external logger: [%s]',[sMessage]);
   Self.SendToLogger(sMessage);
 
+end;
+
+function TExternalLogger.LogQSOToACLog(ce: ContestExchange): integer;
+begin
+   logger.Info('Logging to ACLog not yet implemented');
+end;
+
+function TExternalLogger.LogQSOToHRD(ce: ContestExchange): integer;
+begin
+   logger.Info('Logging to HRD not yet implemented');
 end;
 
 function TExternalLogger.AddADIFField(sFieldName: string; sValue: string): string;
