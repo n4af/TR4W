@@ -437,7 +437,7 @@ var
   ExternalLoggerAddress: string[255] = '127.0.0.1';
   ExternalLoggerEnabled: boolean = false;
   ExternalLoggerPort: integer = 52001;
-    // In DXKeeper case, it is 52000 base port + 1
+  // In DXKeeper case, it is 52000 base port + 1
 
   FakePacket: boolean;
   FakeBandMap: boolean;
@@ -5654,10 +5654,9 @@ var
   Str4: string[2];
 begin
   RXData.QSOPoints := 0;
-  RXCty := RXData.QTH.CountryID; // 4.67.15
-  if (QSOPointsDomesticCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH
-    <>
-    '') then
+  RXCty := RXData.QTH.CountryID; // 4.67.1
+
+  if (QSOPointsDomesticCW >= 0) and (RXData.Mode = CW) and (RXData.DomesticQTH  <>  '') then
   begin
     RXData.QSOPoints := QSOPointsDomesticCW;
     Exit;
@@ -6990,7 +6989,6 @@ begin
             RXData.QSOPoints := 10;
         end;
       end;
-
 
     OKOMSSBQSOPointMethod: // 4.80.1
 

@@ -379,13 +379,6 @@ type
     RemainingMultsWindowSubdue: tr4wColors;
     RemainingMultsWindowBackground: tr4wColors;
     RemainingMultsWindowColor: tr4wColors;
-{
-    RTTYWindowBackground: tr4wColors;
-    RTTYWindowColor: tr4wColors;
-
-    RTTYInverseWindowBackground: tr4wColors;
-    RTTYInverseWindowColor: tr4wColors;
-}
     TotalScoreWindowBackground: tr4wColors;
     TotalScoreWindowColor: tr4wColors;
     TotalWindowBackground: tr4wColors;
@@ -824,9 +817,7 @@ var
   //   ReminderPostedCount             : integer;
   Reminders                             : ReminderArrayPointer;
 
-  //  RTTYX, RTTYY                          : SHORTINT;
-  //  RTTYInverseX, RTTYInverseY            : SHORTINT;
-  //  RTTYReceiveString, RTTYSendString     : Str20;
+ S2SW                                   : boolean = False;
 
   SayHiEnable                           : boolean;
 
