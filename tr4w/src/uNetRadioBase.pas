@@ -588,29 +588,36 @@ procedure TReadingThread.Execute;
 var
   cmd: string;
 begin
-   logger.trace('DEBUG: TReadingThread.Execute');
-   logger.info('In ReadingThread.Execute, readTerminator is [%s]',[Self.readTerminator]);
+   logger.trace('[TNetRadioBase.TReadingThread.Execute] Entered');
+   logger.info('[TNetRadioBase.TReadingThread.Execute] readTerminator is [%s]',[Self.readTerminator]);
    while not Terminated do
       begin
       try
          if FConn.Connected then
             begin
-            //logger.Trace('[TReadingThread.Execute] Calling ReadLn on socket');
+            //logger.Trace('[TNetRadioBase.TReadingThread.Execute] Calling ReadLn on socket');
             cmd := FConn.IOHandler.ReadLn(Self.readTerminator); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
-            logger.trace('[TReadingThread.Execute] Cmd received: (%s)',[cmd]);
+            logger.trace('[TNetRadioBase.TReadingThread.Execute] Cmd received: (%s)',[cmd]);
             Self.msgHandler(cmd);
             end
          else
             begin
-            logger.Trace('[TReadingThread.Execute] socket is not connected');
+            logger.Trace('[TNetRadioBase.TReadingThread.Execute] socket is not connected');
+            // Wait 2 seconds and try to connect
+            sleep(2000);
+            logger.Trace('[TNetRadioBase.TReadingThread.Execute] Attempting to reopen socket after sleeping 2 seconds');
+
+            FConn.Socket.Open;
             end;
          except
-            on EIdNotConnected do
-               logger.info('Socket exception on TReadingThread.Execute');
+            on E: Exception do
+               logger.debug('[TNetRadioBase.TReadingThread.Execute] %s exception raised with message %s', [E.ClassName, E.Message]);
+            {on EIdNotConnected do
+               logger.info('[TNetRadioBase.TReadingThread.Execute] Socket exception on TReadingThread.Execute');
             else
                begin
-               logger.debug('Unknown exception on TReadingThread.Execute');
-               end;
+               logger.debug('[TNetRadioBase.TReadingThread.Execute] Unknown exception on TReadingThread.Execute');
+               end; }
          end;
       end;
    logger.info('<<<<<<<<<<<< Leaving TReadingThread.Execute >>>>>>>>>>>>>>>>>>');
