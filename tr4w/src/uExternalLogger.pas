@@ -1,7 +1,7 @@
 unit uExternalLogger;
 
 interface
-uses uExternalLoggerBase, StrUtils, SysUtils, Math, TF, VC, LOGSUBS2, LogWind, Tree, uCFG;
+uses uExternalLoggerBase, StrUtils, SysUtils, Math, TF, VC, LOGSUBS2, LogWind, LogDupe, Tree, uCFG, PostUnit;
 
 
 Type TExternalLogger = class(TExternalLoggerBase)
@@ -11,9 +11,19 @@ Type TExternalLogger = class(TExternalLoggerBase)
       procedure SendToLogger(sCmd: string; sData: string); overload;
       function AddADIFField(sFieldName: string; sValue: string): string; overload;
       function AddADIFField(sFieldName: string; nValue: integer): string; overload;
+
+      // DXKeeper
       function LogQSOToDXKeeper(ce: ContestExchange): integer;
+      function DeleteQSOToDXKeeper(ce: ContestExchange): integer; // There functions hsould be changed to an interface so we just call one based onthe interface (by log type). ny4i
+      function LookupCallsignToDXKeeper(ce: ContestExchange): integer;
+
+      // ACLog
       function LogQSOToACLog(ce: ContestExchange): integer;
+
+      // HRD
       function LogQSOToHRD(ce: ContestExchange): integer;
+
+
 
       // Add a QueueQSO to copy the record then return to the caller. This allows the actual sending of the TCP message ot be done from a different thread to not slow down the program.
 
@@ -25,8 +35,11 @@ Type TExternalLogger = class(TExternalLoggerBase)
       function Connect: integer; overload;
       procedure ProcessMessage(sMessage: string);
       function LogQSO(ce: ContestExchange): integer;
+      function DeleteQSO(ce: ContestExchange): integer;
+      function LookupCallsign(ce:ContestExchange): integer;
 
 end;
+
 
 var
    firstProcessMessage: boolean = true;
@@ -190,16 +203,35 @@ begin
       lt_ACLog: Result := Self.LogQSOToACLog(ce);
       lt_HRD: Result := Self.LogQSOToHRD(ce);
    end;
-   {
-   if Self.loggerID = 'DXKEEPER' then
-      begin
-      Result := Self.LogQSOToDXKeeper(ce);
-      end
-   else
-      begin
-      logger.Warn('[LogQSO] Called LogQSO without an expected loggerID (%s)',[Self.loggerID]);
-      end;
-      }
+end;
+
+function TExternalLogger.DeleteQSO(ce: ContestExchange): integer;
+begin
+   case Self.logType of
+      lt_NoExternalLogger:
+         begin
+         Result := -1;
+         logger.Error('Within TExternalLogger.DeleteQSO, logType set to NoExternalLogger');
+         end;
+      lt_DxKeeper: Result := Self.DeleteQSOToDXKeeper(ce);
+      //lt_ACLog: Result := Self.LogQSOToACLog(ce);
+      //lt_HRD: Result := Self.LogQSOToHRD(ce);
+   end;
+end;
+
+function TExternalLogger.LookupCallsign(ce: ContestExchange): integer;
+begin
+   case Self.logType of
+      lt_NoExternalLogger:
+         begin
+         Result := -1;
+         logger.Error('Within TExternalLogger.LookupCallsign, logType set to NoExternalLogger');
+         end;
+      lt_DxKeeper: Result := Self.LookupCallsign(ce);
+      //lt_ACLog: Result := Self.LogQSOToACLog(ce);
+      //lt_HRD: Result := Self.LogQSOToHRD(ce);
+   end;
+
 end;
 
 function TExternalLogger.LogQSOToDXKeeper(ce: ContestExchange): integer;
@@ -264,17 +296,18 @@ This is all we need to send as we DO NOT want to send every contact to any of th
   if ce.Frequency <> 0 then //14149280  or 7025000
      begin
      saveDecimalSeparator := DecimalSeparator;
-     try
-        DecimalSeparator := '.';
-        sTemp := FloatToStr((ce.Frequency/1000000));
-        sCoreADIF := sCoreADIF + AddADIFField('FREQ',sTemp);
-     finally
-        DecimalSeparator := saveDecimalSeparator;
-     end;
+        try
+           DecimalSeparator := '.';
+           sTemp := FloatToStr((ce.Frequency/1000000));
+           sCoreADIF := sCoreADIF + AddADIFField('FREQ',sTemp);
+        finally
+           DecimalSeparator := saveDecimalSeparator;
+        end;
      end;
      sCoreADIF :=   sCoreADIF
                   + AddADIFField('BAND',ADIFBANDSTRINGSARRAY[ce.Band])
                   + ADDADIFField('MODE',sMode)
+                  + AddADIFField('CONTEST_ID',ContestTypeSA[ce.ceContest])
                   + AddADIFField('QSO_DATE',SysUtils.format('20%0.2d%0.2d%0.2d',
                                                             [ce.tSysTime.qtYear,
                                                              ce.tSysTime.qtMonth,
@@ -285,7 +318,30 @@ This is all we need to send as we DO NOT want to send every contact to any of th
                                                            ce.tSysTime.qtSecond]))
                   + AddADIFField('STATION_CALLSIGN',MyCall)
                   + AddADIFField('OPERATOR',sOperator)
+
+                  + AddADIFField('SRX_STRING', ce.ExchString)
+                  + AddADIFField( 'STX_STRING',Trim(DeleteRepeatedSpaces(GetMyExchangeForExport)))
+
+
+
                   ;
+  if ExchangeInformation.QSONumber then
+     begin
+     if ce.NumberReceived <> -1 then
+        begin
+        sCoreADIF := sCoreADIF + AddADIFField('SRX',IntToStr(ce.NumberReceived));
+        end;
+     if ce.NumberSent <> -1 then
+        begin
+        sCoreADIF := sCoreADIF + AddADIFField('STX',IntToStr(ce.NumberSent));
+        end;
+      end;
+
+  if ce.Age <> 0 then
+     begin
+     sCoreADIF := sCoreADIF + AddADIFField('AGE',IntToStr( ce.Age));
+     end;
+
   if sSubMode <> '' then
      begin
      sCoreADIF := sCoreADIF + AddADIFField('SUBMODE',sSubMode);
@@ -302,7 +358,11 @@ This is all we need to send as we DO NOT want to send every contact to any of th
      begin
      sCoreADIF := sCoreADIF + AddADIFField('GRIDSQUARE',ce.DomesticQTH);
      end;
-
+  if LooksLikeASection(ce.QTHString) then
+     begin
+     sCoreADIF := sCoreADIF + AddADIFField('ARRL_SECT', ce.QTHString);
+     end;
+   // TODO To include ARRL_SECTION, the EXCHANGEINFORMATION record should have a section indicator, thenuse that to grab section from   QTHString
   sCoreADIF := sCoreADIF + '<EOR>';
   nCoreADIFLength := length(sCoreADIF);
   sCoreADIF := '<ExternalLogADIF:' + IntToStr(nCoreADIFLength) + '>' + sCoreADIF;
@@ -322,6 +382,48 @@ This is all we need to send as we DO NOT want to send every contact to any of th
 
 end;
 
+//-------------------------------
+function TExternalLogger.DeleteQSOToDXKeeper(ce: ContestExchange): integer;
+var sCoreADIF: string;
+    n: integer;
+
+    nCoreADIFLength: integer;
+
+    sMessage: string;
+
+    sTemp: string;
+
+begin
+
+  sCoreADIF :=   AddADIFField('CALL',ce.Callsign)
+               + AddADIFField('QSO_DATE',SysUtils.format('20%0.2d%0.2d%0.2d',
+                                                         [ce.tSysTime.qtYear,
+                                                          ce.tSysTime.qtMonth,
+                                                          ce.tSysTime.qtDay]))
+               + AddADIFField('TIME_ON',SysUtils.format('%0.2d%0.2d%0.2d',
+                                                        [ce.tSysTime.qtHour,
+                                                         ce.tSysTime.qtMinute,
+                                                         ce.tSysTime.qtSecond]))
+               ;
+
+  sCoreADIF := sCoreADIF + '<EOR>';
+  nCoreADIFLength := length(sCoreADIF);
+ // sCoreADIF := '<ExternalLogADIF:' + IntToStr(nCoreADIFLength) + '>' + sCoreADIF;
+  nCoreADIFLength := length(sCoreADIF); // Update to include the ExternalLogADIF field
+  sMessage := '<command:9>deleteqso<parameters:' + IntToStr(nCoreADIFLength {+ nOptionsLength}) + '>' + sCoreADIF;
+  logger.Debug('[TExternalLogger.DeleteQSO] Sending message to external logger: [%s]',[sMessage]);
+  Self.SendToLogger(sMessage);
+
+end;
+
+function TExternalLogger.LookupCallsignToDXKeeper(ce: ContestExchange): integer;
+var sMessage: string;
+begin
+  sMessage := '<command:5>check<parameters:' + IntToStr(length(ce.Callsign)) + '>' + ce.Callsign;
+  logger.Debug('[TExternalLogger.LookupQSOToDXKeeper] Sending message to external logger: [%s]',[sMessage]);
+  Self.SendToLogger(sMessage);
+end;
+//--------------------------------
 function TExternalLogger.LogQSOToACLog(ce: ContestExchange): integer;
 begin
    logger.Info('Logging to ACLog not yet implemented');

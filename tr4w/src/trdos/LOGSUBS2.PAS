@@ -487,12 +487,20 @@ begin
     TempRXData.ceQSO_Skiped := False;
     p := TC_YOUHAVERESTOREDTHELASTDELETED;
     LogContactToUDP(TempRXData);
+    if Assigned(externalLogger) then
+       begin
+       externalLogger.LogQSO(TempRXData);
+       end;
   end
   else
   begin
     TempRXData.ceQSO_Skiped := True;
     p := TC_YOUHAVEDELETEDTHELASTLOGENTRY;
     SendDeletedContactToUDP(TempRXData);
+    if Assigned(externalLogger) then
+       begin
+       externalLogger.DeleteQSO(TempRXData);
+       end;
   end;
   InvertBoolean(tLastLogEntryIsDeleted);
   tSetFilePointer(-1 * SizeOf(ContestExchange), FILE_END);

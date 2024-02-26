@@ -319,6 +319,12 @@ begin
          else
             begin
             logger.Trace('[TExternalLoggerBase.TReadingThread.Execute] socket is not connected');
+            // Wait 2 seconds and try to connect
+            sleep(2000);
+            logger.Trace('[TExternalLoggerBase.TReadingThread.Execute] Attempting to reopen socket after sleeping 2 seconds');
+
+            FConn.Socket.Open;
+
             end;
          except
             on EIdNotConnected do

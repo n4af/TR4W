@@ -863,6 +863,7 @@ function LowerCase(const s: string): string;
 function LooksLikeAGrid(var GridString: ShortString): boolean;
 function LooksLikeAGridIgnoreAE(var GridString: ShortString): boolean;
 function LooksLikeAState(state: string): boolean; // NY4I
+function LooksLikeASection(section: string): boolean;
 function Lpt1BaseAddress: Word;
 function Lpt2BaseAddress: Word;
 function Lpt3BaseAddress: Word;
@@ -4761,6 +4762,71 @@ begin
      Result := true;
      end;
 
+
+end;
+
+function LooksLikeASection(section: string): boolean;
+
+begin
+   if (Section = 'AK') or (Section = 'AL') or (Section = 'AR') or
+      (Section = 'AZ') or (Section = 'CO') or (Section = 'CT') or
+      (Section = 'DE') or (Section = 'GA') or (Section = 'IA') or
+      (Section = 'ID') or (Section = 'IN') or (Section = 'IL') or
+      (Section = 'KS') or (Section = 'KY') or (Section = 'LA') or
+      (Section = 'ME') or (Section = 'MI') or (Section = 'MN') or
+      (Section = 'MO') or (Section = 'MS') or (Section = 'MT') or
+      (Section = 'NC') or (Section = 'ND') or (Section = 'NE') or
+      (Section = 'NH') or (Section = 'NM') or (Section = 'NV') or
+      (Section = 'OH') or (Section = 'OK') or (Section = 'OR') or
+      (Section = 'RI') or (Section = 'SD') or (Section = 'TN') or
+      (Section = 'UT') or (Section = 'VA') or (Section = 'VT') or
+      (Section = 'WI') or (Section = 'WV') or (Section = 'WY') or
+      (Section = 'SC') then
+      begin
+      Result := true;
+      end
+   else if (Section = 'EB') or (Section = 'LAX') or (Section = 'ORG') or
+           (Section = 'SB') or (Section = 'SCV') or (Section = 'SDG') or
+           (Section = 'SF') or (Section = 'SJV') or (Section = 'SV') then
+      begin
+      Result := true;
+      end
+   else if (Section = 'EM') or (Section = 'EMA') or
+           (Section = 'WM') or (Section = 'WMA') then
+      begin
+      Result := true;
+      end
+   else if (Section = 'EN') or (Section = 'WNY') or (Section = 'NNY') or
+           (Section = 'ENY') or (Section = 'NLI') then
+      begin
+      Result := true;
+      end
+   else if (Section = 'EP') or (Section = 'EPA') or
+           (Section = 'WP') or (Section = 'WPA') then
+      begin
+      Result := true;
+      end
+   else if (Section = 'EW') or (Section = 'EWA') or
+           (Section = 'WWA') or (Section = 'WW') then
+      begin
+      result := true;
+      end
+   else if (Section = 'NF') or (Section = 'SF') or (Section = 'WCF') then
+      begin
+      Result := true;
+      end
+   else if (Section = 'NNJ') or (Section = 'SNJ') then
+      begin
+      Result := true;
+      end
+   else if (Section = 'NTX') or (Section = 'STX') or (Section = 'WTX') then
+      begin
+      Result := true;
+      end
+   else
+      begin
+      Result := false;
+      end;
 
 end;
 {
