@@ -158,7 +158,9 @@ begin
   if h = 0 then Exit;
   LastItemInIntercomListBox := tLB_ADDSTRING(h, @wsprintfBuffer);
   SendMessage(h, WM_VSCROLL, SB_BOTTOM, 0);
+  logger.Debug('Calling tCreateThread from AddMessageToIntercomWindow');
   tCreateThread(@FlashIntercomListBox, lpThreadId);
+  logger.Debug('Created Intercom thread with id %d',[lpThreadId]);
 end;
 
 procedure FlashIntercomListBox;

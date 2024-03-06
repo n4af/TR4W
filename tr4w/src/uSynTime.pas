@@ -153,7 +153,9 @@ begin
           200: {Get Time}
             begin
               if NTPThreadID <> 0 then Exit;
+              logger.Info('Calling tCreateThread from NTP');
               tCreateThread(@ConnectToNTPServer, NTPThreadID);
+              logger.Info('Created NTP thread with threadid of %d',[NTPThreadID] );
 
             end;
 

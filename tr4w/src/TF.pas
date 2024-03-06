@@ -1229,6 +1229,7 @@ end;
 function tCreateThread(lpStartAddress: TFNThreadStartRoutine; var lpThreadId: DWORD): THandle;
 begin
   Result := CreateThread(nil, 0, lpStartAddress, nil, 0, lpThreadId);
+  logger.Debug('[tCreateThread] Created thread %d',[lpThreadId]);
 end;
 
 //function _Pow10(val: Extended; Power: Integer): Extended;

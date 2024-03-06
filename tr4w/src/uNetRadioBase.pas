@@ -56,6 +56,7 @@ Type TReadingThread = class(TThread)
     procedure Execute; override;
     procedure DoTerminate; override;
   public
+    radioWasDisconnected: boolean;
     constructor Create(AConn: TIdTCPConnection; proc: TProcessMsgRef); reintroduce;
   end;
 
@@ -258,6 +259,12 @@ end;
 Destructor TNetRadioBase.Destroy;
 var iVFO: TVFO;
 begin
+   if rt <> nil then
+      begin
+      rt.Terminate;
+      rt.WaitFor;
+      FreeAndNil(rt);
+      end;
 
    if socket <> nil then
       begin
@@ -288,12 +295,12 @@ end;
 procedure TNetRadioBase.OnRadioDisconnected(Sender: TObject);
 begin
    logger.Info('<<<<<<<<<<<<<< Network Radio disconnected');
-   if rt <> nil then
+   {if rt <> nil then
       begin
       rt.Terminate;
       rt.WaitFor;
       FreeAndNil(rt);
-      end;
+      end;  }
 end;
 
 procedure TNetRadioBase.OnRadioStatus(Sender: TObject; const Status: TIdStatus; const AStatusText: string);
@@ -459,7 +466,7 @@ end;
 
 function TNetRadioBase.GetCWSpeed: integer;
 begin
-Result := Self.localCWSpeed;
+   Result := Self.localCWSpeed;
 end;
 
 function TNetRadioBase.GetIsRITOn(whichVFO: TVFO): boolean;
@@ -581,6 +588,7 @@ begin
 
   msgHandler := proc;
 
+  logger.Info('Created NetRadioBase::TReadingTYhreadthread with id %d',[Self.ThreadID]);
   inherited Create(False);
 end;
 
@@ -596,14 +604,21 @@ begin
          if FConn.Connected then
             begin
             //logger.Trace('[TNetRadioBase.TReadingThread.Execute] Calling ReadLn on socket');
-            cmd := FConn.IOHandler.ReadLn(Self.readTerminator); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
-            logger.trace('[TNetRadioBase.TReadingThread.Execute] Cmd received: (%s)',[cmd]);
-            Self.msgHandler(cmd);
+            try
+               cmd := FConn.IOHandler.ReadLn(Self.readTerminator); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
+               logger.trace('[TNetRadioBase.TReadingThread.Execute] Cmd received: (%s)',[cmd]);
+               Self.msgHandler(cmd);
+            except
+            on E: Exception do
+               logger.debug('[TNetRadioBase.TReadingThread.Execute] Under FConn.Connected, %s exception raised with message %s', [E.ClassName, E.Message]);
+            end;
+
             end
          else
             begin
             logger.Trace('[TNetRadioBase.TReadingThread.Execute] socket is not connected');
             // Wait 2 seconds and try to connect
+            Self.radioWasDisconnected := true;
             sleep(2000);
             logger.Trace('[TNetRadioBase.TReadingThread.Execute] Attempting to reopen socket after sleeping 2 seconds');
 
@@ -612,12 +627,14 @@ begin
          except
             on E: Exception do
                logger.debug('[TNetRadioBase.TReadingThread.Execute] %s exception raised with message %s', [E.ClassName, E.Message]);
-            {on EIdNotConnected do
+            on EIdConnectTimeout do
+               logger.info('[TNetRadioBase.TReadingThread.Execute] Socket exception on TReadingThread.Execute');
+            on EIdNotConnected do
                logger.info('[TNetRadioBase.TReadingThread.Execute] Socket exception on TReadingThread.Execute');
             else
                begin
                logger.debug('[TNetRadioBase.TReadingThread.Execute] Unknown exception on TReadingThread.Execute');
-               end; }
+               end; 
          end;
       end;
    logger.info('<<<<<<<<<<<< Leaving TReadingThread.Execute >>>>>>>>>>>>>>>>>>');

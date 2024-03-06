@@ -594,7 +594,9 @@ end;
 
 procedure TryConnectToNetwork;
 begin
+  logger.Debug('Calling tCreateThread from TryConnectToNetwork');
   if NetThreadID = 0 then tCreateThread(@ConnectThread, NetThreadID);
+  logger.Debug('Created Network thread with threadid of %d',[NetThreadID] );
 end;
 
 procedure ConnectThread;

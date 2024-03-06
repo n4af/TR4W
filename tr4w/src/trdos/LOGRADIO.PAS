@@ -302,7 +302,7 @@ type
       function ConvertBCDStringToFreq(BCDString: Str20): longint;
 
       procedure FreqToBCD(Freq: longint; Swap: boolean; OpCode: byte);
-      procedure CheckAndInitializeSerialPorts_ForThisRadio;
+      procedure CheckAndInitializePorts_ForThisRadio;
       function WriteToCATPort(const Buffer; nNumberOfBytesToWrite: DWORD): longbool;
       function WritePollRequest(const Buffer; nNumberOfBytesToWrite: DWORD): longbool;
       function AddToOutputBuffer(Buffer: PChar; nNumberOfBytesToWrite: DWORD): longbool;
@@ -1506,7 +1506,7 @@ begin
 end;
 
 { The initializtion of BeginPolling is in this procedure so if we are not using serial ports, it has to be setup somewhere else.}
-procedure RadioObject.CheckAndInitializeSerialPorts_ForThisRadio;
+procedure RadioObject.CheckAndInitializePorts_ForThisRadio;
 begin
    if RadioModel = NoInterfacedRadio then
       begin
@@ -1531,6 +1531,7 @@ begin
          tPollCount := -1;
          tRadioInterfaceThreadHandle :=
             CreateThread(nil, 0, @BeginPolling, @Self, 0, tRadioInterfaceThreadID);
+         logger.Info('Created Radio %s thread with threadid of %d',[Self.RadioName, tRadioInterfaceThreadID] );
          end;
       end;
 

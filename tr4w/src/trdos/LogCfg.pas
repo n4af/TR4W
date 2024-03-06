@@ -221,8 +221,8 @@ begin
   end;
  
 
-  Radio1.CheckAndInitializeSerialPorts_ForThisRadio;
-  Radio2.CheckAndInitializeSerialPorts_ForThisRadio;
+  Radio1.CheckAndInitializePorts_ForThisRadio;
+  Radio2.CheckAndInitializePorts_ForThisRadio;
 
 end;
 

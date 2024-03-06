@@ -444,7 +444,9 @@ begin
                    //          DialogBox(hInstance, MAKEINTRESOURCE(44), hwnddlg, @SpotsFilterDlgProc);
           200: if TelThreadID = 0 then
             begin
+              logger.Debug('Calling tCreateThread from TelnetThread');
               tCreateThread(@ConnectToTelnetCluster, TelThreadID);
+              logger.Debug('Created Telnet (Cluster)  thread with threadid of %d',[TelThreadID] );
               //              ConnectToTelnetCluster;
             end;
 

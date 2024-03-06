@@ -139,7 +139,8 @@ uses
   Log4D,
   Controls,
   uNetRadioBase,
-  uExternalLogger
+  uExternalLogger,
+  IdURI
   ;
 
 var
@@ -434,6 +435,8 @@ procedure tUpdateLog(UpdAction: UpadateAction);
 
 procedure PTTOn;
 procedure PTTOff;
+
+procedure ResetRadioPorts;
 procedure WagCheck;
 
 type
@@ -586,6 +589,41 @@ begin
     // Moved this to the very end of the process to log a contact. ny4i
   end;
 end;
+
+procedure ResetRadioPorts;
+begin
+
+   logger.info('Resetting radio ports');
+   if ActiveRadioPtr.tNetObject <> nil then
+      begin
+      ActiveRadioPtr.tNetObject.Disconnect;
+      ActiveRadioPtr.tNetObject.Connect;
+      end
+   else if ActiveRadioPtr.tHamLibObject <> nil then
+      begin
+      ActiveRadioPtr.tHamLibObject.Disconnect;
+      ActiveRadioPtr.tHamLibObject.Connect;
+      end;
+
+   ActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
+
+   //
+   // Handle radio two
+   //
+   if InActiveRadioPtr.tNetObject <> nil then
+      begin
+      InActiveRadioPtr.tNetObject.Disconnect;
+      InActiveRadioPtr.tNetObject.Connect;
+      end
+   else if InActiveRadioPtr.tNetObject <> nil then
+      begin
+      InActiveRadioPtr.tNetObject.Disconnect;
+      InActiveRadioPtr.tNetObject.Connect;
+      end;
+
+   InActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
+end;
+
 
 procedure Escape_proc;
 var
@@ -3193,40 +3231,37 @@ begin
     item_calculator: WinExec('calc.exe', SW_SHOW);
 
     menu_reset_radio_ports:
-      begin
-        logger.info('Resetting radio ports');
-        if ActiveRadioPtr.tNetObject <> nil then
-        begin
+       begin
+       ResetRadioPorts;
+       {logger.info('Resetting radio ports');
+       if ActiveRadioPtr.tNetObject <> nil then
+          begin
           ActiveRadioPtr.tNetObject.Disconnect;
           ActiveRadioPtr.tNetObject.Connect;
-        end
-        else if ActiveRadioPtr.tHamLibObject <> nil then
-        begin
+       end
+       else if ActiveRadioPtr.tHamLibObject <> nil then
+          begin
           ActiveRadioPtr.tHamLibObject.Disconnect;
           ActiveRadioPtr.tHamLibObject.Connect;
-        end
-        else
-        begin // Active radio is using a serial port
-          ActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
-        end;
-        //
-        // Handle radio two
-        //
-        if InActiveRadioPtr.tNetObject <> nil then
-        begin
+       end;
+
+       ActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
+       //
+       // Handle radio two
+       //
+       if InActiveRadioPtr.tNetObject <> nil then
+          begin
           InActiveRadioPtr.tNetObject.Disconnect;
           InActiveRadioPtr.tNetObject.Connect;
-        end
+          end
         else if InActiveRadioPtr.tNetObject <> nil then
-        begin
-          InActiveRadioPtr.tNetObject.Disconnect;
-          InActiveRadioPtr.tNetObject.Connect;
-        end
-        else
-        begin
-          InActiveRadioPtr.CheckAndInitializeSerialPorts_ForThisRadio;
-        end;
-        //
+           begin
+           InActiveRadioPtr.tNetObject.Disconnect;
+           InActiveRadioPtr.tNetObject.Connect;
+           end;
+
+        InActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
+        }
       end;
 
     menu_pingserver:
@@ -4883,8 +4918,10 @@ begin
   if tPaddleFootSwitchThread <> INVALID_HANDLE_VALUE then
     Exit;
   tExitFromPaddleFootSwitchThread := False;
+  logger.Info('Calling tCreateThread from tRuntPaddleAndFootSwitchThread');
   tPaddleFootSwitchThread := tCreateThread(@tPaddleFootSwitchThreadProc,
     tPaddleThreadID);
+  logger.Info('Created PaddleAndFootSwitch thread with threadid of %d',[tPaddleThreadID] );
   asm
  push THREAD_PRIORITY_LOWEST
  push eax
@@ -7810,8 +7847,10 @@ procedure OpenUrl(url: PChar);
 var
   lpcbValue: DWORD;
   phkResult: hkey;
+  sURI: string;
 begin
-  lpcbValue := SizeOf(TempBuffer2);
+  // This code no longer works so just do the SHellExecute
+  {lpcbValue := SizeOf(TempBuffer2);
 
   if RegOpenKeyEx(HKEY_CLASSES_ROOT, 'http\shell\open\command', 0,
     KEY_ALL_ACCESS, phkResult) = ERROR_SUCCESS then
@@ -7829,7 +7868,11 @@ begin
     WinExec(wsprintfBuffer, SW_SHOWNORMAL);
   end
   else
-    RunExplorer(url);
+     begin}
+     sURI := TIDURI.URLEncode(url);
+     ShellExecute(0, 'open', PChar(sURI), nil, nil, SW_SHOWNORMAL);
+    { end;}
+    //RunExplorer(url);
 end;
 
 function GetAddMultBand(Mult: TAdditionalMultByBand; Band: BandType): BandType;

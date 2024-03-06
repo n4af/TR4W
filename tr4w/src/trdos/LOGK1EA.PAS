@@ -1972,7 +1972,9 @@ procedure DoABeep(TypeOfBeep: BeepType);
 begin
   if not BeepEnable then Exit;
   ActiveBeep := TypeOfBeep;
+  logger.Info('Calling tCreateThread from DoABeep');
   TR4W_BeepThread := tCreateThread(@tDoABeep, TR4W_BeepThreadID);
+  logger.Info('Created Beep thread with threadid of %d',[TR4W_BeepThreadID] );
   asm
    push THREAD_PRIORITY_IDLE
    push eax

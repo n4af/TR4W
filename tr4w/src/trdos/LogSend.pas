@@ -94,7 +94,9 @@ begin
         DVPOn := True;
         tExitFromDVPThread := False;
         DisplayCodeSpeed;
+        logger.Debug('Calling tCreateThread from LogSend');
         tCreateThread(@tDVPPlayThreadproc, DVPThreadID);
+        logger.Debug('Created DVP thread with threadid of %d',[DVPThreadID] );
       end;
     end;
 

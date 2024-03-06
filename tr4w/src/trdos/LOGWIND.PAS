@@ -1987,9 +1987,20 @@ end;
 procedure QuickDisplay(Prompt: PChar);
 begin
   SetTextInQuickCommandWindow(Prompt);
-  if tFlashQDThreadID = 0 then tCreateThread(@FlashQickDisplay, tFlashQDThreadID);
-  if ClearQuickDisplayTimer <> 0 then Windows.KillTimer(tr4whandle, ClearQuickDisplayTimer);
-  ClearQuickDisplayTimer := Windows.SetTimer(tr4whandle, QUICK_REPORT_TIMER_HANDLE, 30000, @ClearQuickDisplayText);
+  logger.Info('[QuickDisplay] (' + Prompt + ')');
+  if length(Prompt) > 0 then
+     begin
+     logger.Debug('Calling tCreateThread from QuickDisplay');
+     if tFlashQDThreadID = 0 then
+        begin
+        tCreateThread(@FlashQickDisplay, tFlashQDThreadID);
+        end;
+     if ClearQuickDisplayTimer <> 0 then
+        begin
+        Windows.KillTimer(tr4whandle, ClearQuickDisplayTimer);
+        end;
+     ClearQuickDisplayTimer := Windows.SetTimer(tr4whandle, QUICK_REPORT_TIMER_HANDLE, 30000, @ClearQuickDisplayText);
+     end;
 end;
 
 procedure SetTextInQuickCommandWindow(Text: PChar);

@@ -736,7 +736,7 @@ begin
       Sleep(FreqPollRate);
 
       rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
-      rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+      rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);   // After the reset radio port on a net radio, the ro.band[nrVFOA] is not being set.
       GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
       rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
       rig^.CurrentStatus.Split := ro.IsSplitEnabled;
@@ -751,6 +751,7 @@ begin
       rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
       rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
       rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+      rig.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
 
       // VFO B
       rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
@@ -762,10 +763,13 @@ begin
 
       UpdateStatus(rig);
       end;
-
-      logger.Info('Exiting pNetworkRadio');
-      rig.CurrentStatus.VFO[VFOA].Frequency := 0;
-      rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+   if not ro.IsConnected then
+      begin
+      firstProcessMessage := true;
+      end;
+   logger.Info('Exiting pNetworkRadio');
+   rig.CurrentStatus.VFO[VFOA].Frequency := 0;
+   rig.CurrentStatus.VFO[VFOB].Frequency := 0;
 
 end;
 
@@ -2533,6 +2537,7 @@ end;
 
 procedure ClearRadioStatus(rig: RadioPtr);
 begin
+   logger.debug('Entered ClearRadioStatus');
    {
      if rig.FilteredStatus.TXOn then
      begin
@@ -2680,6 +2685,7 @@ var
    StatusChanged: boolean;
    TempInteger: integer;
 begin
+  //  logger.Trace('UpdateStatus called for %s', [rig.RadioName]);
    StatusChanged := False;
    //  CompareString(LOCALE_SYSTEM_DEFAULT, 0, @rig.CurrentStatus, SizeOf(RadioStatusRecord), @rig.PreviousStatus, SizeOf(RadioStatusRecord)) <> 2;
    for TempInteger := 0 to SizeOf(RadioStatusRecord) - 1 do
@@ -2766,11 +2772,15 @@ begin
          pTTStatusChanged;
          if rig.FilteredStatus.Freq = 0 then
             Exit;
-
-         if (rig.BandMemory <> rig.FilteredStatus.Band) or (rig.ModeMemory <>
-            rig.FilteredStatus.Mode) then
+         if rig.FilteredStatus.Band = NoBand then
             begin
-               ActiveBand := rig.FilteredStatus.Band;
+            logger.debug('ProcessFilteredStatus:Radio %s] rig.FilteredStatus.Band = NoBand', [rig.RadioName]);
+            logger.debug('ProcessFilteredStatus:Radio %s] rig.FilteredStatus.freq = %d', [rig.RadioName,rig.FilteredStatus.Freq]);
+            end;
+         if (rig.BandMemory <> rig.FilteredStatus.Band) or
+            (rig.ModeMemory <> rig.FilteredStatus.Mode) then
+            begin
+               ActiveBand := rig.FilteredStatus.Band;   // After reset port, filteredstatus.band is NoBand which is the issue     - FS.freq is set correctly so find out what sets filteredStatus up
                ActiveMode := rig.FilteredStatus.Mode;
                DisplayBandMode(ActiveBand, ActiveMode, False);
                VisibleDupeSheetChanged := True;
@@ -3052,7 +3062,9 @@ end;
 
 procedure BeginPolling(rig: RadioPtr); stdcall;
 begin
-   Sleep(100);
+   logger.debug('Entered BeginPolling');
+   ClearRadioStatus(rig);
+   Sleep(100);  // The polling thread did not start after reset?
 
    { If the radio is a network interface, we do not care what type of radio as
      the same class gets all the information from the derived radio class type.

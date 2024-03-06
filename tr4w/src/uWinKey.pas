@@ -312,8 +312,9 @@ begin
     end;
     SetMainWindowText(mweWinKey, @wkREADBuffer);
   end;
-
+  logger.Info('Calling tCreateThread from WkOpen');
   tCreateThread(@wkReadThreadProc, wkThreadID);
+  logger.Info('Created WK thread with id %d',[wkThreadId]);
 
   wklpCommTimeouts.ReadTotalTimeoutConstant := 10 - 0;
 //  wklpCommTimeouts.WriteTotalTimeoutConstant := 1;

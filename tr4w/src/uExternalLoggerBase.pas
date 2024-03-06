@@ -296,6 +296,7 @@ begin
   FConn := AConn;
 
   msgHandler := proc;
+  logger.Info('Created ExternalLogger::TReadingTYhreadthread with id %d',[Self.ThreadID]);
 
   inherited Create(False);
 end;

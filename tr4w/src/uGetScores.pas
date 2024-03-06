@@ -139,7 +139,11 @@ end;
 procedure RunPOSTGetScoresThread;
 begin
   if GetScoresThreadID = 0 then
-    GetScoresThreadHandle := tCreateThread(@CreateConnectionAndSendReportToGetScores, GetScoresThreadID);
+     begin
+     logger.Debug('Calling tCreateThread from RunPOSTGetScoresThread');
+     GetScoresThreadHandle := tCreateThread(@CreateConnectionAndSendReportToGetScores, GetScoresThreadID);
+     logger.Debug('Created GetScores thread with threadid of %d',[GetScoresThreadID] );
+     end;
 //  CreateConnectionAndSendReportToGetScores;
 end;
 

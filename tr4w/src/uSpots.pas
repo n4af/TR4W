@@ -615,6 +615,8 @@ begin
   for Index := 0 to FCount - 1 do
   begin
     a := Abs(FList^[Index].FFrequency - Freq);
+    {logger.debug('[TDXSpotsList.DisplayCallsignOnThisFreq] a = %d, BandMapGuardBand = %d,  PInteger(@FList^[Index].FCall[1])^ = %d, tCQAsInteger = %d',
+                  [a, BandMapGuardBand, PInteger(@FList^[Index].FCall[1])^, tCQAsInteger]);}
     if (a < BandMapGuardBand) and (PInteger(@FList^[Index].FCall[1])^ <> tCQAsInteger) then
     begin
       if a < d then begin d := a; Index2 := Index; end;

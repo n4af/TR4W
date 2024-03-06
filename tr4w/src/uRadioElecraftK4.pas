@@ -561,6 +561,7 @@ begin
       end
    else
       begin
+      logger.trace('[ProcessMessage] VFO A message received %s',[sMessage]);
       vfoBCommand := false;
       sData := AnsiMidStr(sMessage,3,length(sMessage));
       vfo := Self.vfo[nrVFOA];
@@ -583,9 +584,11 @@ begin
       2: begin              // BN
          if Self.BandNumToBand(sData) <> vfo.band then
             begin    // band change so prime RIT, MD settings
-            Self.SendToRadio('BN;MD;MD$;DT;DT$;FA;FB;IF;');
+            logger.debug('[TK4Radio.ProcessMessage] BN Received %s - Sending BN;BN$;MD;MD$;DT;DT$;FA;FB;IF;IF$;FP;FP$; to radio',[sData]);
+            Self.SendToRadio('BN;BN$;MD;MD$;DT;DT$;FA;FB;IF;IF$;FP;FP$;');
             end;
-         vfo.band := Self.BandNumToBand(sData);
+         vfo.band := Self.BandNumToBand(sData);   // if I just set this, then CurrentStatus.band does not get set. It requires the next line to show up upon resetting the ports.
+         Self.vfo[nrVFOA].band := Self.BandNumToBand(sData);     // These two things should be the same.
          logger.debug('[ProcessMessage] Received band number of %s',[sData]);
          end;
       3: begin             // DT
@@ -628,6 +631,7 @@ begin
          Self.ParseIFCommand(sData);
          end;
       8: begin             // KS
+         logger.debug('Received %s in response to KS command',[sData]);
          i := StrToIntDef(AnsiLeftStr(sData,3),-1);
          if IntegerBetween(i,8,100) then
             begin
@@ -734,7 +738,8 @@ end;
 procedure TK4Radio.Initialize;
 begin
    Self.SetAIMode(5);
-   Self.SendToRadio('BN;RT;XT;RO;FT;ID;MD;DT$;IF;FP;');
+   logger.debug('[TK4Radio.Initialize] Sending KS;BN;RT;XT;RO;FT;ID;MD;DT$;IF;FP; to radio');
+   Self.SendToRadio('KS;BN;RT;XT;RO;FT;ID;MD;DT;IF;FP;');
    Self.SendToRadio('BN$;RT$;XT$;RO$;MD$;DT$;IF$;FP$;');
 end;
 

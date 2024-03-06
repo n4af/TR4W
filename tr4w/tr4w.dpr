@@ -586,7 +586,12 @@ begin
      end;
 
 //  wkLoadSettings;
-  tCreateThread(@wkOpen, wkThreadID);
+   if WinKeySettings.wksWinKey2Enable then
+      begin
+      logger.Info('Calling tCreateThread from WinKeyer');
+      tCreateThread(@wkOpen, wkThreadID);
+      logger.Info('Created WinKeyer thread with threadid of %d',[wkThreadID] );
+      end;
 
 {$IF MIXWMODE}
   tEnableMenuItem(menu_windows_mmtty, MF_ENABLED);

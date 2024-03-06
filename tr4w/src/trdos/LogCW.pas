@@ -278,7 +278,9 @@ begin
     //    inc(CWThreadCounter);
     //   windows.SetWindowText(tr4whandle,inttopchar(CWThreadCounter));
 
+      logger.Info('Calling tCreateThread from AddStringToBuffer');
       CWThreadHandle                                        := tCreateThread(@CWThreadProc, CWThreadID);
+      logger.Info('Created CW thread with threadid of %d',[CWThreadID] );
      //                  THREAD_PRIORITY_ABOVE_NORMAL
       asm
 
@@ -1988,8 +1990,11 @@ begin
 //      tActiveKeyerHandle                                  := Radio1.tKeyerPortHandle;
       SerialInvert                                          := Radio1SerialInvert;
           {CodeSpeed                                        := RadioOneSpeed;}
-      CodeSpeed                                             := Radio1.SpeedMemory; {KK1L: 6.73}
-      SetSpeed(CodeSpeed);
+      if true {not Radio1.CWSpeedSync} then     // prep for a future change ny4i
+         begin
+         CodeSpeed := Radio1.SpeedMemory; {KK1L: 6.73}
+         SetSpeed(CodeSpeed);
+         end;
           {KK1L: 6.71 Need to set mode to that of ModeMemory [RadioOne] for split mode SO2R}
           {KK1L: 6.72 Moved this to SendCrypticMessage to only handle CTRL-A requests      }
           {           SwapRadios is run prior to coming here for SO2R and that hoses things}
