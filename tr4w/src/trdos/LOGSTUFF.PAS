@@ -9294,7 +9294,7 @@ begin
   regex := TPerlRegEx.Create;
   try
     logger.debug('Checking if %s is a valid park', [park]);
-    regex.RegEx := '^([A-Z]|[a-z])-{0,1}\d{1,5}';
+    regex.RegEx := '^(\w{1,2})-{0,1}(\d{1,5})';
     //regex.RegEx := '^(?:\w{1,2}\d\/|\d\w\/|\w{1,2}\/)?+\w+[0-9]+\w+\/?\w*\s*$';  // Valid against all of LOTW file
 
     regex.Subject := park;
