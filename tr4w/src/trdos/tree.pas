@@ -429,7 +429,7 @@ const
   MultiBandAddressArray                 : MultiBandAddressArrayType =
     ($E0, $E1, $E2, $E3, $E4, $E5, {160/80/40/20/15/10}
     $E6, $E7, $E8, $E9, $EA, $EB, $EC, {30/17/12/6/2/222/432}
-    $ED, $EE, $EF, $F0, $F1, $F2, $F3, $F4, $F5, {902/1GH/2GH/3GH/5GH/10G/24G/LGT}
+    $ED, $EE, $EF, $F0, $F1, $F2, $F3, $F4, {902/1GH/2GH/3GH/5GH/10G/24G/LGT}
     $FF, $FF); {All/Non}
 
 type

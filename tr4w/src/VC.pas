@@ -1067,7 +1067,7 @@ type
     Band20,
     Band15,
     Band10,
-    Band60,
+//    Band60,
     Band30,
     Band17,
     Band12,
@@ -1125,7 +1125,7 @@ type
     frMode: ModeType;
   end;
 const
-  FreqModeArraySize                     = 26;
+  FreqModeArraySize                     = 25;
   FreqModeArray                         : array[1..FreqModeArraySize] of FreqRecord =
 {(*}
     (
@@ -1134,7 +1134,7 @@ const
     (frMin: 3490000;    frMax: 3600000;    frBand:Band80;   frMode: CW),
 //    (frMin: 3530000;    frMax: 3600000;    frBand:Band80;   frMode: NoMode),
     (frMin: 3600000;    frMax: 4000000;    frBand:Band80;   frMode: Phone),
-    (frMin: 5350000;    frMax: 5405000;    frBand:Band60;   frMode: NoMode),
+//    (frMin: 5350000;    frMax: 5405000;    frBand:Band60;   frMode: NoMode),
     (frMin: 6990000;    frMax: 7040000;    frBand:Band40;   frMode: CW),
     (frMin: 7040000;    frMax: 7100000;    frBand:Band40;   frMode: NoMode),
     (frMin: 7100000;    frMax: 7300000;    frBand:Band40;   frMode: Phone),
@@ -1239,7 +1239,7 @@ const
     ' 20',
     ' 15',
     ' 10',
-    ' 60',
+ //   ' 60',
     ' 30',
     ' 17',
     ' 12',
@@ -1267,7 +1267,7 @@ const
     '20',
     '15',
     '10',
-    '60',
+ //   '60',
     '30',
     '17',
     '12',
@@ -1295,7 +1295,7 @@ const
     '20m',
     '15m',
     '10m',
-    '60m',
+ //   '60m',
     '30m',
     '17m',
     '12m',
@@ -1323,7 +1323,7 @@ const
     '20',
     '15',
     '10',
-    '60',
+ //   '60',
     '30',
     '17',
     '12',

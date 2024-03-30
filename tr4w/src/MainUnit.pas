@@ -8550,7 +8550,7 @@ begin
     rbNone: Result := NoBand;
     rb160m: Result := Band160;
     rb80m: Result := Band80;
-    rb60m: Result := Band60;
+ //   rb60m: Result := Band60;
     rb40m: Result := Band40;
     rb30m: Result := Band30;
     rb20m: Result := Band20;
@@ -8578,7 +8578,7 @@ begin
     NoBand: Result := rbNone;
     Band160: Result := rb160m;
     Band80: Result := rb80m;
-    Band60: Result := rb60m;
+//    Band60: Result := rb60m;
     Band40: Result := rb40m;
     Band30: Result := rb30m;
     Band20: Result := rb20m;

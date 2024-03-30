@@ -2370,7 +2370,7 @@ var
   Image                                 : Byte;
 
 const
-  BandInfoArray                         : array[BandType] of Byte = ($01, $20, $21, $22 , $41, $61, $81, $40, $60, $80, $A0, $A1, $C0, $C1, $E0, $E1, $00, $00, $00, $00, $00, $00, $00, $00);
+   BandInfoArray                         : array[BandType] of Byte = ($01, $20, $21, $41, $61, $81, $40, $60, $80, $A0, $A1, $C0, $C1, $E0, $E1, $00, $00, $00, $00, $00, $00, $00, $00);
 begin
   if BaseAddress = INVALID_HANDLE_VALUE then Exit;
   Image := BandInfoArray[Band];

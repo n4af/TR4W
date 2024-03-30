@@ -757,7 +757,7 @@ begin
     case Exchange.Band of
       Band160: Exchange.Frequency := Exchange.Frequency - 1000000;
       Band80: Exchange.Frequency := Exchange.Frequency - 3000000;
-      Band60: Exchange.Frequency := Exchange.Frequency - 5000000;
+  //    Band60: Exchange.Frequency := Exchange.Frequency - 5000000;
       Band40: Exchange.Frequency := Exchange.Frequency - 7000000;
       Band30: Exchange.Frequency := Exchange.Frequency - 10000000;
       Band20: Exchange.Frequency := Exchange.Frequency - 14000000;

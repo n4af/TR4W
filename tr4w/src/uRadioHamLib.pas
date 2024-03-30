@@ -358,7 +358,7 @@ begin
   case band of
     rb160m: s := 'BAND160M';
     rb80m: s := 'BAND80M';
-    rb60m: s := 'BAND60M';
+ //   rb60m: s := 'BAND60M';
     rb40m: s := 'BAND40M';
     rb30m: s := 'BAND30M';
     rb20m: s := 'BAND20M';
