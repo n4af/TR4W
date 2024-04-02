@@ -2729,9 +2729,12 @@ var
    sComputerID : AnsiString;
    freq : integer;
    txFreq : integer;
+   nMultCount: integer;
+   sContestName: AnsiString;
    sOperator : AnsiString;
    sRecType: AnsiString;
    sExchange: AnsiString;
+   sMultiplierFields: AnsiString;
 begin
    // if operator is blank, use mycall
    // Add CR to output
@@ -2815,11 +2818,65 @@ begin
       begin
       sOperator := CurrentOperator;
       end;
+
+
+   if RxData.DXMult then
+      begin
+      Inc(nMultCount);
+      end;
+   if RxData.DomesticMult then
+      begin
+      Inc(nMultCount);
+      end;
+   if RxData.PrefixMult then
+      begin
+      Inc(nMultCount);
+      end;
+   if RxData.ZoneMult then
+      begin
+      Inc(nMultCount);
+      end;
+   case nMultCount of
+      0:
+         begin
+         sMultiplierFields := #9 + '<ismultiplier1>0</ismultiplier1>' + sLineBreak +
+                              #9 + '<ismultiplier2>0</ismultiplier2>' + sLineBreak +
+                              #9 + '<ismultiplier3>0</ismultiplier3>' + sLineBreak;
+         end;
+      1:
+        begin
+         sMultiplierFields := #9 + '<ismultiplier1>1</ismultiplier1>' + sLineBreak +
+                              #9 + '<ismultiplier2>0</ismultiplier2>' + sLineBreak +
+                              #9 + '<ismultiplier3>0</ismultiplier3>' + sLineBreak;
+         end;
+      2:
+        begin
+         sMultiplierFields := #9 + '<ismultiplier1>1</ismultiplier1>' + sLineBreak +
+                              #9 + '<ismultiplier2>1</ismultiplier2>' + sLineBreak +
+                              #9 + '<ismultiplier3>0</ismultiplier3>' + sLineBreak;
+         end;
+      else
+         begin
+         sMultiplierFields := #9 + '<ismultiplier1>1</ismultiplier1>' + sLineBreak +
+                              #9 + '<ismultiplier2>1</ismultiplier2>' + sLineBreak +
+                              #9 + '<ismultiplier3>1</ismultiplier3>' + sLineBreak;
+         end;
+      end; // case nMultCount
+
+   if length(ContestsArray[Contest].CABName) = 0 then
+      begin
+      sContestName := ContestTypeSA[RxData.ceContest]
+      end
+   else
+      begin
+      sContestName := ContestsArray[Contest].CABName;
+      end;
+
    nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
    Result := '<?xml version="1.0"?>' + sLineBreak +
              '<' + sRecType + '>' + sLineBreak +
              #9 + '<app>TR4W</app>' + sLineBreak +
-             #9 + '<contestname>' + ContestsArray[Contest].CABName + '</contestname>' + sLineBreak +
+             #9 + '<contestname>' + sContestName + '</contestname>' + sLineBreak +
              {#9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak + }
              #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
              #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
@@ -2874,12 +2931,10 @@ begin
             #9 + '<name>' + RxData.Name + '</name>' + sLineBreak +
             #9 + '<power>' + RxData.Power + '</power>' + sLineBreak +
             #9 + '<misctext></misctext>' + sLineBreak +
-            #9 + '<zone>' + Format('%d',[RxData.QTH.Zone]) + '</zone>' + sLineBreak +
+            #9 + '<zone>' + Format('%d',[RxData.Zone]) + '</zone>' + sLineBreak +
             #9 + '<prec>' + {sPrecedence +} '</prec>' + sLineBreak +
             #9 + '<ck>' + Format('%d',[RxData.Check]) + '</ck>' + sLineBreak +                // TODO
-            #9 + '<ismultiplier1>0</ismultiplier1>' + sLineBreak +
-            #9 + '<ismultiplier2>0</ismultiplier2>' + sLineBreak +
-            #9 + '<ismultiplier3>0</ismultiplier3>' + sLineBreak +
+                 sMultiplierFields +
             #9 + '<points>' + Format('%d',[RXData.QSOPoints]) + '</points>' + sLineBreak +
             #9 + '<radionr>' + Format('%d',[Ord(RxData.ceRadio)]) + '</radionr>' + sLineBreak +
             #9 + '<RoverLocation></RoverLocation>' + sLineBreak +
