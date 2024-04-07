@@ -406,7 +406,7 @@ begin
   end;
   { Put the band map on the band/mode of the inactive radio }
   if (DupeInfoCall = MyCall) then exit;    // issue 158
-  if (DupeInfoCall <> '') {and (DupeInfoCall <> EscapeKey)} then
+  if (DupeInfoCall <> '') { and (InactiveRadioPtrNetObject <> nil)} then
 begin
     DisplayGridSquareStatus(CallWindowString);
     ShowStationInformation(@DupeInfoCall);                                          //gav 4.44.8
@@ -430,10 +430,14 @@ begin
         if DupeCheckSound = DupeCheckGratsIfMult then DoABeep(BeepCongrats);
         DupeInfoCallWindowState := diNotDupeMult;
       end;
+      if TwoRadioState <> TwoRadiosDisabled then  // 4.133.1
+      begin
       Format(wsprintfBuffer, '%s OK!!'#13#10'Space bar for %s%s', @DupeInfoCall[1], BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
       SetMainWindowText(mweDupeInfoCall, wsprintfBuffer {DupeInfoCall + ' DUPE!! on ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory]});
       if TwoRadioState <> TwoRadiosDisabled then TwoRadioState := CallReady;
+      scsapmode;
     end;
+   end; 
   end;
  
   RITEnable := True;

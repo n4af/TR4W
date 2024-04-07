@@ -1657,7 +1657,7 @@ begin
   { If AltDBufferEnable - then the initial entry will be either from
     the left over entry from before - or from the bandmap. }
 
-  if AltDBufferEnable then
+  if (AltDBufferEnable) and (TwoRadioMode) then
   begin
     if DupeInfoCall <> '' then
       InputString := DupeInfoCall

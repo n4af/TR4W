@@ -145,13 +145,13 @@ const
   ICOM_LONG_MODECOMMAND                 = True ;
 
 const
-          LANG                                  = 'ENG';
-//        LANG                                  = 'RUS';
+        LANG                                  = 'ENG';
+//         LANG                                  = 'RUS';
 //      LANG                                  = 'MNG';
 //       LANG                                  = 'CZE';
 //        LANG                                  = 'SER';
 //         LANG                                  = 'ROM';
-//       LANG                                  = 'GER';
+//      LANG                                  = 'GER';
 //        LANG                                  = 'UKR';
 // not implemented
 
