@@ -91,7 +91,7 @@ const
   CheckRectWidth = 17;
   //      Below line was (80, 130, 240, 350, 510, 580); ny4i
   BMPanelWidth: array[0..5] of integer = (80, 130, 240, 350, 580, 650);
-    //ny4i added 70 to last two to extend the comment section
+  //ny4i added 70 to last two to extend the comment section
 var
   FreqRectWidth: integer; // = 55 - 20;
   BandmapDRAWITEMSTRUCT: PDrawItemStruct;
@@ -361,7 +361,8 @@ begin
         BandMapStatusBar := Windows.GetDlgItem(hwnddlg, 102);
 
         BandMapStatusBar := tWM_SETFONT(CreateWindow(STATUSCLASSNAME, nil,
-          {SBT_NOBORDERS or}CCS_TOP or CCS_NOMOVEY or WS_CHILD or WS_VISIBLE, 100,
+          {SBT_NOBORDERS or}CCS_TOP or CCS_NOMOVEY or WS_CHILD or WS_VISIBLE,
+            100,
           100, 100, 100, hwnddlg, 101, hInstance, nil), MainFixedFont);
         Windows.SendMessage(BandMapStatusBar, SB_SETBKCOLOR, 0, $00FFFF00);
 
@@ -402,7 +403,7 @@ begin
         case HiWord(wParam) of
           LBN_SETFOCUS:
             begin
-            BandMapPreventRefresh := True; // Gav     4.37.12
+              BandMapPreventRefresh := True; // Gav     4.37.12
               SpotsList.SetCursor;
               ShowSpotInfo;
             end;
@@ -509,8 +510,9 @@ begin
     LastSPFrequency := ActiveRadioPtr^.LastDisplayedFreq;
     LastSPMode := ActiveMode;
   end;
-
-  //?
+  {if ((radio1.filteredstatus.freq <> 0) and (radio2.filteredstatus.freq <> 0)) then
+  TwoRadioState := True;   }
+   //?
   EntryBand := NoBand;
   EntryMode := NoMode;
   logger.Trace('Entering TuneRadioToSpot %s - %d', [Spot.FCall,
@@ -527,20 +529,20 @@ begin
     QSYInActiveRadio := False;
     InBandLock := False;
   end;
-  if BandMapSO2RDisplay then
-//    if TwoRadioState <> TwoRadiosDisabled then // 4.133.1
-    if (ActiveBand = Spot.FBand) and (not WKBusy) then // 4.105.15
-    begin
-      Radio := ActiveRadio;
-      QSYInactiveRadio := False;
-    end
-     else
+  //if BandMapSO2RDisplay then
+  if (TwoRadioMode) and (ActiveBand = Spot.FBand) and (not WKBusy) then
+    // 4.105.15
+  begin
+    Radio := ActiveRadio;
+    QSYInactiveRadio := False;
+  end
+  else
 
-   if TwoRadioState <> TwoRadiosDisabled then // 4.133.1
-   begin
+    // if TwoRadioMode then // 4.133.1
+  begin
     QSYInactiveRadio := True;
     Radio := InactiveRadio;
-    end;
+  end;
 
   if ((InBandLock) and (TwoRadioMode)) then
   begin
@@ -559,10 +561,9 @@ begin
         exit;
       end;
   end;
-
   // Sleep(100);  4.92.4
   logger.trace('[TuneRadioToSpot] Calling SetRadioFreq %d', [(Spot.FFrequency +
-    QZBOffset)]);
+      QZBOffset)]);
   SetRadioFreq(Radio, Spot.FFrequency + QZBOffset, EntryMode, 'A');
   PutRadioOutOfSplit(Radio);
   if (QZBRandomOffsetEnable and (EntryMode = CW)) then
@@ -595,7 +596,7 @@ begin
   begin
     InActiveRadioPtr.BandMemory := Spot.FBand; //Gav 4.37
     InActiveRadioPtr.ModeMemory := Spot.FMode; //Gav 4.37
- //   Exit;  // .126.8
+    //   Exit;  // .126.8
   end;
   tCleareExchangeWindow;
   tCallWindowSetFocus;
@@ -607,16 +608,16 @@ begin
     Exit;
   if PInteger(@Spot.FCall[1])^ = tNEWAsInteger then
     Exit;
-    if TwoRadioState <> TwoRadiosDisabled then   //4.133.1
-    begin
-     tClearDupeInfoCall;
-     DupeInfoCall := Spot.Fcall;
-     DupeCheckOnInactiveRadio(True);
-     SetOpMode(CQOpMode);
-     exit;
-    end
-    else
-  PutCallToCallWindow(Spot.FCall);
+  if TwoRadioState <> TwoRadiosDisabled then //4.133.1
+  begin
+    tClearDupeInfoCall;
+    DupeInfoCall := Spot.Fcall;
+    DupeCheckOnInactiveRadio(True);
+    SetOpMode(CQOpMode);
+    exit;
+  end
+  else
+    PutCallToCallWindow(Spot.FCall);
 
   if not QSOByMode then
     EntryMode := Both;
@@ -653,7 +654,7 @@ var
 begin
   ClearSpotInfo;
   i := GetBMSelItemData;
-    //SendMessage(BandMapListBox, LB_GETITEMDATA, tLB_GETCURSEL(BandMapListBox), 0);
+  //SendMessage(BandMapListBox, LB_GETITEMDATA, tLB_GETCURSEL(BandMapListBox), 0);
   if i = LB_ERR then
     Exit;
 

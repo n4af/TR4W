@@ -406,7 +406,7 @@ begin
   end;
   { Put the band map on the band/mode of the inactive radio }
   if (DupeInfoCall = MyCall) then exit;    // issue 158
-  if (DupeInfoCall <> '') { and (InactiveRadioPtrNetObject <> nil)} then
+  if (DupeInfoCall <> '') {and (DupeInfoCall <> EscapeKey)} then
 begin
     DisplayGridSquareStatus(CallWindowString);
     ShowStationInformation(@DupeInfoCall);                                          //gav 4.44.8
@@ -430,14 +430,10 @@ begin
         if DupeCheckSound = DupeCheckGratsIfMult then DoABeep(BeepCongrats);
         DupeInfoCallWindowState := diNotDupeMult;
       end;
-      if TwoRadioState <> TwoRadiosDisabled then  // 4.133.1
-      begin
       Format(wsprintfBuffer, '%s OK!!'#13#10'Space bar for %s%s', @DupeInfoCall[1], BandStringsArray[InActiveRadioPtr.BandMemory], ModeStringArray[InActiveRadioPtr.ModeMemory]);
       SetMainWindowText(mweDupeInfoCall, wsprintfBuffer {DupeInfoCall + ' DUPE!! on ' + BandStringsArray[InActiveRadioPtr.BandMemory] + ModeString[InActiveRadioPtr.ModeMemory]});
       if TwoRadioState <> TwoRadiosDisabled then TwoRadioState := CallReady;
-      scsapmode;
     end;
-   end; 
   end;
  
   RITEnable := True;
@@ -2963,8 +2959,8 @@ begin
    udp.Send(UDPBroadcastAddress,UDPBroadcastPortContact,sBuf);
 end;
 
-procedure LookupInfoToUDP(RXData: ContestExchange);
-var
+procedure LookupInfoToUDP(RXData: ContestExchange);
+var
    sBuf: AnsiString;
    saveDecimalSeparator: char;
 begin
@@ -2976,13 +2972,13 @@ begin
 end;
 
 
-procedure SendFullLogToUDP;
-var nCount: integer;
-   saveDecimalSeparator: char;
-begin
-   nCount := 0;
-   if not OpenLogFile then
-      begin
+procedure SendFullLogToUDP;
+var nCount: integer;
+   saveDecimalSeparator: char;
+begin
+   nCount := 0;
+   if not OpenLogFile then
+      begin
       logger.error('[SendFullLogToUDP] Could not open log file');
       CloseHandle(tReportFileWrite);
       Exit;
@@ -3023,19 +3019,19 @@ end;
    end;
 end;
 
-function ConvertBandTypeToUDPContactBand(band: BandType): string;
-begin
-   if DecimalSeparator <> '.' then
-      begin
-      // Convert the . in BandTypeToUDPContactBand to the DecimalSeperator
-      result := StringReplace(BandTypeToUDPContactBand[band],'.',DecimalSeparator,[rfReplaceAll]);
-      end
-   else
-      begin
-      result := BandTypeToUDPContactBand[band];
-      end;
+function ConvertBandTypeToUDPContactBand(band: BandType): string;
+begin
+   if DecimalSeparator <> '.' then
+      begin
+      // Convert the . in BandTypeToUDPContactBand to the DecimalSeperator
+      result := StringReplace(BandTypeToUDPContactBand[band],'.',DecimalSeparator,[rfReplaceAll]);
+      end
+   else
+      begin
+      result := BandTypeToUDPContactBand[band];
+      end;
 
-end;
+end;
 
 
-end.
+end.
