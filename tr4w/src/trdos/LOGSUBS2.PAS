@@ -2582,6 +2582,7 @@ var
     BandPchar                             : PChar;
     nQSOs                                 : integer;
     nTotal                                : integer;
+    sContestName                          : string;
 const
   GetScoresMults                        : array[RemainingMultiplierType] of PChar = (nil, 'state', 'country', 'zone', 'prefix');
   GetScoresMultsIARU                   : array[RemainingMultiplierType] of PChar = (nil, 'HQ', 'country', 'zone', 'prefix');
@@ -2620,11 +2621,19 @@ QSOTotals[TempBand, TempMode] is accurate for the individual bands so just sum t
    if UDPBroadcastScore then                // Issue 304 NY4I
      begin
      CalculateTotals;    // This reads the log so be careful how often it is done.
+     if length(ContestsArray[Contest].ADIFName) = 0 then
+         begin
+         sContestName := ContestTypeSA[Contest]
+         end
+     else
+        begin
+        sContestName := ContestsArray[Contest].ADIFName;
+        end;
      sBuf := '<?xml version="1.0"?>' + sLineBreak +
             '<dynamicresults>' +  sLineBreak +
             #9 + '<soft>TR4W</soft>' + sLineBreak +
             #9 + '<version>' + TR4W_CURRENTVERSION_NUMBER + '</version>' + sLineBreak +
-            #9 + '<contest>' + ContestTypeSA[Contest] + '</contest>' +   sLineBreak +
+            #9 + '<contest>' + sContestName + '</contest>' +   sLineBreak +
             #9 + '<call>' + MyCall + '</call>' + sLineBreak +
             #9 + '<club>' + ' ' + '</club>' + sLineBreak +
             #9 + '<class ops="' + tCategoryOperatorSA[CategoryOperator] + '" mode="' + tCategoryModeSA[CategoryMode] +

@@ -436,12 +436,24 @@ var
 //  h                                     : HWND;
   nTotal                                : integer;
   nQSOs                                 : integer;
+  sContestName                          : string;
 const
   GetScoresMults                        : array[RemainingMultiplierType] of PChar = (nil, 'state', 'country', 'zone', 'prefix');
   GetScoresModesArray                   : array[ModeType] of PChar = ('CW', 'DIG', 'PH', 'ALL', nil, nil);
 
 begin
   nTotal := 0;
+  nQSOs := 0;
+
+  if length(ContestsArray[Contest].ADIFName) = 0 then
+     begin
+     sContestName := ContestTypeSA[Contest]
+     end
+  else
+     begin
+     sContestName := ContestsArray[Contest].ADIFName;
+     end;
+
   Index := Format(RequestBody,
 
    'xml=<?xml version="1.0"?><dynamicresults>' +
@@ -450,7 +462,7 @@ begin
     GSCR + '<call>%s</call>' +
     GSCR + '<class ops="%s" mode="%s" power="%s" bands="%s" transmitter="%s"></class>' +
     GSCR + '<breakdown>',
-    ContestTypeSA[Contest],
+    PChar(sContestName),
     @MyCall[1],
     tCategoryOperatorSA[CategoryOperator],
     tCategoryModeSA[CategoryMode],
@@ -481,9 +493,10 @@ begin
       else
          begin
          nQSOs := QSOTotals[TempBand, TempMode];
+         nTotal := nTotal + nQSOs;
          end;
 
-      nTotal := nTotal + QSOTotals[TempBand, TempMode];
+     // nTotal := nTotal + QSOTotals[TempBand, TempMode];
       Index := Index + Format(@RequestBody[Index],
         GSCR + '<qso band="%s" mode="%s">%u</qso>',
         BandPchar,
