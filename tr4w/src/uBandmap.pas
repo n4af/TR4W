@@ -425,11 +425,14 @@ begin
                 logger.Trace('In BandMap::BandmapDlgProc, GetBMSelItemData = LB_ERR so exiting without changing radio');
                 Exit;
               end;
-              if QSYInactiveRadio and TwoRadioMode then
+              if (QSYInactiveRadio) and (TwoRadioMode)  then
                 // 4.92.1                         //Gav 4.37.12
               begin
-                logger.trace('[BandMap::BandmapDlgProc] Calling TuneRadioToSpot for Inactive Radio');
-                TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio);
+                 logger.trace('[BandMap::BandmapDlgProc] Calling TuneRadioToSpot for Inactive Radio')  ;
+                 TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio);
+                  SwapRadios;
+          //     if AltDBufferEnable then
+            //    DupeCheckOnInactiveRadio(True);
               end
               else
               begin
@@ -510,8 +513,8 @@ begin
     LastSPFrequency := ActiveRadioPtr^.LastDisplayedFreq;
     LastSPMode := ActiveMode;
   end;
-  {if ((radio1.filteredstatus.freq <> 0) and (radio2.filteredstatus.freq <> 0)) then
-  TwoRadioState := True;   }
+ {  if ((radio1.filteredstatus.freq <> 0) and (radio2.filteredstatus.freq <> 0)) then
+  TwoRadioState := True;  }
    //?
   EntryBand := NoBand;
   EntryMode := NoMode;

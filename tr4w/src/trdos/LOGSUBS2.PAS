@@ -400,7 +400,7 @@ begin
   end
   else
   begin
-    if not Tune then
+   if not Tune then
 //    tDialogBox(54, @AltDDlgProc);
       CreateModalDialog(140, 50, tr4whandle, @AltDDlgProc, 0);
   end;
