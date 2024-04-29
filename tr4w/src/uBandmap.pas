@@ -529,8 +529,8 @@ begin
     QSYInActiveRadio := False;
     InBandLock := False;
   end;
-  //if BandMapSO2RDisplay then
-  if (TwoRadioMode) and (ActiveBand = Spot.FBand) and (not WKBusy) then
+  if BandMapSO2RDisplay then
+ // if (TwoRadioMode) and (ActiveBand = Spot.FBand) and (not WKBusy) then
     // 4.105.15
   begin
     Radio := ActiveRadio;
@@ -538,7 +538,7 @@ begin
   end
   else
 
-    // if TwoRadioMode then // 4.133.1
+    if TwoRadioMode then // 4.133.1
   begin
     QSYInactiveRadio := True;
     Radio := InactiveRadio;
