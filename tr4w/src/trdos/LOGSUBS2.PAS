@@ -403,7 +403,7 @@ begin
    if not Tune then
 //    tDialogBox(54, @AltDDlgProc);
       CreateModalDialog(140, 50, tr4whandle, @AltDDlgProc, 0);
-  end;
+  end;    
   { Put the band map on the band/mode of the inactive radio }
   if (DupeInfoCall = MyCall) then exit;    // issue 158
   if (DupeInfoCall <> '') {and (DupeInfoCall <> EscapeKey)} then
