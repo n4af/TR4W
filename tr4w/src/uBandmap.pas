@@ -601,7 +601,7 @@ begin
     InActiveRadioPtr.ModeMemory := Spot.FMode; //Gav 4.37
  //   Exit;  // .126.8
   end;
-  tCleareExchangeWindow;
+ // tCleareExchangeWindow;
   tCallWindowSetFocus;
   CallAlreadySent := False;
   ExchangeHasBeenSent := False;
