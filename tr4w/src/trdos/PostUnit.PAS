@@ -1767,6 +1767,9 @@ var
   saveDecimalSeparator                  : char;
 //  IOTAstring                            : Str10;
 begin
+  sMode := '';
+  sSubMode := '';
+  sTemp := '';
   dtReportTime := Now;
   lstrcpy(tReportsFilename, TR4W_LOG_FILENAME);
   tReportsFilename[Windows.lstrlen(tReportsFilename) - 3] := #0;
@@ -1806,9 +1809,12 @@ begin
 
 
   ReadVersionBlock;
-  1:
+  1:    // Rewrite this whole function due to this GoTo... Argh....
   if ReadLogFile then
   begin
+    sMode := '';
+    sSubMode := '';
+    sTemp := '';
     if GoodLookingQSO then
     begin
       // If there is nothing in the ADIFName, then use the ContestTypeSA[Contest]
