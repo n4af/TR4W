@@ -36,7 +36,8 @@ uses
   LogPack,
   LogRadio,
   LogSCP,
-  Tree;
+  Tree,
+  SyncObjs;
 
 type
 
@@ -56,8 +57,10 @@ type
     BList: PSpotsListBuffer; // Gav 4.45.6
     BCount: integer; // Gav 4.45.6
     BCapacity: integer; // Gav 4.45.6
+    FCriticalSection: TCriticalSection;
     procedure Grow;
     procedure GrowBuffer; // Gav 4.45.6
+
 
   protected
     function GetCapacity: integer;
@@ -69,7 +72,7 @@ type
       // Gav 4.45.6
 
   public
-    //    destructor Destroy; override;
+    //destructor Destroy; override;
     constructor Init;
     function Get(Index: integer): TSpotRecord;
     function AddSpot(var Spot: TSpotRecord; SendToNetwork: boolean): integer;
@@ -111,7 +114,13 @@ constructor TDXSpotsList.Init;
 begin
   Grow;
   GrowBuffer; // Gav 4.45.6
+  FCriticalSection := TCriticalSection.Create;
 end;
+
+//destructor TDXSpotsList.Destroy;
+//begin
+//   FreeAndNil(FCriticalSection);
+//end;
 
 function TDXSpotsList.AddSpot(var Spot: TSpotRecord; SendToNetwork: boolean):
   integer;
@@ -176,9 +185,13 @@ begin
 
   if FindSpot(Spot, Result) then
     goto Add;
-  InsertSpot(Result, Spot);
-
-  Add:
+  FCriticalSection.Enter;
+  try
+     InsertSpot(Result, Spot);
+  finally
+     FCriticalSection.Leave;
+  end;
+  Add:    // How to experienced programmers write GoTo statements? I don't get it! // ny4i
   FList^[Result] := Spot;
   //  if CallWinKeyDown then
   //   Windows.SetFocus(wh[mweCall]);
@@ -342,10 +355,15 @@ end;
 
 procedure TDXSpotsList.Clear;
 begin
-  if FCount <> 0 then
-  begin
-    FCount := 0;
-    SetCapacity(0);
+  FCriticalSection.Enter;
+  try
+     if FCount <> 0 then
+        begin
+        FCount := 0;
+        SetCapacity(0);
+        end;
+  finally
+     FCriticalSection.Leave;
   end;
 end;
 
@@ -368,10 +386,15 @@ procedure TDXSpotsList.Delete(Index: integer);
 begin
   if (Index < 0) or (Index >= FCount) then
     Exit; //Error(@SListIndexError, Index);
-  dec(FCount);
-  if Index < FCount then
-    System.Move(FList^[Index + 1], FList^[Index], (FCount - Index) *
-      SizeOf(TSpotRecord));
+  try
+     dec(FCount);
+     if Index < FCount then
+        begin
+        System.Move(FList^[Index + 1], FList^[Index], (FCount - Index) * SizeOf(TSpotRecord));
+        end;
+  finally
+     FCriticalSection.Leave;
+  end;
 end;
 
 function TDXSpotsList.FindSpot(const Spot: TSpotRecord; var Index: integer):
@@ -503,25 +526,38 @@ end;
 
 procedure TDXSpotsList.InsertSpot(Index: integer; const Spot: TSpotRecord);
 begin
-  if FCount = FCapacity then
-    Grow;
-  if Index < FCount then
-    System.Move(FList^[Index], FList^[Index + 1],
-      (FCount - Index) * SizeOf(TSpotRecord));
-  FList^[Index] := Spot;
-  inc(FCount);
+  FCriticalSection.Enter;
+  try
+     if FCount = FCapacity then
+        begin
+        Grow;
+        end;
+     if Index < FCount then
+        begin
+        System.Move(FList^[Index], FList^[Index + 1],(FCount - Index) * SizeOf(TSpotRecord));
+        end;
+     FList^[Index] := Spot;
+     inc(FCount);
+  finally
+     FCriticalSection.Leave;
+  end;
 end;
 
 procedure TDXSpotsList.InsertSpotBuffer(Index: integer; const Spot: TSpotRecord);
   // Gav 4.45.6
 begin
-  if BCount = BCapacity then
-    GrowBuffer;
-  if Index < BCount then
-    System.Move(BList^[Index], BList^[Index + 1],
-      (BCount - Index) * SizeOf(TSpotRecord));
-  BList^[Index] := Spot;
-  inc(BCount);
+  FCriticalSection.Enter;
+  try
+     if BCount = BCapacity then
+       GrowBuffer;
+     if Index < BCount then
+       System.Move(BList^[Index], BList^[Index + 1],
+         (BCount - Index) * SizeOf(TSpotRecord));
+     BList^[Index] := Spot;
+     inc(BCount);
+  finally
+     FCriticalSection.Leave;
+  end;
 end;
 
 procedure TDXSpotsList.SetCapacity(NewCapacity: integer);
@@ -563,12 +599,17 @@ procedure TDXSpotsList.ResetSpotsTimes;
 var
   Index: integer;
 begin
-  if Assigned(FList) then
-  begin
-    for Index := 0 to FCount - 1 do
-    begin
-      FList^[Index].FMinutesLeft := 0;
-    end;
+  FCriticalSection.Enter;
+  try
+     if Assigned(FList) then
+     begin
+       for Index := 0 to FCount - 1 do
+       begin
+         FList^[Index].FMinutesLeft := 0;
+       end;
+     end;
+  finally
+     FCriticalSection.Leave;
   end;
 end;
 
@@ -576,31 +617,41 @@ procedure TDXSpotsList.ResetSpotsDupes;
 var
   Index: integer;
 begin
-  if Assigned(FList) then
-  begin
-    for Index := 0 to FCount - 1 do
-    begin
-      FList^[Index].FDupe := False;
-    end;
+  FCriticalSection.Enter;
+  try
+     if Assigned(FList) then
+     begin
+       for Index := 0 to FCount - 1 do
+       begin
+         FList^[Index].FDupe := False;
+       end;
+     end;
+  finally
+     FCriticalSection.Leave;
   end;
 end;
 
 procedure TDXSpotsList.SetCursor;
 begin
-  if BandMapListBox <> 0 then
-  begin
-    FCurrentCursorFreq := GetBMSelItemData;
-    if FCurrentCursorFreq <> LB_ERR then
-    begin
-      if Assigned(FList) then
-      begin
-        FCurrentCursorFreq := FList^[FCurrentCursorFreq].FFrequency;
-      end
-      else
-      begin
-        DebugMsg('FList was nil in SetCursor');
-      end;
-    end;
+  FCriticalSection.Enter;
+  try
+     if BandMapListBox <> 0 then
+     begin
+       FCurrentCursorFreq := GetBMSelItemData;
+       if FCurrentCursorFreq <> LB_ERR then
+       begin
+         if Assigned(FList) then
+         begin
+           FCurrentCursorFreq := FList^[FCurrentCursorFreq].FFrequency;
+         end
+         else
+         begin
+           DebugMsg('FList was nil in SetCursor');
+         end;
+       end;
+     end;
+  finally
+     FCriticalSection.Leave;
   end;
 end;
 
