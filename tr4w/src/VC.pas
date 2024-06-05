@@ -146,7 +146,7 @@ const
 
 const
          LANG                                  = 'ENG';
-//         LANG                                  = 'RUS';
+//        LANG                                  = 'RUS';
 //      LANG                                  = 'MNG';
 //       LANG                                  = 'CZE';
 //        LANG                                  = 'SER';
