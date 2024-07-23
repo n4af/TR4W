@@ -3643,7 +3643,7 @@ function ProcessRSTAndDomesticOrDXQTHExchange(Exchange: ShortString {Str80}; var
 
 begin
   ProcessRSTAndDomesticOrDXQTHExchange := False;
-
+   
   if DomesticCountryCall(RXData.Callsign) then
   begin
     ProcessRSTAndDomesticOrDXQTHExchange :=
@@ -7623,6 +7623,38 @@ begin
 
       end;
 
+    LABREQSOPointMethod:
+     begin
+     if RXData.QTH.Continent <> MyContinent then   // different continents
+       Case RXData.Band of
+        Band160: RXData.QSOPoints := 6;
+        Band80:  RXData.QSOPoints := 6;
+        Band40:  RXData.QSOPoints := 6;
+         else
+          RXData.QSOPoints := 3;
+        end;
+     if RXData.QTH.Continent = MyContinent then
+      if RXCty <> MyCountry then                  // same continent but different countries
+       Case RXDATA.Band of
+        Band160: RXData.QSOPoints := 4;
+        Band80:  RXData.QSOPoints := 4;
+        Band40:  RXData.QSOPoints := 4;
+         else
+          RXData.QSOPoints := 2;
+        end;
+      if RXCty = MyCountry then                   // same country
+       Case RXDATA.Band of
+        Band160: RXData.QSOPoints := 2;
+        Band80:  RXData.QSOPoints := 2;
+        Band40:  RXData.QSOPoints := 2;
+         else
+          RXData.QSOPoints := 1;
+        end;
+     end;
+//     if MyState = '' then
+
+     
+
     LZDXQSOPointMethod:
       begin
 
@@ -8639,12 +8671,14 @@ begin
         ProcessRSTAndQSONumberOrFrenchDepartmentExchange(ExchangeString, RData);
 
     RSTDomesticQTHExchange:
-      ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString,
-        RData);
+      ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData);
 
     RSTDomesticOrDXQTHExchange:
-      ProcessExchange := ProcessRSTAndDomesticOrDXQTHExchange(ExchangeString,
-        RData);
+      if (Contest = LABRE) and (RData.qth.countryid = 'PY') then
+      ProcessExchange := ProcessRSTAndDomesticQTHExchange(ExchangeString, RData)
+       else
+        ProcessExchange := ProcessRSTAndDomesticOrDXQTHExchange(ExchangeString,
+         RData);
 
     RSTDomesticQTHOrQSONumberExchange:
       if DomesticCountryCall(RData.Callsign) and

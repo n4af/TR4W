@@ -307,6 +307,7 @@ begin
               CANADA_DAY, CANADA_WINTER:
                 SetCommentAndEnableEditControl(TC_ENTERYOURPROVINCEID, icmyState);
 
+
               REFSSB, REFCW:
                 SetCommentAndEnableEditControl(TC_DEPARTMENT, icmyState);
 
@@ -363,6 +364,8 @@ begin
               EnterCountyOrState(QSOParties[ContestsArray[SelectedContest].p].StateName);
 
             case SelectedContest of
+             LABRE:
+                  SetCommentAndEnableEditControl(TC_LABRE,icmyState);
             
                BCQP:            // 4.97.7
                  SetCommentAndEnableEditControl(TC_ENTERYOURISTRICTIFINVE7,icmyState);
@@ -419,7 +422,7 @@ begin
               REFSSB, REFCW: DisplayCheckBox(TC_FRANCE);
               IRTS: DisplayCheckBox(TC_IRTS);   // 4.93.2
              EUDX:
-               DisplayCheckBox(TC_EUDX);  // 4.95.6     
+               DisplayCheckBox(TC_EUDX);  // 4.95.6
               KINGOFSPAINCW, KINGOFSPAINSSB: DisplayCheckBox(TC_SPAIN);
               JIDXCW, JIDXSSB: DisplayCheckBox(TC_JAPAN);
               HELVETIA: DisplayCheckBox(TC_SWITZERLAND);
@@ -427,6 +430,7 @@ begin
               UNDX: DisplayCheckBox(TC_KAZAKHSTAN);
               UKRAINIAN: DisplayCheckBox(TC_UKRAINE);
               OKDX, OKOMSSB: DisplayCheckBox(TC_CZECHREPUBLICORINSLOVAKIA);
+     //         LABRE: DisplayCheckBox(TC_LABRE);
               LZDX: DisplayCheckBox(TC_BULGARIA);
               YODX: DisplayCheckBox(TC_ROMANIA);
               HADX: DisplayCheckBox(TC_HUNGARY);

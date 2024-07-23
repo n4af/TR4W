@@ -788,6 +788,7 @@ type
     ARRLVHFJAN,
     ARRLVHFJUN,
     ARRLVHFSEP,
+    ArizonaQsoParty,
     BALTIC,
     BWQP,
     CIS,
@@ -833,6 +834,7 @@ type
     KCJ,
     KIDSDAY,
     KVP,
+    LABRE,
     LZDX,
     MARCONIMEMORIAL,     //n4af
     MINITEST,
@@ -2734,6 +2736,7 @@ type
     IOTAQSOPointMethod,
     JapanInternationalDXQSOPointMethod,
     KCJQSOPointMethod,
+    LABREQSOPointMethod,
     LQPQSOPointMethod,
     MMCQSOPOINTMETHOD,
     NZFieldDayQSOPointMethod,
@@ -2928,6 +2931,7 @@ const
     'RF CHAMP', //    ChampionshipRFMethod,
     'UKR CHAMP', //    ChampionshipUkrMethod,
     'RADIO VHF FD', //    RadioVHFFDQSOPointMethod,
+    'LABRE', //labreqsopointmethod,
     'LZ', //    LZDXQSOPointMethod,
     'ONY', //    OldNewYearQSOPointMethod,
     'RF AS CHAMP', //    ChampionshipRFASMethod,
@@ -3125,7 +3129,7 @@ type
   end;
 
 const
-QSOPartiesCount = 18;
+QSOPartiesCount = 19;
 
   QSOParties                         : array[1..QSOPartiesCount] of TUSQSOPartyRecord =
   (
@@ -3147,7 +3151,8 @@ QSOPartiesCount = 18;
   (InsideStateDOMFile:'in';         {OutsideStateDOMFile:'IN';         }StateName:'IN'),
   (InsideStateDOMFile:'ve7';        {OutsideStateDOMFile:'VE7';        }StateName: 'VE7'),
   (InsideStateDOMFile:'va';         {OutsideStateDOMFile:'VA';         }StateName:'VA'),
-  (InsideStateDOMFile:'in7qpne';    {OutsideStateDOMFile:'IN7QPNE';    }StateName:'IN7QPNE')
+  (InsideStateDOMFile:'in7qpne';    {OutsideStateDOMFile:'IN7QPNE';    }StateName:'IN7QPNE'),
+  (InsideStateDOMFile:'arizona';    {OutsideStateDOMFile:'ARIZONA';    }StateName:'AZ')
   );
 {*)}
 
@@ -3215,6 +3220,7 @@ QSOPartiesCount = 18;
  ({Name: 'ARRL VHF JAN';              }Email: nil;                      DF: nil;                 WA7BNM:   43; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE:GridExchange;                      XM:NoDXMults; QP:ARRLVHFJUNPointMethod; ADIFName:'ARRL-VHF-JAN';   CABName:''),
  ({Name: 'ARRL VHF JUN';               }Email: nil;                      DF: nil;                 WA7BNM:   43; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE:GridExchange;                      XM:NoDXMults; QP:ARRLVHFJUNPointMethod; ADIFName:'ARRL-VHF-JUN';   CABName:''),
  ({Name: 'ARRL VHF SEP';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: GridSquares;     P: 0; AE: GridExchange;                      XM:NoDXMults; QP:ARRLVHFJUNPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'ARIZONA QSO PARTY';          }Email: 'info@azqp.org';          DF: 'arizona_cty';            WA7BNM:  482; {SK3BG: nil;       } QRZRUID: 0    ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 19; AE: RSTDomesticOrDXQTHExchange;                  XM:ARRLDXCCWithNoUSAOrCanada;  QP:OnePhoneTwoCW; ADIFName:'AZ-QSO-PARTY';   CABName:'ArizonaQP'),        
  ({Name: 'BALTIC';                     }Email: nil;                      DF: nil;                 WA7BNM:   28; {SK3BG: nil;          } QRZRUID: 161 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:BalticQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'BWQP';                       }Email: nil;                      DF: nil;                 WA7BNM: 0000;      {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults;    P: 0; AE: RSTNameAndQTHExchange;              XM:NoDXMults; QP:BWQPQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'CIS';                        }Email: nil;                      DF: 'cis';               WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 500 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticQTHOrQSONumberExchange;           XM:ARRLDXCC; QP:CISQSOPointMethod; ADIFName:'';   CABName:''),
@@ -3260,7 +3266,8 @@ QSOPartiesCount = 18;
  ({Name: 'JT DX';                      }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: MongolianCallSignPrefix; ZnM: NoZoneMults; AIE: ZoneInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:ARRLDXCCWithNoJT;    QP:JTDXQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'KCJ';                        }Email: nil;                      DF: 'japref';            WA7BNM:   89; {SK3BG: 'kcjc';       } QRZRUID: 169 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZONEORDOMESTICQTH;                      XM:NoDXMults; QP:KCJQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'KIDS DAY';                   }Email: nil;                      DF: nil;                 WA7BNM:  224; {SK3BG: 'kidsday';    } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: KidsDayExchange;                             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
- ({Name: 'KVP';                        }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: EUHFCYear;   AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'';   CABName:''),
+ ({Name: 'KVP';                        }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: EUHFCYear;   AIE: noInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'';   CABName:''),
+ ({Name: 'LABRE';                      }Email: 'logs@labre.org.br' ;     DF: 'brazil';            WA7BNM:  761; {SK3BG: 'nil';      } QRZRUID: 0  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticOrDXQTHExchange;                        XM:ARRLDXCC; QP:LABREQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'LZ DX';                      }Email: nil;                      DF: 'lz';                WA7BNM:  187; {SK3BG: 'lzdxc';      } QRZRUID: 53  ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                        XM:NoDXMults; QP:LZDXQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'Marconi Memorial';     }Email: 'contest.marconi@arifano.it';   DF: nil;              WA7BNM:   56; {SK3BG: nil;        }   QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                       XM:CQDXCC; QP:OnePointPerQSO; ADIFName:'';   CABName:''),        //n4af    4.68.1
  ({Name: 'MINITEST';                   }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
@@ -3406,6 +3413,7 @@ QSOPartiesCount = 18;
       'ARRL-VHF-JAN',
       'ARRL-VHF-JUN',
       'ARRL-VHF-SEP',
+      'ARIZONA QSO PARTY',
       'BALTIC',
       'BWQP',
       'CIS',
@@ -3451,6 +3459,7 @@ QSOPartiesCount = 18;
       'KCJ',
       'KIDS DAY',
       'KVP',
+      'LABRE',
       'LZ DX',
       'MARCONI MEMORIAL',       //n4af
       'MINITEST',
@@ -3632,6 +3641,7 @@ QSOPartiesCount = 18;
       ({Name: 'ARRL VHF JAN';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'ARRL VHF JUN';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'ARRL VHF SEP';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
+      ({Name: 'ARIZONA QSO PARTY';          }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),
       ({Name: 'BALTIC';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'BWQP';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),        //n4af
       ({Name: 'CIS';                        }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
@@ -3675,8 +3685,9 @@ QSOPartiesCount = 18;
       ({Name: 'JA LONG PREFECT';            }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'JT DX';                      }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'KCJ';                        }ciCDC1 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'KIDS DAY';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
+      ({Name: 'KIDS DAY';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM1),
       ({Name: 'KVP';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM1 + ciMB1 + ciMM1),
+      ({Name: 'LABRE';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'LZ DX';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name; 'Marconi Memorial';           }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),    //n4af
       ({Name: 'MINITEST';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),

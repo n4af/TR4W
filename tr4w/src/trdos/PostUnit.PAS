@@ -2686,9 +2686,12 @@ begin
     begin
       if LiteralDomesticQTH then
         csQTHString := @TempRXData.QTHString[1]
-      else
+       else
        if ContestName = 'WWDIGI' then
         csQTHString := @TempRXData.QTHString[1]
+      else
+       if contestname  = 'LABRE' then
+        csQTHString := @temprxdata.qthstring[1]
       else
         csQTHString := @TempRXData.DomesticQTH[1] {DomMultQTH};
     end

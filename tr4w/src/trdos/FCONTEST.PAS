@@ -342,6 +342,32 @@ begin
 
   case Contest of
 
+   LABRE:
+   begin
+  // if MyCountry <> 'PY' then
+    //             activeexchange :=  RSTDomesticQTHExchange;
+                  
+    SetCQMemoryString(CW, F1, 'CQ TEST \ \ LABRE');
+        SetCQMemoryString(CW, F2, 'CQ TEST \ \ LABRE');
+        CQExchange := '5NN' + MyState;
+        SearchAndPounceExchange :=  '5NN' + MyState;
+        QSLMessage := '73 \ ';
+    end;
+
+  ARIZONAQSOPARTY:
+   begin
+   SetCQMemoryString(CW, F1, 'CQ AZ \ \ AZ');
+        SetCQMemoryString(CW, F2, 'CQ^AZ CQ^AZ \ \ AZQP');
+        CQExchange := MyState;
+        SearchAndPounceExchange :=  MySTATE;
+        QSLMessage := '73 \/AZ ';
+    if  not FoundMyStateInDomFile then
+     ActiveExchange := RSTDomesticQTHExchange
+      else
+      MultbyBand := False;
+
+   end;
+
   NYQP:
   begin
    //ActiveDxMult := NoDXMults;
