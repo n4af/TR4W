@@ -2889,7 +2889,7 @@ const
     'JA INTERNATIONAL DX', //    JapanInternationalDXQSOPointMethod,
     'KCJ', //    KCJQSOPointMethod,
     'LQP',//    'MQP', //    MQPQSOPointMethod,
-  	'MARCONI MEMORIAL', // MMCQsoPointMethod,      //n4af
+    'MARCONI MEMORIAL', // MMCQsoPointMethod,      //n4af
     'NZ FIELD DAY', //    NZFieldDayQSOPointMethod,
     'OK DX', //    OKDXQSOPointMethod,
     'RAEM', //    RAEMQSOPointMethod,
@@ -3267,7 +3267,7 @@ QSOPartiesCount = 19;
  ({Name: 'KCJ';                        }Email: nil;                      DF: 'japref';            WA7BNM:   89; {SK3BG: 'kcjc';       } QRZRUID: 169 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZONEORDOMESTICQTH;                      XM:NoDXMults; QP:KCJQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'KIDS DAY';                   }Email: nil;                      DF: nil;                 WA7BNM:  224; {SK3BG: 'kidsday';    } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: KidsDayExchange;                             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'KVP';                        }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: EUHFCYear;   AIE: noInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'';   CABName:''),
- ({Name: 'LABRE';                      }Email: 'logs@labre.org.br' ;     DF: 'brazil';            WA7BNM:  761; {SK3BG: 'nil';      } QRZRUID: 0  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticOrDXQTHExchange;                        XM:ARRLDXCC; QP:LABREQSOPointMethod; ADIFName:'';   CABName:''),
+ ({Name: 'LABRE';                      }Email: 'logs@labre.org.br' ;     DF: 'brazil';            WA7BNM:  761; {SK3BG: 'nil';      } QRZRUID: 0  ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTDomesticOrDXQTHExchange;                        XM:ARRLDXCC; QP:LABREQSOPointMethod; ADIFName:'';   CABName:'LABRE-DX'),
  ({Name: 'LZ DX';                      }Email: nil;                      DF: 'lz';                WA7BNM:  187; {SK3BG: 'lzdxc';      } QRZRUID: 53  ; Pxm: NoPrefixMults; ZnM: ITUZones; AIE: ZoneInitialExchange; DM: DomesticFile;    P: 0; AE: RSTZoneOrDomesticQTH;                        XM:NoDXMults; QP:LZDXQSOPointMethod; ADIFName:'';   CABName:''),
  ({Name: 'Marconi Memorial';     }Email: 'contest.marconi@arifano.it';   DF: nil;              WA7BNM:   56; {SK3BG: nil;        }   QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                       XM:CQDXCC; QP:OnePointPerQSO; ADIFName:'';   CABName:''),        //n4af    4.68.1
  ({Name: 'MINITEST';                   }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
