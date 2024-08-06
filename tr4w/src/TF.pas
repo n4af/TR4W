@@ -83,8 +83,8 @@ var
   TempBuffer1                           : array[0..255] of Char;
   TempBuffer2                           : array[0..255] of Char;
   SetDlgItemTextBuffer                  : array[0..255] of Char;
-  //  MMTTYPATH                        : array[0..255] of Char;
   TelnetBuffer                          : array[0..4096 * 5 - 1] of Char;
+  spotsBuffer                            : array[0..4096 * 5 - 1] of Char;
   NetBuffer                             : array[1..4096] of Char;
   SyncNetBuffer                         : array[0..4096 - 1] of Char;
   SYSERRORBUFFER                        : array[0..255] of Char;

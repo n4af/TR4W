@@ -217,13 +217,7 @@ type
   end;
 
   KeyerType = (NoKeyer, CPU, MM3);
-{
-  PendingQTCDataType = record
-    Time: integer;
-    Call: CallString ;
-    QSONumber: integer;
-  end;
-}
+
 //  PendingQTCArrayType = array[0..PendingQTCArraySize - 1] of PendingQTCDataType;
 //  PendingQTCArrayPtr = ^PendingQTCArrayType;
 
@@ -557,55 +551,7 @@ var
   CallLastTimeIWasHere                  : CallString; {KK1L: 6.73 Used in LOGSUBS2 to trigger band map info update}
   CallWindowPosition                    : CallWindowPositionType {= NormalCallWindowPosition};
   CallWindowShowAllSpots                : boolean; {KK1L: 6.65}
-{
-  ColorColors                           : ColorRecord =
-    (
-    AlarmWindowBackground: trRed;
-    AlarmWindowColor: trBlack;
 
-    AutoSendArrowWindowBackground: trBtnFace;
-    AutoSendArrowWindowColor: trRed;
-
-    BandModeWindowBackground: trBtnFace;
-    BandModeWindowColor: trBlack;
-
-    BeamHeadingWindowBackground: trBtnFace;
-    BeamHeadingWindowColor: trBlack;
-
-    CallWindowBackground: trWhite;
-    CallWindowColor: trBlack;
-
-    CountryNameWindowBackground: trBtnFace;
-    CountryNameWindowColor: trBlack;
-
-    EditableLogWindowBackground: trWhite;
-    EditableLogWindowColor: trBlack;
-    ExchangeSAndPWindowBackground: trGreen;
-
-    FrequencyOneWindowBackground: trBtnFace;
-    FrequencyTwoWindowBackground: trBtnFace;
-
-//    FrequencyOneWindowHighlight: trBlack;
-//    FrequencyTwoWindowHighlight: trBlack;
-
-    FrequencyOneWindowColor: trBlack;
-    FrequencyTwoWindowColor: trBlack;
-
-    QSONumberWindowBackground: trWhite;
-    QSONumberWindowColor: trBlack;
-
-    RemainingMultsWindowSubdue: trCyan;
-    RemainingMultsWindowBackground: trLightBlue;
-    RemainingMultsWindowColor: trWhite;
-
-    TotalScoreWindowBackground: trBtnFace;
-    TotalScoreWindowColor: trBlack;
-
-    WholeScreenBackground: trBtnFace;
-
-    )
-    ;
-}
   CommandUseInactiveRadio               : boolean; {KK1L: 6.73}
   ContactsPerPage                       : integer = 50;
   ContinentString                       : Str20;
@@ -831,7 +777,7 @@ var
   SCount                                : integer = 0;
   SpecialCommand                        : SpecialCommandType {= NoSpecialCommand};
   SplitFreq                             : LONGINT;
-
+  Spotcnt                               : integer = 0;
 //  SpeedMemory                 : array[RadioType] of integer; {KK1L: 6.73}
   SpeedString                           : Str10; {KK1L: 6.73}
 

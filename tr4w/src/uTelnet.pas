@@ -233,7 +233,7 @@ var
 
   temprect: TRect;
 
-  i: integer;
+  i, k: integer;
   TempTextColor: Cardinal;
   TempPoint: TPoint;
   TDIS: PDrawItemStruct;
@@ -293,9 +293,23 @@ begin
 
         //   showmessage(@TelnetBuffer);
 
-
         TelnetBuffer[i] := #0;
-        ProcessTelnetString(i);
+     {   spotcnt := spotcnt + 1;       // beta test alleviate # screen writes
+        if spotcnt = 1 then
+        begin
+          move(TelnetBuffer[0], SpotsBuffer[0], i);
+          spotcnt := spotcnt + 1;
+          exit;
+        end
+        else
+        begin
+          spotcnt := 0;
+          ProcessTelnetString(i);
+          move(SpotsBuffer[0], TelnetBuffer[0], i); }
+          ProcessTelnetString(i);
+
+      //  end;                               // end beta
+
         //Except on E : Exception do
        //    begin
            //TLogger.GetInstance.Debug(Format('ProcessTelnet Exception, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
@@ -323,13 +337,12 @@ begin
         EnumerateLinesInFile('DXCLUSTER_ALERT_LIST.TXT',
           EmunDXCLUSTERALERTLISTTXT, True);
 
-
-                // Issue 392
-                // If the cluster in the config file is not in TRCLUSTER.DAT, this does not connect.
-                // We could add it to the EnumTRClusterDAT or just take it as a host and connect.
-                // We should check the hosts is valid too but we can see that in the connect.
-                // Also, ensure we get a useful error message when we cannot connect.
-                // Currently it just says Operation Successful which is false and not helpful.
+        // Issue 392
+        // If the cluster in the config file is not in TRCLUSTER.DAT, this does not connect.
+        // We could add it to the EnumTRClusterDAT or just take it as a host and connect.
+        // We should check the hosts is valid too but we can see that in the connect.
+        // Also, ensure we get a useful error message when we cannot connect.
+        // Currently it just says Operation Successful which is false and not helpful.
         EnumerateLinesInFile('TRCLUSTER.DAT', EmunTRCLUSTERDAT, False);
         EmunTRCLUSTERDAT(@TelnetServer);
         // Issue 392 ny4i - This adds the value in the config for telnet server to the drop-down
@@ -394,7 +407,6 @@ begin
         if HiWord(wParam) = LBN_SELCHANGE then
           DlgDirSelectEx(hwnddlg, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);
 
-
         if HiWord(wParam) = LBN_DBLCLK then
         begin
           //      DlgDirSelectEx(tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle, wsprintfBuffer, SizeOf(wsprintfBuffer), 101);  //n4af
@@ -441,12 +453,12 @@ begin
           207: ShowHelp('ru_dxcluster');
 {$IFEND}
 
-                   //          DialogBox(hInstance, MAKEINTRESOURCE(44), hwnddlg, @SpotsFilterDlgProc);
+          //          DialogBox(hInstance, MAKEINTRESOURCE(44), hwnddlg, @SpotsFilterDlgProc);
           200: if TelThreadID = 0 then
             begin
               logger.Debug('Calling tCreateThread from TelnetThread');
               tCreateThread(@ConnectToTelnetCluster, TelThreadID);
-              logger.Debug('Created Telnet (Cluster)  thread with threadid of %d',[TelThreadID] );
+              logger.Debug('Created Telnet (Cluster)  thread with threadid of %d', [TelThreadID]);
               //              ConnectToTelnetCluster;
             end;
 
@@ -634,6 +646,7 @@ var
   Handle: HWND;
 begin
   Handle := TelnetListBox;
+
   SendMessage(Handle, LB_SETITEMDATA, SendMessage(Handle, LB_ADDSTRING, 0,
     integer(p)), integer(c));
 
@@ -992,12 +1005,7 @@ begin
   TempSpot.FDupe :=
     //CallsignsList.CallsignIsDupe(TempSpot.FCall, TempSpot.FBand, TempSpot.FMode, I1);
   VisibleLog.CallIsADupe(TempSpot.FCall, TempSpot.FBand, TempSpot.FMode);
-  {
-   Buffer := TelnetBuffer;
-  if StrPos(Buffer,'CW') = Nil then exit;
-  if StrPos(Buffer,'BEACON') <> Nil then exit;
-  if StrPos(Buffer,'NCDXF') <> Nil then exit;
-}
+
   if TempSpot.FDupe then
     Stringtype := tstReceivedDupe;
 
@@ -1064,8 +1072,10 @@ var
   TempFrequency: LONGINT;
   Mult: boolean;
 begin
-   if not BandMapEnable then Exit;
-   IF bandmappreventrefresh then exit;
+  if not BandMapEnable then
+    Exit;
+  if bandmappreventrefresh then
+    exit;
   if StringIsAllNumbers(Call) then
     Exit;
   //  if ActiveRadio = RadioOne then TempFrequency := Radio1.FilteredStatus.Freq;
@@ -1133,7 +1143,7 @@ begin
   TempSpot.FSysTime := UTC.wMinute + UTC.wHour * 60 + UTC.wDay * 60 * 24 +
     UTC.wMonth * 60 * 24 * 30;
   SpotsList.AddSpot(TempSpot, True);
- 
+
   DisplayBandMap;
 end;
 

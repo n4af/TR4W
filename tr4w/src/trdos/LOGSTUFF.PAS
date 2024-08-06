@@ -5465,47 +5465,12 @@ begin
     DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
   end;
 end;
-{
-procedure NewBandMapEntry(Call: CallString;
-  Frequency: LONGINT;
-  QSXFrequency: LONGINT;
-  Mode: ModeType;
-  Dupe: boolean;
-  Mult: boolean;
-  MinutesLeft: integer;
-  SendToMulti: boolean;
-  Source: CallString);
 
-begin
-  AddBandMapEntry(Call, Frequency, QSXFrequency, Mode, Dupe, Mult, MinutesLeft, Source);
-
-  if NetSocket <> 0 then
-    begin
-      NetDXSpot.dsCall := Call;
-      NetDXSpot.dsFrequency := Frequency;
-      NetDXSpot.dsQSXFrequency := 0;
-      NetDXSpot.dsMode := Mode;
-      NetDXSpot.dsDupe := Dupe;
-      NetDXSpot.dsMult := Mult;
-      NetDXSpot.dsMinutesLeft := MinutesLeft;
-      NetDXSpot.dsSource := Source;
-      Send(NetSocket, NetDXSpot, SizeOf(NetDXSpot), 0);
-    end;
-
-  DisplayBandMap;
-end;
-}
 
 procedure PushMultiMessageBuffer(Message: Str80);
 
 begin
-  {
-    MultiMessageBuffer[1] := MultiMessageBuffer[2];
-    MultiMessageBuffer[2] := MultiMessageBuffer[3];
-    MultiMessageBuffer[3] := MultiMessageBuffer[4];
-    MultiMessageBuffer[4] := MultiMessageBuffer[5];
-    MultiMessageBuffer[5] := Message;
-  }
+
 end;
 
 procedure DisplayMultiMessageBuffer;
@@ -5513,15 +5478,7 @@ procedure DisplayMultiMessageBuffer;
 begin
   //   if ActiveMultiPort <> NoPort then
   begin
-    //    SaveSetAndClearActiveWindow(EditableLogWindow);
-    {
-    WriteLn(MultiMessageBuffer[1]);
-    WriteLn(MultiMessageBuffer[2]);
-    WriteLn(MultiMessageBuffer[3]);
-    WriteLn(MultiMessageBuffer[4]);
-    Write(MultiMessageBuffer[5]);
-    }
-    //RestorePreviousWindow;
+
   end;
 end;
 
@@ -5595,29 +5552,7 @@ begin
     Result := True;
   CloseLogFile;
 
-  {
-     NumberContacts := (GetFileSize_TR(LogFileName)) div 84;
-
-     if NumberContacts = 0 then
-        if QSOTotals[All, Both] > 2 then
-           Exit
-        else
-           begin
-              LogFileLooksOkay := True;
-              Exit;
-           end;
-
-     if QSOTotals[All, Both] = 0 then Exit;
-
-     if Abs(QSOTotals[All, Both] - NumberContacts) < 10 then
-        begin
-           LogFileLooksOkay := True;
-           Exit;
-        end;
-
-     ErrorPercent := ((QSOTotals[All, Both] - NumberContacts) / QSOTotals[All, Both]) * 100;
-     LogFileLooksOkay := (ErrorPercent < 3.0) and (ErrorPercent > -3.0);
-  }
+  
 end;
 
 procedure NextPage;
