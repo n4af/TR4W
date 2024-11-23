@@ -22,12 +22,13 @@ unit LogWind;
 {$IMPORTEDDATA OFF}
 interface
 uses
-utils_text,
+  utils_text,
   uWinKey,
   uMults,
-//  uTrayBalloon,
+  //  uTrayBalloon,
   uCTYDAT,
   uCallsigns,
+  uCallsignRoutines,
   TF,
   uCommctrl,
   Messages,
@@ -49,73 +50,74 @@ utils_text,
   ;
 
 const
-  tBaseFrequencys                       : array[Band160..Band12] of integer =
-    (1000, 3000,  7000, 14000, 21000, 28000, 10000, 18000, 24000);
-//T1 : Cardinal = 1800000;
+  tBaseFrequencys: array[Band160..Band12] of integer =
+    (1000, 3000, 7000, 14000, 21000, 28000, 10000, 18000, 24000);
+  //T1 : Cardinal = 1800000;
 var
-  TMult                                 : str10 = ' ';
-  BufLine                               : integer = 0;
-  ie_check                              : boolean = false;
-  tBandMapCutoffFrequency               : integer;
-  IE_Switch                             : boolean = False;
-  tBandMapPlaceHolder                   : CallString;
-  tB4IndicatorPrevState                 : integer;
-  tNewMultIndicatorPrevState            : integer;
-  tQSOsWithThisStationPrevState         : integer;
-  tCountryNamePrevState                 : Word;
-  tBeamHeadingPrevState                 : GridString;
-  tLocalTimePrevState                   : Word;
-  Gate                                  : boolean = False;
-  a                                     : cardinal = 0;
-  b                                     : cardinal = 0;
-  c                                     : cardinal = 0;
-  e                                    : cardinal = 0;
-  T2                                    : cardinal = 0;
-  d2                                    : cardinal = 0;
-  d3                                    : cardinal = 0;
- // d4                                    : cardinal = 0;
-  Start                                 : boolean = False;
-  Save                                  : cardinal = 0;
-  d1                                    : cardinal = 0;
-  BMp                                   : integer = 0;
-  const
-  PendingQTCArraySize                   = 600;
+  BMPos: integer = 1;
+  TMult: str10 = ' ';
+  BufLine: integer = 0;
+  ie_check: boolean = false;
+  tBandMapCutoffFrequency: integer;
+  IE_Switch: boolean = False;
+  tBandMapPlaceHolder: CallString;
+  tB4IndicatorPrevState: integer;
+  tNewMultIndicatorPrevState: integer;
+  tQSOsWithThisStationPrevState: integer;
+  tCountryNamePrevState: Word;
+  tBeamHeadingPrevState: GridString;
+  tLocalTimePrevState: Word;
+  Gate: boolean = False;
+  a: cardinal = 0;
+  b: cardinal = 0;
+  c: cardinal = 0;
+  e: cardinal = 0;
+  T2: cardinal = 0;
+  d2: cardinal = 0;
+  d3: cardinal = 0;
+  // d4                                    : cardinal = 0;
+  Start: boolean = False;
+  Save: cardinal = 0;
+  d1: cardinal = 0;
+  BMp: integer = 0;
+const
+  PendingQTCArraySize = 600;
 
-  Blink                                 = 128;
+  Blink = 128;
 
-  NumberEditableLines                   = 5;
-  MaximumReminderRecords                = 100;
-  MaxExchangeTemplateEntries            = 20;
+  NumberEditableLines = 5;
+  MaximumReminderRecords = 100;
+  MaxExchangeTemplateEntries = 20;
 
-  QSOInformationWindowLX                = 55;
-  QSOInformationWindowLY                = 4;
-  QSOInformationWindowRX                = 80;
-  QSOInformationWindowRY                = 7;
+  QSOInformationWindowLX = 55;
+  QSOInformationWindowLY = 4;
+  QSOInformationWindowRX = 80;
+  QSOInformationWindowRY = 7;
 
-  RemainingMultsWindowLX                = 1;
-  RemainingMultsWindowLY                = 8;
-  RemainingMultsWindowRX                = 54;
-  RemainingMultsWindowRY                = 13;
+  RemainingMultsWindowLX = 1;
+  RemainingMultsWindowLY = 8;
+  RemainingMultsWindowRX = 54;
+  RemainingMultsWindowRY = 13;
 
-  BigRemainingMultsWindowLX             = 1;
-  BigRemainingMultsWindowLY             = 8;
-  BigRemainingMultsWindowRX             = 80;
-  BigRemainingMultsWindowRY             = 13;
+  BigRemainingMultsWindowLX = 1;
+  BigRemainingMultsWindowLY = 8;
+  BigRemainingMultsWindowRX = 80;
+  BigRemainingMultsWindowRY = 13;
 
-  MultiplierInformationWindowLX         = 55;
-  MultiplierInformationWindowLY         = 8;
-  MultiplierInformationWindowRX         = 80;
-  MultiplierInformationWindowRY         = 12;
+  MultiplierInformationWindowLX = 55;
+  MultiplierInformationWindowLY = 8;
+  MultiplierInformationWindowRX = 80;
+  MultiplierInformationWindowRY = 12;
 
-  EditableLogWindowLX                   = 1;
-  EditableLogWindowLY                   = 14;
-  EditableLogWindowRX                   = 80;
-  EditableLogWindowRY                   = 18;
+  EditableLogWindowLX = 1;
+  EditableLogWindowLY = 14;
+  EditableLogWindowRX = 80;
+  EditableLogWindowRY = 18;
 
-  BigWindowLX                           = 1;
-  BigWindowLY                           = 2;
-  BigWindowRX                           = 80;
-  BigWindowRY                           = 18;
+  BigWindowLX = 1;
+  BigWindowLY = 2;
+  BigWindowRX = 80;
+  BigWindowRY = 18;
 
 type
 
@@ -129,7 +131,8 @@ type
     State: K5KAStateType;
   end;
 
-  RotatorType = (NoRotator, DCU1Rotator, OrionRotator, YaesuRotator, AlfaSpidRotator); {KK1L: 6.71 Added YaesuRotator}
+  RotatorType = (NoRotator, DCU1Rotator, OrionRotator, YaesuRotator,
+    AlfaSpidRotator); {KK1L: 6.71 Added YaesuRotator}
 
   RateBandArrayType = array[Band160..Band10] of Byte;
 
@@ -165,7 +168,8 @@ type
     User5Info,
     CustomInfo);
 
-  TwoRadioStates = (TwoRadiosDisabled, Idle, CallReady, StationCalled, SendingExchange);
+  TwoRadioStates = (TwoRadiosDisabled, Idle, CallReady, StationCalled,
+    SendingExchange);
 
   BandMapEntry = record
     Call: EightBytes;
@@ -196,14 +200,15 @@ type
     bmMode: ModeType;
   end;
 
-//  BandMapArray = array of {tr4wBandMapEntry} BandMapEntry;
+  //  BandMapArray = array of {tr4wBandMapEntry} BandMapEntry;
 
   BandMapEntryPointer = ^BandMapEntry;
 
   BandMapSplitModeType = (ByCutoffFrequency, AlwaysPhone); {KK1L: 6.64}
 
   RateDisplayType = (QSOs, Points, BandQSOs);
-  HourDisplayType = (ThisHour, LastSixtyMins, BandChanges, BandChangesThisComputer);
+  HourDisplayType = (ThisHour, LastSixtyMins, BandChanges,
+    BandChangesThisComputer);
 
   K1EAStationInfoFieldType = (Pass, Run);
 
@@ -218,8 +223,8 @@ type
 
   KeyerType = (NoKeyer, CPU, MM3);
 
-//  PendingQTCArrayType = array[0..PendingQTCArraySize - 1] of PendingQTCDataType;
-//  PendingQTCArrayPtr = ^PendingQTCArrayType;
+  //  PendingQTCArrayType = array[0..PendingQTCArraySize - 1] of PendingQTCDataType;
+  //  PendingQTCArrayPtr = ^PendingQTCArrayType;
 
   QTCDataType = record
     Call: CallString {EightBytes};
@@ -274,8 +279,8 @@ type
 
   LogEntryArray = array[1..NumberEditableLines] of string {[100]};
 
-//  RemainingMultList = array[0..MaxNumberRemainingDomQTHs] of boolean;
-//  RemainingMultListPointer = ^RemainingMultList;
+  //  RemainingMultList = array[0..MaxNumberRemainingDomQTHs] of boolean;
+  //  RemainingMultListPointer = ^RemainingMultList;
 
   ColorRecord = record
     AlarmWindowBackground: tr4wColors;
@@ -326,8 +331,8 @@ type
     FrequencyOneWindowBackground: tr4wColors;
     FrequencyTwoWindowBackground: tr4wColors; {KK1L: 6.73}
 
-//    FrequencyOneWindowHighlight: tr4wColors; {KK1L: 6.73}
-//    FrequencyTwoWindowHighlight: tr4wColors; {KK1L: 6.73}
+    //    FrequencyOneWindowHighlight: tr4wColors; {KK1L: 6.73}
+    //    FrequencyTwoWindowHighlight: tr4wColors; {KK1L: 6.73}
 
     FrequencyOneWindowColor: tr4wColors;
     FrequencyTwoWindowColor: tr4wColors; {KK1L: 6.73}
@@ -362,7 +367,8 @@ type
     QuickCommandWindowBackground: tr4wColors;
     QuickCommandWindowColor: tr4wColors;
 
-    RadioOneWindowBackground: tr4wColors; {KK1L: 6.73 Changed from RadioWindowBackground}
+    RadioOneWindowBackground: tr4wColors;
+      {KK1L: 6.73 Changed from RadioWindowBackground}
     RadioOneWindowColor: tr4wColors; {KK1L: 6.73 Changed from RadioWindowColor}
     RadioTwoWindowBackground: tr4wColors; {KK1L: 6.73}
     RadioTwoWindowColor: tr4wColors; {KK1L: 6.73}
@@ -409,7 +415,7 @@ type
   CallWindowPositionType = (NormalCallWindowPosition, UpOneCallWindowPosition);
 
 const
-  ZoneMultTypeSA                        : array[ZoneMultType] of PChar =
+  ZoneMultTypeSA: array[ZoneMultType] of PChar =
     (
     'NONE',
     'CQ ZONES',
@@ -420,21 +426,28 @@ const
     'RF CHAMP ZONES'
     );
 
-  TenMinuteRuleTypeSA                   : array[TenMinuteRuleType] of PChar = ('NONE', 'TIME OF FIRST QSO');
+  TenMinuteRuleTypeSA: array[TenMinuteRuleType] of PChar = ('NONE',
+    'TIME OF FIRST QSO');
 
-  RotatorTypeSA                         : array[RotatorType] of PChar = ('NONE', 'DCU1', 'ORION', 'YAESU', 'ALFA SPID');
+  RotatorTypeSA: array[RotatorType] of PChar = ('NONE', 'DCU1', 'ORION', 'YAESU',
+    'ALFA SPID');
 
-  CallWindowPositionTypeSA              : array[CallWindowPositionType] of PChar = ('NORMAL', 'UP');
+  CallWindowPositionTypeSA: array[CallWindowPositionType] of PChar = ('NORMAL',
+    'UP');
 
-  BandMapSplitModeTypeSA                : array[BandMapSplitModeType] of PChar = ('BY CUTOFF FREQ', 'ALWAYS PHONE');
+  BandMapSplitModeTypeSA: array[BandMapSplitModeType] of PChar =
+    ('BY CUTOFF FREQ', 'ALWAYS PHONE');
 
-  HourDisplayTypeSA                     : array[HourDisplayType] of PChar = ('THIS HOUR', 'LAST SIXTY MINUTES', 'BAND CHANGES', 'BAND CHANGES ON THIS COMPUTER');
+  HourDisplayTypeSA: array[HourDisplayType] of PChar = ('THIS HOUR',
+    'LAST SIXTY MINUTES', 'BAND CHANGES', 'BAND CHANGES ON THIS COMPUTER');
 
-  RateDisplayTypeStringArray            : array[RateDisplayType] of PChar = ('QSOS', 'QSO POINTS', 'BAND QSOS');
+  RateDisplayTypeStringArray: array[RateDisplayType] of PChar = ('QSOS',
+    'QSO POINTS', 'BAND QSOS');
 
-  IECursorPosTypeStringArray            : array[InitialExchangeCursorPosType] of PChar = ('AT END', 'AT START');
+  IECursorPosTypeStringArray: array[InitialExchangeCursorPosType] of PChar =
+    ('AT END', 'AT START');
 
-  InitialExchangeTypeStringArray        : array[InitialExchangeType] of PChar =
+  InitialExchangeTypeStringArray: array[InitialExchangeType] of PChar =
     (
     'NONE',
     'NAME',
@@ -452,7 +465,7 @@ const
     'USER 5',
     'CUSTOM'
     );
-  UserInfoTypeSA                        : array[UserInfoType] of PChar =
+  UserInfoTypeSA: array[UserInfoType] of PChar =
     (
     'NONE',
     'NAME',
@@ -473,47 +486,47 @@ const
     );
 var
 
-  k                                     : integer;
+  k: integer;
   //  BMDrawCounter                    : integer;
 
-  ActiveBackground                      : Byte;
-  ActiveBand                            : BandType {= Band160};
-  ActiveColor                           : Byte;
-  ActiveExchange                        : ExchangeType {= NoExchangeReceived};
-  ActiveInitialExchange                 : InitialExchangeType {= NoInitialExchange};
-  ActiveMode                            : ModeType{$IF MMTTYMODE} = Digital{$IFEND};
+  ActiveBackground: Byte;
+  ActiveBand: BandType {= Band160};
+  ActiveColor: Byte;
+  ActiveExchange: ExchangeType {= NoExchangeReceived};
+  ActiveInitialExchange: InitialExchangeType {= NoInitialExchange};
+  ActiveMode: ModeType{$IF MMTTYMODE} = Digital{$IFEND};
 
   //  ActiveModemPort: PortType;
-  ActiveQSOPointMethod                  : QSOPointMethodType {= NoQSOPointMethod};
-  ActiveRotatorPort                     : PortType;
-  ActiveRotatorType                     : RotatorType {= NoRotator};
+  ActiveQSOPointMethod: QSOPointMethodType {= NoQSOPointMethod};
+  ActiveRotatorPort: PortType;
+  ActiveRotatorType: RotatorType {= NoRotator};
   //  ActiveRTTYPort                        : PortType;
-  ActiveWindow                          : WindowType;
-  ActiveZoneMult                        : ZoneMultType {= NoZoneMults};
-  AlarmSet                              : boolean;
-  AlarmMinute                           : integer;
-  AlarmHour                             : integer;
-  AltDBufferEnable                      : boolean;
-  AltDCQEnable                          : boolean;
-  AskForFrequencies                     : boolean;
-  AutoReturnToCQMode                    : boolean = True;
-  AutoSAPEnableRate                     : LONGINT = 500;
-  AutoSendCharacterCount                : integer;
-  AutoSendEnable                        : boolean;
-  AutoTimeIncrementQSOs                 : integer;
-  AutoTimeQSOCount                      : Byte;
+  ActiveWindow: WindowType;
+  ActiveZoneMult: ZoneMultType {= NoZoneMults};
+  AlarmSet: boolean;
+  AlarmMinute: integer;
+  AlarmHour: integer;
+  AltDBufferEnable: boolean;
+  AltDCQEnable: boolean;
+  AskForFrequencies: boolean;
+  AutoReturnToCQMode: boolean = True;
+  AutoSAPEnableRate: LONGINT = 500;
+  AutoSendCharacterCount: integer;
+  AutoSendEnable: boolean;
+  AutoTimeIncrementQSOs: integer;
+  AutoTimeQSOCount: Byte;
 
-  BandMapSO2RDisplay                    : boolean;
-  BandMapAllBands                       : boolean;
-  BandMapAllModes                       : boolean;
-  BandMapBand                           : BandType {= Band160};
-  BandMapMode                           : ModeType {= CW};
-  BandMapBlinkingCall                   : CallString;
-  BandMapBlinkingCallRecord             : BandMapEntryPointer;
-  BandMapCursorData                     : BandMapEntryPointer;
-  BandMapCursorFrequency                : LONGINT;
-  BandMapDisplayCQ                      : boolean = True;
-  BandMapModeCutoffFrequency            : array[Band160..Band2] of LONGINT =
+  BandMapSO2RDisplay: boolean;
+  BandMapAllBands: boolean;
+  BandMapAllModes: boolean;
+  BandMapBand: BandType {= Band160};
+  BandMapMode: ModeType {= CW};
+  BandMapBlinkingCall: CallString;
+  BandMapBlinkingCallRecord: BandMapEntryPointer;
+  BandMapCursorData: BandMapEntryPointer;
+  BandMapCursorFrequency: LONGINT;
+  BandMapDisplayCQ: boolean = True;
+  BandMapModeCutoffFrequency: array[Band160..Band2] of LONGINT =
     (
     1840000,
     3700000,
@@ -528,79 +541,82 @@ var
     144200000
     );
 
-  BandMapDecayTime                      : integer = 60;
-  BandMapDecayValue                     : integer = 60; {KK1L: 6.65}
-  BandMapDecayMultiplier                : integer = 1; {KK1L: 6.65}
-  BandMapDupeDisplay                    : boolean = True;
-  BandMapEnable                         : boolean;
-  BandMapEntryInCallWindow              : boolean;
-  BandMapFileVersion                    : Char = '1';
+  BandMapDecayTime: integer = 60;
+  BandMapDecayValue: integer = 60; {KK1L: 6.65}
+  BandMapDecayMultiplier: integer = 1; {KK1L: 6.65}
+  BandMapDupeDisplay: boolean = True;
+  BandMapEnable: boolean;
+  BandMapEntryInCallWindow: boolean;
+  BandMapFileVersion: Char = '1';
   {KK1L: 6.65 Expanded array to cover all cases to keep BM from going whacko when tuning out of band}
-  BandMapFirstEntryList                 : array[Band160..NoBand, CW..FM] of BandMapEntryPointer;
-  BandMapGuardBand                      : integer; // = 200;
-  BandMapDisplayLimit                   : integer = 164;   //GAV added for centred   bandmap
-  BandMapMultsOnly                      : boolean; {KK1L: 6.68}
-  BandMapSplitMode                      : BandMapSplitModeType {= ByCutoffFrequency}; {KK1L: 6.64}
-  BandMapTotalCalls                     : integer;
-  BandMapWindowRY                       : integer;
-  BandSave                              : BandType;
+  BandMapFirstEntryList: array[Band160..NoBand, CW..FM] of BandMapEntryPointer;
+  BandMapGuardBand: integer; // = 200;
+  BandMapDisplayLimit: integer = 164; //GAV added for centred   bandmap
+  BandMapMultsOnly: boolean; {KK1L: 6.68}
+  BandMapSplitMode: BandMapSplitModeType {= ByCutoffFrequency}; {KK1L: 6.64}
+  BandMapTotalCalls: integer;
+  BandMapWindowRY: integer;
+  BandSave: BandType;
 
-//  BandMemory                  : array[RadioType] of BandType;
+  //  BandMemory                  : array[RadioType] of BandType;
 
-  CalledFromCQMode                      : boolean = True; {KK1L: 6.73}
-  CallLastTimeIWasHere                  : CallString; {KK1L: 6.73 Used in LOGSUBS2 to trigger band map info update}
-  CallWindowPosition                    : CallWindowPositionType {= NormalCallWindowPosition};
-  CallWindowShowAllSpots                : boolean; {KK1L: 6.65}
+  CalledFromCQMode: boolean = True; {KK1L: 6.73}
+  CallLastTimeIWasHere: CallString;
+    {KK1L: 6.73 Used in LOGSUBS2 to trigger band map info update}
+  CallWindowPosition: CallWindowPositionType {= NormalCallWindowPosition};
+  CallWindowShowAllSpots: boolean; {KK1L: 6.65}
 
-  CommandUseInactiveRadio               : boolean; {KK1L: 6.73}
-  ContactsPerPage                       : integer = 50;
-  ContinentString                       : Str20;
+  CommandUseInactiveRadio: boolean; {KK1L: 6.73}
+  ContactsPerPage: integer = 50;
+  ContinentString: Str20;
   //  tr4w_contest                          : string;
 
-  ContestName                           : Str80; {KK1L: 6.68 shortened from Str80}
-  ContestTitle                          : ShortString;
-  ContinentQSOCount                     : array[BandType, ContinentType] of Word;
-  ControlBMemory                        : CallString;
-  CodeSpeedIncrement                    : integer = 3; {KK1L: 6.72}
-  CountryString                         : Str20;
+  ContestName: Str80; {KK1L: 6.68 shortened from Str80}
+  ContestTitle: ShortString;
+  ContinentQSOCount: array[BandType, ContinentType] of Word;
+  ControlBMemory: CallString;
+  CodeSpeedIncrement: integer = 3; {KK1L: 6.72}
+  CountryString: Str20;
   //   CQMenu                          : Str80;
-  CustomInitialExchangeString           : Str40; {KK1L: 6.67 was Str80;}
-  CustomUserString                      : Str40; {KK1L: 6.68 shortened from Str80}
-  CWEnabled                             : boolean  = True;
- // CWByCAT                               : boolean  = False;   // ny4i 4.44.5
+  CustomInitialExchangeString: Str40; {KK1L: 6.67 was Str80;}
+  CustomUserString: Str40; {KK1L: 6.68 shortened from Str80}
+  CWEnabled: boolean = True;
+  // CWByCAT                               : boolean  = False;   // ny4i 4.44.5
 
-  DigitalModeEnable                     : boolean;
+  DigitalModeEnable: boolean;
 
-  DisplayBandMapEnable                  : boolean = True; {KK1L: 6.73}
-  DisplayedCodeSpeed                    : Byte;
-  DVKEnable                             : boolean;
+  DisplayBandMapEnable: boolean = True; {KK1L: 6.73}
+  DisplayedCodeSpeed: Byte;
+  DVKEnable: boolean;
 
-  DVKLocalizedMessagesEnable            : boolean;
-//  DVPEnabled                            : boolean = True;
-  DXMultLimit                           : integer = 32766; {KK1L: 6.65}
+  DVKLocalizedMessagesEnable: boolean;
+  //  DVPEnabled                            : boolean = True;
+  DXMultLimit: integer = 32766; {KK1L: 6.65}
 
-//  EditableLogDisplayed                  : boolean;
-  EscapeFromEditBandMap                 : boolean;
-  NeedToSynchBandMap                    : boolean = True; {KK1L: 6.69}
+  //  EditableLogDisplayed                  : boolean;
+  EscapeFromEditBandMap: boolean;
+  NeedToSynchBandMap: boolean = True; {KK1L: 6.69}
   //   EightBitRTTYPort                : boolean;
      //   ExchangeFunctionKeyMenu         : Str80;
-  ExchangeTemplateList                  : array[0..MaxExchangeTemplateEntries - 1] of StringPointer;
-  ExchangeWindowCursorPosition          : Byte;
+  ExchangeTemplateList: array[0..MaxExchangeTemplateEntries - 1] of
+    StringPointer;
+  ExchangeWindowCursorPosition: Byte;
 
   //   FirstDisplayableBandMapFrequency: LONGINT; {KK1L: 6.64}
-  FirstDisplayedBandMapColumn           : integer; {KK1L: 6.64 allows tracking of bandmap display overflow}
+  FirstDisplayedBandMapColumn: integer;
+    {KK1L: 6.64 allows tracking of bandmap display overflow}
   //  FirstDisplayedBandMapFrequency   : LONGINT; {KK1L: 6.64}
 
     {KK1L: 6.65 Made FoundCursor global. DisplayBandMap will set false if not within guardband}
-  FoundCursor                           : boolean;
+  FoundCursor: boolean;
 
-  FrequencyDisplayed                    : boolean;
+  FrequencyDisplayed: boolean;
 
-  tFrequencyMemory                      : integer;
+  tFrequencyMemory: integer;
 
-  FreqMemory                            : TFreqMemoryType;
+  FreqMemory: TFreqMemoryType;
 
-  DefaultFreqMemory                     : TFreqMemoryType =
+  DefaultFreqMemory: TFreqMemoryType =
     (
     (0001820000, 1840000, 0001840000),
     (0003525000, 3580000, 0003850000),
@@ -628,162 +644,167 @@ var
     (0000000000, 0, 0000000000)
     );
 
-  FrequencyMemoryEnable                 : boolean = True;
-  FreqPollRate                          : integer = 10; {KK1L: 6.71a Frequency Poll Rate in milliseconds}
-  BMDelay                               :  integer = 0; // 4.93.3
-  GridSquareListShown                   : boolean;
+  FrequencyMemoryEnable: boolean = True;
+  FreqPollRate: integer = 10; {KK1L: 6.71a Frequency Poll Rate in milliseconds}
+  BMDelay: integer = 0; // 4.93.3
+  GridSquareListShown: boolean;
 
-  HourDisplay                           : HourDisplayType {= ThisHour};
+  HourDisplay: HourDisplayType {= ThisHour};
 
-  tHandLogMode                          : boolean;
-  InactiveSwapRadio                     : boolean;  // n4af 4.41.3
-  IncrementTimeEnable                   : boolean;
-  InEditBandMap                         : boolean; {KK1L 6.65}
-  InitialExchangeCursorPos              : InitialExchangeCursorPosType { = AtEnd};
+  tHandLogMode: boolean;
+  InactiveSwapRadio: boolean; // n4af 4.41.3
+  IncrementTimeEnable: boolean;
+  InEditBandMap: boolean; {KK1L 6.65}
+  InitialExchangeCursorPos: InitialExchangeCursorPosType { = AtEnd};
 
-  JustLoadingBandMapWithNoRadio         : boolean; {KK1L: 6.68}
+  JustLoadingBandMapWithNoRadio: boolean; {KK1L: 6.68}
 
-  K1EAMultiInfo                         : array[Band160..Band10] of K1EAMultiInfoRecord;
+  K1EAMultiInfo: array[Band160..Band10] of K1EAMultiInfoRecord;
 
-  K5KA                                  : K5KAObject {= (AltDString: ''; State: KAIdle)};
-//  K5KAAltDString                        : Str20;
+  K5KA: K5KAObject {= (AltDString: ''; State: KAIdle)};
+  //  K5KAAltDString                        : Str20;
 
-  LastCQFrequency                       : LONGINT;
-  LastSPFrequency                       : LONGINT;
+  LastCQFrequency: LONGINT;
+  LastSPFrequency: LONGINT;
 
-  LastCQMode                            : ModeType {= CW};
-  LastSPMode                            : ModeType {= CW};
+  LastCQMode: ModeType {= CW};
+  LastSPMode: ModeType {= CW};
   //  LastDisplayableBandMapFrequency  : LONGINT; {KK1L: 6.64}
-  LastDisplayedBand                     : BandType = NoBand;
+  LastDisplayedBand: BandType = NoBand;
   //  LastDisplayedBandMapFrequency    : LONGINT; {KK1L: 6.64}
     //  LastDisplayedDate                     : Str20;
-  LastDisplayedFMMode                   : boolean;
-//  LastDisplayedFreq           : array[RadioType] of LONGINT; {KK1L: 6.73}
-  LastDisplayedMode                     : ModeType {= NoMode};
+  LastDisplayedFMMode: boolean;
+  //  LastDisplayedFreq           : array[RadioType] of LONGINT; {KK1L: 6.73}
+  LastDisplayedMode: ModeType {= NoMode};
   //  LastDisplayedTime                     : Str20;
   //  LastDisplayedHour                     : Str20;
-  LastEditedBandMapEntry                : integer;
-  LastFullTimeString                    : Str20;
-  LastSecond100                         : Word {= 0}; {KK1L: 6.71a Will store the hundredths of seconds since UpdateTimeAndRateDisplays }
+  LastEditedBandMapEntry: integer;
+  LastFullTimeString: Str20;
+  LastSecond100: Word {= 0};
+    {KK1L: 6.71a Will store the hundredths of seconds since UpdateTimeAndRateDisplays }
   {           was called. Used to support wicked fast radio checking               }
-  LastHeadingShown                      : integer;
-//  LastQTCTimeSent                  : Str20;
-//  LogConfigFileName           : string {Str80};
-//  LogFileName                           : string {40};
+  LastHeadingShown: integer;
+  //  LastQTCTimeSent                  : Str20;
+  //  LogConfigFileName           : string {Str80};
+  //  LogFileName                           : string {40};
 
-//  LogRestartFileName          : string;
-  LogSubTitle                           : Str40; {KK1L: 6.68 shortened from Str80}
+  //  LogRestartFileName          : string;
+  LogSubTitle: Str40; {KK1L: 6.68 shortened from Str80}
   //  LogTempFileName                       : string {Str40};
 
-  MaximumDisplayableRemainingMults      : Byte;
-  MaxNumberOfZones                      : integer;
-  MinutesSinceLastBMUpdate              : integer; {KK1L: 6.65}
+  MaximumDisplayableRemainingMults: Byte;
+  MaxNumberOfZones: integer;
+  MinutesSinceLastBMUpdate: integer; {KK1L: 6.65}
 
   //  ModeMemory                        : array[RadioType] of ModeType;
   //  MonoColors                        : ColorRecord;
   //  MouseEnable                       : boolean;
-  MultiInfoMessage                      : Str20;
-//  MultiStatus                           : array[BandType, ModeType] of MultiMessage;
-  MultipleBandsEnabled                  : boolean = True;
-  MultipleModesEnabled                  : boolean = True;
+  MultiInfoMessage: Str20;
+  //  MultiStatus                           : array[BandType, ModeType] of MultiMessage;
+  MultipleBandsEnabled: boolean = True;
+  MultipleModesEnabled: boolean = True;
 
-  MyCall                                : CallString;
-  DEPlusMyCall                          : Str160;
-  MyCheck                               : Str10; {KK1L: 6.67 Was Str20}
-  MultiplierItemWidth                   : integer = 40; // 4.91.4
-  MyContinent                           : ContinentType {= UnknownContinent};
-  MyCountry                             : Str20;
-  MyZone                                : Str20; //ZoneMultiplierString;
-  MyContinentIsSet                      : boolean;
-  MyCountryIsSet                        : boolean;
-  MyZoneIsSet                           : boolean;
+  MyCall: CallString;
+  DEPlusMyCall: Str160;
+  MyCheck: Str10; {KK1L: 6.67 Was Str20}
+  MultiplierItemWidth: integer = 40; // 4.91.4
+  MyContinent: ContinentType {= UnknownContinent};
+  MyCountry: Str20;
+  MyZone: Str20; //ZoneMultiplierString;
+  MyContinentIsSet: boolean;
+  MyCountryIsSet: boolean;
+  MyZoneIsSet: boolean;
 
-//  MyZoneCustom                          : ZoneMultiplierString;
+  //  MyZoneCustom                          : ZoneMultiplierString;
 
-  //MyCounty                              : Str20 = '';
-  MyFDClass                             : Str10;
-  MyFOCNumber                           : Str10;
-  MyName                                : Str20;
-  MyPark                                : Str10;
-  MyPostalCode                          : Str20;
-  MyPrec                                : Str10; {KK1L: 6.67 Was Str20}
-  MySection                             : Str10; {KK1L: 6.67 Was Str20}
-  MyState                               : Str20; {KK1L: 6.67 Was Str20}
+    //MyCounty                              : Str20 = '';
+  MyFDClass: Str10;
+  MyFOCNumber: Str10;
+  MyName: Str20;
+  MyPark: Str10;
+  MyPostalCode: Str20;
+  MyPrec: Str10; {KK1L: 6.67 Was Str20}
+  MySection: Str10; {KK1L: 6.67 Was Str20}
+  MyState: Str20; {KK1L: 6.67 Was Str20}
 
-  NoMultMarineMobile                    : boolean; {KK1L: 6.68 Added for WRTC 2002 as flag to not count /MM or /AM as mults or countries}
-  NumberBandMapEntries                  : integer; {KK1L: 6.64 needed a global version of NumberVisibleBMEntries}
+  NoMultMarineMobile: boolean;
+    {KK1L: 6.68 Added for WRTC 2002 as flag to not count /MM or /AM as mults or countries}
+  NumberBandMapEntries: integer;
+    {KK1L: 6.64 needed a global version of NumberVisibleBMEntries}
 
-  NumberBandQSOsThisMinute              : RateBandArrayType;
+  NumberBandQSOsThisMinute: RateBandArrayType;
 
-  NumberContactsThisMinute              : integer;
-  NumberExchangeTemplates               : SHORTINT;
-  NumberQSOPointsThisMinute             : integer;
+  NumberContactsThisMinute: integer;
+  NumberExchangeTemplates: SHORTINT;
+  NumberQSOPointsThisMinute: integer;
 
-  NextQTCToBeAdded                      : integer;
-//  NextQTCToBeSent                  : integer;
-  NumberQTCBooksSent                    : integer;
-  NumberQTCStations                     : integer;
+  NextQTCToBeAdded: integer;
+  //  NextQTCToBeSent                  : integer;
+  NumberQTCBooksSent: integer;
+  NumberQTCStations: integer;
 
-  NumberReminderRecords                 : Byte;
-  NumberTotalScoreMessages              : Byte;
+  NumberReminderRecords: Byte;
+  NumberTotalScoreMessages: Byte;
 
-  OkayToPutUpBandMapCall                : boolean = True;
-  OnDeckCall                            : CallString;
-  OpMode                                : OpModeType;
-  OpMode2                               : OpModeType;
+  OkayToPutUpBandMapCall: boolean = True;
+  OnDeckCall: CallString;
+  OpMode: OpModeType;
+  OpMode2: OpModeType;
 
-  PacketAddLF                           : boolean;
-  PacketMessMode                        : boolean;
-  PacketReturnCount                     : integer = 2;
-  PacketReturnPerMinute                 : integer;
-  PacketSpotComment                     : Str20; {KK1L: 6.68 Need to change when added to LOGCFG.DAT read.}
-//  PendingQTCArray                  : PendingQTCArrayPtr;
-  //  PrefixInfoFileName               : String='';
+  PacketAddLF: boolean;
+  PacketMessMode: boolean;
+  PacketReturnCount: integer = 2;
+  PacketReturnPerMinute: integer;
+  PacketSpotComment: Str20;
+    {KK1L: 6.68 Need to change when added to LOGCFG.DAT read.}
+  //  PendingQTCArray                  : PendingQTCArrayPtr;
+    //  PrefixInfoFileName               : String='';
 
-  QSOPointsDomesticCW                   : integer = -1;
-  QSOPointsDomesticPhone                : integer = -1;
-  QSOPointsDXCW                         : integer = -1;
-  QSOPointsDXPhone                      : integer = -1;
+  QSOPointsDomesticCW: integer = -1;
+  QSOPointsDomesticPhone: integer = -1;
+  QSOPointsDXCW: integer = -1;
+  QSOPointsDXPhone: integer = -1;
 
-  QSYInactiveRadio                      : boolean;        // Gav     4.37.12
-  QTCDataArray                          : QTCDataArrayPtr;
-  QTCsEnabled                           : boolean;
-  QTCMinutes                            : boolean;
+  QSYInactiveRadio: boolean; // Gav     4.37.12
+  QTCDataArray: QTCDataArrayPtr;
+  QTCsEnabled: boolean;
+  QTCMinutes: boolean;
 
-  RadioOnTheMove                        : array[RadioType] of boolean; {KK1L: 6.73 slowly changing over to arrayed radio varibles}
-  RadioMovingInBandMode                 : array[RadioType] of boolean; {KK1L: 6.73}
+  RadioOnTheMove: array[RadioType] of boolean;
+    {KK1L: 6.73 slowly changing over to arrayed radio varibles}
+  RadioMovingInBandMode: array[RadioType] of boolean; {KK1L: 6.73}
 
-//  RadioOneName                : string[10] = 'Rig 1';
-//  RadioTwoName                : string[10] = 'Rig 2';
+  //  RadioOneName                : string[10] = 'Rig 1';
+  //  RadioTwoName                : string[10] = 'Rig 2';
 
-  Rate                                  : integer;
-  RateDisplay                           : RateDisplayType {= QSOs};
-  RateMinuteArray                       : array[1..60] of RateRecord;
+  Rate: integer;
+  RateDisplay: RateDisplayType {= QSOs};
+  RateMinuteArray: array[1..60] of RateRecord;
   //   ReminderPostedCount             : integer;
-  Reminders                             : ReminderArrayPointer;
+  Reminders: ReminderArrayPointer;
 
- S2SW                                   : boolean = False;
+  S2SW: boolean = False;
 
-  SayHiEnable                           : boolean;
+  SayHiEnable: boolean;
 
-  SCPDupeBackground                     : tr4wColors = trCyan;
-  SCPDupeColor                          : tr4wColors = trRed;
+  SCPDupeBackground: tr4wColors = trCyan;
+  SCPDupeColor: tr4wColors = trRed;
 
-  ScreenHeight                          : integer;
-  SearchAndPounceMode                   : boolean;
-  SelectedColors                        : ColorRecord;
-  SendAltDSpotsToPacket                 : boolean;
-  SingleRadioMode                       : boolean;
-  SCount                                : integer = 0;
-  SpecialCommand                        : SpecialCommandType {= NoSpecialCommand};
-  SplitFreq                             : LONGINT;
-  Spotcnt                               : integer = 0;
-//  SpeedMemory                 : array[RadioType] of integer; {KK1L: 6.73}
-  SpeedString                           : Str10; {KK1L: 6.73}
+  ScreenHeight: integer;
+  SearchAndPounceMode: boolean;
+  SelectedColors: ColorRecord;
+  SendAltDSpotsToPacket: boolean;
+  SingleRadioMode: boolean;
+  SCount: integer = 0;
+  SpecialCommand: SpecialCommandType {= NoSpecialCommand};
+  SplitFreq: LONGINT;
+  Spotcnt: integer = 0;
+  //  SpeedMemory                 : array[RadioType] of integer; {KK1L: 6.73}
+  SpeedString: Str10; {KK1L: 6.73}
 
-  SprintQSYRule                         : boolean;
+  SprintQSYRule: boolean;
 
-  StartingFrequencies                   : array[BandType] of LONGINT =
+  StartingFrequencies: array[BandType] of LONGINT =
     (
     1800000,
     3500000,
@@ -813,41 +834,41 @@ var
 
   //  StoppingFrequencies                   : array[BandType] of LONGINT;
   //  SuperDupeSheet                        : boolean;
-  SuperDupeSheetWindowRY                : integer;
-  SwapPacketSpotRadios                  : boolean;
+  SuperDupeSheetWindowRY: integer;
+  SwapPacketSpotRadios: boolean;
 
-  TenMinuteRule                         : TenMinuteRuleType {= NoTenMinuteRule};
-  TenMinuteTime                         : TenMinuteTimeRecord = (Band: NoBand; Mode: NoMode);
-  TimeSpentByBand                       : array[BandType] of integer;
+  TenMinuteRule: TenMinuteRuleType {= NoTenMinuteRule};
+  TenMinuteTime: TenMinuteTimeRecord = (Band: NoBand; Mode: NoMode);
+  TimeSpentByBand: array[BandType] of integer;
 
-  tThisHourBandChanges                  : integer;
-  tThisHourPreviousBand                 : BandType {= NoBand};
-  TotalThisHour                         : integer;
-  TotalLastSixty                        : integer;
+  tThisHourBandChanges: integer;
+  tThisHourPreviousBand: BandType {= NoBand};
+  TotalThisHour: integer;
+  TotalLastSixty: integer;
 
-  TotalScoreMessages                    : array[0..10] of TotalScoreMessageRecord;
+  TotalScoreMessages: array[0..10] of TotalScoreMessageRecord;
   //  TRFree                                : boolean;
-  TwoRadioState                         : TwoRadioStates {= TwoRadiosDisabled};
-  TuneDupeCheckEnable                   : boolean; {KK1L: 6.73}
+  TwoRadioState: TwoRadioStates {= TwoRadiosDisabled};
+  TuneDupeCheckEnable: boolean; {KK1L: 6.73}
 
-  UnknownCountryFileEnable              : boolean;
-  UnknownCountryFileName                : ShortString {= 'UNKNOWN.CTY'};
-  UserInfoShown                         : UserInfoType {= NoUserInfo};
+  UnknownCountryFileEnable: boolean;
+  UnknownCountryFileName: ShortString {= 'UNKNOWN.CTY'};
+  UserInfoShown: UserInfoType {= NoUserInfo};
 
   //   VGADisplayEnable                : boolean;
-  VHFBandsEnabled                       : boolean;
-  VisibleDupeSheetChanged               : boolean = True;
+  VHFBandsEnabled: boolean;
+  VisibleDupeSheetChanged: boolean = True;
   //   VisibleDupesheetEnable          : boolean;
-  VisibleDupeSheetRemoved               : boolean;
+  VisibleDupeSheetRemoved: boolean;
 
-  WakeUpTimeOut                         : integer;
-  WakeUpCount                           : Byte;
-  WARCBandsEnabled                      : boolean;
-//  WideFreqDisplay                  : boolean; {KK1L: 6.73}
+  WakeUpTimeOut: integer;
+  WakeUpCount: Byte;
+  WARCBandsEnabled: boolean;
+  //  WideFreqDisplay                  : boolean; {KK1L: 6.73}
 
-  DisplayedFreq                         : Str10; {wli}
+  DisplayedFreq: Str10; {wli}
 
-  TourDuration                          : integer;
+  TourDuration: integer;
   //   tUpdateWindow                   : boolean;
 
 procedure ActivateExchangeWindow;
@@ -878,7 +899,8 @@ procedure AddBandMapPlaceHolder; {KK1L: 6.65}
 
 function BandMapExpandedString(Call: EightBytes): CallString;
 
-procedure CalculateNumberVisibleBandMapEntries(var NumberVisibleBandMapEntries: integer;
+procedure CalculateNumberVisibleBandMapEntries(var NumberVisibleBandMapEntries:
+  integer;
   var CursorEntryNumber: integer;
   StartAtTop: boolean);
 
@@ -908,7 +930,8 @@ procedure DisplayQSOsWithThisStation(QSOs: integer);
 //procedure DisplayEditableLog(EditableLog: LogEntryArray);
 //procedure DisplayFreeMemory;
 //procedure DisplayFrequency(Freq: LONGINT; Radio: RadioType); {KK1L: 6.73 Added Radio}
-procedure DisplayFrequency(RSR: RadioStatusRecord {Freq: LONGINT}; Radio: RadioType);
+procedure DisplayFrequency(RSR: RadioStatusRecord {Freq: LONGINT}; Radio:
+  RadioType);
 procedure DisplayInsertMode;
 procedure DisplayMultiMessages;
 procedure DisplayNameSent(Name: Str80);
@@ -928,7 +951,8 @@ procedure DisplayTotalScore {(Score: LONGINT)};
 procedure DisplayUserInfo(Call: CallString);
 
 {KK1L: 6.64 Created procedure because I needed to get this info more than once}
-procedure GetBandMapDisplayInfo(var MaxEntriesPerPage: integer; var NumberBandMapRows: integer);
+procedure GetBandMapDisplayInfo(var MaxEntriesPerPage: integer; var
+  NumberBandMapRows: integer);
 procedure GetBandMapBandModeFromFrequency(Frequency: LONGINT;
   var Band: BandType;
   var Mode: ModeType);
@@ -941,13 +965,16 @@ procedure IncrementTime(Count: integer);
 procedure tCalculateRate();
 procedure LoadBandMap;
 procedure LookForOnDeckCall(var ExchangeString: ShortString {Str80});
-procedure NextBandMapEntry ;
+procedure NextBandMapEntry;
 procedure BMFirst;
 function NextNonDupeEntryInBandMap(Band: BandType; Mode: ModeType): boolean;
-function NextMultiplierEntryInBandMap(Band: BandType; Mode: ModeType): boolean; {KK1L: 6.68}
+function NextMultiplierEntryInBandMap(Band: BandType; Mode: ModeType): boolean;
+  {KK1L: 6.68}
 {KK1L: 6.64 created to allow traversal of entrire displayed bandmap}
-function NextNonDupeEntryInDisplayedBandMap(Band: BandType; Mode: ModeType): boolean;
-function NextMultiplierEntryInDisplayedBandMap(Band: BandType; Mode: ModeType): boolean; {KK1L: 6.68}
+function NextNonDupeEntryInDisplayedBandMap(Band: BandType; Mode: ModeType):
+  boolean;
+function NextMultiplierEntryInDisplayedBandMap(Band: BandType; Mode: ModeType):
+  boolean; {KK1L: 6.68}
 
 procedure OutputQSOorMultStatusString(OutputString_Milt: ShortString {Str160});
 
@@ -962,10 +989,12 @@ procedure QuickDisplay(Prompt: PChar);
 
 procedure QuickDisplayError(Prompt: PChar);
 
-function QuickEditInteger(Prompt: PChar {str80}; MaxInputLength: integer): LONGINT;
+function QuickEditInteger(Prompt: PChar {str80}; MaxInputLength: integer):
+  LONGINT;
 function QuickEditFreq(Prompt: PChar {str80}; MaxInputLength: integer): LONGINT;
 function QuickEditReal(Prompt: PChar {str80}; MaxInputLength: integer): REAL;
-function QuickEditResponse(Prompt: PChar {str80}; MaxInputLength: Byte): ShortString;
+function QuickEditResponse(Prompt: PChar {str80}; MaxInputLength: Byte):
+  ShortString;
 
 //procedure RemoveAndRestorePreviousWindow;
 //procedure RemoveWindow(WindowName: WindowType);
@@ -979,15 +1008,16 @@ procedure SaveBandMap;
 procedure SetColor(Color: integer);
 //procedure SaveAndSetActiveWindow(WindowName: WindowType);
 //procedure SaveSetAndClearActiveWindow(WindowName: WindowType);
-procedure SetUpBandMapEntry(BandMapData: BandMapEntryPointer; Radio: RadioType); {KK1L: 6.73 Added Radio}
+procedure SetUpBandMapEntry(BandMapData: BandMapEntryPointer; Radio: RadioType);
+  {KK1L: 6.73 Added Radio}
 //procedure SetWindow(WindowName: WindowType);
 //procedure SetActiveWindow(WindowName: WindowType); { Does not clear window }
 {wli}
 
 //function TotalNumberQTCsProcessed: integer;
 var
-  TotalNumberQTCsProcessed              : integer;
-//function TotalPendingQTCs: integer;
+  TotalNumberQTCsProcessed: integer;
+  //function TotalPendingQTCs: integer;
 
 procedure UpdateBlinkingBandMapCall;
 
@@ -1032,13 +1062,13 @@ uses
 //  uStack,
   uNet,
   uMP3Recorder,
-//  uRemMults_DX,
-//  uRemMults_DOM,
-//  uRemMults_Zone,
+  //  uRemMults_DX,
+  //  uRemMults_DOM,
+  //  uRemMults_Zone,
   uStations,
   uSpots,
   uRemMults,
- // uReminder,
+  // uReminder,
   uFunctionKeys,
   LogPack,
   uTelnet,
@@ -1263,29 +1293,29 @@ type
   end;
 
 var
-  Band                                  : BandType;
-  Continent                             : ContinentType;
+  Band: BandType;
+  Continent: ContinentType;
 
-  DupeSheetWindowX                      : integer;
-  DupeSheetWindowY                      : integer;
+  DupeSheetWindowX: integer;
+  DupeSheetWindowY: integer;
 
-  NumberMinutesProgramRunning           : integer;
+  NumberMinutesProgramRunning: integer;
 
-//  Radio1InquireCount               : integer;
-//  Radio2InquireCount               : integer;
+  //  Radio1InquireCount               : integer;
+  //  Radio2InquireCount               : integer;
 
-//  Radio1PollCount                  : integer;
-//  Radio2PollCount                  : integer;
+  //  Radio1PollCount                  : integer;
+  //  Radio2PollCount                  : integer;
 
-  SavedWindowList                       : array[0..12] of SavedWindow;
+  SavedWindowList: array[0..12] of SavedWindow;
 
-  StartBand, StopBand                   : BandType;
-  StartMode, StopMode                   : ModeType;
+  StartBand, StopBand: BandType;
+  StartMode, StopMode: ModeType;
 
 procedure LookForOnDeckCall(var ExchangeString: ShortString {Str80});
 
 var
-  TempString, WordString                : Str40;
+  TempString, WordString: Str40;
 
 begin
   OnDeckCall := '';
@@ -1323,7 +1353,7 @@ end;
 function BandMapExpandedString(Call: EightBytes): CallString;
 
 var
-  TempString                            : CallString;
+  TempString: CallString;
 
 begin
   TempString := BigExpandedString(Call);
@@ -1334,19 +1364,20 @@ begin
   BandMapExpandedString := TempString;
 end;
 
-procedure DisplayFrequency(RSR: RadioStatusRecord {Freq: LONGINT}; Radio: RadioType); {KK1L: 6.73 Added Radio switch}
+procedure DisplayFrequency(RSR: RadioStatusRecord {Freq: LONGINT}; Radio:
+  RadioType); {KK1L: 6.73 Added Radio switch}
 
 var
-  TempFreq                              : REAL;
-  TempString                            : string[40];
-  ch                                    : Char;
+  TempFreq: REAL;
+  TempString: string[40];
+  ch: Char;
 
 begin
   ch := '.';
-//  if (RSR.Freq = LastDisplayedFreq[RadioOne]) and (Radio = RadioOne) then    Exit; {KK1L: 6.73 Added Radio}
-//  if (RSR.Freq = LastDisplayedFreq[RadioTwo]) and (Radio = RadioTwo) then    Exit; {KK1L: 6.73}
+  //  if (RSR.Freq = LastDisplayedFreq[RadioOne]) and (Radio = RadioOne) then    Exit; {KK1L: 6.73 Added Radio}
+  //  if (RSR.Freq = LastDisplayedFreq[RadioTwo]) and (Radio = RadioTwo) then    Exit; {KK1L: 6.73}
 
-//  LastDisplayedFreq[Radio] := RSR.Freq;
+  //  LastDisplayedFreq[Radio] := RSR.Freq;
 
   case Radio of {KK1L: 6.73}
     RadioOne:
@@ -1385,13 +1416,12 @@ begin
     TempString := '.';
     DisplayedFreq := IntToStr(RSR.Freq);
     Insert(TempString, DisplayedFreq, length(DisplayedFreq) - 0);
-      //   t.label10 . Caption := DisplayedFreq; // + ' kHz';
+    //   t.label10 . Caption := DisplayedFreq; // + ' kHz';
 //    length(IntToStr(RSR.Freq));
     FrequencyDisplayed := True;
   end
-  else
-    if FrequencyDisplayed then
-      FrequencyDisplayed := False;
+  else if FrequencyDisplayed then
+    FrequencyDisplayed := False;
 
 end;
 
@@ -1399,47 +1429,50 @@ procedure DispalyGrid(Grid: GridString);
 begin
   Grid[5] := #0;
   SetMainWindowText(mweLocator, @Grid[1]);
-//windows.CopyMemory(@TempBuffer1,
-{  asm
-  mov eax,Grid
-  mov dword ptr TempBuffer1,eax
-  end;
-  TempBuffer1[4] := #0;
-  Windows.SetWindowText(LocatorWindowHandle, @TempBuffer1);
-}
+  //windows.CopyMemory(@TempBuffer1,
+  {  asm
+    mov eax,Grid
+    mov dword ptr TempBuffer1,eax
+    end;
+    TempBuffer1[4] := #0;
+    Windows.SetWindowText(LocatorWindowHandle, @TempBuffer1);
+  }
 end;
 
 procedure DisplayBeamHeading(Call: CallString; Grid: GridString);
 
 var
-  Heading, Distance, Country            : integer;
-  HeadingString, DistanceString         : Str20;
-  HisGrid                               : GridString;
-  CountryID                             : DXMultiplierString; //string[CallstringLength] {20};
-  Lat, Lon                              : REAL;
-  TempString                            : Str40;
+  Heading, Distance, Country: integer;
+  HeadingString, DistanceString: Str20;
+  HisGrid: GridString;
+  CountryID: DXMultiplierString; //string[CallstringLength] {20};
+  Lat, Lon: REAL;
+  TempString: Str40;
 
 begin
   if MyGrid <> '' then
   begin
 
-    if Grid <> '' then HisGrid := Grid
+    if Grid <> '' then
+      HisGrid := Grid
     else
       HisGrid := ctyGetGrid(Call, CountryID);
 
-    if HisGrid = '' then Exit;
+    if HisGrid = '' then
+      Exit;
 
-    if tBeamHeadingPrevState = HisGrid then Exit;
+    if tBeamHeadingPrevState = HisGrid then
+      Exit;
     tBeamHeadingPrevState := HisGrid;
 
-//    tSetWindowText(LocatorWindowHandle, 'string(HisGrid)');
+    //    tSetWindowText(LocatorWindowHandle, 'string(HisGrid)');
     DispalyGrid(HisGrid);
     if Call = MyCall then
       GetLatLon(MyGrid, Lat, Lon)
     else
       GetLatLon(ctyGetGrid(Call, CountryID), Lat, Lon);
 
-      //       SaveSetAndClearActiveWindow (BeamHeadingWindow);
+    //       SaveSetAndClearActiveWindow (BeamHeadingWindow);
 
     if HisGrid <> '' then
     begin
@@ -1476,12 +1509,12 @@ begin
     else
       TempString := TC_UNKNOWNCOUNTRY;
 
-      //        WHILE Length (TempString) < (BeamHeadingWindowRX - BeamHeadingWindowLX) DO
-      //            TempString := ' ' + TempString;
+    //        WHILE Length (TempString) < (BeamHeadingWindowRX - BeamHeadingWindowLX) DO
+    //            TempString := ' ' + TempString;
 
     SetMainWindowText(mweBeamHeading, @TempString[1]);
-      //        Showmessage (TempString);
-      //        RestorePreviousWindow;
+    //        Showmessage (TempString);
+    //        RestorePreviousWindow;
   end;
 end;
 
@@ -1492,31 +1525,35 @@ begin
   //    TextColor (Color);
 end;
 
-
-
 procedure DisplayBandMode(Band: BandType; Mode: ModeType; UpdateRadio: boolean);
 begin
 
   if (Band = LastDisplayedBand) and
     (Mode = LastDisplayedMode)
-    //    and (FMMode = LastDisplayedFMMode)
-  then
+    {//    and (FMMode = LastDisplayedFMMode)} then
     Exit;
 
   LastDisplayedBand := Band;
-  LastDisplayedMode := Mode;  
+  LastDisplayedMode := Mode;
   //  LastDisplayedFMMode := FMMode;
 
   UpdateTotals2;
 
-  Format(wsprintfBuffer, TWO_STRINGS, BandStringsArray[Band], ModeStringArray[Mode]);
+  Format(wsprintfBuffer, TWO_STRINGS, BandStringsArray[Band],
+    ModeStringArray[Mode]);
 
   SetMainWindowText(mweBandMode, wsprintfBuffer);
 
-  if MultByBand then MultBand := ActiveBand else MultBand := AllBands;
-  if MultByMode then MultMode := ActiveMode else MultMode := Both;
+  if MultByBand then
+    MultBand := ActiveBand
+  else
+    MultBand := AllBands;
+  if MultByMode then
+    MultMode := ActiveMode
+  else
+    MultMode := Both;
 
-         { Update the band output port for this radio }
+  { Update the band output port for this radio }
 
   ActiveRadioPtr.BandMemory {BandMemory[ActiveRadio]} := Band; {UA4WLI: 2.26}
   ActiveRadioPtr.ModeMemory {ModeMemory[ActiveRadio]} := Mode; {UA4WLI: 2.26}
@@ -1526,12 +1563,14 @@ begin
   if ActiveRadio = RadioOne then
   begin
     Radio1.UpdateBandOutputInfo(Band, Mode);
-    if UpdateRadio then Radio1.SetRadioFreq(FreqMemory[Band, Mode], ActiveMode, 'A');
+    if UpdateRadio then
+      Radio1.SetRadioFreq(FreqMemory[Band, Mode], ActiveMode, 'A');
   end
   else
   begin
     Radio2.UpdateBandOutputInfo(Band, Mode);
-    if UpdateRadio then Radio2.SetRadioFreq(FreqMemory[Band, Mode], ActiveMode, 'A');
+    if UpdateRadio then
+      Radio2.SetRadioFreq(FreqMemory[Band, Mode], ActiveMode, 'A');
   end;
   UpdateAllStationsList;
   SendStationStatus(sstBandModeFreq);
@@ -1539,18 +1578,23 @@ end;
 
 procedure DisplayContestTitle;
 begin
-  Format(wsprintfBuffer, TR4W_CURRENTVERSION + ' - %s'{$IF tDebugMode} + ' - DEBUG MODE'{$IFEND}, @ContestTitle[1]);
+  Format(wsprintfBuffer, TR4W_CURRENTVERSION + ' - %s'{$IF tDebugMode} +
+    ' - DEBUG MODE'{$IFEND}, @ContestTitle[1]);
   Windows.SetWindowText(tr4whandle, wsprintfBuffer);
 end;
 
-procedure DisplayCodeSpeed {(WPM: integer; SendingEnabled: boolean; DVPEnabled: boolean; Mode: ModeType)};
+procedure DisplayCodeSpeed
+  {(WPM: integer; SendingEnabled: boolean; DVPEnabled: boolean; Mode: ModeType)};
 var
-  tPChar                                : PChar;
+  tPChar: PChar;
 begin
   DisplayedCodeSpeed := CodeSpeed;
   if ActiveMode = CW then
   begin
-    if CWEnable or CWEnabled {CWEnabled} then tPChar := '%u WPM' else tPChar := '%u NO CW';
+    if CWEnable or CWEnabled {CWEnabled} then
+      tPChar := '%u WPM'
+    else
+      tPChar := '%u NO CW';
     Format(wsprintfBuffer, tPChar, CodeSpeed);
     SetMainWindowText(mweCodeSpeed, wsprintfBuffer);
     ActiveRadioPtr.SpeedMemory := CodeSpeed;
@@ -1718,7 +1762,7 @@ end;
 
 procedure DisplayInsertMode;
 const
-  InsertModeStringArray                 : array[boolean] of PChar = (TC_OVERRIDE, TC_INSERT);
+  InsertModeStringArray: array[boolean] of PChar = (TC_OVERRIDE, TC_INSERT);
 begin
   SetMainWindowText(mweInsert, InsertModeStringArray[InsertMode]);
 end;
@@ -1726,28 +1770,29 @@ end;
 procedure DisplayNamePercentage({TotalNamesSent: integer; QSONumber: integer});
 
 var
-  Percentage                            : REAL;
-  TNS                                   : integer;
+  Percentage: REAL;
+  TNS: integer;
 begin
-{
-  if (TotalContacts > 0) and SayHiEnable then
-  begin
-    TNS := TotalNamesSent ;
-    Percentage := TNS / TotalContacts;
-    Percentage := Percentage * 100;
-      //    SaveSetAndClearActiveWindow(NamePercentageWindow);
-      //    SetTR4WWindowText(NameSentWindowHandle, IntToStr(Trunc(Percentage))+' %');
-      //    Write(' ', Percentage: 3: 1, '%');
-      //    RestorePreviousWindow;
-  end;
-}
+  {
+    if (TotalContacts > 0) and SayHiEnable then
+    begin
+      TNS := TotalNamesSent ;
+      Percentage := TNS / TotalContacts;
+      Percentage := Percentage * 100;
+        //    SaveSetAndClearActiveWindow(NamePercentageWindow);
+        //    SetTR4WWindowText(NameSentWindowHandle, IntToStr(Trunc(Percentage))+' %');
+        //    Write(' ', Percentage: 3: 1, '%');
+        //    RestorePreviousWindow;
+    end;
+  }
 end;
 
 procedure DisplayNextQSONumber;
 const
-  QSONumberStringArray                  : array[boolean] of PChar = ('%d', '*%d');   
+  QSONumberStringArray: array[boolean] of PChar = ('%d', '*%d');
 begin
-  Format(wsprintfBuffer, QSONumberStringArray[AutoQSONumberDecrement], TotalContacts + 1);
+  Format(wsprintfBuffer, QSONumberStringArray[AutoQSONumberDecrement],
+    TotalContacts + 1);
   if ServerSerialNumber <> 0 then
     if PreviousSerialNumberType = sntReserved then
       Windows.lstrcat(wsprintfBuffer, 'L');
@@ -1757,9 +1802,9 @@ end;
 procedure SortPossibleCalls(var PossibleCalls: PossibleCallRecord);
 
 var
-  Change                                : boolean;
-  Range, CallAddress                    : integer;
-  temp                                  : PossibleCallEntry;
+  Change: boolean;
+  Range, CallAddress: integer;
+  temp: PossibleCallEntry;
 
 begin
   Range := PossibleCalls.NumberPossibleCalls - 1;
@@ -1788,26 +1833,28 @@ end;
 
 procedure DisplayCountryName(Call: CallString);
 var
-  Country                               : Word;
+  Country: Word;
 begin
 
   Country := ctyGetCountry(Call);
   DisplayLocalTime(Country);
-  if tCountryNamePrevState = Country then Exit;
+  if tCountryNamePrevState = Country then
+    Exit;
   tCountryNamePrevState := Country;
   SetMainWindowText(mweCountryName, ctyGetCountryNamePchar(Country));
 end;
 
 procedure DisplayQSOsWithThisStation(QSOs: integer);
 var
-  p                                     : PChar;
+  p: PChar;
 begin
-//  if tQSOsWithThisStationPrevState = QSOs then Exit;
+  //  if tQSOsWithThisStationPrevState = QSOs then Exit;
   tQSOsWithThisStationPrevState := QSOs;
 
   if QSOs <> 0 then
     p := inttopchar(QSOs)
-  else p := nil;
+  else
+    p := nil;
   SetMainWindowText(mweQSOsWithThisStation, p);
 end;
 
@@ -1823,15 +1870,17 @@ begin
   Format(wsprintfBuffer, ' CQ: %u', tRestartInfo.riQSOByOpMode[CQOpMode]);
   SetMainWindowText(mweCQQSOCounter, wsprintfBuffer);
 
-  Format(wsprintfBuffer, ' SP: %u', tRestartInfo.riQSOByOpMode[SearchAndPounceOpMode]);
+  Format(wsprintfBuffer, ' SP: %u',
+    tRestartInfo.riQSOByOpMode[SearchAndPounceOpMode]);
   SetMainWindowText(mweSPQSOCounter, wsprintfBuffer);
 end;
 
 procedure DisplayHour;
 var
-  TempInteger                           : integer;
+  TempInteger: integer;
 begin
-  if AlarmSet then Exit;
+  if AlarmSet then
+    Exit;
   case HourDisplay of
     ThisHour:
       begin
@@ -1860,23 +1909,23 @@ begin
   if not AlarmSet then
   begin
 
-      {        REMOVECANDIDATE
-          case HourDisplay of
-            ThisHour:
-              begin
-                TempString := 'This hr = ' + IntToStr(TotalThisHour);
-                SendMessage(LastProgressBar, PBM_SETPOS, TotalThisHour, 0);
-              end;
-            LastSixtyMins:
-              begin
-                TempString := 'Last 60 = ' + IntToStr(TotalLastSixty);
-                SendMessage(LastProgressBar, PBM_SETPOS, TotalLastSixty, 0);
-              end;
-          end;
+    {        REMOVECANDIDATE
+        case HourDisplay of
+          ThisHour:
+            begin
+              TempString := 'This hr = ' + IntToStr(TotalThisHour);
+              SendMessage(LastProgressBar, PBM_SETPOS, TotalThisHour, 0);
+            end;
+          LastSixtyMins:
+            begin
+              TempString := 'Last 60 = ' + IntToStr(TotalLastSixty);
+              SendMessage(LastProgressBar, PBM_SETPOS, TotalLastSixty, 0);
+            end;
+        end;
 
-          tSetWindowText(HourRateWindowHandle, TempString);
-      }
-      //    tSetWindowText(RateWindowHandle, 'Rate = ' + IntToStr(Rate));
+        tSetWindowText(HourRateWindowHandle, TempString);
+    }
+    //    tSetWindowText(RateWindowHandle, 'Rate = ' + IntToStr(Rate));
 
     Format(wsprintfBuffer, TC_RATE, Rate);
 
@@ -1894,8 +1943,8 @@ end;
 procedure DisplayTotalScore {(Score: LONGINT)};
 
 var
-  i                                     : integer;
-  Score                                 : integer;
+  i: integer;
+  Score: integer;
 begin
 
   Score := TotalScore;
@@ -1914,17 +1963,17 @@ begin
       if TotalScoreMessages[i].Score < Score then
         if TotalScoreMessages[i].Score >= 0 then
         begin
-            //                  SaveSetAndClearActiveWindow (QuickCommandWindow);
+          //                  SaveSetAndClearActiveWindow (QuickCommandWindow);
 
 //          if WindowsOSversion = 2 then
 //            ShowTrayTips(TotalScoreMessages[i].MessageString)
 //          else
-         QuickDisplay(@TotalScoreMessages[i].MessageString[1]);
-            //          ShowAlarmWakeUpWindow(TotalScoreMessages[message].MessageString);
+          QuickDisplay(@TotalScoreMessages[i].MessageString[1]);
+          //          ShowAlarmWakeUpWindow(TotalScoreMessages[message].MessageString);
           DoABeep(Congrats);
 
           TotalScoreMessages[i].Score := -1;
-            //                  RestorePreviousWindow;
+          //                  RestorePreviousWindow;
         end;
 
 end;
@@ -1934,18 +1983,19 @@ begin
   SetTextInQuickCommandWindow(Prompt);
   logger.Info('[QuickDisplay] (' + Prompt + ')');
   if length(Prompt) > 0 then
-     begin
-     logger.Debug('Calling tCreateThread from QuickDisplay');
-     if tFlashQDThreadID = 0 then
-        begin
-        tCreateThread(@FlashQickDisplay, tFlashQDThreadID);
-        end;
-     if ClearQuickDisplayTimer <> 0 then
-        begin
-        Windows.KillTimer(tr4whandle, ClearQuickDisplayTimer);
-        end;
-     ClearQuickDisplayTimer := Windows.SetTimer(tr4whandle, QUICK_REPORT_TIMER_HANDLE, 30000, @ClearQuickDisplayText);
-     end;
+  begin
+    logger.Debug('Calling tCreateThread from QuickDisplay');
+    if tFlashQDThreadID = 0 then
+    begin
+      tCreateThread(@FlashQickDisplay, tFlashQDThreadID);
+    end;
+    if ClearQuickDisplayTimer <> 0 then
+    begin
+      Windows.KillTimer(tr4whandle, ClearQuickDisplayTimer);
+    end;
+    ClearQuickDisplayTimer := Windows.SetTimer(tr4whandle,
+      QUICK_REPORT_TIMER_HANDLE, 30000, @ClearQuickDisplayText);
+  end;
 end;
 
 procedure SetTextInQuickCommandWindow(Text: PChar);
@@ -1956,7 +2006,7 @@ end;
 procedure ClearQuickDisplayText;
 begin
   SetTextInQuickCommandWindow(nil);
-//  Windows.AnimateWindow(wh[mweQuickCommand], 500, AW_HIDE or AW_HOR_POSITIVE);
+  //  Windows.AnimateWindow(wh[mweQuickCommand], 500, AW_HIDE or AW_HOR_POSITIVE);
   Windows.KillTimer(tr4whandle, ClearQuickDisplayTimer);
   ClearQuickDisplayTimer := 0;
 end;
@@ -1969,8 +2019,8 @@ end;
 
 function QuickEditResponse(Prompt: PChar; MaxInputLength: Byte): ShortString;
 var
-  h                                     : HWND;
-  Window                                : Byte;
+  h: HWND;
+  Window: Byte;
 begin
   Format(IQPrompt, TC_ENTER, Prompt);
   IQMaxInputLength := MaxInputLength;
@@ -1985,7 +2035,8 @@ begin
   Result := IQresult;
 end;
 
-function QuickEditInteger(Prompt: PChar {str80}; MaxInputLength: integer): LONGINT;
+function QuickEditInteger(Prompt: PChar {str80}; MaxInputLength: integer):
+  LONGINT;
 
 { This function will put up the prompt specified and get the numeric input
   that is put in.  Only integers will be processed and if the number of
@@ -1994,9 +2045,9 @@ function QuickEditInteger(Prompt: PChar {str80}; MaxInputLength: integer): LONGI
   response will be -1.                                                }
 
 var
-  InputString                           : Str80;
-  InputValue                            : LONGINT;
-  Result1                               : integer;
+  InputString: Str80;
+  InputValue: LONGINT;
+  Result1: integer;
 begin
   tInputDialogInteger := True;
   QuickEditInteger := -1;
@@ -2005,7 +2056,8 @@ begin
   if InputString <> '' then
   begin
     Val(InputString, InputValue, Result1);
-    if Result1 = 0 then QuickEditInteger := InputValue;
+    if Result1 = 0 then
+      QuickEditInteger := InputValue;
   end;
 end;
 
@@ -2021,12 +2073,12 @@ function QuickEditFreq(Prompt: PChar {str80}; MaxInputLength: integer): LONGINT;
 {           and two radios are active. This is used to set the inactive radio.}
 
 var
-  InputString                           : Str80;
-  KHzString, HertzString                : Str20;
-  InputValue                            : LONGINT;
-  Result1                               : integer;
-//  Key                              : Char;
-  CTRLStr, TempStr                      : Str80; {KK1L: 6.73}
+  InputString: Str80;
+  KHzString, HertzString: Str20;
+  InputValue: LONGINT;
+  Result1: integer;
+  //  Key                              : Char;
+  CTRLStr, TempStr: Str80; {KK1L: 6.73}
 
 begin
   QuickEditFreq := -1;
@@ -2061,9 +2113,8 @@ begin
 
   if (CTRLStr = 'CTRL') and (Result1 = 0) then
     InputValue := InputValue * (-1) {KK1L: 6.73}
-  else
-    if Result1 <> 0 then
-      Exit;
+  else if Result1 <> 0 then
+    Exit;
 
   { This used to be all over LOGSUBS2, I moved it here }
 
@@ -2089,9 +2140,9 @@ function QuickEditReal(Prompt: PChar {str80}; MaxInputLength: integer): REAL;
   response will be -1.                                                }
 
 var
-  InputString                           : Str80;
-  Result1                               : integer;
-  InputValue                            : REAL;
+  InputString: Str80;
+  Result1: integer;
+  InputValue: REAL;
   //  Key                                   : Char;
 
 begin
@@ -2250,10 +2301,11 @@ procedure DecrementBandMapTimes;
 { Decrements all times by one.  Any that were at zero get deleted. }
 
 var
-  BandMapEntryRecord, EntryToBeDisposed, PreviousBandMapEntryRecord: BandMapEntryPointer;
-  MinutesLeft                           : Byte;
-  Band                                  : BandType;
-  Mode                                  : ModeType;
+  BandMapEntryRecord, EntryToBeDisposed, PreviousBandMapEntryRecord:
+    BandMapEntryPointer;
+  MinutesLeft: Byte;
+  Band: BandType;
+  Mode: ModeType;
 
 begin
   for Band := Band160 to Band2 do
@@ -2269,38 +2321,43 @@ begin
 
           if MinutesLeft = 0 then { Time to die }
           begin
-            if PreviousBandMapEntryRecord = nil then { This is the first one in list }
+            if PreviousBandMapEntryRecord = nil then
+              { This is the first one in list }
             begin
-              BandMapFirstEntryList[Band, Mode] := BandMapEntryRecord^.NextEntry;
+              BandMapFirstEntryList[Band, Mode] :=
+                BandMapEntryRecord^.NextEntry;
               Dispose(BandMapEntryRecord);
               BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
               Continue;
             end;
 
-                  { Wasn't the first record - change NextExtry of previous
-                    record to point to the NextEntry }
+            { Wasn't the first record - change NextExtry of previous
+              record to point to the NextEntry }
 
-            PreviousBandMapEntryRecord^.NextEntry := BandMapEntryRecord^.NextEntry;
+            PreviousBandMapEntryRecord^.NextEntry :=
+              BandMapEntryRecord^.NextEntry;
 
-                  { Free up the memory }
+            { Free up the memory }
 
             Dispose(BandMapEntryRecord);
 
-                  { We want to process the next band map entry next }
+            { We want to process the next band map entry next }
 
             BandMapEntryRecord := PreviousBandMapEntryRecord^.NextEntry;
             Continue;
           end;
 
-              { We aren't going to delete this entry - decrement the minute count }
+          { We aren't going to delete this entry - decrement the minute count }
 
           dec(MinutesLeft);
 
-          BandMapEntryRecord^.StatusByte := BandMapEntryRecord^.StatusByte and $C0;
-          BandMapEntryRecord^.StatusByte := BandMapEntryRecord^.StatusByte or MinutesLeft;
+          BandMapEntryRecord^.StatusByte := BandMapEntryRecord^.StatusByte and
+            $C0;
+          BandMapEntryRecord^.StatusByte := BandMapEntryRecord^.StatusByte or
+            MinutesLeft;
 
-              { Move to the next entry.  Remember the address of this entry in
-                case I need to link its NextEntry to a different place }
+          { Move to the next entry.  Remember the address of this entry in
+            case I need to link its NextEntry to a different place }
 
           PreviousBandMapEntryRecord := BandMapEntryRecord;
           BandMapEntryRecord := BandMapEntryRecord^.NextEntry;
@@ -2363,11 +2420,11 @@ label
   IgnoreRadioOneFreq, IgnoreRadioTwoFreq;
 
 var
-  DateString, DayString                 : Str20;
-  Hour, Minute, Second, Hundredths      : Word;
+  DateString, DayString: Str20;
+  Hour, Minute, Second, Hundredths: Word;
   AlarmInteger, RecordNumber, IntegerTime {, RateMinute}: integer;
-//  TempBand                              : BandType;
-  TempPchar                             : PChar;
+  //  TempBand                              : BandType;
+  TempPchar: PChar;
 begin
 
   if DoRadios then
@@ -2383,33 +2440,35 @@ begin
   begin
     SetMainWindowText(mweFullTime, GetFullTimeString(False));
 
-    if tElapsedTimeFromLastQSO <> 0 then tDispalyTimeFromLastQSO;
+    if tElapsedTimeFromLastQSO <> 0 then
+      tDispalyTimeFromLastQSO;
 
     if TenMinuteRule <> NoTenMinuteRule then
       TempPchar := ElaspedTimeString(TenMinuteTime.Time)
     else
       TempPchar := nil;
-//    Windows.SetWindowText(TenMinutsWindow, TempPchar);
+    //    Windows.SetWindowText(TenMinutsWindow, TempPchar);
     SetMainWindowText(mweTenMinuts, TempPchar);
   end;
 
   {reminder}
-  if UTC.wSecond = 1 then ShowTourDuration;
+  if UTC.wSecond = 1 then
+    ShowTourDuration;
 
   if UTC.wSecond = 0 then { See if new minute }
   begin
     inc(MinutesSinceLastBMUpdate); {KK1L: 6.65}
 
-      {if tDupesInteval > 0 then RefreshOZHRBandMap;}
-   if ActiveBand in [Band160..Band10] then
-         inc(TimeSpentByBand[ActiveBand]);
+    {if tDupesInteval > 0 then RefreshOZHRBandMap;}
+    if ActiveBand in [Band160..Band10] then
+      inc(TimeSpentByBand[ActiveBand]);
 
     AutoTimeQSOCount := 0;
-      {KK1L: 6.65 Added this check to allow for > 63 minute BM decay}
+    {KK1L: 6.65 Added this check to allow for > 63 minute BM decay}
     if MinutesSinceLastBMUpdate >= BandMapDecayMultiplier then
     begin
       MinutesSinceLastBMUpdate := 0;
-          //DecrementBandMapTimes;
+      //DecrementBandMapTimes;
       SpotsList.DecrementSpotsTimes;
       DisplayBandMap;
     end;
@@ -2446,9 +2505,9 @@ begin
               DoABeep(WakeUp)
             else
               DoABeep(Congrats);
-//            if WindowsOSversion = 2 then
-//              ShowTrayTips(Reminders^[RecordNumber].RemMessage)
-//            else
+            //            if WindowsOSversion = 2 then
+            //              ShowTrayTips(Reminders^[RecordNumber].RemMessage)
+            //            else
             QuickDisplay(@Reminders^[RecordNumber].RemMessage[1]);
           end;
     end;
@@ -2459,7 +2518,7 @@ begin
 
       if AlarmInteger = GetIntegerTime then
       begin
-              //{WLI}                WakeUp;
+        //{WLI}                WakeUp;
         AlarmMinute := AlarmMinute + 4;
 
         if AlarmMinute > 59 then
@@ -2473,7 +2532,7 @@ begin
 
       if (Hour = AlarmHour) and (Minute = AlarmMinute) then
       begin
-              //{WLI}                WakeUp;
+        //{WLI}                WakeUp;
         AlarmMinute := AlarmMinute + 4;
 
         if AlarmMinute > 59 then
@@ -2495,117 +2554,120 @@ begin
     else
       WakeUpCount := 0;
     tCalculateRate();
-{
-//       Fix up the rate array. First, shuffle the minutes
+    {
+    //       Fix up the rate array. First, shuffle the minutes
 
-    for RateMinute := 60 downto 2 do
-    begin
-      RateMinuteArray[RateMinute].TotalQSOs := RateMinuteArray[RateMinute - 1].TotalQSOs;
-      RateMinuteArray[RateMinute].TotalPoints := RateMinuteArray[RateMinute - 1].TotalPoints;
-      RateMinuteArray[RateMinute].BandQSOs := RateMinuteArray[RateMinute - 1].BandQSOs;
-    end;
+        for RateMinute := 60 downto 2 do
+        begin
+          RateMinuteArray[RateMinute].TotalQSOs := RateMinuteArray[RateMinute - 1].TotalQSOs;
+          RateMinuteArray[RateMinute].TotalPoints := RateMinuteArray[RateMinute - 1].TotalPoints;
+          RateMinuteArray[RateMinute].BandQSOs := RateMinuteArray[RateMinute - 1].BandQSOs;
+        end;
 
-//       Put new values on top
+    //       Put new values on top
 
-    RateMinuteArray[1].TotalQSOs := NumberContactsThisMinute;
-    RateMinuteArray[1].TotalPoints := NumberQSOPointsThisMinute;
-    RateMinuteArray[1].BandQSOs := NumberBandQSOsThisMinute;
+        RateMinuteArray[1].TotalQSOs := NumberContactsThisMinute;
+        RateMinuteArray[1].TotalPoints := NumberQSOPointsThisMinute;
+        RateMinuteArray[1].BandQSOs := NumberBandQSOsThisMinute;
 
-//       Compute rate = # QSOs or points in last 10 minutes
+    //       Compute rate = # QSOs or points in last 10 minutes
 
-    Rate := 0;
-
-    for RateMinute := 1 to 10 do
-      case RateDisplay of
-        QSOs: Rate := Rate + RateMinuteArray[RateMinute].TotalQSOs;
-        Points: Rate := Rate + RateMinuteArray[RateMinute].TotalPoints;
-        BandQSOs: if ActiveBand in [Band160..Band10] then Rate := Rate + RateMinuteArray[RateMinute].BandQSOs[ActiveBand];
-      end;
-
-//       Compute last sixty minute totals
-
-    TotalLastSixty := 0;
-
-    for RateMinute := 1 to 60 do
-      case RateDisplay of
-        QSOs: TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].TotalQSOs;
-        Points: TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].TotalPoints;
-        BandQSOs: if ActiveBand in [Band160..Band10] then TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].BandQSOs[ActiveBand];
-      end;
-
-    case RateDisplay of
-      QSOs: TotalThisHour := TotalThisHour + NumberContactsThisMinute;
-      Points: TotalThisHour := TotalThisHour + NumberQSOPointsThisMinute;
-      if tworadiomode then
-      BandQSOs: if ActiveBand in [Band160..Band10] then TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand] + NumberBandQSOsThisMinute[InActiveBand]  // n4af 4.41.2
-      else
-     BandQSOs: if ActiveBand in [Band160..Band10] then TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand] ;
-    end;
-
-//       Zero out minute totals
-
-    NumberContactsThisMinute := 0;
-    NumberQSOPointsThisMinute := 0;
-
-    for TempBand := Band160 to Band10 do NumberBandQSOsThisMinute[TempBand] := 0;
-
-//       Compute rate
-
-    if NumberMinutesProgramRunning >= 10 then
-      Rate := Rate * 6
-    else
-    begin
-      inc(NumberMinutesProgramRunning);
-
-      if NumberMinutesProgramRunning > 0 then
-        Rate := round(Rate * (60 / NumberMinutesProgramRunning))
-      else
         Rate := 0;
-    end;
 
-//          if HourString <> LastDisplayedHour then
-//          begin
-//            TotalThisHour := 0;
-//            LastDisplayedHour := HourString;
-//          end;
+        for RateMinute := 1 to 10 do
+          case RateDisplay of
+            QSOs: Rate := Rate + RateMinuteArray[RateMinute].TotalQSOs;
+            Points: Rate := Rate + RateMinuteArray[RateMinute].TotalPoints;
+            BandQSOs: if ActiveBand in [Band160..Band10] then Rate := Rate + RateMinuteArray[RateMinute].BandQSOs[ActiveBand];
+          end;
 
-    DisplayRate(Rate);
-}
-//          if (Packet.PacketSerialPort <> NoPort) and (PacketReturnPerMinute <> 0) then
-//          begin
-//            Dec(PacketReturnCount);
+    //       Compute last sixty minute totals
 
-//            if PacketReturnCount = 0 then
-//            begin
-//              CPUKeyer.AddSerialPortCharacter(Packet.PacketSerialPort, CarriageReturn);
-//              QuickDisplay('Carriage return sent to packet port.  (per PACKET RETURN PER MINUTE)');
-//              PacketReturnCount := PacketReturnPerMinute;
-//            end;
-//          end;
+        TotalLastSixty := 0;
+
+        for RateMinute := 1 to 60 do
+          case RateDisplay of
+            QSOs: TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].TotalQSOs;
+            Points: TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].TotalPoints;
+            BandQSOs: if ActiveBand in [Band160..Band10] then TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].BandQSOs[ActiveBand];
+          end;
+
+        case RateDisplay of
+          QSOs: TotalThisHour := TotalThisHour + NumberContactsThisMinute;
+          Points: TotalThisHour := TotalThisHour + NumberQSOPointsThisMinute;
+          if tworadiomode then
+          BandQSOs: if ActiveBand in [Band160..Band10] then TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand] + NumberBandQSOsThisMinute[InActiveBand]  // n4af 4.41.2
+          else
+         BandQSOs: if ActiveBand in [Band160..Band10] then TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand] ;
+        end;
+
+    //       Zero out minute totals
+
+        NumberContactsThisMinute := 0;
+        NumberQSOPointsThisMinute := 0;
+
+        for TempBand := Band160 to Band10 do NumberBandQSOsThisMinute[TempBand] := 0;
+
+    //       Compute rate
+
+        if NumberMinutesProgramRunning >= 10 then
+          Rate := Rate * 6
+        else
+        begin
+          inc(NumberMinutesProgramRunning);
+
+          if NumberMinutesProgramRunning > 0 then
+            Rate := round(Rate * (60 / NumberMinutesProgramRunning))
+          else
+            Rate := 0;
+        end;
+
+    //          if HourString <> LastDisplayedHour then
+    //          begin
+    //            TotalThisHour := 0;
+    //            LastDisplayedHour := HourString;
+    //          end;
+
+        DisplayRate(Rate);
+    }
+    //          if (Packet.PacketSerialPort <> NoPort) and (PacketReturnPerMinute <> 0) then
+    //          begin
+    //            Dec(PacketReturnCount);
+
+    //            if PacketReturnCount = 0 then
+    //            begin
+    //              CPUKeyer.AddSerialPortCharacter(Packet.PacketSerialPort, CarriageReturn);
+    //              QuickDisplay('Carriage return sent to packet port.  (per PACKET RETURN PER MINUTE)');
+    //              PacketReturnCount := PacketReturnPerMinute;
+    //            end;
+    //          end;
   end;
 end;
 
 procedure tCalculateRate();
 var
-  RateMinute                            : integer;
-  TempBand                              : BandType;
+  RateMinute: integer;
+  TempBand: BandType;
 begin
-//       Fix up the rate array. First, shuffle the minutes
+  //       Fix up the rate array. First, shuffle the minutes
 
   for RateMinute := 60 downto 2 do
   begin
-    RateMinuteArray[RateMinute].TotalQSOs := RateMinuteArray[RateMinute - 1].TotalQSOs;
-    RateMinuteArray[RateMinute].TotalPoints := RateMinuteArray[RateMinute - 1].TotalPoints;
-    RateMinuteArray[RateMinute].BandQSOs := RateMinuteArray[RateMinute - 1].BandQSOs;
+    RateMinuteArray[RateMinute].TotalQSOs := RateMinuteArray[RateMinute -
+      1].TotalQSOs;
+    RateMinuteArray[RateMinute].TotalPoints := RateMinuteArray[RateMinute -
+      1].TotalPoints;
+    RateMinuteArray[RateMinute].BandQSOs := RateMinuteArray[RateMinute -
+      1].BandQSOs;
   end;
 
-//       Put new values on top
+  //       Put new values on top
 
   RateMinuteArray[1].TotalQSOs := NumberContactsThisMinute;
   RateMinuteArray[1].TotalPoints := NumberQSOPointsThisMinute;
   RateMinuteArray[1].BandQSOs := NumberBandQSOsThisMinute;
 
-//       Compute rate = # QSOs or points in last 10 minutes
+  //       Compute rate = # QSOs or points in last 10 minutes
 
   Rate := 0;
 
@@ -2613,33 +2675,42 @@ begin
     case RateDisplay of
       QSOs: Rate := Rate + RateMinuteArray[RateMinute].TotalQSOs;
       Points: Rate := Rate + RateMinuteArray[RateMinute].TotalPoints;
-      BandQSOs: if ActiveBand in [Band160..Band10] then Rate := Rate + RateMinuteArray[RateMinute].BandQSOs[ActiveBand] +  RateMinuteArray[RateMinute].BandQSOs[InactiveRadioPtr.BandMemory];  // n4af 4.76.4
+      BandQSOs: if ActiveBand in [Band160..Band10] then
+          Rate := Rate + RateMinuteArray[RateMinute].BandQSOs[ActiveBand] +
+            RateMinuteArray[RateMinute].BandQSOs[InactiveRadioPtr.BandMemory];
+            // n4af 4.76.4
     end;
 
-//       Compute last sixty minute totals
+  //       Compute last sixty minute totals
 
   TotalLastSixty := 0;
 
   for RateMinute := 1 to 60 do
     case RateDisplay of
-      QSOs: TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].TotalQSOs;
-      Points: TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].TotalPoints;
-      BandQSOs: if ActiveBand in [Band160..Band10] then TotalLastSixty := TotalLastSixty + RateMinuteArray[RateMinute].BandQSOs[ActiveBand];
+      QSOs: TotalLastSixty := TotalLastSixty +
+        RateMinuteArray[RateMinute].TotalQSOs;
+      Points: TotalLastSixty := TotalLastSixty +
+        RateMinuteArray[RateMinute].TotalPoints;
+      BandQSOs: if ActiveBand in [Band160..Band10] then
+          TotalLastSixty := TotalLastSixty +
+            RateMinuteArray[RateMinute].BandQSOs[ActiveBand];
     end;
 
   case RateDisplay of
     QSOs: TotalThisHour := TotalThisHour + NumberContactsThisMinute;
     Points: TotalThisHour := TotalThisHour + NumberQSOPointsThisMinute;
-    BandQSOs: if ActiveBand in [Band160..Band10] then TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand];
+    BandQSOs: if ActiveBand in [Band160..Band10] then
+        TotalThisHour := TotalThisHour + NumberBandQSOsThisMinute[ActiveBand];
   end;
 
-//       Zero out minute totals
+  //       Zero out minute totals
 
   NumberContactsThisMinute := 0;
   NumberQSOPointsThisMinute := 0;
-  for TempBand := Band160 to Band10 do NumberBandQSOsThisMinute[TempBand] := 0;
+  for TempBand := Band160 to Band10 do
+    NumberBandQSOsThisMinute[TempBand] := 0;
 
-//       Compute rate
+  //       Compute rate
 
   if NumberMinutesProgramRunning >= 10 then
     Rate := Rate * 6
@@ -2654,42 +2725,42 @@ begin
   end;
   DisplayHour;
   DisplayRate(Rate);
-end;                          
+end;
 
 procedure IncrementTime(Count: integer);
 
 var
-  LoopCount                             : integer;
-  Hours, Minutes, Seconds, Hundredths   : Word;
-  Year, Month, Day, DayOfWeek           : Word;
+  LoopCount: integer;
+  Hours, Minutes, Seconds, Hundredths: Word;
+  Year, Month, Day, DayOfWeek: Word;
 
 begin
   AutoTimeQSOCount := 0;
   IncSystemTime(UTC, 60 * 1000 * Count);
   UTC.wSecond := 0;
-{
-  GetTime(Hours, Minutes, Seconds, Hundredths);
-  Minutes := Minutes + Count;
+  {
+    GetTime(Hours, Minutes, Seconds, Hundredths);
+    Minutes := Minutes + Count;
 
-  if Minutes > 59 then
-  begin
-    Minutes := Minutes - 60;
-    inc(Hours);
-
-    if Hours > 23 then
+    if Minutes > 59 then
     begin
-      Hours := Hours - 24;
-      GetDate(Year, Month, Day, DayOfWeek);
-      inc(Day);
-          //WLI            SetDate (Year, Month, Day);
+      Minutes := Minutes - 60;
+      inc(Hours);
+
+      if Hours > 23 then
+      begin
+        Hours := Hours - 24;
+        GetDate(Year, Month, Day, DayOfWeek);
+        inc(Day);
+            //WLI            SetDate (Year, Month, Day);
+      end;
     end;
-  end;
-}
-  //WLI    SetTime (Hours, Minutes, 0, 0);
-//  LastDisplayedTime := '';
-//  LastDisplayedDate := '';
+  }
+    //WLI    SetTime (Hours, Minutes, 0, 0);
+  //  LastDisplayedTime := '';
+  //  LastDisplayedDate := '';
   SystemTimeChanging;
-//  UpdateTimeAndRateDisplays(True, False);
+  //  UpdateTimeAndRateDisplays(True, False);
 end;
 
 procedure ClearAutoSendDisplay;
@@ -2703,12 +2774,13 @@ end;
 
 procedure DisplayAutoSendCharacterCount;
 var
-  h                                     : HWND;
-  nCmdShow                              : integer;
+  h: HWND;
+  nCmdShow: integer;
 begin
 
   h := wh[mweAutoSendCount];
-  if (AutoSendCharacterCount > 0) and AutoSendEnable and (ActiveMode = CW) and not SearchAndPounceMode then
+  if (AutoSendCharacterCount > 0) and AutoSendEnable and (ActiveMode = CW) and
+    not SearchAndPounceMode then
   begin
     nCmdShow := SW_SHOW;
     tSetWindowLeft(h, (AutoSendCharacterCount - 1) * ws2 * 3 + ws * 15 {col4});
@@ -2722,12 +2794,13 @@ procedure DeleteBandMapEntry(var Entry: BandMapEntryPointer);
 
 var
   BandMapEntryRecord, PreviousBandEntryRecord: BandMapEntryPointer;
-  CompressedDeleteCall                  : EightBytes;
-  {  StartBand, StopBand, }Band         : BandType;
-  {  StartMode, StopMode, }Mode         : ModeType;
+  CompressedDeleteCall: EightBytes;
+  {  StartBand, StopBand, }Band: BandType;
+  {  StartMode, StopMode, }Mode: ModeType;
 
 begin
-  if not BandMapEnable then Exit;
+  if not BandMapEnable then
+    Exit;
   tSetStartStopBandMode;
 
   for Band := StartBand to StopBand do
@@ -2735,7 +2808,8 @@ begin
     begin
 
       if (not WARCBandsEnabled) and
-        ({(Band = Band60) or} (Band = Band30) or (Band = Band17) or (Band = Band12)) then
+        ({(Band = Band60) or}(Band = Band30) or (Band = Band17) or (Band =
+          Band12)) then
         Continue; {KK1L: 6.64 Keep band map within contest limits}
 
       PreviousBandEntryRecord := nil;
@@ -2743,27 +2817,30 @@ begin
 
       while BandMapEntryRecord <> nil do
       begin
-        if BigCompressedCallsAreEqual(Entry^.Call, BandMapEntryRecord^.Call) then
-          if Abs(Entry^.Frequency - BandMapEntryRecord^.Frequency) <= BandMapGuardBand then
+        if BigCompressedCallsAreEqual(Entry^.Call, BandMapEntryRecord^.Call)
+          then
+          if Abs(Entry^.Frequency - BandMapEntryRecord^.Frequency) <=
+            BandMapGuardBand then
           begin
 
-                  { We have found the entry to delete }
+            { We have found the entry to delete }
 
             if PreviousBandEntryRecord = nil then { This is the first entry }
             begin
-              BandMapFirstEntryList[Band, Mode] := BandMapEntryRecord^.NextEntry;
+              BandMapFirstEntryList[Band, Mode] :=
+                BandMapEntryRecord^.NextEntry;
               Entry := BandMapEntryRecord^.NextEntry;
               Dispose(BandMapEntryRecord);
               Exit;
             end;
 
-                  { Not the first record }
+            { Not the first record }
 
             PreviousBandEntryRecord^.NextEntry := BandMapEntryRecord^.NextEntry;
             Entry := BandMapEntryRecord^.NextEntry;
 
-                  { Was it the last one?  If so, make the active entry
-                    the previous record }
+            { Was it the last one?  If so, make the active entry
+              the previous record }
 
             if Entry = nil then
               Entry := PreviousBandEntryRecord;
@@ -2777,7 +2854,8 @@ begin
     end;
 end;
 
-procedure SetUpBandMapEntry(BandMapData: BandMapEntryPointer; Radio: RadioType); {KK1L: 6.73 Added Radio}
+procedure SetUpBandMapEntry(BandMapData: BandMapEntryPointer; Radio: RadioType);
+  {KK1L: 6.73 Added Radio}
 
 {KK1L: 6.64 Added sense of mode from frequency so radio would be set to mode}
 {      when bandmapentry is selected}
@@ -2785,12 +2863,13 @@ procedure SetUpBandMapEntry(BandMapData: BandMapEntryPointer; Radio: RadioType);
 {KK1L: 6.64 Added QSXOffset scaling to make range within INTEGER}
 
 var
-  EntryBand                             : BandType;
-  EntryMode                             : ModeType;
-  QSXOffsetInHertz                      : LONGINT;
-  TempCallsign                          : Str20;
+  EntryBand: BandType;
+  EntryMode: ModeType;
+  QSXOffsetInHertz: LONGINT;
+  TempCallsign: Str20;
 begin
-  if BandMapData = nil then Exit;
+  if BandMapData = nil then
+    Exit;
   BandMapCursorData := BandMapData;
 
   with BandMapData^ do
@@ -2798,36 +2877,39 @@ begin
     begin
       GetBandMapBandModeFromFrequency(Frequency, EntryBand, EntryMode);
 
-        //      ClearCallWindowAtSPMove := false;
+      //      ClearCallWindowAtSPMove := false;
       if QSXOffset <> 0 then
       begin
-            {KK1L: 6.64 Scaling added to keep offset within INTEGER range.}
-            {QSXOffsetInHertz := QSXOffset * 10;}
-            {KK1L: 6.64 Not needed. Only LONGINT seems to work as QSXOffset type}
+        {KK1L: 6.64 Scaling added to keep offset within INTEGER range.}
+        {QSXOffsetInHertz := QSXOffset * 10;}
+        {KK1L: 6.64 Not needed. Only LONGINT seems to work as QSXOffset type}
         QSXOffsetInHertz := QSXOffset;
-            {KK1L: 6.64 Trying to add resonable functionality to split stuff}
+        {KK1L: 6.64 Trying to add resonable functionality to split stuff}
         case BandMapSplitMode of
           ByCutoffFrequency:
             begin
-                  {KK1L: 6.71 moved ahead of 'A' because for TS850 need to make B active to change mode}
-              SetRadioFreq(Radio, {wli Frequency +} QSXOffsetInHertz, EntryMode, 'B');
+              {KK1L: 6.71 moved ahead of 'A' because for TS850 need to make B active to change mode}
+              SetRadioFreq(Radio, {wli Frequency +}QSXOffsetInHertz, EntryMode,
+                'B');
               SetRadioFreq(Radio, Frequency, EntryMode, 'A');
             end;
           AlwaysPhone:
             begin
-                  {KK1L: 6.71 moved ahead of 'A' because for TS850 need to make B active to change mode}
-              SetRadioFreq(Radio, {wli Frequency +} QSXOffsetInHertz, Phone, 'B');
+              {KK1L: 6.71 moved ahead of 'A' because for TS850 need to make B active to change mode}
+              SetRadioFreq(Radio, {wli Frequency +}QSXOffsetInHertz, Phone,
+                'B');
               SetRadioFreq(Radio, Frequency, Phone, 'A');
             end;
         end;
-        PutRadioIntoSplit(Radio); {KK1L: 6.71 Moved here from before case for TS850 change}
+        PutRadioIntoSplit(Radio);
+          {KK1L: 6.71 Moved here from before case for TS850 change}
       end
       else {KK1L: 6.64 Takes radio back out of split if not required for next entry}
       begin
         SetRadioFreq(Radio, Frequency, EntryMode, 'A');
         PutRadioOutOfSplit(Radio);
       end;
-        {wli}
+      {wli}
 //      Escape_proc;
 //      SetOpMode(SearchAndPounceOpMode);
       CallAlreadySent := False;
@@ -2845,38 +2927,39 @@ begin
         if Copy(TempCallsign, 1, 3) <> 'NEW' then
           tSetWindowText(wh[mweCall], TempCallsign);
       end;
-        //      Frm.CallWindow . SetFocus;
+      //      Frm.CallWindow . SetFocus;
       tCallWindowSetFocus;
-        //        SendMessage(CallWindowHandle, EM_SETSEL, 16, 16);
+      //        SendMessage(CallWindowHandle, EM_SETSEL, 16, 16);
       PlaceCaretToTheEnd(wh[mweCall]);
       DisplayCountryName(CallWindowString);
       DisplayBeamHeading(CallWindowString, '');
 
-        //        DispalayB4; //???????
+      //        DispalayB4; //???????
 
       if Contest <> GENERALQSO then
       begin
         VisibleLog.ShowMultiplierStatus(@CallWindowString);
         VisibleLog.ShowQSOStatus(@CallWindowString);
       end;
-        //      FRM.CallWindowChange(nil);
-        //      CallAlreadySent := False;
+      //      FRM.CallWindowChange(nil);
+      //      CallAlreadySent := False;
 
     end;
 end;
 
-function NextNonDupeEntryInDisplayedBandMap(Band: BandType; Mode: ModeType): boolean;
+function NextNonDupeEntryInDisplayedBandMap(Band: BandType; Mode: ModeType):
+  boolean;
 
 { Data will be in BandMapCursorData record }
 {KK1L: 6.64 Added to allow stepping through the displayed bandmap rather than just in}
 {      current band and mode.}
 
 var
-  BandMapEntryRecord                    : BandMapEntryPointer;
-  Callsign                              : CallString;
+  BandMapEntryRecord: BandMapEntryPointer;
+  Callsign: CallString;
   //  StartBand, StopBand              : BandType;
   //  StartMode, StopMode              : ModeType;
-  RadioToUse                            : RadioType; {KK1L: 6.73}
+  RadioToUse: RadioType; {KK1L: 6.73}
 
 begin
   NextNonDupeEntryInDisplayedBandMap := False;
@@ -2922,7 +3005,8 @@ begin
     begin
 
       if (not WARCBandsEnabled) and
-        ({(Band = Band60) or} (Band =Band30) or (Band = Band17) or (Band = Band12)) then
+        ({(Band = Band60) or}(Band = Band30) or (Band = Band17) or (Band =
+          Band12)) then
         Continue; {KK1L: 6.64 Keep band map within contest limits}
 
       BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
@@ -2930,7 +3014,7 @@ begin
       while BandMapEntryRecord <> nil do
       begin
         Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
-            {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
+        {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
 //       if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
 //        if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
         if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
@@ -2971,18 +3055,19 @@ end;
 
 {KK1L: 6.68}
 
-function NextMultiplierEntryInDisplayedBandMap(Band: BandType; Mode: ModeType): boolean;
+function NextMultiplierEntryInDisplayedBandMap(Band: BandType; Mode: ModeType):
+  boolean;
 
 { Data will be in BandMapCursorData record }
 {KK1L: 6.68 Added to allow stepping through the displayed bandmap rather than just in}
 {      current band and mode.}
 
 var
-  BandMapEntryRecord                    : BandMapEntryPointer;
-  Callsign                              : CallString;
+  BandMapEntryRecord: BandMapEntryPointer;
+  Callsign: CallString;
   //  StartBand, StopBand              : BandType;
   //  StartMode, StopMode              : ModeType;
-  RadioToUse                            : RadioType; {KK1L: 6.73}
+  RadioToUse: RadioType; {KK1L: 6.73}
 
 begin
   NextMultiplierEntryInDisplayedBandMap := False;
@@ -3028,7 +3113,8 @@ begin
     begin
 
       if (not WARCBandsEnabled) and
-        ({(Band = Band60) or }(Band = Band30) or (Band = Band17) or (Band = Band12)) then
+        ({(Band = Band60) or }(Band = Band30) or (Band = Band17) or (Band =
+          Band12)) then
         Continue; {KK1L: 6.64 Keep band map within contest limits}
 
       BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
@@ -3036,7 +3122,7 @@ begin
       while BandMapEntryRecord <> nil do
       begin
         Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
-            {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
+        {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
 //????????        if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
 //????????          if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
         if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
@@ -3079,9 +3165,9 @@ function NextNonDupeEntryInBandMap(Band: BandType; Mode: ModeType): boolean;
 
 { Data will be in BandMapCursorData record }
 var
-  BandMapEntryRecord                    : BandMapEntryPointer;
-  Callsign                              : CallString;
-  RadioToUse                            : RadioType; {KK1L: 6.73}
+  BandMapEntryRecord: BandMapEntryPointer;
+  Callsign: CallString;
+  RadioToUse: RadioType; {KK1L: 6.73}
 
 begin
   NextNonDupeEntryInBandMap := False;
@@ -3101,7 +3187,7 @@ begin
   while BandMapEntryRecord <> nil do
   begin
     Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
-      {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
+    {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
 //????????    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
 //????????      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
     if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
@@ -3141,9 +3227,9 @@ function NextMultiplierEntryInBandMap(Band: BandType; Mode: ModeType): boolean;
 
 { Data will be in BandMapCursorData record }
 var
-  BandMapEntryRecord                    : BandMapEntryPointer;
-  Callsign                              : CallString;
-  RadioToUse                            : RadioType; {KK1L: 6.73}
+  BandMapEntryRecord: BandMapEntryPointer;
+  Callsign: CallString;
+  RadioToUse: RadioType; {KK1L: 6.73}
 
 begin
   NextMultiplierEntryInBandMap := False;
@@ -3163,7 +3249,7 @@ begin
   while BandMapEntryRecord <> nil do
   begin
     Callsign := BandMapExpandedString(BandMapEntryRecord^.Call);
-      {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
+    {KK1L: 6.73 Use LastDisplayedFreq instead of DisplayedFrequency to support control-A}
 //????????    if BandMapEntryRecord^.Frequency > LastDisplayedFreq[RadioToUse] then
 //????????      if Abs(LastDisplayedFreq[RadioToUse] - BandMapEntryRecord^.Frequency) > BandMapGuardBand then
     if CQLabel(Callsign) then {KK1L: 6.69 added to skip CQ frequency}
@@ -3204,13 +3290,14 @@ procedure GetBandMapBandModeFromFrequency(Frequency: LONGINT;
 { Mode might be setup by someone else - in which case, don't mess with it }
 
 var
-  TempMode                              : ModeType;
-  TempStr                               : Str20;
+  TempMode: ModeType;
+  TempStr: Str20;
 begin
-  CalculateBandMode(Frequency, Band, {Temp} Mode);
-//  if not (Mode in [CW, Phone]) then
+  CalculateBandMode(Frequency, Band, {Temp}Mode);
+  //  if not (Mode in [CW, Phone]) then
   begin
-    if Band = NoBand then Exit;
+    if Band = NoBand then
+      Exit;
     if Frequency >= BandMapModeCutoffFrequency[Band] then
       Mode := Phone
     else
@@ -3221,11 +3308,12 @@ end;
 procedure AddBandMapModeCutoffFrequency(Freq: LONGINT);
 
 var
-  TempBand                              : BandType;
-  TempMode                              : ModeType;
+  TempBand: BandType;
+  TempMode: ModeType;
 begin
   CalculateBandMode(Freq, TempBand, TempMode);
-  if TempBand in [Band160..Band2] then BandMapModeCutoffFrequency[TempBand] := Freq;
+  if TempBand in [Band160..Band2] then
+    BandMapModeCutoffFrequency[TempBand] := Freq;
 end;
 
 procedure AddBandMapPlaceHolder;
@@ -3261,7 +3349,8 @@ begin
   TempSpot.FMult := Mult;
   TempSpot.FMinutesLeft := 0; //MinutesLeft;
   TempSpot.FSourceCall := Source;
-  TempSpot.FSysTime := UTC.wMinute + UTC.wHour * 60 + UTC.wDay * 60 * 24 + UTC.wMonth * 60 * 24 * 30;
+  TempSpot.FSysTime := UTC.wMinute + UTC.wHour * 60 + UTC.wDay * 60 * 24 +
+    UTC.wMonth * 60 * 24 * 30;
   SpotsList.AddSpot(TempSpot, True);
 end;
 
@@ -3279,44 +3368,49 @@ procedure AddBandMapEntry_old(Call: CallString;
 var
   LastBandMapEntryRecord, NextBandMapEntryRecord: BandMapEntryPointer;
   TempBandMapEntryRecord, BandMapEntryRecord: BandMapEntryPointer;
-  StatusByte                            : Byte;
-  QSXOffset                             : LONGINT; {KK1L: 6.64 Tried INTEGER, but no joy.}
-  CompressedCall                        : EightBytes;
-  EntryAdded                            : boolean;
-  Band                                  : BandType;
+  StatusByte: Byte;
+  QSXOffset: LONGINT; {KK1L: 6.64 Tried INTEGER, but no joy.}
+  CompressedCall: EightBytes;
+  EntryAdded: boolean;
+  Band: BandType;
 
 begin
-  if not BandMapEnable then Exit;
+  if not BandMapEnable then
+    Exit;
 
   { The band map seemed to be crashing with SHF frequencies }
 
-  if Frequency > 150000000 then Exit;
-  if Frequency < 10 then Exit;
+  if Frequency > 150000000 then
+    Exit;
+  if Frequency < 10 then
+    Exit;
 
   BigCompressFormat(Call, CompressedCall);
 
   { Fix up status byte }
 
   StatusByte := MinutesLeft and $3F;
-  if Dupe then StatusByte := StatusByte or $40;
-  if Mult then StatusByte := StatusByte or $80;
+  if Dupe then
+    StatusByte := StatusByte or $40;
+  if Mult then
+    StatusByte := StatusByte or $80;
 
   { Compute QSX offset value - zero means none }
 
   if QSXFrequency = 0 then
     QSXOffset := 0
+  else if Abs(QSXFrequency - Frequency) < 327670 then
+    {KK1L: 6.64 Scaling added to keep offset within INTEGER range.}
+    {SXOffset := (QSXFrequency - Frequency) DIV 10}
+    {KK1L: 6.64 Not needed. Only LONGINT seems to work as QSXOffset type}
+    QSXOffset := (QSXFrequency - Frequency)
   else
-    if Abs(QSXFrequency - Frequency) < 327670 then
-      {KK1L: 6.64 Scaling added to keep offset within INTEGER range.}
-      {SXOffset := (QSXFrequency - Frequency) DIV 10}
-      {KK1L: 6.64 Not needed. Only LONGINT seems to work as QSXOffset type}
-      QSXOffset := (QSXFrequency - Frequency)
-    else
-      QSXOffset := 0; { Unexpected result }
+    QSXOffset := 0; { Unexpected result }
 
   GetBandMapBandModeFromFrequency(Frequency, Band, Mode);
 
-  if Band = NoBand then Exit;
+  if Band = NoBand then
+    Exit;
 
   { See if the list of entries for this band mode is empty }
 
@@ -3351,38 +3445,38 @@ begin
   while BandMapEntryRecord <> nil do
   begin
 
-      { See if the frequency is nearly the same - and if so, we will
-        use this record. }
+    { See if the frequency is nearly the same - and if so, we will
+      use this record. }
 
     if Abs(Frequency - BandMapEntryRecord^.Frequency) <= BandMapGuardBand then
     begin
       if EntryAdded then { Already added it - so delete this one }
       begin
 
-              { We should not be able to be here without
-                LastBandMapEntryRecord being setup to something...
+        { We should not be able to be here without
+          LastBandMapEntryRecord being setup to something...
 
-                We are going to set the .NextEntry pointer of the
-                previous record to point to the NextEntry as indicated
-                in the .NextEntry value of the current record }
+          We are going to set the .NextEntry pointer of the
+          previous record to point to the NextEntry as indicated
+          in the .NextEntry value of the current record }
 
         LastBandMapEntryRecord^.NextEntry := BandMapEntryRecord^.NextEntry;
         TempBandMapEntryRecord := BandMapEntryRecord^.NextEntry;
 
-              { Delete the current record. Runtime 204 here? }
+        { Delete the current record. Runtime 204 here? }
 
-              { Runtime 204 here when SPACE entered for frequency }
+        { Runtime 204 here when SPACE entered for frequency }
 
         Dispose(BandMapEntryRecord);
 
-              { Setup current entry with this next entry.
-                LastBandMapEntryRecord is fine the way it is }
+        { Setup current entry with this next entry.
+          LastBandMapEntryRecord is fine the way it is }
 
         BandMapEntryRecord := LastBandMapEntryRecord^.NextEntry;
         Continue;
       end;
 
-          { Entry not yet added - take over this record }
+      { Entry not yet added - take over this record }
 
       BandMapEntryRecord^.Call := CompressedCall;
       BandMapEntryRecord^.Frequency := Frequency;
@@ -3393,7 +3487,7 @@ begin
       BandMapEntryRecord^.Source := Source;
       EntryAdded := True;
 
-          { Setup to examine next record and then continue }
+      { Setup to examine next record and then continue }
 
       LastBandMapEntryRecord := BandMapEntryRecord;
       BandMapEntryRecord := BandMapEntryRecord^.NextEntry;
@@ -3402,19 +3496,19 @@ begin
 
     if BigCompressedCallsAreEqual(CompressedCall, BandMapEntryRecord^.Call) then
     begin
-          { We have found the same call in the band map.  If the frequency
-            was close enough - we would have already used it.  Therefore,
-            we can probably delete this call. }
+      { We have found the same call in the band map.  If the frequency
+        was close enough - we would have already used it.  Therefore,
+        we can probably delete this call. }
 
-          { However, we need to check for the special case that this is the
-            first entry in the list - and therefore wouldn't have been
-            added yet }
+      { However, we need to check for the special case that this is the
+        first entry in the list - and therefore wouldn't have been
+        added yet }
 
       if LastBandMapEntryRecord = nil then { This is the 1st entry }
       begin
 
-              { New for 6.50 - if there are no other entries - just use
-                this one again }
+        { New for 6.50 - if there are no other entries - just use
+          this one again }
 
         if BandMapEntryRecord^.NextEntry = nil then { no next entry }
         begin
@@ -3428,8 +3522,8 @@ begin
           Exit;
         end;
 
-              { New for 6.50 - if the frequency is less than the next
-                bandmap entries, we should also just use this one }
+        { New for 6.50 - if the frequency is less than the next
+          bandmap entries, we should also just use this one }
 
         NextBandMapEntryRecord := BandMapEntryRecord^.NextEntry;
 
@@ -3445,13 +3539,13 @@ begin
           Exit;
         end;
 
-              { Okay - we have found a record with the same call, but we
-                can't leave it here because the frequency indicates that
-                it should be furthur in the list somewhere.
+        { Okay - we have found a record with the same call, but we
+          can't leave it here because the frequency indicates that
+          it should be furthur in the list somewhere.
 
-                Delete the active record and do the splice so the list
-                still works.  This is a unique way of deleting an entry
-                as we have to worry about the BandMapFirstEntry entry. }
+          Delete the active record and do the splice so the list
+          still works.  This is a unique way of deleting an entry
+          as we have to worry about the BandMapFirstEntry entry. }
 
         BandMapFirstEntryList[Band, Mode] := BandMapEntryRecord^.NextEntry;
         TempBandMapEntryRecord := BandMapEntryRecord^.NextEntry;
@@ -3461,15 +3555,15 @@ begin
         Continue;
       end;
 
-          { Found an entry with the same callsign - it isn't the first
-            entry of the list.  The frequencies aren't close enough that
-            we would have already used this record. }
+      { Found an entry with the same callsign - it isn't the first
+        entry of the list.  The frequencies aren't close enough that
+        we would have already used this record. }
 
-          { New in 6.50 - See if the frequency is still less than the
-            next entry - or perhaps that the next entry does not exist.
-            In either case, we can still use this record. }
+      { New in 6.50 - See if the frequency is still less than the
+        next entry - or perhaps that the next entry does not exist.
+        In either case, we can still use this record. }
 
-          { See if there are no other entries }
+      { See if there are no other entries }
 
       if not EntryAdded then
       begin
@@ -3485,7 +3579,7 @@ begin
           Exit;
         end;
 
-              { See if the frequency is less than the next entry }
+        { See if the frequency is less than the next entry }
 
         NextBandMapEntryRecord := BandMapEntryRecord^.NextEntry;
 
@@ -3502,8 +3596,8 @@ begin
         end;
       end;
 
-          { Okay - we can't use this record, so we will delete it and
-            splice the pointers. }
+      { Okay - we can't use this record, so we will delete it and
+        splice the pointers. }
 
       LastBandMapEntryRecord^.NextEntry := BandMapEntryRecord^.NextEntry;
       TempBandMapEntryRecord := BandMapEntryRecord^.NextEntry;
@@ -3513,26 +3607,26 @@ begin
       Continue;
     end;
 
-      { See if the frequency is less than the next record.  If so, this
-        is where we want to put it }
+    { See if the frequency is less than the next record.  If so, this
+      is where we want to put it }
 
     if (not EntryAdded) and
       (Frequency < BandMapEntryRecord^.Frequency) then
     begin
 
-          { New for 6.50 }
+      { New for 6.50 }
 
       if LastBandMapEntryRecord = nil then { This is the first entry }
       begin
         BandMapEntryRecord := New(BandMapEntryPointer);
 
-              { Do the splice }
+        { Do the splice }
 
         BandMapEntryRecord^.NextEntry := BandMapFirstEntryList[Band, Mode];
 
         BandMapFirstEntryList[Band, Mode] := BandMapEntryRecord;
 
-              { Save the data }
+        { Save the data }
 
         BandMapEntryRecord^.Call := CompressedCall;
         BandMapEntryRecord^.Frequency := Frequency;
@@ -3543,26 +3637,26 @@ begin
         BandMapEntryRecord^.Source := Source;
         EntryAdded := True;
 
-              { Setup to go through the rest of the list }
+        { Setup to go through the rest of the list }
 
         LastBandMapEntryRecord := BandMapEntryRecord;
         BandMapEntryRecord := BandMapEntryRecord^.NextEntry;
         Continue;
       end;
 
-          { We need to squeeze an new entry in here }
+      { We need to squeeze an new entry in here }
 
       TempBandMapEntryRecord := BandMapEntryRecord; { Remember }
 
       BandMapEntryRecord := New(BandMapEntryPointer);
 
-          { Do the splice }
+      { Do the splice }
 
       LastBandMapEntryRecord^.NextEntry := BandMapEntryRecord;
 
       BandMapEntryRecord^.NextEntry := TempBandMapEntryRecord;
 
-          { Fill in the data for the new record }
+      { Fill in the data for the new record }
 
       BandMapEntryRecord^.Call := CompressedCall;
       BandMapEntryRecord^.Frequency := Frequency;
@@ -3573,16 +3667,16 @@ begin
       BandMapEntryRecord^.Source := Source;
       EntryAdded := True;
 
-          { Setup to continue looking at the rest of the entries.  We
-            need to do this in case there is an entry on this band/mode
-            later on with the same callsign that needs to be deleted. }
+      { Setup to continue looking at the rest of the entries.  We
+        need to do this in case there is an entry on this band/mode
+        later on with the same callsign that needs to be deleted. }
 
       LastBandMapEntryRecord := BandMapEntryRecord;
       BandMapEntryRecord := BandMapEntryRecord^.NextEntry;
       Continue;
     end;
 
-      { Point to the next entry in the list }
+    { Point to the next entry in the list }
 
     LastBandMapEntryRecord := BandMapEntryRecord;
     BandMapEntryRecord := BandMapEntryRecord^.NextEntry;
@@ -3616,11 +3710,12 @@ procedure SaveBandMap;
 { Saves the band map data to BandMapFileName }
 
 var
-  i                                     : integer;
-  Spot                                  : TSpotRecord;
-  h                                     : HWND;
+  i: integer;
+  Spot: TSpotRecord;
+  h: HWND;
 begin
-  if not tOpenFileForWrite(h, TR4W_BANDMAPBIN_FILENAME) then Exit;
+  if not tOpenFileForWrite(h, TR4W_BANDMAPBIN_FILENAME) then
+    Exit;
   if SpotsList.Count > 0 then
   begin
     sWriteFile(h, BandMapFileVersion, SizeOf(BandMapFileVersion));
@@ -3642,30 +3737,35 @@ procedure LoadBandMap;
 label
   1;
 var
-  TempChar                              : Char;
-  i                                     : integer;
-  c                                     : integer;
-  Spot                                  : TSpotRecord;
-  h                                     : HWND;
-  lpNumberOfBytesRead                   : Cardinal;
+  TempChar: Char;
+  i: integer;
+  c: integer;
+  Spot: TSpotRecord;
+  h: HWND;
+  lpNumberOfBytesRead: Cardinal;
 begin
-  if not TF.tOpenFileForRead(h, TR4W_BANDMAPBIN_FILENAME) then Exit;
+  if not TF.tOpenFileForRead(h, TR4W_BANDMAPBIN_FILENAME) then
+    Exit;
   Windows.ReadFile(h, TempChar, SizeOf(TempChar), lpNumberOfBytesRead, nil);
-  if lpNumberOfBytesRead <> SizeOf(TempChar) then goto 1;
-  if TempChar <> BandMapFileVersion then goto 1;
+  if lpNumberOfBytesRead <> SizeOf(TempChar) then
+    goto 1;
+  if TempChar <> BandMapFileVersion then
+    goto 1;
   Windows.ReadFile(h, c, SizeOf(SpotsList.Count), lpNumberOfBytesRead, nil);
   if c > 0 then
   begin
     for i := 1 to c do
     begin
       ReadFile(h, Spot, SizeOf(TSpotRecord), lpNumberOfBytesRead, nil);
-      if lpNumberOfBytesRead = SizeOf(TSpotRecord) then SpotsList.AddSpot(Spot, False);
+      if lpNumberOfBytesRead = SizeOf(TSpotRecord) then
+        SpotsList.AddSpot(Spot, False);
     end;
   end;
   1: CloseHandle(h);
 end;
 
-procedure GetBandMapDisplayInfo(var MaxEntriesPerPage: integer; var NumberBandMapRows: integer);
+procedure GetBandMapDisplayInfo(var MaxEntriesPerPage: integer; var
+  NumberBandMapRows: integer);
 
 begin
 
@@ -3708,7 +3808,8 @@ end;
 procedure UpdateBlinkingBandMapCall;
 
 begin
-  if not BandMapEnable then Exit;
+  if not BandMapEnable then
+    Exit;
 
   if BandMapBlinkingCallRecord <> nil then
     with BandMapBlinkingCallRecord^ do
@@ -3720,8 +3821,7 @@ begin
   DisplayBandMap;
 end;
 
-
-procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType);   //n4af 4.40.9
+procedure UpdateTenMinuteDate(Band: BandType; Mode: ModeType); //n4af 4.40.9
 
 begin
   if (Band <> TenMinuteTime.Band) or (Mode <> TenMinuteTime.Mode) then
@@ -3732,8 +3832,8 @@ begin
   end;
 end;
 
-
-procedure CalculateNumberVisibleBandMapEntries(var NumberVisibleBandMapEntries: integer;
+procedure CalculateNumberVisibleBandMapEntries(var NumberVisibleBandMapEntries:
+  integer;
   var CursorEntryNumber: integer;
   StartAtTop: boolean);
 
@@ -3742,9 +3842,9 @@ procedure CalculateNumberVisibleBandMapEntries(var NumberVisibleBandMapEntries: 
   BandMapCursorData (global variable) resides at. }
 
 var
-  Band, StartBand, StopBand             : BandType;
-  Mode, StartMode, StopMode             : ModeType;
-  BandMapEntryRecord                    : BandMapEntryPointer;
+  Band, StartBand, StopBand: BandType;
+  Mode, StartMode, StopMode: ModeType;
+  BandMapEntryRecord: BandMapEntryPointer;
 
 begin
   if BandMapAllBands then
@@ -3796,10 +3896,11 @@ begin
 
       while BandMapEntryRecord <> nil do
       begin
-        if ((BandMapEntryRecord^.StatusByte and $40) <> 0) and BandMapDupeDisplay then
+        if ((BandMapEntryRecord^.StatusByte and $40) <> 0) and BandMapDupeDisplay
+          then
         begin {entry is a dupe and we are displaying dupes }
 
-                {wli ???????? ?? nil BandMapCursorData}
+          {wli ???????? ?? nil BandMapCursorData}
           if BandMapCursorData <> nil then
             if BandMapEntryRecord^.Frequency = BandMapCursorData^.Frequency then
             begin
@@ -3811,21 +3912,20 @@ begin
           inc(NumberVisibleBandMapEntries);
         end
 
-        else
-          if ((BandMapEntryRecord^.StatusByte and $40) = 0) then
-          begin {KK1L: 6.64 entry is not a dupe so just check it}
+        else if ((BandMapEntryRecord^.StatusByte and $40) = 0) then
+        begin {KK1L: 6.64 entry is not a dupe so just check it}
 
-                  {wli ???????? ?? nil BandMapCursorData}
-            if BandMapCursorData <> nil then
-              if BandMapEntryRecord^.Frequency = BandMapCursorData^.Frequency then
-              begin
-                BandMapCursorData := BandMapEntryRecord;
-                FoundCursor := True;
-              end;
-            if not FoundCursor then
-              inc(CursorEntryNumber);
-            inc(NumberVisibleBandMapEntries);
-          end;
+          {wli ???????? ?? nil BandMapCursorData}
+          if BandMapCursorData <> nil then
+            if BandMapEntryRecord^.Frequency = BandMapCursorData^.Frequency then
+            begin
+              BandMapCursorData := BandMapEntryRecord;
+              FoundCursor := True;
+            end;
+          if not FoundCursor then
+            inc(CursorEntryNumber);
+          inc(NumberVisibleBandMapEntries);
+        end;
         BandMapEntryRecord := BandMapEntryRecord^.NextEntry;
       end;
     end;
@@ -3841,17 +3941,18 @@ begin
 
 end;
 
-function GetRecordForBandMapCursor(var Entry: BandMapEntryPointer; CursorEntryNumber: integer): boolean;
+function GetRecordForBandMapCursor(var Entry: BandMapEntryPointer;
+  CursorEntryNumber: integer): boolean;
 { KK1L: 6.64 Rewritten as function for possible multiple use. Code updated to work properly }
 {       when displaying dupes or not.                                                  }
 { KK1L: 6.65 CursorEntryNumber did not need to be "pass by reference". Changed to "pass by value"}
 label
   1, 2;
 var
-  EntryNumber                           : integer;
-  FoundRecord                           : boolean;
-  Band {, StartBand, StopBand}          : BandType;
-  Mode {, StartMode, StopMode}          : ModeType;
+  EntryNumber: integer;
+  FoundRecord: boolean;
+  Band {, StartBand, StopBand}: BandType;
+  Mode {, StartMode, StopMode}: ModeType;
 
 begin
 
@@ -3906,16 +4007,17 @@ begin
 
         if (EntryNumber = CursorEntryNumber) then
         begin {KK1L: 6.64 found a cursor match. Get Entry^ in synch then set BandMapCursorData}
-                  //          if (not BandMapDupeDisplay) then {KK1L: 6.64 if not displaying dupes find the next non-dupe}
-                  //            while ((Entry^.StatusByte and $40) <> 0)
-                  //              and (Entry <> nil) do Entry := Entry^.NextEntry;
+          //          if (not BandMapDupeDisplay) then {KK1L: 6.64 if not displaying dupes find the next non-dupe}
+          //            while ((Entry^.StatusByte and $40) <> 0)
+          //              and (Entry <> nil) do Entry := Entry^.NextEntry;
 
           if BandMapDupeDisplay = False then
           begin
             1: if (Entry^.StatusByte and $40) <> 0 then
             begin
               Entry := Entry^.NextEntry;
-              if Entry <> nil then goto 1;
+              if Entry <> nil then
+                goto 1;
             end;
           end;
 
@@ -3936,15 +4038,17 @@ begin
             2: if (Entry^.StatusByte and $40) <> 0 then
             begin
               Entry := Entry^.NextEntry;
-              if Entry <> nil then goto 2;
+              if Entry <> nil then
+                goto 2;
             end;
           end;
 
-                  //          if (not BandMapDupeDisplay) then {KK1L: 6.64 if not displaying dupes find the next non-dupe}
-                  //            while ((Entry^.StatusByte and $40) <> 0) and (Entry <> nil) do
-                  //              Entry := Entry^.NextEntry; {KK1L: 6.64 non-dupe of current cursor}
+          //          if (not BandMapDupeDisplay) then {KK1L: 6.64 if not displaying dupes find the next non-dupe}
+          //            while ((Entry^.StatusByte and $40) <> 0) and (Entry <> nil) do
+          //              Entry := Entry^.NextEntry; {KK1L: 6.64 non-dupe of current cursor}
 
-          if Entry <> nil then {KK1L: 6.64 Only increment if not starting a new band/mode}
+          if Entry <> nil then
+            {KK1L: 6.64 Only increment if not starting a new band/mode}
           begin
             Entry := Entry^.NextEntry;
             inc(EntryNumber);
@@ -3959,16 +4063,17 @@ end;
 procedure DecrementQTCCount(Call: CallString; Count: integer);
 
 var
-  Station                               : integer;
-//  CompressedCall                   : EightBytes;
+  Station: integer;
+  //  CompressedCall                   : EightBytes;
 
 begin
-//  BigCompressFormat(Call, CompressedCall);
+  //  BigCompressFormat(Call, CompressedCall);
 
-  if (NumberQTCStations = 0) or (Count = 0) then Exit;
+  if (NumberQTCStations = 0) or (Count = 0) then
+    Exit;
 
   for Station := 0 to NumberQTCStations - 1 do
-//    if BigCompressedCallsAreEqual(QTCDataArray^[Station].Call, CompressedCall) then
+    //    if BigCompressedCallsAreEqual(QTCDataArray^[Station].Call, CompressedCall) then
     if QTCDataArray^[Station].Call = Call then
       while (QTCDataArray^[Station].NumberQTCs > 0) and (Count > 0) do
       begin
@@ -3978,11 +4083,10 @@ begin
 
 end;
 
-
 procedure OutputQSOorMultStatusString(OutputString_Milt: ShortString {Str160});
 
 var
-  Cursor                                : integer;
+  Cursor: integer;
 
 begin
   GetRidOfPostcedingSpaces(OutputString_Milt);
@@ -3993,26 +4097,27 @@ begin
 
 end;
 
-
 procedure DisplayUserInfo(Call: CallString);
 
 var
-  data                                  : DataBaseEntryRecord;
-  TempString, InfoString, Command       : Str40;
-  CustomString                          : ShortString {str40};
-  Zone                                  : integer;
-  FoundCall                             : boolean;
-  Heading                               : integer;
-  qe                                   : pChar;
-  pstr                                 : str80;
+  data: DataBaseEntryRecord;
+  TempString, InfoString, Command: Str40;
+  CustomString: ShortString {str40};
+  Zone: integer;
+  FoundCall: boolean;
+  Heading: integer;
+  qe: pChar;
+  pstr: str80;
 
 begin
-  if UserInfoShown = NoUserInfo then Exit;
-  if Call = '' then Exit;
+  if UserInfoShown = NoUserInfo then
+    Exit;
+  if Call = '' then
+    Exit;
   FoundCall := CD.GetEntry(Call, data);
 
   Windows.ZeroMemory(@InfoString, SizeOf(InfoString));
-//  InfoString := '';
+  //  InfoString := '';
 
   case UserInfoShown of
     NameInfo:
@@ -4040,10 +4145,10 @@ begin
 
         if (MyGrid <> '') and LooksLikeAGrid(data.Grid) then
         begin
-              //          SaveSetAndClearActiveWindow(BeamHeadingWindow);
+          //          SaveSetAndClearActiveWindow(BeamHeadingWindow);
           Heading := round(GetBeamHeading(MyGrid, data.Grid));
-              //          Write(data.Grid, ' at ', Heading, '?');
-                                   //          RestorePreviousWindow;
+          //          Write(data.Grid, ' at ', Heading, '?');
+                               //          RestorePreviousWindow;
         end;
       end;
 
@@ -4132,7 +4237,7 @@ begin
             if FoundCall and (data.Section <> '') then
               InfoString := InfoString + data.Section + ' ';
 
-            { If they entered USER # instead of USER#, make it work - 6.75 }
+          { If they entered USER # instead of USER#, make it work - 6.75 }
 
           if Command = 'USER' then
           begin
@@ -4187,24 +4292,24 @@ begin
             begin
               InfoString := InfoString + data.Grid + ' ';
 
-                  //              if (MyGrid <> '') and LooksLikeAGrid(data.Grid) then
-                  //              begin
-                  //                SaveSetAndClearActiveWindow(BeamHeadingWindow);
-                  //                Heading := round(GetBeamHeading(MyGrid, data.Grid));
-                  //                Write(data.Grid, ' at ', Heading, '?');
-                  //    SetTR4WWindowText(BeamHeadingWindowHandle, data.Grid+ ' at '+ inttostr(Heading)+ '*');
-                  //                RestorePreviousWindow;
-                  //              end;
+              //              if (MyGrid <> '') and LooksLikeAGrid(data.Grid) then
+              //              begin
+              //                SaveSetAndClearActiveWindow(BeamHeadingWindow);
+              //                Heading := round(GetBeamHeading(MyGrid, data.Grid));
+              //                Write(data.Grid, ' at ', Heading, '?');
+              //    SetTR4WWindowText(BeamHeadingWindowHandle, data.Grid+ ' at '+ inttostr(Heading)+ '*');
+              //                RestorePreviousWindow;
+              //              end;
             end;
 
           if Command = 'FOC' then
             if FoundCall and (data.FOC <> '') then
-         //   begin
+              //   begin
               InfoString := InfoString + data.FOC + ' ';
-        {       pStr := InfoString;
-               qe := @pStr;
-               QuickDisplay(qe);
-               end;       }
+          {       pStr := InfoString;
+                 qe := @pStr;
+                 QuickDisplay(qe);
+                 end;       }
           if Command = 'CHECK' then
             if FoundCall and (data.Check <> '') then
               InfoString := InfoString + data.Check + ' ';
@@ -4223,12 +4328,12 @@ begin
 
   if InfoString <> '' then
   begin
-      //         while length(InfoString) < 32 do
-      //            InfoString := ' ' + InfoString + ' ';
+    //         while length(InfoString) < 32 do
+    //            InfoString := ' ' + InfoString + ' ';
 
     SetMainWindowText(mweUserInfo, @InfoString[1]);
 
-      //         Write(InfoString);
+    //         Write(InfoString);
   end
   else
     SetMainWindowText(mweUserInfo, nil);
@@ -4239,7 +4344,7 @@ end;
 function RTTYInverse(InputString: string): string;
 
 var
-  Address                               : integer;
+  Address: integer;
 
 begin
   if InputString = '' then
@@ -4313,11 +4418,11 @@ procedure UpdateK1EAStationInfo(Field: K1EAStationInfoFieldType;
   MessageString: ShortString {Str20});
 
 var
-  Freq                                  : LONGINT;
-  Index, Result                         : integer;
-  TempString                            : Str20;
-  Band                                  : BandType;
-  Mode                                  : ModeType;
+  Freq: LONGINT;
+  Index, Result: integer;
+  TempString: Str20;
+  Band: BandType;
+  Mode: ModeType;
 
 begin
   GetRidOfPostcedingSpaces(MessageString);
@@ -4325,7 +4430,7 @@ begin
 
   if Result <> 0 then
   begin
-      //{WLI}        SendMorse ('ooops');
+    //{WLI}        SendMorse ('ooops');
     Exit;
   end;
 
@@ -4346,8 +4451,8 @@ end;
 procedure WindInit;
 
 var
-  Band                                  : BandType;
-  Mode                                  : ModeType;
+  Band: BandType;
+  Mode: ModeType;
 begin
   {
   for Band := Band160 to AllBands do
@@ -4365,24 +4470,26 @@ procedure DispalayDupe;
 begin
   Format(QuickDisplayBuffer, TC_ISADUPE, @CallWindowString[1]);
 
-//  DispalayB4(SW_HIDE);
+  //  DispalayB4(SW_HIDE);
   QuickDisplay(QuickDisplayBuffer);
-  if DupeCheckSound <> DupeCheckNoSound then DoABeep(ThreeHarmonics);
-//  SendMessage(wh[mweCall], EM_SETSEL, 0, -1);
-//  EscapeDeletedCallEntry := CallWindowString;
+  if DupeCheckSound <> DupeCheckNoSound then
+    DoABeep(ThreeHarmonics);
+  //  SendMessage(wh[mweCall], EM_SETSEL, 0, -1);
+  //  EscapeDeletedCallEntry := CallWindowString;
   tCleareCallWindow;
 end;
 
 procedure DispalayB4(nCmdShow: integer);
 begin
-  if tB4IndicatorPrevState = nCmdShow then Exit;
+  if tB4IndicatorPrevState = nCmdShow then
+    Exit;
   tB4IndicatorPrevState := nCmdShow;
   Windows.ShowWindow(wh[mweQSOB4Status], nCmdShow);
 end;
 
 procedure DispalayLogGridLines;
 var
-  Style                                 : integer;
+  Style: integer;
 begin
   if tShowGridlines then
     Style := LVS_EX_GRIDLINES or LVS_EX_FULLROWSELECT
@@ -4397,7 +4504,8 @@ end;
 
 procedure DispalayNewMult(nCmndShow: integer);
 begin
-  if nCmndShow = tNewMultIndicatorPrevState then Exit;
+  if nCmndShow = tNewMultIndicatorPrevState then
+    Exit;
   tNewMultIndicatorPrevState := nCmndShow;
   Windows.ShowWindow(wh[mweNewMultStatus], nCmndShow);
 end;
@@ -4406,17 +4514,17 @@ procedure DisplayLocalTime(Country: Word);
 label
   1;
 var
-  i                                     : integer;
-  UTC, LOCAL                            : SYSTEMTIME;
-  Offset                                : LONGINT;
-//  p                                     : PChar;
-  SummerTimeIncrementation              : integer;
-  r                                     : integer;
-  TZ                                    : TIME_ZONE_INFORMATION;
+  i: integer;
+  UTC, LOCAL: SYSTEMTIME;
+  Offset: LONGINT;
+  //  p                                     : PChar;
+  SummerTimeIncrementation: integer;
+  r: integer;
+  TZ: TIME_ZONE_INFORMATION;
 begin
 
-
-  if tLocalTimePrevState = Country then Exit;
+  if tLocalTimePrevState = Country then
+    Exit;
   tLocalTimePrevState := Country;
 
   if Country = UNKNOWN_COUNTRY then
@@ -4430,156 +4538,161 @@ begin
   Windows.ZeroMemory(@LOCAL, SizeOf(LOCAL));
   if not SystemTimeToTzSpecificLocalTime(@tz, UTC, LOCAL) then
   begin
-//    ShowSysErrorMessage('TZ');
+    //    ShowSysErrorMessage('TZ');
   end;
 
-//  SummerTimeIncrementation := 0;
-//  if (UTC.wMonth > 3) and (UTC.wMonth < 11) then SummerTimeIncrementation := 1000;
-//  r := round(ctyGetCountryUTCOffset(Country));
-//  i := round(ctyGetCountryUTCOffset(Country) * -1000) + SummerTimeIncrementation;
-//  IncSystemTime(UTC, 1 {const} * 6 {minuts} * 6 {hours/10} * i); //1 sec = 1000
-{
-  asm
-  movzx eax,word ptr LOCAL.wDayOfWeek
-  mov   eax,[eax*4+PCharDayTags]
-  push  eax
+  //  SummerTimeIncrementation := 0;
+  //  if (UTC.wMonth > 3) and (UTC.wMonth < 11) then SummerTimeIncrementation := 1000;
+  //  r := round(ctyGetCountryUTCOffset(Country));
+  //  i := round(ctyGetCountryUTCOffset(Country) * -1000) + SummerTimeIncrementation;
+  //  IncSystemTime(UTC, 1 {const} * 6 {minuts} * 6 {hours/10} * i); //1 sec = 1000
+  {
+    asm
+    movzx eax,word ptr LOCAL.wDayOfWeek
+    mov   eax,[eax*4+PCharDayTags]
+    push  eax
 
-  xor  eax ,eax
+    xor  eax ,eax
 
-  mov ax,word ptr LOCAL.wMinute
-  push eax
+    mov ax,word ptr LOCAL.wMinute
+    push eax
 
-  mov ax,word ptr LOCAL.wHour
-  push eax
-  end;
-  wsprintf(wsprintfBuffer, '%02u:%02u %s');
+    mov ax,word ptr LOCAL.wHour
+    push eax
+    end;
+    wsprintf(wsprintfBuffer, '%02u:%02u %s');
 
-  asm add esp,20
-  end;
-}
-  Format(wsprintfBuffer, '%02u:%02u %s', integer(LOCAL.wHour), integer(LOCAL.wMinute), PCharDayTags[LOCAL.wDayOfWeek]);
+    asm add esp,20
+    end;
+  }
+  Format(wsprintfBuffer, '%02u:%02u %s', integer(LOCAL.wHour),
+    integer(LOCAL.wMinute), PCharDayTags[LOCAL.wDayOfWeek]);
   1:
   SetMainWindowText(mweLocalTime, wsprintfBuffer);
 end;
 
-
 procedure DisplayBandMap;
 begin
-  if not BandMapEnable then Exit;
-  if not tWindowsExist(tw_BANDMAPWINDOW_INDEX) then Exit;
-//  if  BandMapPreventRefresh then  Exit;             // GAV  4.45.6
+  if not BandMapEnable then
+    Exit;
+  if not tWindowsExist(tw_BANDMAPWINDOW_INDEX) then
+    Exit;
+  //  if  BandMapPreventRefresh then  Exit;             // GAV  4.45.6
   SpotsList.Display;
-  end;
+end;
 
- procedure NextBandMapEntry;
+procedure NextBandMapEntry;
 var
-BandMapEntryRecord                    : BandMapEntryPointer;
-  NumberEntriesDisplayed                : integer;
-  Band                                  : BandType;
-  Mode                                  : ModeType;
-  CC                                    : integer;
-  CurCursorPosData                      : integer;
-  numberbandentries                     : integer;
-  i,j                                  : integer;
-  Spot                                  : TSpotRecord;
-  d                                     : pChar;
-  str1                                   : str10;
+  BandMapEntryRecord: BandMapEntryPointer;
+  NumberEntriesDisplayed: integer;
+  Band: BandType;
+  Mode: ModeType;
+  CC: integer;
+  CurCursorPosData: integer;
+  numberbandentries: integer;
+  i, j: integer;
+  Spot: TSpotRecord;
+  d: pChar;
+  str1: str10;
 
 begin
-   TempSpot.FBand := NoBand;
-              BMp := 0;
-  //            tLB_SETCURSEL(BandMapListBox, 0);
+  TempSpot.FBand := NoBand;
+  spotslist.display;     // 4.138.4
   CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
-    if CC = LB_ERR then Exit;
-     if TwoRadioMode and QSYInactiveRadio then
-      Band := InactiveRadioptr.BandMemory
-       else
-        Band := ActiveRadioptr.BandMemory;
+    //get bandmap size
+  if CC = LB_ERR then
+    Exit;
+  if TwoRadioMode and QSYInactiveRadio then
+    Band := InactiveRadioptr.BandMemory
+  else
+    Band := ActiveRadioptr.BandMemory;
+  if (BMPos = -1) or (BMPos > CC) then
+    // if not in midst of stepping, set k to first entry
+    BMPos := 0;
+  for j := BMPos to CC do
+    // loop thru bm entries looking for match to band and mode
+  begin
+    CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+      // Current Cursor
+    Spot := SpotsList.Get(j); // get current spot
+    //   GetBandMapBandModeFromFrequency(TempSpot.FFrequency, TempSpot.FBand, TempSpot.FMode);
+    CallWindowString := Spot.FCall;
+ //  if not goodcallsyntax(callwindowstring) then
+   //   continue;
+    //    InitialExchange := InitialExchangeEntry(CallWindowString);
+    SetOpMode(SEARCHAndPOUNCEOpMode);
+    logger.info('[NEXTBM] CALL = ' + SPOT.FCALL);
+    logger.info('Freq = ' + IntToStr(Spot.ffrequency));
+    if (Spot.FBand = InactiveRadioptr.BandMemory) and (Spot.FMode = ActiveMode)
+      and (QSYInactiveRadio) then
+    begin
+      logger.Info('Enter NextBandMap INACTIVE-Radio: ' + spot.fcall);
+      LOGGER.INFO('Freq = ' + IntToStr(Spot.ffrequency));
+      PutCallToCallWindow(OnDeckCall);
+      TuneRadioToSpot(Spotslist.Get(k), InActiveRadio);
+      //tSetExchWindInitExchangeEntry;         // autoload initialexch
+     
+      inc(BMPos);
+      exit;
+    end
 
-  //k := Windows.SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);   // K contains real cursor displacement from top (0)
- //  i := GetBMSelItemData; //SendMessage(BandMapListBox, LB_GETITEMDATA, tLB_GETCURSEL(BandMapListBox), 0);
-//  if k = LB_ERR then Exit;
+    else if (Spot.FBand = ActiveRadioptr.BandMemory) and (Spot.FMode = ActiveMode) then
 
-//  Spot := SpotsList.Get(j);
-
-
-
-if (K = -1) or (k > CC) then
-k := 0;
-    for j := k to CC do      // loop thru bm entries looking for match to band and mode
-     begin
-     CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);     // Current Cursor
-      Spot := SpotsList.Get(j);                                       // get current spot
-   //   GetBandMapBandModeFromFrequency(TempSpot.FFrequency, TempSpot.FBand, TempSpot.FMode);
-      CallWindowString := Spot.FCall;
-      SetOpMode(SEARCHAndPOUNCEOpMode);
-      logger.info('[NEXTBM] CALL = '+ SPOT.FCALL);
-      logger.info('Freq = ' + IntToStr(Spot.ffrequency));
-      if (Spot.FBand =  InactiveRadioptr.BandMemory) and (Spot.FMode = ActiveMode) and (QSYInactiveRadio) then
-       begin
-        logger.Info('Enter NextBandMap INACTIVE-Radio: ' + spot.fcall );
-        LOGGER.INFO('Freq = ' + IntToStr(Spot.ffrequency));
-        PutCallToCallWindow(OnDeckCall);
-        TuneRadioToSpot(Spotslist.Get(k), InActiveRadio);
-        inc(k);
-        break;
-       end
-       else
-      if (Spot.FBand = ActiveRadioptr.BandMemory) and (Spot.FMode = ActiveMode) then
       if not (QSYInactiveRadio) then
-       begin
-         logger.info('[NEXTBM-Active] CALL = '+ SPOT.FCALL);
-         LOGGER.INFO('Freq = ' + IntToStr(Spot.ffrequency));
-         PutCallToCallWindow(CallWindowString);
-         TuneRadioToSpot(Spotslist.Get(j), ActiveRadio);
-         inc(k);
-         break;
-     end ;
+      begin
+        logger.info('[NEXTBM-Active] CALL = ' + SPOT.FCALL);
+        LOGGER.INFO('Freq = ' + IntToStr(Spot.ffrequency));
+        PutCallToCallWindow(CallWindowString);
+        TuneRadioToSpot(Spotslist.Get(j), ActiveRadio);
+      //  tSetExchWindInitExchangeEntry;
+      //  tr4w_log_qso_without_cw;
+        inc(BMPos);
+      exit;
+      end;
 
+    if j <= BMPos then
+      inc(BMPos);
+    CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+    if BMPos > CC then
+      BMPos := 0;
+  end; // end loop
+  CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+  if BMPos > CC then
+  begin
+    BMPos := 0;
+    CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
+  end;
 
-       if j = k then
-       inc(k);
-
-          if k > CC then
-           begin
-             k := 0;
-             CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
-           end;
-       end;     // end loop
-           if k > CC-1 then
-           begin
-             k := 0;
-             CC := Windows.SendMessage(BandMapListBox, LB_GETCOUNT, 0, 0);
-           end;
-
-end;     // end procedure
+  inc(BMPos);
+end; // end procedure
 
 procedure BMFirst;
 begin
-              BMp := 0;
-              tLB_SETCURSEL(BandMapListBox, 0);
+  BMp := 0;
+  tLB_SETCURSEL(BandMapListBox, 0);
 
 end;
 
 procedure DisplayBandMap_proc;
 var
 
-  BandMapEntryRecord                    : BandMapEntryPointer;
-  NumberEntriesDisplayed                : integer;
-  Band                                  : BandType;
-  Mode                                  : ModeType;
-  CurrentCursorPos                      : integer;
-  CurCursorPosData                      : integer;
-  Caption                               : string;
+  BandMapEntryRecord: BandMapEntryPointer;
+  NumberEntriesDisplayed: integer;
+  Band: BandType;
+  Mode: ModeType;
+  CurrentCursorPos: integer;
+  CurCursorPosData: integer;
+  Caption: string;
   //  CallSignString                   : CallString;
 
 begin
 
-  if not BandMapEnable then Exit;
-  if (not DisplayBandMapEnable) then Exit;
+  if not BandMapEnable then
+    Exit;
+  if (not DisplayBandMapEnable) then
+    Exit;
 
   //  tr4w_NeedToBlink := False;         //n4af  4.93.4
-
 
   CurCursorPosData := GetBMSelItemData;
 
@@ -4594,7 +4707,8 @@ begin
 
   NumberEntriesDisplayed := 0;
 
-  Caption := 'Bandmap ' + BandStringsArray[StartBand] + ModeStringArray[StartMode] + ' - ';
+  Caption := 'Bandmap ' + BandStringsArray[StartBand] +
+    ModeStringArray[StartMode] + ' - ';
 
   if (not WARCBandsEnabled) and (StopBand = Band12) then
     Caption := Caption + BandStringsArray[Band10] + ModeStringArray[StopMode]
@@ -4612,7 +4726,9 @@ begin
     for Mode := StartMode to StopMode do
     begin
 
-      if ((not WARCBandsEnabled)  or (Band = Band30) or (Band = Band17) or (Band = Band12)) then Continue;
+      if ((not WARCBandsEnabled) or (Band = Band30) or (Band = Band17) or (Band
+        = Band12)) then
+        Continue;
 
       BandMapEntryRecord := BandMapFirstEntryList[Band, Mode];
 
@@ -4620,20 +4736,24 @@ begin
       begin
         with BandMapEntryRecord^ do
         begin
-          if (not BandMapDupeDisplay) and ((BandMapEntryRecord^.StatusByte and $40) <> 0) then
+          if (not BandMapDupeDisplay) and ((BandMapEntryRecord^.StatusByte and
+            $40) <> 0) then
           begin
             BandMapEntryRecord := BandMapEntryRecord^.NextEntry;
             Continue;
           end;
-                //                if not DoNotAddToBandMap then
-          SendMessage(BandMapListBox, LB_ADDSTRING, 0, integer(BandMapEntryRecord));
+          //                if not DoNotAddToBandMap then
+          SendMessage(BandMapListBox, LB_ADDSTRING, 0,
+            integer(BandMapEntryRecord));
 
-          if (Abs(BandMapEntryRecord^.Frequency - BandMapCursorFrequency) <= BandMapGuardBand) then
+          if (Abs(BandMapEntryRecord^.Frequency - BandMapCursorFrequency) <=
+            BandMapGuardBand) then
           begin
             if not CQLabel(BandMapExpandedString(BandMapEntryRecord^.Call)) then
             begin
-            SendMessage(BandMapListBox, LB_GETITEMRECT, wParam(NumberEntriesDisplayed), lParam(@tBlinkerRect));
-      //         tr4w_NeedToBlink := False;     //n4af 4.93.4
+              SendMessage(BandMapListBox, LB_GETITEMRECT,
+                wParam(NumberEntriesDisplayed), lParam(@tBlinkerRect));
+              //         tr4w_NeedToBlink := False;     //n4af 4.93.4
             end;
           end;
 
@@ -4658,7 +4778,7 @@ end;
 
 procedure tDisplayAutoCQStatus;
 var
-  ID                                    : Str10;
+  ID: Str10;
 begin
   Windows.ZeroMemory(@ID, SizeOf(ID));
   ID := KeyId(AutoCQMemory);
@@ -4668,9 +4788,9 @@ end;
 
 procedure UpadateRadioStatus(rig: RadioPtr);
 var
-  TempInt                               : integer;
-  h                                     : HWND;
-  dif                                   : integer;
+  TempInt: integer;
+  h: HWND;
+  dif: integer;
 begin
 
   with rig^ do
@@ -4678,14 +4798,15 @@ begin
     h := tRadioInterfaceWndHandle;
     if h <> 0 then
     begin
-          //          Windows.SetWindowText(InsertWindowHandle, inttopchar(CurrentStatus.PrevRITFreq));
-          //          Windows.SetWindowText(OpModeWindowHandle, inttopchar(CurrentStatus.RITFreq));
+      //          Windows.SetWindowText(InsertWindowHandle, inttopchar(CurrentStatus.PrevRITFreq));
+      //          Windows.SetWindowText(OpModeWindowHandle, inttopchar(CurrentStatus.RITFreq));
 
       if CurrentStatus.PrevRITFreq <> CurrentStatus.RITFreq then
       begin
 {$RANGECHECKS OFF}
-       //SetDlgItemInt(h, 120, CurrentStatus.RITFreq, CurrentStatus.RITFreq < 0);
-       SetDlgItemText(h, 120, RITFreqToPChar(CurrentStatus.RITFreq)); //FreqToPChar(CurrentStatus.RITFreq));
+        //SetDlgItemInt(h, 120, CurrentStatus.RITFreq, CurrentStatus.RITFreq < 0);
+        SetDlgItemText(h, 120, RITFreqToPChar(CurrentStatus.RITFreq));
+          //FreqToPChar(CurrentStatus.RITFreq));
 {$RANGECHECKS ON}
         CurrentStatus.PrevRITFreq := CurrentStatus.RITFreq;
       end;
@@ -4712,16 +4833,17 @@ begin
       SetDlgItemText(h, 102, FreqToPChar(CurrentStatus.VFO[VFOA].Frequency));
       SetDlgItemText(h, 104, FreqToPChar(CurrentStatus.VFO[VFOB].Frequency));
 
-          //              if (CurrentStatus.VFOA.Frequency = 0) or (CurrentStatus.VFOB.Frequency = 0) then SetDlgItemText(h, 120, nil)
+      //              if (CurrentStatus.VFOA.Frequency = 0) or (CurrentStatus.VFOB.Frequency = 0) then SetDlgItemText(h, 120, nil)
 
       Windows.EnableWindow(Windows.GetDlgItem(h, 121), CurrentStatus.RIT);
       Windows.EnableWindow(Windows.GetDlgItem(h, 122), CurrentStatus.XIT);
       Windows.EnableWindow(Windows.GetDlgItem(h, 123), CurrentStatus.Split);
     end;
 
-    Windows.SetWindowText(rig^.FreqWindowHandle, FreqToPChar(CurrentStatus.Freq));
-//    rig.CurrentBand := rig.CurrentStatus.Band;
-//    rig.CurrentMode := rig.CurrentStatus.Mode;
+    Windows.SetWindowText(rig^.FreqWindowHandle,
+      FreqToPChar(CurrentStatus.Freq));
+    //    rig.CurrentBand := rig.CurrentStatus.Band;
+    //    rig.CurrentMode := rig.CurrentStatus.Mode;
 
     if rig = ActiveRadioPtr then
     begin
@@ -4730,15 +4852,15 @@ begin
         if dif > AutoSAPEnableRate then
           if dif <= 10000 then
             if AutoSAPEnable and (OpMode = CQOpMode) then
-             SetOpMode(SearchAndPounceOpMode);
-               
-                //      if tStatusEqualityCounter = StatusEquality then
+              SetOpMode(SearchAndPounceOpMode);
+
+      //      if tStatusEqualityCounter = StatusEquality then
 //        if FilteredStatus.Freq <> 0 then
 //          if (FilteredStatus.Band <> BandMemory[ActiveRadio {RadioOne}])
 //            or (FilteredStatus.Mode <> ModeMemory[ActiveRadio {RadioOne}])
 //            then
       begin
-            //BandMapCursorFrequency := FilteredStatus.Freq;
+        //BandMapCursorFrequency := FilteredStatus.Freq;
         ActiveBand := FilteredStatus.Band;
         ActiveMode := FilteredStatus.Mode;
 
@@ -4749,14 +4871,15 @@ begin
         DisplayAutoSendCharacterCount;
         VisibleLog.ShowRemainingMultipliers; //wli
         ShowFMessages(0);
-            //DoNotAddToBandMap := False;
+        //DoNotAddToBandMap := False;
       end;
 
     end;
 
     Exit;
-      //      DoNotAddToBandMap := True;
-    if ((ActiveRadio = RadioOne) and (rig = @Radio1)) or ((ActiveRadio = RadioTwo) and (rig = @Radio2)) then
+    //      DoNotAddToBandMap := True;
+    if ((ActiveRadio = RadioOne) and (rig = @Radio1)) or ((ActiveRadio =
+      RadioTwo) and (rig = @Radio2)) then
     begin
       dif := Abs(CurrentStatus.Freq - LastDisplayedFreq);
       if LastDisplayedFreq <> 0 then
@@ -4767,13 +4890,13 @@ begin
               SetOpMode(SearchAndPounceOpMode);
           end;
 
-//      if tStatusEqualityCounter = StatusEquality then
-//        if FilteredStatus.Freq <> 0 then
-//          if (FilteredStatus.Band <> BandMemory[ActiveRadio {RadioOne}])
-//            or (FilteredStatus.Mode <> ModeMemory[ActiveRadio {RadioOne}])
-//            then
+      //      if tStatusEqualityCounter = StatusEquality then
+      //        if FilteredStatus.Freq <> 0 then
+      //          if (FilteredStatus.Band <> BandMemory[ActiveRadio {RadioOne}])
+      //            or (FilteredStatus.Mode <> ModeMemory[ActiveRadio {RadioOne}])
+      //            then
       begin
-            //BandMapCursorFrequency := FilteredStatus.Freq;
+        //BandMapCursorFrequency := FilteredStatus.Freq;
         ActiveBand := FilteredStatus.Band;
         ActiveMode := FilteredStatus.Mode;
 
@@ -4784,176 +4907,180 @@ begin
         DisplayAutoSendCharacterCount;
         VisibleLog.ShowRemainingMultipliers; //wli
         ShowFMessages(0);
-            //DoNotAddToBandMap := False;
+        //DoNotAddToBandMap := False;
       end;
 
       if (({CurrentStatus}FilteredStatus.Freq <> BandMapCursorFrequency) or
-        (BandMapMode <> ActiveMode)) and ({CurrentStatus}FilteredStatus.Freq <> 0) then
+        (BandMapMode <> ActiveMode)) and ({CurrentStatus}FilteredStatus.Freq <>
+          0) then
       begin
-        BandMapCursorFrequency := {CurrentStatus} FilteredStatus.Freq;
+        BandMapCursorFrequency := {CurrentStatus}FilteredStatus.Freq;
         BandMapBand := ActiveBand;
         BandMapMode := ActiveMode;
         DisplayBandMap;
       end;
 
       if FrequencyMemoryEnable then
-        FreqMemory[FilteredStatus.Band, FilteredStatus.Mode] := FilteredStatus.Freq;
+        FreqMemory[FilteredStatus.Band, FilteredStatus.Mode] :=
+          FilteredStatus.Freq;
     end;
-  (*  start   REMOVECANDIDATE
-//    LastDisplayedFreq[ActiveRadio] := FilteredStatus.Freq;
+    (*  start   REMOVECANDIDATE
+  //    LastDisplayedFreq[ActiveRadio] := FilteredStatus.Freq;
 
-      {
-          RadioOnTheMove[radioone] := False;
-          RadioMovingInBandMode[radioone] := False;
+        {
+            RadioOnTheMove[radioone] := False;
+            RadioMovingInBandMode[radioone] := False;
 
-          if FilteredStatus.Freq <> 0 then
-             if (FilteredStatus.Freq <> LastDisplayedFreq[radioone]) or
-                (FilteredStatus.Mode <> LastDisplayedMode) then //wli
-                begin
-                   if Abs(FilteredStatus.Freq - LastDisplayedFreq[radioone]) > AutoSAPEnableRate then
-                      begin
-                         RadioOnTheMove[radioone] := LastDisplayedFreq[radioone] <> 0;
-                         //          if RadioOnTheMove[radioone] then if (AutoSAPEnable) and (OpMode = CQOpMode) then FRM.SetSAP;
+            if FilteredStatus.Freq <> 0 then
+               if (FilteredStatus.Freq <> LastDisplayedFreq[radioone]) or
+                  (FilteredStatus.Mode <> LastDisplayedMode) then //wli
+                  begin
+                     if Abs(FilteredStatus.Freq - LastDisplayedFreq[radioone]) > AutoSAPEnableRate then
+                        begin
+                           RadioOnTheMove[radioone] := LastDisplayedFreq[radioone] <> 0;
+                           //          if RadioOnTheMove[radioone] then if (AutoSAPEnable) and (OpMode = CQOpMode) then FRM.SetSAP;
 
-                         RadioMovingInBandMode[radioone] := (FilteredStatus.Band = BandMemory[radioone]) and
-                            (FilteredStatus.Mode = ModeMemory[radioone]) and (LastDisplayedFreq[radioone] <> 0);
+                           RadioMovingInBandMode[radioone] := (FilteredStatus.Band = BandMemory[radioone]) and
+                              (FilteredStatus.Mode = ModeMemory[radioone]) and (LastDisplayedFreq[radioone] <> 0);
 
-                         //                        if RadioMovingInBandMode[radioone] then
-                         //                           begin
-                         //                              if (AutoSAPEnable) and (OpMode = CQOpMode) then SetOpMode(SearchAndPounceOpMode);
+                           //                        if RadioMovingInBandMode[radioone] then
+                           //                           begin
+                           //                              if (AutoSAPEnable) and (OpMode = CQOpMode) then SetOpMode(SearchAndPounceOpMode);
 
-                         //                                          if ClearCallWindowAtSPMove then
-                         //                                            if opmode = SearchAndPounceOpMode then if callwindowstring <> '' then
-                         //                                              begin
-                         //                                                tCleareCallWindow;
-                         //                                                tCleareExchangeWindow;
-                         //                                                setfocus(CallWindowHandle);
-                         //                                                ExchangeHasBeenSent := False;
-                         //                                                ClearCallWindowAtSPMove := true;
-                         //                                              end;
+                           //                                          if ClearCallWindowAtSPMove then
+                           //                                            if opmode = SearchAndPounceOpMode then if callwindowstring <> '' then
+                           //                                              begin
+                           //                                                tCleareCallWindow;
+                           //                                                tCleareExchangeWindow;
+                           //                                                setfocus(CallWindowHandle);
+                           //                                                ExchangeHasBeenSent := False;
+                           //                                                ClearCallWindowAtSPMove := true;
+                           //                                              end;
 
-                         //                           end;
+                           //                           end;
 
-                      end;
+                        end;
 
-                   //         If this is the ActiveRadio, then I have some more things to do.
+                     //         If this is the ActiveRadio, then I have some more things to do.
 
-                   if ActiveRadio = radioone then
-                      begin
-                         if (FilteredStatus.Band <> BandMemory[radioone])
-                            or (FilteredStatus.Mode <> ModeMemory[radioone])
-                            then
-                            if Radio1.TrackingEnable then
-                               begin
-                                  //            IF FilteredStatus.Band <> NoBand THEN
-                                  ActiveBand := FilteredStatus.Band;
-                                  //            IF FilteredStatus.Mode <> NoMode THEN
-                                  ActiveMode := FilteredStatus.Mode;
+                     if ActiveRadio = radioone then
+                        begin
+                           if (FilteredStatus.Band <> BandMemory[radioone])
+                              or (FilteredStatus.Mode <> ModeMemory[radioone])
+                              then
+                              if Radio1.TrackingEnable then
+                                 begin
+                                    //            IF FilteredStatus.Band <> NoBand THEN
+                                    ActiveBand := FilteredStatus.Band;
+                                    //            IF FilteredStatus.Mode <> NoMode THEN
+                                    ActiveMode := FilteredStatus.Mode;
 
-                                  DisplayBandMode(ActiveBand, ActiveMode, False);
-                                  VisibleDupeSheetChanged := True;
+                                    DisplayBandMode(ActiveBand, ActiveMode, False);
+                                    VisibleDupeSheetChanged := True;
 
-                                  DisplayCodeSpeed ;
-                                  DisplayAutoSendCharacterCount;
-                                  VisibleLog.ShowRemainingMultipliers; //wli
-                                  ShowFMessages(0);
-                               end;
+                                    DisplayCodeSpeed ;
+                                    DisplayAutoSendCharacterCount;
+                                    VisibleLog.ShowRemainingMultipliers; //wli
+                                    ShowFMessages(0);
+                                 end;
 
-                         //                     See what radio two might be up to
+                           //                     See what radio two might be up to
 
-                         if TwoRadioState = TwoRadiosDisabled then // No 2nd radio
-                            begin
-                               if ((FilteredStatus.Freq <> BandMapCursorFrequency) or
-                                  (BandMapMode <> ActiveMode)) and (FilteredStatus.Freq <> 0) then
-                                  begin
-                                     BandMapCursorFrequency := FilteredStatus.Freq;
-                                     BandMapBand := ActiveBand;
-                                     BandMapMode := ActiveMode;
-                                     DisplayBandMap;
-                                  end;
-                            end
-                         else
-                            begin
-                               if BandMapEnable then
-                                  if ((FilteredStatus.Band = BandMapBand) and
-                                     (FilteredStatus.Freq <> BandMapCursorFrequency) and
-                                     (FilteredStatus.Freq <> 0)) or
-                                     (RadioOnTheMove[radioone]) then //KK1L: 6.73 Consolidated logic
-                                     begin
-                                        BandMapCursorFrequency := FilteredStatus.Freq;
-                                        BandMapBand := ActiveBand;
-                                        BandMapMode := ActiveMode;
-                                        DisplayBandMap;
-                                     end;
-                            end;
-                      end
-                   else
-                      begin
+                           if TwoRadioState = TwoRadiosDisabled then // No 2nd radio
+                              begin
+                                 if ((FilteredStatus.Freq <> BandMapCursorFrequency) or
+                                    (BandMapMode <> ActiveMode)) and (FilteredStatus.Freq <> 0) then
+                                    begin
+                                       BandMapCursorFrequency := FilteredStatus.Freq;
+                                       BandMapBand := ActiveBand;
+                                       BandMapMode := ActiveMode;
+                                       DisplayBandMap;
+                                    end;
+                              end
+                           else
+                              begin
+                                 if BandMapEnable then
+                                    if ((FilteredStatus.Band = BandMapBand) and
+                                       (FilteredStatus.Freq <> BandMapCursorFrequency) and
+                                       (FilteredStatus.Freq <> 0)) or
+                                       (RadioOnTheMove[radioone]) then //KK1L: 6.73 Consolidated logic
+                                       begin
+                                          BandMapCursorFrequency := FilteredStatus.Freq;
+                                          BandMapBand := ActiveBand;
+                                          BandMapMode := ActiveMode;
+                                          DisplayBandMap;
+                                       end;
+                              end;
+                        end
+                     else
+                        begin
 
-                         //                  Okay, this isn't the active radio, but we might have
-                         //                  something to do if the band map is active.  If we are
-                         //                  tuning to new frequencies on this radio, then we are
-                         //                  going to assume that it is appropriate for the band
-                         //                  map on this band to be displayed!
+                           //                  Okay, this isn't the active radio, but we might have
+                           //                  something to do if the band map is active.  If we are
+                           //                  tuning to new frequencies on this radio, then we are
+                           //                  going to assume that it is appropriate for the band
+                           //                  map on this band to be displayed!
 
-                         if (TwoRadioState <> TwoRadiosDisabled) and BandMapEnable and RadioOnTheMove[radioone] then
-                            begin
-                               BandMapBand := FilteredStatus.Band;
-                               BandMapMode := FilteredStatus.Mode;
-                               BandMapCursorFrequency := FilteredStatus.Freq;
-                               DisplayBandMap;
-                            end;
-                      end;
+                           if (TwoRadioState <> TwoRadiosDisabled) and BandMapEnable and RadioOnTheMove[radioone] then
+                              begin
+                                 BandMapBand := FilteredStatus.Band;
+                                 BandMapMode := FilteredStatus.Mode;
+                                 BandMapCursorFrequency := FilteredStatus.Freq;
+                                 DisplayBandMap;
+                              end;
+                        end;
 
-                   //       DisplayFrequency(FilteredStatus, RadioOne);
- //                  LastDisplayedFreq[radioone] := FilteredStatus.Freq;
+                     //       DisplayFrequency(FilteredStatus, RadioOne);
+   //                  LastDisplayedFreq[radioone] := FilteredStatus.Freq;
 
-                   BandMemory[radioone] := FilteredStatus.Band;
-                   ModeMemory[radioone] := FilteredStatus.Mode;
+                     BandMemory[radioone] := FilteredStatus.Band;
+                     ModeMemory[radioone] := FilteredStatus.Mode;
 
-                   //wli -  what is 'freq'?!
+                     //wli -  what is 'freq'?!
 
-                   //       IF FrequencyMemoryEnable THEN
-                   //        FreqMemory[FilteredStatus.Band, FilteredStatus.Mode] := Freq;
+                     //       IF FrequencyMemoryEnable THEN
+                     //        FreqMemory[FilteredStatus.Band, FilteredStatus.Mode] := Freq;
 
-                   //maybe?
-                   if FrequencyMemoryEnable then
-                      FreqMemory[FilteredStatus.Band, FilteredStatus.Mode] := FilteredStatus.Freq;
+                     //maybe?
+                     if FrequencyMemoryEnable then
+                        FreqMemory[FilteredStatus.Band, FilteredStatus.Mode] := FilteredStatus.Freq;
 
-                end;
-          LastDisplayedFreq[radioone] := FilteredStatus.Freq;
-         }
-         *)
+                  end;
+            LastDisplayedFreq[radioone] := FilteredStatus.Freq;
+           }
+           *)
   end;
 end;
 
 procedure tDispalyOnAirTime;
 var
-d              : Cardinal;
-OperatingTime                        : integer;
-  PreviousQSOTime                       : TQSOTime;
-  Switch : boolean;
+  d: Cardinal;
+  OperatingTime: integer;
+  PreviousQSOTime: TQSOTime;
+  Switch: boolean;
 
- begin
-  if (CallWinKeyDown) and (not Begin_QSO) then              // 4.115.3   dont start timeer until first entry
-   begin
+begin
+  if (CallWinKeyDown) and (not Begin_QSO) then
+    // 4.115.3   dont start timeer until first entry
+  begin
     Begin_QSO := True;
     StartCPU := Windows.GetTickCount;
-   end;
+  end;
 
-if (T2 > 0)  then
- begin
-   d := Windows.GetTickCount;
+  if (T2 > 0) then
+  begin
+    d := Windows.GetTickCount;
     if (d div 1000) mod 2 = 0 then
-     SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(d - StartCPU, False)) ;     //  4.115.3
- end
-   else
-     SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(0, False))
-//  SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False));
+      SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(d -
+        StartCPU, False)); //  4.115.3
+  end
+  else
+    SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(0,
+      False))
+      //  SetMainWindowText(mweOnAirTimeCounter,MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False));
 end;
 
-
-procedure tDispalyTimeFromLastQSO;      // n4af 4.35.5
+procedure tDispalyTimeFromLastQSO; // n4af 4.35.5
 { Try keying on tElapsedTimeFromLastQSO.
 Procedure modified by N4AF to also display total OFF TIME.
 If it total elapsed drops, enter was pressed so
@@ -4964,60 +5091,60 @@ subtract break time from it.
 Then when elapsed next drops below break length, add saved elapsed to current elapsed.
 }
 var
-  d                                    : Cardinal;
-  k                                    : Cardinal;
-  l                                    : Cardinal;
-  TimeDifference                       : Integer;
- //n4af 4.35.5
- begin
- // 4.115.2 remove commented code below
- begin
- T2 := tElapsedTimeFromLastQSO;  // T2 = initial elapsed
- Start := True;
- end;
+  d: Cardinal;
+  k: Cardinal;
+  l: Cardinal;
+  TimeDifference: Integer;
+  //n4af 4.35.5
+begin
+  // 4.115.2 remove commented code below
+  begin
+    T2 := tElapsedTimeFromLastQSO; // T2 = initial elapsed
+    Start := True;
+  end;
 
   d := Windows.GetTickCount - T2;
- //d := a;
- k := Windows.GetTickCount - tElapsedTimeFromLastQSO;     // time from last qso
+  //d := a;
+  k := Windows.GetTickCount - tElapsedTimeFromLastQSO; // time from last qso
 
-  if (k div 1000) mod 2 = 0 then         // if 5 seconds elapsed
-     SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(k, False));     // display elapsed since last qso
-     tDispalyOnAirTime;
-{    if (k < T1) then
-  begin
-  if K < B then
-  begin
-  A := B;     // restore former K value
+  if (k div 1000) mod 2 = 0 then // if 5 seconds elapsed
+    SetMainWindowText(mweLastQSOTime, MillisecondsToFormattedString(k, False));
+      // display elapsed since last qso
+  tDispalyOnAirTime;
+  {    if (k < T1) then
+    begin
+    if K < B then
+    begin
+    A := B;     // restore former K value
+
+    end;
+    if Gate then
+    Gate := False;
+    if C = 0 then
+    D1 :=  D        // save previous K
+      else
+    D1 := b + c + e;
+
+    if (d1 div 1000) mod 2 = 0 then         // if 2 seconds elapsed
+    //       // display elapsed since last qso
+        SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False));
+     b := K;  // last value of K before enter pressed
+
+    end;
+
+     if K > T1 then
+     begin
+
+     if not Gate then
+     begin
+     e := c;    // save old c value into var e  Snap last good K ONCE
+     Gate := true;
+     end;
+
+   C := A;       // c points to the last K
 
   end;
-  if Gate then
-  Gate := False;
-  if C = 0 then
-  D1 :=  D        // save previous K
-    else
-  D1 := b + c + e;
-
-
-  if (d1 div 1000) mod 2 = 0 then         // if 2 seconds elapsed
-  //       // display elapsed since last qso
-      SetMainWindowText(mweOnAirTimeCounter, MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False));
-   b := K;  // last value of K before enter pressed
-
-  end;
-
-   if K > T1 then
-   begin
-   
-   if not Gate then
-   begin
-   e := c;    // save old c value into var e  Snap last good K ONCE
-   Gate := true;
-   end;
-  
- C := A;       // c points to the last K
-
-end;
-}
+  }
 end;
 
 procedure tDispalyMyComputerID;
@@ -5028,13 +5155,19 @@ end;
 
 procedure tDispalyPaddleAndFootSwitchStatus;
 var
-  TempBool                              : LongBool;
+  TempBool: LongBool;
 begin
 
-  if not DoingPaddle then TempBool := False else TempBool := True;
- // Windows.EnableWindow(wh[mwePaddle], TempBool); //n4af 4.36.7
+  if not DoingPaddle then
+    TempBool := False
+  else
+    TempBool := True;
+  // Windows.EnableWindow(wh[mwePaddle], TempBool); //n4af 4.36.7
 
-  if not tDoingFootSwitchEnable then TempBool := False else TempBool := True;
+  if not tDoingFootSwitchEnable then
+    TempBool := False
+  else
+    TempBool := True;
   Windows.EnableWindow(wh[mweFootSwitch], TempBool);
 end;
 
@@ -5047,14 +5180,16 @@ end;
 function CQLabel(Callsign: CallString): boolean;
 begin
   Result := False;
-  if length(Callsign) < 3 then Exit;
-  if (Callsign[1] = 'C') and (Callsign[2] = 'Q') and (Callsign[3] = '/') then Result := True;
+  if length(Callsign) < 3 then
+    Exit;
+  if (Callsign[1] = 'C') and (Callsign[2] = 'Q') and (Callsign[3] = '/') then
+    Result := True;
 end;
 
 procedure old_UpadateRadioStatus(RadioPointer: RadioPtr);
 var
-  TempInt                               : integer;
-  h                                     : HWND;
+  TempInt: integer;
+  h: HWND;
 begin
 end;
 
@@ -5101,58 +5236,58 @@ procedure DisplayCountryInformation(FileName: Str80; Call: CallString);
   in the editable log window. }
 
 var
-  FileRead                              : Text;
-  CountryID                             : Str20;
-  FileString                            : Str80;
-  WhereY                                : integer;
+  FileRead: Text;
+  CountryID: Str20;
+  FileString: Str80;
+  WhereY: integer;
 begin
-{  REMOVECANDIDATE
-  //  if tr4w_WindowsArray[tr4w_LAST5WINDOW_INDEX].tr4w_WndHandle = 0 then Exit;
-  if not OpenFileForRead(FileRead, FileName) then Exit;
+  {  REMOVECANDIDATE
+    //  if tr4w_WindowsArray[tr4w_LAST5WINDOW_INDEX].tr4w_WndHandle = 0 then Exit;
+    if not OpenFileForRead(FileRead, FileName) then Exit;
 
-  CountryID := CountryTable.GetCountryID(CountryTable.GetCountry(Call, True));
+    CountryID := CountryTable.GetCountryID(CountryTable.GetCountry(Call, True));
 
-  strU(CountryID);
-  WhereY := 1;
-  while not Eof(FileRead) do
-  begin
-    ReadLn(FileRead, FileString);
-
-    if UpperCase(FileString) = CountryID then
+    strU(CountryID);
+    WhereY := 1;
+    while not Eof(FileRead) do
     begin
-          //      SaveSetAndClearActiveWindow(EditableLogWindow);
+      ReadLn(FileRead, FileString);
 
-      repeat
-        ReadLn(FileRead, FileString);
+      if UpperCase(FileString) = CountryID then
+      begin
+            //      SaveSetAndClearActiveWindow(EditableLogWindow);
 
-        if FileString <> '' then
-        begin
-                //          if WhereX > 1 then WriteLn;
-                //          Write(FileString);
-                //          SendDlgItemMessage(tr4w_WindowsArray[tr4w_LAST5WINDOW_INDEX].tr4w_WndHandle, 101, LB_ADDSTRING, 0, integer(PChar(string(FileString))));
-                //          SendMessage(_EditableLogWindow, LB_ADDSTRING, 0, integer(PChar(string(FileString))));
-          inc(WhereY);
-        end;
+        repeat
+          ReadLn(FileRead, FileString);
 
-      until (WhereY = 5) or (FileString = '');
+          if FileString <> '' then
+          begin
+                  //          if WhereX > 1 then WriteLn;
+                  //          Write(FileString);
+                  //          SendDlgItemMessage(tr4w_WindowsArray[tr4w_LAST5WINDOW_INDEX].tr4w_WndHandle, 101, LB_ADDSTRING, 0, integer(PChar(string(FileString))));
+                  //          SendMessage(_EditableLogWindow, LB_ADDSTRING, 0, integer(PChar(string(FileString))));
+            inc(WhereY);
+          end;
 
-      Close(FileRead);
-          //      RestorePreviousWindow;
-      Exit;
+        until (WhereY = 5) or (FileString = '');
+
+        Close(FileRead);
+            //      RestorePreviousWindow;
+        Exit;
+
+      end;
 
     end;
 
-  end;
-
-  Close(FileRead);
-}
+    Close(FileRead);
+  }
 end;
 
 procedure FlashQickDisplay;
 var
-  i                                     : integer;
+  i: integer;
 begin
-//  Windows.AnimateWindow(wh[mweQuickCommand], 1000, AW_ACTIVATE or AW_VER_NEGATIVE);
+  //  Windows.AnimateWindow(wh[mweQuickCommand], 1000, AW_ACTIVATE or AW_VER_NEGATIVE);
   for i := 0 to 5 do
   begin
     Windows.EnableWindow(wh[mweQuickCommand], LongBool(i mod 2));
@@ -5164,42 +5299,49 @@ end;
 
 procedure ShowTourDuration;
 var
-  IntegerTime                           : integer;
+  IntegerTime: integer;
 begin
-  if TourDuration = 0 then Exit;
+  if TourDuration = 0 then
+    Exit;
   IntegerTime := UTC.wMinute mod TourDuration;
   Windows.SendMessage(TorDurationPrBarWindow, PBM_SETPOS, IntegerTime, 0);
 
   Format(TempBuffer2, TC_NEWTOUR, IntegerTime, TourDuration);
 
-//  Windows.SetDlgItemText(ReminderDlgHandle, 102, TempBuffer2);
+  //  Windows.SetDlgItemText(ReminderDlgHandle, 102, TempBuffer2);
   Windows.SetWindowText(TorDurationWindow, TempBuffer2);
 
   if IntegerTime = 1 then
   begin
     SendMessage(TorDurationPrBarWindow, PBM_SETMARQUEE, wParam(False), 40);
-    Windows.SetWindowLong(TorDurationPrBarWindow {GetDlgItem(ReminderDlgHandle, 101)}, GWL_STYLE, $50000001);
+    Windows.SetWindowLong(TorDurationPrBarWindow
+      {GetDlgItem(ReminderDlgHandle, 101)}, GWL_STYLE, $50000001);
   end;
 
   if IntegerTime = 0 then
   begin
-    if Sheet.tAutoReset then tClearDupesheet;
-    if (Sheet.tAutoReset and MultReset) then tClearMultsheet; // 4.52.11
+    if Sheet.tAutoReset then
+      tClearDupesheet;
+    if (Sheet.tAutoReset and MultReset) then
+      tClearMultsheet; // 4.52.11
     SendMessage(TorDurationPrBarWindow, PBM_SETMARQUEE, wParam(True), 40);
-    Windows.SetWindowLong(TorDurationPrBarWindow {GetDlgItem(ReminderDlgHandle, 101)}, GWL_STYLE, $50000009);
+    Windows.SetWindowLong(TorDurationPrBarWindow
+      {GetDlgItem(ReminderDlgHandle, 101)}, GWL_STYLE, $50000009);
   end;
 end;
 
 procedure SetListViewColor(Window: TMainWindowElement);
-var rgb: cardinal;
+var
+  rgb: cardinal;
 begin
-  if wh[Window] = 0 then Exit;
-  ListView_SetTextBkColor(wh[Window], tr4wColorsArray[TWindows[Window].mweBackG]);
+  if wh[Window] = 0 then
+    Exit;
+  ListView_SetTextBkColor(wh[Window],
+    tr4wColorsArray[TWindows[Window].mweBackG]);
   ListView_SetBkColor(wh[Window], tr4wColorsArray[TWindows[Window].mweBackG]);
   ListView_SetTextColor(wh[Window], tr4wColorsArray[TWindows[Window].mweColor]);
-  
 
-//  Windows.SendMessage(wh[Window], LVM_REDRAWITEMS, 0, LinesInEditableLog - 1);
+  //  Windows.SendMessage(wh[Window], LVM_REDRAWITEMS, 0, LinesInEditableLog - 1);
   Windows.InvalidateRect(wh[Window], nil, True);
 end;
 
@@ -5213,7 +5355,6 @@ begin
   AutoSendEnable := AutoSendCharacterCount > 0;
   DisplayAutoSendCharacterCount;
 end;
-
 
 begin
   WindInit;
