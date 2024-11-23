@@ -294,7 +294,7 @@ begin
         //   showmessage(@TelnetBuffer);
 
         TelnetBuffer[i] := #0;
-        spotcnt := spotcnt + 1; // beta test alleviate # screen writes
+        spotcnt := spotcnt + 1;       // beta test alleviate # screen writes
         if spotcnt = 1 then
         begin
           move(TelnetBuffer[0], SpotsBuffer[0], i);
@@ -308,7 +308,7 @@ begin
           move(SpotsBuffer[0], TelnetBuffer[0], i);
           ProcessTelnetString(i);
 
-        end; // end beta
+       end;                               // end beta
 
         //Except on E : Exception do
        //    begin

@@ -613,7 +613,7 @@ begin
     Exit;
     if not QSYInactiveRadio then
   PutCallToCallWindow(Spot.FCall);
-  tSetExchWindInitExchangeEntry ; // 4.138.2
+
   if not QSOByMode then
     EntryMode := Both;
   DispalayB4(integer(
@@ -629,7 +629,7 @@ begin
   i := SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
   if i = LB_ERR then
     Exit;
-  spotsList.Delete(SendMessage(BandMapListBox, LB_GETITEMDATA, i, 0));
+  SpotsList.Delete(SendMessage(BandMapListBox, LB_GETITEMDATA, i, 0));
   if tLB_SETCURSEL(BandMapListBox, i) = LB_ERR then
     tLB_SETCURSEL(BandMapListBox, i - 1);
   ShowSpotInfo;

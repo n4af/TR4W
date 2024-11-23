@@ -748,12 +748,10 @@ begin
     if FList^[Index2].FCall <> MyCall then
       if OpMode = SearchAndPounceOpMode then // n4af 4.45.10
       begin
-        tCleareExchangeWindow; // 4.138.3
         tClearDupeInfoCall; // 4.55.6
         PutCallToCallWindow(FList^[Index2].FCall);
         SendMessage(wh[mweCall], EM_SETSEL, 0, -1);
         CallsignIsPastedFromBandMap := True;
-        tSetExchWindInitExchangeEntry ; // 4.138.3
       end;
     //    LOGSUBS2.DoAltZ();
     Exit;

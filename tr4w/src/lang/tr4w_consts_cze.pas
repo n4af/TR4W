@@ -97,7 +97,6 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Chceš ovìøit, zda existuje novìjší verze TR4W ?';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
   TC_IRTS                               = 'EI/GI, enter your County';
   TC_EUDX                               = 'EU country, enter your four character country code';
   TC_UKEI                               = 'Zkontrolovat, je-li UK/EI';
