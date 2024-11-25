@@ -750,7 +750,6 @@ begin
       if OpMode = SearchAndPounceOpMode then // n4af 4.45.10
       begin
         tCleareCallWindow;
-      //  tCleareExchangeWindow; // 4.138.3
         tClearDupeInfoCall; // 4.55.6
         PutCallToCallWindow(FList^[Index2].FCall);
         SendMessage(wh[mweCall], EM_SETSEL, 0, -1);
