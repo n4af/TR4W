@@ -693,6 +693,7 @@ begin
   begin
     ClearAltD;
     tClearDupeInfoCall;
+
   end;
 
   if d <= BandMapGuardBand then
@@ -707,6 +708,7 @@ begin
     DupeInfoCall := FList^[Index2].FCall; // 4.65.2
     DupeCheckOnInactiveRadio(True);
     DupeInfoCallWindowCleared := False;
+    tCallWindowSetFocus;
   end;
 end;
 
@@ -731,8 +733,7 @@ begin
     a := Abs(FList^[Index].FFrequency - Freq);
     {logger.debug('[TDXSpotsList.DisplayCallsignOnThisFreq] a = %d, BandMapGuardBand = %d,  PInteger(@FList^[Index].FCall[1])^ = %d, tCQAsInteger = %d',
                   [a, BandMapGuardBand, PInteger(@FList^[Index].FCall[1])^, tCQAsInteger]);}
-    if (a < BandMapGuardBand) and (PInteger(@FList^[Index].FCall[1])^ <>
-      tCQAsInteger) then
+    if (a < BandMapGuardBand) and (PInteger(@FList^[Index].FCall[1])^ <>  tCQAsInteger) then
     begin
       if a < d then
       begin
@@ -748,30 +749,42 @@ begin
     if FList^[Index2].FCall <> MyCall then
       if OpMode = SearchAndPounceOpMode then // n4af 4.45.10
       begin
-        tCleareExchangeWindow; // 4.138.3
+        tCleareCallWindow;
+      //  tCleareExchangeWindow; // 4.138.3
         tClearDupeInfoCall; // 4.55.6
         PutCallToCallWindow(FList^[Index2].FCall);
         SendMessage(wh[mweCall], EM_SETSEL, 0, -1);
         CallsignIsPastedFromBandMap := True;
-        tSetExchWindInitExchangeEntry ; // 4.138.3
-      end;
-    //    LOGSUBS2.DoAltZ();
-    Exit;
+       // tSetExchWindInitExchangeEntry ; // 4.139.1
+       // Windows.SetFocus(wh[mweCall]);      // 4.139.1
+       end;
+
+
+   Exit;
   end;
 
   if not CallWindowEmpty then
-    if CallsignIsPastedFromBandMap then
+    if (CallsignIsPastedFromBandMap)  then
     begin
       tCleareCallWindow;
       tCleareExchangeWindow;
+      tCallWindowSetFocus;
+    end
+    else
+     if CallWindowEmpty then
+    begin
+     tcleareExchangeWindow;
+     tcleareCallWindow;
+     tCallWindowSetFocus;
     end;
+
 end;
 
 begin
   //  SpotsList := TDXSpotsList.Create;
   SpotsList.Init;
   SpotsList.FCurrentCursorFreq := -1;
-
+  tCallWindowSetFocus;    // 4.139.1
 end.
 
 

@@ -2760,6 +2760,7 @@ begin
                            Second := False;
                               // n4af 4.46.7  first esc d/n clear call
                            switchnext := False; // n4af issue  230
+                           tCallWindowSetFocus;  // 4.139.1
                         end;
          if rig.CurrentStatus.TxOn then
             begin
@@ -2803,7 +2804,7 @@ begin
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
                BandMapBand := ActiveBand;
                BandMapMode := ActiveMode;
-               DisplayBandMap;         
+               DisplayBandMap;
             end;
       end
    else

@@ -1689,7 +1689,6 @@ begin
   if TempBand <> NoBand then
   begin
     SetRadioFreq(ActiveRadio, TempFreq, TempMode, TempVFO);
-    tCleareCallWindow;
     Result := True;
     logger.debug('[TuneOnFreqFromCallWindow] Clearing Mults and QSO Needs Headers');
     SetMainWindowText(mweMultNeedsHeader, PChar(''));
@@ -4707,6 +4706,7 @@ procedure tCleareCallWindow;
 begin
   logger.debug('Clearing main call window');
   Windows.SetWindowText(wh[mweCall], nil);
+
 end;
 
 procedure tCleareExchangeWindow;
@@ -4714,6 +4714,7 @@ begin
   // Windows.SetWindowText(ExchangeWindowHandle, nil);
   // SetMainWindowText(mweExchange, nil);
   Windows.SetWindowText(wh[mweExchange], nil);
+  
 end;
 
 procedure tSetExchWindInitExchangeEntry;
@@ -4723,7 +4724,7 @@ begin
   Windows.ZeroMemory(@ie, SizeOf(ie));
   ie := InitialExchangeEntry(CallWindowString);
   SetMainWindowText(mweExchange, @ie[1]);
-  if LeaveCursorInCallWindow then
+  if LeaveCursorInCallWindow then 
     tCallWindowSetFocus;
 end;
 

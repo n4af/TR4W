@@ -612,8 +612,10 @@ begin
   if PInteger(@Spot.FCall[1])^ = tNEWAsInteger then
     Exit;
     if not QSYInactiveRadio then
-  PutCallToCallWindow(Spot.FCall);
-  tSetExchWindInitExchangeEntry ; // 4.138.2
+     tSetExchWindInitExchangeEntry ; // 4.138.2
+     PutCallToCallWindow(Spot.FCall);
+  
+
   if not QSOByMode then
     EntryMode := Both;
   DispalayB4(integer(
