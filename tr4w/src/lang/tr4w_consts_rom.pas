@@ -104,7 +104,6 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Doresti o versiune mai noua a TR4W ?';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
   TC_IRTS                               = 'EI/GI, enter your County';
   TC_EUDX                               = 'EU country, enter your four character country code';
   TC_LATEST_CONFIG_FILE                 = 'Ultimul fisier de configurare';

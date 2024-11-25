@@ -612,9 +612,13 @@ begin
   if PInteger(@Spot.FCall[1])^ = tNEWAsInteger then
     Exit;
     if not QSYInactiveRadio then
+<<<<<<< HEAD
      tSetExchWindInitExchangeEntry ; // 4.138.2
      PutCallToCallWindow(Spot.FCall);
   
+=======
+  PutCallToCallWindow(Spot.FCall);
+>>>>>>> bfe21056759340675e8035755ab157d2b6247814
 
   if not QSOByMode then
     EntryMode := Both;
@@ -631,7 +635,7 @@ begin
   i := SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
   if i = LB_ERR then
     Exit;
-  spotsList.Delete(SendMessage(BandMapListBox, LB_GETITEMDATA, i, 0));
+  SpotsList.Delete(SendMessage(BandMapListBox, LB_GETITEMDATA, i, 0));
   if tLB_SETCURSEL(BandMapListBox, i) = LB_ERR then
     tLB_SETCURSEL(BandMapListBox, i - 1);
   ShowSpotInfo;

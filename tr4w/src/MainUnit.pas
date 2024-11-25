@@ -457,10 +457,9 @@ type
 type
   TADIF_Fields = (tAdifARRL_SECT = 0, tAdifBAND, tAdifCALL, tAdifCHECK,
     tAdifCLASS, tAdifCQ_Z,
-    tAdifCONTEST_ID, tAdifCNTY, tadifFOC_NUM, tAdifGRIDSQUARE, tAdifFREQ,
-    tAdifFREQ_RX,
+    tAdifCONTEST_ID, tAdifCNTY,tadifFOC_NUM, tAdifGRIDSQUARE, tAdifFREQ, tAdifFREQ_RX,
     tAdifIOTA, tAdifITUZ, tAdifMODE, tAdifNAME, tAdifOPERATOR, tAdifPRECEDENCE,
-    tAdifQSO_DATE, tAdifQSO_DATE_OFF, tAdifTIME_ON, tAdifTIME_OFF,
+    tAdifQSO_DATE, tAdifQSO_DATE_OFF,  tAdifTIME_ON, tAdifTIME_OFF,
     tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
     tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
     tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
@@ -594,36 +593,37 @@ end;
 procedure ResetRadioPorts;
 begin
 
-  logger.info('Resetting radio ports');
-  if ActiveRadioPtr.tNetObject <> nil then
-  begin
-    ActiveRadioPtr.tNetObject.Disconnect;
-    ActiveRadioPtr.tNetObject.Connect;
-  end
-  else if ActiveRadioPtr.tHamLibObject <> nil then
-  begin
-    ActiveRadioPtr.tHamLibObject.Disconnect;
-    ActiveRadioPtr.tHamLibObject.Connect;
-  end;
+   logger.info('Resetting radio ports');
+   if ActiveRadioPtr.tNetObject <> nil then
+      begin
+      ActiveRadioPtr.tNetObject.Disconnect;
+      ActiveRadioPtr.tNetObject.Connect;
+      end
+   else if ActiveRadioPtr.tHamLibObject <> nil then
+      begin
+      ActiveRadioPtr.tHamLibObject.Disconnect;
+      ActiveRadioPtr.tHamLibObject.Connect;
+      end;
 
-  ActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
+   ActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
 
-  //
-  // Handle radio two
-  //
-  if InActiveRadioPtr.tNetObject <> nil then
-  begin
-    InActiveRadioPtr.tNetObject.Disconnect;
-    InActiveRadioPtr.tNetObject.Connect;
-  end
-  else if InActiveRadioPtr.tNetObject <> nil then
-  begin
-    InActiveRadioPtr.tNetObject.Disconnect;
-    InActiveRadioPtr.tNetObject.Connect;
-  end;
+   //
+   // Handle radio two
+   //
+   if InActiveRadioPtr.tNetObject <> nil then
+      begin
+      InActiveRadioPtr.tNetObject.Disconnect;
+      InActiveRadioPtr.tNetObject.Connect;
+      end
+   else if InActiveRadioPtr.tNetObject <> nil then
+      begin
+      InActiveRadioPtr.tNetObject.Disconnect;
+      InActiveRadioPtr.tNetObject.Connect;
+      end;
 
-  InActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
+   InActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
 end;
+
 
 procedure Escape_proc;
 var
@@ -799,7 +799,8 @@ end;
 
 procedure SpaceBarProc2;
 begin
-  if (DupeInfoCall = '') and (CallWindowString = '') and (OpMode = SearchAndPounceOpMode) then // 4.102.3
+  if (DupeInfoCall = '') and (CallWindowString = '') and (OpMode =
+    SearchAndPounceOpMode) then // 4.102.3
     if not DEEnable then
       SendStringAndStop(MyCall)
     else
@@ -837,7 +838,10 @@ begin
   end
   else
   begin
-    if (OpMode <> SearchAndPounceOpMode) and ((CallWindowString = '') or not SpaceBarDupeCheckEnable) then
+    if
+      (
+      (OpMode <> SearchAndPounceOpMode) and ((CallWindowString = '') or not
+      SpaceBarDupeCheckEnable)) then
     begin
       if CWStillBeingSent then
         FlushCWBufferAndClearPTT; { Clear CW sent on Inactive Radio}
@@ -1193,8 +1197,8 @@ begin
   if (ExchangeWindowString = '') and (CallWindowString = '') then
     if AutoReturnToCQMode then
     begin
-      //     tClearDupeInfoCall; // 4.126.1
-      //     clearAltD;         //4.126.1
+ //     tClearDupeInfoCall; // 4.126.1
+ //     clearAltD;         //4.126.1
       NameCallsignPutUp := '';
       CleanUpDisplay;
       if ActiveRadioPtr^.tTwoRadioMode = TR1 then
@@ -1678,9 +1682,8 @@ begin
     begin
       TempFreq := TempFreq * 1000 + StartingFrequencies[TempBand];
     end
-    else
-      TempFreq := TempFreq * 1000 + (StartingFrequencies[TempBand] div 1000000)
-        * 1000000;
+    else  
+      TempFreq := TempFreq * 1000 + (StartingFrequencies[TempBand] div 1000000) * 1000000;
   end
   else
     TempFreq := TempFreq * 1000;
@@ -1945,7 +1948,7 @@ begin
     if (Freq > 1000) and (Freq < 1000000) then
       case RadioToSet.BandMemory {BandMemory[RadioToSet]} of
         Band80: Freq := Freq + 3000000;
-        //      Band60: Freq := Freq  +5300000;
+  //      Band60: Freq := Freq  +5300000;
         Band40: Freq := Freq + 7000000;
         Band20: Freq := Freq + 14000000;
         Band15: Freq := Freq + 21000000;
@@ -2068,9 +2071,9 @@ begin
   end;
 
   if assigned(externalLogger) then
-  begin
-    FreeAndNil(externalLogger);
-  end;
+     begin
+     FreeAndNil(externalLogger);
+     end;
 
   if Radio1.tNetObject <> nil then
   begin
@@ -3227,37 +3230,37 @@ begin
     item_calculator: WinExec('calc.exe', SW_SHOW);
 
     menu_reset_radio_ports:
-      begin
-        ResetRadioPorts;
-        {logger.info('Resetting radio ports');
-        if ActiveRadioPtr.tNetObject <> nil then
-           begin
-           ActiveRadioPtr.tNetObject.Disconnect;
-           ActiveRadioPtr.tNetObject.Connect;
-        end
-        else if ActiveRadioPtr.tHamLibObject <> nil then
-           begin
-           ActiveRadioPtr.tHamLibObject.Disconnect;
-           ActiveRadioPtr.tHamLibObject.Connect;
-        end;
+       begin
+       ResetRadioPorts;
+       {logger.info('Resetting radio ports');
+       if ActiveRadioPtr.tNetObject <> nil then
+          begin
+          ActiveRadioPtr.tNetObject.Disconnect;
+          ActiveRadioPtr.tNetObject.Connect;
+       end
+       else if ActiveRadioPtr.tHamLibObject <> nil then
+          begin
+          ActiveRadioPtr.tHamLibObject.Disconnect;
+          ActiveRadioPtr.tHamLibObject.Connect;
+       end;
 
-        ActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
-        //
-        // Handle radio two
-        //
-        if InActiveRadioPtr.tNetObject <> nil then
+       ActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
+       //
+       // Handle radio two
+       //
+       if InActiveRadioPtr.tNetObject <> nil then
+          begin
+          InActiveRadioPtr.tNetObject.Disconnect;
+          InActiveRadioPtr.tNetObject.Connect;
+          end
+        else if InActiveRadioPtr.tNetObject <> nil then
            begin
            InActiveRadioPtr.tNetObject.Disconnect;
            InActiveRadioPtr.tNetObject.Connect;
-           end
-         else if InActiveRadioPtr.tNetObject <> nil then
-            begin
-            InActiveRadioPtr.tNetObject.Disconnect;
-            InActiveRadioPtr.tNetObject.Connect;
-            end;
+           end;
 
-         InActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
-         }
+        InActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
+        }
       end;
 
     menu_pingserver:
@@ -3502,11 +3505,11 @@ begin
 
     menu_WA7BNM_calendar:
       begin
-        Format(TempBuffer1,
-          'https://contestcalendar.com/contestdetails.php?ref=%u', // 4.127.1',
+       Format(TempBuffer1,
+          'https://contestcalendar.com/contestdetails.php?ref=%u',      // 4.127.1',
           ContestsArray[Contest].WA7BNM);
-        //   OpenUrl(TempBuffer1);
-        Shellexecute(0, 'open', tempbuffer1, nil, nil, SW_NORMAL); // 4.127.1
+     //   OpenUrl(TempBuffer1);
+        Shellexecute(0, 'open', tempbuffer1, nil, nil, SW_NORMAL);  // 4.127.1
 
       end;
 
@@ -3640,7 +3643,7 @@ begin
     end;
   end;
   SetFreq:
-  if TuneOnFreqFromCallWindow then
+   if TuneOnFreqFromCallWindow then
     Exit;
   if CallWindowString = 'TXON' then
   begin
@@ -4919,8 +4922,7 @@ begin
   logger.Info('Calling tCreateThread from tRuntPaddleAndFootSwitchThread');
   tPaddleFootSwitchThread := tCreateThread(@tPaddleFootSwitchThreadProc,
     tPaddleThreadID);
-  logger.Info('Created PaddleAndFootSwitch thread with threadid of %d',
-    [tPaddleThreadID]);
+  logger.Info('Created PaddleAndFootSwitch thread with threadid of %d',[tPaddleThreadID] );
   asm
  push THREAD_PRIORITY_LOWEST
  push eax
@@ -6516,9 +6518,8 @@ function CheckCommandInCallsignWindow: boolean;
 begin
   Result := true;
   case AnsiIndexText(AnsiUpperCase(CallWindowString),
-    ['ADIF', 'CAB', 'CMD', 'COL', 'CWOFF', 'CWON', 'EXIT', 'NOTE', 'OPON',
-    'SCORE',
-      'SUM', 'UDP', 'WCY', 'WWV']) of
+    ['ADIF', 'CAB', 'CMD', 'COL', 'CWOFF', 'CWON', 'EXIT', 'NOTE', 'OPON','SCORE',
+    'SUM', 'UDP', 'WCY', 'WWV']) of
     0: ProcessMenu(menu_adif);
     1: ProcessMenu(menu_cabrillo);
     2: WinExec('cmd.exe', SW_SHOW);
@@ -6905,7 +6906,7 @@ var
   appHQ: string;
   recordFromWSJTX: boolean;
   gridSquare: string;
-  foc_num: string;
+  foc_num : string;
   tempSRX_String: string;
   tempSTX_String: string;
   tempState: string;
@@ -6984,9 +6985,9 @@ begin
               tAdifCNTY:
                 logger.info('[ParseADIFRecord] CNTY was in record as %s but skipping since no place to put it', [fieldValue]); //CNTY
               tAdifFOC_NUM:
-                begin
-                  foc_num := fieldvalue;
-                end;
+               begin
+                foc_num := fieldvalue;
+               end;
               tAdifGRIDSQUARE:
                 begin
                   gridSquare := fieldValue;
@@ -6995,13 +6996,13 @@ begin
                 begin
                   saveDecimalSeparator := DecimalSeparator;
                   try
-                    DecimalSeparator := '.';
-                    neFreq := StrToFloat(fieldValue);
-                    neFreq := neFreq * 1000000;
-                    exch.Frequency := Trunc(neFreq);
-                    logger.Trace('[ParseADIFRecord] FREQ = %s', [fieldValue]);
+                     DecimalSeparator := '.';
+                     neFreq := StrToFloat(fieldValue);
+                     neFreq := neFreq * 1000000;
+                     exch.Frequency := Trunc(neFreq);
+                     logger.Trace('[ParseADIFRecord] FREQ = %s', [fieldValue]);
                   finally
-                    DecimalSeparator := saveDecimalSeparator;
+                     DecimalSeparator :=  saveDecimalSeparator;
                   end;
                 end;
               tAdifITUZ: exch.Zone := StrToInt(fieldValue);
@@ -7104,15 +7105,15 @@ begin
                     recordFromWSJTX := true;
                   end;
                 end;
-              tAdifAPP_N1MM_EXCHANGE1: // N1MM puts the CLASS in APP_N1MM_EXCHANGE1 instead of CLASS. I submitted a ticket but they will not fix it.
-                if exch.ceContest in [ARRLFIELDDAY, WINTERFIELDDAY] then
-                begin
-                  exch.ceClass := AnsiUpperCase(fieldValue);
-                end
-                else if exch.ceContest in [FOCMARATHON] then
-                begin
-                  exch.Power := fieldValue;
-                end;
+              tAdifAPP_N1MM_EXCHANGE1:   // N1MM puts the CLASS in APP_N1MM_EXCHANGE1 instead of CLASS. I submitted a ticket but they will not fix it.
+                 if exch.ceContest in [ARRLFIELDDAY, WINTERFIELDDAY] then
+                    begin
+                    exch.ceClass := AnsiUpperCase(fieldValue);
+                    end
+                 else if exch.ceContest in [FOCMARATHON] then
+                    begin
+                    exch.Power := fieldValue;
+                    end;
 
             else
               if MidStr(fieldName, 1, 4) <> 'APP_' then
@@ -7193,11 +7194,6 @@ begin
         exch.QTHString := gridSquare;
         exch.DomesticQTH := gridSquare;
       end;
-    WAG:
-      begin
-        exch.QTHString := tempSRX_String;
-      end;
-
     ARRL160, CQ160CW, CQ160SSB, UBACW, UBASSB: // 4.106.7
       begin
         exch.DomesticQTH := tempSRX_String;
@@ -7234,9 +7230,9 @@ begin
         // tAdifCQ_Z: exch.Zone := StrToInt(fieldValue);
         exch.zone := strtoint(tempSRX_String);
       end;
-    FOCMARATHON:
+      FOCMARATHON:
       begin
-        exch.Power := foc_num;
+      exch.Power:= foc_num;
       end;
     IARU:
       exch.QTHString := fieldValue;
@@ -7874,10 +7870,10 @@ begin
   end
   else
      begin}
-  sURI := TIDURI.URLEncode(url);
-  ShellExecute(0, 'open', PChar(sURI), nil, nil, SW_SHOWNORMAL);
-  { end;}
-  //RunExplorer(url);
+     sURI := TIDURI.URLEncode(url);
+     ShellExecute(0, 'open', PChar(sURI), nil, nil, SW_SHOWNORMAL);
+    { end;}
+    //RunExplorer(url);
 end;
 
 function GetAddMultBand(Mult: TAdditionalMultByBand; Band: BandType): BandType;
@@ -8555,7 +8551,7 @@ begin
     rbNone: Result := NoBand;
     rb160m: Result := Band160;
     rb80m: Result := Band80;
-    //   rb60m: Result := Band60;
+ //   rb60m: Result := Band60;
     rb40m: Result := Band40;
     rb30m: Result := Band30;
     rb20m: Result := Band20;
@@ -8583,7 +8579,7 @@ begin
     NoBand: Result := rbNone;
     Band160: Result := rb160m;
     Band80: Result := rb80m;
-    //    Band60: Result := rb60m;
+//    Band60: Result := rb60m;
     Band40: Result := rb40m;
     Band30: Result := rb30m;
     Band20: Result := rb20m;
@@ -9025,4 +9021,3 @@ begin
 {$IFEND}
 
 end.
-

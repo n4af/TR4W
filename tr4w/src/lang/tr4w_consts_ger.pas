@@ -90,7 +90,6 @@
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Willst du pruefen, ob es eine neuere Version von TR4W gibt?';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
   TC_EUDX                               = 'EU country, enter your four character country code';
   TC_IRTS                               = 'EI/GI, dein County eingeben';
   TC_LATEST_CONFIG_FILE                 = 'Neueste Config Datei';

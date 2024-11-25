@@ -102,7 +102,6 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Proveri da li je instalirana poslednja verzija TR4W programa';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
   TC_EUDX                               = 'EU country, enter your four character country code';
   TC_LATEST_CONFIG_FILE                 = 'Poslednja konfiguraciona datoteka';
   TC_OPENCONFIGURATIONFILE              = ' - Otvori konfiguracionu datoteku ili kreiraj konfiguraciju za novo takmicenje';

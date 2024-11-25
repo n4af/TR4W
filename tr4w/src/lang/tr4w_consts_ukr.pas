@@ -100,7 +100,6 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Ви хочете перевірити останню версію на сайті програми?'; 
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
   TC_EUDX                               = '«Країна ЄС, введіть чотиризначний код країни»;';
   TC_LATEST_CONFIG_FILE                 = 'Останній файл конфігурації';
   TC_OPENCONFIGURATIONFILE              = ' - Відкрити файли конфігурації або розмістити новий контест';
