@@ -601,7 +601,7 @@ begin
     InActiveRadioPtr.ModeMemory := Spot.FMode; //Gav 4.37
  //   Exit;  // .126.8
   end;
- // tCleareExchangeWindow;
+  tCleareExchangeWindow;
   tCallWindowSetFocus;
   CallAlreadySent := False;
   ExchangeHasBeenSent := False;
@@ -612,13 +612,9 @@ begin
   if PInteger(@Spot.FCall[1])^ = tNEWAsInteger then
     Exit;
     if not QSYInactiveRadio then
-<<<<<<< HEAD
-     tSetExchWindInitExchangeEntry ; // 4.138.2
+   //  tSetExchWindInitExchangeEntry ; // 4.138.2
      PutCallToCallWindow(Spot.FCall);
   
-=======
-  PutCallToCallWindow(Spot.FCall);
->>>>>>> bfe21056759340675e8035755ab157d2b6247814
 
   if not QSOByMode then
     EntryMode := Both;
@@ -635,7 +631,7 @@ begin
   i := SendMessage(BandMapListBox, LB_GETCURSEL, 0, 0);
   if i = LB_ERR then
     Exit;
-  SpotsList.Delete(SendMessage(BandMapListBox, LB_GETITEMDATA, i, 0));
+  spotsList.Delete(SendMessage(BandMapListBox, LB_GETITEMDATA, i, 0));
   if tLB_SETCURSEL(BandMapListBox, i) = LB_ERR then
     tLB_SETCURSEL(BandMapListBox, i - 1);
   ShowSpotInfo;

@@ -755,7 +755,7 @@ begin
         SendMessage(wh[mweCall], EM_SETSEL, 0, -1);
         CallsignIsPastedFromBandMap := True;
        // tSetExchWindInitExchangeEntry ; // 4.139.1
-       // Windows.SetFocus(wh[mweCall]);      // 4.139.1
+       // Windows.SetFocus(wh[mweCall]);      // 4.139.2
        end;
 
 
@@ -767,7 +767,7 @@ begin
     begin
       tCleareCallWindow;
       tCleareExchangeWindow;
-      tCallWindowSetFocus;
+      //tCallWindowSetFocus;
     end
     else
      if CallWindowEmpty then
