@@ -2751,7 +2751,7 @@ begin
             if dif > AutoSAPEnableRate then
                if dif <= 10000 then
                   if AutoSAPEnable {and (Not Switch) } then // n4af 4.44.10
-                     if OpMode = CQOpMode then
+                    // if OpMode = CQOpMode then    // 4.139.3
                         begin
                            SetOpMode(SearchAndPounceOpMode);
                            tClearDupeInfoCall;
