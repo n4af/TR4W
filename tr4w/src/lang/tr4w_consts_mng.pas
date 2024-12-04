@@ -90,6 +90,7 @@ const
   TC_WASBUILDIN                         = 'суулгалаа (суулгасан огноо';
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'TR4W-ийн шинэ хувилбар гарсан эсэхийг шалгах уу?';
   {NEW CONTEST}
+  TC_LABRE                              = 'Enter 2 char QTH ID';
   TC_IRTS                               = 'EI/GI, enter your County';
   TC_EUDX                               = 'EU country, enter your four character country code';
   TC_LATEST_CONFIG_FILE                 = 'Сvvлчийн Config File';
