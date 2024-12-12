@@ -1080,7 +1080,7 @@ begin
         DomesticMultByBand := dmbbAllBand;
       end;
 
-    RUSSIANDX, RU3AXMEMORIAL:
+    RUSSIANDX: // 4.140.1
       begin
         AddRussianDomesticCountrys;
         AddDomesticCountry('CE9');
@@ -1089,6 +1089,11 @@ begin
 //        CountDomesticCountries := True;
 //        ContestName := 'Russian DX Contest';
       end;
+    RU3AXMemorial:
+     begin
+      ActiveExchange := RSTAndGridExchange;
+      ActiveDXMult := ARRLDXCC;
+     end;
 
     SALMONRUN:
       begin

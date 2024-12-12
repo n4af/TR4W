@@ -7271,7 +7271,8 @@ begin
       ((ActiveExchange = RSTAndOrGridExchange) or
       (ActiveExchange = Grid2Exchange) or
       (ActiveExchange = RSTAndGrid3Exchange) or
-      (ActiveExchange = GridExchange) // 4.104.2 // 4.96.3
+      (ActiveExchange = GridExchange) or // 4.104.2 // 4.96.3
+      (ActiveExchange = RSTAndGridExchange)  // 4.140.1
       ) then
     begin
       exch.QTHString := gridSquare;

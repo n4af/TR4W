@@ -2565,7 +2565,10 @@ begin
       slOperators := TStringList.Create;
       slOperators.Duplicates := dupIgnore;
       TempGrid := MyGrid;
-  TempGrid[7] := #0;
+      if length(MyGrid) = 4 then     // 4.140.1
+       TempGrid[5] := #0
+        else
+         TempGrid[7] := #0;
   cMyGrid := @TempGrid[1];
 
   cMyName := @MyName[1];
@@ -2774,6 +2777,12 @@ if TempRXData.DomMultQTH = '' then
             Format(CABRILLO_MYEX, '%-11s', cMyGrid);
             logger.debug('[CabDetail-Grid2Exchange] MyExchange = (%s)',[CABRILLO_MYEX]);
             Format(CABRILLO_HISEX, '%-11s', csQTHString);
+          end;
+
+        RSTAndGridExchange:                // 4.140.1
+          begin
+            Format(CABRILLO_MYEX, '%-7s%-11s ', RSTSent, cMyGrid);
+            Format(CABRILLO_HISEX, '%-3s %-11s ', RSTReceived, csQTHString);
           end;
 
         RSTAndGrid3Exchange:                // 4.96.3
@@ -4286,7 +4295,7 @@ begin
 
       {Make Exchanges Strings}
       case ActiveExchange of
-         GridExchange, Grid2Exchange:
+         GridExchange, Grid2Exchange,RSTAndGridExchange:      // 4.140.1
             begin
            Result := cMyGrid;
         //  Format(CABRILLO_MYEX, '%-11s', cMyGrid);
@@ -4506,7 +4515,6 @@ begin
          RSTALLJAPrefectureAndPrecedenceExchange,
          RSTAndDOMESTICQTH,       //n4af
          RSTAndFOCNumberExchange, //n4af
-         RSTAndGridExchange,
          RSTAndSerialNumberAndGridandPossibleMemberNumber,
          RSTNameAndPossibleFOCNumber,
          RSTPossibleDomesticQTHAndPower,
