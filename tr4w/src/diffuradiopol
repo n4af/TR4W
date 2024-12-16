@@ -1,0 +1,449 @@
+49c49,51
+<    DateUtils;
+---
+>    DateUtils,
+>    uNetRadioBase,
+>    uRadioElecraftK4;
+55a58
+> procedure pNetworkRadio(rig: RadioPtr);
+75a79
+> procedure pFTDX10_FTDX101(rig: RadioPtr);
+92a97,98
+> procedure GetVFOInfoForYaesuType5(buf: PChar; var VFO: VFOStatusType;
+>    FrequencyAdder: integer);
+140c146
+<    if rig.RadioModel in [K3] then
+---
+>    if rig.RadioModel in [K3,K4] then
+288c294
+<                                                             [K3] then
+---
+>                                                             [K3, K4] then
+302c308
+<                                                                         logger.info('Unknown value from K3 ExtendedMode response' + rig^.tBuf);
+---
+>                                                                         logger.info('Unknown value from K3/K4 ExtendedMode response' + rig^.tBuf);
+378c384
+<                                                       logger.trace('K3/Kenwood2 says radio is transmitting');
+---
+>                                                       logger.trace('K3/K4/Kenwood2 says radio is transmitting');
+382c388
+<                                                       logger.trace('K3/Kenwood2 says radio is RECEIVING');
+---
+>                                                       logger.trace('K3/K4/Kenwood2 says radio is RECEIVING');
+711a718,770
+> procedure pNetworkRadio(rig: RadioPtr); // Network classes (K4 network, Flex 6000 series network, etc)
+> var ro: TNetRadioBase;
+> begin
+> 
+>    { Unlike the other polling procedures, all we have to do here is grab the
+>      radio parameters we need from network classes. We do not need to send any
+>      commands as the network class keeps up to date when anything on the radio
+>      changes. This is at least the way the K4 works. If other future network
+>      interfaces do not work that way, then the network class should poll on a
+>      timer so the net effect it appears that the network class just "has" the info.
+>      NY4I 27-Nov-2021
+>    }
+>    logger.Trace('[pNetworkRadio] Entering polling procedure');
+>    ro := rig^.tNetObject;
+>    while ro.IsConnected do
+>       begin
+>       Sleep(FreqPollRate);
+> 
+>       rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
+>       rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+>       GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
+>       rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
+>       rig^.CurrentStatus.Split := ro.IsSplitEnabled;
+>       rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
+>       rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
+>       rig^.CurrentStatus.TXOn := ro.IsTransmitting;
+> 
+>       // VFO A
+>       rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
+>       GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig.CurrentStatus.VFO[VFOA].Mode,rig.CurrentStatus.VFO[VFOA].ExtendedMode);
+>       rig.CurrentStatus.VFO[VFOA].RIT := ro.IsRITOn[nrVFOA];
+>       rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
+>       rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
+>       rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+> 
+>       // VFO B
+>       rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
+>       GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOB],rig.CurrentStatus.VFO[VFOB].Mode,rig.CurrentStatus.VFO[VFOB].ExtendedMode);
+>       rig.CurrentStatus.VFO[VFOB].RIT := ro.IsRITOn[nrVFOB];
+>       rig.CurrentStatus.VFO[VFOB].XIT := ro.IsXITOn[nrVFOB];
+>       rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
+>       rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
+> 
+>       UpdateStatus(rig);
+>       end;
+> 
+>       logger.Info('Exiting pNetworkRadio');
+>       rig.CurrentStatus.VFO[VFOA].Frequency := 0;
+>       rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+> 
+> end;
+> 
+> 
+1350,1408c1409,1411
+<                                     case Ord(rig.tBuf[i + 5]) of
+<                                        0:
+<                                           begin
+<                                              rig.CurrentStatus.Mode := Phone;
+<                                              rig.CurrentStatus.ExtendedMode :=
+<                                                 eLSB;
+<                                           end;
+<                                        1:
+<                                           begin
+<                                              rig.CurrentStatus.Mode := Phone;
+<                                              rig.CurrentStatus.ExtendedMode :=
+<                                                 eUSB;
+<                                           end;
+<                                        2:
+<                                           begin
+<                                              rig.CurrentStatus.Mode := Phone;
+<                                              rig.CurrentStatus.ExtendedMode :=
+<                                                 eAM;
+<                                           end;
+<                                        3:
+<                                           begin
+<                                              rig.CurrentStatus.Mode := CW;
+<                                              rig.CurrentStatus.ExtendedMode :=
+<                                                 eCW;
+<                                           end;
+<                                        4:
+<                                           begin
+<                                              rig.CurrentStatus.Mode := Digital;
+<                                              rig.CurrentStatus.ExtendedMode :=
+<                                                 eRTTY;
+<                                           end;
+<                                        5:
+<                                           begin
+<                                              rig.CurrentStatus.Mode := Phone;
+<                                              rig.CurrentStatus.ExtendedMode :=
+<                                                 eFM;
+<                                           end;
+<                                        7:
+<                                           begin
+<                                              rig.CurrentStatus.Mode := CW;
+<                                              rig.CurrentStatus.ExtendedMode :=
+<                                                 eCW_R;
+<                                           end;
+<                                        8:
+<                                           begin
+<                                              rig.CurrentStatus.Mode := Digital;
+<                                              rig.CurrentStatus.ExtendedMode :=
+<                                                 eRTTY_R;
+<                                           end;
+<                                        else
+<                                           DEBUGMSG('Unknown Mode command from Icom '
+<                                              + IntToStr(Ord(rig.tBuf[i + 5])));
+<                                     end;
+<                                     {case Ord(rig.tBuf[i + 5]) of
+<                                       5: rig.CurrentStatus.Mode := FM;
+<                                       3, 7: rig.CurrentStatus.Mode := CW;
+<                                       4, 8: rig.CurrentStatus.Mode := Digital;
+<                                     else rig.CurrentStatus.Mode := Phone;
+<                                     end;}
+---
+>                                     rig.saveMode := Ord(rig.tBuf[i + 5]);
+>                                     //rig.ProcessIcomMode(Ord(rig.tBuf[i + 5]));
+> 
+1415a1419,1440
+>                            ICOM_STATE:
+>                               if rig.tBuf[i + 5] = ICOM_STATE_DATA_MODE then
+>                                  begin
+>                                  if Ord(rig.tBuf[i + 6]) = 1 then  // Only set Digital if it is on as we would not know what mode is when data mode is reported off. ny4i
+>                                     begin
+>                                     if rig.currentStatus.Mode <> Digital then
+>                                        begin
+>                                        rig.CurrentStatus.Mode := Digital;
+>                                        Icom_Filter_Width := Ord(rig.tBuf[i+7]);
+>                                        logger.Trace('Setting Icom mode to DATA based on 1A06 command');
+>                                        UpdateStatus(rig);
+>                                        end;
+>                                     end
+>                                  else
+>                                     begin
+>                                     if rig.saveMode > 0 then
+>                                        begin
+>                                        rig.ProcessIcomMode(rig.saveMode);
+>                                        UpdateStatus(rig);
+>                                        end;
+>                                     end;
+>                                  end;
+1503,1520d1527
+<    { rig.SendIcomCommand(Ord(ICOM_GET_MODE));
+<     if not icomCheckBuffer(rig) then
+<     begin
+<       ClearRadioStatus(rig);
+<       UpdateStatus(rig);
+<       Sleep(1000);
+<       goto NextPoll;
+<     end;
+< 
+<     rig.SendIcomCommand(Ord(ICOM_GET_FREQ));
+<     if not icomCheckBuffer(rig) then
+<     begin
+<       ClearRadioStatus(rig);
+<       UpdateStatus(rig);
+<       Sleep(1000);
+<       goto NextPoll;
+<     end;
+<    }
+1565c1572
+<    else
+---
+>    else      // else if for radios that do not support VFOB command
+1583a1591,1600
+> 
+>          // Add the 1A06 command
+>          rig.GetIcomDataStateCommand;
+>          if not icomCheckBuffer(rig) then
+>             begin
+>                ClearRadioStatus(rig);
+>                UpdateStatus(rig);
+>                Sleep(1000);
+>                goto NextPoll;
+>             end;
+2261c2278
+<       if rig.RadioModel = FT991 then
+---
+>       if rig.RadioModel in [FT991] then
+2337a2355,2446
+> //------------------------------------------------------------------------------
+> procedure pFTDX10_FTDX101(rig: RadioPtr);
+> 
+> label
+>    1;
+> var
+>    TempVFO: VFOStatusType;
+> begin
+>    repeat
+>       inc(rig.tPollCount);
+> 
+>       rig.WritePollRequest('IF;', 3);
+>          // This retreives VFO A (Primary). Get other VFO with OI; command.
+>       if ((not ReadFromCOMPort(28, rig)) or
+>          (PWORD(@rig.tBuf)^ <> $4649)) then
+>          begin
+>             ClearRadioStatus(rig);
+>             goto 1;
+>          end;
+> 
+>       GetVFOInfoForYaesuType5(@rig.tBuf, rig.CurrentStatus.VFO[VFOA],
+>          rig.FrequencyAdder);
+> 
+>       rig.WritePollRequest('OI;', 3); //opposite band information
+> 
+>       if ((not ReadFromCOMPort(28, rig)) or
+>          (PWORD(@rig.tBuf)^ <> $494F)) then
+>          begin
+>             ClearRadioStatus(rig);
+>             goto 1;
+>          end;
+> 
+>       GetVFOInfoForYaesuType5(@rig.tBuf, rig.CurrentStatus.VFO[VFOB],
+>          rig.FrequencyAdder);
+> 
+>       TempVFO := rig.CurrentStatus.VFO[VFOA];
+>       rig^.CurrentStatus.VFOStatus := VFOA;
+> 
+>       rig.WritePollRequest('FT;', 3);         // This retreives which VFO is different, then we are in split.
+>       if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $494F) }) then
+>          begin
+>          ClearRadioStatus(rig);
+>          goto 1;
+>          end;
+>       if rig.tBuf[3] = '1' then // VFO is the TX
+>          begin
+>          rig^.CurrentStatus.Split := true;
+>          end
+>       else if rig.tBuf[3] = '0' then
+>          begin
+>          rig^.CurrentStatus.Split := false;
+>          end
+>       else
+>          begin
+>          Logger.Error('Yaesu tBuf after FT; command unexpected result (Split set to false)- ' + rig.tBuf);
+>          rig^.CurrentStatus.Split := false;
+>          end;
+>      
+> 
+>       //----------------
+>       rig.WritePollRequest('TX;', 3);
+>       if ((not ReadFromCOMPort(4, rig)) {or (PWORD(@rig.tBuf)^ <> $4649)}) then
+>          begin
+>             ClearRadioStatus(rig);
+>             goto 1;
+>          end;
+>       if rig.tBuf[3] in ['1', '2'] then // VFO is the TX
+>          begin
+>             rig^.CurrentStatus.TXOn := true;
+>          end
+>       else if rig.tBuf[3] = '0' then
+>          begin
+>             rig^.CurrentStatus.TXOn := false;
+>          end
+>       else
+>          begin
+>             Logger.Error('Yaesu tBuf after TX; command unexpected result (TXOn set to false)- ' + rig.tBuf);
+>             rig^.CurrentStatus.TxOn := false;
+>          end;
+> 
+>       rig.CurrentStatus.Freq := TempVFO.Frequency;
+>       rig.CurrentStatus.Band := TempVFO.Band;
+>       rig.CurrentStatus.Mode := TempVFO.Mode;
+>       rig.CurrentStatus.ExtendedMode := TempVFO.ExtendedMode;
+>       //    Windows.SetWindowText(tr4whandle, inttopchar(integer(rig.CurrentStatus.Mode)));
+>       rig.CurrentStatus.RITFreq := TempVFO.RITFreq;
+>       rig.CurrentStatus.RIT := TempVFO.RIT;
+>       rig.CurrentStatus.XIT := TempVFO.XIT;
+>       1:
+>       UpdateStatus(rig);
+>    until rig.tPollCount < 0;
+> end;
+2354c2463,2466
+<    logger.trace('[ReadFromSerialPort] Read %s from serial port',[ArrayToString(rig^.tBuf)]);
+---
+>    if logger.IsTraceEnabled then
+>       begin
+>       logger.trace('[ReadFromSerialPort] Read %s from serial port',[String2Hex(AnsiLeftStr(ArrayToString(rig^.tBuf),BytesRead))]);
+>       end;
+2880a2993,3006
+> 
+>    { If the radio is a network interface, we do not care what type of radio as
+>      the same class gets all the information from the derived radio class type.
+>      This BeginPolling procedure is fired up as a thread so it may cause some
+>      strange issues since we have a thread in the network class. TBD
+>    }
+>    if rig.tNetObject <> nil then
+>       begin
+>       pNetworkRadio(rig);
+>       Exit;   // Nothing else is done here so exit
+>       end;
+> 
+>    // The rest is for serial radio interfaces
+> 
+2884a3011
+> 
+2888c3015
+<          TS2000, FLEX, K2, K3:
+---
+>          TS2000, FLEX, K2, K3, K4:
+2903c3030
+<       FT817, FT847, FT857, FT897:
+---
+>       FT817, FT818, FT847, FT857, FT897:
+2918a3046,3047
+>       FTDX10, FTDX101:
+>          pFTDX10_FTDX101(rig);
+3096a3226,3325
+> procedure GetVFOInfoForYaesuType5(buf: PChar; var VFO: VFOStatusType;
+>    FrequencyAdder: integer);               // FTDX10 because YAESU USES THE SAME MODE CHARACTER FOR c4fm AND psk ON DIFFERENT RADIOS./ dumb!!!!
+> var
+>    TempMode: ModeType;
+>    TempExtendedMode: ExtendedModeType;
+> begin
+>    TempMode := NoMode;
+>    VFO.Frequency := BufferToInt(buf, 6, 9) + FrequencyAdder;
+>       // 9 bytes on this radio
+>    CalculateBandMode(VFO.Frequency, VFO.Band, VFO.Mode);
+>    VFO.RITFreq := BufferToInt(buf, 15, 5);
+>    VFO.RIT := buf[20 - 1] = '1';
+>    VFO.XIT := buf[21 - 1] = '1';
+>    case buf[22 - 1] of
+>       '1':
+>          begin
+>             TempMode := Phone;
+>             tempExtendedMode := eLSB;
+>          end;
+>       '2':
+>          begin
+>             TempMode := Phone;
+>             tempExtendedMode := eUSB;
+>          end;
+>       '3':
+>          begin
+>             TempMode := CW;
+>             tempExtendedMode := eCW;
+>          end;
+>       '4':
+>          begin
+>             TempMode := FM;
+>             tempExtendedMode := eFM;
+>          end;
+>       '5':
+>          begin
+>             TempMode := Phone;
+>             tempExtendedMode := eAM;
+>          end;
+>       '6':
+>          begin
+>             TempMode := Digital;
+>             tempExtendedMode := eRTTY_R;
+>          end;
+>       '7':
+>          begin
+>             TempMode := CW;
+>             tempExtendedMode := eCW_R;
+>          end;
+>       '8':
+>          begin
+>             TempMode := Digital;
+>             tempExtendedMode := eDATA_R;
+>          end;
+>       '9':
+>          begin
+>             TempMode := Digital;
+>             tempExtendedMode := eRTTY;
+>          end;
+>       'A':
+>          begin
+>             TempMode := Digital;
+>             tempExtendedMode := eDATA_FM;
+>          end;
+>       'B':
+>          begin
+>             TempMode := FM;
+>             tempExtendedMode := eFM_N;
+>          end;
+>       'C':
+>          begin
+>             TempMode := Digital;
+>             tempExtendedMode := eData;
+>          end;
+>       'D':
+>          begin
+>             TempMode := Phone;
+>             tempExtendedMode := eAM_N;
+>          end;
+>       'E':
+>          begin
+>             TempMode := Digital;
+>             tempExtendedMode := ePSK31;
+>          end;
+>       'F':
+>          begin
+>             TempMode := Digital;
+>             tempExtendedMode := eData_FM;
+>          end;
+>       else
+>          begin
+>             logger.Error('Unknown mode value for FT891/991 ' + buf[22 - 1]);
+>             tempExtendedMode := eNoMode;
+>          end;
+> 
+>    end;
+>    VFO.Mode := TempMode;
+>    VFO.ExtendedMode := tempExtendedMode;
+> 
+> end;
+3278a3508
+>       #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak +
+3285a3516
+>       #9 + '<EntryWindowHwnd>' +'</EntryWindowHwnd>' + sLineBreak +
+3301c3532
+<       udp.Send(UDPBroadcastAddress, UDPBroadcastPort, sBuf); // ny4i 4.44.9
+---
+>       udp.Send(UDPBroadcastAddress, UDPBroadcastPortRadio, sBuf); // ny4i 4.44.9
