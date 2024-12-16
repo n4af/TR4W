@@ -1547,10 +1547,24 @@ procedure DisplayCodeSpeed {(WPM: integer; SendingEnabled: boolean; DVPEnabled: 
 var
   tPChar                                : PChar;
 begin
+  if ActiveRadioPtr.CWSpeedSync then
+     begin
+     if (CodeSpeed <>  ActiveRadioPtr.SpeedMemory ) then
+        begin
+        CodeSpeed := ActiveRadioPtr.SpeedMemory;
+        end;
+     end;
   DisplayedCodeSpeed := CodeSpeed;
   if ActiveMode = CW then
   begin
-    if CWEnable or CWEnabled {CWEnabled} then tPChar := '%u WPM' else tPChar := '%u NO CW';
+    if CWEnable or CWEnabled {CWEnabled} then
+       begin
+       tPChar := '%u WPM'
+       end
+    else
+       begin
+       tPChar := '%u NO CW';
+       end;
     Format(wsprintfBuffer, tPChar, CodeSpeed);
     SetMainWindowText(mweCodeSpeed, wsprintfBuffer);
     ActiveRadioPtr.SpeedMemory := CodeSpeed;

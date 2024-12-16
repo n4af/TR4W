@@ -126,7 +126,7 @@ procedure pKenwood2(rig: RadioPtr);
 //   NextWait;
 
 type
-   tKenwoodCommands = (kcIF, kcFA, kcFB);
+   tKenwoodCommands = (kcIF, kcFA, kcFB, kcKS);
 var
    PollNumber: tKenwoodCommands;
    stat: TComStat;
@@ -141,9 +141,9 @@ var
    TempCommand: tKenwoodCommands;
 const
    KenwoodPollRequests: array[tKenwoodCommands] of PChar = ('IF;', 'FA;',
-      'FB;');
+      'FB;', 'KS;');
    KenwoodPollRequestsAnswerLength: array[tKenwoodCommands] of integer = (38,
-      14, 14);
+      14, 14, 6);
 begin
    if rig.RadioModel in [K3,K4] then
       begin
@@ -237,6 +237,13 @@ begin
 
                                     begin
                                        case TempCommand of
+                                          kcKS:
+                                             begin
+                                             logger.trace('polling: KS %s', [AnsiLeftStr(rig^.tBuf, 6)]);
+                                             rig^.CurrentStatus.CWSpeed := StrToIntDef(AnsiMidStr(rig^.tBuf,3,3),35);      //BufferToInt(@rig^.tBuf[i - 13], 3, 3);
+                                             rig^.SpeedMemory := rig^.CurrentStatus.CWSpeed;
+                                             end;
+
                                           kcFA:
                                              begin
                                                 logger.trace('polling: FA %s',
@@ -743,6 +750,16 @@ begin
       rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
       rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
       rig^.CurrentStatus.TXOn := ro.IsTransmitting;
+
+      if rig^.CWSpeedSync then
+         begin
+         if rig^.RadioModel in RadioSupportsCWSpeedSync then
+            begin
+            rig^.CurrentStatus.CWSpeed := ro.CWSpeed;
+            CodeSpeed := ro.CWSpeed; // Why is CodeSpeed a global? ny4i DisplayCodeSpeed should display activeradio.CWSpeed
+            
+            end;
+         end;
 
       // VFO A
       rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
@@ -2703,6 +2720,7 @@ begin
       ((UDPBroadcastRadio) and (SecondsBetween(Now, dtLastUDPRadio) > 10) ) then
       begin
          DisplayCurrentStatus(rig); // Update the Radio Window only
+         DisplayCodeSpeed;
          rig.FilteredStatusChanged := True;
       end
    else
@@ -2954,7 +2972,7 @@ begin
             end;
          rig.CurrentStatus.PrevVFOStatus := rig.CurrentStatus.VFOStatus;
       end;
-
+   DisplayCodeSpeed;
    Windows.EnableWindow(rig.RITWndHandle, rig.CurrentStatus.RIT);
    Windows.EnableWindow(rig.XITWndHandle, rig.CurrentStatus.XIT);
    Windows.EnableWindow(rig.SplitWndHandle, rig.CurrentStatus.Split);
