@@ -7077,6 +7077,15 @@ begin
           RXData.QSOPoints := 10;
       end;
 
+      RU3AXMemorialQSOPointMethod:    // 4.140.1
+       begin
+         Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString);
+          Points := (Distance div 500);                        
+          if points = 0 then RXData.QSOPoints := 10
+           else
+            RXData.QSOPoints := Points + 10;
+        end;
+        
     RussianDXQSOPointMethod:
       begin
 
@@ -7100,9 +7109,6 @@ begin
           RXData.QSOPoints := 3
         else
           RXData.QSOPoints := 2;
-        if Contest = RU3AXMEMORIAL then
-          if rxdata.Mode = Phone then
-            RXData.QSOPoints := RXData.QSOPoints * 2;
       end;
 
     SalmonRunQSOPointMethod:

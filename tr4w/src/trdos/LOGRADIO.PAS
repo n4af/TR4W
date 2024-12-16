@@ -155,6 +155,7 @@ type
       {01}VFOStatus: ActiveVFOStatusType;
       {01}PrevVFOStatus: ActiveVFOStatusType;
       {01}TXOn:      boolean;
+      {01}CWSpeed:   integer;
         //  ModeActual:ExtendedRadioModeType; // tom
    end;
 
