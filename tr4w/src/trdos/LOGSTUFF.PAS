@@ -6170,7 +6170,7 @@ begin
              Band20:  RXData.QSOPoints := 2;
              Band15:  RXData.QSOPoints := 2;
              Band10:  RXData.QSOPoints := 2;
-        end;
+           end;
          if RXData.QTH.Continent <> Europe then
 
            case RXData.Band of
@@ -6186,7 +6186,7 @@ begin
 
 
       if (MyCountry <> '9A') and (RXCty = '9A') then
-      begin
+      
         case RXData.Band of
           Band160: RXData.QSOPoints := 10;
           Band80: RXData.QSOPoints := 10;
@@ -6195,10 +6195,7 @@ begin
           Band15: RXData.QSOPoints := 6;
           Band10: RXData.QSOPoints := 6;
         end;
-      end
-      else
-       if RXData.QTH.Continent = MyContinent then
-      begin
+     if RXData.QTH.Continent = MyContinent then
         case RXData.Band of
           Band160: RXData.QSOPoints := 2;
           Band80: RXData.QSOPoints := 2;
@@ -6207,8 +6204,8 @@ begin
           Band15: RXData.QSOPoints := 1;
           Band10: RXData.QSOPoints := 1;
         end;
-      end;
-    {  else
+
+    if (MyCountry <> '9A') and (MyContinent <> RXData.QTH.Continent) then
         case RXData.Band of
           Band160: RXData.QSOPoints := 6;
           Band80: RXData.QSOPoints := 6;
@@ -6216,8 +6213,8 @@ begin
           Band20: RXData.QSOPoints := 3;
           Band15: RXData.QSOPoints := 3;
           Band10: RXData.QSOPoints := 3;
-        end; }
-      end; 
+        end;
+      end;
 
     EuropeanFieldDayQSOPointMethod:
       begin
