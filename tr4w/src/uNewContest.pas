@@ -330,7 +330,7 @@ begin
 
               RDA: SetCommentAndEnableEditControl(TC_ENTERYOURRDAID, icmyState);
 
-              BSCI, IARU:
+              BSCI, IARU, CROATIAN:
                 SetCommentAndEnableEditControl(nil, icmyState);
 
               IOTA:
@@ -364,6 +364,12 @@ begin
               EnterCountyOrState(QSOParties[ContestsArray[SelectedContest].p].StateName);
 
             case SelectedContest of
+           {  CROATIAN:
+              begin
+               Windows.SendMessage(107, BM_SETCHECK, BST_CHECKED, 0);
+               SetCommentAndEnableEditControl(TC_CROAT, icmyState);
+               end;
+             }  
              LABRE:
                   SetCommentAndEnableEditControl(TC_LABRE,icmyState);
             
@@ -445,6 +451,7 @@ begin
               CIS: DisplayCheckBox(TC_CIS);
               SPDX: DisplayCheckBox(TC_POLAND);
               BSCI, IARU: DisplayCheckBox(TC_HQ_OR_MEMBER);
+              CROATIAN: DisplayCheckBox(TC_CROAT);
               IOTA:
                 begin
                   Windows.SetWindowText(NewContestCheckBox, TC_ISLANDSTATION);
