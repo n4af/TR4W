@@ -2531,7 +2531,7 @@ begin
     end; { if case }
 
     if TempString = '' then
-      if Contest in [RUSSIANDX, RDA, RU3AXMEMORIAL] then
+      if Contest in [RUSSIANDX, RDA] then  // 4.140.1
       begin
         ctyLocateCall(Call, TempQTH);
         if RussianID(TempQTH.CountryID) then
@@ -2556,7 +2556,8 @@ begin
     if (ActiveExchange = QSONumberDomesticOrDXQTHExchange) or
       (ActiveExchange = RSTAndFOCNumberExchange) or
       (ActiveExchange = QSONumberDomesticQTHExchange) or
-      (ActiveExchange = QSONumberAndGridSquare) or
+      (ActiveExchange = RSTAndGridExchange) or    // 4.140.1
+        (ActiveExchange = QSONumberAndGridSquare) or
       (ActiveExchange = RSTAndQSONumberOrDomesticQTHExchange) or
       (ActiveExchange = RSTDomesticOrDXQTHExchange) or
       (ActiveExchange = RSTDomesticQTHExchange) or
