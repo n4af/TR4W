@@ -6217,7 +6217,7 @@ begin
          tGetSystemTime;
           TempHour := UTC.wHour;
           if (TempHour >= 23) or (TempHour < 05) then
-            RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;
+            RxData.QSOPoints := RXData.QSOPoints + RXData.QSOPoints;  
           // double points if gmthours
       end;
 
