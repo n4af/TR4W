@@ -552,7 +552,8 @@ const
     ({Name: 'IC7410';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $80; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3067; rt: rtIcom),
     ({Name: 'IC7600';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $7A; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3063; rt: rtIcom),
     ({Name: 'IC7610';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $98; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3078; rt: rtIcom), // 4.65.7 issue #282 #282   // 4.68.12
-    ({Name: 'IC7700';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $74; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3062; rt: rtIcom),
+    ({Name: 'IC7760';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $B2; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3092; rt: rtIcom),
+    ({Name: 'IC7610';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $98; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3078; rt: rtIcom), // 4.65.7 issue #282 #282   // 4.68.12
     ({Name: 'IC7800';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $6A; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3056; rt: rtIcom),
     ({Name: 'IC7850';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3075; rt: rtIcom),
     ({Name: 'IC7851';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3075; rt: rtIcom),
@@ -653,6 +654,7 @@ const
       'IC7600',
       'IC7610',
       'IC7700',
+      'IC7760',
       'IC7800',
       'IC7850',
       'IC7851',
@@ -1821,7 +1823,7 @@ begin
             end;
          end;
 
-      IC705, IC7300, IC7610, IC7850, IC7851, IC9100, IC9700:
+      IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700:
          begin
          if IntegerBetween(mem,0,8) then
             begin
@@ -4020,23 +4022,23 @@ const
    ra: array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
    RadioSupportsCWByCAT := [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000,
-                            FLEX, IC705, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
-                            IC7850, IC7851, IC9100, IC9700, Orion];
+                            FLEX, IC705, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7760,
+                            IC7800, IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
       [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX10, FTDX101, FT450, FT710, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
-      IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610, IC7700, IC7800,
-      IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
+      IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610,
+      IC7700, IC7760, IC7800, IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
 
    RadioSupportsPlayDVK := [ K2, K3, K4 // We do not support the KX2 and KX3? I guess not a lot of call for it.
-                            ,IC705, IC7300, IC7610, IC7850, IC7851, IC9100, IC9700
+                            ,IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700
                             ,FT710, FT991, FT1200, FTDX3000, FTDX5000, FTDX9000, FTDX10, FTDX101
                             ,TS480, TS570, TS590, TS850, TS950, TS990, TS2000
                             ]; // NY4I Issue 639
-   IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
-   IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC9700];
-   IcomRadiosThatSupportPSKMode := [IC7600, IC7610];
+   IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700];
+   IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700];
+   IcomRadiosThatSupportPSKMode := [IC7600, IC7610, IC7760];
    ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];
