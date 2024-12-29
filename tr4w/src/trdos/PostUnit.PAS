@@ -2647,23 +2647,13 @@ begin
        begin
        case TempRXData.ExtMode of
           eNoMode, eRTTY:
-             if Contest = WINTERFIELDDAY then
-                begin
-                ModeString := 'DI'; // Error in WFD's parser they refuse to fix. de NY4I
-                end
-             else
-                begin
-                ModeString := 'RY';
-                end;
+             begin
+             ModeString := 'RY';
+             end;
           else
-             if Contest = WINTERFIELDDAY then
-                begin
-                ModeString := 'DI'; // Error in WFD's parser they refuse to fix. de NY4I
-                end
-             else
-                begin
-                ModeString := 'DG';
-                end;
+             begin
+             ModeString := 'DG';
+             end;
           end; // case
        end
     else if TempRXData.Mode = FM then

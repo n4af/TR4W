@@ -399,8 +399,8 @@ begin
     WINTERFIELDDAY:
       begin
         WARCBandsEnabled := False;
-        SetCQMemoryString(CW, F1, 'CQ^WFD \ \ WFD');
-        SetCQMemoryString(CW, F2, 'CQ^WFD CQ^WFD \ \ WFD');
+        SetCQMemoryString(CW, F1, 'CQ^WFD \ \ TEST');
+        SetCQMemoryString(CW, F2, 'CQ^WFD CQ^WFD \ \ TEST');
         CQExchange := ' ' + MyFDClass + ' ' + MySection;
         SearchAndPounceExchange := MyFDClass + ' ' + MySection;
         QSLMessage := '73 \ WFD';
