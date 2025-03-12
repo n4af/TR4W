@@ -3593,7 +3593,7 @@ begin
       #9 + '<OpCall>' + CurrentOperator + '</OpCall>' +  sLineBreak +
       #9 + '<IsRunning>' + StrUtils.IfThen(OpMode = SearchAndPounceOpMode,'False','True') + '</IsRunning>' + sLineBreak +
       #9 + '<FocusEntry>0</FocusEntry>' + sLineBreak +
-      #9 + '<EntryWindowHwnd>' +'</EntryWindowHwnd>' + sLineBreak +
+      #9 + '<EntryWindowHwnd>' + '0' + '</EntryWindowHwnd>' + sLineBreak +
       #9 + '<Antenna>-1</Antenna>' + sLineBreak +
       #9 + '<Rotors>-1</Rotors>' + sLineBreak +
       #9 + '<FocusRadioNr>1</FocusRadioNr>' + sLineBreak +
@@ -3610,6 +3610,7 @@ begin
    try
       udp.BroadcastEnabled := true;
       udp.Send(UDPBroadcastAddress, UDPBroadcastPortRadio, sBuf); // ny4i 4.44.9
+      logger.trace('[SendRadioInfoToUDP] %s', [sBuf]);
       dtLastUDPRadio := Now;
    except
       on E: Exception do
