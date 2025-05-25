@@ -8,6 +8,7 @@ uses
   VC,
   TF,
   uCRC32,
+  Version,
   Messages;
 const
 
