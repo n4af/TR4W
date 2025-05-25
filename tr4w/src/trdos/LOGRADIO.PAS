@@ -493,6 +493,7 @@ const
     ({Name: 'FT100';      } BR:BR4800;  P: 1; C: 0; S: 0; T:1; RA: $00; SW: 1; SFOC: $0A; SMOC: $0C; SPOC: $00; RX: $00; TX: $00; MB: 3; CW: $02;  LSB: $00; USB: $01; FM: $06; AM: $04; DIGL: $05; DIGU: $05; hamlibID: 1021; rt: rtYaesu1),
     ({Name: 'FTDX10';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1042; rt: rtYaesu4),
     ({Name: 'FTDX101';    } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1040; rt: rtYaesu4),
+    ({Name: 'FTX_1F';     } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1042; rt: rtYaesu4),    // This is reported to be the same command set as the DX10 - NY4I 2025-05-25
     ({Name: 'FT450';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1027; rt: rtYaesu2),
     ({Name: 'FT710';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; rt: rtYaesu4),   // Issue 640 ny4i
     ({Name: 'FT736R';     } BR:BR4800;  P: 0; C: 0; S: 0; T:0; RA: $00; SW: 0; SFOC: $01; SMOC: $07; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $02;  LSB: $00; USB: $01; FM: $08; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1010; rt: rtYaesu1),
@@ -594,6 +595,7 @@ const
       'FT100',
       'FTDX10',
       'FTDX101',
+      'FTX-1F',
       'FT450',
       'FT710',
       'FT736R',
@@ -946,7 +948,7 @@ begin
 
    case IntRadioType of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
-      TS950, TS990, TS2000, FLEX, K2, K3, K4, FTDX10, FTDX101, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
+      TS950, TS990, TS2000, FLEX, K2, K3, K4, FTDX10, FTDX101, FTX_1F, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
       FTDX5000, FTDX9000:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RC;');
@@ -1867,7 +1869,7 @@ begin
             Result := true;
             end;
          end;
-      FT710, FT991, FTDX10, FTDX101, FT1200, FTDX3000, FTDX5000, FTDX9000: 
+      FT710, FT991, FTDX10, FTDX101, FTX_1F, FT1200, FTDX3000, FTDX5000, FTDX9000:
          begin
          if IntegerBetween(mem,0,5) then
             begin
@@ -2061,7 +2063,7 @@ begin
          begin
          ActiveRadioPtr.WriteToCATPort('ST1;', 4);
          end;
-      FTDX10, FTDX101, FT991:
+      FTDX10, FTDX101, FTX_1F, FT991:
          begin
          ActiveRadioPtr.WriteToCATPort('FT3;', 4);
          end;
@@ -2130,7 +2132,7 @@ begin
          begin
           ActiveRadioPtr.WriteToCATPort('ST0;', 4);
          end;
-      FTDX10, FTDX101, FT991:
+      FTDX10, FTDX101, FTX_1F, FT991:
          begin
          ActiveRadioPtr.WriteToCATPort('FT2;', 4);
          end;
@@ -3905,7 +3907,7 @@ begin
             end;
          end;
 
-      FTDX10, FTDX101, FT710, FT450, FT950, FT891, FT991, FT1200, FT2000,
+      FTDX10, FTDX101, FTX_1F, FT710, FT450, FT950, FT891, FT991, FT1200, FT2000,
       FTDX3000, FTDX5000, FTDX9000:
          begin
          if PTTOn then
@@ -4026,14 +4028,14 @@ begin
                             IC7800, IC7850, IC7851, IC9100, IC9700, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
-      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX10, FTDX101, FT450, FT710, FT891, FT950, FT991,
+      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX10, FTDX101, FTX_1F, FT450, FT710, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610,
       IC7700, IC7760, IC7800, IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
 
    RadioSupportsPlayDVK := [ K2, K3, K4 // We do not support the KX2 and KX3? I guess not a lot of call for it.
                             ,IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700
-                            ,FT710, FT991, FT1200, FTDX3000, FTDX5000, FTDX9000, FTDX10, FTDX101
+                            ,FT710, FT991, FT1200, FTDX3000, FTDX5000, FTDX9000, FTDX10, FTDX101, FTX_1F
                             ,TS480, TS570, TS590, TS850, TS950, TS990, TS2000
                             ]; // NY4I Issue 639
    IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700];
@@ -4042,7 +4044,7 @@ begin
    ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];
-   YaesuRadios := [FTDX10, FTDX101, FT450, FT710, FT736R, FT747GX, FT767, FT817,
+   YaesuRadios := [FTDX10, FTDX101, FTX_1F, FT450, FT710, FT736R, FT747GX, FT767, FT817,
                    FT818, FT840, FT847, FT857, FT890, FT891, FT897, FT900, FT920,
                    FT950, FT990, FT991, FT1000, FT1000MP, FT1200, FT2000,
                    FTDX3000, FTDX5000, FTDX9000];

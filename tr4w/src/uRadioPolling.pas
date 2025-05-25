@@ -3124,7 +3124,7 @@ begin
          pFTDX9000(rig);
       FT891, FT991:
          pFT891_FT991(rig); // ny4i Issue218 9 byte frequency
-      FTDX10, FTDX101, FT710:
+      FTDX10, FTDX101, FTX_1F, FT710:
          pFTDX10_FTDX101(rig);
       IC78..IC9700, OMNI6:
          pIcomNew(rig);
