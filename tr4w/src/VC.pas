@@ -183,11 +183,11 @@ const
 {$IFEND}
 
   OZCR2008                              = False;
-  LOGVERSION                            = 'v1.6'; // This is broken out below for comparison later on. Again, needlessly complex. de NY4I
+  LOGVERSION                            = 'v1.7'; // This is broken out below for comparison later on. Again, needlessly complex. de NY4I
   LOGVERSION1                           = 'v';
   LOGVERSION2                           = '1';
   LOGVERSION3                           = '.';
-  LOGVERSION4                           = '6';     // ny4i Added ExtendedMode to ContestExchange
+  LOGVERSION4                           = '7';     // ny4i Added ExtendedMode to ContestExchange
   CURRENTVERSIONASINTEGER               = Ord(LOGVERSION1) + Ord(LOGVERSION2) * 256 + Ord(LOGVERSION3) * $10000 + Ord(LOGVERSION4) * $1000000;
   TR4W_DOWNLOAD_LINK                    : PChar = 'http://www.tr4w.net/download/?' + TR4W_CURRENTVERSION_NUMBER;
 
@@ -1500,9 +1500,134 @@ type
    TRN file was not the right size. This should eliminate that maintenance
    step. de NY4I
 *)
+
+type
+  ContestExchange = record
+{COMMON START}
+
+{06}  tSysTime:            TQSOTime;
+{01}  Band:                BandType;
+{01}  Mode:                ModeType;
+
+{04}  ceQSOID1:            Cardinal;
+{04}  ceQSOID2:            Cardinal;
+{04}  Frequency:           LONGINT;
+
+{01}  ceQSO_Deleted:       boolean;
+{01}  ceComputerID:        Char;
+{01}  ceOperatorID:        Byte;
+{01}  ceRecordKind:        LogRecordKind;
+
+{01}  ceQSO_Skiped:        boolean;
+{01}  ceSendToServer:      boolean;
+{01}  ceNeedSendToServerAE:    boolean;
+{01}  ceDupe:              boolean;
+
+{07}  PostalCode_old:          PostalCodeString;
+{01} // ZERO_01:             DummyByte;
+
+{COMMON END}
+
+{07}  Prefix:              PrefixMultiplierString;
+{01} // ZERO_02:             DummyByte;
+
+{14}  Callsign:            CallString;
+{01}  Age:                 byte;
+{01}  ceWasSendInQTC:      Boolean;
+
+{01}  DomesticMult:        boolean;
+{01}  DXMult:              boolean;
+{01}  PrefixMult:          boolean;
+{01}  ZoneMult:            boolean;
+      ExtMode:             ExtendedModeType;
+      ExchString:          Str40;  // What is entered as SRX exchange
+{04}  ceClass:             string[3]{10}; { Field day class }
+
+{01} // ZERO_04:             DummyByte;
+{01}  Precedence:          Char;
+{01}  ceRadio:             RadioType;
+{01}  Check:               Byte;           {The CHECK is two numbers (year)}
+
+{32}  QTH:                 QTHRecord;
+
+{06}  DXQTH:               DXMultiplierString;
+{01}  //ZERO_05:             DummyByte;
+{01}  Radio:               InterfacedRadioType;
+
+{11}  DomMultQTH:          DomesticMultiplierString; //String for dom mult count
+{01}  //ZERO_06:             DummyByte;
+
+{11}  DomesticQTH:         Str10;//Corrected QTH - if it is need  - i.e. AF1 -> AF-001 in IOTA contest.
+{01}  //ZERO_07:             DummyByte;
+
+{11}  Name:                Str10;
+{01}  //ZERO_08:             DummyByte;
+
+{07}  Power:               string[6];
+{01}  //ZERO_09:             DummyByte;
+
+{04}  NumberReceived:      integer;
+{04}  NumberSent:          integer;
+
+{02}  RSTSent:             smallInt; {Word;}
+{02}  RSTReceived:         smallInt; {Word;}  // if this was an int, I could put ft8 reports here.
+
+{11}  QTHString:           Str10;//QTH received by user (literal)
+{01}  //ZERO_10:             DummyByte;
+
+{06} RandomCharsSent:      string[5];
+{02} TenTenNum:            word;
+
+{05}  Chapter:             string[4];
+{01}  //ZERO_11:             DummyByte;
+{01}  ceClearDupeSheet:    boolean;
+{01}  ceSearchAndPounce:   boolean;
+
+{01}  Prefecture:          Byte;
+{01}  InhibitMults:        boolean;
+{01}  Zone:                Byte;
+{01}  NameSent:            boolean;
+
+{21}  Kids:                Str20; { Used for whole ex string }
+{01}  ceContest:           ContestType;
+{02}  QSOPoints:           word{Smallint};
+
+{08}  RandomCharsReceived: string[7];
+
+{01}  //ZERO_13:             DummyByte;
+{01}  ceClearMultSheet:    Boolean;
+{01}  MP3Record:           Boolean;
+{01}  //res3:                Byte;
+
+{******************************}
+{07}  ceOperator:          OperatorType;
+
+{32}  id:                   string[32];
+{01}  //res15:               Byte;
+
+{01}  //res16:               Byte;
+{01} // res17:               Byte;
+{01} // res18:               Byte;
+{01} // res19:               Byte;
+
+{01} // res20:               Byte;
+{01} // res21:               Byte;
+{01} // res22:               Byte;
+{01}  //res23:               Byte;
+
+//{01}  res25:               Byte;
+{50} sReserved:               string[50]
+   end;
+{*)}
+
+const
+  SizeOfContestExchange                 = SizeOf(ContestExchange);
+type
+  ContestExchangePtr = ^ContestExchange;
+
 type
 
-  ContestExchange = record
+  ContestExchangev1_6 = record
 {COMMON START}
 
 {06}  tSysTime:            TQSOTime;
@@ -1634,9 +1759,9 @@ type
 {*)}
 
 const
-  SizeOfContestExchange                 = SizeOf(ContestExchange);
+  SizeOfContestExchangev1_6                 = SizeOf(ContestExchangev1_6);
 type
-  ContestExchangePtr = ^ContestExchange;
+  ContestExchangePtrv1_6 = ^ContestExchangev1_6;
 
 // This is another declaration of ContestExchange for version 1.5. This is used to convert
 

@@ -4299,6 +4299,7 @@ begin
 
   { Need this in case we exit soon }
   Windows.ZeroMemory(@RData.Callsign, SizeOf(RData.Callsign));
+  RData.ID := GetGUID;
   RData.Callsign := Call;
   if (ExchangeString = '') and not (ActiveExchange in [RSTNameAndQTHExchange,
     RSTAndPOTAPark]) then // These two exchanges allow blank exchanges
@@ -8718,10 +8719,10 @@ function AskConvertLog(sVersion: string): boolean;
 var
   OldFile, NewFile, fName: string;
   fileSetCode, attrs: integer;
-  oldFH: file of ContestExchangev1_5;
+  oldFH: file of ContestExchangev1_6;
   newFH: file of ContestExchange;
   headerFH: file of TLogHeader;
-  oldRXData: ContestExchangev1_5;
+  oldRXData: ContestExchangev1_6;
   newRXData: ContestExchange;
 begin
   Result := false;
@@ -8774,7 +8775,7 @@ begin
   end;
 
   // Now change the name of the original log file to TR4W_LOG_FILENAME + .v1_5
-  OldFile := StrPas(TR4W_LOG_FILENAME) + '.v1_5';
+  OldFile := StrPas(TR4W_LOG_FILENAME) + '.v1_6';
   fName := StrPas(TR4W_LOG_FILENAME);
   if not RenameFile(fName, OldFile) then
   begin
@@ -8820,9 +8821,9 @@ begin
     newRXData.ceNeedSendToServerAE := oldRXData.ceNeedSendToServerAE;
     newRXData.ceDupe := oldRXData.ceDupe;
     newRXData.PostalCode_old := oldRXData.PostalCode_old;
-    newRXData.ZERO_01 := oldRXData.ZERO_01;
+    //newRXData.ZERO_01 := oldRXData.ZERO_01;
     newRXData.Prefix := oldRXData.Prefix;
-    newRXData.ZERO_02 := oldRXData.ZERO_02;
+   // newRXData.ZERO_02 := oldRXData.ZERO_02;
     newRXData.Callsign := oldRXData.Callsign;
     newRXData.Age := oldRXData.Age;
     newRXData.ceWasSendInQTC := oldRXData.ceWasSendInQTC;
@@ -8831,32 +8832,32 @@ begin
     newRXData.PrefixMult := oldRXData.PrefixMult;
     newRXData.ZoneMult := oldRXData.ZoneMult;
     newRXData.ceClass := oldRXData.ceClass;
-    newRXData.ZERO_04 := oldRXData.ZERO_04;
+    //newRXData.ZERO_04 := oldRXData.ZERO_04;
     newRXData.Precedence := oldRXData.Precedence;
     newRXData.ceRadio := oldRXData.ceRadio;
     newRXData.Check := oldRXData.Check;
     newRXData.QTH := oldRXData.QTH;
     newRXData.DXQTH := oldRXData.DXQTH;
-    newRXData.ZERO_05 := oldRXData.ZERO_05;
+    //newRXData.ZERO_05 := oldRXData.ZERO_05;
     newRXData.Radio := oldRXData.Radio;
     newRXData.DomMultQTH := oldRXData.DomMultQTH;
-    newRXData.ZERO_06 := oldRXData.ZERO_06;
+    //newRXData.ZERO_06 := oldRXData.ZERO_06;
     newRXData.DomesticQTH := oldRXData.DomesticQTH;
-    newRXData.ZERO_07 := oldRXData.ZERO_07;
+    //newRXData.ZERO_07 := oldRXData.ZERO_07;
     newRXData.Name := oldRXData.Name;
-    newRXData.ZERO_08 := oldRXData.ZERO_08;
+    //newRXData.ZERO_08 := oldRXData.ZERO_08;
     newRXData.Power := oldRXData.Power;
-    newRXData.ZERO_09 := oldRXData.ZERO_09;
+    //newRXData.ZERO_09 := oldRXData.ZERO_09;
     newRXData.NumberReceived := oldRXData.NumberReceived;
     newRXData.NumberSent := oldRXData.NumberSent;
     newRXData.RSTSent := oldRXData.RSTSent;
     newRXData.RSTReceived := oldRXData.RSTReceived;
     newRXData.QTHString := oldRXData.QTHString;
-    newRXData.ZERO_10 := oldRXData.ZERO_10;
+    //newRXData.ZERO_10 := oldRXData.ZERO_10;
     newRXData.RandomCharsSent := oldRXData.RandomCharsSent;
     newRXData.TenTenNum := oldRXData.TenTenNum;
     newRXData.Chapter := oldRXData.Chapter;
-    newRXData.ZERO_11 := oldRXData.ZERO_11;
+    //newRXData.ZERO_11 := oldRXData.ZERO_11;
     newRXData.ceClearDupeSheet := oldRXData.ceClearDupeSheet;
     newRXData.ceSearchAndPounce := oldRXData.ceSearchAndPounce;
     newRXData.Prefecture := oldRXData.Prefecture;
@@ -8867,20 +8868,20 @@ begin
     newRXData.ceContest := oldRXData.ceContest;
     newRXData.QSOPoints := oldRXData.QSOPoints;
     newRXData.RandomCharsReceived := oldRXData.RandomCharsReceived;
-    newRXData.ZERO_13 := oldRXData.ZERO_13;
+    //newRXData.ZERO_13 := oldRXData.ZERO_13;
     newRXData.ceClearMultSheet := oldRXData.ceClearMultSheet;
     newRXData.MP3Record := oldRXData.MP3Record;
-    newRXData.res3 := oldRXData.res3;
+    //newRXData.res3 := oldRXData.res3;
     newRXData.ceOperator := oldRXData.ceOperator;
-    newRXData.res15 := oldRXData.res15;
-    newRXData.res16 := oldRXData.res16;
-    newRXData.res17 := oldRXData.res17;
-    newRXData.res18 := oldRXData.res18;
-    newRXData.res19 := oldRXData.res19;
-    newRXData.res20 := oldRXData.res20;
-    newRXData.res21 := oldRXData.res21;
-    newRXData.res22 := oldRXData.res22;
-    newRXData.res23 := oldRXData.res23;
+    //newRXData.res15 := oldRXData.res15;
+    //newRXData.res16 := oldRXData.res16;
+    //newRXData.res17 := oldRXData.res17;
+    //newRXData.res18 := oldRXData.res18;
+    //newRXData.res19 := oldRXData.res19;
+    //newRXData.res20 := oldRXData.res20;
+    //newRXData.res21 := oldRXData.res21;
+    //newRXData.res22 := oldRXData.res22;
+    //newRXData.res23 := oldRXData.res23;
     if oldRXData.Mode = CW then
     begin
       newRXData.extMode := eCW;

@@ -693,21 +693,15 @@ begin
 
   // The way UDP handles an edited QSO is to delete it first and then add it again.  Issue 165 ny4i
   // In the case of an actual delete, we do NOT send the subsequent record to re-add the QSO.
-  SendDeletedContactToUDP(EditableQSORXData);
-  LogContactToUDP(EditableQSORXData);
+  // This has chnaged. Now we do not need to send the delete. We just send a ContactReplace
+  //SendDeletedContactToUDP(EditableQSORXData);
+  //LogContactToUDP(EditableQSORXData);
+  LogEditedContactToUDP(EditableQSORxData);
   if Assigned(externalLogger) then
      begin
      externalLogger.DeleteQSO(EditableQSORXData);
      externalLogger.LogQSO(EditableQSORXData);
      end;
-  {if not EditableQSORXData.ceQSO_Deleted then    // This should not depend upon if deleted. Just delete and add again
-  begin
-    LogContactToUDP(EditableQSORXData);
-    if Assigned(externalLogger) then
-       begin
-       externalLogger.LogQSO(EditableQSORXData);
-       end;
-  end; }
 
   if not OpenLogFile then
     Exit;

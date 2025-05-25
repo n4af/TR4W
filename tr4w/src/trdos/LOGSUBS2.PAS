@@ -118,6 +118,7 @@ uses
     );
 procedure SendScoreToUDP;
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
+procedure LogEditedContactToUDP(RXData: ContestExchange); // ny4i
 procedure LookupInfoToUDP(RXData: ContestExchange); // Issue 612 ny4i
 function BuildUDPContact(RXData: ContestExchange; whichUDP: UDPType): string; // Issue 612 ny4i
 procedure SendFullLogToUDP;
@@ -2723,6 +2724,7 @@ begin
             #9 + '<call>' + RXData.Callsign + '</call>' + sLineBreak +
             #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
+            #9 + '<ID>' + RxData.id + '</ID>' + sLineBreak +
       '</contactdelete>'+ sLineBreak ;
       udp.BroadcastEnabled := true;
       udp.Send(UDPBroadcastAddress,UDPBroadcastPortContact,sBuf);
@@ -2744,6 +2746,7 @@ var
    sRecType: AnsiString;
    sExchange: AnsiString;
    sMultiplierFields: AnsiString;
+   sTimestamp: AnsiString;
 begin
    // if operator is blank, use mycall
    // Add CR to output
@@ -2754,6 +2757,7 @@ begin
    case whichUDP of
       
       udpContactInfo: sRecType := 'contactinfo';
+      udpContactReplace: sRecType := 'contactreplace';
       udpLookupInfo: sRecType := 'lookupinfo';
       else
          sRecType := 'contactinfo';
@@ -2882,23 +2886,22 @@ begin
       end;
 
    nNumberReceived := IfThen(RxData.NumberReceived > 0,RxData.NumberReceived,0);
+   sTimestamp := SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
+                             RxData.tSysTime.qtYear,
+                             RxData.tSysTime.qtMonth,
+                             RxData.tSysTime.qtDay,
+                             RxData.tSysTime.qtHour,
+                             RxData.tSysTime.qtMinute,
+                             RxData.tSysTime.qtSecond]);
    Result := '<?xml version="1.0"?>' + sLineBreak +
              '<' + sRecType + '>' + sLineBreak +
              #9 + '<app>TR4W</app>' + sLineBreak +
              #9 + '<contestname>' + sContestName + '</contestname>' + sLineBreak +
              {#9 + '<contestname>' + ContestTypeSA[RxData.ceContest] + '</contestname>' + sLineBreak + }
              #9 + '<contestnr>' + IntToStr(Ord(RxData.ceContest)) + '</contestnr>' + sLineBreak +
-             #9 + '<timestamp>' +                      // 2008-01-01 07:04:00
-             SysUtils.format('20%0.2d-%0.2d-%0.2d %0.2d:%0.2d:%0.2d',[
-                             RxData.tSysTime.qtYear,
-                             RxData.tSysTime.qtMonth,
-                             RxData.tSysTime.qtDay,
-                             RxData.tSysTime.qtHour,
-                             RxData.tSysTime.qtMinute,
-                             RxData.tSysTime.qtSecond]) +
-                 '</timestamp>' + sLineBreak +
-            #9 + '<mycall>' + MyCall + '</mycall>' + sLineBreak +
-            #9 + '<band>' + ConvertBandTypeToUDPContactBand(RXData.Band) + '</band>' + sLineBreak +
+             #9 + '<timestamp>' + sTimestamp + '</timestamp>' + sLineBreak +
+             #9 + '<mycall>' + MyCall + '</mycall>' + sLineBreak +
+             #9 + '<band>' + ConvertBandTypeToUDPContactBand(RXData.Band) + '</band>' + sLineBreak +
             #9 + '<rxfreq>' + Format('%d',[freq div 10]) + '</rxfreq>' + sLineBreak + // 1420100
             #9 + '<txfreq>' + Format('%d',[txFreq div 10]) + '</txfreq>' + sLineBreak +
             #9 + '<operator>' + RXData.ceOperator + '</operator>' + sLineBreak +
@@ -2953,7 +2956,19 @@ begin
             #9 + '<NetBiosName>' + GetLocalComputerName + '</NetBiosName>' + sLineBreak +
             #9 + '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' + sLineBreak +
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
+            #9 + '<ID>' + RxData.id + '</ID>' + sLineBreak +
+            #9 + '<IsClaimedQso>' + Format('%d',[IfThen(RxData.ceQSO_Skiped,0,1)]) + '</IsClaimedQSO>' + sLineBreak +
+            #9 + '<oldtimestamp>' + sTimestamp + '</oldtimestamp>' + sLineBreak +
+            #9 + '<oldcall>' + RXData.Callsign + '</oldcall>' + sLineBreak +
+            #9 + '<SentExchange>' + Trim(RxData.ExchString) + '</SentExchange>' + sLineBreak +
       '</' + sRecType + '>'+ sLineBreak ;
+
+      // Note for above oldcall and oldtimestamp. See message  https://groups.io/g/N1MMLoggerPlus/message/70623 why these fields
+      // existed. This was for old consumers of UDP data that could not handle the GUID field. It has been 3 years since this was done.
+      // As sending the old call and old timestamp is non-trivial, this program will not send th eidfference. It assumes the consumer of the UDP
+      // records has updated their software to handle the ID field.
+      // I left the fields here in case there is software that marked them reequired in the XML.
+      // Tom NY4I 4 May 2025
 end;
 
 
@@ -2964,6 +2979,17 @@ begin
 
    udp.BroadcastEnabled := true;
    sBuf := BuildUDPContact(RXData, udpContactInfo);
+   logger.Trace('Sending UDP Broadcast data: ' + sBuf);
+   udp.Send(UDPBroadcastAddress,UDPBroadcastPortContact,sBuf);
+end;
+
+procedure LogEditedContactToUDP(RXData: ContestExchange);
+var
+   sBuf: AnsiString;
+begin
+
+   udp.BroadcastEnabled := true;
+   sBuf := BuildUDPContact(RXData, udpContactReplace);
    logger.Trace('Sending UDP Broadcast data: ' + sBuf);
    udp.Send(UDPBroadcastAddress,UDPBroadcastPortContact,sBuf);
 end;
@@ -3005,7 +3031,7 @@ begin
             inc(nCount);
             logger.Debug('[SendFullLogToUDP] (%d) Read contact for callsign %s',[nCount,TempRXData.Callsign]);
             //SendDeletedContactToUDP(TempRXData);
-            LogContactToUDP(TempRXData);
+            LogEditedContactToUDP(TempRXData);
             end
          else
             begin

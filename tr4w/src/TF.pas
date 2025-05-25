@@ -26,6 +26,9 @@ uses
   VC,
   utils_text,
   Windows,
+  SysUtils,
+  StrUtils,
+  ActiveX,
   Messages;
 
 type
@@ -114,6 +117,7 @@ function tGetDateFormat(DT: TQSOTime): PChar; //assembler;
 procedure UnableToFindFileMessage(FileName: PChar);
 function DeleteSlashes(p: PChar): PChar;
 function SetParameterInArray(ArrayPtr: PInteger; ArrayLength: integer; aVar: PInteger; ValueToSet: integer): boolean;
+function GetGUID: string;
 function GetValueFromArray(PCharArrayAddress: PChar; ArraySize: Byte; CMD: PChar): Byte;
 function StrPos(const Str1, Str2: PChar): PChar; ASSEMBLER;
 function StrPosPartial(const Str1, Str2: PChar): PChar; ASSEMBLER;
@@ -384,6 +388,34 @@ begin
   Result := INITCOMMONCONTROLSEX(icex);
 end;
 }
+
+function GetGUID: string;   // Result converted to lowercas wth no dashes
+var
+  MyGUID: TGuid;
+  hrslt: HResult;
+begin
+  Result := '';
+  hrslt := CreateGuid(MyGUID);
+  if hrslt = S_OK then
+     begin
+     Result := GuidToString(MyGUID);
+     if AnsiLeftStr(Result,1) = '{' then
+      begin
+      Delete(Result,1,1);
+      end;
+     // Remove dashes
+     Result := StringReplace(Result, '-', '', [rfReplaceAll]);
+     // Convert to lowercase
+     Result := LowerCase(Result);
+     logger.Debug('GUID created %s',[Result]);
+     end
+  else
+     begin
+     logger.warn('Could not create GUID');
+     result := '';
+     end;
+end;
+
 
 function BitmapFromIcon(Handle: HWND; i: HICON): HBITMAP;
 var
