@@ -6,7 +6,7 @@ program tr4wserver;
 uses
   Windows,
   Messages,
-  tr4wserverUnit in 'd:\newsrc\tr4w\src\tr4wserverUnit.pas',
+  tr4wserverUnit,
   uCRC32 in '..\tr4w\src\uCRC32.pas',
   winsock2 in '..\include\WinSock2.pas',
   TF in '..\tr4w\src\TF.pas',
