@@ -6356,6 +6356,7 @@ begin
   end;
   Windows.SetWindowText(wh[mweCall], @Call[1]);
   PlaceCaretToTheEnd(wh[mweCall]);
+  LookupInfoToUDP_CallOnly(Call);
 end;
 
 procedure SetColumnsWidth;
@@ -7262,7 +7263,7 @@ begin
       else // 4.105.12
         exch.QTHString := tempSRX_String;
 
-    WWDIGI, ARRLDIGI:
+    WWDIGI, ARRLDIGI, ARRLVHFJUN, ARRLVHFJAN:
       begin
         exch.ExchString := gridSquare;
         exch.DomesticQTH := gridSquare;
@@ -8490,9 +8491,9 @@ begin
     newRXData.ceNeedSendToServerAE := oldRXData.ceNeedSendToServerAE;
     newRXData.ceDupe := oldRXData.ceDupe;
     newRXData.PostalCode_old := oldRXData.PostalCode_old;
-    //newRXData.ZERO_01 := oldRXData.ZERO_01;
+    newRXData.ZERO_01 := oldRXData.ZERO_01;
     newRXData.Prefix := oldRXData.Prefix;
-   // newRXData.ZERO_02 := oldRXData.ZERO_02;
+    newRXData.ZERO_02 := oldRXData.ZERO_02;
     newRXData.Callsign := oldRXData.Callsign;
     newRXData.Age := oldRXData.Age;
     newRXData.ceWasSendInQTC := oldRXData.ceWasSendInQTC;
@@ -8501,32 +8502,32 @@ begin
     newRXData.PrefixMult := oldRXData.PrefixMult;
     newRXData.ZoneMult := oldRXData.ZoneMult;
     newRXData.ceClass := oldRXData.ceClass;
-    //newRXData.ZERO_04 := oldRXData.ZERO_04;
+    newRXData.ZERO_04 := oldRXData.ZERO_04;
     newRXData.Precedence := oldRXData.Precedence;
     newRXData.ceRadio := oldRXData.ceRadio;
     newRXData.Check := oldRXData.Check;
     newRXData.QTH := oldRXData.QTH;
     newRXData.DXQTH := oldRXData.DXQTH;
-    //newRXData.ZERO_05 := oldRXData.ZERO_05;
+    newRXData.ZERO_05 := oldRXData.ZERO_05;
     newRXData.Radio := oldRXData.Radio;
     newRXData.DomMultQTH := oldRXData.DomMultQTH;
-    //newRXData.ZERO_06 := oldRXData.ZERO_06;
+    newRXData.ZERO_06 := oldRXData.ZERO_06;
     newRXData.DomesticQTH := oldRXData.DomesticQTH;
-    //newRXData.ZERO_07 := oldRXData.ZERO_07;
+    newRXData.ZERO_07 := oldRXData.ZERO_07;
     newRXData.Name := oldRXData.Name;
-    //newRXData.ZERO_08 := oldRXData.ZERO_08;
+    newRXData.ZERO_08 := oldRXData.ZERO_08;
     newRXData.Power := oldRXData.Power;
-    //newRXData.ZERO_09 := oldRXData.ZERO_09;
+    newRXData.ZERO_09 := oldRXData.ZERO_09;
     newRXData.NumberReceived := oldRXData.NumberReceived;
     newRXData.NumberSent := oldRXData.NumberSent;
     newRXData.RSTSent := oldRXData.RSTSent;
     newRXData.RSTReceived := oldRXData.RSTReceived;
     newRXData.QTHString := oldRXData.QTHString;
-    //newRXData.ZERO_10 := oldRXData.ZERO_10;
+    newRXData.ZERO_10 := oldRXData.ZERO_10;
     newRXData.RandomCharsSent := oldRXData.RandomCharsSent;
     newRXData.TenTenNum := oldRXData.TenTenNum;
     newRXData.Chapter := oldRXData.Chapter;
-    //newRXData.ZERO_11 := oldRXData.ZERO_11;
+    newRXData.ZERO_11 := oldRXData.ZERO_11;
     newRXData.ceClearDupeSheet := oldRXData.ceClearDupeSheet;
     newRXData.ceSearchAndPounce := oldRXData.ceSearchAndPounce;
     newRXData.Prefecture := oldRXData.Prefecture;
@@ -8537,7 +8538,7 @@ begin
     newRXData.ceContest := oldRXData.ceContest;
     newRXData.QSOPoints := oldRXData.QSOPoints;
     newRXData.RandomCharsReceived := oldRXData.RandomCharsReceived;
-    //newRXData.ZERO_13 := oldRXData.ZERO_13;
+    newRXData.ZERO_13 := oldRXData.ZERO_13;
     newRXData.ceClearMultSheet := oldRXData.ceClearMultSheet;
     newRXData.MP3Record := oldRXData.MP3Record;
     //newRXData.res3 := oldRXData.res3;

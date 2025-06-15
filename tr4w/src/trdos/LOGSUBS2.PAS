@@ -120,6 +120,7 @@ procedure SendScoreToUDP;
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
 procedure LogEditedContactToUDP(RXData: ContestExchange); // ny4i
 procedure LookupInfoToUDP(RXData: ContestExchange); // Issue 612 ny4i
+procedure LookupInfoToUDP_CallOnly(sCall: string);
 function BuildUDPContact(RXData: ContestExchange; whichUDP: UDPType): string; // Issue 612 ny4i
 procedure SendFullLogToUDP;
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
@@ -2957,7 +2958,7 @@ begin
             #9 + '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' + sLineBreak +
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
             #9 + '<ID>' + RxData.id + '</ID>' + sLineBreak +
-            #9 + '<IsClaimedQso>' + Format('%d',[IfThen(RxData.ceQSO_Skiped,0,1)]) + '</IsClaimedQSO>' + sLineBreak +
+            #9 + '<IsClaimedQSO>' + Format('%d',[IfThen(RxData.ceQSO_Skiped,0,1)]) + '</IsClaimedQSO>' + sLineBreak +
             #9 + '<oldtimestamp>' + sTimestamp + '</oldtimestamp>' + sLineBreak +
             #9 + '<oldcall>' + RXData.Callsign + '</oldcall>' + sLineBreak +
             #9 + '<SentExchange>' + Trim(RxData.ExchString) + '</SentExchange>' + sLineBreak +
@@ -2999,9 +3000,49 @@ var
    sBuf: AnsiString;
    saveDecimalSeparator: char;
 begin
-
+   if not UDPBroadcastLookup then
+      begin
+      exit;
+      end;
    udp.BroadcastEnabled := true;
    sBuf := BuildUDPContact(RXData, udpLookupInfo);
+   logger.Trace('Sending UDP Broadcast data: ' + sBuf);
+   udp.Send(UDPBroadcastAddress,UDPBroadcastPortLookup,sBuf);
+end;
+
+procedure LookupInfoToUDP_CallOnly(sCall: string);
+var
+   sBuf: AnsiString;
+   saveDecimalSeparator: char;
+   sTimestamp: AnsiString;
+   sContestName: AnsiString;
+   i: integer;
+begin
+   if not UDPBroadcastLookup then
+      begin
+      exit;
+      end;
+
+   sTimestamp := FormatDateTime('yyyy-mm-dd hh:nn:ss',Now);
+   i := ContestsArray[Contest].WA7BNM;
+   if length(ContestsArray[Contest].CABName) = 0 then
+      begin
+      sContestName := ContestsArray[Contest].Name
+      end
+   else
+      begin
+      sContestName := ContestsArray[Contest].CABName;
+      end;
+
+   udp.BroadcastEnabled := true;
+   sBuf := '<?xml version="1.0"?>' + sLineBreak +
+             '<' + 'lookupinfo' + '>' + sLineBreak +
+             #9 + '<app>TR4W</app>' + sLineBreak +
+             #9 + '<contestname>' + sContestName + '</contestname>' + sLineBreak +
+             #9 + '<contestnr>' + IntToStr(ContestsArray[Contest].WA7BNM) + '</contestnr>' + sLineBreak +
+             #9 + '<timestamp>' + sTimestamp + '</timestamp>' + sLineBreak +
+             #9 + '<call>' + sCall + '</call>' + sLineBreak +
+             '</' + 'lookupinfo' + '>'+ sLineBreak ;
    logger.Trace('Sending UDP Broadcast data: ' + sBuf);
    udp.Send(UDPBroadcastAddress,UDPBroadcastPortLookup,sBuf);
 end;

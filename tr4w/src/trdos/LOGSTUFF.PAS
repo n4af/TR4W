@@ -52,6 +52,7 @@ uses {Dos, Printer,}Tree,
   LogRadio,
   Messages,
   idUDPClient, // ny4i 4.44.9
+  IdIPMCastClient,
   idGlobal, // ny4i 4.44.9
   SysUtils, // ny4i 4.44.9
   StrUtils, // 4.90.11

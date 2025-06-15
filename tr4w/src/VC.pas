@@ -1525,12 +1525,12 @@ type
 {01}  ceDupe:              boolean;
 
 {07}  PostalCode_old:          PostalCodeString;
-{01} // ZERO_01:             DummyByte;
+{01}  ZERO_01:             DummyByte;
 
 {COMMON END}
 
 {07}  Prefix:              PrefixMultiplierString;
-{01} // ZERO_02:             DummyByte;
+{01}  ZERO_02:             DummyByte;
 
 {14}  Callsign:            CallString;
 {01}  Age:                 byte;
@@ -1544,7 +1544,7 @@ type
       ExchString:          Str40;  // What is entered as SRX exchange
 {04}  ceClass:             string[3]{10}; { Field day class }
 
-{01} // ZERO_04:             DummyByte;
+{01}  ZERO_04:             DummyByte;
 {01}  Precedence:          Char;
 {01}  ceRadio:             RadioType;
 {01}  Check:               Byte;           {The CHECK is two numbers (year)}
@@ -1552,20 +1552,20 @@ type
 {32}  QTH:                 QTHRecord;
 
 {06}  DXQTH:               DXMultiplierString;
-{01}  //ZERO_05:             DummyByte;
+{01}  ZERO_05:             DummyByte;
 {01}  Radio:               InterfacedRadioType;
 
 {11}  DomMultQTH:          DomesticMultiplierString; //String for dom mult count
-{01}  //ZERO_06:             DummyByte;
+{01}  ZERO_06:             DummyByte;
 
 {11}  DomesticQTH:         Str10;//Corrected QTH - if it is need  - i.e. AF1 -> AF-001 in IOTA contest.
-{01}  //ZERO_07:             DummyByte;
+{01}  ZERO_07:             DummyByte;
 
 {11}  Name:                Str10;
-{01}  //ZERO_08:             DummyByte;
+{01}  ZERO_08:             DummyByte;
 
 {07}  Power:               string[6];
-{01}  //ZERO_09:             DummyByte;
+{01}  ZERO_09:             DummyByte;
 
 {04}  NumberReceived:      integer;
 {04}  NumberSent:          integer;
@@ -1574,13 +1574,13 @@ type
 {02}  RSTReceived:         smallInt; {Word;}  // if this was an int, I could put ft8 reports here.
 
 {11}  QTHString:           Str10;//QTH received by user (literal)
-{01}  //ZERO_10:             DummyByte;
+{01}  ZERO_10:             DummyByte;
 
 {06} RandomCharsSent:      string[5];
 {02} TenTenNum:            word;
 
 {05}  Chapter:             string[4];
-{01}  //ZERO_11:             DummyByte;
+{01}  ZERO_11:             DummyByte;
 {01}  ceClearDupeSheet:    boolean;
 {01}  ceSearchAndPounce:   boolean;
 
@@ -1595,7 +1595,7 @@ type
 
 {08}  RandomCharsReceived: string[7];
 
-{01}  //ZERO_13:             DummyByte;
+{01}  ZERO_13:             DummyByte;
 {01}  ceClearMultSheet:    Boolean;
 {01}  MP3Record:           Boolean;
 {01}  //res3:                Byte;

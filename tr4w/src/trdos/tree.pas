@@ -36,6 +36,7 @@ uses
   utils_file,
   TF,
   Messages,
+  PerlRegEx,
   Windows;
 
 var
@@ -819,6 +820,7 @@ procedure HexToWord(InputString: Str80; var OutputWord: Word; var Result: intege
 
 procedure IncrementASCIIInteger(var ASCIIString: Str80);
 procedure IncrementMinute(var DateString: Str20; var TimeString: Str80);
+function IsValidMulticastIPAddress(sIP: string): boolean;
 function WordValueFromCharacter(Character: Char): Word;
 
 //procedure DecodeDate(const DateTime: TDateTime; var Year, Month, Day: word);
@@ -4659,6 +4661,7 @@ end;
 function GetStateFromSection(Section: Str20): Str20;
 
 begin
+  Result := '';
   Section := UpperCase(Section);
 
   if (Section = 'AK') or (Section = 'AL') or (Section = 'AR') or
@@ -4738,6 +4741,7 @@ end;
 function LooksLikeAState(state: string): boolean;
 
 begin
+  Result := false;
   if (state = 'CA') or (state = 'TX') or (state = 'NY') or (state = 'FL') or
      (state = 'TX') or (state = 'PA') or (state = 'MA') or (state = 'NJ') or
      (state = 'WA') or (state = 'MD') or (state = 'DC') or
@@ -4768,6 +4772,7 @@ end;
 function LooksLikeASection(section: string): boolean;
 
 begin
+   Result := false;
    if (Section = 'AK') or (Section = 'AL') or (Section = 'AR') or
       (Section = 'AZ') or (Section = 'CO') or (Section = 'CT') or
       (Section = 'DE') or (Section = 'GA') or (Section = 'IA') or
@@ -5278,5 +5283,27 @@ function String2Hex(const Buffer: Ansistring): string;
        Result := UpperCase(Result + IntToHex(Ord(Buffer[n]), 2)) + ' ';
    end;
 
+function IsValidMulticastIPAddress(sIP: string): boolean;
+var
+  regex: TPerlRegEx;
+begin
+  // create our regex instance, and we want to do a case insensitive search, in multiline mode
+  Result := false;
+  regex := TPerlRegEx.Create;
+  try
+    logger.debug('Checking if %s is a valid multicast IP address', [sIP]);
+    regex.RegEx := '/^2(?:2[4-9]|3\d)(?:\.(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d?|0)){3}$';
+
+    regex.Subject := sIP;
+
+    Result := regex.MatchAgain;
+  finally
+    regex.Free;
+  end;
+  if Result then
+  begin
+    logger.debug('%s is a valid multicast IP address', [sIP]);
+  end;
+end;
 end.
 
