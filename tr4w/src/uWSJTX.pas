@@ -665,7 +665,7 @@ var
   id: string;
   colorType: byte;
 begin
-
+  logger.Debug('[uWSJTX::HighlightCall] Attempto highlight call %s',[sCall]);
   if not FSendColorization then
   begin
     logger.debug('[uWSJTX] FSendColorization is false so not highlighting %s',

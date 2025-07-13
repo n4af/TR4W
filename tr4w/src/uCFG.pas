@@ -868,6 +868,14 @@ begin
 
    Command[Ord(Command[0]) + 1] := #0;
    Result := False;
+
+   if logger.IsDebugEnabled then
+      begin
+      if pshortstring(Command)^ = 'WSJT-X SEND HIGHLIGHTS' then
+         begin
+         logger.debug('Processing WSJT-X SEND HIGHLIGHTS');
+         end;
+      end;
    { if pshortstring(Command)^ = 'QSO POINT METHOD' then
      result := false;  }
    if length(pshortstring(Command)^) > 5 then
@@ -1647,7 +1655,8 @@ end;
 function F_UpdateWSJTXSendColorizations: boolean; // We do this because we cannot see the wsjtx object in the commandArray declaration
 begin
    Result := true;
-   if assigned(wsjtx) then
+
+  if assigned(wsjtx) then   
       begin
       wsjtx.SendColorization := WSJTXSendColorization;
       end

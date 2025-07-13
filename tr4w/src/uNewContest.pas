@@ -82,7 +82,7 @@ const
     'MY PREC',
     'MY QTH',
     'MY SECTION',
-    'MY STATE',
+    'MY INFO (see above):',  // Was MY STATE NY4I
     'MY ZONE',
     'MY POSTAL CODE'
     );

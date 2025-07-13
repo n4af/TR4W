@@ -177,6 +177,9 @@ var
   Inact_Freq: Cardinal = 0;
   Inact_Band: BandType;
   so2r_swap: boolean = false;
+
+  // WSJTX INit Varaibles saves for when wsjtx object is created
+  save_wsjtx_SendColorization: boolean;
 function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
 
 function DeviceIoControlHandler

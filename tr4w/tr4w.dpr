@@ -359,10 +359,10 @@ begin
 //  if TryToCheckTheLatestVersion then Exit;
 //{$IFEND}
 
-  {if WSJTXEnabled then
+  if WSJTXEnabled then
      begin
      wsjtx := TWSJTXServer.Create;
-     end;   }               // Moved after we read the config file
+     end;                  // Moved after we read the config file
   //externalLogger := TExternalLogger.Create('DXKEEPER');
   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
 
@@ -445,10 +445,13 @@ begin
   ReadInConfigFile(cfgCFG);          //n4af 4.31.5
   ReadInConfigFile(cfgCommMes);      //common messages gets precedence - n4af
 
-  if WSJTXEnabled then
+  // Note putting the wsjtx create here causes issues in the config functions above.
+  // The idea is we should create the wsjtx object but start does not get called yet.
+  (*if WSJTXEnabled then
      begin
      wsjtx := TWSJTXServer.Create;
      end;
+     *)
   if elLogType <> lt_NoExternalLogger then
      begin
      externalLogger := TExternalLogger.Create(elLogType);

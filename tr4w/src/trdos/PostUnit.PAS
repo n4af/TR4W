@@ -159,7 +159,7 @@ procedure BandChangeReport;
 procedure MakeReportFileName(ShortFileName: PChar);
 procedure MakeNotesList;
 function GoodLookingQSO: boolean;
-function GetStateFromSection(section: string) : string;
+//function GetStateFromSection(section: string) : string;
 //function CorrectContestExchange: boolean;
 
 var
@@ -254,7 +254,6 @@ const
   NumberTimeCategories                  = 3;
   NumberTransmitterCategories           = 5;
   NumberCertificateCategories           = 2;
-  NumberSections                        = 81;
 
   NumberErmakOverlayCategories          = 11;
 
@@ -381,90 +380,8 @@ const
     nil,
     'FM'
     );
-{
-  tARRLVESections                       : array[0..NumberSections - 1] of PChar = (
-    'AB',
-    'AK',
-    'AL',
-    'AR',
-    'AZ',
-    'BC',
-    'CO',
-    'CT',
-    'DE',
-    'DX',
-    'EB',
-    'EM',
-    'ENY',
-    'EP',
-    'EW',
-    'GA',
-    'IA',
-    'ID',
-    'IL',
-    'IN',
-    'KS',
-    'KY',
-    'LA',
-    'LAX',
-    'MAR',
-    'MB',
-    'MDC',
-    'ME',
-    'MI',
-    'MN',
-    'MO',
-    'MS',
-    'MT',
-    'NC',
-    'ND',
-    'NE',
-    'NFL',
-    'NH',
-    'NL',
-    'NLI',
-    'NM',
-    'NNJ',
-    'NNY',
-    'NTX',
-    'NV',
-    'NWT',
-    'OH',
-    'OK',
-    'ON',
-    'OR',
-    'ORG',
-    'PAC',
-    'PR',
-    'QC',
-    'RI',
-    'SB',
-    'SC',
-    'SCV',
-    'SD',
-    'SDG',
-    'SF',
-    'SFL',
-    'SJV',
-    'SK',
-    'SNJ',
-    'STX',
-    'SV',
-    'TN',
-    'UT',
-    'VA',
-    'VI',
-    'VT',
-    'WCF',
-    'WI',
-    'WMA',
-    'WNY',
-    'WPA',
-    'WTX',
-    'WV',
-    'WWA',
-    'WY');
-}
+  
+
 implementation
 
 uses
@@ -4575,7 +4492,7 @@ begin
   /////Result := i1 - i2;    // This sorts in descendiong count order
 end;
 
-(*----------------------------------------------------------------------------*)
+(*----------------------------------------------------------------------------
 function GetStateFromSection(section: string) : string;
 begin
    logger.debug ('Entering GetStateFromSection with ' + section);
@@ -4609,7 +4526,7 @@ begin
 
    logger.debug('Leaving GetSectionFromState with ' + Result);
 end;
-
+*)
 function DeleteRepeatedSpaces(const s: string): string;
   var
     i, j, State: Integer;

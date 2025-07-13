@@ -41,6 +41,8 @@ uses
 
 var
   tempshowcty                           : Cardinal;
+  sectionsCanadianArray                 : array of string;
+  sectionsUSArray                       : array of string;
 const
   FMSecsPerDay                          : single = MSecsPerDay;
   IMSecsPerDay                          : integer = MSecsPerDay;
@@ -696,6 +698,96 @@ type
 
 const
   InitialCodeSpeed                      = 35;
+
+  NumberSections                        = 86;
+
+  tARRLVESections                : array[0..NumberSections - 1] of string = (
+    'AB',
+    'AK',
+    'AL',
+    'AR',
+    'AZ',
+    'BC',
+    'CO',
+    'CT',
+    'DE',
+    'EB',
+    'EM',
+    'ENY',
+    'EP',
+    'EW',
+    'GA',
+    'GH',
+    'IA',
+    'ID',
+    'IL',
+    'IN',
+    'KS',
+    'KY',
+    'LA',
+    'LAX',
+    'MB',
+    'MDC',
+    'ME',
+    'MI',
+    'MN',
+    'MO',
+    'MS',
+    'MT',
+    'NB',
+    'NC',
+    'ND',
+    'NE',
+    'NFL',
+    'NH',
+    'NL',
+    'NLI',
+    'NM',
+    'NNJ',
+    'NNY',
+    'NS',
+    'NTX',
+    'NV',
+    'OH',
+    'OK',
+    'ONE',
+    'ONN',
+    'ONS',
+    'OR',
+    'ORG',
+    'PAC',
+    'PE',
+    'PR',
+    'QC',
+    'RI',
+    'SB',
+    'SC',
+    'SCV',
+    'SD',
+    'SDG',
+    'SF',
+    'SFL',
+    'SJV',
+    'SK',
+    'SNJ',
+    'STX',
+    'SV',
+    'TER',
+    'TN',
+    'UT',
+    'VA',
+    'VI',
+    'VT',
+    'WCF',
+    'WI',
+    'WMA',
+    'WNY',
+    'WPA',
+    'WTX',
+    'WV',
+    'WWA',
+    'WY',
+    'YUK');
 var
 
   CodeSpeed                             : integer = InitialCodeSpeed;
@@ -4770,9 +4862,22 @@ begin
 end;
 
 function LooksLikeASection(section: string): boolean;
-
+var i: integer;
 begin
    Result := false;
+   // Check if the section is in the array
+   for i := Low(tARRLVESections) to High(tARRLVESections) do
+      begin
+      if tARRLVESections[i] = section then
+         begin
+         Result := True; // Found the section
+         Exit; // Exit the function
+         end;
+      end;
+
+  (*
+
+
    if (Section = 'AK') or (Section = 'AL') or (Section = 'AR') or
       (Section = 'AZ') or (Section = 'CO') or (Section = 'CT') or
       (Section = 'DE') or (Section = 'GA') or (Section = 'IA') or
@@ -4832,7 +4937,7 @@ begin
       begin
       Result := false;
       end;
-
+   *)
 end;
 {
 function ReadFromSerialPort(port: HWND; BytesToRead: Cardinal; WriteDebug: boolean): boolean ;
@@ -5305,5 +5410,25 @@ begin
     logger.debug('%s is a valid multicast IP address', [sIP]);
   end;
 end;
+
+
+function IsSectionInArray(const section: string): Boolean;
+var
+  i: Integer;
+begin
+  Result := False; // Default to False
+
+
+  // Check if the section is in the array
+  for i := Low(tARRLVESections) to High(tARRLVESections) do
+  begin
+    if tARRLVESections[i] = section then
+    begin
+      Result := True; // Found the section
+      Exit; // Exit the function
+    end;
+  end;
+end;
+
 end.
 
