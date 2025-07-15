@@ -6917,7 +6917,9 @@ var
   tempState: string;
   tempVE_Prov: string;
   tempARRL_Sect: string;
+  tempQTH: string;
   saveDecimalSeparator: char;
+  sTemp: string;
 
 begin
   lookingForFieldName := false;
@@ -6975,7 +6977,14 @@ begin
                 begin
                   exch.Band := GetADIFBand(fieldValue);
                 end;
-              tAdifCALL: exch.Callsign := AnsiUpperCase(fieldValue);
+              tAdifCALL:
+                 begin
+                 exch.Callsign := AnsiUpperCase(fieldValue);
+                 if exch.Callsign = 'K2TRY' then
+                    begin
+                    logger.Debug('Found call');
+                    end;
+                 end;
               tAdifCHECK: exch.Check := StrToInt(fieldValue);
               tAdifCLASS: exch.ceClass := AnsiUpperCase(fieldValue);
               tAdifCQ_Z: exch.Zone := StrToInt(fieldValue);
@@ -7066,7 +7075,15 @@ begin
                   // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
                 end;
               tAdifRX_PWR: exch.Power := fieldValue;
-              tAdifSRX: exch.NumberReceived := StrToInt(fieldValue);
+              tAdifSRX:
+                 begin
+                 exch.NumberReceived := StrToIntDef(fieldValue,-1);
+                 if exch.NumberReceived = -1 then
+                    begin
+                    logger.error('[ParseADIFRecord] SRX field was not numeric - error %s - ADIF record was %s',[fieldValue, sADIF]);
+                    exch.NumberReceived := 0;
+                    end;
+                 end;
               tAdifSRX_STRING: tempSRX_String := fieldValue;
               (*begin
               if not recordFromWSJTX then
@@ -7081,7 +7098,15 @@ begin
               exch.QTHString := fieldValue;
               //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
               end; *)
-              tAdifSTX: exch.NumberSent := StrToInt(fieldValue);
+              tAdifSTX:
+                 begin
+                 exch.NumberSent := StrToIntDef(fieldValue,-1);
+                 if exch.NumberSent = -1 then
+                    begin
+                    logger.error('[ParseADIFRecord] STX field was not numeric - error %s - ADIF record was %s',[fieldValue, sADIF]);
+                    exch.NumberSent := 0;
+                    end;
+                 end;
               tAdifSTX_STRING: tempSTX_String := fieldValue; // 4.105.2
               tAdifSUBMODE:
                 begin
@@ -7101,7 +7126,8 @@ begin
                 ;
               tAdifQTH:
                 begin
-                  exch.QTHString := fieldValue;
+                  //exch.QTHString := fieldValue;
+                  tempQTH := fieldValue;
                 end;
               tAdifPROGRAMID:
                 begin
@@ -7179,10 +7205,11 @@ begin
       end;
     end;
   except
-    DebugMsg('Exception processign ADIF Record ' + sADIF);
+    DebugMsg('Exception processing ADIF Record ' + sADIF);
   end;
   // ****************************** DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
   // fix up operator
+
   if exch.ceOperator = '' then
   begin
     exch.ceOperator := currentOperator;
@@ -7227,10 +7254,37 @@ begin
         end;
         exch.ExchString := exch.QTHString;
       end;
-    ARRLSSCW, ARRLSSSSB, WINTERFIELDDAY, ARRLFIELDDAY: // 4.105.2
+   ARRLSSCW, ARRLSSSSB, WINTERFIELDDAY, ARRLFIELDDAY: // 4.105.2
       begin
-        exch.DomesticQTH := tempARRL_Sect;
-        exch.QTHString := tempARRL_SECT;
+      if length(exch.ceClass) = 0 then
+         begin
+         sTemp := FindFieldDayClassInExchangeString(tempSRX_String);
+         exch.ceClass := AnsiUpperCase(sTemp);
+         logger.debug('[ParseADIFRecord] Blank exch.ceClass set to %s',[sTemp]);
+         end;
+
+      // if tempARRL_SECT is blank, then check to see if we can parse it out of the SRX_STRING.
+      // Check each item to see if it LooksLikeASection and use that.
+      if length(tempARRL_Sect) > 0 then
+         begin
+         If LooksLikeAShortSection(tempARRL_Sect) then
+            begin
+            tempARRL_Sect := ConvertShortSectionToFullSection(tempARRL_Sect);
+            end;
+         end
+      else
+         begin                                    // tempARRL_Sect is 0
+         if length(tempSRX_STRING) > 0 then
+            begin
+            tempARRL_Sect := FindSectionInString(tempSRX_String);
+            if LooksLIkeAShortSection(tempARRL_Sect) then
+               begin
+               tempARRL_Sect := ConvertShortSectionToFullSection(tempARRL_Sect);
+               END;
+            end;
+         end;
+      exch.DomesticQTH := tempARRL_Sect;
+      exch.QTHString := tempARRL_SECT;
       end;
     CWOPS:
       exch.Age := StrToIntDef(exch.QTHString, 0);
@@ -7303,9 +7357,13 @@ var
   adif: TextFile;
   adifFileName: string;
   sBuffer: string;
-  FoundEOH: boolean;
+  sRecord: string;
+  sHeader: string;
+  foundEOH: boolean;
+  foundEOR: boolean;
   QSOCounter: integer;
   lpNumberOfBytesWritten: Cardinal;
+  nPos: integer;
 
   procedure DisplayLoadedQSOs;
   begin
@@ -7314,6 +7372,10 @@ var
   end;
 begin
   { This is a total rewrite of the ADIF import processing. - NY4I 2020 Jul 2
+
+  2025 JUL 14 - Discovered this does not handle multiple line ADIF files.
+                So change the code to buffer the records until it finds the EOR
+                and then process the record. - NY4I
   }
   FoundEOH := false;
   try
@@ -7343,58 +7405,85 @@ begin
   end;
 
   if not FileExists(adifFileName) then
-  begin
-    MessageDlg({TC_IMPORTFILENOTFOUND} 'The import file is not available' + ' '
-      + adifFileName, mtError, [mbOK], 0);
-    exit;
-  end;
+     begin
+     MessageDlg({TC_IMPORTFILENOTFOUND} 'The import file is not available' + ' '
+                 + adifFileName, mtError, [mbOK], 0);
+     exit;
+     end;
 
-  if not OpenLogFile then
-  begin
-    MessageDlg({TC_CANNOTOPENLOG} 'Cannot open log file', mtError, [mbOK], 0);
-
-    exit;
-  end;
-  tSetFilePointer(0, FILE_END);
-  // Now open te file and process
-
-  if not FileExists(adifFileName) then
-  begin
-    DebugMsg('In ImportADIF, ADIF file ' + adifFilename + ' does not exists');
-    Exit;
-  end;
-
-  AssignFile(adif, adifFileName);
-  //ReWrite(adif);
-  QSOCounter := 0;
-  Reset(adif);
-  while not Eof(adif) do
-  begin
-    ReadLn(adif, sBuffer);
-    if not FoundEOH then
-    begin
-      if trim(AnsiUpperCase(sBuffer)) = '<EOH>' then
+   if not OpenLogFile then
       begin
-        FoundEOH := true;
+      MessageDlg({TC_CANNOTOPENLOG} 'Cannot open log file', mtError, [mbOK], 0);
+      exit;
       end;
-    end
-    else
-    begin
-      ClearContestExchange(TempRXData);
-      if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
+   tSetFilePointer(0, FILE_END);
+   // Now open te file and process
+
+   if not FileExists(adifFileName) then
       begin
-        ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
-        CalculateQSOPoints(TempRXData);
-        tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange),
-          lpNumberOfBytesWritten);
-        inc(QSOCounter);
-        if QSOCounter mod 100 = 0 then
-        begin
-          DisplayLoadedQSOs;
-        end;
+      logger.debug('[ImportADIF] ADIF file %s does not exist',[adifFilename]);
+      Exit;
       end;
-    end;
-  end;
+
+   AssignFile(adif, adifFileName);
+   //ReWrite(adif);
+   QSOCounter := 0;
+   Reset(adif);
+   while not Eof(adif) do
+      begin
+      ReadLn(adif, sRecord);
+      if not foundEOH then
+         begin
+         if trim(AnsiUpperCase(sRecord)) = '<EOH>' then
+            begin
+            foundEOH := true;              // A header is not technically required so handle that too
+            continue;
+            end
+         else
+            begin
+            sHeader := sHeader + sRecord;
+            continue;
+            end;
+         end;
+
+      if foundEOH then
+         begin
+         if AnsiContainsText(AnsiLowerCase(sRecord),'<eor>') then
+            begin
+            logger.debug('Found <eor> in record %s',[sRecord]);
+            foundEOR := true;
+            sBuffer := sBuffer + sRecord;
+            //-----------------------
+            ClearContestExchange(TempRXData);
+            if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
+               begin
+               ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
+               CalculateQSOPoints(TempRXData);
+               tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange),
+                          lpNumberOfBytesWritten);
+               inc(QSOCounter);
+               if QSOCounter mod 100 = 0 then
+                  begin
+                  DisplayLoadedQSOs;
+                  end;
+               end
+            else
+               begin
+               logger.Error('[] ParseADIFRecord retured false so record did not process - %s',[sBuffer]);
+               end;
+            sBuffer := '';
+            sRecord := ''; // Clear these for nexty time
+            //-----------------------
+            foundEOR := false;
+            continue;
+            end
+         else
+            begin
+            sBuffer := sBuffer + sRecord;
+            continue;
+            end;
+         end;
+      end;
 
   CloseFile(adif);
 

@@ -37,7 +37,8 @@ uses
   TF,
   Messages,
   PerlRegEx,
-  Windows;
+  Windows,
+  Classes;
 
 var
   tempshowcty                           : Cardinal;
@@ -699,9 +700,9 @@ type
 const
   InitialCodeSpeed                      = 35;
 
-  NumberSections                        = 86;
+  NumberSections                        = 87;
 
-  tARRLVESections                : array[0..NumberSections - 1] of string = (
+  tARRLVESections                : array[0..NumberSections - 1] of string = (            // DX is included
     'AB',
     'AK',
     'AL',
@@ -711,11 +712,12 @@ const
     'CO',
     'CT',
     'DE',
+    'DX',
     'EB',
-    'EM',
+    'EMA',
     'ENY',
-    'EP',
-    'EW',
+    'EPA',
+    'EWA',
     'GA',
     'GH',
     'IA',
@@ -837,7 +839,7 @@ function CheckSum(InputString: string): Byte;
 function CheckSumWord(InputString: string): Word;
 
 procedure CompressFormat(Call: CallString; var Output: FourBytes);
-
+function ConvertShortSectionToFullSection(shortSection: string): string;
 //function ControlKeyPressed: boolean;
 function CopyWord(LongString: string; Index: integer): Str80;
 
@@ -853,6 +855,8 @@ procedure ExpandTabs(var InputString: string);
 function ExpandTwoBytes(Input: TwoBytes): Str80;
 //wli
 
+function FindSectionInString(s: string): string;
+function FindFieldDayClassInExchangeString( s: string): string;
 function FirstLetter(InputString: Str80): Char;
 procedure FormFeed;
 
@@ -958,6 +962,7 @@ function LooksLikeAGrid(var GridString: ShortString): boolean;
 function LooksLikeAGridIgnoreAE(var GridString: ShortString): boolean;
 function LooksLikeAState(state: string): boolean; // NY4I
 function LooksLikeASection(section: string): boolean;
+function LooksLikeAShortSection(section: string): boolean;
 function Lpt1BaseAddress: Word;
 function Lpt2BaseAddress: Word;
 function Lpt3BaseAddress: Word;
@@ -4861,75 +4866,100 @@ begin
 
 end;
 
+function FindFieldDayClassInExchangeString( s: string): string;
+// Finds a Field Day class (which is the number of transmitters and class) in a string delimited by spaces.
+// The code will check which one is the section since the exchange string while normally is 1A WCF could be WCF 1A
+var
+   i: integer;
+   sl: TStringList;
+begin
+   Result := '';
+   try
+      sl := TStringList.Create;
+      sl.Delimiter := ' ';
+      sl.DelimitedText := s;
+      if sl.Count <> 2 then
+         begin
+         logger.Error('[FindFieldDayClassInExchangeString] While parsing the passed exchange string (%s), there are more or less than two fields',[s]);
+         Result := '';
+         Exit;
+         end;
+      if (LooksLikeASection(sl[1])) or
+         (LooksLikeAShortSection(sl[1])) then
+         begin
+         Result := sl[0];
+         end
+      else if (LooksLikeASection(sl[0])) or
+              (LooksLikeAShortSection(sl[0])) then
+         begin
+         Result := sl[1];
+         end;
+   finally
+      FreeAndNil(sl);
+   end;
+end;
+
+
+
+
+
+
+function FindSectionInString(s: string): string;
+// Finds an ARRL Section (including VE sections) in a string delimited by spaces
+// The first section is found so if a string had WWA WCF, it would return only WWA -  NY4I
+var
+   i: integer;
+   sl: TStringList;
+begin
+   Result := '';
+   try
+      sl := TStringList.Create;
+      sl.Delimiter := ' ';
+      sl.DelimitedText := s;
+      for i := 1 to (sl.Count - 1) do
+         begin
+         if LooksLikeASection(sl[i]) or
+            LooksLikeAShortSection(sl[i]) then
+            begin
+            Result := sl[i];
+            break;
+            end;
+         end;
+   finally
+      FreeANdNil(sl);
+   end;
+end;
+
+
 function LooksLikeASection(section: string): boolean;
 var i: integer;
+sUpper: string;
 begin
    Result := false;
    // Check if the section is in the array
+   sUpper := AnsiUpperCase(section);
    for i := Low(tARRLVESections) to High(tARRLVESections) do
       begin
-      if tARRLVESections[i] = section then
+      if tARRLVESections[i] = sUpper then
          begin
          Result := True; // Found the section
          Exit; // Exit the function
          end;
       end;
+   end;
 
-  (*
+function LooksLikeAShortSection(section: string): boolean;
+var sUpper: string;
+begin
+// This checks for a historical issue where TR4W allows sections to be saved as their short cut (WM for WMA, EP for EPA).
+// I think this is wrong to do but since th eprogram supports it, this procesure checks if the passed section is one of these.
+// Hopefully, the code will log the right value but all need to agree. - NY4I
 
-
-   if (Section = 'AK') or (Section = 'AL') or (Section = 'AR') or
-      (Section = 'AZ') or (Section = 'CO') or (Section = 'CT') or
-      (Section = 'DE') or (Section = 'GA') or (Section = 'IA') or
-      (Section = 'ID') or (Section = 'IN') or (Section = 'IL') or
-      (Section = 'KS') or (Section = 'KY') or (Section = 'LA') or
-      (Section = 'ME') or (Section = 'MI') or (Section = 'MN') or
-      (Section = 'MO') or (Section = 'MS') or (Section = 'MT') or
-      (Section = 'NC') or (Section = 'ND') or (Section = 'NE') or
-      (Section = 'NH') or (Section = 'NM') or (Section = 'NV') or
-      (Section = 'OH') or (Section = 'OK') or (Section = 'OR') or
-      (Section = 'RI') or (Section = 'SD') or (Section = 'TN') or
-      (Section = 'UT') or (Section = 'VA') or (Section = 'VT') or
-      (Section = 'WI') or (Section = 'WV') or (Section = 'WY') or
-      (Section = 'SC') then
-      begin
-      Result := true;
-      end
-   else if (Section = 'EB') or (Section = 'LAX') or (Section = 'ORG') or
-           (Section = 'SB') or (Section = 'SCV') or (Section = 'SDG') or
-           (Section = 'SF') or (Section = 'SJV') or (Section = 'SV') then
-      begin
-      Result := true;
-      end
-   else if (Section = 'EM') or (Section = 'EMA') or
-           (Section = 'WM') or (Section = 'WMA') then
-      begin
-      Result := true;
-      end
-   else if (Section = 'EN') or (Section = 'WNY') or (Section = 'NNY') or
-           (Section = 'ENY') or (Section = 'NLI') then
-      begin
-      Result := true;
-      end
-   else if (Section = 'EP') or (Section = 'EPA') or
-           (Section = 'WP') or (Section = 'WPA') then
-      begin
-      Result := true;
-      end
-   else if (Section = 'EW') or (Section = 'EWA') or
-           (Section = 'WWA') or (Section = 'WW') then
-      begin
-      result := true;
-      end
-   else if (Section = 'NF') or (Section = 'SF') or (Section = 'WCF') then
-      begin
-      Result := true;
-      end
-   else if (Section = 'NNJ') or (Section = 'SNJ') then
-      begin
-      Result := true;
-      end
-   else if (Section = 'NTX') or (Section = 'STX') or (Section = 'WTX') then
+   sUpper := AnsiUpperCase(section);
+   if (sUpper = 'EP') or (sUpper = 'EM') or (sUpper = 'WW') or
+      (sUpper = 'EW') or (sUpper = 'WP') or (sUpper = 'WT') or
+      (sUpper = 'WC') or (sUpper = 'EN') or (sUpper = 'NF') or
+      (sUpper = 'WM') or (sUpper = 'WN') then
       begin
       Result := true;
       end
@@ -4937,8 +4967,53 @@ begin
       begin
       Result := false;
       end;
-   *)
 end;
+
+function ConvertShortSectionToFullSection(shortSection: string): string;
+begin
+   Result := '';
+   if shortSection = 'EP' then
+      begin
+      Result := 'EPA';
+      end
+   else if shortSection = 'EM' then
+      begin
+      Result := 'EMA';
+      end
+   else if shortSection = 'EN' then
+      begin
+      Result := 'ENY';
+      end
+   else if shortSection = 'WM' then
+      begin
+      Result := 'WMA';
+      end
+   else if shortSection = 'WN' then
+      begin
+      Result := 'WNY';
+      end
+   else if shortSection = 'WC' then
+      begin
+      Result := 'WCF';
+      end
+   else if shortSection = 'EW' then
+      begin
+      Result := 'EWA';
+      end
+   else if shortSection = 'WT' then
+      begin
+      Result := 'WTX';
+      end
+   else if shortSection = 'NF' then
+      begin
+      Result := 'NFL';
+      end
+   else
+      begin
+      Result := '';
+      end;
+   end;
+
 {
 function ReadFromSerialPort(port: HWND; BytesToRead: Cardinal; WriteDebug: boolean): boolean ;
 var

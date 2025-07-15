@@ -1934,6 +1934,18 @@ begin
                 begin
                 if TempRXData.QTHString <> 'DX' then     // Change to validate it is a section
                    begin
+                   if LooksLikeASection(TempRXData.QTHString) then
+                   else
+                      begin
+                      If LooksLikeAShortSection(TempRXData.QTHString) then
+                         begin
+                         TempRXData.QTHString := ConvertShortSectionToFullSection(TempRXData.QTHString);
+                         end
+                      else
+                         begin
+                         logger.error('[] QTHString %s is not a valid section',[TempRXData.QTHString]);
+                         end;
+                      end;
                    WriteADIFField('ARRL_SECT',TempRXData.QTHString);
                    WriteADIFField('CLASS',TempRXData.ceClass);
                    //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s ', tCallStringLength, p);
@@ -2419,7 +2431,7 @@ begin
   Result := True;
 end;
 
-function tGenerateLogPortionOfCabrilloFile: boolean;
+function tGenerateLogPortionOfCabrilloFile: boolean;  // Rewrite this with all strings! NY4I
 label
   1;
 var
@@ -2445,6 +2457,7 @@ var
   nrReceived                            : integer;
   nrSent                                : integer;
   tempcategoryoperator                  : tcategoryoperator;
+  s                                     : string;
 
   T1                                    : PChar;
   T2                                    : PChar;
@@ -3257,6 +3270,12 @@ if TempRXData.DomMultQTH = '' then
             if Contest in [ARRLFIELDDAY, WINTERFIELDDAY] then
                begin
                csQTHString := @TempRXData.QTHString[1];   // Issue 407 ny4i
+               end;
+            s := csQTHString;
+            if LooksLikeAShortSection(s) then
+               begin
+               s := ConvertShortSectionToFullSection(s);
+               csQTHString := PChar(s);
                end;
             Format(CABRILLO_HISEX, '%-3s %-7s', @TempRXData.ceClass[1], csQTHString);
           end;

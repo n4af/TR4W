@@ -1297,6 +1297,14 @@ begin
       RXData.ceClass := TempString2;
       RXData.QTHString := TempString;
     end;
+
+    if Not LooksLikeASection(RXData.QTHString) then
+       begin
+       if LooksLikeAShortSection(RXData.QTHString) then
+          begin
+          RXData.QTHString := COnvertShortSectionToFullSection(RXData.QTHString);
+          end;
+       end;
     // if I enter 999D wtx, then correct it to 99d wtx, then length is of class is still 4. Fix that.
     logger.debug('Calling FoundDomesticQTH from ProcessClassAndDomesticOrDXQTHExchange - QTHString = (%s)', [RXData.QTHString]);
     if not FoundDomesticQTH(RXData) then
