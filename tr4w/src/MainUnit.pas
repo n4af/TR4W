@@ -6980,10 +6980,11 @@ begin
               tAdifCALL:
                  begin
                  exch.Callsign := AnsiUpperCase(fieldValue);
-                 if exch.Callsign = 'K2TRY' then
+                 {if exch.Callsign = 'K2TRY' then
                     begin
                     logger.Debug('Found call');
                     end;
+                    }
                  end;
               tAdifCHECK: exch.Check := StrToInt(fieldValue);
               tAdifCLASS: exch.ceClass := AnsiUpperCase(fieldValue);
