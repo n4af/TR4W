@@ -720,7 +720,7 @@ const
  (crCommand: 'SAY HI ENABLE';                 crAddress: @SayHiEnable;                    crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'SAY HI RATE CUTOFF';            crAddress: @SayHiRateCutOff;                crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'SCORE POSTING ID';              crAddress: @GetScoresPostingID;             crMin:0;  crMax:MAXWORD; crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
- (crCommand: 'SCORE POSTING URL';             crAddress: @GetScoresSeverPostingAddress;   crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctURL; crNetwork: 1),
+ (crCommand: 'SCORE POSTING URL';             crAddress: @GetScoresSeverPostingAddress;   crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctURL; crNetwork: 1),
  (crCommand: 'SCORE READING URL';             crAddress: @GetScoresSeverReadingAddress;   crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctURL; crNetwork: 1),
  (crCommand: 'SCP COUNTRY STRING';            crAddress: @CD.CountryString;               crMin:0;  crMax:80;      crS: csOld; crA: 11;crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
  (crCommand: 'SCP MINIMUM LETTERS';           crAddress: pointer(1);                      crMin:0;  crMax:5;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray;   cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
@@ -1692,14 +1692,11 @@ const
          'RPTSPEX.WAV'),
       (isString: @SearchAndPouncePhoneExchange; isPcharString: 'SAPEXCHG.WAV'),
       //   (isString: @TailEndPhoneMessage; isPcharString: 'TAILEND.WAV'),
-     {
-         (isString: @GetScoresSeverPostingAddress; isPcharString: 'http://www.getscores.org/postscore.aspx'),
-         (isString: @GetScoresSeverReadingAddress; isPcharString: 'http://www.getscores.org/'),
-     }
+  
       (isString: @GetScoresSeverPostingAddress; isPcharString:
-         'http://cqcontest.ru/postscore.jsp'),
+         'http://post.contestonlinescore.com'),
       (isString: @GetScoresSeverReadingAddress; isPcharString:
-         'http://cqcontest.ru'),
+         'https://contestonlinescore.com/scoreboard/'),
 
       (isString: @UnknownCountryFileName; isPcharString: 'UNKNOWN.CTY'),
 
