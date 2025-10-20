@@ -57,8 +57,10 @@ procedure CheckServerAnswer(AnswerLength: integer);
 
 var
   GetScoresPostingID                    : integer;
-  GetScoresSeverPostingAddress          : ShortString {= 'http://www.getscores.org/postscore.aspx'};
-  GetScoresSeverReadingAddress          : ShortString {= 'http://www.getscores.org/'};
+//  GetScoresSeverPostingAddress          : ShortString {= 'http://www.getscores.org/postscore.aspx'};
+//  GetScoresSeverReadingAddress          : ShortString {= 'http://www.getscores.org/'};
+GetScoresSeverPostingAddress          : ShortString {= 'http://post.contestonlinescore.com'};
+GetScoresSeverReadingAddress          : ShortString {= 'https://contestonlinescores.com/scoreboard/'};
   GetScoresHost                         : array[0..31] of Char;
   GetScoresQuery                        : array[0..127] of Char;
   GetScoresPortAsString                 : array[0..7] of Char;

@@ -25,7 +25,7 @@ const
 
 
 
-TR4W_CURRENTVERSION_NUMBER            = '4.142.0' ;  // N4af     New Release
+TR4W_CURRENTVERSION_NUMBER            = '4.143.2' ;  // N4af     New Release
 
 
 
@@ -41,7 +41,7 @@ TR4W_CURRENTVERSION_NUMBER            = '4.142.0' ;  // N4af     New Release
 
   TR4W_CURRENTVERSION                   = 'TR4W v.' + TR4W_CURRENTVERSION_NUMBER; //  {$IF MMTTYMODE} + '_mmtty'{$IFEND};//{$IF LANG <> 'ENG'} + ' [' + LANG + ']'{$IFEND}{$IF MMTTYMODE} + '_mmtty'{$IFEND};
 
-  TR4W_CURRENTVERSIONDATE               = 'April, 2025' ;
+  TR4W_CURRENTVERSIONDATE               = 'October, 2025' ;
 
   TR4WSERVER_CURRENTVERSION             = '1.41';
 

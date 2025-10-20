@@ -1984,7 +1984,8 @@ begin
                WriteADIFField('STATE',sTemp);
                end;
             end
-         else if LooksLikeAState(TempRXData.QTHString) then
+   //      else if LooksLikeAState(TempRXData.QTHString) then
+   else if not(Stringhasnumber(TempRXData.QTHString)) then
             begin
             WriteADIFField('STATE',TempRXData.QTHString);
             end;
