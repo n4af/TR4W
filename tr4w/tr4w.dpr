@@ -2,6 +2,7 @@ program tr4w;
 {$IMPORTEDDATA OFF}
 //https://groups.google.com/group/tr4w/feeds?hl=ru
 uses
+  Forms,
   Messages,
   MMSystem,
   Windows,
@@ -118,7 +119,8 @@ uses
   uSuperCheckPartialFileUpload,
   uRadioHamLib in 'src\uRadioHamLib.pas',
   uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
-  uExternalLogger in 'src\uExternalLogger.pas';
+  uExternalLogger in 'src\uExternalLogger.pas',
+  Unit2 in 'src\Unit2.pas' {Form2};
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -297,6 +299,7 @@ end;
 label
   NoTransMess, TransMess, CommandLine;
 var
+  
   TempHDC                               : HDC;
   TempColor                             : tr4wColors;
   TempTLogBrush                         : TLogBrush {= (lbStyle: BS_SOLID; lbHatch: 0)};
@@ -317,7 +320,31 @@ var
   iniFile                               : TINIFile;                    // Used to simply find the DEBUG setting so we can set it when the logger object is created.
                                                                        // This way we can log before we read the DEBUG LOG LEVEL the legacy method in uCFG. // ny4i
 begin
-   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
+
+   // --- VCL initialization ---
+  Application.Initialize;
+  // Explicitly clear MainForm and prevent auto-terminate:
+  //Do NOT DO THIS Application.CreateForm(TForm2, Form2);
+  
+
+  // Explicitly clear MainForm and prevent auto-terminate:
+  //Application.MainForm := nil;
+  Application.ShowMainForm := False;
+
+  Application.Title := 'TR4W';
+
+  // Create any VCL forms you want available
+  //Application.CreateForm(TTestForm, MainForm);    // example
+  // Application.CreateForm(TOtherForm, OtherForm);
+
+  // Show the main VCL form non-modally (or leave hidden until you call Show/ShowModal)
+  //MainForm.Show;
+
+
+  form2 := TForm2.Create(nil);
+  form2.Show;
+
+  TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
    Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
    iniFile := TINIFile.create(TR4W_INI_FILENAME);
    try
@@ -657,7 +684,14 @@ begin
 
   while (GetMessage(Msg, 0, 0, 0)) do
   begin
-
+      // Give VCL a chance to handle dialog messages
+    if Application.DialogHandle <> 0 then
+       begin
+       if IsDialogMessage(Application.DialogHandle, Msg) then
+          begin
+          Continue;
+          end;
+       end;
     if TranslateAccelerator(tr4whandle, tr4w_accelerators, Msg) <> 0 then
     begin
       asm nop end;

@@ -24,6 +24,7 @@ uses
 
   Windows,
   Messages,
+  Unit2,
   Log4D,
   Version;
 
@@ -365,7 +366,6 @@ const
 
 {$IF tDebugMode}
 var
-
   cw_tick_array                         : array[0..500] of Cardinal;
   cw_tick                               : integer;
 {$IFEND}
@@ -631,7 +631,7 @@ type
     );
 
 var
-
+    form2: TForm2;
 //  tR150SMode                            : boolean;
 //  OrionWaitTime                         : integer = 50;
    ReverseInitialex                     : boolean = False;

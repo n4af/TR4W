@@ -27,6 +27,7 @@ interface
 
 uses
   ShellAPI,
+  Unit2,
   Logstuff,
   uMenu,
   uAltD,
@@ -6519,7 +6520,7 @@ begin
   case AnsiIndexText(AnsiUpperCase(CallWindowString),
     ['ADIF', 'CAB', 'CMD', 'COL', 'CWOFF', 'CWON', 'EXIT', 'NOTE', 'OPON',
     'SCORE',
-      'SUM', 'UDP', 'WCY', 'WWV']) of
+      'SUM', 'UDP', 'WCY', 'WWV','FORM']) of
     0: ProcessMenu(menu_adif);
     1: ProcessMenu(menu_cabrillo);
     2: WinExec('cmd.exe', SW_SHOW);
@@ -6551,6 +6552,17 @@ begin
     11: SendFullLogToUDP;
     12: SendViaTelnetSocket('SH/WCY');
     13: SendViaTelnetSocket('SH/WWV');
+    14: begin
+        if form2 <> nil then
+           begin
+           VC.form2.Show;
+           end
+        else
+           begin
+           VC.form2 := TForm2.Create(nil);
+           VC.form2.show;
+           end;
+        end;
   else
     Result := false; // False result does not clear call window
   end; // case
