@@ -14,7 +14,7 @@ unit uRadioFactory;
 interface
 
 uses
-   uNetRadioBase, uRadioElecraftK4, SysUtils;
+   uNetRadioBase, uRadioElecraftK4, uRadioHamLib, SysUtils;
 
 type
    TRadioModel = (
@@ -102,7 +102,12 @@ begin
 
       rmHamLibGeneric:
          begin
-         raise ERadioFactoryException.Create('HamLib generic interface not yet implemented');
+         Result := THamLib.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         Result.radioModel := 'HamLib Generic';
+         logger.Info('[RadioFactory] Created HamLib instance');
+         logger.Info('[RadioFactory] Remember to configure HamLib-specific properties before connecting');
          end;
 
       else
@@ -133,19 +138,19 @@ class function TRadioFactory.GetSupportedModels: string;
 begin
    Result := 'Supported radio models:'#13#10 +
              '  - Elecraft K4 (implemented)'#13#10 +
+             '  - HamLib Generic (implemented)'#13#10 +
              '  - Elecraft K3 (planned)'#13#10 +
              '  - Yaesu FTdx101 (planned)'#13#10 +
              '  - Yaesu FT-991 (planned)'#13#10 +
              '  - Icom IC-7610 (planned)'#13#10 +
              '  - Icom IC-7300 (planned)'#13#10 +
-             '  - FlexRadio 6000 (planned)'#13#10 +
-             '  - HamLib Generic (planned)';
+             '  - FlexRadio 6000 (planned)';
 end;
 
 class function TRadioFactory.IsModelSupported(model: TRadioModel): boolean;
 begin
-   // Currently only K4 is fully implemented
-   Result := (model = rmElecraftK4);
+   // Currently K4 and HamLib are fully implemented
+   Result := (model = rmElecraftK4) or (model = rmHamLibGeneric);
 end;
 
 initialization
