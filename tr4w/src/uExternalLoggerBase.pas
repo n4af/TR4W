@@ -31,6 +31,11 @@ Type ExternalLoggerType = (lt_NoExternalLogger, lt_DXKeeper, lt_ACLog, lt_HRD);
 
 const ExternalLoggerTypeSA                     : array[ExternalLoggerType] of PChar = ('NONE', 'DXKEEPER', 'ACLOG', 'HRD');
 
+   // Reconnection configuration
+   RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
+   RECONNECT_MAX_DELAY = 30000;       // 30 seconds max delay
+   RECONNECT_BACKOFF_MULTIPLIER = 2;  // Double delay each retry
+
 Type TExternalLoggerBase = class(TObject)
    private
       //socket: TIdTCPClient;
@@ -303,39 +308,127 @@ end;
 
 procedure TReadingThread.Execute;
 var
-  cmd: string;
+   cmd: string;
+   reconnectDelay: integer;
+   consecutiveFailures: integer;
+   wasConnected: boolean;
 begin
    logger.trace('DEBUG: TExternalLoggerBase.TReadingThread.Execute');
    logger.info('In TExternalLoggerBase.ReadingThread.Execute, readTerminator is [%s]',[Self.readTerminator]);
+
+   reconnectDelay := RECONNECT_INITIAL_DELAY;
+   consecutiveFailures := 0;
+   wasConnected := False;
+
    while not Terminated do
       begin
       try
          if FConn.Connected then
             begin
-            //logger.Trace('[TExternalLoggerBase.TReadingThread.Execute] Calling ReadLn on socket');
-            cmd := FConn.IOHandler.ReadLn(Self.readTerminator); // Need a variable for the stop character as hamlibn is #10 and K4 is ;(';');
-            logger.trace('[TExternalLoggerBase.TReadingThread.Execute] Cmd received: (%s)',[cmd]);
-            Self.msgHandler(cmd);
+            // Reset retry logic on successful connection
+            if not wasConnected then
+               begin
+               logger.Info('[TExternalLoggerBase.TReadingThread] External logger connected successfully');
+               reconnectDelay := RECONNECT_INITIAL_DELAY;
+               consecutiveFailures := 0;
+               wasConnected := True;
+               end;
+
+            // Read data from external logger
+            try
+               cmd := FConn.IOHandler.ReadLn(Self.readTerminator);
+               logger.trace('[TExternalLoggerBase.TReadingThread.Execute] Cmd received: (%s)',[cmd]);
+               Self.msgHandler(cmd);
+            except
+               on EIdNotConnected do
+                  begin
+                  logger.Warn('[TExternalLoggerBase.TReadingThread] Lost connection while reading');
+                  wasConnected := False;
+                  end;
+               on EIdConnClosedGracefully do
+                  begin
+                  logger.Info('[TExternalLoggerBase.TReadingThread] Logger closed connection gracefully');
+                  wasConnected := False;
+                  end;
+               on E: Exception do
+                  begin
+                  logger.Debug('[TExternalLoggerBase.TReadingThread] Exception during read: %s - %s', [E.ClassName, E.Message]);
+                  end;
+            end;
             end
          else
             begin
-            logger.Trace('[TExternalLoggerBase.TReadingThread.Execute] socket is not connected');
-            // Wait 2 seconds and try to connect
-            sleep(2000);
-            logger.Trace('[TExternalLoggerBase.TReadingThread.Execute] Attempting to reopen socket after sleeping 2 seconds');
-
-            FConn.Socket.Open;
-
-            end;
-         except
-            on EIdNotConnected do
-               logger.info('Socket exception on TExternalLoggerBase.TReadingThread.Execute');
-            else
+            // Not connected - attempt reconnection with exponential backoff
+            if wasConnected then
                begin
-               logger.debug('Unknown exception on TExternalLoggerBase.TReadingThread.Execute');
+               logger.Warn('[TExternalLoggerBase.TReadingThread] Logger disconnected, entering reconnection mode');
+               wasConnected := False;
                end;
-         end;
+
+            Inc(consecutiveFailures);
+            logger.Info('[TExternalLoggerBase.TReadingThread] Reconnection attempt %d after %d ms delay',
+                        [consecutiveFailures, reconnectDelay]);
+
+            // Wait before retry (with termination check)
+            if not Terminated then
+               begin
+               Sleep(reconnectDelay);
+               end;
+
+            // Attempt to reconnect
+            if not Terminated then
+               begin
+               try
+                  logger.Debug('[TExternalLoggerBase.TReadingThread] Attempting to reopen socket');
+                  FConn.Socket.Open;
+
+                  if FConn.Connected then
+                     begin
+                     logger.Info('[TExternalLoggerBase.TReadingThread] Reconnection successful');
+                     end;
+               except
+                  on EIdConnectTimeout do
+                     begin
+                     logger.Debug('[TExternalLoggerBase.TReadingThread] Connection timeout during reconnect attempt');
+                     // Increase delay with exponential backoff
+                     reconnectDelay := reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER;
+                     if reconnectDelay > RECONNECT_MAX_DELAY then
+                        begin
+                        reconnectDelay := RECONNECT_MAX_DELAY;
+                        end;
+                     end;
+                  on EIdSocketError do
+                     begin
+                     logger.Debug('[TExternalLoggerBase.TReadingThread] Socket error during reconnect attempt');
+                     reconnectDelay := reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER;
+                     if reconnectDelay > RECONNECT_MAX_DELAY then
+                        begin
+                        reconnectDelay := RECONNECT_MAX_DELAY;
+                        end;
+                     end;
+                  on E: Exception do
+                     begin
+                     logger.Debug('[TExternalLoggerBase.TReadingThread] Exception during reconnect: %s - %s',
+                                  [E.ClassName, E.Message]);
+                     reconnectDelay := reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER;
+                     if reconnectDelay > RECONNECT_MAX_DELAY then
+                        begin
+                        reconnectDelay := RECONNECT_MAX_DELAY;
+                        end;
+                     end;
+               end;
+               end;
+            end;
+      except
+         on E: Exception do
+            begin
+            logger.Error('[TExternalLoggerBase.TReadingThread] Unexpected exception in main loop: %s - %s',
+                         [E.ClassName, E.Message]);
+            Sleep(1000);  // Brief pause before continuing
+            end;
       end;
+      end;
+
    logger.info('<<<<<<<<<<<< Leaving TExternalLoggerBase.TReadingThread.Execute >>>>>>>>>>>>>>>>>>');
 end;
 
