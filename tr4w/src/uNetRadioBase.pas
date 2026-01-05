@@ -4,7 +4,7 @@ interface
 
 uses
    IdTCPClient, IdComponent, IdTCPConnection,IdThreadComponent, IdExceptionCore, SysUtils,
-   Classes, StrUtils, Log4D, VC, Tree;
+   Classes, StrUtils, Log4D, VC, Tree, IdException, IdStack, SyncObjs;
 
 Type TProcessMsgRef = procedure (sMessage: string) of Object;
 Type TBinary = (bOn, bOff);
@@ -48,16 +48,19 @@ Type TRadioVFO = class(TObject)
 end;
 
 Type TSimpleEventProc = procedure(const aStrParam:string) of object;
+Type PBoolean = ^Boolean;  // Pointer to Boolean type
 Type TReadingThread = class(TThread)
   protected
     readTerminator: string;
     FConn: TIdTCPConnection;
     msgHandler: TProcessMsgRef;
+    FSocketLock: TCriticalSection;
+    FDisconnecting: PBoolean;  // Pointer to parent's Disconnecting flag
     procedure Execute; override;
     procedure DoTerminate; override;
   public
     radioWasDisconnected: boolean;
-    constructor Create(AConn: TIdTCPConnection; proc: TProcessMsgRef); reintroduce;
+    constructor Create(AConn: TIdTCPConnection; proc: TProcessMsgRef; ASocketLock: TCriticalSection; ADisconnecting: PBoolean); reintroduce;
   end;
 
 //tr4w_ClassName                        : array[0..4] of Char = ('T', 'R', '4', 'W', #0);
@@ -88,6 +91,8 @@ Type TNetRadioBase = class(TObject)
       localSerialPort: portType;
       rt: TReadingThread;
       baseProcMsg: TProcessMsgRef;
+      SocketLock: TCriticalSection;
+      Disconnecting: Boolean;
 
       function GetRadioPort: integer;
       procedure SetRadioPort(Value: Integer);
@@ -246,6 +251,8 @@ begin
    socket.OnConnected := Self.OnRadioConnected;
    socket.OnStatus := Self.OnRadioStatus;
 
+   SocketLock := TCriticalSection.Create;
+   Disconnecting := False;
 end;
 
 {Constructor TNetRadioBase.Create(ProcRef: TProcessMsgRef);
@@ -286,6 +293,8 @@ begin
       end;
    //FreeAndNil(Self.vfo[1]);
    //FreeAndNil(Self.vfo[2]);
+
+   FreeAndNil(SocketLock);
 end;
 
 // Events
@@ -293,8 +302,31 @@ end;
 procedure TNetRadioBase.OnRadioConnected(Sender: TObject);
 begin
    logger.Info('Network Radio connected');
-   rt := TReadingThread.Create(socket, baseProcMsg);
-   rt.readTerminator := Self.readTerminator;
+
+   // Clear disconnecting flag on successful connection
+   Disconnecting := False;
+
+   // Only create reading thread if one doesn't already exist
+   // (the thread creates itself during reconnection)
+   if rt = nil then
+      begin
+      rt := TReadingThread.Create(socket, baseProcMsg, SocketLock, @Disconnecting);
+      rt.readTerminator := Self.readTerminator;
+      logger.Info('Created new reading thread');
+      end
+   else
+      begin
+      logger.Info('Reading thread already exists, no need to create new one');
+      end;
+
+   // Send ID command to verify connection and wake up communication
+   try
+      logger.Info('[OnRadioConnected] Sending ID; command to verify connection');
+      Self.SendToRadio('ID;');
+   except
+      on E: Exception do
+         logger.Error('[OnRadioConnected] Exception sending ID command: %s', [E.Message]);
+   end;
 end;
 
 procedure TNetRadioBase.OnRadioDisconnected(Sender: TObject);
@@ -399,11 +431,40 @@ begin
     socket.ConnectTimeout := 10;
 
     try
+        // Force disconnect to clear any corrupted socket state
+        try
+           if socket.Connected then
+              begin
+              logger.Debug('[TNetRadioBase.Connect] Socket already connected, disconnecting first');
+              socket.Disconnect;
+              end;
+        except
+           on E: Exception do
+              begin
+              logger.Debug('[TNetRadioBase.Connect] Exception during disconnect check: %s - forcing disconnect', [E.Message]);
+              // Force disconnect even if Connected check fails
+              try
+                 socket.Disconnect;
+              except
+                 // Ignore disconnect errors
+              end;
+              end;
+        end;
+
+        Sleep(100);  // Brief delay to ensure cleanup
+
+        logger.Debug('[TNetRadioBase.Connect] Attempting to connect to %s:%d', [socket.Host, socket.Port]);
         socket.Connect;
         logger.Info('[TNetRadioBase.Connect] Connected successfully to network radio');
     except
         on E: Exception do begin
            logger.Error('[TNetRadioBase.Connect] Exception when connecting to radio (%s:%d]: %s', [socket.Host, socket.Port, E.Message]);
+           // Try to disconnect to clear bad state for next attempt
+           try
+              socket.Disconnect;
+           except
+              // Ignore disconnect errors
+           end;
         end;
     end;
 end;
@@ -441,22 +502,36 @@ end;
 procedure TNetRadioBase.SendToRadio(s: string);
 var nLen: integer;
 begin
-   try
-      if socket.Connected then
-         begin
-         logger.Trace('[%s SendToRadio] Sending to radio: (%s) Hex:[%s]',[Self.radioModel,s, String2Hex(s)]);
-         nLen := length(s);
-         socket.IOHandler.WriteLn(s);
-         //socket.IOHandler.Write(s,nLen,0);
-         end
-      else
-         begin
-         logger.error('[SendToRadio] Cannot send command (%s) to radio as not connected',[s]);
-         end;
-   except
-      logger.error('Exception caught on TNetRadioBase.SendToRadio - Command to send was %s',[s]);
-   end;
+   // Don't try to send if we're disconnecting
+   if Disconnecting then
+      begin
+      logger.debug('[SendToRadio] Ignoring command (%s) - radio is disconnecting',[s]);
+      Exit;
+      end;
 
+   SocketLock.Enter;
+   try
+      try
+         if socket.Connected then
+            begin
+            logger.Trace('[%s SendToRadio] Sending to radio: (%s) Hex:[%s]',[Self.radioModel,s, String2Hex(s)]);
+            nLen := length(s);
+            socket.IOHandler.WriteLn(s);
+            //socket.IOHandler.Write(s,nLen,0);
+            end
+         else
+            begin
+            logger.error('[SendToRadio] Cannot send command (%s) to radio as not connected',[s]);
+            end;
+      except
+         on E: Exception do
+            begin
+            logger.error('Exception caught on TNetRadioBase.SendToRadio - Command was (%s) - Exception: %s - %s',[s, E.ClassName, E.Message]);
+            end;
+      end;
+   finally
+      SocketLock.Leave;
+   end;
 end;
 
 function TNetRadioBase.GetIsTransmitting: boolean;
@@ -498,9 +573,24 @@ end;
 
 function TNetRadioBase.GetIsConnected: boolean;
 begin
+   // If we're disconnecting, immediately return false
+   if Disconnecting then
+      begin
+      Result := false;
+      Exit;
+      end;
+
    if Assigned(Self.socket) then
       begin
-      Result := socket.Connected;
+      try
+         Result := socket.Connected;
+      except
+         on E: Exception do
+            begin
+            logger.debug('Exception in GetIsConnected: %s - %s', [E.ClassName, E.Message]);
+            Result := false;
+            end;
+      end;
       end
    else
       begin
@@ -586,12 +676,13 @@ begin
    Result := (v >= i) and (v <= k);
 end;
  }
-constructor TReadingThread.Create(AConn: TIdTCPConnection; proc: TProcessMsgRef);
+constructor TReadingThread.Create(AConn: TIdTCPConnection; proc: TProcessMsgRef; ASocketLock: TCriticalSection; ADisconnecting: PBoolean);
 begin
   logger.debug('************* DEBUG: TReadingThread.Create');
   FConn := AConn;
-
   msgHandler := proc;
+  FSocketLock := ASocketLock;
+  FDisconnecting := ADisconnecting;
 
   logger.Info('Created NetRadioBase::TReadingTYhreadthread with id %d',[Self.ThreadID]);
   inherited Create(False);
@@ -600,120 +691,102 @@ end;
 procedure TReadingThread.Execute;
 var
    cmd: string;
-   reconnectDelay: integer;
-   consecutiveFailures: integer;
    wasConnected: boolean;
 begin
    logger.trace('[TNetRadioBase.TReadingThread.Execute] Entered');
    logger.info('[TNetRadioBase.TReadingThread.Execute] readTerminator is [%s]',[Self.readTerminator]);
 
-   reconnectDelay := RECONNECT_INITIAL_DELAY;
-   consecutiveFailures := 0;
    wasConnected := False;
 
    while not Terminated do
       begin
       try
-         if FConn.Connected then
-            begin
-            // Reset retry logic on successful connection
+         // Check if connected, with exception handling for corrupted socket state
+         try
+            if FConn.Connected then
+               begin
+            // Track connection state
             if not wasConnected then
                begin
-               logger.Info('[TNetRadioBase.TReadingThread] Radio connected successfully');
-               reconnectDelay := RECONNECT_INITIAL_DELAY;
-               consecutiveFailures := 0;
+               logger.Info('[TNetRadioBase.TReadingThread] Radio connected, starting to read');
                wasConnected := True;
                Self.radioWasDisconnected := False;
                end;
 
             // Read data from radio
+            // NOTE: Do NOT lock during ReadLn - it's a blocking call!
             try
                cmd := FConn.IOHandler.ReadLn(Self.readTerminator);
                logger.trace('[TNetRadioBase.TReadingThread.Execute] Cmd received: (%s)',[cmd]);
-               Self.msgHandler(cmd);
+
+               // Call message handler with exception protection
+               try
+                  Self.msgHandler(cmd);
+               except
+                  on E: Exception do
+                     begin
+                     logger.Error('[TNetRadioBase.TReadingThread] Exception in message handler: %s - %s', [E.ClassName, E.Message]);
+                     // Continue reading despite handler error
+                     end;
+               end;
             except
                on EIdNotConnected do
                   begin
                   logger.Warn('[TNetRadioBase.TReadingThread] Lost connection while reading');
                   wasConnected := False;
                   Self.radioWasDisconnected := True;
+                  FDisconnecting^ := True;  // Set disconnecting flag
                   end;
                on EIdConnClosedGracefully do
                   begin
                   logger.Info('[TNetRadioBase.TReadingThread] Radio closed connection gracefully');
                   wasConnected := False;
                   Self.radioWasDisconnected := True;
+                  FDisconnecting^ := True;  // Set disconnecting flag
                   end;
                on E: Exception do
                   begin
                   logger.Debug('[TNetRadioBase.TReadingThread] Exception during read: %s - %s', [E.ClassName, E.Message]);
+                  wasConnected := False;
+                  Self.radioWasDisconnected := True;
+                  FDisconnecting^ := True;  // Set disconnecting flag
                   end;
             end;
             end
          else
             begin
-            // Not connected - attempt reconnection with exponential backoff
+            // Not connected - wait for polling thread to reconnect
             if wasConnected then
                begin
-               logger.Warn('[TNetRadioBase.TReadingThread] Radio disconnected, entering reconnection mode');
+               logger.Warn('[TNetRadioBase.TReadingThread] Radio disconnected, waiting for reconnection');
                wasConnected := False;
                Self.radioWasDisconnected := True;
+               FDisconnecting^ := True;  // Set disconnecting flag
                end;
 
-            Inc(consecutiveFailures);
-            logger.Info('[TNetRadioBase.TReadingThread] Reconnection attempt %d after %d ms delay',
-                        [consecutiveFailures, reconnectDelay]);
-
-            // Wait before retry (with termination check)
-            if not Terminated then
-               begin
-               Sleep(reconnectDelay);
-               end;
-
-            // Attempt to reconnect
-            if not Terminated then
-               begin
-               try
-                  logger.Debug('[TNetRadioBase.TReadingThread] Attempting to reopen socket');
-                  FConn.Socket.Open;
-
-                  if FConn.Connected then
-                     begin
-                     logger.Info('[TNetRadioBase.TReadingThread] Reconnection successful');
-                     end;
-               except
-                  on EIdConnectTimeout do
-                     begin
-                     logger.Debug('[TNetRadioBase.TReadingThread] Connection timeout during reconnect attempt');
-                     // Increase delay with exponential backoff
-                     reconnectDelay := reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER;
-                     if reconnectDelay > RECONNECT_MAX_DELAY then
-                        begin
-                        reconnectDelay := RECONNECT_MAX_DELAY;
-                        end;
-                     end;
-                  on EIdSocketError do
-                     begin
-                     logger.Debug('[TNetRadioBase.TReadingThread] Socket error during reconnect attempt');
-                     reconnectDelay := reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER;
-                     if reconnectDelay > RECONNECT_MAX_DELAY then
-                        begin
-                        reconnectDelay := RECONNECT_MAX_DELAY;
-                        end;
-                     end;
-                  on E: Exception do
-                     begin
-                     logger.Debug('[TNetRadioBase.TReadingThread] Exception during reconnect: %s - %s',
-                                  [E.ClassName, E.Message]);
-                     reconnectDelay := reconnectDelay * RECONNECT_BACKOFF_MULTIPLIER;
-                     if reconnectDelay > RECONNECT_MAX_DELAY then
-                        begin
-                        reconnectDelay := RECONNECT_MAX_DELAY;
-                        end;
-                     end;
-               end;
-               end;
+            // Just wait - polling thread will handle reconnection
+            Sleep(500);
             end;
+         except
+            on E: EIdSocketError do
+               begin
+               // Socket in corrupted state - treat as disconnected
+               logger.Debug('[TNetRadioBase.TReadingThread] Socket error during connection check: %s - treating as disconnected', [E.Message]);
+               if wasConnected then
+                  begin
+                  wasConnected := False;
+                  Self.radioWasDisconnected := True;
+                  FDisconnecting^ := True;
+                  end;
+               Sleep(500);
+               end;
+            on E: Exception do
+               begin
+               // Other exception during connection check
+               logger.Debug('[TNetRadioBase.TReadingThread] Exception during connection check: %s - %s', [E.ClassName, E.Message]);
+               Sleep(500);
+               end;
+         end;
       except
          on E: Exception do
             begin

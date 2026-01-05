@@ -718,7 +718,9 @@ begin
 end;
 
 procedure pNetworkRadio(rig: RadioPtr); // Network classes (K4 network, Flex 6000 series network, etc)
-var ro: TNetRadioBase;
+var
+   ro: TNetRadioBase;
+   wasConnected: Boolean;
 begin
 
    { Unlike the other polling procedures, all we have to do here is grab the
@@ -731,50 +733,82 @@ begin
    }
    logger.Trace('[pNetworkRadio] Entering polling procedure');
    ro := rig^.tNetObject;
-   while ro.IsConnected do
+   wasConnected := False;
+
+   // Keep polling thread alive - will automatically resume when radio reconnects
+   while True do
       begin
-      Sleep(FreqPollRate);
+      if ro.IsConnected then
+         begin
+         // Radio is connected - poll status
+         if not wasConnected then
+            begin
+            logger.Info('[pNetworkRadio] Radio connected, resuming polling');
+            wasConnected := True;
+            end;
 
-      rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
-      rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);   // After the reset radio port on a net radio, the ro.band[nrVFOA] is not being set.
-      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
-      rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
-      rig^.CurrentStatus.Split := ro.IsSplitEnabled;
-      rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
-      rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
-      rig^.CurrentStatus.TXOn := ro.IsTransmitting;
+         Sleep(FreqPollRate);
 
-      // VFO A
-      rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
-      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig.CurrentStatus.VFO[VFOA].Mode,rig.CurrentStatus.VFO[VFOA].ExtendedMode);
-      rig.CurrentStatus.VFO[VFOA].RIT := ro.IsRITOn[nrVFOA];
-      rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
-      rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
-      rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
-      rig.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+         rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
+         rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);   // After the reset radio port on a net radio, the ro.band[nrVFOA] is not being set.
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
+         rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
+         rig^.CurrentStatus.Split := ro.IsSplitEnabled;
+         rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
+         rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
+         rig^.CurrentStatus.TXOn := ro.IsTransmitting;
 
-      // VFO B
-      rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
-      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOB],rig.CurrentStatus.VFO[VFOB].Mode,rig.CurrentStatus.VFO[VFOB].ExtendedMode);
-      rig.CurrentStatus.VFO[VFOB].RIT := ro.IsRITOn[nrVFOB];
-      rig.CurrentStatus.VFO[VFOB].XIT := ro.IsXITOn[nrVFOB];
-      rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
-      rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
+         // VFO A
+         rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig.CurrentStatus.VFO[VFOA].Mode,rig.CurrentStatus.VFO[VFOA].ExtendedMode);
+         rig.CurrentStatus.VFO[VFOA].RIT := ro.IsRITOn[nrVFOA];
+         rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
+         rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
+         rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+         rig.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
 
-      UpdateStatus(rig);
+         // VFO B
+         rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOB],rig.CurrentStatus.VFO[VFOB].Mode,rig.CurrentStatus.VFO[VFOB].ExtendedMode);
+         rig.CurrentStatus.VFO[VFOB].RIT := ro.IsRITOn[nrVFOB];
+         rig.CurrentStatus.VFO[VFOB].XIT := ro.IsXITOn[nrVFOB];
+         rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
+         rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
+
+         UpdateStatus(rig);
+         end
+      else
+         begin
+         // Radio disconnected - attempt reconnection
+         if wasConnected then
+            begin
+            logger.Info('[pNetworkRadio] Radio disconnected, attempting reconnection');
+            wasConnected := False;
+            firstProcessMessage := true;
+            rig.CurrentStatus.VFO[VFOA].Frequency := 0;
+            rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+            end;
+
+         // Attempt to reconnect
+         Sleep(2000);  // Wait 2 seconds before reconnection attempt
+         try
+            logger.Info('[pNetworkRadio] Calling Connect to reconnect radio');
+            ro.Connect;
+         except
+            on E: Exception do
+               begin
+               logger.Debug('[pNetworkRadio] Reconnection attempt failed: %s - %s', [E.ClassName, E.Message]);
+               end;
+         end;
+         end;
       end;
-   if not ro.IsConnected then
-      begin
-      firstProcessMessage := true;
-      end;
-   logger.Info('Exiting pNetworkRadio');
-   rig.CurrentStatus.VFO[VFOA].Frequency := 0;
-   rig.CurrentStatus.VFO[VFOB].Frequency := 0;
 
 end;
 
 procedure pHamLib(rig: RadioPtr);
-var ro: TNetRadioBase;
+var
+   ro: TNetRadioBase;
+   wasConnected: Boolean;
 begin
 
 { To do a full poll, we need to request the following:
@@ -796,42 +830,74 @@ begin
 
    logger.Trace('[pHamLib] Entering polling procedure');
    ro := rig^.tHamLibObject;
-   while ro.IsConnected do
+   wasConnected := False;
+
+   // Keep polling thread alive - will automatically resume when radio reconnects
+   while True do
       begin
-      rig^.tHamLibObject.SendPollRequests;
-      Sleep(FreqPollRate);
-      rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
-      rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
-      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
-      rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
-      rig^.CurrentStatus.Split := ro.IsSplitEnabled;
-      rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
-      rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
-      rig^.CurrentStatus.TXOn := ro.IsTransmitting;
+      if ro.IsConnected then
+         begin
+         // Radio is connected - poll status
+         if not wasConnected then
+            begin
+            logger.Info('[pHamLib] Radio connected, resuming polling');
+            wasConnected := True;
+            end;
 
-      // VFO A
-      rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
-      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig.CurrentStatus.VFO[VFOA].Mode,rig.CurrentStatus.VFO[VFOA].ExtendedMode);
-      rig.CurrentStatus.VFO[VFOA].RIT := ro.IsRITOn[nrVFOA];
-      rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
-      rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
-      rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+         rig^.tHamLibObject.SendPollRequests;
+         Sleep(FreqPollRate);
+         rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
+         rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
+         rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
+         rig^.CurrentStatus.Split := ro.IsSplitEnabled;
+         rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
+         rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
+         rig^.CurrentStatus.TXOn := ro.IsTransmitting;
 
-      // VFO B
-      rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
-      GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOB],rig.CurrentStatus.VFO[VFOB].Mode,rig.CurrentStatus.VFO[VFOB].ExtendedMode);
-      rig.CurrentStatus.VFO[VFOB].RIT := ro.IsRITOn[nrVFOB];
-      rig.CurrentStatus.VFO[VFOB].XIT := ro.IsXITOn[nrVFOB];
-      rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
-      rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
+         // VFO A
+         rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig.CurrentStatus.VFO[VFOA].Mode,rig.CurrentStatus.VFO[VFOA].ExtendedMode);
+         rig.CurrentStatus.VFO[VFOA].RIT := ro.IsRITOn[nrVFOA];
+         rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
+         rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
+         rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
 
-      UpdateStatus(rig);
+         // VFO B
+         rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOB],rig.CurrentStatus.VFO[VFOB].Mode,rig.CurrentStatus.VFO[VFOB].ExtendedMode);
+         rig.CurrentStatus.VFO[VFOB].RIT := ro.IsRITOn[nrVFOB];
+         rig.CurrentStatus.VFO[VFOB].XIT := ro.IsXITOn[nrVFOB];
+         rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
+         rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
+
+         UpdateStatus(rig);
+         end
+      else
+         begin
+         // Radio disconnected - attempt reconnection
+         if wasConnected then
+            begin
+            logger.Info('[pHamLib] Radio disconnected, attempting reconnection');
+            wasConnected := False;
+            rig.CurrentStatus.VFO[VFOA].Frequency := 0;
+            rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+            end;
+
+         // Attempt to reconnect
+         Sleep(2000);  // Wait 2 seconds before reconnection attempt
+         try
+            logger.Info('[pHamLib] Calling Connect to reconnect radio');
+            ro.Connect;
+         except
+            on E: Exception do
+               begin
+               logger.Debug('[pHamLib] Reconnection attempt failed: %s - %s', [E.ClassName, E.Message]);
+               end;
+         end;
+         end;
       end;
 
-      logger.Info('Exiting pHamlib');
-      rig.CurrentStatus.VFO[VFOA].Frequency := 0;
-      rig.CurrentStatus.VFO[VFOB].Frequency := 0;
-   
 end;
 
 

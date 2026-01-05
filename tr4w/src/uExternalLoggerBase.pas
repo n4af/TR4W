@@ -4,7 +4,7 @@ interface
 
 uses
    IdTCPClient, IdComponent, IdTCPConnection,IdThreadComponent, IdExceptionCore, SysUtils,
-   Classes, StrUtils, Log4D, VC, Tree;
+   Classes, StrUtils, Log4D, VC, Tree, IdException, IdStack;
 
 Type TProcessMsgRef = procedure (sMessage: string) of Object;
 
@@ -140,8 +140,18 @@ end;
 procedure TExternalLoggerBase.OnLoggerConnected(Sender: TObject);
 begin
    logger.Info('External logger connected');
-   rt := TReadingThread.Create(socket, baseProcMsg);
-   rt.readTerminator := Self.readTerminator;
+   // Only create reading thread if one doesn't already exist
+   // (the thread creates itself during reconnection)
+   if rt = nil then
+      begin
+      rt := TReadingThread.Create(socket, baseProcMsg);
+      rt.readTerminator := Self.readTerminator;
+      logger.Info('Created new reading thread');
+      end
+   else
+      begin
+      logger.Info('Reading thread already exists, no need to create new one');
+      end;
 end;
 
 procedure TExternalLoggerBase.OnLoggerDisconnected(Sender: TObject);
@@ -278,7 +288,10 @@ begin
          logger.error('[SendToLogger] Cannot send command (%s) to logger as not connected',[s]);
          end;
    except
-      logger.error('Exception caught on TExternalLoggerBase.SendToLogger - Command to send was %s',[s]);
+      on E: Exception do
+         begin
+         logger.error('Exception caught on TExternalLoggerBase.SendToLogger - Command was (%s) - Exception: %s - %s',[s, E.ClassName, E.Message]);
+         end;
    end;
 
 end;
@@ -338,7 +351,17 @@ begin
             try
                cmd := FConn.IOHandler.ReadLn(Self.readTerminator);
                logger.trace('[TExternalLoggerBase.TReadingThread.Execute] Cmd received: (%s)',[cmd]);
-               Self.msgHandler(cmd);
+
+               // Call message handler with exception protection
+               try
+                  Self.msgHandler(cmd);
+               except
+                  on E: Exception do
+                     begin
+                     logger.Error('[TExternalLoggerBase.TReadingThread] Exception in message handler: %s - %s', [E.ClassName, E.Message]);
+                     // Continue reading despite handler error
+                     end;
+               end;
             except
                on EIdNotConnected do
                   begin
@@ -353,6 +376,7 @@ begin
                on E: Exception do
                   begin
                   logger.Debug('[TExternalLoggerBase.TReadingThread] Exception during read: %s - %s', [E.ClassName, E.Message]);
+                  wasConnected := False;
                   end;
             end;
             end
@@ -379,8 +403,8 @@ begin
             if not Terminated then
                begin
                try
-                  logger.Debug('[TExternalLoggerBase.TReadingThread] Attempting to reopen socket');
-                  FConn.Socket.Open;
+                  logger.Debug('[TExternalLoggerBase.TReadingThread] Attempting to reconnect');
+                  TIdTCPClient(FConn).Connect;
 
                   if FConn.Connected then
                      begin
