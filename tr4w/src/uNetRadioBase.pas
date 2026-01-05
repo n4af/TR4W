@@ -92,7 +92,6 @@ Type TNetRadioBase = class(TObject)
       rt: TReadingThread;
       baseProcMsg: TProcessMsgRef;
       SocketLock: TCriticalSection;
-      Disconnecting: Boolean;
 
       function GetRadioPort: integer;
       procedure SetRadioPort(Value: Integer);
@@ -103,7 +102,6 @@ Type TNetRadioBase = class(TObject)
       function GetCWSpeed: integer;
       function GetIsTransmitting: boolean;
       function GetIsReceiving: boolean;
-      function GetISConnected: boolean;
       function GetBand(whichVFO: TVFO): TRadioBand;
       function GetFrequency(whichVFO: TVFO): integer;
       function GetIsRITOn(whichVFO: TVFO): boolean;
@@ -125,6 +123,7 @@ Type TNetRadioBase = class(TObject)
       //procedure IdThreadComponentRun(Sender: TIdThreadComponent);
 
    protected
+      Disconnecting: Boolean;
       readTerminator: string;
       socket: TIdTCPClient;
       localCWSpeed: integer;
@@ -139,6 +138,8 @@ Type TNetRadioBase = class(TObject)
       localXITOffset: integer;
       bandIndependence: boolean;
       procRef: TProcessMsgRef;
+
+      function GetISConnected: boolean; virtual;
 
 
 
@@ -159,11 +160,11 @@ Type TNetRadioBase = class(TObject)
       property serialPort: portType read GetSerialPort write SetSerialPort;
       property PTTviaCAT: boolean read GetPTTviaCAT write SetPTTviaCAT;
       property CWSpeed: integer read GetCWSpeed;
-      function Connect: integer; overload;
+      function Connect: integer; overload; virtual;
       function Connect (address: string; port: integer): integer; overload;
       function VFOToString(whichVFO: TVFO): string;
 
-      procedure Disconnect; overload;
+      procedure Disconnect; overload; virtual;
       property IsTransmitting: boolean read GetIsTransmitting;
       property IsReceiving: boolean read GetIsReceiving;
       property IsConnected: boolean read GetIsConnected;

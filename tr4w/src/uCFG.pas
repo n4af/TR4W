@@ -920,7 +920,7 @@ begin
 
             end;
       end;
-   logger.trace('Searching for %s',[Command]);
+   //logger.trace('Searching for %s',[Command]);
    for i := 1 to CommandsArraySize do
       begin
       //logger.trace('Comparing %s to command %s',[Command,CFGCA[i].crCommand]);

@@ -18,7 +18,7 @@ Type TK4Radio = class(TNetRadioBase)
 
    public
       Constructor Create;
-      function Connect: integer; overload;
+      function Connect: integer; override;
       procedure Transmit;
       procedure Receive;
       procedure BufferCW(cwChars: string);

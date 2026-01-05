@@ -41,7 +41,7 @@ uses
    ExtCtrls,
    uNetRadioBase,
    uRadioElecraftK4,
-   uRadioHamLib;
+   uRadioFactory;
 
 var
    Icom_Filter_Width: integer;     // n4af 4.43.4
@@ -168,8 +168,7 @@ type
       SpeedMemory:       integer;
       BandMemory:        BandType;
       ModeMemory:        ModeType;
-      tNetObject:        TK4Radio;
-      tHamLibObject:     THamLib;   
+      tNetObject:        TNetRadioBase;  // Factory creates K4 or HamLibDirect
       FreqWindowHandle: HWND;
       RadioName:        Str20;
       StartupCommand  : Str50;
@@ -294,6 +293,7 @@ type
       procedure SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char; extendedMode: ExtendedModeType); overload;
       procedure SendCW(Msg: Str160);
       procedure SetUpRadioInterface;
+      function DetermineNetworkRadioModel: TRadioModel;
       procedure StopSendingCW;
       //    procedure StartNextPoll;
       //    function TimeToGiveUp: boolean;
@@ -798,7 +798,8 @@ uses
    uTelnet,
    LogStuff,
    LogSUBS2,
-   LogCW;
+   LogCW,
+   uRadioHamLibDirect;
 
 
 
@@ -919,11 +920,6 @@ begin
          begin
          Radio1.tNetObject.RITClear(nrVFOA);
          Exit;
-         end
-      else if Radio1.tHamLibObject <> nil then
-         begin
-         Radio1.tHamLibObject.RITClear(nrVFOA);
-         Exit;
          end;
       IntRadioType := Radio1.RadioModel;
 //      SerialPort := Radio1.tCATPortType;
@@ -933,11 +929,6 @@ begin
       if Radio2.tNetObject <> nil then
          begin
          Radio2.tNetObject.RITClear(nrVFOA);
-         Exit;
-         end
-      else if Radio2.tHamLibObject <> nil then
-         begin
-         Radio2.tHamLibObject.RITClear(nrVFOA);
          Exit;
          end;
       IntRadioType := Radio2.RadioModel;
@@ -996,11 +987,6 @@ begin
    if Radio1.tNetObject <> nil then
       begin
       Radio1.tNetObject.RITBumpUp;
-      Exit;
-      end
-   else if Radio1.tHamLibObject <> nil then
-      begin
-      Radio1.tHamLibObject.RITBumpUp;
       Exit;
       end;
    if ActiveRadio = RadioOne then
@@ -1208,7 +1194,7 @@ begin
       begin
       if Radio2.tNetObject <> nil then
          begin
-         Radio1.tNetObject.VFOBumpDown(nrVFOA);
+         Radio2.tNetObject.VFOBumpDown(nrVFOA);
          Exit;
          end;
       IntRadioType := Radio2.RadioModel;
@@ -1420,12 +1406,7 @@ begin
       nNumberOfBytesToWrite);
    Inc(CommandsBufferPointer, nNumberOfBytesToWrite);
 {$ELSE}
-  if Self.tHamLibObject <> nil then
-     begin
-     logger.Trace('[AddToOutputBuffer-HamLib] %s',[Buffer]);
-     Self.tHamLibObject.SendToRadio(Buffer);
-     end
-  else if Self.tNetObject <> nil then
+  if Self.tNetObject <> nil then
      begin
      logger.Trace('[AddToOutputBuffer-Network] %s',[Buffer]);
      Self.tNetObject.SendToRadio(Buffer);
@@ -1525,8 +1506,7 @@ begin
    SetUpRadioInterface;
 
    if (tCATPortHandle <> INVALID_HANDLE_VALUE) or
-      (Self.tNetObject <> nil)                 or
-      (Self.tHamLibObject <> nil)              then
+      (Self.tNetObject <> nil)                 then
       begin
       if PollingEnable then
          begin
@@ -1753,11 +1733,6 @@ begin
    if Self.tNetObject <> nil then
       begin
       Result := Self.tNetObject.MemoryKeyer(mem);
-      Exit;
-      end;
-   if Self.tHamLibObject <> nil then
-      begin
-      Result := Self.tHamLibObject.MemoryKeyer(mem);
       Exit;
       end;
 
@@ -2012,13 +1987,6 @@ begin
       Exit;
       end;
 
-   if Self.tHamLibObject <> nil then
-      begin
-      Self.tHamLibObject.Split(true);
-      Exit;
-      end;
-
-
    case RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, K4:
@@ -2085,11 +2053,6 @@ begin
    if Self.tNetObject <> nil then
       begin
       Self.tNetObject.Split(false);
-      Exit;
-      end
-   else if Self.tHamLibObject <> nil then
-      begin
-      Self.tHamLibObject.Split(false);
       Exit;
       end;
 
@@ -2345,18 +2308,6 @@ begin
    // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
 
-   if Self.tHamLibObject <> nil then
-      begin
-      if Msg[1] = CWByCATBufferTerminator then
-         begin
-         Self.tHamLibObject.SendCW;
-         end
-      else
-         begin
-         Self.tHamLibObject.BufferCW(msg);
-         end;
-      Exit;
-      end;
    (* Removed network code as AddToOutputBuffer will send to net radio // ny4i  This is a bad kludge. We should call a new procedure to handle CW for networked radios
    if Self.tNetObject <> nil then
       begin
@@ -2660,11 +2611,6 @@ begin
       Self.tNetObject.StopCW;
       Exit;
       end;
-   if Self.tHamLibObject <> nil then
-      begin
-      Self.tHamLibObject.StopCW;
-      Exit;
-      end;
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
@@ -2725,34 +2671,44 @@ begin
       end;
 end;
 //------------------------------------------------------------------------------
+function RadioObject.DetermineNetworkRadioModel: TRadioModel;
+begin
+   // This is only called for network radios (tCATPortType = Network)
+   Result := rmNone;
+
+   // Check if this radio should use HamLib Direct DLL
+   if Self.UseHamLib then
+   begin
+      Result := rmHamLibDirect;
+      logger.Info('[DetermineNetworkRadioModel] Using HamLib Direct (DLL mode)');
+      Exit;
+   end;
+
+   // Otherwise, determine specific network radio model
+   case Self.RadioModel of
+      K4:
+         begin
+         Result := rmElecraftK4;
+         logger.Info('[DetermineNetworkRadioModel] Using Elecraft K4');
+         end;
+      // Future: K3, IC7610, FT991, etc. when implemented
+   else
+      begin
+      logger.warn('[DetermineNetworkRadioModel] Unknown network radio model, defaulting to K4');
+      Result := rmElecraftK4;
+      end;
+   end;
+end;
+//------------------------------------------------------------------------------
 procedure RadioObject.SetUpRadioInterface;
 var
    hand: HWND;
 //   TempCardinal: cardinal;
    dwFlagsAndAttributes: DWORD;
    EvtChar: char;
+   networkRadioModel: TRadioModel;
 begin
-   if Self.UseHamLib then
-      begin
-      Self.tHamLibObject := THamLib.Create(); // TODO Add serial port parameters to the create and pass here
-      tHamLibObject.radio_COMPort :=  ConvertPortTypeToCOMString(Self.tCATPortType);    //  'COM12';
-      tHamLibObject.radio_BaudRate := Self.RadioBaudRate;   //38400;
-      tHamLibObject.radio_useIPAddress := ConvertPortTypeToCOMString(Self.tCATPortType) = 'socket';
-      tHamLibObject.radio_HamLibID := RadioParametersArray[Self.RadioModel].hamlibID; //1035;   RadioParametersArray[RadioModel].SFOC)
-      tHamLibObject.radioModel := Self.RadioName;
-      tHamLIbObject.radioAddress := TR4W_HAMLIBIPADDRESS;
-      tHamLibObject.radioPort := TR4W_HAMLIBPORT; {TODO Find out why this is not getting set like it does in K4Radio}
-      tHamLibObject.radio_IPAddress := self.IPAddress;
-      tHamLibObject.radio_port := Self.RadioTCPPort;
-      if Self.ReceiverAddress > 0 then
-         begin
-         tHamLibObject.radio_CIVAddress := IntToStr(Self.ReceiverAddress);
-         end;
-      Sleep(1000);
-      tHamLibObject.Connect;
-      logger.Debug('Setting hamlib connection for radio');
-      end
-   else if tCATPortType in [Serial1..Serial20] then
+   if tCATPortType in [Serial1..Serial20] then
       begin
 
       dwFlagsAndAttributes := FILE_ATTRIBUTE_NORMAL;
@@ -2828,18 +2784,54 @@ begin
       end
    else if tCATPortType = Network then
       begin
-      Self.tNetObject := TK4Radio.Create;    // TODO: First this to use some sort of factory so we instantiate the right radio class type (THamLib, TFlex6000, TOmniRig, etc.)
-      if length(Self.IPAddress) > 0 then
+      // Use factory to create network radio (K4 or HamLib Direct)
+      networkRadioModel := Self.DetermineNetworkRadioModel;
+
+      if networkRadioModel <> rmNone then
+      begin
+         Self.tNetObject := TRadioFactory.CreateRadio(
+            networkRadioModel,
+            Self.IPAddress,
+            Self.RadioTCPPort,
+            nil  // msgCallback - add if needed
+         );
+
+         if Self.tNetObject <> nil then
          begin
-         tNetObject.radioAddress := Self.IPAddress;
-         tNetObject.radioPort := Self.RadioTCPPort;
-         tNetObject.Connect;
+            // Configure HamLib Direct if that's what was created
+            if Self.tNetObject is THamLibDirect then
+            begin
+               with THamLibDirect(Self.tNetObject) do
+               begin
+                  HamLibModelID := RadioParametersArray[Self.RadioModel].hamlibID;
+
+                  // Network or serial connection?
+                  if length(Self.IPAddress) > 0 then
+                  begin
+                     UseIPAddress := True;
+                     IPAddress := Self.IPAddress;
+                     IPPort := Self.RadioTCPPort;
+                  end
+                  else
+                  begin
+                     COMPortName := ConvertPortTypeToCOMString(Self.tCATPortType);
+                     BaudRate := Self.RadioBaudRate;
+                  end;
+
+                  if Self.ReceiverAddress > 0 then
+                     CIVAddress := IntToStr(Self.ReceiverAddress);
+               end;
+            end;
+
+            // Connect the radio
+            Self.tNetObject.Connect;
+            logger.Info('[SetUpRadioInterface] Network radio created via factory');
          end
+         else
+            logger.error('[SetUpRadioInterface] Factory failed to create radio');
+      end
       else
-         begin
-         logger.error('[RadioObject.SetUpRadioInterface] Radio IP address is not set for a radio type of TCP/IP');
-         Exit;
-         end;
+         logger.error('[SetUpRadioInterface] Failed to determine radio model for network connection');
       end;
 
    { Initialize the radio variables }
@@ -2878,7 +2870,7 @@ begin
       begin
       if Self.tNetObject <> nil then
          begin
-         TK4Radio(Self.tNetObject).SendToRadio(Self.StartupCommand);
+         Self.tNetObject.SendToRadio(Self.StartupCommand);
          end
       else
          begin
@@ -2914,12 +2906,6 @@ begin
    if Self.tNetObject <> nil then
       begin
       Self.tNetObject.SetCWSpeed(speed);
-      Exit;
-      end;
-
-   if Self.tHamLibObject <> nil then
-      begin
-      Self.tHamLibObject.SetCWSpeed(speed);
       Exit;
       end;
 
@@ -3012,7 +2998,6 @@ begin
       begin
       if VFO = 'B' then
          begin
-         Self.tNetObject.SetFrequency(freq,nrVFOB);
          tNetMode := ModeTypeToNetMode(mode);
          if tNetMode in [rmLSB,rmUSB] then
             begin
@@ -3025,11 +3010,10 @@ begin
                tNetMode := rmUSB;
                end;
             end;
-         Self.tNetObject.SetMode(tNetmode,nrVFOB);
+         Self.tNetObject.SetFrequency(freq,nrVFOB,tNetMode);
          end
       else
          begin
-         Self.tNetObject.SetFrequency(freq,nrVFOA);
          tNetMode := ModeTypeToNetMode(mode);
          if tNetMode in [rmLSB,rmUSB] then
             begin
@@ -3042,48 +3026,7 @@ begin
                tNetMode := rmUSB;
                end;
             end;
-         Self.tNetObject.SetMode(tNetmode,nrVFOA);
-         end;
-      Exit;
-      end;
-
-   if Self.tHamLibObject <> nil then
-      begin
-      if VFO = 'B' then
-         begin
-         //Self.tHamLibObject.SetFrequency(freq,nrVFOB);
-         tNetMode := ModeTypeToNetMode(mode);
-         if tNetMode in [rmLSB,rmUSB] then
-            begin
-            if freq < 8000000 then
-               begin
-               tNetMode := rmLSB;
-               end
-            else
-               begin
-               tNetMode := rmUSB;
-               end;
-            end;
-         Self.tHamLibObject.SetMode(tNetmode,nrVFOB);
-         Self.tHamLibObject.SetFrequency(freq,nrVFOB);
-         end
-      else
-         begin
-         //Self.tHamLibObject.SetFrequency(freq,nrVFOA);
-         tNetMode := ModeTypeToNetMode(mode);
-         if tNetMode in [rmLSB,rmUSB] then
-            begin
-            if freq < 8000000 then
-               begin
-               tNetMode := rmLSB;
-               end
-            else
-               begin
-               tNetMode := rmUSB;
-               end;
-            end;
-         Self.tHamLibObject.SetMode(tNetmode,nrVFOA);
-         Self.tHamLibObject.SetFrequency(freq,nrVFOA);
+         Self.tNetObject.SetFrequency(freq,nrVFOA,tNetMode);
          end;
       Exit;
       end;
@@ -3837,7 +3780,7 @@ function tPTTVIACAT(PTTOn: boolean): boolean;
 
 var
    IntRadioType: InterfacedRadioType;
-   ro: TK4Radio;
+   ro: TNetRadioBase;
 //   SerialPort: PortType;
    TempString: Str80;
    WaitAnswer: cardinal;

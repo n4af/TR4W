@@ -48,7 +48,8 @@ uses
    Math,
    DateUtils,
    uNetRadioBase,
-   uRadioElecraftK4;
+   uRadioElecraftK4,
+   uRadioHamLibDirect;
 
 type
    DebugFileMessagetype = (dfmTX, dfmRX, dfmError);
@@ -68,8 +69,6 @@ procedure pFT817_FT847_FT857_FT897(rig: RadioPtr);
 procedure pFT1000MP(rig: RadioPtr);
 procedure pFT100(rig: RadioPtr);
 function ArrayToString(const a: array of Char): string;
-
-procedure pHamLib(rig: RadioPtr);
 
 procedure pIcom(rig: RadioPtr);
 procedure pIcomNew(rig: RadioPtr);
@@ -749,6 +748,12 @@ begin
 
          Sleep(FreqPollRate);
 
+         // For radios without reading thread (like HamLib Direct), actively poll
+         if Assigned(ro) and (ro is THamLibDirect) then
+            begin
+            THamLibDirect(ro).SendPollRequests;
+            end;
+
          rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
          rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);   // After the reset radio port on a net radio, the ro.band[nrVFOA] is not being set.
          GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
@@ -829,7 +834,7 @@ begin
    }
 
    logger.Trace('[pHamLib] Entering polling procedure');
-   ro := rig^.tHamLibObject;
+   ro := rig^.tNetObject;
    wasConnected := False;
 
    // Keep polling thread alive - will automatically resume when radio reconnects
@@ -844,7 +849,7 @@ begin
             wasConnected := True;
             end;
 
-         rig^.tHamLibObject.SendPollRequests;
+         // rig^.tNetObject.SendPollRequests; // Removed - rigctld no longer supported
          Sleep(FreqPollRate);
          rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
          rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
@@ -3144,11 +3149,6 @@ begin
       Exit;   // Nothing else is done here so exit
       end;
 
-   if rig.tHamLibObject <> nil then
-      begin
-      pHamLib(rig);    // For hamlib testing, TODO HAMLIB uncomment this
-      Exit;   // Nothing else is done here so exit
-      end;
    // The rest is for direct (non-hamlib) serial radio interfaces
 
    PurgeComm(rig^.tCATPortHandle, PURGE_RXCLEAR or PURGE_RXABORT);

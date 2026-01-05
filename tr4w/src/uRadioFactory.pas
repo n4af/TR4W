@@ -14,7 +14,7 @@ unit uRadioFactory;
 interface
 
 uses
-   uNetRadioBase, uRadioElecraftK4, uRadioHamLib, SysUtils;
+   uNetRadioBase, uRadioElecraftK4, SysUtils;
 
 type
    TRadioModel = (
@@ -26,7 +26,7 @@ type
       rmIcomIC7610,
       rmIcomIC7300,
       rmFlexRadio6000,
-      rmHamLibGeneric
+      rmHamLibDirect
    );
 
    TRadioFactory = class
@@ -45,7 +45,7 @@ type
 
 implementation
 
-uses Log4D;
+uses Log4D, uRadioHamLibDirect;
 
 var
    logger: TLogLogger;
@@ -100,14 +100,15 @@ begin
          raise ERadioFactoryException.Create('FlexRadio 6000 series not yet implemented');
          end;
 
-      rmHamLibGeneric:
+      rmHamLibDirect:
          begin
-         Result := THamLib.Create;
+         Result := THamLibDirect.Create(msgCallback);
          Result.radioAddress := address;
          Result.radioPort := port;
-         Result.radioModel := 'HamLib Generic';
-         logger.Info('[RadioFactory] Created HamLib instance');
-         logger.Info('[RadioFactory] Remember to configure HamLib-specific properties before connecting');
+         Result.radioModel := 'HamLib Direct';
+         logger.Info('[RadioFactory] Created HamLib Direct instance');
+         logger.Info('[RadioFactory] Direct DLL mode - no rigctld process needed');
+         logger.Info('[RadioFactory] Remember to set HamLibModelID and serial port before connecting');
          end;
 
       else
@@ -128,7 +129,7 @@ begin
       rmIcomIC7610:     Result := 'Icom IC-7610';
       rmIcomIC7300:     Result := 'Icom IC-7300';
       rmFlexRadio6000:  Result := 'FlexRadio 6000';
-      rmHamLibGeneric:  Result := 'HamLib Generic';
+      rmHamLibDirect:   Result := 'HamLib Direct (DLL)';
    else
       Result := 'Unknown';
    end;
@@ -138,7 +139,7 @@ class function TRadioFactory.GetSupportedModels: string;
 begin
    Result := 'Supported radio models:'#13#10 +
              '  - Elecraft K4 (implemented)'#13#10 +
-             '  - HamLib Generic (implemented)'#13#10 +
+             '  - HamLib Direct via DLL (implemented)'#13#10 +
              '  - Elecraft K3 (planned)'#13#10 +
              '  - Yaesu FTdx101 (planned)'#13#10 +
              '  - Yaesu FT-991 (planned)'#13#10 +
@@ -149,8 +150,8 @@ end;
 
 class function TRadioFactory.IsModelSupported(model: TRadioModel): boolean;
 begin
-   // Currently K4 and HamLib are fully implemented
-   Result := (model = rmElecraftK4) or (model = rmHamLibGeneric);
+   // Currently K4 and HamLib Direct (DLL) are fully implemented
+   Result := (model = rmElecraftK4) or (model = rmHamLibDirect);
 end;
 
 initialization
