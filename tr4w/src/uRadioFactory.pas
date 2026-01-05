@@ -14,7 +14,7 @@ unit uRadioFactory;
 interface
 
 uses
-   uNetRadioBase, uRadioElecraftK4, SysUtils;
+   uNetRadioBase, uRadioElecraftK4, SysUtils, VC;
 
 type
    TRadioModel = (
@@ -29,14 +29,21 @@ type
       rmHamLibDirect
    );
 
+   TConnectionType = (ctNetwork, ctSerial);
+
    TRadioFactory = class
    private
       class function ModelToString(model: TRadioModel): string;
    public
-      class function CreateRadio(model: TRadioModel;
-                                 address: string;
-                                 port: integer;
-                                 msgCallback: TProcessMsgRef): TNetRadioBase;
+      // Network connection
+      class function CreateRadioNetwork(model: TRadioModel;
+                                         address: string;
+                                         port: integer;
+                                         msgCallback: TProcessMsgRef): TNetRadioBase;
+      // Serial connection
+      class function CreateRadioSerial(model: TRadioModel;
+                                        serialPort: PortType;
+                                        msgCallback: TProcessMsgRef): TNetRadioBase;
       class function GetSupportedModels: string;
       class function IsModelSupported(model: TRadioModel): boolean;
    end;
@@ -50,10 +57,10 @@ uses Log4D, uRadioHamLibDirect;
 var
    logger: TLogLogger;
 
-class function TRadioFactory.CreateRadio(model: TRadioModel;
-                                         address: string;
-                                         port: integer;
-                                         msgCallback: TProcessMsgRef): TNetRadioBase;
+class function TRadioFactory.CreateRadioNetwork(model: TRadioModel;
+                                                 address: string;
+                                                 port: integer;
+                                                 msgCallback: TProcessMsgRef): TNetRadioBase;
 begin
    Result := nil;
 
@@ -114,6 +121,69 @@ begin
       else
          begin
          raise ERadioFactoryException.CreateFmt('Unknown radio model: %d', [Ord(model)]);
+         end;
+   end;
+end;
+
+class function TRadioFactory.CreateRadioSerial(model: TRadioModel;
+                                                serialPort: PortType;
+                                                msgCallback: TProcessMsgRef): TNetRadioBase;
+begin
+   Result := nil;
+
+   logger.Info('[RadioFactory] Creating radio for serial: Model=%s, Port=%d',
+               [ModelToString(model), Ord(serialPort)]);
+
+   case model of
+      rmElecraftK4:
+         begin
+         Result := TK4Radio.Create;
+         Result.serialPort := serialPort;
+         Result.radioModel := 'Elecraft K4 (Serial)';
+         logger.Info('[RadioFactory] Created Elecraft K4 instance for serial connection');
+         end;
+
+      rmElecraftK3:
+         begin
+         raise ERadioFactoryException.Create('Elecraft K3 serial not yet implemented');
+         end;
+
+      rmYaesuFTdx101:
+         begin
+         raise ERadioFactoryException.Create('Yaesu FTdx101 serial not yet implemented');
+         end;
+
+      rmYaesuFT991:
+         begin
+         raise ERadioFactoryException.Create('Yaesu FT991 serial not yet implemented');
+         end;
+
+      rmIcomIC7610:
+         begin
+         raise ERadioFactoryException.Create('Icom IC-7610 serial not yet implemented');
+         end;
+
+      rmIcomIC7300:
+         begin
+         raise ERadioFactoryException.Create('Icom IC-7300 serial not yet implemented');
+         end;
+
+      rmFlexRadio6000:
+         begin
+         raise ERadioFactoryException.Create('FlexRadio 6000 does not support serial connections');
+         end;
+
+      rmHamLibDirect:
+         begin
+         Result := THamLibDirect.Create(msgCallback);
+         Result.serialPort := serialPort;
+         Result.radioModel := 'HamLib Direct (Serial)';
+         logger.Info('[RadioFactory] Created HamLib Direct instance for serial connection');
+         end;
+
+      else
+         begin
+         raise ERadioFactoryException.CreateFmt('Unknown radio model for serial: %d', [Ord(model)]);
          end;
    end;
 end;

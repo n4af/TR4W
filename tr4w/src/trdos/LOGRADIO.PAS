@@ -2717,7 +2717,7 @@ begin
       logger.Info('[%s.SetUpRadioInterface] Using HamLib Direct', [Self.RadioName]);
 
       // Create HamLib Direct radio via factory
-      Self.tNetObject := TRadioFactory.CreateRadio(
+      Self.tNetObject := TRadioFactory.CreateRadioNetwork(
          rmHamLibDirect,
          '',  // Address will be set below based on port type
          0,   // Port will be set below based on port type
@@ -2766,8 +2766,29 @@ begin
    end
    else if tCATPortType in [Serial1..Serial20] then
       begin
-      // Legacy serial port code (non-HamLib)
-      logger.Debug('[%s.SetUpRadioInterface] Using legacy serial port code', [Self.RadioName]);
+      // Check if we should use modern radio class (e.g., K4) or legacy serial code
+      if (Self.RadioModel = K4) then
+         begin
+         // Use K4Radio class via factory for serial connection
+         logger.Info('[%s.SetUpRadioInterface] Setting up K4 serial via factory: Port=%d',
+                     [Self.RadioName, Ord(tCATPortType)]);
+         Self.tNetObject := TRadioFactory.CreateRadioSerial(
+            rmElecraftK4,
+            tCATPortType,
+            nil
+         );
+         if Self.tNetObject <> nil then
+            begin
+            Self.tNetObject.Connect;
+            logger.Info('[%s.SetUpRadioInterface] K4 serial radio connected via factory', [Self.RadioName]);
+            end
+         else
+            logger.Error('[%s.SetUpRadioInterface] Failed to create K4 serial radio', [Self.RadioName]);
+         end
+      else
+         begin
+         // Legacy serial port code (non-HamLib, non-K4)
+         logger.Debug('[%s.SetUpRadioInterface] Using legacy serial port code', [Self.RadioName]);
 
       dwFlagsAndAttributes := FILE_ATTRIBUTE_NORMAL;
       EvtChar := #0;
@@ -2839,6 +2860,7 @@ begin
          //      OpenCATDebugFile(tCATPortType);
          end;
 
+         end; // end legacy serial port code else block
       end
    else if tCATPortType = Network then
       begin
@@ -2850,7 +2872,7 @@ begin
       case Self.RadioModel of
          K4:
             begin
-            Self.tNetObject := TRadioFactory.CreateRadio(
+            Self.tNetObject := TRadioFactory.CreateRadioNetwork(
                rmElecraftK4,
                Self.IPAddress,
                Self.RadioTCPPort,
@@ -2862,7 +2884,7 @@ begin
       else
          begin
          logger.warn('[%s] Unknown network radio model, defaulting to K4', [Self.RadioName]);
-         Self.tNetObject := TRadioFactory.CreateRadio(
+         Self.tNetObject := TRadioFactory.CreateRadioNetwork(
             rmElecraftK4,
             Self.IPAddress,
             Self.RadioTCPPort,

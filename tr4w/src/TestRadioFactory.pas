@@ -42,10 +42,10 @@ begin
 
   try
     // Create a single K4 radio using factory
-    radio := TRadioFactory.CreateRadio(rmElecraftK4,
-                                       '192.168.1.100',
-                                       7373,
-                                       ProcessRadio1Message);
+    radio := TRadioFactory.CreateRadioNetwork(rmElecraftK4,
+                                                '192.168.1.100',
+                                                7373,
+                                                ProcessRadio1Message);
 
     WriteLn('Created radio: ', radio.radioModel);
     WriteLn('Address: ', radio.radioAddress);
@@ -86,15 +86,15 @@ begin
     radioManager := TRadioManager.Create;
     try
       // Create two radios
-      radio1 := TRadioFactory.CreateRadio(rmElecraftK4,
-                                          '192.168.1.100',
-                                          7373,
-                                          ProcessRadio1Message);
+      radio1 := TRadioFactory.CreateRadioNetwork(rmElecraftK4,
+                                                   '192.168.1.100',
+                                                   7373,
+                                                   ProcessRadio1Message);
 
-      radio2 := TRadioFactory.CreateRadio(rmElecraftK4,
-                                          '192.168.1.101',
-                                          7373,
-                                          ProcessRadio2Message);
+      radio2 := TRadioFactory.CreateRadioNetwork(rmElecraftK4,
+                                                   '192.168.1.101',
+                                                   7373,
+                                                   ProcessRadio2Message);
 
       // Add to manager
       if radioManager.AddRadio('Radio1', radio1) then
@@ -167,10 +167,10 @@ begin
 
   try
     // Try to create unsupported radio
-    radio1 := TRadioFactory.CreateRadio(rmYaesuFTdx101,
-                                        '192.168.1.100',
-                                        7373,
-                                        ProcessRadio1Message);
+    radio1 := TRadioFactory.CreateRadioNetwork(rmYaesuFTdx101,
+                                                 '192.168.1.100',
+                                                 7373,
+                                                 ProcessRadio1Message);
     WriteLn('ERROR: Should have thrown exception!');
   except
     on E: ERadioFactoryException do
