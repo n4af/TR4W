@@ -737,7 +737,8 @@ begin
    // Keep polling thread alive - will automatically resume when radio reconnects
    while True do
       begin
-      if ro.IsConnected then
+      try
+         if ro.IsConnected then
          begin
          // Radio is connected - poll status
          if not wasConnected then
@@ -806,7 +807,20 @@ begin
                end;
          end;
          end;
-      end;
+      except
+         on E: EAbstractError do
+            begin
+            logger.Error('[pNetworkRadio] ABSTRACT ERROR: %s at address %p', [E.Message, ExceptAddr]);
+            logger.Error('[pNetworkRadio] This indicates a missing method implementation in the radio class');
+            raise;  // Re-raise so user sees the dialog
+            end;
+         on E: Exception do
+            begin
+            logger.Error('[pNetworkRadio] Exception in polling loop: %s - %s', [E.ClassName, E.Message]);
+            Sleep(1000);  // Avoid tight loop on repeated errors
+            end;
+      end;  // end of try-except
+      end;  // end of while True loop iteration
 
 end;
 

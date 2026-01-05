@@ -170,8 +170,8 @@ begin
 
   // Enable HamLib debug logging (logs to stderr/console)
   // Use RIG_DEBUG_WARN for normal operation, RIG_DEBUG_TRACE for troubleshooting
-  rig_set_debug(RIG_DEBUG_WARN);
-  logger.Debug('[THamLibDirect.Connect] HamLib debug level set to WARN');
+  rig_set_debug(RIG_DEBUG_TRACE);  // Temporarily set to TRACE for troubleshooting
+  logger.Debug('[THamLibDirect.Connect] HamLib debug level set to TRACE');
 
   // Initialize rig
   logger.Debug('[THamLibDirect.Connect] Calling rig_init(%d)', [HamLibModelID]);
@@ -211,7 +211,8 @@ begin
       logger.Info('[THamLibDirect.Connect] Configuring serial port: %s at %d baud',
                   [COMPortName, BaudRate]);
 
-      err := rig_set_conf(FRig, TOK_PATHNAME, PChar(COMPortName));
+      // Use token lookup like rigctl does
+      err := rig_set_conf(FRig, rig_token_lookup(FRig, 'rig_pathname'), PChar(COMPortName));
       if err <> RIG_OK then
       begin
         logger.Error('[THamLibDirect.Connect] Error setting serial port: %s',
@@ -223,18 +224,25 @@ begin
       end;
 
       baudStr := IntToStr(BaudRate);
-      err := rig_set_conf(FRig, TOK_SERIAL_SPEED, PChar(baudStr));
+      err := rig_set_conf(FRig, rig_token_lookup(FRig, 'serial_speed'), PChar(baudStr));
       if err <> RIG_OK then
         logger.Warn('[THamLibDirect.Connect] Error setting baud rate: %s',
+                    [RigErrorToString(err)]);
+
+      // Set timeout for serial communication (in milliseconds)
+      err := rig_set_conf(FRig, rig_token_lookup(FRig, 'timeout'), '2000');
+      if err <> RIG_OK then
+        logger.Warn('[THamLibDirect.Connect] Error setting timeout: %s',
                     [RigErrorToString(err)]);
     end;
 
     // Set CI-V address for Icom radios if provided
     if Length(FCIVAddress) > 0 then
     begin
-      logger.Info('[THamLibDirect.Connect] Setting CI-V address: %s', [FCIVAddress]);
-      // Note: CI-V address is typically set via rig backend-specific config
-      // This may need adjustment based on specific Icom model
+      logger.Info('[THamLibDirect.Connect] Setting CI-V address: 0x%s', [FCIVAddress]);
+      err := rig_set_conf(FRig, rig_token_lookup(FRig, 'civaddr'), PChar(FCIVAddress));
+      if err <> RIG_OK then
+        logger.Warn('[THamLibDirect.Connect] Warning setting CI-V address: %s', [RigErrorToString(err)]);
     end;
 
     // Open the connection

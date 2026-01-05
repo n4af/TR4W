@@ -552,8 +552,8 @@ const
     ({Name: 'IC7410';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $80; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3067; rt: rtIcom),
     ({Name: 'IC7600';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $7A; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3063; rt: rtIcom),
     ({Name: 'IC7610';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $98; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3078; rt: rtIcom), // 4.65.7 issue #282 #282   // 4.68.12
+    ({Name: 'IC7700';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $74; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3062; rt: rtIcom),
     ({Name: 'IC7760';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $B2; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3092; rt: rtIcom),
-    ({Name: 'IC7610';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $98; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3078; rt: rtIcom), // 4.65.7 issue #282 #282   // 4.68.12
     ({Name: 'IC7800';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $6A; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3056; rt: rtIcom),
     ({Name: 'IC7850';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3075; rt: rtIcom),
     ({Name: 'IC7851';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $8E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3075; rt: rtIcom),
@@ -2676,11 +2676,14 @@ begin
    // This is only called for network radios (tCATPortType = Network)
    Result := rmNone;
 
+   logger.Info('[%s.DetermineNetworkRadioModel] RadioModel=%d, UseHamLib=%s',
+               [Self.RadioName, Ord(Self.RadioModel), BoolToStr(Self.UseHamLib, True)]);
+
    // Check if this radio should use HamLib Direct DLL
    if Self.UseHamLib then
    begin
       Result := rmHamLibDirect;
-      logger.Info('[DetermineNetworkRadioModel] Using HamLib Direct (DLL mode)');
+      logger.Info('[%s] Using HamLib Direct (DLL mode)', [Self.RadioName]);
       Exit;
    end;
 
@@ -2689,12 +2692,12 @@ begin
       K4:
          begin
          Result := rmElecraftK4;
-         logger.Info('[DetermineNetworkRadioModel] Using Elecraft K4');
+         logger.Info('[%s] Using Elecraft K4', [Self.RadioName]);
          end;
       // Future: K3, IC7610, FT991, etc. when implemented
    else
       begin
-      logger.warn('[DetermineNetworkRadioModel] Unknown network radio model, defaulting to K4');
+      logger.warn('[%s] Unknown network radio model, defaulting to K4', [Self.RadioName]);
       Result := rmElecraftK4;
       end;
    end;
@@ -2708,8 +2711,63 @@ var
    EvtChar: char;
    networkRadioModel: TRadioModel;
 begin
-   if tCATPortType in [Serial1..Serial20] then
+   // Check if we should use HamLib Direct (works with both serial and network)
+   if Self.UseHamLib then
+   begin
+      logger.Info('[%s.SetUpRadioInterface] Using HamLib Direct', [Self.RadioName]);
+
+      // Create HamLib Direct radio via factory
+      Self.tNetObject := TRadioFactory.CreateRadio(
+         rmHamLibDirect,
+         '',  // Address will be set below based on port type
+         0,   // Port will be set below based on port type
+         nil  // msgCallback
+      );
+
+      if Self.tNetObject <> nil then
       begin
+         if Self.tNetObject is THamLibDirect then
+         begin
+            with THamLibDirect(Self.tNetObject) do
+            begin
+               HamLibModelID := RadioParametersArray[Self.RadioModel].hamlibID;
+
+               // Check if using network or serial connection
+               if tCATPortType = Network then
+               begin
+                  // Network connection
+                  logger.Info('[%s] HamLib via network: %s:%d',
+                              [Self.RadioName, Self.IPAddress, Self.RadioTCPPort]);
+                  UseIPAddress := True;
+                  IPAddress := Self.IPAddress;
+                  IPPort := Self.RadioTCPPort;
+               end
+               else if tCATPortType in [Serial1..Serial20] then
+               begin
+                  // Serial connection
+                  COMPortName := ConvertPortTypeToCOMString(Self.tCATPortType);
+                  BaudRate := Self.RadioBaudRate;
+                  logger.Info('[%s] HamLib via serial: %s at %d baud',
+                              [Self.RadioName, COMPortName, BaudRate]);
+                  UseIPAddress := False;
+               end;
+
+               if Self.ReceiverAddress > 0 then
+                  CIVAddress := IntToStr(Self.ReceiverAddress);
+            end;
+         end;
+
+         // Connect the radio
+         Self.tNetObject.Connect;
+         logger.Info('[%s.SetUpRadioInterface] HamLib Direct connected', [Self.RadioName]);
+      end
+      else
+         logger.error('[%s.SetUpRadioInterface] Failed to create HamLib Direct radio', [Self.RadioName]);
+   end
+   else if tCATPortType in [Serial1..Serial20] then
+      begin
+      // Legacy serial port code (non-HamLib)
+      logger.Debug('[%s.SetUpRadioInterface] Using legacy serial port code', [Self.RadioName]);
 
       dwFlagsAndAttributes := FILE_ATTRIBUTE_NORMAL;
       EvtChar := #0;
@@ -2784,54 +2842,42 @@ begin
       end
    else if tCATPortType = Network then
       begin
-      // Use factory to create network radio (K4 or HamLib Direct)
-      networkRadioModel := Self.DetermineNetworkRadioModel;
+      // Non-HamLib network radio (e.g., K4 with native network protocol)
+      logger.Info('[%s.SetUpRadioInterface] Setting up non-HamLib network radio: IP=%s, Port=%d',
+                  [Self.RadioName, Self.IPAddress, Self.RadioTCPPort]);
 
-      if networkRadioModel <> rmNone then
-      begin
+      // Determine which network radio model to use
+      case Self.RadioModel of
+         K4:
+            begin
+            Self.tNetObject := TRadioFactory.CreateRadio(
+               rmElecraftK4,
+               Self.IPAddress,
+               Self.RadioTCPPort,
+               nil
+            );
+            logger.Info('[%s] Using Elecraft K4 network protocol', [Self.RadioName]);
+            end;
+         // Future: K3, IC7610, etc.
+      else
+         begin
+         logger.warn('[%s] Unknown network radio model, defaulting to K4', [Self.RadioName]);
          Self.tNetObject := TRadioFactory.CreateRadio(
-            networkRadioModel,
+            rmElecraftK4,
             Self.IPAddress,
             Self.RadioTCPPort,
-            nil  // msgCallback - add if needed
+            nil
          );
+         end;
+      end;
 
-         if Self.tNetObject <> nil then
-         begin
-            // Configure HamLib Direct if that's what was created
-            if Self.tNetObject is THamLibDirect then
-            begin
-               with THamLibDirect(Self.tNetObject) do
-               begin
-                  HamLibModelID := RadioParametersArray[Self.RadioModel].hamlibID;
-
-                  // Network or serial connection?
-                  if length(Self.IPAddress) > 0 then
-                  begin
-                     UseIPAddress := True;
-                     IPAddress := Self.IPAddress;
-                     IPPort := Self.RadioTCPPort;
-                  end
-                  else
-                  begin
-                     COMPortName := ConvertPortTypeToCOMString(Self.tCATPortType);
-                     BaudRate := Self.RadioBaudRate;
-                  end;
-
-                  if Self.ReceiverAddress > 0 then
-                     CIVAddress := IntToStr(Self.ReceiverAddress);
-               end;
-            end;
-
-            // Connect the radio
-            Self.tNetObject.Connect;
-            logger.Info('[SetUpRadioInterface] Network radio created via factory');
-         end
-         else
-            logger.error('[SetUpRadioInterface] Factory failed to create radio');
+      if Self.tNetObject <> nil then
+      begin
+         Self.tNetObject.Connect;
+         logger.Info('[%s.SetUpRadioInterface] Network radio connected', [Self.RadioName]);
       end
       else
-         logger.error('[SetUpRadioInterface] Failed to determine radio model for network connection');
+         logger.error('[%s.SetUpRadioInterface] Failed to create network radio', [Self.RadioName]);
       end;
 
    { Initialize the radio variables }
