@@ -2770,11 +2770,16 @@ begin
       if (Self.RadioModel = K4) then
          begin
          // Use K4Radio class via factory for serial connection
-         logger.Info('[%s.SetUpRadioInterface] Setting up K4 serial via factory: Port=%d',
-                     [Self.RadioName, Ord(tCATPortType)]);
+         logger.Info('[%s.SetUpRadioInterface] Setting up K4 serial via factory: Port=%d, Baud=%d, DataBits=%d, Parity=%d, StopBits=%d',
+                     [Self.RadioName, Ord(tCATPortType), RadioBaudRate, RadioNumberBits,
+                      Ord(RadioParity), RadioStopBits]);
          Self.tNetObject := TRadioFactory.CreateRadioSerial(
             rmElecraftK4,
             tCATPortType,
+            RadioBaudRate,
+            RadioNumberBits,
+            RadioStopBits,
+            Ord(RadioParity),
             nil
          );
          if Self.tNetObject <> nil then
@@ -2784,6 +2789,9 @@ begin
             end
          else
             logger.Error('[%s.SetUpRadioInterface] Failed to create K4 serial radio', [Self.RadioName]);
+
+         // Exit to prevent any legacy serial code from executing
+         Exit;
          end
       else
          begin

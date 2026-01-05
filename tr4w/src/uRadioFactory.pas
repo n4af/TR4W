@@ -14,7 +14,7 @@ unit uRadioFactory;
 interface
 
 uses
-   uNetRadioBase, uRadioElecraftK4, SysUtils, VC;
+   Windows, uNetRadioBase, uRadioElecraftK4, SysUtils, VC;
 
 type
    TRadioModel = (
@@ -43,6 +43,10 @@ type
       // Serial connection
       class function CreateRadioSerial(model: TRadioModel;
                                         serialPort: PortType;
+                                        baudRate: DWORD;
+                                        dataBits: Byte;
+                                        stopBits: Byte;
+                                        parity: Byte;
                                         msgCallback: TProcessMsgRef): TNetRadioBase;
       class function GetSupportedModels: string;
       class function IsModelSupported(model: TRadioModel): boolean;
@@ -127,18 +131,26 @@ end;
 
 class function TRadioFactory.CreateRadioSerial(model: TRadioModel;
                                                 serialPort: PortType;
+                                                baudRate: DWORD;
+                                                dataBits: Byte;
+                                                stopBits: Byte;
+                                                parity: Byte;
                                                 msgCallback: TProcessMsgRef): TNetRadioBase;
 begin
    Result := nil;
 
-   logger.Info('[RadioFactory] Creating radio for serial: Model=%s, Port=%d',
-               [ModelToString(model), Ord(serialPort)]);
+   logger.Info('[RadioFactory] Creating radio for serial: Model=%s, Port=%d, Baud=%d, %dN%d',
+               [ModelToString(model), Ord(serialPort), baudRate, dataBits, stopBits]);
 
    case model of
       rmElecraftK4:
          begin
          Result := TK4Radio.Create;
          Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
          Result.radioModel := 'Elecraft K4 (Serial)';
          logger.Info('[RadioFactory] Created Elecraft K4 instance for serial connection');
          end;
