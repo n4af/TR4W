@@ -192,8 +192,8 @@ Type TNetRadioBase = class(TObject)
       procedure SendCW; Virtual; Abstract;
       procedure StopCW; Virtual; Abstract;
       procedure SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode); Virtual; Abstract;
-      procedure SetMode(mode:TRadioMode); Virtual; Abstract;
-      function  ToggleMode: TRadioMode; Virtual; Abstract;
+      procedure SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA); Virtual; Abstract;
+      function  ToggleMode(vfo: TVFO = nrVFOA): TRadioMode; Virtual; Abstract;
       procedure SetCWSpeed(speed: integer); Virtual; Abstract;
       procedure RITClear(vfo: TVFO);  Virtual; Abstract;
       procedure XITClear(vfo: TVFO); Virtual; Abstract;
@@ -206,10 +206,10 @@ Type TNetRadioBase = class(TObject)
       procedure Split(splitOn: boolean); Virtual; Abstract;
       procedure SetRITFreq(vfo: TVFO; hz: integer); Virtual; Abstract;
       procedure SetXITFreq(vfo: TVFO; hz: integer); Virtual; Abstract;
-      procedure SetBand(vfo: TVFO; band: TRadioBand); Virtual; Abstract;
-      function  ToggleBand: TRadioBand; Virtual; Abstract;
-      procedure SetFilter(filter:TRadioFilter); Virtual; Abstract;
-      function  SetFilterHz(hz: integer): integer; Virtual; Abstract;
+      procedure SetBand(band: TRadioBand; vfo: TVFO = nrVFOA); Virtual; Abstract;
+      function  ToggleBand(vfo: TVFO = nrVFOA): TRadioBand; Virtual; Abstract;
+      procedure SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA); Virtual; Abstract;
+      function  SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer; Virtual; Abstract;
       function  MemoryKeyer(mem: integer): boolean; Virtual; Abstract;
       procedure VFOBumpDown(whichVFO: TVFO); Virtual; Abstract;
       procedure VFOBumpUp(whichVFO: TVFO); Virtual; Abstract;

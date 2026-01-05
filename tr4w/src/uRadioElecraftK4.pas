@@ -12,37 +12,23 @@ Type TK4Radio = class(TNetRadioBase)
       function BandNumToBand(sBand: string): TRadioBand;
       //procedure ProcessMessage(sMessage: string);
       procedure Initialize;
-      procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload;
       function ModeTypeToInteger(mode: TRadioMode; var dataModeInt: integer): integer;
       function IsDataMode(mode: TRadioMode): boolean;
-
-      // Internal K4-specific implementations
-      procedure SetFrequencyK4(freq: longint; vfo: TVFO);
-      procedure SetModeK4(mode:TRadioMode; vfo: TVFO);
-      function  ToggleModeK4(vfo: TVFO): TRadioMode;
-      procedure SetBandK4(band: TRadioBand; vfo: TVFO);
-      function  ToggleBandK4(vfo: TVFO): TRadioBand;
-      procedure SetFilterK4(whichVFO: TVFO; filter:integer);
-      function  SetFilterHzK4(whichVFO: TVFO; hz: integer): integer;
 
    public
       Constructor Create;
       function Connect: integer; override;
       procedure Transmit; override;
       procedure Receive; override;
+      procedure ProcessMsg(msg: string); override;
       procedure BufferCW(cwChars: string); overload; override;
       procedure SendCW; override;
       procedure StopCW; override;
 
-      // Base class overrides
+      // Base class overrides with VFO parameters
       procedure SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode); override;
-      procedure SetMode(mode:TRadioMode); override;
-      function  ToggleMode: TRadioMode; override;
-      procedure SetBand(vfo: TVFO; band: TRadioBand); override;
-      function  ToggleBand: TRadioBand; override;
-      procedure SetFilter(filter:TRadioFilter); override;
-      function  SetFilterHz(hz: integer): integer; override;
-
+      procedure SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA); override;
+      function  ToggleMode(vfo: TVFO = nrVFOA): TRadioMode; override;
       procedure SetCWSpeed(speed: integer); override;
       procedure RITClear(whichVFO: TVFO); override;
       procedure XITClear(whichVFO: TVFO); override;
@@ -55,11 +41,17 @@ Type TK4Radio = class(TNetRadioBase)
       procedure Split(splitOn: boolean); override;
       procedure SetRITFreq(whichVFO: TVFO; hz: integer); override;
       procedure SetXITFreq(whichVFO: TVFO; hz: integer); override;
-      function MemoryKeyer(mem: integer): boolean; override;
-      procedure ProcessMessage(sMessage: string);
-      procedure ProcessMsg(msg: string); override;
+      procedure SetBand(band: TRadioBand; vfo: TVFO = nrVFOA); override;
+      function  ToggleBand(vfo: TVFO = nrVFOA): TRadioBand; override;
+      procedure SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA); override;
+      function  SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer; override;
+      function  MemoryKeyer(mem: integer): boolean; override;
       procedure VFOBumpDown(whichVFO: TVFO); override;
       procedure VFOBumpUp(whichVFO: TVFO); override;
+
+      // K4-specific methods
+      procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload;
+      procedure ProcessMessage(sMessage: string);
       procedure SetAIMode(i: integer);
 end;
 
@@ -112,7 +104,7 @@ begin
    Self.CWBuffer := Self.CWBuffer + cwChars;
 end;
 
-procedure TK4Radio.SetFrequencyK4(freq: longint; vfo: TVFO);
+procedure TK4Radio.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
 var sCmd: string;
 begin
    case vfo of
@@ -120,14 +112,16 @@ begin
       nrVFOB: sCmd := 'FB';
       else
          begin
-         logger.error('[SetFrequencyK4] Invalid VFO passed');
+         logger.error('[SetFrequency] Invalid VFO passed');
          Exit;
          end;
       end;
    Self.SendToRadio(Format('%2s%.11d;',[sCmd,freq]));
+   if mode <> rmNone then
+      Self.SetMode(mode, vfo);
 end;
 
-procedure TK4Radio.SetModeK4(mode:TRadioMode; vfo: TVFO);
+procedure TK4Radio.SetMode(mode:TRadioMode; vfo: TVFO = nrVFOA);
 var
    sMode: string;
    modeInt: integer;
@@ -146,13 +140,15 @@ begin
       end
    else
       begin
-      logger.error('[SetModeK4] Invalid mode passed Ordimal of mode = %d',[Ord(mode)]);
+      logger.error('[SetMode] Invalid mode passed Ordinal of mode = %d',[Ord(mode)]);
       Exit;
       end;
 end;
 
-function TK4Radio.ToggleModeK4(vfo: TVFO): TRadioMode;
+function TK4Radio.ToggleMode(vfo: TVFO): TRadioMode;
 begin
+   // TODO: Implement mode toggling for K4
+   Result := rmNone;
 end;
 
 procedure TK4Radio.SetCWSpeed(speed: integer);
@@ -246,7 +242,7 @@ begin
    Self.SetRITFreq(whichVFO, hz); // Same on K4
 end;
 
-procedure TK4Radio.SetBandK4(band: TRadioBand; vfo: TVFO);
+procedure TK4Radio.SetBand(band: TRadioBand; vfo: TVFO = nrVFOA);
 var s: string;
 begin
 
@@ -303,41 +299,51 @@ begin
       end;
 end;
 
-function  TK4Radio.ToggleBandK4(vfo: TVFO): TRadioBand;
+function  TK4Radio.ToggleBand(vfo: TVFO = nrVFOA): TRadioBand;
 var newBand: TRadioBand;
 begin
    //newBand := Self.priorBand;
    //Self.priorBand := Self.band;
-   //Self.SetBandK4(newBand, vfo);
+   //Self.SetBand(newBand, vfo);
    //Result := newBand;
-   logger.Warn('ToggleBandK4 not yet implemented');
+   logger.Warn('ToggleBand not yet implemented');
+   Result := rbNone;
 end;
 
-procedure TK4Radio.SetFilterK4(whichVFO: TVFO; filter: integer);
+procedure TK4Radio.SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA);
+var filterInt: integer;
 begin
-   if IntegerBetween(filter, 1, 5) then
-      begin
-      logger.Info('[SetFilterK4] Setting filter on VFO %s to %d',[VFOToString(whichVFO),filter]);
-      if whichVFO = nrVFOA then
-         begin
-         Self.SendToRadio(Format('FP%d;',[filter]));
-         end
-      else if whichVFO = nrVFOB then
-         begin
-         Self.SendToRadio(Format('FP$%d;',[filter]));
-         end;
+   // Convert TRadioFilter enum to K4 filter number (1-5)
+   case filter of
+      rfNarrow: filterInt := 1;
+      rfMid:    filterInt := 3;
+      rfWide:   filterInt := 5;
+   else
+      filterInt := 3;  // Default to middle filter
+   end;
 
+   if IntegerBetween(filterInt, 1, 5) then
+      begin
+      logger.Info('[SetFilter] Setting filter on VFO %s to %d',[VFOToString(vfo),filterInt]);
+      if vfo = nrVFOA then
+         begin
+         Self.SendToRadio(Format('FP%d;',[filterInt]));
+         end
+      else if vfo = nrVFOB then
+         begin
+         Self.SendToRadio(Format('FP$%d;',[filterInt]));
+         end;
       end
    else
       begin
-      logger.error('[SetFilterK4] filter out of range 1..5 - %d',[filter]);
+      logger.error('[SetFilter] filter out of range 1..5 - %d',[filterInt]);
       end;
-
 end;
 
-function  TK4Radio.SetFilterHzK4(whichVFO: TVFO; hz: integer): integer;
+function  TK4Radio.SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer;
 begin
-   logger.Warn('SetFilterHzK4 is not yet implemented on the K4');
+   logger.Warn('SetFilterHz is not yet implemented on the K4');
+   Result := 0;
 end;
 
 function TK4Radio.MemoryKeyer(mem: integer): boolean;
@@ -548,52 +554,6 @@ procedure TK4Radio.ProcessMsg(msg: string);
 begin
    // Forward to ProcessMessage to maintain compatibility
    ProcessMessage(msg);
-end;
-
-// Base class override wrappers - forward to K4-specific internal implementations
-procedure TK4Radio.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
-begin
-   Self.SetFrequencyK4(freq, vfo);  // Call K4 internal implementation
-   Self.SetModeK4(mode, vfo);        // Then set the mode
-end;
-
-procedure TK4Radio.SetMode(mode:TRadioMode);
-begin
-   Self.SetModeK4(mode, nrVFOA);  // Default to VFO A
-end;
-
-function TK4Radio.ToggleMode: TRadioMode;
-begin
-   Result := Self.ToggleModeK4(nrVFOA);  // Default to VFO A
-end;
-
-procedure TK4Radio.SetBand(vfo: TVFO; band: TRadioBand);
-begin
-   Self.SetBandK4(band, vfo);  // Call K4 internal implementation
-end;
-
-function TK4Radio.ToggleBand: TRadioBand;
-begin
-   Result := Self.ToggleBandK4(nrVFOA);  // Default to VFO A
-end;
-
-procedure TK4Radio.SetFilter(filter:TRadioFilter);
-var filterInt: integer;
-begin
-   // Convert TRadioFilter enum to K4 filter number (1-5)
-   case filter of
-      rfNarrow: filterInt := 1;
-      rfMid:    filterInt := 3;
-      rfWide:   filterInt := 5;
-   else
-      filterInt := 3;  // Default to middle filter
-   end;
-   Self.SetFilterK4(nrVFOA, filterInt);  // Default to VFO A
-end;
-
-function TK4Radio.SetFilterHz(hz: integer): integer;
-begin
-   Result := Self.SetFilterHzK4(nrVFOA, hz);  // Default to VFO A
 end;
 
 procedure TK4Radio.ProcessMessage(sMessage: string);

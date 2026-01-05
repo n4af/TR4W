@@ -81,8 +81,8 @@ type
     procedure SendCW; override;
     procedure StopCW; override;
     procedure SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode); override;
-    procedure SetMode(mode: TRadioMode); override;
-    function ToggleMode: TRadioMode; override;
+    procedure SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA); override;
+    function ToggleMode(vfo: TVFO = nrVFOA): TRadioMode; override;
     procedure SetCWSpeed(speed: integer); override;
     procedure RITClear(vfo: TVFO); override;
     procedure XITClear(vfo: TVFO); override;
@@ -95,10 +95,10 @@ type
     procedure Split(splitOn: boolean); override;
     procedure SetRITFreq(vfo: TVFO; hz: integer); override;
     procedure SetXITFreq(vfo: TVFO; hz: integer); override;
-    procedure SetBand(vfo: TVFO; band: TRadioBand); override;
-    function ToggleBand: TRadioBand; override;
-    procedure SetFilter(filter: TRadioFilter); override;
-    function SetFilterHz(hz: integer): integer; override;
+    procedure SetBand(band: TRadioBand; vfo: TVFO = nrVFOA); override;
+    function ToggleBand(vfo: TVFO = nrVFOA): TRadioBand; override;
+    procedure SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA); override;
+    function SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer; override;
     function MemoryKeyer(mem: integer): boolean; override;
     procedure VFOBumpDown(whichVFO: TVFO); override;
     procedure VFOBumpUp(whichVFO: TVFO); override;
@@ -565,7 +565,7 @@ begin
     Self.vfo[vfo].frequency := freq;
 end;
 
-procedure THamLibDirect.SetMode(mode: TRadioMode);
+procedure THamLibDirect.SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA);
 var
   err: Integer;
   hlMode: rmode_t;
@@ -573,7 +573,7 @@ begin
   if FRig = nil then Exit;
 
   hlMode := TR4WModeToHamLibMode(mode);
-  logger.Debug('[THamLibDirect.SetMode] Setting mode to %s', [ModeToString(mode)]);
+  logger.Debug('[THamLibDirect.SetMode] Setting mode to %s on VFO %s', [ModeToString(mode), VFOToString(vfo)]);
 
   err := rig_set_mode(FRig, RIG_VFO_CURR, hlMode, RIG_PASSBAND_NORMAL);
   if err <> RIG_OK then
@@ -582,9 +582,9 @@ begin
     Self.localMode := mode;
 end;
 
-function THamLibDirect.ToggleMode: TRadioMode;
+function THamLibDirect.ToggleMode(vfo: TVFO = nrVFOA): TRadioMode;
 begin
-  logger.Warn('[THamLibDirect.ToggleMode] Not implemented');
+  logger.Warn('[THamLibDirect.ToggleMode] Not implemented for VFO %s', [VFOToString(vfo)]);
   Result := rmUSB;
 end;
 
@@ -736,7 +736,7 @@ begin
     Self.vfo[vfo].XITOffset := hz;
 end;
 
-procedure THamLibDirect.SetBand(vfo: TVFO; band: TRadioBand);
+procedure THamLibDirect.SetBand(band: TRadioBand; vfo: TVFO = nrVFOA);
 begin
   logger.Debug('[THamLibDirect.SetBand] Band selection on %s: %d',
                [VFOToString(vfo), Ord(band)]);
@@ -744,21 +744,21 @@ begin
   // Implementation depends on radio capabilities
 end;
 
-function THamLibDirect.ToggleBand: TRadioBand;
+function THamLibDirect.ToggleBand(vfo: TVFO = nrVFOA): TRadioBand;
 begin
-  logger.Debug('[THamLibDirect.ToggleBand] Not implemented');
+  logger.Debug('[THamLibDirect.ToggleBand] Not implemented for VFO %s', [VFOToString(vfo)]);
   Result := rbNone;
 end;
 
-procedure THamLibDirect.SetFilter(filter: TRadioFilter);
+procedure THamLibDirect.SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA);
 begin
-  logger.Debug('[THamLibDirect.SetFilter] Filter: %d', [Ord(filter)]);
+  logger.Debug('[THamLibDirect.SetFilter] Filter on VFO %s: %d', [VFOToString(vfo), Ord(filter)]);
   // Filter setting via rig_set_mode with specific passband width
 end;
 
-function THamLibDirect.SetFilterHz(hz: integer): integer;
+function THamLibDirect.SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer;
 begin
-  logger.Debug('[THamLibDirect.SetFilterHz] %d Hz', [hz]);
+  logger.Debug('[THamLibDirect.SetFilterHz] %d Hz on VFO %s', [hz, VFOToString(vfo)]);
   // Set passband via rig_set_mode with specific width
   Result := hz;
 end;
