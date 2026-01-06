@@ -64,6 +64,7 @@ Type TReadingThread = class(TThread)
     radioWasDisconnected: boolean;
     constructor Create(AConn: TIdTCPConnection; proc: TProcessMsgRef; ASocketLock: TCriticalSection; ADisconnecting: PBoolean); reintroduce; overload;
     constructor Create(ASerialPort: TSerialPort; proc: TProcessMsgRef; ASocketLock: TCriticalSection; ADisconnecting: PBoolean); reintroduce; overload;
+    procedure ClearSerialBuffer;  // Clear accumulated serial buffer data
   end;
 
 //tr4w_ClassName                        : array[0..4] of Char = ('T', 'R', '4', 'W', #0);
@@ -74,6 +75,9 @@ const
    RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
    RECONNECT_MAX_DELAY = 30000;       // 30 seconds max delay
    RECONNECT_BACKOFF_MULTIPLIER = 2;  // Double delay each retry
+
+   // Serial disconnect detection
+   SERIAL_RESPONSE_TIMEOUT = 5.0;     // 5 seconds - consider disconnected if no valid response
 {var
    logger: TLogLogger;
    appender: TLogFileAppender;
@@ -95,6 +99,7 @@ Type TNetRadioBase = class(TObject)
       rt: TReadingThread;
       baseProcMsg: TProcessMsgRef;
       SocketLock: TCriticalSection;
+      FLastValidResponse: TDateTime;  // Track last valid response for timeout detection
 
       function GetRadioPort: integer;
       procedure SetRadioPort(Value: Integer);
@@ -156,6 +161,11 @@ Type TNetRadioBase = class(TObject)
       serialStopBits: Byte;
       serialParity: Byte;
 
+      // Polling configuration
+      requiresPolling: Boolean;        // True for most radios, False for K4 with AI5
+      autoUpdateCommand: string;       // Command to enable push updates (e.g., 'AI5;')
+      pollingInterval: Integer;        // Milliseconds between polls (default 100)
+
       constructor Create(ProcRef: TProcessMsgRef); overload;
       constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
       Destructor Destroy; overload; Virtual;
@@ -171,6 +181,7 @@ Type TNetRadioBase = class(TObject)
       function Connect: integer; overload; virtual;
       function Connect (address: string; port: integer): integer; overload;
       function VFOToString(whichVFO: TVFO): string;
+      procedure UpdateLastValidResponse;  // Call when valid radio response received
 
       procedure Disconnect; overload; virtual;
       property IsTransmitting: boolean read GetIsTransmitting;
@@ -192,6 +203,17 @@ Type TNetRadioBase = class(TObject)
 
 
    published
+
+      // Polling interface - radios override to send appropriate query commands
+      procedure QueryVFOAFrequency; Virtual;     // Query VFO A frequency
+      procedure QueryVFOBFrequency; Virtual;     // Query VFO B frequency
+      procedure QueryMode; Virtual;              // Query current mode
+      procedure QueryTXStatus; Virtual;          // Query TX/RX status
+      procedure QueryRITState; Virtual;          // Query RIT on/off and value
+      procedure QueryXITState; Virtual;          // Query XIT on/off and value
+      procedure QueryBand; Virtual;              // Query current band
+      procedure QuerySplitState; Virtual;        // Query split on/off
+      procedure PollRadioState; Virtual;         // Main polling method - calls Query* methods
 
       procedure ProcessMsg(msg: string); Virtual; Abstract;
       procedure Transmit; Virtual; Abstract;
@@ -268,8 +290,14 @@ begin
    serialStopBits := 1;
    serialParity := 0;  // No parity
 
+   // Default polling settings (radios override as needed)
+   requiresPolling := True;        // Most radios need polling
+   autoUpdateCommand := '';        // No auto-update by default
+   pollingInterval := 100;         // 100ms default poll interval
+
    SocketLock := TCriticalSection.Create;
    Disconnecting := False;
+   FLastValidResponse := Now;  // Initialize to current time
 end;
 
 {Constructor TNetRadioBase.Create(ProcRef: TProcessMsgRef);
@@ -283,6 +311,60 @@ begin
    Self.radioAddress := address;
    Self.radioPort := port;
    Self.Create(ProcRef);
+end;
+
+// Default polling method implementations - radios override as needed
+procedure TNetRadioBase.QueryVFOAFrequency;
+begin
+  // Default: do nothing - radio classes override
+end;
+
+procedure TNetRadioBase.QueryVFOBFrequency;
+begin
+  // Default: do nothing - radio classes override
+end;
+
+procedure TNetRadioBase.QueryMode;
+begin
+  // Default: do nothing - radio classes override
+end;
+
+procedure TNetRadioBase.QueryTXStatus;
+begin
+  // Default: do nothing - radio classes override
+end;
+
+procedure TNetRadioBase.QueryRITState;
+begin
+  // Default: do nothing - radio classes override
+end;
+
+procedure TNetRadioBase.QueryXITState;
+begin
+  // Default: do nothing - radio classes override
+end;
+
+procedure TNetRadioBase.QueryBand;
+begin
+  // Default: do nothing - radio classes override
+end;
+
+procedure TNetRadioBase.QuerySplitState;
+begin
+  // Default: do nothing - radio classes override
+end;
+
+procedure TNetRadioBase.PollRadioState;
+begin
+  // Default implementation - query all radio state
+  QueryVFOAFrequency;
+  QueryVFOBFrequency;
+  QueryMode;
+  QueryTXStatus;
+  QueryRITState;
+  QueryXITState;
+  QueryBand;
+  QuerySplitState;
 end;
 
 Destructor TNetRadioBase.Destroy;
@@ -449,7 +531,18 @@ begin
          if serialPortObj = nil then
             serialPortObj := TSerialPort.Create(comPortName);
 
-         // Close if already open (for reconnection)
+         // For serial ports: if already open with reading thread, don't close/reopen
+         // This prevents race conditions during reconnection attempts
+         if serialPortObj.IsOpen and (rt <> nil) then
+            begin
+            logger.Debug('[TNetRadioBase.Connect] Serial port already open with reading thread, keeping connection alive');
+            // Clear any accumulated garbage from the buffer
+            rt.ClearSerialBuffer;
+            Result := 0;
+            Exit;
+            end;
+
+         // Close if already open (for initial setup or error recovery)
          if serialPortObj.IsOpen then
             begin
             logger.Debug('[TNetRadioBase.Connect] Serial port already open, closing first');
@@ -470,9 +563,7 @@ begin
             rt := TReadingThread.Create(serialPortObj, baseProcMsg, SocketLock, @Disconnecting);
             rt.readTerminator := Self.readTerminator;
             logger.Info('[TNetRadioBase.Connect] Created serial reading thread');
-            end
-         else
-            logger.Info('[TNetRadioBase.Connect] Reading thread already exists');
+            end;
 
          Result := 0;
       except
@@ -581,6 +672,12 @@ begin
       end;
 end;
 
+procedure TNetRadioBase.UpdateLastValidResponse;
+begin
+   FLastValidResponse := Now;
+   logger.Trace('[UpdateLastValidResponse] Updated last valid response timestamp');
+end;
+
 procedure TNetRadioBase.SendToRadio(s: string);
 var nLen: integer;
 begin
@@ -674,7 +771,18 @@ begin
    if (Self.serialPort <> NoPort) and Assigned(serialPortObj) then
       begin
       try
-         Result := serialPortObj.IsOpen;
+         // For serial, port being "open" isn't enough - radio might be powered off
+         // Check if we've received valid responses recently
+         if not serialPortObj.IsOpen then
+            Result := false
+         else if (Now - FLastValidResponse) * 86400 > SERIAL_RESPONSE_TIMEOUT then
+            begin
+            logger.Info('[GetIsConnected] Serial radio not responding (%.1f seconds since last valid response)',
+                        [(Now - FLastValidResponse) * 86400]);
+            Result := false;
+            end
+         else
+            Result := true;
       except
          on E: Exception do
             begin
@@ -852,15 +960,18 @@ begin
 
                         if Length(completeCmd) > 0 then
                            begin
-                           logger.trace('[TNetRadioBase.TReadingThread.Execute] Processing command: (%s)',[completeCmd]);
-                           try
-                              Self.msgHandler(completeCmd);
-                           except
-                              on E: Exception do
-                                 begin
-                                 logger.Error('[TNetRadioBase.TReadingThread] Exception in message handler: %s - %s', [E.ClassName, E.Message]);
-                                 end;
-                           end;
+                           logger.trace('[TNetRadioBase.TReadingThread.Execute] Processing command: Hex:[%s]',[String2Hex(completeCmd)]);
+                           if Assigned(Self.msgHandler) then
+                              begin
+                              try
+                                 Self.msgHandler(completeCmd);
+                              except
+                                 on E: Exception do
+                                    begin
+                                    logger.Error('[TNetRadioBase.TReadingThread] Exception in message handler: %s - %s', [E.ClassName, E.Message]);
+                                    end;
+                              end;
+                              end;
                            end;
                         end;
                      end
@@ -975,6 +1086,12 @@ procedure TReadingThread.DoTerminate;
 begin
   logger.debug('DEBUG: TReadingThread.DoTerminate');
   inherited;
+end;
+
+procedure TReadingThread.ClearSerialBuffer;
+begin
+  FSerialBuffer := '';
+  logger.Info('[TReadingThread.ClearSerialBuffer] Serial buffer cleared');
 end;
 
 function BoolToString(b: boolean): string;

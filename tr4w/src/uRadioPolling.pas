@@ -720,6 +720,10 @@ procedure pNetworkRadio(rig: RadioPtr); // Network classes (K4 network, Flex 600
 var
    ro: TNetRadioBase;
    wasConnected: Boolean;
+   reconnectDelay: Integer;
+const
+   RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
+   RECONNECT_MAX_DELAY = 30000;       // 30 seconds max delay
 begin
 
    { Unlike the other polling procedures, all we have to do here is grab the
@@ -733,6 +737,7 @@ begin
    logger.Trace('[pNetworkRadio] Entering polling procedure');
    ro := rig^.tNetObject;
    wasConnected := False;
+   reconnectDelay := RECONNECT_INITIAL_DELAY;
 
    // Keep polling thread alive - will automatically resume when radio reconnects
    while True do
@@ -745,6 +750,7 @@ begin
             begin
             logger.Info('[pNetworkRadio] Radio connected, resuming polling');
             wasConnected := True;
+            reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
             end;
 
          Sleep(FreqPollRate);
@@ -753,6 +759,11 @@ begin
          if Assigned(ro) and (ro is THamLibDirect) then
             begin
             THamLibDirect(ro).SendPollRequests;
+            end
+         // For radios that require active polling (Icom, etc.), call PollRadioState
+         else if Assigned(ro) and ro.requiresPolling then
+            begin
+            ro.PollRadioState;
             end;
 
          rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
@@ -788,22 +799,37 @@ begin
          // Radio disconnected - attempt reconnection
          if wasConnected then
             begin
-            logger.Info('[pNetworkRadio] Radio disconnected, attempting reconnection');
+            logger.Info('[pNetworkRadio] Radio disconnected, will attempt reconnection');
             wasConnected := False;
             firstProcessMessage := true;
             rig.CurrentStatus.VFO[VFOA].Frequency := 0;
             rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+            reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on new disconnect
             end;
 
-         // Attempt to reconnect
-         Sleep(2000);  // Wait 2 seconds before reconnection attempt
+         // Attempt to reconnect with exponential backoff
+         Sleep(reconnectDelay);
          try
-            logger.Info('[pNetworkRadio] Calling Connect to reconnect radio');
+            logger.Info('[pNetworkRadio] Reconnection attempt (delay: %dms)', [reconnectDelay]);
             ro.Connect;
+
+            // For radios that require polling, send queries even when disconnected
+            // This "wakes up" radios like Icom that don't send unsolicited messages on power-up
+            if Assigned(ro) and ro.requiresPolling then
+               begin
+               logger.Debug('[pNetworkRadio] Sending poll queries to wake up radio');
+               ro.PollRadioState;
+               end;
+
+            // If Connect succeeds and radio responds, IsConnected will be true on next iteration
          except
             on E: Exception do
                begin
-               logger.Debug('[pNetworkRadio] Reconnection attempt failed: %s - %s', [E.ClassName, E.Message]);
+               logger.Debug('[pNetworkRadio] Reconnection failed: %s - %s', [E.ClassName, E.Message]);
+               // Exponential backoff: double the delay, cap at max
+               reconnectDelay := reconnectDelay * 2;
+               if reconnectDelay > RECONNECT_MAX_DELAY then
+                  reconnectDelay := RECONNECT_MAX_DELAY;
                end;
          end;
          end;
