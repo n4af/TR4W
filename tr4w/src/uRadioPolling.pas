@@ -751,6 +751,13 @@ begin
             logger.Info('[pNetworkRadio] Radio connected, resuming polling');
             wasConnected := True;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
+
+            // Send immediate poll on connection to wake up radio and get initial state
+            if Assigned(ro) and ro.requiresPolling then
+               begin
+               logger.Debug('[pNetworkRadio] Sending initial poll queries on connection');
+               ro.PollRadioState;
+               end;
             end;
 
          Sleep(FreqPollRate);
