@@ -113,10 +113,17 @@ uses
   uGridLookup in 'src\uGridLookup.pas',
   Log4D in 'src\Log4D.pas',
   uNetRadioBase in 'src\uNetRadioBase.pas',
+  uSerialPort in 'src\uSerialPort.pas',
+  uRadioFactory in 'src\uRadioFactory.pas',
   uRadioElecraftK4 in 'src\uRadioElecraftK4.pas',
+  uRadioIcomBase in 'src\uRadioIcomBase.pas',
+  uRadioIcom9700 in 'src\uRadioIcom9700.pas',
+  uRadioIcom7610 in 'src\uRadioIcom7610.pas',
+  uRadioIcom7300 in 'src\uRadioIcom7300.pas',
   GetWinVersionInfo in 'src\GetWinVersionInfo.pas',
   uSuperCheckPartialFileUpload,
   uRadioHamLib in 'src\uRadioHamLib.pas',
+  uRadioHamLibDirect in 'src\uRadioHamLibDirect.pas',
   uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
   uExternalLogger in 'src\uExternalLogger.pas';
 

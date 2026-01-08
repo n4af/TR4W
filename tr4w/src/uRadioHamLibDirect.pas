@@ -870,7 +870,7 @@ begin
 end;
 
 initialization
-  logger := TLogLogger.GetLogger('uRadioHamLibDirect');
+  logger := TLogLogger.GetLogger('TR4WDebugLog');
   logger.Info('HamLib Direct radio module initialized');
 
 finalization

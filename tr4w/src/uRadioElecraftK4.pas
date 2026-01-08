@@ -64,6 +64,11 @@ Uses MainUnit;
 Constructor TK4Radio.Create;
 begin
    inherited Create(ProcessMessage);
+
+   // K4 supports auto-info mode - no polling needed
+   requiresPolling := False;
+   autoUpdateCommand := 'AI5;';     // Enable auto-info mode level 5
+   pollingInterval := 0;            // Not used for K4
 end;
 
 function TK4Radio.Connect: integer;
@@ -95,6 +100,13 @@ end;
 procedure TK4Radio.SendCW;
 var s: string;
 begin
+   if Self.CWBuffer = '' then
+      begin
+      logger.Warn('[K4Radio.SendCW] CW buffer is empty - nothing to send');
+      Exit;
+      end;
+
+   logger.Info('[K4Radio.SendCW] Sending CW: "%s"', [Self.CWBuffer]);
    Self.SendToRadio('KY ' + Self.CWBuffer + ';');
    Self.CWBuffer := '';
 end;
@@ -102,6 +114,7 @@ end;
 procedure TK4Radio.BufferCW(cwChars: string);
 begin
    Self.CWBuffer := Self.CWBuffer + cwChars;
+   logger.Info('[K4Radio.BufferCW] Buffered: "%s", Total buffer: "%s"', [cwChars, Self.CWBuffer]);
 end;
 
 procedure TK4Radio.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
@@ -733,6 +746,7 @@ var
    iBand: integer;
 begin
    iBand := StrToIntDef(sBand,-9);
+   logger.debug('[BandNumToBand] Converting band string "%s" to iBand=%d', [sBand, iBand]);
    case iBand of
       0: Result := rb160m;
       1: Result := rb80m;
@@ -746,10 +760,16 @@ begin
       9: Result := rb10m;
       10:Result := rb6m;
       -9:begin
-         logger.Error('[BandNumToBand] Invalid band requested %s',[sBand]);
+         logger.Error('[BandNumToBand] Invalid band requested (non-numeric): %s',[sBand]);
          Result := rbNone;
          end;
+   else
+      begin
+      logger.Error('[BandNumToBand] Unhandled band value: %d (from string: %s)',[iBand, sBand]);
+      Result := rbNone;
+      end;
    end;
+   logger.debug('[BandNumToBand] Result band = %d', [Ord(Result)]);
 end;
 
 procedure TK4Radio.SetAIMode(i: integer);

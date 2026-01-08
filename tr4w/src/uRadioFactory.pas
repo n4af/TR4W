@@ -25,6 +25,7 @@ type
       rmYaesuFT991,
       rmIcomIC7610,
       rmIcomIC7300,
+      rmIcomIC9700,
       rmFlexRadio6000,
       rmHamLibDirect
    );
@@ -32,9 +33,8 @@ type
    TConnectionType = (ctNetwork, ctSerial);
 
    TRadioFactory = class
-   private
-      class function ModelToString(model: TRadioModel): string;
    public
+      class function ModelToString(model: TRadioModel): string;
       // Network connection
       class function CreateRadioNetwork(model: TRadioModel;
                                          address: string;
@@ -56,7 +56,7 @@ type
 
 implementation
 
-uses Log4D, uRadioHamLibDirect;
+uses Log4D, uRadioHamLibDirect, uRadioIcomBase, uRadioIcom7300, uRadioIcom7610, uRadioIcom9700;
 
 var
    logger: TLogLogger;
@@ -98,12 +98,29 @@ begin
 
       rmIcomIC7610:
          begin
-         raise ERadioFactoryException.Create('Icom IC-7610 not yet implemented');
+         Result := TIcom7610Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         Result.radioModel := 'Icom IC-7610';
+         logger.Info('[RadioFactory] Created Icom IC-7610 instance');
          end;
 
       rmIcomIC7300:
          begin
-         raise ERadioFactoryException.Create('Icom IC-7300 not yet implemented');
+         Result := TIcom7300Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         Result.radioModel := 'Icom IC-7300';
+         logger.Info('[RadioFactory] Created Icom IC-7300 instance');
+         end;
+
+      rmIcomIC9700:
+         begin
+         Result := TIcom9700Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         Result.radioModel := 'Icom IC-9700';
+         logger.Info('[RadioFactory] Created Icom IC-9700 instance');
          end;
 
       rmFlexRadio6000:
@@ -172,12 +189,38 @@ begin
 
       rmIcomIC7610:
          begin
-         raise ERadioFactoryException.Create('Icom IC-7610 serial not yet implemented');
+         Result := TIcom7610Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.radioModel := 'Icom IC-7610 (Serial)';
+         logger.Info('[RadioFactory] Created Icom IC-7610 instance for serial connection');
          end;
 
       rmIcomIC7300:
          begin
-         raise ERadioFactoryException.Create('Icom IC-7300 serial not yet implemented');
+         Result := TIcom7300Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.radioModel := 'Icom IC-7300 (Serial)';
+         logger.Info('[RadioFactory] Created Icom IC-7300 instance for serial connection');
+         end;
+
+      rmIcomIC9700:
+         begin
+         Result := TIcom9700Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.radioModel := 'Icom IC-9700 (Serial)';
+         logger.Info('[RadioFactory] Created Icom IC-9700 instance for serial connection');
          end;
 
       rmFlexRadio6000:
@@ -210,6 +253,7 @@ begin
       rmYaesuFT991:     Result := 'Yaesu FT-991';
       rmIcomIC7610:     Result := 'Icom IC-7610';
       rmIcomIC7300:     Result := 'Icom IC-7300';
+      rmIcomIC9700:     Result := 'Icom IC-9700';
       rmFlexRadio6000:  Result := 'FlexRadio 6000';
       rmHamLibDirect:   Result := 'HamLib Direct (DLL)';
    else
@@ -221,19 +265,24 @@ class function TRadioFactory.GetSupportedModels: string;
 begin
    Result := 'Supported radio models:'#13#10 +
              '  - Elecraft K4 (implemented)'#13#10 +
+             '  - Icom IC-7610 (implemented)'#13#10 +
+             '  - Icom IC-7300 (implemented)'#13#10 +
+             '  - Icom IC-9700 (implemented)'#13#10 +
              '  - HamLib Direct via DLL (implemented)'#13#10 +
              '  - Elecraft K3 (planned)'#13#10 +
              '  - Yaesu FTdx101 (planned)'#13#10 +
              '  - Yaesu FT-991 (planned)'#13#10 +
-             '  - Icom IC-7610 (planned)'#13#10 +
-             '  - Icom IC-7300 (planned)'#13#10 +
              '  - FlexRadio 6000 (planned)';
 end;
 
 class function TRadioFactory.IsModelSupported(model: TRadioModel): boolean;
 begin
-   // Currently K4 and HamLib Direct (DLL) are fully implemented
-   Result := (model = rmElecraftK4) or (model = rmHamLibDirect);
+   // Currently K4, Icom radios (7610/7300/9700), and HamLib Direct (DLL) are fully implemented
+   Result := (model = rmElecraftK4) or
+             (model = rmIcomIC7610) or
+             (model = rmIcomIC7300) or
+             (model = rmIcomIC9700) or
+             (model = rmHamLibDirect);
 end;
 
 initialization

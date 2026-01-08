@@ -1619,7 +1619,8 @@ begin
       end
    else
       begin
-      logger.Error('In F_UpdateExternalLoggerEnabled, externalLogger variable was not assigned');
+      if Assigned(logger) then
+         logger.Error('In F_UpdateExternalLoggerEnabled, externalLogger variable was not assigned');
       end;
       }
 end;
@@ -1640,7 +1641,8 @@ begin
       end
    else
       begin
-      logger.Error('In F_UpdateWSJTXEnabled, wsjtx variable was not assigned');
+      if Assigned(logger) then
+         logger.Error('In F_UpdateWSJTXEnabled, wsjtx variable was not assigned');
       end;
 end;
 
@@ -1653,7 +1655,8 @@ begin
       end
    else
       begin
-      logger.Error('In F_UpdateWSJTXSendColorizations, wsjtx variable was not assigned');
+      if Assigned(logger) then
+         logger.Error('In F_UpdateWSJTXSendColorizations, wsjtx variable was not assigned');
       end;
 end;
 

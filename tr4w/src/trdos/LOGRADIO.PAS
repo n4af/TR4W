@@ -294,6 +294,7 @@ type
       procedure SendCW(Msg: Str160);
       procedure SetUpRadioInterface;
       function DetermineNetworkRadioModel: TRadioModel;
+      function MapRadioModelToFactory: TRadioModel;
       procedure StopSendingCW;
       //    procedure StartNextPoll;
       //    function TimeToGiveUp: boolean;
@@ -2703,6 +2704,25 @@ begin
    end;
 end;
 //------------------------------------------------------------------------------
+function RadioObject.MapRadioModelToFactory: TRadioModel;
+begin
+   // Maps InterfacedRadioType to TRadioModel for factory pattern
+   Result := rmNone;
+
+   case Self.RadioModel of
+      K4:
+         Result := rmElecraftK4;
+      IC7610:
+         Result := rmIcomIC7610;
+      IC7300:
+         Result := rmIcomIC7300;
+      IC9700:
+         Result := rmIcomIC9700;
+   else
+      Result := rmNone;
+   end;
+end;
+//------------------------------------------------------------------------------
 procedure RadioObject.SetUpRadioInterface;
 var
    hand: HWND;
@@ -2710,6 +2730,7 @@ var
    dwFlagsAndAttributes: DWORD;
    EvtChar: char;
    networkRadioModel: TRadioModel;
+   factoryModel: TRadioModel;
 begin
    // Check if we should use HamLib Direct (works with both serial and network)
    if Self.UseHamLib then
@@ -2766,32 +2787,39 @@ begin
    end
    else if tCATPortType in [Serial1..Serial20] then
       begin
-      // Check if we should use modern radio class (e.g., K4) or legacy serial code
-      if (Self.RadioModel = K4) then
+      // Check if we should use modern radio class (e.g., K4, Icom) or legacy serial code
+      if (Self.RadioModel in [K4, IC7610, IC7300, IC9700]) then
          begin
-         // Use K4Radio class via factory for serial connection
-         logger.Info('[%s.SetUpRadioInterface] Setting up K4 serial via factory: Port=%d, Baud=%d, DataBits=%d, Parity=%d, StopBits=%d',
-                     [Self.RadioName, Ord(tCATPortType), RadioBaudRate, RadioNumberBits,
-                      Ord(RadioParity), RadioStopBits]);
-         Self.tNetObject := TRadioFactory.CreateRadioSerial(
-            rmElecraftK4,
-            tCATPortType,
-            RadioBaudRate,
-            RadioNumberBits,
-            RadioStopBits,
-            Ord(RadioParity),
-            nil
-         );
-         if Self.tNetObject <> nil then
-            begin
-            Self.tNetObject.Connect;
-            logger.Info('[%s.SetUpRadioInterface] K4 serial radio connected via factory', [Self.RadioName]);
-            end
-         else
-            logger.Error('[%s.SetUpRadioInterface] Failed to create K4 serial radio', [Self.RadioName]);
+         factoryModel := Self.MapRadioModelToFactory;
 
-         // Exit to prevent any legacy serial code from executing
-         Exit;
+         if factoryModel <> rmNone then
+            begin
+            // Use factory for modern radios (K4, Icom, etc.)
+            logger.Info('[%s.SetUpRadioInterface] Setting up %s serial via factory: Port=%d, Baud=%d, DataBits=%d, Parity=%d, StopBits=%d',
+                        [Self.RadioName, TRadioFactory.ModelToString(factoryModel), Ord(tCATPortType),
+                         RadioBaudRate, RadioNumberBits, Ord(RadioParity), RadioStopBits]);
+            Self.tNetObject := TRadioFactory.CreateRadioSerial(
+               factoryModel,
+               tCATPortType,
+               RadioBaudRate,
+               RadioNumberBits,
+               RadioStopBits,
+               Ord(RadioParity),
+               nil
+            );
+            if Self.tNetObject <> nil then
+               begin
+               Self.tNetObject.Connect;
+               logger.Info('[%s.SetUpRadioInterface] %s serial radio connected via factory',
+                          [Self.RadioName, TRadioFactory.ModelToString(factoryModel)]);
+               end
+            else
+               logger.Error('[%s.SetUpRadioInterface] Failed to create %s serial radio',
+                           [Self.RadioName, TRadioFactory.ModelToString(factoryModel)]);
+
+            // Exit to prevent any legacy serial code from executing
+            Exit;
+            end;
          end
       else
          begin
@@ -2872,34 +2900,27 @@ begin
       end
    else if tCATPortType = Network then
       begin
-      // Non-HamLib network radio (e.g., K4 with native network protocol)
+      // Non-HamLib network radio (e.g., K4, Icom with native network protocol)
       logger.Info('[%s.SetUpRadioInterface] Setting up non-HamLib network radio: IP=%s, Port=%d',
                   [Self.RadioName, Self.IPAddress, Self.RadioTCPPort]);
 
       // Determine which network radio model to use
-      case Self.RadioModel of
-         K4:
-            begin
-            Self.tNetObject := TRadioFactory.CreateRadioNetwork(
-               rmElecraftK4,
-               Self.IPAddress,
-               Self.RadioTCPPort,
-               nil
-            );
-            logger.Info('[%s] Using Elecraft K4 network protocol', [Self.RadioName]);
-            end;
-         // Future: K3, IC7610, etc.
-      else
+      factoryModel := Self.MapRadioModelToFactory;
+      if factoryModel <> rmNone then
          begin
-         logger.warn('[%s] Unknown network radio model, defaulting to K4', [Self.RadioName]);
          Self.tNetObject := TRadioFactory.CreateRadioNetwork(
-            rmElecraftK4,
+            factoryModel,
             Self.IPAddress,
             Self.RadioTCPPort,
             nil
          );
+         logger.Info('[%s] Using %s network protocol', [Self.RadioName, TRadioFactory.ModelToString(factoryModel)]);
+         end
+      else
+         begin
+         logger.warn('[%s] Unknown network radio model (RadioModel=%d), cannot create factory instance',
+                    [Self.RadioName, Ord(Self.RadioModel)]);
          end;
-      end;
 
       if Self.tNetObject <> nil then
       begin
