@@ -58,3 +58,9 @@ tr4w/tr4w.log
 *.RST
 *.TRW
 *.LOG
+
+# Build output text files
+tr4w/build_*.txt
+tr4w/COMPILATION_RESULTS.txt
+tr4w/compile_*.txt
+tr4w/tr4w.log.*
