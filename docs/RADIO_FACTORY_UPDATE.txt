@@ -1,0 +1,343 @@
+================================================================================
+Radio Factory Update - HamLib Direct Support Added
+================================================================================
+
+Date: 2026-01-04
+Build: SUCCESSFUL
+TR4W.EXE: 1,640,448 bytes (compiled 20:47:07)
+
+================================================================================
+CHANGES MADE TO uRadioFactory.pas
+================================================================================
+
+1. ADDED UNIT REFERENCE
+   Line 17: uses uRadioHamLibDirect
+
+2. ADDED NEW RADIO MODEL ENUMERATION
+   Line 30: rmHamLibDirect
+
+   Complete TRadioModel enumeration now includes:
+   - rmNone
+   - rmElecraftK4
+   - rmElecraftK3 (planned)
+   - rmYaesuFTdx101 (planned)
+   - rmYaesuFT991 (planned)
+   - rmIcomIC7610 (planned)
+   - rmIcomIC7300 (planned)
+   - rmFlexRadio6000 (planned)
+   - rmHamLibGeneric (rigctld mode)
+   - rmHamLibDirect (NEW - direct DLL mode)
+
+3. ADDED CREATERADIO CASE
+   Lines 114-123:
+
+   rmHamLibDirect:
+      Result := THamLibDirect.Create(msgCallback);
+      Result.radioAddress := address;
+      Result.radioPort := port;
+      Result.radioModel := 'HamLib Direct';
+      logger.Info('[RadioFactory] Created HamLib Direct instance');
+      logger.Info('[RadioFactory] Direct DLL mode - no rigctld process needed');
+      logger.Info('[RadioFactory] Remember to set HamLibModelID and serial port');
+
+4. UPDATED ModelToString()
+   Line 144: rmHamLibDirect → 'HamLib Direct (DLL)'
+   Line 143: rmHamLibGeneric → 'HamLib Generic (rigctld)' [updated for clarity]
+
+5. UPDATED GetSupportedModels()
+   Added line 155: '  - HamLib Direct via DLL (implemented - NEW!)'
+
+6. UPDATED IsModelSupported()
+   Line 167: Added (model = rmHamLibDirect) to supported models check
+
+   Now returns true for:
+   - rmElecraftK4
+   - rmHamLibGeneric
+   - rmHamLibDirect
+
+================================================================================
+USAGE EXAMPLES
+================================================================================
+
+BASIC USAGE - Create via Factory:
+-----------------------------------
+
+uses uRadioFactory, uHamLibDirect;
+
+var
+  radio: TNetRadioBase;
+begin
+  // Create HamLib Direct radio instance
+  radio := TRadioFactory.CreateRadio(
+    rmHamLibDirect,
+    '',      // address (not used for serial)
+    0,       // port (not used for serial)
+    @MyProcessMsgCallback
+  );
+
+  // Must cast to THamLibDirect to access specific properties
+  if radio is THamLibDirect then
+  begin
+    with THamLibDirect(radio) do
+    begin
+      // Configure for Elecraft K4
+      HamLibModelID := RIG_MODEL_K4;
+      COMPortName := 'COM3';
+      BaudRate := 38400;
+
+      // Connect
+      if Connect = RIG_OK then
+      begin
+        ShowMessage('Connected to K4!');
+
+        // Use standard TNetRadioBase interface
+        SetFrequency(14074000, nrVFOA, rmUSB);
+        SetMode(rmUSB);
+
+        // Poll radio status
+        SendPollRequests;
+
+        Disconnect;
+      end;
+    end;
+  end;
+
+  radio.Free;
+end;
+
+
+ADVANCED USAGE - Direct Instantiation:
+---------------------------------------
+
+uses uRadioHamLibDirect, uHamLibDirect;
+
+var
+  k4Radio: THamLibDirect;
+begin
+  k4Radio := THamLibDirect.Create(@MyProcessMsgCallback);
+  try
+    // Configure for Elecraft K4
+    k4Radio.HamLibModelID := RIG_MODEL_K4;
+    k4Radio.COMPortName := 'COM3';
+    k4Radio.BaudRate := 38400;
+    k4Radio.radioModel := 'My K4';
+
+    // Connect
+    if k4Radio.Connect = RIG_OK then
+    begin
+      // Direct access to all methods
+      k4Radio.SetFrequency(14074000, nrVFOA, rmUSB);
+      k4Radio.Split(True);
+      k4Radio.SetRITFreq(nrVFOA, 100);
+
+      // Access properties
+      freq := k4Radio.frequency[nrVFOA];
+      mode := k4Radio.mode[nrVFOA];
+
+      k4Radio.Disconnect;
+    end;
+  finally
+    k4Radio.Free;
+  end;
+end;
+
+
+NETWORK CONNECTION (for network-enabled radios):
+-------------------------------------------------
+
+var
+  radio: THamLibDirect;
+begin
+  radio := THamLibDirect.Create(@MyProcessMsgCallback);
+  try
+    radio.HamLibModelID := RIG_MODEL_IC7300;
+    radio.UseIPAddress := True;
+    radio.IPAddress := '192.168.1.100';
+    radio.IPPort := 4532;
+
+    if radio.Connect = RIG_OK then
+    begin
+      // Use radio via network
+      radio.SetFrequency(7074000, nrVFOA, rmUSB);
+      radio.Disconnect;
+    end;
+  finally
+    radio.Free;
+  end;
+end;
+
+
+SUPPORTED HAMLIB MODEL IDS:
+----------------------------
+
+From uHamLibDirect.pas constants:
+
+RIG_MODEL_NONE        = 0
+RIG_MODEL_DUMMY       = 1
+RIG_MODEL_NETRIGCTL   = 2
+
+// Elecraft
+RIG_MODEL_K3          = 2029
+RIG_MODEL_K4          = 2039  // Elecraft K4
+
+// Yaesu
+RIG_MODEL_FT991       = 1035
+RIG_MODEL_FTDX101D    = 1043
+RIG_MODEL_FTDX101MP   = 1044
+
+// Icom
+RIG_MODEL_IC7300      = 3073
+RIG_MODEL_IC7610      = 3079
+RIG_MODEL_IC9700      = 3081
+
+
+COMPARISON: rmHamLibGeneric vs rmHamLibDirect:
+-----------------------------------------------
+
+rmHamLibGeneric (rigctld mode):
+  ✓ Uses rigctld.exe process
+  ✓ TCP/IP connection to localhost:4532
+  ✓ Text protocol with command parsing
+  ✓ Requires rigctld process management
+  ✓ Network layer overhead
+  ✓ Good for remote radio control
+
+rmHamLibDirect (DLL mode):
+  ✓ Direct libhamlib-4.dll calls
+  ✓ No external process needed
+  ✓ Binary/function call interface
+  ✓ Simpler, faster, more reliable
+  ✓ Requires libhamlib-4.dll (32-bit)
+  ✓ Better for local radio control
+
+
+CHECKING SUPPORTED MODELS:
+---------------------------
+
+if TRadioFactory.IsModelSupported(rmHamLibDirect) then
+  ShowMessage('HamLib Direct is supported!');
+
+// Get list of all supported models
+ShowMessage(TRadioFactory.GetSupportedModels);
+
+
+ERROR HANDLING:
+---------------
+
+uses uHamLibDirect;  // For RigErrorToString()
+
+var
+  err: Integer;
+  radio: THamLibDirect;
+begin
+  radio := THamLibDirect.Create(@MyProcessMsg);
+  try
+    radio.HamLibModelID := RIG_MODEL_K4;
+    radio.COMPortName := 'COM3';
+    radio.BaudRate := 38400;
+
+    err := radio.Connect;
+    if err <> RIG_OK then
+    begin
+      ShowMessage('Connection failed: ' + RigErrorToString(err));
+      Exit;
+    end;
+
+    // Use radio...
+
+    radio.Disconnect;
+  finally
+    radio.Free;
+  end;
+end;
+
+================================================================================
+REQUIREMENTS
+================================================================================
+
+1. LIBRARY FILE
+   - libhamlib-4.dll (32-bit for Delphi 7)
+   - Place in: C:\TR4W\tr4w\target\ or Windows system PATH
+   - Can be built from: C:\projects\Hamlib-4.6.5\Hamlib-4.6.5\
+
+2. COMPILATION
+   - All units compile successfully
+   - No additional dependencies beyond existing TR4W requirements
+   - Build verified: TR4W.EXE created successfully
+
+3. RADIO CONFIGURATION
+   - Must set HamLibModelID before connecting
+   - Must configure serial port OR network address
+   - Baud rate defaults to 38400 (change if needed)
+
+================================================================================
+LOGGING
+================================================================================
+
+All factory operations are logged via Log4D logger:
+
+[RadioFactory] Creating radio: Model=HamLib Direct (DLL), Address=, Port=0
+[RadioFactory] Created HamLib Direct instance
+[RadioFactory] Direct DLL mode - no rigctld process needed
+[RadioFactory] Remember to set HamLibModelID and serial port before connecting
+
+THamLibDirect class logs to: 'uRadioHamLibDirect' logger
+HamLib bindings log to: helper functions in uHamLibDirect
+
+================================================================================
+FILE SUMMARY
+================================================================================
+
+Modified Files:
+  ✓ src/uRadioFactory.pas (updated with rmHamLibDirect support)
+
+New Files Created:
+  ✓ src/uHamLibDirect.pas (HamLib DLL bindings - 481 lines)
+  ✓ src/uRadioHamLibDirect.pas (THamLibDirect wrapper class - 700+ lines)
+
+Build Output:
+  ✓ target/tr4w.exe (1,640,448 bytes - compiled successfully)
+
+================================================================================
+TESTING CHECKLIST
+================================================================================
+
+Before using in production:
+
+[ ] Obtain libhamlib-4.dll (32-bit)
+[ ] Place DLL in target directory
+[ ] Test basic connection with your radio
+[ ] Verify frequency control works
+[ ] Verify mode changes work
+[ ] Test RIT/XIT functionality
+[ ] Test split operation
+[ ] Test PTT control
+[ ] Compare performance vs rigctld mode
+[ ] Verify polling updates work correctly
+[ ] Test error handling (disconnect, reconnect)
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Get libhamlib-4.dll
+2. Test with actual radio hardware
+3. Compare direct mode vs rigctld mode performance
+4. Consider making HamLib Direct the default for supported radios
+5. Document any radio-specific quirks or configuration needs
+
+================================================================================
+SUCCESS!
+================================================================================
+
+✅ TRadioFactory updated successfully
+✅ rmHamLibDirect model added
+✅ Full project compiled without errors
+✅ Ready for testing with actual hardware
+
+The TR4W project now supports THREE radio control methods:
+  1. Direct Elecraft K4 protocol (rmElecraftK4)
+  2. HamLib via rigctld (rmHamLibGeneric)
+  3. HamLib via direct DLL calls (rmHamLibDirect) ⭐ NEW!
+
+================================================================================
