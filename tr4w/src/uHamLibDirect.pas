@@ -370,6 +370,9 @@ function RigModeToString(mode: rmode_t): string;
 // Convert VFO constant to readable string
 function RigVFOToString(vfo: vfo_t): string;
 
+// Get HamLib version string from DLL
+function GetHamLibVersion: string;
+
 // Direct structure access helper for setting pathname
 // This bypasses rig_set_conf which may not work for all backends
 procedure RigSetPathname(rig: PRIG; const pathname: string);
@@ -381,6 +384,23 @@ function RigGetPathname(rig: PRIG): string;
 procedure RigSetTimeout(rig: PRIG; timeoutMs: Integer);
 
 implementation
+
+function GetHamLibVersion: string;
+var
+  hLib: HMODULE;
+  pVersion: ^PChar;
+begin
+  Result := 'unknown';
+  hLib := GetModuleHandle(HAMLIB_DLL);
+  if hLib = 0 then
+    hLib := LoadLibrary(HAMLIB_DLL);
+  if hLib <> 0 then
+  begin
+    pVersion := GetProcAddress(hLib, 'hamlib_version2');
+    if pVersion <> nil then
+      Result := string(pVersion^);
+  end;
+end;
 
 function RigErrorToString(errcode: Integer): string;
 begin

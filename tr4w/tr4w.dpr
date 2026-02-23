@@ -123,9 +123,11 @@ uses
   GetWinVersionInfo in 'src\GetWinVersionInfo.pas',
   uSuperCheckPartialFileUpload,
   uRadioHamLib in 'src\uRadioHamLib.pas',
+  uHamLibDirect in 'src\uHamLibDirect.pas',
   uRadioHamLibDirect in 'src\uRadioHamLibDirect.pas',
   uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
-  uExternalLogger in 'src\uExternalLogger.pas';
+  uExternalLogger in 'src\uExternalLogger.pas',
+  uDXLabPathfinder in 'src\uDXLabPathfinder.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -456,6 +458,9 @@ begin
      begin
      wsjtx := TWSJTXServer.Create;
      end;
+  logger.debug('[tr4w] SpotCollectorEnabled = %s', [BooleanToStr(SpotCollectorEnabled)]);
+  if SpotCollectorEnabled then
+     StartDXLabPathfinder;
   if elLogType <> lt_NoExternalLogger then
      begin
      externalLogger := TExternalLogger.Create(elLogType);
@@ -468,6 +473,7 @@ begin
   logger.debug('Current program version = %s',[TR4W_CURRENTVERSION]);
   logger.debug('Current TR4W Server version = %s',[TR4WSERVER_CURRENTVERSION]);
   logger.debug('Current log version = %s',[LOGVERSION]);
+  logger.info('HamLib version = %s',[GetHamLibVersion]);
   logger.debug('Windows version = %d.%d Build %d',[tr4w_osverinfo.dwMajorVersion, tr4w_osverinfo.dwMinorVersion, tr4w_osverinfo.dwBuildNumber]);
   logger.debug('%s',[GetOSInfo]);
 
