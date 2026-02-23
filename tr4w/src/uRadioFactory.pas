@@ -47,7 +47,9 @@ type
                                         dataBits: Byte;
                                         stopBits: Byte;
                                         parity: Byte;
-                                        msgCallback: TProcessMsgRef): TNetRadioBase;
+                                        msgCallback: TProcessMsgRef;
+                                        rts: Boolean = False;
+                                        dtr: Boolean = False): TNetRadioBase;
       class function GetSupportedModels: string;
       class function IsModelSupported(model: TRadioModel): boolean;
    end;
@@ -152,7 +154,9 @@ class function TRadioFactory.CreateRadioSerial(model: TRadioModel;
                                                 dataBits: Byte;
                                                 stopBits: Byte;
                                                 parity: Byte;
-                                                msgCallback: TProcessMsgRef): TNetRadioBase;
+                                                msgCallback: TProcessMsgRef;
+                                                rts: Boolean;
+                                                dtr: Boolean): TNetRadioBase;
 begin
    Result := nil;
 
@@ -168,6 +172,8 @@ begin
          Result.serialDataBits := dataBits;
          Result.serialStopBits := stopBits;
          Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
          Result.radioModel := 'Elecraft K4 (Serial)';
          logger.Info('[RadioFactory] Created Elecraft K4 instance for serial connection');
          end;
@@ -195,6 +201,8 @@ begin
          Result.serialDataBits := dataBits;
          Result.serialStopBits := stopBits;
          Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
          Result.radioModel := 'Icom IC-7610 (Serial)';
          logger.Info('[RadioFactory] Created Icom IC-7610 instance for serial connection');
          end;
@@ -207,6 +215,8 @@ begin
          Result.serialDataBits := dataBits;
          Result.serialStopBits := stopBits;
          Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
          Result.radioModel := 'Icom IC-7300 (Serial)';
          logger.Info('[RadioFactory] Created Icom IC-7300 instance for serial connection');
          end;
@@ -219,6 +229,8 @@ begin
          Result.serialDataBits := dataBits;
          Result.serialStopBits := stopBits;
          Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
          Result.radioModel := 'Icom IC-9700 (Serial)';
          logger.Info('[RadioFactory] Created Icom IC-9700 instance for serial connection');
          end;

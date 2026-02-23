@@ -739,8 +739,8 @@ begin
    wasConnected := False;
    reconnectDelay := RECONNECT_INITIAL_DELAY;
 
-   // Keep polling thread alive - will automatically resume when radio reconnects
-   while True do
+   // Keep polling thread alive until stop is requested (e.g. on Reset Radio Ports)
+   while not rig^.PollingStopRequested do
       begin
       try
          if ro.IsConnected then
@@ -808,7 +808,6 @@ begin
             begin
             logger.Info('[pNetworkRadio] Radio disconnected, will attempt reconnection');
             wasConnected := False;
-            firstProcessMessage := true;
             rig.CurrentStatus.VFO[VFOA].Frequency := 0;
             rig.CurrentStatus.VFO[VFOB].Frequency := 0;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on new disconnect
@@ -884,8 +883,8 @@ begin
    ro := rig^.tNetObject;
    wasConnected := False;
 
-   // Keep polling thread alive - will automatically resume when radio reconnects
-   while True do
+   // Keep polling thread alive until stop is requested (e.g. on Reset Radio Ports)
+   while not rig^.PollingStopRequested do
       begin
       if ro.IsConnected then
          begin

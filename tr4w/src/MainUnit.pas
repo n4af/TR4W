@@ -135,6 +135,7 @@ uses
   classes,
   IdGlobal,
   uWSJTX,
+  uDXLabPathfinder,
   Math,
   Log4D,
   Controls,
@@ -593,30 +594,10 @@ end;
 
 procedure ResetRadioPorts;
 begin
-
   logger.info('Resetting radio ports');
-  if ActiveRadioPtr.tNetObject <> nil then
-  begin
-    ActiveRadioPtr.tNetObject.Disconnect;
-    ActiveRadioPtr.tNetObject.Connect;
-  end;
-
+  // CheckAndInitializePorts_ForThisRadio -> SetUpRadioInterface handles stopping
+  // the old polling thread, disconnecting, freeing, and recreating the radio object.
   ActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
-
-  //
-  // Handle radio two
-  //
-  if InActiveRadioPtr.tNetObject <> nil then
-  begin
-    InActiveRadioPtr.tNetObject.Disconnect;
-    InActiveRadioPtr.tNetObject.Connect;
-  end
-  else if InActiveRadioPtr.tNetObject <> nil then
-  begin
-    InActiveRadioPtr.tNetObject.Disconnect;
-    InActiveRadioPtr.tNetObject.Connect;
-  end;
-
   InActiveRadioPtr.CheckAndInitializePorts_ForThisRadio;
 end;
 
@@ -2057,6 +2038,8 @@ begin
   { PTTOff; // 4.113.1
   scWK_RESET; // 4.113.1
   WkClose; // 4.113.1 }
+  if IsDXLabPathfinderRunning then
+    StopDXLabPathfinder;
   if Assigned(wsjtx) then
   begin
     wsjtx.Stop;

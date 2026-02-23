@@ -317,6 +317,7 @@ var
    WSJTXSendColorization: boolean = true;
    WSJTXEnabled: boolean = true;
    WSJTXRadioControlEnabled: boolean = false;
+   SpotCollectorEnabled: boolean = false;
 
 const
 
@@ -339,6 +340,7 @@ const
    + 6 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTLD PORT, HAMLIB RIGCTLD RUN AT STARTUP}
    + 3 {ExternalLoggerAddress & ExernalLoggerPort & ExternalLoggerEnabled}
    + 1 {ExternalLogger}
+   + 1 {SpotCollectorEnabled}
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -750,6 +752,7 @@ const
  (crCommand: 'SKIP ACTIVE BAND';              crAddress: @SkipActiveBand;                 crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'SLASH MARK CHAR';               crAddress: @SlashMarkChar;                  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctChar; crNetwork: 1),
  (crCommand: 'SPACE BAR DUPE CHECK ENABLE';   crAddress: @SpaceBarDupeCheckEnable;        crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
+ (crCommand: 'SPOT COLLECTOR ENABLED';        crAddress: @SpotCollectorEnabled;           crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'SPRINT QSY RULE';               crAddress: @SprintQSYRule;                  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'START SENDING NOW KEY';         crAddress: @StartSendingNowKey;             crMin:0;  crMax:0;       crS: csOld; crA: 19;crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctChar; crNetwork: 1),
  (crCommand: 'STATIONS CALLSIGNS MASK';        crAddress: @StationsCallsignsMask;         crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:1 ; crP:12; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctString; crNetwork: 1),

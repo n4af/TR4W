@@ -7,6 +7,7 @@ uses uNetRadioBase, StrUtils, SysUtils, Math, TF;
 Type TK4Radio = class(TNetRadioBase)
    private
       CWBuffer: string;
+      firstProcessMessage: boolean;
       function ParseIFCommand(cmd: string): boolean;
       function ModeStrToMode(sMode: string; sDataMode: string): TRadioMode;
       function BandNumToBand(sBand: string): TRadioBand;
@@ -55,8 +56,6 @@ Type TK4Radio = class(TNetRadioBase)
       procedure SetAIMode(i: integer);
 end;
 
-var
-   firstProcessMessage: boolean = true;
 implementation
 
 Uses MainUnit;
@@ -65,6 +64,7 @@ Constructor TK4Radio.Create;
 begin
    inherited Create(ProcessMessage);
 
+   firstProcessMessage := true;  // Call Initialize on first message received
    // K4 supports auto-info mode - no polling needed
    requiresPolling := False;
    autoUpdateCommand := 'AI5;';     // Enable auto-info mode level 5
@@ -587,6 +587,7 @@ begin
 // This is a command that has been parsed into its parts. For example, if the radio
 // sends RX;DT5;, this procedure is called once with RX; and once with DT5;
    logger.Trace('[ProcessMessage] Received from radio: (%s)',[sMessage]);
+   UpdateLastValidResponse;  // Any message from the radio means it's connected
    sCommand := AnsiLeftStr(sMessage,2);
    if AnsiMidStr(sMessage,3,1) = '$' then
       begin

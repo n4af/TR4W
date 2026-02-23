@@ -160,6 +160,8 @@ Type TNetRadioBase = class(TObject)
       serialDataBits: Byte;
       serialStopBits: Byte;
       serialParity: Byte;
+      serialRts: Boolean;
+      serialDtr: Boolean;
 
       // Polling configuration
       requiresPolling: Boolean;        // True for most radios, False for K4 with AI5
@@ -370,6 +372,16 @@ end;
 Destructor TNetRadioBase.Destroy;
 var iVFO: TVFO;
 begin
+   // For serial: close the port FIRST so the reading thread's ReadString
+   // returns immediately (ESerialError), allowing rt.WaitFor to complete quickly.
+   // Without this, WaitFor blocks for up to the ReadString timeout (10ms) but
+   // the port stays open, preventing the new radio from opening it.
+   if serialPortObj <> nil then
+      begin
+      if serialPortObj.IsOpen then
+         serialPortObj.Close;
+      end;
+
    if rt <> nil then
       begin
       rt.Terminate;
@@ -388,8 +400,6 @@ begin
 
    if serialPortObj <> nil then
       begin
-      if serialPortObj.IsOpen then
-         serialPortObj.Close;
       FreeAndNil(serialPortObj);
       end;
 
@@ -550,9 +560,10 @@ begin
             end;
 
          // Open with configured port settings
-         serialPortObj.OpenRaw(serialBaudRate, serialDataBits, serialStopBits, serialParity);
-         logger.Info('[TNetRadioBase.Connect] Serial port %s opened: %d baud, %d data bits, parity %d, %d stop bits',
-                     [comPortName, serialBaudRate, serialDataBits, serialParity, serialStopBits]);
+         serialPortObj.OpenRaw(serialBaudRate, serialDataBits, serialStopBits, serialParity, serialRts, serialDtr);
+         logger.Info('[TNetRadioBase.Connect] Serial port %s opened: %d baud, %d data bits, parity %d, %d stop bits, RTS=%s, DTR=%s',
+                     [comPortName, serialBaudRate, serialDataBits, serialParity, serialStopBits,
+                      BoolToStr(serialRts, True), BoolToStr(serialDtr, True)]);
 
          // Clear disconnecting flag on successful connection
          Disconnecting := False;
@@ -667,6 +678,25 @@ begin
          on E: Exception do
             begin
             logger.Error('Exception when disconnecting from radio: %s', [E.Message]);
+            end;
+      end;
+      end
+   else if (serialPortObj <> nil) and serialPortObj.IsOpen then
+      begin
+      try
+         logger.debug('[TNetRadioBase.Disconnect] Closing serial port and terminating reading thread');
+         // Close serial port first so ReadString in reading thread returns immediately
+         serialPortObj.Close;
+         if rt <> nil then
+            begin
+            rt.Terminate;
+            rt.WaitFor;
+            FreeAndNil(rt);
+            end;
+      except
+         on E: Exception do
+            begin
+            logger.Error('[TNetRadioBase.Disconnect] Exception when disconnecting serial radio: %s', [E.Message]);
             end;
       end;
       end;

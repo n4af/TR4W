@@ -64,3 +64,4 @@ tr4w/build_*.txt
 tr4w/COMPILATION_RESULTS.txt
 tr4w/compile_*.txt
 tr4w/tr4w.log.*
+tr4w/build_*.log

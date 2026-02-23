@@ -195,6 +195,7 @@ type
 
       tRadioInterfaceThreadID: cardinal;
       tRadioInterfaceThreadHandle: HWND;
+      PollingStopRequested: Boolean;
       tPollCount: integer;
       tStatusEqualityCounter: cardinal;
       tRadioInterfaceWndHandle: HWND;
@@ -2732,6 +2733,26 @@ var
    networkRadioModel: TRadioModel;
    factoryModel: TRadioModel;
 begin
+   // If a radio object already exists, stop the polling thread and free it before creating a new one.
+   // This prevents the old thread from accessing freed memory (dangling pointer AV).
+   if Self.tNetObject <> nil then
+      begin
+      logger.Info('[%s.SetUpRadioInterface] Stopping polling thread before reinit', [Self.RadioName]);
+      Self.PollingStopRequested := True;
+      if Self.tRadioInterfaceThreadHandle <> 0 then
+         begin
+         WaitForSingleObject(Self.tRadioInterfaceThreadHandle, 3000);
+         CloseHandle(Self.tRadioInterfaceThreadHandle);
+         Self.tRadioInterfaceThreadHandle := 0;
+         Self.tRadioInterfaceThreadID := 0;
+         end;
+      Self.PollingStopRequested := False;
+      logger.Info('[%s.SetUpRadioInterface] Freeing existing radio object before reinit', [Self.RadioName]);
+      Self.tNetObject.Disconnect;
+      Self.tNetObject.Free;
+      Self.tNetObject := nil;
+      end;
+
    // Check if we should use HamLib Direct (works with both serial and network)
    if Self.UseHamLib then
    begin
@@ -2805,7 +2826,9 @@ begin
                RadioNumberBits,
                RadioStopBits,
                Ord(RadioParity),
-               nil
+               nil,
+               tr4w_cat_rts_state = RtsDtr_ON,
+               tr4w_cat_dtr_state = RtsDtr_ON
             );
             if Self.tNetObject <> nil then
                begin

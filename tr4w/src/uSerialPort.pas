@@ -39,7 +39,9 @@ type
       ABaudRate: DWORD;
       ADataBits: Byte;
       AStopBits: Byte;
-      AParity: Byte
+      AParity: Byte;
+      ARts: Boolean = False;
+      ADtr: Boolean = False
     );
     procedure Close;
 
@@ -174,6 +176,9 @@ begin
   DCB.Flags := DCB.Flags or $0001;  // fBinary = 1
   if AParity <> spNone then
     DCB.Flags := DCB.Flags or $0002;  // fParity = 1
+  // Disable DTR and RTS - not used for CAT control, raising them can interfere with radio
+  DCB.Flags := DCB.Flags and not $0030;  // fDtrControl bits 4-5 = 0 (DTR_CONTROL_DISABLE)
+  DCB.Flags := DCB.Flags and not $3000;  // fRtsControl bits 12-13 = 0 (RTS_CONTROL_DISABLE)
 
   if not SetCommState(FHandle, DCB) then
   begin
@@ -205,7 +210,9 @@ procedure TSerialPort.OpenRaw(
   ABaudRate: DWORD;
   ADataBits: Byte;
   AStopBits: Byte;
-  AParity: Byte);
+  AParity: Byte;
+  ARts: Boolean;
+  ADtr: Boolean);
 var
   DCB: TDCB;
   Timeouts: COMMTIMEOUTS;
@@ -260,6 +267,14 @@ begin
   DCB.Flags := DCB.Flags or $0001;  // fBinary = 1
   if AParity <> 0 then  // 0 = no parity
     DCB.Flags := DCB.Flags or $0002;  // fParity = 1
+  // DTR control: bits 4-5. 0=$00=DISABLE, 1=$10=ENABLE
+  DCB.Flags := DCB.Flags and not $0030;  // clear fDtrControl bits first
+  if ADtr then
+    DCB.Flags := DCB.Flags or $0010;     // DTR_CONTROL_ENABLE
+  // RTS control: bits 12-13. 0=$0000=DISABLE, 1=$1000=ENABLE
+  DCB.Flags := DCB.Flags and not $3000;  // clear fRtsControl bits first
+  if ARts then
+    DCB.Flags := DCB.Flags or $1000;     // RTS_CONTROL_ENABLE
 
   if not SetCommState(FHandle, DCB) then
   begin
