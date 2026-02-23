@@ -3,7 +3,7 @@ unit uHamLibDirect;
 {
   HamLib Direct DLL Bindings for Delphi 7
 
-  Translated from HamLib 4.6.5 C headers and VB6 bindings
+  Translated from HamLib 4.7.0 C headers and VB6 bindings
 
   Purpose: Direct DLL interface to libhamlib-4.dll, eliminating the need
            for rigctld TCP/IP daemon.
@@ -43,7 +43,7 @@ unit uHamLibDirect;
     end;
 
   File References:
-    C:\projects\Hamlib-4.6.5\Hamlib-4.6.5\include\hamlib\rig.h
+    C:\projects\hamlib\include\hamlib\rig.h
     C:\projects\Hamlib-4.6.5\Hamlib-4.6.5\bindings\hamlibvb.bas.in
 }
 
