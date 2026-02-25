@@ -113,12 +113,21 @@ uses
   uGridLookup in 'src\uGridLookup.pas',
   Log4D in 'src\Log4D.pas',
   uNetRadioBase in 'src\uNetRadioBase.pas',
+  uSerialPort in 'src\uSerialPort.pas',
+  uRadioFactory in 'src\uRadioFactory.pas',
   uRadioElecraftK4 in 'src\uRadioElecraftK4.pas',
+  uRadioIcomBase in 'src\uRadioIcomBase.pas',
+  uRadioIcom9700 in 'src\uRadioIcom9700.pas',
+  uRadioIcom7610 in 'src\uRadioIcom7610.pas',
+  uRadioIcom7300 in 'src\uRadioIcom7300.pas',
   GetWinVersionInfo in 'src\GetWinVersionInfo.pas',
   uSuperCheckPartialFileUpload,
   uRadioHamLib in 'src\uRadioHamLib.pas',
+  uHamLibDirect in 'src\uHamLibDirect.pas',
+  uRadioHamLibDirect in 'src\uRadioHamLibDirect.pas',
   uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
-  uExternalLogger in 'src\uExternalLogger.pas';
+  uExternalLogger in 'src\uExternalLogger.pas',
+  uDXLabPathfinder in 'src\uDXLabPathfinder.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -449,6 +458,9 @@ begin
      begin
      wsjtx := TWSJTXServer.Create;
      end;
+  logger.debug('[tr4w] SpotCollectorEnabled = %s', [BooleanToStr(SpotCollectorEnabled)]);
+  if SpotCollectorEnabled then
+     StartDXLabPathfinder;
   if elLogType <> lt_NoExternalLogger then
      begin
      externalLogger := TExternalLogger.Create(elLogType);
@@ -461,6 +473,7 @@ begin
   logger.debug('Current program version = %s',[TR4W_CURRENTVERSION]);
   logger.debug('Current TR4W Server version = %s',[TR4WSERVER_CURRENTVERSION]);
   logger.debug('Current log version = %s',[LOGVERSION]);
+  logger.info('HamLib version = %s',[GetHamLibVersion]);
   logger.debug('Windows version = %d.%d Build %d',[tr4w_osverinfo.dwMajorVersion, tr4w_osverinfo.dwMinorVersion, tr4w_osverinfo.dwBuildNumber]);
   logger.debug('%s',[GetOSInfo]);
 
