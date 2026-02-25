@@ -6,9 +6,6 @@
 # Delphi compiler-generated binaries (safe to delete)
 *.exe
 *.dll
-
-# Exception: redistributable HamLib DLLs
-!tr4w/lib/hamlib/*.dll
 *.bpl
 *.bpi
 *.dcp
