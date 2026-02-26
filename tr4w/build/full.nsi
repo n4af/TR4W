@@ -113,7 +113,7 @@ Section "tr4w.exe" secexe
 	File ..\target\libeay32.dll
 	File ..\target\ssleay32.dll
 	File ..\target\libhamlib-4.dll
-	File ..\target\libgcc_s_sjlj-1.dll
+	File ..\target\libgcc_s_dw2-1.dll
 	File ..\target\libusb-1.0.dll
 	File ..\target\libwinpthread-1.dll
 
