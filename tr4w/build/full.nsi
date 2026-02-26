@@ -1,4 +1,4 @@
-!define TR4WVERSION    '144.0'
+!define TR4WVERSION    '144.2'
 !define TR4WINSTFOLDER 'Software\TR4W'
 !define TR4WDRVREG     'SYSTEM\CurrentControlSet\Services\TR4WIO'
 
@@ -9,7 +9,7 @@
 ;!define TR4WLANG    'ser'
 ;!define TR4WLANG    'rom'
 ;!define TR4WLANG    'ger'
-!define TR4WLANG    'ukr'
+;!define TR4WLANG    'ukr'
 ; NOT IMPLEMENTED
 ;!define TR4WLANG    'esp'
 ;!define TR4WLANG    'pol'
