@@ -1053,6 +1053,8 @@ type
     TS890,
     EXPERTTCI,
     ACLOG,
+    IC905,
+    IC7300MK2,
     HAMLIBANY);
 
 

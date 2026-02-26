@@ -34,7 +34,7 @@ unit uRadioIcomBase;
 interface
 
 uses
-  uNetRadioBase, SysUtils, StrUtils, VC, Log4D;
+  uNetRadioBase, uIcomNetworkTransport, SysUtils, StrUtils, VC, Log4D;
 
 type
   TIcomRadio = class(TNetRadioBase)
@@ -44,23 +44,35 @@ type
     FCIVBuffer: string;           // Buffer for accumulating CI-V frames
     FCWBuffer: string;            // Buffer for CW text to send
 
+    // Network transport (Icom UDP protocol)
+    FNetworkTransport: TIcomNetworkTransport;
+    FNetworkUsername: string;
+    FNetworkPassword: string;
+
     function BuildCIVCommand(command: Byte; data: string): string;
     function BCDToByte(bcd: Byte): Byte;
     function ByteToBCD(value: Byte): Byte;
-    function FreqToBCD(freq: LongInt): string;  // Convert frequency to 5-byte BCD
-    function BCDToFreq(bcd: string): LongInt;   // Convert 5-byte BCD to frequency
     function OffsetToBCD(offset: Integer): string;  // Convert RIT/XIT offset to BCD (2 bytes)
     function BandToFreq(band: TRadioBand): LongInt;  // Map band to typical frequency
 
-  protected
-    procedure ProcessCIVFrame(frame: string); virtual;
-
-  private
     procedure ProcessCIVMessage(msg: string);
+    procedure ProcessNetworkCivData(msg: string);
+    procedure OnNetworkStateChange(Sender: TObject);
+
+  protected
+    function FreqToBCD(freq: LongInt): string;  // Convert frequency to 5-byte BCD
+    function BCDToFreq(bcd: string): LongInt;   // Convert 5-byte BCD to frequency
+    procedure ProcessCIVFrame(frame: string); virtual;
+    function GetIsConnected: boolean; override;
+    function IsNetworkConnection: boolean;
 
   public
     constructor Create; reintroduce;
+    destructor Destroy; override;
     procedure ProcessMsg(msg: string); override;
+    function Connect: integer; override;
+    procedure Disconnect; override;
+    procedure SendToRadio(s: string); overload; override;
 
     // Polling interface implementation
     procedure QueryVFOAFrequency; override;
@@ -96,10 +108,13 @@ type
     procedure SetBand(band: TRadioBand; vfo: TVFO = nrVFOA); override;
     function  ToggleBand(vfo: TVFO = nrVFOA): TRadioBand; override;
     procedure SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA); override;
-    procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); override;
+    procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload; override;
 
     property RadioAddress: Byte read FRadioAddress write FRadioAddress;
     property ControllerAddress: Byte read FControllerAddress write FControllerAddress;
+    property NetworkUsername: string read FNetworkUsername write FNetworkUsername;
+    property NetworkPassword: string read FNetworkPassword write FNetworkPassword;
+    property NetworkTransport: TIcomNetworkTransport read FNetworkTransport;
   end;
 
 implementation
@@ -175,7 +190,115 @@ begin
   FCWBuffer := '';
   readTerminator := CIV_EOM;  // CI-V frames end with FD
 
+  FNetworkTransport := nil;
+  FNetworkUsername := '';
+  FNetworkPassword := '';
+
   radioModel := 'Icom';  // Will be overridden by derived classes
+end;
+
+destructor TIcomRadio.Destroy;
+begin
+  if FNetworkTransport <> nil then
+  begin
+    FNetworkTransport.Disconnect;
+    FreeAndNil(FNetworkTransport);
+  end;
+  inherited Destroy;
+end;
+
+function TIcomRadio.IsNetworkConnection: boolean;
+begin
+  // Network connection when serial port is not set and IP address is provided
+  // Use TNetRadioBase() cast to access base class radioAddress (string),
+  // not TIcomRadio.RadioAddress which is the CI-V address (Byte)
+  Result := (serialPort = NoPort) and
+            (Length(TNetRadioBase(Self).radioAddress) > 0) and
+            (radioPort > 0);
+end;
+
+function TIcomRadio.Connect: integer;
+begin
+  if IsNetworkConnection then
+  begin
+    logger.Info('[TIcomRadio.Connect] Connecting via Icom network protocol to %s:%d',
+                [TNetRadioBase(Self).radioAddress, radioPort]);
+
+    // Create transport if needed
+    if FNetworkTransport = nil then
+    begin
+      FNetworkTransport := TIcomNetworkTransport.Create;
+      FNetworkTransport.OnCivData := ProcessNetworkCivData;
+      FNetworkTransport.OnStateChange := OnNetworkStateChange;
+    end;
+
+    Result := FNetworkTransport.Connect(TNetRadioBase(Self).radioAddress,
+                                         radioPort,
+                                         FNetworkUsername, FNetworkPassword);
+    if Result = 0 then
+      logger.Info('[TIcomRadio.Connect] Network connection initiated to %s:%d',
+                  [TNetRadioBase(Self).radioAddress, radioPort])
+    else
+      logger.Error('[TIcomRadio.Connect] Network connection failed: %d', [Result]);
+  end
+  else
+  begin
+    // Serial or TCP connection - use base class
+    Result := inherited Connect;
+  end;
+end;
+
+procedure TIcomRadio.Disconnect;
+begin
+  if IsNetworkConnection and (FNetworkTransport <> nil) then
+  begin
+    logger.Info('[TIcomRadio.Disconnect] Disconnecting Icom network transport');
+    FNetworkTransport.Disconnect;
+    FreeAndNil(FNetworkTransport);
+  end
+  else
+    inherited Disconnect;
+end;
+
+procedure TIcomRadio.SendToRadio(s: string);
+begin
+  if IsNetworkConnection and (FNetworkTransport <> nil) then
+  begin
+    // Send CI-V frame via Icom UDP transport
+    FNetworkTransport.SendCivData(s);
+  end
+  else
+    inherited SendToRadio(s);
+end;
+
+function TIcomRadio.GetIsConnected: boolean;
+begin
+  if IsNetworkConnection then
+  begin
+    if FNetworkTransport <> nil then
+      Result := FNetworkTransport.IsConnected
+    else
+      Result := False;
+  end
+  else
+    Result := inherited GetIsConnected;
+end;
+
+procedure TIcomRadio.ProcessNetworkCivData(msg: string);
+begin
+  // Called from transport thread when CI-V data arrives via UDP
+  // Forward to CI-V message parser
+  logger.Trace('[TIcomRadio.ProcessNetworkCivData] Received CI-V data, length: %d', [Length(msg)]);
+  ProcessCIVMessage(msg);
+end;
+
+procedure TIcomRadio.OnNetworkStateChange(Sender: TObject);
+begin
+  if FNetworkTransport <> nil then
+    logger.Info('[TIcomRadio.OnNetworkStateChange] Transport state changed to: %s',
+                [FNetworkTransport.RadioName])
+  else
+    logger.Info('[TIcomRadio.OnNetworkStateChange] Transport state changed');
 end;
 
 function TIcomRadio.BuildCIVCommand(command: Byte; data: string): string;
