@@ -222,6 +222,8 @@ type
       IcomFilterByte:  byte;
       IDCharacter:     char;
       IPAddress:       str50;
+      IcomNetworkUsername: str50;  // Icom network protocol username
+      IcomNetworkPassword: str50;  // Icom network protocol password
       CWByCATBuffer:   string;                  // ny4i 4.44.5
       //    PartialRadioResponse: string;
       PollingEnable:   boolean;
@@ -569,6 +571,8 @@ const
     ({Name: 'TS890';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2041; rt:rtHamlib),
     ({Name: 'EXPERTTCI'; } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 7; rt:rtHamlib),
     ({Name: 'ACLOG';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 8; rt:rtHamlib),
+    ({Name: 'IC905';      } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $AC; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 0; rt: rtIcom),
+    ({Name: 'IC7300MK2';  } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $B6; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 0; rt: rtIcom),
     ({Name: 'HAMLIBANY';  } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1; rt:rtHamLib)
 );
 {*)}
@@ -670,6 +674,8 @@ const
       'TS890',          // HamLib Only
       'EXPERTTCI',     // HamLib Only
       'ACLOG',          // HamLib Only
+      'IC905',
+      'IC7300MK2',
       'HAMLIB-ANY'      // HamLib Only
       );
 
@@ -801,7 +807,8 @@ uses
    LogStuff,
    LogSUBS2,
    LogCW,
-   uRadioHamLibDirect;
+   uRadioHamLibDirect,
+   uRadioIcomBase;
 
 
 
@@ -953,7 +960,7 @@ begin
          ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR($FF) + CHR($09), 5);
          end;
 
-      IC78..IC9700:
+      IC78..IC9700, IC905, IC7300MK2:
          begin
          if IntRadioType in IcomRadiosThatSupportRIT then
             begin
@@ -1014,7 +1021,7 @@ begin
          Exit;
          end;
 
-      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}    // This does not work for all Icom radios.
+      IC78..IC9700, IC905, IC7300MK2, OMNI6: {KK1L: 6.73 Added OMNI6}    // This does not work for all Icom radios.
          begin
          if IntRadioType in IcomRadiosThatSupportRIT then
             begin
@@ -1074,7 +1081,7 @@ begin
          Exit;
          end;
 
-      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6} // Add code somewhere tohandle radios that do not support 21 code.
+      IC78..IC9700, IC905, IC7300MK2, OMNI6: {KK1L: 6.73 Added OMNI6} // Add code somewhere tohandle radios that do not support 21 code.
          begin
          if IntRadioType in IcomRadiosThatSupportRIT then
             begin
@@ -1151,7 +1158,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($02));
          end;
 
-      IC78..IC9700, OMNI6, FLEX:
+      IC78..IC9700, IC905, IC7300MK2, OMNI6, FLEX:
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1228,7 +1235,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($03));
          end;
 
-      IC78..IC9700, OMNI6, FLEX:
+      IC78..IC9700, IC905, IC7300MK2, OMNI6, FLEX:
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1497,7 +1504,7 @@ begin
       begin
       Exit;
       end;
-   if RadioModel in [IC78..IC9700, FT100, Orion] then
+   if RadioModel in [IC78..IC9700, IC905, IC7300MK2, FT100, Orion] then
       begin
       RadioStopBits := 1;
       end
@@ -1800,7 +1807,7 @@ begin
             end;
          end;
 
-      IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700:
+      IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2:
          begin
          if IntegerBetween(mem,0,8) then
             begin
@@ -2003,7 +2010,7 @@ begin
          //        ActiveRadioPtr.WriteBufferToCATPort('FT1;');//vfo b = tx
          end;
 
-      IC78..IC9700, OMNI6: { KK1L: 6.73 Added OMNI6 }
+      IC78..IC9700, IC905, IC7300MK2, OMNI6: { KK1L: 6.73 Added OMNI6 }
          begin
 
          CommandsTempBuffer[0] := CHR(8);
@@ -2068,7 +2075,7 @@ begin
          //        ActiveRadioPtr.WriteBufferToCATPort('FT0;');
          end;
 
-      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, IC905, IC7300MK2, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          // TLogger.GetInstance.Debug('Sending commands to take Icom out of Split');
          CommandsTempBuffer[0] := CHR(8);
@@ -2690,19 +2697,13 @@ begin
    end;
 
    // Otherwise, determine specific network radio model
-   case Self.RadioModel of
-      K4:
-         begin
-         Result := rmElecraftK4;
-         logger.Info('[%s] Using Elecraft K4', [Self.RadioName]);
-         end;
-      // Future: K3, IC7610, FT991, etc. when implemented
+   Result := Self.MapRadioModelToFactory;
+   if Result <> rmNone then
+      logger.Info('[%s] Using factory model: %s', [Self.RadioName, TRadioFactory.ModelToString(Result)])
    else
       begin
-      logger.warn('[%s] Unknown network radio model, defaulting to K4', [Self.RadioName]);
-      Result := rmElecraftK4;
+      logger.warn('[%s] Unknown network radio model %d, no factory mapping', [Self.RadioName, Ord(Self.RadioModel)]);
       end;
-   end;
 end;
 //------------------------------------------------------------------------------
 function RadioObject.MapRadioModelToFactory: TRadioModel;
@@ -2719,6 +2720,18 @@ begin
          Result := rmIcomIC7300;
       IC9700:
          Result := rmIcomIC9700;
+      IC705:
+         Result := rmIcomIC705;
+      IC7300MK2:
+         Result := rmIcomIC7300MK2;
+      IC7600:
+         Result := rmIcomIC7600;
+      IC7760:
+         Result := rmIcomIC7760;
+      IC7850, IC7851:
+         Result := rmIcomIC7850;
+      IC905:
+         Result := rmIcomIC905;
    else
       Result := rmNone;
    end;
@@ -2809,7 +2822,7 @@ begin
    else if tCATPortType in [Serial1..Serial20] then
       begin
       // Check if we should use modern radio class (e.g., K4, Icom) or legacy serial code
-      if (Self.RadioModel in [K4, IC7610, IC7300, IC9700]) then
+      if (Self.RadioModel in [K4, IC7610, IC7300, IC9700, IC705, IC7300MK2, IC7600, IC7760, IC7850, IC7851, IC905]) then
          begin
          factoryModel := Self.MapRadioModelToFactory;
 
@@ -2947,6 +2960,15 @@ begin
 
       if Self.tNetObject <> nil then
       begin
+         // If this is an Icom radio, set network credentials before connecting
+         if Self.tNetObject is TIcomRadio then
+         begin
+            TIcomRadio(Self.tNetObject).NetworkUsername := Self.IcomNetworkUsername;
+            TIcomRadio(Self.tNetObject).NetworkPassword := Self.IcomNetworkPassword;
+            logger.Info('[%s.SetUpRadioInterface] Set Icom network credentials (user=%s)',
+                        [Self.RadioName, Self.IcomNetworkUsername]);
+         end;
+
          Self.tNetObject.Connect;
          logger.Info('[%s.SetUpRadioInterface] Network radio connected', [Self.RadioName]);
       end
@@ -3434,7 +3456,7 @@ begin
          So, if the radioModel is in IcomRadiosThatSupportVFOB, then just directly address VFOB and do nto do the switch-a-roo.
        *)
 
-        IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
+        IC78..IC9700, IC905, IC7300MK2, OMNI6: {KK1L: 6.73 Added OMNI6}
             begin
             // TLogger.GetInstance.Debug('In Icom radio code');
             if VFO = 'B' then
@@ -4010,7 +4032,7 @@ begin
          end;
   
 
-    IC78..IC9700:
+    IC78..IC9700, IC905, IC7300MK2:
        begin
           TempString := CHR($FE) + CHR($FE) + CHR(Radio1.ReceiverAddress) + CHR($E0) + CHR($1C) + CHR($00) + CHR($00) + CHR($FD);
           if PTTOn then
@@ -4025,7 +4047,7 @@ begin
           WaitAnswer := 14;
        end;
 
-      //      IC78..IC9700, OMNI6: Exit;
+      //      IC78..IC9700, IC905, IC7300MK2, OMNI6: Exit;
 
       Orion:
          begin
@@ -4086,23 +4108,23 @@ const
 begin
    RadioSupportsCWByCAT := [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000,
                             FLEX, IC705, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7760,
-                            IC7800, IC7850, IC7851, IC9100, IC9700, Orion];
+                            IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
       [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX10, FTDX101, FT450, FT710, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610,
-      IC7700, IC7760, IC7800, IC7850, IC7851, IC9100, IC9700, Orion];  // ny4i Issue 120
+      IC7700, IC7760, IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];  // ny4i Issue 120
 
    RadioSupportsPlayDVK := [ K2, K3, K4 // We do not support the KX2 and KX3? I guess not a lot of call for it.
-                            ,IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700
+                            ,IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2
                             ,FT710, FT991, FT1200, FTDX3000, FTDX5000, FTDX9000, FTDX10, FTDX101
                             ,TS480, TS570, TS590, TS850, TS950, TS990, TS2000
                             ]; // NY4I Issue 639
-   IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700];
-   IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700];
+   IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700, IC905, IC7300MK2];
+   IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700, IC905, IC7300MK2];
    IcomRadiosThatSupportPSKMode := [IC7600, IC7610, IC7760];
-   ICOMRadios := [IC78..IC9700];
+   ICOMRadios := [IC78..IC9700, IC905, IC7300MK2];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
                      TS870, TS940, TS950, TS990, TS2000, FLEX];
    YaesuRadios := [FTDX10, FTDX101, FT450, FT710, FT736R, FT747GX, FT767, FT817,

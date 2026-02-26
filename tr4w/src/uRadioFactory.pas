@@ -26,6 +26,12 @@ type
       rmIcomIC7610,
       rmIcomIC7300,
       rmIcomIC9700,
+      rmIcomIC705,
+      rmIcomIC7300MK2,
+      rmIcomIC7600,
+      rmIcomIC7760,
+      rmIcomIC7850,
+      rmIcomIC905,
       rmFlexRadio6000,
       rmHamLibDirect
    );
@@ -58,7 +64,10 @@ type
 
 implementation
 
-uses Log4D, uRadioHamLibDirect, uRadioIcomBase, uRadioIcom7300, uRadioIcom7610, uRadioIcom9700;
+uses Log4D, uRadioHamLibDirect, uRadioIcomBase,
+     uRadioIcom7300, uRadioIcom7610, uRadioIcom9700,
+     uRadioIcom705, uRadioIcom7300MK2, uRadioIcom7600,
+     uRadioIcom7760, uRadioIcom7850, uRadioIcom905;
 
 var
    logger: TLogLogger;
@@ -123,6 +132,54 @@ begin
          Result.radioPort := port;
          Result.radioModel := 'Icom IC-9700';
          logger.Info('[RadioFactory] Created Icom IC-9700 instance');
+         end;
+
+      rmIcomIC705:
+         begin
+         Result := TIcom705Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         logger.Info('[RadioFactory] Created Icom IC-705 instance');
+         end;
+
+      rmIcomIC7300MK2:
+         begin
+         Result := TIcom7300MK2Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         logger.Info('[RadioFactory] Created Icom IC-7300MK2 instance');
+         end;
+
+      rmIcomIC7600:
+         begin
+         Result := TIcom7600Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         logger.Info('[RadioFactory] Created Icom IC-7600 instance');
+         end;
+
+      rmIcomIC7760:
+         begin
+         Result := TIcom7760Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         logger.Info('[RadioFactory] Created Icom IC-7760 instance');
+         end;
+
+      rmIcomIC7850:
+         begin
+         Result := TIcom7850Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         logger.Info('[RadioFactory] Created Icom IC-7850 instance');
+         end;
+
+      rmIcomIC905:
+         begin
+         Result := TIcom905Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         logger.Info('[RadioFactory] Created Icom IC-905 instance');
          end;
 
       rmFlexRadio6000:
@@ -235,6 +292,84 @@ begin
          logger.Info('[RadioFactory] Created Icom IC-9700 instance for serial connection');
          end;
 
+      rmIcomIC705:
+         begin
+         Result := TIcom705Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
+         logger.Info('[RadioFactory] Created Icom IC-705 instance for serial connection');
+         end;
+
+      rmIcomIC7300MK2:
+         begin
+         Result := TIcom7300MK2Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
+         logger.Info('[RadioFactory] Created Icom IC-7300MK2 instance for serial connection');
+         end;
+
+      rmIcomIC7600:
+         begin
+         Result := TIcom7600Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
+         logger.Info('[RadioFactory] Created Icom IC-7600 instance for serial connection');
+         end;
+
+      rmIcomIC7760:
+         begin
+         Result := TIcom7760Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
+         logger.Info('[RadioFactory] Created Icom IC-7760 instance for serial connection');
+         end;
+
+      rmIcomIC7850:
+         begin
+         Result := TIcom7850Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
+         logger.Info('[RadioFactory] Created Icom IC-7850 instance for serial connection');
+         end;
+
+      rmIcomIC905:
+         begin
+         Result := TIcom905Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
+         logger.Info('[RadioFactory] Created Icom IC-905 instance for serial connection');
+         end;
+
       rmFlexRadio6000:
          begin
          raise ERadioFactoryException.Create('FlexRadio 6000 does not support serial connections');
@@ -266,6 +401,12 @@ begin
       rmIcomIC7610:     Result := 'Icom IC-7610';
       rmIcomIC7300:     Result := 'Icom IC-7300';
       rmIcomIC9700:     Result := 'Icom IC-9700';
+      rmIcomIC705:      Result := 'Icom IC-705';
+      rmIcomIC7300MK2:  Result := 'Icom IC-7300MK2';
+      rmIcomIC7600:     Result := 'Icom IC-7600';
+      rmIcomIC7760:     Result := 'Icom IC-7760';
+      rmIcomIC7850:     Result := 'Icom IC-7850';
+      rmIcomIC905:      Result := 'Icom IC-905';
       rmFlexRadio6000:  Result := 'FlexRadio 6000';
       rmHamLibDirect:   Result := 'HamLib Direct (DLL)';
    else
@@ -280,6 +421,12 @@ begin
              '  - Icom IC-7610 (implemented)'#13#10 +
              '  - Icom IC-7300 (implemented)'#13#10 +
              '  - Icom IC-9700 (implemented)'#13#10 +
+             '  - Icom IC-705 (implemented)'#13#10 +
+             '  - Icom IC-7300MK2 (implemented)'#13#10 +
+             '  - Icom IC-7600 (implemented)'#13#10 +
+             '  - Icom IC-7760 (implemented)'#13#10 +
+             '  - Icom IC-7850 (implemented)'#13#10 +
+             '  - Icom IC-905 (implemented)'#13#10 +
              '  - HamLib Direct via DLL (implemented)'#13#10 +
              '  - Elecraft K3 (planned)'#13#10 +
              '  - Yaesu FTdx101 (planned)'#13#10 +
@@ -289,11 +436,16 @@ end;
 
 class function TRadioFactory.IsModelSupported(model: TRadioModel): boolean;
 begin
-   // Currently K4, Icom radios (7610/7300/9700), and HamLib Direct (DLL) are fully implemented
    Result := (model = rmElecraftK4) or
              (model = rmIcomIC7610) or
              (model = rmIcomIC7300) or
              (model = rmIcomIC9700) or
+             (model = rmIcomIC705) or
+             (model = rmIcomIC7300MK2) or
+             (model = rmIcomIC7600) or
+             (model = rmIcomIC7760) or
+             (model = rmIcomIC7850) or
+             (model = rmIcomIC905) or
              (model = rmHamLibDirect);
 end;
 
