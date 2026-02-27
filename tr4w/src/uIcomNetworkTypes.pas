@@ -26,6 +26,7 @@ const
 
   // Packet types (in PktType field, little-endian)
   ICOM_PKT_DATA           = $0000;
+  ICOM_PKT_AUTH           = $0001;  // Auth/session packets: login resp, token, capabilities, status
   ICOM_PKT_ARE_YOU_THERE  = $0003;
   ICOM_PKT_I_AM_HERE      = $0004;
   ICOM_PKT_DISCONNECT     = $0005;
@@ -84,6 +85,12 @@ const
   ICOM_TIMER_RETRANSMIT    = 5004;
   ICOM_TIMER_CIV_WATCHDOG  = 5005;
   ICOM_TIMER_AYT           = 5006;
+  ICOM_TIMER_LOGIN         = 5007;
+  ICOM_TIMER_INITIAL_POLL  = 5008;  // One-shot: seed freq/mode 250ms after CI-V Open
+
+  // Login retry timing (for when radio has stale session and doesn't respond)
+  ICOM_LOGIN_TIMEOUT       = 5000;   // 5 seconds between login retries
+  ICOM_LOGIN_MAX_RETRIES   = 6;      // 6 retries = 30 seconds max
 
   // CI-V markers
   CIV_PREAMBLE             = $FE;
@@ -249,7 +256,7 @@ type
     CivPort:      Word;                    // $42 - Big-endian! CI-V UDP port
     UnusedI:      Word;                    // $44
     AudioPort:    Word;                    // $46
-    UnusedJ:      array[0..6] of Byte;     // $48
+    UnusedJ:      array[0..7] of Byte;     // $48 - 8 bytes to reach $50 total
   end;
 
   // ConnInfo / Stream Request Packet (0x90 = 144 bytes)

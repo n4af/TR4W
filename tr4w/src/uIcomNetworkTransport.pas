@@ -23,6 +23,12 @@ uses
   IdUDPServer, IdSocketHandle, IdGlobal, IdComponent,
   uIcomNetworkTypes, uNetRadioBase, Log4D;
 
+// Direct WinSock sendto declaration using const/untyped params to avoid
+// type conflicts with Windows unit's TSockAddr vs WinSock2.TSockAddr.
+function ws2_sendto(s: Integer; const buf; len, flags: Integer;
+                    const addr; addrlen: Integer): Integer;
+  stdcall; external 'ws2_32.dll' name 'sendto';
+
 type
   TIcomNetworkTransport = class(TObject)
   private
@@ -52,7 +58,8 @@ type
     FSendSeq: Word;                  // Control socket outer sequence
     FCivSeq: Word;                   // CI-V socket outer sequence
     FCivInnerSeq: Word;              // CI-V stream inner sequence
-    FAuthSeq: Word;                  // Auth-related inner sequence
+    FAuthSeq: Word;                  // Auth-related inner sequence (inner payload)
+    FAuthOuterSeq: Word;             // Auth outer Seq (separate from control Seq, starts at 1)
     FPingSendSeq: Word;              // Ping sequence (separate from tracked)
 
     // Capabilities
@@ -68,6 +75,7 @@ type
     FStartTick: LongWord;            // GetTickCount at connect start
     FAYTRetryCount: Integer;         // Are You There retry counter
     FAYTInterval: Integer;           // Current AYT retry interval (backoff)
+    FLoginRetryCount: Integer;       // Login retry counter (for stale-session recovery)
 
     // Retransmit buffer
     FRetransmitList: TList;          // List of PRetransmitEntry
@@ -78,6 +86,7 @@ type
     // Callbacks
     FOnCivData: TProcessMsgRef;
     FOnStateChange: TNotifyEvent;
+    FOnInitialPoll: TNotifyEvent;  // Fired once, 250ms after connect, to seed freq/mode
 
     // Internal - packet building and sending
     procedure SendControlPacket(PktType: Word; Socket: TIdUDPServer;
@@ -126,6 +135,8 @@ type
     procedure OnRetransmitTimer;
     procedure OnCivWatchdogTimer;
     procedure OnAYTTimer;
+    procedure OnLoginTimer;
+    procedure OnInitialPollTimer;
 
     // Internal - retransmit management
     procedure AddToRetransmitBuffer(Seq: Word; const Data: string);
@@ -137,6 +148,7 @@ type
     procedure DestroySockets;
 
     // Internal - ID calculation
+    function GetLocalIPForRoute: string;
     function CalculateMyIdFromSocket(Socket: TIdUDPServer): LongWord;
 
   public
@@ -158,9 +170,13 @@ type
     property CivAddress: Byte read FCivAddress;
     property OnCivData: TProcessMsgRef read FOnCivData write FOnCivData;
     property OnStateChange: TNotifyEvent read FOnStateChange write FOnStateChange;
+    property OnInitialPoll: TNotifyEvent read FOnInitialPoll write FOnInitialPoll;
   end;
 
 implementation
+
+uses
+  WinSock;
 
 var
   logger: TLogLogger;
@@ -168,6 +184,8 @@ var
   // Global transport reference for timer window procedure
   // (Windows SetTimer requires a window proc, not a method pointer)
   GTransportInstance: TIcomNetworkTransport;
+
+function BytesToHexStr(const Data; DataLen: Integer): string; forward;
 
 // Timer window procedure
 function TimerWndProc(Wnd: HWND; Msg: UINT; wParam: WPARAM; lParam: LPARAM): LRESULT; stdcall;
@@ -181,6 +199,8 @@ begin
       ICOM_TIMER_RETRANSMIT:    GTransportInstance.OnRetransmitTimer;
       ICOM_TIMER_CIV_WATCHDOG:  GTransportInstance.OnCivWatchdogTimer;
       ICOM_TIMER_AYT:           GTransportInstance.OnAYTTimer;
+      ICOM_TIMER_LOGIN:         GTransportInstance.OnLoginTimer;
+      ICOM_TIMER_INITIAL_POLL:  GTransportInstance.OnInitialPollTimer;
     end;
     Result := 0;
   end
@@ -302,7 +322,7 @@ begin
     logger.Debug('[IcomTransport] My control ID: $%.8x', [FMyId]);
 
     // Send "Are You There" to start handshake
-    Inc(FSendSeq);
+    // AYT uses Seq=0 (FSendSeq starts at 0); do NOT increment here
     SendControlPacket(ICOM_PKT_ARE_YOU_THERE, FControlSocket,
       0, FRadioAddress, FControlPort, FSendSeq);
     SetState(icsWaitingForHere);
@@ -401,10 +421,10 @@ begin
   Pkt.PktType := ICOM_PKT_DATA;
   Inc(FCivSeq);
   Pkt.Seq := FCivSeq;
-  Pkt.SentID := FCivMyId;
+  Pkt.SentID := FMyId;
   Pkt.RcvdID := FCivRemoteId;
   Pkt.Reply := ICOM_DATA_REPLY_MARKER;
-  Pkt.DataLen := SwapWord(Word(Length(CivFrame)));
+  Pkt.DataLen := Length(CivFrame);  // Little-endian (no swap) — matches wfview
   Pkt.SendSeq := SwapWord(FCivInnerSeq);
   Inc(FCivInnerSeq);
 
@@ -422,11 +442,9 @@ begin
     FSendLock.Leave;
   end;
 
-  // Store for retransmit
-  AddToRetransmitBuffer(FCivSeq, FullPacket);
-
-  logger.Trace('[IcomTransport] Sent CI-V data, outer seq=%d, inner seq=%d, len=%d',
-               [FCivSeq, FCivInnerSeq - 1, Length(CivFrame)]);
+  logger.Debug('[IcomTransport] Sent CI-V data, outer seq=%d, inner seq=%d, len=%d hex: %s',
+               [FCivSeq, FCivInnerSeq - 1, Length(CivFrame),
+                BytesToHexStr(FullPacket[1], Length(FullPacket))]);
 end;
 
 // ============================================================================
@@ -439,6 +457,7 @@ procedure TIcomNetworkTransport.CreateSockets;
     OnRead: TUDPReadEvent; BindPort: Word);
   var
     Binding: TIdSocketHandle;
+    RcvBufSize: Integer;
   begin
     Socket := TIdUDPServer.Create(nil);
     Socket.ThreadedEvent := True;
@@ -450,6 +469,12 @@ procedure TIcomNetworkTransport.CreateSockets;
     Binding.Port := BindPort;
 
     Socket.Active := True;
+
+    // Increase UDP receive buffer to 256KB to reduce packet loss under load
+    RcvBufSize := 256 * 1024;
+    WinSock.setsockopt(Binding.Handle, SOL_SOCKET, SO_RCVBUF,
+      PChar(@RcvBufSize), SizeOf(RcvBufSize));
+
     logger.Debug('[IcomTransport] Socket bound to port %d', [Binding.Port]);
   end;
 
@@ -486,6 +511,45 @@ begin
   end;
 end;
 
+// Use the UDP connect trick to find which local interface routes to the radio.
+// A UDP "connect" sets routing without sending any packet, then getsockname
+// returns the local interface IP that the OS would use for that route.
+function TIcomNetworkTransport.GetLocalIPForRoute: string;
+var
+  Sock: TSocket;
+  DestAddr: TSockAddr;
+  LocalAddr: TSockAddr;
+  AddrLen: Integer;
+  DestIP: u_long;
+begin
+  Result := '';
+  try
+    Sock := WinSock.socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if Sock = INVALID_SOCKET then Exit;
+    try
+      DestIP := WinSock.inet_addr(PChar(FRadioAddress));
+      if DestIP = INADDR_NONE then Exit;
+
+      FillChar(DestAddr, SizeOf(DestAddr), 0);
+      DestAddr.sin_family := AF_INET;
+      DestAddr.sin_port := WinSock.htons(FControlPort);
+      DestAddr.sin_addr.S_addr := DestIP;
+
+      if WinSock.connect(Sock, DestAddr, SizeOf(DestAddr)) <> 0 then Exit;
+
+      AddrLen := SizeOf(LocalAddr);
+      FillChar(LocalAddr, SizeOf(LocalAddr), 0);
+      if WinSock.getsockname(Sock, LocalAddr, AddrLen) <> 0 then Exit;
+
+      Result := string(WinSock.inet_ntoa(LocalAddr.sin_addr));
+    finally
+      WinSock.closesocket(Sock);
+    end;
+  except
+    Result := '';
+  end;
+end;
+
 function TIcomNetworkTransport.CalculateMyIdFromSocket(Socket: TIdUDPServer): LongWord;
 var
   LocalIP: LongWord;
@@ -502,10 +566,15 @@ begin
   else
     LocalPort := 0;
 
-  // Get local IP - use the binding's IP or detect from socket
+  // Get local IP - use the binding's IP, or use routing trick to detect it
   IPStr := Socket.Bindings[0].IP;
   if (IPStr = '') or (IPStr = '0.0.0.0') then
-    IPStr := '127.0.0.1';  // Fallback - will be corrected on first packet
+  begin
+    IPStr := GetLocalIPForRoute;
+    if IPStr = '' then
+      IPStr := '127.0.0.1';  // Last-resort fallback
+    logger.Debug('[IcomTransport] Detected local routing IP: %s', [IPStr]);
+  end;
 
   // Parse IP string to bytes
   FillChar(IPParts, SizeOf(IPParts), 0);
@@ -537,6 +606,23 @@ begin
 end;
 
 // ============================================================================
+// Hex dump helper (for debug logging)
+// ============================================================================
+
+function BytesToHexStr(const Data; DataLen: Integer): string;
+var
+  Bytes: array[0..1023] of Byte absolute Data;
+  I: Integer;
+begin
+  Result := '';
+  for I := 0 to DataLen - 1 do
+  begin
+    if I > 0 then Result := Result + ' ';
+    Result := Result + IntToHex(Bytes[I], 2);
+  end;
+end;
+
+// ============================================================================
 // UDP Read Handlers (called from Indy listener threads)
 // ============================================================================
 
@@ -545,13 +631,11 @@ procedure TIcomNetworkTransport.HandleControlUDPRead(
   const AData: TIdBytes; ABinding: TIdSocketHandle);
 var
   RawData: array of Byte;
-  I: Integer;
 begin
   if Length(AData) < SizeOf(TControlPacket) then Exit;
 
   SetLength(RawData, Length(AData));
-  for I := 0 to High(AData) do
-    RawData[I] := AData[I];
+  Move(AData[0], RawData[0], Length(AData));
 
   HandleReceivedPacket(RawData, Length(RawData), False,
     ABinding.PeerIP, ABinding.PeerPort);
@@ -562,13 +646,11 @@ procedure TIcomNetworkTransport.HandleCivUDPRead(
   const AData: TIdBytes; ABinding: TIdSocketHandle);
 var
   RawData: array of Byte;
-  I: Integer;
 begin
   if Length(AData) < SizeOf(TControlPacket) then Exit;
 
   SetLength(RawData, Length(AData));
-  for I := 0 to High(AData) do
-    RawData[I] := AData[I];
+  Move(AData[0], RawData[0], Length(AData));
 
   HandleReceivedPacket(RawData, Length(RawData), True,
     ABinding.PeerIP, ABinding.PeerPort);
@@ -590,8 +672,12 @@ begin
   Move(Data[0], Pkt, SizeOf(TControlPacket));
   PktType := Pkt.PktType;
 
-  logger.Trace('[IcomTransport] Received packet: type=$%.4x len=%d fromCIV=%s peer=%s:%d',
-               [PktType, DataLen, BoolToStr(FromCivSocket, True), PeerIP, PeerPort]);
+  logger.Trace('[IcomTransport] Received packet: type=$%.4x len=%d fromCIV=%s state=%s peer=%s:%d',
+               [PktType, DataLen, BoolToStr(FromCivSocket, True),
+                IcomStateToString(FState), PeerIP, PeerPort]);
+  logger.Trace('[IcomTransport] Packet hex: %s', [BytesToHexStr(Data[0], DataLen)]);
+  if FState = icsWaitingForLogin then
+    logger.Debug('[IcomTransport] WaitingForLogin raw: %s', [BytesToHexStr(Data[0], DataLen)]);
 
   case PktType of
     ICOM_PKT_I_AM_HERE,
@@ -602,20 +688,37 @@ begin
     ICOM_PKT_PING:
       HandlePingPacket(Data, DataLen, FromCivSocket, PeerIP, PeerPort);
 
-    ICOM_PKT_DATA:
+    ICOM_PKT_DATA,
+    ICOM_PKT_AUTH:
       begin
         if FromCivSocket then
           HandleDataPacket(Data, DataLen)
         else
         begin
           // Data packets on control socket: login response, capabilities, status
-          if DataLen >= SizeOf(TLoginResponsePacket) then
-          begin
-            case FState of
-              icsWaitingForLogin:  HandleLoginResponse(Data, DataLen);
-              icsWaitingForToken:  HandleCapabilities(Data, DataLen);
-              icsWaitingForStream: HandleStatusPacket(Data, DataLen);
-            end;
+          // Each state requires a different minimum packet size - check per-state
+          case FState of
+            icsWaitingForLogin:
+              if DataLen >= SizeOf(TLoginResponsePacket) then  // 96 bytes
+                HandleLoginResponse(Data, DataLen)
+              else
+                logger.Debug('[IcomTransport] WaitingForLogin: too small (%d < %d)',
+                  [DataLen, SizeOf(TLoginResponsePacket)]);
+            icsWaitingForToken:
+              if DataLen >= SizeOf(TCapabilitiesPacket) then   // 66 bytes
+                HandleCapabilities(Data, DataLen)
+              else
+                logger.Debug('[IcomTransport] WaitingForToken: too small (%d < %d)',
+                  [DataLen, SizeOf(TCapabilitiesPacket)]);
+            icsWaitingForStream:
+              if DataLen = SizeOf(TStatusPacket) then          // exactly 80 bytes
+                HandleStatusPacket(Data, DataLen)
+              else
+                logger.Debug('[IcomTransport] WaitingForStream: ignoring non-status pkt len=%d (expected %d)',
+                  [DataLen, SizeOf(TStatusPacket)]);
+          else
+            logger.Debug('[IcomTransport] Control data pkt len=%d dropped (state=%s)',
+              [DataLen, IcomStateToString(FState)]);
           end;
         end;
       end;
@@ -680,13 +783,18 @@ begin
           if FState = icsCIVWaitingForReady then
           begin
             logger.Info('[IcomTransport] CI-V I Am Ready received');
-            SetState(icsConnected);
 
-            // Send CI-V Open
+            // Send CI-V Open BEFORE transitioning to connected so the radio
+            // is ready to respond when our initial freq/mode queries arrive
+            // (OnNetworkStateChange fires synchronously inside SetState)
             SendCivOpen;
 
             // Start keepalive timers
             StartTimers;
+
+            // Transition to connected — fires OnNetworkStateChange which
+            // sends initial QueryVFOAFrequency / QueryMode / transceive check
+            SetState(icsConnected);
 
             // Small delay before sending CI-V commands
             FLastCivData := GetTickCount;
@@ -723,13 +831,27 @@ procedure TIcomNetworkTransport.HandlePingPacket(
   FromCivSocket: Boolean; PeerIP: string; PeerPort: Word);
 var
   Pkt: TPingPacket;
+  ExpectedId: LongWord;
 begin
   if DataLen < SizeOf(TPingPacket) then Exit;
   Move(Data[0], Pkt, SizeOf(TPingPacket));
 
   if Pkt.Reply = 0 then
   begin
-    // Ping request - send response
+    // Only respond to pings addressed to our own session.
+    // Pings addressed to a different RcvdID belong to a stale/other session -
+    // ignoring them lets the radio time out dead sessions faster.
+    // Always use FMyId — radio identifies us by the control-socket ID from authentication
+    ExpectedId := FMyId;
+
+    if (ExpectedId <> 0) and (Pkt.RcvdID <> ExpectedId) then
+    begin
+      logger.Debug('[IcomTransport] Ignoring ping to stale session $%.8x (ours: $%.8x)',
+                   [Pkt.RcvdID, ExpectedId]);
+      Exit;
+    end;
+
+    // Ping request addressed to us - send response
     if FromCivSocket then
       SendPingResponse(Data, DataLen, FCivSocket, PeerIP, PeerPort)
     else
@@ -782,6 +904,7 @@ var
   Offset: Integer;
   I: Integer;
   NameStr: string;
+  RcvBufSize: Integer;
 begin
   if DataLen < SizeOf(TCapabilitiesPacket) then Exit;
   Move(Data[0], CapHdr, SizeOf(TCapabilitiesPacket));
@@ -812,7 +935,25 @@ begin
                 [FRadioName, FCivAddress, FCommonCap]);
   end;
 
-  // Send Stream Request
+  // Create CI-V socket now so we can tell the radio our local CI-V port in the stream request
+  if FCivSocket = nil then
+  begin
+    FCivSocket := TIdUDPServer.Create(nil);
+    FCivSocket.ThreadedEvent := True;
+    FCivSocket.OnUDPRead := HandleCivUDPRead;
+    FCivSocket.Bindings.Add;  // Let OS pick any available port (IP and Port left as defaults)
+    FCivSocket.Active := True;
+
+    // Increase UDP receive buffer to 256KB to reduce packet loss under load
+    RcvBufSize := 256 * 1024;
+    WinSock.setsockopt(FCivSocket.Bindings[0].Handle, SOL_SOCKET, SO_RCVBUF,
+      PChar(@RcvBufSize), SizeOf(RcvBufSize));
+
+    logger.Debug('[IcomTransport] CI-V socket pre-bound to port %d',
+                 [FCivSocket.Bindings[0].Port]);
+  end;
+
+  // Send Stream Request (includes our local CI-V port so radio knows where to connect)
   SendStreamRequest;
   SetState(icsWaitingForStream);
 end;
@@ -825,7 +966,6 @@ procedure TIcomNetworkTransport.HandleStatusPacket(
   const Data: array of Byte; DataLen: Integer);
 var
   Pkt: TStatusPacket;
-  Binding: TIdSocketHandle;
 begin
   if DataLen < SizeOf(TStatusPacket) then Exit;
   Move(Data[0], Pkt, SizeOf(TStatusPacket));
@@ -845,22 +985,8 @@ begin
 
   logger.Info('[IcomTransport] Status received, CI-V port=%d', [FCivPort]);
 
-  // Create CI-V socket now that we know the port
-  if FCivSocket = nil then
-  begin
-    FCivSocket := TIdUDPServer.Create(nil);
-    FCivSocket.ThreadedEvent := True;
-    FCivSocket.OnUDPRead := HandleCivUDPRead;
-
-    Binding := FCivSocket.Bindings.Add;
-    Binding.IP := '0.0.0.0';
-    Binding.Port := 0;  // Any available port
-
-    FCivSocket.Active := True;
-    logger.Debug('[IcomTransport] CI-V socket bound to port %d', [Binding.Port]);
-  end;
-
-  // Calculate CI-V socket ID
+  // CI-V socket was already created in HandleCapabilities before the stream request,
+  // so the radio already knows our local CI-V port from the conninfo packet.
   FCivMyId := CalculateMyIdFromSocket(FCivSocket);
   logger.Debug('[IcomTransport] My CI-V ID: $%.8x', [FCivMyId]);
 
@@ -868,8 +994,9 @@ begin
   FCivSeq := 0;
   FCivInnerSeq := 0;
 
-  // Send "Are You There" on CI-V socket
-  Inc(FCivSeq);
+  // Send "Are You There" on CI-V socket — Seq=0 (do NOT increment, matches control socket AYT pattern)
+  logger.Debug('[IcomTransport] Sending CI-V AYT: localPort=%d -> %s:%d myId=$%.8x',
+    [FCivSocket.Bindings[0].Port, FRadioAddress, FCivPort, FMyId]);
   SendControlPacket(ICOM_PKT_ARE_YOU_THERE, FCivSocket,
     0, FRadioAddress, FCivPort, FCivSeq);
   SetState(icsCIVWaitingForHere);
@@ -952,18 +1079,14 @@ procedure TIcomNetworkTransport.SendControlPacket(PktType: Word;
   TargetAddr: string; TargetPort: Word; var SeqCounter: Word);
 var
   Pkt: TControlPacket;
-  MyId: LongWord;
 begin
-  if Socket = FCivSocket then
-    MyId := FCivMyId
-  else
-    MyId := FMyId;
+  // Always use FMyId — radio identifies us by the control-socket ID from authentication
 
   FillChar(Pkt, SizeOf(Pkt), 0);
   Pkt.Len := ICOM_CONTROL_PKT_SIZE;
   Pkt.PktType := PktType;
   Pkt.Seq := SeqCounter;
-  Pkt.SentID := MyId;
+  Pkt.SentID := FMyId;
   Pkt.RcvdID := RemoteId;
 
   FSendLock.Enter;
@@ -974,7 +1097,7 @@ begin
   end;
 
   logger.Trace('[IcomTransport] Sent control packet: type=$%.4x seq=%d myId=$%.8x rcvdId=$%.8x',
-               [PktType, SeqCounter, MyId, RemoteId]);
+               [PktType, SeqCounter, FMyId, RemoteId]);
 end;
 
 procedure TIcomNetworkTransport.SendPingResponse(
@@ -987,14 +1110,10 @@ begin
   if DataLen < SizeOf(TPingPacket) then Exit;
   Move(Data[0], Pkt, SizeOf(TPingPacket));
 
-  if Socket = FCivSocket then
-    MyId := FCivMyId
-  else
-    MyId := FMyId;
-
+  // Always use FMyId — same ID used across both sockets
   // Swap sender/receiver and set reply flag
   Pkt.RcvdID := Pkt.SentID;
-  Pkt.SentID := MyId;
+  Pkt.SentID := FMyId;
   Pkt.Reply := 1;
   Inc(FPingSendSeq);
   Pkt.Seq := FPingSendSeq;
@@ -1037,16 +1156,17 @@ var
 begin
   FillChar(Pkt, SizeOf(Pkt), 0);
   Pkt.Len := ICOM_LOGIN_PKT_SIZE;
-  Pkt.PktType := ICOM_PKT_DATA;
-  Inc(FSendSeq);
-  Pkt.Seq := FSendSeq;
+  Pkt.PktType := ICOM_PKT_DATA;  // Auth packets use PktType=0 (same as DATA)
+  // Auth packets use their own seq counter starting at 1 (separate from control seq)
+  FAuthOuterSeq := 1;
+  Pkt.Seq := FAuthOuterSeq;
   Pkt.SentID := FMyId;
   Pkt.RcvdID := FRemoteId;
   Pkt.PayloadSize := SwapLongWord(ICOM_LOGIN_PKT_SIZE - $10);
   Pkt.RequestReply := $01;
   Pkt.RequestType := $00;
-  Inc(FAuthSeq);
   Pkt.InnerSeq := SwapWord(FAuthSeq);
+  Inc(FAuthSeq);
 
   // Random token request
   Randomize;
@@ -1074,6 +1194,7 @@ begin
   end;
 
   logger.Debug('[IcomTransport] Sent login packet, authSeq=$%.4x', [FAuthSeq]);
+  logger.Debug('[IcomTransport] Login packet hex: %s', [BytesToHexStr(Pkt, SizeOf(Pkt))]);
 end;
 
 procedure TIcomNetworkTransport.SendTokenAck;
@@ -1082,16 +1203,16 @@ var
 begin
   FillChar(Pkt, SizeOf(Pkt), 0);
   Pkt.Len := ICOM_TOKEN_PKT_SIZE;
-  Pkt.PktType := ICOM_PKT_DATA;
-  Inc(FSendSeq);
-  Pkt.Seq := FSendSeq;
+  Pkt.PktType := ICOM_PKT_DATA;  // Auth packets use PktType=0 (same as DATA)
+  Inc(FAuthOuterSeq);
+  Pkt.Seq := FAuthOuterSeq;
   Pkt.SentID := FMyId;
   Pkt.RcvdID := FRemoteId;
   Pkt.PayloadSize := SwapLongWord(ICOM_TOKEN_PKT_SIZE - $10);
   Pkt.RequestReply := $01;
   Pkt.RequestType := ICOM_TOKEN_ACK;
-  Inc(FAuthSeq);
   Pkt.InnerSeq := SwapWord(FAuthSeq);
+  Inc(FAuthSeq);
   Pkt.TokRequest := FTokRequest;
   Pkt.Token := FToken;
   Pkt.AuthStartID := FAuthStartId;
@@ -1116,9 +1237,9 @@ var
 begin
   FillChar(Pkt, SizeOf(Pkt), 0);
   Pkt.Len := ICOM_TOKEN_PKT_SIZE;
-  Pkt.PktType := ICOM_PKT_DATA;
-  Inc(FSendSeq);
-  Pkt.Seq := FSendSeq;
+  Pkt.PktType := ICOM_PKT_DATA;  // Auth packets use PktType=0 (same as DATA)
+  Inc(FAuthOuterSeq);
+  Pkt.Seq := FAuthOuterSeq;
   Pkt.SentID := FMyId;
   Pkt.RcvdID := FRemoteId;
   Pkt.PayloadSize := SwapLongWord(ICOM_TOKEN_PKT_SIZE - $10);
@@ -1152,16 +1273,16 @@ var
 begin
   FillChar(Pkt, SizeOf(Pkt), 0);
   Pkt.Len := ICOM_CONNINFO_PKT_SIZE;
-  Pkt.PktType := ICOM_PKT_DATA;
-  Inc(FSendSeq);
-  Pkt.Seq := FSendSeq;
+  Pkt.PktType := ICOM_PKT_DATA;  // Auth packets use PktType=0 (same as DATA)
+  Inc(FAuthOuterSeq);
+  Pkt.Seq := FAuthOuterSeq;
   Pkt.SentID := FMyId;
   Pkt.RcvdID := FRemoteId;
   Pkt.PayloadSize := SwapLongWord(ICOM_CONNINFO_PKT_SIZE - $10);
   Pkt.RequestReply := $01;
   Pkt.RequestType := ICOM_CONNINFO_REQUEST;
-  Inc(FAuthSeq);
   Pkt.InnerSeq := SwapWord(FAuthSeq);
+  Inc(FAuthSeq);
   Pkt.TokRequest := FTokRequest;
   Pkt.Token := FToken;
 
@@ -1195,8 +1316,11 @@ begin
   Pkt.RxSample := SwapLongWord(8000);
   Pkt.TxSample := 0;
 
-  // Tell radio our local CI-V port (0 = radio will assign)
-  Pkt.CivPort := 0;
+  // Tell radio our local CI-V port so it knows where to send CI-V data
+  if (FCivSocket <> nil) and (FCivSocket.Bindings.Count > 0) then
+    Pkt.CivPort := SwapLongWord(FCivSocket.Bindings[0].Port)
+  else
+    Pkt.CivPort := 0;
   Pkt.AudioPort := 0;
   Pkt.TxBuffer := 0;
   Pkt.Convert := 1;
@@ -1209,7 +1333,9 @@ begin
     FSendLock.Leave;
   end;
 
-  logger.Debug('[IcomTransport] Sent stream request for radio %s', [FRadioName]);
+  logger.Debug('[IcomTransport] Sent stream request for radio %s (civport field=$%.8x)',
+    [FRadioName, Pkt.CivPort]);
+  logger.Debug('[IcomTransport] Stream request hex: %s', [BytesToHexStr(Pkt, SizeOf(Pkt))]);
 end;
 
 procedure TIcomNetworkTransport.SendCivOpen;
@@ -1221,7 +1347,7 @@ begin
   Pkt.PktType := ICOM_PKT_DATA;
   Inc(FCivSeq);
   Pkt.Seq := FCivSeq;
-  Pkt.SentID := FCivMyId;
+  Pkt.SentID := FMyId;
   Pkt.RcvdID := FCivRemoteId;
   Pkt.Data := ICOM_OPENCLOSE_DATA;
   Pkt.SendSeq := SwapWord(FCivInnerSeq);
@@ -1248,7 +1374,7 @@ begin
   Pkt.PktType := ICOM_PKT_DATA;
   Inc(FCivSeq);
   Pkt.Seq := FCivSeq;
-  Pkt.SentID := FCivMyId;
+  Pkt.SentID := FMyId;
   Pkt.RcvdID := FCivRemoteId;
   Pkt.Data := ICOM_OPENCLOSE_DATA;
   Pkt.SendSeq := SwapWord(FCivInnerSeq);
@@ -1277,7 +1403,7 @@ begin
   Pkt.PktType := ICOM_PKT_DATA;
   Inc(FCivSeq);
   Pkt.Seq := FCivSeq;
-  Pkt.SentID := FCivMyId;
+  Pkt.SentID := FMyId;
   Pkt.RcvdID := FCivRemoteId;
 
   FSendLock.Enter;
@@ -1291,18 +1417,37 @@ end;
 
 procedure TIcomNetworkTransport.SendRawPacket(Socket: TIdUDPServer;
   const Data; DataLen: Integer; TargetAddr: string; TargetPort: Word);
-var
-  IdBytes: TIdBytes;
-begin
-  SetLength(IdBytes, DataLen);
-  Move(Data, IdBytes[0], DataLen);
-
-  try
-    Socket.SendBuffer(TargetAddr, TargetPort, IdBytes);
-  except
-    on E: Exception do
-      logger.Error('[IcomTransport] SendRawPacket exception: %s', [E.Message]);
+type
+  // Minimal sockaddr_in layout - avoids type conflicts between Windows/WinSock2
+  TSockAddrIn4 = packed record
+    sin_family: Word;
+    sin_port:   Word;
+    sin_addr:   LongWord;
+    sin_zero:   array[0..7] of Byte;
   end;
+var
+  SockHandle: Integer;
+  Addr: TSockAddrIn4;
+  Ret: Integer;
+begin
+  // Use direct WinSock sendto() to avoid TIdUDPServer.SendBuffer deadlock
+  // when called from the main thread while Indy read threads are active.
+  if Socket.Bindings.Count = 0 then
+  begin
+    logger.Error('[IcomTransport] SendRawPacket: no socket binding');
+    Exit;
+  end;
+
+  SockHandle := Socket.Bindings[0].Handle;
+
+  FillChar(Addr, SizeOf(Addr), 0);
+  Addr.sin_family := 2;  // AF_INET
+  Addr.sin_port   := (TargetPort shr 8) or ((TargetPort and $FF) shl 8);  // htons
+  Addr.sin_addr   := LongWord(inet_addr(PChar(TargetAddr)));
+
+  Ret := ws2_sendto(SockHandle, Data, DataLen, 0, Addr, SizeOf(Addr));
+  if Ret < 0 then
+    logger.Error('[IcomTransport] SendRawPacket sendto failed');
 end;
 
 // ============================================================================
@@ -1316,6 +1461,21 @@ begin
     logger.Info('[IcomTransport] State: %s -> %s',
                 [IcomStateToString(FState), IcomStateToString(NewState)]);
     FState := NewState;
+
+    // Manage the login retry timer
+    if (NewState = icsWaitingForLogin) and (FTimerWnd <> 0) then
+    begin
+      FLoginRetryCount := 0;
+      SetTimer(FTimerWnd, ICOM_TIMER_LOGIN, ICOM_LOGIN_TIMEOUT, nil);
+    end
+    else if FTimerWnd <> 0 then
+      KillTimer(FTimerWnd, ICOM_TIMER_LOGIN);
+
+    // On connect: fire a one-shot 250ms timer to seed freq/mode after the radio
+    // has had time to process the CI-V Open packet (radio ignores queries sent
+    // immediately after Open — this matches TR4QT/wfview behaviour)
+    if (NewState = icsConnected) and (FTimerWnd <> 0) then
+      SetTimer(FTimerWnd, ICOM_TIMER_INITIAL_POLL, 250, nil);
 
     if Assigned(FOnStateChange) then
     begin
@@ -1345,7 +1505,7 @@ begin
   SetTimer(FTimerWnd, ICOM_TIMER_PING, ICOM_PING_INTERVAL, nil);
   SetTimer(FTimerWnd, ICOM_TIMER_IDLE, ICOM_IDLE_INTERVAL, nil);
   SetTimer(FTimerWnd, ICOM_TIMER_TOKEN, ICOM_TOKEN_RENEWAL_INTERVAL, nil);
-  SetTimer(FTimerWnd, ICOM_TIMER_RETRANSMIT, ICOM_RETRANSMIT_CHECK_INTERVAL, nil);
+  // Retransmit timer disabled — CI-V over LAN doesn't need app-level retransmit
   SetTimer(FTimerWnd, ICOM_TIMER_CIV_WATCHDOG, ICOM_CIV_WATCHDOG_INTERVAL, nil);
 
   logger.Debug('[IcomTransport] All timers started');
@@ -1361,6 +1521,7 @@ begin
   KillTimer(FTimerWnd, ICOM_TIMER_RETRANSMIT);
   KillTimer(FTimerWnd, ICOM_TIMER_CIV_WATCHDOG);
   KillTimer(FTimerWnd, ICOM_TIMER_AYT);
+  KillTimer(FTimerWnd, ICOM_TIMER_LOGIN);
 
   logger.Debug('[IcomTransport] All timers stopped');
 end;
@@ -1464,8 +1625,7 @@ begin
   if FAYTInterval > ICOM_AYT_MAX_INTERVAL then
     FAYTInterval := ICOM_AYT_MAX_INTERVAL;
 
-  // Resend "Are You There"
-  Inc(FSendSeq);
+  // Resend "Are You There" — AYT always uses Seq=0, same as initial send
   SendControlPacket(ICOM_PKT_ARE_YOU_THERE, FControlSocket,
     0, FRadioAddress, FControlPort, FSendSeq);
 
@@ -1475,6 +1635,55 @@ begin
 
   logger.Debug('[IcomTransport] AYT retry %d/%d, interval=%dms',
                [FAYTRetryCount, ICOM_AYT_MAX_RETRIES, FAYTInterval]);
+end;
+
+procedure TIcomNetworkTransport.OnLoginTimer;
+begin
+  if FState <> icsWaitingForLogin then
+  begin
+    KillTimer(FTimerWnd, ICOM_TIMER_LOGIN);
+    Exit;
+  end;
+
+  Inc(FLoginRetryCount);
+  if FLoginRetryCount > ICOM_LOGIN_MAX_RETRIES then
+  begin
+    logger.Error('[IcomTransport] No login response after %d retries - giving up',
+                 [ICOM_LOGIN_MAX_RETRIES]);
+    KillTimer(FTimerWnd, ICOM_TIMER_LOGIN);
+    Disconnect;
+    Exit;
+  end;
+
+  // Resend login packet. The radio may have been busy or a stale session
+  // (from a previous run) may still be active on the radio. By not responding
+  // to pings for that stale session we allow the radio to time it out, after
+  // which a retry of the login should succeed.
+  logger.Debug('[IcomTransport] Login timeout - resending login packet (retry %d/%d)',
+               [FLoginRetryCount, ICOM_LOGIN_MAX_RETRIES]);
+  SendLoginPacket;
+end;
+
+procedure TIcomNetworkTransport.OnInitialPollTimer;
+begin
+  // One-shot timer: kill ourselves immediately so we only fire once
+  KillTimer(FTimerWnd, ICOM_TIMER_INITIAL_POLL);
+
+  if FState <> icsConnected then Exit;
+
+  // 250ms has elapsed since CI-V Open — radio is ready to respond to queries.
+  // Use the dedicated OnInitialPoll callback so TIcomRadio can send its
+  // initial freq/mode queries without conflating with general state changes.
+  logger.Info('[IcomTransport] Initial poll delay complete - seeding freq/mode');
+  if Assigned(FOnInitialPoll) then
+  begin
+    try
+      FOnInitialPoll(Self);
+    except
+      on E: Exception do
+        logger.Error('[IcomTransport] Exception in initial poll callback: %s', [E.Message]);
+    end;
+  end;
 end;
 
 // ============================================================================

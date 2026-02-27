@@ -1608,6 +1608,7 @@ const
   QSYSHIFT = 20000;
 begin
   Result := False;
+  logger.debug('[TuneOnFreq] Enter: CallWindowString="%s"', [CallWindowString]);
   if CheckCommandInCallsignWindow then
   begin
     tCleareCallWindow;
@@ -1615,7 +1616,10 @@ begin
     Exit;
   end;
   if length(CallWindowString) < 2 then
+  begin
+    logger.debug('[TuneOnFreq] Exit: length < 2');
     Exit;
+  end;
 
   TempVFO := 'A';
   TempString := CallWindowString;
@@ -1627,9 +1631,13 @@ begin
   end;
 
   if StringIsAllNumbersOrDecimal(TempString) = False then
+  begin
+    logger.debug('[TuneOnFreq] Exit: not all numbers/decimal, TempString="%s"', [TempString]);
     Exit;
+  end;
 
   TempBand := ActiveBand;
+  logger.debug('[TuneOnFreq] TempBand=%d, TempString="%s"', [Ord(TempBand), TempString]);
 
   if not (TempBand in [Band160..Band2]) then
   begin
@@ -1641,7 +1649,10 @@ begin
         QSYSHIFT, TempBand, TempMode);
 
     if not (TempBand in [Band160..Band2]) then
+    begin
+      logger.debug('[TuneOnFreq] Exit: TempBand not in HF range after fallback, FilteredFreq=%d', [ActiveRadioPtr.FilteredStatus.Freq]);
       Exit;
+    end;
   end;
 
   TempFreq := StrToInt(TempString);
@@ -1661,7 +1672,9 @@ begin
   else
     TempFreq := TempFreq * 1000;
 
+  logger.debug('[TuneOnFreq] TempFreq=%u before GetBandMap', [TempFreq]);
   GetBandMapBandModeFromFrequency(TempFreq, TempBand, TempMode);
+  logger.debug('[TuneOnFreq] After GetBandMap: TempBand=%d, TempMode=%d', [Ord(TempBand), Ord(TempMode)]);
   if TempBand <> NoBand then
   begin
     SetRadioFreq(ActiveRadio, TempFreq, TempMode, TempVFO);
@@ -2871,6 +2884,7 @@ begin
     menu_alt_bandup:
       begin
         RememberFrequency;
+        LastDisplayedBand := NoBand; // Force DisplayBandMode to always call SetRadioFreq
         BandDownOrUp(DirectionUp);
         ShowInformation;
       end;
@@ -2878,6 +2892,7 @@ begin
     menu_alt_banddown:
       begin
         RememberFrequency;
+        LastDisplayedBand := NoBand; // Force DisplayBandMode to always call SetRadioFreq
         BandDownOrUp(DirectionDown);
         ShowInformation;
       end;
