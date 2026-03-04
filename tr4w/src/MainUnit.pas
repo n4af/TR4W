@@ -1,3 +1,4 @@
+
 {
  Copyright Dmitriy Gulyaev UA4WLI 2015.
 
@@ -2345,20 +2346,46 @@ begin
   end;
 end;
 
+
+
+procedure ApplyRoundedWindow;
+const
+  CORNER_RADIUS = 20;
+var
+  R: TRect;
+  Rgn: HRGN;
+begin
+  if tr4whandle = 0 then Exit;
+  Windows.GetWindowRect(tr4whandle, R);
+  Rgn := CreateRoundRectRgn(0, 0,
+           R.Right - R.Left,    // actual window width
+           R.Bottom - R.Top,    // actual window height
+           CORNER_RADIUS, CORNER_RADIUS);
+  SetWindowRgn(tr4whandle, Rgn, True);
+end;
+
 procedure CreateMainWindow;
-//var PanelWidth : array[0..1] of Integer;
+//var PanelWidth : array[0..1] of Integer;                          
+const   CORNER_RADIUS = 40; { Change to 30 or 40 for more rounding }
+
 var
   e: TMainWindowElement;
   temprect: TRect;
   // OffsetY : integer;
 begin
-  tr4whandle := CreateWindowEx($00010100, tr4w_ClassName, nil,
-    WS_SYSMENU or WS_MINIMIZEBOX { or WS_THICKFRAME},
-    0, 30, MainWindowWidth, 0 {MainWindowHeight},
+  tr4whandle := CreateWindowEx($00010000, tr4w_ClassName, nil,
+    WS_POPUP or WS_SYSMENU or WS_MINIMIZEBOX,  // ws popup removes the frame
+   0, 30, MainWindowWidth, 0 {MainWindowHeight},
     0, tr4w_main_menu,
     hInstance, nil);
   tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndHandle := tr4whandle;
   wh[mweWholeScreen] := tr4whandle;
+  { Round the four corners of the main window }
+ //  SetWindowRgn(tr4whandle,
+ //    CreateRoundRectRgn(0, 0, MainWindowWidth,
+   //   6 + MainWindowCaptionAndHeader + EditableLogHeight + ws * 14,
+    //  12, 12),  { 12 = corner radius in pixels, adjust to taste }
+   // True);
   wh[mweEditableLog] := CreateEditableLog(tr4whandle, 0, ws * 7,
     MainWindowChildsWidth, 0 {EditableLogWindowHeight}, False);
   SetListViewColor(mweEditableLog);
@@ -2372,7 +2399,7 @@ begin
   Windows.SetWindowPos(tr4whandle, HWND_TOP, 0, 0, ws * 46, 6
     + MainWindowCaptionAndHeader + EditableLogHeight + ws * 14,
     {SWP_SHOWWINDOW or }SWP_NOMOVE);
-
+   { Round the four corners of the main window - radius 12px, adjust as needed }
   for e := Low(TMainWindowElement) to High(TMainWindowElement) do
   begin
     if TWindows[e].mweiStyle <= 2 then
@@ -2505,7 +2532,8 @@ begin
 
   // AppendMenu(GetSubMenu(tr4w_main_menu, menu_rescore), MF_POPUP , 11010, 'NepItem');
   // InsertMenu(tr4w_main_menu, menu_rescore, MF_BYCOMMAND, 177, 'aa');
-
+  { Apply rounded corners to the main window }
+  ApplyRoundedWindow;
 end;
 
 procedure OpenOtherWindows;
@@ -2519,6 +2547,8 @@ begin
     tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndRect.Left,
     tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndRect.Top, 0, 0, SWP_NOSIZE or
     SWP_SHOWWINDOW);
+     { Reapply rounded region after window is repositioned }
+    ApplyRoundedWindow;
 end;
 
 function tCreateFont(nHeight, fnWeight: integer; lpszFace: PChar): HFONT;
@@ -3983,7 +4013,8 @@ begin
   if NoCaption then
     // if ID <> tw_FUNCTIONKEYSWINDOW_INDEX then
     Windows.SetWindowLong(h, GWL_STYLE, GetWindowLong(h, GWL_STYLE) -
-      WS_CAPTION);
+   //   WS_CAPTION);
+        WS_POPUP);
 
   Radio := nil;
   if ID = tw_RADIOINTERFACEWINDOW1_INDEX then
@@ -6256,6 +6287,7 @@ begin
     WM_WINDOWPOSCHANGING: WINDOWPOSCHANGINGPROC(PWindowPos(lp));
     WM_SIZE: tListBoxClientAlign(wnd);
     WM_LBUTTONDOWN: DragWindow(wnd);
+    
   end;
 end;
 
