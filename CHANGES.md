@@ -24,7 +24,7 @@
 
 Full CI-V over Ethernet/WiFi support for Icom radios using the Icom Remote Utility protocol. This replaces the previous HamLib/rigctld approach for network-connected Icom radios with a native Delphi implementation that matches the wfview reference.
 
-**Supported radios:** IC-705, IC-7100, IC-7300, IC-7300 MK2, IC-7600, IC-7610, IC-7760, IC-7850, IC-7905, IC-9700
+**Supported radios:** IC-705, IC-7100, IC-7300, IC-7300 MK2, IC-7600, IC-7610, IC-7760, IC-7850, IC-905, IC-9700
 
 **Protocol implementation (`uIcomNetworkTransport.pas`):**
 - 7-state machine: Disconnected → WaitingForHere → WaitingForReady → WaitingForLogin → Authenticated → StreamRequested → Connected
