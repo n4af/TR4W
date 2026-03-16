@@ -721,6 +721,9 @@ var
    ro: TNetRadioBase;
    wasConnected: Boolean;
    reconnectDelay: Integer;
+   sleepRemaining: Integer;
+   lastPollTick: LongWord;
+   authErrBuf: array[0..127] of Char;
 const
    RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
    RECONNECT_MAX_DELAY = 30000;       // 30 seconds max delay
@@ -737,6 +740,7 @@ begin
    logger.Trace('[pNetworkRadio] Entering polling procedure');
    ro := rig^.tNetObject;
    wasConnected := False;
+   lastPollTick := 0;
    reconnectDelay := RECONNECT_INITIAL_DELAY;
 
    // Keep polling thread alive until stop is requested (e.g. on Reset Radio Ports)
@@ -748,33 +752,68 @@ begin
          // Radio is connected - poll status
          if not wasConnected then
             begin
-            logger.Info('[pNetworkRadio] Radio connected, resuming polling');
+            logger.Info('[pNetworkRadio] Radio connected — initial freq/mode will be queried by OnInitialPollSeeding timer (250ms)');
             wasConnected := True;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
 
             // Send immediate poll on connection to wake up radio and get initial state
             if Assigned(ro) and ro.requiresPolling then
                begin
-               logger.Debug('[pNetworkRadio] Sending initial poll queries on connection');
+               logger.Debug('[pNetworkRadio] Sending initial RIT/XIT/split/TX poll on connection');
                ro.PollRadioState;
+               end;
+
+            // Sync program's CW speed to radio on initial connection
+            if rig^.CWSpeedSync and (CodeSpeed >= 6) and Assigned(ro) then
+               begin
+               logger.Debug('[pNetworkRadio] Syncing CW speed %d WPM to radio', [CodeSpeed]);
+               ro.SetCWSpeed(CodeSpeed);
                end;
             end;
 
-         Sleep(FreqPollRate);
+         // HamLib Direct polls at its own rate (pollingInterval = 250ms).
+         // Legacy serial radios need FreqPollRate (10ms) for responsiveness.
+         if Assigned(ro) and (ro is THamLibDirect) then
+            Sleep(ro.pollingInterval)
+         else
+            Sleep(FreqPollRate);
 
-         // For radios without reading thread (like HamLib Direct), actively poll
+         // Auth failure may happen asynchronously during handshake.
+         // IsConnected can still be True if Disconnect couldn't complete
+         // (Indy self-deadlock), so check AuthFailed explicitly.
+         if Assigned(ro) and ro.AuthFailed then
+            begin
+            logger.Warn('[pNetworkRadio] Auth failed for %s - stopping', [rig^.RadioName]);
+            StrPCopy(authErrBuf, rig^.RadioName + ': Auth failed - check credentials');
+            QuickDisplayError(authErrBuf);
+            if rig^.tRadioInterfaceWndHandle <> 0 then
+               begin
+               SetDlgItemText(rig^.tRadioInterfaceWndHandle, 130, 'AUTH FAILED');
+               end;
+            Break;
+            end;
+
+         // For radios without reading thread (like HamLib Direct), actively poll.
+         // Sleep above already enforces pollingInterval (250ms) for this radio type.
          if Assigned(ro) and (ro is THamLibDirect) then
             begin
             THamLibDirect(ro).SendPollRequests;
             end
          // For radios that require active polling (Icom, etc.), call PollRadioState
+         // Throttled by pollingInterval (e.g. 500ms for network Icom)
          else if Assigned(ro) and ro.requiresPolling then
             begin
-            ro.PollRadioState;
+            if (GetTickCount - lastPollTick >= LongWord(ro.pollingInterval)) then
+               begin
+               ro.PollRadioState;
+               lastPollTick := GetTickCount;
+               end;
             end;
 
          rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
          rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);   // After the reset radio port on a net radio, the ro.band[nrVFOA] is not being set.
+         logger.Trace('[pNetworkRadio:%s] freq=%d mode=%d (TRadioMode)',
+                      [rig^.RadioName, ro.frequency[nrVFOA], Ord(ro.mode[nrVFOA])]);
          GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
          rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
          rig^.CurrentStatus.Split := ro.IsSplitEnabled;
@@ -799,6 +838,24 @@ begin
          rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
          rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
 
+         // Sync CW speed from radio → program (active radio only, when CWSpeedSync enabled)
+         // Only the active radio should update CodeSpeed — in SO2R, the inactive radio
+         // may have a different speed and would otherwise fight the active radio.
+         if rig^.CWSpeedSync and (ro.CWSpeed > 0) and (ro.CWSpeed <> CodeSpeed)
+            and (rig = ActiveRadioPtr) then
+         begin
+           CodeSpeed := ro.CWSpeed;
+           DisplayedCodeSpeed := ro.CWSpeed;
+         end;
+
+         if TR4W_HAMLIB_DEBUG then
+            logger.Info('[pNetworkRadio:%s] pre-UpdateStatus: VFOA=%d VFOB=%d split=%s VFOStatus=%d',
+               [rig^.RadioName,
+                rig.CurrentStatus.VFO[VFOA].Frequency,
+                rig.CurrentStatus.VFO[VFOB].Frequency,
+                BoolToStr(rig.CurrentStatus.Split, True),
+                Ord(rig.CurrentStatus.VFOStatus)]);
+
          UpdateStatus(rig);
          end
       else
@@ -813,8 +870,39 @@ begin
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on new disconnect
             end;
 
-         // Attempt to reconnect with exponential backoff
-         Sleep(reconnectDelay);
+         // If auth failed, show error and stop reconnecting
+         if Assigned(ro) and ro.AuthFailed then
+            begin
+            logger.Warn('[pNetworkRadio] Authentication failed for %s - not retrying', [rig^.RadioName]);
+            StrPCopy(authErrBuf, rig^.RadioName + ': Auth failed - check credentials');
+            QuickDisplayError(authErrBuf);
+            if rig^.tRadioInterfaceWndHandle <> 0 then
+               begin
+               SetDlgItemText(rig^.tRadioInterfaceWndHandle, 130, 'AUTH FAILED');
+               end;
+            Break;
+            end;
+
+         // Attempt to reconnect with exponential backoff.
+         // Sleep in short intervals so PollingStopRequested is checked promptly
+         // during shutdown (otherwise a 30s sleep blocks ExitProgram).
+         sleepRemaining := reconnectDelay;
+         while (sleepRemaining > 0) and (not rig^.PollingStopRequested) do
+            begin
+            if sleepRemaining > 250 then
+               begin
+               Sleep(250);
+               end
+            else
+               begin
+               Sleep(sleepRemaining);
+               end;
+            Dec(sleepRemaining, 250);
+            end;
+         if rig^.PollingStopRequested then
+            begin
+            Break;
+            end;
          try
             logger.Info('[pNetworkRadio] Reconnection attempt (delay: %dms)', [reconnectDelay]);
             ro.Connect;
@@ -2989,6 +3077,11 @@ begin
    if rig.CurrentStatus.VFO[VFOA].Frequency <>
       rig.CurrentStatus.previousVFO[VFOA].Frequency then
       begin
+         if TR4W_HAMLIB_DEBUG then
+            logger.Info('[DisplayCurrentStatus:%s] VFOA display update: %d → %d',
+               [rig^.RadioName,
+                rig.CurrentStatus.previousVFO[VFOA].Frequency,
+                rig.CurrentStatus.VFO[VFOA].Frequency]);
          if h <> 0 then
             begin
                SetDlgItemText(h, 102,
@@ -3019,6 +3112,11 @@ begin
    if rig.CurrentStatus.VFO[VFOB].Frequency <>
       rig.CurrentStatus.previousVFO[VFOB].Frequency then
       begin
+         if TR4W_HAMLIB_DEBUG then
+            logger.Info('[DisplayCurrentStatus:%s] VFOB display update: %d → %d',
+               [rig^.RadioName,
+                rig.CurrentStatus.previousVFO[VFOB].Frequency,
+                rig.CurrentStatus.VFO[VFOB].Frequency]);
          if h <> 0 then
             begin
                SetDlgItemText(h, 104,
@@ -3054,6 +3152,11 @@ begin
 
    if rig.CurrentStatus.PrevVFOStatus <> rig.CurrentStatus.VFOStatus then
       begin
+         if TR4W_HAMLIB_DEBUG then
+            logger.Info('[DisplayCurrentStatus:%s] VFOStatus change: %d → %d',
+               [rig^.RadioName,
+                Ord(rig.CurrentStatus.PrevVFOStatus),
+                Ord(rig.CurrentStatus.VFOStatus)]);
          if rig.CurrentStatus.VFOStatus = VFOA then
             begin
                EnableWindowTrue(h, 102);

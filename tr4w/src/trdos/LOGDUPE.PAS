@@ -311,6 +311,9 @@ var
 
   TotalNamesSent                        : integer;
   TotalQSOPoints                        : LONGINT {= 0};
+  MOQSOPartyW0MAWorked                  : Boolean;   // W0MA worked at least once (+100 flat bonus)
+  MOQSOPartyK0GQWorked                  : Boolean;   // K0GQ worked at least once (+100 flat bonus)
+  MOQSOPartyPeakHourCount               : Integer;   // 40/80m QSOs in 1400-2000 UTC window (max 250)
 //  TwoLetterCrunchPartialCallList        : array[0..TwoLetterPartialCallListLength] of integer;
 
   WildCardPartials                      : boolean = True;
@@ -321,6 +324,7 @@ var
 
 //procedure AddCallToPartialList(Call: CallString; InitialExchange: CallString);
 
+procedure CheckMOQSOPartyBonusStation(const Callsign: CallString);
 function BigEntryAddress(Entry: FourBytes): integer;
 
 function CallNotInPossibleCallList(Call: CallString; PossCallList: PossibleCallRecord): boolean;
@@ -1335,12 +1339,23 @@ begin
   end;
 
   TotalQSOPoints := 0;
+  MOQSOPartyW0MAWorked := False;
+  MOQSOPartyK0GQWorked := False;
+  MOQSOPartyPeakHourCount := 0;
   TotalNamesSent := 0;
   tRestartInfo.riTotalRecordsInLog := 0;
   tUSQ := 0;
   tUSQE := 0;
   Windows.ZeroMemory(@tRestartInfo.riQSOByOpMode, SizeOf(tRestartInfo.riQSOByOpMode));
   tThisHourPreviousBand := NoBand;
+end;
+
+procedure CheckMOQSOPartyBonusStation(const Callsign: CallString);
+begin
+   if Callsign = 'W0MA' then
+      MOQSOPartyW0MAWorked := True;
+   if Callsign = 'K0GQ' then
+      MOQSOPartyK0GQWorked := True;
 end;
 
 procedure DupeAndMultSheet.DupeSheetTotals(var Totals: QSOTotalArray);

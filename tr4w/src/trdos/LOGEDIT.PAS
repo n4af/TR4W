@@ -2876,6 +2876,15 @@ begin
   
   TotalScore := QPoints * TotalMults;
 
+  if Contest = MOQSOPARTY then
+     begin
+     if MOQSOPartyW0MAWorked then
+        TotalScore := Result + 100;
+     if MOQSOPartyK0GQWorked then
+        TotalScore := Result + 100;
+     TotalScore := Result + MOQSOPartyPeakHourCount;
+     end;
+
   if Contest = CUPURAL then
     Result := Result + 10 * mo.MTotals[AllBands, Both, rmPrefix];
 

@@ -1,7 +1,7 @@
 unit uRadioHamLib;
 
 interface
-uses uNetRadioBase, StrUtils, SysUtils, Math, Classes {for TStringList},
+uses uNetRadioBase, uRadioBand, StrUtils, SysUtils, Math, Classes {for TStringList},
 ShellAPI, Windows, TF;
 
 type
@@ -42,36 +42,35 @@ type
 
     function Start: boolean;
     function Connect: integer; overload;
-    procedure Transmit;
-    procedure Receive;
-    procedure BufferCW(cwChars: string);
-    procedure SendCW;
-    procedure StopCW;
-    procedure SetFrequency(freq: longint; vfo: TVFO);
-    procedure SetMode(mode: TRadioMode; vfo: TVFO);
-    function ToggleMode(vfo: TVFO): TRadioMode;
-    procedure SetCWSpeed(speed: integer);
-    procedure RITClear(whichVFO: TVFO);
-    procedure XITClear(whichVFO: TVFO);
-
-    procedure RITBumpDown;
-    procedure RITBumpUp;
-    procedure RITOn(whichVFO: TVFO);
-    procedure RITOff(whichVFO: TVFO);
-    procedure XITOn(whichVFO: TVFO);
-    procedure XITOff(whichVFO: TVFO);
-    procedure Split(splitOn: boolean);
-    procedure SetRITFreq(whichVFO: TVFO; hz: integer);
-    procedure SetXITFreq(whichVFO: TVFO; hz: integer);
-    procedure SetBand(band: TRadioBand; vfo: TVFO);
-    function ToggleBand(vfo: TVFO): TRadioBand;
-    procedure SetFilter(whichVFO: TVFO; filter: integer);
-    function SetFilterHz(whichVFO: TVFO; hz: integer): integer;
-    function MemoryKeyer(mem: integer): boolean;
+    procedure Transmit; override;
+    procedure Receive; override;
+    procedure BufferCW(cwChars: string); override;
+    procedure SendCW; override;
+    procedure StopCW; override;
+    procedure SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode); override;
+    procedure SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA); override;
+    function  ToggleMode(vfo: TVFO = nrVFOA): TRadioMode; override;
+    procedure SetCWSpeed(speed: integer); override;
+    procedure RITClear(whichVFO: TVFO); override;
+    procedure XITClear(whichVFO: TVFO); override;
+    procedure RITBumpDown; override;
+    procedure RITBumpUp; override;
+    procedure RITOn(whichVFO: TVFO); override;
+    procedure RITOff(whichVFO: TVFO); override;
+    procedure XITOn(whichVFO: TVFO); override;
+    procedure XITOff(whichVFO: TVFO); override;
+    procedure Split(splitOn: boolean); override;
+    procedure SetRITFreq(whichVFO: TVFO; hz: integer); override;
+    procedure SetXITFreq(whichVFO: TVFO; hz: integer); override;
+    procedure SetBand(band: TRadioBand; vfo: TVFO = nrVFOA); override;
+    function  ToggleBand(vfo: TVFO = nrVFOA): TRadioBand; override;
+    procedure SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA); override;
+    function  SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer; override;
+    function  MemoryKeyer(mem: integer): boolean; override;
     procedure SetAIMode(i: integer);
-    procedure ProcessMessage(sMessage: string);
-    procedure VFOBumpDown(whichVFO: TVFO);
-    procedure VFOBumpUp(whichVFO: TVFO);
+    procedure ProcessMsg(msg: string); override;
+    procedure VFOBumpDown(whichVFO: TVFO); override;
+    procedure VFOBumpUp(whichVFO: TVFO); override;
     procedure SendPollRequests;
     procedure CleanUp;
   end;
@@ -91,7 +90,7 @@ var
 begin
   
   //slHamLibCommand := TStringList.Create;
-  inherited Create(ProcessMessage);
+  inherited Create(ProcessMsg);
 end;
 
 destructor THamLib.Destroy;
@@ -207,7 +206,7 @@ begin
   Self.CWBuffer := '';
 end;
 
-procedure THamLib.SetFrequency(freq: longint; vfo: TVFO);
+procedure THamLib.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
 var
   sCmd: string;
 begin
@@ -422,30 +421,29 @@ begin
   logger.Warn('ToggleBand not yet implemented');
 end;
 
-procedure THamLib.SetFilter(whichVFO: TVFO; filter: integer);
+procedure THamLib.SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA);
+var
+   filterInt: integer;
 begin
-  if IntegerBetween(filter, 1, 5) then
-  begin
-    logger.Info('[SetFilter] Setting filter on VFO %s to %d',
-      [VFOToString(whichVFO), filter]);
-    if whichVFO = nrVFOA then
-    begin
-      Self.SendToRadio(Format('FP%d;', [filter]));
-    end
-    else if whichVFO = nrVFOB then
-    begin
-      Self.SendToRadio(Format('FP$%d;', [filter]));
-    end;
-
-  end
-  else
-  begin
-    logger.error('[SetFilter] filter out of range 1..5 - %d', [filter]);
-  end;
-
+   case filter of
+      rfNarrow: filterInt := 1;
+      rfMid:    filterInt := 3;
+      rfWide:   filterInt := 5;
+   else
+      filterInt := 3;
+   end;
+   logger.Info('[SetFilter] Setting filter on VFO %s to %d', [VFOToString(vfo), filterInt]);
+   if vfo = nrVFOA then
+      begin
+      Self.SendToRadio(Format('FP%d;', [filterInt]));
+      end
+   else if vfo = nrVFOB then
+      begin
+      Self.SendToRadio(Format('FP$%d;', [filterInt]));
+      end;
 end;
 
-function THamLib.SetFilterHz(whichVFO: TVFO; hz: integer): integer;
+function THamLib.SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer;
 begin
  { TODO HAMLIB Implement the setfilter with the mode command where we pass the
     current mode but the passband in hz requested
@@ -705,8 +703,9 @@ enum rig_errcode_e {
 >      RIG_EPOWER      /*!< 20 Rig not powered on */
 > }
 
-procedure THamLib.ProcessMessage(sMessage: string);
+procedure THamLib.ProcessMsg(msg: string);
 var
+  sMessage: string;   // alias for msg parameter
   sCommand: string;
   sData: string;
   sMode: string;
@@ -727,6 +726,7 @@ var
   tempMode: ModeType;
   vfoIndex: integer;
 begin
+  sMessage := msg;
   // This is called by the process that receives data on the socket - Event
   // K4 messages are seperated by semi-colons (;) but each message should not have the ; as that is the ReadLn delimiter.
   // This is a command that has been parsed into its parts. For example, if the radio

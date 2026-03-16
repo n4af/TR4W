@@ -335,6 +335,13 @@ var
   iniFile                               : TINIFile;                    // Used to simply find the DEBUG setting so we can set it when the logger object is created.
                                                                        // This way we can log before we read the DEBUG LOG LEVEL the legacy method in uCFG. // ny4i
 begin
+   // Enable thread-safe memory management. TR4W creates threads via Win32
+   // CreateThread (not TThread), which does NOT set this flag automatically.
+   // Without it, concurrent GetMem calls from different threads can corrupt
+   // the heap, causing random AVs at startup when radio polling threads and
+   // the main thread initialize simultaneously.
+   IsMultiThread := True;
+
    TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
    Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
    iniFile := TINIFile.create(TR4W_INI_FILENAME);
@@ -485,7 +492,6 @@ begin
   logger.info('HamLib version = %s',[GetHamLibVersion]);
   logger.debug('Windows version = %d.%d Build %d',[tr4w_osverinfo.dwMajorVersion, tr4w_osverinfo.dwMinorVersion, tr4w_osverinfo.dwBuildNumber]);
   logger.debug('%s',[GetOSInfo]);
-
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
 

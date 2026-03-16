@@ -47,11 +47,13 @@ begin
   // Radio identification
   radioModel := 'Icom IC-9700';
 
+  // IC-9700 CI-V transceive is at menu item $0127, not the default $0150 (IC-7610/IC-7760)
+  FTransceiveMenuBytes := #$01 + #$27;
+
   logger.Info('[TIcom9700Radio.Create] Created IC-9700 radio instance with CI-V address $A2');
 end;
 
 initialization
   logger := TLogLogger.GetLogger('uRadioIcom9700');
-  logger.Level := All;
 
 end.

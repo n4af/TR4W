@@ -1987,7 +1987,10 @@ begin
    //      else if LooksLikeAState(TempRXData.QTHString) then
    else if not(Stringhasnumber(TempRXData.QTHString)) then
             begin
-            WriteADIFField('STATE',TempRXData.QTHString);
+            // MO QSO Party: 3-letter county codes (BAR, BOO, etc.) must not be
+            // exported as STATE.  Only 2-letter codes (TX, MO, etc.) are states.
+            if (Contest <> MOQSOPARTY) or (Length(TempRXData.QTHString) = 2) then
+               WriteADIFField('STATE',TempRXData.QTHString);
             end;
 
         //if ContestsArray[Contest].DM = DomesticMult

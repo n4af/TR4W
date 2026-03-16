@@ -32,6 +32,7 @@ type
       rmIcomIC7760,
       rmIcomIC7850,
       rmIcomIC905,
+      rmIcomIC7100,
       rmFlexRadio6000,
       rmHamLibDirect
    );
@@ -67,7 +68,7 @@ implementation
 uses Log4D, uRadioHamLibDirect, uRadioIcomBase,
      uRadioIcom7300, uRadioIcom7610, uRadioIcom9700,
      uRadioIcom705, uRadioIcom7300MK2, uRadioIcom7600,
-     uRadioIcom7760, uRadioIcom7850, uRadioIcom905;
+     uRadioIcom7760, uRadioIcom7850, uRadioIcom905, uRadioIcom7100;
 
 var
    logger: TLogLogger;
@@ -370,6 +371,19 @@ begin
          logger.Info('[RadioFactory] Created Icom IC-905 instance for serial connection');
          end;
 
+      rmIcomIC7100:
+         begin
+         Result := TIcom7100Radio.Create;
+         Result.serialPort := serialPort;
+         Result.serialBaudRate := baudRate;
+         Result.serialDataBits := dataBits;
+         Result.serialStopBits := stopBits;
+         Result.serialParity := parity;
+         Result.serialRts := rts;
+         Result.serialDtr := dtr;
+         logger.Info('[RadioFactory] Created Icom IC-7100 instance for serial connection');
+         end;
+
       rmFlexRadio6000:
          begin
          raise ERadioFactoryException.Create('FlexRadio 6000 does not support serial connections');
@@ -407,6 +421,7 @@ begin
       rmIcomIC7760:     Result := 'Icom IC-7760';
       rmIcomIC7850:     Result := 'Icom IC-7850';
       rmIcomIC905:      Result := 'Icom IC-905';
+      rmIcomIC7100:     Result := 'Icom IC-7100';
       rmFlexRadio6000:  Result := 'FlexRadio 6000';
       rmHamLibDirect:   Result := 'HamLib Direct (DLL)';
    else
@@ -446,6 +461,7 @@ begin
              (model = rmIcomIC7760) or
              (model = rmIcomIC7850) or
              (model = rmIcomIC905) or
+             (model = rmIcomIC7100) or
              (model = rmHamLibDirect);
 end;
 

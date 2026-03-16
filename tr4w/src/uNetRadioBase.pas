@@ -4,7 +4,7 @@ interface
 
 uses
    Windows, IdTCPClient, IdComponent, IdTCPConnection,IdThreadComponent, IdExceptionCore, SysUtils,
-   Classes, StrUtils, Log4D, VC, Tree, IdException, IdStack, SyncObjs, uSerialPort;
+   Classes, StrUtils, Log4D, VC, Tree, IdException, IdStack, SyncObjs, uSerialPort, uRadioBand;
 
 Type TProcessMsgRef = procedure (sMessage: string) of Object;
 Type TBinary = (bOn, bOff);
@@ -17,11 +17,12 @@ Type TVFO = (nrVFOA, nrVFOB);  // Keep in sync with vfoNames in var section belo
    NY4I 26-Nov-2021
 *)
 
-Type TRadioMode = (rmNone,rmCW, rmCWRev, rmLSB, rmUSB, rmFM, rmAM,
+Type TRadioMode = (rmNone, rmCW, rmCWRev, rmLSB, rmUSB, rmFM, rmAM,
                    rmData, rmDataRev, rmFSK, rmFSKRev, rmPSK, rmPSKRev,
-                   rmAFSK, rmAFSKRev);
-Type TRadioBand = (rbNone,rb160m, rb80m, rb60m, rb40m, rb30m, rb20m, rb17m, rb15m,
-                   rb12m, rb10m, rb6m, rb4m, rb2m, rb70cm);
+                   rmAFSK, rmAFSKRev, rmDV);
+// TRadioBand is defined in uRadioBand (canonical location) and re-exported
+// here via the interface uses clause so all existing consumers are unaffected.
+
 Type TRadioFilter = (rfNarrow, rfMid, rfWide);
 Type TRadioState = (rsOff, rsReceive, rsTransmit);
 Type TRadioVFO = class(TObject)
@@ -149,6 +150,8 @@ Type TNetRadioBase = class(TObject)
       procRef: TProcessMsgRef;
 
       function GetISConnected: boolean; virtual;
+      function GetAuthFailed: boolean; virtual;
+      function BandToFreq(band: TRadioBand): LongInt;  // Map band enum to typical calling frequency
 
 
 
@@ -156,6 +159,7 @@ Type TNetRadioBase = class(TObject)
 
    public
       radioModel: string;
+      rigLabel: string;           // "Rig 1" / "Rig 2" — set by LOGRADIO after creation
       serialBaudRate: DWORD;
       serialDataBits: Byte;
       serialStopBits: Byte;
@@ -189,6 +193,7 @@ Type TNetRadioBase = class(TObject)
       property IsTransmitting: boolean read GetIsTransmitting;
       property IsReceiving: boolean read GetIsReceiving;
       property IsConnected: boolean read GetIsConnected;
+      property AuthFailed: boolean read GetAuthFailed;
       property IsRITOn[whichVFO: TVFO]: boolean read GetIsRITOn;
       property IsXITOn[whichVFO: TVFO]: boolean read GetIsXITOn;
       property IsSplitEnabled: boolean read GetSplitEnabled;
@@ -276,7 +281,7 @@ begin
       Self.vfo[iVFO].ID := iVFO;
       end;
    //Self.vfo[nrVFOB] := TRadioVFO.Create;
-   //Self.vfo[nrVFOB].ID := nrVFOB;
+   //Self.vfo[nrVFOB].ID := nrVFOB;                                                          -
    
    socket := TIdTCPClient.Create();
    socket.ConnectTimeout := 10000;  // TODO Make this a property
@@ -841,10 +846,20 @@ begin
       end;
 end;
 
+function TNetRadioBase.GetAuthFailed: boolean;
+begin
+   Result := False;
+end;
+
 function TNetRadioBase.GetFrequency(whichVFO: TVFO) : integer;
 begin
 
    Result := Self.vfo[whichVFO].frequency;
+end;
+
+function TNetRadioBase.BandToFreq(band: TRadioBand): LongInt;
+begin
+   Result := RadioBandToFreq(band);
 end;
 
 function TNetRadioBase.GetBand(whichVFO: TVFO): TRadioBand;

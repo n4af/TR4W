@@ -140,6 +140,7 @@ uses
   Log4D,
   Controls,
   uNetRadioBase,
+  uRadioBand,
   uExternalLogger,
   IdURI
   ;
@@ -5077,6 +5078,9 @@ begin
           if (SingleBand = TempRXData.Band) or (SingleBand = AllBands) then
             TotalQSOPoints := TotalQSOPoints + TempRXData.QSOPoints;
 
+          if Contest = MOQSOPARTY then
+             CheckMOQSOPartyBonusStation(TempRXData.Callsign);
+
           Sheet.AddQSOToSheets(@TempRXData, True);
           CallsignsList.AddCallsign(TempRXData.Callsign, TempMode,
             TempRXData.Band, TempRXData.ceClearDupeSheet);
@@ -8615,7 +8619,7 @@ begin
       end;
     rmData:
       begin
-        extMode := eRTTY;
+        extMode := eData;
         mode := Digital;
       end;
     rmCWRev:
@@ -8625,7 +8629,7 @@ begin
       end;
     rmDATARev:
       begin
-        extMode := eRTTY_R;
+        extMode := eData_R;
         mode := Digital;
       end;
     rmFSK:
@@ -8642,6 +8646,21 @@ begin
       begin
         extMode := ePSK31;
         mode := Digital;
+      end;
+    rmPSKRev:
+      begin
+        extMode := ePSK31;
+        mode := Digital;
+      end;
+    rmFSKRev:
+      begin
+        extMode := eRTTY_R;
+        mode := Digital;
+      end;
+    rmDV:
+      begin
+        extMode := eDStar;
+        mode := Phone;
       end;
   else
     begin

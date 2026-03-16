@@ -34,7 +34,8 @@ unit uRadioIcomBase;
 interface
 
 uses
-  Windows, uNetRadioBase, uIcomNetworkTransport, uIcomNetworkTypes, SysUtils, StrUtils, VC, Log4D;
+  Windows, uNetRadioBase, uRadioBand, uIcomNetworkTransport, uIcomNetworkTypes, SysUtils, StrUtils, VC, Log4D,
+  uIcomCIV;
 
 type
   TIcomRadio = class(TNetRadioBase)
@@ -53,12 +54,12 @@ type
     FBandMemory: array[TRadioBand] of LongInt;
     FTransceiveChecked: Boolean;  // True after we've queried and logged the transceive state once
     FLastBaseMode: TRadioMode;    // Base mode before data mode overlay (restored when data mode goes off)
+    FInitialQueryPending: Boolean; // True after $19 sent; triggers $03/$04 on $19 response
+    FPollPhase: Integer;            // Rotates through query groups to avoid flooding radio
+    FLastSetCWSpeedTick: DWORD;   // GetTickCount at last SetCWSpeed call — suppresses stale echoes
 
     function BuildCIVCommand(command: Byte; data: string): string;
-    function BCDToByte(bcd: Byte): Byte;
-    function ByteToBCD(value: Byte): Byte;
-    function OffsetToBCD(offset: Integer): string;  // Convert RIT/XIT offset to BCD (2 bytes)
-    function BandToFreq(band: TRadioBand): LongInt;  // Map band to typical frequency
+
 
     procedure ProcessCIVMessage(msg: string);
     procedure ProcessNetworkCivData(msg: string);
@@ -66,10 +67,13 @@ type
     procedure OnInitialPollSeeding(Sender: TObject);  // Fired 250ms after connect to seed freq/mode
 
   protected
-    function FreqToBCD(freq: LongInt): string;  // Convert frequency to 5-byte BCD
-    function BCDToFreq(bcd: string): LongInt;   // Convert 5-byte BCD to frequency
+    FTransceiveMenuBytes: string;  // 2-byte menu item for CI-V transceive query (radio-specific)
+    // Frequency BCD helpers — delegate to standalone functions in uIcomCIV
+    function FreqToBCD(freq: LongInt): string;
+    function BCDToFreq(bcd: string): LongInt;
     procedure ProcessCIVFrame(frame: string); virtual;
     function GetIsConnected: boolean; override;
+    function GetAuthFailed: boolean; override;
     function IsNetworkConnection: boolean;
     function SupportsDataMode: Boolean; virtual;  // Override to True on radios that support $1A $06
 
@@ -90,6 +94,7 @@ type
     procedure QueryXITState; override;
     procedure QueryBand; override;
     procedure QuerySplitState; override;
+    procedure PollRadioState; override;
 
     // Radio control methods
     procedure Transmit; override;
@@ -116,6 +121,10 @@ type
     function  ToggleBand(vfo: TVFO = nrVFOA): TRadioBand; override;
     procedure SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA); override;
     procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload; override;
+    function  MemoryKeyer(mem: integer): boolean; override;
+    function  SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer; override;
+    procedure VFOBumpDown(whichVFO: TVFO); override;
+    procedure VFOBumpUp(whichVFO: TVFO); override;
 
     property RadioAddress: Byte read FRadioAddress write FRadioAddress;
     property ControllerAddress: Byte read FControllerAddress write FControllerAddress;
@@ -154,14 +163,18 @@ const
   CIV_SUBCMD_RX = #$01;
 
   // CI-V Sub-commands for RIT/XIT ($21)
-  CIV_SUBCMD_RIT_OFF = #$00;
-  CIV_SUBCMD_RIT_ON = #$01;
-  CIV_SUBCMD_RIT_FREQ = #$02;
-  CIV_SUBCMD_RIT_READ = #$03;
-  CIV_SUBCMD_XIT_OFF = #$10;
-  CIV_SUBCMD_XIT_ON = #$11;
-  CIV_SUBCMD_XIT_FREQ = #$12;
-  CIV_SUBCMD_XIT_READ = #$13;
+  // Modern Icom layout (IC-7610, IC-7760, confirmed via pcap):
+  //   $21 $00 = shared RIT/XIT offset (read/write, BCD + sign)
+  //   $21 $01 = RIT on/off (read: no data, write: $00/$01)
+  //   $21 $02 = XIT on/off (read: no data, write: $00/$01)
+  CIV_SUBCMD_RIT_OFFSET_READ = #$00;  // Read:  $21 $00 = read shared RIT/XIT offset
+  CIV_SUBCMD_RIT_ONOFF_READ  = #$01;  // Read:  $21 $01 = read RIT on/off
+  CIV_SUBCMD_XIT_ONOFF_READ  = #$02;  // Read:  $21 $02 = read XIT on/off
+  CIV_SUBCMD_RIT_OFF = #$01;          // Write: $21 $01 $00 = RIT off
+  CIV_SUBCMD_RIT_ON  = #$01;          // Write: $21 $01 $01 = RIT on
+  CIV_SUBCMD_XIT_OFF = #$02;          // Write: $21 $02 $00 = XIT off
+  CIV_SUBCMD_XIT_ON  = #$02;          // Write: $21 $02 $01 = XIT on
+  CIV_SUBCMD_RIT_FREQ = #$00;         // Write: $21 $00 <BCD> <sign> = set offset
 
   // CI-V Sub-commands for Split ($0F)
   CIV_SUBCMD_SPLIT_OFF = #$00;
@@ -204,6 +217,9 @@ begin
   FNetworkUsername := '';
   FNetworkPassword := '';
   FLastBaseMode := rmNone;
+  FInitialQueryPending := False;
+  FPollPhase := 0;
+  FTransceiveMenuBytes := #$01 + #$50;  // Default: IC-7610/IC-7760 menu item; IC-9700 overrides to $01 $28
 
   radioModel := 'Icom';  // Will be overridden by derived classes
 end;
@@ -216,6 +232,21 @@ begin
     FreeAndNil(FNetworkTransport);
   end;
   inherited Destroy;
+end;
+
+// Returns a human-readable hex string for a raw CI-V frame, e.g. "FE FE A2 E0 1A FD"
+// Used for trace-level logging of all sent and received CI-V bytes.
+function CIVDataToHex(const s: string): string;
+var
+  i: integer;
+begin
+  Result := '';
+  for i := 1 to Length(s) do
+    begin
+    if i > 1 then
+      Result := Result + ' ';
+    Result := Result + IntToHex(Ord(s[i]), 2);
+    end;
 end;
 
 function TIcomRadio.SupportsDataMode: Boolean;
@@ -248,10 +279,16 @@ begin
       FNetworkTransport.OnCivData := ProcessNetworkCivData;
       FNetworkTransport.OnStateChange := OnNetworkStateChange;
       FNetworkTransport.OnInitialPoll := OnInitialPollSeeding;
+      if rigLabel <> '' then
+        FNetworkTransport.RadioName := rigLabel + ' ' + radioModel
+      else
+        FNetworkTransport.RadioName := radioModel;
     end;
 
-    // Network mode: radio pushes freq/mode via CI-V transceive — no polling needed
-    requiresPolling := False;
+    // Network mode: frequency and mode arrive via CI-V transceive pushes.
+    // RIT, XIT, and split do NOT push — poll those only.
+    requiresPolling := True;
+    pollingInterval := 1000;  // Poll every 1s; PollRadioState queries RIT/XIT/split/TX only
     FTransceiveChecked := False;
 
     Result := FNetworkTransport.Connect(TNetRadioBase(Self).radioAddress,
@@ -274,9 +311,12 @@ procedure TIcomRadio.Disconnect;
 begin
   if IsNetworkConnection and (FNetworkTransport <> nil) then
   begin
-    logger.Info('[TIcomRadio.Disconnect] Disconnecting Icom network transport');
+    logger.Info('[TIcomRadio.Disconnect] Calling FNetworkTransport.Disconnect (state=%s)',
+                [IcomStateToString(FNetworkTransport.State)]);
     FNetworkTransport.Disconnect;
+    logger.Info('[TIcomRadio.Disconnect] FNetworkTransport.Disconnect returned, calling FreeAndNil');
     FreeAndNil(FNetworkTransport);
+    logger.Info('[TIcomRadio.Disconnect] FreeAndNil complete');
   end
   else
     inherited Disconnect;
@@ -284,11 +324,10 @@ end;
 
 procedure TIcomRadio.SendToRadio(s: string);
 begin
+  if logger.IsTraceEnabled then
+    logger.Trace('[%s] CIV TX: %s', [radioModel, CIVDataToHex(s)]);
   if IsNetworkConnection and (FNetworkTransport <> nil) then
-  begin
-    // Send CI-V frame via Icom UDP transport
-    FNetworkTransport.SendCivData(s);
-  end
+    FNetworkTransport.SendCivData(s)
   else
     inherited SendToRadio(s);
 end;
@@ -303,13 +342,24 @@ begin
       // If we return False while in WaitingForLogin the polling thread will
       // call Connect() every ~1 second, aborting the auth handshake before
       // the radio has time to respond.  Only return False when truly disconnected.
-      Result := (FNetworkTransport.State <> icsDisconnected) and
-                (FNetworkTransport.State <> icsDisconnecting)
+      Result := (FNetworkTransport.State <> icsDisconnected)
     else
       Result := False;
   end
   else
     Result := inherited GetIsConnected;
+end;
+
+function TIcomRadio.GetAuthFailed: boolean;
+begin
+   if IsNetworkConnection and (FNetworkTransport <> nil) then
+      begin
+      Result := FNetworkTransport.AuthFailed;
+      end
+   else
+      begin
+      Result := False;
+      end;
 end;
 
 procedure TIcomRadio.ProcessNetworkCivData(msg: string);
@@ -334,21 +384,63 @@ begin
     // radio responds before PreviousStatus is captured, so the timer's
     // follow-up query sees no change and DisplayCurrentStatus is never called.
     // Only check transceive state here — no display impact if ignored.
-    SendToRadio(BuildCIVCommand($1A, #$05 + #$01 + #$50));
+    SendToRadio(BuildCIVCommand($1A, #$05 + FTransceiveMenuBytes));
   end;
 end;
 
 procedure TIcomRadio.OnInitialPollSeeding(Sender: TObject);
 begin
   // Called once by the 250ms timer after CI-V Open so the radio has had time to
-  // process the open packet. Sends the initial freq and mode queries so the UI
-  // shows the correct values without waiting for the user to turn the VFO.
-  if FNetworkTransport = nil then Exit;
-  if FNetworkTransport.State <> icsConnected then Exit;
+  // process the open packet.
+  //
+  // Strategy: query all state directly — do NOT wait for $19 response.
+  // The $19 round-trip was unreliable (if response missed, initial state never loads).
+  // Direct queries are simpler and work on all radios including IC-7760.
+  if FNetworkTransport = nil then
+    begin
+    logger.Warn('[TIcomRadio.OnInitialPollSeeding] Transport is nil — skipping');
+    Exit;
+    end;
+  if FNetworkTransport.State <> icsConnected then
+    begin
+    logger.Warn('[TIcomRadio.OnInitialPollSeeding] Not connected (state=%d) — skipping',
+                [Ord(FNetworkTransport.State)]);
+    Exit;
+    end;
 
-  logger.Info('[TIcomRadio.OnInitialPollSeeding] Sending initial freq/mode queries');
-  QueryVFOAFrequency;
-  QueryMode;
+  logger.Info('[%s.OnInitialPollSeeding] Querying initial state (freq, mode, TX, RIT, XIT, split, CW speed)',
+              [radioModel]);
+
+  // Query frequency and mode — these don't arrive via transceive push on connect
+  QueryVFOAFrequency;   // $03 — VFO A frequency
+  QueryVFOBFrequency;   // $25/$25 $01 — VFO B frequency (overridden per radio)
+  QueryMode;            // $04 — operating mode
+
+  // Data mode doesn't come with $04 — query it separately
+  if SupportsDataMode then
+    begin
+    logger.Debug('[%s.OnInitialPollSeeding] Querying data mode ($1A $06)', [radioModel]);
+    SendToRadio(BuildCIVCommand($1A, #$06));
+    end;
+
+  // States that CI-V transceive does NOT push (needed even with transceive on)
+  QueryTXStatus;        // $1C $00
+  QueryRITState;        // $21 $01 (overridden for IC-7760)
+  QueryXITState;        // $21 $02 (overridden for IC-7760)
+  QuerySplitState;      // $0F
+
+  // CW speed: query radio's current setting
+  SendToRadio(BuildCIVCommand($14, CIV_SUBCMD_CW_SPEED));  // $14 $0C
+
+  // Send $19 for diagnostic purposes only (logs the CI-V address, not used for sequencing)
+  FNetworkTransport.SendCivData(
+    CIV_PREAMBLE1 + CIV_PREAMBLE2 +
+    #$00 + Chr(FControllerAddress) +  // To: broadcast ($00), From: controller
+    #$19 + #$00 +                     // Get transceiver ID
+    CIV_EOM
+  );
+
+  logger.Info('[%s.OnInitialPollSeeding] Initial queries sent', [radioModel]);
 end;
 
 function TIcomRadio.BuildCIVCommand(command: Byte; data: string): string;
@@ -358,112 +450,19 @@ begin
             Chr(command) + data + CIV_EOM;
 end;
 
-function TIcomRadio.ByteToBCD(value: Byte): Byte;
-begin
-  Result := ((value div 10) shl 4) or (value mod 10);
-end;
-
-function TIcomRadio.BCDToByte(bcd: Byte): Byte;
-begin
-  Result := ((bcd shr 4) * 10) + (bcd and $0F);
-end;
-
 function TIcomRadio.FreqToBCD(freq: LongInt): string;
-var
-  i: Integer;
-  freqStr: string;
-  bcdByte: Byte;
 begin
-  // Convert frequency to 10-digit string (pad with zeros)
-  freqStr := Format('%.10d', [freq]);
-
-  // Convert to 5 BCD bytes (2 digits per byte), LSB first
-  Result := '';
-  for i := 5 downto 1 do
-  begin
-    bcdByte := ByteToBCD(StrToInt(Copy(freqStr, i * 2 - 1, 2)));
-    Result := Result + Chr(bcdByte);
-  end;
+   Result := IcomFreqToBCD(freq);
 end;
 
 function TIcomRadio.BCDToFreq(bcd: string): LongInt;
-var
-  i: Integer;
-  freqStr: string;
 begin
-  freqStr := '';
-  // BCD is LSB first, so reverse it
-  for i := Length(bcd) downto 1 do
-  begin
-    freqStr := freqStr + Format('%.2d', [BCDToByte(Ord(bcd[i]))]);
-  end;
-  Result := StrToInt64Def(freqStr, 0);
+   Result := IcomBCDToFreq(bcd);
 end;
 
-function TIcomRadio.OffsetToBCD(offset: Integer): string;
-var
-  absOffset: Integer;
-  offsetStr: string;
-  bcdByte: Byte;
-  i: Integer;
-begin
-  // Convert offset to absolute value (sign handled separately if needed)
-  absOffset := Abs(offset);
+// FreqToRadioBand is defined in uRadioBand (implementation uses above).
+// All call sites below remain unchanged.
 
-  // Convert to 4-digit string (pad with zeros) - max is 9999 Hz
-  offsetStr := Format('%.4d', [absOffset]);
-
-  // Convert to 2 BCD bytes (2 digits per byte), LSB first
-  Result := '';
-  for i := 2 downto 1 do
-  begin
-    bcdByte := ByteToBCD(StrToInt(Copy(offsetStr, i * 2 - 1, 2)));
-    Result := Result + Chr(bcdByte);
-  end;
-end;
-
-function FreqToRadioBand(freq: LongInt): TRadioBand;
-begin
-  // Thread-safe inline conversion — no calls into Tree or MainUnit
-  if      freq < 2000000   then Result := rb160m
-  else if freq < 4000000   then Result := rb80m
-  else if freq < 6000000   then Result := rb60m
-  else if freq < 7300000   then Result := rb40m
-  else if freq < 11000000  then Result := rb30m
-  else if freq < 15000000  then Result := rb20m
-  else if freq < 19000000  then Result := rb17m
-  else if freq < 22000000  then Result := rb15m
-  else if freq < 25000000  then Result := rb12m
-  else if freq < 30000000  then Result := rb10m
-  else if freq < 54000000  then Result := rb6m
-  else if freq < 80000000  then Result := rb4m
-  else if freq < 170000000 then Result := rb2m
-  else if freq < 500000000 then Result := rb70cm
-  else                          Result := rbNone;
-end;
-
-function TIcomRadio.BandToFreq(band: TRadioBand): LongInt;
-begin
-  // Map band to typical calling frequency (in Hz)
-  case band of
-    rb160m:  Result := 1900000;    // 1.9 MHz
-    rb80m:   Result := 3600000;    // 3.6 MHz
-    rb60m:   Result := 5357000;    // 5.357 MHz
-    rb40m:   Result := 7100000;    // 7.1 MHz
-    rb30m:   Result := 10125000;   // 10.125 MHz
-    rb20m:   Result := 14100000;   // 14.1 MHz
-    rb17m:   Result := 18100000;   // 18.1 MHz
-    rb15m:   Result := 21100000;   // 21.1 MHz
-    rb12m:   Result := 24920000;   // 24.92 MHz
-    rb10m:   Result := 28400000;   // 28.4 MHz
-    rb6m:    Result := 50100000;   // 50.1 MHz
-    rb4m:    Result := 70100000;   // 70.1 MHz
-    rb2m:    Result := 144100000;  // 144.1 MHz
-    rb70cm:  Result := 432100000;  // 432.1 MHz
-  else
-    Result := 14100000;  // Default to 20m
-  end;
-end;
 
 procedure TIcomRadio.ProcessMsg(msg: string);
 begin
@@ -551,21 +550,12 @@ begin
   // Valid frame received - update timestamp for disconnect detection
   UpdateLastValidResponse;
 
+  if logger.IsTraceEnabled then
+    logger.Trace('[%s] CIV RX: %s', [radioModel, CIVDataToHex(frame)]);
+
   // Extract command and data
   command := Ord(frame[5]);
   data := Copy(frame, 6, Length(frame) - 6);  // Everything between command and EOM
-
-  // Log what command we're processing
-  case command of
-    $03: logger.trace('[%s] Processing frequency response, data length: %d', [radioModel, Length(data)]);
-    $04: logger.trace('[%s] Processing mode response, data length: %d', [radioModel, Length(data)]);
-    $05: logger.trace('[%s] Processing set frequency command, data length: %d', [radioModel, Length(data)]);
-    $06: logger.trace('[%s] Processing set mode command, data length: %d', [radioModel, Length(data)]);
-    $FB: logger.trace('[%s] Processing ACK (command OK)', [radioModel]);
-    $FA: logger.trace('[%s] Processing NAK (command rejected)', [radioModel]);
-  else
-    logger.trace('[%s] Processing unknown command: $%.2x, data length: %d', [radioModel, command, Length(data)]);
-  end;
 
   case command of
     $00:  // Unsolicited frequency (CI-V transceive push)
@@ -573,7 +563,7 @@ begin
         if Length(data) >= 5 then
         begin
           freq := BCDToFreq(Copy(data, 1, 5));
-          logger.trace('[%s] Transceive freq: %d Hz', [radioModel, freq]);
+          logger.debug('[%s] Transceive freq: %d Hz', [radioModel, freq]);
           Self.vfo[nrVFOA].Frequency := freq;
           Self.vfo[nrVFOA].Band := FreqToRadioBand(freq);
           if Self.vfo[nrVFOA].Band <> rbNone then
@@ -591,34 +581,81 @@ begin
             $01: radioMode := rmUSB;
             $02: radioMode := rmAM;
             $03: radioMode := rmCW;
-            $04: radioMode := rmFM;
+            $04: radioMode := rmFSK;
             $05: radioMode := rmFM;
             $07: radioMode := rmCWRev;
+            $08: radioMode := rmFSKRev;
+            $06: radioMode := rmFM;   // WFM — treat as FM
+            $12: radioMode := rmPSK;
+            $13: radioMode := rmPSKRev;
+            $17: radioMode := rmDV;   // D-STAR digital voice
             else radioMode := rmNone;
           end;
-          logger.trace('[%s] Transceive mode: %d', [radioModel, modeNum]);
+          logger.debug('[%s] Transceive mode: %d', [radioModel, modeNum]);
           FLastBaseMode := radioMode;
           Self.vfo[nrVFOA].Mode := radioMode;
           Self.vfo[nrVFOA].dataMode := rmNone;  // Mode update clears data overlay
           localDataMode := rmNone;
+
+          // Radio doesn't push $1A $06 on data mode change — query it after voice modes
+          if SupportsDataMode and (radioMode in [rmUSB, rmLSB, rmFM, rmAM]) then
+            SendToRadio(BuildCIVCommand($1A, #$06));
         end;
       end;
 
-    $03:  // Read frequency response (initial poll)
+    $03:  // Read frequency response
       begin
+        logger.Info('[%s] $03 response received, data len=%d', [radioModel, Length(data)]);
         if Length(data) >= 5 then
         begin
           freq := BCDToFreq(Copy(data, 1, 5));
-          logger.trace('[%s] Frequency: %d Hz', [radioModel, freq]);
+          logger.Info('[%s] VFO A frequency set: %d Hz', [radioModel, freq]);
           Self.vfo[nrVFOA].Frequency := freq;
           Self.vfo[nrVFOA].Band := FreqToRadioBand(freq);
           if Self.vfo[nrVFOA].Band <> rbNone then
             FBandMemory[Self.vfo[nrVFOA].Band] := freq;
+        end
+        else
+          logger.Warn('[%s] $03 response too short (len=%d), expected >=5', [radioModel, Length(data)]);
+      end;
+
+    $25:  // VFO B frequency response
+      begin
+        if Length(data) >= 6 then  // IC-7760 format: subcmd(1) + freq(5)
+        begin
+          subCmd := Ord(data[1]);
+          freq := BCDToFreq(Copy(data, 2, 5));
+          case subCmd of
+            $00: begin  // VFO A
+              vfo[nrVFOA].Frequency := freq;
+              vfo[nrVFOA].Band := FreqToRadioBand(freq);
+              if vfo[nrVFOA].Band <> rbNone then
+                FBandMemory[vfo[nrVFOA].Band] := freq;
+              logger.debug('[%s] VFO A freq ($25 subcmd): %d Hz', [radioModel, freq]);
+            end;
+            $01: begin  // VFO B
+              vfo[nrVFOB].Frequency := freq;
+              vfo[nrVFOB].Band := FreqToRadioBand(freq);
+              if vfo[nrVFOB].Band <> rbNone then
+                FBandMemory[vfo[nrVFOB].Band] := freq;
+              logger.debug('[%s] VFO B freq ($25 subcmd): %d Hz', [radioModel, freq]);
+            end;
+          end;
+        end
+        else if Length(data) = 5 then  // IC-7610/standard format: freq(5) only, no subcmd
+        begin
+          freq := BCDToFreq(data);
+          vfo[nrVFOB].Frequency := freq;
+          vfo[nrVFOB].Band := FreqToRadioBand(freq);
+          if vfo[nrVFOB].Band <> rbNone then
+            FBandMemory[vfo[nrVFOB].Band] := freq;
+          logger.debug('[%s] VFO B freq ($25): %d Hz', [radioModel, freq]);
         end;
       end;
 
-    $04:  // Read mode response (initial poll)
+    $04:  // Read mode response
       begin
+        logger.Info('[%s] $04 response received, data len=%d', [radioModel, Length(data)]);
         if Length(data) >= 1 then
         begin
           modeNum := Ord(data[1]);
@@ -627,26 +664,38 @@ begin
             $01: radioMode := rmUSB;
             $02: radioMode := rmAM;
             $03: radioMode := rmCW;
-            $04: radioMode := rmFM;
+            $04: radioMode := rmFSK;
             $05: radioMode := rmFM;
             $07: radioMode := rmCWRev;
+            $08: radioMode := rmFSKRev;
+            $06: radioMode := rmFM;   // WFM — treat as FM
+            $12: radioMode := rmPSK;
+            $13: radioMode := rmPSKRev;
+            $17: radioMode := rmDV;   // D-STAR digital voice
             else radioMode := rmNone;
           end;
-          logger.trace('[%s] Mode: %d', [radioModel, modeNum]);
+          logger.Info('[%s] VFO A mode set: byte=$%.2x → TRadioMode=%d', [radioModel, modeNum, Ord(radioMode)]);
           FLastBaseMode := radioMode;
           Self.vfo[nrVFOA].Mode := radioMode;
           Self.vfo[nrVFOA].dataMode := rmNone;
           localDataMode := rmNone;
-        end;
+
+          // $04 doesn't include data mode state — query it for voice modes
+          if SupportsDataMode and (radioMode in [rmUSB, rmLSB, rmFM, rmAM]) then
+            SendToRadio(BuildCIVCommand($1A, #$06));
+        end
+        else
+          logger.Warn('[%s] $04 response empty (len=%d)', [radioModel, Length(data)]);
       end;
 
     $1A:  // Settings responses — transceive check and data mode
       begin
         if Length(data) >= 1 then
         begin
-          // 1A 05 01 50 [value] — CI-V transceive setting query response
+          // 1A 05 [menu byte 1] [menu byte 2] [value] — CI-V transceive setting query response
+          // Menu bytes are radio-specific: IC-7610/IC-7760 = $01 $50; IC-9700 = $01 $28
           if (Ord(data[1]) = $05) and (Length(data) >= 4) and
-             (Ord(data[2]) = $01) and (Ord(data[3]) = $50) then
+             (data[2] = FTransceiveMenuBytes[1]) and (data[3] = FTransceiveMenuBytes[2]) then
           begin
             if not FTransceiveChecked then
             begin
@@ -657,9 +706,9 @@ begin
               begin
                 logger.Warn('[%s] CI-V Transceive is OFF — frequency/mode will not update automatically', [radioModel]);
                 MessageBox(0,
-                  'CI-V Transceive is disabled on this radio.' + #13#10 +
+                  PChar(radioModel + ': CI-V Transceive is disabled on this radio.' + #13#10 +
                   'Frequency and mode will not update automatically in network mode.' + #13#10 + #13#10 +
-                  'To fix: Set > Connectors > CI-V Transceive = ON',
+                  'To fix: Set > Connectors > CI-V Transceive = ON'),
                   'TR4W - Radio Configuration Warning',
                   MB_OK or MB_ICONWARNING or MB_TASKMODAL);
               end;
@@ -675,16 +724,22 @@ begin
               vfo[nrVFOA].Mode := FLastBaseMode;
               vfo[nrVFOA].dataMode := rmNone;
               localDataMode := rmNone;
-              logger.trace('[%s] Data mode OFF, restored base mode', [radioModel]);
+              logger.debug('[%s] Data mode OFF, restored base mode', [radioModel]);
             end
             else
             begin
-              // Data mode ON (D1/D2/D3) — override displayed mode to Data
-              FLastBaseMode := vfo[nrVFOA].Mode;  // Save base mode for restore
-              vfo[nrVFOA].Mode := rmData;
-              vfo[nrVFOA].dataMode := rmData;
-              localDataMode := rmData;
-              logger.trace('[%s] Data mode ON (D%d)', [radioModel, Ord(data[2])]);
+              // Data mode ON (D1/D2/D3) — only apply if current mode is a voice mode
+              // Ignore stale responses that arrive after switching to CW/FSK/PSK
+              if vfo[nrVFOA].Mode in [rmUSB, rmLSB, rmFM, rmAM] then
+              begin
+                FLastBaseMode := vfo[nrVFOA].Mode;  // Save base mode for restore
+                vfo[nrVFOA].Mode := rmData;
+                vfo[nrVFOA].dataMode := rmData;
+                localDataMode := rmData;
+                logger.debug('[%s] Data mode ON (D%d)', [radioModel, Ord(data[2])]);
+              end
+              else
+                logger.debug('[%s] Data mode ON ignored — current mode is not voice', [radioModel]);
             end;
           end;
         end;
@@ -700,7 +755,7 @@ begin
           vfo[nrVFOB].Band := FreqToRadioBand(freq);
           if vfo[nrVFOB].Band <> rbNone then
             FBandMemory[vfo[nrVFOB].Band] := freq;
-          logger.trace('[%s] VFO B freq: %d Hz', [radioModel, freq]);
+          logger.debug('[%s] VFO B freq: %d Hz', [radioModel, freq]);
         end;
         if Length(data) >= 6 then
         begin
@@ -710,13 +765,18 @@ begin
             $01: radioMode := rmUSB;
             $02: radioMode := rmAM;
             $03: radioMode := rmCW;
-            $04: radioMode := rmFM;
+            $04: radioMode := rmFSK;
             $05: radioMode := rmFM;
             $07: radioMode := rmCWRev;
+            $08: radioMode := rmFSKRev;
+            $06: radioMode := rmFM;   // WFM — treat as FM
+            $12: radioMode := rmPSK;
+            $13: radioMode := rmPSKRev;
+            $17: radioMode := rmDV;   // D-STAR digital voice
             else radioMode := rmNone;
           end;
           vfo[nrVFOB].Mode := radioMode;
-          logger.trace('[%s] VFO B mode: %d', [radioModel, modeNum]);
+          logger.debug('[%s] VFO B mode: %d', [radioModel, modeNum]);
         end;
       end;
 
@@ -725,7 +785,7 @@ begin
         if Length(data) >= 1 then
         begin
           localSplitEnabled := (Ord(data[1]) = $01);
-          logger.trace('[%s] Split: %s', [radioModel, BoolToStr(localSplitEnabled, True)]);
+          logger.debug('[%s] Split: %s', [radioModel, BoolToStr(localSplitEnabled, True)]);
         end;
       end;
 
@@ -738,70 +798,99 @@ begin
             radioState := rsTransmit
           else
             radioState := rsReceive;
-          logger.trace('[%s] TX state: %s', [radioModel, IfThen(radioState = rsTransmit, 'TX', 'RX')]);
+          logger.debug('[%s] TX state: %s', [radioModel, IfThen(radioState = rsTransmit, 'TX', 'RX')]);
         end;
       end;
 
-    $21:  // RIT/XIT state or frequency (transceive push or poll response)
+    $21:  // RIT/XIT state or offset (poll response or transceive push)
+      // Modern Icom layout (IC-7610, IC-7760, confirmed via pcap):
+      //   $21 $00 [BCD lo] [BCD hi] [sign] = shared RIT/XIT offset
+      //   $21 $01 [on/off]                 = RIT on/off
+      //   $21 $02 [on/off]                 = XIT on/off
       begin
         if Length(data) >= 1 then
         begin
           subCmd := Ord(data[1]);
           case subCmd of
-            $00:  // RIT off
+            $00:  // Shared RIT/XIT offset
               begin
-                RITState := False;
-                vfo[nrVFOA].RITState := False;
-                logger.trace('[%s] RIT OFF', [radioModel]);
-              end;
-            $01:  // RIT on
-              begin
-                RITState := True;
-                vfo[nrVFOA].RITState := True;
-                logger.trace('[%s] RIT ON', [radioModel]);
-              end;
-            $02, $03:  // RIT frequency (set echo or read response): [subcmd] [BCD lo] [BCD hi] [sign]
-              begin
-                if Length(data) >= 3 then
+                if Length(data) >= 4 then
                 begin
                   offset := BCDToFreq(Copy(data, 2, 2));
-                  if (Length(data) >= 4) and (Ord(data[4]) = $01) then
+                  if Ord(data[4]) <> $00 then
                     offset := -offset;
                   localRITOffset := offset;
+                  localXITOffset := offset;  // Shared
                   vfo[nrVFOA].RITOffset := offset;
-                  logger.trace('[%s] RIT offset: %d Hz', [radioModel, offset]);
+                  vfo[nrVFOA].XITOffset := offset;
+                  logger.debug('[%s] RIT/XIT offset: %d Hz', [radioModel, offset]);
                 end;
               end;
-            $10:  // XIT off
+            $01:  // RIT on/off
               begin
-                XITState := False;
-                vfo[nrVFOA].XITState := False;
-                logger.trace('[%s] XIT OFF', [radioModel]);
-              end;
-            $11:  // XIT on
-              begin
-                XITState := True;
-                vfo[nrVFOA].XITState := True;
-                logger.trace('[%s] XIT ON', [radioModel]);
-              end;
-            $12, $13:  // XIT frequency (set echo or read response): [subcmd] [BCD lo] [BCD hi] [sign]
-              begin
-                if Length(data) >= 3 then
+                if Length(data) >= 2 then
                 begin
-                  offset := BCDToFreq(Copy(data, 2, 2));
-                  if (Length(data) >= 4) and (Ord(data[4]) = $01) then
-                    offset := -offset;
-                  localXITOffset := offset;
-                  vfo[nrVFOA].XITOffset := offset;
-                  logger.trace('[%s] XIT offset: %d Hz', [radioModel, offset]);
+                  RITState := (Ord(data[2]) = $01);
+                  vfo[nrVFOA].RITState := RITState;
+                  logger.debug('[%s] RIT %s', [radioModel, IfThen(RITState, 'ON', 'OFF')]);
+                end;
+              end;
+            $02:  // XIT on/off
+              begin
+                if Length(data) >= 2 then
+                begin
+                  XITState := (Ord(data[2]) = $01);
+                  vfo[nrVFOA].XITState := XITState;
+                  logger.debug('[%s] XIT %s', [radioModel, IfThen(XITState, 'ON', 'OFF')]);
                 end;
               end;
           end;
         end;
       end;
 
+    $14:  // Levels response (CW speed, etc.)
+      begin
+        if (Length(data) >= 3) and (Ord(data[1]) = $0C) then
+        begin
+          // CW speed: 2 BCD bytes encoding 0-255, maps to 6-48 WPM
+          // Format: $0C <bcd-high> <bcd-low> (e.g., $01 $08 = value 108)
+          offset := ((Ord(data[2]) shr 4) * 10) + (Ord(data[2]) and $0F);  // high decimal
+          freq := ((Ord(data[3]) shr 4) * 10) + (Ord(data[3]) and $0F);    // low decimal
+          offset := offset * 100 + freq;  // combine: 0-255 value
+          // Formula (spec): WPM = 6 + value * 42 / 255, round to nearest
+          // Integer round-to-nearest: add half the divisor (127) before div
+          freq := 6 + (offset * 42 + 127) div 255;
+          // Debounce: ignore radio echo for 500ms after a program-initiated SetCWSpeed.
+          // Without this, the radio echoes the old speed back and the polling sync loop
+          // overwrites CodeSpeed with the stale value, causing the bouncing.
+          if GetTickCount - FLastSetCWSpeedTick >= 500 then
+            begin
+            localCWSpeed := freq;
+            logger.debug('[%s] CW speed from radio: %d WPM (BCD $%.2x $%.2x = value %d)',
+                         [radioModel, localCWSpeed, Ord(data[2]), Ord(data[3]), offset]);
+            end
+          else
+            begin
+            logger.debug('[%s] CW speed echo suppressed (debounce): %d WPM (sent %d ms ago)',
+                         [radioModel, freq, GetTickCount - FLastSetCWSpeedTick]);
+            end;
+        end;
+      end;
+
+    $19:  // Transceiver ID response (diagnostic — $19 broadcast sent at end of OnInitialPollSeeding)
+      begin
+        // Radio replies: FE FE [ctrl] [radio] 19 00 [addr] FD
+        // data[1] = $00 (sub-command echo), data[2] = CI-V address
+        // Initial state queries are now sent directly from OnInitialPollSeeding,
+        // not triggered by this response.
+        if Length(data) >= 2 then
+          logger.Info('[%s] Transceiver ID confirmed, CI-V address=$%.2x', [radioModel, Ord(data[2])])
+        else
+          logger.Info('[%s] Transceiver ID response received (no address byte)', [radioModel]);
+      end;
+
     $FB:  // Command OK (ACK)
-      logger.trace('[%s] Command acknowledged', [radioModel]);
+      logger.debug('[%s] Command acknowledged', [radioModel]);
 
     $FA:  // Command NG (NAK)
       logger.warn('[%s] Command rejected', [radioModel]);
@@ -816,10 +905,8 @@ end;
 
 procedure TIcomRadio.QueryVFOBFrequency;
 begin
-  // Select VFO B, read frequency
+  // $25 $01 returns VFO B frequency directly in its response
   SendToRadio(BuildCIVCommand($25, CIV_SUBCMD_VFO_B));
-  SendToRadio(BuildCIVCommand($03, ''));  // Read operating frequency
-  // Note: In production code, might want to switch back to VFO A
 end;
 
 procedure TIcomRadio.QueryMode;
@@ -835,12 +922,15 @@ end;
 
 procedure TIcomRadio.QueryRITState;
 begin
-  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_READ));
+  // $21 $01 = RIT on/off, $21 $00 = shared RIT/XIT offset
+  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_ONOFF_READ));
+  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_OFFSET_READ));
 end;
 
 procedure TIcomRadio.QueryXITState;
 begin
-  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_XIT_READ));
+  // $21 $02 = XIT on/off (offset is shared with RIT, already queried)
+  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_XIT_ONOFF_READ));
 end;
 
 procedure TIcomRadio.QueryBand;
@@ -852,6 +942,18 @@ procedure TIcomRadio.QuerySplitState;
 begin
   // Query split status using command $0F
   SendToRadio(BuildCIVCommand($0F, ''));
+end;
+
+procedure TIcomRadio.PollRadioState;
+begin
+  logger.debug('[%s.PollRadioState] Polling freq, mode, RIT/XIT/Split/TX', [radioModel]);
+  QueryVFOAFrequency;     // $03
+  QueryVFOBFrequency;     // $25 (overridden for IC-7760: $25 $01)
+  QueryMode;              // $04
+  QueryRITState;          // $21 (overridden for IC-7760)
+  QueryXITState;          // $21 (overridden for IC-7760)
+  QuerySplitState;        // $0F
+  QueryTXStatus;          // $1C $00
 end;
 
 // Radio control methods - basic implementations
@@ -874,7 +976,7 @@ begin
   // unexpected VFO state that causes intermittent tuning failures.
   bcdFreq := FreqToBCD(freq);
   SendToRadio(BuildCIVCommand($05, bcdFreq));
-  logger.trace('[%s.SetFrequency] Setting frequency to %d Hz', [radioModel, freq]);
+  logger.debug('[%s.SetFrequency] Setting frequency to %d Hz', [radioModel, freq]);
 end;
 
 procedure TIcomRadio.SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA);
@@ -896,20 +998,25 @@ begin
     rmUSB:    modeCmd := $01;
     rmAM:     modeCmd := $02;
     rmCW:     modeCmd := $03;
+    rmFSK:    modeCmd := $04;
     rmFM:     modeCmd := $05;
     rmCWRev:  modeCmd := $07;
+    rmFSKRev: modeCmd := $08;
+    rmPSK:    modeCmd := $12;
+    rmPSKRev: modeCmd := $13;
+    rmDV:     modeCmd := $17;  // D-STAR digital voice
   else
     modeCmd := $01;  // Default to USB
   end;
 
   SendToRadio(BuildCIVCommand($06, Chr(modeCmd) + Chr(filterCmd)));
-  logger.trace('[%s.SetMode] Set VFO %s mode', [radioModel, IfThen(vfo = nrVFOA, 'A', 'B')]);  // Removed ModeToString to avoid circular dependency
+  logger.debug('[%s.SetMode] Set VFO %s mode', [radioModel, IfThen(vfo = nrVFOA, 'A', 'B')]);  // Removed ModeToString to avoid circular dependency
 end;
 
 procedure TIcomRadio.BufferCW(cwChars: string);
 begin
   FCWBuffer := FCWBuffer + cwChars;
-  logger.trace('[%s.BufferCW] Buffered: "%s", Total buffer: "%s"', [radioModel, cwChars, FCWBuffer]);
+  logger.debug('[%s.BufferCW] Buffered: "%s", Total buffer: "%s"', [radioModel, cwChars, FCWBuffer]);
 end;
 
 procedure TIcomRadio.SendCW;
@@ -933,7 +1040,45 @@ begin
   // Send break command to stop CW
   // CI-V command $17 $01 stops CW sending
   SendToRadio(BuildCIVCommand($17, #$01));
-  logger.trace('[%s.StopCW] CW transmission stopped', [radioModel]);
+  logger.debug('[%s.StopCW] CW transmission stopped', [radioModel]);
+end;
+
+function TIcomRadio.MemoryKeyer(mem: integer): boolean;
+begin
+   Result := True; // default: error
+   if mem = 0 then
+      begin
+      SendToRadio(BuildCIVCommand($28, #$00#$00));
+      logger.debug('[%s.MemoryKeyer] Stopping DVK', [radioModel]);
+      Result := False;
+      end
+   else if (mem >= 1) and (mem <= 8) then
+      begin
+      SendToRadio(BuildCIVCommand($28, #$00 + Chr(mem)));
+      logger.debug('[%s.MemoryKeyer] Playing DVK memory %d', [radioModel, mem]);
+      Result := False;
+      end
+   else
+      logger.error('[%s.MemoryKeyer] Memory %d out of range (0-8)', [radioModel, mem]);
+end;
+
+function TIcomRadio.SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer;
+begin
+   // TODO: implement filter bandwidth control via CI-V $1A $03
+   logger.debug('[%s.SetFilterHz] Not yet implemented (hz=%d)', [radioModel, hz]);
+   Result := 0;
+end;
+
+procedure TIcomRadio.VFOBumpDown(whichVFO: TVFO);
+begin
+   // TODO: implement VFO bump via CI-V frequency step commands
+   logger.debug('[%s.VFOBumpDown] Not yet implemented', [radioModel]);
+end;
+
+procedure TIcomRadio.VFOBumpUp(whichVFO: TVFO);
+begin
+   // TODO: implement VFO bump via CI-V frequency step commands
+   logger.debug('[%s.VFOBumpUp] Not yet implemented', [radioModel]);
 end;
 
 function TIcomRadio.ToggleMode(vfo: TVFO = nrVFOA): TRadioMode;
@@ -962,65 +1107,78 @@ end;
 
 procedure TIcomRadio.SetCWSpeed(speed: integer);
 var
-  bcdSpeed: Byte;
+  icomValue: Integer;
+  bcdHigh, bcdLow: Byte;
 begin
-  // CW speed is typically 6-48 WPM
-  // Convert to BCD (0-255 range, but usually 6-48)
-  bcdSpeed := ByteToBCD(speed);
-  SendToRadio(BuildCIVCommand($14, CIV_SUBCMD_CW_SPEED + Chr(bcdSpeed)));
-  logger.trace('[%s.SetCWSpeed] Set CW speed to %d WPM', [radioModel, speed]);
+  // Icom CW speed: 6–48 WPM maps linearly to CI-V value 0–255
+  // Formula (spec): value = (WPM - 6) * 255 / 42, round to nearest
+  // Integer round-to-nearest: add half the divisor (21) before div
+  if speed < 6 then speed := 6;
+  if speed > 48 then speed := 48;
+  icomValue := ((speed - 6) * 255 + 21) div 42;
+  if icomValue > 255 then icomValue := 255;
+
+  // Encode 0-255 value as 2 BCD bytes: hundreds|tens, ones
+  bcdHigh := IcomByteToBCD(icomValue div 100);    // 0-2
+  bcdLow  := IcomByteToBCD(icomValue mod 100);    // 0-99
+  FLastSetCWSpeedTick := GetTickCount;  // Start debounce window before sending
+  SendToRadio(BuildCIVCommand($14, CIV_SUBCMD_CW_SPEED + Chr(bcdHigh) + Chr(bcdLow)));
+  localCWSpeed := speed;
+  logger.debug('[%s.SetCWSpeed] %d WPM -> icomValue=%d -> BCD $%s $%s',
+               [radioModel, speed, icomValue,
+                IntToHex(bcdHigh, 2), IntToHex(bcdLow, 2)]);
 end;
 
 procedure TIcomRadio.RITClear(whichVFO: TVFO);
 begin
   // Clear RIT by setting offset to 0
   SetRITFreq(whichVFO, 0);
-  logger.trace('[%s.RITClear] Cleared RIT offset', [radioModel]);
+  logger.debug('[%s.RITClear] Cleared RIT offset', [radioModel]);
 end;
 
 procedure TIcomRadio.XITClear(whichVFO: TVFO);
 begin
   // Clear XIT by setting offset to 0
   SetXITFreq(whichVFO, 0);
-  logger.trace('[%s.XITClear] Cleared XIT offset', [radioModel]);
+  logger.debug('[%s.XITClear] Cleared XIT offset', [radioModel]);
 end;
 
 procedure TIcomRadio.RITBumpDown;
 begin
   // Bump RIT down by 10 Hz
   // Note: Would need to track current RIT offset to implement properly
-  logger.trace('[%s.RITBumpDown] RIT bump down not fully implemented', [radioModel]);
+  logger.debug('[%s.RITBumpDown] RIT bump down not fully implemented', [radioModel]);
 end;
 
 procedure TIcomRadio.RITBumpUp;
 begin
   // Bump RIT up by 10 Hz
   // Note: Would need to track current RIT offset to implement properly
-  logger.trace('[%s.RITBumpUp] RIT bump up not fully implemented', [radioModel]);
+  logger.debug('[%s.RITBumpUp] RIT bump up not fully implemented', [radioModel]);
 end;
 
 procedure TIcomRadio.RITOn(vfo: TVFO);
 begin
-  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_ON));
-  logger.trace('[%s.RITOn] RIT enabled', [radioModel]);
+  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_ON + #$01));  // $21 $01 $01
+  logger.debug('[%s.RITOn] RIT enabled', [radioModel]);
 end;
 
 procedure TIcomRadio.RITOff(vfo: TVFO);
 begin
-  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_OFF));
-  logger.trace('[%s.RITOff] RIT disabled', [radioModel]);
+  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_OFF + #$00));  // $21 $01 $00
+  logger.debug('[%s.RITOff] RIT disabled', [radioModel]);
 end;
 
 procedure TIcomRadio.XITOn(vfo: TVFO);
 begin
-  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_XIT_ON));
-  logger.trace('[%s.XITOn] XIT enabled', [radioModel]);
+  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_XIT_ON + #$01));  // $21 $02 $01
+  logger.debug('[%s.XITOn] XIT enabled', [radioModel]);
 end;
 
 procedure TIcomRadio.XITOff(vfo: TVFO);
 begin
-  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_XIT_OFF));
-  logger.trace('[%s.XITOff] XIT disabled', [radioModel]);
+  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_XIT_OFF + #$00));  // $21 $02 $00
+  logger.debug('[%s.XITOff] XIT disabled', [radioModel]);
 end;
 
 procedure TIcomRadio.Split(splitOn: boolean);
@@ -1029,25 +1187,26 @@ begin
     SendToRadio(BuildCIVCommand($0F, CIV_SUBCMD_SPLIT_ON))
   else
     SendToRadio(BuildCIVCommand($0F, CIV_SUBCMD_SPLIT_OFF));
-  logger.trace('[%s.Split] Split %s', [radioModel, IfThen(splitOn, 'enabled', 'disabled')]);
+  logger.debug('[%s.Split] Split %s', [radioModel, IfThen(splitOn, 'enabled', 'disabled')]);
 end;
 
 procedure TIcomRadio.SetRITFreq(vfo: TVFO; hz: integer);
 var
   bcdOffset: string;
 begin
-  bcdOffset := OffsetToBCD(hz);
+  bcdOffset := IcomOffsetToBCD(hz);
   SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_FREQ + bcdOffset));
-  logger.trace('[%s.SetRITFreq] Set RIT offset to %d Hz', [radioModel, hz]);
+  logger.debug('[%s.SetRITFreq] Set RIT offset to %d Hz', [radioModel, hz]);
 end;
 
 procedure TIcomRadio.SetXITFreq(vfo: TVFO; hz: integer);
 var
   bcdOffset: string;
 begin
-  bcdOffset := OffsetToBCD(hz);
-  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_XIT_FREQ + bcdOffset));
-  logger.trace('[%s.SetXITFreq] Set XIT offset to %d Hz', [radioModel, hz]);
+  // RIT/XIT share the same offset register on modern Icom radios ($21 $00)
+  bcdOffset := IcomOffsetToBCD(hz);
+  SendToRadio(BuildCIVCommand($21, CIV_SUBCMD_RIT_FREQ + bcdOffset));
+  logger.debug('[%s.SetXITFreq] Set XIT offset to %d Hz', [radioModel, hz]);
 end;
 
 procedure TIcomRadio.SetBand(band: TRadioBand; vfo: TVFO = nrVFOA);
@@ -1059,7 +1218,7 @@ begin
   if freq = 0 then
     freq := BandToFreq(band);
   SetFrequency(freq, vfo, rmNone);
-  logger.trace('[%s.SetBand] Set band to %d, freq=%d', [radioModel, Ord(band), freq]);
+  logger.debug('[%s.SetBand] Set band to %d, freq=%d', [radioModel, Ord(band), freq]);
 end;
 
 function TIcomRadio.ToggleBand(vfo: TVFO = nrVFOA): TRadioBand;
@@ -1109,7 +1268,7 @@ begin
   end;
 
   SendToRadio(BuildCIVCommand($1A, CIV_SUBCMD_FILTER_WIDTH + Chr(filterNum)));
-  logger.trace('[%s.SetFilter] Set filter to %d', [radioModel, filterNum]);
+  logger.debug('[%s.SetFilter] Set filter to %d', [radioModel, filterNum]);
 end;
 
 procedure TIcomRadio.SendToRadio(whichVFO: TVFO; sCmd: string; sData: string);
@@ -1120,6 +1279,5 @@ end;
 
 initialization
   logger := TLogLogger.GetLogger('uRadioIcomBase');
-  logger.Level := All;
 
 end.

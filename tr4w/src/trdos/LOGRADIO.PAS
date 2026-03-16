@@ -1807,7 +1807,7 @@ begin
             end;
          end;
 
-      IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2:
+      IC705, IC7100, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2:
          begin
          if IntegerBetween(mem,0,8) then
             begin
@@ -2503,23 +2503,8 @@ begin
                len := Min(msgLen, 28);
                // Max for Icom radio. TODO Optimally, this should be sent in multiple batches
                localMsg := Format('%s', [Msg]);
-               DebugMsg('Sending to Icom[' + IntToStr(len) + ' bytes]=' + localMsg);
-               CommandsTempBuffer[0] := Chr(7 + len);
-               CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
-               CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
-               CommandsTempBuffer[3] := CHR(ReceiverAddress);
-               CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
-               CommandsTempBuffer[5] := ICOM_SEND_CW;
-               //CommandsTempBuffer[6] := Chr(0); // No sub command   ny4i Issue 145
-               // Up to 30 characters, add the text to send as ASCII
 
-               //Maybe turn interrogate off when sending?
-               for i := 1 to len do
-                  begin
-                  CommandsTempBuffer[5 + i] := Chr(Ord(Msg[i]));
-                  end;
-
-               CommandsTempBuffer[6 + len] := ICOM_END_OF_MESSAGE_CODE;
+               // SO2R: stop the other radio's CW if it is sending
                if Self.active then
                   begin
                   if InactiveRadioPtr.CWByCAT_Sending then
@@ -2536,11 +2521,36 @@ begin
                      DEBUGMSG('Stopping Sending in SendCW - ACTIVE');
                      end;
                   end;
-               DebugMsg('SendCW for Icom, len = ' + IntToStr(len));
+
                elements := CalculateElements(Msg);  // ny4i Issue 153
                DebugMsg('Total CW Elements for ' + Msg + ' = ' + IntToStr(elements));
                Self.EnableCWBYCATTimer(Round(( (1200 / DisplayedCodeSpeed) * elements) * 1.25)); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
-               AddCommandToBuffer;
+
+               if Self.tNetObject <> nil then
+                  begin
+                  // Network path: route through TIcomRadio.BufferCW/SendCW
+                  DebugMsg('SendCW for Icom network[' + IntToStr(len) + ' bytes]=' + localMsg);
+                  Self.tNetObject.BufferCW(Copy(Msg, 1, len));
+                  Self.tNetObject.SendCW;
+                  end
+               else
+                  begin
+                  // Legacy serial path: build raw CI-V frame
+                  DebugMsg('Sending to Icom[' + IntToStr(len) + ' bytes]=' + localMsg);
+                  CommandsTempBuffer[0] := Chr(7 + len);
+                  CommandsTempBuffer[1] := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[2] := ICOM_PREAMBLE_CODE;
+                  CommandsTempBuffer[3] := CHR(ReceiverAddress);
+                  CommandsTempBuffer[4] := ICOM_CONTROLLER_ADDRESS;
+                  CommandsTempBuffer[5] := ICOM_SEND_CW;
+                  for i := 1 to len do
+                     begin
+                     CommandsTempBuffer[5 + i] := Chr(Ord(Msg[i]));
+                     end;
+                  CommandsTempBuffer[6 + len] := ICOM_END_OF_MESSAGE_CODE;
+                  AddCommandToBuffer;
+                  end;
+
                Self.CWByCAT_Sending := true;
                logger.trace('Self.CWByCAT_Sending set to TRUE - Icom');
                CWByCATBuffer := '';
@@ -2732,6 +2742,8 @@ begin
          Result := rmIcomIC7850;
       IC905:
          Result := rmIcomIC905;
+      IC7100:
+         Result := rmIcomIC7100;
    else
       Result := rmNone;
    end;
@@ -2822,7 +2834,7 @@ begin
    else if tCATPortType in [Serial1..Serial20] then
       begin
       // Check if we should use modern radio class (e.g., K4, Icom) or legacy serial code
-      if (Self.RadioModel in [K4, IC7610, IC7300, IC9700, IC705, IC7300MK2, IC7600, IC7760, IC7850, IC7851, IC905]) then
+      if (Self.RadioModel in [K4, IC7610, IC7300, IC9700, IC705, IC7300MK2, IC7600, IC7760, IC7850, IC7851, IC905, IC7100]) then
          begin
          factoryModel := Self.MapRadioModelToFactory;
 
@@ -2860,7 +2872,8 @@ begin
       else
          begin
          // Legacy serial port code (non-HamLib, non-K4)
-         logger.Debug('[%s.SetUpRadioInterface] Using legacy serial port code', [Self.RadioName]);
+         logger.Info('[%s.SetUpRadioInterface] Using legacy serial port code: Port=%d, Baud=%d, DataBits=%d, Parity=%d, StopBits=%d',
+                     [Self.RadioName, Ord(tCATPortType), RadioBaudRate, RadioNumberBits, Ord(RadioParity), RadioStopBits]);
 
       dwFlagsAndAttributes := FILE_ATTRIBUTE_NORMAL;
       EvtChar := #0;
@@ -2960,12 +2973,14 @@ begin
 
       if Self.tNetObject <> nil then
       begin
+         Self.tNetObject.rigLabel := Self.RadioName;  // "Rig 1" / "Rig 2"
+
          // If this is an Icom radio, set network credentials before connecting
          if Self.tNetObject is TIcomRadio then
          begin
             TIcomRadio(Self.tNetObject).NetworkUsername := Self.IcomNetworkUsername;
             TIcomRadio(Self.tNetObject).NetworkPassword := Self.IcomNetworkPassword;
-            logger.Info('[%s.SetUpRadioInterface] Set Icom network credentials (user=%s)',
+            logger.Info('[%s.SetUpRadioInterface] Set Icom network credentials (user=%s, pass=*******)',
                         [Self.RadioName, Self.IcomNetworkUsername]);
          end;
 

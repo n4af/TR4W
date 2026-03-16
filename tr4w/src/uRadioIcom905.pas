@@ -34,11 +34,12 @@ begin
   inherited Create;
   RadioAddress := $AC;
   radioModel := 'Icom IC-905';
+  // IC-905 CI-V transceive is at menu item $0142, not the default $0150 (IC-7610/IC-7760)
+  FTransceiveMenuBytes := #$01 + #$42;
   logger.Info('[TIcom905Radio.Create] Created IC-905 instance with CI-V address $AC');
 end;
 
 initialization
   logger := TLogLogger.GetLogger('uRadioIcom905');
-  logger.Level := All;
 
 end.

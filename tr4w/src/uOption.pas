@@ -304,7 +304,7 @@ begin
 
   for Command := 1 to CommandsArraySize do
     if not (CFGCA[Command].crS in [csRem]) then
-      if CFGCA[Command].crType in [ctFreqList, ctURL, ctPortLPT, ctDirectory, ctFileName, ctAlphaChar, ctChar, ctBand, ctReal, ctByte, ctInteger, ctMessage, ctWord, ctString, ctBoolean, ctOther, ctMultiplier] then
+      if CFGCA[Command].crType in [ctFreqList, ctURL, ctCaseSensitive, ctPassword, ctPortLPT, ctDirectory, ctFileName, ctAlphaChar, ctChar, ctBand, ctReal, ctByte, ctInteger, ctMessage, ctWord, ctString, ctBoolean, ctOther, ctMultiplier] then
       begin
 
 //        if CommandsFilter <> cfAll then
@@ -339,7 +339,7 @@ begin
             ctDirectory, ctFileName:
               Settingslvi.pszText := CFGCA[Command].crAddress;
 
-            ctURL, ctMessage, ctString:
+            ctURL, ctMessage, ctString, ctCaseSensitive, ctPassword:
               begin
                 Settingslvi.pszText := CFGCA[Command].crAddress;
                 inc(Settingslvi.pszText);
@@ -473,7 +473,7 @@ begin
   if CFGCA[Index].crJ = 2 then Exit;
 
   if
-    (CFGCA[Index].crType in [ctFreqList, ctURL, ctDirectory, ctFileName, ctAlphaChar, ctChar, ctBoolean, ctString, ctByte, ctInteger, ctReal, ctWord])
+    (CFGCA[Index].crType in [ctFreqList, ctURL, ctCaseSensitive, ctPassword, ctDirectory, ctFileName, ctAlphaChar, ctChar, ctBoolean, ctString, ctByte, ctInteger, ctReal, ctWord])
     or (CFGCA[Index].crKind in [ckArray, ckList]) then
   begin
 
@@ -622,11 +622,11 @@ begin
           Exit;
         end;
 
-      ctURL, ctString:
+      ctURL, ctString, ctCaseSensitive, ctPassword:
         begin
           Windows.ZeroMemory(@TempString, SizeOf(TempString));
 
-          if CFGCA[Index].crType = ctURL then tInputDialogLowerCase := True;
+          if CFGCA[Index].crType in [ctURL, ctCaseSensitive, ctPassword] then tInputDialogLowerCase := True;
           tInputDialogPreviousValue := pShortString(CFGCA[Index].crAddress)^;
           TempString := QuickEditResponse(TC_NEWVALUE, CFGCA[Index].crMax);
 

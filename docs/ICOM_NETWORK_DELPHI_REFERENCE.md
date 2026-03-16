@@ -748,12 +748,37 @@ When receiving on the CI-V socket, extract CI-V data as follows:
 
 ## Transceive (Push Updates)
 
-When the radio's frequency, mode, or other settings change (user turns the dial), the radio pushes unsolicited CI-V messages. These arrive as normal data packets on the CI-V socket. Your code should handle these the same way as responses to your commands.
+When CI-V Transceive is enabled on the radio (menu setting), the radio pushes unsolicited CI-V messages for **some** operating parameters. These arrive as broadcast CI-V frames (destination `$00`) on the CI-V socket and should be handled the same way as responses to your commands.
 
-Common push messages:
-- `$00` or `$03` - Frequency changed
-- `$01` or `$04` - Mode changed
-- `$1C $00` - PTT status changed
+### What IS pushed (confirmed via IC-7610 testing):
+- `$00` - VFO A frequency changed (instant on VFO knob turn)
+- `$01` - Operating mode changed (instant on mode switch)
+
+### What is NOT pushed (must poll):
+- `$21` - RIT/XIT state and offset
+- `$0F` - Split on/off
+- `$1C $00` - TX/RX status (PTT)
+- `$14 $0C` - CW speed (untested, assumed not pushed)
+- `$1A $06` - Data mode overlay (confirmed not pushed)
+
+### Polling Strategy
+
+Because most parameters are NOT pushed, you must poll them:
+
+**Poll every ~1 second:**
+- RIT state/offset (`$21 $00`, `$21 $01`)
+- XIT state (`$21 $02`)
+- Split (`$0F`)
+- TX status (`$1C $00`)
+
+**Do NOT poll** (rely on transceive pushes instead):
+- Frequency (`$03`) — arrives via `$00` push
+- Mode (`$04`) — arrives via `$01` push
+
+**WARNING**: Polling `$04` (mode) causes a data mode flicker bug. The poll response returns the base mode (e.g., USB), which overwrites the DIGI state before a follow-up `$1A $06` query can re-detect data mode. Remove `$04` from polling and rely on the `$01` transceive push.
+
+**Query once at startup** (after `$19` response):
+- All parameters: freq, mode, TX status, RIT, XIT, split, VFO B, CW speed
 
 ---
 

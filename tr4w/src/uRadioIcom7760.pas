@@ -30,6 +30,8 @@ type
 
     // Override CI-V frame parsing for extended VFO B format
     procedure ProcessCIVFrame(frame: string); override;
+
+    // RIT/XIT: IC-7760 uses same $21 subcmds as base class (confirmed via pcap)
   end;
 
 implementation
@@ -148,47 +150,6 @@ begin
         end;
       end;
 
-    $21:  // RIT/XIT (shared offset on IC-7760)
-      begin
-        if Length(data) >= 1 then
-        begin
-          case Ord(data[1]) of
-            $00:  // RIT/XIT offset
-              begin
-                if Length(data) >= 4 then
-                begin
-                  // BCD offset: high, low, sign
-                  freq := ((Ord(data[2]) shr 4) and $0F) * 1000 +
-                          (Ord(data[2]) and $0F) * 100 +
-                          ((Ord(data[3]) shr 4) and $0F) * 10 +
-                          (Ord(data[3]) and $0F);
-                  if Ord(data[4]) <> $00 then
-                    freq := -freq;
-                  Self.vfo[nrVFOA].RITOffset := freq;
-                  Self.vfo[nrVFOA].XITOffset := freq;  // Shared
-                  logger.Trace('[IC-7760] RIT/XIT offset: %d Hz', [freq]);
-                end;
-              end;
-            $01:  // RIT on/off
-              begin
-                if Length(data) >= 2 then
-                begin
-                  Self.vfo[nrVFOA].RITState := (Ord(data[2]) = $01);
-                  logger.Trace('[IC-7760] RIT %s', [IfThen(Self.vfo[nrVFOA].RITState, 'ON', 'OFF')]);
-                end;
-              end;
-            $02:  // XIT on/off (Delta TX)
-              begin
-                if Length(data) >= 2 then
-                begin
-                  Self.vfo[nrVFOA].XITState := (Ord(data[2]) = $01);
-                  logger.Trace('[IC-7760] XIT %s', [IfThen(Self.vfo[nrVFOA].XITState, 'ON', 'OFF')]);
-                end;
-              end;
-          end;
-        end;
-      end;
-
   else
     // For all other commands, use the base class handler
     inherited ProcessCIVFrame(frame);
@@ -197,6 +158,5 @@ end;
 
 initialization
   logger := TLogLogger.GetLogger('uRadioIcom7760');
-  logger.Level := All;
 
 end.

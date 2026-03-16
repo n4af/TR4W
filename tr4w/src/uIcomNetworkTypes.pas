@@ -96,23 +96,24 @@ const
   CIV_PREAMBLE             = $FE;
   CIV_EOM                  = $FD;
 
+  // TX buffer for retransmit responses
+  ICOM_BUFSIZE             = 500;    // Max entries in tx seq buffers
+  // Note: Retransmit request uses PktType=$0001, same as ICOM_PKT_AUTH.
+  // Context determines meaning: during auth it's auth data, when connected it's retransmit.
+
   // Reset capability value
   ICOM_RESET_CAP           = $0798;
 
 type
-  // Connection state machine
+  // Connection state machine (matches wfview's 7 states)
   TIcomConnectionState = (
     icsDisconnected,
     icsWaitingForHere,      // Sent "Are You There", waiting for "I Am Here"
     icsWaitingForReady,     // Sent "Are You Ready", waiting for "I Am Ready"
     icsWaitingForLogin,     // Sent login, waiting for response
-    icsWaitingForToken,     // Sent token ack, waiting for capabilities
-    icsWaitingForStream,    // Sent stream request, waiting for CI-V port
-    icsCIVHandshake,        // CI-V socket handshake in progress
-    icsCIVWaitingForHere,   // CI-V: sent Are You There, waiting for I Am Here
-    icsCIVWaitingForReady,  // CI-V: sent Are You Ready, waiting for I Am Ready
-    icsConnected,           // Fully connected, CI-V stream open
-    icsDisconnecting        // Graceful disconnect in progress
+    icsAuthenticated,       // Login OK, sent token ack, waiting for capabilities
+    icsStreamRequested,     // Sent stream request, waiting for CI-V port
+    icsConnected            // Connected — CI-V handshake happens within this state
   );
 
   // Control Packet (0x10 = 16 bytes)
@@ -339,14 +340,14 @@ type
     RemoteId:   LongWord;
   end;
 
-  // Retransmit buffer entry
-  TRetransmitEntry = record
-    Seq:       Word;
-    Data:      string;       // Raw packet bytes as string
-    SendTime:  LongWord;     // GetTickCount when sent
-    Retries:   Integer;
+  // TX sequence buffer entry — stores sent packets for radio's retransmit requests
+  TSeqBufEntry = record
+    Seq:              Word;
+    Data:             string;       // Raw packet bytes
+    SendTime:         LongWord;     // GetTickCount when sent
+    RetransmitCount:  Byte;
   end;
-  PRetransmitEntry = ^TRetransmitEntry;
+  PSeqBufEntry = ^TSeqBufEntry;
 
 // Byte-order helpers
 function SwapWord(Value: Word): Word;
@@ -423,13 +424,9 @@ begin
     icsWaitingForHere:     Result := 'WaitingForHere';
     icsWaitingForReady:    Result := 'WaitingForReady';
     icsWaitingForLogin:    Result := 'WaitingForLogin';
-    icsWaitingForToken:    Result := 'WaitingForToken';
-    icsWaitingForStream:   Result := 'WaitingForStream';
-    icsCIVHandshake:       Result := 'CIVHandshake';
-    icsCIVWaitingForHere:  Result := 'CIVWaitingForHere';
-    icsCIVWaitingForReady: Result := 'CIVWaitingForReady';
+    icsAuthenticated:      Result := 'Authenticated';
+    icsStreamRequested:    Result := 'StreamRequested';
     icsConnected:          Result := 'Connected';
-    icsDisconnecting:      Result := 'Disconnecting';
   else
     Result := 'Unknown';
   end;

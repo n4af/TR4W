@@ -121,6 +121,5 @@ end;
 
 initialization
   logger := TLogLogger.GetLogger('uIcomNetworkDiscovery');
-  logger.Level := All;
 
 end.

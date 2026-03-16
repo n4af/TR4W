@@ -526,6 +526,42 @@ procedure PlayLastSeconds(Seconds: integer);
 begin
 
 end;
+
+// Wait for a thread handle to signal, pumping Windows messages so that
+// cross-thread SendMessage calls (e.g. SetDlgItemText from the polling
+// thread) don't deadlock the main thread.
+procedure WaitForPollingThreadWithMessages(H: THandle; TimeoutMs: DWORD);
+var
+   Deadline: DWORD;
+   Remaining: DWORD;
+   WaitResult: DWORD;
+   Msg: TMsg;
+begin
+   if H = 0 then
+      begin
+      Exit;
+      end;
+   Deadline := GetTickCount + TimeoutMs;
+   repeat
+      Remaining := Deadline - GetTickCount;
+      if Remaining > TimeoutMs then
+         begin
+         Break;  // wrapped past deadline
+         end;
+      WaitResult := MsgWaitForMultipleObjects(1, H, False, Remaining, QS_SENDMESSAGE);
+      if WaitResult = WAIT_OBJECT_0 then
+         begin
+         Break;  // thread exited
+         end;
+      if WaitResult = WAIT_TIMEOUT then
+         begin
+         Break;  // timed out
+         end;
+      // WAIT_OBJECT_0 + 1 = message available — pump it so SendMessage unblocks
+      PeekMessage(Msg, 0, 0, 0, PM_NOREMOVE);
+   until False;
+end;
+
 procedure ExitProgram(Ask: boolean);
 begin
 {$IF not tDebugMode }
@@ -540,7 +576,33 @@ begin
 {$IF  LANG = 'RUS'}
 //  if (OCXHandle <> 0) then FreeLibrary(OCXHandle);
 {$IFEND}
+  logger.Info('[ExitProgram] Step 1: SaveTelnetWindowSpots');
   SaveTelnetWindowSpots;
+
+  // Stop polling threads FIRST so they don't recreate transports or call
+  // SendMessage (SetDlgItemText) while we're tearing down on the main thread.
+  // Use MsgWaitForMultipleObjects to pump messages while waiting — polling
+  // threads call SetDlgItemText which uses SendMessage to the main thread.
+  // Plain WaitForSingleObject deadlocks because SendMessage blocks until
+  // the owning thread processes the message.
+  logger.Info('[ExitProgram] Step 2: Stopping polling threads');
+  Radio1.PollingStopRequested := True;
+  Radio2.PollingStopRequested := True;
+  logger.Info('[ExitProgram] Step 2a: Waiting for Radio1 polling thread');
+  WaitForPollingThreadWithMessages(Radio1.tRadioInterfaceThreadHandle, 3000);
+  logger.Info('[ExitProgram] Step 2b: Waiting for Radio2 polling thread');
+  WaitForPollingThreadWithMessages(Radio2.tRadioInterfaceThreadHandle, 3000);
+  logger.Info('[ExitProgram] Step 2c: Polling threads done');
+
+  // Disconnect network radios BEFORE WSACleanup kills the sockets.
+  // Without this, the radio never receives disconnect packets and keeps
+  // the session alive, blocking reconnection on next program start.
+  logger.Info('[ExitProgram] Step 3: Disconnecting Radio1');
+  if Radio1.tNetObject <> nil then Radio1.tNetObject.Disconnect;
+  logger.Info('[ExitProgram] Step 4: Disconnecting Radio2');
+  if Radio2.tNetObject <> nil then Radio2.tNetObject.Disconnect;
+  logger.Info('[ExitProgram] Step 5: WSACleanup');
+
   if WindowsSocketsInitialised then WSACleanup;
   ntBeepClose;
   SaveTR4WPOSFILE;
@@ -1348,11 +1410,21 @@ begin
     SendStationStatus(sstQSOs);
   end;
   if SingleBand <> AllBands then
-  begin
-    if RXData.Band = SingleBand then TotalQSOPoints := TotalQSOPoints + RXData.QSOPoints;
-  end
+     begin
+     if RXData.Band = SingleBand then TotalQSOPoints := TotalQSOPoints + RXData.QSOPoints;
+     end
   else
-    TotalQSOPoints := TotalQSOPoints + RXData.QSOPoints;
+     TotalQSOPoints := TotalQSOPoints + RXData.QSOPoints;
+
+  if Contest = MOQSOPARTY then
+     begin
+     CheckMOQSOPartyBonusStation(RXData.Callsign);
+     if (RXData.Band in [Band80, Band40]) and
+        (RXData.tSysTime.qtHour >= 14) and
+        (RXData.tSysTime.qtHour < 20) and
+        (MOQSOPartyPeakHourCount < 250) then
+        inc(MOQSOPartyPeakHourCount);
+     end;
   //  ProcessPartialCallAndInitialExchange(RXData);
     //  PushLogStringIntoEditableLogAndLogPopedQSO(LogString, True);
     //  if Trace then Write('&');

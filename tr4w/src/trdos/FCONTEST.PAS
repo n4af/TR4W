@@ -882,6 +882,10 @@ begin
 //        VHFBandsEnabled := True;
       end;
 
+    MOQSOPARTY:
+      begin
+      end;
+
       MWC:
        begin
         ActiveBand := Band80;

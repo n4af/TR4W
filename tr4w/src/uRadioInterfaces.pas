@@ -3,7 +3,7 @@ unit uRadioInterfaces;
 interface
 
 uses
-  uNetRadioBase;  // For TVFO, TRadioMode, TRadioBand, TRadioFilter types
+  uNetRadioBase, uRadioBand;  // For TVFO, TRadioMode, TRadioBand, TRadioFilter types
 
 type
   // Core interface - all radios must support basic operations
