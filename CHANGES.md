@@ -18,6 +18,63 @@
 
 ## 4.145.x — March 2026
 
+### 4.145.2 (2026-03-16) — IcomNetwork branch — NY4I
+
+#### Icom Network Radio Control (Ethernet / WiFi)
+
+Full CI-V over Ethernet/WiFi support for Icom radios using the Icom Remote Utility protocol. This replaces the previous HamLib/rigctld approach for network-connected Icom radios with a native Delphi implementation that matches the wfview reference.
+
+**Supported radios:** IC-705, IC-7100, IC-7300, IC-7300 MK2, IC-7600, IC-7610, IC-7760, IC-7850, IC-7905, IC-9700
+
+**Protocol implementation (`uIcomNetworkTransport.pas`):**
+- 7-state machine: Disconnected → WaitingForHere → WaitingForReady → WaitingForLogin → Authenticated → StreamRequested → Connected
+- Authenticated session management with login retry on stale sessions
+- TX buffer + retransmit response (responds to radio's retransmit requests)
+- Idle keepalive on control socket every 100 ms (matches wfview)
+- Local IP auto-detection via WinSock UDP connect + getsockname
+- Auth failure detection with immediate feedback (red "AUTH FAILED" on radio status line, beep)
+- Shutdown hang fix: `SafeFreeSocket` runs Indy `.Free` on background thread with 500 ms timeout to avoid Indy destructor deadlock
+
+**CI-V state management (`uRadioIcomBase.pas`):**
+- Startup query sequence after `$19` response: frequency, mode, TX status, RIT, XIT, split, VFO B
+- Transceive push handling: `$00` (VFO A freq), `$01` (mode), `$1A $06` (data mode queried after mode push)
+- Polling only for states the radio does not push: RIT/XIT (`$21`), split (`$0F`), TX status (`$1C $00`) — 1 s interval
+- CW speed encode/decode: 6–48 WPM ↔ 0–255 linear ↔ 2-byte BCD
+- CW watchdog: 2 s timeout triggers CivOpen re-handshake
+
+**IC-7760 specifics (`uRadioIcom7760.pas`):**
+- CI-V address `$B2`, controller address `$E1`
+- VFO B via extended `$25`/`$26` commands with sub-command byte `$01`
+- Shared RIT/XIT offset; `$21 $01`/`$21 $02` sub-commands for RIT/XIT on/off
+
+**SO2R fixes:**
+- Per-instance timer dispatch via `GWL_USERDATA` (replaced dangerous `GTransportInstance` global)
+- Radio label (`"Rig 1 IC-7760"`) in all transport log messages
+
+#### Bug Fixes
+
+- **IC-705 BandUp skips 4m band** — IC-705 has no 70 MHz band; sending that frequency causes the radio to reject it and revert to 6m. `TIcom705Radio.ToggleBand` now cycles 6m → 2m directly.
+- **Radio/CAT dialog (ID 66) — HamLib checkbox hidden** — When TCP/IP + Icom is selected, USERNAME/PASSWORD fields were dynamically inserted over the "Use HamLib" checkbox, making it impossible to disable HamLib. Fix: expand the CAT group box height and shift the HamLib checkbox, CW/PTT group box, and all controls below down 56 px at `WM_INITDIALOG`.
+- **Data mode flicker** — Polling `$04` (mode) every second was overwriting the DIGI sub-mode state. Fix: mode arrives via `$01` transceive push only; `$1A $06` is queried after each `$01` push.
+- **Log4D level inheritance** — Removed explicit `logger.Level := All` from all 12 Icom units; debug level now flows from root logger via `UpdateDebugLogLevel` in `uCFG.pas`.
+
+#### New Units & Tests
+
+- `uIcomCIV.pas` — BCD encode/decode helpers for CI-V frequency/value conversion
+- `uRadioBand.pas` — `TRadioBand` enumeration and band-edge frequency constants
+- `uRadioIcom7100.pas` — IC-7100 implementation (CI-V address `$88`)
+- `test/unit/uTestIcomCIV.pas` — 32 CI-V BCD unit tests
+- `test/unit/uTestRadioBand.pas` — band/frequency mapping tests
+- `test/unit/uTR4WTestFramework.pas` — lightweight DUnit-compatible test framework
+
+#### Documentation
+
+- `docs/ICOM_NETWORK_PROTOCOL_GUIDE.md` — Icom remote utility protocol internals
+- `docs/ICOM_NEW_RADIO_IMPLEMENTATION.md` — how to add a new Icom network radio
+- `docs/tr4w-migration-strategy.md` — phased Delphi 7 → Delphi 12 migration plan with testing strategy and dialog migration tracks
+
+---
+
 ### 4.145.1 (2026-03-04)
 - **UI:** Main window rounded corners (issue #834) — N4AF
 
