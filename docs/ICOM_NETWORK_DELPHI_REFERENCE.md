@@ -484,7 +484,8 @@ Note: In responses, the source/destination are **swapped** compared to the comma
 | Set Split | `$0F` | - | 1 byte | 0=off, 1=on |
 | Set CW Keyer Speed | `$14` | `$0C` | 2 BCD bytes | See BCD-to-WPM conversion below |
 | Read S-Meter | `$15` | `$02` | - | Response: 2 bytes (0-255 scale) |
-| Send CW Text | `$17` | - | ASCII chars | Up to 30 characters |
+| Send CW Text | `$17` | `$00` | ASCII chars | Up to 30 characters |
+| Stop CW | `$17` | `$FF` | - | Abort CW sending (ESC key) |
 | Get TX Status (PTT) | `$1C` | `$00` | - | Response: 1 byte (0=RX, 1=TX) |
 | RIT/XIT Offset | `$21` | `$00` | 4 bytes | See RIT section below |
 | RIT On/Off | `$21` | `$01` | 1 byte | 0=off, 1=on |

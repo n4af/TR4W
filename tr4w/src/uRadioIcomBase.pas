@@ -1038,8 +1038,8 @@ end;
 procedure TIcomRadio.StopCW;
 begin
   // Send break command to stop CW
-  // CI-V command $17 $01 stops CW sending
-  SendToRadio(BuildCIVCommand($17, #$01));
+  // CI-V command $17 $FF stops CW sending
+  SendToRadio(BuildCIVCommand($17, #$FF));       // Was 01 for some reason
   logger.debug('[%s.StopCW] CW transmission stopped', [radioModel]);
 end;
 

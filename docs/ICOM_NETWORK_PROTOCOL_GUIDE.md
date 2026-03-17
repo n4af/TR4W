@@ -634,7 +634,7 @@ Byte 4: 100MHz,GHz   → $00
 | S-meter | $15 | $02 | Response: 2 BCD bytes |
 | Power meter | $15 | $11 | Response: 2 BCD bytes |
 | Send CW text | $17 | $00 | Up to 30 ASCII chars |
-| Stop CW | $17 | $01 | Abort CW sending |
+| Stop CW | $17 | $FF | Abort CW sending |
 | PTT status | $1C | $00 | Response: 0=RX, 1=TX |
 | Data mode | $1A | $06 | See section 14 |
 | RIT offset | $21 | $00 | See RIT section |
