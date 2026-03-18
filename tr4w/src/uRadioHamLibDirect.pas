@@ -25,7 +25,7 @@ unit uRadioHamLibDirect;
 interface
 
 uses
-  uNetRadioBase, uHamLibDirect, StrUtils, SysUtils, Math, Classes, Log4D, TF, VC, Tree;
+  uNetRadioBase, uRadioBand, uHamLibDirect, StrUtils, SysUtils, Math, Classes, Log4D, TF, VC, Tree;
 
 type
   THamLibDirect = class(TNetRadioBase)
@@ -160,6 +160,10 @@ var
 begin
   Result := -1;
 
+  // Throttle polling to 250ms — prevents overwhelming the serial port
+  // (FreqPollRate default is 10ms which is far too fast for serial CI-V)
+  pollingInterval := 250;
+
   logger.Info('[THamLibDirect.Connect] Starting connection');
   logger.Debug('[THamLibDirect.Connect] HamLibModelID: %d', [HamLibModelID]);
   logger.Debug('[THamLibDirect.Connect] UseIPAddress: %s', [BoolToStr(UseIPAddress, True)]);
@@ -168,10 +172,16 @@ begin
   logger.Debug('[THamLibDirect.Connect] COMPortName: %s', [COMPortName]);
   logger.Debug('[THamLibDirect.Connect] BaudRate: %d', [BaudRate]);
 
-  // Enable HamLib debug logging (logs to stderr/console)
-  // Use RIG_DEBUG_WARN for normal operation, RIG_DEBUG_TRACE for troubleshooting
-  rig_set_debug(RIG_DEBUG_TRACE);  // Temporarily set to TRACE for troubleshooting
-  logger.Debug('[THamLibDirect.Connect] HamLib debug level set to TRACE');
+  // Set HamLib internal debug level based on config flag
+  if TR4W_HAMLIB_DEBUG then
+     begin
+     rig_set_debug(RIG_DEBUG_TRACE);
+     logger.Info('[THamLibDirect.Connect] HamLib debug level set to TRACE');
+     end
+  else
+     begin
+     rig_set_debug(RIG_DEBUG_WARN);
+     end;
 
   // Initialize rig
   logger.Debug('[THamLibDirect.Connect] Calling rig_init(%d)', [HamLibModelID]);
@@ -551,6 +561,7 @@ procedure THamLibDirect.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode)
 var
   err: Integer;
   hlVFO: vfo_t;
+  activeVFO: vfo_t;
 begin
   if FRig = nil then Exit;
 
@@ -560,9 +571,29 @@ begin
 
   err := rig_set_freq(FRig, hlVFO, freq);
   if err <> RIG_OK then
-    logger.Error('[SetFrequency] Error setting frequency: %s', [RigErrorToString(err)])
+     begin
+     logger.Error('[SetFrequency] Error setting frequency: %s (freq=%d)',
+                  [RigErrorToString(err), freq]);
+     // Some radios (e.g. IC-7760) swap their active VFO when an out-of-range
+     // CI-V command is rejected. If the VFO changed, restore it immediately.
+     // Without this, every subsequent rig_get_freq(VFO_A) call causes HamLib
+     // to physically swap VFOs, making the radio's front-panel display flash
+     // at the polling rate (4Hz) between the two VFO frequencies.
+     // The IC-7760 firmware silently switches to VFO B when it rejects an
+     // out-of-range frequency. HamLib tracks VFO state internally and does NOT
+     // query the radio, so rig_get_vfo returns cached state (VFO A) even after
+     // the radio has switched. Unconditionally force VFO A back.
+     logger.Info('[SetFrequency] Forcing VFO restore after rejection (hlVFO=%d)', [hlVFO]);
+     if rig_set_vfo(FRig, hlVFO) = RIG_OK then
+        logger.Info('[SetFrequency] VFO restored successfully')
+     else
+        logger.Warn('[SetFrequency] rig_set_vfo failed — flash may continue');
+     // Self.vfo[vfo].frequency is intentionally unchanged: the command was
+     // rejected, so as far as TR4W is concerned the frequency did not change.
+     // The next scheduled poll will update it if the radio is actually elsewhere.
+     end
   else
-    Self.vfo[vfo].frequency := freq;
+     Self.vfo[vfo].frequency := freq;
 end;
 
 procedure THamLibDirect.SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA);
@@ -737,11 +768,13 @@ begin
 end;
 
 procedure THamLibDirect.SetBand(band: TRadioBand; vfo: TVFO = nrVFOA);
+var
+  freq: LongInt;
 begin
-  logger.Debug('[THamLibDirect.SetBand] Band selection on %s: %d',
-               [VFOToString(vfo), Ord(band)]);
-  // HamLib band selection would use rig_set_level with RIG_LEVEL_BAND
-  // Implementation depends on radio capabilities
+  freq := BandToFreq(band);
+  logger.Debug('[THamLibDirect.SetBand] Band %d on %s → tuning to %d Hz',
+               [Ord(band), VFOToString(vfo), freq]);
+  SetFrequency(freq, vfo, localMode);
 end;
 
 function THamLibDirect.ToggleBand(vfo: TVFO = nrVFOA): TRadioBand;
@@ -821,6 +854,9 @@ begin
   end;
 
   try
+    if TR4W_HAMLIB_DEBUG then
+       logger.Info('[SendPollRequests] Polling radio state');
+
     // Poll VFO A
     freq := GetFreqFromRig(nrVFOA);
     if freq > 0 then
@@ -829,9 +865,13 @@ begin
       CalculateBandMode(Self.vfo[nrVFOA].frequency, tempBand, tempMode);
       Self.vfo[nrVFOA].band := GetRadioBandFromBandType(tempBand);
     end;
+    if TR4W_HAMLIB_DEBUG then
+       logger.Info('[SendPollRequests] VFO A freq=%.0f', [freq]);
 
     mode := GetModeFromRig(nrVFOA);
     Self.vfo[nrVFOA].mode := HamLibModeToTR4WMode(mode);
+    if TR4W_HAMLIB_DEBUG then
+       logger.Info('[SendPollRequests] VFO A mode=%d', [Integer(mode)]);
 
     rit := GetRITFromRig(nrVFOA);
     Self.vfo[nrVFOA].RITOffset := rit;
@@ -840,28 +880,40 @@ begin
     xit := GetXITFromRig(nrVFOA);
     Self.vfo[nrVFOA].XITOffset := xit;
     Self.vfo[nrVFOA].XITState := (xit <> 0);
+    if TR4W_HAMLIB_DEBUG then
+       logger.Info('[SendPollRequests] RIT=%d XIT=%d', [rit, xit]);
 
-    // Poll VFO B
-    freq := GetFreqFromRig(nrVFOB);
-    if freq > 0 then
-    begin
-      Self.vfo[nrVFOB].frequency := Round(freq);
-      CalculateBandMode(Self.vfo[nrVFOB].frequency, tempBand, tempMode);
-      Self.vfo[nrVFOB].band := GetRadioBandFromBandType(tempBand);
-    end;
-
-    mode := GetModeFromRig(nrVFOB);
-    Self.vfo[nrVFOB].mode := HamLibModeToTR4WMode(mode);
-
-    // PTT and split status
+    // PTT and split status — polled before VFO B so we can gate VFO B on split state.
+    // Reading VFO B on Icom radios requires HamLib to physically swap VFOs, which
+    // causes the radio's front-panel display to flicker. Only do it when split is active
+    // (the only time VFO B frequency is needed for display).
     ptt := GetPTTFromRig;
     if ptt then
-      Self.radioState := rsTransmit
+       Self.radioState := rsTransmit
     else
-      Self.radioState := rsReceive;
+       Self.radioState := rsReceive;
 
     split := GetSplitFromRig;
     Self.localSplitEnabled := split;
+    if TR4W_HAMLIB_DEBUG then
+       logger.Info('[SendPollRequests] PTT=%s split=%s', [BoolToStr(ptt, True), BoolToStr(split, True)]);
+
+    // Poll VFO B only when split is active — avoids unnecessary VFO swap flicker
+    if split then
+       begin
+       freq := GetFreqFromRig(nrVFOB);
+       if freq > 0 then
+          begin
+          Self.vfo[nrVFOB].frequency := Round(freq);
+          CalculateBandMode(Self.vfo[nrVFOB].frequency, tempBand, tempMode);
+          Self.vfo[nrVFOB].band := GetRadioBandFromBandType(tempBand);
+          end;
+       if TR4W_HAMLIB_DEBUG then
+          logger.Info('[SendPollRequests] VFO B freq=%.0f', [freq]);
+
+       mode := GetModeFromRig(nrVFOB);
+       Self.vfo[nrVFOB].mode := HamLibModeToTR4WMode(mode);
+       end;
 
   except
     on E: Exception do

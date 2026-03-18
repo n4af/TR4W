@@ -766,7 +766,7 @@ type
 
   CFGStatus = (csNew, csOld, csRem);
 
-  CFGType = (ctFreqList, ctDirectory, ctFileName, ctMessage, ctMultiplier, ctBoolean, ctReal, ctByte, ctInteger, ctWord, ctString, ctURL, ctOperation, ctOther, ctChar, ctAlphaChar, {ctPort, } ctPortLPT, ctBand);
+  CFGType = (ctFreqList, ctDirectory, ctFileName, ctMessage, ctMultiplier, ctBoolean, ctReal, ctByte, ctInteger, ctWord, ctString, ctURL, ctCaseSensitive, ctPassword, ctOperation, ctOther, ctChar, ctAlphaChar, {ctPort, } ctPortLPT, ctBand);
 
   ContestType =
     (
@@ -842,6 +842,7 @@ type
     MINI40,
     MICHQSOPARTY,
     MINNQSOPARTY,
+    MOQSOPARTY,
     NAQSOCW,
     NAQSOSSB,
     NAQSORTTY,
@@ -1053,6 +1054,8 @@ type
     TS890,
     EXPERTTCI,
     ACLOG,
+    IC905,
+    IC7300MK2,
     HAMLIBANY);
 
 
@@ -2576,6 +2579,7 @@ var
   TR4W_HAMLIBIPADDRESS                  : str50;
   TR4W_HAMLIBPORT                       : integer;
   TR4W_HAMLIBRUNRIGCTLD                 : boolean;
+  TR4W_HAMLIB_DEBUG                     : boolean;
   
   TR4W_LC_FILENAME                      : PChar = 'LUCONSZ.TTF';
 
@@ -3131,7 +3135,7 @@ type
   end;
 
 const
-QSOPartiesCount = 19;
+QSOPartiesCount = 20;
 
   QSOParties                         : array[1..QSOPartiesCount] of TUSQSOPartyRecord =
   (
@@ -3154,7 +3158,8 @@ QSOPartiesCount = 19;
   (InsideStateDOMFile:'ve7';        {OutsideStateDOMFile:'VE7';        }StateName: 'VE7'),
   (InsideStateDOMFile:'va';         {OutsideStateDOMFile:'VA';         }StateName:'VA'),
   (InsideStateDOMFile:'in7qpne';    {OutsideStateDOMFile:'IN7QPNE';    }StateName:'IN7QPNE'),
-  (InsideStateDOMFile:'arizona';    {OutsideStateDOMFile:'ARIZONA';    }StateName:'AZ')
+  (InsideStateDOMFile:'arizona';    {OutsideStateDOMFile:'ARIZONA';    }StateName:'AZ'),
+  (InsideStateDOMFile:'missouri';   {OutsideStateDOMFile:'MISSOURI';   }StateName:'MO')
   );
 {*)}
 
@@ -3275,8 +3280,9 @@ QSOPartiesCount = 19;
  ({Name: 'MINITEST';                   }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'MINI80';                   }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'MINI40';                   }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberExchange;                        XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
- ({Name: 'MICH QSO PARTY';             }Email: nil;                      DF: 'michigan_cty';                 WA7BNM:  323; {SK3BG: 'miqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 2; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'Michigan QSO Party';   CABName:'MI-QSO-PARTY'),
- ({Name: 'MINN QSO PARTY';             }Email: nil;                      DF: 'minnesota_cty';                 WA7BNM:  238; {SK3BG: 'mnqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 1; AE: NameAndDomesticOrDXQTHExchange;              XM:NoDXMults; QP:TwoPointsPerQSO{MQPQSOPointMethod}; ADIFName:'Minnesota QSO Party';   CABName:'MN-QSO-PARTY'),
+ ({Name: 'MICH QSO PARTY';             }Email: nil;                      DF: 'michigan_cty';                 WA7BNM:  323; {SK3BG: 'miqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 2; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'MI-QSO-PARTY';   CABName:'MI-QSO-PARTY'),
+ ({Name: 'MINN QSO PARTY';             }Email: nil;                      DF: 'minnesota_cty';                 WA7BNM:  238; {SK3BG: 'mnqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 1; AE: NameAndDomesticOrDXQTHExchange;              XM:NoDXMults; QP:TwoPointsPerQSO{MQPQSOPointMethod}; ADIFName:'MN-QSO-PARTY';   CABName:'MN-QSO-PARTY'),
+ ({Name: 'MO QSO PARTY';              }Email: 'moqsoparty@w0ma.org' ;    DF: 'missouri_cty';      WA7BNM:  327; {SK3BG: 'moqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 20; AE: RSTDomesticQTHExchange;               XM:NoDXMults; QP:OnePhoneTwoCW; ADIFName:'MO-QSO-PARTY';   CABName:'MO-QSO-PARTY'),
  ({Name: 'NAQP-CW';                    }Email: 'cwnaqpmgr@ncjweb.com';   DF: 'naqp';              WA7BNM:  218; {SK3BG: 'naqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange;              XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'NAQP-SSB';                   }Email: 'ssbnaqpmgr@ncjweb.com';  DF: 'naqp';              WA7BNM:  229; {SK3BG: 'naqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange;              XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
  ({Name: 'NAQP-RTTY';                  }Email: 'rttynaqpmgr@ncjweb.com'; DF: 'naqp';              WA7BNM:  263; {SK3BG: 'naqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange;              XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
@@ -3469,6 +3475,7 @@ QSOPartiesCount = 19;
       'MINI40',
       'MICHIGAN QSO PARTY',
       'MINNESOTA QSO PARTY',
+      'MISSOURI QSO PARTY',
       'NAQP-CW',
       'NAQP-SSB',
       'NAQP-RTTY',
@@ -3697,6 +3704,7 @@ QSOPartiesCount = 19;
       ({Name: 'MINI40';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'MICH QSO PARTY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM1),
       ({Name: 'MINN QSO PARTY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
+      ({Name: 'MO QSO PARTY';              }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM1),
       ({Name: 'NAQP-CW';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'NAQP-SSB';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'NAQP-RTTY';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),

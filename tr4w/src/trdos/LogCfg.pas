@@ -90,6 +90,55 @@ uses
   MainUnit,
   uRadioPolling;
 
+var
+  logger: TLogLogger;
+
+{ Callback for the ctPassword fixup second pass (see ReadInConfigFile).
+  Called by EnumerateLinesInFile with UpperCase=False so CMD retains original
+  case. Uppercases only the key (ID) for CFGCA lookup, then stores CMD for any
+  entry whose crType is ctPassword. }
+procedure RestoreCFGPasswordCase(FileString: PShortString);
+var
+   ID: ShortString;
+   CMD: ShortString;
+   I: Integer;
+begin
+   if FileString^[1] in [';', '[', '_'] then Exit;
+
+   GetRidOfPrecedingSpaces(FileString^);
+   GetRidOfPostcedingSpaces(FileString^);
+
+   ID  := PrecedingString(FileString^, '=');
+   CMD := PostcedingString(FileString^, '=');
+
+   if ID = '' then Exit;
+
+   GetRidOfPrecedingSpaces(ID);
+   GetRidOfPrecedingSpaces(CMD);
+   GetRidOfPostcedingSpaces(ID);
+   GetRidOfPostcedingSpaces(CMD);
+
+   // Uppercase only the key so it matches CFGCA entries (which are uppercase).
+   // CMD is intentionally left as-is вЂ” preserving the user's original case.
+   strU(ID);
+   ID[Length(ID) + 1] := #0;  // null-terminate for PChar comparisons
+
+   for I := 1 to CommandsArraySize do
+      begin
+      if CFGCA[I].crType in [ctCaseSensitive, ctPassword] then
+         if StrComp(CFGCA[I].crCommand, @ID[1]) = 0 then
+            begin
+            PShortString(CFGCA[I].crAddress)^ := CMD;
+            PShortString(CFGCA[I].crAddress)^[Length(CMD) + 1] := #0;
+            if CFGCA[I].crType = ctPassword then
+               logger.Debug('[case fixup] "%s" restored, value=*******', [CFGCA[I].crCommand])
+            else
+               logger.Debug('[case fixup] "%s" restored, value=%s', [CFGCA[I].crCommand, CMD]);
+            Break;
+            end;
+      end;
+end;
+
 procedure PushLogFiles(var LastPushedLogName: Str20);
 
 { This procedure will take the current active log file and create a
@@ -304,8 +353,8 @@ begin
 
   LoadSpecialHelloFile;
 
-  //   !!! убрал но надо понять для чего это
-  //отключает ptt в  симуляторе
+  //   !!! пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
+  //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ ptt пїЅ  пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
   {
     if DDXState <> Off then
     begin
@@ -444,11 +493,55 @@ procedure ReadInConfigFile(ConfigFileName: TCFGType);
   initial values for several global variables.  This makes it easier to
   restart the program in case of a power failure. }
 
+{ --- ARCHITECTURE NOTE: The Case-Sensitivity Problem ---
+
+  EnumerateLinesInFile is called below with UpperCase=True. This causes it to
+  call strU() on every raw line from the file BEFORE the line is parsed into a
+  command key and value. strU() uppercases the ENTIRE line in place using x86 ASM,
+  so a line like:
+
+      RADIO ONE ICOM NETWORK PASSWORD=appleipod
+
+  becomes:
+
+      RADIO ONE ICOM NETWORK PASSWORD=APPLEIPOD
+
+  before EnmuCFGFile ever splits on '='. The value extracted as CMD is therefore
+  already uppercase when CheckCommand stores it, regardless of the ctPassword type.
+
+  The UpperCase=True flag exists for good reason: many command values (booleans
+  stored as 'T'/'F', port names like 'NONE', alpha chars, band names) must be
+  uppercase to pass CheckCommand's validation logic. Changing the flag globally
+  would break all of those.
+
+  STOPGAP FIX (until the config parser is refactored):
+  After the normal load pass, re-read every ctPassword field from the INI file a
+  second time using Windows.GetPrivateProfileString. The Win32 INI API returns
+  values exactly as written in the file вЂ” it never modifies case. This overwrites
+  the uppercase value that the first pass stored, restoring the user's original
+  mixed-case password or username.
+
+  This fixup only runs for cfgINI (not .cfg files) because:
+  - Passwords/usernames are only stored in tr4w.ini, not in contest .cfg files.
+  - GetPrivateProfileString requires a section + key from a proper INI file.
+
+  Long-term fix: the parser should split the raw line into key/value BEFORE
+  calling strU, then uppercase only the key, leaving the value untouched.
+  All ctPassword fields in CFGCA (crType = ctPassword) would then be handled
+  correctly without a second-pass workaround. }
+
 begin
   if ConfigFileName = cfgCFG then ClearDomesticCountryList;
   LineNumberInConfigFile := 0;
   CurrentConfigFile := ConfigFileName;
   EnumerateLinesInFile(CFGFilesArray[ConfigFileName], EnmuCFGFile, True);
+
+  // STOPGAP: Re-read ctPassword fields with original case from the INI file.
+  // See the architecture note above for why this is necessary.
+  // Uses EnumerateLinesInFile (UpperCase=False) + RestoreCFGPasswordCase callback
+  // rather than GetPrivateProfileString, which proved unreliable in this context.
+  if ConfigFileName = cfgINI then
+     EnumerateLinesInFile(TR4W_INI_FILENAME, RestoreCFGPasswordCase, False);
 
   if ConfigFileName = cfgCFG then if not ConfigurationOkay then halt;
 end;
@@ -691,4 +784,8 @@ end;
 //begin
   //  RemainingMultDisplayMode := NoRemainingMults;
   //  RunningConfigFile := False;
+
+initialization
+  logger := TLogLogger.GetLogger('LogCfg');
+
 end.

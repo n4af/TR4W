@@ -56,13 +56,13 @@ var
 begin
   //  ActiveBand := Band160;
   //  ActiveDomesticMult := NoDomesticMults;
-      //  не нужно ActiveDVKPort := NoPort;
+      //  пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ ActiveDVKPort := NoPort;
   //  ActiveDXMult := NoDXMults;
   //  ActiveExchange := NoExchangeReceived;
   //  ActiveFootSwitchPort := NoPort;
   //  ActiveInitialExchange := NoInitialExchange;
   //  ActiveKeyerPort := NoPort;
-      //  не нужно ActiveModemPort := NoPort;
+      //  пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ ActiveModemPort := NoPort;
     ActiveMode := CW;        // 4.51.3
   //  ActivePaddlePort := NoPort;
   //  ActivePrefixMult := NoPrefixMults;
@@ -111,7 +111,7 @@ begin
   //  BandMapGuardBand := 200;
   //  BeepEnable := True;
   //  BeepEvery10QSOs := False;
-  //  не нужно BigRemainingList := False;
+  //  пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ BigRemainingList := False;
   //  BandMapSplitMode := ByCutoffFrequency; {KK1L: 6.64}
 
     CallsignUpdateEnable := False; // 4.63.1
@@ -414,6 +414,7 @@ begin
 
   TR4W_HAMLIBIPADDRESS := '127.0.0.1';
   TR4W_HAMLIBRUNRIGCTLD := true;
+  TR4W_HAMLIB_DEBUG := false;
   TR4W_HAMLIBPORT := 4532;
   SetCQMemoryString(CW, F1, 'CQ TEST \  \ TEST');
   SetCQMemoryString(CW, F2, 'CQ TEST CQ TEST CQ TEST \  \ TEST');
@@ -434,8 +435,8 @@ begin
   SetEXMemoryString(CW, AltF10, 'IS UR CALL @?');
 
 {$IF LANG = 'RUS'}
-  SetEXCaptionMemoryString(CW, F1, 'Мой позывной');
-  SetEXCaptionMemoryString(CW, F2, 'Контр. номер');
+  SetEXCaptionMemoryString(CW, F1, 'пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ');
+  SetEXCaptionMemoryString(CW, F2, 'пїЅпїЅпїЅпїЅпїЅ. пїЅпїЅпїЅпїЅпїЅ');
 {$ELSE}
  if DEEnable then        // ny4i Issue 69
     begin

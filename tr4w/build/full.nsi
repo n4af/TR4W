@@ -140,7 +140,7 @@ SectionEnd
 Section "tr4wserver.exe" secserv
   SectionIn RO
   SetOutPath "$INSTDIR\server"
-  File d:\newsrc\tr4w\\tr4wserver\tr4wserver.exe
+  File ..\tr4wserver\tr4wserver.exe
   SetOutPath "$INSTDIR"
 SectionEnd
 

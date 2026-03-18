@@ -52,6 +52,5 @@ end;
 
 initialization
   logger := TLogLogger.GetLogger('uRadioIcom7610');
-  logger.Level := All;
 
 end.

@@ -30,3 +30,4 @@ copy*
 */__recovery/
 ../*.res
 ../target/*
+tr4w/src/*.dcu

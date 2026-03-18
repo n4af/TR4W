@@ -116,10 +116,19 @@ uses
   uSerialPort in 'src\uSerialPort.pas',
   uRadioFactory in 'src\uRadioFactory.pas',
   uRadioElecraftK4 in 'src\uRadioElecraftK4.pas',
+  uIcomNetworkTypes in 'src\uIcomNetworkTypes.pas',
+  uIcomNetworkTransport in 'src\uIcomNetworkTransport.pas',
+  uIcomNetworkDiscovery in 'src\uIcomNetworkDiscovery.pas',
   uRadioIcomBase in 'src\uRadioIcomBase.pas',
   uRadioIcom9700 in 'src\uRadioIcom9700.pas',
   uRadioIcom7610 in 'src\uRadioIcom7610.pas',
   uRadioIcom7300 in 'src\uRadioIcom7300.pas',
+  uRadioIcom705 in 'src\uRadioIcom705.pas',
+  uRadioIcom7300MK2 in 'src\uRadioIcom7300MK2.pas',
+  uRadioIcom7600 in 'src\uRadioIcom7600.pas',
+  uRadioIcom7760 in 'src\uRadioIcom7760.pas',
+  uRadioIcom7850 in 'src\uRadioIcom7850.pas',
+  uRadioIcom905 in 'src\uRadioIcom905.pas',
   GetWinVersionInfo in 'src\GetWinVersionInfo.pas',
   uSuperCheckPartialFileUpload,
   uRadioHamLib in 'src\uRadioHamLib.pas',
@@ -326,6 +335,13 @@ var
   iniFile                               : TINIFile;                    // Used to simply find the DEBUG setting so we can set it when the logger object is created.
                                                                        // This way we can log before we read the DEBUG LOG LEVEL the legacy method in uCFG. // ny4i
 begin
+   // Enable thread-safe memory management. TR4W creates threads via Win32
+   // CreateThread (not TThread), which does NOT set this flag automatically.
+   // Without it, concurrent GetMem calls from different threads can corrupt
+   // the heap, causing random AVs at startup when radio polling threads and
+   // the main thread initialize simultaneously.
+   IsMultiThread := True;
+
    TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
    Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
    iniFile := TINIFile.create(TR4W_INI_FILENAME);
@@ -476,7 +492,6 @@ begin
   logger.info('HamLib version = %s',[GetHamLibVersion]);
   logger.debug('Windows version = %d.%d Build %d',[tr4w_osverinfo.dwMajorVersion, tr4w_osverinfo.dwMinorVersion, tr4w_osverinfo.dwBuildNumber]);
   logger.debug('%s',[GetOSInfo]);
-
   if CTY.CtyRFOblMode then       // n4af 4.42.6
      ctyLoadInRFOblList;
 

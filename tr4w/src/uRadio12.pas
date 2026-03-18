@@ -58,9 +58,8 @@ begin
         for i := 0 to 3 do
           tWM_SETFONT(CreateStatic(l[i], 5 + i * 45, 55, 45, hwnddlg, 120 + i), MainFixedFont);
 
-//        tWM_SETFONT(GetDlgItem(hwnddlg, 102), CATWindowFont);
-//        tWM_SETFONT(GetDlgItem(hwnddlg, 104), CATWindowFont);
-//        for i := 120 to 123 do          tWM_SETFONT(GetDlgItem(hwnddlg, i), MainFixedFont);
+        // Status line for connection status messages (auth failures, etc.)
+        tWM_SETFONT(CreateStatic(nil, 5, 75, 180, hwnddlg, 130), MainFixedFont);
 
 //        if lParam = tr4w_RADIOINTERFACEWINDOW1_INDEX then p := Radio1AsPchar else p := Radio2AsPchar;
 //        Windows.SetWindowText(hwnddlg, p);
@@ -82,10 +81,16 @@ begin
           Result := BOOL(tr4wBrushArray[trLightBlue]);
         end;
         if Windows.GetDlgCtrlID(lParam) in [121..123] then
-          if Windows.IsWindowEnabled(lParam) then
           begin
-            Result := BOOL(tr4wBrushArray[trYellow]);
+          if Windows.IsWindowEnabled(lParam) then
+             begin
+             Result := BOOL(tr4wBrushArray[trYellow]);
+             end;
           end;
+        if Windows.GetDlgCtrlID(lParam) = 130 then
+           begin
+           SetTextColor(HDC(wParam), RGB(255, 0, 0));
+           end;
       end;
   end;
 end;
