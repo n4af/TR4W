@@ -2362,44 +2362,53 @@ end;
 
 
 
-procedure ApplyRoundedWindow;
-const
-  CORNER_RADIUS = 20;
+procedure ApplyDWMRoundedCorners;
+{ Ask the Windows 11 DWM compositor to round the window corners natively,
+  including the title bar.  Uses dynamic loading so the call is silently
+  skipped on Windows 10 and older where the API does not exist.
+  DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2. }
+type
+   TDwmSetWindowAttribute = function(hwnd: HWND; dwAttribute: DWORD;
+                                     pvAttribute: Pointer;
+                                     cbAttribute: DWORD): HRESULT; stdcall;
 var
-  R: TRect;
-  Rgn: HRGN;
+   hDwm: THandle;
+   DwmSetAttr: TDwmSetWindowAttribute;
+   preference: DWORD;
 begin
-  if tr4whandle = 0 then Exit;
-  Windows.GetWindowRect(tr4whandle, R);
-  Rgn := CreateRoundRectRgn(0, 0,
-           R.Right - R.Left,    // actual window width
-           R.Bottom - R.Top,    // actual window height
-           CORNER_RADIUS, CORNER_RADIUS);
-  SetWindowRgn(tr4whandle, Rgn, True);
+   if tr4whandle = 0 then
+      Exit;
+   hDwm := LoadLibrary('dwmapi.dll');
+   if hDwm = 0 then
+      Exit;
+   try
+      DwmSetAttr := GetProcAddress(hDwm, 'DwmSetWindowAttribute');
+      if Assigned(DwmSetAttr) then
+         begin
+         preference := 2; { DWMWCP_ROUND }
+         DwmSetAttr(tr4whandle, 33 { DWMWA_WINDOW_CORNER_PREFERENCE },
+                    @preference, SizeOf(preference));
+         end;
+   finally
+      FreeLibrary(hDwm);
+   end;
 end;
 
 procedure CreateMainWindow;
-//var PanelWidth : array[0..1] of Integer;                          
-const   CORNER_RADIUS = 40; { Change to 30 or 40 for more rounding }
-
+//var PanelWidth : array[0..1] of Integer;
 var
   e: TMainWindowElement;
   temprect: TRect;
   // OffsetY : integer;
 begin
-  tr4whandle := CreateWindowEx($00010000, tr4w_ClassName, nil,
-    WS_POPUP or WS_SYSMENU or WS_MINIMIZEBOX,  // ws popup removes the frame
-   0, 30, MainWindowWidth, 0 {MainWindowHeight},
+  tr4whandle := CreateWindowEx($00010100 { WS_EX_CONTROLPARENT or WS_EX_WINDOWEDGE },
+    tr4w_ClassName, nil,
+    WS_SYSMENU or WS_MINIMIZEBOX,
+    0, 30, MainWindowWidth, 0 {MainWindowHeight},
     0, tr4w_main_menu,
     hInstance, nil);
   tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndHandle := tr4whandle;
   wh[mweWholeScreen] := tr4whandle;
-  { Round the four corners of the main window }
- //  SetWindowRgn(tr4whandle,
- //    CreateRoundRectRgn(0, 0, MainWindowWidth,
-   //   6 + MainWindowCaptionAndHeader + EditableLogHeight + ws * 14,
-    //  12, 12),  { 12 = corner radius in pixels, adjust to taste }
-   // True);
   wh[mweEditableLog] := CreateEditableLog(tr4whandle, 0, ws * 7,
     MainWindowChildsWidth, 0 {EditableLogWindowHeight}, False);
   SetListViewColor(mweEditableLog);
@@ -2546,8 +2555,8 @@ begin
 
   // AppendMenu(GetSubMenu(tr4w_main_menu, menu_rescore), MF_POPUP , 11010, 'NepItem');
   // InsertMenu(tr4w_main_menu, menu_rescore, MF_BYCOMMAND, 177, 'aa');
-  { Apply rounded corners to the main window }
-  ApplyRoundedWindow;
+  { Ask DWM to round window corners natively (Windows 11+, no-op on older) }
+  ApplyDWMRoundedCorners;
 end;
 
 procedure OpenOtherWindows;
@@ -2561,8 +2570,8 @@ begin
     tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndRect.Left,
     tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndRect.Top, 0, 0, SWP_NOSIZE or
     SWP_SHOWWINDOW);
-     { Reapply rounded region after window is repositioned }
-    ApplyRoundedWindow;
+     { DWM rounding is compositor-managed; no reapplication needed after move }
+    ApplyDWMRoundedCorners;
 end;
 
 function tCreateFont(nHeight, fnWeight: integer; lpszFace: PChar): HFONT;
