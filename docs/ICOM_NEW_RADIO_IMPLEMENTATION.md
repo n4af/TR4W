@@ -127,7 +127,7 @@ These are all CI-V commands sent or handled by TR4W. Verify they exist and behav
 | Command | Direction | Purpose |
 |---------|-----------|---------|
 | `$17 $00 <text>` | Set → Radio | Send CW text string |
-| `$17 $01` | Set → Radio | Stop CW transmission |
+| `$17 $FF` | Set → Radio | Stop CW transmission |
 | `$14 $0C` | Query → Radio | Read CW speed (response: $0C + 2 BCD bytes, 0-255 range) |
 | `$14 $0C <BCD-hi> <BCD-lo>` | Set → Radio | Write CW speed |
 

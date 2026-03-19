@@ -53,6 +53,7 @@ const
   ICOM_RETRANSMIT_CHECK_INTERVAL = 100;
   ICOM_CIV_WATCHDOG_INTERVAL     = 500;
   ICOM_CIV_TIMEOUT_THRESHOLD     = 2000;    // 2 seconds
+  ICOM_PING_DEAD_TIMEOUT_MS      = 15000;   // 15 seconds without a ping → full disconnect+reconnect
 
   // "Are You There" retry config
   ICOM_AYT_MAX_RETRIES    = 10;

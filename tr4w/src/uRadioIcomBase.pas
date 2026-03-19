@@ -35,9 +35,32 @@ interface
 
 uses
   Windows, uNetRadioBase, uRadioBand, uIcomNetworkTransport, uIcomNetworkTypes, SysUtils, StrUtils, VC, Log4D,
-  uIcomCIV;
+  uIcomCIV, Classes, SyncObjs;
 
 type
+  TIcomRadio = class; // forward — TCIVSendThread holds a back-reference
+
+  TCIVPriority = (civpNormal, civpUrgent);
+
+  // Serializes all outbound CI-V commands through a single thread with a minimum
+  // inter-command delay. Prevents any combination of callers (poll, user actions,
+  // transceive follow-ups) from flooding the radio's CI-V input buffer.
+  TCIVSendThread = class(TThread)
+  private
+    FOwner: TIcomRadio;
+    FNormalQueue: TStringList;   // FIFO — index 0 is head
+    FUrgentQueue: TStringList;   // Drained before normal queue
+    FLock: TCriticalSection;
+    FHasWork: TEvent;            // Auto-reset; signaled on each Enqueue call
+    procedure DrainQueues;
+  public
+    constructor Create(AOwner: TIcomRadio);
+    destructor Destroy; override;
+    procedure Execute; override;
+    procedure Enqueue(const cmd: string; priority: TCIVPriority = civpNormal);
+    procedure Stop;
+  end;
+
   TIcomRadio = class(TNetRadioBase)
   private
     FRadioAddress: Byte;          // CI-V address of radio (e.g., 0x94 for IC-7300)
@@ -50,6 +73,9 @@ type
     FNetworkUsername: string;
     FNetworkPassword: string;
 
+    // CI-V send queue — serializes outbound commands with inter-command spacing
+    FCIVSendThread: TCIVSendThread;
+
     // Band memory: remembers last frequency per band (like TR4QT)
     FBandMemory: array[TRadioBand] of LongInt;
     FTransceiveChecked: Boolean;  // True after we've queried and logged the transceive state once
@@ -57,6 +83,9 @@ type
     FInitialQueryPending: Boolean; // True after $19 sent; triggers $03/$04 on $19 response
     FPollPhase: Integer;            // Rotates through query groups to avoid flooding radio
     FLastSetCWSpeedTick: DWORD;   // GetTickCount at last SetCWSpeed call — suppresses stale echoes
+
+    // Actual UDP send — only called by TCIVSendThread.DrainQueues
+    procedure DoSendDirect(const s: string);
 
     function BuildCIVCommand(command: Byte; data: string): string;
 
@@ -84,6 +113,7 @@ type
     function Connect: integer; override;
     procedure Disconnect; override;
     procedure SendToRadio(s: string); overload; override;
+    procedure SendToRadioUrgent(const s: string);  // Bypasses normal queue order (PTT, CW stop)
 
     // Polling interface implementation
     procedure QueryVFOAFrequency; override;
@@ -138,7 +168,109 @@ implementation
 var
   logger: TLogLogger;
 
-// CI-V Protocol Constants
+// CI-V send queue tuning
+const
+  CIV_INTER_COMMAND_DELAY_MS = 25;  // Minimum gap between outbound CI-V commands.
+                                    // Icom CI-V over network needs ~20-30ms between
+                                    // commands to avoid overflowing the radio's input buffer.
+  CIV_QUEUE_MAX_NORMAL       = 50;  // Safety cap: drop normal items beyond this depth.
+                                    // In normal operation the queue depth is 4 (one poll burst).
+
+// ---- TCIVSendThread --------------------------------------------------------
+
+constructor TCIVSendThread.Create(AOwner: TIcomRadio);
+begin
+  inherited Create(True);  // Suspended — caller calls Resume
+  FOwner := AOwner;
+  FNormalQueue := TStringList.Create;
+  FUrgentQueue := TStringList.Create;
+  FLock := TCriticalSection.Create;
+  FHasWork := TEvent.Create(nil, False, False, '');  // Auto-reset, initially non-signaled
+  FreeOnTerminate := False;
+end;
+
+destructor TCIVSendThread.Destroy;
+begin
+  FHasWork.Free;
+  FLock.Free;
+  FUrgentQueue.Free;
+  FNormalQueue.Free;
+  inherited Destroy;
+end;
+
+procedure TCIVSendThread.Execute;
+begin
+  while not Terminated do
+     begin
+     FHasWork.WaitFor(50);  // 50ms timeout so we wake even if a signal is missed
+     DrainQueues;
+     end;
+end;
+
+procedure TCIVSendThread.DrainQueues;
+var
+  cmd: string;
+  hasItem: Boolean;
+begin
+  repeat
+     cmd := '';
+     hasItem := False;
+     FLock.Acquire;
+     try
+        if FUrgentQueue.Count > 0 then
+           begin
+           cmd := FUrgentQueue[0];
+           FUrgentQueue.Delete(0);
+           hasItem := True;
+           end
+        else if FNormalQueue.Count > 0 then
+           begin
+           cmd := FNormalQueue[0];
+           FNormalQueue.Delete(0);
+           hasItem := True;
+           end;
+     finally
+        FLock.Release;
+     end;
+
+     if hasItem then
+        begin
+        FOwner.DoSendDirect(cmd);
+        if not Terminated then
+           Sleep(CIV_INTER_COMMAND_DELAY_MS);
+        end;
+  until (not hasItem) or Terminated;
+end;
+
+procedure TCIVSendThread.Enqueue(const cmd: string; priority: TCIVPriority = civpNormal);
+begin
+  FLock.Acquire;
+  try
+     if priority = civpUrgent then
+        FUrgentQueue.Add(cmd)
+     else
+        begin
+        if FNormalQueue.Count >= CIV_QUEUE_MAX_NORMAL then
+           begin
+           logger.Warn('[TCIVSendThread.Enqueue] Normal queue full (%d items) — dropping command',
+                       [FNormalQueue.Count]);
+           Exit;
+           end;
+        FNormalQueue.Add(cmd);
+        end;
+  finally
+     FLock.Release;
+  end;
+  FHasWork.SetEvent;
+end;
+
+procedure TCIVSendThread.Stop;
+begin
+  Terminate;         // Sets Terminated := True
+  FHasWork.SetEvent; // Wake up immediately if waiting
+end;
+
+// ---- CI-V Protocol Constants -----------------------------------------------
 const
   CIV_PREAMBLE1 = #$FE;
   CIV_PREAMBLE2 = #$FE;
@@ -291,6 +423,15 @@ begin
     pollingInterval := 1000;  // Poll every 1s; PollRadioState queries RIT/XIT/split/TX only
     FTransceiveChecked := False;
 
+    // Start the CI-V send queue thread before opening the transport so that
+    // any commands sent during the handshake are properly serialized.
+    if FCIVSendThread = nil then
+       begin
+       FCIVSendThread := TCIVSendThread.Create(Self);
+       FCIVSendThread.Resume;
+       logger.Info('[TIcomRadio.Connect] CI-V send queue thread started');
+       end;
+
     Result := FNetworkTransport.Connect(TNetRadioBase(Self).radioAddress,
                                          radioPort,
                                          FNetworkUsername, FNetworkPassword);
@@ -310,26 +451,69 @@ end;
 procedure TIcomRadio.Disconnect;
 begin
   if IsNetworkConnection and (FNetworkTransport <> nil) then
-  begin
-    logger.Info('[TIcomRadio.Disconnect] Calling FNetworkTransport.Disconnect (state=%s)',
-                [IcomStateToString(FNetworkTransport.State)]);
-    FNetworkTransport.Disconnect;
-    logger.Info('[TIcomRadio.Disconnect] FNetworkTransport.Disconnect returned, calling FreeAndNil');
-    FreeAndNil(FNetworkTransport);
-    logger.Info('[TIcomRadio.Disconnect] FreeAndNil complete');
-  end
+     begin
+     // Stop the send queue before disconnecting the transport.
+     // Any queued commands are discarded — we are tearing down the connection.
+     if FCIVSendThread <> nil then
+        begin
+        logger.Info('[TIcomRadio.Disconnect] Stopping CI-V send queue thread');
+        FCIVSendThread.Stop;
+        FCIVSendThread.WaitFor;
+        FreeAndNil(FCIVSendThread);
+        logger.Info('[TIcomRadio.Disconnect] CI-V send queue thread stopped');
+        end;
+
+     logger.Info('[TIcomRadio.Disconnect] Calling FNetworkTransport.Disconnect (state=%s)',
+                 [IcomStateToString(FNetworkTransport.State)]);
+     FNetworkTransport.Disconnect;
+     logger.Info('[TIcomRadio.Disconnect] FNetworkTransport.Disconnect returned, calling FreeAndNil');
+     FreeAndNil(FNetworkTransport);
+     logger.Info('[TIcomRadio.Disconnect] FreeAndNil complete');
+     end
   else
-    inherited Disconnect;
+     inherited Disconnect;
 end;
 
-procedure TIcomRadio.SendToRadio(s: string);
+// DoSendDirect — the only place that calls FNetworkTransport.SendCivData.
+// Must only be called from TCIVSendThread.DrainQueues to preserve inter-command spacing.
+procedure TIcomRadio.DoSendDirect(const s: string);
 begin
   if logger.IsTraceEnabled then
-    logger.Trace('[%s] CIV TX: %s', [radioModel, CIVDataToHex(s)]);
+     logger.Trace('[%s] CIV TX: %s', [radioModel, CIVDataToHex(s)]);
   if IsNetworkConnection and (FNetworkTransport <> nil) then
-    FNetworkTransport.SendCivData(s)
+     FNetworkTransport.SendCivData(s)
   else
-    inherited SendToRadio(s);
+     inherited SendToRadio(s);
+end;
+
+// SendToRadio — enqueues at normal priority.
+// All existing callers (poll, set freq/mode, RIT/XIT, etc.) use this path.
+procedure TIcomRadio.SendToRadio(s: string);
+begin
+  if IsNetworkConnection then
+     begin
+     if FCIVSendThread <> nil then
+        FCIVSendThread.Enqueue(s, civpNormal)
+     else
+        DoSendDirect(s);  // Fallback: send queue not yet started (e.g. serial path)
+     end
+  else
+     inherited SendToRadio(s);
+end;
+
+// SendToRadioUrgent — enqueues at urgent priority, ahead of any normal items.
+// Use for time-critical commands: PTT on/off, CW stop.
+procedure TIcomRadio.SendToRadioUrgent(const s: string);
+begin
+  if IsNetworkConnection then
+     begin
+     if FCIVSendThread <> nil then
+        FCIVSendThread.Enqueue(s, civpUrgent)
+     else
+        DoSendDirect(s);
+     end
+  else
+     inherited SendToRadio(s);
 end;
 
 function TIcomRadio.GetIsConnected: boolean;
@@ -946,12 +1130,14 @@ end;
 
 procedure TIcomRadio.PollRadioState;
 begin
-  logger.debug('[%s.PollRadioState] Polling freq, mode, RIT/XIT/Split/TX', [radioModel]);
-  QueryVFOAFrequency;     // $03
-  QueryVFOBFrequency;     // $25 (overridden for IC-7760: $25 $01)
-  QueryMode;              // $04
-  QueryRITState;          // $21 (overridden for IC-7760)
-  QueryXITState;          // $21 (overridden for IC-7760)
+  // Only poll states that CI-V transceive does NOT push automatically.
+  // Freq ($03/$00) and mode ($04/$01) are omitted — they arrive as transceive
+  // pushes when the VFO or mode changes. Polling them every second sent 7+
+  // commands per burst which overwhelmed the radio's CI-V input buffer and
+  // caused it to stop sending transceive pushes entirely (confirmed via log).
+  logger.debug('[%s.PollRadioState] Polling RIT/XIT/Split/TX', [radioModel]);
+  QueryRITState;          // $21 $01
+  QueryXITState;          // $21 $02
   QuerySplitState;        // $0F
   QueryTXStatus;          // $1C $00
 end;
@@ -959,12 +1145,12 @@ end;
 // Radio control methods - basic implementations
 procedure TIcomRadio.Transmit;
 begin
-  SendToRadio(BuildCIVCommand($1C, CIV_SUBCMD_TX));  // TX on
+  SendToRadioUrgent(BuildCIVCommand($1C, CIV_SUBCMD_TX));  // PTT on — urgent
 end;
 
 procedure TIcomRadio.Receive;
 begin
-  SendToRadio(BuildCIVCommand($1C, CIV_SUBCMD_RX));  // RX on
+  SendToRadioUrgent(BuildCIVCommand($1C, CIV_SUBCMD_RX));  // PTT off — urgent
 end;
 
 procedure TIcomRadio.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
@@ -1037,9 +1223,8 @@ end;
 
 procedure TIcomRadio.StopCW;
 begin
-  // Send break command to stop CW
-  // CI-V command $17 $01 stops CW sending
-  SendToRadio(BuildCIVCommand($17, #$01));
+  // CI-V command $17 $FF stops CW sending — sent urgent to jump the queue
+  SendToRadioUrgent(BuildCIVCommand($17, #$FF));
   logger.debug('[%s.StopCW] CW transmission stopped', [radioModel]);
 end;
 

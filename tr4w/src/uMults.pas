@@ -65,7 +65,7 @@ type
     function IsZnMult(Zone: Word; Band: BandType; Mode: ModeType): boolean;
     function IsDXMult(Country: Word; Band: BandType; Mode: ModeType): boolean;
     function IsPxMult(Prfx: CallString; Band: BandType; Mode: ModeType): boolean;
-    function IsDmMult(Dom: CallString; Band: BandType; Mode: ModeType): boolean;
+    function IsDmMult(Dom: CallString; Band: BandType; Mode: ModeType; DomMultType: DomesticMultType): boolean;
     procedure FillVisibleBytes;
   end;
 
@@ -163,14 +163,47 @@ begin
      end;
 end;
 
-function MultsObject.IsDmMult(Dom: CallString; Band: BandType; Mode: ModeType): boolean;
+function MultsObject.IsDmMult(Dom: CallString; Band: BandType; Mode: ModeType; DomMultType: DomesticMultType): boolean;
 var
   Index                                 : integer;
+  InsertPos                             : integer;
+  StoredKey                             : Str10;
+  FieldKey                              : Str10;
 begin
   Dom[Ord(Dom[0]) + 1] := #0;
+
+  // For GridFields the mult unit is the 2-char field ("FN"), not the full
+  // 4-char grid square ("FN20" or "FN25"). Truncate the query to 2 chars so
+  // that any FN-prefixed grid in the store matches, regardless of whether the
+  // stored key is the field ("FN", new format) or the full grid ("FN20", old
+  // log records). GridSquares uses the full 4-char key and is unaffected.
+  if DomMultType = GridFields then
+     begin
+     FieldKey := Copy(Dom, 1, 2);
+     Result := not DomList.StringIsDupe(FieldKey, Band, Mode, Index);
+     if Index = -1 then
+        begin
+        // Exact 2-char field not found — store may have full-grid keys.
+        // FindMult returns the insertion point, which lands at the first
+        // stored entry whose prefix matches FieldKey (e.g. "FN20").
+        DomList.FindMult(FieldKey, InsertPos);
+        if InsertPos < DomList.Count then
+           begin
+           StoredKey := DomList.Get(InsertPos);
+           if Copy(StoredKey, 1, 2) = FieldKey then
+              begin
+              Result := not DomList.StringIsDupeByIndex(InsertPos, Band, Mode);
+              Exit;
+              end;
+           end;
+        Result := True;
+        end;
+     Exit;
+     end;
+
   Result := not DomList.StringIsDupe(Dom, Band, Mode, Index);
   if Index = -1 then
-    Result := True ;
+     Result := True;
 
 end;
 

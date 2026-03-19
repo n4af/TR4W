@@ -7029,7 +7029,7 @@ begin
     RSGB160Method: // 4.67.1
       begin
         if (RXData.DomMultQTH <> '') and (mo.isdmmult(rxdata.dommultqth,
-          AllBands, both) =
+          AllBands, both, ActiveDomesticMult) =
           TRUE) then
           rxdata.qsopoints := 7
         else if mo.isdxmult(RXData.QTH.Country, AllBands, both) = TRUE then
@@ -8011,15 +8011,15 @@ begin
     EUDXQSOPOINTMETHOD:
       { 3. QSO Points
  a. European Union stations:
- QSO with your own country – 2 point,
- QSO with another European Union country – 10 points,
- QSO with a non-European Union country on your continent – 3 points,
- QSO with another continent – 5 points.
+ QSO with your own country ï¿½ 2 point,
+ QSO with another European Union country ï¿½ 10 points,
+ QSO with a non-European Union country on your continent ï¿½ 3 points,
+ QSO with another continent ï¿½ 5 points.
  b. Non- European Union stations:
- QSO with European Union – 10 points,
- QSO with your own country – 2 points,
- QSO with a different country on your continent – 3 points,
- QSO with another continent – 5 points.
+ QSO with European Union ï¿½ 10 points,
+ QSO with your own country ï¿½ 2 points,
+ QSO with a different country on your continent ï¿½ 3 points,
+ QSO with another continent ï¿½ 5 points.
      }
       begin
         if length(MyState) = 4 then // i am in EU region

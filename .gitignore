@@ -46,11 +46,15 @@ tr4w/target/settings/TR4W.INI
 tr4w/target/tr4w.map
 tr4w/target/tr4w-debug.log
 tr4w/target/tr4w.log
+# Ignore everything in target/ but allow specific tracked subdirectories/files.
+# Must use tr4w/target/* (not tr4w/target/) so git descends into the directory
+# and honours the negation rules below. A trailing-slash ignore pattern causes
+# git to skip the directory entirely, making negations inside it ineffective.
+tr4w/target/*
 !tr4w/target/dom
 !tr4w/target/trcluster.dat
 !tr4w/target/cty.dat
 !tr4w/target/commands*.ini
-tr4w/target/
 tr4w/tr4w.cfg
 tr4w/tr4w.dof
 tr4w/COMPILER.LOG
@@ -65,3 +69,11 @@ tr4w/COMPILATION_RESULTS.txt
 tr4w/compile_*.txt
 tr4w/tr4w.log.*
 tr4w/build_*.log
+
+# Claude Code local config and memory
+.claude/
+tr4w/.claude/
+
+# Network capture files (local debugging only)
+*.pcap
+*.pcapng

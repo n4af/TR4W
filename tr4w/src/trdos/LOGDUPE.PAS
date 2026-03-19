@@ -1626,7 +1626,7 @@ begin
    if (Contest = INQSOPARTY) and (RXData.DomMultQTH = 'DX') then         // 4.116.5
      exit;
   if (RXData.DomMultQTH <> '') and DoingDomesticMults then
-    RXData.DomesticMult := mo.IsDmMult(RXData.DomMultQTH, GetAddMultBand(DomesticMultByBand, MultBand), MultMode);
+    RXData.DomesticMult := mo.IsDmMult(RXData.DomMultQTH, GetAddMultBand(DomesticMultByBand, MultBand), MultMode, ActiveDomesticMult);
 
   if (RXData.DXQTH <> '') and DoingDXMults {and (ActiveDXMult <> NoCountDXMults)} then
  // if (activeqsopointmethod = DLRTTY then

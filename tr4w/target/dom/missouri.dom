@@ -1,0 +1,20 @@
+Domestic template for non-Missouri stations in MO QSO Party
+
+INCLUDE FILE S50.DOM
+INCLUDE FILE MISSOURI_CTY.DOM
+Dx = DX
+
+vE1 = VE1, NS
+vE2 = VE2, QU, PQ, QC
+vE3 = VE3, ON
+vE4 = VE4, MB, MAN
+vE5 = VE5, SK, SAS
+vE6 = VE6, AB, ALT, ALB
+vE7 = VE7, BC
+vE8 = VE8, NT, NWT
+vE9 = VE9, NB
+vO1 = VO1, NL, NF
+vY1 = VY1, YT, YU, YK
+vY2 = VY2, PE, PEI
+nU = NU, NUN
+
