@@ -7201,12 +7201,15 @@ begin
   end;
   case exch.ceContest of
     GENERALQSO:
-      if recordFromWSJTX then
-      begin
-        exch.ExchString := gridSquare;
-        exch.QTHString := gridSquare;
-        exch.DomesticQTH := gridSquare;
-      end;
+      // Use grid square as exchange for any ADIF source, not just WSJT-X.
+      // WSJT-X does not always include PROGRAMID, so gating on recordFromWSJTX
+      // caused ExchString to stay empty when PROGRAMID was absent.
+      if gridSquare <> '' then
+         begin
+         exch.ExchString := gridSquare;
+         exch.QTHString := gridSquare;
+         exch.DomesticQTH := gridSquare;
+         end;
     WAG:
       begin
         exch.QTHString := tempSRX_String;

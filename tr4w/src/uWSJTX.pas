@@ -131,6 +131,7 @@ uses
   , LogK1EA // for tPTTViaCommand
   , LogDOM // for ActiveDomesticMult
   , uCFG // for WSJTXRadioControlEnabled
+  , PostUnit // for tCabrilloFreqString
   ;
 // {$R *.dfm}
 
@@ -309,6 +310,7 @@ var
   TempRXData: ContestExchange;
   TempMode: ModeType;
   TempBand: BandType;
+  TempFreq: integer;
   grid: string;
   nResult: integer;
   shortStr: shortString;
@@ -588,22 +590,56 @@ begin
                 ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
 
                 if DoingDXMults then
-                begin
-                  GetDXQTH(TempRXData);
-                end;
+                   begin
+                   GetDXQTH(TempRXData);
+                   end;
                 if DoingPrefixMults then
-                begin
-                  SetPrefix(TempRXData);
-                end;
+                   begin
+                   SetPrefix(TempRXData);
+                   end;
 
                 //CalculateQSOPoints(TempRXData);
                 logger.debug('[uWSJTX] TotalContacts right before update of NumberSent in uWSJTX ADIF UDP message = %d', [TotalContacts]);
 
                 //TempRXData.NumberSent := TotalContacts;
                 //LogContact(TempRXData, true);
+
+                // ParseADIFRecord populates QTHString (state/grid/zone) for most
+                // contests but does not always copy it into ExchString.
+                // ParametersOkay requires a non-empty ExchString to call
+                // ProcessExchange — fall back to QTHString when ExchString is empty.
+                if TempRXData.ExchString = '' then
+                   begin
+                   TempRXData.ExchString := TempRXData.QTHString;
+                   end;
+                if TempRXData.Band <> NoBand then
+                   begin
+                   tempBand := TempRXData.Band;
+                   end
+                else
+                   begin
+                   tempBand := ActiveBand;
+                   end;
+
+                if TempRXData.Frequency <> 0 then
+                   begin
+                   tempFreq := TempRXData.Frequency;
+                   end
+                else
+                   begin
+                   if ActiveRadioPtr.LastDisplayedFreq = 0 then // No connected radio so use default for band
+                      begin
+                      tempFreq := StrToInt(tCabrilloFreqString[TempRXData.Band]) * 1000; //14000 in array but needs to be 14000000
+                      end
+                   else
+                      begin
+                      tempFreq := ActiveRadioPtr.LastDisplayedFreq;
+                      end;
+                   end;
+
                 if ParametersOkay(TempRXData.Callsign,
-                  {TempRXData.QTHString}TempRXData.ExchString, ActiveBand,
-                  Digital, ActiveRadioPtr.LastDisplayedFreq
+                  {TempRXData.QTHString}TempRXData.ExchString, tempBand,
+                  Digital, tempFreq
                   {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
                 begin
                   TempRXData.DomesticQTH := TempRXData.QTHString;
