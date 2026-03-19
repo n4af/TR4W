@@ -69,3 +69,11 @@ tr4w/COMPILATION_RESULTS.txt
 tr4w/compile_*.txt
 tr4w/tr4w.log.*
 tr4w/build_*.log
+
+# Claude Code local config and memory
+.claude/
+tr4w/.claude/
+
+# Network capture files (local debugging only)
+*.pcap
+*.pcapng
