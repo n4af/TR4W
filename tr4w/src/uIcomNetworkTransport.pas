@@ -84,6 +84,7 @@ type
     // Timers
     FTimerWnd: HWND;                 // Hidden window for timer messages
     FLastCivData: LongWord;          // GetTickCount of last CI-V data
+    FLastPingReceived: LongWord;     // GetTickCount of last ping request from radio (0 = never)
     FStartTick: LongWord;            // GetTickCount at connect start
     FAYTRetryCount: Integer;         // Are You There retry counter
     FAYTInterval: Integer;           // Current AYT retry interval (backoff)
@@ -929,7 +930,10 @@ begin
       Exit;
     end;
 
-    // Ping request addressed to us - send response
+    // Ping request addressed to us — radio is alive
+    FLastPingReceived := GetTickCount;
+
+    // Send response
     if FromCivSocket then
       SendPingResponse(Data, DataLen, FCivSocket, PeerIP, PeerPort)
     else
@@ -1593,8 +1597,24 @@ end;
 procedure TIcomNetworkTransport.OnPingTimer;
 begin
   // Ping runs from I Am Here onward (control socket keepalive)
-  if FState <> icsDisconnected then
-    SendPing;
+  if FState = icsDisconnected then
+     Exit;
+
+  SendPing;
+
+  // Dead-radio detection: if we are fully connected and the radio has not sent us
+  // a ping in ICOM_PING_DEAD_TIMEOUT_MS, the WiFi/network link is gone.
+  // UDP is connectionless so we only discover this via absence of inbound pings.
+  // Disconnect here; the polling thread will attempt to reconnect.
+  if (FState = icsConnected) and (FLastPingReceived <> 0) then
+     begin
+     if GetTickCount - FLastPingReceived > ICOM_PING_DEAD_TIMEOUT_MS then
+        begin
+        logger.Warn('[IcomTransport:' + FRadioName + '] No ping from radio for %d ms — network link lost, disconnecting',
+                    [GetTickCount - FLastPingReceived]);
+        Disconnect;
+        end;
+     end;
 end;
 
 procedure TIcomNetworkTransport.OnIdleTimer;
