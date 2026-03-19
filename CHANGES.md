@@ -2,7 +2,7 @@
 
 > TRLOG 4 Windows — Free Amateur Radio Contest Logging Application  
 > Repository: [github.com/n4af/TR4W](https://github.com/n4af/TR4W)  
-> Generated: 2026-03-14
+> Generated: 2026-03-19
 
 ## Contributors
 
@@ -17,6 +17,35 @@
 ---
 
 ## 4.145.x — March 2026
+
+### 4.145.3 (2026-03-19) — NY4I
+
+#### Icom Network — CI-V Send Queue (`uRadioIcomBase.pas`)
+
+- Introduced `TCIVSendThread` to serialize all outbound CI-V commands through a single thread with a 25 ms minimum inter-command delay. Prevents poll bursts and user actions from flooding the radio's CI-V input buffer (dropped commands, response corruption under load).
+- Urgent queue (PTT, CW stop) is drained before normal queue entries.
+- Normal queue depth capped at 50 entries as a safety backstop.
+
+#### Icom Network — Dead-Radio Detection (`uIcomNetworkTransport.pas`, `uIcomNetworkTypes.pas`)
+
+- Track timestamp of last inbound ping from the radio (`FLastPingReceived`).
+- If fully connected and no ping received for 15 seconds, log a warning and disconnect; the polling thread then attempts to reconnect. This is the only reliable signal that a WiFi/network link has gone away (UDP is connectionless).
+
+#### Bug Fixes
+
+- **CW stop command for Icom network** — Was sending `$17 $01`; corrected to `$17 $FF` (closes issue on CWByCAT-ESC-fix branch). Updated in `uRadioIcomBase.pas` and all three Icom protocol docs.
+- **GridFields multiplier tracking** (`uMults.pas`, `LOGDUPE.PAS`, `LOGSTUFF.PAS`) — `IsDmMult` now accepts a `DomMultType` parameter. For GridFields contests the comparison truncates the query to the 2-char field prefix and prefix-matches against stored 4-char grid keys, so any grid in the same field is correctly recognized as already worked. Full 4-char key retained in storage for Cabrillo export.
+- **WSJT-X band/freq logging** (`uWSJTX.pas`, `MainUnit.pas`, `VC.pas`) — Use band and frequency from the WSJT-X ADIF record when TR4W has no radio connected; fall back to radio frequency only when WSJT-X omits them (closes issue #822). `GENERALQSO` now uses grid square from any ADIF source (WSJT-X does not always include `PROGRAMID`). `ExchString` falls back to `QTHString` when ADIF leaves it empty. MO QSO Party: fixed `ciMM` multi-mode flag.
+- **Missouri QSO Party dom files** — `missouri.dom` and `missouri_cty.dom` were on disk but excluded by a `.gitignore` rule for `tr4w/target/`; fixed rule so `dom/` negation takes effect.
+
+#### Repository / Build
+
+- Added missing `arizona.dom`, `arizona_cty.dom`, and `brazil.dom` to `target/dom/` (were present in installer but not in git; exposed by prior `.gitignore` fix for `target/dom`).
+- Added `PerlRegEx.pas`, `pcre.pas`, and precompiled `pcre/*.obj` files to `include/` so the build is fully self-contained.
+- Moved `RadioFactoryTester.dpr` and compile scripts into `tr4w/test/` alongside the unit-test sources.
+- Suppressed `.claude/` dirs and `*.pcap`/`*.pcapng` captures from git status noise.
+
+---
 
 ### 4.145.2 (2026-03-16) — IcomNetwork branch — NY4I
 
@@ -522,4 +551,4 @@ The repository was first committed on April 25, 2014 at version 4.30.3 by Howard
 
 ---
 
-*This changelog was generated from the Git commit history of the [n4af/TR4W](https://github.com/n4af/TR4W) repository on March 14, 2026.*
+*This changelog was generated from the Git commit history of the [n4af/TR4W](https://github.com/n4af/TR4W) repository on March 19, 2026.*
