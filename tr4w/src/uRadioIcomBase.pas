@@ -561,11 +561,14 @@ begin
   logger.Info('[TIcomRadio.OnNetworkStateChange] Transport state: %s',
               [IcomStateToString(FNetworkTransport.State)]);
 
-  { After authentication the radio has reported its actual CI-V address via the
-    capabilities packet. Use it in preference to any hardcoded class default so
-    that user-customised addresses and MK2/variant address differences are handled
-    automatically. }
-  if FNetworkTransport.State = icsAuthenticated then
+  { At StreamRequested the capabilities packet has been received and the transport
+    has populated CivAddress with the radio's actual CI-V address. Update
+    FRadioAddress now — before the CI-V socket is opened — so all subsequent
+    CI-V frames use the correct address. This handles user-customised addresses
+    and model variants (e.g. IC-7300MK2 factory default $B6 vs user-set $94).
+    NOTE: do NOT check at icsAuthenticated — CivAddress is 0 at that point
+    because the capabilities packet arrives after the state transition fires. }
+  if FNetworkTransport.State = icsStreamRequested then
      begin
      if FNetworkTransport.CivAddress <> 0 then
         begin
