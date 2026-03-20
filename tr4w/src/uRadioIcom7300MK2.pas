@@ -4,12 +4,16 @@ unit uRadioIcom7300MK2;
   Icom IC-7300MK2 Radio Implementation
 
   The IC-7300MK2 is the network-capable version of the IC-7300.
-  CI-V address: 0xB6
+  CI-V address: 0xB6 (Icom factory default)
   Controller address: 0xE0 (standard)
   Network capable: Yes
   VFO B format: Standard ($25)
 
-  Note: The original IC-7300 (CI-V $94) is serial-only and NOT network capable.
+  Note: The original IC-7300 uses CI-V $94 and is serial-only (not network capable).
+  Some users change their IC-7300MK2 CI-V address to $94 for compatibility with
+  software that only knows the IC-7300. The transport-reported address (from the
+  capabilities handshake) always overrides this class default at connect time, so
+  both factory-default ($B6) and user-customised ($94 or other) configurations work.
 }
 
 interface
