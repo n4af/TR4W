@@ -2363,10 +2363,12 @@ end;
 
 
 procedure ApplyDWMRoundedCorners;
-{ Ask the Windows 11 DWM compositor to round the window corners natively,
-  including the title bar.  Uses dynamic loading so the call is silently
-  skipped on Windows 10 and older where the API does not exist.
-  DWMWA_WINDOW_CORNER_PREFERENCE = 33, DWMWCP_ROUND = 2. }
+{ On Windows 11: ask the DWM compositor to round window corners natively
+  (title bar included) via DwmSetWindowAttribute(DWMWA_WINDOW_CORNER_PREFERENCE).
+  On Windows 10 fallback: clip the window region with CreateRoundRectRgn,
+  which rounds the visible corners of the title bar and client area. }
+const
+   CORNER_RADIUS = 20;
 type
    TDwmSetWindowAttribute = function(hwnd: HWND; dwAttribute: DWORD;
                                      pvAttribute: Pointer;
@@ -2375,23 +2377,41 @@ var
    hDwm: THandle;
    DwmSetAttr: TDwmSetWindowAttribute;
    preference: DWORD;
+   hr: HRESULT;
+   R: TRect;
+   Rgn: HRGN;
 begin
    if tr4whandle = 0 then
       Exit;
+
+   { Try Windows 11 DWM path first }
+   hr := -1; { assume failure until proven otherwise }
    hDwm := LoadLibrary('dwmapi.dll');
-   if hDwm = 0 then
-      Exit;
-   try
-      DwmSetAttr := GetProcAddress(hDwm, 'DwmSetWindowAttribute');
-      if Assigned(DwmSetAttr) then
-         begin
-         preference := 2; { DWMWCP_ROUND }
-         DwmSetAttr(tr4whandle, 33 { DWMWA_WINDOW_CORNER_PREFERENCE },
-                    @preference, SizeOf(preference));
-         end;
-   finally
-      FreeLibrary(hDwm);
-   end;
+   if hDwm <> 0 then
+      begin
+      try
+         DwmSetAttr := GetProcAddress(hDwm, 'DwmSetWindowAttribute');
+         if Assigned(DwmSetAttr) then
+            begin
+            preference := 2; { DWMWCP_ROUND }
+            hr := DwmSetAttr(tr4whandle, 33 { DWMWA_WINDOW_CORNER_PREFERENCE },
+                             @preference, SizeOf(preference));
+            end;
+      finally
+         FreeLibrary(hDwm);
+      end;
+      end;
+
+   { Windows 10 fallback: clip window region to a rounded rectangle }
+   if hr <> 0 then
+      begin
+      Windows.GetWindowRect(tr4whandle, R);
+      Rgn := CreateRoundRectRgn(0, 0,
+               R.Right - R.Left,
+               R.Bottom - R.Top,
+               CORNER_RADIUS, CORNER_RADIUS);
+      SetWindowRgn(tr4whandle, Rgn, True);
+      end;
 end;
 
 procedure CreateMainWindow;
