@@ -561,6 +561,21 @@ begin
   logger.Info('[TIcomRadio.OnNetworkStateChange] Transport state: %s',
               [IcomStateToString(FNetworkTransport.State)]);
 
+  { After authentication the radio has reported its actual CI-V address via the
+    capabilities packet. Use it in preference to any hardcoded class default so
+    that user-customised addresses and MK2/variant address differences are handled
+    automatically. }
+  if FNetworkTransport.State = icsAuthenticated then
+     begin
+     if FNetworkTransport.CivAddress <> 0 then
+        begin
+        if FNetworkTransport.CivAddress <> FRadioAddress then
+           logger.Info('[TIcomRadio.OnNetworkStateChange] Updating CI-V address from $%.2x to $%.2x (radio-reported)',
+                       [FRadioAddress, FNetworkTransport.CivAddress]);
+        FRadioAddress := FNetworkTransport.CivAddress;
+        end;
+     end;
+
   if FNetworkTransport.State = icsConnected then
   begin
     // Freq/mode queries deferred to OnInitialPollTimer (250ms after CI-V Open).
