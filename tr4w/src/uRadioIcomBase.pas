@@ -97,6 +97,7 @@ type
 
   protected
     FTransceiveMenuBytes: string;  // 2-byte menu item for CI-V transceive query (radio-specific)
+    FSupportsExtendedVFOBCommands: Boolean;  // True if radio supports $25/$26 direct VFO B set (almost all modern Icoms)
     // Frequency BCD helpers — delegate to standalone functions in uIcomCIV
     function FreqToBCD(freq: LongInt): string;
     function BCDToFreq(bcd: string): LongInt;
@@ -352,6 +353,7 @@ begin
   FInitialQueryPending := False;
   FPollPhase := 0;
   FTransceiveMenuBytes := #$01 + #$50;  // Default: IC-7610/IC-7760 menu item; IC-9700 overrides to $01 $28
+  FSupportsExtendedVFOBCommands := True;  // All modern Icoms support $25 $01 <freq> for direct VFO B freq set
 
   radioModel := 'Icom';  // Will be overridden by derived classes
 end;
@@ -1178,12 +1180,37 @@ procedure TIcomRadio.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
 var
   bcdFreq: string;
 begin
-  // $05 sets the active VFO frequency directly — do NOT send $25 (VFO select)
-  // first because the IC-7760 NAKs $25 and it can leave the radio in an
-  // unexpected VFO state that causes intermittent tuning failures.
   bcdFreq := FreqToBCD(freq);
-  SendToRadio(BuildCIVCommand($05, bcdFreq));
-  logger.debug('[%s.SetFrequency] Setting frequency to %d Hz', [radioModel, freq]);
+  if (vfo = nrVFOB) and FSupportsExtendedVFOBCommands then
+     begin
+     // $25 $01 <freq> sets VFO B frequency directly without disturbing the active VFO.
+     // Supported by all modern Icom radios. FSupportsExtendedVFOBCommands defaults to
+     // True; set to False in a subclass constructor for older radios that lack it.
+     SendToRadio(BuildCIVCommand($25, CIV_SUBCMD_VFO_B + bcdFreq));
+     end
+  else
+     begin
+     // $05 sets the active VFO frequency. For VFO A this is always correct.
+     // For VFO B on radios that lack $25 extended support, the caller must have
+     // already selected VFO B before calling here (pre-existing limitation).
+     SendToRadio(BuildCIVCommand($05, bcdFreq));
+     end;
+  logger.debug('[%s.SetFrequency] Set VFO %s to %d Hz', [radioModel, IfThen(vfo = nrVFOA, 'A', 'B'), freq]);
+  // Optimistic update: Icom radios do not transceive-push $00 in response to a
+  // CI-V $05 they received — only front-panel VFO changes trigger transceive.
+  // Update vfo state immediately so the display reflects the new frequency
+  // without waiting for the operator to touch the VFO knob.
+  Self.vfo[vfo].Frequency := freq;
+  Self.vfo[vfo].Band := FreqToRadioBand(freq);
+  if Self.vfo[vfo].Band <> rbNone then
+     FBandMemory[Self.vfo[vfo].Band] := freq;
+  // Also queue a $03 query so the radio confirms the frequency it actually
+  // landed on. If the frequency was rejected (out of band, etc.) this
+  // corrects the optimistic update with the real value.
+  if vfo = nrVFOA then
+     QueryVFOAFrequency
+  else
+     QueryVFOBFrequency;
 end;
 
 procedure TIcomRadio.SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA);
@@ -1191,8 +1218,9 @@ var
   modeCmd: Byte;
   filterCmd: Byte;
 begin
-//TODO: If the radio is in the interface for IcomSupportsVFOBCOmmands, then we do not need to select the VFOB first. We can set VFOB directory with the 26 command
-  // Switch to the appropriate VFO if specified
+  // Note: $26 (selected-band info) can set VFO B mode directly, but it also requires
+  // the frequency in the same command, which creates coupling. The VFO select + $06
+  // approach is simpler and reliable for the infrequent mode-set case.
   if vfo = nrVFOB then
     SendToRadio(BuildCIVCommand($25, CIV_SUBCMD_VFO_B))
   else if vfo = nrVFOA then
