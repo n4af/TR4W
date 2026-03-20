@@ -570,8 +570,11 @@ begin
      if FNetworkTransport.CivAddress <> 0 then
         begin
         if FNetworkTransport.CivAddress <> FRadioAddress then
-           logger.Info('[TIcomRadio.OnNetworkStateChange] Updating CI-V address from $%.2x to $%.2x (radio-reported)',
-                       [FRadioAddress, FNetworkTransport.CivAddress]);
+           logger.Info('[TIcomRadio.OnNetworkStateChange] CI-V address override: ' +
+                       'class default $%.2x replaced by radio-reported $%.2x. ' +
+                       'All CI-V commands will use $%.2x.',
+                       [FRadioAddress, FNetworkTransport.CivAddress,
+                        FNetworkTransport.CivAddress]);
         FRadioAddress := FNetworkTransport.CivAddress;
         end;
      end;
