@@ -429,7 +429,7 @@ begin
      end
   else if CATWTR^.tCATPortType = Network then
      begin
-     if CATWTR^.tNetObject.IsConnected then
+     if (CATWTR^.tNetObject <> nil) and CATWTR^.tNetObject.IsConnected then
         begin
         CATWTR^.tNetObject.Disconnect;
         end;
