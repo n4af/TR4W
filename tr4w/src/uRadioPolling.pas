@@ -763,10 +763,13 @@ begin
             // updates on every connect/reconnect without the user needing to touch the VFO.
             if Assigned(ro) then
                begin
-               logger.Debug('[pNetworkRadio] Querying initial freq/mode');
+               logger.Debug('[pNetworkRadio] Querying initial freq/mode/activeVFO');
                ro.QueryVFOAFrequency;
                ro.QueryVFOBFrequency;
                ro.QueryMode;
+               // Issue #849: query active VFO so $00/$01 transceive pushes route correctly
+               // from the start (without this, FActiveVFO defaults to A even if B is selected)
+               ro.QueryActiveVFO;
                end;
 
             // Poll the remaining states that transceive does not push
@@ -828,15 +831,15 @@ begin
                end;
             end;
 
-         rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
-         rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);   // After the reset radio port on a net radio, the ro.band[nrVFOA] is not being set.
-         logger.Trace('[pNetworkRadio:%s] freq=%d mode=%d (TRadioMode)',
-                      [rig^.RadioName, ro.frequency[nrVFOA], Ord(ro.mode[nrVFOA])]);
-         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
-         rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
+         rig^.CurrentStatus.Freq := ro.frequency[ro.ActiveVFO];
+         rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[ro.ActiveVFO]);
+         logger.Trace('[pNetworkRadio:%s] freq=%d mode=%d (TRadioMode) activeVFO=%d',
+                      [rig^.RadioName, ro.frequency[ro.ActiveVFO], Ord(ro.mode[ro.ActiveVFO]), Ord(ro.ActiveVFO)]);
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[ro.ActiveVFO],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
+         rig^.CurrentStatus.RITFreq :=  ro.RITOffset[ro.ActiveVFO];
          rig^.CurrentStatus.Split := ro.IsSplitEnabled;
-         rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
-         rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
+         rig^.CurrentStatus.RIT := ro.IsRITOn[ro.ActiveVFO];
+         rig^.CurrentStatus.XIT := ro.IsXITOn[ro.ActiveVFO];
          rig^.CurrentStatus.TXOn := ro.IsTransmitting;
 
          // VFO A
