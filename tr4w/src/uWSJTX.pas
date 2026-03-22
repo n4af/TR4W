@@ -72,7 +72,6 @@ type
   protected
     procedure OnServerRead(ASender: TIdUDPListenerThread; const AData: TIdBytes;
       ABinding: TIdSocketHandle);
-    procedure OnBeforeBind(AHandle: TIdSocketHandle);
     procedure IdTCPServer1Execute(AContext: TIdContext);
     procedure IdTCPServer1Connect(AContext: TIdContext);
     procedure IdTCPServer1Disconnect(AContext: TIdContext);
@@ -83,6 +82,7 @@ type
     procedure Start;
       // May want to add the port number to a constructor - for now use default
     procedure Stop;
+    procedure JoinMulticastGroup(const AGroupIP: string);
     destructor Destroy;
     procedure HighlightCall(sCall: string; color: integer; sId: string);
     procedure ClearColors(sId: string);
@@ -132,6 +132,7 @@ uses
   , LogDOM // for ActiveDomesticMult
   , uCFG // for WSJTXRadioControlEnabled
   , PostUnit // for tCabrilloFreqString
+  , IdStack // for GStack.AddMulticastMembership
   ;
 // {$R *.dfm}
 
@@ -142,8 +143,10 @@ begin
   FSendColorization := true;
   firstTime := true;
   udpServ := TIdUDPServer.Create(nil);
-  // udpServ.Binding.SetSockOpt(Id_SOL_SOCKET,Id_SO_REUSEADDR,Id_SO_True);
   udpServ.ThreadedEvent := true;
+  // rsTrue causes TIdSocketHandle.Bind to call SetSockOpt(SO_REUSEADDR, True),
+  // allowing JT-Alert (and other tools) to bind the same port simultaneously.
+  udpServ.ReuseSocket := rsTrue;
   if FUDPPort = 0 then
   begin
     FUDPPort := 2237;
@@ -157,7 +160,6 @@ begin
   udpServ.DefaultPort := FUDPPort;
   udpServ.Bindings.Add.IP := '';
   udpServ.OnUDPRead := Self.OnServerRead;
-  udpServ.OnBeforeBind := Self.OnBeforeBind;
   colorsDupeBack.R := $FF;
   colorsDupeBack.G := $00;
   colorsDupeBack.B := $00;
@@ -199,6 +201,36 @@ begin
    Self.radio := radio;
 end;
 }
+procedure TWSJTXServer.JoinMulticastGroup(const AGroupIP: string);
+var
+   i: Integer;
+begin
+   // Join the multicast group on every bound socket handle so the OS delivers
+   // multicast datagrams to this socket.  SO_REUSEADDR (set via udpServ.ReuseSocket)
+   // allows JT-Alert and other tools to bind the same port simultaneously.
+   if not udpServ.Active then
+      begin
+      logger.Warn('[WSJT-X] JoinMulticastGroup called but UDP server not active');
+      exit;
+      end;
+   if logger.IsInfoEnabled then
+      logger.Info('[WSJT-X] Joining multicast group ' + AGroupIP);
+   for i := 0 to udpServ.Bindings.Count - 1 do
+      begin
+      try
+         GStack.AddMulticastMembership(udpServ.Bindings[i].Handle, AGroupIP, '0.0.0.0');
+         if logger.IsInfoEnabled then
+            logger.Info('[WSJT-X] Joined multicast group ' + AGroupIP +
+                        ' on binding ' + IntToStr(i));
+      except
+         on E: Exception do
+            if logger.IsWarnEnabled then
+               logger.Warn('[WSJT-X] Failed to join multicast group ' + AGroupIP +
+                           ' on binding ' + IntToStr(i) + ': ' + E.Message);
+      end;
+      end;
+end;
+
 procedure TWSJTXServer.Start;
 begin
    if not started then
@@ -206,11 +238,16 @@ begin
          try
             udpServ.Active := true;
             started := true;
+            // Join multicast group if configured (e.g. '224.0.0.1' to match WSJT-X
+            // default).  This allows JT-Alert and TR4W to both receive from WSJT-X
+            // simultaneously.  Leave empty for legacy unicast/loopback operation.
+            if WSJTXMulticastGroup <> '' then
+               JoinMulticastGroup(WSJTXMulticastGroup);
          except
             on E: Exception do
                begin
-               logger.Error('Exception when making UDP servr active - Is JT-Alert runnng?: exception=%s', [E.Message]);
-               QuickDisplay('Error linking to WSJT-X. Is JT-Alert active?');
+               logger.Error('[WSJT-X] Exception binding UDP port ' + IntToStr(FUDPPort) + ': ' + E.Message);
+               QuickDisplay(PChar('WSJT-X bind error port ' + IntToStr(FUDPPort) + ': ' + E.Message));
                end;
          end;
 
@@ -280,11 +317,6 @@ end;
 procedure TWSJTXServer.SetTCPPort(nPort: integer);
 begin
   Self.FTCPPort := nPort;
-end;
-
-procedure TWSJTXServer.OnBeforeBind(AHandle: TIdSocketHandle);
-begin
-  AHandle.SetSockOpt(Id_SOL_SOCKET, Id_SO_REUSEADDR, Id_SO_True);
 end;
 
 procedure TWSJTXServer.OnServerRead(ASender: TIdUDPListenerThread; const AData:

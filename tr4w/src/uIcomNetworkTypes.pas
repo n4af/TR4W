@@ -87,7 +87,6 @@ const
   ICOM_TIMER_CIV_WATCHDOG  = 5005;
   ICOM_TIMER_AYT           = 5006;
   ICOM_TIMER_LOGIN         = 5007;
-  ICOM_TIMER_INITIAL_POLL  = 5008;  // One-shot: seed freq/mode 250ms after CI-V Open
 
   // Login retry timing (for when radio has stale session and doesn't respond)
   ICOM_LOGIN_TIMEOUT       = 5000;   // 5 seconds between login retries

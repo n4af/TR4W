@@ -3984,7 +3984,9 @@ const
 var
   TempFlag: Cardinal;
   h: HWND;
+  hMode: HWND;
   temprect: TRect;
+  ctrlPt: TPoint;
   Radio: RadioPtr;
   i: integer;
 begin
@@ -4073,6 +4075,31 @@ begin
     Radio.RITWndHandle := Windows.GetDlgItem(h, 121);
     Radio.XITWndHandle := Windows.GetDlgItem(h, 122);
     Radio.SplitWndHandle := Windows.GetDlgItem(h, 123);
+    // Dynamically create mode labels to the right of each VFO frequency (Issue #566).
+    // VFO A mode: right of control 102
+    Windows.GetWindowRect(Windows.GetDlgItem(h, 102), temprect);
+    ctrlPt.X := temprect.Right + 4;
+    ctrlPt.Y := temprect.Top;
+    Windows.ScreenToClient(h, ctrlPt);
+    hMode := Windows.CreateWindow('STATIC', '',
+       WS_CHILD or WS_VISIBLE or SS_LEFT,
+       ctrlPt.X, ctrlPt.Y,
+       55, temprect.Bottom - temprect.Top,
+       h, 0, hInstance, nil);
+    Windows.SendMessage(hMode, WM_SETFONT, Windows.SendMessage(h, WM_GETFONT, 0, 0), 1);
+    Radio.ModeVFOAWndHandle := hMode;
+    // VFO B mode: right of control 104
+    Windows.GetWindowRect(Windows.GetDlgItem(h, 104), temprect);
+    ctrlPt.X := temprect.Right + 4;
+    ctrlPt.Y := temprect.Top;
+    Windows.ScreenToClient(h, ctrlPt);
+    hMode := Windows.CreateWindow('STATIC', '',
+       WS_CHILD or WS_VISIBLE or SS_LEFT,
+       ctrlPt.X, ctrlPt.Y,
+       55, temprect.Bottom - temprect.Top,
+       h, 0, hInstance, nil);
+    Windows.SendMessage(hMode, WM_SETFONT, Windows.SendMessage(h, WM_GETFONT, 0, 0), 1);
+    Radio.ModeVFOBWndHandle := hMode;
     DisplayCurrentStatus(Radio);
   end;
 
@@ -8703,7 +8730,7 @@ begin
       end;
     rmAFSK:
       begin
-        extMode := eDATA;
+        extMode := eRTTY;
         mode := Digital;
       end;
     rmPSK:

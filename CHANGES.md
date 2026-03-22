@@ -18,6 +18,20 @@
 
 ## 4.145.x — March 2026
 
+### 4.145.4 (2026-03-21) — NY4I
+
+#### Icom Network — Initial Frequency Display (`uRadioPolling.pas`, `uRadioIcomBase.pas`, `uIcomNetworkTransport.pas`, `uIcomNetworkTypes.pas`)
+
+- Fixed frequency/mode display staying blank after connect. Root cause: the `OnInitialPollSeeding` WM_TIMER callback was registered on a thread that never pumps a Win32 message queue (the polling thread uses `Sleep()`), so it never fired. Replaced with direct queries (`QueryVFOAFrequency`, `QueryVFOBFrequency`, `QueryMode`, `PollRadioState`) issued by the polling thread the moment `IsConnected` first becomes true. The timer mechanism (`ICOM_TIMER_INITIAL_POLL`, `OnInitialPollSeeding`, `FOnInitialPoll`/`OnInitialPoll`) has been removed entirely.
+- Frequency display is now blanked when the radio disconnects, so stale data is never shown.
+
+#### HamLib — Remove Obsolete rigctld Configuration (`uCFG.pas`, `VC.pas`, `CFGDEF.PAS`, `tr4w.dpr`) — Issue #846
+
+- Deleted `uRadioHamLib.pas` (the old rigctld-based `THamLib` class). All HamLib radio control now goes through `uRadioHamLibDirect.pas` (`THamLibDirect`) which links directly to `libhamlib-4.dll`. The file was already unreferenced — no factory, no polling thread, no `uses` clause pointed to it.
+- Removed four obsolete config parameters: `HAMLIB PATH`, `HAMLIB RIGCTLD PORT`, `HAMLIB RIGCTLD IP ADDRESS`, `HAMLIB RIGCTLD RUN AT STARTUP`, along with their backing variables (`TR4W_HAMLIBPATH`, `TR4W_HAMLIBPORT`, `TR4W_HAMLIBIPADDRESS`, `TR4W_HAMLIBRUNRIGCTLD`) and defaults. `HAMLIB DEBUG` is retained as it applies to the DLL-based path.
+
+---
+
 ### 4.145.3 (2026-03-19) — NY4I
 
 #### Icom Network — CI-V Send Queue (`uRadioIcomBase.pas`)

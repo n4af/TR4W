@@ -1,13 +1,14 @@
 unit uRadioElecraftK4;
 
 interface
-uses uNetRadioBase, uRadioBand, StrUtils, SysUtils, Math, TF;
+uses uNetRadioBase, uRadioBand, StrUtils, SysUtils, Math, TF, Log4D;
 
 
 Type TK4Radio = class(TNetRadioBase)
    private
       CWBuffer: string;
       firstProcessMessage: boolean;
+      logger: TLogLogger;  // Per-instance logger; shadows MainUnit.logger so all log calls in this class are radio-identified
       function ParseIFCommand(cmd: string): boolean;
       function ModeStrToMode(sMode: string; sDataMode: string): TRadioMode;
       function BandNumToBand(sBand: string): TRadioBand;
@@ -63,6 +64,9 @@ Uses MainUnit;
 Constructor TK4Radio.Create;
 begin
    inherited Create(ProcessMessage);
+
+   // Generic logger until rigLabel is set by LOGRADIO after creation
+   logger := TLogLogger.GetLogger('TR4WDebugLog.K4-Radio');
 
    firstProcessMessage := true;  // Call Initialize on first message received
    // K4 supports auto-info mode - no polling needed
@@ -631,10 +635,10 @@ begin
       3: begin             // DT
          sDataMode := AnsiLeftStr(sData,1);
          case StrToIntDef(sDataMode,-9) of
-            0: vfo.datamode := rmData;
-            1: vfo.datamode := rmAFSK;
-            2: vfo.datamode := rmFSK;
-            3: vfo.datamode := rmPSK;
+            0: begin vfo.datamode := rmData;  vfo.mode := rmData;  end;
+            1: begin vfo.datamode := rmAFSK;  vfo.mode := rmAFSK;  end;
+            2: begin vfo.datamode := rmFSK;   vfo.mode := rmFSK;   end;
+            3: begin vfo.datamode := rmPSK;   vfo.mode := rmPSK;   end;
             -9:logger.error('[ProcessMessage] Non-numeric passed with DT command (%s)',[sData]);
             end;
          end;
@@ -682,7 +686,12 @@ begin
       9: begin             // MA
          end;
       10:begin             // MD
-         vfo.mode := Self.ModeStrToMode(AnsiLeftStr(sData,1),' ');
+         // For DATA mode (6), the sub-mode comes separately via DT response.
+         // Use the already-known vfo.datamode to avoid a spurious ModeStrToMode error.
+         if AnsiLeftStr(sData,1) = '6' then
+            vfo.mode := vfo.datamode
+         else
+            vfo.mode := Self.ModeStrToMode(AnsiLeftStr(sData,1),' ');
          logger.trace('[ProcessMessage] Mode data = %s',[sData]);
          end;
       11:begin              // RT
@@ -781,6 +790,13 @@ end;
 
 procedure TK4Radio.Initialize;
 begin
+   // Now rigLabel is set by LOGRADIO — reinitialize logger with the radio's identity.
+   // Inherits root appender and format; category name appears in every log line.
+   if Self.rigLabel <> '' then
+      logger := TLogLogger.GetLogger('TR4WDebugLog.K4-' + Self.rigLabel)
+   else
+      logger := TLogLogger.GetLogger('TR4WDebugLog.K4-Radio');
+
    Self.SetAIMode(5);
    logger.debug('[TK4Radio.Initialize] Sending KS;BN;RT;XT;RO;FT;ID;MD;DT$;IF;FP; to radio');
    Self.SendToRadio('KS;BN;RT;XT;RO;FT;ID;MD;DT;IF;FP;');

@@ -606,6 +606,7 @@ var
   WindowDupeCheckCall: CallString;
 
   WSJTXUDPPort: integer = 2237;
+  WSJTXMulticastGroup: Str20 = '';   // e.g. '224.0.0.1' to join WSJT-X multicast group
   psw: integer = 0;
   tPreviousDupeQSOsShowed: boolean;
   tPreviousDupeQSOsWndHandle: HWND;
