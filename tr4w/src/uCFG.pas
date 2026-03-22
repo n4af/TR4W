@@ -130,6 +130,7 @@ function F_AUTO_SEND_CHARACTER_COUNT: boolean;
 procedure UpdateDebugLogLevel;
 function F_UpdateWSJTXSendColorizations : boolean;
 function F_UpdateWSJTXEnabled: boolean;
+function F_UpdateWSJTXMulticastGroup: boolean;
 function F_UpdateExternalLoggerEnabled: boolean;
 //function F_SETPARALLELPORT: boolean;
 
@@ -187,7 +188,7 @@ const
       );
 
    {crA}
-   AdditionalProcsArray: array[1..24] of Pointer =        // These mult be boolean functions
+   AdditionalProcsArray: array[1..25] of Pointer =        // These mult be boolean functions
       (
       @F_CONTEST,
       @F_ZONE_MULTIPLIER,
@@ -213,7 +214,8 @@ const
       @F_MY_CONTINENT,
       @F_UpdateWSJTXEnabled,
       //@F_UpdateExternalLoggerEnabled,
-      @F_UpdateWSJTXSendColorizations
+      @F_UpdateWSJTXSendColorizations,
+      @F_UpdateWSJTXMulticastGroup   // Issue 443 index 25
       //@F_SETPARALLELPORT
       );
 
@@ -337,11 +339,13 @@ const
    + 2 {UDPLookupInfo} // Issue 612 ny4i
    + 2 {Radio1 & Radio2 UseHamLib} // Issue 676 ny4i
    + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
-   + 7 {HAMLIBPATH, Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB RIGCTLD IP ADDRESS, HAMLIB RIGCTLD PORT, HAMLIB RIGCTLD RUN AT STARTUP, HAMLIB DEBUG}
+   + 3 {Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB DEBUG}
    + 3 {ExternalLoggerAddress & ExernalLoggerPort & ExternalLoggerEnabled}
    + 1 {ExternalLogger}
    + 1 {SpotCollectorEnabled}
    + 4 {Icom Network Username and Password for Radio 1 and Radio 2}
+   + 1 {WSJTXMulticastGroup}  // Issue 443
+   + 2 {Icom Data Mode ID for Radio 1 and Radio 2}
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -482,10 +486,6 @@ const
  (crCommand: 'FREQUENCY POLL RATE';           crAddress: @FreqPollRate;                   crMin:10; crMax:1000;    crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
  (crCommand: 'FT1000MP CW REVERSE';           crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'GRID MAP CENTER';               crAddress: @GridMapCenter;                  crMin:0;  crMax:6;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
- (crCommand: 'HAMLIB PATH';                   crAddress: @TR4W_HAMLIBPATH;                crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctFileName; crNetwork: 0),
- (crCommand: 'HAMLIB RIGCTLD PORT';           crAddress: @TR4W_HAMLIBPORT;                crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // ny4i 4.44.9
- (crCommand: 'HAMLIB RIGCTLD IP ADDRESS';     crAddress: @TR4W_HAMLIBIPADDRESS;           crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctString; crNetwork: 0),  // ny4i 4.44.9
- (crCommand: 'HAMLIB RIGCTLD RUN AT STARTUP'; crAddress: @TR4W_HAMLIBRUNRIGCTLD;          crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HAMLIB DEBUG';                crAddress: @TR4W_HAMLIB_DEBUG;               crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HAND LOG MODE';                 crAddress: @tHandLogMode;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:1 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HF BAND ENABLE';                crAddress: @HFBandEnable;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
@@ -666,6 +666,7 @@ const
  (crCommand: 'RADIO ONE IP ADDRESS';          crAddress: @Radio1.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctString; crNetwork: 0),
  (crCommand: 'RADIO ONE ICOM NETWORK USERNAME'; crAddress: @Radio1.IcomNetworkUsername;  crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctCaseSensitive; crNetwork: 0),
  (crCommand: 'RADIO ONE ICOM NETWORK PASSWORD'; crAddress: @Radio1.IcomNetworkPassword;  crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctPassword; crNetwork: 0),
+ (crCommand: 'RADIO ONE ICOM DATA MODE ID';    crAddress: @Radio1.IcomDataModeID;        crMin:1;  crMax:3;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO ONE KEYER DTR';           crAddress: pointer(31);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther; crNetwork: 0),
  (crCommand: 'RADIO ONE KEYER RTS';           crAddress: pointer(30);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther; crNetwork: 0),
  (crCommand: 'RADIO ONE KEYER STOP BITS';     crAddress: @Radio1.RadioKeyerStopBits;      crMin:0;  crMax:2;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // ny4i
@@ -694,6 +695,7 @@ const
  (crCommand: 'RADIO TWO IP ADDRESS';          crAddress: @Radio2.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctString; crNetwork: 0),
  (crCommand: 'RADIO TWO ICOM NETWORK USERNAME'; crAddress: @Radio2.IcomNetworkUsername;  crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctCaseSensitive; crNetwork: 0),
  (crCommand: 'RADIO TWO ICOM NETWORK PASSWORD'; crAddress: @Radio2.IcomNetworkPassword;  crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctPassword; crNetwork: 0),
+ (crCommand: 'RADIO TWO ICOM DATA MODE ID';    crAddress: @Radio2.IcomDataModeID;        crMin:1;  crMax:3;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO TWO KEYER DTR';           crAddress: pointer(35);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther; crNetwork: 0),
  (crCommand: 'RADIO TWO KEYER RTS';           crAddress: pointer(34);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther; crNetwork: 0),
  (crCommand: 'RADIO TWO KEYER STOP BITS';     crAddress: @Radio2.RadioKeyerStopBits;      crMin:0;  crMax:2;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // ny4i
@@ -831,6 +833,7 @@ const
  (crCommand: 'WK WEIGHT';                     crAddress: @WinKeySettings.wksValueList.vlWeight;           crMin:10; crMax:90;        crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfWK; crType: ctByte; crNetwork: 1),
  (crCommand: 'WINDOW SIZE';                   crAddress: pointer(5);                                      crMin:1;  crMax:15;        crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckArray; cfFunc: cfAppearance; crType: ctInteger; crNetwork: 1),
  (crCommand: 'WSJT-X BROADCAST PORT';         crAddress: @WSJTXUDPPort;                                   crMin:1;  crMax:65535;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 1),   // ny4i
+ (crCommand: 'WSJT-X MULTICAST GROUP';        crAddress: @WSJTXMulticastGroup;                            crMin:0;  crMax:16;        crS: csNew; crA: 25; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctString;  crNetwork: 0),   // Issue 443
  (crCommand: 'WSJT-X ENABLED';                crAddress: @WSJTXEnabled;                                   crMin:0;  crMax:0;         crS: csNew; crA: 23; crC:0; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),     // ny4i Issue 438
  (crCommand: 'WSJT-X RADIO CONTROL ENABLED';  crAddress: @WSJTXRadioControlEnabled;                       crMin:0;  crMax:0;         crS: csNew; crA: 23; crC:0; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),     // ny4i Issue 673
  (crCommand: 'WSJT-X SEND HIGHLIGHTS';        crAddress: @WSJTXSendColorization;                          crMin:0;  crMax:0;         crS: csNew; crA: 24; crC:0;  crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),     // ny4i Issue 438
@@ -1669,6 +1672,18 @@ begin
       if Assigned(logger) then
          logger.Error('In F_UpdateWSJTXSendColorizations, wsjtx variable was not assigned');
       end;
+end;
+
+function F_UpdateWSJTXMulticastGroup: boolean;  // Issue 443
+begin
+   Result := true;
+   if not assigned(wsjtx) then
+      begin
+      // wsjtx not created yet — JoinMulticastGroup will be called in Start
+      exit;
+      end;
+   if WSJTXMulticastGroup <> '' then
+      wsjtx.JoinMulticastGroup(WSJTXMulticastGroup);
 end;
 
 procedure ProcessTotalScoreMessage(ID, CMD: ShortString);

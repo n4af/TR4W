@@ -199,9 +199,11 @@ type
       tPollCount: integer;
       tStatusEqualityCounter: cardinal;
       tRadioInterfaceWndHandle: HWND;
-      RITWndHandle: HWND;
-      XITWndHandle: HWND;
-      SplitWndHandle: HWND;
+      RITWndHandle:     HWND;
+      XITWndHandle:     HWND;
+      SplitWndHandle:   HWND;
+      ModeVFOAWndHandle: HWND;  // Issue #566: mode label beside VFO A freq
+      ModeVFOBWndHandle: HWND;  // Issue #566: mode label beside VFO B freq
       tRadioOnTheMove: boolean;
       tBuf: array[1..512] of char;
       active : boolean;
@@ -224,6 +226,7 @@ type
       IPAddress:       str50;
       IcomNetworkUsername: str50;  // Icom network protocol username
       IcomNetworkPassword: str50;  // Icom network protocol password
+      IcomDataModeID: Byte;        // Icom data sub-mode: 1=D1 (default), 2=D2, 3=D3
       CWByCATBuffer:   string;                  // ny4i 4.44.5
       //    PartialRadioResponse: string;
       PollingEnable:   boolean;
@@ -2982,6 +2985,12 @@ begin
             TIcomRadio(Self.tNetObject).NetworkPassword := Self.IcomNetworkPassword;
             logger.Info('[%s.SetUpRadioInterface] Set Icom network credentials (user=%s, pass=*******)',
                         [Self.RadioName, Self.IcomNetworkUsername]);
+            if Self.IcomDataModeID in [1..3] then
+               begin
+               TIcomRadio(Self.tNetObject).DataModeID := Self.IcomDataModeID;
+               logger.Info('[%s.SetUpRadioInterface] Icom data mode ID set to D%d',
+                           [Self.RadioName, Self.IcomDataModeID]);
+               end;
          end;
 
          Self.tNetObject.Connect;
@@ -3129,6 +3138,28 @@ begin
    Self.SetRadioFreq(Freq, Mode, VFO);
 end;
 
+// Returns mode adjusted for frequency: if mode is SSB, selects LSB below 8 MHz
+// and USB at or above 8 MHz (standard ham radio sideband convention).
+// Non-SSB modes are returned unchanged.
+function AdjustSSBModeForFreq(mode: TRadioMode; freq: longint): TRadioMode;
+begin
+   if mode in [rmLSB, rmUSB] then
+      begin
+      if freq < 8000000 then
+         begin
+         Result := rmLSB;
+         end
+      else
+         begin
+         Result := rmUSB;
+         end;
+      end
+   else
+      begin
+      Result := mode;
+      end;
+end;
+
 procedure RadioObject.SetRadioFreq(Freq: longint; Mode: ModeType; VFO: char);
 
 var
@@ -3155,34 +3186,12 @@ begin
       begin
       if VFO = 'B' then
          begin
-         tNetMode := ModeTypeToNetMode(mode);
-         if tNetMode in [rmLSB,rmUSB] then
-            begin
-            if freq < 8000000 then
-               begin
-               tNetMode := rmLSB;
-               end
-            else
-               begin
-               tNetMode := rmUSB;
-               end;
-            end;
+         tNetMode := AdjustSSBModeForFreq(ModeTypeToNetMode(mode), freq);
          Self.tNetObject.SetFrequency(freq,nrVFOB,tNetMode);
          end
       else
          begin
-         tNetMode := ModeTypeToNetMode(mode);
-         if tNetMode in [rmLSB,rmUSB] then
-            begin
-            if freq < 8000000 then
-               begin
-               tNetMode := rmLSB;
-               end
-            else
-               begin
-               tNetMode := rmUSB;
-               end;
-            end;
+         tNetMode := AdjustSSBModeForFreq(ModeTypeToNetMode(mode), freq);
          Self.tNetObject.SetFrequency(freq,nrVFOA,tNetMode);
          end;
       Exit;
