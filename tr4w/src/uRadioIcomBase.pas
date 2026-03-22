@@ -1290,9 +1290,14 @@ begin
   SendToRadio(BuildCIVCommand($06, Chr(modeCmd) + Chr(filterCmd)));
 
   // Set or clear the Icom data sub-mode flag ($1A $06):
-  //   AFSK  → turn data mode ON  using FDataModeID (D1/D2/D3, default D1)
-  //   plain voice/CW → turn data mode OFF ($00) so radio leaves USB-D (issue #845)
-  //   FSK/PSK use native Icom mode numbers and do not need $1A $06
+  //   Entering data mode  → turn flag ON  ($1A $06 D1/D2/D3) via FDataModeID
+  //   Leaving data mode for a voice mode → turn flag OFF ($1A $06 $00)
+  //   Only send the clear command when the previous mode was actually a data
+  //   mode; sending $1A $06 $00 unnecessarily (e.g. USB→USB on a retune) is
+  //   known to kill the IC-7760 CI-V transceive stream (same failure mode as
+  //   the now-disabled $26 $01 VFO B mode query).
+  //   CW/CW-R: the radio auto-clears data mode on $06 $03 — no $1A $06 needed.
+  //   FSK/PSK: use native Icom mode numbers and need no $1A $06 command.
   if SupportsDataMode then
      begin
      if mode in [rmAFSK, rmData, rmDataRev] then
@@ -1300,13 +1305,13 @@ begin
         logger.Info('[%s.SetMode] Sending $1A $06 $%.2x (data mode ON, D%d)', [radioModel, FDataModeID, FDataModeID]);
         SendToRadio(BuildCIVCommand($1A, #$06 + Chr(FDataModeID)));
         end
-     // Only clear data mode when switching to a voice mode (USB/LSB/AM/FM).
-     // CW/CW-R have no data sub-mode: the radio auto-clears data mode when
-     // switching to CW via $06, and sending $1A $06 $00 in CW mode is NAK'd.
-     // FSK/PSK use native Icom mode numbers and need no $1A $06 command.
-     else if mode in [rmUSB, rmLSB, rmAM, rmFM] then
+     else if (mode in [rmUSB, rmLSB, rmAM, rmFM]) and
+             (Self.vfo[vfo].Mode in [rmData, rmDataRev, rmAFSK]) then
         begin
-        logger.Info('[%s.SetMode] Sending $1A $06 $00 (clear data mode for voice mode)', [radioModel]);
+        // Clear the data sub-mode flag only if we were previously in a data
+        // mode.  Sending $1A $06 $00 while already in a plain voice mode is
+        // redundant and risks stalling the IC-7760 CI-V stream.
+        logger.Info('[%s.SetMode] Sending $1A $06 $00 (leaving data mode, prev TRadioMode=%d)', [radioModel, Ord(Self.vfo[vfo].Mode)]);
         SendToRadio(BuildCIVCommand($1A, #$06 + #$00));
         end;
      end;
