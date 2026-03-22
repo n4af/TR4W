@@ -752,21 +752,39 @@ begin
          // Radio is connected - poll status
          if not wasConnected then
             begin
-            logger.Info('[pNetworkRadio] Radio connected — initial freq/mode will be queried by OnInitialPollSeeding timer (250ms)');
+            logger.Info('[pNetworkRadio] Radio connected — querying initial freq/mode/state');
             wasConnected := True;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
 
-            // Send immediate poll on connection to wake up radio and get initial state
+            // Query freq and mode directly from the polling thread.
+            // The OnInitialPollSeeding timer window is created on this thread, which has
+            // no Win32 message pump (it only calls Sleep), so WM_TIMER is never dispatched
+            // and the timer callback never fires. Querying here guarantees the display
+            // updates on every connect/reconnect without the user needing to touch the VFO.
+            if Assigned(ro) then
+               begin
+               logger.Debug('[pNetworkRadio] Querying initial freq/mode');
+               ro.QueryVFOAFrequency;
+               ro.QueryVFOBFrequency;
+               ro.QueryMode;
+               end;
+
+            // Poll the remaining states that transceive does not push
             if Assigned(ro) and ro.requiresPolling then
                begin
-               logger.Debug('[pNetworkRadio] Sending initial RIT/XIT/split/TX poll on connection');
+               logger.Debug('[pNetworkRadio] Querying initial RIT/XIT/split/TX');
                ro.PollRadioState;
                end;
 
-            // Sync program's CW speed to radio on initial connection
-            if rig^.CWSpeedSync and (CodeSpeed >= 6) and Assigned(ro) then
+            // CW speed on initial connection:
+            // - CWSpeedSync OFF: program is master — push CodeSpeed to radio so they agree.
+            // - CWSpeedSync ON:  radio is master — do NOT push; leave the radio's speed alone.
+            //   The $14 $0C query sent during connect will return ro.CWSpeed, and the
+            //   polling loop below (ro.CWSpeed -> CodeSpeed sync) will apply it on the
+            //   first cycle that sees a valid response.
+            if not rig^.CWSpeedSync and (CodeSpeed >= 6) and Assigned(ro) then
                begin
-               logger.Debug('[pNetworkRadio] Syncing CW speed %d WPM to radio', [CodeSpeed]);
+               logger.Debug('[pNetworkRadio] CWSpeedSync off — pushing program speed %d WPM to radio', [CodeSpeed]);
                ro.SetCWSpeed(CodeSpeed);
                end;
             end;
@@ -843,10 +861,11 @@ begin
          // may have a different speed and would otherwise fight the active radio.
          if rig^.CWSpeedSync and (ro.CWSpeed > 0) and (ro.CWSpeed <> CodeSpeed)
             and (rig = ActiveRadioPtr) then
-         begin
-           CodeSpeed := ro.CWSpeed;
-           DisplayedCodeSpeed := ro.CWSpeed;
-         end;
+            begin
+            logger.Info('[pNetworkRadio] CWSpeedSync: radio speed %d WPM -> CodeSpeed', [ro.CWSpeed]);
+            CodeSpeed := ro.CWSpeed;
+            DisplayCodeSpeed;  // Refreshes display and persists to SpeedMemory
+            end;
 
          if TR4W_HAMLIB_DEBUG then
             logger.Info('[pNetworkRadio:%s] pre-UpdateStatus: VFOA=%d VFOB=%d split=%s VFOStatus=%d',
@@ -865,8 +884,26 @@ begin
             begin
             logger.Info('[pNetworkRadio] Radio disconnected, will attempt reconnection');
             wasConnected := False;
+            // Zero freq in both Current and Previous status.
+            // Current: so the display shows blank, not a stale reading.
+            // Previous: so UpdateStatus detects a real change when reconnect brings the
+            //           actual frequency back (if only Current were zeroed, a reconnect
+            //           at the same frequency would produce no StatusChanged event).
+            rig.CurrentStatus.Freq := 0;
             rig.CurrentStatus.VFO[VFOA].Frequency := 0;
             rig.CurrentStatus.VFO[VFOB].Frequency := 0;
+            rig.PreviousStatus.Freq := 0;
+            rig.PreviousStatus.VFO[VFOA].Frequency := 0;
+            rig.PreviousStatus.VFO[VFOB].Frequency := 0;
+            // Blank the frequency display immediately. FreqToPChar(0) shows "0.000"
+            // which is as misleading as the stale value, so write '' directly.
+            if rig^.FreqWindowHandle <> 0 then
+               Windows.SetWindowText(rig^.FreqWindowHandle, '');
+            if rig^.tRadioInterfaceWndHandle <> 0 then
+               begin
+               SetDlgItemText(rig^.tRadioInterfaceWndHandle, 102, '');
+               SetDlgItemText(rig^.tRadioInterfaceWndHandle, 104, '');
+               end;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on new disconnect
             end;
 
@@ -907,15 +944,9 @@ begin
             logger.Info('[pNetworkRadio] Reconnection attempt (delay: %dms)', [reconnectDelay]);
             ro.Connect;
 
-            // For radios that require polling, send queries even when disconnected
-            // This "wakes up" radios like Icom that don't send unsolicited messages on power-up
-            if Assigned(ro) and ro.requiresPolling then
-               begin
-               logger.Debug('[pNetworkRadio] Sending poll queries to wake up radio');
-               ro.PollRadioState;
-               end;
-
-            // If Connect succeeds and radio responds, IsConnected will be true on next iteration
+            // Connect only initiates the handshake (sends AYH for Icom, opens TCP for K4).
+            // IsConnected will be True on the next loop iteration once the handshake completes.
+            // The connected branch (above) handles initial polling and CW speed sync at that point.
          except
             on E: Exception do
                begin
@@ -3179,6 +3210,28 @@ begin
    Windows.EnableWindow(rig.XITWndHandle, rig.CurrentStatus.XIT);
    Windows.EnableWindow(rig.SplitWndHandle, rig.CurrentStatus.Split);
 
+   // Update VFO A mode label when mode changes (Issue #566)
+   if (rig.ModeVFOAWndHandle <> 0) and
+      (rig.CurrentStatus.VFO[VFOA].ExtendedMode <>
+       rig.CurrentStatus.previousVFO[VFOA].ExtendedMode) then
+      begin
+      Windows.SetWindowText(rig.ModeVFOAWndHandle,
+         PChar(ExtendedModeStringArray[rig.CurrentStatus.VFO[VFOA].ExtendedMode]));
+      rig.CurrentStatus.previousVFO[VFOA].ExtendedMode :=
+         rig.CurrentStatus.VFO[VFOA].ExtendedMode;
+      end;
+
+   // Update VFO B mode label when mode changes (Issue #566)
+   if (rig.ModeVFOBWndHandle <> 0) and
+      (rig.CurrentStatus.VFO[VFOB].ExtendedMode <>
+       rig.CurrentStatus.previousVFO[VFOB].ExtendedMode) then
+      begin
+      Windows.SetWindowText(rig.ModeVFOBWndHandle,
+         PChar(ExtendedModeStringArray[rig.CurrentStatus.VFO[VFOB].ExtendedMode]));
+      rig.CurrentStatus.previousVFO[VFOB].ExtendedMode :=
+         rig.CurrentStatus.VFO[VFOB].ExtendedMode;
+      end;
+
 end;
 
 function ReadFromCOMPort(b: Cardinal; rig: RadioPtr): boolean;
@@ -3839,7 +3892,7 @@ begin
    if which = 0 then
       begin
          rig.CurrentStatus.VFO[VFOA].Mode := mode;
-         rig.CurrentStatus.VFO[VFOB].ExtendedMode := em;
+         rig.CurrentStatus.VFO[VFOA].ExtendedMode := em;  // was VFOB — copy-paste bug
          rig.CurrentStatus.Mode := mode;
          rig.CurrentStatus.ExtendedMode := em;
       end

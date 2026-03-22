@@ -131,7 +131,6 @@ uses
   uRadioIcom905 in 'src\uRadioIcom905.pas',
   GetWinVersionInfo in 'src\GetWinVersionInfo.pas',
   uSuperCheckPartialFileUpload,
-  uRadioHamLib in 'src\uRadioHamLib.pas',
   uHamLibDirect in 'src\uHamLibDirect.pas',
   uRadioHamLibDirect in 'src\uRadioHamLibDirect.pas',
   uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
@@ -342,6 +341,19 @@ begin
    // the main thread initialize simultaneously.
    IsMultiThread := True;
 
+   // Check for another running instance BEFORE opening any shared files
+   // (log file, etc.) to avoid an EFOpenError crash on the second instance.
+   tMutex := CreateMutex(nil, False, tr4w_ClassName);
+   if tMutex = 0 then
+      begin
+      Exit;
+      end;
+   if GetLastError = ERROR_ALREADY_EXISTS then
+      begin
+      MessageBox(0, Pchar(TC_RUNWARN), tr4w_ClassName, MB_OK or MB_ICONWARNING or MB_SYSTEMMODAL or MB_TOPMOST);
+      Exit;
+      end;
+
    TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
    Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
    iniFile := TINIFile.create(TR4W_INI_FILENAME);
@@ -368,17 +380,6 @@ begin
    logger.info('******************** PROGRAM STARTUP ************************');
    logger.Trace('trace output');
    logger.Info('DecimalSeparator = ' + DecimalSeparator);
-  tMutex := CreateMutex(nil, False, tr4w_ClassName);
-  if tMutex = 0 then
-  begin
-    Exit;
-  end;
-  if GetLastError = ERROR_ALREADY_EXISTS then
-     begin
-     logger.fatal(TC_RUNWARN);
-     MessageBox(0, Pchar(TC_RUNWARN), tr4w_ClassName, MB_OK or MB_ICONWARNING or MB_SYSTEMMODAL or MB_TOPMOST);   // n4af 4.48.4
-     Exit;
-     end;
 
 //{$IF LANG = 'ENG'}
 //  if TryToCheckTheLatestVersion then Exit;
@@ -579,6 +580,8 @@ begin
   tCallWindowSetFocus;
 
   LoadInPlugins;
+
+  CheckNTPAtStartup;
 
   asm
   mov  ebx,0

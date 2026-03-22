@@ -3439,10 +3439,33 @@ if TempRXData.DomMultQTH = '' then
           end;
 
         RSTDomesticOrDXQTHExchange:
-          begin
+           begin
                 //-                if MyState = '' then cMyState := 'DX';
-            if TempRXData.QTHString = '' then
-              if TempRXData.DXQTH = '' then csQTHString := 'DX' else csQTHString := @TempRXData.DXQTH[1];
+           if TempRXData.QTHString = '' then
+              begin
+              if TempRXData.DXQTH = '' then
+                 begin
+                 csQTHString := 'DX';
+                 end
+              else
+                 begin
+                 if Contest = FLORIDAQSOPARTY then
+                    begin
+                    csQTHString := @TempRXData.QTH.Prefix[1];
+                    end
+                 else
+                    begin
+                    csQTHString := @TempRXData.DXQTH[1];
+                    end;
+                 end;
+              end
+           else if TempRXData.QTHString = 'DX' then
+              begin
+              if Contest = FLORIDAQSOPARTY then
+                 begin
+                 csQTHString := @TempRXData.QTH.Prefix[1];
+                 end;
+              end;
 
             asm
                 push csQTHString

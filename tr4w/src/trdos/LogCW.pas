@@ -1990,10 +1990,14 @@ begin
 //      tActiveKeyerHandle                                  := Radio1.tKeyerPortHandle;
       SerialInvert                                          := Radio1SerialInvert;
           {CodeSpeed                                        := RadioOneSpeed;}
-      if true {not Radio1.CWSpeedSync} then     // prep for a future change ny4i
+      if not Radio1.CWSpeedSync then     // ny4i: radio is master → don't push speed back
          begin
          CodeSpeed := Radio1.SpeedMemory; {KK1L: 6.73}
          SetSpeed(CodeSpeed);
+         end
+      else
+         begin
+         CodeSpeed := Radio1.SpeedMemory; {KK1L: 6.73}
          end;
           {KK1L: 6.71 Need to set mode to that of ModeMemory [RadioOne] for split mode SO2R}
           {KK1L: 6.72 Moved this to SendCrypticMessage to only handle CTRL-A requests      }
@@ -2015,8 +2019,15 @@ begin
 //      tActiveKeyerHandle                                  := Radio2.tKeyerPortHandle;
       SerialInvert                                          := Radio2SerialInvert;
         {CodeSpeed                                          := RadioTwoSpeed;}
-      CodeSpeed                                             := Radio2.SpeedMemory; {KK1L: 6.73}
-      SetSpeed(CodeSpeed);
+      if not Radio2.CWSpeedSync then     // ny4i: radio is master → don't push speed back
+         begin
+         CodeSpeed := Radio2.SpeedMemory; {KK1L: 6.73}
+         SetSpeed(CodeSpeed);
+         end
+      else
+         begin
+         CodeSpeed := Radio2.SpeedMemory; {KK1L: 6.73}
+         end;
         {KK1L: 6.71 Need to set mode to that of ModeMemory [RadioTwo] for split mode SO2R}
         {KK1L: 6.72 Moved this to SendCrypticMessage to only handle CTRL-A requests      }
         {           SwapRadios is run prior to coming here for SO2R and that hoses things}

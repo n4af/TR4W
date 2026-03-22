@@ -104,7 +104,6 @@ type
     // Callbacks
     FOnCivData: TProcessMsgRef;
     FOnStateChange: TNotifyEvent;
-    FOnInitialPoll: TNotifyEvent;  // Fired once, 250ms after connect, to seed freq/mode
 
     // Internal - packet building and sending
     procedure SendControlPacket(PktType: Word; Socket: TIdUDPServer;
@@ -153,7 +152,6 @@ type
     procedure OnCivWatchdogTimer;
     procedure OnAYTTimer;
     procedure OnLoginTimer;
-    procedure OnInitialPollTimer;
 
     // Internal - tracked send (central path for all sequenced sends)
     procedure SendTrackedPacket(Socket: TIdUDPServer; const Data: string;
@@ -196,7 +194,6 @@ type
     property CivAddress: Byte read FCivAddress;
     property OnCivData: TProcessMsgRef read FOnCivData write FOnCivData;
     property OnStateChange: TNotifyEvent read FOnStateChange write FOnStateChange;
-    property OnInitialPoll: TNotifyEvent read FOnInitialPoll write FOnInitialPoll;
     property AuthFailed: Boolean read FAuthFailed;
   end;
 
@@ -225,7 +222,6 @@ begin
       ICOM_TIMER_CIV_WATCHDOG:  Inst.OnCivWatchdogTimer;
       ICOM_TIMER_AYT:           Inst.OnAYTTimer;
       ICOM_TIMER_LOGIN:         Inst.OnLoginTimer;
-      ICOM_TIMER_INITIAL_POLL:  Inst.OnInitialPollTimer;
     end;
     Result := 0;
   end
@@ -474,7 +470,7 @@ begin
 
   SendTrackedPacket(FCivSocket, FullPacket, FRadioAddress, FCivPort, FCivSeq);
 
-  logger.Debug('[IcomTransport:' + FRadioName + '] Sent CI-V data, outer seq=%d, inner seq=%d, len=%d',
+  logger.Trace('[IcomTransport:' + FRadioName + '] Sent CI-V data, outer seq=%d, inner seq=%d, len=%d',
                [FCivSeq - 1, FCivInnerSeq - 1, Length(CivFrame)]);
 end;
 
@@ -867,9 +863,6 @@ begin
 
             FLastCivData := GetTickCount;
             logger.Info('[IcomTransport:' + FRadioName + '] Fully connected to %s, CI-V stream open', [FRadioName]);
-
-            // Fire initial poll 250ms after CivOpen
-            SetTimer(FTimerWnd, ICOM_TIMER_INITIAL_POLL, 250, nil);
 
             // Notify state change listeners (radio can now send CI-V commands)
             if Assigned(FOnStateChange) then
@@ -1589,7 +1582,6 @@ begin
   KillTimer(FTimerWnd, ICOM_TIMER_CIV_WATCHDOG);
   KillTimer(FTimerWnd, ICOM_TIMER_AYT);
   KillTimer(FTimerWnd, ICOM_TIMER_LOGIN);
-  KillTimer(FTimerWnd, ICOM_TIMER_INITIAL_POLL);
 
   logger.Debug('[IcomTransport:' + FRadioName + '] All timers stopped');
 end;
@@ -1705,26 +1697,6 @@ begin
   logger.Debug('[IcomTransport:' + FRadioName + '] Login timeout - resending login packet (retry %d/%d)',
                [FLoginRetryCount, ICOM_LOGIN_MAX_RETRIES]);
   SendLoginPacket;
-end;
-
-procedure TIcomNetworkTransport.OnInitialPollTimer;
-begin
-  // One-shot timer: kill ourselves immediately so we only fire once
-  KillTimer(FTimerWnd, ICOM_TIMER_INITIAL_POLL);
-
-  if not FCivStreamOpen then Exit;
-
-  // 250ms has elapsed since CI-V Open — radio is ready to respond to queries.
-  logger.Info('[IcomTransport:' + FRadioName + '] Initial poll delay complete - seeding freq/mode');
-  if Assigned(FOnInitialPoll) then
-  begin
-    try
-      FOnInitialPoll(Self);
-    except
-      on E: Exception do
-        logger.Error('[IcomTransport:' + FRadioName + '] Exception in initial poll callback: %s', [E.Message]);
-    end;
-  end;
 end;
 
 // ============================================================================

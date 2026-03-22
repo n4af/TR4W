@@ -593,7 +593,12 @@ begin
      // The next scheduled poll will update it if the radio is actually elsewhere.
      end
   else
+     begin
      Self.vfo[vfo].frequency := freq;
+     // Set mode if provided. rmNone means "frequency only, leave mode alone".
+     if mode <> rmNone then
+        SetMode(mode, vfo);
+     end;
 end;
 
 procedure THamLibDirect.SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA);
@@ -606,7 +611,7 @@ begin
   hlMode := TR4WModeToHamLibMode(mode);
   logger.Debug('[THamLibDirect.SetMode] Setting mode to %s on VFO %s', [ModeToString(mode), VFOToString(vfo)]);
 
-  err := rig_set_mode(FRig, RIG_VFO_CURR, hlMode, RIG_PASSBAND_NORMAL);
+  err := rig_set_mode(FRig, TR4WVFOToHamLibVFO(vfo), hlMode, RIG_PASSBAND_NORMAL);
   if err <> RIG_OK then
     logger.Error('[SetMode] Error setting mode: %s', [RigErrorToString(err)])
   else
