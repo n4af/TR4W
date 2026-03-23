@@ -50,6 +50,10 @@ begin
   // IC-9700 CI-V transceive is at menu item $0127, not the default $0150 (IC-7610/IC-7760)
   FTransceiveMenuBytes := #$01 + #$27;
 
+  // IC-9700 supports $07 $D2 Main/Sub band selection in principle, but its
+  // firmware does not reliably respond to polling — see issue #850.
+  // FSupportsActiveVFOQuery left False until software state-tracking is implemented.
+
   logger.Info('[TIcom9700Radio.Create] Created IC-9700 radio instance with CI-V address $A2');
 end;
 

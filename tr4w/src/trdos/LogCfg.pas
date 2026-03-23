@@ -775,9 +775,19 @@ var
   CMD := 'FM';
   if not CheckCommand(@ID, CMD) then
   begin
-    Format(wsprintfBuffer, TC_INVALIDSTATEMENTINCONFIGFILE, CFGFilesArray[CurrentConfigFile], LineNumberInConfigFile, @FileString^[1]);
-    showwarning(wsprintfBuffer);
+    // Commands removed in a prior version — log quietly, no dialog
+    if (ID = 'HAMLIB RIGCTLD PORT') or
+       (ID = 'HAMLIB RIGCTLD IP ADDRESS') or
+       (ID = 'HAMLIB RIGCTLD RUN AT STARTUP') then
+       begin
+       logger.Warn('[LogCfg] Obsolete command ignored (removed): %s', [ID]);
+       end
+    else
+       begin
+       Format(wsprintfBuffer, TC_INVALIDSTATEMENTINCONFIGFILE, CFGFilesArray[CurrentConfigFile], LineNumberInConfigFile, @FileString^[1]);
+       showwarning(wsprintfBuffer);
 //    halt;
+       end;
   end;
 end;
 

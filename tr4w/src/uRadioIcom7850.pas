@@ -34,6 +34,7 @@ begin
   inherited Create;
   RadioAddress := $8E;
   radioModel := 'Icom IC-7850';
+  FSupportsActiveVFOQuery := True;  // Supports $07 $D2 Main/Sub band selection
   logger.Info('[TIcom7850Radio.Create] Created IC-7850 instance with CI-V address $8E');
 end;
 
