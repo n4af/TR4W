@@ -18,6 +18,23 @@
 
 ## 4.145.x — March 2026
 
+### 4.145.5 (2026-03-22) — NY4I
+
+#### Icom Network — VFO A/B Independent Display (`uRadioIcomBase.pas`, `uRadioPolling.pas`, `uNetRadioBase.pas`) — Issue #849
+
+- **Fixed both VFOs showing wrong mode (DATA when plain USB/LSB was set).** Root cause: the `$26` (VFO B mode-only) response handler was reading `data[4]` (the filter byte, FIL1 = `$01`) as the data-mode flag instead of `data[3]` (the actual data-mode byte). The IC-7760 `$26` frame layout is `subCmd + mode + dataMode + filter`, not `subCmd + mode + filter + dataMode`. A filter value of FIL1 (`$01`) was being treated as "data mode D1 active", causing every mode on VFO B to display as DATA.
+- **Fixed inactive VFO always queried as VFO B.** The `$01` (mode push) and `$04` (mode query) handlers always called `QueryVFOBMode` for the inactive VFO. When VFO B is the active/main VFO, the *inactive* VFO is A — the handler now picks `QueryVFOAMode` or `QueryVFOBMode` based on `FActiveVFO`.
+- **Fixed `dataMode` field never updated in `$26` handler.** Handler set `vfo.Mode` but left `vfo.dataMode` stale, causing data-mode state to diverge from display mode. Now both fields are always updated together.
+- **Added `FSupportsActiveVFOQuery` flag** to gate all `$07 $D2` (Main/Sub band selection) logic. Set `True` for IC-7600, IC-7610, IC-7760, IC-7850 (confirmed Main/Sub support); left `False` for IC-7300, IC-7300MK2, IC-705, IC-905, IC-7100 (VFO A/B only — no `$07 $D2`). IC-9700 deferred pending firmware polling workaround (issue #850).
+- **`QueryVFOAMode` / `QueryVFOBMode` / `QueryActiveVFO`** virtual stubs added to `TNetRadioBase` (`uNetRadioBase.pas`) so the polling thread can call them without a concrete type reference.
+- **Startup query order** in `uRadioPolling.pas`: `QueryActiveVFO` is now called first so `FActiveVFO` is known before VFO freq/mode queries begin.
+
+#### Bug Fix — Obsolete HAMLIB Config Commands No Longer Show Blocking Dialog (`src/trdos/LogCfg.pas`)
+
+Users who had `HAMLIB RIGCTLD PORT`, `HAMLIB RIGCTLD IP ADDRESS`, or `HAMLIB RIGCTLD RUN AT STARTUP` in their `.cfg` file (left over from when those parameters existed) were shown a blocking warning dialog at startup after those commands were removed in 4.145.4. These three commands are now silently ignored with a `WARN`-level log entry instead of a dialog.
+
+---
+
 ### 4.145.4 (2026-03-21) — NY4I
 
 #### Icom Network — Initial Frequency Display (`uRadioPolling.pas`, `uRadioIcomBase.pas`, `uIcomNetworkTransport.pas`, `uIcomNetworkTypes.pas`)
