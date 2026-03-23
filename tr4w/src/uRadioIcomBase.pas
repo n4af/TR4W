@@ -79,12 +79,14 @@ type
     // Band memory: remembers last frequency per band (like TR4QT)
     FBandMemory: array[TRadioBand] of LongInt;
     FTransceiveChecked: Boolean;  // True after we've queried and logged the transceive state once
+    FVFOQueryPending: Boolean;    // True while $25 $00/$01 query pair is in flight; prevents flooding
+    FVFOQuerySentTick: DWORD;    // GetTickCount when query was sent; used to expire FVFOQueryPending
     FLastBaseMode: TRadioMode;    // Base mode before data mode overlay (restored when data mode goes off)
+    FActiveVFO: TVFO;             // Which VFO is currently active (main); updated via $07 $D2 query/push
     FInitialQueryPending: Boolean; // True after $19 sent; triggers $03/$04 on $19 response
     FPollPhase: Integer;            // Rotates through query groups to avoid flooding radio
     FLastSetCWSpeedTick: DWORD;   // GetTickCount at last SetCWSpeed call — suppresses stale echoes
     FDataModeID: Byte;            // Icom data sub-mode: $01=D1 (default), $02=D2, $03=D3 — configurable via RADIO x ICOM DATA MODE ID
-    FActiveVFO: TVFO;             // VFO currently selected on the radio — updated via $07 transceive push
 
     // Actual UDP send — only called by TCIVSendThread.DrainQueues
     procedure DoSendDirect(const s: string);
@@ -99,6 +101,7 @@ type
   protected
     FTransceiveMenuBytes: string;  // 2-byte menu item for CI-V transceive query (radio-specific)
     FSupportsExtendedVFOBCommands: Boolean;  // True if radio supports $25/$26 direct VFO B set (almost all modern Icoms)
+    FSupportsActiveVFOQuery: Boolean;        // True if radio supports $07 $D2 to read which VFO is active (e.g. IC-7760)
     // Frequency BCD helpers — delegate to standalone functions in uIcomCIV
     function FreqToBCD(freq: LongInt): string;
     function BCDToFreq(bcd: string): LongInt;
@@ -120,8 +123,9 @@ type
     // Polling interface implementation
     procedure QueryVFOAFrequency; override;
     procedure QueryVFOBFrequency; override;
-    procedure QueryActiveVFO; override;   // Issue #849: query which VFO is selected ($07 read)
-    procedure QueryVFOBMode;              // Issue #566: poll VFO B freq+mode via $26
+    procedure QueryVFOAMode;              // $26 $00 — VFO A mode (when VFO B is active)
+    procedure QueryVFOBMode; override;    // $26 $01 — VFO B mode
+    procedure QueryActiveVFO; override;   // $07 $D2 — which VFO is active (if FSupportsActiveVFOQuery)
     procedure QueryMode; override;
     procedure QueryTXStatus; override;
     procedure QueryRITState; override;
@@ -166,7 +170,6 @@ type
     property NetworkPassword: string read FNetworkPassword write FNetworkPassword;
     property DataModeID: Byte read FDataModeID write FDataModeID;
     property NetworkTransport: TIcomNetworkTransport read FNetworkTransport;
-    function ActiveVFO: TVFO; override;  // Returns which VFO is currently active on the radio
   end;
 
 implementation
@@ -360,7 +363,8 @@ begin
   FPollPhase := 0;
   FTransceiveMenuBytes := #$01 + #$50;  // Default: IC-7610/IC-7760 menu item; IC-9700 overrides to $01 $28
   FSupportsExtendedVFOBCommands := True;  // All modern Icoms support $25 $01 <freq> for direct VFO B freq set
-  FActiveVFO := nrVFOA;  // Assume VFO A is active at startup; updated by $07 transceive pushes
+  FSupportsActiveVFOQuery := False;       // Overridden True by radios that support $07 $D2 (e.g. IC-7760)
+  FActiveVFO := nrVFOA;                  // Safe default; updated by $07 $D2 response on connect
 
   radioModel := 'Icom';  // Will be overridden by derived classes
 end;
@@ -373,11 +377,6 @@ begin
     FreeAndNil(FNetworkTransport);
   end;
   inherited Destroy;
-end;
-
-function TIcomRadio.ActiveVFO: TVFO;
-begin
-   Result := FActiveVFO;
 end;
 
 // Returns a human-readable hex string for a raw CI-V frame, e.g. "FE FE A2 E0 1A FD"
@@ -699,6 +698,7 @@ var
   modeNum: Byte;
   radioMode: TRadioMode;
   subCmd: Byte;
+  vfoSlot: TVFO;
   offset: LongInt;
 begin
   // Minimum frame: FE FE [To] [From] [Cmd] FD = 6 bytes
@@ -713,6 +713,17 @@ begin
   if frame[Length(frame)] <> CIV_EOM then
     Exit;
 
+  // CI-V frame layout: FE FE [dest] [src] [cmd] [data...] FD
+  // frame[3] = destination, frame[4] = source.
+  // Discard frames addressed TO the radio (echoes of our own outgoing commands).
+  // Only process frames FROM the radio: dest = FControllerAddress or $00 (broadcast).
+  if (Ord(frame[3]) = FRadioAddress) then
+  begin
+    if logger.IsTraceEnabled then
+      logger.Trace('[%s] CIV echo (discarded): %s', [radioModel, CIVDataToHex(frame)]);
+    Exit;
+  end;
+
   // Valid frame received - update timestamp for disconnect detection
   UpdateLastValidResponse;
 
@@ -724,16 +735,51 @@ begin
   data := Copy(frame, 6, Length(frame) - 6);  // Everything between command and EOM
 
   case command of
-    $00:  // Unsolicited frequency (CI-V transceive push — active VFO)
+    $00:  // Unsolicited frequency push — active VFO changed frequency
       begin
         if Length(data) >= 5 then
         begin
           freq := BCDToFreq(Copy(data, 1, 5));
-          logger.debug('[%s] Transceive freq: %d Hz (VFO %s)', [radioModel, freq, vfoNames[FActiveVFO]]);
-          Self.vfo[FActiveVFO].Frequency := freq;
-          Self.vfo[FActiveVFO].Band := FreqToRadioBand(freq);
-          if Self.vfo[FActiveVFO].Band <> rbNone then
-            FBandMemory[Self.vfo[FActiveVFO].Band] := freq;
+          if FSupportsActiveVFOQuery then
+          begin
+            // Best case: FActiveVFO is known from $07 $D2 — route directly, no round-trip.
+            // $00 carries the active VFO's new frequency; inactive VFO is unchanged.
+            logger.Debug('[%s] $00 freq push: %d Hz → VFO %s (direct)',
+               [radioModel, freq, IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
+            Self.vfo[FActiveVFO].Frequency := freq;
+            Self.vfo[FActiveVFO].Band := FreqToRadioBand(freq);
+            if Self.vfo[FActiveVFO].Band <> rbNone then
+              FBandMemory[Self.vfo[FActiveVFO].Band] := freq;
+          end
+          else if FSupportsExtendedVFOBCommands then
+          begin
+            // Active VFO unknown — must query both slots.
+            // Guard and timeout prevent flooding under heavy receive traffic.
+            if FVFOQueryPending and (GetTickCount - FVFOQuerySentTick > 2000) then
+            begin
+              logger.Warn('[%s] $25 query timed out — clearing pending flag', [radioModel]);
+              FVFOQueryPending := False;
+            end;
+            if not FVFOQueryPending then
+            begin
+              logger.Debug('[%s] $00 freq push (%d Hz) → querying $25/$00 and $25/$01', [radioModel, freq]);
+              FVFOQueryPending := True;
+              FVFOQuerySentTick := GetTickCount;
+              QueryVFOAFrequency;   // $25 $00 → nrVFOA
+              QueryVFOBFrequency;   // $25 $01 → nrVFOB
+            end
+            else
+              logger.Debug('[%s] $00 freq push (%d Hz) skipped — query already in flight', [radioModel, freq]);
+          end
+          else
+          begin
+            // Older radios: $00 always refers to VFO A
+            logger.Debug('[%s] $00 freq push: %d Hz → VFO A', [radioModel, freq]);
+            Self.vfo[nrVFOA].Frequency := freq;
+            Self.vfo[nrVFOA].Band := FreqToRadioBand(freq);
+            if Self.vfo[nrVFOA].Band <> rbNone then
+              FBandMemory[Self.vfo[nrVFOA].Band] := freq;
+          end;
         end;
       end;
 
@@ -757,7 +803,8 @@ begin
             $17: radioMode := rmDV;   // D-STAR digital voice
             else radioMode := rmNone;
           end;
-          logger.debug('[%s] Transceive mode: %d (VFO %s)', [radioModel, modeNum, vfoNames[FActiveVFO]]);
+          logger.debug('[%s] Transceive mode push: $%.2x → TRadioMode=%d → VFO %s',
+             [radioModel, modeNum, Ord(radioMode), IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
           FLastBaseMode := radioMode;
           Self.vfo[FActiveVFO].Mode := radioMode;
           Self.vfo[FActiveVFO].dataMode := rmNone;  // Mode update clears data overlay
@@ -766,7 +813,53 @@ begin
           // Radio doesn't push $1A $06 on data mode change — query it after voice modes
           if SupportsDataMode and (radioMode in [rmUSB, rmLSB, rmFM, rmAM]) then
             SendToRadio(BuildCIVCommand($1A, #$06));
+
+          // $01 = active VFO mode changed. Radio doesn't push $26 unsolicited,
+          // so query the INACTIVE VFO mode to keep its display in sync.
+          // If VFO A is active → VFO B is inactive ($26 $01).
+          // If VFO B is active → VFO A is inactive ($26 $00).
+          if FSupportsExtendedVFOBCommands then
+             begin
+             if FActiveVFO = nrVFOA then
+                QueryVFOBMode   // $26 $01 → nrVFOB (inactive)
+             else
+                QueryVFOAMode;  // $26 $00 → nrVFOA (inactive)
+             end;
         end;
+      end;
+
+    $27:  // Bandscope data — pushed unsolicited by radio, not used
+      begin
+        // Silently discard — frames can be hundreds of bytes
+      end;
+
+    $07:  // VFO selection response or transceive push
+      begin
+        // $07 $D2 <value> — active VFO query response or push when VFO changes
+        // value $00 = main (VFO A active), $01 = sub (VFO B active)
+        if (Length(data) >= 2) and (Ord(data[1]) = $D2) then
+          begin
+          if Ord(data[2]) = $00 then
+            vfoSlot := nrVFOA
+          else
+            vfoSlot := nrVFOB;
+          if vfoSlot <> FActiveVFO then
+            begin
+            // VFO selection changed — refresh both frequencies and modes
+            FActiveVFO := vfoSlot;
+            logger.Info('[%s] $07 $D2: active VFO changed to VFO %s — refreshing',
+               [radioModel, IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
+            QueryVFOAFrequency;
+            QueryVFOBFrequency;
+            QueryVFOAMode;
+            QueryVFOBMode;
+            end
+          else
+            logger.Debug('[%s] $07 $D2: VFO %s active (unchanged)',
+               [radioModel, IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
+          end
+        else if Length(data) >= 1 then
+          logger.Debug('[%s] $07 response: byte[1]=$%.2x (unhandled sub-cmd)', [radioModel, Ord(data[1])]);
       end;
 
     $03:  // Read operating frequency response — returns the active VFO's frequency
@@ -775,39 +868,19 @@ begin
         if Length(data) >= 5 then
         begin
           freq := BCDToFreq(Copy(data, 1, 5));
-          // $03 always returns the currently selected VFO's frequency, not necessarily
-          // VFO A. Route to FActiveVFO so it lands in the correct slot.
-          logger.Info('[%s] $03 freq: %d Hz (VFO %s)', [radioModel, freq, vfoNames[FActiveVFO]]);
-          Self.vfo[FActiveVFO].Frequency := freq;
-          Self.vfo[FActiveVFO].Band := FreqToRadioBand(freq);
-          if Self.vfo[FActiveVFO].Band <> rbNone then
-            FBandMemory[Self.vfo[FActiveVFO].Band] := freq;
+          // $03 returns the currently selected VFO. We only call $03 from the
+          // initial connect block (before $25/$00 is available) so treat it as VFO A.
+          logger.Debug('[%s] $03 freq: %d Hz -> VFO A', [radioModel, freq]);
+          Self.vfo[nrVFOA].Frequency := freq;
+          Self.vfo[nrVFOA].Band := FreqToRadioBand(freq);
+          if Self.vfo[nrVFOA].Band <> rbNone then
+            FBandMemory[Self.vfo[nrVFOA].Band] := freq;
         end
         else
           logger.Warn('[%s] $03 response too short (len=%d), expected >=5', [radioModel, Length(data)]);
       end;
 
-    $07:  // VFO select — transceive push when user changes VFO on front panel
-      begin
-        // data[1]: $00 = VFO A selected, $01 = VFO B selected
-        // Radio sends this push immediately when the operator presses the VFO A/B key.
-        // We track it so that subsequent $00/$01 transceive pushes go to the correct slot.
-        if Length(data) >= 1 then
-        begin
-          if Ord(data[1]) = $00 then
-          begin
-            FActiveVFO := nrVFOA;
-            logger.debug('[%s] VFO A selected (via $07 transceive)', [radioModel]);
-          end
-          else if Ord(data[1]) = $01 then
-          begin
-            FActiveVFO := nrVFOB;
-            logger.debug('[%s] VFO B selected (via $07 transceive)', [radioModel]);
-          end;
-        end;
-      end;
-
-    $25:  // VFO B frequency response
+    $25:  // VFO A/B frequency response (explicit read via $25 $00 / $25 $01)
       begin
         if Length(data) >= 6 then  // IC-7760 format: subcmd(1) + freq(5)
         begin
@@ -819,14 +892,15 @@ begin
               vfo[nrVFOA].Band := FreqToRadioBand(freq);
               if vfo[nrVFOA].Band <> rbNone then
                 FBandMemory[vfo[nrVFOA].Band] := freq;
-              logger.debug('[%s] VFO A freq ($25 subcmd): %d Hz', [radioModel, freq]);
+              FVFOQueryPending := False;  // Query pair complete — allow next $00 to trigger
+              logger.Info('[%s] $25/$00: VFO A freq = %d Hz', [radioModel, freq]);
             end;
             $01: begin  // VFO B
               vfo[nrVFOB].Frequency := freq;
               vfo[nrVFOB].Band := FreqToRadioBand(freq);
               if vfo[nrVFOB].Band <> rbNone then
                 FBandMemory[vfo[nrVFOB].Band] := freq;
-              logger.debug('[%s] VFO B freq ($25 subcmd): %d Hz', [radioModel, freq]);
+              logger.Info('[%s] $25/$01: VFO B freq = %d Hz', [radioModel, freq]);
             end;
           end;
         end
@@ -862,15 +936,24 @@ begin
             $17: radioMode := rmDV;   // D-STAR digital voice
             else radioMode := rmNone;
           end;
-          logger.Info('[%s] VFO A mode set: byte=$%.2x → TRadioMode=%d', [radioModel, modeNum, Ord(radioMode)]);
+          logger.Info('[%s] $04 mode: byte=$%.2x → TRadioMode=%d → VFO %s',
+             [radioModel, modeNum, Ord(radioMode), IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
           FLastBaseMode := radioMode;
-          Self.vfo[nrVFOA].Mode := radioMode;
-          Self.vfo[nrVFOA].dataMode := rmNone;
+          Self.vfo[FActiveVFO].Mode := radioMode;
+          Self.vfo[FActiveVFO].dataMode := rmNone;
           localDataMode := rmNone;
 
-          // $04 doesn't include data mode state — query it for voice modes
+          // $04 doesn't include data mode state — query it for voice modes.
+          // Also query the inactive VFO mode, same logic as $01 handler.
           if SupportsDataMode and (radioMode in [rmUSB, rmLSB, rmFM, rmAM]) then
-            SendToRadio(BuildCIVCommand($1A, #$06));
+             SendToRadio(BuildCIVCommand($1A, #$06));
+          if FSupportsExtendedVFOBCommands then
+             begin
+             if FActiveVFO = nrVFOA then
+                QueryVFOBMode
+             else
+                QueryVFOAMode;
+             end;
         end
         else
           logger.Warn('[%s] $04 response empty (len=%d)', [radioModel, Length(data)]);
@@ -909,22 +992,24 @@ begin
             if Ord(data[2]) = $00 then
             begin
               // Data mode OFF — restore the base voice/CW mode
-              vfo[nrVFOA].Mode := FLastBaseMode;
-              vfo[nrVFOA].dataMode := rmNone;
+              vfo[FActiveVFO].Mode := FLastBaseMode;
+              vfo[FActiveVFO].dataMode := rmNone;
               localDataMode := rmNone;
-              logger.debug('[%s] Data mode OFF, restored base mode', [radioModel]);
+              logger.debug('[%s] Data mode OFF, restored base mode on VFO %s',
+                 [radioModel, IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
             end
             else
             begin
               // Data mode ON (D1/D2/D3) — only apply if current mode is a voice mode
               // Ignore stale responses that arrive after switching to CW/FSK/PSK
-              if vfo[nrVFOA].Mode in [rmUSB, rmLSB, rmFM, rmAM] then
+              if vfo[FActiveVFO].Mode in [rmUSB, rmLSB, rmFM, rmAM] then
               begin
-                FLastBaseMode := vfo[nrVFOA].Mode;  // Save base mode for restore
-                vfo[nrVFOA].Mode := rmData;
-                vfo[nrVFOA].dataMode := rmData;
+                FLastBaseMode := vfo[FActiveVFO].Mode;  // Save base mode for restore
+                vfo[FActiveVFO].Mode := rmData;
+                vfo[FActiveVFO].dataMode := rmData;
                 localDataMode := rmData;
-                logger.debug('[%s] Data mode ON (D%d)', [radioModel, Ord(data[2])]);
+                logger.debug('[%s] Data mode ON (D%d) on VFO %s',
+                   [radioModel, Ord(data[2]), IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
               end
               else
                 logger.debug('[%s] Data mode ON ignored — current mode is not voice', [radioModel]);
@@ -976,8 +1061,13 @@ begin
             end
           else if Length(data) >= 3 then
             begin
-            // Mode-only query response: $01 <mode> <filter> [<datamode>]
-            // Radio returns this when we send $26 $01 as a read query (no freq included)
+            // Mode-only query response: <subCmd> <mode> <filter> [<datamode>]
+            // subCmd $00 = VFO A mode ($26 $00 query), subCmd $01 = VFO B mode ($26 $01 query)
+            subCmd := Ord(data[1]);
+            if subCmd = $00 then
+              vfoSlot := nrVFOA
+            else
+              vfoSlot := nrVFOB;
             modeNum := Ord(data[2]);
             case modeNum of
               $00: radioMode := rmLSB;
@@ -994,9 +1084,24 @@ begin
               $17: radioMode := rmDV;
               else radioMode := rmNone;
             end;
-            vfo[nrVFOB].Mode := radioMode;
-            logger.Info('[%s] VFO B mode ($26 $01 query): byte=$%.2x → TRadioMode=%d',
-               [radioModel, modeNum, Ord(radioMode)]);
+            // IC-7760 $26 mode-only response format: subCmd + mode + dataMode + filter
+            // data[2]=mode, data[3]=dataMode ($00=off, $01-$03=D1-D3), data[4]=filter
+            // NOTE: dataMode comes BEFORE filter — do not confuse with filter byte.
+            if SupportsDataMode and (radioMode in [rmUSB, rmLSB, rmFM, rmAM]) and
+               (Length(data) >= 3) and (Ord(data[3]) <> $00) then
+              begin
+              vfo[vfoSlot].Mode := rmData;
+              vfo[vfoSlot].dataMode := rmData;
+              logger.Info('[%s] VFO %s mode ($26 $%.2x query): mode=$%.2x + data mode D%d → rmData',
+                 [radioModel, IfThen(vfoSlot = nrVFOA, 'A', 'B'), subCmd, modeNum, Ord(data[3])]);
+              end
+            else
+              begin
+              vfo[vfoSlot].Mode := radioMode;
+              vfo[vfoSlot].dataMode := rmNone;
+              logger.Info('[%s] VFO %s mode ($26 $%.2x query): mode=$%.2x → TRadioMode=%d',
+                 [radioModel, IfThen(vfoSlot = nrVFOA, 'A', 'B'), subCmd, modeNum, Ord(radioMode)]);
+              end;
             end
           else
             logger.Warn('[%s] $26 response unexpected length %d, ignoring',
@@ -1176,24 +1281,29 @@ begin
   SendToRadio(BuildCIVCommand($25, CIV_SUBCMD_VFO_B));
 end;
 
-procedure TIcomRadio.QueryActiveVFO;
+procedure TIcomRadio.QueryVFOAMode;
 begin
-  // Read which VFO is currently selected on the radio.
-  // Response: $07 $00 = VFO A, $07 $01 = VFO B.
-  // Processed in ProcessCIVFrame $07 handler which sets FActiveVFO.
-  SendToRadio(BuildCIVCommand($07, ''));
+  // $26 $00 — reads VFO A mode when VFO B is active (symmetric to $26 $01 for VFO B).
+  // Only meaningful on extended-command radios; response handled in $26 handler by subCmd $00.
+  if FSupportsExtendedVFOBCommands then
+    SendToRadio(BuildCIVCommand($26, CIV_SUBCMD_VFO_A));
 end;
 
 procedure TIcomRadio.QueryVFOBMode;
 begin
-  // $26 returns VFO B frequency + mode in one frame.
-  // IC-7760 and other extended-command radios use sub-command $01.
-  // Standard Icoms use plain $26 with no sub-command.
-  // Not pushed by transceive — must be polled.  // Issue #566
+  // $26 $01 returns VFO B mode. Extended radios use sub-command $01, standard Icoms use plain $26.
   if FSupportsExtendedVFOBCommands then
     SendToRadio(BuildCIVCommand($26, CIV_SUBCMD_VFO_B))
   else
     SendToRadio(BuildCIVCommand($26, ''));
+end;
+
+procedure TIcomRadio.QueryActiveVFO;
+begin
+  // $07 $D2 read — returns $00 (main/VFO A active) or $01 (sub/VFO B active).
+  // Only supported on radios with FSupportsActiveVFOQuery = True (e.g. IC-7760).
+  if FSupportsActiveVFOQuery then
+    SendToRadio(BuildCIVCommand($07, #$D2));
 end;
 
 procedure TIcomRadio.QueryMode;
@@ -1234,20 +1344,16 @@ end;
 procedure TIcomRadio.PollRadioState;
 begin
   // Only poll states that CI-V transceive does NOT push automatically.
-  // Freq ($03/$00) and mode ($04/$01) are omitted — they arrive as transceive
-  // pushes when the VFO or mode changes. Polling them every second sent 7+
-  // commands per burst which overwhelmed the radio's CI-V input buffer and
-  // caused it to stop sending transceive pushes entirely (confirmed via log).
-  // $07 transceive push is not reliable across all radios/firmware versions —
-  // poll it every cycle so FActiveVFO stays current when the operator
-  // switches VFOs from the front panel.
-  logger.trace('[%s.PollRadioState] Polling RIT/XIT/Split/TX/VFOBMode/ActiveVFO', [radioModel]);
-  QueryActiveVFO;         // $07     — which VFO is selected (transceive push unreliable)
+  // VFO A freq/mode arrive via $00/$01 transceive pushes — polling $25 $00 every
+  // second would overwrite VFO A with physical VFO A when VFO B is active, fighting
+  // the transceive push. Leave VFO A entirely to the transceive mechanism.
+  // VFO B freq/mode are polled via $26 since transceive only pushes the active VFO.
+  logger.trace('[%s.PollRadioState] Polling RIT/XIT/Split/TX/ActiveVFO', [radioModel]);
   QueryRITState;          // $21 $01
   QueryXITState;          // $21 $02
   QuerySplitState;        // $0F
   QueryTXStatus;          // $1C $00
-  QueryVFOBMode;          // $26 $01 — VFO B freq+mode (not pushed by transceive)
+  QueryActiveVFO;         // $07 $D2 — keep FActiveVFO current; triggers refresh only on change
 end;
 
 // Radio control methods - basic implementations

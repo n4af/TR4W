@@ -36,6 +36,7 @@ begin
   RadioAddress := $B2;
   ControllerAddress := $E1;  // NOT the typical $E0
   radioModel := 'Icom IC-7760';
+  FSupportsActiveVFOQuery := True;  // IC-7760 supports $07 $D2 to read active VFO
   logger.Info('[TIcom7760Radio.Create] Created IC-7760 instance, CI-V=$B2, Controller=$E1');
 end;
 

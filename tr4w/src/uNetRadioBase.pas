@@ -188,8 +188,6 @@ Type TNetRadioBase = class(TObject)
       function Connect (address: string; port: integer): integer; overload;
       function VFOToString(whichVFO: TVFO): string;
       procedure UpdateLastValidResponse;  // Call when valid radio response received
-      function ActiveVFO: TVFO; virtual;  // Returns the VFO currently active on the radio (default: A)
-
       procedure Disconnect; overload; virtual;
       property IsTransmitting: boolean read GetIsTransmitting;
       property IsReceiving: boolean read GetIsReceiving;
@@ -215,7 +213,9 @@ Type TNetRadioBase = class(TObject)
       // Polling interface - radios override to send appropriate query commands
       procedure QueryVFOAFrequency; Virtual;     // Query VFO A frequency
       procedure QueryVFOBFrequency; Virtual;     // Query VFO B frequency
-      procedure QueryActiveVFO; Virtual;         // Query which VFO is currently selected
+      procedure QueryVFOAMode; Virtual;          // Query VFO A mode (Icom $26 $00)
+      procedure QueryVFOBMode; Virtual;          // Query VFO B mode (Icom $26 $01)
+      procedure QueryActiveVFO; Virtual;         // Query which VFO is active (Icom $07 $D2)
       procedure QueryMode; Virtual;              // Query current mode
       procedure QueryTXStatus; Virtual;          // Query TX/RX status
       procedure QueryRITState; Virtual;          // Query RIT on/off and value
@@ -333,9 +333,19 @@ begin
   // Default: do nothing - radio classes override
 end;
 
+procedure TNetRadioBase.QueryVFOAMode;
+begin
+  // Default: do nothing - Icom overrides with $26 $00
+end;
+
+procedure TNetRadioBase.QueryVFOBMode;
+begin
+  // Default: do nothing - Icom overrides with $26 $01
+end;
+
 procedure TNetRadioBase.QueryActiveVFO;
 begin
-  // Default: do nothing - radios that track active VFO (e.g. Icom) override
+  // Default: do nothing - Icom overrides with $07 $D2 where supported
 end;
 
 procedure TNetRadioBase.QueryMode;
@@ -366,11 +376,6 @@ end;
 procedure TNetRadioBase.QuerySplitState;
 begin
   // Default: do nothing - radio classes override
-end;
-
-function TNetRadioBase.ActiveVFO: TVFO;
-begin
-   Result := nrVFOA;  // Default: most radios are VFO-A centric; Icom overrides this
 end;
 
 procedure TNetRadioBase.PollRadioState;

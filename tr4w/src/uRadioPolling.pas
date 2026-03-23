@@ -763,13 +763,13 @@ begin
             // updates on every connect/reconnect without the user needing to touch the VFO.
             if Assigned(ro) then
                begin
-               logger.Debug('[pNetworkRadio] Querying initial freq/mode/activeVFO');
+               logger.Debug('[pNetworkRadio] Querying initial freq/mode');
+               ro.QueryActiveVFO;      // $07 $D2 — must be first so FActiveVFO is set before mode routing
                ro.QueryVFOAFrequency;
                ro.QueryVFOBFrequency;
-               ro.QueryMode;
-               // Issue #849: query active VFO so $00/$01 transceive pushes route correctly
-               // from the start (without this, FActiveVFO defaults to A even if B is selected)
-               ro.QueryActiveVFO;
+               ro.QueryMode;           // $04 — active VFO mode → routed to FActiveVFO slot
+               ro.QueryVFOAMode;       // $26 $00 — inactive VFO A mode (when VFO B is active)
+               ro.QueryVFOBMode;       // $26 $01 — VFO B mode + data mode
                end;
 
             // Poll the remaining states that transceive does not push
@@ -831,15 +831,15 @@ begin
                end;
             end;
 
-         rig^.CurrentStatus.Freq := ro.frequency[ro.ActiveVFO];
-         rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[ro.ActiveVFO]);
-         logger.Trace('[pNetworkRadio:%s] freq=%d mode=%d (TRadioMode) activeVFO=%d',
-                      [rig^.RadioName, ro.frequency[ro.ActiveVFO], Ord(ro.mode[ro.ActiveVFO]), Ord(ro.ActiveVFO)]);
-         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[ro.ActiveVFO],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
-         rig^.CurrentStatus.RITFreq :=  ro.RITOffset[ro.ActiveVFO];
+         rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
+         rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+         logger.Trace('[pNetworkRadio:%s] freq=%d mode=%d (TRadioMode)',
+                      [rig^.RadioName, ro.frequency[nrVFOA], Ord(ro.mode[nrVFOA])]);
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
+         rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
          rig^.CurrentStatus.Split := ro.IsSplitEnabled;
-         rig^.CurrentStatus.RIT := ro.IsRITOn[ro.ActiveVFO];
-         rig^.CurrentStatus.XIT := ro.IsXITOn[ro.ActiveVFO];
+         rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
+         rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
          rig^.CurrentStatus.TXOn := ro.IsTransmitting;
 
          // VFO A

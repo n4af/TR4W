@@ -46,6 +46,7 @@ begin
 
   // Radio identification
   radioModel := 'Icom IC-7610';
+  FSupportsActiveVFOQuery := True;  // Supports $07 $D2 Main/Sub band selection
 
   logger.Info('[TIcom7610Radio.Create] Created IC-7610 radio instance with CI-V address $98');
 end;

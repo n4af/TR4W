@@ -1159,7 +1159,8 @@ begin
         SetLength(Frame, FrameEnd - FrameStart + 1);
         Move(Data[FrameStart], Frame[1], Length(Frame));
 
-        logger.Trace('[IcomTransport:' + FRadioName + '] Extracted CI-V frame, len=%d', [Length(Frame)]);
+        if logger.IsTraceEnabled then
+           logger.Trace('[IcomTransport:' + FRadioName + '] CIV RX: %s', [BytesToHexStr(Frame[1], Length(Frame))]);
 
         // Forward to callback
         if Assigned(FOnCivData) then
