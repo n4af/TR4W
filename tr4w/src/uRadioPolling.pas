@@ -388,11 +388,6 @@ begin
                                                    begin
                                                       logger.trace('K3/K4/Kenwood2 says radio is RECEIVING');
                                                    end;
-                                                if radio1.CurrentStatus.TXOn
-                                                   then
-                                                   begin
-                                                      logger.trace('radio1.CurrentStatus.TXOn is true');
-                                                   end;
                                              end;
                                        end;
                                     end;
@@ -833,8 +828,6 @@ begin
 
          rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
          rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
-         logger.Trace('[pNetworkRadio:%s] freq=%d mode=%d (TRadioMode)',
-                      [rig^.RadioName, ro.frequency[nrVFOA], Ord(ro.mode[nrVFOA])]);
          GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
          rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
          rig^.CurrentStatus.Split := ro.IsSplitEnabled;

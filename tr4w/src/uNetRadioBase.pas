@@ -63,6 +63,7 @@ Type TReadingThread = class(TThread)
     procedure DoTerminate; override;
   public
     radioWasDisconnected: boolean;
+    radioName: string;  // Set after creation for radio-identified trace messages
     constructor Create(AConn: TIdTCPConnection; proc: TProcessMsgRef; ASocketLock: TCriticalSection; ADisconnecting: PBoolean); reintroduce; overload;
     constructor Create(ASerialPort: TSerialPort; proc: TProcessMsgRef; ASocketLock: TCriticalSection; ADisconnecting: PBoolean); reintroduce; overload;
     procedure ClearSerialBuffer;  // Clear accumulated serial buffer data
@@ -450,6 +451,7 @@ begin
       begin
       rt := TReadingThread.Create(socket, baseProcMsg, SocketLock, @Disconnecting);
       rt.readTerminator := Self.readTerminator;
+      rt.radioName := Self.rigLabel + ' ' + Self.radioModel;
       logger.Info('Created new reading thread');
       end
    else
@@ -595,6 +597,7 @@ begin
             begin
             rt := TReadingThread.Create(serialPortObj, baseProcMsg, SocketLock, @Disconnecting);
             rt.readTerminator := Self.readTerminator;
+            rt.radioName := Self.rigLabel + ' ' + Self.radioModel;
             logger.Info('[TNetRadioBase.Connect] Created serial reading thread');
             end;
 
@@ -747,13 +750,13 @@ begin
          if (Self.serialPort <> NoPort) and Assigned(serialPortObj) and serialPortObj.IsOpen then
             begin
             // Serial connection
-            logger.Trace('[%s SendToRadio] Sending to serial radio: (%s) Hex:[%s]',[Self.radioModel,s, String2Hex(s)]);
+            logger.Trace('[%s %s TX] (%s) Hex:[%s]',[Self.rigLabel, Self.radioModel, s, String2Hex(s)]);
             serialPortObj.WriteString(s + #13);  // K4 expects CR terminator
             end
          else if socket.Connected then
             begin
             // Network connection
-            logger.Trace('[%s SendToRadio] Sending to radio: (%s) Hex:[%s]',[Self.radioModel,s, String2Hex(s)]);
+            logger.Trace('[%s %s TX] (%s) Hex:[%s]',[Self.rigLabel, Self.radioModel, s, String2Hex(s)]);
             nLen := length(s);
             socket.IOHandler.WriteLn(s);
             //socket.IOHandler.Write(s,nLen,0);
@@ -1011,7 +1014,7 @@ begin
                      begin
                      // Add to buffer
                      FSerialBuffer := FSerialBuffer + cmd;
-                     logger.trace('[TNetRadioBase.TReadingThread.Execute] Serial received: (%s) Hex:[%s], Buffer now %d chars',[cmd, String2Hex(cmd), Length(FSerialBuffer)]);
+                     logger.trace('[%s RX] Serial received: (%s) Hex:[%s], Buffer now %d chars',[Self.radioName, cmd, String2Hex(cmd), Length(FSerialBuffer)]);
 
                      // Process complete commands (terminated by readTerminator)
                      while Pos(Self.readTerminator, FSerialBuffer) > 0 do
@@ -1022,7 +1025,7 @@ begin
 
                         if Length(completeCmd) > 0 then
                            begin
-                           logger.trace('[TNetRadioBase.TReadingThread.Execute] Processing command: Hex:[%s]',[String2Hex(completeCmd)]);
+                           logger.trace('[%s RX] Command: (%s) Hex:[%s]',[Self.radioName, completeCmd, String2Hex(completeCmd)]);
                            if Assigned(Self.msgHandler) then
                               begin
                               try
@@ -1061,7 +1064,7 @@ begin
             // NOTE: Do NOT lock during ReadLn - it's a blocking call!
             try
                cmd := FConn.IOHandler.ReadLn(Self.readTerminator);
-               logger.trace('[TNetRadioBase.TReadingThread.Execute] Cmd received: (%s)',[cmd]);
+               logger.trace('[%s RX] (%s)',[Self.radioName, cmd]);
 
                // Call message handler with exception protection
                try

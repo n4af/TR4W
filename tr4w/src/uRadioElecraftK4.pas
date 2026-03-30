@@ -633,14 +633,21 @@ begin
          logger.debug('[ProcessMessage] Received band number of %s',[sData]);
          end;
       3: begin             // DT
+         // DT updates only the remembered data sub-mode.
+         // The K4 sends DT responses even when in SSB/CW — the sub-mode register persists.
+         // vfo.mode must NOT be set here; doing so would overwrite a valid SSB/CW mode.
+         // The MD handler already applies vfo.datamode → vfo.mode when MD=6 arrives.
          sDataMode := AnsiLeftStr(sData,1);
          case StrToIntDef(sDataMode,-9) of
-            0: begin vfo.datamode := rmData;  vfo.mode := rmData;  end;
-            1: begin vfo.datamode := rmAFSK;  vfo.mode := rmAFSK;  end;
-            2: begin vfo.datamode := rmFSK;   vfo.mode := rmFSK;   end;
-            3: begin vfo.datamode := rmPSK;   vfo.mode := rmPSK;   end;
+            0: vfo.datamode := rmData;
+            1: vfo.datamode := rmAFSK;
+            2: vfo.datamode := rmFSK;
+            3: vfo.datamode := rmPSK;
             -9:logger.error('[ProcessMessage] Non-numeric passed with DT command (%s)',[sData]);
             end;
+         // If currently in a data mode, sync vfo.mode with the new sub-mode.
+         if vfo.mode in [rmData, rmDataRev, rmFSK, rmFSKRev, rmPSK, rmPSKRev, rmAFSK, rmAFSKRev] then
+            vfo.mode := vfo.datamode;
          end;
       4: begin             // FA
          hz := StrToIntDef(AnsiLeftStr(sData,11),-9);
@@ -692,7 +699,6 @@ begin
             vfo.mode := vfo.datamode
          else
             vfo.mode := Self.ModeStrToMode(AnsiLeftStr(sData,1),' ');
-         logger.trace('[ProcessMessage] Mode data = %s',[sData]);
          end;
       11:begin              // RT
          vfo.RITState := AnsiLeftStr(sData,1) = '1';
