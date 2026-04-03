@@ -14,7 +14,7 @@ unit uRadioFactory;
 interface
 
 uses
-   Windows, uNetRadioBase, uRadioElecraftK4, SysUtils, VC;
+   Windows, uNetRadioBase, uRadioElecraftK4, uFlexRadio6000, SysUtils, VC;
 
 type
    TRadioModel = (
@@ -185,7 +185,11 @@ begin
 
       rmFlexRadio6000:
          begin
-         raise ERadioFactoryException.Create('FlexRadio 6000 series not yet implemented');
+         Result := TFlexRadio6000.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         Result.radioModel := 'FlexRadio 6000';
+         logger.Info('[RadioFactory] Created FlexRadio 6000 instance');
          end;
 
       rmHamLibDirect:
@@ -386,7 +390,10 @@ begin
 
       rmFlexRadio6000:
          begin
-         raise ERadioFactoryException.Create('FlexRadio 6000 does not support serial connections');
+         // FlexRadio 6000 serial is not handled by the factory — the caller's
+         // legacy serial path handles it directly.  Return nil to signal this.
+         logger.Warn('[RadioFactory] FlexRadio 6000 serial not handled by factory — use legacy serial path');
+         Result := nil;
          end;
 
       rmHamLibDirect:
@@ -446,7 +453,7 @@ begin
              '  - Elecraft K3 (planned)'#13#10 +
              '  - Yaesu FTdx101 (planned)'#13#10 +
              '  - Yaesu FT-991 (planned)'#13#10 +
-             '  - FlexRadio 6000 (planned)';
+             '  - FlexRadio 6000 (implemented)';
 end;
 
 class function TRadioFactory.IsModelSupported(model: TRadioModel): boolean;
@@ -462,6 +469,7 @@ begin
              (model = rmIcomIC7850) or
              (model = rmIcomIC905) or
              (model = rmIcomIC7100) or
+             (model = rmFlexRadio6000) or
              (model = rmHamLibDirect);
 end;
 
