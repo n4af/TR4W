@@ -48,6 +48,7 @@ type TFlexRadio6000 = class(TNetRadioBase)
       procedure ParseStatusLine(const line: string);
       procedure ProcessSliceStatus(const payload: string);
       procedure ProcessInterlockStatus(const payload: string);
+      procedure ProcessTransmitStatus(const payload: string);
       procedure SendSubscriptions;
 
    public
@@ -211,8 +212,12 @@ begin
 end;
 
 procedure TFlexRadio6000.SendFlexCmd(cmd: string);
+var
+   fullCmd: string;
 begin
-   inherited SendToRadio(Format('C%d|%s', [NextSeq, cmd]));
+   fullCmd := Format('C%d|%s', [NextSeq, cmd]);
+   logger.Info('[FlexRadio6000 TX] %s', [fullCmd]);
+   inherited SendToRadio(fullCmd);
 end;
 
 function TFlexRadio6000.SliceForVFO(whichVFO: TVFO): integer;
@@ -234,12 +239,16 @@ end;
 procedure TFlexRadio6000.SendSubscriptions;
 begin
    logger.Info('[FlexRadio6000] Sending subscription sequence');
-   SendFlexCmd('client udpport 4995');
-   SendFlexCmd('sub pan all');
+   // sub slice all: frequency, mode, RIT/XIT, split — core VFO state
+   // sub tx all:    TX/interlock status (transmitting, PTT)
+   // keepalive disable: prevents the radio from disconnecting us on a keepalive timeout
+   // Deliberately omitted:
+   //   sub pan all  — panadapter/display data; the pan handle we need for SetBand
+   //                  is included in the slice status (pan= key), so this is redundant
+   //   sub spot all — DX spots handled by TR4W's own cluster connection
+   //   client udpport — we do not consume VITA-49 UDP streams
+   //   info / meter list — not used by TR4W
    SendFlexCmd('sub slice all');
-   SendFlexCmd('sub spot all');
-   SendFlexCmd('info');
-   SendFlexCmd('meter list');
    SendFlexCmd('sub tx all');
    SendFlexCmd('keepalive disable');
 end;
@@ -356,6 +365,10 @@ begin
       begin
       ProcessInterlockStatus(payload);
       end
+   else if typeWord = 'transmit' then
+      begin
+      ProcessTransmitStatus(payload);
+      end
    else
       begin
       logger.Debug('[FlexRadio6000.ParseStatusLine] Ignoring status type: %s', [typeWord]);
@@ -381,6 +394,7 @@ var
    dotPos:      integer;
    fracStr:     string;
    freqHz:      integer;
+   parsedMode:  TRadioMode;
 begin
    // Payload: '<sliceNum> RF_frequency=<mhz> mode=<m> rit_on=<0/1> ...'
    sliceNumStr := SplitDelimiter(payload, ' ', 0);
@@ -422,6 +436,7 @@ begin
          if (mhzInt >= 0) and (mhzFrac >= 0) then
             begin
             freqHz           := (mhzInt * 1000000) + mhzFrac;
+            logger.Info('[FlexRadio6000] RF_frequency push: slice %d → %d Hz', [sliceNum, freqHz]);
             vfoObj.frequency := freqHz;
             vfoObj.band      := FreqToRadioBand(freqHz);
             end
@@ -436,11 +451,16 @@ begin
          end;
       end;
 
-   // Mode
+   // Mode — only store if a real mode was returned; OFF/unknown returns rmNone
+   // and must not overwrite the last good mode (OFF is a transient slice state)
    modeStr := ParseKeyValue(payload, 'mode');
    if modeStr <> '' then
       begin
-      vfoObj.mode := FlexModeToRadioMode(modeStr);
+      parsedMode := FlexModeToRadioMode(modeStr);
+      if parsedMode <> rmNone then
+         begin
+         vfoObj.mode := parsedMode;
+         end;
       end;
 
    // RIT
@@ -518,6 +538,63 @@ begin
 end;
 
 // ---------------------------------------------------------------------------
+// ProcessTransmitStatus — handles 'S<handle>|transmit freq=<MHz> ...' pushes.
+//
+// After a 'slice tune' command, the FlexRadio sends a transmit-type status
+// line (NOT a slice RF_frequency update) as the first confirmation.  We parse
+// the freq= key and update VFO A so the TR4W display reflects the new frequency
+// without waiting for a subsequent slice push.
+//
+// Limitation: In split mode the TX frequency differs from the RX frequency;
+// this path updates VFO A (RX) from the TX freq push, which would be wrong.
+// Split is not yet implemented, so this is safe for the current release.
+// ---------------------------------------------------------------------------
+procedure TFlexRadio6000.ProcessTransmitStatus(const payload: string);
+var
+   freqStr: string;
+   dotPos:  integer;
+   mhzInt:  integer;
+   mhzFrac: integer;
+   fracStr: string;
+   freqHz:  integer;
+begin
+   freqStr := ParseKeyValue(payload, 'freq');
+   if freqStr = '' then
+      begin
+      Exit;
+      end;
+
+   dotPos := Pos('.', freqStr);
+   if dotPos = 0 then
+      begin
+      logger.Warn('[FlexRadio6000.ProcessTransmitStatus] freq value missing decimal: %s', [freqStr]);
+      Exit;
+      end;
+
+   mhzInt  := StrToIntDef(Copy(freqStr, 1, dotPos - 1), -1);
+   fracStr := Copy(freqStr, dotPos + 1, 6);
+   while Length(fracStr) < 6 do
+      begin
+      fracStr := fracStr + '0';
+      end;
+   mhzFrac := StrToIntDef(fracStr, -1);
+
+   if (mhzInt >= 0) and (mhzFrac >= 0) then
+      begin
+      freqHz := (mhzInt * 1000000) + mhzFrac;
+      logger.Info('[FlexRadio6000] transmit freq push: %d Hz → updating VFO A', [freqHz]);
+      // In non-split mode TX freq = RX freq; update VFO A so the display reflects
+      // the tuned frequency immediately (before any subsequent slice push arrives).
+      Self.vfo[nrVFOA].frequency := freqHz;
+      Self.vfo[nrVFOA].band      := FreqToRadioBand(freqHz);
+      end
+   else
+      begin
+      logger.Warn('[FlexRadio6000.ProcessTransmitStatus] Bad freq value: %s', [freqStr]);
+      end;
+end;
+
+// ---------------------------------------------------------------------------
 // Mode mapping
 // ---------------------------------------------------------------------------
 
@@ -525,7 +602,8 @@ function TFlexRadio6000.FlexModeToRadioMode(const sMode: string): TRadioMode;
 begin
    // AnsiIndexText is case-insensitive, which makes this robust to firmware variations
    case AnsiIndexText(sMode, ['USB', 'LSB', 'CW', 'CWL', 'AM', 'SAM',
-                               'FM', 'NFM', 'DFM', 'DIGU', 'DIGL', 'RTTY']) of
+                               'FM', 'NFM', 'DFM', 'DIGU', 'DIGL', 'RTTY',
+                               'OFF']) of
       0:  Result := rmUSB;
       1:  Result := rmLSB;
       2:  Result := rmCW;
@@ -538,6 +616,12 @@ begin
       9:  Result := rmData;
       10: Result := rmDataRev;
       11: Result := rmFSK;     // RTTY
+      12:
+         begin
+         // OFF = slice disabled or transitioning — do not overwrite last good mode
+         logger.Debug('[FlexRadio6000.FlexModeToRadioMode] Slice mode is OFF (transitioning)');
+         Result := rmNone;
+         end;
    else
       begin
       logger.Warn('[FlexRadio6000.FlexModeToRadioMode] Unknown Flex mode string: "%s"', [sMode]);
@@ -598,10 +682,10 @@ end;
 
 procedure TFlexRadio6000.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
 begin
-   // Frequency is sent in MHz with 6 decimal places.
-   // Integer arithmetic is used — never FloatToStr or Format('%.6f') — to avoid
-   // locale decimal separator issues (e.g., '14,156400' on German Windows is rejected).
-   SendFlexCmd(Format('slice t %d freq=%d.%06d',
+   // Frequency is set via "slice tune <index> <MHz>" — NOT "slice set RF_frequency".
+   // RF_frequency is a read-only status key pushed by the radio; slice tune is the
+   // write command.  Integer arithmetic avoids locale decimal separator issues.
+   SendFlexCmd(Format('slice tune %d %d.%06d',
                [SliceForVFO(vfo), freq div 1000000, freq mod 1000000]));
    if mode <> rmNone then
       begin

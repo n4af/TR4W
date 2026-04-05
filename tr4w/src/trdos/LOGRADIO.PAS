@@ -2469,7 +2469,10 @@ begin
                logger.trace('Total CW Elements for %s = %d',[sMsg,elements]);
                localMsg := Format(formatStr, [sMsg]);
                Self.EnableCWBYCATTimer( Round(1200 / DisplayedCodeSpeed) * elements); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
-               AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
+               if Self.tNetObject <> nil then
+                  Self.tNetObject.SendToRadio(localMsg)
+               else
+                  AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
                logger.trace('Adding K/E/F radio CW string to buffer');
                Self.CWByCAT_Sending := true;
                logger.trace('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
@@ -2747,6 +2750,8 @@ begin
          Result := rmIcomIC905;
       IC7100:
          Result := rmIcomIC7100;
+      FLEX:
+         Result := rmFlexRadio6000;
    else
       Result := rmNone;
    end;
@@ -2868,6 +2873,26 @@ begin
                logger.Error('[%s.SetUpRadioInterface] Failed to create %s serial radio',
                            [Self.RadioName, TRadioFactory.ModelToString(factoryModel)]);
 
+            // Initialize timer and event handlers — must happen for all radio paths
+            Self.EventHandlers := EventHandlers;
+            Self.tmrCWByCAT := TTimer.Create(nil);
+            Self.tmrCWByCAT.Enabled := false;
+            Self.tmrCWByCAT.OnTimer := Self.EventHandlers.OnTimerTick;
+            // Reset filtered status
+            with FilteredStatus do
+               begin
+               Band := NoBand;
+               Mode := NoMode;
+               Freq := 0;
+               end;
+            // Send startup command if configured
+            if length(Self.StartupCommand) > 0 then
+               begin
+               if Self.tNetObject <> nil then
+                  begin
+                  Self.tNetObject.SendToRadio(Self.StartupCommand);
+                  end;
+               end;
             // Exit to prevent any legacy serial code from executing
             Exit;
             end;
