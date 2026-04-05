@@ -35,6 +35,7 @@ type TFlexRadio6000 = class(TNetRadioBase)
       FHandshakeDone: boolean;   // True once H line received and subscriptions have been sent
       FSlice0TX:      boolean;   // True when slice 0 is the current TX slice
       FSlice1TX:      boolean;   // True when slice 1 is the current TX slice
+      FCWBuffer:      string;    // Accumulates characters until SendCW flushes them
       logger:         TLogLogger;
 
       function  NextSeq: integer;
@@ -104,6 +105,7 @@ begin
    FHandshakeDone    := False;
    FSlice0TX         := True;
    FSlice1TX         := False;
+   FCWBuffer         := '';
 end;
 
 function TFlexRadio6000.Connect: integer;
@@ -712,25 +714,71 @@ end;
 // CW — not supported via TCP API
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// CW — SmartSDR CWX subsystem
+//
+// The radio maintains its own character queue.  TR4W follows the same
+// buffer/flush pattern used by TK4Radio:
+//   BufferCW  — appends characters to FCWBuffer (no radio contact yet)
+//   SendCW    — flushes FCWBuffer to the radio via 'cwx send "<text>"'
+//   StopCW    — cancels any queued/in-progress CW via 'cwx clear'
+//
+// Space encoding: SmartSDR uses ASCII 127 (DEL, \u007f) inside quoted
+// cwx send strings to represent word-spaces, because a literal space
+// would terminate the quoted token.  Any space in FCWBuffer is replaced
+// before the command is sent.
+//
+// Speed range: SmartSDR accepts 5–100 WPM for 'cwx wpm'.  TR4W typically
+// stays within 5–60 WPM, well inside that range.
+// ---------------------------------------------------------------------------
+
 procedure TFlexRadio6000.BufferCW(cwChars: string);
 begin
-   logger.Warn('[FlexRadio6000.BufferCW] CW injection not supported via SmartSDR TCP/IP API — use hardware keyer jack');
+   FCWBuffer := FCWBuffer + cwChars;
+   logger.Info('[FlexRadio6000.BufferCW] Buffered: "%s"  total: "%s"',
+               [cwChars, FCWBuffer]);
 end;
 
 procedure TFlexRadio6000.SendCW;
+var
+   encoded: string;
+   i:       integer;
 begin
-   logger.Warn('[FlexRadio6000.SendCW] CW injection not supported via SmartSDR TCP/IP API — use hardware keyer jack');
+   if FCWBuffer = '' then
+      begin
+      logger.Warn('[FlexRadio6000.SendCW] Buffer empty — nothing to send');
+      Exit;
+      end;
+
+   // Replace spaces with char 127 (SmartSDR word-space encoding inside quotes)
+   encoded := '';
+   for i := 1 to Length(FCWBuffer) do
+      begin
+      if FCWBuffer[i] = ' ' then
+         begin
+         encoded := encoded + #127;
+         end
+      else
+         begin
+         encoded := encoded + FCWBuffer[i];
+         end;
+      end;
+
+   logger.Info('[FlexRadio6000.SendCW] Sending CW: "%s"', [FCWBuffer]);
+   SendFlexCmd('cwx send "' + encoded + '"');
+   FCWBuffer := '';
 end;
 
 procedure TFlexRadio6000.StopCW;
 begin
-   logger.Warn('[FlexRadio6000.StopCW] CW injection not supported via SmartSDR TCP/IP API — use hardware keyer jack');
+   FCWBuffer := '';
+   SendFlexCmd('cwx clear');
 end;
 
 procedure TFlexRadio6000.SetCWSpeed(speed: integer);
 begin
    Self.localCWSpeed := speed;
-   SendFlexCmd(Format('transmit set speed=%d', [speed]));
+   SendFlexCmd(Format('cwx wpm %d', [speed]));
 end;
 
 // ---------------------------------------------------------------------------
