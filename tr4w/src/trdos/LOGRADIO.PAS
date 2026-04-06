@@ -2413,10 +2413,17 @@ begin
 //            msgLen := length(Msg);              //length(Msg);
             //len := Min(msgLen, 24);             // 24 max for Kenwood
             case RadioModel of
-               TS480, TS570, TS590, TS950, TS990, TS2000, FLEX:
+               TS480, TS570, TS590, TS950, TS990, TS2000:
                   begin
                   maxLen := 24;
                   pad := true;
+                  end;
+               FLEX:
+                  begin
+                  // cwx send has no length limit and no padding requirement.
+                  // Flex serial (KY path) uses 24/pad like Kenwood — handled below.
+                  maxLen := 24;
+                  pad := (Self.tCATPortType <> Network);
                   end;
                K2, K3, K4:
                   begin

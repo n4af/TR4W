@@ -19,7 +19,7 @@ unit uFlexRadio6000;
 
   Known limitations:
     - CW injection is not supported via TCP; use the radio's hardware keyer jack.
-    - Split mode is not yet implemented (deferred — requires slice create/assign logic).
+    - Split mode: slice set 0 tx=0 + slice set 1 tx=1. Slice 1 must exist (SmartSDR creates it).
 }
 
 interface
@@ -35,6 +35,7 @@ type TFlexRadio6000 = class(TNetRadioBase)
       FHandshakeDone: boolean;   // True once H line received and subscriptions have been sent
       FSlice0TX:      boolean;   // True when slice 0 is the current TX slice
       FSlice1TX:      boolean;   // True when slice 1 is the current TX slice
+      FSlice1Exists:  boolean;   // True once a slice 1 status push has been received
       FCWBuffer:      string;    // Accumulates characters until SendCW flushes them
       logger:         TLogLogger;
 
@@ -105,6 +106,7 @@ begin
    FHandshakeDone    := False;
    FSlice0TX         := True;
    FSlice1TX         := False;
+   FSlice1Exists     := False;
    FCWBuffer         := '';
 end;
 
@@ -115,6 +117,7 @@ begin
    FHandshakeDone      := False;
    FClientHandle       := '';
    FPanHandle          := '';
+   FSlice1Exists       := False;
    FCmdSeq             := 0;
    Result := inherited Connect;
    // Note: the base class OnRadioConnected sends 'ID;' after the TCP connection
@@ -409,6 +412,11 @@ begin
    else if sliceNum = 1 then
       begin
       whichVFO := nrVFOB;
+      if not FSlice1Exists then
+         begin
+         FSlice1Exists := True;
+         logger.Info('[FlexRadio6000] Slice 1 detected — split available');
+         end;
       end
    else
       begin
@@ -587,6 +595,7 @@ begin
       logger.Info('[FlexRadio6000] transmit freq push: %d Hz → updating VFO A', [freqHz]);
       // In non-split mode TX freq = RX freq; update VFO A so the display reflects
       // the tuned frequency immediately (before any subsequent slice push arrives).
+      // In split mode this will show TX freq — acceptable for contest use.
       Self.vfo[nrVFOA].frequency := freqHz;
       Self.vfo[nrVFOA].band      := FreqToRadioBand(freqHz);
       end
@@ -850,11 +859,32 @@ end;
 
 procedure TFlexRadio6000.Split(splitOn: boolean);
 begin
-   // TODO: Implement split by reassigning the TX slice:
-   //   Enable:  slice set 0 tx=0  +  slice set 1 tx=1
-   //   Disable: slice set 0 tx=1  +  slice set 1 tx=0
-   // Requires slice 1 to already exist in SmartSDR.  Deferred pending live testing.
-   logger.Warn('[FlexRadio6000.Split] Split mode not yet implemented for FlexRadio 6000');
+   if splitOn then
+      begin
+      // Create slice 1 if it does not yet exist, using the same panadapter as slice 0.
+      // If it already exists (from a previous split or SmartSDR), reuse it.
+      if not FSlice1Exists then
+         begin
+         if FPanHandle = '' then
+            begin
+            logger.Warn('[FlexRadio6000.Split] Pan handle not yet known — cannot create slice 1');
+            Exit;
+            end;
+         logger.Info('[FlexRadio6000] Creating slice 1 for split on pan %s', [FPanHandle]);
+         SendFlexCmd(Format('slice create pan=%s mode=CW', [FPanHandle]));
+         // FSlice1Exists will be set True when the radio pushes the slice 1 status
+         end;
+      // Assign TX to slice 1; keep slice 0 as the active RX slice
+      SendFlexCmd('slice set 1 tx=1');
+      SendFlexCmd('slice set 0 tx=0');
+      SendFlexCmd('slice set 0 active=1');
+      end
+   else
+      begin
+      // Return TX to slice 0; leave slice 1 in place (matches DXCommander behaviour)
+      SendFlexCmd('slice set 0 tx=1');
+      SendFlexCmd('slice set 1 tx=0');
+      end;
 end;
 
 // ---------------------------------------------------------------------------
