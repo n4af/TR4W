@@ -2470,7 +2470,7 @@ begin
                Self.EnableCWBYCATTimer( Round(1200 / DisplayedCodeSpeed) * elements); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
                // Flex over TCP: delegate to the factory object's cwx API.
                // Flex over serial falls through to the legacy KY path below.
-               if (RadioModel = FLEX) and (Self.tNetObject <> nil) and (Self.IPAddress <> '') then
+               if (RadioModel = FLEX) and (Self.tNetObject <> nil) and (Self.tCATPortType = Network) then
                   begin
                   Self.tNetObject.BufferCW(sMsg);
                   Self.tNetObject.SendCW;
