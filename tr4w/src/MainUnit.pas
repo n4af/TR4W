@@ -159,6 +159,7 @@ var
   Switch: boolean = False;
   SwitchNext: boolean = False; // 4.52.3
   CallWinKeyDown: boolean = False; // 4.52.4
+  CallWindowCharConsumed: boolean = False; // set by CallWindowKeyDownProc when it fully handles a char
   FontS: integer;
   FirstQSO: Cardinal;
   T1: Cardinal;
@@ -2213,14 +2214,8 @@ var
   nCmdShow: integer;
 begin
 
-  if ActiveRadioPtr.CurrentStatus.Split then
-  begin
-    QuickDisplay(TC_Split_Warn); //N4AF 4.31.3 // NY4I reformatted
-  end
-  else //N4AF 4.31.3
-  begin
-    QuickDisplay(nil);
-  end;
+  // Split warning is driven by DisplayCurrentStatus (uRadioPolling) on confirmed
+  // state transitions — not here, where CurrentStatus.Split may be stale.
   // SetMainWindowText(mweName, nil);
   // CallDataBase.ClearDataEntry;
   SetMainWindowText(mweName, '');
@@ -2481,8 +2476,10 @@ begin
 
   DisplayInsertMode;
 
-  Radio1.FreqWindowHandle := wh[mweRadioOneFreq];
-  Radio2.FreqWindowHandle := wh[mweRadioTwoFreq];
+  Radio1.FreqWindowHandle   := wh[mweRadioOneFreq];
+  Radio1.RadioNameWndHandle := wh[mweRadioOne];
+  Radio2.FreqWindowHandle   := wh[mweRadioTwoFreq];
+  Radio2.RadioNameWndHandle := wh[mweRadioTwo];
 
   LastProgressBar := CreateProgress32InMainWindow(ws * 28 {col6},
     EditableLogHeight + 10 * ws {Line4}, $000000FF);
@@ -2710,6 +2707,20 @@ begin
         end;
       end;
     end;
+
+    if (lParam = integer(wh[mweRadioOneFreq])) or
+       (lParam = integer(wh[mweRadioOne])) then
+       begin
+       if Radio1.RadioDisconnected then
+          TempWindowColor := tr4wColorsArray[AlertColor];
+       end;
+
+    if (lParam = integer(wh[mweRadioTwoFreq])) or
+       (lParam = integer(wh[mweRadioTwo])) then
+       begin
+       if Radio2.RadioDisconnected then
+          TempWindowColor := tr4wColorsArray[AlertColor];
+       end;
 
     goto DrawWindow;
   end;
@@ -3771,6 +3782,7 @@ begin
   begin
     tr4w_alt_n_transmit_frequency; // Note this is a toggle
     tCleareCallWindow;
+    CallWindowCharConsumed := True; // prevent WM_CHAR from inserting '-' into the cleared field
     Exit;
   end;
   // start sending now code

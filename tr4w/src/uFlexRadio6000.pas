@@ -35,6 +35,7 @@ type TFlexRadio6000 = class(TNetRadioBase)
       FHandshakeDone: boolean;   // True once H line received and subscriptions have been sent
       FSlice0TX:      boolean;   // True when slice 0 is the current TX slice
       FSlice1TX:      boolean;   // True when slice 1 is the current TX slice
+      FSlice0Valid:   boolean;   // True once slice 0 is confirmed in-use; False on in_use=0
       FSlice1Exists:  boolean;   // True once a slice 1 status push has been received
       FCWBuffer:      string;    // Accumulates characters until SendCW flushes them
       logger:         TLogLogger;
@@ -52,6 +53,9 @@ type TFlexRadio6000 = class(TNetRadioBase)
       procedure ProcessInterlockStatus(const payload: string);
       procedure ProcessTransmitStatus(const payload: string);
       procedure SendSubscriptions;
+
+   protected
+      function  GetIsOperational: boolean; override;
 
    public
       constructor Create;
@@ -106,6 +110,7 @@ begin
    FHandshakeDone    := False;
    FSlice0TX         := True;
    FSlice1TX         := False;
+   FSlice0Valid      := False;
    FSlice1Exists     := False;
    FCWBuffer         := '';
 end;
@@ -117,6 +122,7 @@ begin
    FHandshakeDone      := False;
    FClientHandle       := '';
    FPanHandle          := '';
+   FSlice0Valid        := False;
    FSlice1Exists       := False;
    FCmdSeq             := 0;
    Result := inherited Connect;
@@ -255,6 +261,8 @@ begin
    //   info / meter list — not used by TR4W
    SendFlexCmd('sub slice all');
    SendFlexCmd('sub tx all');
+   // keepalive disable: radio will not enforce a ping timeout.
+   // See issue #856 for future improvement to keepalive enable + ping.
    SendFlexCmd('keepalive disable');
 end;
 
@@ -380,6 +388,13 @@ begin
       end;
 end;
 
+function TFlexRadio6000.GetIsOperational: boolean;
+begin
+   // Flex is operational only when slice 0 is valid (in_use=1).
+   // TCP may be connected while SmartSDR is gone and slices have been torn down.
+   Result := FSlice0Valid;
+end;
+
 procedure TFlexRadio6000.ProcessSliceStatus(const payload: string);
 var
    sliceNumStr: string;
@@ -408,10 +423,43 @@ begin
    if sliceNum = 0 then
       begin
       whichVFO := nrVFOA;
+      // Track slice 0 validity — when SmartSDR closes, it pushes in_use=0.
+      // IsOperational returns FSlice0Valid; the polling loop uses this to set
+      // the alert color even though the TCP connection is still up.
+      if ParseKeyValue(payload, 'in_use') = '0' then
+         begin
+         if FSlice0Valid then
+            begin
+            FSlice0Valid := False;
+            logger.Info('[FlexRadio6000] Slice 0 removed (in_use=0) — radio not operational');
+            end;
+         Exit;
+         end;
+      if not FSlice0Valid then
+         begin
+         FSlice0Valid := True;
+         logger.Info('[FlexRadio6000] Slice 0 confirmed in-use — radio operational');
+         end;
       end
    else if sliceNum = 1 then
       begin
       whichVFO := nrVFOB;
+      // If slice 1 is being removed (SmartSDR closed it), clear split state and exit.
+      // The radio pushes 'in_use=0' when a slice is deallocated.
+      if ParseKeyValue(payload, 'in_use') = '0' then
+         begin
+         if FSlice1Exists then
+            begin
+            FSlice1Exists          := False;
+            FSlice1TX              := False;
+            FSlice0TX              := True;
+            Self.localSplitEnabled := False;
+            Self.vfo[nrVFOB].frequency := 0;
+            Self.vfo[nrVFOB].band      := rbNone;
+            logger.Info('[FlexRadio6000] Slice 1 removed — split cleared, VFO B reset');
+            end;
+         Exit;
+         end;
       if not FSlice1Exists then
          begin
          FSlice1Exists := True;
@@ -510,6 +558,11 @@ begin
       else
          begin
          FSlice1TX := txStr = '1';
+         // When slice 1 loses TX, TX must be returning to slice 0.
+         // FSlice0TX may be stale (e.g. split was enabled externally via SmartSDR
+         // without TR4W setting FSlice0TX := False), so force it here.
+         if not FSlice1TX then
+            FSlice0TX := True;
          end;
       Self.localSplitEnabled := not FSlice0TX;
       end;
@@ -550,23 +603,21 @@ end;
 // ---------------------------------------------------------------------------
 // ProcessTransmitStatus — handles 'S<handle>|transmit freq=<MHz> ...' pushes.
 //
-// After a 'slice tune' command, the FlexRadio sends a transmit-type status
-// line (NOT a slice RF_frequency update) as the first confirmation.  We parse
-// the freq= key and update VFO A so the TR4W display reflects the new frequency
-// without waiting for a subsequent slice push.
-//
-// Limitation: In split mode the TX frequency differs from the RX frequency;
-// this path updates VFO A (RX) from the TX freq push, which would be wrong.
-// Split is not yet implemented, so this is safe for the current release.
+// 'transmit freq=' always carries the TX slice's frequency.
+// 'TX_slice_index=' in the same push tells us which slice is TX.
+// We parse TX_slice_index directly rather than relying on the cached FSlice0TX,
+// which may not yet reflect the new state if this push arrives before the
+// corresponding 'slice N tx=' push (e.g. when SmartSDR disables split).
 // ---------------------------------------------------------------------------
 procedure TFlexRadio6000.ProcessTransmitStatus(const payload: string);
 var
-   freqStr: string;
-   dotPos:  integer;
-   mhzInt:  integer;
-   mhzFrac: integer;
-   fracStr: string;
-   freqHz:  integer;
+   freqStr:  string;
+   dotPos:   integer;
+   mhzInt:   integer;
+   mhzFrac:  integer;
+   fracStr:  string;
+   freqHz:   integer;
+   txVFO:    TVFO;
 begin
    freqStr := ParseKeyValue(payload, 'freq');
    if freqStr = '' then
@@ -592,12 +643,17 @@ begin
    if (mhzInt >= 0) and (mhzFrac >= 0) then
       begin
       freqHz := (mhzInt * 1000000) + mhzFrac;
-      logger.Info('[FlexRadio6000] transmit freq push: %d Hz → updating VFO A', [freqHz]);
-      // In non-split mode TX freq = RX freq; update VFO A so the display reflects
-      // the tuned frequency immediately (before any subsequent slice push arrives).
-      // In split mode this will show TX freq — acceptable for contest use.
-      Self.vfo[nrVFOA].frequency := freqHz;
-      Self.vfo[nrVFOA].band      := FreqToRadioBand(freqHz);
+      // Route to the TX VFO using FSlice0TX.
+      // FSlice0TX is set optimistically in Split() before the radio confirms,
+      // so it is always current by the time this push arrives.
+      if FSlice0TX then
+         txVFO := nrVFOA
+      else
+         txVFO := nrVFOB;
+      logger.Info('[FlexRadio6000] transmit freq push: %d Hz → updating VFO %s',
+                  [freqHz, VFOToString(txVFO)]);
+      Self.vfo[txVFO].frequency := freqHz;
+      Self.vfo[txVFO].band      := FreqToRadioBand(freqHz);
       end
    else
       begin
@@ -700,6 +756,21 @@ begin
    // write command.
    // Delphi 7 Format('%06d') pads with spaces, not zeros — build the fractional
    // part manually: adding 1000000 guarantees 7 digits, Copy strips the leading '1'.
+
+   // Always update the internal VFO object — this is the desired frequency
+   // regardless of whether the backing slice currently exists.
+   Self.vfo[vfo].frequency := freq;
+   Self.vfo[vfo].band      := FreqToRadioBand(freq);
+
+   // Only send the tune command to the radio if the slice exists.
+   // For VFO B: slice 1 may not exist yet (split not active). The stored
+   // frequency will be applied by Split(True) when it creates the slice.
+   if (vfo = nrVFOB) and (not FSlice1Exists) then
+      begin
+      logger.Info('[FlexRadio6000.SetFrequency] VFO B freq %d Hz stored — slice 1 not yet created, will apply on Split', [freq]);
+      Exit;
+      end;
+
    fracStr := Copy(IntToStr(1000000 + (freq mod 1000000)), 2, 6);
    SendFlexCmd(Format('slice tune %d %d.%s',
                [SliceForVFO(vfo), freq div 1000000, fracStr]));
@@ -858,6 +929,8 @@ end;
 // ---------------------------------------------------------------------------
 
 procedure TFlexRadio6000.Split(splitOn: boolean);
+var
+   fracStr: string;
 begin
    if splitOn then
       begin
@@ -872,8 +945,22 @@ begin
             end;
          logger.Info('[FlexRadio6000] Creating slice 1 for split on pan %s', [FPanHandle]);
          SendFlexCmd(Format('slice create pan=%s mode=CW', [FPanHandle]));
-         // FSlice1Exists will be set True when the radio pushes the slice 1 status
+         // FSlice1Exists will be set True when the radio pushes the slice 1 status.
+         // If a VFO B frequency was stored before the slice existed, apply it now.
+         if Self.vfo[nrVFOB].frequency > 0 then
+            begin
+            fracStr := Copy(IntToStr(1000000 + (Self.vfo[nrVFOB].frequency mod 1000000)), 2, 6);
+            logger.Info('[FlexRadio6000.Split] Applying stored VFO B freq %d Hz to new slice 1', [Self.vfo[nrVFOB].frequency]);
+            SendFlexCmd(Format('slice tune 1 %d.%s',
+                        [Self.vfo[nrVFOB].frequency div 1000000, fracStr]));
+            end;
          end;
+      // Update TX state optimistically before the radio echoes back.
+      // This ensures ProcessTransmitStatus routes the imminent 'transmit freq='
+      // push to VFO B rather than VFO A (the push arrives before the slice tx= confirmation).
+      FSlice0TX          := False;
+      FSlice1TX          := True;
+      Self.localSplitEnabled := True;
       // Assign TX to slice 1; keep slice 0 as the active RX slice
       SendFlexCmd('slice set 1 tx=1');
       SendFlexCmd('slice set 0 tx=0');
@@ -881,6 +968,10 @@ begin
       end
    else
       begin
+      // Update TX state optimistically (same reason as above)
+      FSlice0TX          := True;
+      FSlice1TX          := False;
+      Self.localSplitEnabled := False;
       // Return TX to slice 0; leave slice 1 in place (matches DXCommander behaviour)
       SendFlexCmd('slice set 0 tx=1');
       SendFlexCmd('slice set 1 tx=0');

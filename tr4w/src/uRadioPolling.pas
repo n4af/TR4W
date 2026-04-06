@@ -722,6 +722,24 @@ var
 const
    RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
    RECONNECT_MAX_DELAY = 30000;       // 30 seconds max delay
+
+   // SetRadioAlertState — set or clear RadioDisconnected flag and repaint freq/name
+   // windows only on a state transition (guarded by current flag value).
+   procedure SetRadioAlertState(alertOn: boolean);
+   begin
+      if alertOn = rig^.RadioDisconnected then
+         Exit;   // No change — do not call InvalidateRect unnecessarily
+      rig^.RadioDisconnected := alertOn;
+      if alertOn then
+         logger.Info('[pNetworkRadio] %s — alert color ON', [rig^.RadioName])
+      else
+         logger.Info('[pNetworkRadio] %s — alert color OFF', [rig^.RadioName]);
+      if rig^.FreqWindowHandle <> 0 then
+         Windows.InvalidateRect(rig^.FreqWindowHandle, nil, False);
+      if rig^.RadioNameWndHandle <> 0 then
+         Windows.InvalidateRect(rig^.RadioNameWndHandle, nil, False);
+   end;
+
 begin
 
    { Unlike the other polling procedures, all we have to do here is grab the
@@ -750,6 +768,7 @@ begin
             logger.Info('[pNetworkRadio] Radio connected — querying initial freq/mode/state');
             wasConnected := True;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
+            SetRadioAlertState(False);  // TCP reconnected — clear alert (operational check below)
 
             // Query freq and mode directly from the polling thread.
             // The OnInitialPollSeeding timer window is created on this thread, which has
@@ -871,11 +890,16 @@ begin
                 BoolToStr(rig.CurrentStatus.Split, True),
                 Ord(rig.CurrentStatus.VFOStatus)]);
 
+         // Check operational state (e.g. Flex slice 0 validity).
+         // TCP may be up while slices are gone (SmartSDR closed); alert in that case too.
+         SetRadioAlertState(not ro.IsOperational);
+
          UpdateStatus(rig);
          end
       else
          begin
          // Radio disconnected - attempt reconnection
+         SetRadioAlertState(True);  // TCP disconnected
          if wasConnected then
             begin
             logger.Info('[pNetworkRadio] Radio disconnected, will attempt reconnection');
@@ -3205,6 +3229,18 @@ begin
    Windows.EnableWindow(rig.RITWndHandle, rig.CurrentStatus.RIT);
    Windows.EnableWindow(rig.XITWndHandle, rig.CurrentStatus.XIT);
    Windows.EnableWindow(rig.SplitWndHandle, rig.CurrentStatus.Split);
+
+   // Drive the split warning from confirmed radio state, not from CallWindowChange.
+   // CallWindowChange fires before CurrentStatus.Split is updated, causing the
+   // warning to flicker or appear/disappear at the wrong time in both directions.
+   if (rig = ActiveRadioPtr) and
+      (rig.PreviousStatus.Split <> rig.CurrentStatus.Split) then
+      begin
+      if rig.CurrentStatus.Split then
+         QuickDisplay(TC_SPLIT_WARN)
+      else
+         QuickDisplay(nil);
+      end;
 
    // Update VFO A mode label when mode changes (Issue #566)
    if (rig.ModeVFOAWndHandle <> 0) and

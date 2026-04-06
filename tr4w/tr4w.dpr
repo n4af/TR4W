@@ -704,6 +704,11 @@ begin
             if (Msg.HWND = wh[mweCall]) then
                begin
                CallWindowKeyDownProc(Msg.wParam);
+               if CallWindowCharConsumed then
+                  begin
+                  CallWindowCharConsumed := False;
+                  goto NoTransMess;
+                  end;
                end
             else if Msg.HWND = wh[mweExchange] then       // ny4i Issue 87
                begin

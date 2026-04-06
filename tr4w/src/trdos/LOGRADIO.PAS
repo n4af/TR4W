@@ -168,8 +168,10 @@ type
       SpeedMemory:       integer;
       BandMemory:        BandType;
       ModeMemory:        ModeType;
-      tNetObject:        TNetRadioBase;  // Factory creates K4 or HamLibDirect
-      FreqWindowHandle: HWND;
+      tNetObject:          TNetRadioBase;  // Factory creates K4 or HamLibDirect
+      FreqWindowHandle:    HWND;
+      RadioNameWndHandle:  HWND;
+      RadioDisconnected:   Boolean;
       RadioName:        Str20;
       StartupCommand  : Str50;
       HamLibID:          integer;
