@@ -683,12 +683,17 @@ end;
 // ---------------------------------------------------------------------------
 
 procedure TFlexRadio6000.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
+var
+   fracStr: string;
 begin
    // Frequency is set via "slice tune <index> <MHz>" — NOT "slice set RF_frequency".
    // RF_frequency is a read-only status key pushed by the radio; slice tune is the
-   // write command.  Integer arithmetic avoids locale decimal separator issues.
-   SendFlexCmd(Format('slice tune %d %d.%06d',
-               [SliceForVFO(vfo), freq div 1000000, freq mod 1000000]));
+   // write command.
+   // Delphi 7 Format('%06d') pads with spaces, not zeros — build the fractional
+   // part manually: adding 1000000 guarantees 7 digits, Copy strips the leading '1'.
+   fracStr := Copy(IntToStr(1000000 + (freq mod 1000000)), 2, 6);
+   SendFlexCmd(Format('slice tune %d %d.%s',
+               [SliceForVFO(vfo), freq div 1000000, fracStr]));
    if mode <> rmNone then
       begin
       SetMode(mode, vfo);
