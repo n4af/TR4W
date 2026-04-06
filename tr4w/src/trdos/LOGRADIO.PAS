@@ -2467,12 +2467,22 @@ begin
                   end;
                elements := CalculateElements(sMsg);  // ny4i Issue 153
                logger.trace('Total CW Elements for %s = %d',[sMsg,elements]);
-               localMsg := Format(formatStr, [sMsg]);
                Self.EnableCWBYCATTimer( Round(1200 / DisplayedCodeSpeed) * elements); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
-               if Self.tNetObject <> nil then
-                  Self.tNetObject.SendToRadio(localMsg)
+               // Flex over TCP: delegate to the factory object's cwx API.
+               // Flex over serial falls through to the legacy KY path below.
+               if (RadioModel = FLEX) and (Self.tNetObject <> nil) and (Self.IPAddress <> '') then
+                  begin
+                  Self.tNetObject.BufferCW(sMsg);
+                  Self.tNetObject.SendCW;
+                  end
                else
-                  AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
+                  begin
+                  localMsg := Format(formatStr, [sMsg]);
+                  if Self.tNetObject <> nil then
+                     Self.tNetObject.SendToRadio(localMsg)
+                  else
+                     AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
+                  end;
                logger.trace('Adding K/E/F radio CW string to buffer');
                Self.CWByCAT_Sending := true;
                logger.trace('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
