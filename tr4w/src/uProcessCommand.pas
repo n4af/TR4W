@@ -109,7 +109,7 @@ const
 
 
  // sCommands                             =  67  {$IF MMTYMODE} + 5  {$IFEND};
-  sCommands                             =  72 + 2;  // 4.72.9    // Added PlayMessageActive and PlayMessageInactive
+  sCommands                             =  72 + 2 + 1 + 5;  // Issue 61 Added OTRSP command + 5 display entries
 
   sCommandsArray                        : array[0..sCommands - 1] of TsCommandsArrayType =
     (
@@ -166,6 +166,12 @@ const
     (caCommand: 'SWAPRADIOS'; caAddress: @SwapRadios),
     (caCommand: 'TOGGLEMODES'; caAddress: @ToggleModes),
     (caCommand: 'TOGGLESTEREOPIN'; caAddress: @ToggleStereoPin),
+    (caCommand: 'OTRSP'; caAddress: @OTRSPCommand),  // Issue 61 - OTRSP RX focus
+    (caCommand: ' OTRSP=RX1    = Listen to Radio 1'; caAddress: @OTRSPCommand),
+    (caCommand: ' OTRSP=RX2    = Listen to Radio 2'; caAddress: @OTRSPCommand),
+    (caCommand: ' OTRSP=RXA    = Listen to active (TX) radio'; caAddress: @OTRSPCommand),
+    (caCommand: ' OTRSP=RXI    = Listen to inactive radio'; caAddress: @OTRSPCommand),
+    (caCommand: ' OTRSP=STEREO = Stereo (hear both radios)'; caAddress: @OTRSPCommand),
     (caCommand: 'TOGGLECW'; caAddress: @scTOGGLECW),
     (caCommand: 'BANDUP'; caAddress: @scBANDUP),
     (caCommand: 'BANDDOWN'; caAddress: @scBANDDOWN),

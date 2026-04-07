@@ -124,6 +124,7 @@ procedure SendFullLogToUDP;
 procedure SendDeletedContactToUDP(RXData: ContestExchange);
 procedure ToggleModes;
 procedure ToggleStereoPin; {KK1L: 6.71}
+procedure OTRSPCommand;
 procedure LogContact(var RXData: ContestExchange; MyComputer: boolean);
 procedure SwapMultDisplay;
 procedure PushLogStringIntoEditableLogAndLogPopedQSO(LogString: ShortString {Str80}; MyQSO: boolean);
@@ -147,7 +148,8 @@ implementation
 uses
   uProcessCommand,
   MainUnit,
-  uRadioPolling;
+  uRadioPolling,
+  uYCCCSO2R;
 procedure CreateAndSendPacketSpot(PacketSpotCall: CallString; PacketSpotFreq: LONGINT);
 
 begin
@@ -336,7 +338,44 @@ procedure ToggleStereoPin; {KK1L: 6.71}
 begin
   TF.InvertBoolean(StereoPinState);
   SetStereoPin(StereoControlPin, StereoPinState);
+  if ycccActive then
+     YCCCSetStereo(StereoPinState);
 end;
+
+{ Handles OTRSP=RX1, OTRSP=RX2, OTRSP=RXA, OTRSP=RXI, OTRSP=STEREO function key commands }
+procedure OTRSPCommand;
+var
+   cmd: string;
+begin
+   if not ycccActive then
+      begin
+      Exit;
+      end;
+   cmd := UpperCase(scFileName);
+   if cmd = 'RX1' then
+      begin
+      YCCCSetRxMode(False, False);
+      end
+   else if cmd = 'RX2' then
+      begin
+      YCCCSetRxMode(True, False);
+      end
+   else if cmd = 'STEREO' then
+      begin
+      YCCCSetRxMode(False, True);
+      end
+   else if cmd = 'RXA' then
+      begin
+      { Follow active (TX) radio }
+      YCCCSetRxMode(ActiveRadio = RadioTwo, False);
+      end
+   else if cmd = 'RXI' then
+      begin
+      { Follow inactive radio - opposite of TX }
+      YCCCSetRxMode(ActiveRadio = RadioOne, False);
+      end;
+end;
+
 procedure ToggleModes;
 begin
   if (MultipleModesEnabled) or (TotalContacts = 0) then

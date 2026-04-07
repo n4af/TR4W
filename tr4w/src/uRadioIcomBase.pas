@@ -901,7 +901,7 @@ begin
         // Inverted  (IC-9700):         $00 = VFO B active, $01 = VFO A active.
         if (Length(data) >= 2) and (Ord(data[1]) = $D2) then
           begin
-          logger.Info('[%s] $07 $D2 raw value = $%.2x (FActiveVFOInverted=%s)',
+          logger.Trace('[%s] $07 $D2 raw value = $%.2x (FActiveVFOInverted=%s)',
              [radioModel, Ord(data[2]), BoolToStr(FActiveVFOInverted, True)]);
           if FActiveVFOInverted then
              begin
@@ -929,7 +929,7 @@ begin
             QueryVFOBMode;
             end
           else
-            logger.Debug('[%s] $07 $D2: VFO %s active (unchanged)',
+            logger.Trace('[%s] $07 $D2: VFO %s active (unchanged)',
                [radioModel, IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
           end
         else if Length(data) >= 1 then

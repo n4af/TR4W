@@ -56,6 +56,12 @@ procedure YCCCClose;
 { SO2R switching - call from SwapRadios with 1=Radio1 or 2=Radio2 }
 procedure YCCCSetActiveRadio(radio: integer);
 
+{ Stereo RX toggle - call from ToggleStereoPin with current StereoPinState }
+procedure YCCCSetStereo(stereo: boolean);
+
+{ OTRSP RX focus - rx2=True means RX radio 2; stereo=True mixes both }
+procedure YCCCSetRxMode(rx2: boolean; stereo: boolean);
+
 { CW keyer interface - mirrors WinKeyer API used in LogCW.pas }
 procedure YCCCAddCWMessageToBuffer(const msg: string);
 procedure YCCCFlushCWBuffer;
@@ -631,6 +637,40 @@ begin
       FSO2RState := FSO2RState and not (SO2R_TX2 or SO2R_RX2 or SO2R_STEREO);
       end;
    logger.Debug('YCCC SO2R state -> radio ' + IntToStr(radio) +
+      ' (state=$' + IntToHex(FSO2RState, 2) + ')');
+   YCCCSendCmd(CMD_SO2R_STATE, FSO2RState);
+end;
+
+procedure YCCCSetStereo(stereo: boolean);
+begin
+   if stereo then
+      begin
+      FSO2RState := FSO2RState or SO2R_STEREO;
+      end
+   else
+      begin
+      FSO2RState := FSO2RState and not SO2R_STEREO;
+      end;
+   logger.Debug('YCCC stereo=' + BoolToStr(stereo) +
+      ' (state=$' + IntToHex(FSO2RState, 2) + ')');
+   YCCCSendCmd(CMD_SO2R_STATE, FSO2RState);
+end;
+
+procedure YCCCSetRxMode(rx2: boolean; stereo: boolean);
+begin
+   if stereo then
+      begin
+      FSO2RState := FSO2RState or SO2R_STEREO;
+      end
+   else if rx2 then
+      begin
+      FSO2RState := (FSO2RState or SO2R_RX2) and not SO2R_STEREO;
+      end
+   else
+      begin
+      FSO2RState := FSO2RState and not (SO2R_RX2 or SO2R_STEREO);
+      end;
+   logger.Debug('YCCC RX mode: rx2=' + BoolToStr(rx2) + ' stereo=' + BoolToStr(stereo) +
       ' (state=$' + IntToHex(FSO2RState, 2) + ')');
    YCCCSendCmd(CMD_SO2R_STATE, FSO2RState);
 end;
