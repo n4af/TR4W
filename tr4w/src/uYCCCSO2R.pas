@@ -3,18 +3,27 @@
   YCCC SO2R+ box support via USB HID (OTRSP protocol).
   VID = 0x16C0  PID = 0x065E
 
-  All communication goes through a single HID device - there is no serial
-  COM port.  The box handles CW keying AND SO2R antenna/headphone switching.
-
-  Reference implementation: trlinux/src/keyeryccc.pas + ycccprotocol.pas
-  Protocol spec:            http://www.k1xm.org/OTRSP/OTRSP_Protocol.pdf
+  Reference: trlinux/src/keyeryccc.pas (uses hid_set_nonblocking — non-blocking I/O)
+             trlinux/src/ycccprotocol.pas
 
   Threading model
   ---------------
-  Main thread  : never touches FHandle, never calls WriteFile/ReadFile.
-                 YCCCSendCmd only enqueues a command and sets FWriteEvent.
-  Write thread : wakes on FWriteEvent, drains write queue via WriteFile.
-  Read thread  : blocking ReadFile loop; advances CW buffer on keyer events.
+  The device is opened with FILE_FLAG_OVERLAPPED so no I/O call ever blocks.
+
+  Main thread  : calls YCCCSendCmd — enqueues cmd+val, signals FWriteEvent.
+                 Never touches FHandle directly. Always returns immediately.
+  Write thread : WaitForMultipleObjects([FWriteEvent, FStopEvent]);
+                 drains write queue via overlapped WriteFile (50ms timeout).
+  Read thread  : overlapped ReadFile + WaitForMultipleObjects([readOvl, FStopEvent]).
+                 Calls CancelIo and exits cleanly when FStopEvent fires.
+
+  Shutdown sequence (YCCCClose)
+  -----------------------------
+  1. SetEvent(FStopEvent)  -- wakes both threads
+  2. WaitForSingleObject   -- read thread: CancelIo then exits
+  3. WaitForSingleObject   -- write thread exits
+  4. CloseHandle(FHandle)  -- now safe (no pending I/O)
+  5. CloseHandle events
 
   Phase 1 scope:
     - HID device open/close (SetupAPI enumeration by VID/PID)
@@ -89,6 +98,9 @@ const
    CW_BUFFER_SIZE   = 1024;
    HID_PACKET_SIZE  = 3;    { report-ID byte + cmd + val }
    WRITE_QUEUE_SIZE = 64;
+   WRITE_TIMEOUT_MS = 100;  { overlapped WriteFile timeout in milliseconds }
+
+   ERROR_IO_PENDING = 997;
 
 { ---- Windows SetupAPI / HID type declarations --------------------------- }
 
@@ -149,15 +161,16 @@ function HidD_GetAttributes(HidDeviceObject: THandle;
    var Attributes: THIDD_ATTRIBUTES): BOOL; stdcall;
    external 'hid.dll' name 'HidD_GetAttributes';
 
+function CancelIo(hFile: THandle): BOOL; stdcall;
+   external 'kernel32.dll' name 'CancelIo';
+
 { ---- Module state ------------------------------------------------------- }
 
 var
    FHandle:     THandle = INVALID_HANDLE_VALUE;
 
-   { SO2R state register - mirrors the box's internal state byte.
-     Bits: 0=TX2, 1=RX2, 2=STEREO, 3=PTT }
+   { SO2R state register - mirrors the box's internal state byte }
    FSO2RState:  byte = 0;
-
    FKeyerSpeed: integer = 25;
 
    { Local CW character buffer.
@@ -166,32 +179,33 @@ var
    FCWBufStart: integer = 0;
    FCWBufEnd:   integer = 0;
 
-   { FMirror: ASCII value of the character currently in the keyer hardware.
-     0 means the keyer is free to accept the next character. }
+   { FMirror: ASCII value of character currently in the keyer hardware (0 = free) }
    FMirror:     integer = 0;
-
    FKeyerIdle:  boolean = True;
 
-   { Write queue - main thread enqueues here, write thread drains it.
-     Main thread only updates FWriteQueueTail.
-     Write thread only updates FWriteQueueHead. }
+   { Write queue: main thread produces (FWriteQueueTail), write thread consumes (FWriteQueueHead) }
    FWriteQueue:     array[0..WRITE_QUEUE_SIZE-1] of TWriteEntry;
    FWriteQueueHead: integer = 0;
    FWriteQueueTail: integer = 0;
-   FWriteEvent:     THandle = 0;   { auto-reset event }
+
+   { Synchronisation handles }
+   FWriteEvent:  THandle = 0;   { auto-reset: signals write thread there is data }
+   FStopEvent:   THandle = 0;   { manual-reset: signals both threads to stop }
+
+   { Overlapped structures for each thread's I/O }
+   FReadOvl:    OVERLAPPED;
+   FWriteOvl:   OVERLAPPED;
 
    FReadThread:  THandle = 0;
    FReadThID:    DWORD   = 0;
    FWriteThread: THandle = 0;
    FWriteThID:   DWORD   = 0;
-   FStopThread:  boolean = False;
 
    logger: TLogLogger;
 
 { ---- Internal helpers --------------------------------------------------- }
 
-{ Enqueue a command and wake the write thread.  Safe to call from any thread.
-  Never blocks - just a memory write + SetEvent. }
+{ Enqueue a command and wake the write thread.  Never blocks - safe from any thread. }
 procedure YCCCSendCmd(cmd, val: byte);
 var
    nextTail: integer;
@@ -203,8 +217,7 @@ begin
    nextTail := (FWriteQueueTail + 1) mod WRITE_QUEUE_SIZE;
    if nextTail = FWriteQueueHead then
       begin
-      { Queue full - drop the command rather than block }
-      logger.Debug('YCCC write queue full, dropping command');
+      logger.Debug('YCCC write queue full, dropping cmd=$' + IntToHex(cmd, 2));
       Exit;
       end;
    FWriteQueue[FWriteQueueTail].cmd := cmd;
@@ -213,8 +226,7 @@ begin
    SetEvent(FWriteEvent);
 end;
 
-{ Send the next character from the local buffer to the keyer.
-  Called from the read thread only - never from main thread. }
+{ Send the next CW character to the keyer.  Called from read thread only. }
 procedure YCCCSendNextChar;
 begin
    if FMirror <> 0 then
@@ -234,18 +246,28 @@ end;
 
 { ---- Write thread ------------------------------------------------------- }
 
-{ Drains FWriteQueue via WriteFile.  Never runs on the main thread. }
 function YCCCWriteThreadProc(param: Pointer): DWORD; stdcall;
 var
-   pkt:     array[0..HID_PACKET_SIZE-1] of byte;
-   written: DWORD;
-   entry:   TWriteEntry;
+   pkt:      array[0..HID_PACKET_SIZE-1] of byte;
+   written:  DWORD;
+   err:      DWORD;
+   entry:    TWriteEntry;
+   handles:  array[0..1] of THandle;
+   waitRes:  DWORD;
 begin
    logger.Debug('YCCC write thread started');
-   while not FStopThread do
+   handles[0] := FWriteEvent;
+   handles[1] := FStopEvent;
+
+   while True do
       begin
-      WaitForSingleObject(FWriteEvent, 100);
-      while (FWriteQueueHead <> FWriteQueueTail) and not FStopThread do
+      waitRes := WaitForMultipleObjects(2, @handles[0], False, INFINITE);
+      if waitRes = WAIT_OBJECT_0 + 1 then
+         begin
+         Break;   { stop event }
+         end;
+
+      while FWriteQueueHead <> FWriteQueueTail do
          begin
          entry           := FWriteQueue[FWriteQueueHead];
          FWriteQueueHead := (FWriteQueueHead + 1) mod WRITE_QUEUE_SIZE;
@@ -254,42 +276,83 @@ begin
          pkt[2] := entry.val;
          logger.Debug('YCCC TX: cmd=$' + IntToHex(entry.cmd, 2) +
             ' val=$' + IntToHex(entry.val, 2));
-         WriteFile(FHandle, pkt, HID_PACKET_SIZE, written, nil);
+         ResetEvent(FWriteOvl.hEvent);
+         written := 0;
+         if not WriteFile(FHandle, pkt, HID_PACKET_SIZE, written, @FWriteOvl) then
+            begin
+            err := GetLastError;
+            if err = ERROR_IO_PENDING then
+               begin
+               { Wait for write completion with timeout }
+               WaitForSingleObject(FWriteOvl.hEvent, WRITE_TIMEOUT_MS);
+               end
+            else
+               begin
+               logger.Debug('YCCC WriteFile error: ' + IntToStr(err));
+               end;
+            end;
          end;
       end;
+
    logger.Debug('YCCC write thread stopped');
    Result := 0;
 end;
 
 { ---- Read thread -------------------------------------------------------- }
 
-{ Reads 2-byte responses from the box in a blocking loop.
-  Windows HID prepends a report-ID byte (0x00), so we read 3 bytes. }
 function YCCCReadThreadProc(param: Pointer): DWORD; stdcall;
 var
    buf:      array[0..HID_PACKET_SIZE-1] of byte;
    nRead:    DWORD;
+   err:      DWORD;
    cmd, val: byte;
+   handles:  array[0..1] of THandle;
+   waitRes:  DWORD;
 begin
    logger.Debug('YCCC read thread started');
-   while not FStopThread do
+   handles[0] := FReadOvl.hEvent;
+   handles[1] := FStopEvent;
+
+   while True do
       begin
+      FillChar(buf, SizeOf(buf), 0);
       nRead := 0;
-      if not ReadFile(FHandle, buf, SizeOf(buf), nRead, nil) then
+      ResetEvent(FReadOvl.hEvent);
+
+      if ReadFile(FHandle, buf, SizeOf(buf), nRead, @FReadOvl) then
          begin
-         logger.Debug('YCCC read thread: ReadFile failed - handle closed');
-         Break;
+         { Completed synchronously - fall through to process }
+         end
+      else
+         begin
+         err := GetLastError;
+         if err <> ERROR_IO_PENDING then
+            begin
+            logger.Debug('YCCC ReadFile error: ' + IntToStr(err));
+            Break;
+            end;
+         { Wait for data or stop signal }
+         waitRes := WaitForMultipleObjects(2, @handles[0], False, INFINITE);
+         if waitRes = WAIT_OBJECT_0 + 1 then
+            begin
+            { Stop event - cancel pending read and exit }
+            CancelIo(FHandle);
+            logger.Debug('YCCC read thread: stop requested');
+            Break;
+            end;
+         if not GetOverlappedResult(FHandle, FReadOvl, nRead, False) then
+            begin
+            logger.Debug('YCCC GetOverlappedResult failed: ' + IntToStr(GetLastError));
+            Break;
+            end;
          end;
+
       if nRead < 2 then
          begin
          Continue;
          end;
 
-      logger.Debug('YCCC RX: ' + IntToStr(nRead) + ' bytes: $' +
-         IntToHex(buf[0], 2) + ' $' + IntToHex(buf[1], 2) +
-         ' $' + IntToHex(buf[2], 2));
-
-      { Determine cmd/val: Windows HID prepends a report-ID byte (0x00) }
+      { Windows HID prepends a report-ID byte (0x00) }
       if (nRead = 3) and (buf[0] = 0) then
          begin
          cmd := buf[1];
@@ -300,6 +363,9 @@ begin
          cmd := buf[0];
          val := buf[1];
          end;
+
+      logger.Debug('YCCC RX: $' + IntToHex(buf[0], 2) + ' $' +
+         IntToHex(buf[1], 2) + ' $' + IntToHex(buf[2], 2));
 
       if cmd = CMD_KEYER_EVENT then
          begin
@@ -386,10 +452,11 @@ begin
             Continue;
             end;
 
+         { Open with FILE_FLAG_OVERLAPPED so all I/O is non-blocking }
          h := CreateFileA(detailData.DevicePath,
             GENERIC_READ or GENERIC_WRITE,
             FILE_SHARE_READ or FILE_SHARE_WRITE,
-            nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+            nil, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, 0);
 
          if h = INVALID_HANDLE_VALUE then
             begin
@@ -400,10 +467,10 @@ begin
          attrs.Size := SizeOf(THIDD_ATTRIBUTES);
 
          if HidD_GetAttributes(h, attrs) and
-            (attrs.VendorID  = YCCC_VENDOR_ID)  and
+            (attrs.VendorID  = YCCC_VENDOR_ID) and
             (attrs.ProductID = YCCC_PRODUCT_ID) then
             begin
-            logger.Debug('YCCC device found at index ' + IntToStr(idx - 1));
+            logger.Debug('YCCC device found at HID index ' + IntToStr(idx - 1));
             Result := h;
             Exit;
             end;
@@ -415,7 +482,7 @@ begin
       SetupDiDestroyDeviceInfoList(devInfo);
    end;
 
-   logger.Debug('YCCC device not found (VID=16C0 PID=065E)');
+   logger.Debug('YCCC device not found (VID=$16C0 PID=$065E)');
 end;
 
 { ---- Public API --------------------------------------------------------- }
@@ -426,6 +493,7 @@ begin
 
    logger := TLogLogger.GetLogger('uYCCCSO2R');
    logger.Debug('YCCC opening device');
+
    FHandle := YCCCFindDevice;
    if FHandle = INVALID_HANDLE_VALUE then
       begin
@@ -434,39 +502,42 @@ begin
       end;
 
    { Initialise state }
-   FSO2RState  := 0;
-   FKeyerSpeed := 25;
-   FCWBufStart := 0;
-   FCWBufEnd   := 0;
-   FMirror     := 0;
-   FKeyerIdle  := True;
-   FStopThread := False;
+   FSO2RState      := 0;
+   FKeyerSpeed     := 25;
+   FCWBufStart     := 0;
+   FCWBufEnd       := 0;
+   FMirror         := 0;
+   FKeyerIdle      := True;
    FWriteQueueHead := 0;
    FWriteQueueTail := 0;
 
-   { Create write event (auto-reset) }
-   FWriteEvent := CreateEvent(nil, False, False, nil);
-   if FWriteEvent = 0 then
+   { Events }
+   FWriteEvent := CreateEvent(nil, False, False, nil);  { auto-reset }
+   FStopEvent  := CreateEvent(nil, True,  False, nil);  { manual-reset }
+
+   FillChar(FReadOvl,  SizeOf(FReadOvl),  0);
+   FillChar(FWriteOvl, SizeOf(FWriteOvl), 0);
+   FReadOvl.hEvent  := CreateEvent(nil, True, False, nil);
+   FWriteOvl.hEvent := CreateEvent(nil, True, False, nil);
+
+   if (FWriteEvent = 0) or (FStopEvent = 0) or
+      (FReadOvl.hEvent = 0) or (FWriteOvl.hEvent = 0) then
       begin
       logger.Debug('YCCC CreateEvent failed');
-      CloseHandle(FHandle);
-      FHandle := INVALID_HANDLE_VALUE;
+      YCCCClose;
       Exit;
       end;
 
-   { Start write thread first so queued init commands get sent }
+   { Start write thread first so queued init commands get sent immediately }
    FWriteThread := CreateThread(nil, 0, @YCCCWriteThreadProc, nil, 0, FWriteThID);
    if FWriteThread = 0 then
       begin
       logger.Debug('YCCC write thread creation failed');
-      CloseHandle(FWriteEvent);
-      FWriteEvent := 0;
-      CloseHandle(FHandle);
-      FHandle := INVALID_HANDLE_VALUE;
+      YCCCClose;
       Exit;
       end;
 
-   { Queue init commands - write thread will send them }
+   { Queue init commands }
    YCCCSendCmd(CMD_SO2R_STATE,  FSO2RState);
    YCCCSendCmd(CMD_KEYER_SPEED, FKeyerSpeed);
    YCCCSendCmd(CMD_KEYER_CONFIG, 0);
@@ -476,53 +547,59 @@ begin
    if FReadThread = 0 then
       begin
       logger.Debug('YCCC read thread creation failed');
-      FStopThread := True;
-      SetEvent(FWriteEvent);
-      WaitForSingleObject(FWriteThread, 2000);
-      CloseHandle(FWriteThread);
-      FWriteThread := 0;
-      CloseHandle(FWriteEvent);
-      FWriteEvent := 0;
-      CloseHandle(FHandle);
-      FHandle := INVALID_HANDLE_VALUE;
+      YCCCClose;
       Exit;
       end;
 
    ycccActive := True;
    Result     := True;
-   logger.Debug('YCCC opened successfully');
+   logger.Debug('YCCC opened successfully (overlapped I/O)');
 end;
 
 procedure YCCCClose;
 begin
-   ycccActive  := False;
-   FStopThread := True;
+   ycccActive := False;
 
-   { Close the HID handle first - this unblocks the blocking ReadFile }
-   if FHandle <> INVALID_HANDLE_VALUE then
+   { Signal both threads to stop }
+   if FStopEvent <> 0 then
       begin
-      CloseHandle(FHandle);
-      FHandle := INVALID_HANDLE_VALUE;
+      SetEvent(FStopEvent);
       end;
 
-   { Wake the write thread so it sees FStopThread }
-   if FWriteEvent <> 0 then
-      begin
-      SetEvent(FWriteEvent);
-      end;
-
+   { Wait for threads to exit cleanly.
+     Read thread calls CancelIo on itself when it sees FStopEvent.
+     Write thread exits its WaitForMultipleObjects loop. }
    if FReadThread <> 0 then
       begin
-      WaitForSingleObject(FReadThread, 2000);
+      WaitForSingleObject(FReadThread, 3000);
       CloseHandle(FReadThread);
       FReadThread := 0;
       end;
 
    if FWriteThread <> 0 then
       begin
-      WaitForSingleObject(FWriteThread, 2000);
+      WaitForSingleObject(FWriteThread, 3000);
       CloseHandle(FWriteThread);
       FWriteThread := 0;
+      end;
+
+   { Now safe to close the device handle }
+   if FHandle <> INVALID_HANDLE_VALUE then
+      begin
+      CloseHandle(FHandle);
+      FHandle := INVALID_HANDLE_VALUE;
+      end;
+
+   if FReadOvl.hEvent <> 0 then
+      begin
+      CloseHandle(FReadOvl.hEvent);
+      FReadOvl.hEvent := 0;
+      end;
+
+   if FWriteOvl.hEvent <> 0 then
+      begin
+      CloseHandle(FWriteOvl.hEvent);
+      FWriteOvl.hEvent := 0;
       end;
 
    if FWriteEvent <> 0 then
@@ -531,14 +608,20 @@ begin
       FWriteEvent := 0;
       end;
 
-   logger.Debug('YCCC closed');
+   if FStopEvent <> 0 then
+      begin
+      CloseHandle(FStopEvent);
+      FStopEvent := 0;
+      end;
+
+   if logger <> nil then
+      begin
+      logger.Debug('YCCC closed');
+      end;
 end;
 
 procedure YCCCSetActiveRadio(radio: integer);
 begin
-   { TX and RX both follow the active radio (mono mode).
-     Radio 2: set TX2 + RX2, clear STEREO.
-     Radio 1: clear TX2 + RX2 + STEREO. }
    if radio = 2 then
       begin
       FSO2RState := (FSO2RState or (SO2R_TX2 or SO2R_RX2)) and not SO2R_STEREO;
@@ -572,7 +655,7 @@ begin
    logger.Debug('YCCC CW buffer: "' + msg + '"');
 
    { Kick off sending if the keyer is idle and nothing is in flight.
-     YCCCSendNextChar calls YCCCSendCmd which only sets an event - safe from main thread. }
+     YCCCSendNextChar -> YCCCSendCmd -> SetEvent only, no blocking. }
    if FKeyerIdle and (FMirror = 0) then
       begin
       YCCCSendNextChar;
@@ -597,15 +680,12 @@ end;
 
 function YCCCDeleteLastChar: boolean;
 begin
-   { Remove the last character from the local buffer if possible }
    if FCWBufStart <> FCWBufEnd then
       begin
       FCWBufEnd := (FCWBufEnd - 1 + CW_BUFFER_SIZE) mod CW_BUFFER_SIZE;
       Result    := True;
       Exit;
       end;
-
-   { Otherwise ask the box to cancel the character currently in flight }
    Result := FMirror <> 0;
    if Result then
       begin
@@ -617,14 +697,8 @@ end;
 
 procedure YCCCSetSpeed(wpm: integer);
 begin
-   if wpm < 2 then
-      begin
-      wpm := 2;
-      end;
-   if wpm > 99 then
-      begin
-      wpm := 99;
-      end;
+   if wpm < 2 then wpm := 2;
+   if wpm > 99 then wpm := 99;
    FKeyerSpeed := wpm;
    logger.Debug('YCCC CW speed ' + IntToStr(wpm) + ' wpm');
    YCCCSendCmd(CMD_KEYER_SPEED, FKeyerSpeed);
