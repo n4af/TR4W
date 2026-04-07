@@ -464,7 +464,7 @@ end;
 
 procedure scPlayMessageActive;
 var bError: boolean;
-    nMemoryNum: integer;
+   // nMemoryNum: integer;
 begin
    if ActiveRadioPtr.tNetObject <> nil then
       begin
@@ -503,7 +503,7 @@ end;
 
 procedure scPlayMessageInActive;
 var bError: boolean;
-    nMemoryNum: integer;
+   // nMemoryNum: integer;
 begin
    if InActiveRadioPtr.tNetObject <> nil then
       begin

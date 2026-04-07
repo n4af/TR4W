@@ -1965,7 +1965,7 @@ begin
       if TempRXData.QTHString <> '' then
          begin
    //    getridofprecedingspaces(TempRXData.QTHString);
-         p := nil;
+         //p := nil;
          p := @TempRXData.QTHString[1];
          if TempRXData.QTHString[1] = ' ' then        //n4af 4.34.6    remove preceding space using pointer math
             begin                                           //n4af 4.34.6

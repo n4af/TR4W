@@ -3935,7 +3935,7 @@ end;
 procedure ExchangeWindowKeyDownProc(wParam: integer);
 var
   p: hwnd;
-  c: hwnd;
+  //c: hwnd;
   itempos: integer;
   key: char;
 
@@ -4350,7 +4350,7 @@ function ParametersOkay(Call: CallString;
 
 var
   RST: Word;
-  s1, s2, s3, s4: str20;
+  //s1, s2, s3, s4: str20;
 begin
   logger.debug('>>>Entering ParametersOkay');
   logger.debug('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d, ExchangeString = %s', [call, BandStringsArray[Band], ModeStringArray[Mode], freq, ExchangeString]);
@@ -4831,16 +4831,16 @@ end;
 function tCreateStaticWindow(lpWindowName: PChar;
   dwStyle: DWORD; X, Y, nWidth, nHeight: integer; hwndParent: HWND;
   HMENU: HMENU): HWND;
-var
-  x1, y1, x2, y2, x3, y3: integer;
+//var
+  //x1, y1, x2, y2, x3, y3: integer;
 begin
-  x1 := 20;
+  {x1 := 20;
   y1 := 20;
   x2 := 160;
   y2 := 200;
   x3 := 3;
   y3 := 3;
-
+  }
   //Result := CreateRoundRectRgn(x1,y1,x2,y2,x3,y3);
   Result := CreateWindowEx(0 {WS_EX_DLGMODALFRAME}, StaticPChar, lpWindowName,
     dwStyle, X, Y, nWidth, nHeight, hwndParent, HMENU, hInstance, nil);
@@ -6708,7 +6708,7 @@ end;
 procedure SetRemMultsColumnWidth;
 var
   Width: integer;
-  DomWidth: integer;
+ // DomWidth: integer;
 
 begin
   // 4.71.2 attempt to allow longer column width for long DOM MULTS by setting SHOW DOMESTIC MULTIPLIER NAME to TRUE
@@ -7935,8 +7935,8 @@ end;
 
 procedure OpenUrl(url: PChar);
 var
-  lpcbValue: DWORD;
-  phkResult: hkey;
+ // lpcbValue: DWORD;
+ // phkResult: hkey;
   sURI: string;
 begin
   // This code no longer works so just do the SHellExecute
@@ -8609,7 +8609,7 @@ end;
 
 function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
 begin
-  Result := false;
+  //Result := false;
   if Length(sTime) in [4, 6] then
   begin
     try

@@ -394,10 +394,10 @@ uses
 
 procedure CreateGridSquareList(Call: CallString; Band: BandType);
 
-var
-  FileRead                              : Text;
-  TempString                            : string; //{WLI}
-  FileString                            : Str80;
+//var
+  //FileRead                              : Text;
+ // TempString                            : string; //{WLI}
+  //FileString                            : Str80;
 
 begin
   {
@@ -471,7 +471,7 @@ function FoundDomesticQTH(var RXData: ContestExchange): boolean;
 
 var
   QTHString                             : ShortString {Str40}; //{WLI}
-  CharacterPointer                      : integer;
+ // CharacterPointer                      : integer;
 
 begin
   FoundDomesticQTH := False;
@@ -515,7 +515,7 @@ function GetInitialExchangeIndex(InitialExchange: CallString): integer;
 
 var
   TempBytes                             : EightBytes;
-  Address                               : integer;
+  //Address                               : integer;
 
 begin
   GetInitialExchangeIndex := 0; { Default in case we can't do it }
@@ -578,9 +578,9 @@ end;
 
 procedure AddCallToPartialList(Call: CallString; InitialExchange: CallString);
 
-var
-  ProperAddress                         : integer;
-  Index, BlockNumber, BlockAddress      : integer;
+//var
+  //ProperAddress                         : integer;
+ // Index, BlockNumber, BlockAddress      : integer;
 
 begin
  {
@@ -747,7 +747,7 @@ end;
 procedure GetDXQTH(var RXData: ContestExchange);
 
 var
-  ID                                    : string[6];
+  //ID                                    : string[6];
   NumberChar                            : Char; {KK1L: 6.70}
 
 begin

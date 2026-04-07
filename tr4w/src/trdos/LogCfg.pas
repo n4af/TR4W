@@ -276,8 +276,8 @@ begin
 end;
 
 procedure SetUpGlobalsAndInitialize;
-var
-FileName : str40;
+//var
+//FileName : str40;
 begin
 
   StartCPU := GetTickCount;

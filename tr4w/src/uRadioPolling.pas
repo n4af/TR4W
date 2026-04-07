@@ -2774,7 +2774,7 @@ end;
 function ReadFromSerialPort(BytesToRead: Cardinal; rig: RadioPtr): boolean;
 var
    BytesRead: Cardinal;
-   s: string;
+  // s: string;
 begin
    Result := False;
    if BytesToRead > SizeOf(rig^.tBuf) then

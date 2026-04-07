@@ -770,7 +770,7 @@ procedure ShowHelpMessageForCommand;
 var
   Row                                   : integer;
   Index                                 : integer;
-  returnLen                             : integer;
+ // returnLen                             : integer;
 begin
   Row := SendMessage(SettingshLV, LVM_GETNEXTITEM, -1, LVNI_SELECTED or LVNI_FOCUSED);
   if Row = -1 then Exit;

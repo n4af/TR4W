@@ -266,7 +266,7 @@ begin
         ListView_SetItem(LogCompareListView, elvi);
         asm ret
         end;
-        OpenGetServerLogDlg := False;
+       // OpenGetServerLogDlg := False;
       end;
 
 //    WM_HELP: tWinHelp(48);
