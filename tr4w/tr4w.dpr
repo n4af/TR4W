@@ -135,7 +135,8 @@ uses
   uRadioHamLibDirect in 'src\uRadioHamLibDirect.pas',
   uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
   uExternalLogger in 'src\uExternalLogger.pas',
-  uDXLabPathfinder in 'src\uDXLabPathfinder.pas';
+  uDXLabPathfinder in 'src\uDXLabPathfinder.pas',
+  uYCCCSO2R in 'src\uYCCCSO2R.pas';
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -622,6 +623,13 @@ begin
       logger.Info('Calling tCreateThread from WinKeyer');
       tCreateThread(@wkOpen, wkThreadID);
       logger.Info('Created WinKeyer thread with threadid of %d',[wkThreadID] );
+      end;
+
+   if YCCCSo2rEnable then
+      begin
+      logger.Info('Opening YCCC SO2R box');
+      if not YCCCOpen then
+         logger.Warn('YCCC SO2R box not found or failed to open');
       end;
 
 {$IF MIXWMODE}

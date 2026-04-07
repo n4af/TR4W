@@ -28,6 +28,7 @@ uses
    uIO,
    uCTYDAT,
    uWinKey,
+   uYCCCSO2R,
    uGetScores,
    uStations,
    uRemMults,
@@ -346,6 +347,7 @@ const
    + 4 {Icom Network Username and Password for Radio 1 and Radio 2}
    + 1 {WSJTXMulticastGroup}  // Issue 443
    + 2 {Icom Data Mode ID for Radio 1 and Radio 2}
+   + 1 {YCCCSo2rEnable}  // Issue 61
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -838,6 +840,7 @@ const
  (crCommand: 'WSJT-X RADIO CONTROL ENABLED';  crAddress: @WSJTXRadioControlEnabled;                       crMin:0;  crMax:0;         crS: csNew; crA: 23; crC:0; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),     // ny4i Issue 673
  (crCommand: 'WSJT-X SEND HIGHLIGHTS';        crAddress: @WSJTXSendColorization;                          crMin:0;  crMax:0;         crS: csNew; crA: 24; crC:0;  crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),     // ny4i Issue 438
  (crCommand: 'YAESU RESPONSE TIMEOUT';        crAddress: nil;                                             crMin:0;  crMax:0;         crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
+ (crCommand: 'YCCC SO2R ENABLE';              crAddress: @YCCCSo2rEnable;                                 crMin:0;  crMax:0;         crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),  // Issue 61
  (crCommand: 'ZONE MULTIPLIER';               crAddress: pointer(23);                                     crMin:0;  crMax:0;         crS: csOld; crA: 2; crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctMultiplier)
     {*)}
       );

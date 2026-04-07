@@ -25,6 +25,7 @@ uses
 utils_text,
   MMSystem,
   uWinKey,
+  uYCCCSO2R,
   uMixW,
   uMMTTY,
   TF,
@@ -263,6 +264,12 @@ begin
      Exit;
     end;
 
+    if ycccActive then
+    begin
+      YCCCAddCWMessageToBuffer(Msg);
+      Exit;
+    end;
+
    if ActiveRadioPtr.tPTTStatus = PTT_OFF then
       begin
        PTTOn;
@@ -350,6 +357,10 @@ begin
      begin
      Result                                                 := wkBUSY;
      end
+  else if ycccActive then
+     begin
+     Result                                                 := YCCCCWBusy;
+     end
   else
      begin
      Result                                                 := CPUKeyer.CWStillBeingSent;   // ny4i Issue 149 With CWBC, it was possible to miss we were still sending
@@ -365,6 +376,11 @@ begin
   else if wkActive then
   begin
     wkSendByte(wkCMD_BACKSPACE);   // ny4i Just a note...Result is not set here...
+    Exit;
+  end
+  else if ycccActive then
+  begin
+    Result := YCCCDeleteLastChar;
     Exit;
   end;
   DeleteLastCharacter                                       := CPUKeyer.DeleteLastCharacter;
@@ -393,6 +409,8 @@ begin
   CPUKeyer.FlushCWBuffer;
   WKBusy                                                    := False; // 4.90.5
 //  if wkActive then wkClearBuffer;    // Gav    remove
+  if ycccActive then
+     YCCCFlushCWBuffer;
 end;
 
 procedure FlushCWBufferAndClearPTT;
@@ -561,6 +579,7 @@ begin
        end;
     tSetPaddleElementLength;
     wkSetSpeed(Speed);
+    YCCCSetSpeed(Speed);
   end;
 end;
 

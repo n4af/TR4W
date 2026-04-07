@@ -24,6 +24,7 @@ interface
 uses
   uNet,
   uWinKey,
+  uYCCCSO2R,
   uMixW,
   uMMTTY,
   VC,
@@ -576,6 +577,8 @@ begin
     InvalidateRect(Radio2.tRadioInterfaceWndHandle, nil, True);
 
   wkSetKeyerOutput(ActiveRadioPtr);
+  if ycccActive then
+     YCCCSetActiveRadio(Integer(ActiveRadio)); { RadioOne=1, RadioTwo=2 }
 
   if QSONumberByBand then
     DisplayNextQSONumber;

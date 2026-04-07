@@ -54,9 +54,10 @@ Write-Host "Project: $PROJECT" -ForegroundColor Yellow
 Write-Host "Output: $EXE_DIR" -ForegroundColor Yellow
 Write-Host ""
 
+Push-Location "C:\TR4W\tr4w"
 & $DCC32 $PROJECT -`$D+ -`$L+ -`$Y+ -NC:\Temp "/U$LIB" "/I$LIB" "/E$EXE_DIR"
-
 $result = $LASTEXITCODE
+Pop-Location
 
 Write-Host ""
 if ($result -eq 0) {
