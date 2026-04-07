@@ -299,6 +299,20 @@ begin
       {background end}
 
     end;
+
+    // ALERT COLOR — standalone entry (not a TMainWindowElement pair)
+    inc(i);
+    Settingslvi.iItem := i - 1;
+    Settingslvi.iSubItem := COMMAND_FIELD;
+    Settingslvi.pszText := 'ALERT COLOR';
+    ListView_InsertItem(SettingshLV, Settingslvi);
+    Settingslvi.iSubItem := VALUE_FIELD;
+    Settingslvi.pszText := tr4wColorsSA[AlertColor];
+    ListView_SetItem(SettingshLV, Settingslvi);
+    Settingslvi.iSubItem := NUMBER_FIELD;
+    Settingslvi.pszText := inttopchar(i);
+    ListView_SetItem(SettingshLV, Settingslvi);
+
     Exit;
   end;
 
@@ -415,6 +429,17 @@ begin
 
   if CommandsFilter = cfCol then
   begin
+    // ALERT COLOR is the last row — past the end of the TMainWindowElement pairs
+    if Row >= (Ord(High(TMainWindowElement)) + 1) * 2 then
+       begin
+       if AlertColor = High(tr4wColors) then
+          AlertColor := Low(tr4wColors)
+       else
+          Inc(AlertColor);
+       ListView_SetItemText(SettingshLV, Row, VALUE_FIELD, tr4wColorsSA[AlertColor]);
+       goto EnableButtons;
+       end;
+
     TempInteger := Row div 2; //window
     if (Row mod 2) = 0 then
       TempColor := @TWindows[TMainWindowElement(TempInteger)].mweColor //1-back
@@ -745,7 +770,7 @@ procedure ShowHelpMessageForCommand;
 var
   Row                                   : integer;
   Index                                 : integer;
-  returnLen                             : integer;
+ // returnLen                             : integer;
 begin
   Row := SendMessage(SettingshLV, LVM_GETNEXTITEM, -1, LVNI_SELECTED or LVNI_FOCUSED);
   if Row = -1 then Exit;

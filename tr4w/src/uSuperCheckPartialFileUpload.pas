@@ -20,11 +20,11 @@ Type TSCPUpload = class(TObject)
       m_loggerName: string;
       m_trace: boolean;
       m_loggerHash: string;
-      m_hashSignature: string;
+     // m_hashSignature: string;
       m_production: boolean;
       m_timestamp: string;
-      m_fileRaw: string;
-      m_fileEncoded: string;
+     // m_fileRaw: string;
+     // m_fileEncoded: string;
       m_uploadURL: string;
       m_credentials: string;
       m_cabHash: string;
@@ -33,7 +33,7 @@ Type TSCPUpload = class(TObject)
       m_errorResult: string;
       m_httpStatusCode: integer;
       m_JSON: string;
-      sRequiredPeerName: string;
+     // sRequiredPeerName: string;
       indyLog: TIdLogFile;
       sslOpts: TIdSSLIOHandlerSocketOpenSSL;
       http: TIdHTTP;
@@ -146,14 +146,14 @@ end;
 function TSCPUpload.SendFile(_filename: string): boolean;
 var fs: TFileStream;
     ms: TMemoryStream;
-    s: string;
+    //s: string;
     httpResult: string;
     hash: string;
     json: TSTringStream;
-    response: TStringStream;
+   // response: TStringStream;
     sCabRaw: string;
 begin
-   Result := false;
+   //Result := false;
    // First check that the log file exists
    if not FileExists(_filename) then
       begin
@@ -234,7 +234,7 @@ begin
 end;
 
 procedure TSCPUpload.SetLoggerName(loggerName: string);
-var s: string;
+//var s: string;
 begin
    Self.m_loggerName := loggerName;
    Self.http.Request.UserAgent := loggerName;
@@ -289,7 +289,7 @@ function TSCPUpload.SSLIOHandlerVerifyPeer(ThePeerCert: TIdX509; AOk: Boolean; A
 var sTemp: string;
    sActualIssuerName: string;
    sActualPeerName: string;
-   bVerifiedPeer: boolean;
+  // bVerifiedPeer: boolean;
    begin
 //Note this is called MULTIPLE times, one for each cert in the chain, starting
 //with the CA cert & ending with the user cert.
@@ -315,7 +315,7 @@ var sTemp: string;
          if (Pos(UpperCase(SCP_CANAME), UpperCase(sActualIssuerName)) > 0) or
             ((Pos(UpperCase('supercheckpartial.com'), UpperCase(sActualPeerName)) > 0)) then
             begin
-            bVerifiedPeer := True;
+            //bVerifiedPeer := True;
             Result := True;
             end;
          end;

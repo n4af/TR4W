@@ -168,8 +168,10 @@ type
       SpeedMemory:       integer;
       BandMemory:        BandType;
       ModeMemory:        ModeType;
-      tNetObject:        TNetRadioBase;  // Factory creates K4 or HamLibDirect
-      FreqWindowHandle: HWND;
+      tNetObject:          TNetRadioBase;  // Factory creates K4 or HamLibDirect
+      FreqWindowHandle:    HWND;
+      RadioNameWndHandle:  HWND;
+      RadioDisconnected:   Boolean;
       RadioName:        Str20;
       StartupCommand  : Str50;
       HamLibID:          integer;
@@ -2413,10 +2415,17 @@ begin
 //            msgLen := length(Msg);              //length(Msg);
             //len := Min(msgLen, 24);             // 24 max for Kenwood
             case RadioModel of
-               TS480, TS570, TS590, TS950, TS990, TS2000, FLEX:
+               TS480, TS570, TS590, TS950, TS990, TS2000:
                   begin
                   maxLen := 24;
                   pad := true;
+                  end;
+               FLEX:
+                  begin
+                  // cwx send has no length limit and no padding requirement.
+                  // Flex serial (KY path) uses 24/pad like Kenwood — handled below.
+                  maxLen := 24;
+                  pad := (Self.tCATPortType <> Network);
                   end;
                K2, K3, K4:
                   begin
@@ -2467,9 +2476,22 @@ begin
                   end;
                elements := CalculateElements(sMsg);  // ny4i Issue 153
                logger.trace('Total CW Elements for %s = %d',[sMsg,elements]);
-               localMsg := Format(formatStr, [sMsg]);
                Self.EnableCWBYCATTimer( Round(1200 / DisplayedCodeSpeed) * elements); //ny4i Issue153 When timer fires, reset CWBYCAT_Sending
-               AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
+               // Flex over TCP: delegate to the factory object's cwx API.
+               // Flex over serial falls through to the legacy KY path below.
+               if (RadioModel = FLEX) and (Self.tNetObject <> nil) and (Self.tCATPortType = Network) then
+                  begin
+                  Self.tNetObject.BufferCW(sMsg);
+                  Self.tNetObject.SendCW;
+                  end
+               else
+                  begin
+                  localMsg := Format(formatStr, [sMsg]);
+                  if Self.tNetObject <> nil then
+                     Self.tNetObject.SendToRadio(localMsg)
+                  else
+                     AddToOutputBuffer(addr(localMsg[1]), length(localMsg));
+                  end;
                logger.trace('Adding K/E/F radio CW string to buffer');
                Self.CWByCAT_Sending := true;
                logger.trace('Self.CWByCAT_Sending set to TRUE - Elecraft/Kenwood/Flex');
@@ -2747,6 +2769,8 @@ begin
          Result := rmIcomIC905;
       IC7100:
          Result := rmIcomIC7100;
+      FLEX:
+         Result := rmFlexRadio6000;
    else
       Result := rmNone;
    end;
@@ -2868,6 +2892,26 @@ begin
                logger.Error('[%s.SetUpRadioInterface] Failed to create %s serial radio',
                            [Self.RadioName, TRadioFactory.ModelToString(factoryModel)]);
 
+            // Initialize timer and event handlers — must happen for all radio paths
+            Self.EventHandlers := EventHandlers;
+            Self.tmrCWByCAT := TTimer.Create(nil);
+            Self.tmrCWByCAT.Enabled := false;
+            Self.tmrCWByCAT.OnTimer := Self.EventHandlers.OnTimerTick;
+            // Reset filtered status
+            with FilteredStatus do
+               begin
+               Band := NoBand;
+               Mode := NoMode;
+               Freq := 0;
+               end;
+            // Send startup command if configured
+            if length(Self.StartupCommand) > 0 then
+               begin
+               if Self.tNetObject <> nil then
+                  begin
+                  Self.tNetObject.SendToRadio(Self.StartupCommand);
+                  end;
+               end;
             // Exit to prevent any legacy serial code from executing
             Exit;
             end;

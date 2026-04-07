@@ -151,6 +151,7 @@ Type TNetRadioBase = class(TObject)
       procRef: TProcessMsgRef;
 
       function GetISConnected: boolean; virtual;
+      function GetIsOperational: boolean; virtual;
       function GetAuthFailed: boolean; virtual;
       function BandToFreq(band: TRadioBand): LongInt;  // Map band enum to typical calling frequency
 
@@ -193,6 +194,7 @@ Type TNetRadioBase = class(TObject)
       property IsTransmitting: boolean read GetIsTransmitting;
       property IsReceiving: boolean read GetIsReceiving;
       property IsConnected: boolean read GetIsConnected;
+      property IsOperational: boolean read GetIsOperational;
       property AuthFailed: boolean read GetAuthFailed;
       property IsRITOn[whichVFO: TVFO]: boolean read GetIsRITOn;
       property IsXITOn[whichVFO: TVFO]: boolean read GetIsXITOn;
@@ -864,6 +866,13 @@ begin
       logger.debug('In TNetRadioBase.GetIsConnected, socket is nil');
       Result := false;
       end;
+end;
+
+function TNetRadioBase.GetIsOperational: boolean;
+begin
+   // Default: connected = operational.
+   // Radios with richer state (e.g. Flex slices) override this.
+   Result := True;
 end;
 
 function TNetRadioBase.GetAuthFailed: boolean;

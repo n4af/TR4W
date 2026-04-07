@@ -1,7 +1,7 @@
 unit uRadioElecraftK4;
 
 interface
-uses uNetRadioBase, uRadioBand, StrUtils, SysUtils, Math, TF, Log4D;
+uses uNetRadioBase, uRadioBand, StrUtils, SysUtils, Math, TF, Log4D, VC;
 
 
 Type TK4Radio = class(TNetRadioBase)
@@ -52,6 +52,7 @@ Type TK4Radio = class(TNetRadioBase)
       procedure VFOBumpUp(whichVFO: TVFO); override;
 
       // K4-specific methods
+      procedure PollRadioState; override;
       procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload;
       procedure ProcessMessage(sMessage: string);
       procedure SetAIMode(i: integer);
@@ -81,7 +82,18 @@ begin
    Result := Inherited Connect;
    if Self.IsConnected then
       begin
-      Self.SetAIMode(5);
+      if Self.serialPort <> NoPort then
+         begin
+         // Serial: disable AI to avoid flooding the serial port.
+         // Use periodic polling instead (same approach as legacy K3 code).
+         Self.SetAIMode(0);
+         Self.requiresPolling := True;
+         Self.pollingInterval  := 1000;
+         end
+      else
+         begin
+         Self.SetAIMode(5);
+         end;
       Self.SendToRadio('RT;XT;RO;FT;ID;MD;DT$;IF;');
       Self.SendToRadio('RT$;XT$;RO$;MD$;DT$;IF$;');
       end;
@@ -788,10 +800,16 @@ begin
    logger.debug('[BandNumToBand] Result band = %d', [Ord(Result)]);
 end;
 
+procedure TK4Radio.PollRadioState;
+begin
+   // IF gives VFO A freq + mode + RIT/XIT/split/TX state in one response.
+   // FB gives VFO B frequency.
+   Self.SendToRadio('IF;FB;');
+end;
+
 procedure TK4Radio.SetAIMode(i: integer);
 begin
    Self.SendToRadio(Format('AI%d;',[i]));
-   
 end;
 
 procedure TK4Radio.Initialize;
@@ -803,7 +821,10 @@ begin
    else
       logger := TLogLogger.GetLogger('TR4WDebugLog.K4-Radio');
 
-   Self.SetAIMode(5);
+   if Self.serialPort <> NoPort then
+      Self.SetAIMode(0)   // Serial: polling mode; AI5 would flood the serial port
+   else
+      Self.SetAIMode(5);
    logger.debug('[TK4Radio.Initialize] Sending KS;BN;RT;XT;RO;FT;ID;MD;DT$;IF;FP; to radio');
    Self.SendToRadio('KS;BN;RT;XT;RO;FT;ID;MD;DT;IF;FP;');
    Self.SendToRadio('BN$;RT$;XT$;RO$;MD$;DT$;IF$;FP$;');

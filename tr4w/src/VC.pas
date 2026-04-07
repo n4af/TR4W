@@ -438,7 +438,8 @@ type
     trYellow,
     trWhite,
 
-    trBtnFace
+    trBtnFace,
+    trAlert
     );
   Ptr4wColors = ^tr4wColors;
 //http://code.google.com/p/doctype/wiki/CSSColors
@@ -469,7 +470,8 @@ const
     'YELLOW',
     'WHITE',
 
-    'BTNFACE'
+    'BTNFACE',
+    'ALERT'
     );
 
 var
@@ -498,7 +500,8 @@ var
     $00FFFF,
     $FFFFFF,
 
-    clbtnface
+    clbtnface,
+    $0000FF  //ALERT (RED)
     );
 type
   TMainWindowElementInfo = record
@@ -651,6 +654,7 @@ var
 //  DomesticMultIsRussianOblast           : boolean;
 
   CreateCabrilloWindow                  : HWND;
+  AlertColor                            : tr4wColors = trAlert;
   wh                                    : array[TMainWindowElement] of HWND;
 
   TWindows                              : array[TMainWindowElement] of TMainWindowElementInfo =

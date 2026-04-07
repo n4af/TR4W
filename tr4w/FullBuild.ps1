@@ -16,8 +16,11 @@ $TEST_DIR = "C:\TR4W\tr4w\test\unit"
 Write-Host "=== Compiling Unit Tests ===" -ForegroundColor Cyan
 Write-Host ""
 
+$TEST_DCU_DIR = "C:\Temp\tr4w-test"
+New-Item -ItemType Directory -Force -Path $TEST_DCU_DIR | Out-Null
+
 Push-Location $TEST_DIR
-& $DCC32 $TEST_DPR -`$D+ -`$L+ -`$Y+ -NC:\Temp "/E$TEST_DIR"
+& $DCC32 $TEST_DPR -`$D+ -`$L+ -`$Y+ "-N$TEST_DCU_DIR" "/E$TEST_DIR"
 $testBuildResult = $LASTEXITCODE
 Pop-Location
 
@@ -48,6 +51,11 @@ Write-Host ""
 # ---------------------------------------------------------------------------
 # Step 2: Build main TR4W application.
 # ---------------------------------------------------------------------------
+
+# Clear the main DCU cache so stale DCUs from previous or test builds
+# cannot cause "File not found: '*.dcu'" failures.
+Write-Host "Clearing DCU cache (C:\Temp)..." -ForegroundColor Gray
+Get-ChildItem "C:\Temp\*.dcu" -ErrorAction SilentlyContinue | Remove-Item -Force
 
 Write-Host "=== Building TR4W Project ===" -ForegroundColor Cyan
 Write-Host "Project: $PROJECT" -ForegroundColor Yellow

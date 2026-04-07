@@ -935,6 +935,19 @@ begin
 
             end;
       end;
+
+   if pshortstring(Command)^ = 'ALERT COLOR' then
+      begin
+      TempByte := GetValueFromArray(@tr4wColorsSA,
+         Byte(High(tr4wColors)), @CustomCMD);
+      if TempByte <> UNKNOWNTYPE then
+         begin
+         AlertColor := tr4wColors(TempByte);
+         Result := True;
+         Exit;
+         end;
+      end;
+
    //logger.trace('Searching for %s',[Command]);
    for i := 1 to CommandsArraySize do
       begin
