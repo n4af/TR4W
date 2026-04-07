@@ -275,8 +275,8 @@ var
   TempDomesticQTHDataFileName           : PChar;
   TmpBuf                                : array[0..255] of Char;
     TempOblast                          : Str2;
-  i,j                                   : integer;
-  k                                     : str10;
+ // i,j                                   : integer;
+ // k                                     : str10;
 begin
   CTY.ctyCountryMode := ARRLCountryMode;  
 
@@ -311,7 +311,7 @@ begin
     //if ActiveZoneMult = ITUZones then
     RecalculateMyCountryContinentAndZoneNew(MyCall);
 
-    TempDomesticQTHDataFileName := nil;
+    //TempDomesticQTHDataFileName := nil;
 
     if ContestsArray[Contest].p <> 0 then
     begin

@@ -21,11 +21,13 @@ program tr4w_unit_tests;
 
 uses
    SysUtils,
-   uTR4WTestFramework in 'uTR4WTestFramework.pas',
-   uIcomCIV         in '..\..\src\uIcomCIV.pas',
-   uTestIcomCIV     in 'uTestIcomCIV.pas',
-   uRadioBand       in '..\..\src\uRadioBand.pas',
-   uTestRadioBand   in 'uTestRadioBand.pas';
+   uTR4WTestFramework   in 'uTR4WTestFramework.pas',
+   uIcomCIV             in '..\..\src\uIcomCIV.pas',
+   uTestIcomCIV         in 'uTestIcomCIV.pas',
+   uRadioBand           in '..\..\src\uRadioBand.pas',
+   uTestRadioBand       in 'uTestRadioBand.pas',
+   uFlexRadioUtils      in '..\..\src\uFlexRadioUtils.pas',
+   uTestFlexRadioUtils  in 'uTestFlexRadioUtils.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -35,6 +37,7 @@ begin
 
    RegisterSuite(TIcomCIVTests.Create('IcomCIV'));
    RegisterSuite(TRadioBandTests.Create('RadioBand'));
+   RegisterSuite(TFlexRadioUtilsTests.Create('FlexRadioUtils'));
 
    if RunAllSuites then
       begin

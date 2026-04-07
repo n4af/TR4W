@@ -452,7 +452,7 @@ begin
               // a message to the UDP receiver in WSJT-X.
               Unpack(AData, index, isNew);
               Unpack(AData, index, tm);
-              ztime := IncMilliSecond(0, tm);
+              //ztime := IncMilliSecond(0, tm);
               Unpack(AData, index, SNR);
               Unpack(AData, index, DT);
               Unpack(AData, index, DF);
@@ -480,7 +480,7 @@ begin
                           if IsValidCallsign(slCQMessage[i]) then
                              begin
                              foundCall := true;
-                             CallIndex := i;
+                            // CallIndex := i;
                              DXCall := slCQMessage[i];
                              logger.debug('Found callsign %s', [DXCall]);
                              end;
@@ -491,7 +491,7 @@ begin
                           if LooksLikeAGridIgnoreAE(shortStr) then
                              begin
                              foundGrid := true;
-                             gridIndex := i;
+                             //gridIndex := i;
                              grid := slCQMessage[i];
                              logger.debug('Found grid %s', [grid]);
                              end;
@@ -837,7 +837,7 @@ begin
   messageType := 13;
   id := sID;
 
-  colorType := 0; // RGB
+ // colorType := 0; // RGB
 
   pack(AData, magic); {.............................................Magic number}
 
@@ -1379,7 +1379,7 @@ begin
   aaa := copy(aaa, x + 1, length(aaa));
 
   z := AnsiPos('<', aaa);
-  i := AnsiPos('_INTL', AnsiUppercase(fieldName));
+  //i := AnsiPos('_INTL', AnsiUppercase(fieldName));
   //if dmData.DebugLevel >=1 then Write(' pos INTL:',i);
   if z = 0 then
   begin

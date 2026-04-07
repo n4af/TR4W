@@ -233,7 +233,7 @@ var
 
   temprect: TRect;
 
-  i, k: integer;
+  i : integer;
   TempTextColor: Cardinal;
   TempPoint: TPoint;
   TDIS: PDrawItemStruct;
@@ -942,7 +942,7 @@ begin
     for i := DX + 39 to DX + 65 do
     begin
       //        i1:=
-      i1 := PInteger(@TelnetBuffer[i])^;
+     // i1 := PInteger(@TelnetBuffer[i])^;
 
       if PInteger(@TelnetBuffer[i])^ = 542659409 {QSX } then
       begin

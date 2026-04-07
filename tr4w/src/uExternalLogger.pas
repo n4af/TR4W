@@ -6,7 +6,7 @@ uses uExternalLoggerBase, StrUtils, SysUtils, Math, TF, VC, LOGSUBS2, LogWind, L
 
 Type TExternalLogger = class(TExternalLoggerBase)
    private
-      localCE: ContestExchange;
+     // localCE: ContestExchange;
       procedure Initialize;
       procedure SendToLogger(sCmd: string; sData: string); overload;
       function AddADIFField(sFieldName: string; sValue: string): string; overload;
@@ -72,7 +72,7 @@ end;
 procedure TExternalLogger.ProcessMessage(sMessage: string);
 var
    sCommand: string;
-   i: integer;
+  // i: integer;
 begin
 // This is called by the process that receives data on the socket - Event
    logger.Debug('[TExternalLogger.ProcessMessage] Received from external logger: (%s)',[sMessage]);
@@ -148,7 +148,7 @@ end;
 
 function TExternalLogger.LogQSOToDXKeeper(ce: ContestExchange): integer;
 var sCoreADIF: string;
-    n: integer;
+    //n: integer;
     sMode: string;
     sOperator: string;
     nCoreADIFLength: integer;
@@ -297,13 +297,13 @@ end;
 //-------------------------------
 function TExternalLogger.DeleteQSOToDXKeeper(ce: ContestExchange): integer;
 var sCoreADIF: string;
-    n: integer;
+    //n: integer;
 
     nCoreADIFLength: integer;
 
     sMessage: string;
 
-    sTemp: string;
+   // sTemp: string;
 
 begin
 
@@ -319,7 +319,7 @@ begin
                ;
 
   sCoreADIF := sCoreADIF + '<EOR>';
-  nCoreADIFLength := length(sCoreADIF);
+  //nCoreADIFLength := length(sCoreADIF);
  // sCoreADIF := '<ExternalLogADIF:' + IntToStr(nCoreADIFLength) + '>' + sCoreADIF;
   nCoreADIFLength := length(sCoreADIF); // Update to include the ExternalLogADIF field
   sMessage := '<command:9>deleteqso<parameters:' + IntToStr(nCoreADIFLength {+ nOptionsLength}) + '>' + sCoreADIF;

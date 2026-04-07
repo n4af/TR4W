@@ -319,9 +319,9 @@ var
   TempTLogBrush                         : TLogBrush {= (lbStyle: BS_SOLID; lbHatch: 0)};
   c                                     : Cardinal;
   TempString                            : ShortString;
-     P                                   : Pchar; //n4af
-      P1                                   : boolean; //n4af
-   S1                                   : String; //n4af
+   //  P                                   : Pchar; //n4af
+   //   P1                                   : boolean; //n4af
+   // S1                                   : String; //n4af
 {$IF not tDebugMode}
   s                                     : string;
 {$IFEND}
@@ -359,12 +359,9 @@ begin
    iniFile := TINIFile.create(TR4W_INI_FILENAME);
    try
    appender := TLogRollingFileAppender.Create('name','tr4w.log');
-   //appender.Layout := TLogPatternLayout.Create('%d [%5p] %m%n');
    appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
-   //appender.Layout := TLogHTMLLayout.Create;
    TLogBasicConfigurator.Configure(appender);
    logger := TLogLogger.GetLogger('TR4WDebugLog');
-   //logLevels := llError; // For after we load config so we can set the value.
    sDebugLevel := iniFile.ReadString('COMMANDS','DEBUG LOG LEVEL', 'ERROR');
    for i := Low(tLogLevelsSA) to High(tLogLevelsSA) do
       begin
@@ -375,25 +372,16 @@ begin
          end;
       end;
    UpdateDebugLogLevel;
-   //TLogLogger.GetRootLogger.Level := Error;   // This is because to debug the CFG part, we need top set this since the level has not been read yet.
 
    logger.info('******************** PROGRAM STARTUP ************************');
    logger.Trace('trace output');
    logger.Info('DecimalSeparator = ' + DecimalSeparator);
 
-//{$IF LANG = 'ENG'}
-//  if TryToCheckTheLatestVersion then Exit;
-//{$IFEND}
 
-  {if WSJTXEnabled then
-     begin
-     wsjtx := TWSJTXServer.Create;
-     end;   }               // Moved after we read the config file
-  //externalLogger := TExternalLogger.Create('DXKEEPER');
+
   TR4W_PATH_NAME[Windows.GetCurrentDirectory(SizeOf(TR4W_PATH_NAME), @TR4W_PATH_NAME)] := '\';
 
  Format(TR4W_INI_FILENAME, '%ssettings\tr4w.ini', TR4W_PATH_NAME);
- // Format(TempBuffer, '%s%s', tempstring, 'tr4w.ini');
   LuconSZLoadded := AddFontResource(TR4W_LC_FILENAME) <> 0;
   MainFixedFont := tCreateFont(15, FW_BOLD * Ord(BoldFont), @MainFontName[1]);
   MSSansSerifFont := tCreateFont(15, FW_DONTCARE, 'MS Sans Serif');
@@ -412,7 +400,6 @@ begin
   end;
 
   begin
-//    tDialogBox(43, @NewContestDlgProc);
     CreateModalDialog(305, 235, tr4whandle, @NewContestDlgProc, 0);
     if TR4W_CFG_FILENAME[0] = '_' then Exit;
   end;
@@ -568,10 +555,6 @@ begin
   tDispalyMyComputerID;
   SetMainWindowText(mweCurrentOperator, CurrentOperator);
 
-//  WSAStartup($0202, PWSAData(@wsprintfBuffer)^);
-//  InitCommonControls();
-
-//  TR4WDriver := TDriverConnection.Create;
   ntBeepInit;
   OpenOtherWindows;
 
@@ -704,6 +687,11 @@ begin
             if (Msg.HWND = wh[mweCall]) then
                begin
                CallWindowKeyDownProc(Msg.wParam);
+               if CallWindowCharConsumed then
+                  begin
+                  CallWindowCharConsumed := False;
+                  goto NoTransMess;
+                  end;
                end
             else if Msg.HWND = wh[mweExchange] then       // ny4i Issue 87
                begin

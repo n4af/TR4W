@@ -16,6 +16,22 @@
 
 ---
 
+## 4.146.x — April 2026
+
+### 4.146.1 (2026-04-06) — NY4I
+
+#### FlexRadio 6000 — Split, Alert Color, and UI Fixes (`uFlexRadio6000.pas`, `uNetRadioBase.pas`, `uRadioPolling.pas`, `MainUnit.pas`, `VC.pas`, `uCFG.pas`, `uOption.pas`, `LOGRADIO.PAS`, `tr4w.dpr`) — Issue #855
+
+- **Fixed split indicator not clearing when SmartSDR closes slice 1.** Root cause: `in_use=0` push for slice 1 was not handled. Now clears split state and zeros VFO B frequency/band when slice 1 is deallocated.
+- **Fixed VFO B showing VFO A's frequency when split is disabled.** When split was enabled externally from SmartSDR (`slice 0 tx=0` push), `FSlice0TX` was set to False. On subsequent split disable (`slice 1 tx=0`), only `FSlice1TX` was updated — leaving `FSlice0TX` stale and routing the `transmit freq=` push to VFO B. Fixed: when slice 1 loses TX, `FSlice0TX` is forced True (TX must be returning to slice 0).
+- **Fixed VFO B frequency not preserved across split enable/disable.** `SetFrequency` for VFO B now always updates the internal VFO object first; if slice 1 doesn't exist yet, it exits early without sending. `Split(True)` applies the stored VFO B frequency when creating the new slice.
+- **Added alert color when radio is disconnected or not operational.** The frequency and radio name windows change to the alert color when the radio is disconnected or when TCP is connected but no slices exist (SmartSDR running but no RX slice). `IsOperational` virtual property on `TNetRadioBase` allows `TFlexRadio6000` to distinguish these states. `RadioDisconnected` flag on `RadioObject` is set/cleared by the polling thread on state transitions only, avoiding redundant repaints.
+- **Added ALERT COLOR to the colors configuration dialog** (`uOption.pas`, `uCFG.pas`, `VC.pas`). Defaults to red. Configurable via `ALERT COLOR = <color name>` in the `.cfg` file.
+- **Fixed `-` key leaving a `-` in the call window after toggling split.** The `-` handler in `CallWindowKeyDownProc` fires on `WM_CHAR`. After the handler clears the call window, the same `WM_CHAR` event delivered the `-` to `KeyboardCallsignChar` which re-inserted it. Fixed with a `CallWindowCharConsumed` flag that causes `tr4w.dpr` to skip `KeyboardCallsignChar` for that message.
+- **Fixed split warning (QuickDisplay) showing/hiding based on stale polling value.** `CallWindowChange` fired before `CurrentStatus.Split` was updated by the polling thread, causing the split warning to appear when turning split off and not appear when turning split on. Moved split warning display to `DisplayCurrentStatus` (`uRadioPolling.pas`), driven by confirmed state transitions (`PreviousStatus.Split` → `CurrentStatus.Split`). Removed the racy QD calls from `CallWindowChange`.
+
+---
+
 ## 4.145.x — March 2026
 
 ### 4.145.5 (2026-03-22) — NY4I
