@@ -8523,6 +8523,7 @@ begin
     if not (ActiveExchange in [RSTNameAndQTHExchange, RSTAndPOTAPark]) then
       Exit;
 
+
   case ActiveExchange of
 
     RSTAndGridSquareOrRDAExchange:

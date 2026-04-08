@@ -1,4 +1,4 @@
-!define TR4WVERSION    '146.1'
+!define TR4WVERSION    '146.3'
 !define TR4WINSTFOLDER 'Software\TR4W'
 !define TR4WDRVREG     'SYSTEM\CurrentControlSet\Services\TR4WIO'
 
@@ -227,6 +227,7 @@ Section "Domestic multiplier files" Secdom
    File ..\target\dom\colorado.dom
    File ..\target\dom\colorado_cty.dom
    File ..\target\dom\croat.dom
+    File ..\target\dom\dc.dom
    File ..\target\dom\delaware_cty.dom
    File ..\target\dom\ea.dom
    File ..\target\dom\eudx.dom
@@ -289,6 +290,7 @@ Section "Domestic multiplier files" Secdom
    File ..\target\dom\s50p13.dom
    File ..\target\dom\s50p13dc.dom
    File ..\target\dom\s50p14dc.dom
+   File ..\target\dom\s51.dom
    File ..\target\dom\seven.dom
    File ..\target\dom\seven_cty.dom
    File ..\target\dom\spdx.dom

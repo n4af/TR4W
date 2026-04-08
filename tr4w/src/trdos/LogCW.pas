@@ -579,7 +579,7 @@ begin
        end;
     tSetPaddleElementLength;
     wkSetSpeed(Speed);
-    YCCCSetSpeed(Speed);
+ //   YCCCSetSpeed(Speed);
   end;
 end;
 
