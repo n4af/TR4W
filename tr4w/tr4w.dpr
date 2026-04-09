@@ -254,7 +254,6 @@ begin
         else
           tCallWindowSetFocus;
         ShowFMessages(0);
-
       end;
 
     WM_CTLCOLORLISTBOX, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC:
