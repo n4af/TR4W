@@ -18,7 +18,7 @@
 
 ## 4.146.x — April 2026
 
-### 4.146.4 (pending) — NY4I
+### 4.146.4 (2026-04-09) — NY4I
 
 #### Band Map — CTRL-END Focus Fix (`src/uBandmap.pas`, `src/MainUnit.pas`, `src/uMenu.pas`) — Issue #861
 
