@@ -765,7 +765,7 @@ begin
          // Radio is connected - poll status
          if not wasConnected then
             begin
-            logger.Info('[pNetworkRadio] Radio connected — querying initial freq/mode/state');
+            logger.trace('[pNetworkRadio] Radio connected — querying initial freq/mode/state');
             wasConnected := True;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
             SetRadioAlertState(False);  // TCP reconnected — clear alert (operational check below)

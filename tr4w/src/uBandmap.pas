@@ -103,6 +103,7 @@ var
   tBlinkerRect: TRect;
   tIvertedBlinker: boolean;
   BandMapPreventRefresh: boolean; // Gav 4.37.12
+  BandMapSettingFocus: boolean;  // True while CTRL-END is directing focus to band map listbox (issue #861)
   //  DoNotAddToBandMap                : boolean;
   // BandMapListBoxHDC                     : HDC;
  // tr4w_NetedToBlink                      : boolean;
@@ -687,6 +688,13 @@ end;
 
 procedure KillFocus; // Gav 4.47.4 #141
 begin
+  // If CTRL-END is in the middle of directing focus to the band map, DefDlgProc's
+  // WM_ACTIVATE handling fires a nested SetFocus which immediately triggers LBN_KILLFOCUS.
+  // Guard against this to prevent KillFocus from stealing focus back. (#861)
+  if BandMapSettingFocus then
+     begin
+     Exit;
+     end;
   BandMapPreventRefresh := False;
   SpotsList.SendAndClearBuffer;
   DisplayBandMap;

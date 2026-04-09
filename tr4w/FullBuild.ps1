@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Continue"
 
-$LIB = "C:\Indy\Lib\Core;C:\Indy\Lib\System;C:\tr4w\tr4w\include;C:\Indy\Lib\Protocols"
+$LIB = "C:\Indy\Indy\Lib\Core;C:\Indy\Indy\Lib\System;C:\tr4w\tr4w\include;C:\Indy\Indy\Lib\Protocols"
 $DCC32 = "C:\Program Files (x86)\Borland\Delphi7\Bin\DCC32.EXE"
 $PROJECT = "C:\TR4W\tr4w\tr4w.dpr"
 $EXE_DIR = "C:\TR4W\tr4w\target"
@@ -52,18 +52,13 @@ Write-Host ""
 # Step 2: Build main TR4W application.
 # ---------------------------------------------------------------------------
 
-# Clear the main DCU cache so stale DCUs from previous or test builds
-# cannot cause "File not found: '*.dcu'" failures.
-Write-Host "Clearing DCU cache (C:\Temp)..." -ForegroundColor Gray
-Get-ChildItem "C:\Temp\*.dcu" -ErrorAction SilentlyContinue | Remove-Item -Force
-
 Write-Host "=== Building TR4W Project ===" -ForegroundColor Cyan
 Write-Host "Project: $PROJECT" -ForegroundColor Yellow
 Write-Host "Output: $EXE_DIR" -ForegroundColor Yellow
 Write-Host ""
 
 Push-Location "C:\TR4W\tr4w"
-& $DCC32 $PROJECT -`$D+ -`$L+ -`$Y+ -NC:\Temp "/U$LIB" "/I$LIB" "/E$EXE_DIR"
+& $DCC32 $PROJECT -`$D+ -`$L+ -`$Y+ "/U$LIB" "/I$LIB" "/E$EXE_DIR"
 $result = $LASTEXITCODE
 Pop-Location
 

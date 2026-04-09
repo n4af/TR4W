@@ -130,13 +130,40 @@ uses
   uRadioIcom7850 in 'src\uRadioIcom7850.pas',
   uRadioIcom905 in 'src\uRadioIcom905.pas',
   GetWinVersionInfo in 'src\GetWinVersionInfo.pas',
-  uSuperCheckPartialFileUpload,
+  uSuperCheckPartialFileUpload in 'src\uSuperCheckPartialFileUpload.pas',
   uHamLibDirect in 'src\uHamLibDirect.pas',
   uRadioHamLibDirect in 'src\uRadioHamLibDirect.pas',
   uExternalLoggerBase in 'src\uExternalLoggerBase.pas',
   uExternalLogger in 'src\uExternalLogger.pas',
+  uExternalLoggerFactory in 'src\uExternalLoggerFactory.pas',
+  // uExternalLoggerManager uses Generics.Collections (Delphi 2009+) - not Delphi 7 IDE compatible
+  //uExternalLoggerManager in 'src\uExternalLoggerManager.pas',
   uDXLabPathfinder in 'src\uDXLabPathfinder.pas',
-  uYCCCSO2R in 'src\uYCCCSO2R.pas';
+  uYCCCSO2R in 'src\uYCCCSO2R.pas',
+  uFlexRadio6000 in 'src\uFlexRadio6000.pas',
+  uRadioBand in 'src\uRadioBand.pas',
+  uRadioIcom7100 in 'src\uRadioIcom7100.pas',
+  uIcomCIV in 'src\uIcomCIV.pas',
+  // uRadioManager uses Generics.Collections (Delphi 2009+) - not Delphi 7 IDE compatible
+  //uRadioManager in 'src\uRadioManager.pas',
+  // uDXSSpotsFilter and uSpotsFilter reference SendViaSocket which is not defined - unfinished code
+  //uDXSSpotsFilter in 'src\uDXSSpotsFilter.pas',
+  //uSpotsFilter in 'src\uSpotsFilter.pas',
+  // uRemMults_DOM/DX/Zone: dead code since initial commit, depends on Country9.pas which was never in the repo
+  //uRemMults_DOM in 'src\uRemMults_DOM.pas',
+  //uRemMults_DX in 'src\uRemMults_DX.pas',
+  //uRemMults_Zone in 'src\uRemMults_Zone.pas',
+  uAbout in 'src\uAbout.pas',
+  uHardWare in 'src\uHardWare.pas',
+  uReminder in 'src\uReminder.pas',
+  // uSCP: never referenced anywhere, was never compiled prior to this session - orphaned code
+  //uSCP in 'src\uSCP.pas',
+  // uMultsFrequencies: never referenced (commented out in MainUnit and uNet) - orphaned code
+  //uMultsFrequencies in 'src\uMultsFrequencies.pas',
+  uMakeHelpFile in 'src\uMakeHelpFile.pas',
+  uTrayBalloon in 'src\uTrayBalloon.pas',
+  uVariants in 'src\uVariants.pas';
+  //cty in 'src\cty.pas';  // Excluded: unit name 'cty' conflicts with global variable 'CTY' from uCTYDAT
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
 {$IF LANG = 'RUS'}{$R res\tr4w_rus.res}{$IFEND}
@@ -227,7 +254,6 @@ begin
         else
           tCallWindowSetFocus;
         ShowFMessages(0);
-
       end;
 
     WM_CTLCOLORLISTBOX, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC:

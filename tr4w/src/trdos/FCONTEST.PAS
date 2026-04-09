@@ -1033,6 +1033,11 @@ begin
        AutoDupeEnableSandP := False;
        ContestName := 'POTA';
        WARCBandsEnabled := True;
+       SetCQMemoryString(CW, F1, 'CQ^POTA \ \ ');
+       SetCQMemoryString(CW, F2, 'CQ^POTA CQ^POTA \ \ FD');
+       //CQExchange := ' ' + MyFDClass + ' ' + MySection;
+       //SearchAndPounceExchange := MyFDClass + ' ' + MySection;
+       QSLMessage := '73 \ EE';
        end;
 
     QCWA:

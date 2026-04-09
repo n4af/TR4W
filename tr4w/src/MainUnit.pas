@@ -3074,7 +3074,11 @@ begin
     menu_ctrl_cursorinbandmap:
       begin
         if tWindowsExist(tw_BANDMAPWINDOW_INDEX) then
+          begin
+          BandMapSettingFocus := True;
           Windows.SetFocus(BandMapListBox);
+          BandMapSettingFocus := False;
+          end;
       end;
 
     menu_ctrl_cursorintelnet:
