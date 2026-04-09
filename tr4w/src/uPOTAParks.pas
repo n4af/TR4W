@@ -268,6 +268,8 @@ begin
       end;
 
    // Anything else ('59', '599', random words) — not a park reference.
+   // Return the token unchanged so callers (RST detection, etc.) still work.
+   Result := S;
 end;
 
 // ---------------------------------------------------------------------------

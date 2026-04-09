@@ -265,7 +265,6 @@ const
     (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
 
     (mrText: RC_Download + RC_Download_HK; mrId: menu_download_latest_cty_dat), // 4.75.3
-    (mrText: 'Download POTA Parks'; mrId: menu_download_pota_parks),  // issue #864
 //    (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transfreq),     // 4.68.11
     (mrText: RC_ALTP + RC_ALTP_HK; mrId: menu_alt_p),
     (mrText: RC_AUTOCQ + RC_AUTOCQ_HK; mrId: menu_alt_autocq),
@@ -364,6 +363,7 @@ const
     (mrText: RC_CALCULATOR; mrId: item_calculator),
     (mrText: '-'; mrId: 0),
     (mrText: RC_RESET_RADIO_PORTS; mrId: menu_reset_radio_ports),
+    (mrText: 'Download POTA Parks'; mrId: menu_download_pota_parks),  // issue #864
  //}
     (mrText: '-'; mrId: 0),
     (mrText: RC_3830; mrId: menu_3830_scores_posting),
