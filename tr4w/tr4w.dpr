@@ -272,6 +272,13 @@ begin
          QuickDisplay(PChar('POTA parks download failed'));
       end;
 
+    WM_POTA_LOAD_DONE:
+      begin
+      // Fired by TPOTALoadThread after parsing the CSV off the UI thread.
+      // lParam is the parsed TStringList — ApplyLoadedParks takes ownership.
+      ApplyLoadedParks(lParam);
+      end;
+
     WM_CTLCOLORLISTBOX, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC:
       begin
         Result := DrawWindows(lParam, wParam);
@@ -609,9 +616,9 @@ begin
 
   CheckNTPAtStartup;
 
-  // Load POTA parks database if available (downloaded separately via menu).
-  // LoadPOTAParks returns -1 silently if the file does not exist.
-  LoadPOTAParks(POTAParksFilePath);
+  // Load POTA parks database off the UI thread (file may be ~3 MB / 50k entries).
+  // TPOTALoadThread parses the CSV and posts WM_POTA_LOAD_DONE when done.
+  LoadPOTAParksAsync(tr4whandle);
 
   asm
   mov  ebx,0

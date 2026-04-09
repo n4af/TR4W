@@ -32,6 +32,11 @@ const
    // Main thread should call LoadPOTAParks then QuickDisplay the result.
    WM_POTA_DOWNLOAD_DONE = WM_APP + 200;
 
+   // Posted to ANotifyWnd when async startup load completes.
+   // lParam = TStringList pointer (already parsed; main thread owns it after this).
+   // Main thread must call ApplyLoadedParks(lParam) from the handler.
+   WM_POTA_LOAD_DONE = WM_APP + 201;
+
 // Returns full path to the parks CSV (same directory as tr4w.exe).
 function POTAParksFilePath: string;
 
@@ -56,6 +61,16 @@ function NormalizePOTAPark(const AToken: string; const AMyPark: string): string;
 // Saves to ATargetFile. On completion posts WM_POTA_DOWNLOAD_DONE to ANotifyWnd.
 // The main thread should handle that message by calling LoadPOTAParks.
 procedure DownloadPOTAParksAsync(const ATargetFile: string; ANotifyWnd: HWND);
+
+// Start an asynchronous load of an already-downloaded parks CSV.
+// Does all parsing off the UI thread. On completion posts WM_POTA_LOAD_DONE
+// to ANotifyWnd with lParam = parsed TStringList pointer.
+// The main thread MUST call ApplyLoadedParks(lParam) from that handler.
+procedure LoadPOTAParksAsync(ANotifyWnd: HWND);
+
+// Apply a pre-parsed parks list delivered via WM_POTA_LOAD_DONE lParam.
+// Must be called on the main thread. Takes ownership of the TStringList.
+procedure ApplyLoadedParks(ALParam: LPARAM);
 
 implementation
 
@@ -270,6 +285,83 @@ begin
    // Anything else ('59', '599', random words) — not a park reference.
    // Return the token unchanged so callers (RST detection, etc.) still work.
    Result := S;
+end;
+
+// ---------------------------------------------------------------------------
+// Async startup load thread
+// Parses the CSV entirely off the UI thread and hands the result to the
+// main thread via PostMessage so FParks is only ever written from one thread.
+// ---------------------------------------------------------------------------
+
+type
+   TPOTALoadThread = class(TThread)
+   private
+      FNotifyWnd: HWND;
+   protected
+      procedure Execute; override;
+   public
+      constructor Create(ANotifyWnd: HWND);
+   end;
+
+constructor TPOTALoadThread.Create(ANotifyWnd: HWND);
+begin
+   inherited Create(True);  // Create suspended
+   FNotifyWnd := ANotifyWnd;
+   FreeOnTerminate := True;
+end;
+
+procedure TPOTALoadThread.Execute;
+var
+   Lines: TStringList;
+   NewParks: TStringList;
+   I: Integer;
+   Ref, Name: string;
+   Filename: string;
+begin
+   Filename := POTAParksFilePath;
+   if not FileExists(Filename) then
+      Exit;  // Nothing to load; no notification needed
+   Lines := TStringList.Create;
+   NewParks := TStringList.Create;
+   try
+      NewParks.Sorted := True;
+      NewParks.CaseSensitive := False;
+      Lines.LoadFromFile(Filename);
+      for I := 1 to Lines.Count - 1 do  // Row 0 is the CSV header
+         begin
+         Ref := UpperCase(Trim(GetCSVField(Lines[I], 0)));
+         Name := Trim(GetCSVField(Lines[I], 1));
+         if (Ref <> '') and (Name <> '') then
+            NewParks.Add(Ref + '=' + Name);
+         end;
+      // Post the parsed list to the main thread. Ownership transfers on receipt.
+      PostMessage(FNotifyWnd, WM_POTA_LOAD_DONE, 0, LPARAM(NewParks));
+      NewParks := nil;  // Ownership passed via PostMessage
+   except
+      // Silently discard on any file/parse error
+   end;
+   Lines.Free;
+   if Assigned(NewParks) then
+      NewParks.Free;
+end;
+
+procedure LoadPOTAParksAsync(ANotifyWnd: HWND);
+var
+   Thread: TPOTALoadThread;
+begin
+   Thread := TPOTALoadThread.Create(ANotifyWnd);
+   Thread.Resume;
+end;
+
+procedure ApplyLoadedParks(ALParam: LPARAM);
+var
+   NewParks: TStringList;
+begin
+   NewParks := TStringList(ALParam);
+   if not Assigned(NewParks) then
+      Exit;
+   FParks.Free;
+   FParks := NewParks;
 end;
 
 // ---------------------------------------------------------------------------
