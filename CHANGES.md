@@ -18,6 +18,43 @@
 
 ## 4.146.x — April 2026
 
+### 4.146.4 (pending) — NY4I
+
+#### Band Map — CTRL-END Focus Fix (`src/uBandmap.pas`, `src/MainUnit.pas`, `src/uMenu.pas`) — Issue #861
+
+- **Fixed CTRL-END not moving cursor to band map on the second press.** Root cause: when the band map dialog is re-activated after losing focus, Win32's `DefDlgProc` fires a nested `SetFocus(BandMapListBox)` synchronously *inside* the outer `SetFocus` call from the CTRL-END handler. The outer `SetFocus` then sends `WM_KILLFOCUS` to the now-focused listbox, triggering `LBN_KILLFOCUS` → `KillFocus()` → `SetFocus(wh[mweCall])`, leaving focus on the call window. Fixed with a `BandMapSettingFocus` flag that causes `KillFocus` to exit early while CTRL-END is directing focus to the band map.
+- **Restored Ctrl+End shortcut to move cursor to band map.** The `RC_CURSORINBM_HK` hotkey and its `menu_ctrl_cursorinbandmap` menu entry had been commented out since at least the initial 2014 commit with no documented reason. Re-enabled both. `T_MENU_ARRAY_SIZE` bumped from 175 to 176 to match.
+
+#### POTA — Default CW Memories (`src/trdos/FCONTEST.PAS`)
+
+- Added default F1 (`CQ POTA \ \`) and F2 (`CQ POTA CQ POTA \ \ FD`) CW memories and a default QSL message (`73 \ EE`) for the POTA contest type.
+
+---
+
+### 4.146.3 (2026-04-08) — N4AF
+
+#### Michigan QSO Party — DC Added as Multiplier (`target/dom/michigan.dom`, `target/dom/dc.dom`, `target/dom/s51.dom`) — Issue #862
+
+- **Added District of Columbia (DC) as a multiplier for Michigan stations** in the Michigan QSO Party, effective for the April 18, 2026 event. `michigan.dom` updated to reference `S51.DOM`; `dc.dom` and `s51.dom` added to the installer.
+
+#### YCCC SO2R — CW Speed (`src/trdos/LogCW.pas`)
+
+- Disabled `YCCCSetSpeed` call in the CW speed change handler to prevent speed commands from being sent to the YCCC SO2R box during keyer operation.
+
+---
+
+### 4.146.2 (2026-04-07) — NY4I
+
+#### YCCC SO2R Box — OTRSP RX Control and Overlapped I/O (`src/uYCCCSO2R.pas`, `src/trdos/LOGSUBS2.PAS`, `src/uProcessCommand.pas`) — Issue #61
+
+- **Rewrote serial I/O to use overlapped (`FILE_FLAG_OVERLAPPED`) mode** so `WriteFile` never blocks the main UI thread. A dedicated write thread drains the command queue via `WaitForMultipleObjects`.
+- **Added `YCCCSetStereo()` and `YCCCSetRxMode()`** for independent RX antenna control per the OTRSP protocol.
+- **Hooked `ToggleStereoPin`** to call `YCCCSetStereo` for stereo/mono RX switching.
+- **Added `OTRSPCommand` procedure** in `LOGSUBS2.PAS` handling the `OTRSP=RX1`, `RX2`, `RXA`, `RXI`, and `STEREO` function key messages.
+- **Registered `OTRSP` command** and five display-only help entries in `uProcessCommand.pas` commands list.
+
+---
+
 ### 4.146.1 (2026-04-06) — NY4I
 
 #### FlexRadio 6000 — Split, Alert Color, and UI Fixes (`uFlexRadio6000.pas`, `uNetRadioBase.pas`, `uRadioPolling.pas`, `MainUnit.pas`, `VC.pas`, `uCFG.pas`, `uOption.pas`, `LOGRADIO.PAS`, `tr4w.dpr`) — Issue #855
