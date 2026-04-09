@@ -4844,53 +4844,27 @@ begin
 end;
 
 procedure SaveLogFileToFloppy;
-
+var
+  ErrorMsg: string;
 begin
-
   if TR4W_FLOPPY_FILENAME[0] = #0 then
-    exit;
-  Windows.lstrcat(TR4W_FLOPPY_FILENAME, p);
-  asm
-  lea  eax,TR4W_FLOPPY_FILENAME
-  push eax
-  lea  eax,TR4W_LOG_FILENAME
-  push eax
-  end;
+     Exit;
 
-  { h := CreateFile(@TR4W_Floppy_Filename, GENERIC_WRITE or GENERIC_READ, FILE_SHARE_WRITE or FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
-    SetFilePointer(h, 0, nil, FILE_END);
-   tOpenFileForWrite(h,@TR4W_Floppy_Filename); }
-  wsprintf(QuickDisplayBuffer, TC_SAVINGTO);
-  asm add esp,16
-  end;
+  Format(QuickDisplayBuffer, TC_SAVINGTO, TR4W_LOG_FILENAME, TR4W_FLOPPY_FILENAME);
   QuickDisplay(QuickDisplayBuffer);
 
   if not Windows.CopyFile(TR4W_LOG_FILENAME, TR4W_FLOPPY_FILENAME, False) then
-  begin
-    SysErrorMessage(GetLastError);
-    asm
-    push eax
-    lea  eax,TR4W_FLOPPY_FILENAME
-    push eax
-    end;
-    wsprintf(QuickDisplayBuffer, '%s: %s');
-    asm add esp,16
-    end;
-    QuickDisplay(QuickDisplayBuffer);
-
-    DoABeep(Warning);
-  end
+     begin
+     ErrorMsg := SysErrorMessage(GetLastError);
+     Format(QuickDisplayBuffer, '%s: %s', TR4W_FLOPPY_FILENAME, PChar(ErrorMsg));
+     QuickDisplay(QuickDisplayBuffer);
+     DoABeep(Warning);
+     end
   else
-  begin
-    asm
-      lea eax,  TR4W_FLOPPY_FILENAME
-      push eax
-    end;
-    wsprintf(QuickDisplayBuffer, TC_FILESAVEDTOSUCCESSFULLY);
-    asm add esp,12
-    end;
-    QuickDisplay(QuickDisplayBuffer);
-  end;
+     begin
+     Format(QuickDisplayBuffer, TC_FILESAVEDTOSUCCESSFULLY, TR4W_FLOPPY_FILENAME);
+     QuickDisplay(QuickDisplayBuffer);
+     end;
   {
     if FloppyFileSaveName = '' then Exit;
     Windows.ZeroMemory(@TR4W_FLOPPY_FILENAME, SizeOf(TR4W_FLOPPY_FILENAME));
