@@ -3073,8 +3073,17 @@ begin
 
     menu_ctrl_cursorinbandmap:
       begin
+        logger.info('[CTRL-END] BandMapWindowExists=%s BandMapListBox=%d CurrentFocus=%d',
+          [BoolToStr(tWindowsExist(tw_BANDMAPWINDOW_INDEX), True),
+           BandMapListBox,
+           Windows.GetFocus]);
         if tWindowsExist(tw_BANDMAPWINDOW_INDEX) then
+          begin
           Windows.SetFocus(BandMapListBox);
+          logger.info('[CTRL-END] SetFocus called, new focus=%d', [Windows.GetFocus]);
+          end
+        else
+          logger.info('[CTRL-END] Band map window does not exist - skipping SetFocus');
       end;
 
     menu_ctrl_cursorintelnet:

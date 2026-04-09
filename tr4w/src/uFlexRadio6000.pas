@@ -133,7 +133,7 @@ begin
    // subscriptions are sent from ProcessMsg once the H line arrives.
    if Self.IsConnected then
       begin
-      logger.Info('[FlexRadio6000.Connect] TCP connected to %s:%d — awaiting radio handshake',
+      logger.trace('[FlexRadio6000.Connect] TCP connected to %s:%d — awaiting radio handshake',
                   [Self.radioAddress, Self.radioPort]);
       end;
 end;
@@ -227,7 +227,7 @@ var
    fullCmd: string;
 begin
    fullCmd := Format('C%d|%s', [NextSeq, cmd]);
-   logger.Info('[FlexRadio6000 TX] %s', [fullCmd]);
+   logger.trace('[FlexRadio6000 TX] %s', [fullCmd]);
    inherited SendToRadio(fullCmd);
 end;
 
@@ -249,7 +249,7 @@ end;
 
 procedure TFlexRadio6000.SendSubscriptions;
 begin
-   logger.Info('[FlexRadio6000] Sending subscription sequence');
+   logger.trace('[FlexRadio6000] Sending subscription sequence');
    // sub slice all: frequency, mode, RIT/XIT, split — core VFO state
    // sub tx all:    TX/interlock status (transmitting, PTT)
    // keepalive disable: prevents the radio from disconnecting us on a keepalive timeout
@@ -289,14 +289,14 @@ begin
       'V':
          begin
          // V1.4.0.0 — radio firmware version
-         logger.Info('[FlexRadio6000] Radio firmware: %s', [line]);
+         logger.trace('[FlexRadio6000] Radio firmware: %s', [line]);
          end;
 
       'H':
          begin
          // H<hex> — client handle assigned by the radio
          FClientHandle := Copy(line, 2, Length(line) - 1);
-         logger.Info('[FlexRadio6000] Client handle: %s', [FClientHandle]);
+         logger.trace('[FlexRadio6000] Client handle: %s', [FClientHandle]);
          if not FHandshakeDone then
             begin
             FHandshakeDone := True;
@@ -307,7 +307,7 @@ begin
       'M':
          begin
          // M<code>|<text> — informational message from radio
-         logger.Info('[FlexRadio6000] Server message: %s', [line]);
+         logger.trace('[FlexRadio6000] Server message: %s', [line]);
          end;
 
       'R':
@@ -431,14 +431,14 @@ begin
          if FSlice0Valid then
             begin
             FSlice0Valid := False;
-            logger.Info('[FlexRadio6000] Slice 0 removed (in_use=0) — radio not operational');
+            logger.trace('[FlexRadio6000] Slice 0 removed (in_use=0) — radio not operational');
             end;
          Exit;
          end;
       if not FSlice0Valid then
          begin
          FSlice0Valid := True;
-         logger.Info('[FlexRadio6000] Slice 0 confirmed in-use — radio operational');
+         logger.TRACE('[FlexRadio6000] Slice 0 confirmed in-use — radio operational');
          end;
       end
    else if sliceNum = 1 then
@@ -456,14 +456,14 @@ begin
             Self.localSplitEnabled := False;
             Self.vfo[nrVFOB].frequency := 0;
             Self.vfo[nrVFOB].band      := rbNone;
-            logger.Info('[FlexRadio6000] Slice 1 removed — split cleared, VFO B reset');
+            logger.trace('[FlexRadio6000] Slice 1 removed — split cleared, VFO B reset');
             end;
          Exit;
          end;
       if not FSlice1Exists then
          begin
          FSlice1Exists := True;
-         logger.Info('[FlexRadio6000] Slice 1 detected — split available');
+         logger.trace('[FlexRadio6000] Slice 1 detected — split available');
          end;
       end
    else
@@ -494,7 +494,7 @@ begin
          if (mhzInt >= 0) and (mhzFrac >= 0) then
             begin
             freqHz           := (mhzInt * 1000000) + mhzFrac;
-            logger.Info('[FlexRadio6000] RF_frequency push: slice %d → %d Hz', [sliceNum, freqHz]);
+            logger.trace('[FlexRadio6000] RF_frequency push: slice %d → %d Hz', [sliceNum, freqHz]);
             vfoObj.frequency := freqHz;
             vfoObj.band      := FreqToRadioBand(freqHz);
             end
@@ -650,7 +650,7 @@ begin
          txVFO := nrVFOA
       else
          txVFO := nrVFOB;
-      logger.Info('[FlexRadio6000] transmit freq push: %d Hz → updating VFO %s',
+      logger.Trace('[FlexRadio6000] transmit freq push: %d Hz → updating VFO %s',
                   [freqHz, VFOToString(txVFO)]);
       Self.vfo[txVFO].frequency := freqHz;
       Self.vfo[txVFO].band      := FreqToRadioBand(freqHz);
@@ -767,7 +767,7 @@ begin
    // frequency will be applied by Split(True) when it creates the slice.
    if (vfo = nrVFOB) and (not FSlice1Exists) then
       begin
-      logger.Info('[FlexRadio6000.SetFrequency] VFO B freq %d Hz stored — slice 1 not yet created, will apply on Split', [freq]);
+      logger.trace('[FlexRadio6000.SetFrequency] VFO B freq %d Hz stored — slice 1 not yet created, will apply on Split', [freq]);
       Exit;
       end;
 
@@ -820,7 +820,7 @@ end;
 procedure TFlexRadio6000.BufferCW(cwChars: string);
 begin
    FCWBuffer := FCWBuffer + cwChars;
-   logger.Info('[FlexRadio6000.BufferCW] Buffered: "%s"  total: "%s"',
+   logger.trace('[FlexRadio6000.BufferCW] Buffered: "%s"  total: "%s"',
                [cwChars, FCWBuffer]);
 end;
 
@@ -849,7 +849,7 @@ begin
          end;
       end;
 
-   logger.Info('[FlexRadio6000.SendCW] Sending CW: "%s"', [FCWBuffer]);
+   logger.trace('[FlexRadio6000.SendCW] Sending CW: "%s"', [FCWBuffer]);
    SendFlexCmd('cwx send "' + encoded + '"');
    FCWBuffer := '';
 end;
@@ -943,14 +943,14 @@ begin
             logger.Warn('[FlexRadio6000.Split] Pan handle not yet known — cannot create slice 1');
             Exit;
             end;
-         logger.Info('[FlexRadio6000] Creating slice 1 for split on pan %s', [FPanHandle]);
+         logger.trace('[FlexRadio6000] Creating slice 1 for split on pan %s', [FPanHandle]);
          SendFlexCmd(Format('slice create pan=%s mode=CW', [FPanHandle]));
          // FSlice1Exists will be set True when the radio pushes the slice 1 status.
          // If a VFO B frequency was stored before the slice existed, apply it now.
          if Self.vfo[nrVFOB].frequency > 0 then
             begin
             fracStr := Copy(IntToStr(1000000 + (Self.vfo[nrVFOB].frequency mod 1000000)), 2, 6);
-            logger.Info('[FlexRadio6000.Split] Applying stored VFO B freq %d Hz to new slice 1', [Self.vfo[nrVFOB].frequency]);
+            logger.trace('[FlexRadio6000.Split] Applying stored VFO B freq %d Hz to new slice 1', [Self.vfo[nrVFOB].frequency]);
             SendFlexCmd(Format('slice tune 1 %d.%s',
                         [Self.vfo[nrVFOB].frequency div 1000000, fracStr]));
             end;

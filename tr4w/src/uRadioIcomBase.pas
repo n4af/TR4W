@@ -742,7 +742,7 @@ begin
   if FFirstMessage then
      begin
      FFirstMessage := False;
-     logger.Info('[%s] First valid CI-V frame — querying initial VFO frequency and mode', [radioModel]);
+     logger.trace('[%s] First valid CI-V frame — querying initial VFO frequency and mode', [radioModel]);
      // IC-9700 (FMainBandProcessingOnly): $04 returns only the Main Band mode and cannot
      // distinguish VFO A from VFO B. Use $26 $00/$01 for literal-addressed mode queries.
      // Query freq+mode together per VFO so both arrive as a pair.
