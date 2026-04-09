@@ -515,6 +515,7 @@ uses
   // ColorCfg,
   // Country9,
   FCONTEST,
+  uPOTAParks,
   Types;
 
 function GetCPU: int64;
@@ -2152,6 +2153,25 @@ begin
       end;
     end;
 
+  // POTA: look up park name from exchange as typed and show via QuickDisplay.
+  if (ActiveExchange = RSTAndPOTAPark) and POTAParksLoaded then
+     begin
+     TempString := ExchangeWindowString;
+     while TempString <> '' do
+        begin
+        TestString := RemoveFirstString(TempString);
+        TestString := NormalizePOTAPark(TestString, MyPark);
+        if TestString <> '' then
+           begin
+           if GetPOTAParkName(TestString) <> '' then
+              begin
+              QuickDisplay(PChar(GetPOTAParkName(TestString)));
+              Exit;
+              end;
+           end;
+        end;
+     end;
+
 {$IF MORSERUNNER}
   if MorseRunnerWindow <> 0 then
     Windows.SendMessage(MorseRunner_Number, WM_SETTEXT, 0,
@@ -3422,6 +3442,12 @@ begin
 
       Shellexecute(0, 'open', 'https://www.country-files.com/cty/cty.dat', nil,
         nil, SW_SHOW); // 4.86.2
+
+    menu_download_pota_parks:
+      begin
+      QuickDisplay('Downloading POTA parks...');
+      DownloadPOTAParksAsync(POTAParksFilePath, tr4whandle);
+      end;
 
     menu_spmode_ortab:
       ProcessTAB(LowordWparam);

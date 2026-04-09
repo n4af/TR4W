@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 176 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS and separator};
+    T_MENU_ARRAY_SIZE                     = 178 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS and separator};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -265,6 +265,7 @@ const
     (mrText: RC_SSBCWMODE + RC_SSBCWMODE_HK; mrId: menu_alt_ssbcwmode),
 
     (mrText: RC_Download + RC_Download_HK; mrId: menu_download_latest_cty_dat), // 4.75.3
+    (mrText: 'Download POTA Parks'; mrId: menu_download_pota_parks),  // issue #864
 //    (mrText: RC_TRANSFREQ + RC_TRANSFREQ_HK; mrId: menu_alt_transfreq),     // 4.68.11
     (mrText: RC_ALTP + RC_ALTP_HK; mrId: menu_alt_p),
     (mrText: RC_AUTOCQ + RC_AUTOCQ_HK; mrId: menu_alt_autocq),
@@ -390,6 +391,7 @@ const
 //    (mrText: '-'; mrId: 0),
     (mrText: RC_HOMEPAGE; mrId: menu_home_page),
     (mrText: RC_Download + RC_Download_HK; mrID: menu_download_latest_cty_dat), // 4.75.3
+    (mrText: 'Download POTA Parks'; mrId: menu_download_pota_parks),  // issue #864
     {$IF LANG = 'RUS'}
     (mrText: RC_WIKI; mrId: menu_wiki_rus),
 {$IFEND}

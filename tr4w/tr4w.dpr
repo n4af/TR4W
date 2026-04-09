@@ -162,7 +162,8 @@ uses
   //uMultsFrequencies in 'src\uMultsFrequencies.pas',
   uMakeHelpFile in 'src\uMakeHelpFile.pas',
   uTrayBalloon in 'src\uTrayBalloon.pas',
-  uVariants in 'src\uVariants.pas';
+  uVariants in 'src\uVariants.pas',
+  uPOTAParks in 'src\uPOTAParks.pas';
   //cty in 'src\cty.pas';  // Excluded: unit name 'cty' conflicts with global variable 'CTY' from uCTYDAT
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
@@ -254,6 +255,21 @@ begin
         else
           tCallWindowSetFocus;
         ShowFMessages(0);
+      end;
+
+    WM_POTA_DOWNLOAD_DONE:
+      begin
+      // Fired by the async download thread (see uPOTAParks).
+      // wParam=1: file saved OK; wParam=0: download failed.
+      if wParam = 1 then
+         begin
+         if LoadPOTAParks(POTAParksFilePath) > 0 then
+            QuickDisplay(PChar('POTA parks loaded'))
+         else
+            QuickDisplay(PChar('POTA parks file could not be loaded'));
+         end
+      else
+         QuickDisplay(PChar('POTA parks download failed'));
       end;
 
     WM_CTLCOLORLISTBOX, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC:
@@ -592,6 +608,10 @@ begin
   LoadInPlugins;
 
   CheckNTPAtStartup;
+
+  // Load POTA parks database if available (downloaded separately via menu).
+  // LoadPOTAParks returns -1 silently if the file does not exist.
+  LoadPOTAParks(POTAParksFilePath);
 
   asm
   mov  ebx,0

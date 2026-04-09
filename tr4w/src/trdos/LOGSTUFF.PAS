@@ -766,7 +766,8 @@ implementation
 
 uses uNet,
   PostUnit,
-  MainUnit;
+  MainUnit,
+  uPOTAParks;
 
 procedure BandChange(var ActiveBand: BandType; Direction: DirectionType);
 
@@ -4591,6 +4592,12 @@ begin
     Exit;
   end;
   ParseExchange(Exchange, FirstString, SecondString, ThirdString);
+  // Normalize abbreviated park tokens before validation.
+  // 'US1274' -> 'US-1274', '1274' -> 'US-1274' (using MY PARK prefix).
+  // RST values (2-3 digits like '59') are returned unchanged.
+  FirstString  := NormalizePOTAPark(FirstString,  MyPark);
+  SecondString := NormalizePOTAPark(SecondString, MyPark);
+  ThirdString  := NormalizePOTAPark(ThirdString,  MyPark);
   if IsValidPOTAPark(FirstString) then
   begin
     RXData.QTHString := FirstString;

@@ -2290,6 +2290,7 @@ const
   menu_inactiveradio_cwspeeddown        = 10514;
 
  // menu_alt_transfreq                    = 10311;   // 4.47.3 remove
+  menu_download_pota_parks              = 10607;  // issue #864
   menu_home_page                        = 10606;
 //  menu_send_bug                         = 10605;
   menu_wiki_rus                         = 10604;
