@@ -1945,8 +1945,12 @@ begin
          begin
          WriteADIFField('MY_SIG','POTA');
          WriteADIFField('MY_SIG_INFO',myPark);
-         end;
-      WriteADIFField('SRX_STRING', TempRXData.ExchString);
+         // Use the normalized park ref (QTHString = 'US-1224') not the raw
+         // exchange string ('1224') so SRX_STRING and SIG_INFO are consistent.
+         WriteADIFField('SRX_STRING', TempRXData.QTHString);
+         end
+      else
+         WriteADIFField('SRX_STRING', TempRXData.ExchString);
       stxString := GetMyExchangeForExport;
       WriteADIFField('STX_STRING',Trim(DeleteRepeatedSpaces(stxString)));
 
