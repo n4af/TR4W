@@ -162,7 +162,8 @@ uses
   //uMultsFrequencies in 'src\uMultsFrequencies.pas',
   uMakeHelpFile in 'src\uMakeHelpFile.pas',
   uTrayBalloon in 'src\uTrayBalloon.pas',
-  uVariants in 'src\uVariants.pas';
+  uVariants in 'src\uVariants.pas',
+  uPOTAParks in 'src\uPOTAParks.pas';
   //cty in 'src\cty.pas';  // Excluded: unit name 'cty' conflicts with global variable 'CTY' from uCTYDAT
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
@@ -254,6 +255,36 @@ begin
         else
           tCallWindowSetFocus;
         ShowFMessages(0);
+      end;
+
+    WM_POTA_DOWNLOAD_DONE:
+      begin
+      // Fired by the async download thread (see uPOTAParks).
+      // wParam=1: file saved OK; wParam=0: download failed.
+      if wParam = 1 then
+         begin
+         if LoadPOTAParks(POTAParksFilePath) > 0 then
+            QuickDisplay(PChar('POTA parks loaded'))
+         else
+            QuickDisplay(PChar('POTA parks file could not be loaded'));
+         end
+      else
+         QuickDisplay(PChar('POTA parks download failed'));
+      end;
+
+    WM_POTA_LOAD_DONE:
+      begin
+      // Fired by TPOTALoadThread after parsing the CSV off the UI thread.
+      // lParam is the parsed TStringList — ApplyLoadedParks takes ownership.
+      ApplyLoadedParks(lParam);
+      end;
+
+    WM_POTA_NEXT_PARK:
+      begin
+      // Fired by TryLogContact after logging the first park of a 2fer/3fer.
+      // PostMessage ensures this arrives after the caller's own tCleareCallWindow
+      // / tCleareExchangeWindow calls have already completed.
+      HandlePOTANextPark;
       end;
 
     WM_CTLCOLORLISTBOX, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC:
@@ -555,6 +586,8 @@ begin
    ShowMessage('AUTOSPOT is enabled - Test Mode Only'); // Hard on relays - be careful
 {$ENDIF}
   tr4w_accelerators := LoadAccelerators(hInstance, 'T');
+  // Ctrl+T → menu_repeat_pota_parks is defined directly in the .res file.
+
   RegisterClass(tr4w_WinClass);
 
   CursorBitmap := LoadImage(hInstance, 'cursor.bmp', IMAGE_BITMAP, ws2 * 3, ws + 2, LR_LOADFROMFILE);
@@ -592,6 +625,10 @@ begin
   LoadInPlugins;
 
   CheckNTPAtStartup;
+
+  // Load POTA parks database off the UI thread (file may be ~3 MB / 50k entries).
+  // TPOTALoadThread parses the CSV and posts WM_POTA_LOAD_DONE when done.
+  LoadPOTAParksAsync(tr4whandle);
 
   asm
   mov  ebx,0

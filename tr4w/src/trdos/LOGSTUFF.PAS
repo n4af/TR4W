@@ -766,7 +766,8 @@ implementation
 
 uses uNet,
   PostUnit,
-  MainUnit;
+  MainUnit,
+  uPOTAParks;
 
 procedure BandChange(var ActiveBand: BandType; Direction: DirectionType);
 
@@ -4578,66 +4579,162 @@ end;
 
 function ProcessRSTAndPOTAPark(Exchange: ShortString; var RXData:
   ContestExchange): boolean;
+// Parses a POTA exchange of the form:
+//   RST PARK              e.g. "57 US-0663"
+//   RST PARK PARK         e.g. "57 US-0663 US-1234"   (2fer)
+//   RST PARK PARK PARK    e.g. "57 US-0663 US-1234 US-5678"  (3fer, etc.)
+//   PARK                  e.g. "US-0663"              (no RST)
+//
+// We tokenize the raw exchange string ourselves rather than using ParseExchange,
+// which is hard-limited to three tokens and truncates the third field to
+// Str10 (10 chars).  That truncation makes it impossible to carry two park
+// refs in one field (e.g. "US-0663 US-1234" = 15 chars).
+//
+// Delimiter rules:
+//   - Tokens are separated by spaces and/or commas, so the operator can type
+//     "57 US-0663 US-1234" or "57 US-0663, US-1234" interchangeably.
+//
+// Multi-park handling:
+//   - The first valid park found becomes RXData.QTHString (logged in this QSO).
+//   - Any additional valid parks are pushed onto the FPendingParks queue in
+//     uPOTAParks.  TryLogContact checks HasPendingParks after writing the QSO
+//     and auto-refills the exchange for the next park so the operator just
+//     presses Enter again.
+//
+// RST handling:
+//   - The first numeric token is RSTSent; the second (rare in POTA) is RSTReceived.
+//   - Non-numeric, non-park tokens are silently ignored.
 var
-  FirstString, SecondString, ThirdString: Str10;
+  S          : string;    // Working copy of the exchange for easy manipulation
+  Token      : string;    // Current token being examined
+  Normalized : string;    // Token after NormalizePOTAPark()
+  SpacePos   : Integer;   // Index of the next space delimiter
+  RSTFound   : Boolean;   // True once we have consumed the RST token
+  ParkCount  : Integer;   // Total park refs found (used for Nfer label)
+  AllParks   : string;    // Space-separated list of all parks found (for SetLastPOTAExchange)
+  IsFresh    : Boolean;   // True when this is a new contact, not a 2fer continuation
 begin
+  Result := False;
+  RXData.RSTReceived := DefaultRST;
+  RXData.RSTSent     := DefaultRST;
+  RXData.QTHString   := '';
 
-  ProcessRSTAndPOTAPark := false;
-  if length(Exchange) = 0 then
-  begin
-    RXData.RSTReceived := DefaultRST;
-    RXData.RSTSent := DefaultRST;
-    Result := true;
-    Exit;
-  end;
-  ParseExchange(Exchange, FirstString, SecondString, ThirdString);
-  if IsValidPOTAPark(FirstString) then
-  begin
-    RXData.QTHString := FirstString;
-    if StringIsAllNumbers(SecondString) then
-    begin
-      RxData.RSTSent := StrToIntDef(SecondString, DefaultRST);
-      if StringIsAllNumbers(ThirdString) then
-      begin
-        RXData.RSTReceived := StrToIntDef(ThirdString, DefaultRST);
-      end
-      else
-      begin
-        RXData.RSTReceived := DefaultRST;
-      end;
-    end
-    else
-    begin
-      RXData.RSTSent := DefaultRST;
-    end;
-    Result := true;
-  end
-  else
-  begin
-    if StringIsAllNumbers(FirstString) then //Most likely RS(T)
-    begin
-      if StringIsAllNumbers(SecondString) then // Both RST Sent and Received
-      begin
-        RxData.RSTSent := StrToIntDef(FirstString, DefaultRST);
-        RXData.RSTReceived := StrToIntDef(SecondString, DefaultRST);
-        if IsValidPOTAPark(ThirdString) then
+  if Length(Exchange) = 0 then
+     begin
+     // Empty exchange is acceptable in POTA (defaults apply).
+     Result := True;
+     Exit;
+     end;
+
+  // Clear the pending queue only when this is a fresh contact, not a 2fer
+  // continuation.  A continuation is identified by the current call window
+  // matching the call stored by the previous log (SetPendingContactInfo).
+  // Any mismatch means a new station is being logged, so we start fresh.
+  // This preserves parks queued from the original exchange (e.g. US-5678
+  // in a 3fer "57 US-0663 US-1234 US-5678") across the intermediate Enter
+  // presses that log each subsequent park.
+  if GetPendingCall <> CallWindowString then
+     ClearPendingParks;
+
+  // Normalise delimiters: replace commas with spaces so the main loop only
+  // needs to handle space-separated tokens.
+  S := Exchange;
+  for SpacePos := 1 to Length(S) do
+     if S[SpacePos] = ',' then
+        S[SpacePos] := ' ';
+
+  RSTFound  := False;
+  ParkCount := 0;
+  AllParks  := '';
+  // IsFresh: true when the call window does not match the stored pending call,
+  // meaning this is a new contact rather than a 2fer/3fer continuation.
+  // Used below to decide whether to store the exchange for "Repeat POTA Parks".
+  IsFresh   := (GetPendingCall <> string(CallWindowString));
+
+  // Walk token by token until the string is exhausted.
+  while S <> '' do
+     begin
+     // Skip any run of leading spaces left by the previous iteration.
+     while (S <> '') and (S[1] = ' ') do
+        Delete(S, 1, 1);
+     if S = '' then
+        Break;
+
+     // Extract the next whitespace-delimited token.
+     SpacePos := Pos(' ', S);
+     if SpacePos > 0 then
         begin
-          RXData.QTHString := thirdString;
-          Result := true;
-        end;
-      end
-      else
-      begin
-        if IsValidPOTAPark(SecondString) then
+        Token := Copy(S, 1, SpacePos - 1);
+        Delete(S, 1, SpacePos);
+        end
+     else
         begin
-          RXData.RSTSent := StrToIntDef(FirstString, DefaultRST);
-          RXData.RSTReceived := DefaultRST;
-          RXData.QTHString := SecondString;
-          Result := true;
+        Token := S;
+        S := '';
         end;
-      end;
-    end;
-  end;
+
+     if Token = '' then
+        Continue;
+
+     // Try to interpret the token as a park reference.
+     // NormalizePOTAPark returns the original token unchanged when it is not
+     // a park reference (e.g. an RST value like "57" or "599").
+     Normalized := NormalizePOTAPark(Token, MyPark);
+
+     if IsValidPOTAPark(Normalized) then
+        begin
+        if RXData.QTHString = '' then
+           begin
+           // First park found — this is the QTH for the QSO being logged.
+           RXData.QTHString := Normalized;
+           Result := True;
+           end
+        else
+           begin
+           // Additional park (2fer, 3fer...) — queue for the next log action.
+           // TryLogContact will dequeue this after the current QSO is written
+           // and pre-fill the exchange so the operator presses Enter once more.
+           QueuePendingPark(Normalized);
+           end;
+        // Accumulate all parks for SetLastPOTAExchange below.
+        if AllParks = '' then
+           AllParks := Normalized
+        else
+           AllParks := AllParks + ' ' + Normalized;
+        Inc(ParkCount);
+        end
+     else if StringIsAllNumbers(Token) then
+        begin
+        // Numeric token — treat as signal report.
+        // POTA operators give one RST for the contact regardless of how many
+        // parks the station is activating.
+        if not RSTFound then
+           begin
+           RXData.RSTSent := StrToIntDef(Token, DefaultRST);
+           RSTFound := True;
+           end
+        else
+           begin
+           // A second numeric token is RSTReceived (uncommon in POTA but valid).
+           RXData.RSTReceived := StrToIntDef(Token, DefaultRST);
+           end;
+        end;
+     // Any other token (stray letters, punctuation) is silently skipped.
+     end;
+
+  // Record total park count so HandlePOTANextPark can display the right label
+  // ("2fer", "3fer", etc.).  Only meaningful when more than one park was found;
+  // for a single-park exchange the label is never shown.
+  if ParkCount > 1 then
+     SetTotalParks(ParkCount);
+
+  // On a fresh contact, store the full exchange (RST + all parks) so the
+  // "Repeat POTA Parks (2nd Op)" menu command can re-fill it for a second
+  // operator without the operator having to retype everything.
+  // On 2fer/3fer continuations (IsFresh = False) we leave the stored value
+  // unchanged — it was already set on the first Enter press.
+  if IsFresh and (AllParks <> '') then
+     SetLastPOTAExchange(IntToStr(RXData.RSTSent) + ' ' + AllParks);
 end;
 
 function ProcessRSTZoneAndPossibleDomesticQTHExchange(Exchange: Str80; var
@@ -4837,53 +4934,27 @@ begin
 end;
 
 procedure SaveLogFileToFloppy;
-
+var
+  ErrorMsg: string;
 begin
-
   if TR4W_FLOPPY_FILENAME[0] = #0 then
-    exit;
-  Windows.lstrcat(TR4W_FLOPPY_FILENAME, p);
-  asm
-  lea  eax,TR4W_FLOPPY_FILENAME
-  push eax
-  lea  eax,TR4W_LOG_FILENAME
-  push eax
-  end;
+     Exit;
 
-  { h := CreateFile(@TR4W_Floppy_Filename, GENERIC_WRITE or GENERIC_READ, FILE_SHARE_WRITE or FILE_SHARE_READ, nil, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
-    SetFilePointer(h, 0, nil, FILE_END);
-   tOpenFileForWrite(h,@TR4W_Floppy_Filename); }
-  wsprintf(QuickDisplayBuffer, TC_SAVINGTO);
-  asm add esp,16
-  end;
+  Format(QuickDisplayBuffer, TC_SAVINGTO, TR4W_LOG_FILENAME, TR4W_FLOPPY_FILENAME);
   QuickDisplay(QuickDisplayBuffer);
 
   if not Windows.CopyFile(TR4W_LOG_FILENAME, TR4W_FLOPPY_FILENAME, False) then
-  begin
-    SysErrorMessage(GetLastError);
-    asm
-    push eax
-    lea  eax,TR4W_FLOPPY_FILENAME
-    push eax
-    end;
-    wsprintf(QuickDisplayBuffer, '%s: %s');
-    asm add esp,16
-    end;
-    QuickDisplay(QuickDisplayBuffer);
-
-    DoABeep(Warning);
-  end
+     begin
+     ErrorMsg := SysErrorMessage(GetLastError);
+     Format(QuickDisplayBuffer, '%s: %s', TR4W_FLOPPY_FILENAME, PChar(ErrorMsg));
+     QuickDisplay(QuickDisplayBuffer);
+     DoABeep(Warning);
+     end
   else
-  begin
-    asm
-      lea eax,  TR4W_FLOPPY_FILENAME
-      push eax
-    end;
-    wsprintf(QuickDisplayBuffer, TC_FILESAVEDTOSUCCESSFULLY);
-    asm add esp,12
-    end;
-    QuickDisplay(QuickDisplayBuffer);
-  end;
+     begin
+     Format(QuickDisplayBuffer, TC_FILESAVEDTOSUCCESSFULLY, TR4W_FLOPPY_FILENAME);
+     QuickDisplay(QuickDisplayBuffer);
+     end;
   {
     if FloppyFileSaveName = '' then Exit;
     Windows.ZeroMemory(@TR4W_FLOPPY_FILENAME, SizeOf(TR4W_FLOPPY_FILENAME));
@@ -9302,7 +9373,7 @@ begin
   regex := TPerlRegEx.Create;
   try
     logger.debug('Checking if %s is a valid park', [park]);
-    regex.RegEx := '^(\w{1,2})-{0,1}(\d{1,5})';
+    regex.RegEx := '^([A-Za-z]{1,4})-(\d{1,5})$';  // letters-hyphen-digits only; rejects RST values like '59'
     //regex.RegEx := '^(?:\w{1,2}\d\/|\d\w\/|\w{1,2}\/)?+\w+[0-9]+\w+\/?\w*\s*$';  // Valid against all of LOTW file
 
     regex.Subject := park;

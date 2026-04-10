@@ -995,12 +995,18 @@ procedure RITBumpUp;
 
 var
    IntRadioType: InterfacedRadioType;
+   ActiveNetObj: TNetRadioBase;
 //   SerialPort: PortType;
 
 begin
-   if Radio1.tNetObject <> nil then
+   if ActiveRadio = RadioOne then
+      ActiveNetObj := Radio1.tNetObject
+   else
+      ActiveNetObj := Radio2.tNetObject;
+
+   if ActiveNetObj <> nil then
       begin
-      Radio1.tNetObject.RITBumpUp;
+      ActiveNetObj.RITBumpUp;
       Exit;
       end;
    if ActiveRadio = RadioOne then
@@ -1054,12 +1060,18 @@ procedure RITBumpDown;
 
 var
    IntRadioType: InterfacedRadioType;
+   ActiveNetObj: TNetRadioBase;
 //   SerialPort: PortType;
 
 begin
-   if Radio1.tNetObject <> nil then
+   if ActiveRadio = RadioOne then
+      ActiveNetObj := Radio1.tNetObject
+   else
+      ActiveNetObj := Radio2.tNetObject;
+
+   if ActiveNetObj <> nil then
       begin
-      Radio1.tNetObject.RITBumpDown;
+      ActiveNetObj.RITBumpDown;
       Exit;
       end;
 
