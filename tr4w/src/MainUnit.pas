@@ -2613,11 +2613,16 @@ begin
     Windows.EnableMenuItem(tr4w_main_menu, menu_ctrl_qtcfunctions, MF_BYCOMMAND
       or MF_GRAYED);
 
-  // Gray POTA-specific menu items when not in a POTA contest.
+  // Remove POTA-specific menu items entirely when not in a POTA contest.
+  // DeleteMenu is used rather than MF_GRAYED so the items are invisible —
+  // they are irrelevant outside POTA and would clutter the menu.
+  // Note: once deleted they are not re-added if the operator switches contests
+  // mid-session, but that is consistent with TR4W's existing per-contest menu
+  // state pattern (other items are also only grayed/deleted at load time).
   if Contest <> POTA then
      begin
-     Windows.EnableMenuItem(tr4w_main_menu, menu_download_pota_parks, MF_BYCOMMAND or MF_GRAYED);
-     Windows.EnableMenuItem(tr4w_main_menu, menu_repeat_pota_parks,   MF_BYCOMMAND or MF_GRAYED);
+     Windows.DeleteMenu(tr4w_main_menu, menu_download_pota_parks, MF_BYCOMMAND);
+     Windows.DeleteMenu(tr4w_main_menu, menu_repeat_pota_parks,   MF_BYCOMMAND);
      end;
   // if ContestsArray[Contest].e <> 0 then
   ErmakSpecification := ((ContestsBooleanArray[Contest] and (1 shl ERMAK_BIT))

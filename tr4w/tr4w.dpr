@@ -586,6 +586,8 @@ begin
    ShowMessage('AUTOSPOT is enabled - Test Mode Only'); // Hard on relays - be careful
 {$ENDIF}
   tr4w_accelerators := LoadAccelerators(hInstance, 'T');
+  // Ctrl+T → menu_repeat_pota_parks is defined directly in the .res file.
+
   RegisterClass(tr4w_WinClass);
 
   CursorBitmap := LoadImage(hInstance, 'cursor.bmp', IMAGE_BITMAP, ws2 * 3, ws + 2, LR_LOADFROMFILE);

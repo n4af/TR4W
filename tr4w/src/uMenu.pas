@@ -130,6 +130,7 @@ const
   RC_CLEARMSHEET_HK                     = #9'Ctrl+C';
   RC_SHDX_CALLSIGN_HK                   = #9'Ctrl+S';
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
+  RC_REPEAT_POTA_HK                     = #9'Ctrl+T';
 
 
     T_MENU_ARRAY_SIZE                     = 179 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS, separator, Repeat POTA Parks};
@@ -364,7 +365,7 @@ const
     (mrText: '-'; mrId: 0),
     (mrText: RC_RESET_RADIO_PORTS; mrId: menu_reset_radio_ports),
     (mrText: 'Download POTA Parks'; mrId: menu_download_pota_parks),  // issue #864
-    (mrText: 'Repeat POTA Parks (2nd Op)'; mrId: menu_repeat_pota_parks),
+    (mrText: 'Repeat POTA Parks (2nd Op)' + RC_REPEAT_POTA_HK; mrId: menu_repeat_pota_parks),
  //}
     (mrText: '-'; mrId: 0),
     (mrText: RC_3830; mrId: menu_3830_scores_posting),
