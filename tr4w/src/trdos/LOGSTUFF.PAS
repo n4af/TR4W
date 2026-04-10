@@ -4611,6 +4611,8 @@ var
   SpacePos   : Integer;   // Index of the next space delimiter
   RSTFound   : Boolean;   // True once we have consumed the RST token
   ParkCount  : Integer;   // Total park refs found (used for Nfer label)
+  AllParks   : string;    // Space-separated list of all parks found (for SetLastPOTAExchange)
+  IsFresh    : Boolean;   // True when this is a new contact, not a 2fer continuation
 begin
   Result := False;
   RXData.RSTReceived := DefaultRST;
@@ -4643,6 +4645,11 @@ begin
 
   RSTFound  := False;
   ParkCount := 0;
+  AllParks  := '';
+  // IsFresh: true when the call window does not match the stored pending call,
+  // meaning this is a new contact rather than a 2fer/3fer continuation.
+  // Used below to decide whether to store the exchange for "Repeat POTA Parks".
+  IsFresh   := (GetPendingCall <> string(CallWindowString));
 
   // Walk token by token until the string is exhausted.
   while S <> '' do
@@ -4689,6 +4696,11 @@ begin
            // and pre-fill the exchange so the operator presses Enter once more.
            QueuePendingPark(Normalized);
            end;
+        // Accumulate all parks for SetLastPOTAExchange below.
+        if AllParks = '' then
+           AllParks := Normalized
+        else
+           AllParks := AllParks + ' ' + Normalized;
         Inc(ParkCount);
         end
      else if StringIsAllNumbers(Token) then
@@ -4715,6 +4727,14 @@ begin
   // for a single-park exchange the label is never shown.
   if ParkCount > 1 then
      SetTotalParks(ParkCount);
+
+  // On a fresh contact, store the full exchange (RST + all parks) so the
+  // "Repeat POTA Parks (2nd Op)" menu command can re-fill it for a second
+  // operator without the operator having to retype everything.
+  // On 2fer/3fer continuations (IsFresh = False) we leave the stored value
+  // unchanged — it was already set on the first Enter press.
+  if IsFresh and (AllParks <> '') then
+     SetLastPOTAExchange(IntToStr(RXData.RSTSent) + ' ' + AllParks);
 end;
 
 function ProcessRSTZoneAndPossibleDomesticQTHExchange(Exchange: Str80; var

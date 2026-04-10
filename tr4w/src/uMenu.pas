@@ -132,7 +132,7 @@ const
   RC_LOGIN_HK                           = #9'Ctrl+Alt+I';
 
 
-    T_MENU_ARRAY_SIZE                     = 178 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS and separator};
+    T_MENU_ARRAY_SIZE                     = 179 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS, separator, Repeat POTA Parks};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -364,6 +364,7 @@ const
     (mrText: '-'; mrId: 0),
     (mrText: RC_RESET_RADIO_PORTS; mrId: menu_reset_radio_ports),
     (mrText: 'Download POTA Parks'; mrId: menu_download_pota_parks),  // issue #864
+    (mrText: 'Repeat POTA Parks (2nd Op)'; mrId: menu_repeat_pota_parks),
  //}
     (mrText: '-'; mrId: 0),
     (mrText: RC_3830; mrId: menu_3830_scores_posting),

@@ -122,6 +122,13 @@ procedure SetPendingContactInfo(const ACall: string; ARST: Integer);
 function GetPendingCall: string;
 function GetPendingRST: Integer;
 
+// Store / retrieve the full exchange string (RST + all parks) from the most
+// recently logged fresh POTA contact.  Used by "Repeat POTA Parks (2nd Op)"
+// to re-fill the exchange for a second operator at the same station.
+// Example stored value: "57 US-0663 US-1234"
+procedure SetLastPOTAExchange(const AExchange: string);
+function GetLastPOTAExchange: string;
+
 implementation
 
 // ---------------------------------------------------------------------------
@@ -148,6 +155,11 @@ var
    // ProcessRSTAndPOTAPark once after parsing is complete; reset to 0 by
    // ClearPendingParks so stale values never bleed across contacts.
    FTotalParks : Integer = 0;
+
+   // Full exchange string (RST + all parks) from the most recently logged fresh
+   // POTA contact.  Set by ProcessRSTAndPOTAPark on fresh contacts only.
+   // Used by "Repeat POTA Parks (2nd Op)" to pre-fill the exchange window.
+   FLastPOTAExchange : string = '';
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -405,6 +417,16 @@ end;
 function GetTotalParks: Integer;
 begin
    Result := FTotalParks;
+end;
+
+procedure SetLastPOTAExchange(const AExchange: string);
+begin
+   FLastPOTAExchange := AExchange;
+end;
+
+function GetLastPOTAExchange: string;
+begin
+   Result := FLastPOTAExchange;
 end;
 
 procedure SetPendingContactInfo(const ACall: string; ARST: Integer);

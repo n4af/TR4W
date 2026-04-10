@@ -406,6 +406,7 @@ procedure tClearDupeInfoCall;
 procedure tCleareCallWindow;
 procedure tCleareExchangeWindow;
 procedure tSetExchWindInitExchangeEntry;
+procedure HandleRepeatPOTAParks;
 procedure HandlePOTANextPark;
 procedure tListBoxClientAlign(Parent: HWND);
 //function AddCallsignAndExchangeToInitialExchangesList(Call: CallString; InitialExchangeString: CallString): boolean;
@@ -595,20 +596,22 @@ begin
 
     tCleareExchangeWindow;
 
-    // 2fer / 3fer handling.
-    // If ProcessRSTAndPOTAPark found additional park refs in the exchange
-    // (e.g. "57 US-0663 US-1234"), it queued them in uPOTAParks.
-    // We cannot restore the windows here directly — the CALLER of TryLogContact
-    // (e.g. the CQ return handler) also calls tCleareCallWindow / tCleareExchange-
-    // Window after we return, which would immediately overwrite anything we set.
-    // Instead we PostMessage so delivery happens after the full call stack
-    // unwinds and all caller clears are complete.
     if (ActiveExchange = RSTAndPOTAPark) and HasPendingParks then
        begin
+       // 2fer / 3fer handling.
+       // If ProcessRSTAndPOTAPark found additional park refs in the exchange
+       // (e.g. "57 US-0663 US-1234"), it queued them in uPOTAParks.
+       // We cannot restore the windows here directly — the CALLER of TryLogContact
+       // (e.g. the CQ return handler) also calls tCleareCallWindow / tCleareExchange-
+       // Window after we return, which would immediately overwrite anything we set.
+       // Instead we PostMessage so delivery happens after the full call stack
+       // unwinds and all caller clears are complete.
        SetPendingContactInfo(SavedCall, SavedRSTSent);
        PostMessage(tr4whandle, WM_POTA_NEXT_PARK, 0, 0);
        end;
-
+    // The above code is only done for POTA handling multiple parks.
+    // Note the same code concept could be used for a station on multiple
+    // county lines in a state QSO party.
     tCallWindowSetFocus;
     CleanUpDisplay;
 
@@ -2609,6 +2612,13 @@ begin
   if not (Contest in [DARCWAEDCCW..DARCWAEDCSSB]) then
     Windows.EnableMenuItem(tr4w_main_menu, menu_ctrl_qtcfunctions, MF_BYCOMMAND
       or MF_GRAYED);
+
+  // Gray POTA-specific menu items when not in a POTA contest.
+  if Contest <> POTA then
+     begin
+     Windows.EnableMenuItem(tr4w_main_menu, menu_download_pota_parks, MF_BYCOMMAND or MF_GRAYED);
+     Windows.EnableMenuItem(tr4w_main_menu, menu_repeat_pota_parks,   MF_BYCOMMAND or MF_GRAYED);
+     end;
   // if ContestsArray[Contest].e <> 0 then
   ErmakSpecification := ((ContestsBooleanArray[Contest] and (1 shl ERMAK_BIT))
     <> 0) and (RussianID(MyCall));
@@ -3475,6 +3485,9 @@ begin
       QuickDisplay('Downloading POTA parks...');
       DownloadPOTAParksAsync(POTAParksFilePath, tr4whandle);
       end;
+
+    menu_repeat_pota_parks:
+      HandleRepeatPOTAParks;
 
     menu_spmode_ortab:
       ProcessTAB(LowordWparam);
@@ -4861,6 +4874,32 @@ begin
   SetMainWindowText(mweExchange, @ie[1]);
   if LeaveCursorInCallWindow then
     tCallWindowSetFocus;
+end;
+
+procedure HandleRepeatPOTAParks;
+// Called from the "Repeat POTA Parks (2nd Op)" Commands menu item.
+// Pre-fills the exchange with the parks from the last logged POTA contact so
+// the operator only needs to type the new callsign and press Enter.
+// The call window is left blank — the operator types the second op's call.
+var
+  ExchStr : string;
+  ExchBuf : array[0..80] of Char;
+begin
+  ExchStr := GetLastPOTAExchange;
+  if ExchStr = '' then
+     begin
+     QuickDisplay('No POTA parks logged yet this session');
+     Exit;
+     end;
+
+  // Pre-fill exchange window; leave call window empty for the new callsign.
+  Windows.ZeroMemory(@ExchBuf[0], SizeOf(ExchBuf));
+  Move(ExchStr[1], ExchBuf[0], Length(ExchStr));
+  ExchangeWindowString := ExchStr;
+  Windows.SetWindowText(wh[mweExchange], ExchBuf);
+
+  tCallWindowSetFocus;
+  QuickDisplay(PChar('2nd op: type callsign, verify exchange, then Enter - ' + ExchStr));
 end;
 
 procedure HandlePOTANextPark;
