@@ -892,12 +892,17 @@ end;
 
 procedure TFlexRadio6000.RITBumpDown;
 begin
-   SetRITFreq(nrVFOA, Self.vfo[nrVFOA].RITOffset - 10);
+   // Update local state immediately — the Flex does not reliably echo rit_freq
+   // back after a slice set command, so we cannot wait for feedback to advance
+   // the offset.  When feedback does arrive it will agree with our value.
+   Self.vfo[nrVFOA].RITOffset := Self.vfo[nrVFOA].RITOffset - 10;
+   SetRITFreq(nrVFOA, Self.vfo[nrVFOA].RITOffset);
 end;
 
 procedure TFlexRadio6000.RITBumpUp;
 begin
-   SetRITFreq(nrVFOA, Self.vfo[nrVFOA].RITOffset + 10);
+   Self.vfo[nrVFOA].RITOffset := Self.vfo[nrVFOA].RITOffset + 10;
+   SetRITFreq(nrVFOA, Self.vfo[nrVFOA].RITOffset);
 end;
 
 // ---------------------------------------------------------------------------
