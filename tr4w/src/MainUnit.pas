@@ -406,6 +406,7 @@ procedure tClearDupeInfoCall;
 procedure tCleareCallWindow;
 procedure tCleareExchangeWindow;
 procedure tSetExchWindInitExchangeEntry;
+procedure HandlePOTANextPark;
 procedure tListBoxClientAlign(Parent: HWND);
 //function AddCallsignAndExchangeToInitialExchangesList(Call: CallString; InitialExchangeString: CallString): boolean;
 //function FindStringInInitCallsignListBox(s: CallString; var Index: integer): boolean;
@@ -542,6 +543,12 @@ begin
 end;
 
 function TryLogContact: boolean;
+var
+  // Saved before ClearContestExchange wipes ReceivedData; passed to
+  // SetPendingContactInfo so the WM_POTA_NEXT_PARK handler can restore
+  // the call and pre-fill the exchange after the caller's window clears.
+  SavedCall    : CallString;
+  SavedRSTSent : Integer;
 begin
   Result := False;
 
@@ -558,6 +565,11 @@ begin
     ReceivedData.ceComputerID := ComputerID;
 
     LogContact(ReceivedData, True);
+
+    // Capture before ClearContestExchange zeroes out ReceivedData.
+    // Needed for 2fer refill below.
+    SavedCall    := ReceivedData.Callsign;
+    SavedRSTSent := ReceivedData.RSTSent;
 
     tElapsedTimeFromLastQSO := Windows.GetTickCount;
     UpdateWindows;
@@ -582,6 +594,21 @@ begin
     // showint(2);
 
     tCleareExchangeWindow;
+
+    // 2fer / 3fer handling.
+    // If ProcessRSTAndPOTAPark found additional park refs in the exchange
+    // (e.g. "57 US-0663 US-1234"), it queued them in uPOTAParks.
+    // We cannot restore the windows here directly — the CALLER of TryLogContact
+    // (e.g. the CQ return handler) also calls tCleareCallWindow / tCleareExchange-
+    // Window after we return, which would immediately overwrite anything we set.
+    // Instead we PostMessage so delivery happens after the full call stack
+    // unwinds and all caller clears are complete.
+    if (ActiveExchange = RSTAndPOTAPark) and HasPendingParks then
+       begin
+       SetPendingContactInfo(SavedCall, SavedRSTSent);
+       PostMessage(tr4whandle, WM_POTA_NEXT_PARK, 0, 0);
+       end;
+
     tCallWindowSetFocus;
     CleanUpDisplay;
 
@@ -4832,8 +4859,65 @@ begin
   Windows.ZeroMemory(@ie, SizeOf(ie));
   ie := InitialExchangeEntry(CallWindowString);
   SetMainWindowText(mweExchange, @ie[1]);
-  if LeaveCursorInCallWindow then 
+  if LeaveCursorInCallWindow then
     tCallWindowSetFocus;
+end;
+
+procedure HandlePOTANextPark;
+// Called from the WM_POTA_NEXT_PARK handler in tr4w.dpr after the full
+// call-stack from TryLogContact has unwound (and all caller window-clears
+// have completed).  Restores the call and pre-fills the exchange for the
+// next park in a 2fer / 3fer / Nfer contact so the operator just presses Enter.
+var
+  NextPark      : string;
+  ParkName      : string;
+  CallBuf       : array[0..100] of Char;
+  ExchBuf       : array[0..80]  of Char;
+  ExchStr       : string;
+  TotalParks    : Integer;
+  RemainingAfter: Integer;   // Parks still queued AFTER this one is dequeued
+  CurrentParkNum: Integer;   // Sequential number of the park about to be logged
+  FerLabel      : string;    // "2fer", "3fer", etc.
+begin
+  NextPark := DequeuePendingPark;
+  if NextPark = '' then
+     Exit;
+
+  // Compute the "Nfer" label.  After dequeueing, RemainingAfter tells us how
+  // many parks are still waiting.  CurrentParkNum is the one we just dequeued.
+  //   Total=3, remaining=1 → current=2 → "3fer park 2 of 3"
+  //   Total=3, remaining=0 → current=3 → "3fer park 3 of 3"
+  TotalParks     := GetTotalParks;
+  RemainingAfter := PendingParksCount;
+  CurrentParkNum := TotalParks - RemainingAfter;
+  FerLabel       := IntToStr(TotalParks) + 'fer';
+
+  // Restore the callsign.  Use a zero-initialized char buffer to guarantee
+  // null termination (ShortString[1] is not null-terminated after its content).
+  Windows.ZeroMemory(@CallBuf[0], SizeOf(CallBuf));
+  Move(GetPendingCall[1], CallBuf[0], Length(GetPendingCall));
+  CallWindowString := GetPendingCall;  // implicit truncation to CallstringLength
+  Windows.SetWindowText(wh[mweCall], CallBuf);
+
+  // Pre-fill exchange: same RST + next park ref.
+  ExchStr := IntToStr(GetPendingRST) + ' ' + NextPark;
+  Windows.ZeroMemory(@ExchBuf[0], SizeOf(ExchBuf));
+  Move(ExchStr[1], ExchBuf[0], Length(ExchStr));
+  ExchangeWindowString := ExchStr;  // implicit truncation to Str40 (40 chars)
+  Windows.SetWindowText(wh[mweExchange], ExchBuf);
+
+  // Show which park is pre-filled and prompt the operator to confirm with Enter.
+  // "log" is avoided — Enter moves focus to the exchange window (not directly to
+  // log), so "start" better describes what happens next.
+  ParkName := GetPOTAParkName(NextPark);
+  if ParkName <> '' then
+     QuickDisplay(PChar(FerLabel + ' park ' + IntToStr(CurrentParkNum) + ' of ' +
+                        IntToStr(TotalParks) + ': ' + NextPark + ' ' + ParkName +
+                        ' - press Enter to start ' + FerLabel))
+  else
+     QuickDisplay(PChar(FerLabel + ' park ' + IntToStr(CurrentParkNum) + ' of ' +
+                        IntToStr(TotalParks) + ': ' + NextPark +
+                        ' - press Enter to start ' + FerLabel));
 end;
 
 procedure tListBoxClientAlign(Parent: HWND);

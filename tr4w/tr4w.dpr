@@ -279,6 +279,14 @@ begin
       ApplyLoadedParks(lParam);
       end;
 
+    WM_POTA_NEXT_PARK:
+      begin
+      // Fired by TryLogContact after logging the first park of a 2fer/3fer.
+      // PostMessage ensures this arrives after the caller's own tCleareCallWindow
+      // / tCleareExchangeWindow calls have already completed.
+      HandlePOTANextPark;
+      end;
+
     WM_CTLCOLORLISTBOX, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC:
       begin
         Result := DrawWindows(lParam, wParam);

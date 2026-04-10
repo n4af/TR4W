@@ -37,6 +37,14 @@ const
    // Main thread must call ApplyLoadedParks(lParam) from the handler.
    WM_POTA_LOAD_DONE = WM_APP + 201;
 
+   // Posted to tr4whandle after a 2fer/3fer QSO is logged.
+   // The handler calls HandlePOTANextPark (MainUnit.pas) to dequeue the next
+   // park ref and restore the call/exchange windows for the follow-up log.
+   // Using PostMessage ensures delivery happens after the caller's own window
+   // clears have completed; direct SetWindowText inside TryLogContact would be
+   // immediately overwritten by the caller.
+   WM_POTA_NEXT_PARK = WM_APP + 202;
+
 // Returns full path to the parks CSV (same directory as tr4w.exe).
 function POTAParksFilePath: string;
 
@@ -72,6 +80,48 @@ procedure LoadPOTAParksAsync(ANotifyWnd: HWND);
 // Must be called on the main thread. Takes ownership of the TStringList.
 procedure ApplyLoadedParks(ALParam: LPARAM);
 
+// ---------------------------------------------------------------------------
+// 2fer / 3fer pending park queue.
+//
+// When the operator enters multiple park refs in the exchange (e.g.
+// "57 US-0663 US-1234"), ProcessRSTAndPOTAPark logs the first park normally
+// and queues the remainder here.  After the QSO is written, TryLogContact
+// checks HasPendingParks and, if true, restores the callsign and pre-fills
+// the exchange with the next park so the operator can press Enter once more.
+//
+// The queue is rebuilt on every call to ProcessRSTAndPOTAPark (i.e. every
+// Enter press), so it always reflects the current exchange field content.
+// ---------------------------------------------------------------------------
+
+// Push a canonical park reference onto the end of the pending queue.
+procedure QueuePendingPark(const ARef: string);
+
+// Remove and return the first park from the queue.
+// Returns '' if the queue is empty.
+function DequeuePendingPark: string;
+
+// True when at least one park is waiting in the queue.
+function HasPendingParks: Boolean;
+
+// Number of parks currently in the queue.
+function PendingParksCount: Integer;
+
+// Discard all queued parks.  Called at the start of each exchange parse so
+// the queue always matches the current exchange field content.
+procedure ClearPendingParks;
+
+// Total number of parks parsed from the current exchange (including the first
+// one that was logged directly as QTHString, not queued).  Used by
+// HandlePOTANextPark to produce the correct "2fer"/"3fer"/etc. label.
+procedure SetTotalParks(N: Integer);
+function GetTotalParks: Integer;
+
+// Store the callsign and RST of the contact just logged, for use by the
+// WM_POTA_NEXT_PARK handler when it pre-fills the call/exchange windows.
+procedure SetPendingContactInfo(const ACall: string; ARST: Integer);
+function GetPendingCall: string;
+function GetPendingRST: Integer;
+
 implementation
 
 // ---------------------------------------------------------------------------
@@ -81,6 +131,23 @@ implementation
 var
    // Sorted TStringList: entries are 'REFERENCE=Park Name' (uppercase keys).
    FParks: TStringList = nil;
+
+   // Ordered queue of additional park refs for 2fer/3fer contacts.
+   // Populated by ProcessRSTAndPOTAPark; consumed by HandlePOTANextPark.
+   // Only ever accessed from the main thread.
+   FPendingParks: TStringList = nil;
+
+   // Call and RST saved from the QSO just logged, used by the WM_POTA_NEXT_PARK
+   // handler to restore the call window and pre-fill the exchange for the
+   // next park.  Set by SetPendingContactInfo before PostMessage is called.
+   FPendingCall : string  = '';
+   FPendingRST  : Integer = 0;
+
+   // Total number of parks found in the current exchange (including the first
+   // one stored directly in QTHString, which is never queued).  Set by
+   // ProcessRSTAndPOTAPark once after parsing is complete; reset to 0 by
+   // ClearPendingParks so stale values never bleed across contacts.
+   FTotalParks : Integer = 0;
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -288,6 +355,75 @@ begin
 end;
 
 // ---------------------------------------------------------------------------
+// 2fer / 3fer pending park queue
+// ---------------------------------------------------------------------------
+
+procedure QueuePendingPark(const ARef: string);
+begin
+   // Create the queue lazily on first use.
+   if not Assigned(FPendingParks) then
+      FPendingParks := TStringList.Create;
+   FPendingParks.Add(ARef);
+end;
+
+function DequeuePendingPark: string;
+begin
+   Result := '';
+   if not Assigned(FPendingParks) or (FPendingParks.Count = 0) then
+      Exit;
+   // Return the front entry and remove it, preserving FIFO order so 2fer
+   // parks are logged in the same sequence the operator typed them.
+   Result := FPendingParks[0];
+   FPendingParks.Delete(0);
+end;
+
+function HasPendingParks: Boolean;
+begin
+   Result := Assigned(FPendingParks) and (FPendingParks.Count > 0);
+end;
+
+function PendingParksCount: Integer;
+begin
+   if Assigned(FPendingParks) then
+      Result := FPendingParks.Count
+   else
+      Result := 0;
+end;
+
+procedure ClearPendingParks;
+begin
+   if Assigned(FPendingParks) then
+      FPendingParks.Clear;
+   FTotalParks := 0;
+end;
+
+procedure SetTotalParks(N: Integer);
+begin
+   FTotalParks := N;
+end;
+
+function GetTotalParks: Integer;
+begin
+   Result := FTotalParks;
+end;
+
+procedure SetPendingContactInfo(const ACall: string; ARST: Integer);
+begin
+   FPendingCall := ACall;
+   FPendingRST  := ARST;
+end;
+
+function GetPendingCall: string;
+begin
+   Result := FPendingCall;
+end;
+
+function GetPendingRST: Integer;
+begin
+   Result := FPendingRST;
+end;
+
+// ---------------------------------------------------------------------------
 // Async startup load thread
 // Parses the CSV entirely off the UI thread and hands the result to the
 // main thread via PostMessage so FParks is only ever written from one thread.
@@ -436,10 +572,13 @@ end;
 // ---------------------------------------------------------------------------
 
 initialization
-   FParks := nil;
+   FParks        := nil;
+   FPendingParks := nil;
 
 finalization
    FParks.Free;
    FParks := nil;
+   FPendingParks.Free;
+   FPendingParks := nil;
 
 end.

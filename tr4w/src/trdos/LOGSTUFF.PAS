@@ -4579,72 +4579,142 @@ end;
 
 function ProcessRSTAndPOTAPark(Exchange: ShortString; var RXData:
   ContestExchange): boolean;
+// Parses a POTA exchange of the form:
+//   RST PARK              e.g. "57 US-0663"
+//   RST PARK PARK         e.g. "57 US-0663 US-1234"   (2fer)
+//   RST PARK PARK PARK    e.g. "57 US-0663 US-1234 US-5678"  (3fer, etc.)
+//   PARK                  e.g. "US-0663"              (no RST)
+//
+// We tokenize the raw exchange string ourselves rather than using ParseExchange,
+// which is hard-limited to three tokens and truncates the third field to
+// Str10 (10 chars).  That truncation makes it impossible to carry two park
+// refs in one field (e.g. "US-0663 US-1234" = 15 chars).
+//
+// Delimiter rules:
+//   - Tokens are separated by spaces and/or commas, so the operator can type
+//     "57 US-0663 US-1234" or "57 US-0663, US-1234" interchangeably.
+//
+// Multi-park handling:
+//   - The first valid park found becomes RXData.QTHString (logged in this QSO).
+//   - Any additional valid parks are pushed onto the FPendingParks queue in
+//     uPOTAParks.  TryLogContact checks HasPendingParks after writing the QSO
+//     and auto-refills the exchange for the next park so the operator just
+//     presses Enter again.
+//
+// RST handling:
+//   - The first numeric token is RSTSent; the second (rare in POTA) is RSTReceived.
+//   - Non-numeric, non-park tokens are silently ignored.
 var
-  FirstString, SecondString, ThirdString: Str10;
+  S          : string;    // Working copy of the exchange for easy manipulation
+  Token      : string;    // Current token being examined
+  Normalized : string;    // Token after NormalizePOTAPark()
+  SpacePos   : Integer;   // Index of the next space delimiter
+  RSTFound   : Boolean;   // True once we have consumed the RST token
+  ParkCount  : Integer;   // Total park refs found (used for Nfer label)
 begin
+  Result := False;
+  RXData.RSTReceived := DefaultRST;
+  RXData.RSTSent     := DefaultRST;
+  RXData.QTHString   := '';
 
-  ProcessRSTAndPOTAPark := false;
-  if length(Exchange) = 0 then
-  begin
-    RXData.RSTReceived := DefaultRST;
-    RXData.RSTSent := DefaultRST;
-    Result := true;
-    Exit;
-  end;
-  ParseExchange(Exchange, FirstString, SecondString, ThirdString);
-  // Normalize abbreviated park tokens before validation.
-  // 'US1274' -> 'US-1274', '1274' -> 'US-1274' (using MY PARK prefix).
-  // RST values (2-3 digits like '59') are returned unchanged.
-  FirstString  := NormalizePOTAPark(FirstString,  MyPark);
-  SecondString := NormalizePOTAPark(SecondString, MyPark);
-  ThirdString  := NormalizePOTAPark(ThirdString,  MyPark);
-  if IsValidPOTAPark(FirstString) then
-  begin
-    RXData.QTHString := FirstString;
-    if StringIsAllNumbers(SecondString) then
-    begin
-      RxData.RSTSent := StrToIntDef(SecondString, DefaultRST);
-      if StringIsAllNumbers(ThirdString) then
-      begin
-        RXData.RSTReceived := StrToIntDef(ThirdString, DefaultRST);
-      end
-      else
-      begin
-        RXData.RSTReceived := DefaultRST;
-      end;
-    end
-    else
-    begin
-      RXData.RSTSent := DefaultRST;
-    end;
-    Result := true;
-  end
-  else
-  begin
-    if StringIsAllNumbers(FirstString) then //Most likely RS(T)
-    begin
-      if StringIsAllNumbers(SecondString) then // Both RST Sent and Received
-      begin
-        RxData.RSTSent := StrToIntDef(FirstString, DefaultRST);
-        RXData.RSTReceived := StrToIntDef(SecondString, DefaultRST);
-        if IsValidPOTAPark(ThirdString) then
+  if Length(Exchange) = 0 then
+     begin
+     // Empty exchange is acceptable in POTA (defaults apply).
+     Result := True;
+     Exit;
+     end;
+
+  // Clear the pending queue only when this is a fresh contact, not a 2fer
+  // continuation.  A continuation is identified by the current call window
+  // matching the call stored by the previous log (SetPendingContactInfo).
+  // Any mismatch means a new station is being logged, so we start fresh.
+  // This preserves parks queued from the original exchange (e.g. US-5678
+  // in a 3fer "57 US-0663 US-1234 US-5678") across the intermediate Enter
+  // presses that log each subsequent park.
+  if GetPendingCall <> CallWindowString then
+     ClearPendingParks;
+
+  // Normalise delimiters: replace commas with spaces so the main loop only
+  // needs to handle space-separated tokens.
+  S := Exchange;
+  for SpacePos := 1 to Length(S) do
+     if S[SpacePos] = ',' then
+        S[SpacePos] := ' ';
+
+  RSTFound  := False;
+  ParkCount := 0;
+
+  // Walk token by token until the string is exhausted.
+  while S <> '' do
+     begin
+     // Skip any run of leading spaces left by the previous iteration.
+     while (S <> '') and (S[1] = ' ') do
+        Delete(S, 1, 1);
+     if S = '' then
+        Break;
+
+     // Extract the next whitespace-delimited token.
+     SpacePos := Pos(' ', S);
+     if SpacePos > 0 then
         begin
-          RXData.QTHString := thirdString;
-          Result := true;
-        end;
-      end
-      else
-      begin
-        if IsValidPOTAPark(SecondString) then
+        Token := Copy(S, 1, SpacePos - 1);
+        Delete(S, 1, SpacePos);
+        end
+     else
         begin
-          RXData.RSTSent := StrToIntDef(FirstString, DefaultRST);
-          RXData.RSTReceived := DefaultRST;
-          RXData.QTHString := SecondString;
-          Result := true;
+        Token := S;
+        S := '';
         end;
-      end;
-    end;
-  end;
+
+     if Token = '' then
+        Continue;
+
+     // Try to interpret the token as a park reference.
+     // NormalizePOTAPark returns the original token unchanged when it is not
+     // a park reference (e.g. an RST value like "57" or "599").
+     Normalized := NormalizePOTAPark(Token, MyPark);
+
+     if IsValidPOTAPark(Normalized) then
+        begin
+        if RXData.QTHString = '' then
+           begin
+           // First park found — this is the QTH for the QSO being logged.
+           RXData.QTHString := Normalized;
+           Result := True;
+           end
+        else
+           begin
+           // Additional park (2fer, 3fer...) — queue for the next log action.
+           // TryLogContact will dequeue this after the current QSO is written
+           // and pre-fill the exchange so the operator presses Enter once more.
+           QueuePendingPark(Normalized);
+           end;
+        Inc(ParkCount);
+        end
+     else if StringIsAllNumbers(Token) then
+        begin
+        // Numeric token — treat as signal report.
+        // POTA operators give one RST for the contact regardless of how many
+        // parks the station is activating.
+        if not RSTFound then
+           begin
+           RXData.RSTSent := StrToIntDef(Token, DefaultRST);
+           RSTFound := True;
+           end
+        else
+           begin
+           // A second numeric token is RSTReceived (uncommon in POTA but valid).
+           RXData.RSTReceived := StrToIntDef(Token, DefaultRST);
+           end;
+        end;
+     // Any other token (stray letters, punctuation) is silently skipped.
+     end;
+
+  // Record total park count so HandlePOTANextPark can display the right label
+  // ("2fer", "3fer", etc.).  Only meaningful when more than one park was found;
+  // for a single-park exchange the label is never shown.
+  if ParkCount > 1 then
+     SetTotalParks(ParkCount);
 end;
 
 function ProcessRSTZoneAndPossibleDomesticQTHExchange(Exchange: Str80; var
