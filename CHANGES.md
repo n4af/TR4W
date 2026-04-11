@@ -8,10 +8,10 @@
 
 | Handle | GitHub | Commits |
 |--------|--------|---------|
-| N4AF — Howie Hoyt | [@n4af](https://github.com/n4af) | 905 |
-| NY4I — Tom Schaefer | [@ny4i](https://github.com/ny4i) | 434 |
+| N4AF — Howie Hoyt | [@n4af](https://github.com/n4af) | 734 |
+| NY4I — Tom Schaefer | [@ny4i](https://github.com/ny4i) | 394 |
 | GM0GAV — Gavin Taylor | [@gm0gav](https://github.com/gm0gav) | 12 |
-| K0TI — Dan | [@Dan-K0TI](https://github.com/Dan-K0TI) | 10 |
+| K0TI — Dan | [@Dan-K0TI](https://github.com/Dan-K0TI) | 8 |
 | Vojtěch Šádek | [@vksadek](https://github.com/vksadek) | 1 |
 
 ---
