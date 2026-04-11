@@ -18,6 +18,31 @@
 
 ## 4.146.x — April 2026
 
+### 4.146.5 (2026-04-11) — NY4I
+
+#### POTA — Parks on the Air Full Feature Set (`src/trdos/FCONTEST.PAS`, `src/trdos/LOGSTUFF.PAS`, `src/MainUnit.pas`, `src/trdos/LOGSUBS2.PAS`) — Issue #864
+
+- **Park name lookup**: downloads park name from the POTA API on exchange entry; name is displayed alongside the park reference in the QSO window.
+- **Exchange normalization**: park references are normalized to canonical form (e.g. `K-1234`) before logging and export.
+- **ADIF export**: normalized park reference written to `SRX_STRING` field.
+- **QTH/RST fix**: QTH field was incorrectly showing RST value; now correctly populated from exchange.
+- **Exchange acceptance fix**: exchange was not being accepted under certain conditions; also moved POTA menu to the Tools menu.
+- **2fer/3fer/Nfer auto-log**: multiple park references can be entered in a single exchange; TR4W auto-logs one QSO per park.
+- **Nfer label fix**: QuickDisplay now shows "3fer", "4fer" etc. dynamically based on actual park count — was always "2fer".
+- **2nd operator repeat (Ctrl+T)**: new Commands menu item pre-fills the exchange with the last logged park references so a second operator can work the same activation without re-typing parks. Ctrl+T accelerator added to the resource table.
+- **Stealth menu**: POTA menu items are hidden entirely (not just grayed) when the active contest is not POTA.
+
+#### Radio — RIT and SO2R Fixes (`src/trdos/LOGRADIO.PAS`, `src/uFlexRadio6000.pas`)
+
+- **SO2R RIT routing**: `RITBumpUp`/`RITBumpDown` always routed to `Radio1.tNetObject` regardless of which radio was active; now correctly routes to the active radio.
+- **FlexRadio RIT accumulation**: RIT offset was stuck after the first bump because Flex does not reliably echo `rit_freq` back; local offset now updated optimistically before sending the CAT command.
+
+#### Miscellaneous
+
+- **SaveLogFileToFloppy**: removed bogus `lstrcat` call, replaced inline assembly with clean Delphi.
+
+---
+
 ### 4.146.4 (2026-04-09) — NY4I
 
 #### Band Map — CTRL-END Focus Fix (`src/uBandmap.pas`, `src/MainUnit.pas`, `src/uMenu.pas`) — Issue #861
