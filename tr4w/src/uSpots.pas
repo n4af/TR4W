@@ -340,6 +340,11 @@ begin
     SendMessage(BandMapListBox, LB_ADDSTRING, 0, FiltSpotIndex[k]);
   tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
   tSetWindowRedraw(BandMapListBox, True);
+  // WM_SETREDRAW(True) causes the list box to queue an erase+paint, which
+  // produces a visible flash. Cancel the pending erase, then repaint
+  // immediately without erasing — owner-draw items fill their own background.
+  ValidateRect(BandMapListBox, nil);
+  RedrawWindow(BandMapListBox, nil, 0, RDW_INVALIDATE or RDW_NOERASE or RDW_UPDATENOW);
   asm push NumberEntriesDisplayed
   end;
   wsprintf(wsprintfBuffer, TC_SPOTS);

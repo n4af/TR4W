@@ -102,6 +102,7 @@ const
 var
   ItemsInTelnetPopupMenu: integer;
   ClientStatus: TClientStatus = (csID: NET_CLIENTSTATUS_ID);
+  BandMapNeedsRefresh: boolean = False;
   //  ClusterTypeDetermined            : boolean;
 
   //  tClusterType                          : ClusterType = ctDXSpider;
@@ -770,8 +771,13 @@ begin
   begin
     sleep(BMDelay);
     // So we do not drive the serial port and radio too fast.    // 4.93.beta       // 4.102.5
-    if TestSocketBuffer < 1 then
-      DisplayBandMap; //Gav 4.44.6
+    // Signal the 250ms refresh timer rather than repainting immediately.
+    // The timer coalesces bursts of spots into a single repaint, eliminating
+    // flashing. The spot data (FList) is always current; the display is at
+    // most 250ms behind.
+    if BandMapAllBands or (TempSpot.FBand = BandmapBand) then
+      if BandMapAllModes or (TempSpot.FMode = BandmapMode) then
+        BandMapNeedsRefresh := True;
 
 {$IFDEF AUTOSPOT}
     if TwoRadioMode then

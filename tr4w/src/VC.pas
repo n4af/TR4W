@@ -2108,6 +2108,7 @@ const
   ALARM_WAKEUP_TIMER_HANDLE             = 9;
   CLOSE_ALARM_WAKEUP_HANDLE             = 10;
   UPDATE_NET_CW_MESSAGE                 = 11;
+  BANDMAP_REFRESH_TIMER_HANDLE          = 12;
 
   {menu items & accelerators}
 

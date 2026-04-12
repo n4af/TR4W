@@ -671,6 +671,7 @@ begin
   if not tHandLogMode then
      begin
      SetTimer(tr4whandle, ONE_SECOND_TIMER_HANDLE, 1000, @OneSecTimerProc);
+     SetTimer(tr4whandle, BANDMAP_REFRESH_TIMER_HANDLE, 250, @BandMapRefreshTimerProc);
      for c := menu_alt_increment_time_1 to menu_alt_increment_time_0 do EnableMenuItem(tr4w_main_menu, c, MF_GRAYED + MF_BYCOMMAND);
      end
   else

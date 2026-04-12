@@ -483,21 +483,21 @@ begin
   // port/socket that is about to be closed by inherited Disconnect below.
   if FCIVSendThread <> nil then
      begin
-     logger.Info('[TIcomRadio.Disconnect] Stopping CI-V send queue thread');
+     logger.Debug('[TIcomRadio.Disconnect] Stopping CI-V send queue thread');
      FCIVSendThread.Stop;
      FCIVSendThread.WaitFor;
      FreeAndNil(FCIVSendThread);
-     logger.Info('[TIcomRadio.Disconnect] CI-V send queue thread stopped');
+     logger.Debug('[TIcomRadio.Disconnect] CI-V send queue thread stopped');
      end;
 
   if IsNetworkConnection and (FNetworkTransport <> nil) then
      begin
-     logger.Info('[TIcomRadio.Disconnect] Calling FNetworkTransport.Disconnect (state=%s)',
+     logger.Debug('[TIcomRadio.Disconnect] Calling FNetworkTransport.Disconnect (state=%s)',
                  [IcomStateToString(FNetworkTransport.State)]);
      FNetworkTransport.Disconnect;
-     logger.Info('[TIcomRadio.Disconnect] FNetworkTransport.Disconnect returned, calling FreeAndNil');
+     logger.Debug('[TIcomRadio.Disconnect] FNetworkTransport.Disconnect returned, calling FreeAndNil');
      FreeAndNil(FNetworkTransport);
-     logger.Info('[TIcomRadio.Disconnect] FreeAndNil complete');
+     logger.Debug('[TIcomRadio.Disconnect] FreeAndNil complete');
      end
   else
      inherited Disconnect;
@@ -578,7 +578,7 @@ procedure TIcomRadio.OnNetworkStateChange(Sender: TObject);
 begin
   if FNetworkTransport = nil then Exit;
 
-  logger.Info('[TIcomRadio.OnNetworkStateChange] Transport state: %s',
+  logger.Debug('[TIcomRadio.OnNetworkStateChange] Transport state: %s',
               [IcomStateToString(FNetworkTransport.State)]);
 
   { At StreamRequested the capabilities packet has been received and the transport
@@ -921,7 +921,7 @@ begin
             begin
             // VFO selection changed — refresh both frequencies and modes
             FActiveVFO := vfoSlot;
-            logger.Info('[%s] $07 $D2: active VFO changed to VFO %s — refreshing',
+            logger.Debug('[%s] $07 $D2: active VFO changed to VFO %s — refreshing',
                [radioModel, IfThen(FActiveVFO = nrVFOA, 'A', 'B')]);
             QueryVFOAFrequency;
             QueryVFOAMode;
@@ -938,7 +938,7 @@ begin
 
     $03:  // Read operating frequency response — returns the active VFO's frequency
       begin
-        logger.Info('[%s] $03 response received, data len=%d', [radioModel, Length(data)]);
+        logger.Debug('[%s] $03 response received, data len=%d', [radioModel, Length(data)]);
         if Length(data) >= 5 then
         begin
           freq := BCDToFreq(Copy(data, 1, 5));
@@ -971,7 +971,7 @@ begin
             FBandMemory[vfo[vfoSlot].Band] := freq;
           if subCmd = $00 then
             FVFOQueryPending := False;  // Query pair complete — allow next $00 to trigger
-          logger.Info('[%s] $25/$%.2x → radio object vfo[%s] freq = %d Hz',
+          logger.Debug('[%s] $25/$%.2x → radio object vfo[%s] freq = %d Hz',
              [radioModel, subCmd, IfThen(vfoSlot = nrVFOA, 'nrVFOA', 'nrVFOB'), freq]);
         end
         else if Length(data) = 5 then  // IC-7610/standard format: freq(5) only, no subcmd
@@ -1000,7 +1000,7 @@ begin
            end
         else
            begin
-           logger.Info('[%s] $04 response received, data len=%d', [radioModel, Length(data)]);
+           logger.Debug('[%s] $04 response received, data len=%d', [radioModel, Length(data)]);
            if Length(data) >= 1 then
            begin
              modeNum := Ord(data[1]);
@@ -1020,7 +1020,7 @@ begin
                else radioMode := rmNone;
              end;
              vfoSlot := FActiveVFO;
-             logger.Info('[%s] $04 mode: byte=$%.2x → TRadioMode=%d → VFO %s',
+             logger.Debug('[%s] $04 mode: byte=$%.2x → TRadioMode=%d → VFO %s',
                 [radioModel, modeNum, Ord(radioMode), IfThen(vfoSlot = nrVFOA, 'A', 'B')]);
              FLastBaseMode := radioMode;
              Self.vfo[vfoSlot].Mode := radioMode;
@@ -1107,7 +1107,7 @@ begin
       // IC-7760 format (FSupportsExtendedVFOBCommands): $01 <freq5> <mode> <filter>
       // Standard format: <freq5> <mode> <filter>
       begin
-        logger.Info('[%s] $26 response received, data len=%d, extended=%s',
+        logger.Debug('[%s] $26 response received, data len=%d, extended=%s',
            [radioModel, Length(data), BoolToStr(FSupportsExtendedVFOBCommands, True)]);
         if FSupportsExtendedVFOBCommands then
           begin
@@ -1141,7 +1141,7 @@ begin
               else radioMode := rmNone;
             end;
             vfo[nrVFOB].Mode := radioMode;
-            logger.Info('[%s] VFO B freq+mode ($26 push): %d Hz, mode=$%.2x → TRadioMode=%d',
+            logger.Debug('[%s] VFO B freq+mode ($26 push): %d Hz, mode=$%.2x → TRadioMode=%d',
                [radioModel, freq, modeNum, Ord(radioMode)]);
             end
           else if Length(data) >= 3 then
@@ -1176,14 +1176,14 @@ begin
               begin
               vfo[vfoSlot].Mode := rmData;
               vfo[vfoSlot].dataMode := rmData;
-              logger.Info('[%s] $26/$%.2x → radio object vfo[%s] mode=$%.2x + data mode D%d → rmData',
+              logger.Debug('[%s] $26/$%.2x → radio object vfo[%s] mode=$%.2x + data mode D%d → rmData',
                  [radioModel, subCmd, IfThen(vfoSlot = nrVFOA, 'nrVFOA', 'nrVFOB'), modeNum, Ord(data[3])]);
               end
             else
               begin
               vfo[vfoSlot].Mode := radioMode;
               vfo[vfoSlot].dataMode := rmNone;
-              logger.Info('[%s] $26/$%.2x → radio object vfo[%s] mode=$%.2x → TRadioMode=%d',
+              logger.Debug('[%s] $26/$%.2x → radio object vfo[%s] mode=$%.2x → TRadioMode=%d',
                  [radioModel, subCmd, IfThen(vfoSlot = nrVFOA, 'nrVFOA', 'nrVFOB'), modeNum, Ord(radioMode)]);
               end;
             end
@@ -1201,7 +1201,7 @@ begin
             vfo[nrVFOB].Band := FreqToRadioBand(freq);
             if vfo[nrVFOB].Band <> rbNone then
               FBandMemory[vfo[nrVFOB].Band] := freq;
-            logger.Info('[%s] VFO B freq ($26): %d Hz', [radioModel, freq]);
+            logger.Debug('[%s] VFO B freq ($26): %d Hz', [radioModel, freq]);
             end;
           if Length(data) >= 6 then
             begin
@@ -1222,7 +1222,7 @@ begin
               else radioMode := rmNone;
             end;
             vfo[nrVFOB].Mode := radioMode;
-            logger.Info('[%s] VFO B mode ($26): byte=$%.2x → TRadioMode=%d',
+            logger.Debug('[%s] VFO B mode ($26): byte=$%.2x → TRadioMode=%d',
                [radioModel, modeNum, Ord(radioMode)]);
             end;
           end;
@@ -1332,9 +1332,9 @@ begin
         // Initial state queries are sent directly by the polling thread on connect —
         // this response is logged for diagnostics only.
         if Length(data) >= 2 then
-          logger.Info('[%s] Transceiver ID confirmed, CI-V address=$%.2x', [radioModel, Ord(data[2])])
+          logger.Debug('[%s] Transceiver ID confirmed, CI-V address=$%.2x', [radioModel, Ord(data[2])])
         else
-          logger.Info('[%s] Transceiver ID response received (no address byte)', [radioModel]);
+          logger.Debug('[%s] Transceiver ID response received (no address byte)', [radioModel]);
       end;
 
     $FB:  // Command OK (ACK)
@@ -1460,7 +1460,7 @@ procedure TIcomRadio.SetFrequency(freq: longint; vfo: TVFO; mode: TRadioMode);
 var
   bcdFreq: string;
 begin
-  logger.Info('[%s.SetFrequency] freq=%d VFO=%s TRadioMode=%d', [radioModel, freq, IfThen(vfo = nrVFOA, 'A', 'B'), Ord(mode)]);
+  logger.Debug('[%s.SetFrequency] freq=%d VFO=%s TRadioMode=%d', [radioModel, freq, IfThen(vfo = nrVFOA, 'A', 'B'), Ord(mode)]);
   bcdFreq := FreqToBCD(freq);
   if (vfo = nrVFOB) and FSupportsExtendedVFOBCommands then
      begin
@@ -1504,7 +1504,7 @@ var
   filterCmd: Byte;
   dataMode: Byte;
 begin
-  logger.Info('[%s.SetMode] Setting VFO %s to TRadioMode=%d', [radioModel, IfThen(vfo = nrVFOA, 'A', 'B'), Ord(mode)]);
+  logger.Debug('[%s.SetMode] Setting VFO %s to TRadioMode=%d', [radioModel, IfThen(vfo = nrVFOA, 'A', 'B'), Ord(mode)]);
 
   // Map TRadioMode to Icom mode numbers
   filterCmd := $01;  // Default filter
@@ -1539,7 +1539,7 @@ begin
         dataMode := FDataModeID
      else
         dataMode := 0;
-     logger.Info('[%s.SetMode] Sending $26 $01 modeCmd=$%.2x dataMode=$%.2x filterCmd=$%.2x',
+     logger.Debug('[%s.SetMode] Sending $26 $01 modeCmd=$%.2x dataMode=$%.2x filterCmd=$%.2x',
         [radioModel, modeCmd, dataMode, filterCmd]);
      SendToRadio(BuildCIVCommand($26, #$01 + Chr(modeCmd) + Chr(dataMode) + Chr(filterCmd)));
      end
@@ -1550,7 +1550,7 @@ begin
      if vfo = nrVFOB then
         SendToRadio(BuildCIVCommand($07, #$01));
 
-     logger.Info('[%s.SetMode] Sending $06 modeCmd=$%.2x filterCmd=$%.2x', [radioModel, modeCmd, filterCmd]);
+     logger.Debug('[%s.SetMode] Sending $06 modeCmd=$%.2x filterCmd=$%.2x', [radioModel, modeCmd, filterCmd]);
      SendToRadio(BuildCIVCommand($06, Chr(modeCmd) + Chr(filterCmd)));
 
      // Set or clear the Icom data sub-mode flag ($1A $06):
@@ -1565,13 +1565,13 @@ begin
         begin
         if mode in [rmAFSK, rmData, rmDataRev] then
            begin
-           logger.Info('[%s.SetMode] Sending $1A $06 $%.2x (data mode ON, D%d)', [radioModel, FDataModeID, FDataModeID]);
+           logger.Debug('[%s.SetMode] Sending $1A $06 $%.2x (data mode ON, D%d)', [radioModel, FDataModeID, FDataModeID]);
            SendToRadio(BuildCIVCommand($1A, #$06 + Chr(FDataModeID)));
            end
         else if (mode in [rmUSB, rmLSB, rmAM, rmFM]) and
                 (Self.vfo[vfo].Mode in [rmData, rmDataRev, rmAFSK]) then
            begin
-           logger.Info('[%s.SetMode] Sending $1A $06 $00 (leaving data mode, prev TRadioMode=%d)', [radioModel, Ord(Self.vfo[vfo].Mode)]);
+           logger.Debug('[%s.SetMode] Sending $1A $06 $00 (leaving data mode, prev TRadioMode=%d)', [radioModel, Ord(Self.vfo[vfo].Mode)]);
            SendToRadio(BuildCIVCommand($1A, #$06 + #$00));
            end;
         end;
@@ -1591,7 +1591,7 @@ begin
   else
      Self.vfo[vfo].Mode := mode;
 
-  logger.Info('[%s.SetMode] Done — VFO %s TRadioMode=%d modeCmd=$%.2x', [radioModel, IfThen(vfo = nrVFOA, 'A', 'B'), Ord(mode), modeCmd]);
+  logger.Debug('[%s.SetMode] Done — VFO %s TRadioMode=%d modeCmd=$%.2x', [radioModel, IfThen(vfo = nrVFOA, 'A', 'B'), Ord(mode), modeCmd]);
 end;
 
 procedure TIcomRadio.BufferCW(cwChars: string);
