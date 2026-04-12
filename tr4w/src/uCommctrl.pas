@@ -2590,8 +2590,10 @@ const
   LVSCW_AUTOSIZE                        = -1;
   LVSCW_AUTOSIZE_USEHEADER              = -2;
   LVM_SETCOLUMNWIDTH                    = LVM_FIRST + 30;
+  LVM_GETHEADER                         = LVM_FIRST + 31;
 
 function ListView_SetColumnWidth(HWND: HWND; iCol: integer; cx: integer): BOOL;
+function ListView_GetHeader(hWnd: HWND): HWND;
 
 const
   LVM_CREATEDRAGIMAGE                   = LVM_FIRST + 33;
@@ -4933,6 +4935,11 @@ end;
 function ListView_SetColumnWidth(HWND: HWND; iCol: integer; cx: integer): BOOL;
 begin
   Result := BOOL(SendMessage(HWND, LVM_SETCOLUMNWIDTH, iCol, cx {MakeLong((cx), 0)}));
+end;
+
+function ListView_GetHeader(hWnd: HWND): HWND;
+begin
+  Result := SendMessage(hWnd, LVM_GETHEADER, 0, 0);
 end;
 
 function ListView_CreateDragImage(HWND: HWND; i: integer;

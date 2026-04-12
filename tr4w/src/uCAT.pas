@@ -407,6 +407,28 @@ begin
           1000:
              begin
              ButtonsEnable;
+             // Warn if user is enabling HamLib for a radio that TR4W supports natively.
+             // HamLib polling on natively-supported radios causes excessive CI-V traffic
+             // that interferes with front-panel operation. Allow it but make the tradeoff clear.
+             if boolean(TF.SendDlgItemMessage(hwnddlg, 1000, BM_GETCHECK)) then
+                begin
+                if not (InterfacedRadioType(tCB_GETCURSEL(hwnddlg, 121)) in HAMLibONLYRadios) then
+                   begin
+                   MessageBox(hwnddlg,
+                     'This radio has native TR4W support. Using HamLib is not recommended.' + #13#10 +
+                     #13#10 +
+                     'RIT and XIT status will update every 5 seconds due to the HamLib implementation on certain (Icom) rigs.' + #13#10 +
+                     #13#10 +
+                     'Querying RIT/XIT requires a physical VFO select command that could ' +
+                     'interfere with front-panel operations.' + #13#10 +
+                     #13#10 +
+                     'All other values (frequency, mode, PTT, split) update every second.' + #13#10 +
+                     #13#10 +
+                     'Check this option only if you have a specific reason to use HamLib.',
+                     'HamLib Not Recommended for This Radio',
+                     MB_OK or MB_ICONWARNING);
+                   end;
+                end;
              end;
         end;
       end;
