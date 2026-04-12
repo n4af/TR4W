@@ -18,6 +18,24 @@
 
 ## 4.146.x — April 2026
 
+### 4.146.6 (2026-04-12) — NY4I
+
+#### Column Width Fix on Startup (`src/MainUnit.pas`, `src/uCommctrl.pas`, `src/VC.pas`, `tr4w/tr4w.dpr`) — Issue #866
+
+- **QTH/exchange columns too narrow on startup**: `EnsureListViewColumnVisible` was using `LVSCW_AUTOSIZE_USEHEADER`, which sizes to the header text width only (e.g. "QTH" = 3 chars), ignoring data. Changed to `LVSCW_AUTOSIZE` so columns fit their widest data value.
+- **User-adjusted column widths**: added `ColumnAutoSize` flag and `ColumnWidthOverride` array to persist user-adjusted widths across sessions.
+
+#### HamLib Direct Improvements (`src/uRadioHamLibDirect.pas`, `src/uHamLibDirect.pas`, `src/uRadioPolling.pas`, `src/uCAT.pas`, `src/uCFG.pas`)
+
+- **WSJT-X minimal poll set**: adopted the 6-command poll cycle WSJT-X uses (VFO A freq/mode, PTT, split, VFO B) with no RIT/XIT in the fast heartbeat. RIT/XIT moved to a 5-second slow poll (`SendRITXITPoll`), eliminating `$07 $D0` front-panel menu interference on IC-7610/7760.
+- **Async transceive callbacks**: registered via `rig_set_trn(RIG_TRN_RIG)` for fast front-panel response; heartbeat polling remains primary for serial backends.
+- **Accurate RIT/XIT on/off state**: uses `rig_get_func(RIG_FUNC_RIT/XIT)` separately from offset values; fixes false "RIT active" display when IC-7610 stores a non-zero offset with RIT disabled.
+- **HamLib trace logging**: `HAMLIB TRACE = TRUE` in config redirects HamLib internal debug to `hamlib_trace.log`.
+- **HamLib warning in CAT dialog**: warns when HamLib is selected for a radio with native TR4W support, explaining the RIT/XIT limitation.
+- **KX3 support**: added KX3 between K3 and K4 (`LOGRADIO.PAS`, `VC.pas`) — Kenwood protocol, 38400 baud, HamLib ID 2045.
+
+---
+
 ### 4.146.5 (2026-04-11) — NY4I
 
 #### POTA — Parks on the Air Full Feature Set (`src/trdos/FCONTEST.PAS`, `src/trdos/LOGSTUFF.PAS`, `src/MainUnit.pas`, `src/trdos/LOGSUBS2.PAS`) — Issue #864
