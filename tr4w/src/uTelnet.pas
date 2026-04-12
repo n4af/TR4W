@@ -824,6 +824,7 @@ var
   DivHertz: boolean;
   QSXBand: BandType;
   QSXMode: ModeType;
+  UpKhz: integer;
 
   Offset: integer;
   ct: Cardinal;
@@ -990,6 +991,30 @@ begin
         TempSpot.FQSXFrequency := TempSpot.FFrequency + 4000;
       if PInteger(@TelnetBuffer[i])^ = $20355055 {UP5 } then
         TempSpot.FQSXFrequency := TempSpot.FFrequency + 5000;
+
+      // Handle "UP <n>" format (space between UP and number, e.g. "UP 5", "UP 10").
+      // Word-boundary guard: require a space (or start of comment field) before
+      // "UP" so that words like "PUP", "CUP", "SOUP" in spot comments don't
+      // trigger a false split.
+      // "UP <n>" with space-separated number, e.g. "UP 5", "UP 10".
+      // Require a space before 'U' (word boundary) and a digit after "UP ".
+      if (TelnetBuffer[i] = 'U') and
+         (TelnetBuffer[i + 1] = 'P') and
+         (TelnetBuffer[i + 2] = ' ') and
+         (TelnetBuffer[i - 1] = ' ') and
+         (TelnetBuffer[i + 3] in ['0'..'9']) then
+         begin
+         UpKhz := 0;
+         for QSXPos := 3 to 8 do
+            begin
+            TempChar := TelnetBuffer[i + QSXPos];
+            if not (TempChar in ['0'..'9']) then
+               Break;
+            UpKhz := UpKhz * 10 + (Ord(TempChar) - 48);
+            end;
+         if UpKhz > 0 then
+            TempSpot.FQSXFrequency := TempSpot.FFrequency + UpKhz * 1000;
+         end;
     end;
   end;
 
