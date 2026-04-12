@@ -340,7 +340,7 @@ const
    + 2 {UDPLookupInfo} // Issue 612 ny4i
    + 2 {Radio1 & Radio2 UseHamLib} // Issue 676 ny4i
    + 2 {Radio1 and Radio2 KEYER STOP BITS} // Issue 678 ny4i
-   + 3 {Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB DEBUG}
+   + 5 {Radio ONE HAMLIB ID, Radio 2 HAMLIB ID, HAMLIB DEBUG, HAMLIB ASYNC ONLY, HAMLIB TRACE}
    + 3 {ExternalLoggerAddress & ExernalLoggerPort & ExternalLoggerEnabled}
    + 1 {ExternalLogger}
    + 1 {SpotCollectorEnabled}
@@ -348,6 +348,7 @@ const
    + 1 {WSJTXMulticastGroup}  // Issue 443
    + 2 {Icom Data Mode ID for Radio 1 and Radio 2}
    + 1 {YCCCSo2rEnable}  // Issue 61
+   + 1 {ColumnAutoSize}  // Issue 866
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -416,6 +417,7 @@ const
  (crCommand: 'CHECK LOG FILE SIZE';           crAddress: @CheckLogFileSize;               crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'CLEAR DUPE SHEET';              crAddress: @ClearDupeSheetCommandGiven;     crMin:0;  crMax:0;       crS: csOld; crA: 4; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'CODE SPEED';                    crAddress: @CodeSpeed;                      crMin:0;  crMax:99;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger; crNetwork: 1),
+ (crCommand: 'COLUMN AUTOSIZE';              crAddress: @ColumnAutoSize;                 crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
 // (crCommand: 'COLUMN DUPESHEET COLOR';        crAddress: @ColumnDupeSheetColor;           crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'COLUMN DUPESHEET ENABLE';        crAddress: @ColumnDupeSheetEnable;          crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'COMPLETE CALLSIGN MASK';        crAddress: @CompleteCallsignMask;           crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctString; crNetwork: 1),
@@ -489,6 +491,8 @@ const
  (crCommand: 'FT1000MP CW REVERSE';           crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'GRID MAP CENTER';               crAddress: @GridMapCenter;                  crMin:0;  crMax:6;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
  (crCommand: 'HAMLIB DEBUG';                crAddress: @TR4W_HAMLIB_DEBUG;               crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
+(crCommand: 'HAMLIB ASYNC ONLY';          crAddress: @TR4W_HAMLIB_ASYNC_ONLY;          crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
+(crCommand: 'HAMLIB TRACE';               crAddress: @TR4W_HAMLIB_TRACE;               crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HAND LOG MODE';                 crAddress: @tHandLogMode;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:1 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HF BAND ENABLE';                crAddress: @HFBandEnable;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'HOUR DISPLAY';                  crAddress: pointer(8);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther; crNetwork: 1),
@@ -875,6 +879,7 @@ var
    TempByte: Byte;
    //  TempString                            : Str10;
    TempElement: TMainWindowElement;
+   TempColumn: LogColumnsType;
 begin
 {$IF MAKE_DEFAULT_VALUES = TRUE}
    Result := True;
@@ -934,6 +939,21 @@ begin
                   end;
 
             end;
+      end;
+
+   if StrPos(@Command[1], 'COLUMN WIDTH ') = @Command[1] then
+      begin
+      for TempColumn := Low(LogColumnsType) to High(LogColumnsType) do
+         begin
+         if UpperCase(ColumnsArray[TempColumn].Text) = Copy(pshortstring(Command)^, 14, 255) then
+            begin
+            Val(CustomCMD, TempInteger, code);
+            if code = 0 then
+               ColumnWidthOverride[TempColumn] := TempInteger;
+            Result := True;
+            Exit;
+            end;
+         end;
       end;
 
    if pshortstring(Command)^ = 'ALERT COLOR' then

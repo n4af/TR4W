@@ -183,6 +183,8 @@ function WindowProc(TRHWND: HWND; Msg: UINT; wParam: wParam; lParam: lParam): lo
 
 label
   GoToExit, CallDefWindowProc;
+var
+  HDNotifyPtr: PHDNotify;
 begin
 
   case Msg of
@@ -234,7 +236,20 @@ begin
                 begin
                 end;
             end
-          else
+          else if (hWndFrom = ListView_GetHeader(wh[mweEditableLog])) then
+            begin
+            if (code = HDN_ENDTRACK) or (code = HDN_ENDTRACKW) then
+               begin
+               HDNotifyPtr := PHDNotify(lParam);
+               if (HDNotifyPtr^.pItem <> nil) and
+                  ((HDNotifyPtr^.pItem^.mask and HDI_WIDTH) <> 0) then
+                  SaveColumnWidthToConfig(HDNotifyPtr^.Item, HDNotifyPtr^.pItem^.cxy)
+               else
+                  // pItem unavailable — fall back to querying the ListView directly
+                  SaveColumnWidthToConfig(HDNotifyPtr^.Item,
+                     ListView_GetColumnWidth(wh[mweEditableLog], HDNotifyPtr^.Item));
+               end;
+            end;
       end;
     WM_MEASUREITEM: if wParam = MainWindowPCLID then
         PMeasureItemStruct(lParam).itemHeight := ws;
