@@ -263,6 +263,8 @@ procedure PTTOffWhenStopWAV(uTimerID, uMessage: UINT; dwUser, dw1, dw2: DWORD)
   stdcall;
 procedure OneSecTimerProc(uTimerID, uMessage: UINT; dwUser, dw1, dw2: DWORD)
   stdcall;
+procedure BandMapRefreshTimerProc(uTimerID, uMessage: UINT; dwUser, dw1, dw2: DWORD)
+  stdcall;
 
 procedure SaveTR4WPOSFILE;
 procedure LoadTR4WPOSFILE;
@@ -1570,6 +1572,16 @@ begin
   // Windows.SetWindowText(tr4whandle, inttopchar({GetHeapStatus.TotalFree}AllocMemSize));
  // Windows.SetWindowText(InsertWindowHandle, inttopchar(FreeMemCount));
 {$IFEND}
+end;
+
+procedure BandMapRefreshTimerProc(uTimerID, uMessage: UINT; dwUser, dw1, dw2: DWORD)
+  stdcall;
+begin
+  if BandMapNeedsRefresh then
+     begin
+     BandMapNeedsRefresh := False;
+     DisplayBandMap;
+     end;
 end;
 
 procedure PTTOffWhenStopWAV(uTimerID, uMessage: UINT; dwUser, dw1, dw2: DWORD)
