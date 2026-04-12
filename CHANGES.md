@@ -32,7 +32,8 @@
 - **Accurate RIT/XIT on/off state**: uses `rig_get_func(RIG_FUNC_RIT/XIT)` separately from offset values; fixes false "RIT active" display when IC-7610 stores a non-zero offset with RIT disabled.
 - **HamLib trace logging**: `HAMLIB TRACE = TRUE` in config redirects HamLib internal debug to `hamlib_trace.log`.
 - **HamLib warning in CAT dialog**: warns when HamLib is selected for a radio with native TR4W support, explaining the RIT/XIT limitation.
-- **KX3 support**: added KX3 between K3 and K4 (`LOGRADIO.PAS`, `VC.pas`) — Kenwood protocol, 38400 baud, HamLib ID 2045.
+
+#### Added **KX3 support**: added KX3 between K3 and K4 (`LOGRADIO.PAS`, `VC.pas`) — Kenwood protocol, 38400 baud, HamLib ID 2045.
 
 ---
 
