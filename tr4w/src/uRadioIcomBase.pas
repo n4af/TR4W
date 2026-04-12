@@ -1502,14 +1502,9 @@ procedure TIcomRadio.SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA);
 var
   modeCmd: Byte;
   filterCmd: Byte;
+  dataMode: Byte;
 begin
   logger.Info('[%s.SetMode] Setting VFO %s to TRadioMode=%d', [radioModel, IfThen(vfo = nrVFOA, 'A', 'B'), Ord(mode)]);
-  // To set VFO B mode: select VFO B ($07 $01), send $06, then restore VFO A ($07 $00).
-  // $25/$26 are read/set band-info commands, not VFO-select commands — using them here
-  // queues a read query whose response can race with the $06 mode command.
-  // For VFO A no selection step is needed: $06 always targets the active (main) VFO.
-  if vfo = nrVFOB then
-     SendToRadio(BuildCIVCommand($07, #$01));
 
   // Map TRadioMode to Icom mode numbers
   filterCmd := $01;  // Default filter
@@ -1523,8 +1518,8 @@ begin
     rmCWRev:  modeCmd := $07;
     rmFSKRev: modeCmd := $08;
     rmAFSK,
-    rmData:     modeCmd := $01;  // USB base mode + data sub-mode via $1A $06
-    rmDataRev:  modeCmd := $00;  // LSB base mode + data sub-mode via $1A $06
+    rmData:     modeCmd := $01;  // USB base mode + data sub-mode
+    rmDataRev:  modeCmd := $00;  // LSB base mode + data sub-mode
     rmPSK:    modeCmd := $12;
     rmPSKRev: modeCmd := $13;
     rmDV:     modeCmd := $17;  // D-STAR digital voice
@@ -1532,45 +1527,63 @@ begin
     modeCmd := $01;  // Default to USB
   end;
 
-  logger.Info('[%s.SetMode] Sending $06 with modeCmd=$%.2x filterCmd=$%.2x', [radioModel, modeCmd, filterCmd]);
-  SendToRadio(BuildCIVCommand($06, Chr(modeCmd) + Chr(filterCmd)));
-
-  // Set or clear the Icom data sub-mode flag ($1A $06):
-  //   Entering data mode  → turn flag ON  ($1A $06 D1/D2/D3) via FDataModeID
-  //   Leaving data mode for a voice mode → turn flag OFF ($1A $06 $00)
-  //   Only send the clear command when the previous mode was actually a data
-  //   mode; sending $1A $06 $00 unnecessarily (e.g. USB→USB on a retune) is
-  //   known to kill the IC-7760 CI-V transceive stream (same failure mode as
-  //   the now-disabled $26 $01 VFO B mode query).
-  //   CW/CW-R: the radio auto-clears data mode on $06 $03 — no $1A $06 needed.
-  //   FSK/PSK: use native Icom mode numbers and need no $1A $06 command.
-  if SupportsDataMode then
+  if (vfo = nrVFOB) and FSupportsExtendedVFOBCommands then
      begin
+     // Use $26 $01 <mode> <dataMode> <filter> to set VFO B mode directly,
+     // without any VFO-swap sequence. The $07 $01 / $06 / $07 $00 approach
+     // races with CI-V transceive pushes over network connections — the $06
+     // command lands on whichever VFO is active when the radio processes it,
+     // which may still be VFO A. $26 $01 targets VFO B unconditionally.
+     // This matches the serial path (LOGRADIO.PAS IcomRadiosThatSupportVFOB).
      if mode in [rmAFSK, rmData, rmDataRev] then
-        begin
-        logger.Info('[%s.SetMode] Sending $1A $06 $%.2x (data mode ON, D%d)', [radioModel, FDataModeID, FDataModeID]);
-        SendToRadio(BuildCIVCommand($1A, #$06 + Chr(FDataModeID)));
-        end
-     else if (mode in [rmUSB, rmLSB, rmAM, rmFM]) and
-             (Self.vfo[vfo].Mode in [rmData, rmDataRev, rmAFSK]) then
-        begin
-        // Clear the data sub-mode flag only if we were previously in a data
-        // mode.  Sending $1A $06 $00 while already in a plain voice mode is
-        // redundant and risks stalling the IC-7760 CI-V stream.
-        logger.Info('[%s.SetMode] Sending $1A $06 $00 (leaving data mode, prev TRadioMode=%d)', [radioModel, Ord(Self.vfo[vfo].Mode)]);
-        SendToRadio(BuildCIVCommand($1A, #$06 + #$00));
-        end;
-     end;
+        dataMode := FDataModeID
+     else
+        dataMode := 0;
+     logger.Info('[%s.SetMode] Sending $26 $01 modeCmd=$%.2x dataMode=$%.2x filterCmd=$%.2x',
+        [radioModel, modeCmd, dataMode, filterCmd]);
+     SendToRadio(BuildCIVCommand($26, #$01 + Chr(modeCmd) + Chr(dataMode) + Chr(filterCmd)));
+     end
+  else
+     begin
+     // VFO A, or radios without $25/$26 support: use $06 targeting the active VFO.
+     // For VFO B on older radios, swap to VFO B first, then restore VFO A after.
+     if vfo = nrVFOB then
+        SendToRadio(BuildCIVCommand($07, #$01));
 
-  // Restore VFO A after setting VFO B mode
-  if vfo = nrVFOB then
-     SendToRadio(BuildCIVCommand($07, #$00));
+     logger.Info('[%s.SetMode] Sending $06 modeCmd=$%.2x filterCmd=$%.2x', [radioModel, modeCmd, filterCmd]);
+     SendToRadio(BuildCIVCommand($06, Chr(modeCmd) + Chr(filterCmd)));
+
+     // Set or clear the Icom data sub-mode flag ($1A $06):
+     //   Entering data mode  → turn flag ON  ($1A $06 D1/D2/D3) via FDataModeID
+     //   Leaving data mode for a voice mode → turn flag OFF ($1A $06 $00)
+     //   Only send the clear command when the previous mode was actually a data
+     //   mode; sending $1A $06 $00 unnecessarily (e.g. USB→USB on a retune) is
+     //   known to kill the IC-7760 CI-V transceive stream.
+     //   CW/CW-R: the radio auto-clears data mode on $06 $03 — no $1A $06 needed.
+     //   FSK/PSK: use native Icom mode numbers and need no $1A $06 command.
+     if SupportsDataMode then
+        begin
+        if mode in [rmAFSK, rmData, rmDataRev] then
+           begin
+           logger.Info('[%s.SetMode] Sending $1A $06 $%.2x (data mode ON, D%d)', [radioModel, FDataModeID, FDataModeID]);
+           SendToRadio(BuildCIVCommand($1A, #$06 + Chr(FDataModeID)));
+           end
+        else if (mode in [rmUSB, rmLSB, rmAM, rmFM]) and
+                (Self.vfo[vfo].Mode in [rmData, rmDataRev, rmAFSK]) then
+           begin
+           logger.Info('[%s.SetMode] Sending $1A $06 $00 (leaving data mode, prev TRadioMode=%d)', [radioModel, Ord(Self.vfo[vfo].Mode)]);
+           SendToRadio(BuildCIVCommand($1A, #$06 + #$00));
+           end;
+        end;
+
+     if vfo = nrVFOB then
+        SendToRadio(BuildCIVCommand($07, #$00));
+     end;
 
   // Optimistic update: reflect the new mode in our cached VFO state immediately.
   // The polling thread reads vfo.Mode on every cycle; without this update, the
   // stale mode triggers ProcessFilteredStatus to override the display back to
   // the old mode before the transceive-push confirmation from the radio arrives.
-  // This mirrors the frequency optimistic update already done in SetFrequency.
   // rmAFSK maps to rmData because that is what the radio confirms: a $01 $01
   // (USB) transceive push combined with the $1A $06 $01 (data ON) response.
   if mode = rmAFSK then
