@@ -322,6 +322,7 @@ procedure ProcessCommandLine;
 procedure PutCallToCallWindow(Call: CallString);
 procedure SetColumnsWidth;
 procedure EnsureListViewColumnVisible(h: HWND);
+procedure SaveColumnWidthToConfig(ColIndex: Integer; NewWidth: Integer);
 procedure ExecuteConfigurationFile(f: ShortString);
 procedure CheckEditableWindowHeight;
 function CheckCommandInCallsignWindow: boolean;
@@ -6640,13 +6641,40 @@ procedure EnsureListViewColumnVisible(h: HWND);
 var
   TempColumn: LogColumnsType;
 begin
-
-  for TempColumn := logColNumberReceive {logColCallsign} {logColBand} to
-  High(LogColumnsType) {Pred(logColDummy)} do
+  for TempColumn := logColBand to High(LogColumnsType) do
     if ColumnsArray[TempColumn].Enable then
-      // if TempColumn <> logColCallsign then
-      ListView_SetColumnWidth(h, integer(TempColumn), LVSCW_AUTOSIZE_USEHEADER);
+      begin
+      if ColumnWidthOverride[TempColumn] > 0 then
+        // User has manually sized this column — restore their saved width
+        ListView_SetColumnWidth(h, ColumnsArray[TempColumn].pos, ColumnWidthOverride[TempColumn])
+      else if (TempColumn >= logColNumberReceive) and ColumnAutoSize then
+        // Original auto-size behavior: unchanged from before Issue 866
+        ListView_SetColumnWidth(h, integer(TempColumn), LVSCW_AUTOSIZE_USEHEADER);
+      end;
+end;
 
+procedure SaveColumnWidthToConfig(ColIndex: Integer; NewWidth: Integer);
+var
+   TempColumn: LogColumnsType;
+   KeyName: ShortString;
+   WidthStr: ShortString;
+begin
+   for TempColumn := Low(LogColumnsType) to High(LogColumnsType) do
+      begin
+      if ColumnsArray[TempColumn].Enable and (ColumnsArray[TempColumn].pos = ColIndex) then
+         begin
+         if NewWidth > 0 then
+            begin
+            ColumnWidthOverride[TempColumn] := NewWidth;
+            KeyName := 'COLUMN WIDTH ' + ColumnsArray[TempColumn].Text;
+            KeyName[Ord(KeyName[0]) + 1] := #0;
+            Str(NewWidth, WidthStr);
+            WidthStr[Ord(WidthStr[0]) + 1] := #0;
+            Windows.WritePrivateProfileString('COMMANDS', @KeyName[1], @WidthStr[1], @TR4W_CFG_FILENAME);
+            end;
+         Exit;
+         end;
+      end;
 end;
 
 procedure ExecuteConfigurationFile(f: ShortString);

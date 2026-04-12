@@ -287,6 +287,9 @@ const
 
 // Debug control
 procedure rig_set_debug(debug_level: rig_debug_level_e); cdecl; external HAMLIB_DLL;
+// rig_set_debug_file is loaded dynamically at runtime (may not exist in all builds)
+// Use MSVCRT fopen to obtain a C FILE* compatible with HamLib's debug stream
+function msvcrt_fopen(filename: PChar; mode: PChar): Pointer; cdecl; external 'msvcrt.dll' name 'fopen';
 
 // Initialization and cleanup
 function rig_init(rig_model: Integer): PRIG; cdecl; external HAMLIB_DLL;
@@ -348,6 +351,22 @@ function rig_set_xit(rig: PRIG; vfo: vfo_t; xit: shortfreq_t): Integer; cdecl; e
 function rig_get_xit(rig: PRIG; vfo: vfo_t; var xit: shortfreq_t): Integer; cdecl; external HAMLIB_DLL;
 
 {-----------------------------------------------------------------------------
+  Function settings (on/off capabilities) — rig_get_func / rig_set_func
+  setting_t is a 64-bit bitmask; each bit represents one function.
+  RIG_FUNC_RIT = bit 5 (32), RIG_FUNC_XIT = bit 6 (64).
+-----------------------------------------------------------------------------}
+
+type
+  setting_t = Int64;
+
+const
+  RIG_FUNC_RIT = setting_t(1) shl 24;  // RIT on/off state (hamlib rig.h bit 24)
+  RIG_FUNC_XIT = setting_t(1) shl 31;  // XIT on/off state (hamlib rig.h bit 31)
+
+function rig_get_func(rig: PRIG; vfo: vfo_t; func: setting_t; var status: Integer): Integer; cdecl; external HAMLIB_DLL;
+function rig_set_func(rig: PRIG; vfo: vfo_t; func: setting_t; status: Integer): Integer; cdecl; external HAMLIB_DLL;
+
+{-----------------------------------------------------------------------------
   Utility Functions
 -----------------------------------------------------------------------------}
 
@@ -356,6 +375,52 @@ function rigerror(errnum: Integer): PChar; cdecl; external HAMLIB_DLL;
 
 // Mode string conversion
 function rig_strrmode(mode: rmode_t): PChar; cdecl; external HAMLIB_DLL;
+
+{-----------------------------------------------------------------------------
+  Transceive Mode
+
+  When enabled with RIG_TRN_RIG, the radio pushes unsolicited freq/mode/PTT
+  changes. HamLib invokes the registered callbacks from its internal reader
+  thread. Register callbacks before calling rig_set_trn.
+-----------------------------------------------------------------------------}
+
+const
+  RIG_TRN_OFF  = 0;  // Transceive disabled (polling only)
+  RIG_TRN_RIG  = 1;  // Radio pushes changes (requires backend/hardware support)
+  RIG_TRN_POLL = 2;  // HamLib polls and fires callbacks (software emulation)
+
+type
+  // Called from HamLib reader thread when radio pushes a frequency change.
+  // rig_arg is the user pointer registered via rig_set_freq_callback.
+  TRigFreqCallback = function(rig: PRIG; vfo: vfo_t; freq: freq_t;
+                               rig_arg: Pointer): Integer; cdecl;
+
+  // Called from HamLib reader thread when radio pushes a mode/width change.
+  TRigModeCallback = function(rig: PRIG; vfo: vfo_t; mode: rmode_t;
+                               width: pbwidth_t; rig_arg: Pointer): Integer; cdecl;
+
+  // Called from HamLib reader thread when radio pushes a VFO change.
+  TRigVFOCallback  = function(rig: PRIG; vfo: vfo_t;
+                               rig_arg: Pointer): Integer; cdecl;
+
+  // Called from HamLib reader thread when radio pushes a PTT state change.
+  TRigPTTCallback  = function(rig: PRIG; vfo: vfo_t; ptt: ptt_t;
+                               rig_arg: Pointer): Integer; cdecl;
+
+// Enable or disable transceive mode.
+// Must be called after rig_open. Returns RIG_ENIMPL if backend does not support it.
+function rig_set_trn(rig: PRIG; trn: Integer): Integer; cdecl; external HAMLIB_DLL;
+
+// Register a callback to be invoked when the radio pushes unsolicited changes.
+// arg is passed back verbatim to each callback invocation (use as Self pointer).
+function rig_set_freq_callback(rig: PRIG; cb: TRigFreqCallback;
+                                arg: Pointer): Integer; cdecl; external HAMLIB_DLL;
+function rig_set_mode_callback(rig: PRIG; cb: TRigModeCallback;
+                                arg: Pointer): Integer; cdecl; external HAMLIB_DLL;
+function rig_set_vfo_callback(rig: PRIG;  cb: TRigVFOCallback;
+                               arg: Pointer): Integer; cdecl; external HAMLIB_DLL;
+function rig_set_ptt_callback(rig: PRIG;  cb: TRigPTTCallback;
+                               arg: Pointer): Integer; cdecl; external HAMLIB_DLL;
 
 {-----------------------------------------------------------------------------
   Helper Functions (Delphi-specific)

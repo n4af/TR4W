@@ -144,7 +144,7 @@ const
    KenwoodPollRequestsAnswerLength: array[tKenwoodCommands] of integer = (38,
       14, 14);
 begin
-   if rig.RadioModel in [K3,K4] then
+   if rig.RadioModel in [K3,KX3,K4] then
       begin
          SetK3ExtendedCommandMode;
       end;
@@ -292,7 +292,7 @@ begin
                                                    '6':
                                                       begin
                                                          if rig^.RadioModel in
-                                                            [K3, K4] then
+                                                            [K3, KX3,K4] then
                                                             begin
                                                                case rig^.tBuf[i
                                                                   - 3] of
@@ -382,11 +382,11 @@ begin
                                                    rig^.tBuf[i - 9] = '1';
                                                 if rig^.tBuf[i - 9] = '1' then
                                                    begin
-                                                      logger.trace('K3/K4/Kenwood2 says radio is transmitting');
+                                                      logger.trace('K3/KX3/K4/Kenwood2 says radio is transmitting');
                                                    end
                                                 else
                                                    begin
-                                                      logger.trace('K3/K4/Kenwood2 says radio is RECEIVING');
+                                                      logger.trace('K3/KX3/K4/Kenwood2 says radio is RECEIVING');
                                                    end;
                                              end;
                                        end;
@@ -718,6 +718,8 @@ var
    reconnectDelay: Integer;
    sleepRemaining: Integer;
    lastPollTick: LongWord;
+   lastHeartbeatTick: LongWord;
+   lastRITXITTick: LongWord;
    authErrBuf: array[0..127] of Char;
 const
    RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
@@ -754,6 +756,8 @@ begin
    ro := rig^.tNetObject;
    wasConnected := False;
    lastPollTick := 0;
+   lastHeartbeatTick := 0;
+   lastRITXITTick := 0;
    reconnectDelay := RECONNECT_INITIAL_DELAY;
 
    // Keep polling thread alive until stop is requested (e.g. on Reset Radio Ports)
@@ -806,10 +810,10 @@ begin
                end;
             end;
 
-         // HamLib Direct polls at its own rate (pollingInterval = 250ms).
-         // Legacy serial radios need FreqPollRate (10ms) for responsiveness.
+         // HamLib Direct: short sleep so FNeedsPoll is checked promptly when
+         // an async callback fires. Legacy serial radios use FreqPollRate.
          if Assigned(ro) and (ro is THamLibDirect) then
-            Sleep(ro.pollingInterval)
+            Sleep(50)
          else
             Sleep(FreqPollRate);
 
@@ -828,11 +832,39 @@ begin
             Break;
             end;
 
-         // For radios without reading thread (like HamLib Direct), actively poll.
-         // Sleep above already enforces pollingInterval (250ms) for this radio type.
+         // HamLib Direct: drain user commands first on every cycle (max 50ms latency),
+         // then poll when an async callback fired or the heartbeat interval elapsed.
+         // Set HAMLIB ASYNC ONLY = TRUE in cfg to disable the heartbeat and only
+         // poll on async callbacks — useful for testing whether transceive is working.
          if Assigned(ro) and (ro is THamLibDirect) then
             begin
-            THamLibDirect(ro).SendPollRequests;
+            THamLibDirect(ro).DrainUrgentQueue;
+
+            if InterlockedExchange(THamLibDirect(ro).FNeedsPoll, 0) <> 0 then
+               begin
+               if TR4W_HAMLIB_DEBUG then
+                  logger.Info('[pNetworkRadio] HamLib poll triggered by ASYNC callback');
+               THamLibDirect(ro).SendPollRequests;
+               lastHeartbeatTick := GetTickCount;
+               end
+            else if not TR4W_HAMLIB_ASYNC_ONLY and
+                    (GetTickCount - lastHeartbeatTick >= LongWord(ro.pollingInterval)) then
+               begin
+               if TR4W_HAMLIB_DEBUG then
+                  logger.Info('[pNetworkRadio] HamLib poll triggered by HEARTBEAT (%dms)',
+                              [ro.pollingInterval]);
+               THamLibDirect(ro).SendPollRequests;
+               lastHeartbeatTick := GetTickCount;
+               end;
+
+            // RIT/XIT slow poll — every 5000ms independently of the main heartbeat.
+            // rig_get_rit/xit trigger $07 D0 side-effects in HamLib's Icom driver
+            // which dismiss front-panel menus; polling infrequently keeps them usable.
+            if GetTickCount - lastRITXITTick >= 5000 then
+               begin
+               THamLibDirect(ro).SendRITXITPoll;
+               lastRITXITTick := GetTickCount;
+               end;
             end
          // For radios that require active polling (Icom, etc.), call PollRadioState
          // Throttled by pollingInterval (e.g. 500ms for network Icom)
@@ -882,7 +914,8 @@ begin
             DisplayCodeSpeed;  // Refreshes display and persists to SpeedMemory
             end;
 
-         if TR4W_HAMLIB_DEBUG then
+         // HamLib Direct skips this — SendPollRequests already logs individual values.
+         if TR4W_HAMLIB_DEBUG and not (ro is THamLibDirect) then
             logger.Info('[pNetworkRadio:%s] pre-UpdateStatus: VFOA=%d VFOB=%d split=%s VFOStatus=%d',
                [rig^.RadioName,
                 rig.CurrentStatus.VFO[VFOA].Frequency,
@@ -3393,7 +3426,7 @@ begin
    case rig^.RadioModel of
       TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
          TS950, TS990,
-         TS2000, FLEX, K2, K3, K4:
+         TS2000, FLEX, K2, K3, KX3, K4:
          begin
 {$IF MASKEVENT}
             pKenwoodNew(rig);

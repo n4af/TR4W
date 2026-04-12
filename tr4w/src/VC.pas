@@ -966,6 +966,7 @@ type
     NoInterfacedRadio,
     K2,
     K3,
+    KX3,
     K4,
     FLEX,       // 4.87.2
     TS140,
@@ -2450,6 +2451,9 @@ var
 
   WindowSize                            : integer = 5;
 
+  ColumnAutoSize                        : boolean = True;
+  ColumnWidthOverride                   : array[LogColumnsType] of Integer;
+
   LinesInEditableLog                    : integer = 5;
 
 //  StaticWindowHeight                    : integer;
@@ -2582,7 +2586,9 @@ var
   TR4W_MMTTYPATH                        : FileNameType;
 
   TR4W_HAMLIB_DEBUG                     : boolean;
-  
+  TR4W_HAMLIB_ASYNC_ONLY                : boolean;  // Disable heartbeat — async callbacks only (testing)
+  TR4W_HAMLIB_TRACE                     : boolean;  // Enable HamLib internal trace → target/hamlib_trace.log
+
   TR4W_LC_FILENAME                      : PChar = 'LUCONSZ.TTF';
 
   CPUstart, CPUstop                     : int64;
