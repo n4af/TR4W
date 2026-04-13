@@ -533,6 +533,7 @@ var
   BandMapDecayMultiplier                : integer = 1; {KK1L: 6.65}
   BandMapDupeDisplay                    : boolean = True;
   BandMapEnable                         : boolean;
+  BandMapNeedsRefresh                   : boolean = False;
   BandMapEntryInCallWindow              : boolean;
   BandMapFileVersion                    : Char = '1';
   {KK1L: 6.65 Expanded array to cover all cases to keep BM from going whacko when tuning out of band}

@@ -685,8 +685,8 @@ begin
 
   Radio1.SetRadioFreq(R1VFO.Frequency, R1VFO.Mode, 'A');
   Radio2.SetRadioFreq(R2VFO.Frequency, R2VFO.Mode, 'A');
-} 
-
+}
+  logger.Debug('Entering scExchangeRadios');
   if Radio1.FilteredStatus.Freq = 0 then Exit;
   if Radio2.FilteredStatus.Freq = 0 then Exit;
 
@@ -695,6 +695,8 @@ begin
 
   Radio1.SetRadioFreq(R1REC.Freq, R1REC.Mode, 'A'{VFPLETTERARRAY[Radio1.FilteredStatus.VFOStatus]});
   Radio2.SetRadioFreq(R2REC.Freq, R2REC.Mode, 'A'{VFPLETTERARRAY[Radio2.FilteredStatus.VFOStatus]});
+
+  logger.Debug('Exiting scExchangeRadios');
 end;
 
 procedure csMMTTY_GRABLASTCALL;

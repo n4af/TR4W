@@ -88,7 +88,7 @@ begin
          // Use periodic polling instead (same approach as legacy K3 code).
          Self.SetAIMode(0);
          Self.requiresPolling := True;
-         Self.pollingInterval  := 1000;
+         Self.pollingInterval  := 100; // Default; overridden by FREQUENCY POLL RATE in pNetworkRadio
          end
       else
          begin
