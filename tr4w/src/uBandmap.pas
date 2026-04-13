@@ -370,13 +370,23 @@ begin
         tLB_SETCOLUMNWIDTH(hwnddlg, BandMapItemWidth); // 4.98.9
 
         BandMapEnable := True;
+        // WS_EX_COMPOSITED causes Windows to paint all children via a back
+        // buffer and blit atomically, eliminating the visible top-to-bottom
+        // sweep when the owner-draw list box repaints its ~164 items.
+        Windows.SetWindowLong(hwnddlg, GWL_EXSTYLE,
+          Windows.GetWindowLong(hwnddlg, GWL_EXSTYLE) or WS_EX_COMPOSITED);
         SendMessage(BandMapStatusBar, SB_SETPARTS, 6, integer(@BMPanelWidth));
         //      SetTimer(hwnddlg, BANDMAP_BLINK_TIMER_HANDLE, 600, nil);     //n4af
         tr4w_WindowsArray[tw_BANDMAPWINDOW_INDEX].WndHandle := hwnddlg;
         //      BandMapListBoxHDC := Windows.GetDC(BandMapListBox);
           //           DoNotAddToBandMap := False;
 
-        DisplayBandMap;
+        // DisplayBandMap is intentionally omitted here.
+        // OpenTR4WWindow calls SetWindowPos(SWP_SHOWWINDOW) immediately after
+        // CreateDialogIndirectParam, which fires WM_SIZE → DisplayBandMap.
+        // Calling DisplayBandMap in both WM_INITDIALOG and WM_SIZE causes two
+        // WM_SETREDRAW off/on cycles in rapid succession, producing a visible
+        // flash on startup with many spots loaded from BandMap.bin.
       end;
 
     WM_COMMAND:
@@ -636,6 +646,7 @@ begin
   if tLB_SETCURSEL(BandMapListBox, i) = LB_ERR then
     tLB_SETCURSEL(BandMapListBox, i - 1);
   ShowSpotInfo;
+  DisplayBandMap;
 end;
 
 procedure SetTextInBMSB(Index: integer; Text: PChar);

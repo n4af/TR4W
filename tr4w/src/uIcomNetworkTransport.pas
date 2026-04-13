@@ -374,7 +374,7 @@ end;
 
 procedure TIcomNetworkTransport.Disconnect;
 begin
-  logger.Info('[IcomTransport:' + FRadioName + '] Disconnect called from state %s',
+  logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect called from state %s',
               [IcomStateToString(FState)]);
 
   if FState = icsDisconnected then
@@ -383,14 +383,14 @@ begin
      end;
 
   // Stop all timers first
-  logger.Info('[IcomTransport:' + FRadioName + '] Disconnect: StopTimers');
+  logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect: StopTimers');
   StopTimers;
 
   // Send CI-V Close if stream was open
   if FCivStreamOpen and (FCivSocket <> nil) and (FCivRemoteId <> 0) then
      begin
      try
-        logger.Info('[IcomTransport:' + FRadioName + '] Disconnect: SendCivClose');
+        logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect: SendCivClose');
         SendCivClose;
         SendControlPacket(ICOM_PKT_DISCONNECT, FCivSocket,
            FCivRemoteId, FRadioAddress, FCivPort, FCivSeq);
@@ -406,7 +406,7 @@ begin
   if (FControlSocket <> nil) and (FRemoteId <> 0) then
      begin
      try
-        logger.Info('[IcomTransport:' + FRadioName + '] Disconnect: SendControlDisconnect');
+        logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect: SendControlDisconnect');
         SendControlPacket(ICOM_PKT_DISCONNECT, FControlSocket,
            FRemoteId, FRadioAddress, FControlPort, FSendSeq);
      except
@@ -417,17 +417,17 @@ begin
      end;
      end;
 
-  logger.Info('[IcomTransport:' + FRadioName + '] Disconnect: Sleep(100)');
+  logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect: Sleep(100)');
   Sleep(100);
 
-  logger.Info('[IcomTransport:' + FRadioName + '] Disconnect: DestroySockets');
+  logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect: DestroySockets');
   DestroySockets;
-  logger.Info('[IcomTransport:' + FRadioName + '] Disconnect: DestroySockets done');
+  logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect: DestroySockets done');
   ClearAllBuffers;
 
   if FTimerWnd <> 0 then
      begin
-     logger.Info('[IcomTransport:' + FRadioName + '] Disconnect: DestroyWindow');
+     logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect: DestroyWindow');
      SetWindowLong(FTimerWnd, GWL_USERDATA, 0);
      DestroyWindow(FTimerWnd);
      FTimerWnd := 0;
@@ -435,7 +435,7 @@ begin
 
   FCivStreamOpen := False;
   SetState(icsDisconnected);
-  logger.Info('[IcomTransport:' + FRadioName + '] Disconnect: complete');
+  logger.Debug('[IcomTransport:' + FRadioName + '] Disconnect: complete');
 end;
 
 procedure TIcomNetworkTransport.SendCivData(const CivFrame: string);
@@ -537,9 +537,9 @@ procedure TIcomNetworkTransport.DestroySockets;
 
       // Step 1: Deactivate (stops listener thread, closes socket)
       try
-         logger.Info('[IcomTransport:' + FRadioName + '] DestroySockets: ' + Name + ' Active:=False');
+         logger.Debug('[IcomTransport:' + FRadioName + '] DestroySockets: ' + Name + ' Active:=False');
          Socket.Active := False;
-         logger.Info('[IcomTransport:' + FRadioName + '] DestroySockets: ' + Name + ' Active:=False done');
+         logger.Debug('[IcomTransport:' + FRadioName + '] DestroySockets: ' + Name + ' Active:=False done');
       except
          on E: Exception do
             begin
@@ -549,7 +549,7 @@ procedure TIcomNetworkTransport.DestroySockets;
 
       // Step 2: Free the object on a background thread with timeout.
       // If the Indy destructor hangs, we abandon it — ExitProcess cleans up.
-      logger.Info('[IcomTransport:' + FRadioName + '] DestroySockets: Freeing ' + Name);
+      logger.Debug('[IcomTransport:' + FRadioName + '] DestroySockets: Freeing ' + Name);
       FreeThread := BeginThread(nil, 0, @FreeObjectThread, Pointer(Socket), 0, ThreadId);
       if FreeThread <> 0 then
          begin
@@ -561,7 +561,7 @@ procedure TIcomNetworkTransport.DestroySockets;
             end
          else
             begin
-            logger.Info('[IcomTransport:' + FRadioName + '] DestroySockets: ' + Name + ' freed OK');
+            logger.Debug('[IcomTransport:' + FRadioName + '] DestroySockets: ' + Name + ' freed OK');
             end;
          end
       else
@@ -578,7 +578,7 @@ procedure TIcomNetworkTransport.DestroySockets;
 begin
   SafeFreeSocket(FControlSocket, 'Control');
   SafeFreeSocket(FCivSocket, 'CIV');
-  logger.Info('[IcomTransport:' + FRadioName + '] DestroySockets: complete');
+  logger.Debug('[IcomTransport:' + FRadioName + '] DestroySockets: complete');
 end;
 
 // Use the UDP connect trick to find which local interface routes to the radio.
@@ -812,7 +812,7 @@ begin
           if (FState = icsConnected) and (FCivRemoteId = 0) then
           begin
             FCivRemoteId := Pkt.SentID;
-            logger.Info('[IcomTransport:' + FRadioName + '] CI-V I Am Here received, remoteId=$%.8x',
+            logger.Debug('[IcomTransport:' + FRadioName + '] CI-V I Am Here received, remoteId=$%.8x',
                         [FCivRemoteId]);
 
             // Send "Are You Ready" on CI-V socket (seq=1, untracked, like wfview)
@@ -826,7 +826,7 @@ begin
           if FState = icsWaitingForHere then
           begin
             FRemoteId := Pkt.SentID;
-            logger.Info('[IcomTransport:' + FRadioName + '] Control I Am Here received, remoteId=$%.8x',
+            logger.Debug('[IcomTransport:' + FRadioName + '] Control I Am Here received, remoteId=$%.8x',
                         [FRemoteId]);
 
             // Kill AYT timer
@@ -852,7 +852,7 @@ begin
           // CI-V I Am Ready (within Connected state)
           if (FState = icsConnected) and (FCivRemoteId <> 0) and (not FCivStreamOpen) then
           begin
-            logger.Info('[IcomTransport:' + FRadioName + '] CI-V I Am Ready received');
+            logger.Debug('[IcomTransport:' + FRadioName + '] CI-V I Am Ready received');
 
             // Send CI-V Open
             SendCivOpen;
@@ -880,7 +880,7 @@ begin
         begin
           if FState = icsWaitingForReady then
           begin
-            logger.Info('[IcomTransport:' + FRadioName + '] Control I Am Ready received');
+            logger.Debug('[IcomTransport:' + FRadioName + '] Control I Am Ready received');
 
             // Send Login
             SendLoginPacket;
@@ -1088,7 +1088,7 @@ begin
   if FCivPort = 0 then
     FCivPort := ICOM_DEFAULT_CIV_PORT;  // Fallback
 
-  logger.Info('[IcomTransport:' + FRadioName + '] Status received, CI-V port=%d', [FCivPort]);
+  logger.Debug('[IcomTransport:' + FRadioName + '] Status received, CI-V port=%d', [FCivPort]);
 
   // CI-V socket was already created in HandleCapabilities
   FCivMyId := CalculateMyIdFromSocket(FCivSocket);
@@ -1539,7 +1539,7 @@ procedure TIcomNetworkTransport.SetState(NewState: TIcomConnectionState);
 begin
   if FState <> NewState then
   begin
-    logger.Info('[IcomTransport:' + FRadioName + '] State: %s -> %s',
+    logger.Debug('[IcomTransport:' + FRadioName + '] State: %s -> %s',
                 [IcomStateToString(FState), IcomStateToString(NewState)]);
     FState := NewState;
 
