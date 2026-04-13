@@ -155,6 +155,8 @@ begin
    RadioWaitLoops := RadioTimeoutTime Div RadioWaitTime; // how may loops to make
 
    repeat
+      if rig^.PollingStopRequested then Exit;
+
       inc(rig^.tPollCount);
 
       NumberOfSucceffulPolls := 0;
@@ -188,6 +190,7 @@ begin
 
             while BufferNotChanged < RadioWaitLoops do
               begin
+                if rig^.PollingStopRequested then Exit;
                 Sleep(RadioWaitTime);  // wait a little for some bytes
                 ClearCommError(rig^.tCATPortHandle, Errs, @stat);
                 if stat.cbInQue > BytesInBuffer then
@@ -774,6 +777,16 @@ begin
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
             SetRadioAlertState(False);  // TCP reconnected — clear alert (operational check below)
 
+            // For serial radios that require active polling, honour the user-configurable
+            // FREQUENCY POLL RATE setting (FreqPollRate, default 10ms, range 10-1000ms).
+            // This keeps serial K4 poll latency consistent with legacy K3 behaviour.
+            if ro.requiresPolling and (ro.serialPort <> NoPort) then
+               begin
+               ro.pollingInterval := FreqPollRate;
+               logger.Debug('[pNetworkRadio] Serial polling interval set to %dms (FREQUENCY POLL RATE)',
+                            [ro.pollingInterval]);
+               end;
+
             // Query freq and mode directly from the polling thread.
             // The OnInitialPollSeeding timer window is created on this thread, which has
             // no Win32 message pump (it only calls Sleep), so WM_TIMER is never dispatched
@@ -1138,6 +1151,8 @@ begin
    Step := KenwoodPollCount;
    NextPoll:
    Sleep(FreqPollRate);
+
+   if rig^.PollingStopRequested then Exit;
 
    if rig.CommandsBufferPointer <> 0 then
       begin
@@ -3093,7 +3108,7 @@ begin
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
                BandMapBand := ActiveBand;
                BandMapMode := ActiveMode;
-               DisplayBandMap;
+               BandMapNeedsRefresh := True; // coalesced via 250ms timer — avoids flash on every VFO poll
             end;
       end
    else
@@ -3121,7 +3136,7 @@ begin
                BandMapMode := rig.FilteredStatus.Mode;
                VisibleDupeSheetChanged := True;
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
-               DisplayBandMap;     
+               BandMapNeedsRefresh := True; // coalesced via 250ms timer — avoids flash on every VFO poll
             end;
 
          //GAV End of added

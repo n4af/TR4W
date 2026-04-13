@@ -590,10 +590,12 @@ begin
       WaitResult := MsgWaitForMultipleObjects(1, H, False, Remaining, QS_SENDMESSAGE);
       if WaitResult = WAIT_OBJECT_0 then
          begin
+         logger.Info('[WaitForPollingThread] Thread exited cleanly');
          Break;  // thread exited
          end;
       if WaitResult = WAIT_TIMEOUT then
          begin
+         logger.Info('[WaitForPollingThread] TIMED OUT after %dms', [TimeoutMs]);
          Break;  // timed out
          end;
       // WAIT_OBJECT_0 + 1 = message available — pump it so SendMessage unblocks
@@ -606,6 +608,7 @@ begin
 {$IF not tDebugMode }
   if Ask then
     if YesOrNo(tr4whandle, TC_DOYOUREALLYWANTTOEXITTHEPROGRAM) = IDno then Exit;
+  logger.Info('Starting ExitProgram');
 {$IFEND}
 //  GetLogColumnsWidth;
 //  timeEndPeriod(1);
@@ -616,7 +619,9 @@ begin
 //  if (OCXHandle <> 0) then FreeLibrary(OCXHandle);
 {$IFEND}
   logger.Info('[ExitProgram] Step 1: SaveTelnetWindowSpots');
+  logger.debug('Calling SaveTelnetWindowSpots');
   SaveTelnetWindowSpots;
+  logger.debug('Back from SaveTelnetWindowSpots');
 
   // Stop polling threads FIRST so they don't recreate transports or call
   // SendMessage (SetDlgItemText) while we're tearing down on the main thread.
@@ -627,9 +632,9 @@ begin
   logger.Info('[ExitProgram] Step 2: Stopping polling threads');
   Radio1.PollingStopRequested := True;
   Radio2.PollingStopRequested := True;
-  logger.Info('[ExitProgram] Step 2a: Waiting for Radio1 polling thread');
+  logger.Info('[ExitProgram] Step 2a: Waiting for Radio1 (handle=%d)', [Radio1.tRadioInterfaceThreadHandle]);
   WaitForPollingThreadWithMessages(Radio1.tRadioInterfaceThreadHandle, 3000);
-  logger.Info('[ExitProgram] Step 2b: Waiting for Radio2 polling thread');
+  logger.Info('[ExitProgram] Step 2b: Waiting for Radio2 (handle=%d)', [Radio2.tRadioInterfaceThreadHandle]);
   WaitForPollingThreadWithMessages(Radio2.tRadioInterfaceThreadHandle, 3000);
   logger.Info('[ExitProgram] Step 2c: Polling threads done');
 
@@ -637,29 +642,53 @@ begin
   // Without this, the radio never receives disconnect packets and keeps
   // the session alive, blocking reconnection on next program start.
   logger.Info('[ExitProgram] Step 3: Disconnecting Radio1');
-  if Radio1.tNetObject <> nil then Radio1.tNetObject.Disconnect;
+  if Radio1.tNetObject <> nil then
+     begin
+     Radio1.tNetObject.Disconnect;
+     end;
   logger.Info('[ExitProgram] Step 4: Disconnecting Radio2');
-  if Radio2.tNetObject <> nil then Radio2.tNetObject.Disconnect;
+  if Radio2.tNetObject <> nil then
+     begin
+     Radio2.tNetObject.Disconnect;
+     end;
   logger.Info('[ExitProgram] Step 5: WSACleanup');
 
-  if WindowsSocketsInitialised then WSACleanup;
+  if WindowsSocketsInitialised then
+     begin
+     WSACleanup;
+     end;
+
   ntBeepClose;
+
+  logger.Info('[ExitProgram] SaveTR4WPOSFILE');
   SaveTR4WPOSFILE;
-  if BackCopyEnable then StopBackCopy;
+
+  if BackCopyEnable then
+     begin
+     StopBackCopy;
+     end;
+
   if NetDebug then
-  begin
-    Close(NetDebugBinaryOutput);
-    Close(NetDebugBinaryInput);
-  end;
+     begin
+     Close(NetDebugBinaryOutput);
+     Close(NetDebugBinaryInput);
+     end;
   if UDPBroadcastScore then
      begin
      SendScoreToUDP;
      end;
-  if DVKEnable then DVPUnInit;
+  if DVKEnable then
+     begin
+     DVPUnInit;
+     end;
+
   {if BandMapEnable then }SaveBandMap;
   wkClose;
   DriverDestroy;
+
+  logger.Info('[ExitProgram] Step SaveRestartFile');
   Sheet.SaveRestartFile;
+
   UnInitializeKeyer;
   NoSound;
   CD.SCPDisableAndDeAllocateFileBuffer;
@@ -668,15 +697,21 @@ begin
 //  SpotsList.Destroy;
   if LuconSZLoadded then RemoveFontResource(TR4W_LC_FILENAME);
 {$IF SCPDEBUG}
-  if scpLoaded then scpClose;
+  if scpLoaded then
+     begin
+     scpClose;
+     end;
 {$IFEND}
 //  if TrayBallonDisplayed then Balloon_DeleteTrayIcon;
   FreeAndNil(udp); // ny4i 4.44.9 Destroy the udp object
   FreeAndNil(slElements);
   // Restore StickyKeys settings // ny4i Issue 126
   SystemParametersInfo( SPI_SETSTICKYKEYS, SizeOf(StickyKeysAtStartup), @StickyKeysAtStartup, 0 );
-  tr4w_ShutDown;
+ logger.Info('[ExitProgram] Calling tr4w_Shutdown');
+ tr4w_ShutDown;
+ logger.Info('[ExitProgram] Exiting');
 end;
+
 procedure TalkToRTTYPort;
 
 

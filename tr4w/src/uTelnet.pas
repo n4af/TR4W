@@ -102,7 +102,7 @@ const
 var
   ItemsInTelnetPopupMenu: integer;
   ClientStatus: TClientStatus = (csID: NET_CLIENTSTATUS_ID);
-  BandMapNeedsRefresh: boolean = False;
+  // BandMapNeedsRefresh moved to LogWind so it is accessible from uRadioPolling without circular dependencies
   //  ClusterTypeDetermined            : boolean;
 
   //  tClusterType                          : ClusterType = ctDXSpider;
