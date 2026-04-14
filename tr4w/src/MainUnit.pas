@@ -521,6 +521,7 @@ uses
   // Country9,
   FCONTEST,
   uPOTAParks,
+  uCTYUpdate,
   Types;
 
 function GetCPU: int64;
@@ -3490,13 +3491,10 @@ begin
 {$IFEND}
 
     menu_download_latest_cty_dat:
-
-      // OpenUrl('http://www.tr4w.net/');
-      // if GetScoresThreadID = 0 then CreateThread(nil, 0, @CheckLatestVersion, nil, 0, GetScoresThreadID);
-      // OpenURL('http://www.country-files.com/cty/cty.dat/'); // 4.75.3
-
-      Shellexecute(0, 'open', 'https://www.country-files.com/cty/cty.dat', nil,
-        nil, SW_SHOW); // 4.86.2
+      begin
+      QuickDisplay(PChar('Downloading CTY.DAT...'));
+      DownloadCTYAsync(string(PChar(@TR4W_CTY_FILENAME)), tr4whandle);
+      end;
 
     menu_download_pota_parks:
       begin
