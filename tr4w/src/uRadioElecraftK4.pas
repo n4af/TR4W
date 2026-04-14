@@ -502,7 +502,7 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
    sVFO := AnsiLeftStr(s,1);           // vspbd1*;
 
    Delete(s,1,2); // Skip s as we do not care if scanning  // spbd1*;
-   logger.debug('[ParseIFComand] Checking split command in %s',[s]);
+   logger.trace('[ParseIFComand] Checking split command in %s',[s]);
    Self.localSplitEnabled := AnsiLeftStr(s,1) = '1';           // pbd1*;
 
 
@@ -626,7 +626,7 @@ begin
 
    Case AnsiIndexText(AnsiUppercase(sCommand), ['AI','BI','BN','DT','FA','FB','FT','IF','KS','MA','MD','RT','RX','TX','XT','RO', 'FP']) of
       0: begin                                     // AI
-         logger.info('[ProcessMessage] AI command set to %s',[sData]);
+         logger.debug('[ProcessMessage] AI command set to %s',[sData]);
          end;
       1: begin            // BI
          if sData = '1' then
@@ -642,7 +642,7 @@ begin
             end;
          vfo.band := Self.BandNumToBand(sData);   // if I just set this, then CurrentStatus.band does not get set. It requires the next line to show up upon resetting the ports.
          Self.vfo[nrVFOA].band := Self.BandNumToBand(sData);     // These two things should be the same.
-         logger.debug('[ProcessMessage] Received band number of %s',[sData]);
+         logger.trace('[ProcessMessage] Received band number of %s',[sData]);
          end;
       3: begin             // DT
          // DT updates only the remembered data sub-mode.
@@ -685,7 +685,7 @@ begin
          end;
       6: begin             // FT
          Self.localSplitEnabled := AnsiLeftStr(sData,1) = '1';
-         logger.debug('[ProcessMessage] FT (Split) received - Split is %s - localSplitEnabled = %s',[AnsiLeftStr(sData,1),BoolToString(Self.localSplitEnabled)]);
+         logger.trace('[ProcessMessage] FT (Split) received - Split is %s - localSplitEnabled = %s',[AnsiLeftStr(sData,1),BoolToString(Self.localSplitEnabled)]);
          end;
       7: begin             // IF
          Self.ParseIFCommand(sData);
@@ -722,7 +722,7 @@ begin
       14:begin              // XT
          vfo.XITState := AnsiLeftStr(sData,1) = '1';
          //Self.XITState := AnsiLeftStr(sData,1) = '1';
-         logger.debug('[ProcessMessage] XIT Enabled is %s',[AnsiLeftStr(sData,1)]);
+         logger.trace('[ProcessMessage] XIT Enabled is %s',[AnsiLeftStr(sData,1)]);
          end;
       15:begin    // RO
          RITSign := IfThen(AnsiLeftStr(sData,1) = '-',-1,1);
@@ -774,7 +774,7 @@ var
    iBand: integer;
 begin
    iBand := StrToIntDef(sBand,-9);
-   logger.debug('[BandNumToBand] Converting band string "%s" to iBand=%d', [sBand, iBand]);
+   logger.trace('[BandNumToBand] Converting band string "%s" to iBand=%d', [sBand, iBand]);
    case iBand of
       0: Result := rb160m;
       1: Result := rb80m;
@@ -797,7 +797,7 @@ begin
       Result := rbNone;
       end;
    end;
-   logger.debug('[BandNumToBand] Result band = %d', [Ord(Result)]);
+   logger.trace('[BandNumToBand] Result band = %d', [Ord(Result)]);
 end;
 
 procedure TK4Radio.PollRadioState;
