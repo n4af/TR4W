@@ -471,15 +471,15 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
 
    Self.localRITOffset := (ritOffset * ritMultiplier);
    Self.localXITOffset := (Self.localRITOffset); // Because on K4, these are the same
-   logger.debug('[ParseIFCommand] RITOffset = %d',[Self.localRITOffset]);
+   logger.trace('[ParseIFCommand] RITOffset = %d',[Self.localRITOffset]);
    
    Delete(s,1,4);                      // rx*00tmvspbd1*;
    Self.RITState := AnsiLeftStr(s,1) = '1';
-   logger.Debug('In IF processor, RIT is %s',[AnsiLeftStr(s,1)]);
+   logger.trace('In IF processor, RIT is %s',[AnsiLeftStr(s,1)]);
 
    Delete(s,1,1);                      // x*00tmvspbd1*;
    Self.XITState := AnsiLeftStr(s,1) = '1';
-   logger.Debug('In IF processor, XIT is %s',[AnsiLeftStr(s,1)]);
+   logger.trace('In IF processor, XIT is %s',[AnsiLeftStr(s,1)]);
 
    Delete(s,1,1);
    Delete(s,1,1); // Skip space       // *00tmvspbd1*;
@@ -494,11 +494,11 @@ if applicable (0=DATA A, 1=AFSK A, 2= FSK D, 3=PSK D)
       Self.RadioState := rsReceive;
       end;
    Delete(s,1,1);
-   logger.debug('[ParseIFCommand] string at mode = %s',[s]);
+   logger.trace('[ParseIFCommand] string at mode = %s',[s]);
    sMode := AnsiLeftStr(s,1);          // mvspbd1*;
 
    Delete(s,1,1);
-   logger.debug('[ParseIFCommand] string at vfo = %s',[s]);
+   logger.trace('[ParseIFCommand] string at vfo = %s',[s]);
    sVFO := AnsiLeftStr(s,1);           // vspbd1*;
 
    Delete(s,1,2); // Skip s as we do not care if scanning  // spbd1*;
