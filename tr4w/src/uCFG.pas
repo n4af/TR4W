@@ -321,6 +321,7 @@ var
    WSJTXEnabled: boolean = true;
    WSJTXRadioControlEnabled: boolean = false;
    SpotCollectorEnabled: boolean = false;
+   CTYUpdateCheckOnStartup: boolean = true;
 
 const
 
@@ -349,6 +350,7 @@ const
    + 2 {Icom Data Mode ID for Radio 1 and Radio 2}
    + 1 {YCCCSo2rEnable}  // Issue 61
    + 1 {ColumnAutoSize}  // Issue 866
+   + 1 {CTYUpdateCheckOnStartup}  // Issue 779
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -440,6 +442,7 @@ const
 // (crCommand: 'CQ MENU';                       crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctString; crNetwork: 1),
  (crCommand: 'CQ SSB EXCHANGE NAME KNOWN';    crAddress: @CQPhoneExchangeNameKnown;       crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage; crNetwork: 0),
  (crCommand: 'CQ SSB EXCHANGE';               crAddress: @CQPhoneExchange;                crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 3; crKind: ckNormal;  cfFunc: cfAll; crType: ctMessage; crNetwork: 0),
+ (crCommand: 'CTY UPDATE CHECK ON STARTUP';   crAddress: @CTYUpdateCheckOnStartup;        crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'CURTIS KEYER MODE';             crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctOther; crNetwork: 1),
  (crCommand: 'CUSTOM CARET';                  crAddress: @tr4w_CustomCaret;               crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'CUSTOM INITIAL EXCHANGE STRING';crAddress: @CustomInitialExchangeString;    crMin:0;  crMax:40;      crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),

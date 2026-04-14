@@ -163,7 +163,8 @@ uses
   uMakeHelpFile in 'src\uMakeHelpFile.pas',
   uTrayBalloon in 'src\uTrayBalloon.pas',
   uVariants in 'src\uVariants.pas',
-  uPOTAParks in 'src\uPOTAParks.pas';
+  uPOTAParks in 'src\uPOTAParks.pas',
+  uCTYUpdate in 'src\uCTYUpdate.pas';
   //cty in 'src\cty.pas';  // Excluded: unit name 'cty' conflicts with global variable 'CTY' from uCTYDAT
 
 {$IF LANG = 'ENG'}{$R res\tr4w_eng.res}{$IFEND}
@@ -300,6 +301,33 @@ begin
       // PostMessage ensures this arrives after the caller's own tCleareCallWindow
       // / tCleareExchangeWindow calls have already completed.
       HandlePOTANextPark;
+      end;
+
+    WM_CTY_VERSION_CHECKED:
+      begin
+      if wParam = 1 then
+         begin
+         // Silent startup notice — no MessageBox, no blocking
+         Format(wsprintfBuffer,
+            'Newer CTY.DAT available (dated %d). Press Alt-O to download.',
+            lParam);
+         QuickDisplay(wsprintfBuffer);
+         end;
+      end;
+
+    WM_CTY_DOWNLOAD_DONE:
+      begin
+      if wParam = 1 then
+         begin
+         QuickDisplay(PChar('CTY.DAT downloaded. Reloading...'));
+         // Reload on main thread — CTY tables have no locking, so background
+         // reload would race with callsign lookups. Message handler is a safe
+         // quiescent point.
+         ctyLoadInCountryFile(TR4W_CTY_FILENAME, False, True);
+         QuickDisplay(PChar('CTY.DAT reloaded successfully.'));
+         end
+      else
+         QuickDisplay(PChar('CTY.DAT download failed.'));
       end;
 
     WM_CTLCOLORLISTBOX, WM_CTLCOLOREDIT, WM_CTLCOLORSTATIC:
@@ -644,6 +672,11 @@ begin
   // Load POTA parks database off the UI thread (file may be ~3 MB / 50k entries).
   // TPOTALoadThread parses the CSV and posts WM_POTA_LOAD_DONE when done.
   LoadPOTAParksAsync(tr4whandle);
+
+  // Silent background CTY version check — posts WM_CTY_VERSION_CHECKED when done.
+  // Config is already loaded at this point so CTYUpdateCheckOnStartup is valid.
+  if CTYUpdateCheckOnStartup then
+     CheckCTYVersionAsync(tr4whandle);
 
   asm
   mov  ebx,0
