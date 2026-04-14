@@ -116,7 +116,7 @@ var
   BandMapDisplayGhz: boolean;
 
 implementation
-uses MainUnit;
+uses MainUnit, uDupesheet;
 
 function BandmapDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam:
   lParam): BOOL; stdcall;
@@ -441,7 +441,9 @@ begin
               if ((radio1.filteredstatus.freq <> 0) and (radio2.filteredstatus.freq <> 0)) and (QSYInactiveRadio) then
               begin
                 InActiveRadioPtr.BandMemory := Spot.FBand;
-                dupeinfocall := spot.fcall; // 4.135.1
+                tClearDupeInfoCall;              // issue 872: zero buffer before assign to prevent PChar read-past-end
+                ClearAltD;
+                dupeinfocall := spot.fcall;
                 dupecheckoninactiveradio(true);
                 logger.trace('[BandMap::BandmapDlgProc] Calling TuneRadioToSpot for Inactive Radio');
                 TuneRadioToSpot(SpotsList.Get(TempInt), InActiveRadio);
