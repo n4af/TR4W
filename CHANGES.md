@@ -37,6 +37,51 @@
 
 ---
 
+### 4.146.7 / 4.146.8 (2026-04-13) — NY4I
+
+#### Band Map Flicker (`src/uBandmap.pas`, `src/trdos/LOGSUBS2.PAS`, `src/trdos/LOGWIND.PAS`) — Issue #688
+
+- **Coalesced refresh timer**: rapid spot arrivals and VFO changes now coalesce into a single `DisplayBandMap` call via a 250 ms `BandMapNeedsRefresh` flag instead of redrawing on every event.
+- **WS_EX_COMPOSITED**: applied to the band map dialog so all children paint through DWM's back buffer, eliminating the top-to-bottom repaint sweep.
+- **ValidateRect + RDW_NOERASE**: cancels the pending erase flash after `WM_SETREDRAW(True)` before owner-draw items fill their own backgrounds.
+- **Spot deletion**: `DeleteSpotFromBandmap` now calls `DisplayBandMap` immediately after removing a spot; previously the deleted item stayed visible until the next spot arrival triggered a refresh.
+
+#### Radio — K4 Serial Rate, K3 Shutdown, Icom VFO B (`src/uRadioPolling.pas`, `src/uRadioElecraftK4.pas`, `src/trdos/LOGSUBS2.PAS`, `src/uRadioIcomBase.pas`)
+
+- **K4 serial poll rate**: `pollingInterval` now reads from `FreqPollRate` (`FREQUENCY POLL RATE` config, default 10 ms) instead of being hardcoded at 1000 ms — VFO update responsiveness now matches the K3.
+- **K3/K4 clean shutdown**: `pKenwood2`/`pKenwoodNew` polling threads now check `PollingStopRequested` at the outer loop and inner byte-wait loop, exiting in ~20 ms on quit instead of timing out after 3000 ms.
+- **Icom VFO B mode write**: replaced the old `$07 $01` / `$06` / `$07 $00` sequence with the `$26 $01` extended command on radios that support `FSupportsExtendedVFOBCommands` (e.g. IC-7760), matching the serial path in `LOGRADIO.PAS`.
+
+#### Cluster — False Split Fix (`src/uTelnet.pas`)
+
+- **False split on UP substring**: tightened the `UP <n>` parser so it only fires when a space precedes `U` and a digit immediately follows `UP `, preventing spot comments like "Pup Emma" from being misread as a split frequency.
+
+---
+
+### 4.146.10 (2026-04-14) — NY4I
+
+#### WinKeyer — Trace Logging (`src/uWinKey.pas`, `src/trdos/LogCW.pas`) — Issue #871
+
+- **Per-character trace logging**: added trace-level log lines to `wkSend`, `wkSendAdminCommand`, `wkSendByte`, `wkSendTwoBytes`, `wkAddCharToHostBuffer`, `wkAddCWMessageToInternalBuffer`, and `wkSendNextByteFromHostBuffer`. Each entry shows the printable character, decimal ordinal, and hex value to help pinpoint the source of an extra space in sent CW.
+
+#### Band Map — Alt-D Residue Fix (`src/uBandmap.pas`) — Issue #872
+
+- **Stale callsign bytes on double-click**: with QSY INACTIVE RADIO enabled, `DupeInfoCall` was assigned without zeroing the buffer first. `wsprintf` then read stale bytes from a previously longer callsign (e.g. DF9II displayed as DF9IIA3CNO). Fixed by calling `tClearDupeInfoCall` + `ClearAltD` before assignment, matching the established pattern in `uSpots.pas`.
+
+---
+
+### 4.146.11 (2026-04-14) — NY4I
+
+#### CTY.DAT Auto-Update (`src/uCTYUpdate.pas`, `tr4w.dpr`, `src/uCFG.pas`, `src/MainUnit.pas`) — Issue #779
+
+- **Background version check on startup**: TR4W fetches the country-files.com RSS feed on a background thread, extracts the latest `VER\d{8}` date from the first item description, and compares it to the installed file. A QuickDisplay hint appears when an update is available.
+- **In-band version detection**: `GetInstalledCTYVersion` scans CTY.DAT line-by-line for the embedded `=VER\d{8}` marker so the comparison is always accurate against the actual installed file.
+- **Alt+O download**: pressing Alt+O triggers an async download of the latest `cty.dat` directly to the program directory; the country table reloads automatically on completion without restarting.
+- **Startup check toggle**: the version check can be disabled with `CTY UPDATE CHECK ON STARTUP = FALSE` in the config file.
+- **Accelerator fix**: the Alt+O accelerator ID in all language `.RES` files was corrected from stale ID 10311 (`menu_alt_transfreq`) to 10603 (`menu_download_latest_cty_dat`).
+
+---
+
 ### 4.146.5 (2026-04-11) — NY4I
 
 #### POTA — Parks on the Air Full Feature Set (`src/trdos/FCONTEST.PAS`, `src/trdos/LOGSTUFF.PAS`, `src/MainUnit.pas`, `src/trdos/LOGSUBS2.PAS`) — Issue #864
