@@ -18,22 +18,27 @@
 
 ## 4.146.x — April 2026
 
-### 4.146.6 (2026-04-12) — NY4I
+### 4.146.11 (2026-04-14) — NY4I
 
-#### Column Width Fix on Startup (`src/MainUnit.pas`, `src/uCommctrl.pas`, `src/VC.pas`, `tr4w/tr4w.dpr`) — Issue #866
+#### CTY.DAT Auto-Update (`src/uCTYUpdate.pas`, `tr4w.dpr`, `src/uCFG.pas`, `src/MainUnit.pas`) — Issue #779
 
-- **QTH/exchange columns too narrow on startup**: `EnsureListViewColumnVisible` was using `LVSCW_AUTOSIZE_USEHEADER`, which sizes to the header text width only (e.g. "QTH" = 3 chars), ignoring data. Changed to `LVSCW_AUTOSIZE` so columns fit their widest data value.
-- **User-adjusted column widths**: added `ColumnAutoSize` flag and `ColumnWidthOverride` array to persist user-adjusted widths across sessions.
+- **Background version check on startup**: TR4W fetches the country-files.com RSS feed on a background thread, extracts the latest `VER\d{8}` date from the first item description, and compares it to the installed file. A QuickDisplay hint appears when an update is available.
+- **In-band version detection**: `GetInstalledCTYVersion` scans CTY.DAT line-by-line for the embedded `=VER\d{8}` marker so the comparison is always accurate against the actual installed file.
+- **Alt+O download**: pressing Alt+O triggers an async download of the latest `cty.dat` directly to the program directory; the country table reloads automatically on completion without restarting.
+- **Startup check toggle**: the version check can be disabled with `CTY UPDATE CHECK ON STARTUP = FALSE` in the config file.
+- **Accelerator fix**: the Alt+O accelerator ID in all language `.RES` files was corrected from stale ID 10311 (`menu_alt_transfreq`) to 10603 (`menu_download_latest_cty_dat`).
 
-#### HamLib Direct Improvements (`src/uRadioHamLibDirect.pas`, `src/uHamLibDirect.pas`, `src/uRadioPolling.pas`, `src/uCAT.pas`, `src/uCFG.pas`)
+---
 
-- **WSJT-X minimal poll set**: adopted the 6-command poll cycle WSJT-X uses (VFO A freq/mode, PTT, split, VFO B) with no RIT/XIT in the fast heartbeat. RIT/XIT moved to a 5-second slow poll (`SendRITXITPoll`), eliminating `$07 $D0` front-panel menu interference on IC-7610/7760.
-- **Async transceive callbacks**: registered via `rig_set_trn(RIG_TRN_RIG)` for fast front-panel response; heartbeat polling remains primary for serial backends.
-- **Accurate RIT/XIT on/off state**: uses `rig_get_func(RIG_FUNC_RIT/XIT)` separately from offset values; fixes false "RIT active" display when IC-7610 stores a non-zero offset with RIT disabled.
-- **HamLib trace logging**: `HAMLIB TRACE = TRUE` in config redirects HamLib internal debug to `hamlib_trace.log`.
-- **HamLib warning in CAT dialog**: warns when HamLib is selected for a radio with native TR4W support, explaining the RIT/XIT limitation.
+### 4.146.10 (2026-04-14) — NY4I
 
-#### Added **KX3 support**: added KX3 between K3 and K4 (`LOGRADIO.PAS`, `VC.pas`) — Kenwood protocol, 38400 baud, HamLib ID 2045.
+#### WinKeyer — Trace Logging (`src/uWinKey.pas`, `src/trdos/LogCW.pas`) — Issue #871
+
+- **Per-character trace logging**: added trace-level log lines to `wkSend`, `wkSendAdminCommand`, `wkSendByte`, `wkSendTwoBytes`, `wkAddCharToHostBuffer`, `wkAddCWMessageToInternalBuffer`, and `wkSendNextByteFromHostBuffer`. Each entry shows the printable character, decimal ordinal, and hex value to help pinpoint the source of an extra space in sent CW.
+
+#### Band Map — Alt-D Residue Fix (`src/uBandmap.pas`) — Issue #872
+
+- **Stale callsign bytes on double-click**: with QSY INACTIVE RADIO enabled, `DupeInfoCall` was assigned without zeroing the buffer first. `wsprintf` then read stale bytes from a previously longer callsign (e.g. DF9II displayed as DF9IIA3CNO). Fixed by calling `tClearDupeInfoCall` + `ClearAltD` before assignment, matching the established pattern in `uSpots.pas`.
 
 ---
 
@@ -58,27 +63,22 @@
 
 ---
 
-### 4.146.10 (2026-04-14) — NY4I
+### 4.146.6 (2026-04-12) — NY4I
 
-#### WinKeyer — Trace Logging (`src/uWinKey.pas`, `src/trdos/LogCW.pas`) — Issue #871
+#### Column Width Fix on Startup (`src/MainUnit.pas`, `src/uCommctrl.pas`, `src/VC.pas`, `tr4w/tr4w.dpr`) — Issue #866
 
-- **Per-character trace logging**: added trace-level log lines to `wkSend`, `wkSendAdminCommand`, `wkSendByte`, `wkSendTwoBytes`, `wkAddCharToHostBuffer`, `wkAddCWMessageToInternalBuffer`, and `wkSendNextByteFromHostBuffer`. Each entry shows the printable character, decimal ordinal, and hex value to help pinpoint the source of an extra space in sent CW.
+- **QTH/exchange columns too narrow on startup**: `EnsureListViewColumnVisible` was using `LVSCW_AUTOSIZE_USEHEADER`, which sizes to the header text width only (e.g. "QTH" = 3 chars), ignoring data. Changed to `LVSCW_AUTOSIZE` so columns fit their widest data value.
+- **User-adjusted column widths**: added `ColumnAutoSize` flag and `ColumnWidthOverride` array to persist user-adjusted widths across sessions.
 
-#### Band Map — Alt-D Residue Fix (`src/uBandmap.pas`) — Issue #872
+#### HamLib Direct Improvements (`src/uRadioHamLibDirect.pas`, `src/uHamLibDirect.pas`, `src/uRadioPolling.pas`, `src/uCAT.pas`, `src/uCFG.pas`)
 
-- **Stale callsign bytes on double-click**: with QSY INACTIVE RADIO enabled, `DupeInfoCall` was assigned without zeroing the buffer first. `wsprintf` then read stale bytes from a previously longer callsign (e.g. DF9II displayed as DF9IIA3CNO). Fixed by calling `tClearDupeInfoCall` + `ClearAltD` before assignment, matching the established pattern in `uSpots.pas`.
+- **WSJT-X minimal poll set**: adopted the 6-command poll cycle WSJT-X uses (VFO A freq/mode, PTT, split, VFO B) with no RIT/XIT in the fast heartbeat. RIT/XIT moved to a 5-second slow poll (`SendRITXITPoll`), eliminating `$07 $D0` front-panel menu interference on IC-7610/7760.
+- **Async transceive callbacks**: registered via `rig_set_trn(RIG_TRN_RIG)` for fast front-panel response; heartbeat polling remains primary for serial backends.
+- **Accurate RIT/XIT on/off state**: uses `rig_get_func(RIG_FUNC_RIT/XIT)` separately from offset values; fixes false "RIT active" display when IC-7610 stores a non-zero offset with RIT disabled.
+- **HamLib trace logging**: `HAMLIB TRACE = TRUE` in config redirects HamLib internal debug to `hamlib_trace.log`.
+- **HamLib warning in CAT dialog**: warns when HamLib is selected for a radio with native TR4W support, explaining the RIT/XIT limitation.
 
----
-
-### 4.146.11 (2026-04-14) — NY4I
-
-#### CTY.DAT Auto-Update (`src/uCTYUpdate.pas`, `tr4w.dpr`, `src/uCFG.pas`, `src/MainUnit.pas`) — Issue #779
-
-- **Background version check on startup**: TR4W fetches the country-files.com RSS feed on a background thread, extracts the latest `VER\d{8}` date from the first item description, and compares it to the installed file. A QuickDisplay hint appears when an update is available.
-- **In-band version detection**: `GetInstalledCTYVersion` scans CTY.DAT line-by-line for the embedded `=VER\d{8}` marker so the comparison is always accurate against the actual installed file.
-- **Alt+O download**: pressing Alt+O triggers an async download of the latest `cty.dat` directly to the program directory; the country table reloads automatically on completion without restarting.
-- **Startup check toggle**: the version check can be disabled with `CTY UPDATE CHECK ON STARTUP = FALSE` in the config file.
-- **Accelerator fix**: the Alt+O accelerator ID in all language `.RES` files was corrected from stale ID 10311 (`menu_alt_transfreq`) to 10603 (`menu_download_latest_cty_dat`).
+#### Added **KX3 support**: added KX3 between K3 and K4 (`LOGRADIO.PAS`, `VC.pas`) — Kenwood protocol, 38400 baud, HamLib ID 2045.
 
 ---
 
