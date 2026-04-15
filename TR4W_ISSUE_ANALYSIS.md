@@ -15,7 +15,7 @@
 | Tier 3 (Radio Factory work) | #826 **closed** ✓; others still open and need verification |
 | Tier 4 (test-against-new-arch) | #803 **closed** ✓; #703, #121, #315, #685 still open |
 | New issues since analysis (861–877) | 15 new issues, 13 closed in rapid succession; #871 and #877 still open |
-| **Triage pass (2026-04-15)** | **95 open issues now carry the `Triaged` label** — all open issues are now triaged |
+| **Triage pass (2026-04-15)** | Labels incorrectly bulk-applied and reverted. `Triaged` means analysis + recommendations in comments — only issues #853, #854, #856, #850, #871, #866 carry it legitimately. Remaining issues need proper per-issue triage. |
 
 ---
 
@@ -43,7 +43,7 @@ These were flagged in the original analysis but remain open. They need a human v
 
 ## Current Open Issues — Full List (as of 2026-04-15)
 
-All 95 open issues now carry the `Triaged` label. Count: **95 open issues**.
+Count: **~95 open issues**. The `Triaged` label should only be applied after a developer has analyzed the issue and left recommendations in the comments. Issues below that already carry `Triaged`: #853, #854, #856, #850, #871. The remainder need per-issue analysis before being marked triaged.
 
 ### Active / Recently Worked (High Priority)
 
@@ -253,4 +253,4 @@ All 95 open issues now carry the `Triaged` label. Count: **95 open issues**.
 
 ---
 
-*Updated 2026-04-15 by cross-referencing all open GitHub issues, recent commits (through 4.146.11), and PR #869. All 95 open issues now carry the `Triaged` label.*
+*Updated 2026-04-15 by cross-referencing all open GitHub issues, recent commits (through 4.146.11), and PR #869. Note: `Triaged` label requires actual per-issue analysis with recommendations posted in the issue comments — it is not a bulk acknowledgment label.*
