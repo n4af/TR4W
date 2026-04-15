@@ -1,138 +1,256 @@
-# TR4W: Open Issues Potentially Resolved by Existing Commits
+# TR4W: Open Issues Analysis & Work Planning
 
-> Cross-reference of 172 open GitHub issues against 1,300 commits and 111 merged PRs  
+> Cross-reference of open GitHub issues against commits, PRs, and triage status  
 > Repository: [github.com/n4af/TR4W](https://github.com/n4af/TR4W)  
-> Generated: 2026-03-14
-
-## Summary
-
-| Category | Count | Action |
-|----------|-------|--------|
-| Directly referenced by issue number in commits | 12 | Close after quick verification |
-| Partially addressed — work started or related fix merged | 3 | Review scope, close or update |
-| Likely addressed by Radio Factory / Icom / reconnect work | 5 | Verify against new architecture, close or update |
-| NSIS installer commit directly satisfies the request | 1 | Close |
-
-**Total candidates for closure: 21 out of 172 open issues**
+> Original analysis: 2026-03-14 | **Last updated: 2026-04-15**
 
 ---
 
-## Tier 1 — Issue Number Explicitly Referenced in Commits (Close These)
+## Status Since Original Analysis
 
-These issues have commits with the issue number directly in the commit message. In Howie's workflow, `issue NNN` in a commit message typically means the issue was worked on in that build. These should be closable.
-
-| Issue | Title | Commit(s) | Date | Author |
-|-------|-------|-----------|------|--------|
-| [#91](https://github.com/n4af/TR4W/issues/91) | Multipliers Remaining Display | `1bbb401c` — "4.45.9 issue 91" | 2016-02-10 | N4AF |
-| [#125](https://github.com/n4af/TR4W/issues/125) | `-` key in call window does nothing | `ef7f63b8` — "4.47.3 issue # 125" | 2016-03-08 | N4AF |
-| [#159](https://github.com/n4af/TR4W/issues/159) | With CWByCAT, use CWTiming for AutoSend/AutoTerminate | `c62ed0fa` — "4.50.7 Issue # 159 uTelnet" | 2016-06-26 | N4AF |
-| [#271](https://github.com/n4af/TR4W/issues/271) | PLS ADD RSGB DX Contest | `67d1e4fe` — "issue 271 remove RSGB" | 2023-06-08 | N4AF |
-| [#656](https://github.com/n4af/TR4W/issues/656) | Improve format of summary data | `a39da6a1` — "issue 656 4.123.6" | 2023-06-19 | N4AF |
-| [#688](https://github.com/n4af/TR4W/issues/688) | Lock the bandmap window while updating to prevent flashing | `1cd40d24` — "issue 688 4.127.3" | 2023-10-15 | N4AF |
-| [#694](https://github.com/n4af/TR4W/issues/694) | Spot filter handles 60M wrong | `626f757a`, `569cacf3` — "issue 694 4.126.5" | 2023-09-15 | N4AF |
-| [#785](https://github.com/n4af/TR4W/issues/785) | ADIF Import fails to input DOK from WAG contest | `64a70edc` — "issue 785 WAG IE" | 2024-10-23 | N4AF |
-| [#805](https://github.com/n4af/TR4W/issues/805) | Croatian DX (9A DX) fails to support mix mode | `ac79688e` — "4.140.1 issue#805 9A DX" | 2024-12-21 | N4AF |
-| [#834](https://github.com/n4af/TR4W/issues/834) | Make main window have rounded corners | `a0744e69` — "4.145.1 issue 834 Main window rounded corners" | 2026-03-04 | N4AF |
-
-### Edge Cases — Referenced but May Be Partial
-
-| Issue | Title | Commit(s) | Notes |
-|-------|-------|-----------|-------|
-| [#87](https://github.com/n4af/TR4W/issues/87) | SCP-like behavior for Section names | `42749d70` — "getting ready for Issue 87. This closes #163." | Commit says "getting ready for" — suggests prep work only. Verify if follow-up was done. |
-| [#800](https://github.com/n4af/TR4W/issues/800) | CW Speed Sync not following K4 | `ad86674b` — "4.140.5 minus issue 800", PR #804 (CW speed fix) | The commit says "minus issue 800" which may mean "excluding" this fix. PR #804 fixed CW speed for Kenwood/Elecraft but noted Icom/Yaesu/Flex/HamLib still needed. Needs clarification from Howie. |
+| Item | Finding |
+|------|---------|
+| Tier 1 issues flagged for closure | 8 of 10 are now **closed** ✓ |
+| Tier 2 issues (partial/superseded) | #713 and #826 **closed** ✓; #415, #446 still open |
+| Tier 3 (Radio Factory work) | #826 **closed** ✓; others still open and need verification |
+| Tier 4 (test-against-new-arch) | #803 **closed** ✓; #703, #121, #315, #685 still open |
+| New issues since analysis (861–877) | 15 new issues, 13 closed in rapid succession; #871 and #877 still open |
+| **Triage pass (2026-04-15)** | **95 open issues now carry the `Triaged` label** — all open issues are now triaged |
 
 ---
 
-## Tier 2 — Partially Addressed or Superseded by Major Work
+## Still Open From Original Analysis
 
-These issues describe features or fixes where significant related work has been merged, but the commit did not reference the issue number. The work may fully or partially cover them.
+### Issues That Should Now Be Verified/Closed
 
-### [#415](https://github.com/n4af/TR4W/issues/415) — Translation updates 2020-July
+These were flagged in the original analysis but remain open. They need a human verification pass to confirm resolution and close.
 
-Two commits reference this: `e64d9c39` and `8e17a349` (2020-07-04) — "Create TC_WAGWarn [issue 415)". The issue had a checklist of 4 translation items. The WAGWarn item was done. **Check if the other 3 items (`TC_CANNOTOPENLOG`, `TC_LOGNOTPRESENT`, `TC_IMPORTFILENOTFOUND`) were completed** in subsequent commits.
-
-### [#713](https://github.com/n4af/TR4W/issues/713) — RAEM contest, error text in STX_STRING after ADIF
-
-Referenced in PR #725 body ("issue-713-raem" branch name). PR #725 was merged 2024-02-06 — "Added code to handle the ADIF export of myexchange." The PR body says STX_STRING was not being set properly and the fix was to set it to "None" and log an error. **This likely addresses the issue — close with reference to PR #725.**
-
-### [#446](https://github.com/n4af/TR4W/issues/446) — Add support for Expert Electronics Universal Transceiver Interface
-
-Referenced in PR #672 body. The PR was about network parameter safeguards, not TCI implementation. **This is a false positive** — the issue is likely still open and unaddressed.
-
----
-
-## Tier 3 — Likely Addressed by Radio Factory / Reconnection Work (Jan–Feb 2026)
-
-Your major Radio Factory PR (#827) and surrounding commits from December 2025 through February 2026 introduced architecture changes that likely address several open issues, even though those issue numbers were not explicitly referenced.
-
-### [#383](https://github.com/n4af/TR4W/issues/383) — Add a message to status line when radio connection is lost
-
-**Likely addressed.** The reconnection work (`ff069fd7`, `4e94f924`, `f40ff310`) added comprehensive disconnection detection, state tracking, and logging. The `Disconnecting` flag and state transitions provide the infrastructure for a status message. **Verify whether the status bar was actually updated to show a disconnect message, or whether only the log/debug output was added.**
-
-### [#826](https://github.com/n4af/TR4W/issues/826) — Can the NSIS installer files be put into GitHub repo?
-
-**Directly addressed.** Commit `0af3d6c3` (2026-02-25, Tom Schaefer): "Add NSIS installer script with HamLib DLLs." **Close this one — you did exactly what was asked.**
-
-### [#735](https://github.com/n4af/TR4W/issues/735) — Add support for direct logging via TCP to ACLog
-
-**Partially addressed.** The External Logger Factory (`uExternalLoggerFactory.pas`, `uExternalLoggerManager.pas`, commit `18321c2d`) created the framework with `lt_ACLog` as a planned type. The issue itself describes a stub `LogQSOToACLog` function. **The framework is in place but ACLog protocol implementation may still be a stub. Check `uExternalLogger.pas` for actual ACLog send logic.**
-
-### [#736](https://github.com/n4af/TR4W/issues/736) — Add HRD support to external logger
-
-**Same situation as #735.** The factory pattern supports `lt_HRD` as a type. **Check whether the HRD TCP protocol was actually implemented or remains stubbed.**
-
-### [#766](https://github.com/n4af/TR4W/issues/766) — Exception when editing a contact with external logger
-
-**Likely addressed.** The reconnection and exception-handling work added comprehensive exception protection throughout socket operations and message handlers (`ff069fd7`). The external logger reconnection logic (`4e94f924`) specifically handles `EIdNotConnected`, `EIdConnClosedGracefully`, and other Indy exceptions. **Test by editing a contact while an external logger is connected.**
+| Issue | Title | Status | Notes |
+|-------|-------|--------|-------|
+| [#688](https://github.com/n4af/TR4W/issues/688) | Lock bandmap window while updating to prevent flashing | **Open — likely resolved** | PR #869 (merged 2026-04-13) specifically addressed this: 250ms coalesced refresh timer, `WS_EX_COMPOSITED`, `RDW_NOERASE`. Band map flicker greatly reduced per PR description. Close after confirming in a build. |
+| [#87](https://github.com/n4af/TR4W/issues/87) | SCP-like behavior for Section names | Open | Commit said "getting ready for" — still unverified. |
+| [#800](https://github.com/n4af/TR4W/issues/800) | CW Speed Sync not following K4 | Open | Commit `ad86674b` said "minus issue 800" — K4 CW sync still unresolved. Issue #871 (WinKeyer extra space) is related but distinct. |
+| [#383](https://github.com/n4af/TR4W/issues/383) | Status line message when radio connection lost | Open | Reconnection work added detection infrastructure; verify if status bar actually shows disconnect message. |
+| [#735](https://github.com/n4af/TR4W/issues/735) | Direct log via TCP to ACLog | Open | Factory framework has `lt_ACLog` stub — check `uExternalLogger.pas` for actual send logic. |
+| [#736](https://github.com/n4af/TR4W/issues/736) | HRD support for external logger | Open | Same as #735 — factory has `lt_HRD`, verify implementation vs. stub. |
+| [#766](https://github.com/n4af/TR4W/issues/766) | Exception when editing contact with external logger | Open | Exception handling was added broadly — test by editing a contact with logger connected. |
+| [#703](https://github.com/n4af/TR4W/issues/703) | K4 network doesn't reset split on bandmap click | Open | Split handling rewritten in factory pattern. Test on current build. |
+| [#121](https://github.com/n4af/TR4W/issues/121) | S&P mode entered on Icom in split mode | Open | New `TIcomRadioBase` CI-V implementation is completely new. Test on IC-7300/7610/9700. |
+| [#415](https://github.com/n4af/TR4W/issues/415) | Translation updates 2020-July | Open | WAGWarn item was done; verify remaining 3 (`TC_CANNOTOPENLOG`, `TC_LOGNOTPRESENT`, `TC_IMPORTFILENOTFOUND`). |
+| [#396](https://github.com/n4af/TR4W/issues/396) | Applied merge by mistake | Open | This was a 2020 incident, not an active bug. **Close as resolved.** |
 
 ---
 
-## Tier 4 — Worth Investigating (Radio-Specific Issues vs. New Architecture)
+## Current Open Issues — Full List (as of 2026-04-15)
 
-These open issues describe radio-specific problems that the new factory pattern architecture may have changed the behavior of, either fixing or potentially requiring new approaches.
+All 95 open issues now carry the `Triaged` label. Count: **95 open issues**.
 
-### [#703](https://github.com/n4af/TR4W/issues/703) — K4 over network doesn't reset split mode when clicking bandmap
+### Active / Recently Worked (High Priority)
 
-The K4 now goes through the factory pattern with `TK4Radio` class. Split handling was reworked. **Test on current build — the split toggle logic was rewritten in the factory pattern refactor.**
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#877](https://github.com/n4af/TR4W/issues/877) | POTA parser does not accept free-form info like state or name | enhancement, POTA, Triaged |
+| [#871](https://github.com/n4af/TR4W/issues/871) | Extra Space Inserted Between Callsign and Report (AUTO SEND CHARACTER COUNT) | Triaged |
 
-### [#803](https://github.com/n4af/TR4W/issues/803) — Split after clicking spot not working on K4 over TCP
+### Bugs
 
-Same area as #703. Both relate to K4 + TCP + split mode. **These two should be tested together on the current build.**
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#818](https://github.com/n4af/TR4W/issues/818) | NewContest dialog asks for MY STATE on non-state contests | bug, Triaged |
+| [#807](https://github.com/n4af/TR4W/issues/807) | 9A (Croatian) DX awarding zero points | bug, Triaged |
+| [#800](https://github.com/n4af/TR4W/issues/800) | CW Speed Sync not following K4 | bug, Radio Control, Triaged |
+| [#788](https://github.com/n4af/TR4W/issues/788) | NextBandMap still displays deleted spot | bug, Triaged |
+| [#784](https://github.com/n4af/TR4W/issues/784) | Next Bandmap fails to clear Initial Exchange field | bug, Triaged |
+| [#766](https://github.com/n4af/TR4W/issues/766) | Exception when editing contact with external logger | bug, External Logger, Triaged |
+| [#740](https://github.com/n4af/TR4W/issues/740) | BAND MAP CALL WINDOW feature does not seem to work | bug, Triaged |
+| [#726](https://github.com/n4af/TR4W/issues/726) | PostUnit: remaining MyExchange handlers in GenerateMyExchange | bug, Triaged |
+| [#716](https://github.com/n4af/TR4W/issues/716) | Random access violation using multi-network | bug, Multi-network, Triaged |
+| [#709](https://github.com/n4af/TR4W/issues/709) | Croatian DX counting multipliers wrong | bug, Triaged |
+| [#683](https://github.com/n4af/TR4W/issues/683) | Orion and Omni mode change ALT-M does not work | bug, Radio Control, Triaged |
+| [#680](https://github.com/n4af/TR4W/issues/680) | CW port already open after APPLY/OK in Radio setup | bug, Triaged |
+| [#505](https://github.com/n4af/TR4W/issues/505) | In S&P, after sending call via ENTER, F1 does not send call again | bug, Radio Control, Triaged |
+| [#459](https://github.com/n4af/TR4W/issues/459) | Extra characters show up after save backup log | bug, Triaged |
+| [#435](https://github.com/n4af/TR4W/issues/435) | Implement Kenwood TS990/TS890 Mode properly | bug, Radio Control, Triaged |
+| [#426](https://github.com/n4af/TR4W/issues/426) | DVK recording and volume fail to function | bug, Triaged |
+| [#417](https://github.com/n4af/TR4W/issues/417) | NA SPRINT: QTHString not cleared when exchange in State/name/# order | bug, ADIF, Triaged |
+| [#121](https://github.com/n4af/TR4W/issues/121) | S&P mode entered on Icom in split mode | bug, Triaged |
 
-### [#121](https://github.com/n4af/TR4W/issues/121) — S&P mode entered on Icom radios in split mode
+### Bandmap
 
-This was filed in 2016 against the old Icom polling code. The new `TIcomRadioBase` with CI-V protocol (`4d0528fc`) is a completely new implementation. **Test on IC-7300/7610/9700 to see if the new CI-V implementation still has this behavior.**
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#835](https://github.com/n4af/TR4W/issues/835) | When clicking spot in band map, send UDP lookup message | Band Map, External Logger, Triaged |
+| [#747](https://github.com/n4af/TR4W/issues/747) | After selecting bandmap, auto tab to exchange window | Band Map, Triaged |
+| [#705](https://github.com/n4af/TR4W/issues/705) | Copy spot from bandmap to clipboard in pasteable format | enhancement, Band Map, Triaged |
+| [#699](https://github.com/n4af/TR4W/issues/699) | In QSO Party, flag county in spot as mult in band map | enhancement, DX Cluster, Triaged |
+| [#688](https://github.com/n4af/TR4W/issues/688) | Lock bandmap window while updating to prevent flashing | Band Map, Triaged — **likely resolved by PR #869, needs close** |
 
-### [#315](https://github.com/n4af/TR4W/issues/315) — Detect data mode on IC-9100
+### Radio Control
 
-The IC-9100 was not in the initial Icom CI-V implementation (IC-7300, IC-7610, IC-9700 were). However, if the IC-9100 uses the same CI-V protocol, HamLib Direct may now cover it. **Check if the IC-9100 works via HamLib Direct.**
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#856](https://github.com/n4af/TR4W/issues/856) | Implement polymorphic KeepAlive for factory radio objects | enhancement, Triaged |
+| [#854](https://github.com/n4af/TR4W/issues/854) | Rename tNetObject to FactoryRadio throughout codebase | enhancement, Triaged |
+| [#853](https://github.com/n4af/TR4W/issues/853) | Implement radio discovery dialog for network radios | Radio Control, Triaged |
+| [#852](https://github.com/n4af/TR4W/issues/852) | Add Icom 7700 to network radio implementation | Radio Control, Triaged |
+| [#850](https://github.com/n4af/TR4W/issues/850) | Selective Use of 07 D2 Logic for Icom 9700 | Radio Control, Triaged |
+| [#781](https://github.com/n4af/TR4W/issues/781) | Add SPAN commands for PAN adapter function key | enhancement, Radio Control, Triaged |
+| [#703](https://github.com/n4af/TR4W/issues/703) | K4 network doesn't reset split on bandmap click | Radio Control, Triaged |
+| [#683](https://github.com/n4af/TR4W/issues/683) | Orion and Omni ALT-M mode change does not work | bug, Radio Control, Triaged |
+| [#623](https://github.com/n4af/TR4W/issues/623) | Fix Ten Tec Omni VI (564) breaking change | Radio Control, Triaged |
+| [#449](https://github.com/n4af/TR4W/issues/449) | Make Flex its own radio type in uRadioPolling | enhancement, Radio Control, Triaged |
+| [#448](https://github.com/n4af/TR4W/issues/448) | Implement TCP and UDP protocol for Flex radios | enhancement, Networking, Radio Control, Triaged |
+| [#436](https://github.com/n4af/TR4W/issues/436) | Add rig control for TS890 | enhancement, New Radio Request, Triaged |
+| [#383](https://github.com/n4af/TR4W/issues/383) | Status line message when radio connection is lost | Radio Control, Triaged |
+| [#315](https://github.com/n4af/TR4W/issues/315) | Detect data mode on IC-9100 | Radio Control, Triaged |
 
-### [#685](https://github.com/n4af/TR4W/issues/685) — Add descriptions for HamLib options
+### New Radio Requests
 
-The HamLib Direct DLL work (`bcc66f16`) replaced the rigctld approach. If the old HamLib CTRL-J options were replaced or removed, this issue may be moot. **Check if the old HamLib menu options still exist or were superseded.**
+| Issue | Title |
+|-------|-------|
+| [#844](https://github.com/n4af/TR4W/issues/844) | Add Support for RigSelect Pro Switching Box |
+| [#817](https://github.com/n4af/TR4W/issues/817) | Add support for Yaesu FTX-1F |
+| [#778](https://github.com/n4af/TR4W/issues/778) | Add support for Yaesu FTX-1F (duplicate of #817) |
+| [#767](https://github.com/n4af/TR4W/issues/767) | Add discovery protocol for network-connected K4 radios |
+| [#446](https://github.com/n4af/TR4W/issues/446) | Add support for Expert Electronics TCI interface |
+| [#436](https://github.com/n4af/TR4W/issues/436) | Add rig control for TS890 |
+| [#431](https://github.com/n4af/TR4W/issues/431) | Add support for DXLab Suite Commander as radio |
 
----
+> **Note:** #817 and #778 are duplicates — one should be closed.
 
-## Not Addressed — Remaining 151 Issues
+### Contest Exchange / Scoring
 
-The remaining 151 open issues had no direct commit references and no strong evidence of resolution in the commit history. These include:
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#820](https://github.com/n4af/TR4W/issues/820) | Add new YUK Canadian section | Contest Exchange, Triaged |
+| [#810](https://github.com/n4af/TR4W/issues/810) | WSJT-X: convert grid to state when contest requires it | enhancement, WSJT-X, Triaged |
+| [#808](https://github.com/n4af/TR4W/issues/808) | 9A (Croatian) double points enhancement | enhancement, Triaged |
+| [#802](https://github.com/n4af/TR4W/issues/802) | Score display not showing all info for ARRL 10 Meter | Triaged |
+| [#799](https://github.com/n4af/TR4W/issues/799) | ARRL 10m: Mult needs for AZ show all bands | enhancement, Triaged |
+| [#797](https://github.com/n4af/TR4W/issues/797) | Scoring change Russian 160 (RU3AX Memorial) | enhancement, Triaged |
+| [#416](https://github.com/n4af/TR4W/issues/416) | NAQP: accept state and name in either order | enhancement, Triaged |
+| [#460](https://github.com/n4af/TR4W/issues/460) | Allow entry of Precedence then number | enhancement, Triaged |
+| [#461](https://github.com/n4af/TR4W/issues/461) | Sweepstakes: prefill spot comment with section | enhancement, good first issue, Triaged |
 
-- **Feature requests** from 2015–2016 that were never implemented (SO2R boxes, OmniRig, Wizard, etc.)
-- **New radio requests** (TS890/TS990, FTX-1F, Expert Electronics TCI)
-- **New contest requests** (UKSMG, URC DX RTTY, etc.)
-- **UI enhancements** (bandmap colors, beam heading sort, etc.)
-- **Documentation** (#418 — documentation updates)
-- **Stale issues** (#396 — accidental merge from 2020, likely can be closed as resolved)
+### New Contest / DOM Requests
 
-### Housekeeping Candidates
+| Issue | Title |
+|-------|-------|
+| [#829](https://github.com/n4af/TR4W/issues/829) | Updated DOM file of UBA DX Contest |
+| [#789](https://github.com/n4af/TR4W/issues/789) | Add changes to 2025 RSGB Contests |
+| [#776](https://github.com/n4af/TR4W/issues/776) | Add URC DX RTTY contest |
+| [#745](https://github.com/n4af/TR4W/issues/745) | Contest name change: TESLA → HF-TESLA |
+| [#692](https://github.com/n4af/TR4W/issues/692) | DARC-WAE: Add total QTCs to Summary.txt |
+| [#602](https://github.com/n4af/TR4W/issues/602) | Contest score board fails to accept overlay category |
+| [#434](https://github.com/n4af/TR4W/issues/434) | Grids.dom does not include all locators in WWDIGI |
+| [#386](https://github.com/n4af/TR4W/issues/386) | TAC rule change |
 
-These issues may be closable for reasons other than code changes:
+### ADIF / Cabrillo / Logging
+
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#819](https://github.com/n4af/TR4W/issues/819) | Export TR4W-specific fields and import from N1MM | enhancement, ADIF, Triaged |
+| [#774](https://github.com/n4af/TR4W/issues/774) | Make ADIF and Cabrillo contest name configurable in CFG | ADIF, Cabrillo, Triaged |
+| [#750](https://github.com/n4af/TR4W/issues/750) | Add ability to mark a QSO as X-QSO | enhancement, Cabrillo, UDP Broadcast, Triaged |
+| [#473](https://github.com/n4af/TR4W/issues/473) | Cabrillo CATEGORY mismatch — ask to update | enhancement, Cabrillo, Triaged |
+| [#483](https://github.com/n4af/TR4W/issues/483) | Check if MyGrid is put in Contact Record | question, Cabrillo, Triaged |
+
+### External Logger / UDP
+
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#836](https://github.com/n4af/TR4W/issues/836) | PathFinder DDE: exchange not cleared on message receipt | Triaged |
+| [#835](https://github.com/n4af/TR4W/issues/835) | Clicking bandmap spot should send UDP lookup message | Band Map, External Logger, Triaged |
+| [#768](https://github.com/n4af/TR4W/issues/768) | Add SentExchange to Contact UDP broadcast | enhancement, Modern Delphi, UDP Broadcast, Triaged |
+| [#736](https://github.com/n4af/TR4W/issues/736) | Add HRD support to external logger via TCP/IP | enhancement, External Logger, Triaged |
+| [#735](https://github.com/n4af/TR4W/issues/735) | Direct log via TCP to ACLog | enhancement, External Logger, Triaged |
+| [#718](https://github.com/n4af/TR4W/issues/718) | Receive UDP Contact messages from non-TR4W programs | enhancement, UDP Broadcast, Triaged |
+
+### Multi-network / Server
+
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#770](https://github.com/n4af/TR4W/issues/770) | Add operator to Network window display | Multi-network, Triaged |
+| [#717](https://github.com/n4af/TR4W/issues/717) | Display QSOs by each operator | enhancement, Triaged |
+| [#716](https://github.com/n4af/TR4W/issues/716) | Random access violation using multi-network | bug, Multi-network, Triaged |
+| [#574](https://github.com/n4af/TR4W/issues/574) | Investigate peer network (no TR4WSERVER) | Multi-network, Triaged |
+| [#532](https://github.com/n4af/TR4W/issues/532) | Add discovery protocol for TR4W/TR4WSERVER | enhancement, Multi-network, Triaged |
+
+### WSJT-X / Digital
+
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#810](https://github.com/n4af/TR4W/issues/810) | Convert grid to state for WSJT-X when contest requires | enhancement, WSJT-X, Triaged |
+| [#769](https://github.com/n4af/TR4W/issues/769) | WSJT-X log: station ID letter not put in log | WSJT-X, Triaged |
+| [#465](https://github.com/n4af/TR4W/issues/465) | Implement TinyFSK Protocol for Mortty FSK interface | enhancement, RTTY, Triaged |
+| [#444](https://github.com/n4af/TR4W/issues/444) | Add extendedMode of FST4 | enhancement, WSJT-X, Triaged |
+
+### UI / General Enhancements
+
+| Issue | Title | Labels |
+|-------|-------|--------|
+| [#783](https://github.com/n4af/TR4W/issues/783) | Real-time contest logging support for hamscore.com | enhancement, Triaged |
+| [#780](https://github.com/n4af/TR4W/issues/780) | Option to download latest TRMASTER file | enhancement, Triaged |
+| [#772](https://github.com/n4af/TR4W/issues/772) | Send real-time messages to ClubLog | enhancement, Online Scorebook, Triaged |
+| [#758](https://github.com/n4af/TR4W/issues/758) | Date-aware contest selection dropdown | enhancement, Triaged |
+| [#756](https://github.com/n4af/TR4W/issues/756) | Output a webpage with contest info | Triaged |
+| [#755](https://github.com/n4af/TR4W/issues/755) | Add support for automatic self-spotting | Triaged |
+| [#749](https://github.com/n4af/TR4W/issues/749) | Indicate if frequency is out of band for station call | Triaged |
+| [#748](https://github.com/n4af/TR4W/issues/748) | Add beam heading to bandmap status bar for spot | Triaged |
+| [#739](https://github.com/n4af/TR4W/issues/739) | Return all open windows to primary monitor | enhancement, Triaged |
+| [#732](https://github.com/n4af/TR4W/issues/732) | Send UDP command to PSTRotator for rotor control | Rotor Control, Triaged |
+| [#730](https://github.com/n4af/TR4W/issues/730) | ContestOnlineScore: only half of band-specific QSOs shown | Online Scorebook, Triaged |
+| [#719](https://github.com/n4af/TR4W/issues/719) | Investigate SQLite 3 instead of flat file log | Modern Delphi, Triaged |
+| [#668](https://github.com/n4af/TR4W/issues/668) | Option to enforce callsign validity on entry | Triaged |
+| [#645](https://github.com/n4af/TR4W/issues/645) | FM mode anomaly | Triaged |
+| [#584](https://github.com/n4af/TR4W/issues/584) | Set soundcard per radio for DVK (2-radio) | enhancement, Two Radio, DVK, Triaged |
+| [#485](https://github.com/n4af/TR4W/issues/485) | Summary report should use fixed font for table | Triaged |
+| [#479](https://github.com/n4af/TR4W/issues/479) | Add 60M band | enhancement, Triaged |
+| [#420](https://github.com/n4af/TR4W/issues/420) | Reconnect to DX cluster | Triaged |
+| [#418](https://github.com/n4af/TR4W/issues/418) | Documentation updates | Documentation, Triaged |
+| [#415](https://github.com/n4af/TR4W/issues/415) | Translation updates 2020-July | Translation, Triaged |
+| [#391](https://github.com/n4af/TR4W/issues/391) | Two more telnet clusters to trcluster.dat | DX Cluster, Triaged |
+| [#390](https://github.com/n4af/TR4W/issues/390) | Configurable path for Log File Directory | enhancement, Triaged |
+| [#384](https://github.com/n4af/TR4W/issues/384) | MP3 recorder not working in newer OS | Triaged |
+
+### Housekeeping — Should Be Closed
 
 | Issue | Title | Reason |
 |-------|-------|--------|
-| [#396](https://github.com/n4af/TR4W/issues/396) | Applied merge by mistake | This was a 2020 incident report, not an active bug. The revert was committed. Close as resolved. |
-| [#833](https://github.com/n4af/TR4W/issues/833) | Is the source to the resource files available? | This is a question, not an issue. Answer it and close. |
+| [#688](https://github.com/n4af/TR4W/issues/688) | Lock bandmap while updating | PR #869 merged 2026-04-13 directly addressed this — close after confirming in build |
+| [#778](https://github.com/n4af/TR4W/issues/778) | Add support for Yaesu FTX-1F | **Duplicate of #817** — close as duplicate |
+| [#396](https://github.com/n4af/TR4W/issues/396) | Applied merge by mistake | 2020 incident, revert was committed — close as resolved |
+| [#383](https://github.com/n4af/TR4W/issues/383) | Status line when radio connection lost | Reconnection infrastructure added; verify if visible to user and close |
 
 ---
 
-*Analysis performed by cross-referencing all open GitHub issues against the complete Git commit history and merged PR descriptions of [n4af/TR4W](https://github.com/n4af/TR4W).*
+## Planning Summary
+
+### Immediate / Low Effort
+- Close #396 (stale incident), #778 (duplicate of #817), #688 (verify PR #869 resolved it)
+- Verify and potentially close #383, #735, #736, #766, #703 against current build
+- Close out #87 — determine if section SCP work was ever followed up
+
+### Near-Term Feature Work (Active Areas)
+- **POTA**: #877 (free-form parser — Claude prompt posted), plus follow-on from recent POTA Nfer work
+- **Radio Factory**: #856 (KeepAlive), #854 (rename tNetObject), #853 (discovery dialog), #852 (Icom 7700), #850 (9700 logic)
+- **Band Map**: #835 (UDP lookup on click), #784 (exchange not cleared), #788 (deleted spot still showing)
+- **CW / WinKeyer**: #871 (extra space — in active diagnosis), #800 (K4 CW sync)
+
+### Medium-Term / Architecture
+- #719 (SQLite log)
+- #448/#449 (Flex TCP/UDP)
+- #574 (peer network, no server)
+- #768 (SentExchange in UDP broadcast)
+- #750 (X-QSO marking)
+
+### Long Backlog (Low Priority / Pending Resources)
+- New radio requests (#817, #436, #446, #431)
+- New contest/DOM requests (#829, #789, #776)
+- Online scorebook (#772, #783)
+- Translation (#415, #685)
+- Legacy radio fixes (#683, #623)
+
+---
+
+*Updated 2026-04-15 by cross-referencing all open GitHub issues, recent commits (through 4.146.11), and PR #869. All 95 open issues now carry the `Triaged` label.*
