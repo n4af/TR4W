@@ -198,6 +198,54 @@ windows are on VCL forms. Migration approach:
 
 ---
 
+## Binary Log Format History
+
+The TR4W binary log (`ContestExchange` record) has the following version history.
+All versions use fixed-size records; the version is stored in `TLogHeader` (first record).
+
+| Version | Key changes | Frozen type in VC.pas |
+|---------|-------------|----------------------|
+| v1.5 | No `ExtMode`, no `ExchString`, no `id` | `ContestExchangev1_5` |
+| v1.6 | Added `ExtMode`, `ExchString`; ZERO pad fields active; no `id` | `ContestExchangev1_6` |
+| v1.7 | Added `id: string[32]`, `sReserved: string[50]`; res3/res15-23 removed | `ContestExchange` (current) |
+
+**Log conversion** (`AskConvertLog` in `MainUnit.pas`) handles v1.5→v1.7 and v1.6→v1.7.
+Files already at v1.7 open directly without conversion. The `id` field (a GUID) is
+populated on new QSOs via `TF.GetGUID` and left blank when upgrading from v1.6 (no
+source data available).
+
+**v1.7 is the frozen binary format.** Do not add fields to `ContestExchange`. All new
+per-QSO fields belong in the SQLite schema described below.
+
+---
+
+## Deferred Log Format Fields (SQLite Phase)
+
+These fields are **not** in the v1.7 binary `ContestExchange` record and should be
+added as columns when the log is migrated to SQLite. They were consciously deferred
+because the binary format is frozen at v1.7 (last format before D12/SQLite).
+
+### Why each field was deferred
+
+| Column | Type | Reason deferred | Notes |
+|--------|------|-----------------|-------|
+| `tx_frequency` | INTEGER | Split-op TX freq differs from RX | Binary record has one `Frequency` field only |
+| `my_grid` | TEXT | Changes mid-contest (Rover operations) | Currently global setting, not per-QSO |
+| `my_park_ref` | TEXT | Changes mid-contest (POTA activators visiting multiple parks) | POTA/SOTA/WWFF — no per-QSO field exists today |
+| `contacted_grid` | TEXT | Shoehorned into `QTHString` (context-dependent) | QTHString is reused for grid, QTH, section depending on contest |
+| `dxcc_entity` | INTEGER | Useful for DXCC tracking without re-parsing CTY.DAT | Partially covered by `QTH.CountryID` string |
+
+### Migration note
+
+During the binary→SQLite import, `QTHString` must be interpreted contextually per
+contest type — the same field holds gridsquare, section, or QTH depending on which
+contest was active. Preserve the raw `QTHString` value in a `qth_string_raw` column
+alongside the structured fields so nothing is lost.
+
+The TR4QT SQLite implementation at `C:\projects\TR4QT` is the reference schema.
+
+---
+
 ## What NOT to Do
 
 - **Do not refactor and migrate simultaneously.** Pick one. Phase 1 is compile-only;

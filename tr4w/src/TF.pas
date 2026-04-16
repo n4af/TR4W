@@ -26,6 +26,8 @@ uses
   VC,
   utils_text,
   Windows,
+  SysUtils,
+  ActiveX,
   Messages;
 
 type
@@ -114,6 +116,7 @@ function tGetDateFormat(DT: TQSOTime): PChar; //assembler;
 procedure UnableToFindFileMessage(FileName: PChar);
 function DeleteSlashes(p: PChar): PChar;
 function SetParameterInArray(ArrayPtr: PInteger; ArrayLength: integer; aVar: PInteger; ValueToSet: integer): boolean;
+function GetGUID: string;
 function GetValueFromArray(PCharArrayAddress: PChar; ArraySize: Byte; CMD: PChar): Byte;
 function StrPos(const Str1, Str2: PChar): PChar; ASSEMBLER;
 function StrPosPartial(const Str1, Str2: PChar): PChar; ASSEMBLER;
@@ -385,6 +388,25 @@ begin
 end;
 }
 
+function GetGUID: string;   // Returns 32-char lowercase hex, no dashes or braces
+var
+   MyGUID: TGUID;
+begin
+   Result := '';
+   if CreateGUID(MyGUID) <> S_OK then
+      begin
+      logger.Warn('Could not create GUID');
+      Exit;
+      end;
+   Result := LowerCase(
+      Format('%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',
+         [MyGUID.D1, MyGUID.D2, MyGUID.D3,
+          MyGUID.D4[0], MyGUID.D4[1], MyGUID.D4[2], MyGUID.D4[3],
+          MyGUID.D4[4], MyGUID.D4[5], MyGUID.D4[6], MyGUID.D4[7]]));
+   logger.Debug('GUID created %s', [Result]);
+end;
+
+
 function BitmapFromIcon(Handle: HWND; i: HICON): HBITMAP;
 var
   winDC, srcdc, destdc                  : HDC;
@@ -459,7 +481,7 @@ begin
   asm add esp,24
   end;
   Result := MillisecondsBuffer;
-  //  MessageBox(0, Result, 'Сообщение', MB_OK);
+  //  MessageBox(0, Result, 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ', MB_OK);
 
 end;
 

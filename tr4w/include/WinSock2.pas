@@ -1400,8 +1400,6 @@ procedure FD_ZERO(var FDSet: TFDSet);
 //=============================================================
 implementation
 
-uses TF;
-
 //=============================================================
 
 function Accept; external WINSOCK2_DLL Name 'accept';
