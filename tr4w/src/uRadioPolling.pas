@@ -78,6 +78,7 @@ procedure SetVFOModeExtendedMode(rig: RadioPtr; which: Cardinal; mode: ModeType;
 
 procedure pFTDX9000(rig: RadioPtr);
 procedure pFTDX10_FTDX101(rig: RadioPtr);
+procedure pFTX1F(rig: RadioPtr);
 procedure pFT891_FT991(rig: RadioPtr);
 procedure pOrion(rig: RadioPtr);
 procedure pOrion3(rig: RadioPtr);
@@ -96,6 +97,8 @@ function GetFrequencyForYaesuFT747(a: PChar): Cardinal;
 procedure GetVFOInfoForYaesuType3(buf: PChar; var VFO: VFOStatusType;
    FrequencyAdder: integer);
 procedure GetVFOInfoForYaesuType5(buf: PChar; var VFO: VFOStatusType;
+   FrequencyAdder: integer);
+procedure GetVFOInfoForYaesuFTX1(buf: PChar; var VFO: VFOStatusType;
    FrequencyAdder: integer);
 procedure BeginPolling(rig: RadioPtr); stdcall;
 procedure SetDCBForIcom(port: HWND);
@@ -3474,6 +3477,8 @@ begin
          pFT891_FT991(rig); // ny4i Issue218 9 byte frequency
       FTDX10, FTDX101, FT710:
          pFTDX10_FTDX101(rig);
+      FTX1F:
+         pFTX1F(rig);
       IC78..IC9700, OMNI6:
          pIcomNew(rig);
       //    pIcom(rig);
@@ -3751,6 +3756,216 @@ begin
    VFO.Mode := TempMode;
    VFO.ExtendedMode := tempExtendedMode;
 
+end;
+//------------------------------------------------------------------------------
+procedure GetVFOInfoForYaesuFTX1(buf: PChar; var VFO: VFOStatusType;
+   FrequencyAdder: integer);
+   // FTX-1F/FTX-1R IF response layout (30 bytes total, Issue #817):
+   //   Pos 1-2:   "IF"
+   //   Pos 3-7:   P1  VFO/memory channel (5 bytes — 2 longer than FTDX10's 3-byte P1)
+   //   Pos 8-16:  P2  VFO frequency Hz (9 bytes)
+   //   Pos 17:    P3  Clarifier direction (+/-)
+   //   Pos 18-21: P3  Clarifier offset 0000-9990 Hz (4 bytes)
+   //   Pos 22:    P4  RX CLAR on/off
+   //   Pos 23:    P5  TX CLAR on/off
+   //   Pos 24:    P6  Mode
+   //   Pos 25:    P7  VFO type
+   //   Pos 26:    P8  CTCSS
+   //   Pos 27-28: P9  Fixed "00"
+   //   Pos 29:    P10 Simplex/shift
+   //   Pos 30:    ";"
+var
+   TempMode         : ModeType;
+   TempExtendedMode : ExtendedModeType;
+begin
+   TempMode := NoMode;
+   VFO.Frequency := BufferToInt(buf, 8, 9) + FrequencyAdder;
+   CalculateBandMode(VFO.Frequency, VFO.Band, VFO.Mode);
+   VFO.RITFreq := BufferToInt(buf, 17, 5);  // direction byte + 4-digit offset
+   VFO.RIT     := buf[22 - 1] = '1';        // P4 RX CLAR
+   VFO.XIT     := buf[23 - 1] = '1';        // P5 TX CLAR
+   case buf[24 - 1] of                       // P6 MODE
+      '1':
+         begin
+         TempMode         := Phone;
+         TempExtendedMode := eLSB;
+         end;
+      '2':
+         begin
+         TempMode         := Phone;
+         TempExtendedMode := eUSB;
+         end;
+      '3':
+         begin
+         TempMode         := CW;
+         TempExtendedMode := eCW;
+         end;
+      '4':
+         begin
+         TempMode         := FM;
+         TempExtendedMode := eFM;
+         end;
+      '5':
+         begin
+         TempMode         := Phone;
+         TempExtendedMode := eAM;
+         end;
+      '6':
+         begin
+         TempMode         := Digital;
+         TempExtendedMode := eRTTY_R;
+         end;
+      '7':
+         begin
+         TempMode         := CW;
+         TempExtendedMode := eCW_R;
+         end;
+      '8':
+         begin
+         TempMode         := Digital;
+         TempExtendedMode := eData_R;
+         end;
+      '9':
+         begin
+         TempMode         := Digital;
+         TempExtendedMode := eRTTY;
+         end;
+      'A':
+         begin
+         TempMode         := Digital;
+         TempExtendedMode := eData_FM;
+         end;
+      'B':
+         begin
+         TempMode         := FM;
+         TempExtendedMode := eFM_N;
+         end;
+      'C':
+         begin
+         TempMode         := Digital;
+         TempExtendedMode := eData;
+         end;
+      'D':
+         begin
+         TempMode         := Phone;
+         TempExtendedMode := eAM_N;
+         end;
+      'E':
+         begin
+         TempMode         := Digital;
+         TempExtendedMode := ePSK31;
+         end;
+      'F':
+         begin
+         TempMode         := Digital;
+         TempExtendedMode := eData_FM;
+         end;
+      'H':
+         begin
+         // C4FM-DN (digital narrow) Yaesu System Fusion digital voice
+         TempMode         := Phone;
+         TempExtendedMode := eC4FM;
+         end;
+      'I':
+         begin
+         // C4FM-VW (digital voice wide) Yaesu System Fusion digital voice
+         TempMode         := Phone;
+         TempExtendedMode := eC4FM;
+         end;
+      '0', 'G', 'J':
+         begin
+         // Unused/reserved mode values in FTX-1 CAT manual
+         TempMode         := NoMode;
+         TempExtendedMode := eNoMode;
+         end;
+      else
+         begin
+         logger.Error('Unknown mode value for FTX-1F: ' + buf[24 - 1]);
+         TempMode         := NoMode;
+         TempExtendedMode := eNoMode;
+         end;
+   end;
+   VFO.Mode         := TempMode;
+   VFO.ExtendedMode := TempExtendedMode;
+end;
+//------------------------------------------------------------------------------
+procedure pFTX1F(rig: RadioPtr);
+   // FTX-1F/FTX-1R polling procedure (Issue #817).
+   // IF; and OI; responses are 30 bytes (vs 28 for FTDX10) because the
+   // VFO/memory-channel field (P1) is 5 bytes instead of 3.
+label
+   1;
+var
+   TempVFO: VFOStatusType;
+begin
+   repeat
+      inc(rig.tPollCount);
+
+      rig.WritePollRequest('IF;', 3);
+         // Retrieves VFO A (Primary). Get other VFO with OI; command.
+      if ((not ReadFromCOMPort(30, rig)) or
+         (PWORD(@rig.tBuf)^ <> $4649)) then
+         begin
+         ClearRadioStatus(rig);
+         goto 1;
+         end;
+
+      GetVFOInfoForYaesuFTX1(@rig.tBuf, rig.CurrentStatus.VFO[VFOA],
+         rig.FrequencyAdder);
+
+      rig.WritePollRequest('OI;', 3);  // Opposite VFO information
+      if ((not ReadFromCOMPort(30, rig)) or
+         (PWORD(@rig.tBuf)^ <> $494F)) then
+         begin
+         ClearRadioStatus(rig);
+         goto 1;
+         end;
+
+      GetVFOInfoForYaesuFTX1(@rig.tBuf, rig.CurrentStatus.VFO[VFOB],
+         rig.FrequencyAdder);
+
+      TempVFO := rig.CurrentStatus.VFO[VFOA];
+      rig^.CurrentStatus.VFOStatus := VFOA;
+
+      rig.WritePollRequest('FT;', 3);
+      if not ReadFromCOMPort(4, rig) then
+         begin
+         ClearRadioStatus(rig);
+         goto 1;
+         end;
+      if rig.tBuf[3] = '1' then
+         rig^.CurrentStatus.Split := true
+      else if rig.tBuf[3] = '0' then
+         rig^.CurrentStatus.Split := false
+      else
+         begin
+         logger.Error('FTX-1F: unexpected FT; response (Split set to false): ' + rig.tBuf);
+         rig^.CurrentStatus.Split := false;
+         end;
+
+      rig.WritePollRequest('TX;', 3);
+      if not ReadFromCOMPort(4, rig) then
+         begin
+         ClearRadioStatus(rig);
+         goto 1;
+         end;
+      if rig.tBuf[3] in ['1', '2'] then
+         rig^.CurrentStatus.TXOn := true
+      else if rig.tBuf[3] = '0' then
+         rig^.CurrentStatus.TXOn := false
+      else
+         begin
+         logger.Error('FTX-1F: unexpected TX; response (TXOn set to false): ' + rig.tBuf);
+         rig^.CurrentStatus.TXOn := false;
+         end;
+
+      rig.CurrentStatus.ExtendedMode := TempVFO.ExtendedMode;
+      rig.CurrentStatus.RITFreq     := TempVFO.RITFreq;
+      rig.CurrentStatus.RIT         := TempVFO.RIT;
+      rig.CurrentStatus.XIT         := TempVFO.XIT;
+      1:
+      UpdateStatus(rig);
+   until rig.tPollCount < 0;
 end;
 
 procedure SetVFOA(rig: RadioPtr);

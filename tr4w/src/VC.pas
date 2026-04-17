@@ -985,6 +985,7 @@ type
     FT100,
     FTDX10,
     FTDX101,
+    FTX1F,     // Yaesu FTX-1F/FTX-1R — rtYaesu4, 30-byte IF response (Issue #817)
     FT450,
     FT710,
     FT736R,
