@@ -14,7 +14,7 @@
 | K0TI — Dan | [@Dan-K0TI](https://github.com/Dan-K0TI) | 8 |
 | Vojtěch Šádek | [@vksadek](https://github.com/vksadek) | 1 |
 | Dmitriy Gulyaev UA4WLI | | (Original Author of Win32 Port / Pre-GitHub)|
-| N6TR - Tree | | (Original TRLOG (DOS) Author) |
+| N6TR - Tree | [@n6tr](https://github.com/n6tr) | (Original TRLOG (DOS) Author) |
 
 Various contributors along the way
 
