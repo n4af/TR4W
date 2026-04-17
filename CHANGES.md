@@ -18,6 +18,35 @@
 
 ## 4.146.x — April 2026
 
+### 4.146.14 (2026-04-17) — NY4I
+
+#### POTA Exchange Parser — Free-Form with State/Section/Name Recognition (`src/trdos/LOGSTUFF.PAS`, `src/trdos/LOGSCP.PAS`, `src/trdos/FCONTEST.PAS`, `src/trdos/tree.pas`) — Issue #877
+
+- **Free-form exchange**: POTA exchange is now always accepted — blocked saves are gone. Tokens are classified as US state/province (→ DomesticQTH), ARRL section, operator name (→ Name), or free-form notes (→ ExchString).
+- **OperatorNameSet**: sorted list of ~1,300 operator names built from TRMASTER.DTA at contest load; binary search replaces the prior all-alpha character heuristic for name detection.
+- **IsValidPOTAPark regex fix**: updated to require exactly a 2-letter prefix and 4–5 digit park number (e.g. `US-1234`, `K-0001`); rejects RST values and malformed refs.
+- **LooksLikeAPOTAPark**: new helper in `tree.pas`; POTA added to `LooksLikeAGrid` exchange list so grid squares in POTA exchanges are recognised.
+
+#### POTA ADIF Import/Export (`src/MainUnit.pas`, `src/trdos/PostUnit.PAS`) — Issue #877
+
+- **ADIF import**: new fields `SIG`, `SIG_INFO`, `POTA_REF`, `APP_N1MM_ID`, `APP_TR4W_ID` parsed on import. POTA import tries `POTA_REF` → `SIG_INFO` (when `SIG=POTA`) → `STATE` fallback.
+- **ADIF export**: writes `MY_POTA_REF` alongside existing `MY_SIG`/`MY_SIG_INFO` for backward compatibility; conditionally writes `SIG`/`SIG_INFO`/`POTA_REF` only when QTHString is a valid park ref; writes `STATE` or `GRIDSQUARE` from ExchString when applicable; adds `APP_TR4W_ID` (QSO GUID) to all records.
+- **IsValidGUID**: new function validates GUID format for APP_TR4W_ID/APP_N1MM_ID fields on import.
+
+---
+
+### 4.146.13 (2026-04-17) — NY4I
+
+#### Yaesu FTX-1F/FTX-1R Radio Support (`src/trdos/LOGRADIO.PAS`) — Issue #817
+
+- **FTX-1F/FTX-1R serial CAT**: new polling procedure `pFTX1F` and parser `GetVFOInfoForYaesuFTX1` using the `rtYaesu4` protocol family. The FTX-1 IF response is 30 bytes (vs FTDX10's 28) due to a 5-byte P1 field, shifting all subsequent field positions. C4FM voice modes map to `Phone`/`eC4FM`. HamLib model 1051.
+
+#### Log Version Guard (`src/MainUnit.pas`)
+
+- **Newer-than-program log detection**: opening a log file whose version exceeds the program's `LOGVERSION` now shows a clear error dialog and halts cleanly, rather than offering a meaningless downgrade conversion.
+
+---
+
 ### 4.146.12 (2026-04-16) — NY4I
 
 #### Log Format v1.7 (`src/VC.pas`, `src/MainUnit.pas`, `src/TF.pas`, `src/trdos/LOGSUBS2.PAS`, `src/uEditQSO.pas`) — Issue #674, closes #768
