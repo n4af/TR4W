@@ -345,7 +345,7 @@ begin
 
         EnableWindowTrue(hwnddlg, FLD_SAVE_BUTTON);
         Windows.SetFocus(GetDlgItem(hwnddlg, FLD_CALLSIGN));
-        SendDlgItemMessage(hwnddlg, FLD_CALLSIGN, EM_SETSEL, 16, 16); //в конец
+        SendDlgItemMessage(hwnddlg, FLD_CALLSIGN, EM_SETSEL, 16, 16); //пїЅ пїЅпїЅпїЅпїЅпїЅ
 
       end;
 
@@ -691,23 +691,25 @@ begin
   EditableQSORXData.ceQSO_Deleted := boolean(TF.SendDlgItemMessage(eq_handle,
     FLD_DELETED, BM_GETCHECK));
 
-  // The way UDP handles an edited QSO is to delete it first and then add it again.  Issue 165 ny4i
-  // In the case of an actual delete, we do NOT send the subsequent record to re-add the QSO.
-  SendDeletedContactToUDP(EditableQSORXData);
-  LogContactToUDP(EditableQSORXData);
-  if Assigned(externalLogger) then
+  // Deleted QSOs send a contactdelete only.
+  // Edited (non-deleted) QSOs send a contactreplace so consumers update in place.
+  if EditableQSORXData.ceQSO_Deleted then
      begin
-     externalLogger.DeleteQSO(EditableQSORXData);
-     externalLogger.LogQSO(EditableQSORXData);
+     SendDeletedContactToUDP(EditableQSORXData);
+     if Assigned(externalLogger) then
+        begin
+        externalLogger.DeleteQSO(EditableQSORXData);
+        end;
+     end
+  else
+     begin
+     LogEditedContactToUDP(EditableQSORxData);
+     if Assigned(externalLogger) then
+        begin
+        externalLogger.DeleteQSO(EditableQSORXData);
+        externalLogger.LogQSO(EditableQSORXData);
+        end;
      end;
-  {if not EditableQSORXData.ceQSO_Deleted then    // This should not depend upon if deleted. Just delete and add again
-  begin
-    LogContactToUDP(EditableQSORXData);
-    if Assigned(externalLogger) then
-       begin
-       externalLogger.LogQSO(EditableQSORXData);
-       end;
-  end; }
 
   if not OpenLogFile then
     Exit;

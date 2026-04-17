@@ -4462,6 +4462,7 @@ begin
 
   { Need this in case we exit soon }
   Windows.ZeroMemory(@RData.Callsign, SizeOf(RData.Callsign));
+  RData.ID := GetGUID;
   RData.Callsign := Call;
   if (ExchangeString = '') and not (ActiveExchange in [RSTNameAndQTHExchange,
     RSTAndPOTAPark]) then // These two exchanges allow blank exchanges
@@ -5266,7 +5267,6 @@ begin
         TempBuffer1);
       showwarning(wsprintfBuffer);
       CloseLogFile;
-      // Convert the log?
       if not AskConvertLog(TempBuffer1) then
       begin
         logger.Fatal(wsprintfBuffer);
@@ -6088,6 +6088,9 @@ begin
           end;
           }
           {rk4wwq}
+
+          if RescoredRXData^.id = '' then
+             RescoredRXData^.id := GetGUID;
 
           Sheet.SetMultFlags(RescoredRXData^);
           CalculateQSOPoints(RescoredRXData^);
@@ -9008,76 +9011,94 @@ begin
 end;
 
 (*----------------------------------------------------------------------------*)
-
 function AskConvertLog(sVersion: string): boolean;
+{ Converts a log file from a prior binary format to the current v1.7 format.
+  Supported source versions: v1.5, v1.6.
+  For each source version there is a corresponding frozen record type:
+    v1.5 -> ContestExchangev1_5  (no ExtMode, no ExchString, no id)
+    v1.6 -> ContestExchangev1_6  (no id field)
+  The original log is renamed to <logname>.<vN_N> and a read-only backup
+  copy is created as <logname>-<version>.bkup before any conversion begins.
+  The id field is left blank after conversion. }
 var
-  OldFile, NewFile, fName: string;
+  OldFile, NewFile, fName, sVersionTag: string;
   fileSetCode, attrs: integer;
-  oldFH: file of ContestExchangev1_5;
+  oldFH_v1_6: file of ContestExchangev1_6;
+  oldFH_v1_5: file of ContestExchangev1_5;
   newFH: file of ContestExchange;
   headerFH: file of TLogHeader;
-  oldRXData: ContestExchangev1_5;
+  oldRXData_v1_6: ContestExchangev1_6;
+  oldRXData_v1_5: ContestExchangev1_5;
   newRXData: ContestExchange;
 begin
   Result := false;
 
-  //ReadVersionBlock; // Just resets points to the start
-  // Read the version block to confirm the versions are different. Ask again if they want to convert
-  { The general logic here is as follows:
+  logger.Info('AskConvertLog: converting log from version ' + sVersion + ' to ' + LOGVERSION);
 
-  Read the log header and confirm.
-  If the user wants to convert, make a backup of the current log with priorVersion in the name (as read from the version record)
-  }
-  if YesOrNo(0, TC_WANTTOCONVERTLOG) = mrNo then
-  begin
-    logger.Fatal('User opted to not upgrade log format');
-    Halt;
-  end;
+  if (sVersion <> 'v1.5') and (sVersion <> 'v1.6') then
+     begin
+     ShowMessage(PChar('Cannot convert log version ' + sVersion + ' to ' + LOGVERSION + '. Unknown source version.'));
+     logger.Fatal('AskConvertLog: unknown source version: ' + sVersion);
+     Exit;
+     end;
+
+  { The general logic here is as follows:
+    Read the log header and confirm the version differs from current.
+    If the user agrees to convert, back up the original file, then
+    rename it with a version-tagged extension so the conversion reads it. }
+  if YesOrNo(0, PChar('This log is version ' + sVersion + '. Would you like to convert it to ' + LOGVERSION + '?')) = mrNo then
+     begin
+     logger.Fatal('User opted to not upgrade log format');
+     Halt;
+     end;
+
   NewFile := StrPas(TR4W_LOG_FILENAME) + '-' + sVersion + '.bkup';
   if not FileExists(TR4W_LOG_FILENAME) then
-  begin
-    ShowMessage(PChar(TC_LOGFILENOTFOUND));
-    Exit;
-  end;
+     begin
+     ShowMessage(PChar(TC_LOGFILENOTFOUND));
+     Exit;
+     end;
 
   if FileExists(PChar(NewFile)) then
-  begin
-    attrs := FileGetAttr(NewFile);
-    if attrs and faReadOnly > 0 then
-    begin
-      ShowMessage(PChar(TC_CANNOTCOPYLOGREADONLY));
-      Exit;
-    end;
-  end;
+     begin
+     attrs := FileGetAttr(NewFile);
+     if attrs and faReadOnly > 0 then
+        begin
+        ShowMessage(PChar(TC_CANNOTCOPYLOGREADONLY));
+        Exit;
+        end;
+     end;
 
   if not CopyFile(TR4W_LOG_FILENAME, PChar(NewFile), false) then
-  begin
-    ShowMessage(PChar(TC_CANNOTBACKUPLOG + StrPas(TR4W_LOG_FILENAME)));
-    Exit;
-  end;
+     begin
+     ShowMessage(PChar(TC_CANNOTBACKUPLOG + StrPas(TR4W_LOG_FILENAME)));
+     Exit;
+     end;
 
-  ShowMessage(PChar(TC_BACKUPCREATED)); // good copy so set to read-only
+  ShowMessage(PChar(TC_BACKUPCREATED));
   fileSetCode := FileSetAttr(NewFile, faReadOnly);
   if fileSetCode = 0 then
-  begin
-    logger.Info(NewFile + ' made into a read only file');
-  end
+     begin
+     logger.Info(NewFile + ' made into a read only file');
+     end
   else
-  begin
-    ShowMessage(TC_CANNOTCOPYLOGREADONLY);
-    Exit;
-  end;
+     begin
+     ShowMessage(TC_CANNOTCOPYLOGREADONLY);
+     Exit;
+     end;
 
-  // Now change the name of the original log file to TR4W_LOG_FILENAME + .v1_5
-  OldFile := StrPas(TR4W_LOG_FILENAME) + '.v1_5';
+  // Rename the original log to TR4W_LOG_FILENAME + '.<vN_N>' (e.g. .v1_5, .v1_6, .v1_7)
+  sVersionTag := StringReplace(sVersion, '.', '_', [rfReplaceAll]);
+  OldFile := StrPas(TR4W_LOG_FILENAME) + '.' + sVersionTag;
   fName := StrPas(TR4W_LOG_FILENAME);
   if not RenameFile(fName, OldFile) then
-  begin
-    ShowMessage(PChar(TC_CANNOTRENAME + ' ' + fName + ' >>> ' + OldFile));
-    Exit;
-  end;
+     begin
+     ShowMessage(PChar(TC_CANNOTRENAME + ' ' + fName + ' >>> ' + OldFile));
+     Exit;
+     end;
+
   //***
-  // Now the file is backed up so time to convert...
+  // Original is backed up and renamed. Write the new v1.7 header and convert.
   //***
 
   AssignFile(headerFH, TR4W_LOG_FILENAME);
@@ -9085,115 +9106,179 @@ begin
   Write(headerFH, LogHeader);
   CloseFile(headerFH);
 
-  AssignFile(oldFH, OldFile);
-  FileMode := fmOpenRead;
-  Reset(oldFH);
+  if sVersion = 'v1.5' then
+     begin
+     // --- v1.5 to v1.7 ---
+     // v1.5 has no ExtMode or ExchString fields; derive ExtMode from Mode
+     // and use QTHString as a fallback for ExchString.
+     AssignFile(oldFH_v1_5, OldFile);
+     FileMode := fmOpenRead;
+     Reset(oldFH_v1_5);
+     AssignFile(newFH, TR4W_LOG_FILENAME);
+     FileMode := fmOpenWrite;
+     Reset(newFH);
+     Seek(newFH, 1);
+     Seek(oldFH_v1_5, 1);
+     while not EOF(oldFH_v1_5) do
+        begin
+        Read(oldFH_v1_5, oldRXData_v1_5);
+        ClearContestExchange(newRXData);
+        newRXData.tSysTime := oldRXData_v1_5.tSysTime;
+        newRXData.Band := oldRXData_v1_5.Band;
+        newRXData.Mode := oldRXData_v1_5.Mode;
+        newRXData.ceQSOID1 := oldRXData_v1_5.ceQSOID1;
+        newRXData.ceQSOID2 := oldRXData_v1_5.ceQSOID2;
+        newRXData.Frequency := oldRXData_v1_5.Frequency;
+        newRXData.ceQSO_Deleted := oldRXData_v1_5.ceQSO_Deleted;
+        newRXData.ceComputerID := oldRXData_v1_5.ceComputerID;
+        newRXData.ceOperatorID := oldRXData_v1_5.ceOperatorID;
+        newRXData.ceRecordKind := oldRXData_v1_5.ceRecordKind;
+        newRXData.ceQSO_Skiped := oldRXData_v1_5.ceQSO_Skiped;
+        newRXData.ceSendToServer := oldRXData_v1_5.ceSendToServer;
+        newRXData.ceNeedSendToServerAE := oldRXData_v1_5.ceNeedSendToServerAE;
+        newRXData.ceDupe := oldRXData_v1_5.ceDupe;
+        newRXData.PostalCode_old := oldRXData_v1_5.PostalCode_old;
+        newRXData.Prefix := oldRXData_v1_5.Prefix;
+        newRXData.Callsign := oldRXData_v1_5.Callsign;
+        newRXData.Age := oldRXData_v1_5.Age;
+        newRXData.ceWasSendInQTC := oldRXData_v1_5.ceWasSendInQTC;
+        newRXData.DomesticMult := oldRXData_v1_5.DomesticMult;
+        newRXData.DXMult := oldRXData_v1_5.DXMult;
+        newRXData.PrefixMult := oldRXData_v1_5.PrefixMult;
+        newRXData.ZoneMult := oldRXData_v1_5.ZoneMult;
+        newRXData.ceClass := oldRXData_v1_5.ceClass;
+        newRXData.Precedence := oldRXData_v1_5.Precedence;
+        newRXData.ceRadio := oldRXData_v1_5.ceRadio;
+        newRXData.Check := oldRXData_v1_5.Check;
+        newRXData.QTH := oldRXData_v1_5.QTH;
+        newRXData.DXQTH := oldRXData_v1_5.DXQTH;
+        newRXData.Radio := oldRXData_v1_5.Radio;
+        newRXData.DomMultQTH := oldRXData_v1_5.DomMultQTH;
+        newRXData.DomesticQTH := oldRXData_v1_5.DomesticQTH;
+        newRXData.Name := oldRXData_v1_5.Name;
+        newRXData.Power := oldRXData_v1_5.Power;
+        newRXData.NumberReceived := oldRXData_v1_5.NumberReceived;
+        newRXData.NumberSent := oldRXData_v1_5.NumberSent;
+        newRXData.RSTSent := oldRXData_v1_5.RSTSent;
+        newRXData.RSTReceived := oldRXData_v1_5.RSTReceived;
+        newRXData.QTHString := oldRXData_v1_5.QTHString;
+        newRXData.RandomCharsSent := oldRXData_v1_5.RandomCharsSent;
+        newRXData.TenTenNum := oldRXData_v1_5.TenTenNum;
+        newRXData.Chapter := oldRXData_v1_5.Chapter;
+        newRXData.ceClearDupeSheet := oldRXData_v1_5.ceClearDupeSheet;
+        newRXData.ceSearchAndPounce := oldRXData_v1_5.ceSearchAndPounce;
+        newRXData.Prefecture := oldRXData_v1_5.Prefecture;
+        newRXData.InhibitMults := oldRXData_v1_5.InhibitMults;
+        newRXData.Zone := oldRXData_v1_5.Zone;
+        newRXData.NameSent := oldRXData_v1_5.NameSent;
+        newRXData.Kids := oldRXData_v1_5.Kids;
+        newRXData.ceContest := oldRXData_v1_5.ceContest;
+        newRXData.QSOPoints := oldRXData_v1_5.QSOPoints;
+        newRXData.RandomCharsReceived := oldRXData_v1_5.RandomCharsReceived;
+        newRXData.ceClearMultSheet := oldRXData_v1_5.ceClearMultSheet;
+        newRXData.MP3Record := oldRXData_v1_5.MP3Record;
+        newRXData.ceOperator := oldRXData_v1_5.ceOperator;
+        // Derive ExtMode from Mode (v1.5 has no ExtMode field)
+        if oldRXData_v1_5.Mode = CW then
+           begin
+           newRXData.ExtMode := eCW;
+           end
+        else if oldRXData_v1_5.Mode = Phone then
+           begin
+           newRXData.ExtMode := eSSB;
+           end
+        else if oldRXData_v1_5.Mode = Digital then
+           begin
+           newRXData.ExtMode := eRTTY;
+           end;
+        // Use QTHString as ExchString fallback (v1.5 has no ExchString field)
+        newRXData.ExchString := oldRXData_v1_5.QTHString;
+        // id (GUID) left blank; rescore will backfill if needed
+        Write(newFH, newRXData);
+        end;
+     CloseFile(oldFH_v1_5);
+     CloseFile(newFH);
+     end
+  else
+     begin
+     // --- v1.6 to v1.7 ---
+     // v1.6 has no id field; id is left blank after conversion.
+     AssignFile(oldFH_v1_6, OldFile);
+     FileMode := fmOpenRead;
+     Reset(oldFH_v1_6);
+     AssignFile(newFH, TR4W_LOG_FILENAME);
+     FileMode := fmOpenWrite;
+     Reset(newFH);
+     Seek(newFH, 1);
+     Seek(oldFH_v1_6, 1);
+     while not EOF(oldFH_v1_6) do
+        begin
+        Read(oldFH_v1_6, oldRXData_v1_6);
+        ClearContestExchange(newRXData);
+        newRXData.tSysTime := oldRXData_v1_6.tSysTime;
+        newRXData.Band := oldRXData_v1_6.Band;
+        newRXData.Mode := oldRXData_v1_6.Mode;
+        newRXData.ceQSOID1 := oldRXData_v1_6.ceQSOID1;
+        newRXData.ceQSOID2 := oldRXData_v1_6.ceQSOID2;
+        newRXData.Frequency := oldRXData_v1_6.Frequency;
+        newRXData.ceQSO_Deleted := oldRXData_v1_6.ceQSO_Deleted;
+        newRXData.ceComputerID := oldRXData_v1_6.ceComputerID;
+        newRXData.ceOperatorID := oldRXData_v1_6.ceOperatorID;
+        newRXData.ceRecordKind := oldRXData_v1_6.ceRecordKind;
+        newRXData.ceQSO_Skiped := oldRXData_v1_6.ceQSO_Skiped;
+        newRXData.ceSendToServer := oldRXData_v1_6.ceSendToServer;
+        newRXData.ceNeedSendToServerAE := oldRXData_v1_6.ceNeedSendToServerAE;
+        newRXData.ceDupe := oldRXData_v1_6.ceDupe;
+        newRXData.PostalCode_old := oldRXData_v1_6.PostalCode_old;
+        newRXData.Prefix := oldRXData_v1_6.Prefix;
+        newRXData.Callsign := oldRXData_v1_6.Callsign;
+        newRXData.Age := oldRXData_v1_6.Age;
+        newRXData.ceWasSendInQTC := oldRXData_v1_6.ceWasSendInQTC;
+        newRXData.DomesticMult := oldRXData_v1_6.DomesticMult;
+        newRXData.DXMult := oldRXData_v1_6.DXMult;
+        newRXData.PrefixMult := oldRXData_v1_6.PrefixMult;
+        newRXData.ZoneMult := oldRXData_v1_6.ZoneMult;
+        newRXData.ExtMode := oldRXData_v1_6.ExtMode;
+        newRXData.ExchString := oldRXData_v1_6.ExchString;
+        newRXData.ceClass := oldRXData_v1_6.ceClass;
+        newRXData.Precedence := oldRXData_v1_6.Precedence;
+        newRXData.ceRadio := oldRXData_v1_6.ceRadio;
+        newRXData.Check := oldRXData_v1_6.Check;
+        newRXData.QTH := oldRXData_v1_6.QTH;
+        newRXData.DXQTH := oldRXData_v1_6.DXQTH;
+        newRXData.Radio := oldRXData_v1_6.Radio;
+        newRXData.DomMultQTH := oldRXData_v1_6.DomMultQTH;
+        newRXData.DomesticQTH := oldRXData_v1_6.DomesticQTH;
+        newRXData.Name := oldRXData_v1_6.Name;
+        newRXData.Power := oldRXData_v1_6.Power;
+        newRXData.NumberReceived := oldRXData_v1_6.NumberReceived;
+        newRXData.NumberSent := oldRXData_v1_6.NumberSent;
+        newRXData.RSTSent := oldRXData_v1_6.RSTSent;
+        newRXData.RSTReceived := oldRXData_v1_6.RSTReceived;
+        newRXData.QTHString := oldRXData_v1_6.QTHString;
+        newRXData.RandomCharsSent := oldRXData_v1_6.RandomCharsSent;
+        newRXData.TenTenNum := oldRXData_v1_6.TenTenNum;
+        newRXData.Chapter := oldRXData_v1_6.Chapter;
+        newRXData.ceClearDupeSheet := oldRXData_v1_6.ceClearDupeSheet;
+        newRXData.ceSearchAndPounce := oldRXData_v1_6.ceSearchAndPounce;
+        newRXData.Prefecture := oldRXData_v1_6.Prefecture;
+        newRXData.InhibitMults := oldRXData_v1_6.InhibitMults;
+        newRXData.Zone := oldRXData_v1_6.Zone;
+        newRXData.NameSent := oldRXData_v1_6.NameSent;
+        newRXData.Kids := oldRXData_v1_6.Kids;
+        newRXData.ceContest := oldRXData_v1_6.ceContest;
+        newRXData.QSOPoints := oldRXData_v1_6.QSOPoints;
+        newRXData.RandomCharsReceived := oldRXData_v1_6.RandomCharsReceived;
+        newRXData.ceClearMultSheet := oldRXData_v1_6.ceClearMultSheet;
+        newRXData.MP3Record := oldRXData_v1_6.MP3Record;
+        newRXData.ceOperator := oldRXData_v1_6.ceOperator;
+        // id left blank — not present in v1.6 files
+        Write(newFH, newRXData);
+        end;
+     CloseFile(oldFH_v1_6);
+     CloseFile(newFH);
+     end;
 
-  AssignFile(newFH, TR4W_LOG_FILENAME);
-  FileMode := fmOpenWrite;
-  Reset(newFH);
-
-  Seek(newFH, 1); // 0 relative to 1 is second record -- after the header
-  seek(oldFH, 1); // Skip old header
-  // Now read the log
-  while not EOF(oldFH) do
-  begin
-    Read(oldFH, oldRXData);
-    ClearContestExchange(newRXData);
-    newRXData.tSysTime := oldRXData.tSysTime;
-    newRXData.Band := oldRXData.Band;
-    newRXData.Mode := oldRXData.Mode;
-    newRXData.ceQSOID1 := oldRXData.ceQSOID1;
-    newRXData.ceQSOID2 := oldRXData.ceQSOID2;
-    newRXData.Frequency := oldRXData.Frequency;
-    newRXData.ceQSO_Deleted := oldRXData.ceQSO_Deleted;
-    newRXData.ceComputerID := oldRXData.ceComputerID;
-    newRXData.ceOperatorID := oldRXData.ceOperatorID;
-    newRXData.ceRecordKind := oldRXData.ceRecordKind;
-    newRXData.ceQSO_Skiped := oldRXData.ceQSO_Skiped;
-    newRXData.ceSendToServer := oldRXData.ceSendToServer;
-    newRXData.ceNeedSendToServerAE := oldRXData.ceNeedSendToServerAE;
-    newRXData.ceDupe := oldRXData.ceDupe;
-    newRXData.PostalCode_old := oldRXData.PostalCode_old;
-    newRXData.ZERO_01 := oldRXData.ZERO_01;
-    newRXData.Prefix := oldRXData.Prefix;
-    newRXData.ZERO_02 := oldRXData.ZERO_02;
-    newRXData.Callsign := oldRXData.Callsign;
-    newRXData.Age := oldRXData.Age;
-    newRXData.ceWasSendInQTC := oldRXData.ceWasSendInQTC;
-    newRXData.DomesticMult := oldRXData.DomesticMult;
-    newRXData.DXMult := oldRXData.DXMult;
-    newRXData.PrefixMult := oldRXData.PrefixMult;
-    newRXData.ZoneMult := oldRXData.ZoneMult;
-    newRXData.ceClass := oldRXData.ceClass;
-    newRXData.ZERO_04 := oldRXData.ZERO_04;
-    newRXData.Precedence := oldRXData.Precedence;
-    newRXData.ceRadio := oldRXData.ceRadio;
-    newRXData.Check := oldRXData.Check;
-    newRXData.QTH := oldRXData.QTH;
-    newRXData.DXQTH := oldRXData.DXQTH;
-    newRXData.ZERO_05 := oldRXData.ZERO_05;
-    newRXData.Radio := oldRXData.Radio;
-    newRXData.DomMultQTH := oldRXData.DomMultQTH;
-    newRXData.ZERO_06 := oldRXData.ZERO_06;
-    newRXData.DomesticQTH := oldRXData.DomesticQTH;
-    newRXData.ZERO_07 := oldRXData.ZERO_07;
-    newRXData.Name := oldRXData.Name;
-    newRXData.ZERO_08 := oldRXData.ZERO_08;
-    newRXData.Power := oldRXData.Power;
-    newRXData.ZERO_09 := oldRXData.ZERO_09;
-    newRXData.NumberReceived := oldRXData.NumberReceived;
-    newRXData.NumberSent := oldRXData.NumberSent;
-    newRXData.RSTSent := oldRXData.RSTSent;
-    newRXData.RSTReceived := oldRXData.RSTReceived;
-    newRXData.QTHString := oldRXData.QTHString;
-    newRXData.ZERO_10 := oldRXData.ZERO_10;
-    newRXData.RandomCharsSent := oldRXData.RandomCharsSent;
-    newRXData.TenTenNum := oldRXData.TenTenNum;
-    newRXData.Chapter := oldRXData.Chapter;
-    newRXData.ZERO_11 := oldRXData.ZERO_11;
-    newRXData.ceClearDupeSheet := oldRXData.ceClearDupeSheet;
-    newRXData.ceSearchAndPounce := oldRXData.ceSearchAndPounce;
-    newRXData.Prefecture := oldRXData.Prefecture;
-    newRXData.InhibitMults := oldRXData.InhibitMults;
-    newRXData.Zone := oldRXData.Zone;
-    newRXData.NameSent := oldRXData.NameSent;
-    newRXData.Kids := oldRXData.Kids;
-    newRXData.ceContest := oldRXData.ceContest;
-    newRXData.QSOPoints := oldRXData.QSOPoints;
-    newRXData.RandomCharsReceived := oldRXData.RandomCharsReceived;
-    newRXData.ZERO_13 := oldRXData.ZERO_13;
-    newRXData.ceClearMultSheet := oldRXData.ceClearMultSheet;
-    newRXData.MP3Record := oldRXData.MP3Record;
-    newRXData.res3 := oldRXData.res3;
-    newRXData.ceOperator := oldRXData.ceOperator;
-    newRXData.res15 := oldRXData.res15;
-    newRXData.res16 := oldRXData.res16;
-    newRXData.res17 := oldRXData.res17;
-    newRXData.res18 := oldRXData.res18;
-    newRXData.res19 := oldRXData.res19;
-    newRXData.res20 := oldRXData.res20;
-    newRXData.res21 := oldRXData.res21;
-    newRXData.res22 := oldRXData.res22;
-    newRXData.res23 := oldRXData.res23;
-    if oldRXData.Mode = CW then
-    begin
-      newRXData.extMode := eCW;
-    end
-    else if oldRXData.Mode = Phone then
-    begin
-      newRXData.ExtMode := eSSB;
-    end
-    else if oldRXData.Mode = Digital then
-    begin
-      newRXData.ExtMode := eRTTY;
-    end;
-    newRXData.ExchString := oldRXData.QTHString;
-    Write(newFH, newRXData);
-  end;
-
-  CloseFile(oldFH);
-  CloseFile(newFH);
   Result := true;
 end;
 (*----------------------------------------------------------------------------*)

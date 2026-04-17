@@ -11,6 +11,7 @@ uses
 
 
 function GetOSInfo: string;
+function GetWindowsBuildDetail: string;
 
 var
   GetProductInfo: function (dwOSMajorVersion, dwOSMinorVersion,
@@ -323,7 +324,7 @@ begin
       begin
       if OSVI_NT.wProductType = VER_NT_WORKSTATION then
          begin
-         if OSVI_NT.dwBuildNumber = 22000 then
+         if OSVI_NT.dwBuildNumber >= 22000 then
             begin
             Result := 'Windows 11 ';
             end
@@ -411,6 +412,34 @@ begin
     Result := 'Unknown';
   end;{ OSVI_NT.dwPlatformId }
 end;{ GetOSInfo }
+
+function GetWindowsBuildDetail: string;
+const
+  REG_KEY = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion';
+var
+  Reg: TRegistry;
+  sDisplay, sBuild: string;
+  nUBR: integer;
+begin
+  Result := '';
+  Reg := TRegistry.Create;
+  try
+    Reg.RootKey := HKEY_LOCAL_MACHINE;
+    if Reg.OpenKeyReadOnly(REG_KEY) then
+       begin
+       try
+         sDisplay := Reg.ReadString('DisplayVersion');
+         sBuild   := Reg.ReadString('CurrentBuildNumber');
+         nUBR     := Reg.ReadInteger('UBR');
+         Result   := sDisplay + ' (Build ' + sBuild + '.' + IntToStr(nUBR) + ')';
+       finally
+         Reg.CloseKey;
+       end;
+       end;
+  finally
+    Reg.Free;
+  end;
+end;
 
 initialization
   @GetProductInfo := GetProcAddress(GetModuleHandle('KERNEL32.DLL'),
