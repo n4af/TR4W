@@ -781,3 +781,374 @@ The repository was first committed on April 25, 2014 at version 4.30.3 by Howard
 ---
 
 *This changelog was generated from the Git commit history of the [n4af/TR4W](https://github.com/n4af/TR4W) repository on March 19, 2026.*
+
+---
+
+## Pre-GitHub History (2009–2012) — UA4WLI
+
+> The following release history predates the GitHub repository. It was recorded by
+> Dmitriy Gulyaev (UA4WLI), the original author of TR4W, in `src/uHistory.pas`.
+> Versions span 4.162 through 4.247, covering September 2009 through December 2012.
+
+### 2009
+
+#### 4.162 (September 24, 2009) — UA4WLI
+
+- **Revised:** Code optimization: cty.dat processing
+- **Added:** Support of R9W-UW9WK-MEMORIAL contest
+
+#### 4.167 (October 2, 2009) — UA4WLI
+
+- **Added:** New commands: RADIO ONE WIDE CW FILTER RADIO TWO WIDE CW FILTER Actuals for FT747GX, FT840, FT890, FT900, FT990, FT1000 rigs. Set width of CW filter
+
+#### 4.168 (October 11, 2009) — UA4WLI
+
+- **Fixed:** lame_enc.dll usage
+- **Fixed:** Winkeyer - silence after sending n messages
+- **Revised:** Changed appearance and location of new tour window in multi tours contests
+
+#### 4.169 (October 12, 2009) — UA4WLI
+
+- **Fixed:** Winkeyer usage with old firmware
+
+#### 4.173 (October 29, 2009) — UA4WLI
+
+- **Fixed:** Display of "MULT" indicator
+- **Fixed:** Usage of "REMAINING MULTS" reserved keyword in cty.dat
+- **Fixed:** Exhange parser in ARRL-SS contest
+- **Fixed:** Zones definition for Asiatic Russia
+
+#### 4.172 (October 29, 2009) — UA4WLI
+
+- **Fixed:** Usage of SINGLE BAND SCORE command
+- **Fixed:** Import from ADIF v.2
+
+#### 4.175 (October 31, 2009) — UA4WLI
+
+- **Fixed:** Usage of CALLSIGN UPDATE ENABLE with more then one callsign in exchange window
+- **Added:** Additional way to load in remaining mults list - use REMAININGMULTS.TXT in log path
+
+#### 4.177 (November 3, 2009) — UA4WLI
+
+- **Fixed:** Filling Exchange Window with previous exchanges in Ukrainian DX Contest
+- **Fixed:** Serial number lockout when all client staions are in S&P mode
+- **Revised:** Changed method of mode setting for Icom rigs (to fix problem with IC718)
+
+#### 4.178 (November 8, 2009) — UA4WLI
+
+- **Revised:** Leading zero for checks in Cabrillo file for ARRL-SS
+- **Added:** Processing of WEIGHT command
+
+#### 4.179 (November 11, 2009) — UA4WLI
+
+- **Fixed:** Azimuth display
+- **Fixed:** Dupes display in bandmap for spots coming from telnet cluster
+- **Revised:** Default value of QSO BY MODE in ARRL-SS set to FALSE
+
+#### 4.181 (November 24, 2009) — UA4WLI
+
+- **Revised:** Network PTT lockout will work only for stations with PTT LOCKOUT=TRUE. Stations with PTT LOCKOUT=FALSE will not interfere to stations with PTT LOCKOUT=TRUE
+- **Revised:** Corrected points calculation for LZLZ Qs in LZ DX contest
+- **Added:** New command - DVP RECOREDER - defines a program that will be used for editing and playing audio files
+
+#### 4.182 (November 26, 2009) — UA4WLI
+
+- **Fixed:** BAND MAP CUTOFF FREQUENCY for 40m
+- **Fixed:** PTT LOCKOUT with Winkeyer
+
+#### 4.183 (December 4, 2009) — UA4WLI
+
+- **Added:** Support of EXECUTE, LASTSPFREQ and LASTCQFREQ special commands
+- **Added:** New menu item - Ctrl- -> Execute configuration file
+- **Added:** Support of TAC (TOPS Activity Contest) contest
+- **Added:** Colored spots in DX CLuster window: red color - new mult, gray color - dupe
+
+#### 4.186 (December 6, 2009) — UA4WLI
+
+- **Added:** Support of TUNE ALT-D ENABLE command
+- **Added:** "Send inactive rig to the frequency" in bandmap popup menu will tune the inactive radio to spot frequency and load the callsign into the Alt-D buffer
+- **Added:** Support of DARC-10M, RADIO-MEMORY, REF-CW and REF-SSB contests
+- **Added:** Support of IC-910H rig
+
+#### 4.187 (December 21, 2009) — UA4WLI
+
+- **Fixed:** Loss of focus in callsign and exchange windows
+- **Fixed:** Polling of FT450
+- **Added:** Support of BLACK SEA CUP contest
+- **Added:** Login function in networked mode - "Net" -> "Log in". Callsign of current operator displayed in log and in right bottom part of the main window
+
+### 2010
+
+#### 4.191 (January 11, 2010) — UA4WLI
+
+- **Fixed:** AUTO QSO NUMBER DECREMENT usage
+- **Fixed:** Multipliers calculation in BLACK SEA CUP
+- **Fixed:** Truncation of the first character in CW mode
+- **Added:** "Latest config file" button in start window
+- **Added:** Added S48P14DC.DOM file in DOM directory
+- **Fixed:** Display of TEN MINUTE RULE counter
+- **Revised:** Off-time for calculation of "Operating Time" changed to 30 minutes
+- **Revised:** Enabled "Help" -> "Check the latest version" menu item
+- **Revised:** New appearance of "Summary" report
+- **Revised:** Changed "CT1BOH info screen" window
+- **Added:** Export of log to EDI format
+
+#### 4.192 (January 13, 2010) — UA4WLI
+
+- **Fixed:** NO POLL DURING PTT usage
+- **Removed:** Removed JST245 rig
+- **Added:** New compressing method of executable file
+
+#### 4.195 (February 2, 2010) — UA4WLI
+
+- **Added:** Code optimization
+- **Added:** New menus:
+- **Added:** Usage of WK PTT line in phone mode
+- **Added:** Support of K3 rig
+- **Removed:** Command SERIAL PORT DEBUG is no longer supported. Use instead Portmon program.
+- **Added:** Winkeyer settings stored as configuration commands in tr4w.ini file
+- **Removed:** INPUT CONFIG FILE command is no longer processed
+- **Fixed:** Import from ADIF file with tags in mixed case
+- **Added:** Menu bar in file preview window
+
+#### 4.196 (February 7, 2010) — UA4WLI
+
+- **Added:** Use of own driver tr4wio.sys for access to parallel ports. DLPORTIO driver is no longer used
+- **Fixed:** Missed STROBE signal (pin 1) at keying with parralel port
+- **Added:** For observation of status of parallel port you may use tr4wlptmonitor.exe v.1.02 which is included in this release
+
+#### 4.197 (February 10, 2010) — UA4WLI
+
+- **Added:** Editable BAND MAP CUTOFF FREQUENCY and FREQUENCY MEMORY commands
+
+#### 4.198 (February 14, 2010) — UA4WLI
+
+- **Fixed:** Rewritted routines of determining of countries and multipliers
+
+#### 4.200 (February 27, 2010) — UA4WLI
+
+- **Fixed:** Two radio mode with Winkeyer
+- **Fixed:** Split mode in FT1000MP
+- **Fixed:** FREQUENCY MEMORY for 160m
+- **Fixed:** IC735 polling
+- **Fixed:** Orion polling
+- **Added:** Editable color/background of exchange window
+
+#### 4.206 (March 5, 2010) — UA4WLI
+
+- **Fixed:** Creating new CFG file
+- **Added:** New menu item - Tools -> WA7BNM
+- **Added:** Auto CQ in phone mode
+- **Added:** AUTO QSL INTERVAL in phone mode
+- **Fixed:** Installation error
+- **Fixed:** Cleaning of exchange window
+
+#### 4.207 (March 12, 2010) — UA4WLI
+
+- **Fixed:** QSO edit
+- **Fixed:** SHOW DOMESTIC MULTIPLIER NAME
+- **Added:** New menu item - "Help" -> "Send bug report"
+- **Added:** New special commands: CLEARDUPESHEET, CLEARMULTSHEET, BOOLSWAP=CTRL-J_BOOLEAN_COMMAND where CTRL-J_BOOLEAN_COMMAND - Ctrl-J boolean type command (i.e. BOOLSWAP=SHOW DOMESTIC MULTIPLIER NAME)
+
+#### 4.208 (March 14, 2010) — UA4WLI
+
+- **Fixed:** Time synchronize
+- **Fixed:** "Stations" window
+- **Added:** Support of IC78 rig
+- **Revised:** For ICOM`s users: If necessary program will ask to "Disable "CI-V Transceive" mode in your ICOM rig." (in most cases via rig menu). Refer to rig user manual for details
+
+#### 4.218 (April 19, 2010) — UA4WLI
+
+- **Fixed:** Quality of the recorded MP3 files
+- **Fixed:** Alt-K in phone mode
+- **Fixed:** WK AUTOSPACE, WK CT SPACING, WK KEYER MODE, WK PADDLE SWAP
+- **Fixed:** Usage of CQ SSB EXCHANGE and QUICK QSL SSB MESSAGE comands
+- **Fixed:** IC781 mode polling
+- **Fixed:** Orion polling
+- **Fixed:** FT857, FT897 frequency setting
+- **Revised:** GAGARIN CUP QSO points calculation
+- **Added:** Support of "CI-V transcieve" mode
+- **Added:** New special command - SENDMESSAGE. Equivalent of "Net" -> "Send message" menu item
+- **Revised:** If SERIAL NUMBER LOCKOUT=1 in tr4wserver.exe settings then locked numbers will be displayed with the "L" suffix in "QSO NUMBER" window
+- **Added:** New command - RADIO ONE/TWO ICOM FILTER BYTE. Values: 0 - disable filter width control; 1,2,3 - Wide, Normal, Narrow filters. Applicable only for ICOM`s rigs
+
+#### 4.219 (April 28, 2010) — UA4WLI
+
+- **Fixed:** Crash on MP3 RECORDER SAMPLERATE command
+- **Added:** Support of skimmers spots
+
+#### 4.220 (May 19, 2010) — UA4WLI
+
+- **Fixed:** Definition of country for /MM callsigns
+- **Fixed:** Logging of Sicily callsigns in ARI contest
+- **Fixed:** MMAA contest - callsign overwrite if CALLSIGN UPDATE ENABLE=TRUE
+- **Fixed:** Overwrite of user function keys messages by defaults
+- **Fixed:** Points/multipliers calculation, default exchange number in WRTC contest
+- **Fixed:** Default value of ICOM RESPONSE TIMEOUT increased to 60 ms
+- **Revised:** Updated QSO POINT METHOD, MINNESOTA_CTY.DOM and MINNESOTA.DOM files for MINNESOTA QSO PARTY in accordance with new rules
+- **Revised:** Usage of old "Tools" -> "Synchronize PC time" dialog window
+- **Added:** Support of CWOPS contest
+
+#### 4.229 (August 24, 2010) — UA4WLI
+
+- **Fixed:** DARC-WAEDC - corrected multipliers calculation for EU stations
+- **Added:** RDAC and YODX contests - determination of domestic multiplier by callsign. Determination based on previous Qs data and initial.ex
+- **Added:** Determination of domestic multiplier on the basis of exchange number
+- **Fixed:** START SENDING NOW KEY function for callsigns with slash
+- **Fixed:** Telnet/Bandmap window - reject of spots with frequency > 430 MHz
+- **Added:** "Possible calls" function with using of (tr)master.dta
+- **Added:** Support of ICOM IC-7200 transceiver
+- **Added:** TR-LOG style of dupesheet window. Command COLUMN DUPESHEET ENABLE not processed
+- **Added:** Display of multipliers in "Remaining mults" window in European HF Championship
+- **Added:** Processing of MY ZONE command
+- **Added:** Common (for all contests) function keys messages may be stored in ../TR4W/COMMONMESSAGES.INI file
+- **Added:** Logging of BP100 callsign
+- **Added:** usage of ADD DOMESTIC COUNTRY = CLEAR
+- **Added:** ICOM RESPONSE TIMEOUT command not processed. Value of ICOM RESPONSE TIMEOUT determined by the program based on the value of RADIO ONE/TWO BAUD RATE
+- **Added:** Support of OZHCR-VHF
+- **Added:** Support of RAC CANADA DAY
+- **Added:** MESSAGE ENABLE command
+- **Added:** EUROPEAN VHF contest: for 9A paricipants points calculate according with Croatien VHF contest rules
+- **Added:** PTT signal in FM mode
+- **Added:** Updated IARUHQ.DOM file
+- **Added:** defination of grid for UA/UA9 stations
+- **Added:** "Initial exchange" function (initial.ex) enabled for WRTC contest
+- **Added:** New special command - WK_RESET - resets the Winkeyer2 processor to the power up state. Example - CQ CW MEMORY CONTROLF4=`WK_RESET`
+- **Added:** New special command - WK_SWAPTUNE - swap Winkeyer2 tune function
+- **Added:** Default value of CUSTOM CARET changed to TRUE
+- **Added:** Default value of DISTANCE MODE changed to KM
+
+#### 4.231 (December 4, 2010) — UA4WLI
+
+- **Fixed:** Default value of CALLSIGN UPDATE ENABLE for ARRL-SS-CW and ARRL-SS-SSB is set to TRUE
+- **Added:** Enter a 2 or 3 digit number in the Call Window followed by a CTRL-P would cause the rotator to point in the direction in degrees indicated by the numbers
+- **Added:** New multipliers file - ARRL10.DOM
+- **Fixed:** Export to ADIF format for WAG and ARRL-SS contests
+- **Fixed:** Support of "EXCHANGERADIOS" special command (`EXCHANGERADIOS`)
+- **Added:** QSK keying if KEYER OUTPUT PORT = PARALLEL and PTT ENABLE = FALSE
+- **Added:** Forming exchange string for contests with EXCHANGE RECEIVED=RST ZONE
+- **Added:** Country definition of R*2 callsigns
+- **Added:** DX Clutser: support of OL5Q skimmer (217.75.211.40:7300) spots format
+- **Added:** Contests with EXCHANGE RECEIVED = QSO NUMBER NAME DOMESTIC OR DX QTH (US QSO parties): parsing of exchange strings like 222VE3
+- **Added:** Export to ADIF in NAQP contest
+- **Added:** Two radio dupe sheet windows
+- **Added:** Improved manual input of frequency in callsign window
+- **Added:** Changed polling logic for Kenwood`s rigs
+
+### 2011
+
+#### 4.233 (February 3, 2011) — UA4WLI
+
+- **Fixed:** Fixes
+- **Added:** Support of CQ-WPX-RTTY
+- **Added:** Support of NAQP-RTTY contest (MMTTY version)
+- **Fixed:** Corrected S48.DOM file
+- **Fixed:** New multipliers determination in NAQP
+- **Added:** Updated PMC.DOM file
+- **Added:** Removed "VER" as an alias for Vermont in S48.DOM file
+- **Added:** Identification of Guantanamo Bay (KG4) callsigns
+
+#### 4.234 (March 8, 2011) — UA4WLI
+
+- **Added:** New command QZB RANDOM OFFSET ENABLE ( default value = FALSE)
+- **Fixed:** "Send spot" - sending spots only for "my log"
+- **Added:** Support of NAQP-RTTY contest (MMTTY version)
+- **Fixed:** No program interruption if RELAY CONTROL PORT = PADDLE PORT
+- **Fixed:** Fixes for NAQP-RTTY
+- **Added:** New command `MM_CLEAR_THE_TX_BUFFER`
+- **Added:** New command `MM_SWITCH_TO_TX`
+- **Added:** New command `MM_SWITCH_TO_RX_IMMEDIATELY`
+- **Added:** New command `MM_SWITCH_TO_RX_ AFTER_THE_TRANSMISSION_IS_COMPLETED`
+- **Fixed:** Alt+P->O in phone mode
+- **Fixed:** Identification of russian oblast by callsign
+- **Added:** Support of NA-SPRINT-RTTY (MMTTY version)
+- **Added:** Auto CQ in RTTY mode
+
+#### 4.221 (May 24, 2011) — UA4WLI
+
+- **Fixed:** Garbage in Alt-D callsign
+- **Added:** Determination of new mult if MULT BY BAND = FALSE
+- **Added:** Default value of INITIAL EXCHANGE for CWOPS contest is set to NAME QTH
+- **Fixed:** BAND MAP CALL WINDOW ENABLE = TRUE will not work if callsign in CALLSIGN WINDOW is typed by operator or if spot`s callsign = MY CALL
+
+#### 4.236 (July 4, 2011) — UA4WLI
+
+- **Added:** Added support of CWOPEN contest
+- **Revised:** Corrected ARRLSECT.DOM file
+
+#### 4.239 (October 9, 2011) — UA4WLI
+
+- **Added:** Initial exchange in OZCHR-TEAMS contest
+- **Fixed:** LEAVE CURSOR IN CALL WINDOW
+- **Revised:** Support of RSGB-ROPOCO-CW and RSGB-ROPOCO-SSB contests (revision)
+- **Fixed:** Drop-down commands list in "DX-cluster window"
+- **Fixed:** "Tools" -> "Synchronize PC time" -> "Synchronize clock" : display error if program does not running with Administrator Privileges"
+- **Fixed:** Country determination for RI1FJ and RI1MV callsigns
+- **Fixed:** Score calculation in DARC-WAEDC
+- **Fixed:** Drop-down list with addresses in "DX-Cluster" window
+- **Added:** New menu item in bandmap popup-menu - "BAND MAP MULTS ONLY"
+- **Fixed:** Multipliers calculation in CQ-M and OZCHR-TEAMS contests. Corrected r150s.dat file
+- **Revised:** Renamed ARI contest to ARI-DX. Added MB multiplier to ari.dom
+- **Revised:** ARRL-FD contest: corrected score calculation, score calculated without power multipliers; added export to cabrillo
+- **Revised:** Support of MAKROTHEN-RTTY contest
+- **Added:** QSO NUMBER BY BAND command
+
+#### 4.241 (December 7, 2011) — UA4WLI
+
+- **Fixed:** EXCHANGERADIOS function key command
+- **Fixed:** MP3 PLAYER command
+- **Revised:** "0" value in total window don`t displayed
+- **Added:** New command MAIN CALLSIGN
+- **Added:** Import from ADIF: handling of PRECEDENCE, CHECK, ARRL_SECT tags
+- **Revised:** Values of SCORE POSTING URL and SCORE READING URL commands changed to http://cqcontest.ru
+- **Fixed:** QSOB4.WAV message in phone mode
+- **Fixed:** INITIAL EXCHANGE CURSOR POS = AT END. If INITIAL EXCHANGE OVERWRITE = TRUE then cursor always will be placed at the end of exchange window
+- **Revised:** Changed windows names: "TEN MINUTS" > "TEN MINUTES", "LOCATOR" > "GRID LOCATOR"
+
+### 2012
+
+#### 4.243 (January 4, 2012) — UA4WLI
+
+- **Fixed:** Added HI identifier in HAWAII.DOM file
+- **Fixed:** Added EWA identifier in ARRLSECT.DOM file
+- **Fixed:** Truncating frequency in bandmap
+- **Added:** Check of filling of LOCATION field in ARRL-10 contest
+- **Fixed:** Exchange parsing in ARRL-FD contest
+- **Revised:** Command BANDMAP ITEM HEIGHT renamed to BAND MAP ITEM HEIGHT
+- **Revised:** Command BANDMAP ITEM WIDTH renamed to BAND MAP ITEM WIDTH
+- **Revised:** Window "SP COUNTER" renamed to "S&P COUNTER""
+- **Revised:** Default value of POSSIBLE CALL MODE changed to ALL
+- **Added:** Support of ARRL-RTTY contest
+
+#### 4.244 (February 25, 2012) — UA4WLI
+
+- **Revised:** Corrected PMC.DOM file
+- **Fixed:** Corrected UI of "New contest" window
+- **Added:** Processing of RX_PWR ADIF tag
+- **Added:** Import of frequency in kHz from ADIF file
+- **Fixed:** Value of EXCHANGE RECEIVED for DARC-10M contest changed to RST QSO NUMBER AND POSSIBLE DOMESTIC QTH
+- **Added:** Support of CQIR contest
+- **Added:** Support of WWIH (WORLD WIDE IRON HAM) contest
+
+#### 4.245 (May 9, 2012) — UA4WLI
+
+- **Added:** M (Multiplier) column in log show actual mults for QSO: x(DXCC), d(Domestic), z(Zone), p(Prefix)
+- **Revised:** MMAA contest renamed to CQMM. Corrected score calculation
+- **Added:** If LATEST CONFIG FILE is empty or file is not exist - button "Latest config file..." in "Open configuration file..." is not visible
+- **Revised:** Updated ARI.DOM file
+- **Added:** Support of ICOM IC7410 transceiver
+- **Added:** After program startup: if value of MY GRID is empty then the program will ask to enter your grid locator
+- **Added:** Prefill of exchange number in RDAC contest
+- **Revised:** "DVP" function renamed to "DVK" (Digital Voice Keyer).
+- **Added:** Added new command DVK LOCALIZED MESSAGES ENABLE.
+
+#### 4.246 (July 21, 2012) — UA4WLI
+
+- **Revised:** New ARRL Section for Canada in Sweepstakes and other ARRL contests
+- **Fixed:** Problem with NAQP Cabrillo file
+
+#### 4.247 (December 8, 2012) — UA4WLI
+
+- **Revised:** Corrected ARRLSECT.DOM file
+- **Revised:** New rules of RADIO-160 contest
+- **Added:** Support of YAESU FTDX3000 transceiver
