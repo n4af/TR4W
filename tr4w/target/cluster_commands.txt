@@ -2,6 +2,8 @@
 DIRECTORY
 -
 #AR-CLUSTER COMMANDS:
+baddata
+set/dx/filter call={} or (not skimmer and spottercont=NA) or ((skimmer and unique>2)
 SET/NOFILTER
 >SET FILTER
 SET/FILTER DXBANDMODE/PASS 160-CW
