@@ -5263,6 +5263,22 @@ begin
     TempBuffer1[4] := #0; //temp
     if PInteger(@TempBuffer1)^ <> CURRENTVERSIONASINTEGER then
     begin
+      // If the file is NEWER than this program we cannot safely open or convert
+      // it. Show a clear error and stop — never attempt a downgrade conversion.
+      if StrPas(TempBuffer1) > LOGVERSION then
+         begin
+         logger.Fatal('Log file version ' + StrPas(TempBuffer1) +
+            ' is newer than this program (' + LOGVERSION + ').' +
+            ' Upgrade TR4W to open this log.');
+         ShowMessage(PChar(
+            'This log file was created by a newer version of TR4W (' +
+            StrPas(TempBuffer1) + ').' + #13#10 +
+            'This program understands up to version ' + LOGVERSION + '.' + #13#10 +
+            'Please upgrade TR4W to open this log.'));
+         CloseLogFile;
+         Halt;
+         end;
+
       Format(wsprintfBuffer, TC_DIFVERSION, _LOGFILE, LogHeader.lhVersionString,
         TempBuffer1);
       showwarning(wsprintfBuffer);
