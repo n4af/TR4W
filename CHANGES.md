@@ -18,6 +18,33 @@
 
 ## 4.146.x — April 2026
 
+### 4.146.12 (2026-04-16) — NY4I
+
+#### Log Format v1.7 (`src/VC.pas`, `src/MainUnit.pas`, `src/TF.pas`, `src/trdos/LOGSUBS2.PAS`, `src/uEditQSO.pas`) — Issue #674, closes #768
+
+- **QSO GUID field**: `ContestExchange` gains an `id` field (GUID string via `TF.GetGUID`) giving each QSO a unique identifier; `sReserved` adds expansion space and freezes the v1.6 layout as `ContestExchangev1_6`.
+- **Log conversion**: `AskConvertLog` handles v1.5→v1.7 and v1.6→v1.7 with correct typed record reads and a prompt showing the source version. A read-only backup is created before any conversion begins.
+- **UDP broadcast fix**: `uEditQSO` correctly sends delete-then-add when editing a QSO; `LogEditedContactToUDP` added to `LOGSUBS2.PAS`.
+
+#### TR4WServer — Standalone Logging, Dependency Cleanup (`tr4wserver/src/tr4wserverUnit.pas`, `tr4wserver/tr4wserver.dpr`, `src/MainUnit.pas`)
+
+- **Removed TF/MainUnit dependency**: TR4WServer no longer pulls in the full TR4W application via `TF → MainUnit`; replaced with a standalone `InitServerLogger` using Log4D directly.
+- **Improved server logging**: received `ContestExchange` fields logged on each client message; bind/accept errors include the system error string.
+- **BuildServer.ps1**: new PowerShell build script for TR4WServer, matching the `FullBuild.ps1` pattern.
+- **Stale duplicate removed**: `tr4w/src/tr4wserverUnit.pas` caused the Delphi IDE to resolve the wrong unit via `.dof` SearchPath; removed to prevent build errors.
+- **`{$DEFINE TR4WSERVER}` workaround removed**: the conditional guard in `MainUnit.pas` around `AskConvertLog` is no longer needed.
+
+#### Windows Version Logging (`src/GetWinVersionInfo.pas`)
+
+- **Windows 11 detection fix**: corrected `dwBuildNumber >= 22000` threshold; reads registry `DisplayVersion`/`UBR` so the debug log shows the full friendly string, e.g. `Windows 11 25H2 (Build 26200.5074)`.
+
+#### Network Thread Observability (`src/uNet.pas`) — closes #768
+
+- **Server address in log**: `TryConnectToNetwork` logs `host:port` on each connection attempt.
+- **Thread exit confirmation**: `ConnectThread` logs its thread ID on exit, confirming cleanup and making thread lifecycle visible in the debug log.
+
+---
+
 ### 4.146.11 (2026-04-14) — NY4I
 
 #### CTY.DAT Auto-Update (`src/uCTYUpdate.pas`, `tr4w.dpr`, `src/uCFG.pas`, `src/MainUnit.pas`) — Issue #779
