@@ -20,6 +20,13 @@ http://www.gnu.org/licenses/gpl-3.0.txt
  }
 unit uInet;
 
+
+{**************************************************************************
+  This is dead code. Do not use this. Make use of the Indy HTTP (TIdHTTP).
+  There are several examples of doing this in the code
+  This module could be removed int he future
+  Tom Schaefer NY4I 2026-04-14
+***************************************************************************}
 interface
 
 uses

@@ -26,8 +26,10 @@ uses
   Windows,
   WinSock2,
   VC,
-  TF,
+  Log4D,
+  SysUtils,
   uCRC32,
+  Version,
   Messages;
 const
 
@@ -223,6 +225,9 @@ var
 //  SetPointerEvent                       : Cardinal;
   BytesWritten                          : Cardinal;
 
+  logger                                : TLogLogger;
+  appender                              : TLogRollingFileAppender;
+
   LastDisplayedBytesRCVD                : Cardinal = 0;
   LastDisplayedBytesSEND                : Cardinal = 0;
 
@@ -283,6 +288,7 @@ procedure SetComputerID(ID: Char; s: TSocket);
 procedure SetStatus(Status: TClientStatus; s: TSocket);
 procedure SendSpotViaNet(Status: TSendSpotViaNetwork; s: TSocket);
 function CorrectPassword(s: TSocket; BytesReceived: integer): boolean;
+procedure InitServerLogger;
 //procedure LoadinMultsFrequencies;
 //procedure SaveMultsFrequencies;
 //procedure SendMFToClients;
@@ -315,6 +321,16 @@ begin
   RunServer;
 end;
 
+procedure InitServerLogger;
+begin
+  appender := TLogRollingFileAppender.Create('name', 'tr4wserver.log');
+  appender.Layout := TLogPatternLayout.Create('%d ' + TTCCPattern);
+  TLogBasicConfigurator.Configure(appender);
+  logger := TLogLogger.GetLogger('TR4WServer');
+  logger.Level := All;
+  logger.Info('TR4WServer starting');
+end;
+
 procedure RunServer;
 label
   UnSucc;
@@ -333,11 +349,11 @@ begin
   mysaddr.sin_port := htons(PortNumber);
   mysaddr.sin_addr.S_addr := 0;
   if WinSock2.bind(ServerSocket, @mysaddr, SizeOf(mysaddr)) <> 0 then
-  begin
-    ServerMessageBox(TF.SysErrorMessage(GetLastError), MB_OK or MB_ICONWARNING or MB_TOPMOST);
-//    tf.ShowSysErrorMessage('BIND');
-    goto UnSucc;
-  end;
+     begin
+     logger.Error('bind() failed on port ' + IntToStr(PortNumber) + ', error ' + IntToStr(GetLastError));
+     ServerMessageBox('bind() failed. Check that the port is not already in use. See tr4wserver.log for details.', MB_OK or MB_ICONWARNING or MB_TOPMOST);
+     goto UnSucc;
+     end;
   if listen(ServerSocket, maxclients) <> 0 then goto UnSucc;
   Windows.EnableWindow(GetDlgItem(ApplicationHandle, 103), False);
   Windows.EnableWindow(GetDlgItem(ApplicationHandle, 104), True);
@@ -434,11 +450,11 @@ begin
   for i := 1 to maxclients do
     if ClientsSoocketsArray[i].clSocket <> 0 then
     begin
-      Format(DisplayBuffer, '%s: %s', ClientsSoocketsArray[i].clIPAdr, ClientsSoocketsArray[i].clName);
+      StrPCopy(DisplayBuffer, SysUtils.Format('%s: %s', [string(ClientsSoocketsArray[i].clIPAdr), string(ClientsSoocketsArray[i].clName)]));
       Windows.SendDlgItemMessage(ApplicationHandle, 109, LB_ADDSTRING, 0, integer(@DisplayBuffer));
     end;
 
-  Format(DisplayBuffer, 'TR4WSERVER [%d]', nclients);
+  StrPCopy(DisplayBuffer, SysUtils.Format('TR4WSERVER [%d]', [nclients]));
   Windows.SetWindowText(ApplicationHandle, DisplayBuffer);
   Windows.SetDlgItemInt(ApplicationHandle, tsCLIENTS, nclients, False);
 end;
@@ -967,10 +983,23 @@ begin
 end;
 
 function sRecv(s: TSocket; var buf; Len: integer): integer;
+var
+  i    : integer;
+  sHex : string;
 begin
   Result := recv(s, buf, Len, 0);
   BytesRCVD := BytesRCVD + DWORD(Result);
   DisplayRCVDBytes;
+  logger.Debug('sRecv: ' + IntToStr(Result) + ' bytes received');
+  if logger.IsEnabledFor(Trace) and (Result > 0) then
+     begin
+     sHex := '';
+     for i := 0 to Result - 1 do
+        begin
+        sHex := sHex + IntToHex(PByteArray(@buf)^[i], 2) + ' ';
+        end;
+     logger.Trace('sRecv data: ' + sHex);
+     end;
 end;
 
 function tUpdateServerLog(UpdAction: UpadateAction): boolean;
