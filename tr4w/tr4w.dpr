@@ -573,7 +573,7 @@ begin
      externalLogger.loggerAddress := externalLoggerAddress;
      end;
   UpdateDebugLogLevel;
-  logger.debug('**************** Program Startup ************************');
+  //logger.debug('**************** Program Startup ************************');
   logger.info('DecimalSeparator = ' + DecimalSeparator);
   logger.debug('Current program version = %s',[TR4W_CURRENTVERSION]);
   logger.debug('Current TR4W Server version = %s',[TR4WSERVER_CURRENTVERSION]);
