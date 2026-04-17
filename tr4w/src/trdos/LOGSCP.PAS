@@ -29,6 +29,7 @@ uses
   utils_file,
   Windows,
   Messages,
+  Classes,
   uCallSignRoutines,
   uCTYDAT,
   //Country9,
@@ -239,6 +240,11 @@ type
 
     procedure ShowStatistics;
     procedure TransferNewData(OldData: DataBaseEntryRecord; var NewData: DataBaseEntryRecord);
+
+    { Iterates every entry in TRMASTER.DTA and collects non-empty operator
+      names (uppercased) into Names.  Uses a private file handle so it does
+      not disturb the shared TRMasterFileRead state used by SCP lookups. }
+    procedure BuildOperatorNameSet(Names: TStringList);
   end;
 
 const
@@ -252,11 +258,19 @@ const
 var
   CD                                    : CallDatabase {=
 
-  
+
  };
   CallsAlreadySaved                     : CallsAlreadySavedArrayPtr;
   NumberCallsAlreadySaved               : integer;
   PossibleCallList                      : PossibleCallRecord {= (NumberPossibleCalls: 0)};
+
+  { Sorted list of unique operator names (uppercased) built from TRMASTER.DTA.
+    Nil until InitOperatorNameSet is called.  Supports fast binary-search
+    lookups via NameInOperatorSet. }
+  OperatorNameSet                       : TStringList;
+
+procedure InitOperatorNameSet;
+function NameInOperatorSet(const AName: string): Boolean;
 
 function GetRandomLetter: Char;
 function GetRandomNumber: Char;
@@ -264,7 +278,8 @@ function GetRandomNumber: Char;
 implementation
 uses LogWind,
   uMaster,
-  MainUnit;
+  MainUnit,
+  SysUtils;
 
 function DoubleIndexCall(Call: CallString): boolean;
 
@@ -315,7 +330,7 @@ begin
   begin
     if MemoryAllocated > 0 then
       FreeMem(Buffer1, MemoryAllocated);
-      {wli îøèáêà 216 íà FreeMem}
+      {wli ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 216 ï¿½ï¿½ FreeMem}
     if (NumberBytes > MaximumMemoryToUse) or
       (NumberBytes < 0) then
       NumberBytes := MaximumMemoryToUse;
@@ -3165,6 +3180,94 @@ procedure CallDatabase.CheckDTAFile;
 
 begin
 
+end;
+
+{ --------------------------------------------------------------------------
+  Operator name set â€” built once from TRMASTER.DTA, searched by callers
+  that need to recognise a token as an operator name.
+  -------------------------------------------------------------------------- }
+
+procedure CallDatabase.BuildOperatorNameSet(Names: TStringList);
+{ Opens a private read handle to TRMASTER.DTA, walks every 37Ã—37 cell,
+  and adds each non-empty operator name (uppercased) to Names.
+  The shared TRMasterFileRead handle and CellBuffer state are untouched. }
+var
+   FileHandle  : HWND;
+   LocalBuf    : CellBufferObject;
+   X           : Integer;
+   Y           : Integer;
+   StartOffset : LONGINT;
+   EndOffset   : LONGINT;
+   NumBytes    : LONGINT;
+   EntryStr    : ShortString;
+   Rec         : DataBaseEntryRecord;
+begin
+   if not LoadInIndexArray then
+      Exit;
+   if not tOpenFileForRead(FileHandle, ActiveFilename) then
+      Exit;
+   FillChar(LocalBuf, SizeOf(LocalBuf), 0);
+   LocalBuf.MaximumMemoryToUse := BufferArraySize;
+   try
+      for X := 0 to 36 do
+         begin
+         for Y := 0 to 36 do
+            begin
+            StartOffset := SCPIndexArray^[X, Y];
+            { End offset = start of the next cell; the very last cell uses SCPEndOfFile }
+            if Y < 36 then
+               EndOffset := SCPIndexArray^[X, Y + 1]
+            else if X < 36 then
+               EndOffset := SCPIndexArray^[X + 1, 0]
+            else
+               EndOffset := SCPEndOfFile;
+            NumBytes := EndOffset - StartOffset;
+            if NumBytes <= 0 then
+               Continue;
+            if NumBytes > BufferArraySize then
+               NumBytes := BufferArraySize;
+            Windows.SetFilePointer(FileHandle, StartOffset, nil, FILE_BEGIN);
+            LocalBuf.LoadCellIntoBuffer('', FileHandle, NumBytes);
+            while LocalBuf.GetNextEntry(EntryStr) do
+               begin
+               ParseEntryToDataRecord(EntryStr, Rec);
+               if Rec.mName <> '' then
+                  Names.Add(UpperCase(Rec.mName));
+               end;
+            end;
+         end;
+   finally
+      LocalBuf.GoAway;
+      CloseHandle(FileHandle);
+      end;
+end;
+
+procedure InitOperatorNameSet;
+{ Builds OperatorNameSet from TRMASTER.DTA on first call (idempotent).
+  MasterFileExists is set at startup before ActiveFilename is populated,
+  so we do a live check here now that the contest has set the filename. }
+begin
+   if OperatorNameSet <> nil then
+      Exit;
+   CD.MasterFileExists := (CD.ActiveFilename[0] <> #0) and
+      FileExists(CD.ActiveFilename);
+   if not CD.MasterFileExists then
+      begin
+      logger.Debug('InitOperatorNameSet: TRMASTER.DTA not found â€” name lookup disabled');
+      Exit;
+      end;
+   OperatorNameSet            := TStringList.Create;
+   OperatorNameSet.Sorted     := True;
+   OperatorNameSet.Duplicates := dupIgnore;
+   CD.BuildOperatorNameSet(OperatorNameSet);
+   logger.Debug('OperatorNameSet: ' + IntToStr(OperatorNameSet.Count) +
+      ' names loaded from TRMASTER.DTA');
+end;
+
+function NameInOperatorSet(const AName: string): Boolean;
+begin
+   Result := (OperatorNameSet <> nil) and
+      (OperatorNameSet.IndexOf(UpperCase(AName)) >= 0);
 end;
 
 begin

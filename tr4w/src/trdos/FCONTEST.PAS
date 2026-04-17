@@ -1035,6 +1035,8 @@ begin
         //CQExchange := ' ' + MyFDClass + ' ' + MySection;
         //SearchAndPounceExchange := MyFDClass + ' ' + MySection;
         QSLMessage := '73 \ EE';
+        { Build operator name set from TRMASTER.DTA (lazy — no-op if already done) }
+        InitOperatorNameSet;
       end;
 
     QCWA:

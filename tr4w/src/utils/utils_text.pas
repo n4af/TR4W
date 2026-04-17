@@ -15,7 +15,7 @@ function StringHasLowerCase(InputString: Str160): boolean;
 function StringIsAllNumbers(InputString: Str160): boolean;
 function StringIsAllNumbersOrSpaces(InputString: Str160): boolean;
 function StringIsAllNumbersOrDecimal(InputString: Str160): boolean;
-function StringIsAllAlphanumericOrDash(InputString: Str160): boolean;
+function StringIsAllAlphanumericOrDash(InputString: Str160; bNoCase: boolean = false): boolean;
 function StringHasLetters(InputString: Str160): boolean;
 function StringWithFirstWordDeleted(InputString: Str160): Str160;
 
@@ -65,12 +65,17 @@ begin
   StringHas := pos(SearchString, LongString) <> 0;
 end;
 
-function StringIsAllAlphanumericOrDash(InputString: Str160): boolean;
+
+
+function StringIsAllAlphanumericOrDash(InputString: Str160; bNoCase: boolean = false): boolean;
 var
   CharPos                               : integer;
 begin
    StringIsAllAlphanumericOrDash := False;
    if InputString = '' then Exit;
+
+   if bNoCase then
+      InputString := UpperCase(InputString);
 
    for CharPos := 1 to length(InputString) do
       begin

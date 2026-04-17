@@ -640,6 +640,7 @@ function GetSentRSTFromExchangeString(var ExchangeString: ShortString {Str40}):
 procedure IncrementQTCCount(Call: CallString);
 function IsValidPOTAPark(const park: string): boolean;
 function IsValidCallsign(const callsign: string): boolean;
+function IsValidGUID(const guid: string): boolean;
 function IsValidUSCallsign(const callsign: string): boolean;
 function IsValidUSPrefix(const callsign: string): boolean;
 
@@ -4614,10 +4615,14 @@ var
   AllParks   : string;    // Space-separated list of all parks found (for SetLastPOTAExchange)
   IsFresh    : Boolean;   // True when this is a new contact, not a 2fer continuation
 begin
-  Result := False;
+  // POTA is free-form — any exchange (including empty) is valid. Always True.
+  Result             := True;
   RXData.RSTReceived := DefaultRST;
   RXData.RSTSent     := DefaultRST;
   RXData.QTHString   := '';
+  RXData.DomesticQTH := '';
+  RXData.Name        := '';
+  RXData.ExchString  := '';
 
   if Length(Exchange) = 0 then
      begin
@@ -4718,8 +4723,50 @@ begin
            // A second numeric token is RSTReceived (uncommon in POTA but valid).
            RXData.RSTReceived := StrToIntDef(Token, DefaultRST);
            end;
+        end
+     else if LooksLikeAState(UpperCase(Token)) then
+        begin
+        // State abbreviation (US or Canadian province) — store in DomesticQTH.
+        // First one wins; extras fall through to ExchString below.
+        if RXData.DomesticQTH = '' then
+           RXData.DomesticQTH := UpperCase(Token)
+        else
+           begin
+           if RXData.ExchString = '' then
+              RXData.ExchString := UpperCase(Token)
+           else
+              RXData.ExchString := RXData.ExchString + ' ' + UpperCase(Token);
+           end;
+        end
+     else if LooksLikeASection(UpperCase(Token)) then
+        begin
+        // ARRL section — store in DomesticQTH if not already taken by a state.
+        if RXData.DomesticQTH = '' then
+           RXData.DomesticQTH := UpperCase(Token)
+        else
+           begin
+           if RXData.ExchString = '' then
+              RXData.ExchString := UpperCase(Token)
+           else
+              RXData.ExchString := RXData.ExchString + ' ' + UpperCase(Token);
+           end;
+        end
+     else
+        begin
+        // Check the token against the TRMASTER.DTA name database.
+        // If it matches a known operator name, store it in Name (first match
+        // wins).  Unknown tokens go to ExchString as free-form notes.
+        // Either way the QSO is always saved — POTA exchange is free-form.
+        if NameInOperatorSet(Token) and (RXData.Name = '') then
+           RXData.Name := Token
+        else
+           begin
+           if RXData.ExchString = '' then
+              RXData.ExchString := Token
+           else
+              RXData.ExchString := RXData.ExchString + ' ' + Token;
+           end;
         end;
-     // Any other token (stray letters, punctuation) is silently skipped.
      end;
 
   // Record total park count so HandlePOTANextPark can display the right label
@@ -9290,6 +9337,28 @@ end;
 
 // ^[AaWaKkNn][a-zA-Z]?[0-9][a-zA-Z]{1,3}$/
 
+function IsValidGUID(const guid: string): boolean;
+var
+  regex: TPerlRegEx;
+begin
+  // create our regex instance, and we want to do a case insensitive search, in multiline mode
+  Result := false;
+  regex := TPerlRegEx.Create;
+  try
+     logger.debug('Checking if %s is a valid guid', [guid]);
+     regex.RegEx := '^[{]?[0-9a-fA-F]{8}-?([0-9a-fA-F]{4}-?){3}[0-9a-fA-F]{12}[}]?$';  // letters-hyphen-digits only;
+     regex.Subject := guid;
+
+     Result := regex.MatchAgain;
+  finally
+     regex.Free;
+  end;
+  if Result then
+  begin
+    logger.debug('%s is a valid GUID', [guid]);
+  end;
+end;
+
 function IsValidUSPrefix(const callsign: string): boolean;
 var
   regex: TPerlRegEx;
@@ -9373,7 +9442,8 @@ begin
   regex := TPerlRegEx.Create;
   try
     logger.debug('Checking if %s is a valid park', [park]);
-    regex.RegEx := '^([A-Za-z]{1,4})-(\d{1,5})$';  // letters-hyphen-digits only; rejects RST values like '59'
+   // regex.RegEx := '^([A-Za-z]{1,4})-(\d{1,5})$';  // letters-hyphen-digits only; rejects RST values like '59'      - Claude's version but this does not follow US-12345
+   regex.RegEx := '^([A-Za-z]{2})-(\d{4,5})$';  // letters-hyphen-digits only; rejects RST values like '59'
     //regex.RegEx := '^(?:\w{1,2}\d\/|\d\w\/|\w{1,2}\/)?+\w+[0-9]+\w+\/?\w*\s*$';  // Valid against all of LOTW file
 
     regex.Subject := park;

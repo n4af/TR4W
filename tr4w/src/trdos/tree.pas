@@ -862,6 +862,7 @@ function LineInput(Prompt: Str160;
 function LowerCase(const s: string): string;
 function LooksLikeAGrid(var GridString: ShortString): boolean;
 function LooksLikeAGridIgnoreAE(var GridString: ShortString): boolean;
+function LooksLikeAPOTAPark(park: string): boolean;
 function LooksLikeAState(state: string): boolean; // NY4I
 function LooksLikeASection(section: string): boolean;
 function Lpt1BaseAddress: Word;
@@ -3094,6 +3095,12 @@ begin
  }
 end;
 
+
+function LooksLikeAPOTAPark(park: string): boolean;
+begin
+   Result := IsValidPOTAPark(park);
+end;
+
 function LooksLikeAGrid(var GridString: ShortString): boolean;
 
 { If it does look like a grid, it will make the first two letters lower
@@ -3115,6 +3122,7 @@ begin
       (ActiveExchange = RSTQSONumberAndGridSquareExchange) or
       (ActiveExchange = GridExchange)  or
       (ActiveExchange = RSTNameAndQTHExchange) or // ny4i - Added for GeneralQSo to check if there is a grid in the exchange
+      (ActiveExchange = RSTAndPOTAPark) or        // ny4i Added so free-form POTA exchange can find a grid.
       (ActiveExchange = RSTAndGridExchange)) then
 
      begin
@@ -4738,6 +4746,7 @@ end;
 function LooksLikeAState(state: string): boolean;
 
 begin
+  Result := false;
   if (state = 'CA') or (state = 'TX') or (state = 'NY') or (state = 'FL') or
      (state = 'TX') or (state = 'PA') or (state = 'MA') or (state = 'NJ') or
      (state = 'WA') or (state = 'MD') or (state = 'DC') or
@@ -4768,6 +4777,7 @@ end;
 function LooksLikeASection(section: string): boolean;
 
 begin
+   Result := false;
    if (Section = 'AK') or (Section = 'AL') or (Section = 'AR') or
       (Section = 'AZ') or (Section = 'CO') or (Section = 'CT') or
       (Section = 'DE') or (Section = 'GA') or (Section = 'IA') or
