@@ -952,7 +952,11 @@ begin
             begin
             Val(CustomCMD, TempInteger, code);
             if code = 0 then
+               begin
                ColumnWidthOverride[TempColumn] := TempInteger;
+               logger.Debug('CheckCommand: COLUMN WIDTH %s = %d (col index %d)',
+                  [ColumnsArray[TempColumn].Text, TempInteger, Ord(TempColumn)]);
+               end;
             Result := True;
             Exit;
             end;

@@ -473,7 +473,7 @@ type
     tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
     tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
     tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
-    tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1
+    tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1, tAdifAPP_N1MM_ID, tAdifAPP_TR4W_ID,tAdifSIG, tAdifSIG_INFO, tAdifPOTAREF
     );
 var
   FreeMemCount: integer;
@@ -6669,13 +6669,20 @@ end;
 procedure EnsureListViewColumnVisible(h: HWND);
 var
   TempColumn: LogColumnsType;
+  ActualWidth: Integer;
 begin
   for TempColumn := logColBand to High(LogColumnsType) do
     if ColumnsArray[TempColumn].Enable then
       begin
       if ColumnWidthOverride[TempColumn] > 0 then
-        // User has manually sized this column — restore their saved width
-        ListView_SetColumnWidth(h, ColumnsArray[TempColumn].pos, ColumnWidthOverride[TempColumn])
+         begin
+         // User has manually sized this column — restore their saved width
+         ListView_SetColumnWidth(h, ColumnsArray[TempColumn].pos, ColumnWidthOverride[TempColumn]);
+         ActualWidth := ListView_GetColumnWidth(h, ColumnsArray[TempColumn].pos);
+         logger.Debug('EnsureListViewColumnVisible: %s pos=%d override=%d actual=%d',
+            [ColumnsArray[TempColumn].Text, ColumnsArray[TempColumn].pos,
+             ColumnWidthOverride[TempColumn], ActualWidth]);
+         end
       else if (TempColumn >= logColNumberReceive) and ColumnAutoSize then
         // Original auto-size behavior: unchanged from before Issue 866
         ListView_SetColumnWidth(h, integer(TempColumn), LVSCW_AUTOSIZE_USEHEADER);
@@ -7208,6 +7215,9 @@ var
   tempState: string;
   tempVE_Prov: string;
   tempARRL_Sect: string;
+  tempSIG: string;
+  tempPOTAREF: string;
+  tempSIG_INFO: string;
   saveDecimalSeparator: char;
 
 begin
@@ -7259,7 +7269,7 @@ begin
                 'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                 'STATE', 'STX', 'STX_STRING', 'SUBMODE', 'TEN_TEN',
                 'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN',
-                'QTH', 'PROGRAMID', 'APP_N1MM_EXCHANGE1'])) of
+                'QTH', 'PROGRAMID', 'APP_N1MM_EXCHANGE1', 'APP_N1MM_ID', 'APP_TR4W_ID','SIG', 'SIG_INFO', 'POTA_REF'])) of
               tAdifARRL_SECT: tempARRL_Sect := fieldValue;
               //exch.QTHString := fieldValue;
               tAdifBAND:
@@ -7410,6 +7420,17 @@ begin
                 begin
                   exch.Power := fieldValue;
                 end;
+              tAdifAPP_N1MM_ID, tAdifAPP_TR4W_ID:
+                 if IsValidGUID(fieldValue) then
+                    begin
+                    exch.id := fieldValue;
+                    end;
+              tAdifSIG:
+                 tempSIG := fieldValue;
+              tAdifSIG_INFO:
+                 tempSIG_INFO := fieldValue;
+              tAdifPOTAREF:
+                tempPOTARef := fieldValue;
 
             else
               if MidStr(fieldName, 1, 4) <> 'APP_' then
@@ -7559,7 +7580,32 @@ begin
         exch.DomesticQTH := tempSRX_String
       else // 4.105.12
         exch.QTHString := tempSRX_String;
-
+    POTA:
+       if IsValidPOTAPark(tempPOTARef) then
+          begin
+          if length(tempPOTAREF) = 0 then
+             begin
+             if ANSIUPPERCASE(tempSIG) = 'POTA' then
+                begin
+                if IsValidPOTAPark(tempSIG_INFO) then
+                   begin
+                   exch.QTHString := tempSIG_INFO;
+                   end;
+                end;
+             end
+          else
+             begin
+             exch.QTHString := tempPOTAREF;
+             end;
+          end
+       else
+          begin
+          if LooksLikeAState(tempState) then
+             begin
+             exch.QTHString := tempState;
+             exch.DomesticQTH := tempState;
+             end;
+          end;
     WWDIGI, ARRLDIGI:
       begin
         exch.ExchString := gridSquare;

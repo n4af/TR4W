@@ -1945,9 +1945,25 @@ begin
          begin
          WriteADIFField('MY_SIG','POTA');
          WriteADIFField('MY_SIG_INFO',myPark);
+         WriteADIFField('MY_POTA_REF',myPark);   // Newer ADIF field - Prior fields kept for backward compatibility
          // Use the normalized park ref (QTHString = 'US-1224') not the raw
          // exchange string ('1224') so SRX_STRING and SIG_INFO are consistent.
-         WriteADIFField('SRX_STRING', TempRXData.QTHString);
+         if LooksLikeAPOTAPark(TempRXData.QTHString) then
+            begin
+            WriteADIFField('SRX_STRING', TempRXData.QTHString);
+            end
+         else
+            begin
+            WriteADIFField('SRX_STRING', TempRXData.ExchString);
+            if LooksLikeAState(TempRXData.ExchString) then
+               begin
+               WriteADIFField('STATE', TempRXData.ExchString);
+               end
+            else if LooksLikeAGrid(TempRXData.ExchString) then
+               begin
+               WriteADIFField('GRIDSQUARE', TempRXData.ExchString);
+               end;
+            end;
          end
       else
          WriteADIFField('SRX_STRING', TempRXData.ExchString);
@@ -2052,8 +2068,13 @@ begin
               end;
             POTA:
                begin
-               WriteADIFField('SIG','POTA');
-               WriteADIFField('SIG_INFO',TempRXData.QTHString);
+               if LooksLikeAPOTAPark(TempRXData.QTHString) then
+                  begin
+                  WriteADIFField('SIG','POTA');
+                  WriteADIFField('SIG_INFO',TempRXData.QTHString);
+                  WriteADIFField('POTA_REF',TempRXData.QTHString); // Newer ADIF field - Prior fields kept for backward compatibility
+                  end;
+
                end;
             IOTA:
               begin
@@ -2099,7 +2120,7 @@ begin
         sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);          //n4af 04.30.2
       end;
 
-      if ExchangeInformation.QSONumber then
+      if true then // Write QSO number for all contests, not just when ExchangeInformation.QSONumber is set
       begin
         if TempRXData.NumberReceived <> -1 then
         begin
@@ -2209,6 +2230,8 @@ begin
       asm add esp,16 end;
       sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
 
+      // Write APP_TR4W_ fields
+      WriteADIFField('APP_TR4W_ID',TempRXData.id);
 
       sWriteFile(tReportFileWrite, '<EOR>'#13#10, 7);
     end;
