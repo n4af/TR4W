@@ -27,7 +27,10 @@ uses
    uRadioBand           in '..\..\src\uRadioBand.pas',
    uTestRadioBand       in 'uTestRadioBand.pas',
    uFlexRadioUtils      in '..\..\src\uFlexRadioUtils.pas',
-   uTestFlexRadioUtils  in 'uTestFlexRadioUtils.pas';
+   uTestFlexRadioUtils  in 'uTestFlexRadioUtils.pas',
+   VC                   in '..\..\src\VC.pas',
+   utils_text           in '..\..\src\utils\utils_text.pas',
+   uTestUtilsText       in 'uTestUtilsText.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -38,6 +41,7 @@ begin
    RegisterSuite(TIcomCIVTests.Create('IcomCIV'));
    RegisterSuite(TRadioBandTests.Create('RadioBand'));
    RegisterSuite(TFlexRadioUtilsTests.Create('FlexRadioUtils'));
+   RegisterSuite(TUtilsTextTests.Create('UtilsText'));
 
    if RunAllSuites then
       begin
