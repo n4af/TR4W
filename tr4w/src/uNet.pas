@@ -64,9 +64,9 @@ type
 
 const
 {$IF OZCR2008}
-  NetColumns                            = 11;
+  NetColumns                            = 12;
 {$ELSE}
-  NetColumns                            = 9;
+  NetColumns                            = 10;
 {$IFEND}
   NetColumnsArray                       : array[0..NetColumns - 1] of TNetWindowColumnsInfo =
     (
@@ -79,7 +79,8 @@ const
     (Width: 37; Text: 'PTT'; fmt: LVCFMT_CENTER),
     (Width: 40; Text: 'Qs'; fmt: LVCFMT_CENTER),
     (Width: 70; Text: RC_CALLSIGN; fmt: LVCFMT_LEFT),
-    (Width: 25; Text: 'D'; fmt: LVCFMT_CENTER)
+    (Width: 25; Text: 'D'; fmt: LVCFMT_CENTER),
+    (Width: 70; Text: 'Op'; fmt: LVCFMT_LEFT)
 //,    (Width: 50; Text: 'LN'; fmt: LVCFMT_LEFT)
 {$IF OZCR2008}
     ,
@@ -551,6 +552,9 @@ begin
         SetStatusByte;
         Windows.GetWindowText(wh[mweCall], @MyStationState.ssCallsign, SizeOf(MyStationState.ssCallsign));
       end;
+
+    sstOperator:
+      Windows.CopyMemory(@MyStationState.ssOperator, @CurrentOperator, SizeOf(OperatorType));
   end;
 
   MyStationState.ssType := ssType;
@@ -781,6 +785,9 @@ begin
         ListView_SetItemText(h, i, 8 - 1, StatusArray[Index].ssCallsign);
         ListView_SetItemText(h, i, 9 - 1, da[(StatusArray[Index].ssStatusByte and (1 shl 2)) <> 0]);
       end;
+
+    sstOperator:
+      ListView_SetItemText(h, i, 9, StatusArray[Index].ssOperator);
   end;
 
   //  ListView_SetItemText(h, I, 8, inttopchar(StatusArray[Index].ssCWElements));

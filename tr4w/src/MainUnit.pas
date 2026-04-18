@@ -3535,6 +3535,7 @@ begin
               Windows.CopyMemory(@CurrentOperator, @TempCallstring[1], 6);
               SetMainWindowText(mweCurrentOperator, CurrentOperator);
               Sheet.SaveRestartFile; // Issue 661 ny4i
+              SendStationStatus(sstOperator);
             end
             else
             begin
@@ -3546,6 +3547,7 @@ begin
             Windows.CopyMemory(@CurrentOperator, @TempCallstring[1], 6);
             SetMainWindowText(mweCurrentOperator, CurrentOperator);
             Sheet.SaveRestartFile; // Issue 661 ny4i
+            SendStationStatus(sstOperator);
           end
           else
           begin
