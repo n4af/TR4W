@@ -648,6 +648,16 @@ begin
 
     CloseHandle(f);
 
+    // If the user confirmed overwriting an existing contest, delete any
+    // existing .TRW log file.  LoadinLog fatally halts if the file size
+    // is not an exact multiple of SizeOf(ContestExchange), which will be
+    // true of any .TRW from a previous (different) contest.
+    lstrcpy(TempBuffer1, TR4W_CFG_FILENAME);
+    TempBuffer1[lstrlen(TempBuffer1) - 3] := 'T';
+    TempBuffer1[lstrlen(TempBuffer1) - 2] := 'R';
+    TempBuffer1[lstrlen(TempBuffer1) - 1] := 'W';
+    Windows.DeleteFile(TempBuffer1); // no-op (returns False) if no .TRW exists
+
     DestroyWindow(h);
   end
   else
