@@ -25,7 +25,7 @@ const
 
 
 
-TR4W_CURRENTVERSION_NUMBER            = '4.146.14' ;  // N4af     New Release
+TR4W_CURRENTVERSION_NUMBER            = '4.146.test' ;  // N4af     New Release
 
 
 

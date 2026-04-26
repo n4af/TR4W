@@ -5278,7 +5278,7 @@ begin
          CloseLogFile;
          Halt;
          end;
-
+ 
       Format(wsprintfBuffer, TC_DIFVERSION, _LOGFILE, LogHeader.lhVersionString,
         TempBuffer1);
       showwarning(wsprintfBuffer);

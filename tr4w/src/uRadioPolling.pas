@@ -731,17 +731,17 @@ const
    RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
    RECONNECT_MAX_DELAY = 30000;       // 30 seconds max delay
 
-   // SetRadioAlertState â€” set or clear RadioDisconnected flag and repaint freq/name
+   // SetRadioAlertState — set or clear RadioDisconnected flag and repaint freq/name
    // windows only on a state transition (guarded by current flag value).
    procedure SetRadioAlertState(alertOn: boolean);
    begin
       if alertOn = rig^.RadioDisconnected then
-         Exit;   // No change â€” do not call InvalidateRect unnecessarily
+         Exit;   // No change — do not call InvalidateRect unnecessarily
       rig^.RadioDisconnected := alertOn;
       if alertOn then
-         logger.Info('[pNetworkRadio] %s â€” alert color ON', [rig^.RadioName])
+         logger.Info('[pNetworkRadio] %s — alert color ON', [rig^.RadioName])
       else
-         logger.Info('[pNetworkRadio] %s â€” alert color OFF', [rig^.RadioName]);
+         logger.Info('[pNetworkRadio] %s — alert color OFF', [rig^.RadioName]);
       if rig^.FreqWindowHandle <> 0 then
          Windows.InvalidateRect(rig^.FreqWindowHandle, nil, False);
       if rig^.RadioNameWndHandle <> 0 then
@@ -775,10 +775,10 @@ begin
          // Radio is connected - poll status
          if not wasConnected then
             begin
-            logger.trace('[pNetworkRadio] Radio connected â€” querying initial freq/mode/state');
+            logger.trace('[pNetworkRadio] Radio connected — querying initial freq/mode/state');
             wasConnected := True;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
-            SetRadioAlertState(False);  // TCP reconnected â€” clear alert (operational check below)
+            SetRadioAlertState(False);  // TCP reconnected — clear alert (operational check below)
 
             // For serial radios that require active polling, honour the user-configurable
             // FREQUENCY POLL RATE setting (FreqPollRate, default 10ms, range 10-1000ms).
@@ -798,12 +798,12 @@ begin
             if Assigned(ro) then
                begin
                logger.Debug('[pNetworkRadio] Querying initial freq/mode');
-               ro.QueryActiveVFO;      // $07 $D2 â€” must be first so FActiveVFO is set before mode routing
+               ro.QueryActiveVFO;      // $07 $D2 — must be first so FActiveVFO is set before mode routing
                ro.QueryVFOAFrequency;
                ro.QueryVFOBFrequency;
-               ro.QueryMode;           // $04 â€” active VFO mode â†’ routed to FActiveVFO slot
-               ro.QueryVFOAMode;       // $26 $00 â€” inactive VFO A mode (when VFO B is active)
-               ro.QueryVFOBMode;       // $26 $01 â€” VFO B mode + data mode
+               ro.QueryMode;           // $04 — active VFO mode ? routed to FActiveVFO slot
+               ro.QueryVFOAMode;       // $26 $00 — inactive VFO A mode (when VFO B is active)
+               ro.QueryVFOBMode;       // $26 $01 — VFO B mode + data mode
                end;
 
             // Poll the remaining states that transceive does not push
@@ -814,14 +814,14 @@ begin
                end;
 
             // CW speed on initial connection:
-            // - CWSpeedSync OFF: program is master â€” push CodeSpeed to radio so they agree.
-            // - CWSpeedSync ON:  radio is master â€” do NOT push; leave the radio's speed alone.
+            // - CWSpeedSync OFF: program is master — push CodeSpeed to radio so they agree.
+            // - CWSpeedSync ON:  radio is master — do NOT push; leave the radio's speed alone.
             //   The $14 $0C query sent during connect will return ro.CWSpeed, and the
             //   polling loop below (ro.CWSpeed -> CodeSpeed sync) will apply it on the
             //   first cycle that sees a valid response.
             if not rig^.CWSpeedSync and (CodeSpeed >= 6) and Assigned(ro) then
                begin
-               logger.Debug('[pNetworkRadio] CWSpeedSync off â€” pushing program speed %d WPM to radio', [CodeSpeed]);
+               logger.Debug('[pNetworkRadio] CWSpeedSync off — pushing program speed %d WPM to radio', [CodeSpeed]);
                ro.SetCWSpeed(CodeSpeed);
                end;
             end;
@@ -851,7 +851,7 @@ begin
          // HamLib Direct: drain user commands first on every cycle (max 50ms latency),
          // then poll when an async callback fired or the heartbeat interval elapsed.
          // Set HAMLIB ASYNC ONLY = TRUE in cfg to disable the heartbeat and only
-         // poll on async callbacks â€” useful for testing whether transceive is working.
+         // poll on async callbacks — useful for testing whether transceive is working.
          if Assigned(ro) and (ro is THamLibDirect) then
             begin
             THamLibDirect(ro).DrainUrgentQueue;
@@ -873,7 +873,7 @@ begin
                lastHeartbeatTick := GetTickCount;
                end;
 
-            // RIT/XIT slow poll â€” every 5000ms independently of the main heartbeat.
+            // RIT/XIT slow poll — every 5000ms independently of the main heartbeat.
             // rig_get_rit/xit trigger $07 D0 side-effects in HamLib's Icom driver
             // which dismiss front-panel menus; polling infrequently keeps them usable.
             if GetTickCount - lastRITXITTick >= 5000 then
@@ -919,8 +919,8 @@ begin
          rig.CurrentStatus.VFO[VFOB].RITFreq := ro.RITOffset[nrVFOB];
          rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
 
-         // Sync CW speed from radio â†’ program (active radio only, when CWSpeedSync enabled)
-         // Only the active radio should update CodeSpeed â€” in SO2R, the inactive radio
+         // Sync CW speed from radio ? program (active radio only, when CWSpeedSync enabled)
+         // Only the active radio should update CodeSpeed — in SO2R, the inactive radio
          // may have a different speed and would otherwise fight the active radio.
          if rig^.CWSpeedSync and (ro.CWSpeed > 0) and (ro.CWSpeed <> CodeSpeed)
             and (rig = ActiveRadioPtr) then
@@ -930,7 +930,7 @@ begin
             DisplayCodeSpeed;  // Refreshes display and persists to SpeedMemory
             end;
 
-         // HamLib Direct skips this â€” SendPollRequests already logs individual values.
+         // HamLib Direct skips this — SendPollRequests already logs individual values.
          if TR4W_HAMLIB_DEBUG and not (ro is THamLibDirect) then
             logger.Info('[pNetworkRadio:%s] pre-UpdateStatus: VFOA=%d VFOB=%d split=%s VFOStatus=%d',
                [rig^.RadioName,
@@ -3111,7 +3111,7 @@ begin
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
                BandMapBand := ActiveBand;
                BandMapMode := ActiveMode;
-               BandMapNeedsRefresh := True; // coalesced via 250ms timer â€” avoids flash on every VFO poll
+               BandMapNeedsRefresh := True; // coalesced via 250ms timer — avoids flash on every VFO poll
             end;
       end
    else
@@ -3139,7 +3139,7 @@ begin
                BandMapMode := rig.FilteredStatus.Mode;
                VisibleDupeSheetChanged := True;
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
-               BandMapNeedsRefresh := True; // coalesced via 250ms timer â€” avoids flash on every VFO poll
+               BandMapNeedsRefresh := True; // coalesced via 250ms timer — avoids flash on every VFO poll
             end;
 
          //GAV End of added
@@ -3180,7 +3180,7 @@ begin
       rig.CurrentStatus.previousVFO[VFOA].Frequency then
       begin
          if TR4W_HAMLIB_DEBUG then
-            logger.Info('[DisplayCurrentStatus:%s] VFOA display update: %d â†’ %d',
+            logger.Info('[DisplayCurrentStatus:%s] VFOA display update: %d ? %d',
                [rig^.RadioName,
                 rig.CurrentStatus.previousVFO[VFOA].Frequency,
                 rig.CurrentStatus.VFO[VFOA].Frequency]);
@@ -3215,7 +3215,7 @@ begin
       rig.CurrentStatus.previousVFO[VFOB].Frequency then
       begin
          if TR4W_HAMLIB_DEBUG then
-            logger.Info('[DisplayCurrentStatus:%s] VFOB display update: %d â†’ %d',
+            logger.Info('[DisplayCurrentStatus:%s] VFOB display update: %d ? %d',
                [rig^.RadioName,
                 rig.CurrentStatus.previousVFO[VFOB].Frequency,
                 rig.CurrentStatus.VFO[VFOB].Frequency]);
@@ -3255,7 +3255,7 @@ begin
    if rig.CurrentStatus.PrevVFOStatus <> rig.CurrentStatus.VFOStatus then
       begin
          if TR4W_HAMLIB_DEBUG then
-            logger.Info('[DisplayCurrentStatus:%s] VFOStatus change: %d â†’ %d',
+            logger.Info('[DisplayCurrentStatus:%s] VFOStatus change: %d ? %d',
                [rig^.RadioName,
                 Ord(rig.CurrentStatus.PrevVFOStatus),
                 Ord(rig.CurrentStatus.VFOStatus)]);
@@ -3762,7 +3762,7 @@ procedure GetVFOInfoForYaesuFTX1(buf: PChar; var VFO: VFOStatusType;
    FrequencyAdder: integer);
    // FTX-1F/FTX-1R IF response layout (30 bytes total, Issue #817):
    //   Pos 1-2:   "IF"
-   //   Pos 3-7:   P1  VFO/memory channel (5 bytes â€” 2 longer than FTDX10's 3-byte P1)
+   //   Pos 3-7:   P1  VFO/memory channel (5 bytes — 2 longer than FTDX10's 3-byte P1)
    //   Pos 8-16:  P2  VFO frequency Hz (9 bytes)
    //   Pos 17:    P3  Clarifier direction (+/-)
    //   Pos 18-21: P3  Clarifier offset 0000-9990 Hz (4 bytes)
@@ -4187,7 +4187,7 @@ begin
    if which = 0 then
       begin
          rig.CurrentStatus.VFO[VFOA].Mode := mode;
-         rig.CurrentStatus.VFO[VFOA].ExtendedMode := em;  // was VFOB â€” copy-paste bug
+         rig.CurrentStatus.VFO[VFOA].ExtendedMode := em;  // was VFOB — copy-paste bug
          rig.CurrentStatus.Mode := mode;
          rig.CurrentStatus.ExtendedMode := em;
       end
