@@ -7204,7 +7204,7 @@ var
   c: string;
   cU: string; // Uppercase version of C for comparison
   theString: string;
-  i: integer;
+  i,j,k: integer;
   contest: ContestType;
   appHQ: string;
   recordFromWSJTX: boolean;
@@ -7369,12 +7369,13 @@ begin
               tAdifRX_PWR: exch.Power := fieldValue;
               tAdifSRX: exch.NumberReceived := StrToInt(fieldValue);
               tAdifSRX_STRING: tempSRX_String := fieldValue;
-              (*begin
+             (*begin
+              
               if not recordFromWSJTX then
-              begin
+            //  begin
               ProcessImportedSRX_String(fieldValue, exch);
               end;
-              end; *)
+               end; *)
               tAdifSTATE:
                 tempState := fieldValue;
               (*if Length(exch.QTHString) = 0 then
@@ -7625,8 +7626,16 @@ begin
     end
     else
     begin
-      exch.ExchString := tempSRX_String;
-    end;
+     if DoingDomesticMults then
+      begin        //load domQTH with ALPHA portion of the srx_string
+       j := 1;
+       while (j <= Length(tempSRX_String)) and not (tempSRX_String[j] in ['0'..'9']) do
+        Inc(j);
+        exch.DomesticQTH := Copy(tempSRX_String, 1, j - 1);
+                                                                                      end
+         else
+          exch.ExchString := tempSRX_String;
+       end;
   end; // of case
 
   { if recordFromWSJTX then
