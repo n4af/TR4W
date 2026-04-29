@@ -554,7 +554,7 @@ var
   // the call and pre-fill the exchange after the caller's window clears.
   SavedCall    : CallString;
   SavedRSTSent : Integer;
-begin
+  begin
   Result := False;
 
   if ParametersOkay(CallWindowString, ExchangeWindowString, ActiveBand,
@@ -1283,35 +1283,44 @@ begin
       SendMessageToMixW('<TX>');
     end;
 
-    if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange =
-      RSTQTHExchange) then
+    if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange = RSTQTHExchange)
+     or (ActiveExchange = RSTDomesticorDXQTHExchange) then
     begin
       if pos('/', S1) > 0 then
       begin
         n := pos('/', S1);
         TempString := leftstr(s1, n - 1);
         CallWindowString := Callw + '/' + TempString;
-        ExchangeWindowString := TempString;
-      end;
-      if n > 0 then
-        S2 := rightstr(s1, length(s1) - n);
-    end;
-    if (ActiveExchange = RSTDomesticQTHExchange) then
-      if (IsAlpha(S2)) then
-        ExchangeWindowString := S2;
-    if ActiveExchange = RSTAndPOTAPark then
-    begin
+         S2 := rightstr(s1, length(s1) - n);
+          ExchangeWindowString := S2;
+
+   // if ActiveExchange = RSTAndPOTAPark then
+   // begin
       if pos('/', S1) > 0 then
       begin
         n := pos('/', S1);
         TempString := leftstr(s1, n - 1);
-        CallWindowString := Callw { + '/' + TempString};
+        CallWindowString := Callw; // { + '/' + TempString};
         ExchangeWindowString := TempString;
-      end;
-      if n > 0 then
+        TryLogContact;
+        TempString := '';
+        CallWindowString := Callw;
+        ExchangeWindowString :=S2;
+        trylogcontact;
+        CallWindowString := '';
+        ExchangeWindowString := '';
+        exit;
+      end
+      else
+       begin
+        exchangewindowstring := s1;
+        trylogcontact;
+       end;
+
+  {    if n > 0 then
       begin
         S2 := rightstr(s1, length(s1) - n);
-      end;
+      end; }
     end;
 
     if ActiveMode in [CW, Digital] then
@@ -1364,10 +1373,11 @@ begin
       // S3 := '';
       exchangewindowstring := s1;
       BeSilent := True;
-      S2 := '';
+   //   S2 := '';
       goto loop;
     end;
   end;
+ end; 
 end;
 
 function Send_DE: boolean;
