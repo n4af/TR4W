@@ -768,7 +768,9 @@ implementation
 uses uNet,
   PostUnit,
   MainUnit,
-  uPOTAParks;
+  uPOTAParks,
+  uPendingCounties,
+  Classes; // TStringList — used by ProcessRSTAndDomesticQTHExchange
 
 procedure BandChange(var ActiveBand: BandType; Direction: DirectionType);
 
@@ -3413,18 +3415,41 @@ function ProcessRSTAndDomesticQTHExchange(Exchange: ShortString {Str80}; var
 
 { Any digits found at the start of the exchange will be used to determine
   the RS(T).  If the first character is not a digit, the default RS(T)
-  will be used and the whole exchange will be used as the QTH. }
+  will be used and the whole exchange will be used as the QTH.
+
+  Multi-county handling (Issue #885): the operator can give more than one
+  county in a single exchange when working a station bridging county lines:
+    "DAL/BAY"      -- slash-separated
+    "DAL BAY"      -- space-separated
+    "599 DAL/BAY"  -- with RST
+    "DAL/BAY CIT"  -- mixed forms / three counties
+  All '/'-characters are mapped to spaces before tokenizing so both formats
+  travel the same code path.  Every valid domestic QTH found in user-typed
+  order is collected; the first becomes RXData.QTHString for THIS QSO and
+  the rest are pushed onto uPendingCounties so TryLogContact can drain the
+  queue and write a separate QSO for each. }
 
 var
-  TempString: Str80;
-  QTHFound: boolean;
+  TempString : Str80;
+  i          : Integer;
+  ProbeRX    : ContestExchange;
+  ValidQTHs  : TStringList;
 
 begin
-  QTHFound := False;
-
   ProcessRSTAndDomesticQTHExchange := False;
+  ClearPendingCounties;
+
   GetRidOfPrecedingSpaces(Exchange);
   GetRidOfPostcedingSpaces(Exchange);
+
+  // Treat slash-separated counties as space-separated (e.g. "DAL/BAY" =>
+  // "DAL BAY") so a single tokenizer handles both formats.
+  for i := 1 to Length(Exchange) do
+    if Exchange[i] = '/' then
+      Exchange[i] := ' ';
+
+  // Single-token, non-numeric branch: still a single QTH after slash mapping
+  // (e.g. plain "DAL").  Behavior unchanged from prior code.
   if not StringHas(Exchange, ' ') and not StringIsAllNumbers(Exchange) then
   begin
     RXData.RSTReceived := DefaultRST;
@@ -3444,44 +3469,69 @@ begin
     Exit;
   end;
 
-  while Exchange <> '' do
-  begin
-    TempString := RemoveLastString(Exchange);
-
-    if StringIsAllNumbers(TempString) and (RXData.RSTReceived = 0) then
+  // Multi-token branch.  Walk right-to-left (RemoveLastString returns the
+  // rightmost token).  Numeric tokens become RST.  Probe every other token
+  // against the domestic-mults table and collect every match in a list,
+  // preserving user-typed order via Insert(0, ...).
+  ValidQTHs := TStringList.Create;
+  try
+    while Exchange <> '' do
     begin
-      if length(TempString) = 1 then
-      begin
+      TempString := RemoveLastString(Exchange);
+      if TempString = '' then
+        Continue;
 
-        case ActiveMode of
-          CW: RXData.RSTReceived := 509 + (Ord(TempString[1]) - 48) * 10;
-          Phone: RXData.RSTReceived := 50 + (Ord(TempString[1]) - 48);
-        end;
+      if StringIsAllNumbers(TempString) and (RXData.RSTReceived = 0) then
+      begin
+        if length(TempString) = 1 then
+        begin
+          case ActiveMode of
+            CW    : RXData.RSTReceived := 509 + (Ord(TempString[1]) - 48) * 10;
+            Phone : RXData.RSTReceived := 50  + (Ord(TempString[1]) - 48);
+          end;
+        end
+        else
+          RXData.RSTReceived := StrToInt(TempString);
       end
       else
-        RXData.RSTReceived := StrToInt(TempString);
-    end
-    else if not QTHFound then
-    begin
-      RXData.QTHString := TempString;
-      if FoundDomesticQTH(RXData) then
-        QTHFound := True;
+      begin
+        // Probe with a scratch ContestExchange so we can keep walking after
+        // the first match.  FoundDomesticQTH writes DomMultQTH/DomesticQTH
+        // on the record passed in; we only want to update the real RXData
+        // once, with the first user-typed QTH.
+        FillChar(ProbeRX, SizeOf(ProbeRX), 0);
+        ProbeRX.QTHString := TempString;
+        if FoundDomesticQTH(ProbeRX) then
+          ValidQTHs.Insert(0, TempString);  // user-typed order
+      end;
     end;
-  end;
 
-  if QTHFound then
-  begin
+    if ValidQTHs.Count = 0 then
+    begin
+      logger.error('[ProcessRSTAndDomesticQTHExchange] Improper Domestic QTH - Exchange = (%s)', [Exchange]);
+      ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+      Exit;
+    end;
+
+    // First valid QTH (in user-typed order) is for this QSO.  Re-run
+    // FoundDomesticQTH against the real RXData to populate DomMultQTH /
+    // DomesticQTH from the canonical name.
+    RXData.QTHString := ValidQTHs[0];
+    FoundDomesticQTH(RXData);
+
     if RXData.RSTReceived = 0 then
       RXData.RSTReceived := DefaultRST;
-    ProcessRSTAndDomesticQTHExchange := True;
-    //      Exit;
-  end
-  else
-  begin
-    logger.error('[ProcessRSTAndDomesticQTHExchange] Improper Domestic QTH - Exchange = (%s)', [Exchange]);
-    ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
-  end;
 
+    // Queue any additional valid QTHs.  TryLogContact will drain the queue
+    // immediately after writing the QSO above, logging one extra QSO per
+    // queued county.
+    for i := 1 to ValidQTHs.Count - 1 do
+      QueuePendingCounty(ValidQTHs[i]);
+
+    ProcessRSTAndDomesticQTHExchange := True;
+  finally
+    ValidQTHs.Free;
+  end;
 end;
 
 function ProcessRSTAndJAPrefectureExchange(Exchange: ShortString {Str80}; var
@@ -4611,9 +4661,7 @@ var
   Normalized : string;    // Token after NormalizePOTAPark()
   SpacePos   : Integer;   // Index of the next space delimiter
   RSTFound   : Boolean;   // True once we have consumed the RST token
-  ParkCount  : Integer;   // Total park refs found (used for Nfer label)
-  AllParks   : string;    // Space-separated list of all parks found (for SetLastPOTAExchange)
-  IsFresh    : Boolean;   // True when this is a new contact, not a 2fer continuation
+  AllParks   : string;    // Space-separated list of all parks (for SetLastPOTAExchange)
 begin
   // POTA is free-form — any exchange (including empty) is valid. Always True.
   Result             := True;
@@ -4631,15 +4679,10 @@ begin
      Exit;
      end;
 
-  // Clear the pending queue only when this is a fresh contact, not a 2fer
-  // continuation.  A continuation is identified by the current call window
-  // matching the call stored by the previous log (SetPendingContactInfo).
-  // Any mismatch means a new station is being logged, so we start fresh.
-  // This preserves parks queued from the original exchange (e.g. US-5678
-  // in a 3fer "57 US-0663 US-1234 US-5678") across the intermediate Enter
-  // presses that log each subsequent park.
-  if GetPendingCall <> CallWindowString then
-     ClearPendingParks;
+  // Always rebuild the queue from this exchange.  TryLogContact drains the
+  // queue inline immediately after the first LogContact, so by the time we
+  // re-enter for the next contact the queue is empty already.
+  ClearPendingParks;
 
   // Normalise delimiters: replace commas with spaces so the main loop only
   // needs to handle space-separated tokens.
@@ -4649,12 +4692,7 @@ begin
         S[SpacePos] := ' ';
 
   RSTFound  := False;
-  ParkCount := 0;
   AllParks  := '';
-  // IsFresh: true when the call window does not match the stored pending call,
-  // meaning this is a new contact rather than a 2fer/3fer continuation.
-  // Used below to decide whether to store the exchange for "Repeat POTA Parks".
-  IsFresh   := (GetPendingCall <> string(CallWindowString));
 
   // Walk token by token until the string is exhausted.
   while S <> '' do
@@ -4696,9 +4734,8 @@ begin
            end
         else
            begin
-           // Additional park (2fer, 3fer...) — queue for the next log action.
-           // TryLogContact will dequeue this after the current QSO is written
-           // and pre-fill the exchange so the operator presses Enter once more.
+           // Additional park (2fer/Nfer) — queue for inline drain in
+           // TryLogContact: one extra LogContact per queued ref, no refill.
            QueuePendingPark(Normalized);
            end;
         // Accumulate all parks for SetLastPOTAExchange below.
@@ -4706,7 +4743,6 @@ begin
            AllParks := Normalized
         else
            AllParks := AllParks + ' ' + Normalized;
-        Inc(ParkCount);
         end
      else if StringIsAllNumbers(Token) then
         begin
@@ -4769,18 +4805,9 @@ begin
         end;
      end;
 
-  // Record total park count so HandlePOTANextPark can display the right label
-  // ("2fer", "3fer", etc.).  Only meaningful when more than one park was found;
-  // for a single-park exchange the label is never shown.
-  if ParkCount > 1 then
-     SetTotalParks(ParkCount);
-
-  // On a fresh contact, store the full exchange (RST + all parks) so the
-  // "Repeat POTA Parks (2nd Op)" menu command can re-fill it for a second
-  // operator without the operator having to retype everything.
-  // On 2fer/3fer continuations (IsFresh = False) we leave the stored value
-  // unchanged — it was already set on the first Enter press.
-  if IsFresh and (AllParks <> '') then
+  // Store the full exchange (RST + all parks) so "Repeat POTA Parks (2nd Op)"
+  // can re-fill it for a second operator at the same station.
+  if AllParks <> '' then
      SetLastPOTAExchange(IntToStr(RXData.RSTSent) + ' ' + AllParks);
 end;
 

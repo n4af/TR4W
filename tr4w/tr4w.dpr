@@ -164,6 +164,7 @@ uses
   uTrayBalloon in 'src\uTrayBalloon.pas',
   uVariants in 'src\uVariants.pas',
   uPOTAParks in 'src\uPOTAParks.pas',
+  uPendingCounties in 'src\uPendingCounties.pas',
   uCTYUpdate in 'src\uCTYUpdate.pas';
   //cty in 'src\cty.pas';  // Excluded: unit name 'cty' conflicts with global variable 'CTY' from uCTYDAT
 
@@ -293,14 +294,6 @@ begin
       // Fired by TPOTALoadThread after parsing the CSV off the UI thread.
       // lParam is the parsed TStringList — ApplyLoadedParks takes ownership.
       ApplyLoadedParks(lParam);
-      end;
-
-    WM_POTA_NEXT_PARK:
-      begin
-      // Fired by TryLogContact after logging the first park of a 2fer/3fer.
-      // PostMessage ensures this arrives after the caller's own tCleareCallWindow
-      // / tCleareExchangeWindow calls have already completed.
-      HandlePOTANextPark;
       end;
 
     WM_CTY_VERSION_CHECKED:

@@ -410,7 +410,6 @@ procedure tCleareCallWindow;
 procedure tCleareExchangeWindow;
 procedure tSetExchWindInitExchangeEntry;
 procedure HandleRepeatPOTAParks;
-procedure HandlePOTANextPark;
 procedure tListBoxClientAlign(Parent: HWND);
 //function AddCallsignAndExchangeToInitialExchangesList(Call: CallString; InitialExchangeString: CallString): boolean;
 //function FindStringInInitCallsignListBox(s: CallString; var Index: integer): boolean;
@@ -521,6 +520,7 @@ uses
   // Country9,
   FCONTEST,
   uPOTAParks,
+  uPendingCounties,
   uCTYUpdate,
   Types;
 
@@ -547,6 +547,40 @@ begin
     result := '';
 end;
 
+// Logs additional QSO records when the operator entered multiple POTA park
+// references or multiple counties in a single exchange.  The parser
+// (ProcessRSTAndPOTAPark / ProcessRSTAndDomesticQTHExchange) places extras
+// onto uPOTAParks's or uPendingCounties's queue; this procedure drains both
+// queues and writes one extra QSO per queued ref.
+//
+// Kept in its own procedure rather than inlined into TryLogContact so the
+// extra ReceivedData accesses do not push TryLogContact past the threshold
+// where Delphi 7 pins @ReceivedData into ESI as an optimization (an
+// optimization that interacts badly with the calls in this drain logic and
+// produced an AV at TryLogContact's later @ReceivedData accesses).
+//
+// Issue #885 (county lines) and POTA Nfer.
+
+procedure DrainPendingMultiQSORefs;
+var
+  TempRX : ContestExchange;
+begin
+  if (not HasPendingParks) and (not HasPendingCounties) then
+    Exit;
+  TempRX := ReceivedData;
+  while HasPendingParks do
+    begin
+    TempRX.QTHString := DequeuePendingPark;
+    LogContact(TempRX, True);
+    end;
+  while HasPendingCounties do
+    begin
+    TempRX.QTHString := DequeuePendingCounty;
+    FoundDomesticQTH(TempRX);  // refresh DomMultQTH/DomesticQTH
+    LogContact(TempRX, True);
+    end;
+end;
+
 function TryLogContact: boolean;
 var
   // Saved before ClearContestExchange wipes ReceivedData; passed to
@@ -570,6 +604,7 @@ var
     ReceivedData.ceComputerID := ComputerID;
 
     LogContact(ReceivedData, True);
+    DrainPendingMultiQSORefs;
 
     // Capture before ClearContestExchange zeroes out ReceivedData.
     // Needed for 2fer refill below.
@@ -600,22 +635,6 @@ var
 
     tCleareExchangeWindow;
 
-    if (ActiveExchange = RSTAndPOTAPark) and HasPendingParks then
-       begin
-       // 2fer / 3fer handling.
-       // If ProcessRSTAndPOTAPark found additional park refs in the exchange
-       // (e.g. "57 US-0663 US-1234"), it queued them in uPOTAParks.
-       // We cannot restore the windows here directly — the CALLER of TryLogContact
-       // (e.g. the CQ return handler) also calls tCleareCallWindow / tCleareExchange-
-       // Window after we return, which would immediately overwrite anything we set.
-       // Instead we PostMessage so delivery happens after the full call stack
-       // unwinds and all caller clears are complete.
-       SetPendingContactInfo(SavedCall, SavedRSTSent);
-       PostMessage(tr4whandle, WM_POTA_NEXT_PARK, 0, 0);
-       end;
-    // The above code is only done for POTA handling multiple parks.
-    // Note the same code concept could be used for a station on multiple
-    // county lines in a state QSO party.
     tCallWindowSetFocus;
     CleanUpDisplay;
 
@@ -1283,45 +1302,10 @@ begin
       SendMessageToMixW('<TX>');
     end;
 
-    if (ActiveExchange = RSTDomesticQTHExchange) or (ActiveExchange = RSTQTHExchange)
-     or (ActiveExchange = RSTDomesticorDXQTHExchange) then
-    begin
-      if pos('/', S1) > 0 then
-      begin
-        n := pos('/', S1);
-        TempString := leftstr(s1, n - 1);
-        CallWindowString := Callw + '/' + TempString;
-         S2 := rightstr(s1, length(s1) - n);
-          ExchangeWindowString := S2;
-
-   // if ActiveExchange = RSTAndPOTAPark then
-   // begin
-      if pos('/', S1) > 0 then
-      begin
-        n := pos('/', S1);
-        TempString := leftstr(s1, n - 1);
-        CallWindowString := Callw; // { + '/' + TempString};
-        ExchangeWindowString := TempString;
-        TryLogContact;
-        TempString := '';
-        CallWindowString := Callw;
-        ExchangeWindowString :=S2;
-        trylogcontact;
-        CallWindowString := '';
-        ExchangeWindowString := '';
-        exit;
-      end
-      else
-       begin
-        exchangewindowstring := s1;
-        trylogcontact;
-       end;
-
-  {    if n > 0 then
-      begin
-        S2 := rightstr(s1, length(s1) - n);
-      end; }
-    end;
+    // Multi-county exchanges (e.g. "DAL/BAY", "DAL BAY") are handled at the
+    // parser level: ProcessRSTAndDomesticQTHExchange splits and queues the
+    // extras, and the drain loop in TryLogContact logs the additional QSOs
+    // immediately.  No pre-split is needed here -- Issue #885.
 
     if ActiveMode in [CW, Digital] then
 
@@ -1377,7 +1361,6 @@ begin
       goto loop;
     end;
   end;
- end; 
 end;
 
 function Send_DE: boolean;
@@ -4927,63 +4910,6 @@ begin
 
   tCallWindowSetFocus;
   QuickDisplay(PChar('2nd op: type callsign, verify exchange, then Enter - ' + ExchStr));
-end;
-
-procedure HandlePOTANextPark;
-// Called from the WM_POTA_NEXT_PARK handler in tr4w.dpr after the full
-// call-stack from TryLogContact has unwound (and all caller window-clears
-// have completed).  Restores the call and pre-fills the exchange for the
-// next park in a 2fer / 3fer / Nfer contact so the operator just presses Enter.
-var
-  NextPark      : string;
-  ParkName      : string;
-  CallBuf       : array[0..100] of Char;
-  ExchBuf       : array[0..80]  of Char;
-  ExchStr       : string;
-  TotalParks    : Integer;
-  RemainingAfter: Integer;   // Parks still queued AFTER this one is dequeued
-  CurrentParkNum: Integer;   // Sequential number of the park about to be logged
-  FerLabel      : string;    // "2fer", "3fer", etc.
-begin
-  NextPark := DequeuePendingPark;
-  if NextPark = '' then
-     Exit;
-
-  // Compute the "Nfer" label.  After dequeueing, RemainingAfter tells us how
-  // many parks are still waiting.  CurrentParkNum is the one we just dequeued.
-  //   Total=3, remaining=1 → current=2 → "3fer park 2 of 3"
-  //   Total=3, remaining=0 → current=3 → "3fer park 3 of 3"
-  TotalParks     := GetTotalParks;
-  RemainingAfter := PendingParksCount;
-  CurrentParkNum := TotalParks - RemainingAfter;
-  FerLabel       := IntToStr(TotalParks) + 'fer';
-
-  // Restore the callsign.  Use a zero-initialized char buffer to guarantee
-  // null termination (ShortString[1] is not null-terminated after its content).
-  Windows.ZeroMemory(@CallBuf[0], SizeOf(CallBuf));
-  Move(GetPendingCall[1], CallBuf[0], Length(GetPendingCall));
-  CallWindowString := GetPendingCall;  // implicit truncation to CallstringLength
-  Windows.SetWindowText(wh[mweCall], CallBuf);
-
-  // Pre-fill exchange: same RST + next park ref.
-  ExchStr := IntToStr(GetPendingRST) + ' ' + NextPark;
-  Windows.ZeroMemory(@ExchBuf[0], SizeOf(ExchBuf));
-  Move(ExchStr[1], ExchBuf[0], Length(ExchStr));
-  ExchangeWindowString := ExchStr;  // implicit truncation to Str40 (40 chars)
-  Windows.SetWindowText(wh[mweExchange], ExchBuf);
-
-  // Show which park is pre-filled and prompt the operator to confirm with Enter.
-  // "log" is avoided — Enter moves focus to the exchange window (not directly to
-  // log), so "start" better describes what happens next.
-  ParkName := GetPOTAParkName(NextPark);
-  if ParkName <> '' then
-     QuickDisplay(PChar(FerLabel + ' park ' + IntToStr(CurrentParkNum) + ' of ' +
-                        IntToStr(TotalParks) + ': ' + NextPark + ' ' + ParkName +
-                        ' - press Enter to start ' + FerLabel))
-  else
-     QuickDisplay(PChar(FerLabel + ' park ' + IntToStr(CurrentParkNum) + ' of ' +
-                        IntToStr(TotalParks) + ': ' + NextPark +
-                        ' - press Enter to start ' + FerLabel));
 end;
 
 procedure tListBoxClientAlign(Parent: HWND);
