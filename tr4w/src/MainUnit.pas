@@ -7624,8 +7624,17 @@ begin
       exch.ExchString := IntToStr(exch.RSTReceived) + ' ' + gridSquare;
     end
     else
-    begin
-      exch.ExchString := tempSRX_String;
+    begin   //4.146.15    State QP
+    if ((ActiveExchange = RSTDomesticOrDXQTHExchange) or (ActiveExchange = QSONumberDomesticOrDXQTHExchange)  {or
+    (ActiveExchange = RSTDomesticQTHExchange)}) then
+    exch.domesticQTH := tempSRX_String
+    else        //number and qth ?
+     begin
+       for I := 1 to Length(tempSRX_String) do
+        if tempSRX_String[I] in ['A'..'Z', 'a'..'z'] then
+          exch.DomesticQTH := exch.DomesticQTH + tempSRX_String[I];
+       end;
+
     end;
   end; // of case
 
