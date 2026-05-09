@@ -37,14 +37,6 @@ const
    // Main thread must call ApplyLoadedParks(lParam) from the handler.
    WM_POTA_LOAD_DONE = WM_APP + 201;
 
-   // Posted to tr4whandle after a 2fer/3fer QSO is logged.
-   // The handler calls HandlePOTANextPark (MainUnit.pas) to dequeue the next
-   // park ref and restore the call/exchange windows for the follow-up log.
-   // Using PostMessage ensures delivery happens after the caller's own window
-   // clears have completed; direct SetWindowText inside TryLogContact would be
-   // immediately overwritten by the caller.
-   WM_POTA_NEXT_PARK = WM_APP + 202;
-
 // Returns full path to the parks CSV (same directory as tr4w.exe).
 function POTAParksFilePath: string;
 
@@ -81,16 +73,17 @@ procedure LoadPOTAParksAsync(ANotifyWnd: HWND);
 procedure ApplyLoadedParks(ALParam: LPARAM);
 
 // ---------------------------------------------------------------------------
-// 2fer / 3fer pending park queue.
+// Multi-park (2fer/Nfer) pending queue.
 //
-// When the operator enters multiple park refs in the exchange (e.g.
-// "57 US-0663 US-1234"), ProcessRSTAndPOTAPark logs the first park normally
-// and queues the remainder here.  After the QSO is written, TryLogContact
-// checks HasPendingParks and, if true, restores the callsign and pre-fills
-// the exchange with the next park so the operator can press Enter once more.
+// When the operator enters multiple park refs in one exchange
+// ("57 US-0663 US-1234"), ProcessRSTAndPOTAPark stores the first ref in
+// RXData.QTHString for the QSO it is currently building and pushes the rest
+// onto this queue.  TryLogContact then drains the queue inline immediately
+// after the first LogContact -- one extra LogContact per queued ref, no
+// window refill, no extra Enter press from the operator.
 //
-// The queue is rebuilt on every call to ProcessRSTAndPOTAPark (i.e. every
-// Enter press), so it always reflects the current exchange field content.
+// The queue is rebuilt on every call to the parser, so it always reflects
+// the current exchange field content.
 // ---------------------------------------------------------------------------
 
 // Push a canonical park reference onto the end of the pending queue.
@@ -106,25 +99,13 @@ function HasPendingParks: Boolean;
 // Number of parks currently in the queue.
 function PendingParksCount: Integer;
 
-// Discard all queued parks.  Called at the start of each exchange parse so
-// the queue always matches the current exchange field content.
+// Discard all queued parks.  Called by the parser at the start of every
+// exchange parse so the queue always matches the current exchange field.
 procedure ClearPendingParks;
 
-// Total number of parks parsed from the current exchange (including the first
-// one that was logged directly as QTHString, not queued).  Used by
-// HandlePOTANextPark to produce the correct "2fer"/"3fer"/etc. label.
-procedure SetTotalParks(N: Integer);
-function GetTotalParks: Integer;
-
-// Store the callsign and RST of the contact just logged, for use by the
-// WM_POTA_NEXT_PARK handler when it pre-fills the call/exchange windows.
-procedure SetPendingContactInfo(const ACall: string; ARST: Integer);
-function GetPendingCall: string;
-function GetPendingRST: Integer;
-
 // Store / retrieve the full exchange string (RST + all parks) from the most
-// recently logged fresh POTA contact.  Used by "Repeat POTA Parks (2nd Op)"
-// to re-fill the exchange for a second operator at the same station.
+// recently logged POTA contact.  Used by "Repeat POTA Parks (2nd Op)" to
+// re-fill the exchange for a second operator at the same station.
 // Example stored value: "57 US-0663 US-1234"
 procedure SetLastPOTAExchange(const AExchange: string);
 function GetLastPOTAExchange: string;
@@ -141,24 +122,12 @@ var
 
    // Ordered queue of additional park refs for 2fer/3fer contacts.
    // Populated by ProcessRSTAndPOTAPark; consumed by HandlePOTANextPark.
-   // Only ever accessed from the main thread.
+   // Drained inline by TryLogContact; only ever accessed from the main thread.
    FPendingParks: TStringList = nil;
 
-   // Call and RST saved from the QSO just logged, used by the WM_POTA_NEXT_PARK
-   // handler to restore the call window and pre-fill the exchange for the
-   // next park.  Set by SetPendingContactInfo before PostMessage is called.
-   FPendingCall : string  = '';
-   FPendingRST  : Integer = 0;
-
-   // Total number of parks found in the current exchange (including the first
-   // one stored directly in QTHString, which is never queued).  Set by
-   // ProcessRSTAndPOTAPark once after parsing is complete; reset to 0 by
-   // ClearPendingParks so stale values never bleed across contacts.
-   FTotalParks : Integer = 0;
-
-   // Full exchange string (RST + all parks) from the most recently logged fresh
-   // POTA contact.  Set by ProcessRSTAndPOTAPark on fresh contacts only.
-   // Used by "Repeat POTA Parks (2nd Op)" to pre-fill the exchange window.
+   // Full exchange string (RST + all parks) from the most recently logged
+   // POTA contact.  Used by "Repeat POTA Parks (2nd Op)" to pre-fill the
+   // exchange window for a second operator at the same station.
    FLastPOTAExchange : string = '';
 
 // ---------------------------------------------------------------------------
@@ -406,17 +375,6 @@ procedure ClearPendingParks;
 begin
    if Assigned(FPendingParks) then
       FPendingParks.Clear;
-   FTotalParks := 0;
-end;
-
-procedure SetTotalParks(N: Integer);
-begin
-   FTotalParks := N;
-end;
-
-function GetTotalParks: Integer;
-begin
-   Result := FTotalParks;
 end;
 
 procedure SetLastPOTAExchange(const AExchange: string);
@@ -427,22 +385,6 @@ end;
 function GetLastPOTAExchange: string;
 begin
    Result := FLastPOTAExchange;
-end;
-
-procedure SetPendingContactInfo(const ACall: string; ARST: Integer);
-begin
-   FPendingCall := ACall;
-   FPendingRST  := ARST;
-end;
-
-function GetPendingCall: string;
-begin
-   Result := FPendingCall;
-end;
-
-function GetPendingRST: Integer;
-begin
-   Result := FPendingRST;
 end;
 
 // ---------------------------------------------------------------------------

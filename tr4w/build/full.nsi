@@ -4,8 +4,9 @@
 
 ;!define MMTTYMODE  'mmtty'
 ;!define TR4WLANG    'rus'
-;!define TR4WLANG    'mng'
 ;!define TR4WLANG    'cze'
+!define TR4WLANG    'mng'
+
 ;!define TR4WLANG    'ser'
 ;!define TR4WLANG    'rom'
 ;!define TR4WLANG    'ger'
