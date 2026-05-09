@@ -592,11 +592,30 @@ begin
     KillTimer(tr4whandle, UPDATE_NET_CW_MESSAGE);
 end;
 
+type
+  TNetConnectLogState = (nclsInitial, nclsTrying, nclsConnected, nclsFailed);
+
+const
+  FConnectLogStateLabel : array[TNetConnectLogState] of string =
+    ('initial', 'trying', 'connected', 'failed');
+
+var
+  // Last logged connect-attempt outcome.  TR4W retries every ~5s while the
+  // multi-op server is unreachable; without this gate the log would fill
+  // with four debug lines per retry (TryConnectToNetwork enter, tCreateThread
+  // create, Network thread create, ConnectThread exit) drowning out anything
+  // else.  We log only on transitions: first attempt, recover, fail.
+  FConnectLogState : TNetConnectLogState = nclsInitial;
+
 procedure TryConnectToNetwork;
 begin
-  logger.Debug('Calling tCreateThread from TryConnectToNetwork -> %s:%d', [ServerAddress, ServerPort]);
+  // Only log on state transitions.
+  if FConnectLogState <> nclsTrying then
+     begin
+     logger.Debug('TryConnectToNetwork -> %s:%d  (will retry every 5s while server is unreachable; further attempts logged only on state change)', [ServerAddress, ServerPort]);
+     FConnectLogState := nclsTrying;
+     end;
   if NetThreadID = 0 then tCreateThread(@ConnectThread, NetThreadID);
-  logger.Debug('Created Network thread with threadid of %d',[NetThreadID] );
 end;
 
 procedure ConnectThread;
@@ -645,6 +664,11 @@ begin
 //    SendStationStatus;
     EnableNetworkMenuItem(MF_ENABLED + MF_BYPOSITION);
     ShowConnectionStatus(TC_CONNECTEDTO);
+    if FConnectLogState <> nclsConnected then
+       begin
+       logger.Info('Connected to TR4WServer at %s:%d', [ServerAddress, ServerPort]);
+       FConnectLogState := nclsConnected;
+       end;
   end
   else
   begin
@@ -652,9 +676,17 @@ begin
     1:
     ShowConnectionStatus(TC_FAILEDTOCONNECTTO);
     NetDisconnect;
+    if FConnectLogState <> nclsFailed then
+       begin
+       logger.Warn('Failed to connect to TR4WServer at %s:%d (will keep retrying silently)', [ServerAddress, ServerPort]);
+       FConnectLogState := nclsFailed;
+       end;
   end;
   2:
-  logger.Debug('[ConnectThread] Thread %d exiting, NetThreadID cleared', [GetCurrentThreadId]);
+  // Demoted from debug to trace: this fires every ~5s during a retry loop
+  // and was drowning the log.  Still available for thread-lifecycle
+  // debugging at trace level.
+  logger.Trace('[ConnectThread] Thread %d exiting, NetThreadID cleared', [GetCurrentThreadId]);
   NetThreadID := 0;
 end;
 
