@@ -38,13 +38,12 @@ uses
   LogWind,
   utils_net,
   utils_file,
-  WinSock2,
+  Classes,
+  SysUtils,
+  IdHTTP,
+  IdSSLOpenSSL,
   Tree
   ;
-type
-
-  TUrlGetPart = function(pszIn: PChar; pszOut: PChar; pcchOut: LPDWORD; dwPart, dwFlags: DWORD): HRESULT; stdcall;
-
 function GetScoresDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 procedure CreateConnectionAndSendReportToGetScores;
 procedure RunPOSTGetScoresThread;
@@ -57,16 +56,8 @@ procedure CheckServerAnswer(AnswerLength: integer);
 
 var
   GetScoresPostingID                    : integer;
-//  GetScoresSeverPostingAddress          : ShortString {= 'http://www.getscores.org/postscore.aspx'};
-//  GetScoresSeverReadingAddress          : ShortString {= 'http://www.getscores.org/'};
-GetScoresSeverPostingAddress          : ShortString {= 'http://post.contestonlinescore.com'};
-GetScoresSeverReadingAddress          : ShortString {= 'https://contestonlinescores.com/scoreboard/'};
-  GetScoresHost                         : array[0..31] of Char;
-  GetScoresQuery                        : array[0..127] of Char;
-  GetScoresPortAsString                 : array[0..7] of Char;
-  GetScoresPort                         : Cardinal;
-
-  GetScoresSocket                       : Cardinal;
+  GetScoresSeverPostingAddress          : ShortString {= 'https://post.contestonlinescore.com/post/'};
+  GetScoresSeverReadingAddress          : ShortString {= 'https://contestonlinescore.com/scoreboard/'};
   GetScoresBuffer                       : array[0..4096 - 1] of Char;
   GetScoresThreadID                     : Cardinal;
   GetScoresThreadHandle                 : Cardinal;
@@ -74,14 +65,6 @@ GetScoresSeverReadingAddress          : ShortString {= 'https://contestonlinesco
 const
 
   GSCR                                  = ''; //#13#10;
-//  GetScoresIP                           = 'www.getscores.org'; //'66.203.151.196';
-  PostMethodRequestHeader               =
-    'POST /%s HTTP/1.1'#13#10 +
-    'Content-Type: application/x-www-form-urlencoded'#13#10 +
-//    'User-Agent: ' + TR4W_CURRENTVERSION + #13#10 +
-  'Content-Length: %u'#13#10 +
-    'Host: %s'#13#10 +
-    'Connection: close'#13#10#13#10;
 {
   XML                                   =
     'xml=<?xml version="1.0"?><dynamicresults>' +
@@ -151,73 +134,69 @@ end;
 
 procedure CreateConnectionAndSendReportToGetScores;
 var
-  h                                     : HWND;
-  c                                     : Cardinal;
-  Module                                : HWND;
-  UrlGetPart                            : TUrlGetPart;
-  pcchOut                               : DWORD;
-const
-  URL_PART_NONE                         = 0;
-  URL_PART_SCHEME                       = 1;
-  URL_PART_HOSTNAME                     = 2;
-  URL_PART_USERNAME                     = 3;
-  URL_PART_PASSWORD                     = 4;
-  URL_PART_PORT                         = 5;
-  URL_PART_QUERY                        = 6;
-label
-  1;
+   http : TIdHTTP;
+   ssl  : TIdSSLIOHandlerSocketOpenSSL;
+   PostBody  : TStringStream;
+   sURL      : string;
+   h         : HWND;
 begin
-  ShowGetScoresStatus(TC_CONNECT);
+   ShowGetScoresStatus(TC_CONNECT);
+   MakePOSTRequestNew; // fills GetScoresBuffer with the URL-encoded POST body
 
-  Module := LoadLibrary('shlwapi.dll');
-  @UrlGetPart := GetProcAddress(Module, 'UrlGetPartA');
-  pcchOut := SizeOf(GetScoresHost);
-  if UrlGetPart(@GetScoresSeverPostingAddress[1], GetScoresHost, @pcchOut, URL_PART_HOSTNAME, 0) = ERROR_SUCCESS then
-  begin
-    pcchOut := SizeOf(GetScoresQuery);
-    Windows.ZeroMemory(@GetScoresPortAsString, SizeOf(GetScoresPortAsString));
-    UrlGetPart(@GetScoresSeverPostingAddress[1], GetScoresPortAsString, @pcchOut, URL_PART_PORT, 0);
-    GetScoresPort := PCharToInt(GetScoresPortAsString);
-    if GetScoresPort = 0 then GetScoresPort := 80;
+   sURL := string(GetScoresSeverPostingAddress);
 
-    Windows.ZeroMemory(@GetScoresQuery, SizeOf(GetScoresQuery));
-    for c := 8 to length(GetScoresSeverPostingAddress) - 1 do
-      if GetScoresSeverPostingAddress[c] = '/' then
-      begin
-        Windows.CopyMemory(@GetScoresQuery, @GetScoresSeverPostingAddress[c + 1], length(GetScoresSeverPostingAddress) - c);
-        Break;
+   http := TIdHTTP.Create(nil);
+   ssl  := TIdSSLIOHandlerSocketOpenSSL.Create(nil);
+   try
+      // Attach SSL handler only for https:// URLs so plain http:// custom
+      // URLs (if configured by the operator) still work without TLS.
+      if (Length(sURL) >= 8) and
+         (LowerCase(Copy(sURL, 1, 8)) = 'https://') then
+         begin
+         ssl.SSLOptions.Method := TIdSSLVersion(sslvTLSv1_2);
+         http.IOHandler := ssl;
+         end;
+
+      http.HandleRedirects := True;
+      http.Request.UserAgent    := TR4W_CURRENTVERSION;
+      http.Request.ContentType  := 'application/x-www-form-urlencoded';
+
+      PostBody := TStringStream.Create(string(PChar(@GetScoresBuffer)));
+      try
+         logger.Debug('Score post: URL = %s', [sURL]);
+         http.Post(sURL, PostBody);
+      finally
+         PostBody.Free;
       end;
-  end;
-  FreeLibrary(Module);
 
-  if not GetConnection(GetScoresSocket, GetScoresHost, GetScoresPort, SOCK_STREAM) then
-  begin
-//    showmessage(SysErrorMessage(WSAGetLastError));
-    ShowGetScoresStatus(TC_FAILEDTOCONNECTTOGETSCORESORG);
-    goto 1;
-  end;
+      if http.ResponseCode = 200 then
+         begin
+         // Save the server response for diagnostics
+         if tOpenFileForWrite(h, GetScoresAnswerFileName) then
+            begin
+            sWriteFile(h, GetScoresBuffer, lstrlen(GetScoresBuffer));
+            CloseHandle(h);
+            end;
+         ShowGetScoresStatus(TC_UPLOADEDSUCCESSFULLY);
+         end
+      else
+         begin
+         logger.Warn('Score post: server returned %d for %s', [http.ResponseCode, sURL]);
+         ShowGetScoresStatus(TC_FAILEDTOCONNECTTOGETSCORESORG);
+         end;
 
-{
-  if strpos(@GetScoresSeverPostingAddress[1], 'http://rdxc.org/asp/pages/update.asp') <> nil then
-    SendOnLineResultsToRDXC2010Site
-  else
-   }
-//  MakePOSTRequest;
+   except
+      on E: Exception do
+         begin
+         logger.Error('Score post failed for %s: %s', [sURL, E.Message]);
+         ShowGetScoresStatus(TC_FAILEDTOCONNECTTOGETSCORESORG);
+         end;
+   end;
 
-  WinSock2.Send(GetScoresSocket, GetScoresBuffer, MakePOSTRequestNew, 0);
-  c := WinSock2.recv(GetScoresSocket, GetScoresBuffer, SizeOf(GetScoresBuffer), 0);
-//  ShowMessage(GetScoresBuffer);
-
-  if not tOpenFileForWrite(h, GetScoresAnswerFileName) then goto 1;
-  sWriteFile(h, GetScoresBuffer, c);
-  CloseHandle(h);
-
-  CheckServerAnswer(c);
-  1:
-  closesocket(GetScoresSocket);
-
-  GetScoresThreadID := 0;
-  CloseHandle(GetScoresThreadHandle);
+   http.Free;
+   ssl.Free;
+   GetScoresThreadID := 0;
+   CloseHandle(GetScoresThreadHandle);
 end;
 {
 function MakePOSTRequestForRDXC2010: integer;
@@ -535,11 +514,10 @@ begin
     GSCR + '<score>%u</score>' +
     GSCR + '<timestamp>%s</timestamp>' + GSCR + '</dynamicresults>', TotalScore, SystemTimeToString(UTC));
 
-  Format(GetScoresBuffer, PostMethodRequestHeader, GetScoresQuery, Index, GetScoresHost);
-//  ShowMessage(GetScoresBuffer);
-  Windows.lstrcat(GetScoresBuffer, RequestBody);
-//  ShowMessage(GetScoresBuffer);
-   logger.Debug('[MakePOSTRequestNew] %s',[GetScoresBuffer]);
+  // Copy the URL-encoded XML body into GetScoresBuffer for use by the caller.
+  // HTTP framing is now handled by TIdHTTP in CreateConnectionAndSendReportToGetScores.
+  lstrcpy(GetScoresBuffer, RequestBody);
+  logger.Debug('[MakePOSTRequestNew] %s', [GetScoresBuffer]);
   Result := Windows.lstrlen(GetScoresBuffer);
 {
   if not Tree.tOpenFileForWrite(h, 'GetScoresAnswerFileName') then Exit;
