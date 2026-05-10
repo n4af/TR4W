@@ -2038,7 +2038,25 @@ begin
             end;
          end
       else
-         WriteADIFField('SRX_STRING', TempRXData.ExchString);
+         begin
+         // Normalize SRX_STRING to include the implied RST so it is symmetric
+         // with STX_STRING (which GetMyExchangeForExport always builds with
+         // RST).  Without this, in contests where the operator does not
+         // type the RST (e.g. FQP CW, 599 implied), single-QSO exchanges
+         // export as "<SRX_STRING:3>HIL" while multi-county legs (built by
+         // PerQSOExchString in MainUnit) export as "<SRX_STRING:7>599 HIL".
+         // RST_RCVD lives in its own ADIF field; this purely normalizes the
+         // SRX_STRING display.  Stored ExchString is unchanged so Cabrillo
+         // emit is unaffected.
+         sTemp := IntToStr(TempRXData.RSTReceived);
+         if (TempRXData.ExchString <> '') and
+            (Copy(TempRXData.ExchString, 1, Length(sTemp) + 1) = sTemp + ' ') then
+            WriteADIFField('SRX_STRING', TempRXData.ExchString)
+         else if TempRXData.ExchString = '' then
+            WriteADIFField('SRX_STRING', sTemp)
+         else
+            WriteADIFField('SRX_STRING', sTemp + ' ' + TempRXData.ExchString);
+         end;
       stxString := GetMyExchangeForExport;
       WriteADIFField('STX_STRING',Trim(DeleteRepeatedSpaces(stxString)));
 
