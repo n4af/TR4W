@@ -2272,7 +2272,7 @@ var
 begin
 
   // Split warning is driven by DisplayCurrentStatus (uRadioPolling) on confirmed
-  // state transitions â€” not here, where CurrentStatus.Split may be stale.
+  // state transitions — not here, where CurrentStatus.Split may be stale.
   // SetMainWindowText(mweName, nil);
   // CallDataBase.ClearDataEntry;
   SetMainWindowText(mweName, '');
@@ -2621,7 +2621,7 @@ begin
       or MF_GRAYED);
 
   // Remove POTA-specific menu items entirely when not in a POTA contest.
-  // DeleteMenu is used rather than MF_GRAYED so the items are invisible â€”
+  // DeleteMenu is used rather than MF_GRAYED so the items are invisible —
   // they are irrelevant outside POTA and would clutter the menu.
   // Note: once deleted they are not re-added if the operator switches contests
   // mid-session, but that is consistent with TR4W's existing per-contest menu
@@ -4890,7 +4890,7 @@ procedure HandleRepeatPOTAParks;
 // Called from the "Repeat POTA Parks (2nd Op)" Commands menu item.
 // Pre-fills the exchange with the parks from the last logged POTA contact so
 // the operator only needs to type the new callsign and press Enter.
-// The call window is left blank â€” the operator types the second op's call.
+// The call window is left blank — the operator types the second op's call.
 var
   ExchStr : string;
   ExchBuf : array[0..80] of Char;
@@ -5200,7 +5200,7 @@ begin
     if PInteger(@TempBuffer1)^ <> CURRENTVERSIONASINTEGER then
     begin
       // If the file is NEWER than this program we cannot safely open or convert
-      // it. Show a clear error and stop â€” never attempt a downgrade conversion.
+      // it. Show a clear error and stop — never attempt a downgrade conversion.
       if StrPas(TempBuffer1) > LOGVERSION then
          begin
          logger.Fatal('Log file version ' + StrPas(TempBuffer1) +
@@ -6612,7 +6612,7 @@ begin
       begin
       if ColumnWidthOverride[TempColumn] > 0 then
          begin
-         // User has manually sized this column â€” restore their saved width
+         // User has manually sized this column — restore their saved width
          ListView_SetColumnWidth(h, ColumnsArray[TempColumn].pos, ColumnWidthOverride[TempColumn]);
          ActualWidth := ListView_GetColumnWidth(h, ColumnsArray[TempColumn].pos);
          logger.Debug('EnsureListViewColumnVisible: %s pos=%d override=%d actual=%d',
@@ -7563,6 +7563,19 @@ begin
     end
     else
 
+
+
+
+
+
+
+
+
+
+
+
+
+    begin
      if DoingDomesticMults then
       begin        //load domQTH with ALPHA portion of the srx_string
        j := 1;
@@ -7573,7 +7586,16 @@ begin
          else
           exch.ExchString := tempSRX_String;
        end;
-     end;
+
+  end; // of case
+
+  { if recordFromWSJTX then
+  begin
+  exch.DomesticQTH := gridSquare;
+  end; }
+end; // of ParseADIFRecord
+(*----------------------------------------------------------------------------*)
+
 procedure ImportFromADIF;
 var
   openDlg: TOpenDialog;
@@ -9272,7 +9294,7 @@ begin
         newRXData.ceClearMultSheet := oldRXData_v1_6.ceClearMultSheet;
         newRXData.MP3Record := oldRXData_v1_6.MP3Record;
         newRXData.ceOperator := oldRXData_v1_6.ceOperator;
-        // id left blank â€” not present in v1.6 files
+        // id left blank — not present in v1.6 files
         Write(newFH, newRXData);
         end;
      CloseFile(oldFH_v1_6);
