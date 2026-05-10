@@ -3693,10 +3693,36 @@ if StringIsAllNumbers(ThirdString)  then
 
 function ProcessRSTAndDomesticOrDXQTHExchange(Exchange: ShortString {Str80}; var
   RXData: ContestExchange): boolean;
-
+var
+  // State-QP rover detection (KG1S/MON): the country lookup in
+  // ParametersOkay treats /M as a Great Britain prefix indicator and
+  // sets RXData.QTH.Country to G, which causes DomesticCountryCall
+  // below to return False and routes the exchange to the DX parser
+  // (which discards the county).  Detect the rover form here and
+  // force the domestic-parser route so MON gets logged as the county.
+  RoverSlashPos : Integer;
+  RoverProbeRX  : ContestExchange;
 begin
   ProcessRSTAndDomesticOrDXQTHExchange := False;
-   
+
+  // Rover-form override: if the call has a /COUNTY suffix and COUNTY
+  // validates as a domestic QTH, treat as domestic regardless of
+  // DomesticCountryCall's verdict on the slashed form.
+  RoverSlashPos := Pos('/', string(RXData.Callsign));
+  if RoverSlashPos > 0 then
+     begin
+     FillChar(RoverProbeRX, SizeOf(RoverProbeRX), 0);
+     RoverProbeRX.QTHString := UpperCase(
+        Copy(string(RXData.Callsign), RoverSlashPos + 1,
+             Length(string(RXData.Callsign)) - RoverSlashPos));
+     if FoundDomesticQTH(RoverProbeRX) then
+        begin
+        ProcessRSTAndDomesticOrDXQTHExchange :=
+          ProcessRSTAndDomesticQTHExchange(Exchange, RXData);
+        Exit;
+        end;
+     end;
+
   if DomesticCountryCall(RXData.Callsign) then
   begin
     ProcessRSTAndDomesticOrDXQTHExchange :=

@@ -268,6 +268,10 @@ uses
   MainUnit;
 
 function wkOpen: boolean;
+var
+  versionByte : Byte;
+  family      : Byte;
+  msg         : string;
 begin
   Result := False;
 
@@ -297,21 +301,23 @@ begin
   asm mov dword ptr wkREADBuffer[0], 0 end;
   if wkRead(1) then
   begin
-    WK2 := wkREADBuffer[0] >= 20;
-    asm
-    xor eax,eax
-    mov al,byte ptr wkREADBuffer[0]
-    push eax
-
-    xor  eax,eax
-    mov  al,byte ptr wk2
-    add  eax,1
-    push eax
-    end;
-    wsprintf(@wkREADBuffer, 'WK%u v%u');
-    asm add esp,16
-    end;
-    SetMainWindowText(mweWinKey, @wkREADBuffer);
+    // The keyer's HOST OPEN response is its firmware-revision byte.
+    // Map it to a family digit for the status display:
+    //   v < 20   -> WK1     (legacy WinKeyer)
+    //   v 20-29  -> WK2     (WinKeyer2)
+    //   v >= 30  -> WK3     (WinKeyer3 — was previously displayed as WK2
+    //                        because the family was tracked as a single
+    //                        Boolean WK2 := version >= 20.  Issue #891)
+    versionByte := wkREADBuffer[0];
+    WK2 := versionByte >= 20;
+    if versionByte >= 30 then
+      family := 3
+    else if versionByte >= 20 then
+      family := 2
+    else
+      family := 1;
+    msg := Format('WK%d v%d', [family, versionByte]);
+    SetMainWindowText(mweWinKey, PChar(msg));
   end;
   logger.Info('Calling tCreateThread from WkOpen');
   tCreateThread(@wkReadThreadProc, wkThreadID);

@@ -471,6 +471,8 @@ uses
   uCbrSum,
   MainUnit,
   uCFG;
+  // mo.DomList (ADIF CNTY long-name lookup) is reachable via the
+  // interface-section 'uses uMults' clause above.
 
 procedure WriteADIFField(sFieldName: string; sFieldValue: string);
 var sBuffer: string;
@@ -484,6 +486,31 @@ begin
       begin
       DEBUGMSG('[WriteADIFField] ' + sFieldName + ' value is blank - skipping');
       end;
+end;
+
+// For state-based QSO parties, return the host state's 2-letter ADIF
+// postal code; for any other contest return ''.  Used during ADIF export
+// when QTHString carries a county/section code instead of a 2-letter
+// state code -- in those contests we know the state by the contest itself.
+function GetStateForContest(c: ContestType): string;
+begin
+   case c of
+      CALQSOPARTY        : Result := 'CA';
+      FLORIDAQSOPARTY    : Result := 'FL';
+      MICHQSOPARTY       : Result := 'MI';
+      MINNQSOPARTY       : Result := 'MN';
+      MOQSOPARTY         : Result := 'MO';
+      NCQSOPARTY         : Result := 'NC';
+      OHIOQSOPARTY       : Result := 'OH';
+      TEXASQSOPARTY      : Result := 'TX';
+      WISCONSINQSOPARTY  : Result := 'WI';
+      TENNESSEEQSOPARTY  : Result := 'TN';
+      COLORADOQSOPARTY   : Result := 'CO';
+      PAQSOPARTY         : Result := 'PA';
+      INQSOPARTY         : Result := 'IN';
+   else
+      Result := '';
+   end;
 end;
 
 procedure CreateCabrilloFile;
@@ -1765,6 +1792,18 @@ var
   sMode                                 : string;
   sSubMode                              : string;
   saveDecimalSeparator                  : char;
+  // State-QP rover (KG1S/MON): per-record bare call for the standard
+  // <CALL> field, plus the full form for <APP_TR4W_ROVERCALL>.  Computed
+  // per QSO in the read loop below and consumed by the <CALL> Format
+  // and the WriteADIFField call that follows.
+  adifCallStr                           : string;
+  adifRoverFullCall                     : string;
+  roverSlashPos                         : Integer;
+  roverSuffix                           : string;
+  // ADIF CNTY emit: index into mo.DomList for the worked station's
+  // county code so we can pull the long-form county name (FAltName)
+  // loaded from <state>_cty.dom files.
+  cntyIdx                               : Integer;
 //  IOTAstring                            : Str10;
 begin
   sMode := '';
@@ -1856,8 +1895,35 @@ begin
       //if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
       //if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
 
+      // State-QP rover (KG1S/MON): if the QSO record's call has a slash
+      // and the suffix matches the QSO's QTHString, it's a rover entry.
+      // Emit the bare call ("KG1S") in the standard <CALL> field and
+      // the full call ("KG1S/MON") in the TR4W-specific
+      // <APP_TR4W_ROVERCALL> field.  Gate on ActiveExchange so we only
+      // do this for state-QP contests; ActiveExchange is set to the
+      // contest type that created the log even at export time.
+      adifCallStr      := string(TempRXData.Callsign);
+      adifRoverFullCall := '';
+      if ((ActiveExchange = RSTDomesticQTHExchange) or
+          (ActiveExchange = RSTQTHExchange) or
+          (ActiveExchange = RSTDomesticOrDXQTHExchange)) then
+         begin
+         roverSlashPos := Pos('/', adifCallStr);
+         if roverSlashPos > 0 then
+            begin
+            roverSuffix := Copy(adifCallStr, roverSlashPos + 1,
+                                Length(adifCallStr) - roverSlashPos);
+            if (roverSuffix <> '') and
+               (UpperCase(roverSuffix) = UpperCase(string(TempRXData.QTHString))) then
+               begin
+               adifRoverFullCall := adifCallStr;
+               adifCallStr := Copy(adifCallStr, 1, roverSlashPos - 1);
+               end;
+            end;
+         end;
+
       sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%d <RST_RCVD:%u>%d '  // Moved CONTEST_ID below to make it conditional
-                  ,[length(TempRXData.Callsign), TempRXData.Callsign
+                  ,[Length(adifCallStr), adifCallStr
                   ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
                  // ,length(ExtendedModeStringArray[TempRXData.Mode]), ExtendedModeStringArray[TempRXData.Mode]
                  // ,length(ModeStringArray[TempRXData.Mode]), ModeStringArray[TempRXData.Mode]
@@ -1876,6 +1942,12 @@ begin
                   ]
                   );
       sWriteFileFromString(tReportFileWrite, sBuffer);
+
+      // State-QP rover: emit the full original (KG1S/MON) in the TR4W
+      // app-specific field so the operator's intent survives ADIF
+      // round-trips.  Empty string when the QSO wasn't a rover entry.
+      if adifRoverFullCall <> '' then
+         WriteADIFField('APP_TR4W_ROVERCALL', adifRoverFullCall);
 
       if not (Contest in [POTA,GENERALQSO]) then
          begin
@@ -1966,7 +2038,25 @@ begin
             end;
          end
       else
-         WriteADIFField('SRX_STRING', TempRXData.ExchString);
+         begin
+         // Normalize SRX_STRING to include the implied RST so it is symmetric
+         // with STX_STRING (which GetMyExchangeForExport always builds with
+         // RST).  Without this, in contests where the operator does not
+         // type the RST (e.g. FQP CW, 599 implied), single-QSO exchanges
+         // export as "<SRX_STRING:3>HIL" while multi-county legs (built by
+         // PerQSOExchString in MainUnit) export as "<SRX_STRING:7>599 HIL".
+         // RST_RCVD lives in its own ADIF field; this purely normalizes the
+         // SRX_STRING display.  Stored ExchString is unchanged so Cabrillo
+         // emit is unaffected.
+         sTemp := IntToStr(TempRXData.RSTReceived);
+         if (TempRXData.ExchString <> '') and
+            (Copy(TempRXData.ExchString, 1, Length(sTemp) + 1) = sTemp + ' ') then
+            WriteADIFField('SRX_STRING', TempRXData.ExchString)
+         else if TempRXData.ExchString = '' then
+            WriteADIFField('SRX_STRING', sTemp)
+         else
+            WriteADIFField('SRX_STRING', sTemp + ' ' + TempRXData.ExchString);
+         end;
       stxString := GetMyExchangeForExport;
       WriteADIFField('STX_STRING',Trim(DeleteRepeatedSpaces(stxString)));
 
@@ -2007,10 +2097,35 @@ begin
    //      else if LooksLikeAState(TempRXData.QTHString) then
    else if not(Stringhasnumber(TempRXData.QTHString)) then
             begin
-            // MO QSO Party: 3-letter county codes (BAR, BOO, etc.) must not be
-            // exported as STATE.  Only 2-letter codes (TX, MO, etc.) are states.
-            if (Contest <> MOQSOPARTY) or (Length(TempRXData.QTHString) = 2) then
-               WriteADIFField('STATE',TempRXData.QTHString);
+            // ADIF STATE is the worked station's 2-letter US state postal
+            // code.  In state QSO parties, in-state stations send a county
+            // code in QTHString (3-letter for FL/MO/etc., variable elsewhere)
+            // -- those are NOT valid STATE values.  Three cases:
+            //   * QTHString is 2 letters: looks like a postal code, emit it.
+            //   * QTHString is multi-letter and we know the contest's host
+            //     state: emit that state (e.g. FQP county MON -> FL).
+            //   * Otherwise: skip.  Better no STATE than a bogus one.
+            if Length(TempRXData.QTHString) = 2 then
+               WriteADIFField('STATE', TempRXData.QTHString)
+            else
+               begin
+               sTemp := GetStateForContest(Contest);
+               if sTemp <> '' then
+                  begin
+                  WriteADIFField('STATE', sTemp);
+                  // ADIF CNTY = "<state>,<county-full-name>".  The long
+                  // form is loaded from <state>_cty.dom into FAltName by
+                  // LOGDOM.PAS when the file ships entries like
+                  // "Mon = MON,^Monroe".  Some state QP dom files do not
+                  // (yet) carry the ^Long second field (e.g. florida_cty.dom,
+                  // tennessee_cty.dom) -- in those cases FAltName is empty
+                  // and we just skip CNTY rather than emit a bogus value.
+                  if mo.DomList.FindMult(TempRXData.QTHString, cntyIdx) and
+                     (mo.DomList.FList[cntyIdx].FAltName <> '') then
+                     WriteADIFField('CNTY',
+                        sTemp + ',' + mo.DomList.FList[cntyIdx].FAltName);
+                  end;
+               end;
             end;
 
         //if ContestsArray[Contest].DM = DomesticMult

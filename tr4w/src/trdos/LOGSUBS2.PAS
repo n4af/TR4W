@@ -1397,8 +1397,13 @@ begin
   if MobileCall(RXData.Callsign) and (ActiveDomesticMult = DomesticFile) and (RXData.DomesticQTH <> '')then    // n4af 4.41.8 Add Q.P. Rover  // 4.98.6
      RXData.Callsign := PrecedingString(RXData.Callsign,'/')  + '/' + RXData.DomesticQTH;  // n4af 4.41.7
 
-  if VisibleLog.CallIsADupe(RXData.Callsign, RXData.Band, RXData.Mode) or
-    ((ActiveDomesticMult = GridSquares) and RoverCall(RXData.Callsign) and (NumberGridSquaresInList > 0)) then
+  // ceClearDupeSheet bypass: county-line / Nfer follow-up records carry
+  // this flag so the dupe check below (and the matching one in
+  // tUpdateLog(actRescore)) does NOT flag them as dupes.  See
+  // MainUnit.DrainPendingMultiQSORefs for where the flag is set.
+  if (not RXData.ceClearDupeSheet) and
+    (VisibleLog.CallIsADupe(RXData.Callsign, RXData.Band, RXData.Mode) or
+    ((ActiveDomesticMult = GridSquares) and RoverCall(RXData.Callsign) and (NumberGridSquaresInList > 0))) then
     if not (ActiveQSOPointMethod = AlwaysOnePointPerQSO) then
     begin
         //      if Trace then Write('#');
