@@ -588,6 +588,17 @@ begin
     TempRX.QTHString := DequeuePendingCounty;
     FoundDomesticQTH(TempRX);  // refresh DomMultQTH/DomesticQTH
     TempRX.ExchString := PerQSOExchString(TempRX);   // Issue #889
+    // QSO-party rule: a station that changes county is a new station and
+    // is NOT a dupe of an earlier QSO with the same call.  The follow-up
+    // county records share callsign+band+mode with the first one, so the
+    // generic dupe check would otherwise flag them, blank their points,
+    // and emit "AF4O is a dupe and will be logged with zero QSO points."
+    // Setting ceClearDupeSheet=True bypasses both LogContact's and
+    // tUpdateLog(actRescore)'s dupe-stamping for this record only.
+    TempRX.ceClearDupeSheet := True;
+    // Each county leg is a distinct logged QSO and should carry its own
+    // sequential NumberSent rather than reuse the first record's value.
+    Inc(TempRX.NumberSent);
     LogContact(TempRX, True);
     end;
 end;
@@ -613,6 +624,60 @@ end;
 //   - the suffix validates as a domestic QTH (so /M, /P, /4 etc. are left
 //     alone for other code paths to handle)
 // On True, RoverCounty is populated with the validated county abbreviation.
+
+// Wrap ctyLocateCall so a state-QP rover suffix (KG1S/MON) is stripped
+// off the call before the country/zone lookup.  /M would otherwise be
+// interpreted as a Great Britain prefix indicator, mislabeling the QSO
+// with country=G.  The caller's Call value is unchanged; only the lookup
+// uses the bare form.
+//
+// Falls through to plain ctyLocateCall behaviour when:
+//   - active exchange is not a state-QP type
+//   - the call has no '/'
+//   - the suffix doesn't validate as a domestic QTH (e.g. /M, /P, /4)
+//
+// Used by ParametersOkay (live entry) and ParseADIFRecord at EOR (import).
+
+function ctyLocateCallStripRover(const Call: CallString; var QTH: QTHRecord): Boolean;
+var
+  LookupCall  : CallString;
+  SlashPos    : Integer;
+  ProbeRX     : ContestExchange;
+  FoundQTH    : Boolean;
+  ProbeSuffix : string;
+begin
+  LookupCall := Call;
+  logger.Info('[ctyLocateCallStripRover] ENTER Call=[%s] ActiveExchange=%d',
+              [string(Call), Ord(ActiveExchange)]);
+  if ((ActiveExchange = RSTDomesticQTHExchange) or
+      (ActiveExchange = RSTQTHExchange) or
+      (ActiveExchange = RSTDomesticOrDXQTHExchange)) then
+     begin
+     SlashPos := Pos('/', string(LookupCall));
+     logger.Info('[ctyLocateCallStripRover] QP exchange, SlashPos=%d', [SlashPos]);
+     if SlashPos > 0 then
+        begin
+        FillChar(ProbeRX, SizeOf(ProbeRX), 0);
+        ProbeSuffix := UpperCase(
+           Copy(string(LookupCall), SlashPos + 1,
+                Length(string(LookupCall)) - SlashPos));
+        ProbeRX.QTHString := ProbeSuffix;
+        FoundQTH := FoundDomesticQTH(ProbeRX);
+        logger.Info('[ctyLocateCallStripRover] suffix=[%s] FoundDomesticQTH=%s',
+                    [ProbeSuffix, BoolToStr(FoundQTH, True)]);
+        if FoundQTH then
+           LookupCall := Copy(string(LookupCall), 1, SlashPos - 1);
+        end;
+     end
+  else
+     begin
+     logger.Info('[ctyLocateCallStripRover] NOT a QP exchange, skipping strip', []);
+     end;
+  Result := ctyLocateCall(LookupCall, QTH);
+  logger.Info('[ctyLocateCallStripRover] EXIT LookupCall=[%s] Result=%s CountryID=[%s] Prefix=[%s]',
+              [string(LookupCall), BoolToStr(Result, True),
+               string(QTH.CountryID), string(QTH.Prefix)]);
+end;
 
 function DetectRoverSlashInCall(out RoverCounty: string): Boolean;
 var
@@ -4547,11 +4612,6 @@ function ParametersOkay(Call: CallString;
 var
   RST: Word;
   //s1, s2, s3, s4: str20;
-  // State-QP rover (KG1S/MON) — locals used only for the ctyLocateCall
-  // path below to look up the country/zone with the suffix stripped.
-  RoverLookupCall : CallString;
-  RoverSlashPos   : Integer;
-  RoverProbeRX    : ContestExchange;
 begin
   logger.debug('>>>Entering ParametersOkay');
   logger.debug('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d, ExchangeString = %s', [call, BandStringsArray[Band], ModeStringArray[Mode], freq, ExchangeString]);
@@ -4699,30 +4759,11 @@ begin
   else
     DefaultRST := 599;
 
-  // State-QP rover (KG1S/MON): the country/zone lookup must run on the
-  // BARE call (KG1S) rather than the slashed form, otherwise /M is
-  // interpreted as a Great Britain prefix indicator and the QSO ends up
-  // tagged with country=G.  Detect a state-QP /COUNTY suffix and strip
-  // it for this lookup only; the original RData.Callsign is preserved
-  // unchanged so the rover form survives into the log and Cabrillo.
-  RoverLookupCall := RData.Callsign;
-  if ((ActiveExchange = RSTDomesticQTHExchange) or
-      (ActiveExchange = RSTQTHExchange) or
-      (ActiveExchange = RSTDomesticOrDXQTHExchange)) then
-     begin
-     RoverSlashPos := Pos('/', string(RoverLookupCall));
-     if RoverSlashPos > 0 then
-        begin
-        FillChar(RoverProbeRX, SizeOf(RoverProbeRX), 0);
-        RoverProbeRX.QTHString := UpperCase(
-           Copy(string(RoverLookupCall), RoverSlashPos + 1,
-                Length(string(RoverLookupCall)) - RoverSlashPos));
-        if FoundDomesticQTH(RoverProbeRX) then
-           RoverLookupCall := Copy(string(RoverLookupCall), 1,
-                                   RoverSlashPos - 1);
-        end;
-     end;
-  ctyLocateCall(RoverLookupCall, RData.QTH);
+  // State-QP rover (KG1S/MON): use ctyLocateCallStripRover so the
+  // country/zone lookup runs on the bare call (KG1S) instead of the
+  // slashed form (which would be misinterpreted as a GB prefix
+  // indicator).  RData.Callsign itself is preserved.
+  ctyLocateCallStripRover(RData.Callsign, RData.QTH);
 
   if DoingDXMults then
     GetDXQTH(RData);
@@ -6095,6 +6136,19 @@ var
   RescoredRXData: ContestExchangePtr;
   LogSize: Cardinal;
   QSOCounter: Cardinal;
+  // Snapshot of fields that actRescore can mutate, captured before the
+  // rescore work so we can log a single line per record describing the
+  // before/after when anything actually changed.  Useful for catching
+  // silent rescore-induced corruption (e.g. rover-call /M -> DX=G).
+  beforeCountryID : DXMultiplierString;
+  beforePrefix    : PrefixMultiplierString;
+  beforeDXQTH     : DXMultiplierString;
+  beforeDomMult   : Boolean;
+  beforeDXMult    : Boolean;
+  beforePrefixMult: Boolean;
+  beforeZoneMult  : Boolean;
+  beforeQSOPoints : Word;
+  beforeDupe      : Boolean;
 begin
 
   if not OpenLogFile then
@@ -6145,12 +6199,27 @@ begin
       if RescoredRXData^.ceQSO_Deleted = False then
         if RescoredRXData^.ceQSO_Skiped = False then
         begin
+          // Snapshot before rescore so we can report what (if anything) changed.
+          beforeCountryID  := RescoredRXData^.QTH.CountryID;
+          beforePrefix     := RescoredRXData^.Prefix;
+          beforeDXQTH      := RescoredRXData^.DXQTH;
+          beforeDomMult    := RescoredRXData^.DomesticMult;
+          beforeDXMult     := RescoredRXData^.DXMult;
+          beforePrefixMult := RescoredRXData^.PrefixMult;
+          beforeZoneMult   := RescoredRXData^.ZoneMult;
+          beforeQSOPoints  := RescoredRXData^.QSOPoints;
+          beforeDupe       := RescoredRXData^.ceDupe;
+
           if DoingPrefixMults then
           begin
             Windows.ZeroMemory(@RescoredRXData.QTH, SizeOf(RescoredRXData.QTH));
             Windows.ZeroMemory(@RescoredRXData.DXQTH,
               SizeOf(RescoredRXData.DXQTH));
-            ctyLocateCall(RescoredRXData^.Callsign, RescoredRXData.QTH);
+            // State-QP rover (KG1S/MON): strip suffix for country lookup so
+            // /M doesn't get misread as a GB prefix.  Without this the
+            // rescore wipes the correct USA lookup done at log-time and
+            // restamps the record as DX=G.
+            ctyLocateCallStripRover(RescoredRXData^.Callsign, RescoredRXData.QTH);
             SetPrefix(RescoredRXData^);
           end;
           // if (RXData.Prefix <> '') and DoingPrefixMults then
@@ -6166,7 +6235,11 @@ begin
             Windows.ZeroMemory(@RescoredRXData.QTH, SizeOf(RescoredRXData.QTH));
             Windows.ZeroMemory(@RescoredRXData.DXQTH,
               SizeOf(RescoredRXData.DXQTH));
-            ctyLocateCall(RescoredRXData^.Callsign, RescoredRXData.QTH);
+            // State-QP rover (KG1S/MON): strip suffix for country lookup so
+            // /M doesn't get misread as a GB prefix.  Without this the
+            // rescore wipes the correct USA lookup done at log-time and
+            // restamps the record as DX=G.
+            ctyLocateCallStripRover(RescoredRXData^.Callsign, RescoredRXData.QTH);
             GetDXQTH(RescoredRXData^);
             //.DXQTH := RescoredRXData.QTH.CountryID;
           end;
@@ -6200,6 +6273,35 @@ begin
           end
           else
             RescoredRXData^.ceDupe := False;
+
+          // Report whenever actRescore actually mutated a record.  One line
+          // per changed record makes silent rescore-induced corruption
+          // (rover-call DX=G, mult-flag flip, points change, etc.) visible.
+          if (beforeCountryID  <> RescoredRXData^.QTH.CountryID) or
+             (beforePrefix     <> RescoredRXData^.Prefix)        or
+             (beforeDXQTH      <> RescoredRXData^.DXQTH)         or
+             (beforeDomMult    <> RescoredRXData^.DomesticMult)  or
+             (beforeDXMult     <> RescoredRXData^.DXMult)        or
+             (beforePrefixMult <> RescoredRXData^.PrefixMult)    or
+             (beforeZoneMult   <> RescoredRXData^.ZoneMult)      or
+             (beforeQSOPoints  <> RescoredRXData^.QSOPoints)     or
+             (beforeDupe       <> RescoredRXData^.ceDupe) then
+             begin
+             logger.Info('[actRescore] %s [%d] changed: ' +
+                'CountryID [%s]->[%s] Prefix [%s]->[%s] DXQTH [%s]->[%s] ' +
+                'DomMult %s->%s DXMult %s->%s PrefixMult %s->%s ZoneMult %s->%s ' +
+                'QSOPoints %d->%d Dupe %s->%s',
+                [string(RescoredRXData^.Callsign), QSOCounter,
+                 string(beforeCountryID),  string(RescoredRXData^.QTH.CountryID),
+                 string(beforePrefix),     string(RescoredRXData^.Prefix),
+                 string(beforeDXQTH),      string(RescoredRXData^.DXQTH),
+                 BoolToStr(beforeDomMult,    True), BoolToStr(RescoredRXData^.DomesticMult, True),
+                 BoolToStr(beforeDXMult,     True), BoolToStr(RescoredRXData^.DXMult,       True),
+                 BoolToStr(beforePrefixMult, True), BoolToStr(RescoredRXData^.PrefixMult,   True),
+                 BoolToStr(beforeZoneMult,   True), BoolToStr(RescoredRXData^.ZoneMult,     True),
+                 beforeQSOPoints, RescoredRXData^.QSOPoints,
+                 BoolToStr(beforeDupe, True), BoolToStr(RescoredRXData^.ceDupe, True)]);
+             end;
 
           Sheet.AddQSOToSheets(@RescoredRXData^, False);
           CallsignsList.AddCallsign(RescoredRXData^.Callsign,
@@ -7328,7 +7430,9 @@ begin
         testStr := MidStr(sADIF_UPPER, i, 4);
         if MidStr(sADIF_UPPER, i, 4) = 'EOR>' then
         begin
-          ctyLocateCall(exch.Callsign, exch.QTH);
+          // State-QP rover (KG1S/MON): strip suffix for country lookup
+          // so /M doesn't get misread as a GB prefix indicator.
+          ctyLocateCallStripRover(exch.Callsign, exch.QTH);
           Result := true;
           break;
         end
@@ -7550,7 +7654,9 @@ begin
         else if (MidStr(sADIF_UPPER, i, 5) = '<EOR>') or
           (MidStr(sADIF_UPPER, i, 4) = 'EOR>') then
         begin
-          ctyLocateCall(exch.Callsign, exch.QTH);
+          // State-QP rover (KG1S/MON): strip suffix for country lookup
+          // so /M doesn't get misread as a GB prefix indicator.
+          ctyLocateCallStripRover(exch.Callsign, exch.QTH);
           // if DoingDXMults then GetDXQTH(TempRXData);
           // if DoingPrefixMults then SetPrefix(TempRXData);
           // Sheet.SetMultFlags(TempRXData);
@@ -7849,7 +7955,11 @@ begin
       ClearContestExchange(TempRXData);
       if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
       begin
-        ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
+        // State-QP rover (KG1S/MON): strip suffix for country lookup so
+        // the /M tail isn't misread as a GB prefix indicator.  Without
+        // this wrapper the post-ParseADIFRecord lookup overwrites the
+        // QTH set inside ParseADIFRecord and we end up with DX=G.
+        ctyLocateCallStripRover(TempRXData.Callsign, TempRXData.QTH);
         CalculateQSOPoints(TempRXData);
         tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange),
           lpNumberOfBytesWritten);

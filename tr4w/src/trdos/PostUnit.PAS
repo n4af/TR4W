@@ -471,6 +471,8 @@ uses
   uCbrSum,
   MainUnit,
   uCFG;
+  // mo.DomList (ADIF CNTY long-name lookup) is reachable via the
+  // interface-section 'uses uMults' clause above.
 
 procedure WriteADIFField(sFieldName: string; sFieldValue: string);
 var sBuffer: string;
@@ -484,6 +486,31 @@ begin
       begin
       DEBUGMSG('[WriteADIFField] ' + sFieldName + ' value is blank - skipping');
       end;
+end;
+
+// For state-based QSO parties, return the host state's 2-letter ADIF
+// postal code; for any other contest return ''.  Used during ADIF export
+// when QTHString carries a county/section code instead of a 2-letter
+// state code -- in those contests we know the state by the contest itself.
+function GetStateForContest(c: ContestType): string;
+begin
+   case c of
+      CALQSOPARTY        : Result := 'CA';
+      FLORIDAQSOPARTY    : Result := 'FL';
+      MICHQSOPARTY       : Result := 'MI';
+      MINNQSOPARTY       : Result := 'MN';
+      MOQSOPARTY         : Result := 'MO';
+      NCQSOPARTY         : Result := 'NC';
+      OHIOQSOPARTY       : Result := 'OH';
+      TEXASQSOPARTY      : Result := 'TX';
+      WISCONSINQSOPARTY  : Result := 'WI';
+      TENNESSEEQSOPARTY  : Result := 'TN';
+      COLORADOQSOPARTY   : Result := 'CO';
+      PAQSOPARTY         : Result := 'PA';
+      INQSOPARTY         : Result := 'IN';
+   else
+      Result := '';
+   end;
 end;
 
 procedure CreateCabrilloFile;
@@ -1773,6 +1800,10 @@ var
   adifRoverFullCall                     : string;
   roverSlashPos                         : Integer;
   roverSuffix                           : string;
+  // ADIF CNTY emit: index into mo.DomList for the worked station's
+  // county code so we can pull the long-form county name (FAltName)
+  // loaded from <state>_cty.dom files.
+  cntyIdx                               : Integer;
 //  IOTAstring                            : Str10;
 begin
   sMode := '';
@@ -2048,10 +2079,35 @@ begin
    //      else if LooksLikeAState(TempRXData.QTHString) then
    else if not(Stringhasnumber(TempRXData.QTHString)) then
             begin
-            // MO QSO Party: 3-letter county codes (BAR, BOO, etc.) must not be
-            // exported as STATE.  Only 2-letter codes (TX, MO, etc.) are states.
-            if (Contest <> MOQSOPARTY) or (Length(TempRXData.QTHString) = 2) then
-               WriteADIFField('STATE',TempRXData.QTHString);
+            // ADIF STATE is the worked station's 2-letter US state postal
+            // code.  In state QSO parties, in-state stations send a county
+            // code in QTHString (3-letter for FL/MO/etc., variable elsewhere)
+            // -- those are NOT valid STATE values.  Three cases:
+            //   * QTHString is 2 letters: looks like a postal code, emit it.
+            //   * QTHString is multi-letter and we know the contest's host
+            //     state: emit that state (e.g. FQP county MON -> FL).
+            //   * Otherwise: skip.  Better no STATE than a bogus one.
+            if Length(TempRXData.QTHString) = 2 then
+               WriteADIFField('STATE', TempRXData.QTHString)
+            else
+               begin
+               sTemp := GetStateForContest(Contest);
+               if sTemp <> '' then
+                  begin
+                  WriteADIFField('STATE', sTemp);
+                  // ADIF CNTY = "<state>,<county-full-name>".  The long
+                  // form is loaded from <state>_cty.dom into FAltName by
+                  // LOGDOM.PAS when the file ships entries like
+                  // "Mon = MON,^Monroe".  Some state QP dom files do not
+                  // (yet) carry the ^Long second field (e.g. florida_cty.dom,
+                  // tennessee_cty.dom) -- in those cases FAltName is empty
+                  // and we just skip CNTY rather than emit a bogus value.
+                  if mo.DomList.FindMult(TempRXData.QTHString, cntyIdx) and
+                     (mo.DomList.FList[cntyIdx].FAltName <> '') then
+                     WriteADIFField('CNTY',
+                        sTemp + ',' + mo.DomList.FList[cntyIdx].FAltName);
+                  end;
+               end;
             end;
 
         //if ContestsArray[Contest].DM = DomesticMult
