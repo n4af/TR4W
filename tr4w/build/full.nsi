@@ -1,11 +1,11 @@
-!define TR4WVERSION    '147.00'
+!define TR4WVERSION    '147.01'
 !define TR4WINSTFOLDER 'Software\TR4W'
 !define TR4WDRVREG     'SYSTEM\CurrentControlSet\Services\TR4WIO'
 
 ;!define MMTTYMODE  'mmtty'
 ;!define TR4WLANG    'rus'
 ;!define TR4WLANG    'cze'
-!define TR4WLANG    'mng'
+;!define TR4WLANG    'mng'
 
 ;!define TR4WLANG    'ser'
 ;!define TR4WLANG    'rom'
