@@ -7548,6 +7548,7 @@ begin
         exch.ExchString := gridSquare;
         exch.DomesticQTH := gridSquare;
       end;
+ 
   else
     if (ActiveDomesticMult = GridSquares) or
       ((ActiveExchange = RSTAndOrGridExchange) or
@@ -7561,6 +7562,19 @@ begin
       exch.ExchString := IntToStr(exch.RSTReceived) + ' ' + gridSquare;
     end
     else
+
+
+
+
+
+
+
+
+
+
+
+
+
     begin
      if DoingDomesticMults then
       begin        //load domQTH with ALPHA portion of the srx_string
@@ -7572,6 +7586,7 @@ begin
          else
           exch.ExchString := tempSRX_String;
        end;
+
   end; // of case
 
   { if recordFromWSJTX then
