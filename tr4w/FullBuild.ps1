@@ -20,7 +20,8 @@ $TEST_DCU_DIR = "C:\Temp\tr4w-test"
 New-Item -ItemType Directory -Force -Path $TEST_DCU_DIR | Out-Null
 
 Push-Location $TEST_DIR
-& $DCC32 $TEST_DPR -`$D+ -`$L+ -`$Y+ "-N$TEST_DCU_DIR" "/E$TEST_DIR"
+# /U includes src\ so VC.pas (and Log4D.dcu within it) resolve correctly
+& $DCC32 $TEST_DPR -`$D+ -`$L+ -`$Y+ "-N$TEST_DCU_DIR" "/E$TEST_DIR" "/UC:\TR4W\tr4w\src"
 $testBuildResult = $LASTEXITCODE
 Pop-Location
 

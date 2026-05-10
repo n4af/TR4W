@@ -1766,7 +1766,7 @@ const
       //   (isString: @TailEndPhoneMessage; isPcharString: 'TAILEND.WAV'),
   
       (isString: @GetScoresSeverPostingAddress; isPcharString:
-         'http://post.contestonlinescore.com'),
+         'https://post.contestonlinescore.com/post/'),
       (isString: @GetScoresSeverReadingAddress; isPcharString:
          'https://contestonlinescore.com/scoreboard/'),
 

@@ -1356,7 +1356,7 @@ const
     );
 
 type
-  StationStatusType = (sstComputerNameAndID, sstBandModeFreq, sstPTT, sstOpMode, sstQSOs, sstCallsign);
+  StationStatusType = (sstComputerNameAndID, sstBandModeFreq, sstPTT, sstOpMode, sstQSOs, sstCallsign, sstOperator);
 
   TStationState = packed record
 
@@ -1375,6 +1375,8 @@ type
     {09}ssName: array[0..8] of Char;
 
     {01}ssType: StationStatusType;
+
+    {11}ssOperator: OperatorType;
   end;
 
 type

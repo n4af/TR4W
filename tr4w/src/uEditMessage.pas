@@ -179,7 +179,17 @@ begin
 //        if lParam = integer(MsgEditHWND) then if HiWord(wParam) = EN_KILLFOCUS then DestroyHintListBox;
 
         case wParam of
-          3: CreateModalDialog(225, 170, EditMessageWnd, @MessagesListDlgProc, 0);
+          3:
+            begin
+            // SelPos[102] is saved by EN_KILLFOCUS when the edit field loses
+            // focus to this button, so it already holds the cursor position.
+            if CreateModalDialog(225, 170, EditMessageWnd, @MessagesListDlgProc, 0) = 1 then
+              begin
+              Windows.SendMessage(MsgEditHWND, EM_SETSEL, SelPos[102], SelPos[102]);
+              Windows.SendMessage(MsgEditHWND, EM_REPLACESEL, 1, Integer(PChar(LastSelectedCommand)));
+              SetFocus(MsgEditHWND);
+              end;
+            end;
           109:
             begin
               i := Windows.GetDlgItemText(hwnddlg, 102, @TempBuffer2, SizeOf(ID));
