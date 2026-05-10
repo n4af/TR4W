@@ -591,6 +591,64 @@ begin
     end;
 end;
 
+// Issue: state-QP rover slash-in-call (e.g. "KG1S/PIN").  When the
+// operator types a call with a /COUNTY suffix, treat the suffix as the
+// rover's current location: strip the /COUNTY off the call and pre-fill
+// the exchange field with the county.  Net effect — the QSO is logged
+// with the bare call (KG1S) and county PIN, and the Cabrillo / ADIF
+// output is correct without any output-side stripping.
+//
+// Only fires when:
+//   - active exchange is a state-QP type
+//   - the call contains exactly one '/'
+//   - the suffix validates as a domestic QTH (so /M, /P, /4 etc. are left
+//     alone for other code paths to handle)
+//   - the exchange field is empty (operator hasn't typed something else)
+//
+// Note: this means subsequent rover QSOs from the same callsign in
+// different counties will be flagged as dupes (same logged callsign).
+// Address scoring/dupe behaviour for QP rovers in a follow-up issue.
+
+procedure ApplyRoverSlashInCall;
+var
+  CallStr     : string;
+  SlashPos    : Integer;
+  RoverCounty : string;
+  ProbeRX     : ContestExchange;
+begin
+  if not ((ActiveExchange = RSTDomesticQTHExchange) or
+          (ActiveExchange = RSTQTHExchange) or
+          (ActiveExchange = RSTDomesticOrDXQTHExchange)) then
+     Exit;
+
+  CallStr := string(CallWindowString);
+  SlashPos := Pos('/', CallStr);
+  if SlashPos = 0 then
+     Exit;
+
+  RoverCounty := UpperCase(Copy(CallStr, SlashPos + 1, Length(CallStr) - SlashPos));
+  if RoverCounty = '' then
+     Exit;
+
+  // Validate the suffix against the domestic-mults table using a scratch
+  // ContestExchange so we don't disturb any global state.
+  FillChar(ProbeRX, SizeOf(ProbeRX), 0);
+  ProbeRX.QTHString := RoverCounty;
+  if not FoundDomesticQTH(ProbeRX) then
+     Exit;  // /M, /P, /4 or any non-county suffix — leave alone
+
+  // Strip the suffix from the call and update the call window.
+  CallWindowString := Copy(CallStr, 1, SlashPos - 1);
+  Windows.SetWindowText(wh[mweCall], PChar(string(CallWindowString)));
+
+  // Pre-fill the exchange only if the operator hasn't already typed something.
+  if ExchangeWindowString = '' then
+     begin
+     ExchangeWindowString := RoverCounty;
+     Windows.SetWindowText(wh[mweExchange], PChar(string(ExchangeWindowString)));
+     end;
+end;
+
 function TryLogContact: boolean;
 var
   // Saved before ClearContestExchange wipes ReceivedData; passed to
@@ -600,6 +658,10 @@ var
   SavedRSTSent : Integer;
   begin
   Result := False;
+
+  // Issue: state-QP rover (KG1S/PIN) — strip rover suffix and pre-fill
+  // exchange so downstream code sees clean inputs.
+  ApplyRoverSlashInCall;
 
   if ParametersOkay(CallWindowString, ExchangeWindowString, ActiveBand,
     ActiveMode, ActiveRadioPtr.LastDisplayedFreq
