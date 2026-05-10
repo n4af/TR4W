@@ -561,6 +561,14 @@ end;
 //
 // Issue #885 (county lines) and POTA Nfer.
 
+// Build the per-QSO exchange string in <RST> <QTH> form so each multi-ref
+// QSO gets its own ADIF SRX_STRING instead of the combined original input.
+// Issue #889.
+function PerQSOExchString(const RXData: ContestExchange): string;
+begin
+  Result := IntToStr(RXData.RSTReceived) + ' ' + string(RXData.QTHString);
+end;
+
 procedure DrainPendingMultiQSORefs;
 var
   TempRX : ContestExchange;
@@ -571,12 +579,14 @@ begin
   while HasPendingParks do
     begin
     TempRX.QTHString := DequeuePendingPark;
+    TempRX.ExchString := PerQSOExchString(TempRX);   // Issue #889
     LogContact(TempRX, True);
     end;
   while HasPendingCounties do
     begin
     TempRX.QTHString := DequeuePendingCounty;
     FoundDomesticQTH(TempRX);  // refresh DomMultQTH/DomesticQTH
+    TempRX.ExchString := PerQSOExchString(TempRX);   // Issue #889
     LogContact(TempRX, True);
     end;
 end;
@@ -602,6 +612,14 @@ var
 {$IFEND}
     ReceivedData.ceSearchAndPounce := OpMode = SearchAndPounceOpMode;
     ReceivedData.ceComputerID := ComputerID;
+
+    // Issue #889: when this is a multi-county or multi-park entry, the
+    // parser has queued additional refs and ParametersOkay just stamped
+    // ReceivedData.ExchString with the COMBINED original input
+    // (e.g. "57 PIN/HIL").  Rewrite to per-QSO form for the first QSO so
+    // each ADIF SRX_STRING reflects only its own ref.
+    if HasPendingParks or HasPendingCounties then
+       ReceivedData.ExchString := PerQSOExchString(ReceivedData);
 
     LogContact(ReceivedData, True);
     DrainPendingMultiQSORefs;
