@@ -596,9 +596,14 @@ begin
     // Setting ceClearDupeSheet=True bypasses both LogContact's and
     // tUpdateLog(actRescore)'s dupe-stamping for this record only.
     TempRX.ceClearDupeSheet := True;
-    // Each county leg is a distinct logged QSO and should carry its own
-    // sequential NumberSent rather than reuse the first record's value.
-    Inc(TempRX.NumberSent);
+    // NumberSent is intentionally NOT incremented for county-line follow-up
+    // records: per CQ Magazine guidance for the California QSO Party (and
+    // other state QPs that combine serial numbers with county-line ops),
+    // ALL legs of a single on-air exchange share the one transmitted serial
+    // number.  Both records inherit it from the first.  See issue #892 for
+    // the related "next station's serial jumps by N" question, which is a
+    // separate architectural concern (TotalContacts/QSOTotals is bumped per
+    // LogContact call rather than per distinct station worked).
     LogContact(TempRX, True);
     end;
 end;
