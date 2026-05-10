@@ -989,6 +989,8 @@ begin
 end;
 
 function wkOpenPort: boolean;
+var
+  msg: string;
 begin
   Result := False;
   asm
@@ -1002,17 +1004,13 @@ begin
   WinKeyHandle := CreateFile(@wkREADBuffer, GENERIC_READ or GENERIC_WRITE, 0, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL {FILE_FLAG_OVERLAPPED}, 0);
   if WinKeyHandle = INVALID_HANDLE_VALUE then
   begin
-    SysErrorMessage(GetLastError);
-    asm
-  push eax
-  xor eax,eax
-  mov al,byte ptr WinKeySettings.wksWinKey2Port
-  push eax
-    end;
-    wsprintf(@wkREADBuffer, 'Winkeyer port COM%u: %s');
-    asm add esp,16
-    end;
-    showwarning(@wkREADBuffer);
+    // SysErrorMessage returns an AnsiString via a hidden var-parameter, not in
+    // eax. Assign to a local so the string data remains alive, then build the
+    // full message with SysUtils.Format. No inline asm / varargs juggling.
+    msg := Format('Winkeyer port COM%d: %s',
+                  [Integer(WinKeySettings.wksWinKey2Port),
+                   SysErrorMessage(GetLastError)]);
+    showwarning(PChar(msg));
     Exit;
   end;
   GetCommState(WinKeyHandle, wkDCB);
