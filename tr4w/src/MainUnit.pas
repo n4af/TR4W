@@ -472,7 +472,8 @@ type
     tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
     tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
     tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
-    tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1, tAdifAPP_N1MM_ID, tAdifAPP_TR4W_ID,tAdifSIG, tAdifSIG_INFO, tAdifPOTAREF
+    tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1, tAdifAPP_N1MM_ID, tAdifAPP_TR4W_ID,tAdifSIG, tAdifSIG_INFO, tAdifPOTAREF,
+    tAdifAPP_TR4W_ROVERCALL
     );
 var
   FreeMemCount: integer;
@@ -589,6 +590,91 @@ begin
     TempRX.ExchString := PerQSOExchString(TempRX);   // Issue #889
     LogContact(TempRX, True);
     end;
+end;
+
+// State-QP rover slash-in-call ("KG1S/MON"):
+//
+// The operator types a call with a /COUNTY suffix to indicate the rover's
+// current county.  TR4W keeps the call AS-IS in the log (KG1S/MON) so the
+// operator's intent is preserved end-to-end.  Cabrillo emits the literal
+// KG1S/MON; ADIF emits the bare call in the standard <CALL> field plus the
+// full form in a TR4W-specific <APP_TR4W_ROVERCALL> field (handled at
+// export time in PostUnit.PAS).
+//
+// At submit time (Enter, just before TryLogContact runs), if the operator
+// has not already typed an exchange, move the county from the call's slash-
+// suffix into the exchange field so the standard exchange parser sees a
+// clean "MON" and produces the right multiplier / log row.  No keystroke-
+// time interference — the operator can edit the call freely while typing.
+
+// Detect a state-QP rover slash-in-call.  Returns True when:
+//   - active exchange is a state-QP type
+//   - CallWindowString contains a '/'
+//   - the suffix validates as a domestic QTH (so /M, /P, /4 etc. are left
+//     alone for other code paths to handle)
+// On True, RoverCounty is populated with the validated county abbreviation.
+
+function DetectRoverSlashInCall(out RoverCounty: string): Boolean;
+var
+  CallStr  : string;
+  SlashPos : Integer;
+  ProbeRX  : ContestExchange;
+begin
+  Result := False;
+  RoverCounty := '';
+
+  if not ((ActiveExchange = RSTDomesticQTHExchange) or
+          (ActiveExchange = RSTQTHExchange) or
+          (ActiveExchange = RSTDomesticOrDXQTHExchange)) then
+     Exit;
+
+  CallStr := string(CallWindowString);
+  SlashPos := Pos('/', CallStr);
+  if SlashPos = 0 then
+     Exit;
+
+  RoverCounty := UpperCase(Copy(CallStr, SlashPos + 1, Length(CallStr) - SlashPos));
+  if RoverCounty = '' then
+     Exit;
+
+  // Validate the suffix against the domestic-mults table using a scratch
+  // ContestExchange so we don't disturb any global state.
+  FillChar(ProbeRX, SizeOf(ProbeRX), 0);
+  ProbeRX.QTHString := RoverCounty;
+  if not FoundDomesticQTH(ProbeRX) then
+     Exit;  // /M, /P, /4 or any non-county suffix — leave alone
+
+  Result := True;
+end;
+
+// When the operator hits Enter in the call window with a rover call
+// ("KG1S/MON") and no exchange typed yet, copy the county from the call's
+// slash-suffix into the exchange field and move focus there so the
+// operator can confirm with another Enter to log.
+//
+// Called from the start of ReturnInCQOpMode / ReturnInSAPOpMode (the
+// Enter-in-call-window handlers) — NOT from TryLogContact, which fires
+// only when both call and exchange are filled.
+//
+// The call itself is left untouched: KG1S/MON is the operator's intent
+// and survives through the log, Cabrillo, and the ADIF APP_TR4W_ROVERCALL
+// field.
+
+procedure PrefillExchangeFromRoverCallSuffix;
+var
+  RoverCounty : string;
+begin
+  if ExchangeWindowString <> '' then
+     Exit;
+  if not DetectRoverSlashInCall(RoverCounty) then
+     Exit;
+  ExchangeWindowString := RoverCounty;
+  Windows.SetWindowText(wh[mweExchange], PChar(string(ExchangeWindowString)));
+  // Move focus to exchange.  The caller's existing focus-move logic only
+  // fires when ExchangeWindowString is empty (which won't be true after
+  // we just populated it), so we have to do it ourselves here.
+  if not LeaveCursorInCallWindow then
+     tExchangeWindowSetFocus;
 end;
 
 function TryLogContact: boolean;
@@ -1086,6 +1172,12 @@ begin
     end;
     Exit;
   end;
+
+  // State-QP rover (KG1S/MON): if call has /COUNTY suffix and exchange
+  // is empty, copy the county to the exchange and move focus there so
+  // the operator can confirm with another Enter.
+  PrefillExchangeFromRoverCallSuffix;
+
   if (length(CallWindowString) <> 0) and (length(ExchangeWindowString) = 0) and
     SwitchNext then // 4.52.8
     if tAutoSendMode and (AutoSendCharacterCount > 0) then
@@ -1260,6 +1352,11 @@ begin
         SendFunctionKeyMessage(F1, OpMode);
       Exit;
     end;
+
+  // State-QP rover (KG1S/MON): if call has /COUNTY suffix and exchange
+  // is empty, copy the county to the exchange and move focus there so
+  // the operator can confirm with another Enter.
+  PrefillExchangeFromRoverCallSuffix;
 
   // if tr4w_CallWindowActive then
   if (length(CallWindowString) >= 3) then
@@ -4450,6 +4547,11 @@ function ParametersOkay(Call: CallString;
 var
   RST: Word;
   //s1, s2, s3, s4: str20;
+  // State-QP rover (KG1S/MON) — locals used only for the ctyLocateCall
+  // path below to look up the country/zone with the suffix stripped.
+  RoverLookupCall : CallString;
+  RoverSlashPos   : Integer;
+  RoverProbeRX    : ContestExchange;
 begin
   logger.debug('>>>Entering ParametersOkay');
   logger.debug('Calling ParametersOkay with call = %s, Band = %s, Mode = %s, freq = %d, ExchangeString = %s', [call, BandStringsArray[Band], ModeStringArray[Mode], freq, ExchangeString]);
@@ -4597,7 +4699,30 @@ begin
   else
     DefaultRST := 599;
 
-  ctyLocateCall(RData.Callsign, RData.QTH);
+  // State-QP rover (KG1S/MON): the country/zone lookup must run on the
+  // BARE call (KG1S) rather than the slashed form, otherwise /M is
+  // interpreted as a Great Britain prefix indicator and the QSO ends up
+  // tagged with country=G.  Detect a state-QP /COUNTY suffix and strip
+  // it for this lookup only; the original RData.Callsign is preserved
+  // unchanged so the rover form survives into the log and Cabrillo.
+  RoverLookupCall := RData.Callsign;
+  if ((ActiveExchange = RSTDomesticQTHExchange) or
+      (ActiveExchange = RSTQTHExchange) or
+      (ActiveExchange = RSTDomesticOrDXQTHExchange)) then
+     begin
+     RoverSlashPos := Pos('/', string(RoverLookupCall));
+     if RoverSlashPos > 0 then
+        begin
+        FillChar(RoverProbeRX, SizeOf(RoverProbeRX), 0);
+        RoverProbeRX.QTHString := UpperCase(
+           Copy(string(RoverLookupCall), RoverSlashPos + 1,
+                Length(string(RoverLookupCall)) - RoverSlashPos));
+        if FoundDomesticQTH(RoverProbeRX) then
+           RoverLookupCall := Copy(string(RoverLookupCall), 1,
+                                   RoverSlashPos - 1);
+        end;
+     end;
+  ctyLocateCall(RoverLookupCall, RData.QTH);
 
   if DoingDXMults then
     GetDXQTH(RData);
@@ -7175,11 +7300,18 @@ var
   tempPOTAREF: string;
   tempSIG_INFO: string;
   saveDecimalSeparator: char;
+  // State-QP rover round-trip: when APP_TR4W_ROVERCALL is present in
+  // an imported record, it carries the full operator-typed callsign
+  // (e.g. KG1S/MON) and overrides whatever the standard <CALL> field
+  // delivered.  The two fields can appear in either order in the ADIF
+  // record, so we use a flag rather than positional logic.
+  haveRoverCall: Boolean;
 
 begin
   lookingForFieldName := false;
   lookingForFieldLen := false;
   lookingForFieldValue := false;
+  haveRoverCall := false;
 
   try
     sADIF_UPPER := ANSIUPPERCASE(sADIF); // For testing without changing original
@@ -7225,14 +7357,28 @@ begin
                 'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
                 'STATE', 'STX', 'STX_STRING', 'SUBMODE', 'TEN_TEN',
                 'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN',
-                'QTH', 'PROGRAMID', 'APP_N1MM_EXCHANGE1', 'APP_N1MM_ID', 'APP_TR4W_ID','SIG', 'SIG_INFO', 'POTA_REF'])) of
+                'QTH', 'PROGRAMID', 'APP_N1MM_EXCHANGE1', 'APP_N1MM_ID', 'APP_TR4W_ID','SIG', 'SIG_INFO', 'POTA_REF',
+                'APP_TR4W_ROVERCALL'])) of
               tAdifARRL_SECT: tempARRL_Sect := fieldValue;
               //exch.QTHString := fieldValue;
               tAdifBAND:
                 begin
                   exch.Band := GetADIFBand(fieldValue);
                 end;
-              tAdifCALL: exch.Callsign := AnsiUpperCase(fieldValue);
+              tAdifCALL:
+                // If we have already seen APP_TR4W_ROVERCALL in this record,
+                // it carries the full rover form (KG1S/MON) and we keep that
+                // instead of the stripped-down standard CALL value.
+                if not haveRoverCall then
+                   exch.Callsign := AnsiUpperCase(fieldValue);
+              tAdifAPP_TR4W_ROVERCALL:
+                // TR4W-specific full rover callsign (KG1S/MON) — overrides
+                // whatever the standard CALL field delivered.  See the
+                // matching emit code in PostUnit.PAS::ExportToADIF.
+                begin
+                exch.Callsign := AnsiUpperCase(fieldValue);
+                haveRoverCall := true;
+                end;
               tAdifCHECK: exch.Check := StrToInt(fieldValue);
               tAdifCLASS: exch.ceClass := AnsiUpperCase(fieldValue);
               tAdifCQ_Z: exch.Zone := StrToInt(fieldValue);

@@ -1765,6 +1765,14 @@ var
   sMode                                 : string;
   sSubMode                              : string;
   saveDecimalSeparator                  : char;
+  // State-QP rover (KG1S/MON): per-record bare call for the standard
+  // <CALL> field, plus the full form for <APP_TR4W_ROVERCALL>.  Computed
+  // per QSO in the read loop below and consumed by the <CALL> Format
+  // and the WriteADIFField call that follows.
+  adifCallStr                           : string;
+  adifRoverFullCall                     : string;
+  roverSlashPos                         : Integer;
+  roverSuffix                           : string;
 //  IOTAstring                            : Str10;
 begin
   sMode := '';
@@ -1856,8 +1864,35 @@ begin
       //if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
       //if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
 
+      // State-QP rover (KG1S/MON): if the QSO record's call has a slash
+      // and the suffix matches the QSO's QTHString, it's a rover entry.
+      // Emit the bare call ("KG1S") in the standard <CALL> field and
+      // the full call ("KG1S/MON") in the TR4W-specific
+      // <APP_TR4W_ROVERCALL> field.  Gate on ActiveExchange so we only
+      // do this for state-QP contests; ActiveExchange is set to the
+      // contest type that created the log even at export time.
+      adifCallStr      := string(TempRXData.Callsign);
+      adifRoverFullCall := '';
+      if ((ActiveExchange = RSTDomesticQTHExchange) or
+          (ActiveExchange = RSTQTHExchange) or
+          (ActiveExchange = RSTDomesticOrDXQTHExchange)) then
+         begin
+         roverSlashPos := Pos('/', adifCallStr);
+         if roverSlashPos > 0 then
+            begin
+            roverSuffix := Copy(adifCallStr, roverSlashPos + 1,
+                                Length(adifCallStr) - roverSlashPos);
+            if (roverSuffix <> '') and
+               (UpperCase(roverSuffix) = UpperCase(string(TempRXData.QTHString))) then
+               begin
+               adifRoverFullCall := adifCallStr;
+               adifCallStr := Copy(adifCallStr, 1, roverSlashPos - 1);
+               end;
+            end;
+         end;
+
       sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%d <RST_RCVD:%u>%d '  // Moved CONTEST_ID below to make it conditional
-                  ,[length(TempRXData.Callsign), TempRXData.Callsign
+                  ,[Length(adifCallStr), adifCallStr
                   ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
                  // ,length(ExtendedModeStringArray[TempRXData.Mode]), ExtendedModeStringArray[TempRXData.Mode]
                  // ,length(ModeStringArray[TempRXData.Mode]), ModeStringArray[TempRXData.Mode]
@@ -1876,6 +1911,12 @@ begin
                   ]
                   );
       sWriteFileFromString(tReportFileWrite, sBuffer);
+
+      // State-QP rover: emit the full original (KG1S/MON) in the TR4W
+      // app-specific field so the operator's intent survives ADIF
+      // round-trips.  Empty string when the QSO wasn't a rover entry.
+      if adifRoverFullCall <> '' then
+         WriteADIFField('APP_TR4W_ROVERCALL', adifRoverFullCall);
 
       if not (Contest in [POTA,GENERALQSO]) then
          begin
