@@ -207,6 +207,14 @@ begin
    EmitField(first,    'Operator',     string(rec.ceOperator));
    EmitField(first,    'ID',           string(rec.id));
 
+   // Contest-attribute flag the verifier needs.  CountyLineAllowed is
+   // True for the 13 single-state QSO parties where a CALL/<county>
+   // form decomposes into bare CALL + APP_TR4W_ROVERCALL.  Living in
+   // ContestsArray (Pascal), we surface it so Python doesn't have to
+   // duplicate the list.
+   EmitBoolField(first, 'CountyLineAllowed',
+                 ContestsArray[rec.ceContest].CountyLineAllowed);
+
    // Filter-relevant flags (Python can re-apply the GoodLookingQSO
    // filter if needed)
    EmitField(first,    'RecordKind',   RecordKindToString(rec.ceRecordKind));

@@ -49,8 +49,13 @@ state** of the `.TRW` by the **current** TR4W build.  In particular:
 For each record (matched by position):
 
 - `CALL`, `BAND` (with 70cm/23cm rewrites)
+- `APP_TR4W_ROVERCALL` (when the contest's `CountyLineAllowed` flag is
+  set and the call's `/<county>` suffix matches `QTHString`)
 - `QSO_DATE`, `TIME_ON`, `TIME_OFF`
 - `MODE` and `SUBMODE` (using the same `ExtMode` mapping as `uADIF`)
+- `CONTEST_ID` (when the contest has a non-empty ADIF name)
+- `FREQ` (numeric, 1 Hz tolerance to absorb Delphi-vs-Python float
+  formatting differences)
 - `RST_SENT`, `RST_RCVD`
 - `SRX` / `STX` (5-digit zero-padded, when set)
 - `OPERATOR`, `APP_TR4W_ID`

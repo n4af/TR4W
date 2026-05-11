@@ -246,13 +246,31 @@ def cross_check(log_records, adif_records):
         return False
 
     for i, (log, adif) in enumerate(zip(log_records, adif_records)):
-        # CALL.  For state-QP rover ('CALL/<county>' where county matches
-        # QTHString), ADIF emits the bare call here.  We approximate by
-        # checking that ADIF CALL is a prefix of the log call up to '/'.
+        # ---- CALL + APP_TR4W_ROVERCALL ----
+        # For state-QP rover ('CALL/<county>' where county matches
+        # QTHString AND the contest's CountyLineAllowed flag is set),
+        # uADIF.ResolveRoverCall decomposes into bare CALL in <CALL>
+        # plus the full form in <APP_TR4W_ROVERCALL>.
         log_call = log["Call"]
         adif_call = adif.get("CALL", "")
-        if "/" in log_call and adif_call == log_call.split("/", 1)[0]:
-            pass  # rover-decomposed; tail emitter writes APP_TR4W_ROVERCALL
+        is_rover_decomposed = False
+        if (
+            "/" in log_call
+            and log.get("CountyLineAllowed")
+            and log["QTHString"]
+        ):
+            suffix = log_call.split("/", 1)[1]
+            if suffix.upper() == log["QTHString"].upper():
+                is_rover_decomposed = True
+        if is_rover_decomposed:
+            bare = log_call.split("/", 1)[0]
+            chk.expect(i, "CALL (rover bare)", bare, adif_call)
+            chk.expect(
+                i,
+                "APP_TR4W_ROVERCALL",
+                log_call,
+                adif.get("APP_TR4W_ROVERCALL"),
+            )
         else:
             chk.expect(i, "CALL", log_call, adif_call)
 
@@ -298,6 +316,41 @@ def cross_check(log_records, adif_records):
         chk.expect(i, "MODE", expected_mode, adif.get("MODE"))
         if expected_submode is not None:
             chk.expect(i, "SUBMODE", expected_submode, adif.get("SUBMODE"))
+
+        # ---- CONTEST_ID ----
+        # uADIF emits CONTEST_ID = ContestsArray[ceContest].ADIFName
+        # for every record except POTA and GENERALQSO.  When ADIFName
+        # is empty (legacy contest with no ADIF mapping) the field is
+        # also skipped because EmitADIFField returns '' for empty values.
+        # We replicate by simply: if the log surfaces a non-empty
+        # Contest string, expect it in CONTEST_ID; otherwise skip.
+        if log.get("Contest"):
+            chk.expect(i, "CONTEST_ID", log["Contest"], adif.get("CONTEST_ID"))
+
+        # ---- FREQ ----
+        # uADIF.FormatADIFFreq: freqHz / 1_000_000, '.'-separated, no
+        # forced precision.  Compare numerically with 1 Hz tolerance to
+        # avoid float-repr fragility.
+        if log["FrequencyHz"]:
+            chk.checks += 1
+            expected_mhz = log["FrequencyHz"] / 1_000_000
+            actual_freq = adif.get("FREQ")
+            if actual_freq is None:
+                chk.errors.append(
+                    (i, "FREQ", f"{expected_mhz}", "<missing>")
+                )
+            else:
+                try:
+                    actual_mhz = float(actual_freq)
+                    if abs(actual_mhz - expected_mhz) > 1e-6:
+                        chk.errors.append(
+                            (i, "FREQ", f"{expected_mhz}", actual_freq)
+                        )
+                except ValueError:
+                    chk.errors.append(
+                        (i, "FREQ", expected_mhz,
+                         f"non-float: {actual_freq!r}")
+                    )
 
         # RST_SENT / RST_RCVD (stored as integers in log, emitted as IntToStr)
         chk.expect(i, "RST_SENT", str(log["RSTSent"]), adif.get("RST_SENT"))
