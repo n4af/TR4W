@@ -20,6 +20,63 @@ Various contributors along the way
 
 ---
 
+## 4.147.x — May 2026
+
+### 4.147.02 (2026-05-10) — NY4I / N4AF
+
+#### State QSO Party Rover — Slash-in-Call (`src/MainUnit.pas`, `src/trdos/PostUnit.PAS`, `src/trdos/LOGSUBS2.PAS`)
+
+- **Rover call format (KG1S/MON)**: a state-QP rover call with a `/COUNTY` suffix is kept literally in the log (so Cabrillo and the on-screen log preserve it end-to-end); the county is pre-filled into the exchange at submit time.
+- **Country lookup**: the slash-suffix is stripped before `ctyLocateCall` in import, live submit, and rescore paths so `/M` no longer mislabels a US rover as country=G.
+- **ADIF round-trip**: export emits the bare call in `<CALL>` plus the full rover form in a TR4W-specific `<APP_TR4W_ROVERCALL>` field; import recognizes that field and restores the full form.
+- **ADIF STATE**: contest→state map for 13 state QSO parties (CA/FL/MI/MN/MO/NC/OH/TX/WI/TN/CO/PA/IN); emits the contest's postal code when QTHString is a county, the 2-letter QTH otherwise, otherwise skipped. Replaces the prior MO-only special case.
+- **ADIF CNTY**: emitted as `<CNTY:N>state,long-name` when `mo.DomList.FAltName` is populated for the worked county (CA, MO, OH, PA, WI, IL, TX, MI). FL/TN `_cty.dom` files lack `^Long` second fields, so CNTY is silently skipped for those.
+- **County-line ops**: follow-up county records (multi-county Nfer Enter) are no longer flagged as dupes, do not emit the "is a dupe and will be logged with zero QSO points" banner / three-harmonic beep, and share the single transmitted serial number per CQ Magazine guidance for CQP. Implemented via `ceClearDupeSheet` honored at both `LogContact` and `tUpdateLog(actRescore)`.
+- **ADIF SRX_STRING normalization**: `<SRX_STRING>` is normalized to include the implied RST (e.g. `599 HIL`) so it is symmetric with `STX_STRING` regardless of whether the operator typed the RST.
+
+#### Multi-County / Multi-Park Nfer (`src/MainUnit.pas`) — Issues #885, #889
+
+- **Single Enter = N QSOs**: one Enter press logs N QSOs for multi-county and multi-park entries.
+- **Per-QSO SRX_STRING**: each follow-up record carries its own ADIF `<SRX_STRING>` (one ref per record), not the combined operator input.
+
+#### ADIF Multiplier Repopulation (`src/MainUnit.pas`) — Issue #884
+
+- **Import ADIF for state QPs**: after an import, multipliers (counties) are correctly repopulated for state QPs using the `RSTDomesticOrDXQTHExchange` style. Verified with CA QP and FL QP.
+
+#### WinKeyer (`src/uWinKey.pas`)
+
+- **WK3 hardware detection** — Issue #891: status field now reads `WK3 v31` for K1EL WinKeyer3. The binary `WK2 := version >= 20` check labeled anything ≥20 as "WK2"; now classified by K1EL firmware version (v<20 → WK1, v20-29 → WK2, v≥30 → WK3). Inline-asm `wsprintf` replaced with `Format`/`PChar`.
+- **Port-open error fix**: `Winkeyer port COM5: xlk ,ÿñ"nS` garbage replaced with a readable Windows error message. Delphi 7 ABI mismatch — `SysErrorMessage(GetLastError)` returned its AnsiString via a hidden var-parameter (not eax), so the asm push'd random bytes into wsprintf. Now uses `SysUtils.Format`/`PChar`.
+
+#### Networking
+
+- **Active operator in network window** (`src/uNet.pas`, `src/VC.pas`, `src/MainUnit.pas`) — Issue #770: the network window shows the active operator name for each connected station.
+- **uGetScores HTTPS** (`src/uGetScores.pas`) — Issue #26: raw WinSock2 POST replaced with `TIdHTTP` + TLS so secure score-site submissions work.
+- **Connect-retry log filter** (`src/uNet.pas`): repeated retry messages are logged once per state change rather than once per retry.
+
+#### Programmable Messages — Cmd Insert (`src/uMessagesList.pas`, `src/uEditMessage.pas`) — Issue #47
+
+- **Double-click to insert at cursor**: in the message editor, double-clicking a command in the command list inserts the command text at the cursor position rather than replacing the field.
+
+#### New Contest — Clean .TRW Overwrite (`src/uNewContest.pas`) — Issue #674
+
+- **Delete .TRW on overwrite**: when creating a new contest that overwrites an existing one, the old `.TRW` file is deleted as part of the overwrite so stale log records do not bleed in.
+
+#### Tests (`tr4w/test/unit/`)
+
+- **utils_text unit tests**: tests for `StringIsAll*` and `StringWithFirstWordDeleted` added to `tr4w_unit_tests.dpr`.
+
+#### Diagnostic Logging (`src/MainUnit.pas`)
+
+- **`ctyLocateCallStripRover` trace**: ENTER/QP/suffix/EXIT lines at INFO so the country lookup behaviour for slashed calls is visible.
+- **`actRescore` changed-record trace**: one INFO line per record when any of `CountryID`, `Prefix`, `DXQTH`, mult flags, `QSOPoints`, or `Dupe` changes during a rescore.
+
+#### Known Follow-Ups
+
+- **Issue #892** (next-station serial jumps by N after a multi-county / Nfer entry): TR4W conflates "log record count" with "next serial to transmit". Architectural fix needs a separate `NextSerialCounter`, out of scope for this release.
+
+---
+
 ## 4.146.x — April 2026
 
 ### 4.146.14 (2026-04-17) — NY4I
