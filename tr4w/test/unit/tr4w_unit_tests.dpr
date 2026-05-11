@@ -32,7 +32,8 @@ uses
    utils_text           in '..\..\src\utils\utils_text.pas',
    uTestUtilsText       in 'uTestUtilsText.pas',
    uADIF                in '..\..\src\uADIF.pas',
-   uTestADIF            in 'uTestADIF.pas';
+   uTestADIF            in 'uTestADIF.pas',
+   uTestADIFFixtures    in 'uTestADIFFixtures.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -47,6 +48,7 @@ begin
    RegisterSuite(TADIFLexerTests.Create('ADIFLexer'));
    RegisterSuite(TADIFHelperTests.Create('ADIFHelpers'));
    RegisterSuite(TADIFMappingTests.Create('ADIFMapping'));
+   RegisterSuite(TADIFFixtureTests.Create('ADIFFixtures'));
 
    if RunAllSuites then
       begin

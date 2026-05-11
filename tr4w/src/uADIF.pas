@@ -165,6 +165,14 @@ function IsValidGUID(const guid: string): Boolean;
 // Clear a TADIFRecordTemps to empty/false state.
 procedure InitADIFRecordTemps(var temps: TADIFRecordTemps);
 
+// Initialize a ContestExchange to a sane "no record yet" state for use
+// by the ADIF parser.  Mirrors the relevant parts of the legacy
+// ClearContestExchange (trdos/LOGDUPE.PAS) -- specifically the
+// sentinels the parser depends on, e.g. Mode = NoMode so the MODE-
+// handler's `if exch.Mode = NoMode` guard fires.  Does NOT touch
+// MainUnit-global fields like ceContest's contest-specific defaults.
+procedure InitContestExchangeForParse(var exch: ContestExchange);
+
 // Apply a parsed field list to a ContestExchange record, populating
 // "obvious" exch.X fields (CALL, BAND, MODE, FREQ, RST, SRX, STX, etc.)
 // directly, and capturing the contest-aware temp values (SRX_STRING,
@@ -665,7 +673,13 @@ const
    // Order MUST match the TADIF_Fields enum declaration.  Adding a field
    // requires updating BOTH this array AND the enum.
    ADIF_FIELD_NAMES : array[0..44] of string = (
-      'ARRL_SECT', 'BAND', 'CALL', 'CHECK', 'CLASS', 'CQ_Z',
+      // ADIF spec field name is `CQZ` (no underscore).  The original
+      // import lookup had `CQ_Z` which never matched real-world ADIF
+      // exports -- the tAdifCQ_Z handler was effectively dead until
+      // this fix.  Zone parsing for CQ-WW used to rely on the SRX_STRING
+      // post-processing in MainUnit's contest tail.  Surfaced by the
+      // CQ-WW-CW fixture test (uTestADIFFixtures).
+      'ARRL_SECT', 'BAND', 'CALL', 'CHECK', 'CLASS', 'CQZ',
       'CONTEST_ID', 'CNTY', 'FOC_NUM', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
       'IOTA', 'ITUZ', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
       'QSO_DATE', 'QSO_DATE_OFF', 'TIME_ON', 'TIME_OFF',
@@ -897,6 +911,30 @@ end;
 // Multi-record entry point
 // ---------------------------------------------------------------------------
 
+// Initialize a ContestExchange to a sane "no record yet" state.  Matches
+// the parts of MainUnit/trdos's ClearContestExchange that the ADIF
+// parser depends on (specifically: Mode = NoMode so the MODE-handler
+// guard `if exch.Mode = NoMode then ...` fires, and a few other
+// sentinels that distinguish "not seen" from "seen as zero").  Does NOT
+// touch ceContest (caller's job, normally via the ADIF CONTEST_ID
+// field) or any field that depends on MainUnit globals.
+procedure InitContestExchangeForParse(var exch: ContestExchange);
+const
+   // ClearContestExchange uses -1 / MAXWORD / MAXBYTE as "not set" sentinels.
+   // Windows.MAXWORD is $FFFF; declared locally to avoid `uses Windows`.
+   SENTINEL_WORD = $FFFF;
+begin
+   FillChar(exch, SizeOf(exch), 0);
+   exch.Band           := NoBand;
+   exch.Mode           := NoMode;
+   exch.ExtMode        := eNoMode;
+   exch.NumberReceived := SENTINEL_WORD;
+   exch.NumberSent     := SENTINEL_WORD;
+   exch.TenTenNum      := SENTINEL_WORD;
+   exch.Zone           := DUMMYZONE;
+   exch.QTH.Zone       := DUMMYZONE;
+end;
+
 function ImportADIFFromString(const s: string;
                               var records: TContestExchangeArray): Integer;
 var
@@ -938,7 +976,7 @@ begin
 
       // Lex + apply
       ParseADIFFieldsList(chunk, fields);
-      FillChar(exch, SizeOf(exch), 0);
+      InitContestExchangeForParse(exch);
       InitADIFRecordTemps(temps);
       ApplyADIFFieldsToExchange(fields, exch, temps);
 

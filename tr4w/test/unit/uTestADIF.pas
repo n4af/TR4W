@@ -369,7 +369,7 @@ var
 begin
    BeginTest('Test_BasicMapping_PopulatesExch');
 
-   FillChar(exch, SizeOf(exch), 0);
+   InitContestExchangeForParse(exch);
    SetLength(fields, 5);
    fields[0].Name := 'CALL';     fields[0].Value := 'kg1s';
    fields[1].Name := 'BAND';     fields[1].Value := '20m';
@@ -394,7 +394,7 @@ var
 begin
    BeginTest('Test_BasicMapping_CapturesTemps');
 
-   FillChar(exch, SizeOf(exch), 0);
+   InitContestExchangeForParse(exch);
    SetLength(fields, 4);
    fields[0].Name := 'SRX_STRING';  fields[0].Value := 'MON';
    fields[1].Name := 'STATE';       fields[1].Value := 'FL';
@@ -417,7 +417,7 @@ begin
    BeginTest('Test_FromWSJTX_StripsPlusFromRST');
    // WSJT-X transmits signed-dB SNR like +05.  Mapping must strip the
    // sign so StrToIntDef parses the magnitude.
-   FillChar(exch, SizeOf(exch), 0);
+   InitContestExchangeForParse(exch);
    SetLength(fields, 3);
    fields[0].Name := 'PROGRAMID'; fields[0].Value := 'WSJT-X';
    fields[1].Name := 'RST_RCVD';  fields[1].Value := '+05';
@@ -441,7 +441,7 @@ var
    temps  : TADIFRecordTemps;
 begin
    BeginTest('Test_RoverCallAfterCALL_Overrides');
-   FillChar(exch, SizeOf(exch), 0);
+   InitContestExchangeForParse(exch);
    SetLength(fields, 2);
    fields[0].Name := 'CALL';
    fields[0].Value := 'KG1S';
@@ -461,7 +461,7 @@ begin
    BeginTest('Test_CALLAfterRoverCall_DoesNotOverride');
    // Field order reversed — rover call seen first, plain CALL second.
    // Mapping must keep the rover form regardless of order.
-   FillChar(exch, SizeOf(exch), 0);
+   InitContestExchangeForParse(exch);
    SetLength(fields, 2);
    fields[0].Name := 'APP_TR4W_ROVERCALL';
    fields[0].Value := 'KG1S/MON';
@@ -479,7 +479,7 @@ var
    temps  : TADIFRecordTemps;
 begin
    BeginTest('Test_ModeNotOverwrittenAfterSet');
-   FillChar(exch, SizeOf(exch), 0);
+   InitContestExchangeForParse(exch);
    // First MODE=CW sets exch.Mode=CW.  Second MODE=SSB must be ignored
    // because legacy guard is `if exch.Mode = NoMode then ...`.  This
    // matches the original ParseADIFRecord behaviour.
