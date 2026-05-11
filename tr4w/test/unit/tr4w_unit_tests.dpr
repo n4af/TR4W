@@ -46,6 +46,7 @@ begin
    RegisterSuite(TUtilsTextTests.Create('UtilsText'));
    RegisterSuite(TADIFLexerTests.Create('ADIFLexer'));
    RegisterSuite(TADIFHelperTests.Create('ADIFHelpers'));
+   RegisterSuite(TADIFMappingTests.Create('ADIFMapping'));
 
    if RunAllSuites then
       begin

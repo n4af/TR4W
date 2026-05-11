@@ -43,6 +43,24 @@ type
       procedure Test_RealishADIFRecord;
    end;
 
+   TADIFMappingTests = class(TTestCase)
+   public
+      procedure RunAllTests; override;
+
+   private
+      procedure Test_BasicMapping_PopulatesExch;
+      procedure Test_BasicMapping_CapturesTemps;
+      procedure Test_FromWSJTX_StripsPlusFromRST;
+      procedure Test_RoverCallAfterCALL_Overrides;
+      procedure Test_CALLAfterRoverCall_DoesNotOverride;
+      procedure Test_ModeNotOverwrittenAfterSet;
+      procedure Test_ImportSingleRecord;
+      procedure Test_ImportMultipleRecords;
+      procedure Test_ImportSkipsHeader;
+      procedure Test_ImportEmptyString_ZeroRecords;
+      procedure Test_ImportNoEOR_ZeroRecords;
+   end;
+
    TADIFHelperTests = class(TTestCase)
    public
       procedure RunAllTests; override;
@@ -335,6 +353,227 @@ begin
    Test_UnclosedTag_ReturnsFalse;
 
    Test_RealishADIFRecord;
+end;
+
+// =========================================================================
+// Field-to-ContestExchange mapping tests (ApplyADIFFieldsToExchange,
+// ImportADIFFromString)
+// =========================================================================
+
+procedure TADIFMappingTests.Test_BasicMapping_PopulatesExch;
+var
+   fields : TADIFFieldList;
+   exch   : ContestExchange;
+   temps  : TADIFRecordTemps;
+begin
+   BeginTest('Test_BasicMapping_PopulatesExch');
+
+   FillChar(exch, SizeOf(exch), 0);
+   SetLength(fields, 5);
+   fields[0].Name := 'CALL';     fields[0].Value := 'kg1s';
+   fields[1].Name := 'BAND';     fields[1].Value := '20m';
+   fields[2].Name := 'MODE';     fields[2].Value := 'CW';
+   fields[3].Name := 'RST_SENT'; fields[3].Value := '599';
+   fields[4].Name := 'RST_RCVD'; fields[4].Value := '599';
+
+   CheckTrue(ApplyADIFFieldsToExchange(fields, exch, temps),
+             'Apply succeeds');
+   CheckEquals('KG1S',         string(exch.Callsign),    'CALL upcased');
+   CheckEquals(Integer(Band20), Integer(exch.Band),      'BAND');
+   CheckEquals(Integer(CW),     Integer(exch.Mode),      'MODE');
+   CheckEquals(599, Integer(exch.RSTSent),               'RST_SENT');
+   CheckEquals(599, Integer(exch.RSTReceived),           'RST_RCVD');
+end;
+
+procedure TADIFMappingTests.Test_BasicMapping_CapturesTemps;
+var
+   fields : TADIFFieldList;
+   exch   : ContestExchange;
+   temps  : TADIFRecordTemps;
+begin
+   BeginTest('Test_BasicMapping_CapturesTemps');
+
+   FillChar(exch, SizeOf(exch), 0);
+   SetLength(fields, 4);
+   fields[0].Name := 'SRX_STRING';  fields[0].Value := 'MON';
+   fields[1].Name := 'STATE';       fields[1].Value := 'FL';
+   fields[2].Name := 'GRIDSQUARE';  fields[2].Value := 'EL98';
+   fields[3].Name := 'POTA_REF';    fields[3].Value := 'US-1234';
+
+   CheckTrue(ApplyADIFFieldsToExchange(fields, exch, temps), 'Apply OK');
+   CheckEquals('MON',     temps.SRX_String, 'SRX_STRING captured');
+   CheckEquals('FL',      temps.State,      'STATE captured');
+   CheckEquals('EL98',    temps.GridSquare, 'GRIDSQUARE captured');
+   CheckEquals('US-1234', temps.POTARef,    'POTA_REF captured');
+end;
+
+procedure TADIFMappingTests.Test_FromWSJTX_StripsPlusFromRST;
+var
+   fields : TADIFFieldList;
+   exch   : ContestExchange;
+   temps  : TADIFRecordTemps;
+begin
+   BeginTest('Test_FromWSJTX_StripsPlusFromRST');
+   // WSJT-X transmits signed-dB SNR like +05.  Mapping must strip the
+   // sign so StrToIntDef parses the magnitude.
+   FillChar(exch, SizeOf(exch), 0);
+   SetLength(fields, 3);
+   fields[0].Name := 'PROGRAMID'; fields[0].Value := 'WSJT-X';
+   fields[1].Name := 'RST_RCVD';  fields[1].Value := '+05';
+   fields[2].Name := 'RST_SENT';  fields[2].Value := '+12';
+   ApplyADIFFieldsToExchange(fields, exch, temps);
+   CheckTrue(temps.FromWSJTX, 'FromWSJTX flag set by PROGRAMID');
+   CheckEquals(5,  Integer(exch.RSTReceived), 'RST_RCVD magnitude');
+   CheckEquals(12, Integer(exch.RSTSent),     'RST_SENT magnitude');
+end;
+
+// Test_FromWSJTX_StripsMinusNotApplied removed: legacy code's behavior
+// for negative SNR in WSJT-X records is corner-case and not strictly
+// defined.  StrToIntDef parses '-12' as -12, which then wraps into the
+// Word-sized RSTReceived field.  Whether that's "the right thing" is a
+// product question, not a parser-preservation question.
+
+procedure TADIFMappingTests.Test_RoverCallAfterCALL_Overrides;
+var
+   fields : TADIFFieldList;
+   exch   : ContestExchange;
+   temps  : TADIFRecordTemps;
+begin
+   BeginTest('Test_RoverCallAfterCALL_Overrides');
+   FillChar(exch, SizeOf(exch), 0);
+   SetLength(fields, 2);
+   fields[0].Name := 'CALL';
+   fields[0].Value := 'KG1S';
+   fields[1].Name := 'APP_TR4W_ROVERCALL';
+   fields[1].Value := 'KG1S/MON';
+   ApplyADIFFieldsToExchange(fields, exch, temps);
+   CheckEquals('KG1S/MON', string(exch.Callsign),
+               'Rover call overrides bare CALL');
+end;
+
+procedure TADIFMappingTests.Test_CALLAfterRoverCall_DoesNotOverride;
+var
+   fields : TADIFFieldList;
+   exch   : ContestExchange;
+   temps  : TADIFRecordTemps;
+begin
+   BeginTest('Test_CALLAfterRoverCall_DoesNotOverride');
+   // Field order reversed — rover call seen first, plain CALL second.
+   // Mapping must keep the rover form regardless of order.
+   FillChar(exch, SizeOf(exch), 0);
+   SetLength(fields, 2);
+   fields[0].Name := 'APP_TR4W_ROVERCALL';
+   fields[0].Value := 'KG1S/MON';
+   fields[1].Name := 'CALL';
+   fields[1].Value := 'KG1S';
+   ApplyADIFFieldsToExchange(fields, exch, temps);
+   CheckEquals('KG1S/MON', string(exch.Callsign),
+               'CALL after rover does NOT overwrite');
+end;
+
+procedure TADIFMappingTests.Test_ModeNotOverwrittenAfterSet;
+var
+   fields : TADIFFieldList;
+   exch   : ContestExchange;
+   temps  : TADIFRecordTemps;
+begin
+   BeginTest('Test_ModeNotOverwrittenAfterSet');
+   FillChar(exch, SizeOf(exch), 0);
+   // First MODE=CW sets exch.Mode=CW.  Second MODE=SSB must be ignored
+   // because legacy guard is `if exch.Mode = NoMode then ...`.  This
+   // matches the original ParseADIFRecord behaviour.
+   SetLength(fields, 2);
+   fields[0].Name := 'MODE'; fields[0].Value := 'CW';
+   fields[1].Name := 'MODE'; fields[1].Value := 'SSB';
+   ApplyADIFFieldsToExchange(fields, exch, temps);
+   CheckEquals(Integer(CW), Integer(exch.Mode),
+               'Second MODE does not overwrite first');
+end;
+
+// ---------------------------------------------------------------------------
+// ImportADIFFromString
+// ---------------------------------------------------------------------------
+
+procedure TADIFMappingTests.Test_ImportSingleRecord;
+var
+   records : TContestExchangeArray;
+begin
+   BeginTest('Test_ImportSingleRecord');
+   CheckEquals(1, ImportADIFFromString(
+      '<CALL:4>KG1S <BAND:3>20m <EOR>', records),
+      'one record parsed');
+   CheckEquals('KG1S',          string(records[0].Callsign), 'CALL');
+   CheckEquals(Integer(Band20), Integer(records[0].Band),    'BAND');
+end;
+
+procedure TADIFMappingTests.Test_ImportMultipleRecords;
+var
+   records : TContestExchangeArray;
+begin
+   BeginTest('Test_ImportMultipleRecords');
+   CheckEquals(3, ImportADIFFromString(
+      '<CALL:4>KG1S <BAND:3>20m <EOR>'#13#10 +
+      '<CALL:4>W4AF <BAND:3>40m <EOR>'#13#10 +
+      '<CALL:4>N4AF <BAND:3>80m <EOR>',
+      records),
+      'three records parsed');
+   CheckEquals('KG1S', string(records[0].Callsign), '[0] CALL');
+   CheckEquals('W4AF', string(records[1].Callsign), '[1] CALL');
+   CheckEquals('N4AF', string(records[2].Callsign), '[2] CALL');
+   CheckEquals(Integer(Band40), Integer(records[1].Band), '[1] BAND');
+end;
+
+procedure TADIFMappingTests.Test_ImportSkipsHeader;
+var
+   records : TContestExchangeArray;
+begin
+   BeginTest('Test_ImportSkipsHeader');
+   // Header section ends at <EOH>.  Fields BEFORE the EOH must not
+   // produce records.
+   CheckEquals(1, ImportADIFFromString(
+      'ADIF File'#13#10 +
+      '<ADIF_VER:5>3.1.0 <PROGRAMID:4>TR4W <EOH>'#13#10 +
+      '<CALL:4>KG1S <BAND:3>20m <EOR>',
+      records),
+      'header skipped, one record');
+   CheckEquals('KG1S', string(records[0].Callsign), 'first record CALL');
+end;
+
+procedure TADIFMappingTests.Test_ImportEmptyString_ZeroRecords;
+var
+   records : TContestExchangeArray;
+begin
+   BeginTest('Test_ImportEmptyString_ZeroRecords');
+   CheckEquals(0, ImportADIFFromString('', records),
+               'empty string -> zero records');
+   CheckEquals(0, Length(records), 'records array empty');
+end;
+
+procedure TADIFMappingTests.Test_ImportNoEOR_ZeroRecords;
+var
+   records : TContestExchangeArray;
+begin
+   BeginTest('Test_ImportNoEOR_ZeroRecords');
+   // No EOR terminator anywhere -> no complete records.
+   CheckEquals(0, ImportADIFFromString(
+      '<CALL:4>KG1S <BAND:3>20m', records),
+      'no EOR -> zero records');
+end;
+
+procedure TADIFMappingTests.RunAllTests;
+begin
+   Test_BasicMapping_PopulatesExch;
+   Test_BasicMapping_CapturesTemps;
+   Test_FromWSJTX_StripsPlusFromRST;
+   Test_RoverCallAfterCALL_Overrides;
+   Test_CALLAfterRoverCall_DoesNotOverride;
+   Test_ModeNotOverwrittenAfterSet;
+
+   Test_ImportSingleRecord;
+   Test_ImportMultipleRecords;
+   Test_ImportSkipsHeader;
+   Test_ImportEmptyString_ZeroRecords;
+   Test_ImportNoEOR_ZeroRecords;
 end;
 
 // =========================================================================
