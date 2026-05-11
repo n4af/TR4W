@@ -45,6 +45,7 @@ begin
    RegisterSuite(TFlexRadioUtilsTests.Create('FlexRadioUtils'));
    RegisterSuite(TUtilsTextTests.Create('UtilsText'));
    RegisterSuite(TADIFLexerTests.Create('ADIFLexer'));
+   RegisterSuite(TADIFHelperTests.Create('ADIFHelpers'));
 
    if RunAllSuites then
       begin

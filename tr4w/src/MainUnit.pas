@@ -29,6 +29,7 @@ interface
 uses
   ShellAPI,
   Logstuff,
+  uADIF,
   uMenu,
   uAltD,
   uMessagesList,
@@ -169,8 +170,8 @@ var
   Third: Boolean = False;
   wsjtx: TWSJTXServer;
   externalLogger: TExternalLogger;
-  saveLastADIFName: string; // ny4i to save for ContestByADIFName cache
-  saveLastContest: ContestType;
+  // saveLastADIFName / saveLastContest cache moved to uADIF.pas with
+  // GetContestByADIFName (Issue #887).
   logger: TLogLogger;
   appender: TLogFileAppender;
   s1, s2, s3, s4: str20;
@@ -217,7 +218,7 @@ procedure OpenUrl(url: PChar);
 function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
 procedure ProcessImportedSRX_String(fieldValue: string; var exch:
   ContestExchange);
-function GetContestByADIFName(sADIFName: string): ContestType;
+// GetContestByADIFName moved to uADIF.pas (Issue #887).
 procedure SetExtendedModeFromMode(RData: ContestExchange);
 function GetTR4WBandFromNetworkBand(band: TRadioBand): BandType;
 function GetRadioBandFromBandType(band: BandType): TRadioBand;
@@ -388,8 +389,7 @@ function IsCWByCATActive(theRadio: RadioPtr): boolean; overload;
 // ny4i Issue # 111
 function IsCWByCATActive: boolean; overload; // ny4i Issue # 111
 
-function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
-function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
+// ADIFDateStringToQSOTime, ADIFTimeStringToQSOTime moved to uADIF.pas (Issue #887).
 function DigitsIn(n: smallInt): byte;
 function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
 
@@ -462,19 +462,8 @@ type
 
   Ttr4wGetPlugin = function(): PChar; stdcall;
 
-type
-  TADIF_Fields = (tAdifARRL_SECT = 0, tAdifBAND, tAdifCALL, tAdifCHECK,
-    tAdifCLASS, tAdifCQ_Z,
-    tAdifCONTEST_ID, tAdifCNTY, tadifFOC_NUM, tAdifGRIDSQUARE, tAdifFREQ,
-    tAdifFREQ_RX,
-    tAdifIOTA, tAdifITUZ, tAdifMODE, tAdifNAME, tAdifOPERATOR, tAdifPRECEDENCE,
-    tAdifQSO_DATE, tAdifQSO_DATE_OFF, tAdifTIME_ON, tAdifTIME_OFF,
-    tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
-    tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
-    tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
-    tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1, tAdifAPP_N1MM_ID, tAdifAPP_TR4W_ID,tAdifSIG, tAdifSIG_INFO, tAdifPOTAREF,
-    tAdifAPP_TR4W_ROVERCALL
-    );
+// TADIF_Fields enum moved to uADIF.pas (Issue #887).
+
 var
   FreeMemCount: integer;
   ReallocMemCount: integer;
@@ -7247,132 +7236,7 @@ end;
 
 (*----------------------------------------------------------------------------*)
 
-function GetADIFMode(sMode: string): ModeAndExtendedModeType;
-var
-  sModeUpper: string;
-begin
-  sModeUpper := ANSIUPPERCASE(sMode);
-  case AnsiIndexText(AnsiUpperCase(sMode), ['CW', 'SSB', 'AM', 'FM', 'FT8',
-    'RTTY', 'MFSK', 'PSK31', 'PSK']) of
-    0: // CW
-      begin
-        Result.msmMode := CW;
-        Result.msmExtendedMode := eCW;
-      end;
-
-    1:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eSSB;
-      end;
-    2:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eAM;
-      end;
-    3:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eFM;
-      end;
-    4:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eFT8;
-      end;
-    5:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eRTTY;
-      end;
-    6:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eMFSK;
-      end;
-    7, 8:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := ePSK31;
-      end;
-    -1:
-      Result.msmMode := NoMode;
-  else
-    Result.msmMode := NoMode;
-  end;
-end;
-(*----------------------------------------------------------------------------*)
-
-function GetADIFSubMode(sSubMode: string): ModeAndExtendedModeType;
-var
-  sModeUpper: string;
-begin
-  sModeUpper := ANSIUPPERCASE(sSubMode);
-  case AnsiIndexText(AnsiUpperCase(sSubMode), ['FT4', 'JS8', 'USB', 'LSB',
-    'PSK31']) of
-    0:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eFT4;
-      end;
-    1:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eJS8;
-      end;
-    2:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eUSB;
-      end;
-    3:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eLSB;
-      end;
-    4:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := ePSK31;
-      end;
-    -1:
-      Result.msmMode := NoMode;
-  else
-    Result.msmMode := NoMode;
-  end;
-end;
-(*----------------------------------------------------------------------------*)
-
-function GetADIFBand(sBand: string): BandType;
-var
-  sBandLower: string;
-  iBand: BandType;
-begin
-  sBandLower := AnsiLowerCase(sBand);
-  for iBand := Low(BandType) to High(BandType) do
-  begin
-    if sBandLower = ADIFBANDSTRINGSARRAY[iBand] then
-    begin
-      Result := iBand;
-      Break;
-    end;
-  end;
-  (* Case AnsiIndexText(AnsiUpperCase(sBand), ['160M', '80M', '40M', ,'30M', '20M', '17M', '15M', '12M', '10M', '6M', '2M''RTTY']) of
-  0: // CW
-  Result := CW;
-  1: // SSB
-  Result := Phone;
-  2:
-  Result := Digital; // FT8 should be its own mode
-  3:
-  Result := Digital;
-  -1:
-  Result := NoMode;
-  else
-  Result := NoMode;
-  end; *)
-end;
-(*----------------------------------------------------------------------------*)
+// GetADIFMode, GetADIFSubMode, GetADIFBand moved to uADIF.pas (Issue #887).
 
 function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
 var
@@ -9092,49 +8956,7 @@ begin
   // Call base function with active radio // ny4i Issue 111
 end;
 
-function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
-
-begin
-  Result := false;
-  try
-    if Length(sDate) = 8 then
-    begin
-      qsoTime.qtYear := Ord(StrToInt(MidStr(sDate, 1, 4)) mod 100);
-      qsoTime.qtMonth := Ord(StrToInt(MidStr(sDate, 5, 2)));
-      qsoTime.qtDay := Ord(StrToInt(MidStr(sDate, 7, 2)));
-      Result := true;
-    end;
-  except
-    result := false;
-  end;
-end;
-
-function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
-begin
-  //Result := false;
-  if Length(sTime) in [4, 6] then
-  begin
-    try
-      qsoTime.qtHour := Ord(StrToInt(MidStr(sTime, 1, 2)));
-      qsoTime.qtMinute := Ord(StrToInt(MidStr(sTime, 3, 2)));
-      if Length(sTime) = 6 then
-      begin
-        qsoTime.qtSecond := Ord(StrToInt(MidStr(sTime, 5, 2)));
-      end
-      else
-      begin
-        qsoTime.qtSecond := 0;
-      end;
-      Result := true;
-    except
-      result := false;
-    end;
-  end
-  else
-  begin // ADIF Time is too small
-    Result := false;
-  end;
-end;
+// ADIFDateStringToQSOTime, ADIFTimeStringToQSOTime moved to uADIF.pas (Issue #887).
 
 function GetTR4WBandFromNetworkBand(band: TRadioBand): BandType;
 begin
@@ -9589,30 +9411,7 @@ end;
 // Note we cache last returned one to avoid a subsequent lookup since the
 // contest most likely did not change. An example is an ADIF file import.
 
-function GetContestByADIFName(sADIFName: string): ContestType;
-var
-  i: ContestType;
-begin
-  if sADIFName = saveLastADIFName then
-  begin
-    Result := saveLastContest;
-  end
-  else
-  begin
-    Result := Low(ContestsArray); // First contest is DmmyContest
-    for i := low(ContestsArray) to High(ContestsArray) do
-    begin
-      if ContestsArray[i].ADIFName = sADIFName then
-      begin
-        Result := i;
-        saveLastADIFName := sADIFName;
-        // caches last since most likely did not change
-        saveLastContest := i;
-        break;
-      end;
-    end;
-  end;
-end;
+// GetContestByADIFName moved to uADIF.pas (Issue #887).
 
 procedure SetExtendedModeFromMode(RData: ContestExchange);
 begin

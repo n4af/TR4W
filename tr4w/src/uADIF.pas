@@ -1,32 +1,42 @@
 unit uADIF;
 
 {
-  TR4W ADIF lexer — focused, dependency-light, testable.
+  TR4W ADIF lexer + helpers — focused, dependency-light, testable.
 
-  This unit contains a lightweight ADIF field-list lexer used as the first
-  step of ADIF import.  It is deliberately small and free of MainUnit /
-  windowing / contest-state dependencies so the unit-test runner can link
-  it without dragging in the rest of TR4W.
+  This unit contains the migration-touchy core of ADIF import: the
+  string-slicing lexer and the small helpers that map ADIF field text
+  into TR4W types (band, mode, date, time, contest).
 
-  Issue #887 — first incremental commit.  This commit ships:
+  It deliberately depends only on SysUtils / StrUtils / Log4D / VC so
+  the unit-test runner can link it without pulling MainUnit and its
+  window / contest-state globals.
+
+  Issue #887 — second incremental commit.  This commit adds:
+    - TADIF_Fields enum (moved from MainUnit)
+    - GetADIFBand / GetADIFMode / GetADIFSubMode (moved)
+    - ADIFDateStringToQSOTime / ADIFTimeStringToQSOTime (moved)
+    - GetContestByADIFName (moved; cache preserved as unit-private)
+    - IsValidGUID (local copy; avoids dragging trdos/LOGSTUFF.PAS)
+
+  Previously shipped (first incremental commit):
+    - ParseADIFFieldsList (the lexer)
     - TADIFField / TADIFFieldList types
-    - ParseADIFFieldsList — single-record field lexer
 
-  Follow-up commits will add the field-name -> ContestExchange mapping
-  (currently inlined in MainUnit.ParseADIFRecord) and the multi-record
-  ImportADIFFromString entry point.
+  Still in MainUnit, will move in follow-up commits:
+    - The field-name -> ContestExchange mapping case statement
+    - The contest-specific post-processing tail
+    - ImportADIFFromString multi-record entry point
 
-  See docs/tr4w-migration-strategy.md for the larger context: ADIF string
-  handling is the highest-risk surface for Phase 2 (Unicode correctness),
-  so a focused regression net here pays back later.
+  See docs/tr4w-migration-strategy.md.  ADIF string handling is the
+  highest-risk surface for Phase 2 (Unicode correctness); each function
+  here is reachable from the unit-test runner without MainUnit baggage.
 
   Delphi 12 migration note:
     Bare `string` is used here.  In D7 this is AnsiString; in D12 it
     becomes UnicodeString.  ADIF is fundamentally a text format with
-    occasional UTF-8 in NAME/QTH/COMMENT fields, so the UnicodeString
-    transition is the correct semantic.  Wire-byte data (CI-V, etc.)
-    elsewhere in TR4W explicitly types AnsiString — the migration strategy
-    doc (line 70-72) flags this distinction.
+    UTF-8 in NAME/QTH/COMMENT fields, so the UnicodeString transition
+    is the correct semantic.  Wire-byte data (CI-V, etc.) elsewhere in
+    TR4W explicitly types AnsiString.
 }
 
 interface
@@ -34,7 +44,8 @@ interface
 uses
    SysUtils,
    StrUtils,
-   Log4D;
+   Log4D,
+   VC;
 
 type
    TADIFField = record
@@ -44,26 +55,97 @@ type
 
    TADIFFieldList = array of TADIFField;
 
+   // ADIF field-name dispatch enum.  Order MUST match the AnsiIndexText
+   // string array in MainUnit.ParseADIFRecord (and in the future, in
+   // ApplyADIFFieldsToExchange when that moves here).  Adding entries
+   // requires updating both the enum and the lookup array.
+   TADIF_Fields = (tAdifARRL_SECT = 0, tAdifBAND, tAdifCALL, tAdifCHECK,
+      tAdifCLASS, tAdifCQ_Z,
+      tAdifCONTEST_ID, tAdifCNTY, tadifFOC_NUM, tAdifGRIDSQUARE, tAdifFREQ,
+      tAdifFREQ_RX,
+      tAdifIOTA, tAdifITUZ, tAdifMODE, tAdifNAME, tAdifOPERATOR, tAdifPRECEDENCE,
+      tAdifQSO_DATE, tAdifQSO_DATE_OFF, tAdifTIME_ON, tAdifTIME_OFF,
+      tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
+      tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
+      tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
+      tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1, tAdifAPP_N1MM_ID,
+      tAdifAPP_TR4W_ID, tAdifSIG, tAdifSIG_INFO, tAdifPOTAREF,
+      tAdifAPP_TR4W_ROVERCALL);
+
+// =========================================================================
+// Lexer
+// =========================================================================
+
 // Parse a single ADIF record's field list from `s`.
 //
-// The lexer reads fields of the form `<NAME:n>VALUE` (optionally `<NAME:n:T>`
-// where T is the ADIF data-type indicator — type is discarded).  Whitespace
-// and free-form text between fields is ignored.  The lexer stops at the
-// first `<EOR>` or `<EOH>` it encounters (case-insensitive).
+// The lexer reads fields of the form `<NAME:n>VALUE` (optionally
+// `<NAME:n:T>` where T is the ADIF data-type indicator — type is
+// discarded).  Whitespace and free-form text between fields is ignored.
+// The lexer stops at the first `<EOR>` or `<EOH>` it encounters
+// (case-insensitive).
 //
 // Returns True if a terminator (<EOR> or <EOH>) was found.  Returns False
-// when the end of `s` is reached without a terminator, OR when a malformed
+// when the end of `s` is reached without a terminator OR when a malformed
 // tag is encountered.  Even on False, `fields` contains the fields that
 // were successfully parsed before the error/end.
-function ParseADIFFieldsList(const s: string; out fields: TADIFFieldList): Boolean;
+function ParseADIFFieldsList(const s: string;
+                             out fields: TADIFFieldList): Boolean;
+
+// =========================================================================
+// Per-field type-conversion helpers
+// =========================================================================
+
+// Convert an ADIF BAND string ("20m", "70cm") to a TR4W BandType.
+// Returns NoBand for unrecognized input.  Case-insensitive.
+function GetADIFBand(sBand: string): BandType;
+
+// Convert an ADIF MODE string ("CW", "SSB", "FT8", ...) to a TR4W
+// (Mode, ExtendedMode) pair.  Returns NoMode for unrecognized input.
+// Case-insensitive.
+function GetADIFMode(sMode: string): ModeAndExtendedModeType;
+
+// Convert an ADIF SUBMODE string ("FT4", "USB", "LSB", ...) to a TR4W
+// (Mode, ExtendedMode) pair.  Returns NoMode for unrecognized input.
+// Case-insensitive.
+function GetADIFSubMode(sSubMode: string): ModeAndExtendedModeType;
+
+// Parse an ADIF QSO_DATE string ("YYYYMMDD", 8 chars).  Returns True on
+// success and sets qsoTime.qtYear/qtMonth/qtDay.  Returns False (without
+// modifying qsoTime) on invalid input.
+function ADIFDateStringToQSOTime(sDate: string;
+                                 var qsoTime: TQSOTime): Boolean;
+
+// Parse an ADIF TIME_ON / TIME_OFF string ("HHMM" or "HHMMSS").  Returns
+// True on success and sets qsoTime.qtHour/qtMinute/qtSecond (seconds = 0
+// when only HHMM provided).  Returns False on invalid input.
+function ADIFTimeStringToQSOTime(sTime: string;
+                                 var qsoTime: TQSOTime): Boolean;
+
+// Look up a contest by its ADIF CONTEST_ID value.  Returns the first
+// ContestType whose ContestsArray[].ADIFName matches sADIFName; otherwise
+// returns the contest at Low(ContestsArray) (DummyContest).  Caller must
+// then verify ContestsArray[Result].ADIFName = sADIFName to distinguish
+// "not found" from "first contest".  Cached single-entry for the common
+// case of all QSOs in a file sharing the same contest.
+function GetContestByADIFName(sADIFName: string): ContestType;
+
+// Validate an ADIF GUID/UUID string.  Accepts 32 hex characters with
+// optional 8-4-4-4-12 hyphens and optional `{...}` braces.  Used to gate
+// the APP_N1MM_ID / APP_TR4W_ID assignment to exch.id.
+function IsValidGUID(const guid: string): Boolean;
 
 implementation
 
 var
    logger : TLogLogger;
 
+   // Single-entry cache for GetContestByADIFName.  All QSOs in a typical
+   // import file share the same CONTEST_ID, so this is a hot path.
+   saveLastADIFName : string;
+   saveLastContest  : ContestType;
+
 // ---------------------------------------------------------------------------
-// Helpers
+// Lexer helpers
 // ---------------------------------------------------------------------------
 
 procedure AppendField(var fields: TADIFFieldList;
@@ -188,7 +270,232 @@ begin
    Result := False;
 end;
 
+// ---------------------------------------------------------------------------
+// Per-field type-conversion helpers
+// ---------------------------------------------------------------------------
+
+function GetADIFBand(sBand: string): BandType;
+var
+   sBandLower : string;
+   iBand      : BandType;
+   entry      : PChar;
+begin
+   Result := NoBand;
+   // Reject empty input — ADIFBANDSTRINGSARRAY has nil entries for the
+   // tail of BandType (placeholders), and an empty string would match
+   // those PChar(nil) entries on string comparison, yielding a spurious
+   // band.  No legitimate ADIF input has BAND=''.
+   if sBand = '' then
+      Exit;
+   sBandLower := AnsiLowerCase(sBand);
+   for iBand := Low(BandType) to High(BandType) do
+      begin
+      entry := ADIFBANDSTRINGSARRAY[iBand];
+      if (entry <> nil) and (sBandLower = entry) then
+         begin
+         Result := iBand;
+         Break;
+         end;
+      end;
+end;
+
+function GetADIFMode(sMode: string): ModeAndExtendedModeType;
+begin
+   case AnsiIndexText(AnsiUpperCase(sMode),
+                      ['CW', 'SSB', 'AM', 'FM', 'FT8',
+                       'RTTY', 'MFSK', 'PSK31', 'PSK']) of
+      0:                              // CW
+         begin
+         Result.msmMode := CW;
+         Result.msmExtendedMode := eCW;
+         end;
+      1:                              // SSB
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eSSB;
+         end;
+      2:                              // AM
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eAM;
+         end;
+      3:                              // FM
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eFM;
+         end;
+      4:                              // FT8
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eFT8;
+         end;
+      5:                              // RTTY
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eRTTY;
+         end;
+      6:                              // MFSK
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eMFSK;
+         end;
+      7, 8:                           // PSK31, PSK
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := ePSK31;
+         end;
+   else
+      Result.msmMode := NoMode;
+   end;
+end;
+
+function GetADIFSubMode(sSubMode: string): ModeAndExtendedModeType;
+begin
+   case AnsiIndexText(AnsiUpperCase(sSubMode),
+                      ['FT4', 'JS8', 'USB', 'LSB', 'PSK31']) of
+      0:                              // FT4
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eFT4;
+         end;
+      1:                              // JS8
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eJS8;
+         end;
+      2:                              // USB
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eUSB;
+         end;
+      3:                              // LSB
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eLSB;
+         end;
+      4:                              // PSK31
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := ePSK31;
+         end;
+   else
+      Result.msmMode := NoMode;
+   end;
+end;
+
+function ADIFDateStringToQSOTime(sDate: string;
+                                 var qsoTime: TQSOTime): Boolean;
+begin
+   Result := False;
+   try
+      if Length(sDate) = 8 then
+         begin
+         qsoTime.qtYear  := Ord(StrToInt(MidStr(sDate, 1, 4)) mod 100);
+         qsoTime.qtMonth := Ord(StrToInt(MidStr(sDate, 5, 2)));
+         qsoTime.qtDay   := Ord(StrToInt(MidStr(sDate, 7, 2)));
+         Result := True;
+         end;
+   except
+      Result := False;
+   end;
+end;
+
+function ADIFTimeStringToQSOTime(sTime: string;
+                                 var qsoTime: TQSOTime): Boolean;
+begin
+   Result := False;
+   if Length(sTime) in [4, 6] then
+      begin
+      try
+         qsoTime.qtHour   := Ord(StrToInt(MidStr(sTime, 1, 2)));
+         qsoTime.qtMinute := Ord(StrToInt(MidStr(sTime, 3, 2)));
+         if Length(sTime) = 6 then
+            qsoTime.qtSecond := Ord(StrToInt(MidStr(sTime, 5, 2)))
+         else
+            qsoTime.qtSecond := 0;
+         Result := True;
+      except
+         Result := False;
+      end;
+      end;
+end;
+
+function GetContestByADIFName(sADIFName: string): ContestType;
+var
+   i : ContestType;
+begin
+   if sADIFName = saveLastADIFName then
+      begin
+      Result := saveLastContest;
+      Exit;
+      end;
+
+   Result := Low(ContestsArray); // first contest = DummyContest
+   for i := Low(ContestsArray) to High(ContestsArray) do
+      begin
+      if ContestsArray[i].ADIFName = sADIFName then
+         begin
+         Result := i;
+         saveLastADIFName := sADIFName;
+         saveLastContest  := i;
+         Break;
+         end;
+      end;
+end;
+
+// ---------------------------------------------------------------------------
+// IsValidGUID
+//
+// Standalone GUID validator that does NOT depend on TPerlRegEx (the
+// LOGSTUFF.PAS version uses TPerlRegEx, which would drag in a much
+// heavier dependency surface).  Accepts:
+//   - 32 raw hex characters (no separators)
+//   - 8-4-4-4-12 hyphenated form (36 characters)
+//   - Either of the above wrapped in `{...}` braces
+// ---------------------------------------------------------------------------
+
+function IsValidGUID(const guid: string): Boolean;
+const
+   HEX_CHARS = ['0'..'9', 'a'..'f', 'A'..'F'];
+var
+   s        : string;
+   i        : Integer;
+   hexCount : Integer;
+begin
+   Result := False;
+   if guid = '' then
+      Exit;
+
+   s := guid;
+
+   // Strip optional surrounding braces
+   if (Length(s) >= 2) and (s[1] = '{') and (s[Length(s)] = '}') then
+      s := Copy(s, 2, Length(s) - 2);
+
+   if (Length(s) <> 32) and (Length(s) <> 36) then
+      Exit;
+
+   hexCount := 0;
+   for i := 1 to Length(s) do
+      begin
+      if s[i] in HEX_CHARS then
+         Inc(hexCount)
+      else if s[i] = '-' then
+         begin
+         // Hyphens only at positions 9, 14, 19, 24 in 8-4-4-4-12 layout
+         if (Length(s) <> 36) or
+            ((i <> 9) and (i <> 14) and (i <> 19) and (i <> 24)) then
+            Exit;
+         end
+      else
+         Exit;
+      end;
+
+   Result := hexCount = 32;
+end;
+
 initialization
    logger := TLogLogger.GetLogger('uADIF');
+   saveLastADIFName := '';
 
 end.
