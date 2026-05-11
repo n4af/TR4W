@@ -22,6 +22,50 @@ Various contributors along the way
 
 ---
 
+## 4.147.x — May 2026
+
+### 4.147.02 (2026-05-10) — NY4I / N4AF
+
+#### State QSO Party Rover Operations
+
+- **Rover calls (e.g. `KG1S/MON`)**: when a rover sends their call with a `/county` suffix, TR4W now preserves the full callsign in the log and Cabrillo. The county is automatically pre-filled into the exchange when you press Enter so you don't have to retype it.
+- **Country lookup**: rover calls like `AF4O/MON` are no longer mislabeled as Great Britain (the `/M` was being read as a GB prefix). This is fixed for entry, import, and rescore.
+- **County-line QSOs**: when you log a county-line station (e.g. `PIN/HIL`), the second county is no longer flagged as a duplicate and no longer scores zero points. Both records also share the single transmitted serial number, matching CQ Magazine guidance for the California QSO Party.
+
+#### ADIF Import/Export
+
+- **ADIF STATE field**: for state QSO parties, the STATE field now correctly reports the contest's host state (e.g. `FL` for FQP) when the QTHString is a county code instead of incorrectly emitting the county as the state. Supported for CA, FL, MI, MN, MO, NC, OH, TX, WI, TN, CO, PA, IN.
+- **ADIF CNTY field**: state-and-county is now emitted as `<state>,<long-name>` (e.g. `CA,Alameda`) when the long county name is available in the dom file. Currently emitted for CA, MO, OH, PA, WI, IL, TX, MI. FL and TN ship `_cty.dom` files without long names, so CNTY is skipped for those states.
+- **Rover call round-trip**: ADIF export records the bare call (`KG1S`) in the standard `<CALL>` field plus the full rover form (`KG1S/MON`) in a TR4W-specific `<APP_TR4W_ROVERCALL>` field. ADIF import recognizes that field and restores the full call.
+- **SRX_STRING consistency**: the received-exchange field now always includes the implied RST (e.g. `599 HIL`) regardless of whether you typed it, so it matches the sent-exchange field in CW contests where 599 is implied.
+- **Import for state QPs**: importing an ADIF now correctly repopulates county multipliers — verified with California QSO Party and Florida QSO Party.
+
+#### Multi-County / Multi-Park Entry
+
+- **One Enter, N QSOs**: a single Enter press logs one QSO per ref for multi-county and multi-park exchanges.
+- **Per-QSO exchange string**: each follow-up record in a multi-county or multi-park entry carries its own SRX_STRING with only its own ref, not the combined operator input.
+
+#### WinKeyer
+
+- **WK3 hardware**: the WinKeyer status field at the bottom of the screen now shows `WK3` for K1EL WinKeyer3 hardware (previously showed `WK2`).
+- **COM port error message**: when the COM port for your WinKeyer can't be opened, the error dialog now shows a readable Windows error message instead of garbage characters.
+
+#### Multi-Op / Networking
+
+- **Operator visible in network window**: the network window now shows the active operator's name for each connected station.
+- **Score posting over HTTPS**: TR4W can now post scores to score-tracking sites that require HTTPS (Issue #26).
+- **Cleaner connect-retry log**: repeated connection retry messages are now logged once per state change instead of once per retry, making the log easier to read when a remote is briefly unavailable.
+
+#### Programmable Messages
+
+- **Double-click to insert at cursor**: in the message editor, double-clicking a command in the command list now inserts the command at the cursor position rather than replacing the whole field.
+
+#### New Contest Setup
+
+- **Clean overwrite**: creating a new contest with the same name as an existing one now removes the old log file as part of the overwrite, so stale records don't bleed into the new log.
+
+---
+
 ## 4.146.x — April 2026
 
 ### 4.146.14 (2026-04-17) — NY4I
