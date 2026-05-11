@@ -2364,19 +2364,22 @@ begin
     end
     else if Call[CharIndex] = '/' then
     begin
-      if ((CharIndex > 3) and (CharIndex <> length(Call)) or
-        ((CharIndex < length(Call)) and (CharIndex > 1))) then
+      // A '/' at the very start or very end of the token cannot belong
+      // to a callsign (no prefix or no body to suffix).
+      if (CharIndex = 1) or (CharIndex = length(Call)) then
       begin
-        LooksLikeACallSign := True;
+        LooksLikeACallSign := False;
         Exit;
       end;
-    end;
-
-    if ((CharIndex = 1) or (CharIndex = length(Call))) and (Call[CharIndex] =
-      '/') then
-    begin
-      LooksLikeACallSign := False;
-      Exit;
+      // Otherwise: do NOT return True here just because we found a '/'.
+      // The legacy code returned True at the first interior '/' which
+      // misfires for state-QP multi-county exchanges like "PIN/HIL" --
+      // both halves are all-letter county codes that resemble nothing
+      // like a real callsign.  Real callsigns require a letter<->digit
+      // transition in the prefix/body, which the end-of-function
+      // `nChanges >= 2` check enforces.  Tokens like "PIN/HIL" have
+      // nChanges = 0 and correctly fail that check.  See the
+      // Callsign-Update-Enable / Howie / county-line discussion.
     end;
   end;
 
