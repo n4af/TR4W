@@ -30,7 +30,9 @@ uses
    uTestFlexRadioUtils  in 'uTestFlexRadioUtils.pas',
    VC                   in '..\..\src\VC.pas',
    utils_text           in '..\..\src\utils\utils_text.pas',
-   uTestUtilsText       in 'uTestUtilsText.pas';
+   uTestUtilsText       in 'uTestUtilsText.pas',
+   uADIF                in '..\..\src\uADIF.pas',
+   uTestADIF            in 'uTestADIF.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -42,6 +44,7 @@ begin
    RegisterSuite(TRadioBandTests.Create('RadioBand'));
    RegisterSuite(TFlexRadioUtilsTests.Create('FlexRadioUtils'));
    RegisterSuite(TUtilsTextTests.Create('UtilsText'));
+   RegisterSuite(TADIFLexerTests.Create('ADIFLexer'));
 
    if RunAllSuites then
       begin
