@@ -248,6 +248,11 @@ var
    goodCount     : Integer;
    skippedCount  : Integer;
    logVersion    : string;
+   fileSizeLow   : DWORD;
+   fileSizeHigh  : DWORD;
+   fileSize      : Int64;
+   recordsBytes  : Int64;
+   leftover      : Int64;
 begin
    hFile := CreateFile(PChar(logPath), GENERIC_READ,
                        FILE_SHARE_READ or FILE_SHARE_WRITE,
@@ -259,6 +264,40 @@ begin
       Halt(2);
       end;
    try
+      // Up-front sanity check: file must be header + integer * record.
+      // If not, the file was probably written by a TR4W version with a
+      // different SizeOfContestExchange and reading it with our stride
+      // would yield garbage data (misaligned record offsets), which is
+      // worse than failing.  Bail with a clear message.
+      fileSizeLow := GetFileSize(hFile, @fileSizeHigh);
+      fileSize := (Int64(fileSizeHigh) shl 32) or fileSizeLow;
+      if fileSize < SizeOf(header) then
+         begin
+         Writeln(ErrOutput,
+                 'logdump: file too small to contain a header (',
+                 fileSize, ' bytes, need at least ', SizeOf(header), ')');
+         Halt(3);
+         end;
+      recordsBytes := fileSize - SizeOf(header);
+      leftover := recordsBytes mod SizeOf(rec);
+      if leftover <> 0 then
+         begin
+         Writeln(ErrOutput,
+                 'logdump: file size ', fileSize,
+                 ' is not header(', SizeOf(header),
+                 ') + N * record(', SizeOf(rec), ').  ',
+                 'Remainder = ', leftover, ' byte(s).');
+         Writeln(ErrOutput,
+                 '         This usually means the .TRW was written by a ',
+                 'TR4W version with a different SizeOfContestExchange ',
+                 '(field added/removed since this log was created).  ',
+                 'Reading records at the current stride would produce ',
+                 'misaligned/garbage data, so aborting.  ',
+                 'Workaround: open the log in current TR4W and save it ',
+                 'to force an in-place upgrade.');
+         Halt(3);
+         end;
+
       // Read the header (which is exactly SizeOfContestExchange bytes --
       // lhDummy is sized to fill the record out).
       FillChar(header, SizeOf(header), 0);
@@ -283,7 +322,16 @@ begin
       goodCount    := 0;
       skippedCount := 0;
 
-      // Read records until end-of-file.
+      // Read records until end-of-file.  Match the legacy ReadLogFile
+      // (MainUnit.pas):
+      //   Windows.ReadFile(..., TempRXData, SizeOf(ContestExchange), ...);
+      //   Result := bytesRead = SizeOf(ContestExchange);
+      // i.e. any short read at the tail terminates the loop SILENTLY --
+      // TR4W treats trailing bytes that don't form a complete record as
+      // end-of-file.  We must match this exactly or our record counts
+      // diverge from what ExportToADIF sees.  (Real-world cases: a log
+      // written by an older TR4W with a smaller SizeOfContestExchange,
+      // or a file truncated mid-write.)
       while True do
          begin
          FillChar(rec, SizeOf(rec), 0);
@@ -293,14 +341,19 @@ begin
                     recCount + 1);
             Halt(3);
             end;
-         if bytesRead = 0 then
-            Break;  // clean EOF
          if bytesRead <> SizeOf(rec) then
             begin
-            Writeln(ErrOutput, 'logdump: short read at record ',
-                    recCount + 1, ' (got ', bytesRead, ' of ',
-                    SizeOf(rec), ' bytes)');
-            Halt(3);
+            // Match ReadLogFile: any short read = EOF.  Warn if it
+            // wasn't a clean zero-byte EOF so the user knows the file
+            // has a trailing partial record (silently dropped).
+            if bytesRead <> 0 then
+               Writeln(ErrOutput,
+                       'logdump: WARNING -- ', bytesRead,
+                       ' trailing byte(s) after record ', recCount,
+                       ' do not form a complete record (expected ',
+                       SizeOf(rec),
+                       ').  Silently dropping, matching TR4W behaviour.');
+            Break;
             end;
          Inc(recCount);
          if GoodLookingQSO(rec) then
