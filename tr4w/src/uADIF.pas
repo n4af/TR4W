@@ -1267,8 +1267,13 @@ begin
    // FREQ (locale-independent, '.' separator)
    Result := Result + EmitADIFField('FREQ', freqStr);
 
-   // SRX_STRING (received exchange, RST-normalized)
-   Result := Result + EmitADIFField('SRX_STRING', ResolveSRXString(rec));
+   // SRX_STRING (received exchange, RST-normalized).
+   // POTA uses a different SRX_STRING shape (park ref instead of
+   // RST-prefixed exchange).  The tail emitter handles POTA's
+   // SRX_STRING -- uADIF skips it here to avoid a double-emit
+   // where the last-wins parse would lose the park ref.
+   if rec.ceContest <> POTA then
+      Result := Result + EmitADIFField('SRX_STRING', ResolveSRXString(rec));
 
    // STATE - emit when QTHString is a 2-letter postal code, OR when this
    // is a single-state QSO party and QTHString is a county code.

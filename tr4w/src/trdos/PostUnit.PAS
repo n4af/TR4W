@@ -40,6 +40,7 @@ uses
   VC,
 //  Help,
   uMults,
+  uADIF,
   LogEdit,
   TF,
   LogWind,
@@ -1764,599 +1765,209 @@ begin
   FilePreview;
 end;
 
-procedure ExportToADIF;
-label
-  1;
-
+// ---------------------------------------------------------------------------
+// Tail emitter callback for uADIF.ExportADIFToString.
+// Emits the contest-specific fields that uADIF.EmitADIFRecord skips because
+// they need access to MainUnit/trdos globals (MyCall, MyFDClass, MySection,
+// MyPark, mo.DomList, ActiveZoneMult, etc.) or are gated on contest-specific
+// reinterpretation of QTHString.  Called once per record.
+// ---------------------------------------------------------------------------
+function EmitContestSpecificTailForExport(const rec: ContestExchange): string;
 var
-  sBuffer                               : string;
-  tCallStringLength                     : Cardinal;
-
-  tBandString                           : PChar;
-  tBandStringLength                     : Cardinal;
-
-  tModeString                           : PChar;
-  tModeStringLength                     : Cardinal;
-
-  tRSTSendStringLength                  : Cardinal;
-  tRSTRcvdStringLength                  : Cardinal;
-
-  tContestName                          : PChar;
-  tContestNamelength                    : Cardinal;
-  nNumberOfBytesToWrite                 : Cardinal;
-  p                                     : PChar;
-  nLength                               : integer;
-  sTemp                                 : string;
-  dtReportTime                          : TDateTime;
-  stxString                             : string;
-  sMode                                 : string;
-  sSubMode                              : string;
-  saveDecimalSeparator                  : char;
-  // State-QP rover (KG1S/MON): per-record bare call for the standard
-  // <CALL> field, plus the full form for <APP_TR4W_ROVERCALL>.  Computed
-  // per QSO in the read loop below and consumed by the <CALL> Format
-  // and the WriteADIFField call that follows.
-  adifCallStr                           : string;
-  adifRoverFullCall                     : string;
-  roverSlashPos                         : Integer;
-  roverSuffix                           : string;
-  // ADIF CNTY emit: index into mo.DomList for the worked station's
-  // county code so we can pull the long-form county name (FAltName)
-  // loaded from <state>_cty.dom files.
-  cntyIdx                               : Integer;
-//  IOTAstring                            : Str10;
+   stxString  : string;
+   cntyIdx    : Integer;
+   stateCode  : string;
+   qthForGrid : ShortString;
+   exchForGrid : ShortString;
 begin
-  sMode := '';
-  sSubMode := '';
-  sTemp := '';
-  dtReportTime := Now;
-  lstrcpy(tReportsFilename, TR4W_LOG_FILENAME);
-  tReportsFilename[Windows.lstrlen(tReportsFilename) - 3] := #0;
-  lstrcat(tReportsFilename, 'ADI');
-  if not tOpenFileForWrite(tReportFileWrite, tReportsFilename) then Exit;
-  //saveDecimalSeperator := DecimalSeperator;
-  if not OpenLogFile then
-  begin
-    CloseHandle(tReportFileWrite);
-    Exit;
-  end;
+   Result := '';
 
-  {
-  saveDecimalSeparator := DecimalSeparator;
-  DecimalSeparator := '.'; // Set this so we use . as reqired by ADIF and not localized separator ny4i
-  } // This code wasd commented so the specific functions that use StrFloat do this work to ensure the window is very small where we change the DecimalSeparator.
-  // Otherwise an exception in this procedure could cause DecimalSeparator to be set incorrectly.
+   // ----- STX_STRING (always, from MY side) -----
+   stxString := GetMyExchangeForExport;
+   Result := Result + EmitADIFField('STX_STRING',
+                                    Trim(DeleteRepeatedSpaces(stxString)));
 
-  // Issue 405 to fix up the header - ny4i
-  sWriteFileFromString(tReportFileWrite,'ADIF File'#13#10);
-
-   sWriteFileFromString(tReportFileWrite,'Created by TR4W version ' + TR4W_CURRENTVERSION + ' on ' + FormatDateTime('mmm-dd-yyyy hh:mm:ss',dtReportTime) + #13#10);
-
-  WriteADIFField('ADIF_VER','3.1.0');
-  sWriteFile(tReportFileWrite, #13#10, 1);
-
-  WriteADIFField('CREATED_TIMESTAMP',FormatDateTime('yyyymmdd hhnnss',dtReportTime));
-  sWriteFile(tReportFileWrite, #13#10, 1);
-
-  WriteADIFField('PROGRAMID','TR4W');
-  sWriteFile(tReportFileWrite, #13#10, 1);
-
-  WriteADIFField('PROGRAMVERSION',TR4W_CURRENTVERSION);
-  sWriteFile(tReportFileWrite, #13#10, 1);
-
-  sWriteFile(tReportFileWrite, #13#10'<EOH>'#13#10, 9);
-
-
-  ReadVersionBlock;
-  1:    // Rewrite this whole function due to this GoTo... Argh....
-  if ReadLogFile then
-  begin
-    sMode := '';
-    sSubMode := '';
-    sTemp := '';
-    if GoodLookingQSO then
-    begin
-      // If there is nothing in the ADIFName, then use the ContestTypeSA[Contest]
-      if length(ContestsArray[Contest].ADIFName) = 0 then
-         begin
-         tContestName := ContestTypeSA[Contest]
-         end
-      else
-         begin
-         tContestName := ContestsArray[Contest].ADIFName;     // NY4I
-         end;
-      tContestNamelength := Windows.lstrlen(tContestName);
-
-      tCallStringLength := length(TempRXData.Callsign);
-
-      tBandString := ADIFBANDSTRINGSARRAY[TempRXData.Band];
-      tBandStringLength := Windows.lstrlen(tBandString);
-    //   if contest =  RADIOVHFFD  then       // added 4.61.1
-        begin                              // 4.61.1
-        if tBandString = '432' then        // NY4I made CM to cm per ADIF spec
-         begin
-           tBandString := '70cm';
-           tBandStringLength := 4;
-         end;
-        if tBandString = '1GH' then
-         begin
-           tBandString := '23cm';
-           tBandStringLength := 4;
-         end;
-        end;
-
-          //          if TempRXData.ceFMMode then TempMode := FM else TempMode := TempRXData.Mode;
-      tModeString := ADIFModeString[TempRXData.Mode];
-      tModeStringLength := Windows.lstrlen(tModeString);
-
-
-      tRSTSendStringLength := DigitsIn(TempRXData.RSTSent);  // ny4i This changed as RST could be different lengths now.
-      tRSTRcvdStringLength := DigitsIn(TempRXData.RSTReceived);
-      //if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
-      //if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
-
-      // State-QP rover (KG1S/MON): if the QSO record's call has a slash
-      // and the suffix matches the QSO's QTHString, it's a rover entry.
-      // Emit the bare call ("KG1S") in the standard <CALL> field and
-      // the full call ("KG1S/MON") in the TR4W-specific
-      // <APP_TR4W_ROVERCALL> field.  Gate on ActiveExchange so we only
-      // do this for state-QP contests; ActiveExchange is set to the
-      // contest type that created the log even at export time.
-      adifCallStr      := string(TempRXData.Callsign);
-      adifRoverFullCall := '';
-      if ((ActiveExchange = RSTDomesticQTHExchange) or
-          (ActiveExchange = RSTQTHExchange) or
-          (ActiveExchange = RSTDomesticOrDXQTHExchange)) then
-         begin
-         roverSlashPos := Pos('/', adifCallStr);
-         if roverSlashPos > 0 then
-            begin
-            roverSuffix := Copy(adifCallStr, roverSlashPos + 1,
-                                Length(adifCallStr) - roverSlashPos);
-            if (roverSuffix <> '') and
-               (UpperCase(roverSuffix) = UpperCase(string(TempRXData.QTHString))) then
-               begin
-               adifRoverFullCall := adifCallStr;
-               adifCallStr := Copy(adifCallStr, 1, roverSlashPos - 1);
-               end;
-            end;
-         end;
-
-      sBuffer := SysUtils.Format('<CALL:%u>%s <BAND:%u>%s <QSO_DATE:8>%04d%.2d%.2d <TIME_ON:6>%.2d%.2d%.2d <TIME_OFF:6>%.2d%.2d%.2d <RST_SENT:%u>%d <RST_RCVD:%u>%d '  // Moved CONTEST_ID below to make it conditional
-                  ,[Length(adifCallStr), adifCallStr
-                  ,length(ADIFBANDSTRINGSARRAY[TempRXData.Band]), ADIFBANDSTRINGSARRAY[TempRXData.Band]
-                 // ,length(ExtendedModeStringArray[TempRXData.Mode]), ExtendedModeStringArray[TempRXData.Mode]
-                 // ,length(ModeStringArray[TempRXData.Mode]), ModeStringArray[TempRXData.Mode]
-                  ,TempRXData.tSysTime.qtYear+2000
-                  ,TempRXData.tSysTime.qtMonth
-                  ,TempRXData.tSysTime.qtDay
-                  ,TempRXData.tSysTime.qtHour
-                  ,TempRXData.tSysTime.qtMinute
-                  ,TempRXData.tSysTime.qtSecond
-                  ,TempRXData.tSysTime.qtHour
-                  ,TempRXData.tSysTime.qtMinute
-                  ,TempRXData.tSysTime.qtSecond
-                  ,tRSTSendStringLength, TempRXData.RSTSent
-                  ,tRSTRcvdStringLength, TempRXData.RSTReceived
-                 // ,tContestNamelength, StrPas(tContestName)     // Moved below to make this conditional--not everything is a contest
-                  ]
-                  );
-      sWriteFileFromString(tReportFileWrite, sBuffer);
-
-      // State-QP rover: emit the full original (KG1S/MON) in the TR4W
-      // app-specific field so the operator's intent survives ADIF
-      // round-trips.  Empty string when the QSO wasn't a rover entry.
-      if adifRoverFullCall <> '' then
-         WriteADIFField('APP_TR4W_ROVERCALL', adifRoverFullCall);
-
-      if not (Contest in [POTA,GENERALQSO]) then
-         begin
-         WriteADIFField('CONTEST_ID',StrPas(tContestName));
-         end;
-      if TempRXData.ExtMode = eNoMode then
-         begin
-         if TempRXData.Mode = Digital then
-            begin
-            sMode := 'RTTY';  // Issue 457 Revisited.
-            end
-         else
-            begin
-            sMode := ADIFModeString[TempRXData.mode];
-            end;
-         end
-      else if TempRXData.ExtMode = eUSB then
-         begin
-         sMode := 'SSB';
-         sSubMode := 'USB';
-         end
-      else if TempRXData.ExtMode = eLSB then
-         begin
-         sMode := 'SSB';
-         sSubMode := 'LSB';
-         end
-      else if TempRXData.ExtMode = ePSK31 then
-         begin
-         sMode := 'PSK';
-         sSubMode := ExtendedModeStringArray[TempRXData.ExtMode];
-         end
-      else if TempRXData.ExtMode = eFT4 then    // ??? In MFSKModes[TempRXData.ExtMode]?
-         begin
-         sMode := 'MFSK';
-         sSubMode := ExtendedModeStringArray[TempRXData.ExtMode];
-         end
-      else
-         begin
-         sMode := ExtendedModeStringArray[TempRXData.ExtMode];
-         end;
-       WriteADIFField('MODE',sMode);
-       if sSubMode <> '' then
-          begin
-          WriteADIFField('SUBMODE',sSubMode);
-          end;
-
-
-
-
-      if TempRXData.Frequency <> 0 then //14149280  or 7025000
-         begin
-         // Making this simpler...
-         saveDecimalSeparator := DecimalSeparator;
-         try
-            DecimalSeparator := '.';
-            sTemp := FloatToStr((TempRXData.Frequency/1000000));
-            sBuffer := SysUtils.Format('<FREQ:%u>%s',[length(sTemp),sTemp]);
-            sWriteFileFromString(tReportFileWrite, sBuffer);
-         finally
-            DecimalSeparator := saveDecimalSeparator;
-         end;
-
-
-      end;
-
-      if Contest = POTA then
-         begin
-         WriteADIFField('MY_SIG','POTA');
-         WriteADIFField('MY_SIG_INFO',myPark);
-         WriteADIFField('MY_POTA_REF',myPark);   // Newer ADIF field - Prior fields kept for backward compatibility
-         // Use the normalized park ref (QTHString = 'US-1224') not the raw
-         // exchange string ('1224') so SRX_STRING and SIG_INFO are consistent.
-         if LooksLikeAPOTAPark(TempRXData.QTHString) then
-            begin
-            WriteADIFField('SRX_STRING', TempRXData.QTHString);
-            end
-         else
-            begin
-            WriteADIFField('SRX_STRING', TempRXData.ExchString);
-            if LooksLikeAState(TempRXData.ExchString) then
-               begin
-               WriteADIFField('STATE', TempRXData.ExchString);
-               end
-            else if LooksLikeAGrid(TempRXData.ExchString) then
-               begin
-               WriteADIFField('GRIDSQUARE', TempRXData.ExchString);
-               end;
-            end;
-         end
-      else
-         begin
-         // Normalize SRX_STRING to include the implied RST so it is symmetric
-         // with STX_STRING (which GetMyExchangeForExport always builds with
-         // RST).  Without this, in contests where the operator does not
-         // type the RST (e.g. FQP CW, 599 implied), single-QSO exchanges
-         // export as "<SRX_STRING:3>HIL" while multi-county legs (built by
-         // PerQSOExchString in MainUnit) export as "<SRX_STRING:7>599 HIL".
-         // RST_RCVD lives in its own ADIF field; this purely normalizes the
-         // SRX_STRING display.  Stored ExchString is unchanged so Cabrillo
-         // emit is unaffected.
-         sTemp := IntToStr(TempRXData.RSTReceived);
-         if (TempRXData.ExchString <> '') and
-            (Copy(TempRXData.ExchString, 1, Length(sTemp) + 1) = sTemp + ' ') then
-            WriteADIFField('SRX_STRING', TempRXData.ExchString)
-         else if TempRXData.ExchString = '' then
-            WriteADIFField('SRX_STRING', sTemp)
-         else
-            WriteADIFField('SRX_STRING', sTemp + ' ' + TempRXData.ExchString);
-         end;
-      stxString := GetMyExchangeForExport;
-      WriteADIFField('STX_STRING',Trim(DeleteRepeatedSpaces(stxString)));
-
-      if TempRXData.Precedence <> #0 then
+   // ----- POTA-specific (uADIF skips SRX_STRING for POTA) -----
+   if rec.ceContest = POTA then
       begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<PRECEDENCE:1>%c ', TempRXData.Precedence);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-
-      if TempRXData.Check <> 0 then
-      begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<CHECK:2>%02u', TempRXData.Check);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-
-      if TempRXData.QTHString <> '' then
+      Result := Result + EmitADIFField('MY_SIG', 'POTA');
+      Result := Result + EmitADIFField('MY_SIG_INFO', string(MyPark));
+      Result := Result + EmitADIFField('MY_POTA_REF', string(MyPark));
+      if LooksLikeAPOTAPark(string(rec.QTHString)) then
+         Result := Result + EmitADIFField('SRX_STRING', string(rec.QTHString))
+      else
          begin
-   //    getridofprecedingspaces(TempRXData.QTHString);
-         //p := nil;
-         p := @TempRXData.QTHString[1];
-         if TempRXData.QTHString[1] = ' ' then        //n4af 4.34.6    remove preceding space using pointer math
-            begin                                           //n4af 4.34.6
-            inc(p);                                          //n4af 4.34.6    bump pointer past space
-            tCallStringLength := length(TempRXData.QTHString)-1;  //n4af 4.34.6
-            end
+         Result := Result + EmitADIFField('SRX_STRING', string(rec.ExchString));
+         if LooksLikeAState(string(rec.ExchString)) then
+            Result := Result + EmitADIFField('STATE', string(rec.ExchString))
          else
-            tCallStringLength := length(TempRXData.QTHString);
-
-         //if TempRXData.DomesticMult then           // ny4i Issue 398       // This was not quite right - NY4I 2020-11-22
-         if ContestsArray[Contest].DF = 'arrlsect' then
             begin
-            sTemp := GetStateFromSection(TempRXData.QTHString);
-            if length(sTemp) > 0 then
-               begin
-               WriteADIFField('STATE',sTemp);
-               end;
-            end
-   //      else if LooksLikeAState(TempRXData.QTHString) then
-   else if not(Stringhasnumber(TempRXData.QTHString)) then
-            begin
-            // ADIF STATE is the worked station's 2-letter US state postal
-            // code.  In state QSO parties, in-state stations send a county
-            // code in QTHString (3-letter for FL/MO/etc., variable elsewhere)
-            // -- those are NOT valid STATE values.  Three cases:
-            //   * QTHString is 2 letters: looks like a postal code, emit it.
-            //   * QTHString is multi-letter and we know the contest's host
-            //     state: emit that state (e.g. FQP county MON -> FL).
-            //   * Otherwise: skip.  Better no STATE than a bogus one.
-            if Length(TempRXData.QTHString) = 2 then
-               WriteADIFField('STATE', TempRXData.QTHString)
-            else
-               begin
-               sTemp := GetStateForContest(Contest);
-               if sTemp <> '' then
-                  begin
-                  WriteADIFField('STATE', sTemp);
-                  // ADIF CNTY = "<state>,<county-full-name>".  The long
-                  // form is loaded from <state>_cty.dom into FAltName by
-                  // LOGDOM.PAS when the file ships entries like
-                  // "Mon = MON,^Monroe".  Some state QP dom files do not
-                  // (yet) carry the ^Long second field (e.g. florida_cty.dom,
-                  // tennessee_cty.dom) -- in those cases FAltName is empty
-                  // and we just skip CNTY rather than emit a bogus value.
-                  if mo.DomList.FindMult(TempRXData.QTHString, cntyIdx) and
-                     (mo.DomList.FList[cntyIdx].FAltName <> '') then
-                     WriteADIFField('CNTY',
-                        sTemp + ',' + mo.DomList.FList[cntyIdx].FAltName);
-                  end;
-               end;
+            exchForGrid := rec.ExchString;
+            if LooksLikeAGrid(exchForGrid) then
+               Result := Result + EmitADIFField('GRIDSQUARE',
+                                                string(rec.ExchString));
             end;
+         end;
+      end;
 
-        //if ContestsArray[Contest].DM = DomesticMult
+   // ----- CNTY (state QP with FAltName loaded from <state>_cty.dom) -----
+   stateCode := GetStateForContest(rec.ceContest);
+   if (stateCode <> '') and (rec.QTHString <> '') and
+      (Length(rec.QTHString) <> 2) then
+      begin
+      if mo.DomList.FindMult(rec.QTHString, cntyIdx) and
+         (mo.DomList.FList[cntyIdx].FAltName <> '') then
+         Result := Result + EmitADIFField('CNTY',
+                              stateCode + ',' +
+                              mo.DomList.FList[cntyIdx].FAltName);
+      end;
 
-   {    case activeexchange of
-         'rstandgridexchange'
-         else
-          exit;    }
-
-      if (LooksLikeAGrid(TempRXData.DomesticQTH) and (ActiveDomesticMult <> RDADistrict)) then
-         begin
-          nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<GRIDSQUARE:%u>%s ', tCallStringLength, p);
-          sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-        end
-        else
-          case Contest of
+   // ----- Contest-specific primary-location field -----
+   //
+   // uADIF.EmitADIFRecord already emitted <QTH> when QTHString is non-empty.
+   // Most contests have a more specific tag (GRIDSQUARE / IOTA / ARRL_SECT /
+   // DOK / APP_TR4W_HQ / POTA_REF) -- emit it here too so the file matches
+   // the original ExportToADIF output.  A few contests deliberately suppress
+   // any location field (CQ160, NA-SPRINT, NAQSO).
+   if rec.QTHString <> '' then
+      begin
+      qthForGrid := rec.DomesticQTH;
+      if LooksLikeAGrid(qthForGrid) and (ActiveDomesticMult <> RDADistrict) then
+         Result := Result + EmitADIFField('GRIDSQUARE',
+                                          string(rec.DomesticQTH))
+      else
+         case rec.ceContest of
             WAG:
-              begin
-                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<DOK:%u>%s', tCallStringLength, p);
-                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-              end;
-
-            ARRL160:              // 4.105.5
-             if (TempRXData.QTH.CountryID = 'K') or (TempRXData.QTH.CountryID = 'VE') then
-              WriteADIFField('ARRL_SECT',TempRXData.QTHString);
-
+               Result := Result + EmitADIFField('DOK',
+                                                string(rec.QTHString));
+            ARRL160:
+               if (rec.QTH.CountryID = 'K') or (rec.QTH.CountryID = 'VE') then
+                  Result := Result + EmitADIFField('ARRL_SECT',
+                                                   string(rec.QTHString));
             ARRLFIELDDAY, WINTERFIELDDAY:
-                begin
-                if TempRXData.QTHString <> 'DX' then     // Change to validate it is a section
-                   begin
-                   WriteADIFField('ARRL_SECT',TempRXData.QTHString);
-                   WriteADIFField('CLASS',TempRXData.ceClass);
-                   //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s ', tCallStringLength, p);
-                   //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-                   end;
-
-                nLength := length(MyFDClass) + 1 + length(MySection);
-                sBuffer := SysUtils.Format('<STX_STRING:%u>%s %s ',[nLength, MyFDClass, MySection]);
-                sWriteFileFromString(tReportFileWrite, sBuffer);
-                end;
-            ARRLSSCW, ARRLSSSSB:
                begin
-               if TempRXData.QTHString <> 'DX' then     // Change to validate it is a section
-                   begin
-                   WriteADIFField('ARRL_SECT',TempRXData.QTHString);
-                   //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<ARRL_SECT:%u>%s ', tCallStringLength, p);
-                   //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-                   end;
-               end;
-
-            CQ160CW, CQ160SSB, NASPRINTCW, SPRINTSSB, NASPRINTRTTY, NAQSOCW, NAQSOSSB, NAQSORTTY:
-              begin
-                //nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<STATE:%u>%-4s ', tCallStringLength, p);  // Removed NY4I Issue 398 as we use CE.DomesticMult but whazt happens if Italy works Italy?
-                //sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-              end;
-            POTA:
-               begin
-               if LooksLikeAPOTAPark(TempRXData.QTHString) then
+               if rec.QTHString <> 'DX' then
                   begin
-                  WriteADIFField('SIG','POTA');
-                  WriteADIFField('SIG_INFO',TempRXData.QTHString);
-                  WriteADIFField('POTA_REF',TempRXData.QTHString); // Newer ADIF field - Prior fields kept for backward compatibility
+                  Result := Result + EmitADIFField('ARRL_SECT',
+                                                   string(rec.QTHString));
+                  Result := Result + EmitADIFField('CLASS',
+                                                   string(rec.ceClass));
                   end;
-
+               // Legacy behaviour: emit an additional STX_STRING with
+               // MyFDClass + MySection.  The record then has two
+               // STX_STRING tags; the second one wins on parse.
+               Result := Result + EmitADIFField('STX_STRING',
+                                                string(MyFDClass) + ' ' +
+                                                string(MySection));
                end;
+            ARRLSSCW, ARRLSSSSB:
+               if rec.QTHString <> 'DX' then
+                  Result := Result + EmitADIFField('ARRL_SECT',
+                                                   string(rec.QTHString));
+            CQ160CW, CQ160SSB, NASPRINTCW, SPRINTSSB, NASPRINTRTTY,
+            NAQSOCW, NAQSOSSB, NAQSORTTY:
+               ;  // legacy: no extra location field
+            POTA:
+               if LooksLikeAPOTAPark(string(rec.QTHString)) then
+                  begin
+                  Result := Result + EmitADIFField('SIG', 'POTA');
+                  Result := Result + EmitADIFField('SIG_INFO',
+                                                   string(rec.QTHString));
+                  Result := Result + EmitADIFField('POTA_REF',
+                                                   string(rec.QTHString));
+                  end;
             IOTA:
-              begin
-                strU(TempRXData.DomesticQTH);
-                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<IOTA:6>%s ', @TempRXData.DomesticQTH[1]);
-                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-              end;
-
+               Result := Result + EmitADIFField('IOTA',
+                                                string(rec.DomesticQTH));
             IARU:
-              begin
-                nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<APP_TR4W_HQ:%u>%-7s ', tCallStringLength, p);
-                sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-              end;
+               Result := Result + EmitADIFField('APP_TR4W_HQ',
+                                                string(rec.QTHString));
             ARRLDIGI, WWDIGI, BATAVIA_FT8:
-               begin
-               nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<GRIDSQUARE:%u>%s ', tCallStringLength, p);
-               logger.Debug('CabDetail] Writing gridsquare as (%s) - Writing %d bytes',[CABRILLO_BUFFER,nNumberOfBytesToWrite]);
-               sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-               end;
-          else
-            begin
-               nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<QTH:%u>%s ',tCallStringLength, p);
-               sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);  //n4af 04.30.2
-            end;
-          end;
-        end;
-
-
-      if TempRXData.Name <> '' then
-      begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<NAME:%u>%s ', length(TempRXData.Name), @TempRXData.Name[1]);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);         //n4af 04.30.2
+               Result := Result + EmitADIFField('GRIDSQUARE',
+                                                string(rec.QTHString));
+         else
+            // Default: uADIF already emitted <QTH:...>.  Nothing more.
+            ;
+         end;
       end;
 
-   if ((TempRXData.Power <> '') and (Contest = FOCMARATHON)) Then
+   // ----- CQZ / ITUZ (zone) -----
+   if rec.Zone <> DUMMYZONE then
       begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<FOC_NUM:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-      if ((TempRXData.Power <> '') and (Contest <> FOCMARATHON)) then
-      begin
-        nNumberOfBytesToWrite := Format(CABRILLO_BUFFER, '<RX_PWR:%u>%s', length(TempRXData.Power), @TempRXData.Power[1]);
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);          //n4af 04.30.2
-      end;
-
-      if true then // Write QSO number for all contests, not just when ExchangeInformation.QSONumber is set
-      begin
-        if TempRXData.NumberReceived <> -1 then
-        begin
-          asm
-          push TempRXData.NumberReceived
-          end;
-          nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<SRX:5>%05u');
-          asm add esp,12
-          end;
-          sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-        end;
-
-        asm
-          push TempRXData.NumberSent
-        end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<STX:5>%05u ');
-        asm add esp,12
-        end;
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-      end;
-      if TempRXData.Zone <> DUMMYZONE then
-      begin
-        if ActiveZoneMult in [CQZones, ITUZones] then
-        begin
-          if ActiveZoneMult = CQZones then p := '<CQZ:2>%02u' else p := '<ITUZ:2>%02u';
-          asm
-        xor  eax,eax
-        mov  al,TempRXData.Zone
-        push eax
-          end;
-          nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, p);
-          asm add esp,12
-          end;
-          sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-        end
-        else
-        begin
-          if (ExchangeInformation.Zone and (ActiveZoneMult = NoZoneMults)) then
-          begin
-
-            if CTY.ctyZoneMode = CQZoneMode then p := '<CQZ:2>%02u' else p := '<ITUZ:2>%02u';
-            asm
-        xor  eax,eax
-        mov  al,TempRXData.Zone
-        push eax
-            end;
-            nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, p);
-            asm add esp,12
-            end;
-            sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-          end;
-        end;
+      if ActiveZoneMult = CQZones then
+         Result := Result + EmitADIFField('CQZ',
+                                          SysUtils.Format('%.2d', [rec.Zone]))
+      else if ActiveZoneMult = ITUZones then
+         Result := Result + EmitADIFField('ITUZ',
+                                          SysUtils.Format('%.2d', [rec.Zone]))
+      else if (ActiveZoneMult = NoZoneMults) and ExchangeInformation.Zone then
+         begin
+         if CTY.ctyZoneMode = CQZoneMode then
+            Result := Result + EmitADIFField('CQZ',
+                                  SysUtils.Format('%.2d', [rec.Zone]))
+         else
+            Result := Result + EmitADIFField('ITUZ',
+                                  SysUtils.Format('%.2d', [rec.Zone]));
+         end;
       end;
 
-      if TempRXData.TenTenNum <> MAXWORD then
+   // ----- STATION_CALLSIGN (when operator differs from MyCall) -----
+   if (rec.ceOperator <> '') and
+      (string(rec.ceOperator) <> string(MyCall)) then
+      Result := Result + EmitADIFField('STATION_CALLSIGN', string(MyCall));
+end;
+
+procedure ExportToADIF;
+var
+   records      : TContestExchangeArray;
+   dtReportTime : TDateTime;
+   adifStr      : string;
+begin
+   dtReportTime := Now;
+   lstrcpy(tReportsFilename, TR4W_LOG_FILENAME);
+   tReportsFilename[Windows.lstrlen(tReportsFilename) - 3] := #0;
+   lstrcat(tReportsFilename, 'ADI');
+   if not tOpenFileForWrite(tReportFileWrite, tReportsFilename) then Exit;
+
+   if not OpenLogFile then
       begin
-        asm
-        xor  eax,eax
-        mov  ax, TempRXData.TenTenNum
-        push eax
-        end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<TEN_TEN:5>%05u');
-        asm add esp,12
-        end;
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+      CloseHandle(tReportFileWrite);
+      Exit;
       end;
 
-      if TempRXData.Age <> 0 then
+   // Banner lines (pre-header, kept for compatibility with older ADIF
+   // consumers that expect the "Created by TR4W..." comment).
+   sWriteFileFromString(tReportFileWrite, 'ADIF File'#13#10);
+   sWriteFileFromString(tReportFileWrite,
+      'Created by TR4W version ' + TR4W_CURRENTVERSION +
+      ' on ' + FormatDateTime('mmm-dd-yyyy hh:mm:ss', dtReportTime) +
+      #13#10);
+
+   // Read all "good" QSOs from the log into an in-memory array.
+   SetLength(records, 0);
+   ReadVersionBlock;
+   while ReadLogFile do
       begin
-        asm
-        xor  eax,eax
-        mov  al, TempRXData.Age
-        push eax
-        end;
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<AGE:3>%03u');
-        asm add esp,12
-        end;
-        sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+      if GoodLookingQSO then
+         begin
+         SetLength(records, Length(records) + 1);
+         records[High(records)] := TempRXData;
+         end;
       end;
 
-      if TempRXData.ceOperator[0] <> #0 then
-      begin
-        asm
-        lea eax, TempRXData.ceOperator
-        push eax
-        end;
-        Windows.lstrlen(TempRXData.ceOperator);
-        asm push eax end;
-        if TempRXData.ceOperator <> MyCall then
-           begin           // Add STATION_CALLSIGN because operator is different
-           nLength := length(MyCall);
-           sBuffer := SysUtils.Format('<STATION_CALLSIGN:%u>%s ',[nLength, MyCall]);
-           sWriteFileFromString(tReportFileWrite, sBuffer);
-           end;
-      end
+   // Build the whole ADIF document (header + records + tail extras) and
+   // write it as one block.  The per-record body lives in
+   // uADIF.EmitADIFRecord; the contest-specific extras come from the
+   // EmitContestSpecificTailForExport callback above.
+   adifStr := uADIF.ExportADIFToString(records,
+                                       string(TR4W_CURRENTVERSION),
+                                       @EmitContestSpecificTailForExport);
+   sWriteFileFromString(tReportFileWrite, adifStr);
 
-      else
-
-        asm
-        lea eax,MyCall+1
-        push eax
-        xor eax,eax
-        mov al, byte ptr MyCall
-        push eax
-        end;
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '<OPERATOR:%u>%s ');
-      asm add esp,16 end;
-      sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-
-      // Write APP_TR4W_ fields
-      WriteADIFField('APP_TR4W_ID',TempRXData.id);
-
-      sWriteFile(tReportFileWrite, '<EOR>'#13#10, 7);
-    end;
-    goto 1;
-  end;
-  CloseHandle(tReportFileWrite);
-  CloseLogFile;
-  PreviewFileNameAddress := tReportsFilename;
-  FilePreview;
-  //DecimalSeparator :=  saveDecimalSeparator;
+   CloseHandle(tReportFileWrite);
+   CloseLogFile;
+   PreviewFileNameAddress := tReportsFilename;
+   FilePreview;
 end;
 
 
