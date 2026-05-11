@@ -32,6 +32,8 @@ unit uTestADIFFixtures;
 interface
 
 uses
+   VC,
+   uADIF,
    uTR4WTestFramework;
 
 type
@@ -81,15 +83,29 @@ type
       procedure Test_GeneralQSO_RecordCount;
       procedure Test_GeneralQSO_BareUSBModeAcceptsFallthrough;
       procedure Test_GeneralQSO_NameFieldParsed;
+
+      // Round-trip stability: import fixture, export via uADIF (no
+      // contest-specific tail), re-import, assert records survive
+      // the round-trip.  Tail emitter is nil so this covers ONLY
+      // the fields uADIF.EmitADIFRecord emits -- contest-specific
+      // extras (POTA MY_*, ARRL_SECT, GRIDSQUARE, etc.) are tested
+      // by PostUnit-side integration, not here.
+      procedure CheckRecordsEquivalent(const a, b: ContestExchange;
+                                        const ctx: string);
+      procedure CheckRoundTrip(const fixtureName: string);
+      procedure Test_RoundTrip_FQP;
+      procedure Test_RoundTrip_CQWW_CW;
+      procedure Test_RoundTrip_CQWPX_SSB;
+      procedure Test_RoundTrip_ARRLDIGI;
+      procedure Test_RoundTrip_ARRLDX_CW;
+      procedure Test_RoundTrip_GeneralQSO;
    end;
 
 implementation
 
 uses
    SysUtils,
-   Classes,
-   VC,
-   uADIF;
+   Classes;
 
 // ---------------------------------------------------------------------------
 // Harness helpers
@@ -554,6 +570,86 @@ begin
 end;
 
 // ---------------------------------------------------------------------------
+// Round-trip stability tests
+//
+// For each fixture: load -> export (no tail emitter) -> re-import.
+// Compare the second-import records against the first.  Asserts only
+// the fields uADIF.EmitADIFRecord both EMITS and uADIF.ApplyADIFFields-
+// ToExchange parses BACK.  Lost-by-design fields (DomesticQTH,
+// ExchString reinterpreted by contest tail, etc.) are deliberately
+// excluded from the comparison -- they are tested at the integration
+// level when the tail is wired.
+// ---------------------------------------------------------------------------
+
+procedure TADIFFixtureTests.CheckRecordsEquivalent(const a, b: ContestExchange;
+                                                    const ctx: string);
+begin
+   CheckEquals(string(a.Callsign), string(b.Callsign),  ctx + ' Callsign');
+   CheckEquals(Integer(a.Band),    Integer(b.Band),     ctx + ' Band');
+   CheckEquals(Integer(a.Mode),    Integer(b.Mode),     ctx + ' Mode');
+   CheckEquals(Integer(a.ExtMode), Integer(b.ExtMode),  ctx + ' ExtMode');
+   CheckEquals(string(a.QTHString),string(b.QTHString), ctx + ' QTHString');
+   CheckEquals(a.Frequency,        b.Frequency,         ctx + ' Frequency');
+   CheckEquals(Integer(a.RSTSent),     Integer(b.RSTSent),     ctx + ' RSTSent');
+   CheckEquals(Integer(a.RSTReceived), Integer(b.RSTReceived), ctx + ' RSTReceived');
+   CheckEquals(Integer(a.NumberSent),     Integer(b.NumberSent),     ctx + ' NumberSent');
+   CheckEquals(Integer(a.NumberReceived), Integer(b.NumberReceived), ctx + ' NumberReceived');
+   CheckEquals(Integer(a.ceContest), Integer(b.ceContest), ctx + ' ceContest');
+end;
+
+procedure TADIFFixtureTests.CheckRoundTrip(const fixtureName: string);
+var
+   r1, r2 : TContestExchangeArray;
+   adif   : string;
+   i      : Integer;
+begin
+   r1 := LoadADIFFixture(fixtureName);
+   adif := ExportADIFToString(r1, '4.147.x-roundtrip-test', nil);
+   ImportADIFFromString(adif, r2);
+   CheckEquals(Length(r1), Length(r2),
+               fixtureName + ': record count after round-trip');
+   for i := 0 to High(r1) do
+      CheckRecordsEquivalent(r1[i], r2[i],
+                             fixtureName + '[' + IntToStr(i) + ']');
+end;
+
+procedure TADIFFixtureTests.Test_RoundTrip_FQP;
+begin
+   BeginTest('Test_RoundTrip_FQP');
+   CheckRoundTrip('fqp_rover_and_county_line.adi');
+end;
+
+procedure TADIFFixtureTests.Test_RoundTrip_CQWW_CW;
+begin
+   BeginTest('Test_RoundTrip_CQWW_CW');
+   CheckRoundTrip('cqww_cw_zones.adi');
+end;
+
+procedure TADIFFixtureTests.Test_RoundTrip_CQWPX_SSB;
+begin
+   BeginTest('Test_RoundTrip_CQWPX_SSB');
+   CheckRoundTrip('cqwpx_ssb_serials.adi');
+end;
+
+procedure TADIFFixtureTests.Test_RoundTrip_ARRLDIGI;
+begin
+   BeginTest('Test_RoundTrip_ARRLDIGI');
+   CheckRoundTrip('arrl_digi_grids.adi');
+end;
+
+procedure TADIFFixtureTests.Test_RoundTrip_ARRLDX_CW;
+begin
+   BeginTest('Test_RoundTrip_ARRLDX_CW');
+   CheckRoundTrip('arrldx_cw_dxexch.adi');
+end;
+
+procedure TADIFFixtureTests.Test_RoundTrip_GeneralQSO;
+begin
+   BeginTest('Test_RoundTrip_GeneralQSO');
+   CheckRoundTrip('generalqso_usb.adi');
+end;
+
+// ---------------------------------------------------------------------------
 // Test suite dispatch
 // ---------------------------------------------------------------------------
 
@@ -610,6 +706,14 @@ begin
    Test_GeneralQSO_RecordCount;
    Test_GeneralQSO_BareUSBModeAcceptsFallthrough;
    Test_GeneralQSO_NameFieldParsed;
+
+   // Round-trip stability across contest archetypes
+   Test_RoundTrip_FQP;
+   Test_RoundTrip_CQWW_CW;
+   Test_RoundTrip_CQWPX_SSB;
+   Test_RoundTrip_ARRLDIGI;
+   Test_RoundTrip_ARRLDX_CW;
+   Test_RoundTrip_GeneralQSO;
 end;
 
 end.

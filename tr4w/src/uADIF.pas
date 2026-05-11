@@ -45,7 +45,8 @@ uses
    SysUtils,
    StrUtils,
    Log4D,
-   VC;
+   VC,
+   utils_text;
 
 type
    TADIFField = record
@@ -204,6 +205,57 @@ function ApplyADIFFieldsToExchange(const fields: TADIFFieldList;
 // the count of records successfully parsed (= Length(records)).
 function ImportADIFFromString(const s: string;
                               var records: TContestExchangeArray): Integer;
+
+// =========================================================================
+// Export side
+// =========================================================================
+
+type
+   // Caller-supplied tail emitter.  Returns ADIF text to append between
+   // EmitADIFRecord's output and the closing <EOR> for a single record.
+   // Used by PostUnit.ExportToADIF to add contest-specific fields
+   // (GRIDSQUARE / IOTA / ARRL_SECT / POTA MY_SIG / CLASS / STATION_CALLSIGN /
+   // STX_STRING built from MainUnit globals / CQZ/ITUZ / CNTY from mo.DomList).
+   // Tests pass nil to skip the tail entirely.
+   TContestTailEmitter = function(const rec: ContestExchange): string;
+
+// Build one ADIF field as `<NAME:LEN>VALUE ` (trailing space for tag
+// separation).  Empty value returns ''.
+function EmitADIFField(const name, value: string): string;
+
+// Build the ADIF header (ADIF_VER, CREATED_TIMESTAMP, PROGRAMID,
+// PROGRAMVERSION, <EOH>).  Pure -- caller can prepend a banner line
+// if desired.
+function EmitADIFHeader(const programVersion: string): string;
+
+// Build a single ADIF record from a ContestExchange.  Emits the
+// "ContestExchange-driven" fields only -- fields whose values come
+// from the record itself (call, band, mode, RST, etc.).  Does NOT
+// emit `<EOR>` -- caller appends.
+//
+// Excludes fields that need MainUnit/trdos globals (STATION_CALLSIGN,
+// STX_STRING via GetMyExchangeForExport, CNTY via mo.DomList,
+// CQZ/ITUZ via ActiveZoneMult, POTA MY_* fields via myPark, ARRL-FD
+// CLASS via MyFDClass etc.).  PostUnit.ExportToADIF provides those
+// via the TContestTailEmitter callback.
+function EmitADIFRecord(const rec: ContestExchange): string;
+
+// Build the entire ADIF document for the given records: header +
+// (EmitADIFRecord(r) + tailEmitter(r) + <EOR>) for each record.
+// `programVersion` is the value for the PROGRAMVERSION ADIF tag in
+// the header.  `tailEmitter` may be nil -- in which case no contest-
+// specific extras are added per record (suitable for tests).
+function ExportADIFToString(const records: TContestExchangeArray;
+                            const programVersion: string;
+                            tailEmitter: TContestTailEmitter): string;
+
+// Return the host state's 2-letter postal code for the 13 known
+// single-state QSO parties (CA/FL/MI/MN/MO/NC/OH/TX/WI/TN/CO/PA/IN).
+// Returns '' for any other contest.  Used by EmitADIFRecord to emit
+// STATE when QTHString carries a county code instead of a 2-letter
+// state code.  Originally lived in PostUnit; moved here so it is
+// reachable from both uADIF (export) and the test runner.
+function GetStateForContest(c: ContestType): string;
 
 implementation
 
@@ -985,6 +1037,305 @@ begin
       Inc(Result);
 
       p := recordEnd;
+      end;
+end;
+
+// ---------------------------------------------------------------------------
+// Export side
+// ---------------------------------------------------------------------------
+
+function GetStateForContest(c: ContestType): string;
+begin
+   case c of
+      CALQSOPARTY        : Result := 'CA';
+      FLORIDAQSOPARTY    : Result := 'FL';
+      MICHQSOPARTY       : Result := 'MI';
+      MINNQSOPARTY       : Result := 'MN';
+      MOQSOPARTY         : Result := 'MO';
+      NCQSOPARTY         : Result := 'NC';
+      OHIOQSOPARTY       : Result := 'OH';
+      TEXASQSOPARTY      : Result := 'TX';
+      WISCONSINQSOPARTY  : Result := 'WI';
+      TENNESSEEQSOPARTY  : Result := 'TN';
+      COLORADOQSOPARTY   : Result := 'CO';
+      PAQSOPARTY         : Result := 'PA';
+      INQSOPARTY         : Result := 'IN';
+   else
+      Result := '';
+   end;
+end;
+
+function EmitADIFField(const name, value: string): string;
+begin
+   if value = '' then
+      Result := ''
+   else
+      Result := SysUtils.Format('<%s:%u>%s ', [name, Length(value), value]);
+end;
+
+function EmitADIFHeader(const programVersion: string): string;
+begin
+   Result :=
+      EmitADIFField('ADIF_VER', '3.1.0') + #13#10 +
+      EmitADIFField('CREATED_TIMESTAMP',
+                    FormatDateTime('yyyymmdd hhnnss', Now)) + #13#10 +
+      EmitADIFField('PROGRAMID', 'TR4W') + #13#10 +
+      EmitADIFField('PROGRAMVERSION', programVersion) + #13#10 +
+      '<EOH>'#13#10;
+end;
+
+// ----- Per-field helpers used by EmitADIFRecord -----------------------
+
+// Format an integer with at least minLen digits (zero-padded).
+function PadInt(n: Integer; minLen: Integer): string;
+begin
+   Result := IntToStr(n);
+   while Length(Result) < minLen do
+      Result := '0' + Result;
+end;
+
+// Determine the (MODE, SUBMODE) ADIF tag pair for a ContestExchange
+// based on its ExtMode.  Mirrors the mapping in PostUnit.ExportToADIF
+// (the if/else chain on TempRXData.ExtMode).
+procedure ResolveADIFModeSubmode(const rec: ContestExchange;
+                                  out modeStr, subModeStr: string);
+begin
+   modeStr := '';
+   subModeStr := '';
+
+   if rec.ExtMode = eNoMode then
+      begin
+      // No extended mode -- use base Mode.  Special case kept from the
+      // legacy export: Digital with no ExtMode emits as RTTY (issue 457).
+      if rec.Mode = Digital then
+         modeStr := 'RTTY'
+      else
+         modeStr := ADIFModeString[rec.Mode];
+      end
+   else if rec.ExtMode = eUSB then
+      begin
+      modeStr    := 'SSB';
+      subModeStr := 'USB';
+      end
+   else if rec.ExtMode = eLSB then
+      begin
+      modeStr    := 'SSB';
+      subModeStr := 'LSB';
+      end
+   else if rec.ExtMode = ePSK31 then
+      begin
+      modeStr    := 'PSK';
+      subModeStr := ExtendedModeStringArray[rec.ExtMode];
+      end
+   else if rec.ExtMode = eFT4 then
+      begin
+      modeStr    := 'MFSK';
+      subModeStr := ExtendedModeStringArray[rec.ExtMode];
+      end
+   else
+      modeStr := ExtendedModeStringArray[rec.ExtMode];
+end;
+
+// Format a frequency (Hz) as an ADIF FREQ string in MHz.  Uses '.'
+// as decimal regardless of locale (ADIF spec requires it).
+function FormatADIFFreq(freqHz: LongInt): string;
+var
+   saveSep : Char;
+begin
+   if freqHz = 0 then
+      begin
+      Result := '';
+      Exit;
+      end;
+   saveSep := DecimalSeparator;
+   try
+      DecimalSeparator := '.';
+      Result := FloatToStr(freqHz / 1000000);
+   finally
+      DecimalSeparator := saveSep;
+   end;
+end;
+
+// Compose a state-QP rover call's bare-and-rover form.  When the
+// callsign has a '/<county>' suffix that matches the QSO's QTHString,
+// returns (bareCall, fullCall).  Otherwise returns (callsign, '').
+procedure ResolveRoverCall(const rec: ContestExchange;
+                            out bareCall, roverFullCall: string);
+var
+   callStr     : string;
+   slashPos    : Integer;
+   suffix      : string;
+begin
+   bareCall := string(rec.Callsign);
+   roverFullCall := '';
+   // Only relevant for state-QP exchanges.
+   if not ContestsArray[rec.ceContest].CountyLineAllowed then
+      Exit;
+   callStr := bareCall;
+   slashPos := Pos('/', callStr);
+   if slashPos = 0 then
+      Exit;
+   suffix := Copy(callStr, slashPos + 1, Length(callStr) - slashPos);
+   if (suffix <> '') and
+      (UpperCase(suffix) = UpperCase(string(rec.QTHString))) then
+      begin
+      roverFullCall := callStr;
+      bareCall := Copy(callStr, 1, slashPos - 1);
+      end;
+end;
+
+// Build the SRX_STRING value with RST normalization -- mirrors the
+// commit f048dc7 logic in PostUnit.PAS.
+function ResolveSRXString(const rec: ContestExchange): string;
+var
+   rstStr   : string;
+   exch     : string;
+   prefix   : string;
+begin
+   exch := string(rec.ExchString);
+   rstStr := IntToStr(rec.RSTReceived);
+   prefix := rstStr + ' ';
+   if (exch <> '') and (Copy(exch, 1, Length(prefix)) = prefix) then
+      Result := exch
+   else if exch = '' then
+      Result := rstStr
+   else
+      Result := rstStr + ' ' + exch;
+end;
+
+// ----- EmitADIFRecord -------------------------------------------------
+
+function EmitADIFRecord(const rec: ContestExchange): string;
+var
+   bareCall       : string;
+   roverFullCall  : string;
+   bandStr        : string;
+   modeStr        : string;
+   subModeStr     : string;
+   freqStr        : string;
+   stateForQP     : string;
+begin
+   ResolveRoverCall(rec, bareCall, roverFullCall);
+
+   // BAND string -- mirror the legacy 70cm/23cm rewrites.
+   bandStr := string(ADIFBANDSTRINGSARRAY[rec.Band]);
+   if bandStr = '432' then bandStr := '70cm';
+   if bandStr = '1GH' then bandStr := '23cm';
+
+   ResolveADIFModeSubmode(rec, modeStr, subModeStr);
+   freqStr := FormatADIFFreq(rec.Frequency);
+
+   Result := '';
+
+   // Identification + timestamps
+   Result := Result + EmitADIFField('CALL', bareCall);
+   Result := Result + EmitADIFField('BAND', bandStr);
+   Result := Result + EmitADIFField('QSO_DATE',
+      SysUtils.Format('%.4d%.2d%.2d',
+         [rec.tSysTime.qtYear + 2000,
+          rec.tSysTime.qtMonth,
+          rec.tSysTime.qtDay]));
+   Result := Result + EmitADIFField('TIME_ON',
+      SysUtils.Format('%.2d%.2d%.2d',
+         [rec.tSysTime.qtHour,
+          rec.tSysTime.qtMinute,
+          rec.tSysTime.qtSecond]));
+   Result := Result + EmitADIFField('TIME_OFF',
+      SysUtils.Format('%.2d%.2d%.2d',
+         [rec.tSysTime.qtHour,
+          rec.tSysTime.qtMinute,
+          rec.tSysTime.qtSecond]));
+
+   // RST and exchange
+   Result := Result + EmitADIFField('RST_SENT', IntToStr(rec.RSTSent));
+   Result := Result + EmitADIFField('RST_RCVD', IntToStr(rec.RSTReceived));
+
+   // APP_TR4W_ROVERCALL (full rover form, e.g. KG1S/MON)
+   if roverFullCall <> '' then
+      Result := Result + EmitADIFField('APP_TR4W_ROVERCALL', roverFullCall);
+
+   // CONTEST_ID, unless POTA/GENERALQSO (legacy behaviour)
+   if not (rec.ceContest in [POTA, GENERALQSO]) then
+      Result := Result + EmitADIFField('CONTEST_ID',
+         string(ContestsArray[rec.ceContest].ADIFName));
+
+   // MODE / SUBMODE
+   Result := Result + EmitADIFField('MODE', modeStr);
+   if subModeStr <> '' then
+      Result := Result + EmitADIFField('SUBMODE', subModeStr);
+
+   // FREQ (locale-independent, '.' separator)
+   Result := Result + EmitADIFField('FREQ', freqStr);
+
+   // SRX_STRING (received exchange, RST-normalized)
+   Result := Result + EmitADIFField('SRX_STRING', ResolveSRXString(rec));
+
+   // STATE - emit when QTHString is a 2-letter postal code, OR when this
+   // is a single-state QSO party and QTHString is a county code.
+   if (Length(rec.QTHString) = 2) and not StringHasNumber(rec.QTHString) then
+      Result := Result + EmitADIFField('STATE', string(rec.QTHString))
+   else
+      begin
+      stateForQP := GetStateForContest(rec.ceContest);
+      if (stateForQP <> '') and (rec.QTHString <> '') then
+         Result := Result + EmitADIFField('STATE', stateForQP);
+      end;
+
+   // QTH - the "default" location field.  Always emit when QTHString
+   // is non-empty.  Contests that prefer GRIDSQUARE/IOTA/ARRL_SECT
+   // can override via the tail emitter.
+   if rec.QTHString <> '' then
+      Result := Result + EmitADIFField('QTH', string(rec.QTHString));
+
+   // PRECEDENCE / CHECK
+   if rec.Precedence <> #0 then
+      Result := Result + EmitADIFField('PRECEDENCE', string(rec.Precedence));
+   if rec.Check <> 0 then
+      Result := Result + EmitADIFField('CHECK', PadInt(rec.Check, 2));
+
+   // NAME / FOC_NUM / RX_PWR
+   if rec.Name <> '' then
+      Result := Result + EmitADIFField('NAME', string(rec.Name));
+   if rec.Power <> '' then
+      begin
+      if rec.ceContest = FOCMARATHON then
+         Result := Result + EmitADIFField('FOC_NUM', string(rec.Power))
+      else
+         Result := Result + EmitADIFField('RX_PWR', string(rec.Power));
+      end;
+
+   // SRX / STX (numeric serials)
+   if rec.NumberReceived <> $FFFF then       // -1 as Word -> not set
+      Result := Result + EmitADIFField('SRX', PadInt(rec.NumberReceived, 5));
+   if rec.NumberSent <> $FFFF then
+      Result := Result + EmitADIFField('STX', PadInt(rec.NumberSent, 5));
+
+   if rec.TenTenNum <> $FFFF then
+      Result := Result + EmitADIFField('TEN_TEN', PadInt(rec.TenTenNum, 5));
+
+   if rec.Age <> 0 then
+      Result := Result + EmitADIFField('AGE', PadInt(rec.Age, 3));
+
+   // OPERATOR + APP_TR4W_ID
+   if rec.ceOperator <> '' then
+      Result := Result + EmitADIFField('OPERATOR', string(rec.ceOperator));
+   if rec.id <> '' then
+      Result := Result + EmitADIFField('APP_TR4W_ID', string(rec.id));
+end;
+
+function ExportADIFToString(const records: TContestExchangeArray;
+                            const programVersion: string;
+                            tailEmitter: TContestTailEmitter): string;
+var
+   i : Integer;
+begin
+   Result := EmitADIFHeader(programVersion);
+   for i := 0 to High(records) do
+      begin
+      Result := Result + EmitADIFRecord(records[i]);
+      if Assigned(tailEmitter) then
+         Result := Result + tailEmitter(records[i]);
+      Result := Result + '<EOR>'#13#10;
       end;
 end;
 
