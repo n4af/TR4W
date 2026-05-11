@@ -7369,12 +7369,23 @@ begin
       end
     else if DoingDomesticMults then
       begin
-      // Load domQTH with the ALPHA prefix of the SRX_STRING.
-      j := 1;
-      while (j <= Length(temps.SRX_String)) and
-            not (temps.SRX_String[j] in ['0'..'9']) do
-        Inc(j);
-      exch.DomesticQTH := Copy(temps.SRX_String, 1, j - 1);
+      if exch.QTHString <> '' then
+        // ADIF QTH tag carries the county/state code unambiguously
+        // for state QSO parties.  Prefer it when present -- the
+        // alpha-prefix-of-SRX_STRING heuristic below was already
+        // unreliable, and now fails outright because SRX_STRING is
+        // normalized to include a leading RST ("59 MON") on export.
+        exch.DomesticQTH := exch.QTHString
+      else
+        begin
+        // Legacy fallback for ADIF imports that lack a QTH tag.
+        // Loads DomesticQTH with the ALPHA prefix of SRX_STRING.
+        j := 1;
+        while (j <= Length(temps.SRX_String)) and
+              not (temps.SRX_String[j] in ['0'..'9']) do
+          Inc(j);
+        exch.DomesticQTH := Copy(temps.SRX_String, 1, j - 1);
+        end;
       end
     else
       exch.ExchString := temps.SRX_String;
@@ -7411,6 +7422,20 @@ var
   FoundEOH: boolean;
   QSOCounter: integer;
   lpNumberOfBytesWritten: Cardinal;
+  // County-line detection during import.  Within a single ImportFromADIF
+  // pass we remember the first QTHString seen for each (call|band|mode)
+  // tuple.  When a later record reuses the same (call|band|mode) with a
+  // different QTHString AND the contest's CountyLineAllowed flag is True,
+  // we set ceClearDupeSheet on the later record so the post-import
+  // rescore (tUpdateLog(actRescore)) does NOT flag it as a dupe.
+  // ContestsArray[ceContest].CountyLineAllowed is set to True only for
+  // the 13 single-state QSO parties (VC.pas).  Multi-state QPs (7QP /
+  // NEQP / etc.) are deliberately not flagged -- they need their own
+  // per-state county-line handling, tracked separately.
+  seenCallBandMode    : TStringList;
+  cbmKey              : string;
+  cbmKeyIdx           : Integer;
+  priorQTHForKey      : string;
 
   procedure DisplayLoadedQSOs;
   begin
@@ -7473,36 +7498,63 @@ begin
   //ReWrite(adif);
   QSOCounter := 0;
   Reset(adif);
-  while not Eof(adif) do
-  begin
-    ReadLn(adif, sBuffer);
-    if not FoundEOH then
+  seenCallBandMode := TStringList.Create;
+  try
+    seenCallBandMode.CaseSensitive := False;
+    while not Eof(adif) do
     begin
-      if trim(AnsiUpperCase(sBuffer)) = '<EOH>' then
+      ReadLn(adif, sBuffer);
+      if not FoundEOH then
       begin
-        FoundEOH := true;
-      end;
-    end
-    else
-    begin
-      ClearContestExchange(TempRXData);
-      if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
-      begin
-        // State-QP rover (KG1S/MON): strip suffix for country lookup so
-        // the /M tail isn't misread as a GB prefix indicator.  Without
-        // this wrapper the post-ParseADIFRecord lookup overwrites the
-        // QTH set inside ParseADIFRecord and we end up with DX=G.
-        ctyLocateCallStripRover(TempRXData.Callsign, TempRXData.QTH);
-        CalculateQSOPoints(TempRXData);
-        tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange),
-          lpNumberOfBytesWritten);
-        inc(QSOCounter);
-        if QSOCounter mod 100 = 0 then
+        if trim(AnsiUpperCase(sBuffer)) = '<EOH>' then
         begin
-          DisplayLoadedQSOs;
+          FoundEOH := true;
+        end;
+      end
+      else
+      begin
+        ClearContestExchange(TempRXData);
+        if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
+        begin
+          // State-QP rover (KG1S/MON): strip suffix for country lookup so
+          // the /M tail isn't misread as a GB prefix indicator.  Without
+          // this wrapper the post-ParseADIFRecord lookup overwrites the
+          // QTH set inside ParseADIFRecord and we end up with DX=G.
+          ctyLocateCallStripRover(TempRXData.Callsign, TempRXData.QTH);
+
+          // County-line follow-up detection.  If the imported record
+          // reuses (call|band|mode) with a different QTHString AND the
+          // contest's CountyLineAllowed flag is True (see VC.pas), set
+          // ceClearDupeSheet so the post-import rescore does not
+          // dupe-flag this record.  Otherwise leave the flag alone --
+          // the standard dupe check stays in effect.
+          cbmKey := string(TempRXData.Callsign) + '|' +
+                    IntToStr(Ord(TempRXData.Band)) + '|' +
+                    IntToStr(Ord(TempRXData.Mode));
+          cbmKeyIdx := seenCallBandMode.IndexOfName(cbmKey);
+          if cbmKeyIdx >= 0 then
+            begin
+            priorQTHForKey := seenCallBandMode.ValueFromIndex[cbmKeyIdx];
+            if (priorQTHForKey <> string(TempRXData.QTHString)) and
+               ContestsArray[TempRXData.ceContest].CountyLineAllowed then
+              TempRXData.ceClearDupeSheet := True;
+            end
+          else
+            seenCallBandMode.Add(cbmKey + '=' + string(TempRXData.QTHString));
+
+          CalculateQSOPoints(TempRXData);
+          tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange),
+            lpNumberOfBytesWritten);
+          inc(QSOCounter);
+          if QSOCounter mod 100 = 0 then
+          begin
+            DisplayLoadedQSOs;
+          end;
         end;
       end;
     end;
+  finally
+    seenCallBandMode.Free;
   end;
 
   CloseFile(adif);

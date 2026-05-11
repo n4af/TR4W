@@ -55,6 +55,7 @@ type
       procedure Test_CALLAfterRoverCall_DoesNotOverride;
       procedure Test_ModeNotOverwrittenAfterSet;
       procedure Test_ImportSingleRecord;
+      procedure Test_ImportFQPRecord_QTHSet;
       procedure Test_ImportMultipleRecords;
       procedure Test_ImportSkipsHeader;
       procedure Test_ImportEmptyString_ZeroRecords;
@@ -506,6 +507,31 @@ begin
    CheckEquals(Integer(Band20), Integer(records[0].Band),    'BAND');
 end;
 
+procedure TADIFMappingTests.Test_ImportFQPRecord_QTHSet;
+var
+   records : TContestExchangeArray;
+begin
+   BeginTest('Test_ImportFQPRecord_QTHSet');
+   // Verbatim record shape produced by TR4W's FQP export.  The QTH
+   // field carries the county code and must land in exch.QTHString.
+   CheckEquals(1, ImportADIFFromString(
+      '<CALL:4>KG1S <BAND:3>20m <QSO_DATE:8>20260510 ' +
+      '<TIME_ON:6>154644 <RST_SENT:2>59 <RST_RCVD:2>59 ' +
+      '<CONTEST_ID:12>FL-QSO-PARTY <MODE:3>SSB <SUBMODE:3>USB ' +
+      '<FREQ:5>14.32<SRX_STRING:6>59 MON <STX_STRING:6>59 PIN ' +
+      '<STATE:2>FL <QTH:3>MON <STX:5>00033 <OPERATOR:4>NY4I <EOR>',
+      records),
+      'one FQP record parsed');
+   CheckEquals('KG1S', string(records[0].Callsign), 'CALL');
+   CheckEquals('MON',  string(records[0].QTHString),
+               'QTH tag value lands in exch.QTHString');
+   // DomesticQTH population happens in MainUnit's contest-specific
+   // tail, NOT in uADIF.  This test only covers what uADIF does, so
+   // DomesticQTH is not asserted here.  The "QTH column shows blank
+   // for FQP imports" bug is covered by an integration test path,
+   // not the uADIF unit test.
+end;
+
 procedure TADIFMappingTests.Test_ImportMultipleRecords;
 var
    records : TContestExchangeArray;
@@ -570,6 +596,7 @@ begin
    Test_ModeNotOverwrittenAfterSet;
 
    Test_ImportSingleRecord;
+   Test_ImportFQPRecord_QTHSet;
    Test_ImportMultipleRecords;
    Test_ImportSkipsHeader;
    Test_ImportEmptyString_ZeroRecords;
@@ -638,9 +665,67 @@ begin
    CheckEquals(Integer(Digital), Integer(m.msmMode),         'RTTY.Mode');
    CheckEquals(Integer(eRTTY),   Integer(m.msmExtendedMode), 'RTTY.ExtMode');
 
+   m := GetADIFMode('DATA');
+   CheckEquals(Integer(Digital), Integer(m.msmMode),         'DATA.Mode');
+   CheckEquals(Integer(eData),   Integer(m.msmExtendedMode), 'DATA.ExtMode');
+
+   // --- CW family (reverse-sidetone) ---
+   m := GetADIFMode('CW-R');
+   CheckEquals(Integer(CW),    Integer(m.msmMode),         'CW-R.Mode');
+   CheckEquals(Integer(eCW_R), Integer(m.msmExtendedMode), 'CW-R.ExtMode');
+
+   // --- Digital family (reverses + protocols) ---
+   m := GetADIFMode('RTTY-R');
+   CheckEquals(Integer(Digital), Integer(m.msmMode), 'RTTY-R.Mode');
+   CheckEquals(Integer(eRTTY_R), Integer(m.msmExtendedMode), 'RTTY-R.ExtMode');
+
+   m := GetADIFMode('DATA-R');
+   CheckEquals(Integer(Digital), Integer(m.msmMode), 'DATA-R.Mode');
+   CheckEquals(Integer(eData_R), Integer(m.msmExtendedMode), 'DATA-R.ExtMode');
+
+   m := GetADIFMode('PSK-R');
+   CheckEquals(Integer(Digital), Integer(m.msmMode), 'PSK-R.Mode');
+   CheckEquals(Integer(ePSK_R),  Integer(m.msmExtendedMode), 'PSK-R.ExtMode');
+
+   m := GetADIFMode('JT65');
+   CheckEquals(Integer(Digital), Integer(m.msmMode), 'JT65.Mode');
+   CheckEquals(Integer(eJT65),   Integer(m.msmExtendedMode), 'JT65.ExtMode');
+
+   m := GetADIFMode('PSK63');
+   CheckEquals(Integer(Digital), Integer(m.msmMode), 'PSK63.Mode');
+   CheckEquals(Integer(ePSK63),  Integer(m.msmExtendedMode), 'PSK63.ExtMode');
+
+   m := GetADIFMode('DATA-FM');
+   CheckEquals(Integer(Digital),  Integer(m.msmMode), 'DATA-FM.Mode');
+   CheckEquals(Integer(eData_FM), Integer(m.msmExtendedMode), 'DATA-FM.ExtMode');
+
+   // --- Phone family (narrowband + digital voice) ---
+   m := GetADIFMode('FM-N');
+   CheckEquals(Integer(Phone), Integer(m.msmMode),         'FM-N.Mode');
+   CheckEquals(Integer(eFM_N), Integer(m.msmExtendedMode), 'FM-N.ExtMode');
+
+   m := GetADIFMode('AM-N');
+   CheckEquals(Integer(Phone), Integer(m.msmMode),         'AM-N.Mode');
+   CheckEquals(Integer(eAM_N), Integer(m.msmExtendedMode), 'AM-N.ExtMode');
+
+   m := GetADIFMode('WFM');
+   CheckEquals(Integer(Phone), Integer(m.msmMode),         'WFM.Mode');
+   CheckEquals(Integer(eWFM),  Integer(m.msmExtendedMode), 'WFM.ExtMode');
+
+   m := GetADIFMode('C4FM');
+   CheckEquals(Integer(Phone), Integer(m.msmMode),         'C4FM.Mode');
+   CheckEquals(Integer(eC4FM), Integer(m.msmExtendedMode), 'C4FM.ExtMode');
+
+   m := GetADIFMode('D-STAR');
+   CheckEquals(Integer(Phone),  Integer(m.msmMode),         'D-STAR.Mode');
+   CheckEquals(Integer(eDStar), Integer(m.msmExtendedMode), 'D-STAR.ExtMode');
+
    // Case-insensitive
    m := GetADIFMode('cw');
    CheckEquals(Integer(CW), Integer(m.msmMode), 'lowercase cw');
+
+   m := GetADIFMode('d-star');
+   CheckEquals(Integer(Phone), Integer(m.msmMode), 'lowercase d-star');
 end;
 
 procedure TADIFHelperTests.Test_GetADIFMode_UnknownMode;

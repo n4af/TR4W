@@ -364,9 +364,22 @@ end;
 
 function GetADIFMode(sMode: string): ModeAndExtendedModeType;
 begin
+   // Default extended mode in case lookup hits the else branch — keeps
+   // the field deterministic when MODE is unrecognized.
+   Result.msmExtendedMode := eNoMode;
+
+   // The lookup list mirrors what TR4W's export side emits.  Several
+   // entries (CW-R, RTTY-R, FM-N, C4FM, etc.) are TR4W-specific
+   // extended modes that the export puts in the ADIF MODE field
+   // (not SUBMODE), so the import must accept them there too for
+   // round-trip.  Whether that is fully ADIF-spec-correct is a
+   // separate question; this matches existing export behaviour.
    case AnsiIndexText(AnsiUpperCase(sMode),
                       ['CW', 'SSB', 'AM', 'FM', 'FT8',
-                       'RTTY', 'MFSK', 'PSK31', 'PSK']) of
+                       'RTTY', 'MFSK', 'PSK31', 'PSK', 'DATA',
+                       'CW-R', 'RTTY-R', 'DATA-R', 'PSK-R',
+                       'JT65', 'PSK63', 'DATA-FM',
+                       'FM-N', 'AM-N', 'WFM', 'C4FM', 'D-STAR']) of
       0:                              // CW
          begin
          Result.msmMode := CW;
@@ -406,6 +419,77 @@ begin
          begin
          Result.msmMode := Digital;
          Result.msmExtendedMode := ePSK31;
+         end;
+      9:                              // DATA  (generic digital)
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eData;
+         end;
+
+      // --- CW family ---
+      10:                             // CW-R
+         begin
+         Result.msmMode := CW;
+         Result.msmExtendedMode := eCW_R;
+         end;
+
+      // --- Digital family (reverses + protocols) ---
+      11:                             // RTTY-R
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eRTTY_R;
+         end;
+      12:                             // DATA-R
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eData_R;
+         end;
+      13:                             // PSK-R
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := ePSK_R;
+         end;
+      14:                             // JT65
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eJT65;
+         end;
+      15:                             // PSK63
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := ePSK63;
+         end;
+      16:                             // DATA-FM
+         begin
+         Result.msmMode := Digital;
+         Result.msmExtendedMode := eData_FM;
+         end;
+
+      // --- Phone family (narrowband + digital voice) ---
+      17:                             // FM-N
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eFM_N;
+         end;
+      18:                             // AM-N
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eAM_N;
+         end;
+      19:                             // WFM
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eWFM;
+         end;
+      20:                             // C4FM (Yaesu digital voice)
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eC4FM;
+         end;
+      21:                             // D-STAR (Icom digital voice)
+         begin
+         Result.msmMode := Phone;
+         Result.msmExtendedMode := eDStar;
          end;
    else
       Result.msmMode := NoMode;
