@@ -24,6 +24,15 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.04 (2026-05-12) — NY4I / N4AF
+
+#### ADIF Import/Export
+
+- **CQ zone now imported correctly**: importing an ADIF that contained a `<CQZ>` field used to silently drop the CQ zone on every QSO. The CQ zone is now read correctly on import — fixes silent data loss for CQ WW and similar zone-based contests when round-tripping through ADIF.
+- **Records without a mode are no longer marked as CW**: importing an ADIF whose records did not include a `<MODE>` field used to silently set every such record to CW. Those records are now imported with no mode set, so incomplete records show up as incomplete and can be reviewed and corrected rather than being misclassified.
+
+---
+
 ### 4.147.02 (2026-05-10) — NY4I / N4AF
 
 #### State QSO Party Rover Operations

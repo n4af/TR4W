@@ -22,6 +22,33 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.04 (2026-05-12) — NY4I / N4AF
+
+#### ADIF Parser/Emitter Refactor (`src/uADIF.pas`, `src/MainUnit.pas`, `src/trdos/PostUnit.PAS`) — Issue #887, PR #896
+
+- **Extract ADIF code into `uADIF.pas`**: focused, dependency-light unit (deps: `SysUtils`, `StrUtils`, `Log4D`, `VC`, `utils_text`) with pure string-in / string-out entry points so the ADIF format logic can be exercised by unit tests without linking `MainUnit`.
+- **Part 1 — field-list lexer**: `ParseADIFFieldsList` extracted with unit tests.
+- **Part 2 — move `TADIF_Fields` enum and helpers** from `MainUnit`: `GetADIFBand`/`Mode`/`SubMode`, `ADIFDate`/`Time`, `GetContestByADIFName`, `IsValidGUID`, `InitContestExchangeForParse`.
+- **Part 3 — field mapping + multi-record import**: `ApplyADIFFieldsToExchange`, `TADIFRecordTemps`, `ImportADIFFromString`.
+- **Part 4a — export side + differential round-trip tests**: `EmitADIFField`, `EmitADIFHeader`, `EmitADIFRecord`, `ExportADIFToString`, `GetStateForContest`, `ResolveADIFModeSubmode`, `ResolveRoverCall`, `ResolveSRXString`, `FormatADIFFreq`, `PadInt`. 21 fixture tests + 6 differential round-trip tests.
+- **Part 4b — refactor `PostUnit.ExportToADIF`**: reduces the function from ~600 lines to ~30 lines that builds an in-memory record array and hands it to `uADIF.ExportADIFToString` with a `TContestTailEmitter` callback for the contest-specific fields that require `MainUnit`/`trdos` globals (STX_STRING, CNTY, CQZ/ITUZ, STATION_CALLSIGN, MY_POTA_REF/SIG/SIG_INFO, ARRL_SECT, CLASS, GRIDSQUARE, IOTA, DOK, APP_TR4W_HQ).
+
+#### Latent Bug Fixes Surfaced by ADIF Work
+
+- **Stack-buffer overflow in `sWriteFileFromString`** (`src/utils/utils_file.pas`): the function copied its input into a fixed 256-byte stack buffer via `StrLCopy(buffer, ..., 255)` and then asked `WriteFile` to write `Length(sBuffer)` bytes from that buffer. Any input ≥ 256 chars caused `WriteFile` to read uninitialized stack data past the end of the local array. Latent for years because every legacy caller passed short fragments; the Part 4b refactor writes the whole ADIF document in one call and immediately tripped it. Fix: write the string contents directly with `WriteFile(hFile, PChar(sBuffer)^, Length(sBuffer), ...)` — no intermediate buffer, no truncation. Empty-string guard added to avoid dereferencing a nil PChar.
+- **`ADIF_FIELD_NAMES` had `'CQ_Z'` instead of `'CQZ'`** (`src/uADIF.pas`): TR4W's own export emits `<CQZ:N>...` but the import-side lookup table used `'CQ_Z'`, so imported ADIF files silently never populated the CQ zone field for any QSO — silent data loss on import for every contest that uses CQ zones.
+- **`ImportADIFFromString` left Mode = CW for parse-time-defaulted records** (`src/uADIF.pas`): `FillChar(rec, SizeOf(rec), 0)` zero-initialized the `ContestExchange` before parsing, which set `Mode := CW` (first enum value). Any imported QSO whose source ADIF lacked a `MODE` field silently became CW instead of being flagged. Fix: `InitContestExchangeForParse` helper sets `Mode := NoMode`, `ExtMode := eNoMode`, etc. explicitly.
+
+#### ADIF Export Verifier — Test Infrastructure (`tr4w/test/logdump/`, `tr4w/test/python/`)
+
+End-to-end test harness that cross-checks the `.ADI` produced by `File -> Export to ADIF` against the canonical binary log (`.TRW`).
+
+- **`logdump.exe`** (`tr4w/test/logdump/logdump.dpr`): Delphi 7 console tool that reuses the canonical `ContestExchange` record from `VC.pas` and emits JSONL — no risk of layout drift between Pascal and a separate consumer. Applies the same `GoodLookingQSO` filter as `ExportToADIF`. Detects non-aligned `.TRW` files up front (`(fileSize - headerSize) mod recordSize` must be zero) and halts with a clear diagnostic before reading garbage. Matches the legacy `MainUnit.ReadLogFile` behaviour of treating a short trailing read as silent EOF.
+- **`verify_adif_export.py`** (`tr4w/test/python/`): Python cross-checker. Runs `logdump.exe` to get canonical record values, parses the `.ADI` output, asserts per-record equivalence on `ContestExchange`-driven fields (CALL, BAND, MODE/SUBMODE, dates, RST, SRX/STX, FREQ, CONTEST_ID, APP_TR4W_ROVERCALL, OPERATOR, APP_TR4W_ID, NAME, RX_PWR, CHECK, TEN_TEN, QTH, STATE). Also runs a structural-cleanliness pass over the whole `.ADI` that catches non-printable bytes anywhere in the file — the check that would have caught the `sWriteFileFromString` overflow instantly, with byte offset and context window.
+- **Phase 1 scope** deliberately excludes the contest-specific tail fields because they depend on `MainUnit`/`trdos` globals.
+
+---
+
 ### 4.147.02 (2026-05-10) — NY4I / N4AF
 
 #### State QSO Party Rover — Slash-in-Call (`src/MainUnit.pas`, `src/trdos/PostUnit.PAS`, `src/trdos/LOGSUBS2.PAS`)
