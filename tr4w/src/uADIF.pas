@@ -257,6 +257,16 @@ function ExportADIFToString(const records: TContestExchangeArray;
 // reachable from both uADIF (export) and the test runner.
 function GetStateForContest(c: ContestType): string;
 
+// Build the RST-normalized SRX_STRING value: if ExchString already
+// starts with the literal RSTReceived (e.g. operator typed `599 HIL`),
+// return ExchString unchanged; otherwise prepend `RSTReceived ` so
+// the field is symmetric with STX_STRING.  Used by the export tail
+// emitter for contests whose exchange convention includes an implied
+// RST (ExchangeInformation.RST = True) -- state QPs and zone
+// contests.  Contests whose exchange has no RST (FD, SS, Winter FD,
+// etc.) should emit SRX_STRING = ExchString directly, NOT call this.
+function ResolveSRXString(const rec: ContestExchange): string;
+
 implementation
 
 var
@@ -1267,13 +1277,15 @@ begin
    // FREQ (locale-independent, '.' separator)
    Result := Result + EmitADIFField('FREQ', freqStr);
 
-   // SRX_STRING (received exchange, RST-normalized).
-   // POTA uses a different SRX_STRING shape (park ref instead of
-   // RST-prefixed exchange).  The tail emitter handles POTA's
-   // SRX_STRING -- uADIF skips it here to avoid a double-emit
-   // where the last-wins parse would lose the park ref.
-   if rec.ceContest <> POTA then
-      Result := Result + EmitADIFField('SRX_STRING', ResolveSRXString(rec));
+   // SRX_STRING is NOT emitted here.  The correct shape depends on the
+   // contest's exchange convention (does it include an implied RST?
+   // is it a park ref?  is it the literal ExchString?), and that
+   // knowledge lives in ExchangeInformation.RST (in trdos/LOGDUPE.PAS)
+   // which uADIF deliberately does not depend on.  PostUnit's tail
+   // emitter (EmitContestSpecificTailForExport) handles SRX_STRING
+   // for all contests using ExchangeInformation -- see Issue #898.
+   // ResolveSRXString below is exported as a helper for the tail
+   // emitter's RST-normalizing branch.
 
    // STATE - emit when QTHString is a 2-letter postal code, OR when this
    // is a single-state QSO party and QTHString is a county code.
@@ -1309,10 +1321,21 @@ begin
          Result := Result + EmitADIFField('RX_PWR', string(rec.Power));
       end;
 
-   // SRX / STX (numeric serials)
-   if rec.NumberReceived <> $FFFF then       // -1 as Word -> not set
+   // SRX / STX (numeric serials).  Two "unset" sentinels are in use:
+   //   $FFFF (65535) -- set by uADIF.InitContestExchangeForParse for
+   //                    records built from imported ADIF
+   //   -1            -- left in place by live-entry / binary-log
+   //                    paths for contests that don't use a serial
+   //                    (e.g. Field Day on the SRX side -- ExchString
+   //                    carries class+section, NumberReceived stays
+   //                    at its initialized value)
+   // Without the >0 guard, FD records emit garbage like <SRX:5>000-1
+   // because PadInt(-1, 5) produces the literal string "000-1".
+   if (rec.NumberReceived > 0)      and
+      (rec.NumberReceived <> $FFFF) then
       Result := Result + EmitADIFField('SRX', PadInt(rec.NumberReceived, 5));
-   if rec.NumberSent <> $FFFF then
+   if (rec.NumberSent > 0)      and
+      (rec.NumberSent <> $FFFF) then
       Result := Result + EmitADIFField('STX', PadInt(rec.NumberSent, 5));
 
    if rec.TenTenNum <> $FFFF then
