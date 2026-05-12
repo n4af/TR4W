@@ -92,7 +92,16 @@ begin
          end
       else
          begin
+         // Network: AI5 pushes state changes -- no polling needed for
+         // state.  But the K4 server drops clients that send nothing
+         // for 10 seconds (per K4 Programmer's Reference, PING/PONG
+         // section -- Issue #897).  Enable a 1 Hz poll that sends
+         // PING; as a keep-alive.  ProcessMessage handles the PONG;
+         // response explicitly (case 17, 'PO') and at the top calls
+         // UpdateLastValidResponse, refreshing the inbound watchdog.
          Self.SetAIMode(5);
+         Self.requiresPolling := True;
+         Self.pollingInterval := 1000; // 1 Hz keep-alive ping
          end;
       Self.SendToRadio('RT;XT;RO;FT;ID;MD;DT$;IF;');
       Self.SendToRadio('RT$;XT$;RO$;MD$;DT$;IF$;');
@@ -624,7 +633,7 @@ begin
       SetLength(sData,length(sData)-1);
       end;
 
-   Case AnsiIndexText(AnsiUppercase(sCommand), ['AI','BI','BN','DT','FA','FB','FT','IF','KS','MA','MD','RT','RX','TX','XT','RO', 'FP']) of
+   Case AnsiIndexText(AnsiUppercase(sCommand), ['AI','BI','BN','DT','FA','FB','FT','IF','KS','MA','MD','RT','RX','TX','XT','RO','FP','PO']) of
       0: begin                                     // AI
          logger.debug('[ProcessMessage] AI command set to %s',[sData]);
          end;
@@ -761,6 +770,18 @@ begin
             logger.error('[ProcessMessage] For FP command, invalid value in sData (%s)',[sData]);
             end;
          end;
+      17:begin    // PO (response to PING -- the full token is PONG;)
+         // The K4 server drops clients that send nothing for 10 s.
+         // We send PING; at 1 Hz from PollRadioState in network mode
+         // (see Connect's network branch and Issue #897).  PONG; is
+         // the documented response.  Nothing to do here: the call to
+         // UpdateLastValidResponse at the top of ProcessMessage has
+         // already refreshed the inbound watchdog, which is the only
+         // state PONG carries.  Explicit case branch (rather than a
+         // fall-through) so future maintainers can see that PONG is
+         // an expected message and is handled, not ignored by accident.
+         logger.Trace('[ProcessMessage] PONG keep-alive response');
+         end;
    end; // of case
    if firstProcessMessage then
       begin
@@ -802,9 +823,22 @@ end;
 
 procedure TK4Radio.PollRadioState;
 begin
-   // IF gives VFO A freq + mode + RIT/XIT/split/TX state in one response.
-   // FB gives VFO B frequency.
-   Self.SendToRadio('IF;FB;');
+   if Self.serialPort <> NoPort then
+      begin
+      // Serial: poll state (no AI on serial).
+      // IF gives VFO A freq + mode + RIT/XIT/split/TX state in one response.
+      // FB gives VFO B frequency.
+      Self.SendToRadio('IF;FB;');
+      end
+   else
+      begin
+      // Network: AI5 already pushes state changes; just keep the
+      // connection alive.  PING; is the documented keep-alive
+      // command (Issue #897, K4 Programmer's Reference).  The K4
+      // server drops clients that go silent for 10 s, so we send
+      // PING; at 1 Hz from Connect's pollingInterval.
+      Self.SendToRadio('PING;');
+      end;
 end;
 
 procedure TK4Radio.SetAIMode(i: integer);
