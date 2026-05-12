@@ -1321,10 +1321,21 @@ begin
          Result := Result + EmitADIFField('RX_PWR', string(rec.Power));
       end;
 
-   // SRX / STX (numeric serials)
-   if rec.NumberReceived <> $FFFF then       // -1 as Word -> not set
+   // SRX / STX (numeric serials).  Two "unset" sentinels are in use:
+   //   $FFFF (65535) -- set by uADIF.InitContestExchangeForParse for
+   //                    records built from imported ADIF
+   //   -1            -- left in place by live-entry / binary-log
+   //                    paths for contests that don't use a serial
+   //                    (e.g. Field Day on the SRX side -- ExchString
+   //                    carries class+section, NumberReceived stays
+   //                    at its initialized value)
+   // Without the >0 guard, FD records emit garbage like <SRX:5>000-1
+   // because PadInt(-1, 5) produces the literal string "000-1".
+   if (rec.NumberReceived > 0)      and
+      (rec.NumberReceived <> $FFFF) then
       Result := Result + EmitADIFField('SRX', PadInt(rec.NumberReceived, 5));
-   if rec.NumberSent <> $FFFF then
+   if (rec.NumberSent > 0)      and
+      (rec.NumberSent <> $FFFF) then
       Result := Result + EmitADIFField('STX', PadInt(rec.NumberSent, 5));
 
    if rec.TenTenNum <> $FFFF then
