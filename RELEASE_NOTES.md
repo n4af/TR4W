@@ -98,7 +98,7 @@ Various contributors along the way
 
 #### Radio Control
 
-- Added native support for the **Yaesu FTX-1F and FTX-1R** transceivers, including C4FM voice modes.
+- Added native support for the **Yaesu FTX-1F** transceiver, including C4FM voice modes.
 
 #### Usability
 
