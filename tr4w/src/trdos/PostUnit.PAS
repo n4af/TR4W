@@ -1787,6 +1787,26 @@ begin
    Result := Result + EmitADIFField('STX_STRING',
                                     Trim(DeleteRepeatedSpaces(stxString)));
 
+   // ----- SRX_STRING (Issue #898) -----
+   // uADIF.EmitADIFRecord deliberately does NOT emit SRX_STRING because
+   // its shape is contest-specific:
+   //   POTA          -> park-ref shape (handled below in the POTA branch)
+   //   RST-implied   -> "RST + ExchString"  (ResolveSRXString normalizes)
+   //   no RST        -> ExchString as-is    (FD, SS, Winter FD, etc.)
+   // The "is RST part of this contest's exchange?" knowledge lives in
+   // ExchangeInformation.RST (trdos/LOGDUPE.PAS), which uADIF cannot
+   // see without taking a trdos dependency.  POTA's own SRX_STRING is
+   // emitted further down -- this branch handles every other contest.
+   if rec.ceContest <> POTA then
+      begin
+      if ExchangeInformation.RST then
+         Result := Result + EmitADIFField('SRX_STRING',
+                                          ResolveSRXString(rec))
+      else
+         Result := Result + EmitADIFField('SRX_STRING',
+                                          string(rec.ExchString));
+      end;
+
    // ----- POTA-specific (uADIF skips SRX_STRING for POTA) -----
    if rec.ceContest = POTA then
       begin
