@@ -53,12 +53,24 @@ begin
 end;
 
 function sWriteFileFromString(hFile: THandle; sBuffer: string): BOOL;
+// Write the entire string to hFile.  Bug history: prior versions copied
+// sBuffer into a fixed 256-byte stack buffer via StrLCopy and then asked
+// WriteFile to write length(sBuffer) bytes -- which read random stack
+// data past the end of the buffer for any input >= 256 chars.  Old code
+// happened to work because every caller passed a short fragment; the
+// ADIF export refactor (Issue #887) writes the whole document in one
+// call and immediately tripped the bug.  Write the string contents
+// directly -- no fixed buffer, no length cap.
 var
    lpNumberOfBytesWritten                : DWORD;
-   buffer                                : array[0..255] of Char;
 begin
-   StrLCopy(buffer, PChar(sBuffer), High(buffer));
-   Result := Windows.WriteFile(hFile, buffer, length(sBuffer), lpNumberOfBytesWritten, nil);
+   if sBuffer = '' then
+      begin
+      Result := True;
+      Exit;
+      end;
+   Result := Windows.WriteFile(hFile, PChar(sBuffer)^, Length(sBuffer),
+                               lpNumberOfBytesWritten, nil);
 end;
 
 function tOpenFileForWrite(var h: HWND; FileName: PChar): boolean;

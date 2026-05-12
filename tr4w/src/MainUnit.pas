@@ -29,6 +29,7 @@ interface
 uses
   ShellAPI,
   Logstuff,
+  uADIF,
   uMenu,
   uAltD,
   uMessagesList,
@@ -169,8 +170,8 @@ var
   Third: Boolean = False;
   wsjtx: TWSJTXServer;
   externalLogger: TExternalLogger;
-  saveLastADIFName: string; // ny4i to save for ContestByADIFName cache
-  saveLastContest: ContestType;
+  // saveLastADIFName / saveLastContest cache moved to uADIF.pas with
+  // GetContestByADIFName (Issue #887).
   logger: TLogLogger;
   appender: TLogFileAppender;
   s1, s2, s3, s4: str20;
@@ -217,7 +218,7 @@ procedure OpenUrl(url: PChar);
 function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
 procedure ProcessImportedSRX_String(fieldValue: string; var exch:
   ContestExchange);
-function GetContestByADIFName(sADIFName: string): ContestType;
+// GetContestByADIFName moved to uADIF.pas (Issue #887).
 procedure SetExtendedModeFromMode(RData: ContestExchange);
 function GetTR4WBandFromNetworkBand(band: TRadioBand): BandType;
 function GetRadioBandFromBandType(band: BandType): TRadioBand;
@@ -388,8 +389,7 @@ function IsCWByCATActive(theRadio: RadioPtr): boolean; overload;
 // ny4i Issue # 111
 function IsCWByCATActive: boolean; overload; // ny4i Issue # 111
 
-function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
-function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
+// ADIFDateStringToQSOTime, ADIFTimeStringToQSOTime moved to uADIF.pas (Issue #887).
 function DigitsIn(n: smallInt): byte;
 function GetModeFromExtendedMode(extMode: ExtendedModeType): ModeType;
 
@@ -462,19 +462,8 @@ type
 
   Ttr4wGetPlugin = function(): PChar; stdcall;
 
-type
-  TADIF_Fields = (tAdifARRL_SECT = 0, tAdifBAND, tAdifCALL, tAdifCHECK,
-    tAdifCLASS, tAdifCQ_Z,
-    tAdifCONTEST_ID, tAdifCNTY, tadifFOC_NUM, tAdifGRIDSQUARE, tAdifFREQ,
-    tAdifFREQ_RX,
-    tAdifIOTA, tAdifITUZ, tAdifMODE, tAdifNAME, tAdifOPERATOR, tAdifPRECEDENCE,
-    tAdifQSO_DATE, tAdifQSO_DATE_OFF, tAdifTIME_ON, tAdifTIME_OFF,
-    tAdifRST_RCVD, tAdifRST_SENT, tAdifRX_PWR, tAdifSRX, tAdifSRX_STRING,
-    tAdifSTATE, tAdifSTX, tAdifSTX_STRING, tAdifSUBMODE, tAdifTEN_TEN,
-    tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
-    tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1, tAdifAPP_N1MM_ID, tAdifAPP_TR4W_ID,tAdifSIG, tAdifSIG_INFO, tAdifPOTAREF,
-    tAdifAPP_TR4W_ROVERCALL
-    );
+// TADIF_Fields enum moved to uADIF.pas (Issue #887).
+
 var
   FreeMemCount: integer;
   ReallocMemCount: integer;
@@ -7247,629 +7236,179 @@ end;
 
 (*----------------------------------------------------------------------------*)
 
-function GetADIFMode(sMode: string): ModeAndExtendedModeType;
+// GetADIFMode, GetADIFSubMode, GetADIFBand moved to uADIF.pas (Issue #887).
+
+// ---------------------------------------------------------------------------
+// Contest-specific post-processing for an imported ADIF record.
+//
+// Most ADIF tag-to-ContestExchange mapping is done by uADIF.ApplyADIFFields-
+// ToExchange (a pure function, no MainUnit globals).  But for several
+// contests, the tag-level value needs contest-aware reinterpretation:
+// e.g. for ARRL_RTTY_ROUNDUP, the QTHString is built from RST + STATE in
+// a contest-defined format; for POTA, the QTHString comes from POTA_REF
+// or SIG_INFO depending on which was supplied.
+//
+// This routine takes the temps captured during field mapping and applies
+// the contest-specific logic.  It uses MainUnit-scope globals
+// (currentOperator, ActiveDomesticMult, ActiveExchange, DoingDomesticMults)
+// which is why it stays in MainUnit rather than moving to uADIF.
+// ---------------------------------------------------------------------------
+procedure ApplyContestSpecificADIFTail(const temps: TADIFRecordTemps;
+                                       var exch: ContestExchange);
 var
-  sModeUpper: string;
+  j : Integer;
 begin
-  sModeUpper := ANSIUPPERCASE(sMode);
-  case AnsiIndexText(AnsiUpperCase(sMode), ['CW', 'SSB', 'AM', 'FM', 'FT8',
-    'RTTY', 'MFSK', 'PSK31', 'PSK']) of
-    0: // CW
-      begin
-        Result.msmMode := CW;
-        Result.msmExtendedMode := eCW;
-      end;
-
-    1:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eSSB;
-      end;
-    2:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eAM;
-      end;
-    3:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eFM;
-      end;
-    4:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eFT8;
-      end;
-    5:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eRTTY;
-      end;
-    6:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eMFSK;
-      end;
-    7, 8:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := ePSK31;
-      end;
-    -1:
-      Result.msmMode := NoMode;
-  else
-    Result.msmMode := NoMode;
-  end;
-end;
-(*----------------------------------------------------------------------------*)
-
-function GetADIFSubMode(sSubMode: string): ModeAndExtendedModeType;
-var
-  sModeUpper: string;
-begin
-  sModeUpper := ANSIUPPERCASE(sSubMode);
-  case AnsiIndexText(AnsiUpperCase(sSubMode), ['FT4', 'JS8', 'USB', 'LSB',
-    'PSK31']) of
-    0:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eFT4;
-      end;
-    1:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := eJS8;
-      end;
-    2:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eUSB;
-      end;
-    3:
-      begin
-        Result.msmMode := Phone;
-        Result.msmExtendedMode := eLSB;
-      end;
-    4:
-      begin
-        Result.msmMode := Digital;
-        Result.msmExtendedMode := ePSK31;
-      end;
-    -1:
-      Result.msmMode := NoMode;
-  else
-    Result.msmMode := NoMode;
-  end;
-end;
-(*----------------------------------------------------------------------------*)
-
-function GetADIFBand(sBand: string): BandType;
-var
-  sBandLower: string;
-  iBand: BandType;
-begin
-  sBandLower := AnsiLowerCase(sBand);
-  for iBand := Low(BandType) to High(BandType) do
-  begin
-    if sBandLower = ADIFBANDSTRINGSARRAY[iBand] then
-    begin
-      Result := iBand;
-      Break;
-    end;
-  end;
-  (* Case AnsiIndexText(AnsiUpperCase(sBand), ['160M', '80M', '40M', ,'30M', '20M', '17M', '15M', '12M', '10M', '6M', '2M''RTTY']) of
-  0: // CW
-  Result := CW;
-  1: // SSB
-  Result := Phone;
-  2:
-  Result := Digital; // FT8 should be its own mode
-  3:
-  Result := Digital;
-  -1:
-  Result := NoMode;
-  else
-  Result := NoMode;
-  end; *)
-end;
-(*----------------------------------------------------------------------------*)
-
-function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
-var
-  sADIF_UPPER: string;
-  //colonPosition: integer;
-  neFreq: extended;
-  msm: ModeAndExtendedModeType;
-  lookingForFieldName: boolean;
-  lookingForFieldLen: boolean;
-  lookingForFieldValue: boolean;
-  fieldName: string;
-  fieldLen: string;
-  fieldValue: string;
-  testStr: string;
-  tempRST: string;
-  originalLen: integer;
-  c: string;
-  cU: string; // Uppercase version of C for comparison
-  theString: string;
-  i,j,k: integer;
-  contest: ContestType;
-  appHQ: string;
-  recordFromWSJTX: boolean;
-  gridSquare: string;
-  foc_num: string;
-  tempSRX_String: string;
-  tempSTX_String: string;
-  tempState: string;
-  tempVE_Prov: string;
-  tempARRL_Sect: string;
-  tempSIG: string;
-  tempPOTAREF: string;
-  tempSIG_INFO: string;
-  saveDecimalSeparator: char;
-  // State-QP rover round-trip: when APP_TR4W_ROVERCALL is present in
-  // an imported record, it carries the full operator-typed callsign
-  // (e.g. KG1S/MON) and overrides whatever the standard <CALL> field
-  // delivered.  The two fields can appear in either order in the ADIF
-  // record, so we use a flag rather than positional logic.
-  haveRoverCall: Boolean;
-
-begin
-  lookingForFieldName := false;
-  lookingForFieldLen := false;
-  lookingForFieldValue := false;
-  haveRoverCall := false;
-
-  try
-    sADIF_UPPER := ANSIUPPERCASE(sADIF); // For testing without changing original
-    logger.debug('[ParseADIFRecord] Parsing %s', [sADIF]); // <BAND:3>20m <...
-    originalLen := length(sADIF);
-
-    for i := 1 to originalLen do
-    begin
-      c := MidStr(sADIF, i, 1);
-      cU := AnsiUpperCase(c);
-      //Log('Next 10 bytes = ' + MidStr(sADIF,i,10) + ' - theString = ' + theString + ' LookingForFieldValue = ' + BoolToStr(lookingForFieldValue));
-      if cU = 'E' then
-      begin
-        testStr := MidStr(sADIF_UPPER, i, 4);
-        if MidStr(sADIF_UPPER, i, 4) = 'EOR>' then
-        begin
-          // State-QP rover (KG1S/MON): strip suffix for country lookup
-          // so /M doesn't get misread as a GB prefix indicator.
-          ctyLocateCallStripRover(exch.Callsign, exch.QTH);
-          Result := true;
-          break;
-        end
-        else
-        begin
-          theString := theString + c;
-        end;
-      end
-      else if c = '<' then
-      begin
-        if lookingForFieldValue then
-        begin
-          fieldValue := Trim(theString);
-          if length(fieldValue) <> StrToInt(fieldLen) then
-          begin
-            logger.error('[ParseADIFRecord] fieldName = [%s] field value length = %s but actual length = %d', [fieldName, fieldLen, length(fieldValue)]);
-          end
-          else
-          begin
-            case TADIF_Fields(AnsiIndexText(AnsiUpperCase(fieldName),
-              // Be careful addng these. The order matters in the case...
-              ['ARRL_SECT', 'BAND', 'CALL', 'CHECK', 'CLASS', 'CQ_Z',
-              'CONTEST_ID', 'CNTY', 'FOC_NUM', 'GRIDSQUARE', 'FREQ', 'FREQ_RX',
-                'IOTA', 'ITUZ', 'MODE', 'NAME', 'OPERATOR', 'PRECEDENCE',
-                'QSO_DATE', 'QSO_DATE_OFF', 'TIME_ON', 'TIME_OFF',
-                'RST_RCVD', 'RST_SENT', 'RX_PWR', 'SRX', 'SRX_STRING',
-                'STATE', 'STX', 'STX_STRING', 'SUBMODE', 'TEN_TEN',
-                'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN',
-                'QTH', 'PROGRAMID', 'APP_N1MM_EXCHANGE1', 'APP_N1MM_ID', 'APP_TR4W_ID','SIG', 'SIG_INFO', 'POTA_REF',
-                'APP_TR4W_ROVERCALL'])) of
-              tAdifARRL_SECT: tempARRL_Sect := fieldValue;
-              //exch.QTHString := fieldValue;
-              tAdifBAND:
-                begin
-                  exch.Band := GetADIFBand(fieldValue);
-                end;
-              tAdifCALL:
-                // If we have already seen APP_TR4W_ROVERCALL in this record,
-                // it carries the full rover form (KG1S/MON) and we keep that
-                // instead of the stripped-down standard CALL value.
-                if not haveRoverCall then
-                   exch.Callsign := AnsiUpperCase(fieldValue);
-              tAdifAPP_TR4W_ROVERCALL:
-                // TR4W-specific full rover callsign (KG1S/MON) — overrides
-                // whatever the standard CALL field delivered.  See the
-                // matching emit code in PostUnit.PAS::ExportToADIF.
-                begin
-                exch.Callsign := AnsiUpperCase(fieldValue);
-                haveRoverCall := true;
-                end;
-              tAdifCHECK: exch.Check := StrToInt(fieldValue);
-              tAdifCLASS: exch.ceClass := AnsiUpperCase(fieldValue);
-              tAdifCQ_Z: exch.Zone := StrToInt(fieldValue);
-              tAdifCONTEST_ID:
-                begin // CONTEST_ID
-                  contest := GetContestByADIFNAme(fieldValue);
-                  if ContestsArray[contest].ADIFName = fieldValue then
-                  begin
-                    exch.ceContest := contest;
-                  end;
-                end;
-              tAdifCNTY:
-                logger.info('[ParseADIFRecord] CNTY was in record as %s but skipping since no place to put it', [fieldValue]); //CNTY
-              tAdifFOC_NUM:
-                begin
-                  foc_num := fieldvalue;
-                end;
-              tAdifGRIDSQUARE:
-                begin
-                  gridSquare := fieldValue;
-                end;
-              tAdifFREQ:
-                begin
-                  saveDecimalSeparator := DecimalSeparator;
-                  try
-                    DecimalSeparator := '.';
-                    neFreq := StrToFloat(fieldValue);
-                    neFreq := neFreq * 1000000;
-                    exch.Frequency := Trunc(neFreq);
-                    logger.Trace('[ParseADIFRecord] FREQ = %s', [fieldValue]);
-                  finally
-                    DecimalSeparator := saveDecimalSeparator;
-                  end;
-                end;
-              tAdifITUZ: exch.Zone := StrToInt(fieldValue);
-              tAdifMODE:
-                begin
-                  if exch.Mode = NoMode then
-                  begin
-                    msm := GetADIFMode(fieldValue);
-                    exch.Mode := msm.msmMode;
-                    exch.ExtMode := msm.msmExtendedMode;
-                  end;
-                end;
-              tAdifNAME: exch.Name := fieldValue;
-              tAdifOPERATOR: StrPLCopy(exch.ceOperator, fieldValue,
-                  High(exch.ceOperator));
-              tAdifPRECEDENCE: exch.Precedence := fieldValue[1]; // 4.105.2
-              tAdifQSO_DATE:
-                if not ADIFDateStringToQSOTime(fieldValue, exch.tSysTime) then
-                begin
-                  ; //exit;
-                end;
-              tAdifTIME_ON:
-                if not ADIFTimeStringToQSOTime(fieldValue, exch.tSysTime) then
-                begin
-                  ; //exit;
-                end;
-              tAdifTIME_OFF: // 4.105.2
-                if not ADIFTimeStringToQSOTime(fieldValue, exch.tSysTime) then
-                begin
-                  ; //exit;
-                end;
-              tAdifRST_RCVD:
-                begin
-                  tempRST := fieldValue;
-                  if recordFromWSJTX then
-                  begin // Check for + in ther string and remove
-                    if Pos('+', fieldValue) > 0 then
-                    begin
-                      tempRST := AnsiMidStr(fieldValue, 2, length(fieldValue));
-                    end;
-                  end;
-                  exch.RSTReceived := StrToIntDef(tempRST, 599);
-                  // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
-                end;
-              tAdifRST_SENT:
-                begin
-                  tempRST := fieldValue;
-                  if recordFromWSJTX then
-                  begin // Check for + in ther string and remove
-                    if Pos('+', fieldValue) > 0 then
-                    begin
-                      tempRST := AnsiMidStr(fieldValue, 2, length(fieldValue));
-                    end;
-                  end;
-                  exch.RSTSent := StrToIntDef(tempRST, 599);
-                  // ADIF RST is a string but TR is a word (positive integers only so SNR from FT8 is out)...fieldValue;
-                end;
-              tAdifRX_PWR: exch.Power := fieldValue;
-              tAdifSRX: exch.NumberReceived := StrToInt(fieldValue);
-              tAdifSRX_STRING: tempSRX_String := fieldValue;
-             (*begin
-              
-              if not recordFromWSJTX then
-            //  begin
-              ProcessImportedSRX_String(fieldValue, exch);
-              end;
-               end; *)
-              tAdifSTATE:
-                tempState := fieldValue;
-              (*if Length(exch.QTHString) = 0 then
-              begin
-              exch.QTHString := fieldValue;
-              //DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
-              end; *)
-              tAdifSTX: exch.NumberSent := StrToInt(fieldValue);
-              tAdifSTX_STRING: tempSTX_String := fieldValue; // 4.105.2
-              tAdifSUBMODE:
-                begin
-                  msm := GetADIFSubmode(fieldValue);
-                  exch.Mode := msm.msmMode;
-                  exch.ExtMode := msm.msmExtendedMode;
-                end;
-              tAdifTEN_TEN: exch.TenTenNum := StrToInt(fieldValue);
-              tAdifVE_PROV: tempVE_Prov := fieldValue;
-              (* if Length(exch.QTHString) = 0 then
-              begin
-              exch.QTHString := fieldValue;
-              end; *)
-              tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ:
-                appHQ := fieldValue;
-              tAdifSTATION_CALLSIGN:
-                ;
-              tAdifQTH:
-                begin
-                  exch.QTHString := fieldValue;
-                end;
-              tAdifPROGRAMID:
-                begin
-                  if fieldValue = 'WSJT-X' then
-                  begin
-                    recordFromWSJTX := true;
-                  end;
-                end;
-              tAdifAPP_N1MM_EXCHANGE1: // N1MM puts the CLASS in APP_N1MM_EXCHANGE1 instead of CLASS. I submitted a ticket but they will not fix it.
-                if exch.ceContest in [ARRLFIELDDAY, WINTERFIELDDAY] then
-                begin
-                  exch.ceClass := AnsiUpperCase(fieldValue);
-                end
-                else if exch.ceContest in [FOCMARATHON] then
-                begin
-                  exch.Power := fieldValue;
-                end;
-              tAdifAPP_N1MM_ID, tAdifAPP_TR4W_ID:
-                 if IsValidGUID(fieldValue) then
-                    begin
-                    exch.id := fieldValue;
-                    end;
-              tAdifSIG:
-                 tempSIG := fieldValue;
-              tAdifSIG_INFO:
-                 tempSIG_INFO := fieldValue;
-              tAdifPOTAREF:
-                tempPOTARef := fieldValue;
-
-            else
-              if MidStr(fieldName, 1, 4) <> 'APP_' then
-              begin
-                DebugMsg('ADIF ' + fieldName + ' is present but no handler');
-              end;
-            end;
-            //Log('Found field: [' + fieldName + '], [' + fieldLen + '], [' + fieldValue + ']');
-          end;
-          theString := '';
-          lookingForFieldValue := false;
-          lookingForFieldName := true;
-        end
-        else if (MidStr(sADIF_UPPER, i, 5) = '<EOR>') or
-          (MidStr(sADIF_UPPER, i, 4) = 'EOR>') then
-        begin
-          // State-QP rover (KG1S/MON): strip suffix for country lookup
-          // so /M doesn't get misread as a GB prefix indicator.
-          ctyLocateCallStripRover(exch.Callsign, exch.QTH);
-          // if DoingDXMults then GetDXQTH(TempRXData);
-          // if DoingPrefixMults then SetPrefix(TempRXData);
-          // Sheet.SetMultFlags(TempRXData);
-
-          Result := true;
-          break;
-        end
-        else
-        begin
-          theString := '';
-          lookingForFieldName := true;
-        end;
-      end
-      else if c = ':' then
-      begin
-        if lookingForFieldName then
-        begin
-          FieldName := theString;
-          theString := '';
-          lookingForFieldName := false;
-          lookingForFieldLen := true;
-        end
-        else
-        begin
-          theString := theString + c;
-        end;
-      end
-      else if c = '>' then
-      begin
-        if lookingForFieldLen then
-        begin
-          FieldLen := theString;
-          theString := '';
-          lookingForFieldLen := false;
-          lookingForFieldValue := true;
-        end;
-      end
-      else
-      begin
-        theString := theString + c;
-      end;
-    end;
-  except
-    DebugMsg('Exception processign ADIF Record ' + sADIF);
-  end;
-  // ****************************** DomQTHTable.GetDomQTH(exch.QTHString, exch.DomMultQTH, exch.DomesticQTH);
   // fix up operator
   if exch.ceOperator = '' then
-  begin
     exch.ceOperator := currentOperator;
-  end;
-  if length(tempSRX_String) > 0 then
-  begin
-    exch.ExchString := tempSRX_String;
-  end;
+
+  if Length(temps.SRX_String) > 0 then
+    exch.ExchString := temps.SRX_String;
+
   case exch.ceContest of
     GENERALQSO:
       // Use grid square as exchange for any ADIF source, not just WSJT-X.
-      // WSJT-X does not always include PROGRAMID, so gating on recordFromWSJTX
+      // WSJT-X does not always include PROGRAMID, so gating on FromWSJTX
       // caused ExchString to stay empty when PROGRAMID was absent.
-      if gridSquare <> '' then
-         begin
-         exch.ExchString := gridSquare;
-         exch.QTHString := gridSquare;
-         exch.DomesticQTH := gridSquare;
-         end;
-    WAG:
-      begin
-        exch.QTHString := tempSRX_String;
-      end;
+      if temps.GridSquare <> '' then
+        begin
+        exch.ExchString  := temps.GridSquare;
+        exch.QTHString   := temps.GridSquare;
+        exch.DomesticQTH := temps.GridSquare;
+        end;
 
-    ARRL160, CQ160CW, CQ160SSB, UBACW, UBASSB: // 4.106.7
-      begin
-        exch.DomesticQTH := tempSRX_String;
-      end;
+    WAG:
+      exch.QTHString := temps.SRX_String;
+
+    ARRL160, CQ160CW, CQ160SSB, UBACW, UBASSB:
+      exch.DomesticQTH := temps.SRX_String;
 
     ARRL_RTTY_ROUNDUP:
       begin
-        // This code was RST and Number received for Roundup but that is only for DX stations.
-        // For US stations, it is RST and State.
-        // Find out when this changed as it messed up WSJTX Roundup processing
         logger.Debug('[ParseADIF] exch.QTH.CountryID = %s',
-          [exch.QTH.CountryID]);
+                     [exch.QTH.CountryID]);
         if (exch.QTH.CountryID = 'K') or (exch.QTH.CountryID = 'VE') then
-        begin
-          exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + tempState;
-        end
+          exch.QTHString := IntToStr(exch.RSTReceived) + ' ' + temps.State
         else
-        begin
           exch.QTHString := IntToStr(exch.RSTReceived) + ' ' +
-            IntToStr(exch.NumberReceived);
-        end;
+                            IntToStr(exch.NumberReceived);
         exch.ExchString := exch.QTHString;
       end;
-    ARRLSSCW, ARRLSSSSB, WINTERFIELDDAY, ARRLFIELDDAY: // 4.105.2
+
+    ARRLSSCW, ARRLSSSSB, WINTERFIELDDAY, ARRLFIELDDAY:
       begin
-        exch.DomesticQTH := tempARRL_Sect;
-        exch.QTHString := tempARRL_SECT;
+        exch.DomesticQTH := temps.ARRL_Sect;
+        exch.QTHString   := temps.ARRL_Sect;
       end;
+
     CWOPS:
       exch.Age := StrToIntDef(exch.QTHString, 0);
-    CQWWCW, CQWWSSB: // 4.105.16
+
+    CQWWCW, CQWWSSB:
       begin
-        exch.QTHString := fieldValue;
-        // tAdifCQ_Z: exch.Zone := StrToInt(fieldValue);
-        exch.zone := strtoint(tempSRX_String);
-      end;
-    FOCMARATHON:
-      begin
-        exch.Power := foc_num;
-      end;
-    IARU:
-      exch.QTHString := fieldValue;
-    NAQSOCW, NAQSOSSB, NAQSORTTY, NCCCSPRINT: // 4.103.1 // 4.105.13
-      begin
-        exch.QTHString := tempState;
-        exch.DomesticQTH := tempState;
-        exch.ExchString := tempState;
+        // For CQWW the QTHString is the zone (as a string); the SRX_STRING
+        // carries the zone numerically.
+        exch.QTHString := temps.SRX_String;
+        exch.zone      := StrToIntDef(temps.SRX_String, 0);
       end;
 
-    // below commented as it already defaults
-    { ARRLFIELDDAY, WINTERFIELDDAY:
-    //if recordFromWSJTX then
-    // begin
-    exch.ExchString := tempSRX_String; //exch.QTHString;
-    }
-    // end;
-    UKRAINIAN, OKDX, LZDX: // 4.105.4 // 4.105.11
-      if IsAlpha(tempSRX_String) then
-        exch.DomesticQTH := tempSRX_String
-      else // 4.105.12
-        exch.QTHString := tempSRX_String;
+    FOCMARATHON:
+      exch.Power := temps.FOC_Num;
+
+    IARU:
+      exch.QTHString := temps.SRX_String;
+
+    NAQSOCW, NAQSOSSB, NAQSORTTY, NCCCSPRINT:
+      begin
+        exch.QTHString   := temps.State;
+        exch.DomesticQTH := temps.State;
+        exch.ExchString  := temps.State;
+      end;
+
+    UKRAINIAN, OKDX, LZDX:
+      if IsAlpha(temps.SRX_String) then
+        exch.DomesticQTH := temps.SRX_String
+      else
+        exch.QTHString := temps.SRX_String;
+
     POTA:
-       if IsValidPOTAPark(tempPOTARef) then
+      if IsValidPOTAPark(temps.POTARef) then
+        begin
+        if Length(temps.POTARef) = 0 then
           begin
-          if length(tempPOTAREF) = 0 then
-             begin
-             if ANSIUPPERCASE(tempSIG) = 'POTA' then
-                begin
-                if IsValidPOTAPark(tempSIG_INFO) then
-                   begin
-                   exch.QTHString := tempSIG_INFO;
-                   end;
-                end;
-             end
-          else
-             begin
-             exch.QTHString := tempPOTAREF;
-             end;
+          if AnsiUpperCase(temps.SIG) = 'POTA' then
+            if IsValidPOTAPark(temps.SIG_Info) then
+              exch.QTHString := temps.SIG_Info;
           end
-       else
+        else
+          exch.QTHString := temps.POTARef;
+        end
+      else
+        if LooksLikeAState(temps.State) then
           begin
-          if LooksLikeAState(tempState) then
-             begin
-             exch.QTHString := tempState;
-             exch.DomesticQTH := tempState;
-             end;
+          exch.QTHString   := temps.State;
+          exch.DomesticQTH := temps.State;
           end;
+
     WWDIGI, ARRLDIGI:
       begin
-        exch.ExchString := gridSquare;
-        exch.DomesticQTH := gridSquare;
+        exch.ExchString  := temps.GridSquare;
+        exch.DomesticQTH := temps.GridSquare;
       end;
- 
+
   else
     if (ActiveDomesticMult = GridSquares) or
-      ((ActiveExchange = RSTAndOrGridExchange) or
-      (ActiveExchange = Grid2Exchange) or
-      (ActiveExchange = RSTAndGrid3Exchange) or
-      (ActiveExchange = GridExchange) // 4.104.2 // 4.96.3
-      ) then
-    begin
-      exch.QTHString := gridSquare;
-      exch.DomesticQTH := gridSquare;
-      exch.ExchString := IntToStr(exch.RSTReceived) + ' ' + gridSquare;
-    end
+       (ActiveExchange = RSTAndOrGridExchange) or
+       (ActiveExchange = Grid2Exchange) or
+       (ActiveExchange = RSTAndGrid3Exchange) or
+       (ActiveExchange = GridExchange) then
+      begin
+      exch.QTHString   := temps.GridSquare;
+      exch.DomesticQTH := temps.GridSquare;
+      exch.ExchString  := IntToStr(exch.RSTReceived) + ' ' + temps.GridSquare;
+      end
+    else if DoingDomesticMults then
+      begin
+      if exch.QTHString <> '' then
+        // ADIF QTH tag carries the county/state code unambiguously
+        // for state QSO parties.  Prefer it when present -- the
+        // alpha-prefix-of-SRX_STRING heuristic below was already
+        // unreliable, and now fails outright because SRX_STRING is
+        // normalized to include a leading RST ("59 MON") on export.
+        exch.DomesticQTH := exch.QTHString
+      else
+        begin
+        // Legacy fallback for ADIF imports that lack a QTH tag.
+        // Loads DomesticQTH with the ALPHA prefix of SRX_STRING.
+        j := 1;
+        while (j <= Length(temps.SRX_String)) and
+              not (temps.SRX_String[j] in ['0'..'9']) do
+          Inc(j);
+        exch.DomesticQTH := Copy(temps.SRX_String, 1, j - 1);
+        end;
+      end
     else
+      exch.ExchString := temps.SRX_String;
+  end;
+end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-    begin
-     if DoingDomesticMults then
-      begin        //load domQTH with ALPHA portion of the srx_string
-       j := 1;
-       while (j <= Length(tempSRX_String)) and not (tempSRX_String[j] in ['0'..'9']) do
-        Inc(j);
-        exch.DomesticQTH := Copy(tempSRX_String, 1, j - 1);
-                                                                                      end
-         else
-          exch.ExchString := tempSRX_String;
-       end;
-
-  end; // of case
-
-  { if recordFromWSJTX then
-  begin
-  exch.DomesticQTH := gridSquare;
-  end; }
+function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
+var
+  fields : TADIFFieldList;
+  temps  : TADIFRecordTemps;
+begin
+  logger.debug('[ParseADIFRecord] Parsing %s', [sADIF]);
+  Result := ParseADIFFieldsList(sADIF, fields);
+  // Even when no terminator is found, apply whatever fields the lexer
+  // managed to parse -- same forgiving behaviour as the legacy
+  // implementation, which logged at error but kept the partial exch.
+  ApplyADIFFieldsToExchange(fields, exch, temps);
+  ApplyContestSpecificADIFTail(temps, exch);
+  // State-QP rover (KG1S/MON): strip suffix for country lookup so /M
+  // doesn't get misread as a GB prefix indicator.  Done here (rather
+  // than inside uADIF) because the strip uses MainUnit-scope state
+  // (DomQTHTable, ActiveExchange).
+  ctyLocateCallStripRover(exch.Callsign, exch.QTH);
 end; // of ParseADIFRecord
 (*----------------------------------------------------------------------------*)
 
@@ -7883,6 +7422,20 @@ var
   FoundEOH: boolean;
   QSOCounter: integer;
   lpNumberOfBytesWritten: Cardinal;
+  // County-line detection during import.  Within a single ImportFromADIF
+  // pass we remember the first QTHString seen for each (call|band|mode)
+  // tuple.  When a later record reuses the same (call|band|mode) with a
+  // different QTHString AND the contest's CountyLineAllowed flag is True,
+  // we set ceClearDupeSheet on the later record so the post-import
+  // rescore (tUpdateLog(actRescore)) does NOT flag it as a dupe.
+  // ContestsArray[ceContest].CountyLineAllowed is set to True only for
+  // the 13 single-state QSO parties (VC.pas).  Multi-state QPs (7QP /
+  // NEQP / etc.) are deliberately not flagged -- they need their own
+  // per-state county-line handling, tracked separately.
+  seenCallBandMode    : TStringList;
+  cbmKey              : string;
+  cbmKeyIdx           : Integer;
+  priorQTHForKey      : string;
 
   procedure DisplayLoadedQSOs;
   begin
@@ -7945,36 +7498,63 @@ begin
   //ReWrite(adif);
   QSOCounter := 0;
   Reset(adif);
-  while not Eof(adif) do
-  begin
-    ReadLn(adif, sBuffer);
-    if not FoundEOH then
+  seenCallBandMode := TStringList.Create;
+  try
+    seenCallBandMode.CaseSensitive := False;
+    while not Eof(adif) do
     begin
-      if trim(AnsiUpperCase(sBuffer)) = '<EOH>' then
+      ReadLn(adif, sBuffer);
+      if not FoundEOH then
       begin
-        FoundEOH := true;
-      end;
-    end
-    else
-    begin
-      ClearContestExchange(TempRXData);
-      if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
-      begin
-        // State-QP rover (KG1S/MON): strip suffix for country lookup so
-        // the /M tail isn't misread as a GB prefix indicator.  Without
-        // this wrapper the post-ParseADIFRecord lookup overwrites the
-        // QTH set inside ParseADIFRecord and we end up with DX=G.
-        ctyLocateCallStripRover(TempRXData.Callsign, TempRXData.QTH);
-        CalculateQSOPoints(TempRXData);
-        tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange),
-          lpNumberOfBytesWritten);
-        inc(QSOCounter);
-        if QSOCounter mod 100 = 0 then
+        if trim(AnsiUpperCase(sBuffer)) = '<EOH>' then
         begin
-          DisplayLoadedQSOs;
+          FoundEOH := true;
+        end;
+      end
+      else
+      begin
+        ClearContestExchange(TempRXData);
+        if ParseADIFRecord(sBuffer, TempRXData) then // processed a record if true
+        begin
+          // State-QP rover (KG1S/MON): strip suffix for country lookup so
+          // the /M tail isn't misread as a GB prefix indicator.  Without
+          // this wrapper the post-ParseADIFRecord lookup overwrites the
+          // QTH set inside ParseADIFRecord and we end up with DX=G.
+          ctyLocateCallStripRover(TempRXData.Callsign, TempRXData.QTH);
+
+          // County-line follow-up detection.  If the imported record
+          // reuses (call|band|mode) with a different QTHString AND the
+          // contest's CountyLineAllowed flag is True (see VC.pas), set
+          // ceClearDupeSheet so the post-import rescore does not
+          // dupe-flag this record.  Otherwise leave the flag alone --
+          // the standard dupe check stays in effect.
+          cbmKey := string(TempRXData.Callsign) + '|' +
+                    IntToStr(Ord(TempRXData.Band)) + '|' +
+                    IntToStr(Ord(TempRXData.Mode));
+          cbmKeyIdx := seenCallBandMode.IndexOfName(cbmKey);
+          if cbmKeyIdx >= 0 then
+            begin
+            priorQTHForKey := seenCallBandMode.ValueFromIndex[cbmKeyIdx];
+            if (priorQTHForKey <> string(TempRXData.QTHString)) and
+               ContestsArray[TempRXData.ceContest].CountyLineAllowed then
+              TempRXData.ceClearDupeSheet := True;
+            end
+          else
+            seenCallBandMode.Add(cbmKey + '=' + string(TempRXData.QTHString));
+
+          CalculateQSOPoints(TempRXData);
+          tWriteFile(LogHandle, TempRXData, SizeOf(ContestExchange),
+            lpNumberOfBytesWritten);
+          inc(QSOCounter);
+          if QSOCounter mod 100 = 0 then
+          begin
+            DisplayLoadedQSOs;
+          end;
         end;
       end;
     end;
+  finally
+    seenCallBandMode.Free;
   end;
 
   CloseFile(adif);
@@ -9092,49 +8672,7 @@ begin
   // Call base function with active radio // ny4i Issue 111
 end;
 
-function ADIFDateStringToQSOTime(sDate: string; var qsoTime: TQSOTime): boolean;
-
-begin
-  Result := false;
-  try
-    if Length(sDate) = 8 then
-    begin
-      qsoTime.qtYear := Ord(StrToInt(MidStr(sDate, 1, 4)) mod 100);
-      qsoTime.qtMonth := Ord(StrToInt(MidStr(sDate, 5, 2)));
-      qsoTime.qtDay := Ord(StrToInt(MidStr(sDate, 7, 2)));
-      Result := true;
-    end;
-  except
-    result := false;
-  end;
-end;
-
-function ADIFTimeStringToQSOTime(sTime: string; var qsoTime: TQSOTime): boolean;
-begin
-  //Result := false;
-  if Length(sTime) in [4, 6] then
-  begin
-    try
-      qsoTime.qtHour := Ord(StrToInt(MidStr(sTime, 1, 2)));
-      qsoTime.qtMinute := Ord(StrToInt(MidStr(sTime, 3, 2)));
-      if Length(sTime) = 6 then
-      begin
-        qsoTime.qtSecond := Ord(StrToInt(MidStr(sTime, 5, 2)));
-      end
-      else
-      begin
-        qsoTime.qtSecond := 0;
-      end;
-      Result := true;
-    except
-      result := false;
-    end;
-  end
-  else
-  begin // ADIF Time is too small
-    Result := false;
-  end;
-end;
+// ADIFDateStringToQSOTime, ADIFTimeStringToQSOTime moved to uADIF.pas (Issue #887).
 
 function GetTR4WBandFromNetworkBand(band: TRadioBand): BandType;
 begin
@@ -9589,30 +9127,7 @@ end;
 // Note we cache last returned one to avoid a subsequent lookup since the
 // contest most likely did not change. An example is an ADIF file import.
 
-function GetContestByADIFName(sADIFName: string): ContestType;
-var
-  i: ContestType;
-begin
-  if sADIFName = saveLastADIFName then
-  begin
-    Result := saveLastContest;
-  end
-  else
-  begin
-    Result := Low(ContestsArray); // First contest is DmmyContest
-    for i := low(ContestsArray) to High(ContestsArray) do
-    begin
-      if ContestsArray[i].ADIFName = sADIFName then
-      begin
-        Result := i;
-        saveLastADIFName := sADIFName;
-        // caches last since most likely did not change
-        saveLastContest := i;
-        break;
-      end;
-    end;
-  end;
-end;
+// GetContestByADIFName moved to uADIF.pas (Issue #887).
 
 procedure SetExtendedModeFromMode(RData: ContestExchange);
 begin
