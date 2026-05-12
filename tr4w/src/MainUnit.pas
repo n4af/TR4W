@@ -5466,7 +5466,14 @@ begin
       if (not TempRXData.ceQSO_Skiped) and (TempRXData.Band <> NoBand) and
         (TempRXData.Mode <> NoMode) then
       begin
-        if TempRXData.ceQSO_Deleted = False then
+        // Issue #750: X-QSO records are kept in the log (and the
+        // editable log view -- they paint grayed) but contribute
+        // nothing to QSOTotals, multipliers, points, or the dupe
+        // sheet.  tUpdateLog(actRescore) has the same guard for the
+        // same reason; this load-time path (LoadinLog) also needs
+        // it so totals are correct after a fresh log open / load.
+        if (TempRXData.ceQSO_Deleted = False) and
+           (TempRXData.ceXQSO        = False) then
         begin
           TempMode := TempRXData.Mode;
           if TempMode = FM then
@@ -5613,6 +5620,31 @@ begin
     LVS_EX_GRIDLINES or LVS_EX_FULLROWSELECT);
 end;
 
+// Stash the X-QSO flag on a fully-populated editable-log row in the
+// row's per-item lParam slot.  Used by the NM_CUSTOMDRAW handler in
+// tr4w.dpr to gray out X-QSO rows without re-reading the binary log
+// on every paint.  Called from tAddContestExchangeToLog after the
+// row's text subitems are all set -- doing this as a separate
+// LVM_SETITEM with LVIF_PARAM avoids the bug where putting LVIF_PARAM
+// in the shared TLVItem mask causes every subsequent SetItem (one per
+// subitem column) to also try to set lParam, which Windows rejects
+// for subitems (lParam is per-item, not per-subitem).  Issue #750.
+procedure SetRowXQSOFlag(ListViewHandle: HWND; rowIndex: Integer;
+                         isXQSO: Boolean);
+var
+   lvi: TLVItem;
+begin
+   FillChar(lvi, SizeOf(lvi), 0);
+   lvi.Mask     := LVIF_PARAM;
+   lvi.iItem    := rowIndex;
+   lvi.iSubItem := 0;
+   if isXQSO then
+      lvi.lParam := 1
+   else
+      lvi.lParam := 0;
+   SendMessage(ListViewHandle, LVM_SETITEM, 0, LPARAM(@lvi));
+end;
+
 procedure tAddContestExchangeToLog(RXData: ContestExchange; ListViewHandle:
   HWND; var Index: integer);
 label
@@ -5628,7 +5660,16 @@ begin
 
   inc(Index);
   elvi.iSubItem := ColumnsArray[logColBand].pos; //Ord(logColBand);
-  // elvi.lParam := value32;
+
+  // Issue #750: stash the X-QSO flag in the row's per-item lParam so the
+  // editable log's NM_CUSTOMDRAW handler (tr4w.dpr WM_NOTIFY) can gray
+  // out the row without re-reading the binary log on every paint.  This
+  // happens in SetRowXQSOFlag below, AFTER all the text subitems are
+  // set: lParam is per-item, not per-subitem, and including LVIF_PARAM
+  // in elvi.Mask here would cause every subsequent ListView_SetItem
+  // (via the asm `call setitem` thunks below) to also try to set
+  // lParam on a subitem, which Windows rejects -- only the first
+  // column would render.  Issue #750 v0.1 hit exactly that bug.
 
   if RXData.ceRecordKind = rkNote then
   begin
@@ -5957,6 +5998,13 @@ begin
     end;
   end;
 
+  // Issue #750: stash the X-QSO flag on the just-built row so the
+  // NM_CUSTOMDRAW handler (tr4w.dpr WM_NOTIFY) can gray out X-QSO
+  // rows without re-reading the binary log.  Uses elvi.iItem because
+  // the var-parameter Index has already been inc'd (the row we just
+  // populated is at elvi.iItem, which equals Index - 1 by now).
+  SetRowXQSOFlag(ListViewHandle, elvi.iItem, RXData.ceXQSO);
+
   Exit;
 
   setitem:
@@ -6190,8 +6238,26 @@ begin
       RescoredRXData^.ceClearDupeSheet := False;
 
     if UpdAction = actRescore then
+      // Issue #750: X-QSO records stay in the log (for NIL protection
+      // of the worked station) but are deliberately excluded from
+      // every scoring artifact -- the rescore rebuilds the dupe
+      // sheet, mult sheet, and totals from this loop, so skipping
+      // X-QSO from the main scoring path makes them invisible to
+      // dupe checking, mults, and totals.  We ALSO zero out the
+      // record's own QSOPoints and ceDupe fields so the editable log
+      // displays a consistent "0" in the Pts column for every
+      // X-QSO record (matches DXLog.net's convention -- N1MM keeps
+      // the historical points, but a consistent visual signal is
+      // more useful at a glance).  The contact still exports to
+      // ADIF and Cabrillo (with the `X-QSO:` prefix instead of `QSO:`).
       if RescoredRXData^.ceQSO_Deleted = False then
         if RescoredRXData^.ceQSO_Skiped = False then
+        if RescoredRXData^.ceXQSO then
+          begin
+          RescoredRXData^.QSOPoints := 0;
+          RescoredRXData^.ceDupe    := False;
+          end
+        else
         begin
           // Snapshot before rescore so we can report what (if anything) changed.
           beforeCountryID  := RescoredRXData^.QTH.CountryID;

@@ -79,6 +79,7 @@ const
   FLD_TENTENNUM = 120;
   FLD_PREFECTURE = 121;
   FLD_QSOPOINTS = 122;
+  FLD_XQSO = 170;       // Issue #750 -- X-QSO checkbox (not claimed for Cabrillo)
 
   FLD_SAVE_BUTTON = 123;
   FLD_CANCEL_BUTTON = 124;
@@ -280,6 +281,11 @@ begin
           integer(EditableQSORXData.ceQSO_Deleted), 0);
         Windows.SendDlgItemMessage(hwnddlg, FLD_DUPE, BM_SETCHECK,
           integer(EditableQSORXData.ceDupe), 0);
+
+        // Issue #750: X-QSO checkbox.  Toggled state is read back on
+        // Save in the matching block below.
+        Windows.SendDlgItemMessage(hwnddlg, FLD_XQSO, BM_SETCHECK,
+          integer(EditableQSORXData.ceXQSO), 0);
 
         Windows.SetDlgItemInt(hwnddlg, FLD_NUMBERSEND,
           Cardinal(EditableQSORXData.NumberSent), True);
@@ -690,6 +696,14 @@ begin
   {DELETED}
   EditableQSORXData.ceQSO_Deleted := boolean(TF.SendDlgItemMessage(eq_handle,
     FLD_DELETED, BM_GETCHECK));
+
+  {X-QSO -- Issue #750.  Not claimed for credit but stays in the log for
+   NIL protection of the other station.  Counts for nothing else
+   (multipliers, points, dupe check), and the Cabrillo export emits an
+   `X-QSO:` line prefix.  ADIF export emits APP_TR4W_CLAIMEDQSO=0 so a
+   round-trip preserves the flag.}
+  EditableQSORXData.ceXQSO := boolean(TF.SendDlgItemMessage(eq_handle,
+    FLD_XQSO, BM_GETCHECK));
 
   // Deleted QSOs send a contactdelete only.
   // Edited (non-deleted) QSOs send a contactreplace so consumers update in place.

@@ -187,6 +187,7 @@ label
   GoToExit, CallDefWindowProc;
 var
   HDNotifyPtr: PHDNotify;
+  lplvcd: PNMLVCustomDraw;
 begin
 
   case Msg of
@@ -229,6 +230,36 @@ begin
             case code of
 
               NM_DBLCLK: EditableLogWindowDblClick;
+
+              // Issue #750: gray out the editable-log row for X-QSO
+              // records.  The X-QSO flag is stashed in the row's
+              // per-item lParam by tAddContestExchangeToLog ->
+              // SetRowXQSOFlag.  We must return CDRF_NOTIFYITEMDRAW
+              // at the table-level prepaint to be called back per
+              // item; then at item prepaint, replace the text colour
+              // with mid-gray ($808080) when the item's lParam is 1.
+              // CDRF_NEWFONT tells the listview to apply the new
+              // colour.  Exit; bypasses the trailing DefWindowProc
+              // call so our Result is what gets returned to the
+              // listview's parent-wndproc dispatch.
+              NM_CUSTOMDRAW:
+                begin
+                  lplvcd := PNMLVCustomDraw(lParam);
+                  case lplvcd.nmcd.dwDrawStage of
+                     CDDS_PREPAINT:
+                        begin
+                        Result := CDRF_NOTIFYITEMDRAW;
+                        Exit;
+                        end;
+                     CDDS_ITEMPREPAINT:
+                        begin
+                        if lplvcd.nmcd.lItemlParam = 1 then
+                           lplvcd.clrText := $00808080; // mid-gray
+                        Result := CDRF_NEWFONT;
+                        Exit;
+                        end;
+                  end;
+                end;
 
               NM_SETFOCUS:
                 begin

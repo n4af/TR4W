@@ -1782,6 +1782,10 @@ var
 begin
    Result := '';
 
+   // APP_TR4W_CLAIMEDQSO (Issue #750) is emitted by uADIF.EmitADIFRecord
+   // -- it's a ContestExchange-sourced field, not contest-specific, and
+   // round-trip tests rely on it being present without a tail emitter.
+
    // ----- STX_STRING (always, from MY side) -----
    stxString := GetMyExchangeForExport;
    Result := Result + EmitADIFField('STX_STRING',
@@ -2515,7 +2519,17 @@ if TempRXData.DomMultQTH = '' then
             push ModeString
             push Freq
       end;
-      wsprintf(CABRILLO_FIRST_PART, 'QSO: %5s %s %d-%02d-%02d %02d%02d %-7s ');
+      // Issue #750: X-QSO records use the 'X-QSO:' Cabrillo prefix
+      // instead of 'QSO:'.  Same argument set on the stack -- only the
+      // literal prefix in the format string differs.  The 2-char wider
+      // prefix shifts later columns by 2 chars; Cabrillo parsers are
+      // expected to be tolerant of column alignment for X-QSO lines.
+      if TempRXData.ceXQSO then
+         wsprintf(CABRILLO_FIRST_PART,
+                  'X-QSO: %5s %s %d-%02d-%02d %02d%02d %-7s ')
+      else
+         wsprintf(CABRILLO_FIRST_PART,
+                  'QSO: %5s %s %d-%02d-%02d %02d%02d %-7s ');
       asm add esp,40
       end;
 {

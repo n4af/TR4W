@@ -99,6 +99,18 @@ type
       procedure Test_RoundTrip_ARRLDIGI;
       procedure Test_RoundTrip_ARRLDX_CW;
       procedure Test_RoundTrip_GeneralQSO;
+      // Issue #750: X-QSO field round-trip.  Fixture has 4 records,
+      // one normal (APP_TR4W_CLAIMEDQSO=1) and three X-QSO records
+      // using each of the recognized field conventions:
+      //   APP_TR4W_CLAIMEDQSO=0  (TR4W)
+      //   APP_N1MM_CLAIMEDQSO=0  (N1MM)
+      //   APP_DXLOG_XQSO=Y       (DXLog.net)
+      // Import must set ceXQSO=True for all three.  Re-export should
+      // emit APP_TR4W_CLAIMEDQSO=0 for them.  Re-import should still
+      // see them as X-QSO.
+      procedure Test_RoundTrip_XQSO_Field;
+      procedure Test_Import_XQSO_N1MM_Convention;
+      procedure Test_Import_XQSO_DXLog_Convention;
    end;
 
 implementation
@@ -595,6 +607,12 @@ begin
    CheckEquals(Integer(a.NumberSent),     Integer(b.NumberSent),     ctx + ' NumberSent');
    CheckEquals(Integer(a.NumberReceived), Integer(b.NumberReceived), ctx + ' NumberReceived');
    CheckEquals(Integer(a.ceContest), Integer(b.ceContest), ctx + ' ceContest');
+   // Issue #750: X-QSO flag must round-trip through ADIF.  Export
+   // emits APP_TR4W_CLAIMEDQSO=0 for X-QSO records (skipped for
+   // normal records); import recognizes both that field and the
+   // N1MM / DXLog.net equivalents.  Cast to Integer because the
+   // CheckEquals overloads don't include Boolean.
+   CheckEquals(Integer(a.ceXQSO), Integer(b.ceXQSO), ctx + ' ceXQSO');
 end;
 
 procedure TADIFFixtureTests.CheckRoundTrip(const fixtureName: string);
@@ -647,6 +665,56 @@ procedure TADIFFixtureTests.Test_RoundTrip_GeneralQSO;
 begin
    BeginTest('Test_RoundTrip_GeneralQSO');
    CheckRoundTrip('generalqso_usb.adi');
+end;
+
+// ---------------------------------------------------------------------------
+// Issue #750: X-QSO field round-trip via APP_TR4W_CLAIMEDQSO.  The
+// fixture has 4 records -- one normal (CLAIMEDQSO=1) and three
+// X-QSO records flagged with each of the recognized field conventions
+// (TR4W=0, N1MM=0, DXLog=Y).  CheckRecordsEquivalent compares ceXQSO
+// so any drift in import OR export breaks the round-trip.
+// ---------------------------------------------------------------------------
+procedure TADIFFixtureTests.Test_RoundTrip_XQSO_Field;
+begin
+   BeginTest('Test_RoundTrip_XQSO_Field');
+   CheckRoundTrip('xqso_claimed_field.adi');
+end;
+
+// Cross-tool import: a record flagged X-QSO via N1MM's
+// APP_N1MM_CLAIMEDQSO=0 must import with ceXQSO=True so the operator
+// who switches loggers doesn't silently lose the "don't claim this"
+// flag.
+procedure TADIFFixtureTests.Test_Import_XQSO_N1MM_Convention;
+var
+   records : TContestExchangeArray;
+begin
+   BeginTest('Test_Import_XQSO_N1MM_Convention');
+   records := LoadADIFFixture('xqso_claimed_field.adi');
+   CheckTrue(Length(records) >= 3,
+             'fixture must have at least 3 records');
+   // Records 0..3 in the fixture: normal (TR4W=1), X-QSO via TR4W=0,
+   // X-QSO via N1MM=0, X-QSO via DXLog=Y.  Record index 2 carries
+   // APP_N1MM_CLAIMEDQSO=0.
+   CheckFalse(records[0].ceXQSO,
+              'record 0: normal QSO (TR4W=1) must NOT be X-QSO');
+   CheckTrue (records[2].ceXQSO,
+              'record 2: N1MM CLAIMEDQSO=0 must be recognized as X-QSO');
+end;
+
+// Cross-tool import: a record flagged X-QSO via DXLog.net's
+// APP_DXLOG_XQSO=Y must import with ceXQSO=True.  Same rationale as
+// the N1MM case; the field name and value semantics are different
+// (Y/N vs 0/1) so this is a meaningful separate test.
+procedure TADIFFixtureTests.Test_Import_XQSO_DXLog_Convention;
+var
+   records : TContestExchangeArray;
+begin
+   BeginTest('Test_Import_XQSO_DXLog_Convention');
+   records := LoadADIFFixture('xqso_claimed_field.adi');
+   CheckTrue(Length(records) >= 4,
+             'fixture must have at least 4 records');
+   CheckTrue(records[3].ceXQSO,
+             'record 3: DXLog XQSO=Y must be recognized as X-QSO');
 end;
 
 // ---------------------------------------------------------------------------
@@ -714,6 +782,11 @@ begin
    Test_RoundTrip_ARRLDIGI;
    Test_RoundTrip_ARRLDX_CW;
    Test_RoundTrip_GeneralQSO;
+
+   // X-QSO field round-trip + cross-tool import (Issue #750)
+   Test_RoundTrip_XQSO_Field;
+   Test_Import_XQSO_N1MM_Convention;
+   Test_Import_XQSO_DXLog_Convention;
 end;
 
 end.
