@@ -580,6 +580,32 @@ begin
         //     LiteralDomesticQTH := true;    // 4.91.5
       end;
 
+    RTC: // Issue #902 -- Real-Time Contest (COS)
+      begin
+        // Rules permit only 40/20/15/10 m on CW and SSB.  TR4W cannot
+        // disable individual HF bands (no per-band toggle exists), so
+        // 160/80 stay clickable; the scoring branch in CalculateQSOPoints
+        // awards 0 points and inhibits mults for any QSO outside the
+        // 40/20/15/10 + CW/SSB rules.  WARC bands ARE disabled here.
+        WARCBandsEnabled := False;
+
+        // CW function-key defaults and SAP exchange strings.
+        // Exchange shape: <serial#> <MyGrid> -- e.g. "001 FN20".
+        // RST is optional per the rules and is not transmitted by default.
+        // MyGrid is substituted at FCONTEST init time (same idiom as MyZone
+        // in SetUpRSTMyZoneExchange); the operator must restart the contest
+        // setup if MyGrid changes.
+        CQExchange := ' # ' + MyGrid;
+        RepeatSearchAndPounceExchange := ' # ' + MyGrid;
+        SearchAndPounceExchange := ' # ' + MyGrid;
+        SetCQMemoryString(CW, F3, '# ' + MyGrid);
+        SetEXMemoryString(CW, F4, 'NR # ' + MyGrid);
+        SetEXMemoryString(CW, F5, '@ DE \ # ' + MyGrid);
+        SetEXMemoryString(CW, AltF4, 'NR?');
+        SetEXCaptionMemoryString(CW, F4, 'NR');
+        SetEXCaptionMemoryString(CW, F5, 'Cl+Ex');
+      end;
+
     ARRLVHFJUN, ARRLVHFSEP:
       begin
         ActiveBand := Band6;
