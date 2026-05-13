@@ -51,7 +51,7 @@ Various contributors along the way
 
 #### Radio Control
 
-- **K4 over network — connection no longer drops during idle periods**: K4 radios in remote/host mode (and the Elecraft `k4remote.elecraft.com` server) drop a client that sends nothing for 10 seconds. TR4W's K4 network mode used to sit silent during operator idle periods and would silently lose the connection. TR4W now sends a `PING;` once per second over the network connection to keep it alive. Serial mode is unchanged.
+- **K4 over network — connection no longer drops during idle periods**: K4 radios in remote/host mode drops a client that sends nothing for 10 seconds. TR4W's K4 network mode used to sit silent during operator idle periods and would silently lose the connection. TR4W now sends a `PING;` once per second over the network connection to keep it alive. Serial mode is unchanged.
 
 #### ADIF Import/Export
 
