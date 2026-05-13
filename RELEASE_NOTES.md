@@ -24,6 +24,42 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.06 (2026-05-13) — NY4I / N4AF
+
+#### Logging — X-QSO Support
+
+- **Mark a QSO as X-QSO**: an X-QSO record stays in your log for NIL-protection purposes (so the other station gets credit if their log is checked against yours) but contributes nothing to YOUR score — no QSO count, no multipliers, no points, no presence in the dupe sheet.
+- **How to use**: open the QSO in the edit dialog, tick the X-QSO checkbox after the S&P checkbox. The row is grayed out in the log view so you can see at a glance which contacts are excluded.
+- **What it does to exports**:
+  - **Cabrillo**: emits `X-QSO:` instead of `QSO:` for that record (per Cabrillo spec).
+  - **ADIF**: tags the record so other software knows it's not claimed. TR4W's ADIF import also recognizes the equivalent fields from N1MM+ and DXLog.net, so X-QSO survives round-trips between loggers.
+- **Toggle off and rescore** restores the QSO's points based on the normal contest rules.
+- **All 11 languages supported**.
+
+#### Log View
+
+- **Column auto-fit on double-click survives restart**: when you double-click the right edge of a column header in the editable log to auto-fit, TR4W now adds a small padding so the content stays fully visible across restarts. Previously, columns auto-fit just barely wide enough would lose a character or two on restart (e.g. `14046.00` becoming `14046...`).
+- Manual drag is unchanged — whatever width you drag to is what gets saved.
+
+#### WSJT-X / FT8
+
+- **Cleaner debug log for no-multiplier contests**: ARRL Digital, CQ WPX Digital, and similar QSO-count-only contests no longer generate misleading "Checking if grid X is a multiplier" log lines in `tr4w.log`. No functional change; only the spurious log noise is gone.
+
+---
+
+### 4.147.05 (2026-05-12) — NY4I / N4AF
+
+#### Radio Control
+
+- **K4 over network — connection no longer drops during idle periods**: K4 radios in remote/host mode (and the Elecraft `k4remote.elecraft.com` server) drop a client that sends nothing for 10 seconds. TR4W's K4 network mode used to sit silent during operator idle periods and would silently lose the connection. TR4W now sends a `PING;` once per second over the network connection to keep it alive. Serial mode is unchanged.
+
+#### ADIF Import/Export
+
+- **Field Day, Sweepstakes, and similar no-RST contests no longer get a bogus `59` in `<SRX_STRING>`**: an earlier fix to add implied RST to state QSO party exchanges was incorrectly applied to contests whose exchanges have no RST. Field Day export was emitting `<SRX_STRING:9>59 1D WCF` with a bogus leading `59`. Each contest now picks the right shape — RST contests still get the implied `599`, non-RST contests get just the exchange.
+- **No more `<SRX:5>000-1` garbage in ADIF**: for contests where the received-serial field is unused (e.g. Field Day), the ADIF export was emitting `<SRX:5>000-1` — a malformed numeric field. Export now correctly skips SRX (and symmetrically STX) when no serial was received.
+
+---
+
 ### 4.147.04 (2026-05-12) — NY4I / N4AF
 
 #### ADIF Import/Export

@@ -22,6 +22,49 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.06 (2026-05-13) — NY4I / N4AF
+
+#### X-QSO Support (`src/VC.pas`, `src/uEditQSO.pas`, `src/MainUnit.pas`, `src/trdos/LOGSUBS2.PAS`, `src/uADIF.pas`, `res/`) — Issue #750, PR #901
+
+X-QSO records stay in the log for NIL protection of the worked station but contribute nothing to the score — no QSO count, no multipliers, no points, no presence in the dupe sheet.
+
+- **Storage**: `ceXQSO: Boolean` in `ContestExchange`, freed from `sReserved` (record size unchanged; legacy logs read as `ceXQSO=False`).
+- **Edit dialog**: X-QSO checkbox after S&P. `FLD_XQSO = 170` with Set/GetCheck handlers in `uEditQSO.pas`.
+- **Visual indicator**: full row grayed in editable log view (mid-gray text via `NM_CUSTOMDRAW`).
+- **Score/dupe/mult exclusion**: enforced at both rebuild paths — `tUpdateLog(actRescore)` and `LoadinLog`. X-QSO records have `QSOPoints` zeroed at rescore (DXLog.net convention — consistent visual `0` in Pts column). Toggle X-QSO off and a normal rescore restores points based on contest rules.
+- **ADIF emit**: `APP_TR4W_CLAIMEDQSO` field (`1` normal, `0` X-QSO); TR4W-namespaced.
+- **ADIF import**: recognizes `APP_TR4W_CLAIMEDQSO`, `APP_N1MM_CLAIMEDQSO`, `APP_DXLOG_XQSO` for cross-tool round-trip.
+- **Cabrillo**: leading tag becomes `X-QSO:` instead of `QSO:`.
+- **UDP**: `LogContactToUDP` reports `<IsClaimedQso>0</IsClaimedQso>` for X-QSO and skipped records.
+- **Resource files**: X-QSO checkbox (resource ID 170) added to all 10 remaining language `.RES` files (`tr4w_rus`, `tr4w_ser`, `tr4w_esp`, `tr4w_mng`, `tr4w_pol`, `tr4w_cze`, `tr4w_rom`, `tr4w_chn`, `tr4w_ger`, `tr4w_ukr`).
+- Tests: 632 unit tests pass; added `Test_RoundTrip_XQSO_Field`, `Test_Import_XQSO_N1MM_Convention`, `Test_Import_XQSO_DXLog_Convention`.
+
+#### Column Auto-Fit Padding (`tr4w.dpr` `WindowProc`) — Issue #900, PR #901
+
+- **Double-click column-divider auto-fit now pads width so content survives restart**: at the just-fits threshold the Win32 Header control picked a width a few pixels narrower than the cell-content area (the ListView cell layout adds an internal margin). Value displayed correctly in the current session but applying the same pixel value on restart triggered ellipsis truncation (e.g. `14046.00` → `14046...`).
+- Second issue uncovered during testing: the OS's internal auto-fit during `HDN_DIVIDERDBLCLICK` does **not** generate an `HDN_ENDTRACK`, so a flag-based "set in DBLCLICK, save in ENDTRACK" approach silently dropped the save on double-click.
+- Fix: intercept `HDN_DIVIDERDBLCLICK` directly in `WindowProc`. Run auto-fit via `LVSCW_AUTOSIZE_USEHEADER`, read resulting width, add `COLUMN_DOUBLECLICK_PAD_PX` (12 px), apply, `SaveColumnWidthToConfig`, return `Result := 1; Exit;` to suppress the OS's default auto-fit. Manual drag unchanged — `HDN_ENDTRACK` still saves dragged width exactly.
+
+#### WSJT-X Mult-Check Gate (`src/uWSJTX.pas`) — PR #901
+
+- **Skip multiplier lookups for QSO-count-only contests**: CQ-decode handler was calling `DetermineIfNewMult` / `DetermineIfNewDomesticMult` on every decode regardless of whether the active contest had any multiplier dimension. For ARRL-DIGI / CQ-WPX-DIGI / similar contests every `Doing*Mults` global is False so these lookups always returned False but produced confusing log lines like `[uWSJTX] Checking if grid FN is a multiplier`. Gate behind `DoingDomesticMults or DoingDXMults or DoingPrefixMults or DoingZoneMults`. Dupe handling unchanged.
+
+---
+
+### 4.147.05 (2026-05-12) — NY4I / N4AF
+
+#### K4 Network Keep-Alive (`src/uRadioElecraftK4.pas`) — Issue #897, PR #899
+
+- **PING/PONG keep-alive in network mode**: K4 servers (`k4remote.elecraft.com`, K4 in host mode) drop a client that sends nothing for 10 seconds. TR4W's K4 network mode uses AI5 — state changes pushed from radio to client — but the client itself sent nothing during operator idle periods. An operator who tuned once and then sat quietly for >10 s silently lost the connection.
+- Fix: in network mode `Connect` sets `requiresPolling := True; pollingInterval := 1000`. `PollRadioState` branches on `serialPort` — serial sends `IF;FB;` (current behaviour, AI disabled), network sends `PING;`. `ProcessMessage` adds `'PO'` to its `AnsiIndexText` list with an explicit case 17 that logs the PONG response (rather than fall-through, so a future reader sees PONG is handled). PONG refreshes the inbound watchdog via the existing `UpdateLastValidResponse` at the top of `ProcessMessage`.
+
+#### ADIF Export Bug Fixes (`src/uADIF.pas`, `src/trdos/PostUnit.PAS`) — Issue #898, PR #899
+
+- **`<SRX_STRING>` no longer prepends `59` for non-RST contests**: `ResolveSRXString` (added in PR #896) normalized `<SRX_STRING>` with an implied RST prefix so it would be symmetric with `<STX_STRING>` for state QSO parties. That assumption breaks for any contest whose exchange has no RST — ARRL Field Day, Winter Field Day, Sweepstakes (CW/SSB). FD export was emitting `<SRX_STRING:9>59 1D WCF` (bogus leading `59`). Fix: move `<SRX_STRING>` emission out of `uADIF.EmitADIFRecord` and into `PostUnit.EmitContestSpecificTailForExport` (the tail-emitter callback). Tail emitter decides shape: POTA → park-ref (existing branch unchanged); `ExchangeInformation.RST = True` → `ResolveSRXString` (state QPs / zone contests); `ExchangeInformation.RST = False` → `ExchString` as-is (FD, SS, Winter FD). `ResolveSRXString` promoted from private helper to public function in `uADIF`'s interface.
+- **`<SRX>` / `<STX>` guard against unset-serial sentinels**: two "unset" sentinels were in use — `$FFFF` (65535, from `uADIF.InitContestExchangeForParse`) and `-1` (live-entry / binary-log paths). Prior guard was `<> $FFFF` only, dating from when these fields were `Word`. Fields are now signed `Integer`, so `-1` stays `-1`. For Field Day where SRX is unused and stays `-1`, `EmitADIFRecord` was producing `<SRX:5>000-1` (`IntToStr(-1) = '-1'` zero-padded to width 5). Fix: require value to be positive AND not the parse sentinel. Applied symmetrically to STX.
+
+---
+
 ### 4.147.04 (2026-05-12) — NY4I / N4AF
 
 #### ADIF Parser/Emitter Refactor (`src/uADIF.pas`, `src/MainUnit.pas`, `src/trdos/PostUnit.PAS`) — Issue #887, PR #896
