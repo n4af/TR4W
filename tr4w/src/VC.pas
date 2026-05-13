@@ -1627,7 +1627,16 @@ type
 {01}  //res23:               Byte;
 
 //{01}  res25:               Byte;
-{50} sReserved:               string[50]
+// ceXQSO: True when the operator has marked this contact as a Cabrillo
+// X-QSO -- the contact happened and is kept in the log for NIL
+// protection of the other station, but is not claimed for credit
+// (excluded from QSO count, multipliers, points, and dupe checking).
+// Stored in the slot freed by shrinking sReserved from string[50] to
+// string[49]; the on-disk byte at this offset in older logs was the
+// length byte of unused sReserved (always zero), so existing logs read
+// with ceXQSO = False after the layout change.  Issue #750.
+{01}  ceXQSO:              Boolean;
+{49} sReserved:               string[49]
    end;
 {*)}
 

@@ -95,7 +95,15 @@ type
       tAdifVE_PROV, tAdifAPP_TR4W_HQ, tAdifAPP_N1MM_HQ, tAdifSTATION_CALLSIGN,
       tAdifQTH, tAdifPROGRAMID, tAdifAPP_N1MM_EXCHANGE1, tAdifAPP_N1MM_ID,
       tAdifAPP_TR4W_ID, tAdifSIG, tAdifSIG_INFO, tAdifPOTAREF,
-      tAdifAPP_TR4W_ROVERCALL);
+      tAdifAPP_TR4W_ROVERCALL,
+      // X-QSO / "not claimed" markers -- Issue #750.  Three different
+      // conventions in the wild, all recognized on import:
+      //   APP_TR4W_CLAIMEDQSO  value '1' = normal, '0' = X-QSO  (TR4W)
+      //   APP_N1MM_CLAIMEDQSO  value '1' = normal, '0' = X-QSO  (N1MM)
+      //   APP_DXLOG_XQSO       value 'Y' = X-QSO                (DXLog.net)
+      // Export emits only APP_TR4W_CLAIMEDQSO; the others are import-only.
+      tAdifAPP_TR4W_CLAIMEDQSO, tAdifAPP_N1MM_CLAIMEDQSO,
+      tAdifAPP_DXLOG_XQSO);
 
 // =========================================================================
 // Lexer
@@ -734,7 +742,7 @@ end;
 const
    // Order MUST match the TADIF_Fields enum declaration.  Adding a field
    // requires updating BOTH this array AND the enum.
-   ADIF_FIELD_NAMES : array[0..44] of string = (
+   ADIF_FIELD_NAMES : array[0..47] of string = (
       // ADIF spec field name is `CQZ` (no underscore).  The original
       // import lookup had `CQ_Z` which never matched real-world ADIF
       // exports -- the tAdifCQ_Z handler was effectively dead until
@@ -750,7 +758,9 @@ const
       'VE_PROV', 'APP_TR4W_HQ', 'APP_N1MM_HQ', 'STATION_CALLSIGN',
       'QTH', 'PROGRAMID', 'APP_N1MM_EXCHANGE1', 'APP_N1MM_ID',
       'APP_TR4W_ID', 'SIG', 'SIG_INFO', 'POTA_REF',
-      'APP_TR4W_ROVERCALL');
+      'APP_TR4W_ROVERCALL',
+      // X-QSO marker fields (Issue #750) -- order must match the enum
+      'APP_TR4W_CLAIMEDQSO', 'APP_N1MM_CLAIMEDQSO', 'APP_DXLOG_XQSO');
 
 function ApplyADIFFieldsToExchange(const fields: TADIFFieldList;
                                    var exch: ContestExchange;
@@ -949,6 +959,23 @@ begin
 
             tAdifPOTAREF:
                temps.POTARef := fieldValue;
+
+            // X-QSO markers (Issue #750).  Three different field
+            // conventions in the wild; recognize all of them so an ADIF
+            // exported from TR4W, N1MM, or DXLog.net round-trips into
+            // TR4W with the X-QSO flag preserved.  TR4W and N1MM use
+            // CLAIMEDQSO = '0' to mean "X-QSO"; DXLog.net uses XQSO = 'Y'.
+            // Any non-claimed value sets the flag; presence with the
+            // claimed value (TR4W/N1MM '1', DXLog '0' or 'N') leaves it
+            // False so we don't overwrite a True already set by an
+            // earlier field on the same record.
+            tAdifAPP_TR4W_CLAIMEDQSO, tAdifAPP_N1MM_CLAIMEDQSO:
+               if Trim(fieldValue) = '0' then
+                  exch.ceXQSO := True;
+
+            tAdifAPP_DXLOG_XQSO:
+               if (Trim(fieldValue) = 'Y') or (Trim(fieldValue) = 'y') then
+                  exch.ceXQSO := True;
 
          else
             // Unknown / unhandled field.  Silently accept anything
@@ -1349,6 +1376,18 @@ begin
       Result := Result + EmitADIFField('OPERATOR', string(rec.ceOperator));
    if rec.id <> '' then
       Result := Result + EmitADIFField('APP_TR4W_ID', string(rec.id));
+
+   // APP_TR4W_CLAIMEDQSO (Issue #750).  Mirrors N1MM's
+   // APP_N1MM_CLAIMEDQSO convention: '1' = normal QSO, '0' = X-QSO
+   // (logged but not claimed for credit -- e.g. an off-band contact
+   // kept for NIL protection of the other station).  Only emit for
+   // X-QSO records so a grep of the ADIF for CLAIMEDQSO finds exactly
+   // the not-claimed contacts; normal QSOs are implied by absence.
+   // Lives in uADIF (not the tail emitter) because the value is
+   // sourced directly from rec.ceXQSO -- no MainUnit/trdos globals
+   // needed -- and because round-trip tests use a nil tail emitter.
+   if rec.ceXQSO then
+      Result := Result + EmitADIFField('APP_TR4W_CLAIMEDQSO', '0');
 end;
 
 function ExportADIFToString(const records: TContestExchangeArray;

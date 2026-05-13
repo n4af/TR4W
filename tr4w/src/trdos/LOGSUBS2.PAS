@@ -3108,7 +3108,12 @@ begin
             #9 + '<IsRunQSO>' + Format('%d',[IfThen(RxData.ceSearchAndPounce,0,1)]) + '</IsRunQSO>' + sLineBreak +
             #9 + '<StationName>' +  ComputerName + '</StationName>' + sLineBreak + // Issue 263 NY4I
             #9 + '<ID>' + RxData.id + '</ID>' + sLineBreak +
-            #9 + '<IsClaimedQso>' + Format('%d',[IfThen(RxData.ceQSO_Skiped,0,1)]) + '</IsClaimedQSO>' + sLineBreak +
+            // Issue #750: X-QSO records (kept in the log for NIL
+            // protection but not claimed for credit) also report
+            // IsClaimedQso=0 -- same wire-format meaning as a skipped
+            // QSO from the consumer's perspective.  N1MM uses the
+            // same convention.
+            #9 + '<IsClaimedQso>' + Format('%d',[IfThen(RxData.ceQSO_Skiped or RxData.ceXQSO,0,1)]) + '</IsClaimedQSO>' + sLineBreak +
             #9 + '<oldtimestamp>' + sTimestamp + '</oldtimestamp>' + sLineBreak +
             #9 + '<oldcall>' + RXData.Callsign + '</oldcall>' + sLineBreak +
             #9 + '<SentExchange>' + Trim(RxData.ExchString) + '</SentExchange>' + sLineBreak +

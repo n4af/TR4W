@@ -181,12 +181,39 @@ uses
 {$IF LANG = 'UKR'}{$R res\tr4w_ukr.res}{$IFEND}
 
 {$R 'Win11.res'}
+
+// Column-double-click padding (Issue #750 follow-up).
+//
+// Windows' default ListView/Header response to a double-click on a
+// column divider is to auto-fit the column to its widest content.
+// The auto-fit chooses the header-divider position, which is a few
+// pixels narrower than the cell-content area because the ListView's
+// cell layout adds an internal left/right margin.  At the just-fits
+// threshold the saved value triggers ellipsis on the very content
+// that fit visually pre-save.
+//
+// Fix: intercept HDN_DIVIDERDBLCLICK directly -- run the auto-fit
+// ourselves with LVSCW_AUTOSIZE_USEHEADER, add COLUMN_DOUBLECLICK_PAD_PX
+// for breathing room, apply that width, and save.  We must do all
+// the work inside HDN_DIVIDERDBLCLICK and suppress the default OS
+// behaviour: HDN_ENDTRACK only fires for end-of-drag, not for
+// double-click auto-fit, so a "set a flag in HDN_DIVIDERDBLCLICK
+// and add padding in HDN_ENDTRACK" approach silently drops the
+// save on double-click.  Manual drag is handled in HDN_ENDTRACK
+// without padding -- the dragged width is the operator's explicit
+// choice.
+const
+  COLUMN_DOUBLECLICK_PAD_PX = 12;
+
 function WindowProc(TRHWND: HWND; Msg: UINT; wParam: wParam; lParam: lParam): longword; stdcall;
 
 label
   GoToExit, CallDefWindowProc;
 var
   HDNotifyPtr: PHDNotify;
+  lplvcd: PNMLVCustomDraw;
+  hdrColIdx: Integer;
+  hdrNewWidth: Integer;
 begin
 
   case Msg of
@@ -230,6 +257,36 @@ begin
 
               NM_DBLCLK: EditableLogWindowDblClick;
 
+              // Issue #750: gray out the editable-log row for X-QSO
+              // records.  The X-QSO flag is stashed in the row's
+              // per-item lParam by tAddContestExchangeToLog ->
+              // SetRowXQSOFlag.  We must return CDRF_NOTIFYITEMDRAW
+              // at the table-level prepaint to be called back per
+              // item; then at item prepaint, replace the text colour
+              // with mid-gray ($808080) when the item's lParam is 1.
+              // CDRF_NEWFONT tells the listview to apply the new
+              // colour.  Exit; bypasses the trailing DefWindowProc
+              // call so our Result is what gets returned to the
+              // listview's parent-wndproc dispatch.
+              NM_CUSTOMDRAW:
+                begin
+                  lplvcd := PNMLVCustomDraw(lParam);
+                  case lplvcd.nmcd.dwDrawStage of
+                     CDDS_PREPAINT:
+                        begin
+                        Result := CDRF_NOTIFYITEMDRAW;
+                        Exit;
+                        end;
+                     CDDS_ITEMPREPAINT:
+                        begin
+                        if lplvcd.nmcd.lItemlParam = 1 then
+                           lplvcd.clrText := $00808080; // mid-gray
+                        Result := CDRF_NEWFONT;
+                        Exit;
+                        end;
+                  end;
+                end;
+
               NM_SETFOCUS:
                 begin
                   ActiveMainWindow := awEditableLog;
@@ -240,16 +297,50 @@ begin
             end
           else if (hWndFrom = ListView_GetHeader(wh[mweEditableLog])) then
             begin
-            if (code = HDN_ENDTRACK) or (code = HDN_ENDTRACKW) then
+            // HDN_DIVIDERDBLCLICK: operator double-clicked the divider
+            // to auto-fit.  Do EVERYTHING here (auto-fit, padding,
+            // save) instead of deferring to a follow-up HDN_ENDTRACK:
+            // per Win32, HDN_ENDTRACK only fires for end-of-drag.  The
+            // OS's internal auto-fit during double-click does not
+            // generate one, so a flag-based "wait for HDN_ENDTRACK"
+            // approach silently drops the save.
+            //
+            // We run the auto-fit ourselves with LVSCW_AUTOSIZE_USEHEADER,
+            // add COLUMN_DOUBLECLICK_PAD_PX for breathing room, apply
+            // that to the column, and save.  Returning a non-zero
+            // Result suppresses the default header auto-fit; Exit
+            // bypasses DefWindowProc which would otherwise overwrite
+            // Result with its own return value.
+            if (code = HDN_DIVIDERDBLCLICKA) or (code = HDN_DIVIDERDBLCLICKW) then
                begin
+               HDNotifyPtr := PHDNotify(lParam);
+               hdrColIdx := HDNotifyPtr^.Item;
+               ListView_SetColumnWidth(wh[mweEditableLog], hdrColIdx,
+                                       LVSCW_AUTOSIZE_USEHEADER);
+               hdrNewWidth := ListView_GetColumnWidth(wh[mweEditableLog],
+                                                     hdrColIdx)
+                              + COLUMN_DOUBLECLICK_PAD_PX;
+               ListView_SetColumnWidth(wh[mweEditableLog], hdrColIdx,
+                                       hdrNewWidth);
+               SaveColumnWidthToConfig(hdrColIdx, hdrNewWidth);
+               Result := 1; // suppress default header auto-fit
+               Exit;
+               end
+            else if (code = HDN_ENDTRACK) or (code = HDN_ENDTRACKW) then
+               begin
+               // Normal end-of-drag: save the dragged width exactly
+               // as the operator left it.  No padding here -- the
+               // operator explicitly chose this width.
                HDNotifyPtr := PHDNotify(lParam);
                if (HDNotifyPtr^.pItem <> nil) and
                   ((HDNotifyPtr^.pItem^.mask and HDI_WIDTH) <> 0) then
-                  SaveColumnWidthToConfig(HDNotifyPtr^.Item, HDNotifyPtr^.pItem^.cxy)
+                  SaveColumnWidthToConfig(HDNotifyPtr^.Item,
+                                          HDNotifyPtr^.pItem^.cxy)
                else
                   // pItem unavailable — fall back to querying the ListView directly
                   SaveColumnWidthToConfig(HDNotifyPtr^.Item,
-                     ListView_GetColumnWidth(wh[mweEditableLog], HDNotifyPtr^.Item));
+                     ListView_GetColumnWidth(wh[mweEditableLog],
+                                             HDNotifyPtr^.Item));
                end;
             end;
       end;

@@ -522,19 +522,32 @@ begin
                        logger.debug('[uWSJTX] %s is a DUPE', [DXCall]);
                        HighLightCall(DXCall, 1, id);
                        end
-                    else if VisibleLog.DetermineIfNewMult(call, TempBand,
-                                                           TempMode) then
+                    // Issue #750-adjacent cleanup: gate the multiplier
+                    // checks on at least one multiplier dimension being
+                    // active for the current contest.  Contests like
+                    // ARRL-DIGI / CQ-WPX-DIGI score on QSO count only --
+                    // every Doing*Mults global is False -- so the
+                    // DetermineIfNewMult and DetermineIfNewDomesticMult
+                    // calls below always return False but still log
+                    // confusing "Checking if grid FN is a multiplier"
+                    // lines that suggest TR4W is doing mult work it
+                    // is not.  Cheap to skip cleanly.
+                    else if DoingDomesticMults or
+                            DoingDXMults       or
+                            DoingPrefixMults   or
+                            DoingZoneMults     then
                        begin
-                       logger.debug('[uWSJTX] %s is a MULT (from callsign',
-                                                             [DXCall]);
-                       
-                       HighlightCall(grid, 2, id);
-                        // Pass back id as given to us but without ? or a1..a7, etc.
-                       end
-                    else
-                       begin
-                       if grid <> '' then
-                        // Even if gridFields (2 digit) grid, the DeterimeIfNewDomesticMult only checks left 2 bytes
+                       if VisibleLog.DetermineIfNewMult(call, TempBand,
+                                                       TempMode) then
+                          begin
+                          logger.debug('[uWSJTX] %s is a MULT (from callsign',
+                                                                [DXCall]);
+
+                          HighlightCall(grid, 2, id);
+                           // Pass back id as given to us but without ? or a1..a7, etc.
+                          end
+                       else if grid <> '' then
+                           // Even if gridFields (2 digit) grid, the DeterimeIfNewDomesticMult only checks left 2 bytes
                           begin
                           logger.debug('[uWSJTX] Checking if grid %s is a multiplier (call=%s)', [AnsiLeftStr(grid, 2), DXCall]);
                           VisibleLog.DetermineIfNewDomesticMult(grid, TempBand,
@@ -546,14 +559,17 @@ begin
                              HighLightCall(grid, 2, id);
                              // Pass back id as given to us
                              end
-
-                       else
-                          begin
-                          logger.debug('[uWSJTX] %s is NOT a domestic MULT',
-                                       [AnsiLeftStr(grid, 2)]);
+                          else
+                             begin
+                             logger.debug('[uWSJTX] %s is NOT a domestic MULT',
+                                          [AnsiLeftStr(grid, 2)]);
+                             end;
                           end;
                        end;
-                     end;
+                    // else: no multiplier dimensions in this contest;
+                    // not a dupe -> no highlight (operator works
+                    // everyone by default; only the exceptions need a
+                    // color hint).
                      end // if call <> ...
                   else
                   begin
