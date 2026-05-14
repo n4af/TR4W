@@ -501,6 +501,7 @@ uses
 {$IFEND}
 
   uRadioPolling,
+  uHamScore,        // Issue #783 -- HamScoreResyncFromScratch (Tools menu)
   LogCfg,
   LogCW,
   uCT1BOH,
@@ -3671,6 +3672,13 @@ begin
 
     menu_repeat_pota_parks:
       HandleRepeatPOTAParks;
+
+    menu_hamscore_resync:                 // Issue #783
+      begin
+      QuickDisplay('HamScore: queueing full log resync...');
+      HamScoreResyncFromScratch;       // enqueue <deletelog>
+      SendFullLogToHamScore;           // enqueue every QSO from the binary log
+      end;
 
     menu_spmode_ortab:
       ProcessTAB(LowordWparam);

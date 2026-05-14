@@ -2432,6 +2432,7 @@ const
  // menu_alt_transfreq                    = 10311;   // 4.47.3 remove
   menu_download_pota_parks              = 10607;  // issue #864
   menu_repeat_pota_parks               = 10608;  // repeat last logged parks for second operator
+  menu_hamscore_resync                 = 10609;  // Issue #783 -- HamScore RTC: wipe server log + re-send all QSOs
   menu_home_page                        = 10606;
 //  menu_send_bug                         = 10605;
   menu_wiki_rus                         = 10604;

@@ -118,6 +118,7 @@ uses
     );
 procedure SendScoreToUDP;
 procedure LogContactToUDP(RXData: ContestExchange); // ny4i
+procedure SendFullLogToHamScore;  // Issue #783 -- enqueue every QSO for RTC resync
 procedure LogEditedContactToUDP(RXData: ContestExchange); // ny4i
 procedure LookupInfoToUDP(RXData: ContestExchange); // Issue 612 ny4i
 function BuildUDPContact(RXData: ContestExchange; whichUDP: UDPType): string; // Issue 612 ny4i
@@ -3168,6 +3169,40 @@ begin
    udp.Send(UDPBroadcastAddress,UDPBroadcastPortLookup,sBuf);
 end;
 
+
+// Issue #783 -- HamScore RTC: walk the binary log file and enqueue every
+// good QSO via HamScoreOnLog so the server can rebuild its view from
+// scratch.  Pairs with HamScoreResyncFromScratch which enqueues the
+// <deletelog> separator first.  Mirrors SendFullLogToUDP's iteration
+// pattern (same OpenLogFile / ReadLogFile / GoodLookingQSO trio).
+procedure SendFullLogToHamScore;
+var
+  nCount: Integer;
+begin
+  nCount := 0;
+  if not OpenLogFile then
+    begin
+    logger.Error('[SendFullLogToHamScore] Could not open log file');
+    CloseHandle(tReportFileWrite);
+    Exit;
+    end;
+  try
+    ReadVersionBlock;
+    while ReadLogFile do  // fills global TempRXData
+      begin
+      if GoodLookingQSO then
+        begin
+        Inc(nCount);
+        HamScoreOnLog(TempRXData);
+        end;
+      end;
+    CloseLogFile;
+    Logger.Info('[SendFullLogToHamScore] Enqueued %d QSO(s) for RTC resync', [nCount]);
+  except
+    on E: Exception do
+      Logger.Error('[SendFullLogToHamScore] %s', [E.Message]);
+  end;
+end;
 
 procedure SendFullLogToUDP;
 var nCount: integer;
