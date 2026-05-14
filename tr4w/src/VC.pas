@@ -2479,6 +2479,7 @@ var
   tInputDialogWarning                   : boolean;
   tInputDialogInteger                   : boolean;
   tInputDialogLowerCase                 : boolean;
+  tInputDialogPassword                  : boolean;       // Issue #783 -- mask input as '*' bullets
   tInputDialogPreviousValue             : ShortString;
 //  CMDLowerCase                          : ShortString;
   ClearQuickDisplayTimer                : Cardinal;
