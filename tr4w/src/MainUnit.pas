@@ -1675,15 +1675,16 @@ begin
       tr4w_WindowsArray[i].WndRect.Bottom := 600;
     end;
   // Issue #783 Phase 4: give the HamScore status window enough room for
-  // the URL line (the default 220px is too narrow for a full URL).
+  // the URL line and the multi-line status edit.  Default 220 x N is too
+  // narrow / short.  Min: 410 wide x 270 tall.
   if tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Right -
-     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Left < 400 then
+     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Left < 410 then
     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Right :=
-      tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Left + 400;
+      tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Left + 410;
   if tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Bottom -
-     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Top < 180 then
+     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Top < 270 then
     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Bottom :=
-      tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Top + 180;
+      tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Top + 270;
 
   if tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndRect.Right = 0 then
   begin
@@ -2836,7 +2837,7 @@ procedure OpenOtherWindows;
 var
   i: WindowsType;
 begin
-  for i := tw_BANDMAPWINDOW_INDEX to tw_DUPESHEETWINDOW2_INDEX do
+  for i := tw_BANDMAPWINDOW_INDEX to tw_HAMSCOREWINDOW_INDEX do  // Issue #783 -- include HamScore in restore
     if tr4w_WindowsArray[i].WndVisible then
       OpenTR4WWindow(i);
   Windows.SetWindowPos(tr4whandle, HWND_TOP,
@@ -3031,7 +3032,7 @@ begin
   LowordWparam := LoWord(menuID);
 
   if LowordWparam >= menu_windows_bandmap then
-    if LowordWparam <= {menu_rm_prefix}menu_windows_dupesheet2 then
+    if LowordWparam <= menu_windows_hamscore then  // Issue #783 -- extended past dupesheet2
     begin
       ID := WindowsType(LowordWparam - menu_windows_bandmap + 1);
       if not tWindowsExist(ID) then
@@ -3690,14 +3691,6 @@ begin
       QuickDisplay('HamScore: queueing full log resync...');
       HamScoreResyncFromScratch;       // enqueue <deletelog>
       SendFullLogToHamScore;           // enqueue every QSO from the binary log
-      end;
-
-    menu_hamscore_window:                 // Issue #783 Phase 4
-      begin
-      if not tWindowsExist(tw_HAMSCOREWINDOW_INDEX) then
-        OpenTR4WWindow(tw_HAMSCOREWINDOW_INDEX)
-      else
-        CloseTR4WWindow(tw_HAMSCOREWINDOW_INDEX);
       end;
 
     menu_spmode_ortab:

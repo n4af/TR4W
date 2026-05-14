@@ -228,7 +228,7 @@ const
     (mrText: '-'; mrId: 0),
     (mrText: RC_INTERCOM + RC_INTERCOM_HK; mrId: menu_windows_intercom),
     (mrText: RC_POSTSCORETOGS + RC_GETSCORES_HK; mrId: menu_windows_getscores),
-    (mrText: 'HamScore RTC Status'; mrId: menu_hamscore_window),  // Issue #783 Phase 4
+    (mrText: 'HamScore RTC Status'; mrId: menu_windows_hamscore),  // Issue #783 Phase 4
     (mrText: RC_STATIONS + RC_STATIONS_HK; mrId: menu_windows_stations),
     (mrText: RC_MP3REC + RC_MP3REC_HK; mrId: menu_windows_mp3recorder),
 {$IF MMTTYMODE}
