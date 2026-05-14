@@ -41,6 +41,7 @@ function ConvertLatLonToGrid(Lat, Lon: REAL): GridString;
 function GetBeamHeading(MyGrid, HisGrid: GridString): integer;
 function GetDistanceBetweenGrids(Grid1, Grid2: GridString): integer;
 function GetEuropeanDistanceBetweenGrids(Grid1, Grid2: GridString): integer;
+function RTCGridDistance(Grid1, Grid2: GridString): Double; // Issue #902 -- RTC contest Haversine
 procedure GetLatLon(Grid: GridString; var Lat, Lon: REAL);
 function GetSunriseSunsetString(Lat: REAL; Lon: REAL): Str80;
 function LooksLikeAGeoCoordinates(Coordinates: Str40; var LatValue, LongValue: integer): boolean;
@@ -312,6 +313,64 @@ begin
 
   Calc_GeoDist(Lat1, Lon1, Lat2, Lon2, ShortHeading, LongHeading, Distance);
   GetDistanceBetweenGrids := round(Distance);
+end;
+
+function RTCGridDistance(Grid1, Grid2: GridString): Double;
+{ Issue #902 -- Haversine distance in km between the CENTERS of two 4-character
+  Maidenhead grid squares.  Used by the RTC (Real-Time Contest) scoring method.
+  R = 6371 km.  Reference fixture from the rules: FN36 to DM18 = 3664.72 km.
+
+  Why a dedicated helper instead of GetDistanceBetweenGrids:
+    1. GetDistanceBetweenGrids pads 4-char grids with 'LL' (offset half a
+       sub-square from the true center).  RTC rules require the geometric
+       center of the 4-char square.
+    2. GetDistanceBetweenGrids uses Calc_GeoDist (a Vincenty-style geodesic).
+       RTC rules specify Haversine.
+    For non-RTC contests we keep the existing helper unchanged. }
+const
+   R_EARTH_KM = 6371.0;
+   DEG2RAD    = Pi / 180.0;
+
+   procedure GridCenterDeg(const G: GridString; var Lat, Lon: Double);
+   var
+      g4: GridString;
+   begin
+      g4 := UpperCase(G);
+      // 4-char Maidenhead: 20 deg lon field x 2 deg lon square; 10 deg lat field x 1 deg lat square.
+      // Center = corner + half square width.
+      Lon := -180.0
+           + (Ord(g4[1]) - Ord('A')) * 20.0
+           + (Ord(g4[3]) - Ord('0')) *  2.0
+           + 1.0;
+      Lat :=  -90.0
+           + (Ord(g4[2]) - Ord('A')) * 10.0
+           + (Ord(g4[4]) - Ord('0')) *  1.0
+           + 0.5;
+   end;
+
+var
+   Lat1, Lon1, Lat2, Lon2 : Double;
+   dLat, dLon, A, C       : Double;
+begin
+   Result := 0.0;
+   if (Length(Grid1) < 4) or (Length(Grid2) < 4) then
+      begin
+      Exit;
+      end;
+
+   GridCenterDeg(Grid1, Lat1, Lon1);
+   GridCenterDeg(Grid2, Lat2, Lon2);
+
+   Lat1 := Lat1 * DEG2RAD;
+   Lat2 := Lat2 * DEG2RAD;
+   dLat := Lat2 - Lat1;
+   dLon := (Lon2 - Lon1) * DEG2RAD;
+
+   A := Sin(dLat / 2.0) * Sin(dLat / 2.0)
+      + Cos(Lat1) * Cos(Lat2) * Sin(dLon / 2.0) * Sin(dLon / 2.0);
+   C := 2.0 * ArcTan2(Sqrt(A), Sqrt(1.0 - A));
+
+   Result := R_EARTH_KM * C;
 end;
 
 function GetEuropeanDistanceBetweenGrids(Grid1, Grid2: GridString): integer;

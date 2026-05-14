@@ -957,7 +957,8 @@ type
     YOTA,
     IN7QPNE,
     MST ,        // 4.110.5
-    SST
+    SST,
+    RTC          // Real-Time Contest (COS) -- exchange: RST + serial + 4-char grid; distance-based scoring
     );
 
     { NOTE: pls ensure VC INTERFACEDRADIOTYPE and LOGRADIO INTEFACEDRADIOTYPE ARE IN THE SAME ORDER }
@@ -2981,7 +2982,8 @@ type
  //   RSGBDXMethod,
     NYQPQP,
     RCCVHFQP,
-    CFOQP
+    CFOQP,
+    RTCQSOPointMethod  // Haversine grid-center distance, tier 1/2/3/4 @ 2000/4000/8000 km
     );
 
 const
@@ -3134,7 +3136,8 @@ const
      'HAMSPIRIT', // 4.115.5
       'NYQPQP',
       'RCCVHFQP',
-      'CFOQP'
+      'CFOQP',
+      'RTC'                // Issue #902
     );
 
 { When adding a new ExchangeType, please add a handler in the case statement in GetMyExchangeForExport
@@ -3546,7 +3549,8 @@ QSOPartiesCount = 20;
  ({Name: 'YOTA';                       }Email: nil;                      DF: 'YOTA';                 WA7BNM:   0; {SK3BG: nil;    } QRZRUID: 0; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:YOTAQSOPointMethod; ADIFName:'YOTA';   CABName:'') ,
  ({Name: 'IN7QPNE';                    }Email: nil;                      DF: 'in7qpne_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 18; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN7QPNE-QSO-PARTY';   CABName:'IN7QPNE-QSO-PARTY'),     // 4.88.2
  ({Name: 'MST';                        }Email: nil;                      DF: nil;                 WA7BNM:  3146; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix;        ZnM: NoZoneMults; AIE:NoInitialExchange ; DM: NoDomesticMults; P: 0; AE: QSONumberandNameExchange;             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'MST';   CABName:''),          // 4.110.5
- ({Name: 'SST';                        }Email: 'k1usn.radioclub.sst@gmail.com';   DF: 'naqp';              WA7BNM:  218; {SK3BG: 'naqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange;              XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO; ADIFName:'';   CABName:'')
+ ({Name: 'SST';                        }Email: 'k1usn.radioclub.sst@gmail.com';   DF: 'naqp';              WA7BNM:  218; {SK3BG: 'naqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange;              XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
+ ({Name: 'RTC';                        }Email: nil;                      DF: nil;                 WA7BNM:  782; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridSquares;     P: 0; AE: RSTQSONumberAndGridSquareExchange;          XM:NoDXMults; QP:RTCQSOPointMethod; ADIFName:'RTC';   CABName:'RTC')   // Issue #902 Real-Time Contest (COS)
  );
 
 
@@ -3739,7 +3743,8 @@ QSOPartiesCount = 20;
       'YOTA',
       'IN7QPNE',
       'MST',           // 4.110.5
-      'SST'
+      'SST',
+      'RTC'            // Issue #902
      );
 
   const
@@ -3968,7 +3973,8 @@ QSOPartiesCount = 20;
       ({Name: 'YOTA';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'IN7QPNE     ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),     // 4.99.7
       ({Name: 'MST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),        // 4.110.5
-      ({Name: 'SST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0)
+      ({Name: 'SST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
+      ({Name: 'RTC';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0)        // Issue #902
 
         );
 

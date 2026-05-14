@@ -5749,6 +5749,7 @@ procedure CalculateQSOPoints(var RXData: ContestExchange);
 var
   PtsMult, Points, MyZoneValue, Result: integer;
   Distance: LONGINT;
+  RTCDistKm: Double; // Issue #902 -- RTC contest Haversine distance
   RRC, MRC, RXCty, TheirID, CountryID: CallString; // 4.72.5
   TempOblast: string[2];
   la1, la2, lo1, lo2: integer;
@@ -7442,6 +7443,43 @@ begin
       begin
         Distance := GetDistanceBetweenGrids(MyGrid, RXData.QTHString);
         RXData.QSOPoints := (Distance div 3000) + 1;
+      end;
+
+    RTCQSOPointMethod: // Issue #902 -- RTC: Haversine grid-center distance, tiers at 2000/4000/8000 km
+      begin
+      // Rules permit only 40/20/15/10 m on CW and SSB.  TR4W has no per-band
+      // disable, so we enforce here: any QSO outside those bands or modes
+      // scores 0 and does NOT count as a multiplier.
+      if not (RXData.Band in [Band40, Band20, Band15, Band10]) then
+         begin
+         RXData.QSOPoints := 0;
+         RXData.InhibitMults := True;
+         end
+      else if not (RXData.Mode in [CW, Phone]) then
+         begin
+         RXData.QSOPoints := 0;
+         RXData.InhibitMults := True;
+         end
+      else if (MyGrid <> '') and (RXData.QTHString <> '') then
+         begin
+         RTCDistKm := RTCGridDistance(MyGrid, RXData.QTHString);
+         if RTCDistKm < 2000.0 then
+            begin
+            RXData.QSOPoints := 1;
+            end
+         else if RTCDistKm < 4000.0 then
+            begin
+            RXData.QSOPoints := 2;
+            end
+         else if RTCDistKm < 8000.0 then
+            begin
+            RXData.QSOPoints := 3;
+            end
+         else
+            begin
+            RXData.QSOPoints := 4;
+            end;
+         end;
       end;
 
     TenTenQSOPointMethod:

@@ -100,9 +100,9 @@ uses
     '21',
     '28',
    
-    '30',
-    '17',
-    '12',
+    '10',
+    '18',
+    '24',
     '50',
     '144',
     '222',
@@ -3113,7 +3113,7 @@ begin
             // IsClaimedQso=0 -- same wire-format meaning as a skipped
             // QSO from the consumer's perspective.  N1MM uses the
             // same convention.
-            #9 + '<IsClaimedQso>' + Format('%d',[IfThen(RxData.ceQSO_Skiped or RxData.ceXQSO,0,1)]) + '</IsClaimedQSO>' + sLineBreak +
+            #9 + '<IsClaimedQso>' + Format('%d',[IfThen(RxData.ceQSO_Skiped or RxData.ceXQSO,0,1)]) + '</IsClaimedQso>' + sLineBreak +
             #9 + '<oldtimestamp>' + sTimestamp + '</oldtimestamp>' + sLineBreak +
             #9 + '<oldcall>' + RXData.Callsign + '</oldcall>' + sLineBreak +
             #9 + '<SentExchange>' + Trim(RxData.ExchString) + '</SentExchange>' + sLineBreak +

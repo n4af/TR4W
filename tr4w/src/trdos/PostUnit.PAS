@@ -2346,7 +2346,11 @@ begin
       slOperators := TStringList.Create;
       slOperators.Duplicates := dupIgnore;
       TempGrid := MyGrid;
-  TempGrid[7] := #0;
+  // Issue #902 -- null-terminate after the actual grid length.
+  // Old code wrote #0 at byte 7 unconditionally; for 4-char grids (e.g. EL88)
+  // that left bytes 5..6 holding uninitialized stack memory, which leaked
+  // into the Cabrillo MY-EXCH column as random non-printables.
+  TempGrid[Length(MyGrid) + 1] := #0;
   cMyGrid := @TempGrid[1];
 
   cMyName := @MyName[1];
@@ -4048,7 +4052,10 @@ begin
    Result := 'Error generating my exchange';
    try
    TempGrid := MyGrid;
-   TempGrid[5] := #0;
+   // Issue #902 -- null-terminate after the actual grid length.
+   // Old code wrote #0 at byte 5 unconditionally; that silently truncated
+   // 6-char grids (e.g. EL88AA -> EL88) in the exported exchange field.
+   TempGrid[Length(MyGrid) + 1] := #0;
    cMyGrid := @TempGrid[1];
 
    cMyName := @MyName[1];
