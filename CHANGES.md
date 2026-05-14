@@ -22,6 +22,92 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.09 (2026-05-14) — NY4I / N4AF
+
+#### HamScore RTC Realtime Upload (new `src/uHamScore.pas`, hooks across `LOGSUBS2.PAS`, `uEditQSO.pas`, `uCFG.pas`, `MainUnit.pas`, `tr4w.dpr`) — Issue #783
+
+Worker-thread uploader that POSTs contest log data to hamscore.com every 2 minutes per the RTC v2.3.3-xml specification: `<dynamicresults>` plus zero or more `<contactinfo>` / `<contactreplace>` / `<contactdelete>` / `<deletelog>` containers per POST. HTTP Basic auth, callsign as username.
+
+- **`THamScoreUploader` (TThread)**: waits on stop event + cycle event via `WaitForMultipleObjects(120000)`. Stop event terminates on shutdown; cycle event lets the UI's "Push Now" trigger an early cycle.
+- **`TRTCContact`**: pre-renders the XML body on the main thread at enqueue time so the worker holds no live `ContestExchange` references.
+- **Reliability per spec section 2.2**: snapshot of pending list taken under `TCriticalSection`; not-CFM responses (network error, HTTP non-2xx, server error, ResyncLog, unexpected) restore the snapshot to the head of the pending list for the next cycle. Only explicit `"Status":"CFM"` frees the contacts.
+- **HTTP transport**: `TIdHTTP` + `TIdSSLIOHandlerSocketOpenSSL` (TLS 1.2). Connect 15s, read 30s.
+- **Status parser**: `Pos()` lookup; recognises `CFM`/`OK`/`Error`/`ResyncLog`. No JSON dependency.
+- **`<dynamicresults>` reuse**: extracted public `BuildDynamicResultsXml: AnsiString` from `uGetScores`; mirrors `MakePOSTRequestNew`'s schema but returns AnsiString without the `xml=` prefix or shared `GetScoresBuffer`. Existing 5-min scoreboard poster unchanged.
+- **Hooks**: `LogContact` → `HamScoreOnLog`; `uEditQSO` → `HamScoreOnEdit` / `HamScoreOnDelete`. Cheap no-ops when uploader is nil.
+- **Config**: `HAMSCORE ENABLE` (Boolean), `HAMSCORE URL` (default `https://hamscore.com/postxml/index.php`), `HAMSCORE USERNAME` (empty → MyCall), `HAMSCORE PASSWORD` (`ctPassword`).
+
+#### HamScore Status Window (`src/uHamScore.pas` `HamScoreDlgProc`, `MainUnit.pas`, `uMenu.pas`, `VC.pas`) — Issue #783 Phase 4
+
+- **`tw_HAMSCOREWINDOW_INDEX`** (slot 20, was `tw_Dummy10`). Menu id `menu_windows_hamscore = 10219` lines up with `OpenTR4WWindow`'s `CheckMenuItem(10199 + Ord(ID))` so the menu auto-checkmarks while open. Auto-mapper bound in `WM_COMMAND` extended from `menu_windows_dupesheet2` to `menu_windows_hamscore`.
+- **Layout**: anchor-based via `HamScoreLayoutControls`. Top labels stretch full client width; status field is a multi-line read-only edit (`ES_MULTILINE | ES_READONLY | ES_AUTOVSCROLL | WS_VSCROLL`) that fills remaining space; buttons anchor bottom-left.
+- **Anti-flicker resize**: suspends repainting (`WM_SETREDRAW=0`), moves all controls with `bRepaint=False`, then one `RedrawWindow(RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN)`. Eliminates the ghost-text artifacts left by per-`MoveWindow` partial invalidation.
+- **Min drag size**: `WM_GETMINMAXINFO` caps `ptMinTrackSize` at 410×270.
+- **Diff-aware refresh**: `SetTextIfChanged` keeps the 1 Hz timer from resetting scroll position or text selection.
+- **Push Now**: signals `FCycleEvent` so the worker wakes before the 2-min timer.
+- **Visibility persists across restart**: `OpenOtherWindows` restore loop and `WndRect` default-init loop both extended from `tw_DUPESHEETWINDOW2_INDEX` to `tw_HAMSCOREWINDOW_INDEX`.
+
+#### Resync Flow (`MainUnit.pas`, `src/trdos/LOGSUBS2.PAS`, `uMenu.pas`) — Issue #783 Phase 3
+
+- New Tools-menu item `menu_hamscore_resync` (10609): enqueues `<deletelog>` via `HamScoreResyncFromScratch`, then iterates the binary log via new `SendFullLogToHamScore` (mirrors `SendFullLogToUDP`'s `OpenLogFile` / `ReadVersionBlock` / `ReadLogFile` / `GoodLookingQSO` pattern). Spec sections 1.7 + 2.4.
+
+#### Password Masking in Settings Dialog (`src/uOption.pas`, `src/uInputQuery.pas`, `src/VC.pas`, `src/uCFG.pas`) — Issue #783
+
+The Ctrl+J Settings listview was displaying every `ctPassword` field in the clear.
+
+- **`ctPassword` rows mask as `'********'`** in the listview by default. Fixed length so the actual password length doesn't leak.
+- **"Show passwords" checkbox** (`BS_AUTOCHECKBOX`) at x=560, y=472 — on the dialog itself, not the listview, so it stays visible regardless of scroll position. Per-session state, resets unchecked at every open.
+- **`RefreshPasswordRows`** iterates the listview, finds `ctPassword` rows via `IndexArray + CFGCA[].crType`, rewrites each row's value-column text via `ListView_SetItemText`.
+- **Edit dialog (double-click) honors the toggle**: when off, pre-fill is the mask AND the input edit gets `EM_SETPASSWORDCHAR(Ord('*'))` so new typing appears as `*`. OK with text equal to the mask → no change (the real password is preserved). Empty field → pre-fill empty regardless. New `tInputDialogPassword` flag in `VC.pas` joins the existing input-dialog flags.
+- **After successful edit**: `ctPassword` rows refresh through `RefreshPasswordRows` so the row stays masked when the toggle is off (previously bypassed the mask via direct `ListView_SetItemText`).
+- **`SERVER PASSWORD`** type fix in `uCFG.pas`: was `crType: ctString` instead of `ctPassword` — corrected so the masking applies. No other code touched the type.
+
+---
+
+### 4.147.08 (2026-05-14) — NY4I / N4AF
+
+#### Generic Network Credentials (`src/uCFG.pas`, `src/uCAT.pas`, `src/trdos/LOGRADIO.PAS`) — Issue #904
+
+The Icom-prefixed network-credential config statements rebadged because the Kenwood TS-890 (Issue #436) also needs LAN credentials.
+
+- **Storage rename**: `Radio*.IcomNetworkUsername` / `IcomNetworkPassword` → `Radio*.NetworkUsername` / `NetworkPassword` in `LOGRADIO.PAS`. Three internal call sites in `SetUpRadioInterface` updated.
+- **CFGCA**: new canonical `RADIO ONE/TWO NETWORK USERNAME/PASSWORD` statements; existing `RADIO ONE/TWO ICOM NETWORK USERNAME/PASSWORD` retained as backward-compat aliases at the same storage. `CommandsArraySize` delta bumped +4 → +8.
+- **CAT dialog** (`uCAT.pas`): `UpdateIcomCredentialsVisibility` → `UpdateNetworkCredentialsVisibility`; labels "ICOM USERNAME/PASSWORD" → "NETWORK USERNAME/PASSWORD". On Save, writes the canonical name and deletes the legacy `ICOM NETWORK ...` key (`WritePrivateProfileString` with nil) so the .ini doesn't accumulate stale duplicates.
+
+#### Kenwood TS-890 Native Control (new `src/uRadioKenwoodTS890.pas`, `src/trdos/LOGRADIO.PAS`, `src/uRadioFactory.pas`, `src/uCAT.pas`) — Issue #436
+
+The TS-890S was previously HamLib-only. Now native serial CAT and direct TCP/IP LAN control.
+
+- **Native serial** (`LOGRADIO.PAS`): `RadioParametersArray[TS890]` → `rt: rtKenwood`; default `BR4800`; `P:0` → `P:1` for polling. Dropped from `HamLibONLYRadios`; added to `KenwoodRadios`, `RadioSupportsCWByCAT`, `RadioSupportsCWSpeedSync`, `RadioSupportsPlayDVK`. Added to every Kenwood case statement that previously listed TS990 (~12 sites: RIT clear/bump, VFO up/down, CW send / KS / KY, memory keyer with `hiMem := 6`, AI/IF parsing in the polling code).
+- **Native network** (new `TKenwoodTS890Radio` extending `TNetRadioBase`): Speaks Kenwood ASCII CAT over a TCP socket after a 3-step LAN auth handshake: `##CN;` → `##CN1;`, `##ID0<idLen:2><pwLen:2><id><pw>;` → `##ID1;`. Default port 60000.
+- **Auth state machine**: `ksNone` → `ksWaitingForCN` → `ksWaitingForID` → `ksAuthenticated` (or `ksAuthFailed`). All CAT operations are no-ops until authenticated.
+- **Post-auth init**: `AI2; FA; FB; OM0; OM1; KS; TB; FT; RT; XT; ID;`. `ID;` must return `ID024;` for TS-890S.
+- **AI2 push** handles freq/mode updates; `requiresPolling := False`.
+- **TS-890 OM mode map** per Kenwood PC Command Reference Rev 1: `1=LSB 2=USB 3=CW 4=FM 5=AM 6=FSK 7=CW-R 9=FSK-R A=PSK B=PSK-R C/D/E/F=LSB/USB/FM/AM-DATA`.
+- **CW speed**: 4–60 wpm via `KSnnn;`.
+- **RIT/XIT**: `RC;` clears, `RU<nnnnn>;` / `RD<nnnnn>;` sets a specific offset (silently capped at 9999). RIT and XIT share one offset.
+- **Filter slots A/B/C** via `FL00/01/02`. `SetFilterHz` no-op (no Hz-based bandwidth-set CAT command picked).
+- **Memory keyer** PB1..PB6.
+- **`SetMode(mode, nrVFOB)` known limitation**: TS-890 OM SET ignores its P1 (VFO) byte per spec, so cross-VFO mode-set isn't possible with one command.
+- **Factory wiring** (`uRadioFactory.pas`): new `rmKenwoodTS890`; `CreateRadioNetwork` case; `ModelToString`, `IsModelSupported`, `GetSupportedModels` updated. `MapRadioModelToFactory` (`LOGRADIO.PAS`) routes `TS890` → `rmKenwoodTS890`. `SetUpRadioInterface` sets credentials before `Connect`.
+- **CAT dialog** shows credential fields when the operator picks TS890 + TCP/IP port.
+
+#### Dropdown Alphabetization (`src/VC.pas`, `src/trdos/LOGRADIO.PAS`)
+
+TS890, IC905, IC7300MK2 were each appended at the end of `InterfacedRadioType` — operators couldn't find TS890 in the Radio Type combo because it sat below the HamLib-only block. Pascal `case` matches enum members by name not ordinal, so moves don't break case statements.
+
+- Moved `TS890` between `TS870` and `TS940` in the enum + parallel `InterfacedRadioTypeSA` and `RadioParametersArray`.
+- Moved `IC905` between `IC781` and `IC910`.
+- Moved `IC7300MK2` right after `IC7300`.
+- **Cleanup**: removed `, IC905, IC7300MK2` tails from 12 sites that listed `IC78..IC9700, IC905, IC7300MK2` patterns. Now that the two members fall WITHIN the `IC78..IC9700` ordinal range, the explicit tails became "duplicate case label" compile errors.
+- **Positive side effect**: `[IC78..IC9700, OMNI6]` patterns in `uProcessCommand.pas` and `uRadioPolling.pas` (which never had the tail) now correctly include IC905 and IC7300MK2.
+
+#### Version.pas Build Unbreak (`src/Version.pas`)
+
+- Closed an unterminated string literal introduced in commit `a334faa` (the "Issue #903 4.147.07" version bump): `'4.147.07+++…+++ ;` had an opening quote, a run of `+` characters, no closing quote before the semicolon. `FullBuild.ps1` failed at the unit-tests pre-gate. No version-number change.
+
+---
+
 ### 4.147.07 (2026-05-14) — NY4I / N4AF
 
 #### RTC Contest (`src/VC.pas`, `src/trdos/LOGGRID.PAS`, `src/trdos/LOGSTUFF.PAS`, `src/trdos/FCONTEST.PAS`, `src/uNewContest.pas`) — Issue #902, PR #903

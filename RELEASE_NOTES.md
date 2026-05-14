@@ -24,6 +24,38 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.09 (2026-05-14) — NY4I / N4AF
+
+#### HamScore RTC Realtime Scoring
+
+- **TR4W now uploads contacts to hamscore.com in near-realtime** during a contest. Every 2 minutes the program posts new QSOs, edited QSOs, and deleted QSOs to hamscore.com so the live scoreboard reflects your log within minutes. To enable: set HAMSCORE ENABLE = TRUE and HAMSCORE PASSWORD = (your hamscore password) in the configuration. The program logs in with your callsign as the username automatically. (Issue #783)
+- **Tools menu → HamScore: Resync log from scratch** wipes the server's copy of your log and re-uploads every QSO. Use this if you started a contest with test QSOs to clear, recreated a lost log, or want to make sure the server is in sync with what's on your screen.
+- **Windows menu → HamScore RTC Status** opens a status window showing the URL being posted to, your effective username, the queue depth, and the last cycle's outcome (CFM, server error, etc). A Push Now button triggers an immediate post instead of waiting for the next 2-minute cycle. The window is fully resizable; long server error messages wrap and can be selected/copied for support purposes. The window stays open across restarts if you had it open when you exited.
+
+#### Settings Window (Ctrl+J)
+
+- **Passwords are masked by default.** All password-typed config statements (HAMSCORE PASSWORD, RADIO ONE/TWO NETWORK PASSWORD, SERVER PASSWORD) now show as `********` in the Settings list instead of in the clear. Tick the new "Show passwords" checkbox at the bottom of the dialog to reveal them. The checkbox state resets to off every time you open Settings.
+- **Editing a masked password is also masked.** Double-clicking a password field shows asterisks in the edit dialog with `*` characters appearing as you type. If you click OK without changing anything, the real password is preserved. Tick "Show passwords" first if you need to see what's there before editing.
+- Note: passwords are still stored as plaintext in tr4w.ini on disk — the masking is a UI-layer hide. Encryption at rest is planned for a future release.
+
+---
+
+### 4.147.08 (2026-05-14) — NY4I / N4AF
+
+#### New Radio Support
+
+- **Kenwood TS-890S — native control over both serial and LAN.** Previously TR4W could only talk to a TS-890 through HamLib. Now select TS-890 from the radio dropdown for either serial CAT (default 4800 baud, raise it in your radio's menu if you want faster) or direct TCP/IP. For LAN control, set the IP address, port (defaults to 60000), and your Admin ID + Password from the radio's LAN menu in the new NETWORK USERNAME / NETWORK PASSWORD fields. RIT/XIT, CW keying, CW speed sync, memory keyer (PB1..PB6), filter slots A/B/C, and split all work natively. (Issue #436)
+
+#### Configuration
+
+- **NETWORK USERNAME / NETWORK PASSWORD** replace the older Icom-specific ICOM NETWORK USERNAME / PASSWORD config statements. The old names continue to work — your existing tr4w.ini files don't need any changes. When you save changes through the radio config dialog, the .ini is automatically migrated to the new names. (Issue #904)
+
+#### Radio Type Dropdown
+
+- **TS890, IC905, and IC7300MK2 now appear alphabetically.** Previously these were at the very bottom of the radio dropdown (below HAMLIB-ANY) so operators couldn't find them. They now sit alphabetically with the rest of the Kenwoods and Icoms.
+
+---
+
 ### 4.147.07 (2026-05-14) — NY4I / N4AF
 
 #### New Contest
