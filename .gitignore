@@ -77,3 +77,6 @@ tr4w/.claude/
 # Network capture files (local debugging only)
 *.pcap
 *.pcapng
+
+# GitHub Wiki — separate repo at n4af/TR4W.wiki.git, cloned locally for editing
+wiki/
