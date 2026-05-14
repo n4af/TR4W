@@ -979,6 +979,7 @@ type
     TS690,
     TS850,
     TS870,
+    TS890,    // Issue #436 -- alphabetical placement among Kenwoods
     TS940,
     TS950,
     TS990,
@@ -1037,12 +1038,14 @@ type
     IC765,
     IC775,
     IC781,
+    IC905,    // Alphabetical placement among Icoms (between IC781 and IC910)
     IC910,
     IC970D,
     IC7000,
     IC7100,
     IC7200,
     IC7300,
+    IC7300MK2,  // Alphabetical placement among Icoms (right after IC7300)
     IC7410,
     IC7600,
     IC7610,     // 4.65.7 issue 282
@@ -1058,11 +1061,8 @@ type
     FLRIG,
     TRXMANAGER,
     FT757GXII,
-    TS890,
     EXPERTTCI,
     ACLOG,
-    IC905,
-    IC7300MK2,
     HAMLIBANY);
 
 
