@@ -226,8 +226,8 @@ type
       IcomFilterByte:  byte;
       IDCharacter:     char;
       IPAddress:       str50;
-      IcomNetworkUsername: str50;  // Icom network protocol username
-      IcomNetworkPassword: str50;  // Icom network protocol password
+      NetworkUsername: str50;  // Network radio username (Icom CI-V/IP, Kenwood TS-890, etc.) -- Issue #904
+      NetworkPassword: str50;  // Network radio password -- Issue #904
       IcomDataModeID: Byte;        // Icom data sub-mode: 1=D1 (default), 2=D2, 3=D3
       CWByCATBuffer:   string;                  // ny4i 4.44.5
       //    PartialRadioResponse: string;
@@ -496,6 +496,7 @@ const
     ({Name: 'TS690';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2005; rt: rtKenwood),
     ({Name: 'TS850';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2009; rt: rtKenwood),
     ({Name: 'TS870';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2010; rt: rtKenwood),
+    ({Name: 'TS890';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2041; rt: rtKenwood),  // Issue #436 -- native Kenwood serial; default 4800 baud (radio menu can raise to 115200)
     ({Name: 'TS940';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2011; rt: rtKenwood),
     ({Name: 'TS950';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2012; rt: rtKenwood),
     ({Name: 'TS990';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2039; rt: rtKenwood),
@@ -554,12 +555,14 @@ const
     ({Name: 'IC765';      } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $2C; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3029; rt: rtIcom),
     ({Name: 'IC775';      } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $46; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3030; rt: rtIcom),
     ({Name: 'IC781';      } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $26; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3031; rt: rtIcom),
+    ({Name: 'IC905';      } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $AC; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 0; rt: rtIcom),
     ({Name: 'IC910';      } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $60; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3044; rt: rtIcom),
     ({Name: 'IC970D';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $2E; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3035; rt: rtIcom),
     ({Name: 'IC7000';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $70; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3060; rt: rtIcom),
     ({Name: 'IC7100';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $88; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3070; rt: rtIcom),
     ({Name: 'IC7200';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $76; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3061; rt: rtIcom),
     ({Name: 'IC7300';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $94; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3073; rt: rtIcom),
+    ({Name: 'IC7300MK2';  } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $B6; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 0; rt: rtIcom),
     ({Name: 'IC7410';     } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $80; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3067; rt: rtIcom),
     ({Name: 'IC7600';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $7A; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3063; rt: rtIcom),
     ({Name: 'IC7610';     } BR:BR9600;  P: 1; C: 0; S: 0; T:0; RA: $98; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 3078; rt: rtIcom), // 4.65.7 issue #282 #282   // 4.68.12
@@ -575,11 +578,8 @@ const
     ({Name: 'FLRIG';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 4; rt:rtHamlib),
     ({Name: 'TRXMANAGER';} BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 5; rt:rtHamlib),
     ({Name: 'FT757GXII';  } BR:BR4800;  P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1007; rt:rtHamlib),
-    ({Name: 'TS890';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2041; rt:rtHamlib),
     ({Name: 'EXPERTTCI'; } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 7; rt:rtHamlib),
     ({Name: 'ACLOG';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 8; rt:rtHamlib),
-    ({Name: 'IC905';      } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $AC; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 0; rt: rtIcom),
-    ({Name: 'IC7300MK2';  } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $B6; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 0; rt: rtIcom),
     ({Name: 'HAMLIBANY';  } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1; rt:rtHamLib)
 );
 {*)}
@@ -601,6 +601,7 @@ const
       'TS690',
       'TS850',
       'TS870',
+      'TS890',
       'TS940',
       'TS950',
       'TS990',
@@ -659,12 +660,14 @@ const
       'IC765',
       'IC775',
       'IC781',
+      'IC905',
       'IC910H',
       'IC970D',
       'IC7000',
       'IC7100',
       'IC7200',
       'IC7300',
+      'IC7300MK2',
       'IC7410',
       'IC7600',
       'IC7610',
@@ -680,11 +683,8 @@ const
       'FLRIG',          // HamLib Only
       'TRX-MANAGER',    // HamLib Only
       'FT757GXII',      // HamLib Only
-      'TS890',          // HamLib Only
       'EXPERTTCI',     // HamLib Only
       'ACLOG',          // HamLib Only
-      'IC905',
-      'IC7300MK2',
       'HAMLIB-ANY'      // HamLib Only
       );
 
@@ -817,7 +817,8 @@ uses
    LogSUBS2,
    LogCW,
    uRadioHamLibDirect,
-   uRadioIcomBase;
+   uRadioIcomBase,
+   uRadioKenwoodTS890;  // Issue #436
 
 
 
@@ -954,7 +955,7 @@ begin
       end;
 
    case IntRadioType of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000, FLEX, K2, K3, K4, FTDX10, FTDX101, FTX1F, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
       FTDX5000, FTDX9000:
          begin
@@ -969,7 +970,7 @@ begin
          ActiveRadioPtr.WriteToCATPort(CHR(0) + CHR(0) + CHR(0) + CHR($FF) + CHR($09), 5);
          end;
 
-      IC78..IC9700, IC905, IC7300MK2:
+      IC78..IC9700:
          begin
          if IntRadioType in IcomRadiosThatSupportRIT then
             begin
@@ -1025,7 +1026,7 @@ begin
       end;
 
    case IntRadioType of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000, K2, K3, K4 {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RU;');
@@ -1036,7 +1037,7 @@ begin
          Exit;
          end;
 
-      IC78..IC9700, IC905, IC7300MK2, OMNI6: {KK1L: 6.73 Added OMNI6}    // This does not work for all Icom radios.
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}    // This does not work for all Icom radios.
          begin
          if IntRadioType in IcomRadiosThatSupportRIT then
             begin
@@ -1091,7 +1092,7 @@ begin
       end;
 
    case IntRadioType of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000, K2, K3, K4 {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RD;');
@@ -1102,7 +1103,7 @@ begin
          Exit;
          end;
 
-      IC78..IC9700, IC905, IC7300MK2, OMNI6: {KK1L: 6.73 Added OMNI6} // Add code somewhere tohandle radios that do not support 21 code.
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6} // Add code somewhere tohandle radios that do not support 21 code.
          begin
          if IntRadioType in IcomRadiosThatSupportRIT then
             begin
@@ -1156,7 +1157,7 @@ begin
 
    case IntRadioType of
 
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000:
          begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('UP;', 3);
@@ -1179,7 +1180,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($02));
          end;
 
-      IC78..IC9700, IC905, IC7300MK2, OMNI6, FLEX:
+      IC78..IC9700, OMNI6, FLEX:
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1233,7 +1234,7 @@ begin
 
    case IntRadioType of
 
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000:
          begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('DN;', 3);
@@ -1256,7 +1257,7 @@ begin
             CHR(0) + CHR(0) + CHR(0) + CHR(0) + CHR($03));
          end;
 
-      IC78..IC9700, IC905, IC7300MK2, OMNI6, FLEX:
+      IC78..IC9700, OMNI6, FLEX:
          begin
          if ActiveRadioPtr.CurrentStatus.Freq = 0 then
             begin
@@ -1525,7 +1526,7 @@ begin
       begin
       Exit;
       end;
-   if RadioModel in [IC78..IC9700, IC905, IC7300MK2, FT100, Orion] then
+   if RadioModel in [IC78..IC9700, FT100, Orion] then
       begin
       RadioStopBits := 1;
       end
@@ -1851,10 +1852,11 @@ begin
             Result := true;
             end;
          end;
-      TS480, TS570, TS590, TS850, TS950, TS990, TS2000:
+      TS480, TS570, TS590, TS850, TS890, TS950, TS990, TS2000:
          begin
          case RadioModel of
             TS590: hiMem := 3;
+            TS890: hiMem := 6;  // Issue #436 -- TS-890 PB memories 1..6
             TS990: hiMem := 6;
             else hiMem := 3;
          end;
@@ -2018,7 +2020,7 @@ begin
       end;
 
    case RadioModel of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, K4:
          begin
          AddToOutputBuffer('FR0;FT1;', 8);
@@ -2031,7 +2033,7 @@ begin
          //        ActiveRadioPtr.WriteBufferToCATPort('FT1;');//vfo b = tx
          end;
 
-      IC78..IC9700, IC905, IC7300MK2, OMNI6: { KK1L: 6.73 Added OMNI6 }
+      IC78..IC9700, OMNI6: { KK1L: 6.73 Added OMNI6 }
          begin
 
          CommandsTempBuffer[0] := CHR(8);
@@ -2087,7 +2089,7 @@ begin
       end;
 
    case RadioModel of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, K4:
          begin
          //ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('FR0;FT0;', 8);
@@ -2096,7 +2098,7 @@ begin
          //        ActiveRadioPtr.WriteBufferToCATPort('FT0;');
          end;
 
-      IC78..IC9700, IC905, IC7300MK2, OMNI6: {KK1L: 6.73 Added OMNI6}
+      IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
          begin
          // TLogger.GetInstance.Debug('Sending commands to take Icom out of Split');
          CommandsTempBuffer[0] := CHR(8);
@@ -2431,7 +2433,7 @@ begin
 //            msgLen := length(Msg);              //length(Msg);
             //len := Min(msgLen, 24);             // 24 max for Kenwood
             case RadioModel of
-               TS480, TS570, TS590, TS950, TS990, TS2000:
+               TS480, TS570, TS590, TS890, TS950, TS990, TS2000:
                   begin
                   maxLen := 24;
                   pad := true;
@@ -2684,7 +2686,7 @@ begin
                begin
               AddToOutputBuffer('KY ' + Chr(4) + ';RX;', 8); // Chr(4) stops the K3 // ny4i Issue 157
                end;
-            TS480, TS570, TS590, TS950, TS990, TS2000, TS850:
+            TS480, TS570, TS590, TS890, TS950, TS990, TS2000, TS850:
                begin
                AddToOutputBuffer('KY0;', 4);
                AddToOutputBuffer('RX;', 3);
@@ -2787,6 +2789,8 @@ begin
          Result := rmIcomIC7100;
       FLEX:
          Result := rmFlexRadio6000;
+      TS890:                          // Issue #436 -- TS-890 network control
+         Result := rmKenwoodTS890;
    else
       Result := rmNone;
    end;
@@ -3041,16 +3045,25 @@ begin
          // If this is an Icom radio, set network credentials before connecting
          if Self.tNetObject is TIcomRadio then
          begin
-            TIcomRadio(Self.tNetObject).NetworkUsername := Self.IcomNetworkUsername;
-            TIcomRadio(Self.tNetObject).NetworkPassword := Self.IcomNetworkPassword;
+            TIcomRadio(Self.tNetObject).NetworkUsername := Self.NetworkUsername;
+            TIcomRadio(Self.tNetObject).NetworkPassword := Self.NetworkPassword;
             logger.Info('[%s.SetUpRadioInterface] Set Icom network credentials (user=%s, pass=*******)',
-                        [Self.RadioName, Self.IcomNetworkUsername]);
+                        [Self.RadioName, Self.NetworkUsername]);
             if Self.IcomDataModeID in [1..3] then
                begin
                TIcomRadio(Self.tNetObject).DataModeID := Self.IcomDataModeID;
                logger.Info('[%s.SetUpRadioInterface] Icom data mode ID set to D%d',
                            [Self.RadioName, Self.IcomDataModeID]);
                end;
+         end;
+
+         // Kenwood TS-890 also requires LAN credentials (Issue #436).
+         if Self.tNetObject is TKenwoodTS890Radio then
+         begin
+            TKenwoodTS890Radio(Self.tNetObject).NetworkUsername := Self.NetworkUsername;
+            TKenwoodTS890Radio(Self.tNetObject).NetworkPassword := Self.NetworkPassword;
+            logger.Info('[%s.SetUpRadioInterface] Set Kenwood TS-890 LAN credentials (user=%s, pass=*******)',
+                        [Self.RadioName, Self.NetworkUsername]);
          end;
 
          Self.tNetObject.Connect;
@@ -3540,7 +3553,7 @@ begin
          So, if the radioModel is in IcomRadiosThatSupportVFOB, then just directly address VFOB and do nto do the switch-a-roo.
        *)
 
-        IC78..IC9700, IC905, IC7300MK2, OMNI6: {KK1L: 6.73 Added OMNI6}
+        IC78..IC9700, OMNI6: {KK1L: 6.73 Added OMNI6}
             begin
             // TLogger.GetInstance.Debug('In Icom radio code');
             if VFO = 'B' then
@@ -4060,7 +4073,7 @@ begin
       Exit;
       end;
    case IntRadioType of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, KX3, K4:
          begin
          if PTTOn then
@@ -4116,7 +4129,7 @@ begin
          end;
   
 
-    IC78..IC9700, IC905, IC7300MK2:
+    IC78..IC9700:
        begin
           TempString := CHR($FE) + CHR($FE) + CHR(Radio1.ReceiverAddress) + CHR($E0) + CHR($1C) + CHR($00) + CHR($00) + CHR($FD);
           if PTTOn then
@@ -4131,7 +4144,7 @@ begin
           WaitAnswer := 14;
        end;
 
-      //      IC78..IC9700, IC905, IC7300MK2, OMNI6: Exit;
+      //      IC78..IC9700, OMNI6: Exit;
 
       Orion:
          begin
@@ -4190,32 +4203,32 @@ var
 const
    ra: array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
-   RadioSupportsCWByCAT := [TS850, K2, K3, KX3, K4, TS480, TS570, TS590, TS990, TS2000,
+   RadioSupportsCWByCAT := [TS850, K2, K3, KX3, K4, TS480, TS570, TS590, TS890, TS990, TS2000,
                             FLEX, IC705, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7760,
-                            IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];
+                            IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];  // TS890 -- Issue #436
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
-      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX10, FTDX101, FTX1F, FT450, FT710, FT891, FT950, FT991,
+      [TS850, K2, K3, K4, TS480, TS570, TS590, TS890, TS990, TS2000, FLEX, FTDX10, FTDX101, FTX1F, FT450, FT710, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610,
-      IC7700, IC7760, IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];  // ny4i Issue 120
+      IC7700, IC7760, IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];  // ny4i Issue 120; TS890 -- Issue #436
 
    RadioSupportsPlayDVK := [ K2, K3, K4 // We do not support the KX2 and KX3? I guess not a lot of call for it.
                             ,IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2
                             ,FT710, FT991, FT1200, FTDX3000, FTDX5000, FTDX9000, FTDX10, FTDX101, FTX1F
-                            ,TS480, TS570, TS590, TS850, TS950, TS990, TS2000
-                            ]; // NY4I Issue 639
+                            ,TS480, TS570, TS590, TS850, TS890, TS950, TS990, TS2000
+                            ]; // NY4I Issue 639; TS890 -- Issue #436
    IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700, IC905, IC7300MK2];
    IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700, IC905, IC7300MK2];
    IcomRadiosThatSupportPSKMode := [IC7600, IC7610, IC7760];
-   ICOMRadios := [IC78..IC9700, IC905, IC7300MK2];
+   ICOMRadios := [IC78..IC9700];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
-                     TS870, TS940, TS950, TS990, TS2000, FLEX];
+                     TS870, TS890, TS940, TS950, TS990, TS2000, FLEX];  // TS890 -- Issue #436
    YaesuRadios := [FTDX10, FTDX101, FTX1F, FT450, FT710, FT736R, FT747GX, FT767, FT817,
                    FT818, FT840, FT847, FT857, FT890, FT891, FT897, FT900, FT920,
                    FT950, FT990, FT991, FT1000, FT1000MP, FT1200, FT2000,
                    FTDX3000, FTDX5000, FTDX9000];
-   HamLibONLYRadios := [FLRIG,TRXMANAGER,FT757GXII,TS890,EXPERTTCI,ACLOG,HAMLIBANY];
+   HamLibONLYRadios := [FLRIG,TRXMANAGER,FT757GXII,EXPERTTCI,ACLOG,HAMLIBANY];  // TS890 removed -- now has native serial via rtKenwood (Issue #436)
    for i := 1 to 2 do
       begin
       TempRadio := ra[i];

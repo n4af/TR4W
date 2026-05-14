@@ -345,7 +345,7 @@ const
    + 3 {ExternalLoggerAddress & ExernalLoggerPort & ExternalLoggerEnabled}
    + 1 {ExternalLogger}
    + 1 {SpotCollectorEnabled}
-   + 4 {Icom Network Username and Password for Radio 1 and Radio 2}
+   + 8 {Network Username/Password for Radio 1+2 + backward-compat ICOM NETWORK aliases -- Issue #904}
    + 1 {WSJTXMulticastGroup}  // Issue 443
    + 2 {Icom Data Mode ID for Radio 1 and Radio 2}
    + 1 {YCCCSo2rEnable}  // Issue 61
@@ -673,8 +673,10 @@ const
  (crCommand: 'RADIO ONE ICOM FILTER BYTE';    crAddress: pointer(15);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO ONE ID CHARACTER';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctChar; crNetwork: 0),
  (crCommand: 'RADIO ONE IP ADDRESS';          crAddress: @Radio1.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctString; crNetwork: 0),
- (crCommand: 'RADIO ONE ICOM NETWORK USERNAME'; crAddress: @Radio1.IcomNetworkUsername;  crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctCaseSensitive; crNetwork: 0),
- (crCommand: 'RADIO ONE ICOM NETWORK PASSWORD'; crAddress: @Radio1.IcomNetworkPassword;  crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctPassword; crNetwork: 0),
+ (crCommand: 'RADIO ONE ICOM NETWORK USERNAME'; crAddress: @Radio1.NetworkUsername;     crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctCaseSensitive; crNetwork: 0),  // Backward-compat alias for NETWORK USERNAME -- Issue #904
+ (crCommand: 'RADIO ONE ICOM NETWORK PASSWORD'; crAddress: @Radio1.NetworkPassword;     crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctPassword;       crNetwork: 0),  // Backward-compat alias for NETWORK PASSWORD -- Issue #904
+ (crCommand: 'RADIO ONE NETWORK USERNAME';      crAddress: @Radio1.NetworkUsername;     crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctCaseSensitive; crNetwork: 0),  // Issue #904 -- canonical generic name
+ (crCommand: 'RADIO ONE NETWORK PASSWORD';      crAddress: @Radio1.NetworkPassword;     crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio1; crType: ctPassword;       crNetwork: 0),  // Issue #904 -- canonical generic name
  (crCommand: 'RADIO ONE ICOM DATA MODE ID';    crAddress: @Radio1.IcomDataModeID;        crMin:1;  crMax:3;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO ONE KEYER DTR';           crAddress: pointer(31);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther; crNetwork: 0),
  (crCommand: 'RADIO ONE KEYER RTS';           crAddress: pointer(30);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;   cfFunc: cfRadio1; crType: ctOther; crNetwork: 0),
@@ -702,8 +704,10 @@ const
  (crCommand: 'RADIO TWO ICOM FILTER BYTE';    crAddress: pointer(16);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckArray; cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO TWO ID CHARACTER';        crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckNormal; cfFunc: cfAll; crType: ctChar; crNetwork: 0),
  (crCommand: 'RADIO TWO IP ADDRESS';          crAddress: @Radio2.IPAddress;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctString; crNetwork: 0),
- (crCommand: 'RADIO TWO ICOM NETWORK USERNAME'; crAddress: @Radio2.IcomNetworkUsername;  crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctCaseSensitive; crNetwork: 0),
- (crCommand: 'RADIO TWO ICOM NETWORK PASSWORD'; crAddress: @Radio2.IcomNetworkPassword;  crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctPassword; crNetwork: 0),
+ (crCommand: 'RADIO TWO ICOM NETWORK USERNAME'; crAddress: @Radio2.NetworkUsername;     crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctCaseSensitive; crNetwork: 0),  // Backward-compat alias for NETWORK USERNAME -- Issue #904
+ (crCommand: 'RADIO TWO ICOM NETWORK PASSWORD'; crAddress: @Radio2.NetworkPassword;     crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctPassword;       crNetwork: 0),  // Backward-compat alias for NETWORK PASSWORD -- Issue #904
+ (crCommand: 'RADIO TWO NETWORK USERNAME';      crAddress: @Radio2.NetworkUsername;     crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctCaseSensitive; crNetwork: 0),  // Issue #904 -- canonical generic name
+ (crCommand: 'RADIO TWO NETWORK PASSWORD';      crAddress: @Radio2.NetworkPassword;     crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfRadio2; crType: ctPassword;       crNetwork: 0),  // Issue #904 -- canonical generic name
  (crCommand: 'RADIO TWO ICOM DATA MODE ID';    crAddress: @Radio2.IcomDataModeID;        crMin:1;  crMax:3;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctInteger; crNetwork: 0),
  (crCommand: 'RADIO TWO KEYER DTR';           crAddress: pointer(35);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther; crNetwork: 0),
  (crCommand: 'RADIO TWO KEYER RTS';           crAddress: pointer(34);                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList;   cfFunc: cfRadio2; crType: ctOther; crNetwork: 0),
