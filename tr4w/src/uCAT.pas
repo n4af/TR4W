@@ -87,9 +87,11 @@ var
         SWP_NOSIZE or SWP_NOZORDER);
   end;
 
-  // Show ICOM NETWORK USERNAME/PASSWORD fields only when port is TCP/IP
-  // AND the selected radio is an Icom model that supports network control.
-  procedure UpdateIcomCredentialsVisibility;
+  // Show NETWORK USERNAME/PASSWORD fields only when port is TCP/IP
+  // AND the selected radio is a network model that requires credentials.
+  // Issue #904 -- renamed from "Icom credentials"; same fields cover
+  // Kenwood TS-890 (Issue #436) and any future credentialed network radio.
+  procedure UpdateNetworkCredentialsVisibility;
   var
      RadioIdx, PortIdx, ShowCmd: Integer;
   begin
@@ -164,9 +166,10 @@ begin
         for BRT := BR1200 to BR115200 do
           tCB_ADDSTRING_PCHAR(hwnddlg, 128, inttopchar(CAT_BAUDRATE_ARRAY[integer(BRT)]));
 
-        // Create ICOM NETWORK USERNAME (label 112, edit 132) and
-        // ICOM NETWORK PASSWORD (label 113, edit 133) dynamically.
-        // Positioned below control 131 (TCP port), sized to match.
+        // Create NETWORK USERNAME (label 112, edit 132) and NETWORK PASSWORD
+        // (label 113, edit 133) dynamically. Positioned below control 131
+        // (TCP port), sized to match. Used by Icom CI-V/IP, Kenwood TS-890,
+        // and any future credentialed network radio (Issue #904).
         // The label prepend loop below will build the full command names.
         GetWindowRect(GetDlgItem(hwnddlg, 111), Rect111);
         GetWindowRect(GetDlgItem(hwnddlg, 131), Rect131);
@@ -191,9 +194,9 @@ begin
            DlgWindowRect.Bottom - DlgWindowRect.Top + 56,
            SWP_NOZORDER);
         // Short display text — saving is handled explicitly in RestartPollingThread.
-        CreateStatic('ICOM USERNAME', LabelX, NewY, LabelW, hwnddlg, 112);
+        CreateStatic('NETWORK USERNAME', LabelX, NewY, LabelW, hwnddlg, 112);
         CreateEdit(ES_AUTOHSCROLL, EditX, NewY, EditW, 22, hwnddlg, 132);
-        CreateStatic('ICOM PASSWORD', LabelX, NewY + 28, LabelW, hwnddlg, 113);
+        CreateStatic('NETWORK PASSWORD', LabelX, NewY + 28, LabelW, hwnddlg, 113);
         // ES_PASSWORD masks the text with bullets
         CreateEdit(ES_AUTOHSCROLL or ES_PASSWORD, EditX, NewY + 28, EditW, 22, hwnddlg, 133);
 
@@ -310,8 +313,8 @@ begin
 
         Windows.SetDlgItemText(hwnddlg, 130, PChar(string(CATWTR^.IPAddress)));
         Windows.SetDlgItemInt(hwnddlg, 131, CATWTR^.RadioTCPPort, False);
-        Windows.SetDlgItemText(hwnddlg, 132, PChar(string(CATWTR^.IcomNetworkUsername)));
-        Windows.SetDlgItemText(hwnddlg, 133, PChar(string(CATWTR^.IcomNetworkPassword)));
+        Windows.SetDlgItemText(hwnddlg, 132, PChar(string(CATWTR^.NetworkUsername)));
+        Windows.SetDlgItemText(hwnddlg, 133, PChar(string(CATWTR^.NetworkPassword)));
         hamLibCheckBoxWind := GetDlgItem(hwnddlg, 1000);
 
         if RadioType in HAMLibONLYRadios then
@@ -327,7 +330,7 @@ begin
            begin
            Windows.SendDlgItemMessage(hwnddlg, 1000, BM_SETCHECK, BST_CHECKED, 0);
            end;
-        UpdateIcomCredentialsVisibility;
+        UpdateNetworkCredentialsVisibility;
         EnableWindowFalse(hwnddlg, 117);
         EnableWindowFalse(hwnddlg, 118);
       end;
@@ -362,13 +365,13 @@ begin
                 EnableWindowFalse(hwnddlg,132);
                 EnableWindowFalse(hwnddlg,133);
                end;
-             UpdateIcomCredentialsVisibility;
+             UpdateNetworkCredentialsVisibility;
              end;
           if LoWord(wParam) = 121 then
           begin
             i := tCB_GETCURSEL(hwnddlg, 121);
             tCB_SETCURSEL(hwnddlg, 128, Cardinal(RadioParametersArray[InterfacedRadioType(i)].br));
-            UpdateIcomCredentialsVisibility;
+            UpdateNetworkCredentialsVisibility;
 {
             I := tCB_GETCURSEL(hwnddlg, 121);
             TempByte := 2;
@@ -530,27 +533,42 @@ if (CATWTR^.tCATPortHandle <> INVALID_HANDLE_VALUE) or
   CheckCommand(@ID, CMD);
 
 
-  // Save ICOM NETWORK USERNAME (control 132) and PASSWORD (control 133)
-  // explicitly — these use short display labels, so command names are hardcoded.
+  // Save NETWORK USERNAME (control 132) and PASSWORD (control 133)
+  // explicitly -- these use short display labels, so command names are hardcoded.
+  // Issue #904: write the canonical NETWORK names; migrate legacy
+  // "ICOM NETWORK ..." keys by deleting them (CFGCA still parses the old
+  // names from any .cfg / .ini files that still have them).
   Windows.ZeroMemory(@ID, SizeOf(ID));
   Windows.ZeroMemory(@CMD, SizeOf(CMD));
+  if CATWTR = @Radio1 then
+     ID := 'RADIO ONE NETWORK USERNAME'
+  else
+     ID := 'RADIO TWO NETWORK USERNAME';
+  CMD := GetDialogItemText(CATWndHWND, 132);
+  Windows.WritePrivateProfileString('Radio', @ID[1], @CMD[1], TR4W_INI_FILENAME);
+  CheckCommand(@ID, CMD);
+  // Delete the legacy ICOM NETWORK USERNAME key (nil value = delete).
   if CATWTR = @Radio1 then
      ID := 'RADIO ONE ICOM NETWORK USERNAME'
   else
      ID := 'RADIO TWO ICOM NETWORK USERNAME';
-  CMD := GetDialogItemText(CATWndHWND, 132);
-  Windows.WritePrivateProfileString('Radio', @ID[1], @CMD[1], TR4W_INI_FILENAME);
-  CheckCommand(@ID, CMD);
+  Windows.WritePrivateProfileString('Radio', @ID[1], nil, TR4W_INI_FILENAME);
 
   Windows.ZeroMemory(@ID, SizeOf(ID));
   Windows.ZeroMemory(@CMD, SizeOf(CMD));
   if CATWTR = @Radio1 then
-     ID := 'RADIO ONE ICOM NETWORK PASSWORD'
+     ID := 'RADIO ONE NETWORK PASSWORD'
   else
-     ID := 'RADIO TWO ICOM NETWORK PASSWORD';
+     ID := 'RADIO TWO NETWORK PASSWORD';
   CMD := GetDialogItemText(CATWndHWND, 133);
   Windows.WritePrivateProfileString('Radio', @ID[1], @CMD[1], TR4W_INI_FILENAME);
   CheckCommand(@ID, CMD);
+  // Delete the legacy ICOM NETWORK PASSWORD key.
+  if CATWTR = @Radio1 then
+     ID := 'RADIO ONE ICOM NETWORK PASSWORD'
+  else
+     ID := 'RADIO TWO ICOM NETWORK PASSWORD';
+  Windows.WritePrivateProfileString('Radio', @ID[1], nil, TR4W_INI_FILENAME);
 
   CATWTR^.CheckAndInitializePorts_ForThisRadio;
   InitializeKeyer;

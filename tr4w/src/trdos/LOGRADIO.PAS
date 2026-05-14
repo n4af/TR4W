@@ -226,8 +226,8 @@ type
       IcomFilterByte:  byte;
       IDCharacter:     char;
       IPAddress:       str50;
-      IcomNetworkUsername: str50;  // Icom network protocol username
-      IcomNetworkPassword: str50;  // Icom network protocol password
+      NetworkUsername: str50;  // Network radio username (Icom CI-V/IP, Kenwood TS-890, etc.) -- Issue #904
+      NetworkPassword: str50;  // Network radio password -- Issue #904
       IcomDataModeID: Byte;        // Icom data sub-mode: 1=D1 (default), 2=D2, 3=D3
       CWByCATBuffer:   string;                  // ny4i 4.44.5
       //    PartialRadioResponse: string;
@@ -3041,10 +3041,10 @@ begin
          // If this is an Icom radio, set network credentials before connecting
          if Self.tNetObject is TIcomRadio then
          begin
-            TIcomRadio(Self.tNetObject).NetworkUsername := Self.IcomNetworkUsername;
-            TIcomRadio(Self.tNetObject).NetworkPassword := Self.IcomNetworkPassword;
+            TIcomRadio(Self.tNetObject).NetworkUsername := Self.NetworkUsername;
+            TIcomRadio(Self.tNetObject).NetworkPassword := Self.NetworkPassword;
             logger.Info('[%s.SetUpRadioInterface] Set Icom network credentials (user=%s, pass=*******)',
-                        [Self.RadioName, Self.IcomNetworkUsername]);
+                        [Self.RadioName, Self.NetworkUsername]);
             if Self.IcomDataModeID in [1..3] then
                begin
                TIcomRadio(Self.tNetObject).DataModeID := Self.IcomDataModeID;
