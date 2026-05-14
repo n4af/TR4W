@@ -128,7 +128,8 @@ var
 implementation
 uses
   MainUnit,
-  uLogEdit;
+  uLogEdit,
+  uHamScore;     // Issue #783 -- HamScoreOnEdit / HamScoreOnDelete hooks
 
 function EditQSODlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam:
   lParam): BOOL; stdcall;
@@ -714,6 +715,8 @@ begin
         begin
         externalLogger.DeleteQSO(EditableQSORXData);
         end;
+     // Issue #783 -- HamScore RTC: send <contactdelete> next cycle.
+     HamScoreOnDelete(EditableQSORXData);
      end
   else
      begin
@@ -723,6 +726,8 @@ begin
         externalLogger.DeleteQSO(EditableQSORXData);
         externalLogger.LogQSO(EditableQSORXData);
         end;
+     // Issue #783 -- HamScore RTC: send <contactreplace> next cycle.
+     HamScoreOnEdit(EditableQSORxData);
      end;
 
   if not OpenLogFile then

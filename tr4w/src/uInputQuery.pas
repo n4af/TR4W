@@ -77,9 +77,20 @@ begin
         Windows.SetWindowLong(Get101Window(hwnddlg), GWL_STYLE, dwNewLong);
         SetDlgItemText(hwnddlg, 101, @tInputDialogPreviousValue[1]);
 
+        // Issue #783 -- when editing a ctPassword field with "Show passwords"
+        // off, the caller sets tInputDialogPassword and pre-fills the value
+        // with '********'.  Switch the edit to password-input mode using '*'
+        // as the masking character, matching the listview's PASSWORD_MASK so
+        // the operator sees consistent UX.  EM_SETPASSWORDCHAR is the only
+        // Win32 way to convert an existing edit to password mode after
+        // creation -- toggling ES_PASSWORD via SetWindowLong does not work.
+        if tInputDialogPassword then
+          SendDlgItemMessage(hwnddlg, 101, EM_SETPASSWORDCHAR, Ord('*'), 0);
+
         tInputDialogWarning := False;
         tInputDialogInteger := False;
         tInputDialogLowerCase := False;
+        tInputDialogPassword := False;
         Windows.ZeroMemory(@tInputDialogPreviousValue, SizeOf(tInputDialogPreviousValue));
         Windows.ZeroMemory(@IQresult, SizeOf(IQresult));
       end;

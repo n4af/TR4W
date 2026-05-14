@@ -79,8 +79,18 @@ function NewSLVProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): U
 implementation
 uses MainUnit;
 
+const
+  // Issue #783 -- ctPassword fields display as this fixed mask in the
+  // settings listview unless the operator ticks the "Show passwords"
+  // checkbox.  Fixed length so we don't leak the actual password length.
+  PASSWORD_MASK: PChar = '********';
+  ID_SHOWPASSWORDS_CB = 210;   // free in this dialog (200..204 are buttons)
+
 var
   IndexArray                            : array[1..CommandsArraySize] of Word;
+  ShowPasswords                         : Boolean = False;  // per-session, resets every dialog open
+
+procedure RefreshPasswordRows(hwnddlg: HWND); forward;   // Issue #783
 
 function SettingsDlgProc2(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): longword {BOOL}; stdcall;
 label
@@ -114,6 +124,16 @@ begin
 
           CreateButton(St, l[TempInteger], TempInteger * 110 + 5, 470, 107, hwnddlg, M);
         end;
+
+        // Issue #783 -- "Show passwords" checkbox lives on the dialog itself
+        // (NOT inside the listview), so it stays visible regardless of how far
+        // the operator scrolls.  Defaults unchecked at every open; per-session
+        // state, no persistence.
+        ShowPasswords := False;
+        CreateButton(BS_AUTOCHECKBOX or BS_NOTIFY,
+                     'Show passwords', 560, 472, 150, hwnddlg, ID_SHOWPASSWORDS_CB);
+        Windows.SendDlgItemMessage(hwnddlg, ID_SHOWPASSWORDS_CB, BM_SETCHECK,
+                                   BST_UNCHECKED, 0);
 
         CreateStatic(RC_ARROWTOSELIT, 0, 433, 548, hwnddlg, 106);
 
@@ -183,6 +203,13 @@ begin
 
           203: SendParameterToNetwork;
 
+          ID_SHOWPASSWORDS_CB:                                            // Issue #783
+            begin
+              ShowPasswords := SendDlgItemMessage(hwnddlg, ID_SHOWPASSWORDS_CB,
+                                                 BM_GETCHECK, 0, 0) = BST_CHECKED;
+              RefreshPasswordRows(hwnddlg);
+            end;
+
         end;
       end;
 
@@ -219,6 +246,36 @@ begin
 }
   end;
 
+end;
+
+// Issue #783 -- update only the value-column text of every ctPassword row
+// in the listview, switching between PASSWORD_MASK and the live value based
+// on ShowPasswords.  Cheap: O(rows), but only touches password rows.  Called
+// when the operator toggles the "Show passwords" checkbox.
+procedure RefreshPasswordRows(hwnddlg: HWND);
+var
+  rowCount, row, cmd: Integer;
+  buf:                array[0..63] of Char;
+begin
+  if SettingshLV = 0 then Exit;
+  rowCount := ListView_GetItemCount(SettingshLV);
+  for row := 0 to rowCount - 1 do
+    begin
+    cmd := IndexArray[row + 1];   // IndexArray is 1-based
+    if (cmd <= 0) or (cmd > CommandsArraySize) then Continue;
+    if CFGCA[cmd].crType <> ctPassword then Continue;
+
+    if ShowPasswords then
+      begin
+      // Skip the leading length byte of the ShortString at crAddress.
+      // ListView_SetItemText needs a writable PChar; copy into a local buffer.
+      Windows.ZeroMemory(@buf, SizeOf(buf));
+      Windows.lstrcpyn(buf, PChar(Integer(CFGCA[cmd].crAddress) + 1), SizeOf(buf));
+      ListView_SetItemText(SettingshLV, row, VALUE_FIELD, buf);
+      end
+    else
+      ListView_SetItemText(SettingshLV, row, VALUE_FIELD, PASSWORD_MASK);
+    end;
 end;
 
 procedure CommandsToListView2(f:cfgfunc  );
@@ -353,10 +410,24 @@ begin
             ctDirectory, ctFileName:
               Settingslvi.pszText := CFGCA[Command].crAddress;
 
-            ctURL, ctMessage, ctString, ctCaseSensitive, ctPassword:
+            ctURL, ctMessage, ctString, ctCaseSensitive:
               begin
                 Settingslvi.pszText := CFGCA[Command].crAddress;
                 inc(Settingslvi.pszText);
+              end;
+
+            ctPassword:                                                   // Issue #783
+              begin
+                // Mask the value unless the operator ticked "Show passwords".
+                // Initial population only -- toggling the checkbox later
+                // calls RefreshPasswordRows to update without rebuilding.
+                if ShowPasswords then
+                  begin
+                    Settingslvi.pszText := CFGCA[Command].crAddress;
+                    inc(Settingslvi.pszText);
+                  end
+                else
+                  Settingslvi.pszText := PASSWORD_MASK;
               end;
 
             ctBoolean: Settingslvi.pszText := BA[PBoolean(CFGCA[Command].crAddress)^];
@@ -652,16 +723,45 @@ begin
           Windows.ZeroMemory(@TempString, SizeOf(TempString));
 
           if CFGCA[Index].crType in [ctURL, ctCaseSensitive, ctPassword] then tInputDialogLowerCase := True;
-          tInputDialogPreviousValue := pShortString(CFGCA[Index].crAddress)^;
+
+          // Issue #783 -- ctPassword + "Show passwords" off: pre-fill with the
+          // password mask and tell the input dialog to mask its input field
+          // with '*'.  Pre-fill is the mask only when there is an existing
+          // value; an empty field stays empty so the operator does not see
+          // misleading asterisks for a never-set password.
+          if (CFGCA[Index].crType = ctPassword) and (not ShowPasswords) then
+            begin
+            tInputDialogPassword := True;
+            if Length(pShortString(CFGCA[Index].crAddress)^) > 0 then
+              tInputDialogPreviousValue := PASSWORD_MASK
+            else
+              tInputDialogPreviousValue := '';
+            end
+          else
+            tInputDialogPreviousValue := pShortString(CFGCA[Index].crAddress)^;
+
           TempString := QuickEditResponse(TC_NEWVALUE, CFGCA[Index].crMax);
 
           if TempString = '' then Exit;
+
+          // If the operator hit OK without changing the masked pre-fill, we
+          // would otherwise overwrite the real password with literal '****'.
+          // Detect and skip.
+          if (CFGCA[Index].crType = ctPassword) and (not ShowPasswords) and
+             (TempString = PASSWORD_MASK) then
+            Exit;
 
           ListView_GetItemText(SettingshLV, Row, 0, @TempBuffer1[1], 40);
           if CheckCommand(@TempBuffer1, TempString {CMD}) then
           begin
             pShortString(CFGCA[Index].crAddress)^ := TempString;
-            ListView_SetItemText(SettingshLV, Row, 1, @TempString[1]);
+            // For ctPassword, route through RefreshPasswordRows so the
+            // listview honours the current "Show passwords" state instead
+            // of leaking the new value in the clear.
+            if CFGCA[Index].crType = ctPassword then
+              RefreshPasswordRows(settingswindowhandle)
+            else
+              ListView_SetItemText(SettingshLV, Row, 1, @TempString[1]);
           end;
         end;
     end;

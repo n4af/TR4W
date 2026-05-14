@@ -133,7 +133,7 @@ const
   RC_REPEAT_POTA_HK                     = #9'Ctrl+T';
 
 
-    T_MENU_ARRAY_SIZE                     = 179 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS, separator, Repeat POTA Parks};
+    T_MENU_ARRAY_SIZE                     = 179 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS, separator, Repeat POTA Parks} + 2 {HamScore Resync (Tools) + HamScore Status (Windows menu), Issue #783};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -228,6 +228,7 @@ const
     (mrText: '-'; mrId: 0),
     (mrText: RC_INTERCOM + RC_INTERCOM_HK; mrId: menu_windows_intercom),
     (mrText: RC_POSTSCORETOGS + RC_GETSCORES_HK; mrId: menu_windows_getscores),
+    (mrText: 'HamScore RTC Status'; mrId: menu_windows_hamscore),  // Issue #783 Phase 4
     (mrText: RC_STATIONS + RC_STATIONS_HK; mrId: menu_windows_stations),
     (mrText: RC_MP3REC + RC_MP3REC_HK; mrId: menu_windows_mp3recorder),
 {$IF MMTTYMODE}
@@ -366,6 +367,7 @@ const
     (mrText: RC_RESET_RADIO_PORTS; mrId: menu_reset_radio_ports),
     (mrText: 'Download POTA Parks'; mrId: menu_download_pota_parks),  // issue #864
     (mrText: 'Repeat POTA Parks (2nd Op)' + RC_REPEAT_POTA_HK; mrId: menu_repeat_pota_parks),
+    (mrText: 'HamScore: Resync log from scratch'; mrId: menu_hamscore_resync),  // Issue #783
  //}
     (mrText: '-'; mrId: 0),
     (mrText: RC_3830; mrId: menu_3830_scores_posting),

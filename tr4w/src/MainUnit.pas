@@ -501,6 +501,7 @@ uses
 {$IFEND}
 
   uRadioPolling,
+  uHamScore,        // Issue #783 -- HamScoreResyncFromScratch (Tools menu)
   LogCfg,
   LogCW,
   uCT1BOH,
@@ -1665,7 +1666,7 @@ begin
   1:
   CloseHandle(h);
   2:
-  for i := tw_BANDMAPWINDOW_INDEX to tw_DUPESHEETWINDOW2_INDEX do
+  for i := tw_BANDMAPWINDOW_INDEX to tw_HAMSCOREWINDOW_INDEX do
     if tr4w_WindowsArray[i].WndRect.Right = 0 then
     begin
       tr4w_WindowsArray[i].WndRect.Top := 400;
@@ -1673,6 +1674,17 @@ begin
       tr4w_WindowsArray[i].WndRect.Right := Ord(i) * 30 + 220;
       tr4w_WindowsArray[i].WndRect.Bottom := 600;
     end;
+  // Issue #783 Phase 4: give the HamScore status window enough room for
+  // the URL line and the multi-line status edit.  Default 220 x N is too
+  // narrow / short.  Min: 410 wide x 270 tall.
+  if tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Right -
+     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Left < 410 then
+    tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Right :=
+      tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Left + 410;
+  if tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Bottom -
+     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Top < 270 then
+    tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Bottom :=
+      tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Top + 270;
 
   if tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndRect.Right = 0 then
   begin
@@ -1691,7 +1703,7 @@ begin
     tr4w_WindowsArray[tw_NETWINDOW_INDEX].WndRect.Right := 500;
     tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndRect.Right := 650;
   end;
-  for i := tw_BANDMAPWINDOW_INDEX to tw_Dummy10 do
+  for i := tw_BANDMAPWINDOW_INDEX to tw_HAMSCOREWINDOW_INDEX do
     tr4w_WindowsArray[i].WndHandle := 0;
 
   tr4w_WindowsArray[tw_BANDMAPWINDOW_INDEX].WndProcAdr := @BandmapDlgProc;
@@ -1710,6 +1722,8 @@ begin
   tr4w_WindowsArray[tw_NETWINDOW_INDEX].WndProcAdr := @NetDlgProc;
   tr4w_WindowsArray[tw_INTERCOMWINDOW_INDEX].WndProcAdr := @IntercomDlgProc;
   tr4w_WindowsArray[tw_POSTSCORESWINDOW_INDEX].WndProcAdr := @GetScoresDlgProc;
+  // Issue #783 Phase 4 -- HamScore RTC status window dialog
+  tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndProcAdr := @HamScoreDlgProc;
   tr4w_WindowsArray[tw_STATIONS_INDEX].WndProcAdr := @StationsDlgProc;
   tr4w_WindowsArray[tw_STATIONS_RM_DX].WndProcAdr := @RemainingMultsDlgProc
     {RemainingMultsDXDlgProc};
@@ -2823,7 +2837,7 @@ procedure OpenOtherWindows;
 var
   i: WindowsType;
 begin
-  for i := tw_BANDMAPWINDOW_INDEX to tw_DUPESHEETWINDOW2_INDEX do
+  for i := tw_BANDMAPWINDOW_INDEX to tw_HAMSCOREWINDOW_INDEX do  // Issue #783 -- include HamScore in restore
     if tr4w_WindowsArray[i].WndVisible then
       OpenTR4WWindow(i);
   Windows.SetWindowPos(tr4whandle, HWND_TOP,
@@ -3018,7 +3032,7 @@ begin
   LowordWparam := LoWord(menuID);
 
   if LowordWparam >= menu_windows_bandmap then
-    if LowordWparam <= {menu_rm_prefix}menu_windows_dupesheet2 then
+    if LowordWparam <= menu_windows_hamscore then  // Issue #783 -- extended past dupesheet2
     begin
       ID := WindowsType(LowordWparam - menu_windows_bandmap + 1);
       if not tWindowsExist(ID) then
@@ -3672,6 +3686,13 @@ begin
     menu_repeat_pota_parks:
       HandleRepeatPOTAParks;
 
+    menu_hamscore_resync:                 // Issue #783 Phase 3
+      begin
+      QuickDisplay('HamScore: queueing full log resync...');
+      HamScoreResyncFromScratch;       // enqueue <deletelog>
+      SendFullLogToHamScore;           // enqueue every QSO from the binary log
+      end;
+
     menu_spmode_ortab:
       ProcessTAB(LowordWparam);
 
@@ -4245,7 +4266,7 @@ const
     tw_MP3RECORDER,
     tw_REMMULTSWINDOW_INDEX,
     tw_MASTERWINDOW_INDEX,
-    tw_Dummy10,
+    tw_HAMSCOREWINDOW_INDEX,   // Issue #783 Phase 4 -- HamScore status window
     tw_Dummy11
     );
 var
