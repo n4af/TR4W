@@ -534,6 +534,14 @@ begin
    modeChar := ModeToModeChar(mode);
    if modeChar = #0 then Exit;
 
+   // KENWOOD QUIRK: per the TS-890 PC Command Reference, the OM command's
+   // P1 (VFO) byte is "ignored with the setting command" -- the radio always
+   // applies the mode to the currently active VFO. We still emit a P1 byte
+   // to match the documented command shape, but SetMode(mode, nrVFOB) when
+   // VFO A is the active VFO will NOT change VFO B's mode; the radio will
+   // change VFO A's mode instead. Setting the inactive VFO's mode would
+   // require swap-VFO -> OM -> swap-VFO-back; not implemented (TR4W's
+   // contest flow operates on the active VFO, so this is acceptable).
    case vfo of
       nrVFOA: vfoChar := '0';
       nrVFOB: vfoChar := '1';
@@ -616,17 +624,41 @@ begin
 end;
 
 procedure TKenwoodTS890Radio.SetRITFreq(whichVFO: TVFO; hz: integer);
+var
+   magnitude: Integer;
 begin
    if FAuthState <> ksAuthenticated then Exit;
-   // TS-890 has no single-shot SET-RIT-OFFSET; clear then bump in steps.
-   // Conservative stub for now; refine in a follow-up commit.
+
+   // TS-890 sets a specific RIT/XIT offset in two steps:
+   //   1. Clear the current offset:           RC;
+   //   2. Apply magnitude with direction:
+   //         RU<nnnnn>;   for a positive offset (RIT up)
+   //         RD<nnnnn>;   for a negative offset (RIT down)
+   //      where nnnnn is the 5-digit Hz value in the range 00000..09999.
+   // The RIT and XIT offsets share one value on the TS-890; setting one
+   // changes the other. XITClear / SetXITFreq route through here.
+   //
+   // When hz exceeds +-9999 we silently clamp to 9999. The TR4W RIT shift
+   // keys are press-repeatedly UI affordances; once at the radio's limit,
+   // further presses are no-ops, no warning needed.
    Self.SendToRadio('RC;');
+   if hz = 0 then Exit;
+
+   magnitude := Abs(hz);
+   if magnitude > 9999 then
+      magnitude := 9999;
+
+   if hz > 0 then
+      Self.SendToRadio(Format('RU%.5d;', [magnitude]))
+   else
+      Self.SendToRadio(Format('RD%.5d;', [magnitude]));
 end;
 
 procedure TKenwoodTS890Radio.SetXITFreq(whichVFO: TVFO; hz: integer);
 begin
-   if FAuthState <> ksAuthenticated then Exit;
-   Self.SendToRadio('RC;');
+   // TS-890 has one shared RIT/XIT offset; setting XIT uses the same
+   // RC + RU/RD command sequence as RIT.
+   Self.SetRITFreq(whichVFO, hz);
 end;
 
 // ============================================================================
@@ -656,8 +688,22 @@ end;
 
 procedure TKenwoodTS890Radio.SetFilter(filter: TRadioFilter; vfo: TVFO = nrVFOA);
 begin
-   // TS-890 IF DSP filter selection is per-mode and not a simple narrow/wide
-   // toggle. Stubbed pending hardware testing.
+   if FAuthState <> ksAuthenticated then Exit;
+
+   // TS-890 has 3 receive filter slots, A / B / C, selected via the FL0
+   // command (P1 = 0/1/2). The bandwidth of each slot is user-configurable
+   // in the radio's menu; by convention A is the narrowest and C the widest,
+   // so we map rfNarrow/Mid/Wide -> A/B/C.
+   //
+   // Caveat: the radio rejects FL02; (filter C) when menu [6-10]
+   // ("RX Filter Numbers") is set to "2", meaning the operator has restricted
+   // their radio to two filter slots. We don't pre-query that menu setting
+   // here; if the radio NAKs, the polling thread will log it at trace level.
+   case filter of
+      rfNarrow: Self.SendToRadio('FL00;');
+      rfMid:    Self.SendToRadio('FL01;');
+      rfWide:   Self.SendToRadio('FL02;');
+   end;
 end;
 
 function TKenwoodTS890Radio.SetFilterHz(hz: integer; vfo: TVFO = nrVFOA): integer;
