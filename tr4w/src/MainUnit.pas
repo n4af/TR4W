@@ -1692,7 +1692,7 @@ begin
     tr4w_WindowsArray[tw_NETWINDOW_INDEX].WndRect.Right := 500;
     tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndRect.Right := 650;
   end;
-  for i := tw_BANDMAPWINDOW_INDEX to tw_Dummy10 do
+  for i := tw_BANDMAPWINDOW_INDEX to tw_HAMSCOREWINDOW_INDEX do
     tr4w_WindowsArray[i].WndHandle := 0;
 
   tr4w_WindowsArray[tw_BANDMAPWINDOW_INDEX].WndProcAdr := @BandmapDlgProc;
@@ -1711,6 +1711,8 @@ begin
   tr4w_WindowsArray[tw_NETWINDOW_INDEX].WndProcAdr := @NetDlgProc;
   tr4w_WindowsArray[tw_INTERCOMWINDOW_INDEX].WndProcAdr := @IntercomDlgProc;
   tr4w_WindowsArray[tw_POSTSCORESWINDOW_INDEX].WndProcAdr := @GetScoresDlgProc;
+  // Issue #783 Phase 4 -- HamScore RTC status window dialog
+  tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndProcAdr := @HamScoreDlgProc;
   tr4w_WindowsArray[tw_STATIONS_INDEX].WndProcAdr := @StationsDlgProc;
   tr4w_WindowsArray[tw_STATIONS_RM_DX].WndProcAdr := @RemainingMultsDlgProc
     {RemainingMultsDXDlgProc};
@@ -3673,11 +3675,19 @@ begin
     menu_repeat_pota_parks:
       HandleRepeatPOTAParks;
 
-    menu_hamscore_resync:                 // Issue #783
+    menu_hamscore_resync:                 // Issue #783 Phase 3
       begin
       QuickDisplay('HamScore: queueing full log resync...');
       HamScoreResyncFromScratch;       // enqueue <deletelog>
       SendFullLogToHamScore;           // enqueue every QSO from the binary log
+      end;
+
+    menu_hamscore_window:                 // Issue #783 Phase 4
+      begin
+      if not tWindowsExist(tw_HAMSCOREWINDOW_INDEX) then
+        OpenTR4WWindow(tw_HAMSCOREWINDOW_INDEX)
+      else
+        CloseTR4WWindow(tw_HAMSCOREWINDOW_INDEX);
       end;
 
     menu_spmode_ortab:
@@ -4253,7 +4263,7 @@ const
     tw_MP3RECORDER,
     tw_REMMULTSWINDOW_INDEX,
     tw_MASTERWINDOW_INDEX,
-    tw_Dummy10,
+    tw_HAMSCOREWINDOW_INDEX,   // Issue #783 Phase 4 -- HamScore status window
     tw_Dummy11
     );
 var

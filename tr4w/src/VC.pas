@@ -2110,7 +2110,7 @@ type
    {17}tw_MP3RECORDER,
    {18}tw_STATIONS_RM_PREFIX,
    {19}tw_DUPESHEETWINDOW2_INDEX,
-   {20}tw_Dummy10,
+   {20}tw_HAMSCOREWINDOW_INDEX,
    {21}tw_Dummy11
     );
 
@@ -2433,6 +2433,7 @@ const
   menu_download_pota_parks              = 10607;  // issue #864
   menu_repeat_pota_parks               = 10608;  // repeat last logged parks for second operator
   menu_hamscore_resync                 = 10609;  // Issue #783 -- HamScore RTC: wipe server log + re-send all QSOs
+  menu_hamscore_window                 = 10610;  // Issue #783 Phase 4 -- open HamScore status window
   menu_home_page                        = 10606;
 //  menu_send_bug                         = 10605;
   menu_wiki_rus                         = 10604;

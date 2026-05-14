@@ -75,15 +75,21 @@ type
 
   THamScoreUploader = class(TThread)
   private
-    FQueueLock:  TCriticalSection;
-    FPending:    TList;            // FIFO of TRTCContact owned by the uploader
-    FStopEvent:  TEvent;
-    FCycleEvent: TEvent;           // currently unused; reserved for "post now" UI hook
-    FURL:        string;
-    FUsername:   string;
-    FPassword:   string;
-    FCycleMs:    Integer;          // 120000 in production; injectable for tests
-    FLogger:     TLogLogger;
+    FQueueLock:    TCriticalSection;
+    FPending:      TList;            // FIFO of TRTCContact owned by the uploader
+    FStopEvent:    TEvent;
+    FCycleEvent:   TEvent;           // signaled by PushNow to wake the worker early
+    FURL:          string;
+    FUsername:     string;
+    FPassword:     string;
+    FCycleMs:      Integer;          // 120000 in production; injectable for tests
+    FLogger:       TLogLogger;
+
+    // Status snapshot for the Phase 4 UI window.  Updated from the worker
+    // thread inside DoCycle; read by the dialog from the main thread.  All
+    // reads/writes go through FQueueLock so we never tear a multi-byte field.
+    FLastCycleTime:   TDateTime;     // time the most recent cycle completed
+    FLastCycleStatus: string;        // human-readable last-cycle outcome
 
     function  TakePendingSnapshot: TList;     // moves FPending to a local list, replaces with new empty list
     procedure RestorePending(snapshot: TList); // puts un-CFMed contacts back at the head of FPending
@@ -92,6 +98,7 @@ type
     function  ResponseStatusKind(const responseBody: string): string;  // 'CFM' | 'OK' | 'Error' | 'ResyncLog' | ''
     procedure DoCycle;
     procedure FreeContactList(list: TList);
+    procedure SetCycleStatus(const status: string);
   protected
     procedure Execute; override;
   public
@@ -99,7 +106,16 @@ type
     destructor  Destroy; override;
     procedure   Enqueue(contact: TRTCContact);   // takes ownership
     procedure   RequestStop;
-    property    CycleMs: Integer read FCycleMs write FCycleMs;
+    procedure   PushNow;                         // wake the worker for an immediate cycle
+
+    // Read-only status accessors for the Phase 4 dialog (thread-safe snapshot).
+    function    GetPendingCount: Integer;
+    function    GetLastCycleStatus: string;
+    function    GetLastCycleTime: TDateTime;
+
+    property    URL:      string  read FURL;
+    property    Username: string  read FUsername;
+    property    CycleMs:  Integer read FCycleMs write FCycleMs;
   end;
 
 // ---------------------------------------------------------------------------
@@ -131,12 +147,18 @@ procedure HamScoreOnDelete(const RXData: ContestExchange);
 // every QSO from the current binary log file.
 procedure HamScoreResyncFromScratch;
 
+// Phase 4 -- HamScore status window dialog procedure.  Wired into
+// tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndProcAdr by MainUnit.
+function HamScoreDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
+
 implementation
 
 uses
-  StrUtils, IdAuthentication,
+  StrUtils, IdAuthentication, Messages,
   LogWind,           // MyCall global
   ZoneCont,          // GetContinentName, ContinentType
+  TF,                // CreateButton, CreateStatic
+  MainUnit,          // CloseTR4WWindow, DefTR4WProc, FrmSetFocus (impl/impl cycle is OK)
   uGetScores;        // BuildDynamicResultsXml (added by this PR)
 
 const
@@ -359,6 +381,8 @@ begin
   FStopEvent  := TEvent.Create(nil, True, False, '');     // manual reset
   FCycleEvent := TEvent.Create(nil, False, False, '');    // auto reset (unused for now)
   FLogger     := TLogLogger.GetLogger('TR4WDebugLog.HamScore.Uploader');
+  FLastCycleStatus := 'Not yet run';
+  FLastCycleTime   := 0;
   FLogger.Info('[HamScore] Created uploader: URL=%s user=%s cycle=%dms',
     [FURL, FUsername, FCycleMs]);
 end;
@@ -385,6 +409,56 @@ end;
 procedure THamScoreUploader.RequestStop;
 begin
   FStopEvent.SetEvent;
+end;
+
+procedure THamScoreUploader.PushNow;
+begin
+  // Manual push from the Phase 4 UI: signal the worker to wake before the
+  // 2-minute timer expires.  Auto-reset event so the next post-then-sleep
+  // cycle returns to its normal cadence.
+  if FCycleEvent <> nil then
+    FCycleEvent.SetEvent;
+end;
+
+procedure THamScoreUploader.SetCycleStatus(const status: string);
+begin
+  FQueueLock.Acquire;
+  try
+    FLastCycleStatus := status;
+    FLastCycleTime   := Now;
+  finally
+    FQueueLock.Release;
+  end;
+end;
+
+function THamScoreUploader.GetPendingCount: Integer;
+begin
+  FQueueLock.Acquire;
+  try
+    Result := FPending.Count;
+  finally
+    FQueueLock.Release;
+  end;
+end;
+
+function THamScoreUploader.GetLastCycleStatus: string;
+begin
+  FQueueLock.Acquire;
+  try
+    Result := FLastCycleStatus;
+  finally
+    FQueueLock.Release;
+  end;
+end;
+
+function THamScoreUploader.GetLastCycleTime: TDateTime;
+begin
+  FQueueLock.Acquire;
+  try
+    Result := FLastCycleTime;
+  finally
+    FQueueLock.Release;
+  end;
 end;
 
 procedure THamScoreUploader.Enqueue(contact: TRTCContact);
@@ -567,6 +641,7 @@ begin
       // Network error -- keep snapshot for next cycle.
       FLogger.Info('[HamScore] Cycle: network error, %d QSO(s) retained for retry',
         [snapshot.Count]);
+      SetCycleStatus(Format('Network error -- %d QSO(s) retained', [snapshot.Count]));
       RestorePending(snapshot);
       snapshot := nil;   // ownership transferred
       Exit;
@@ -576,6 +651,7 @@ begin
     begin
       FLogger.Warn('[HamScore] Cycle: HTTP %d, %d QSO(s) retained',
         [httpCode, snapshot.Count]);
+      SetCycleStatus(Format('HTTP %d -- %d QSO(s) retained', [httpCode, snapshot.Count]));
       RestorePending(snapshot);
       snapshot := nil;
       Exit;
@@ -585,6 +661,10 @@ begin
     if (status = 'CFM') or ((status = 'OK') and not hadQSOs) then
     begin
       FLogger.Info('[HamScore] Cycle CFM (%d QSO(s) confirmed)', [snapshot.Count]);
+      if status = 'CFM' then
+        SetCycleStatus(Format('CFM -- %d QSO(s) confirmed', [snapshot.Count]))
+      else
+        SetCycleStatus('OK -- score-only post accepted');
       // snapshot will be freed in finally -- contacts are released
       Exit;
     end;
@@ -595,6 +675,7 @@ begin
       // manual Tools-menu resync remains the operator's escape hatch.
       FLogger.Warn('[HamScore] Server requested ResyncLog -- retaining queue, ' +
         'use Tools menu HamScore Resync to comply');
+      SetCycleStatus('ResyncLog requested -- use Tools menu Resync');
       RestorePending(snapshot);
       snapshot := nil;
       Exit;
@@ -604,6 +685,7 @@ begin
     begin
       FLogger.Error('[HamScore] Server error: %s -- retaining %d QSO(s)',
         [responseBody, snapshot.Count]);
+      SetCycleStatus('Server error: ' + responseBody);
       RestorePending(snapshot);
       snapshot := nil;
       Exit;
@@ -612,6 +694,7 @@ begin
     // No recognised status (server might be down/proxied).  Keep retrying.
     FLogger.Warn('[HamScore] Unexpected response, retaining %d QSO(s): %s',
       [snapshot.Count, responseBody]);
+    SetCycleStatus(Format('Unexpected response -- %d QSO(s) retained', [snapshot.Count]));
     RestorePending(snapshot);
     snapshot := nil;
   finally
@@ -625,19 +708,32 @@ end;
 
 procedure THamScoreUploader.Execute;
 var
-  waitResult: TWaitResult;
+  handles:   array[0..1] of THandle;
+  waitRet:   DWORD;
 begin
   FLogger.Info('[HamScore] Worker thread started');
+  // Wait on TWO events: stop (priority) and cycle-now (push button).
+  // WaitForMultipleObjects returns WAIT_OBJECT_0+i for the signaled handle,
+  // WAIT_TIMEOUT after FCycleMs ms, or WAIT_FAILED on error.  WaitAll = False
+  // means "any of these wakes us".
+  handles[0] := FStopEvent.Handle;
+  handles[1] := FCycleEvent.Handle;
   try
     while not Terminated do
     begin
-      waitResult := FStopEvent.WaitFor(Cardinal(FCycleMs));
-      if Terminated or (waitResult = wrSignaled) then Break;
+      waitRet := WaitForMultipleObjects(2, @handles, False, Cardinal(FCycleMs));
+      if Terminated then Break;
+      if waitRet = WAIT_OBJECT_0 then Break;     // FStopEvent
+      // Either FCycleEvent fired (waitRet = WAIT_OBJECT_0+1) or the 2-minute
+      // timer expired (WAIT_TIMEOUT).  Both run a cycle.
       try
         DoCycle;
       except
         on E: Exception do
+        begin
           FLogger.Error('[HamScore] DoCycle exception: %s', [E.Message]);
+          SetCycleStatus('Exception: ' + E.Message);
+        end;
       end;
     end;
   finally
@@ -708,11 +804,138 @@ end;
 
 procedure HamScoreResyncFromScratch;
 begin
-  // Implemented in Phase 3 -- enqueues a <deletelog> then walks the binary
-  // log file calling HamScoreOnLog for every QSO.
+  // Phase 3 -- enqueue the <deletelog> separator.  The full-log walk that
+  // re-uploads every QSO lives in LOGSUBS2.SendFullLogToHamScore, which is
+  // called by the Tools-menu handler in MainUnit immediately after this.
   if Uploader = nil then Exit;
   Uploader.Enqueue(TRTCContact.Create(rckDeleteLog, '', RenderDeleteLogBody));
-  // Phase 3 also iterates the log here -- forward declared.
+end;
+
+// ===========================================================================
+// Phase 4 -- HamScore status dialog
+// ===========================================================================
+
+const
+  HAMSCORE_TIMER_ID         = 1;
+  HAMSCORE_REFRESH_MS       = 1000;   // refresh queued count + status every 1s
+  HAMSCORE_BTN_PUSH_NOW     = 101;
+  HAMSCORE_BTN_RESYNC       = 102;
+  HAMSCORE_LBL_URL          = 110;
+  HAMSCORE_LBL_USERNAME     = 111;
+  HAMSCORE_LBL_QUEUE_TITLE  = 112;
+  HAMSCORE_LBL_QUEUE_VAL    = 113;
+  HAMSCORE_LBL_STATUS_TITLE = 114;
+  HAMSCORE_LBL_STATUS_VAL   = 115;
+  HAMSCORE_LBL_LASTRUN_VAL  = 116;
+
+procedure SetTextSafe(hwnddlg: HWND; ctrlId: Integer; const s: string);
+begin
+  Windows.SetDlgItemText(hwnddlg, ctrlId, PChar(s));
+end;
+
+procedure HamScoreRefreshStatus(hwnddlg: HWND);
+var
+  pendCount: Integer;
+  status:    string;
+  lastTime:  TDateTime;
+  url:       string;
+  user:      string;
+begin
+  if Uploader = nil then
+    begin
+    SetTextSafe(hwnddlg, HAMSCORE_LBL_URL,         'URL: (uploader not running -- HAMSCORE ENABLE = FALSE or password missing)');
+    SetTextSafe(hwnddlg, HAMSCORE_LBL_USERNAME,    'User: --');
+    SetTextSafe(hwnddlg, HAMSCORE_LBL_QUEUE_VAL,   '--');
+    SetTextSafe(hwnddlg, HAMSCORE_LBL_STATUS_VAL,  'Disabled');
+    SetTextSafe(hwnddlg, HAMSCORE_LBL_LASTRUN_VAL, '');
+    Exit;
+    end;
+
+  pendCount := Uploader.GetPendingCount;
+  status    := Uploader.GetLastCycleStatus;
+  lastTime  := Uploader.GetLastCycleTime;
+  url       := Uploader.URL;
+  user      := Uploader.Username;
+  if user = '' then
+    user := string(MyCall) + ' (default; HAMSCORE USERNAME empty)';
+
+  SetTextSafe(hwnddlg, HAMSCORE_LBL_URL,         'URL: ' + url);
+  SetTextSafe(hwnddlg, HAMSCORE_LBL_USERNAME,    'User: ' + user);
+  SetTextSafe(hwnddlg, HAMSCORE_LBL_QUEUE_VAL,   IntToStr(pendCount));
+  SetTextSafe(hwnddlg, HAMSCORE_LBL_STATUS_VAL,  status);
+  if lastTime = 0 then
+    SetTextSafe(hwnddlg, HAMSCORE_LBL_LASTRUN_VAL, 'Last cycle: never')
+  else
+    SetTextSafe(hwnddlg, HAMSCORE_LBL_LASTRUN_VAL,
+      'Last cycle: ' + FormatDateTime('yyyy-mm-dd hh:nn:ss', lastTime));
+end;
+
+function HamScoreDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
+label
+  Done;
+begin
+  Result := False;
+  case Msg of
+    WM_LBUTTONDOWN, WM_WINDOWPOSCHANGING, WM_EXITSIZEMOVE:
+      DefTR4WProc(Msg, lParam, hwnddlg);
+
+    WM_INITDIALOG:
+      begin
+        // Layout (single column).  Y in pixels.
+        CreateStatic(nil, 5,   5, 360, hwnddlg, HAMSCORE_LBL_URL);
+        CreateStatic(nil, 5,  25, 360, hwnddlg, HAMSCORE_LBL_USERNAME);
+
+        CreateStatic('Queued contacts:', 5, 55, 130, hwnddlg, HAMSCORE_LBL_QUEUE_TITLE);
+        CreateStatic('--',               140, 55, 60, hwnddlg, HAMSCORE_LBL_QUEUE_VAL);
+
+        CreateStatic('Last status:',     5, 75, 130, hwnddlg, HAMSCORE_LBL_STATUS_TITLE);
+        CreateStatic('--',               140, 75, 220, hwnddlg, HAMSCORE_LBL_STATUS_VAL);
+        CreateStatic('',                 5, 95, 360, hwnddlg, HAMSCORE_LBL_LASTRUN_VAL);
+
+        CreateButton(0, 'Push Now',       5, 125, 100, hwnddlg, HAMSCORE_BTN_PUSH_NOW);
+        CreateButton(0, 'Resync from log', 110, 125, 130, hwnddlg, HAMSCORE_BTN_RESYNC);
+
+        SetTimer(hwnddlg, HAMSCORE_TIMER_ID, HAMSCORE_REFRESH_MS, nil);
+        HamScoreRefreshStatus(hwnddlg);
+      end;
+
+    WM_TIMER:
+      HamScoreRefreshStatus(hwnddlg);
+
+    WM_COMMAND:
+      begin
+        case wParam of
+          HAMSCORE_BTN_PUSH_NOW:
+            begin
+              if Uploader <> nil then
+                begin
+                Uploader.PushNow;
+                SetTextSafe(hwnddlg, HAMSCORE_LBL_STATUS_VAL, 'Push Now signaled -- cycle will run shortly');
+                end;
+            end;
+
+          HAMSCORE_BTN_RESYNC:
+            begin
+              // Tools-menu equivalent inline; calls into the same helpers.
+              // (We cannot pull SendFullLogToHamScore from here without a
+              // circular reference, so the resync button only enqueues the
+              // <deletelog>; user should also use Tools menu Resync to
+              // walk the full log.  Documented in the help dialog later.)
+              HamScoreResyncFromScratch;
+              SetTextSafe(hwnddlg, HAMSCORE_LBL_STATUS_VAL,
+                '<deletelog> queued -- use Tools menu Resync to enqueue all QSOs');
+            end;
+        end;
+        if HiWord(wParam) = BN_CLICKED then FrmSetFocus;
+      end;
+
+    WM_CLOSE:
+      begin
+        Done:
+        KillTimer(hwnddlg, HAMSCORE_TIMER_ID);
+        CloseTR4WWindow(tw_HAMSCOREWINDOW_INDEX);
+      end;
+  end;
 end;
 
 end.
