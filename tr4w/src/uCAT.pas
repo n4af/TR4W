@@ -100,7 +100,8 @@ var
      if (PortIdx = 21) and  // 21 = TCP/IP in the port combo
         (InterfacedRadioType(RadioIdx) in
          [IC705, IC7300MK2, IC7600, IC7610,
-          IC7760, IC7850, IC7851, IC9700, IC905])
+          IC7760, IC7850, IC7851, IC9700, IC905,
+          TS890])  // Issue #436 -- TS-890 LAN requires Admin ID/Password
      then
         ShowCmd := SW_SHOW
      else

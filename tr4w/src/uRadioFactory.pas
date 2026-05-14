@@ -34,6 +34,7 @@ type
       rmIcomIC905,
       rmIcomIC7100,
       rmFlexRadio6000,
+      rmKenwoodTS890,   // Issue #436 -- TS-890 network (Kenwood CAT over TCP + ##CN/##ID auth)
       rmHamLibDirect
    );
 
@@ -68,7 +69,8 @@ implementation
 uses Log4D, uRadioHamLibDirect, uRadioIcomBase,
      uRadioIcom7300, uRadioIcom7610, uRadioIcom9700,
      uRadioIcom705, uRadioIcom7300MK2, uRadioIcom7600,
-     uRadioIcom7760, uRadioIcom7850, uRadioIcom905, uRadioIcom7100;
+     uRadioIcom7760, uRadioIcom7850, uRadioIcom905, uRadioIcom7100,
+     uRadioKenwoodTS890;  // Issue #436
 
 var
    logger: TLogLogger;
@@ -190,6 +192,16 @@ begin
          Result.radioPort := port;
          Result.radioModel := 'FlexRadio 6000';
          logger.Info('[RadioFactory] Created FlexRadio 6000 instance');
+         end;
+
+      rmKenwoodTS890:
+         begin
+         Result := TKenwoodTS890Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         Result.radioModel := 'Kenwood TS-890S';
+         logger.Info('[RadioFactory] Created Kenwood TS-890 instance (Issue #436)');
+         logger.Info('[RadioFactory] Remember to set NetworkUsername/NetworkPassword before Connect');
          end;
 
       rmHamLibDirect:
@@ -430,6 +442,7 @@ begin
       rmIcomIC905:      Result := 'Icom IC-905';
       rmIcomIC7100:     Result := 'Icom IC-7100';
       rmFlexRadio6000:  Result := 'FlexRadio 6000';
+      rmKenwoodTS890:   Result := 'Kenwood TS-890S';
       rmHamLibDirect:   Result := 'HamLib Direct (DLL)';
    else
       Result := 'Unknown';
@@ -449,6 +462,7 @@ begin
              '  - Icom IC-7760 (implemented)'#13#10 +
              '  - Icom IC-7850 (implemented)'#13#10 +
              '  - Icom IC-905 (implemented)'#13#10 +
+             '  - Kenwood TS-890S (implemented, Issue #436)'#13#10 +
              '  - HamLib Direct via DLL (implemented)'#13#10 +
              '  - Elecraft K3 (planned)'#13#10 +
              '  - Yaesu FTdx101 (planned)'#13#10 +
@@ -470,6 +484,7 @@ begin
              (model = rmIcomIC905) or
              (model = rmIcomIC7100) or
              (model = rmFlexRadio6000) or
+             (model = rmKenwoodTS890) or
              (model = rmHamLibDirect);
 end;
 

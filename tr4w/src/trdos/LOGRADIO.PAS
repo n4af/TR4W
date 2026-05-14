@@ -575,7 +575,7 @@ const
     ({Name: 'FLRIG';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 4; rt:rtHamlib),
     ({Name: 'TRXMANAGER';} BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 5; rt:rtHamlib),
     ({Name: 'FT757GXII';  } BR:BR4800;  P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 1007; rt:rtHamlib),
-    ({Name: 'TS890';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2041; rt:rtHamlib),
+    ({Name: 'TS890';      } BR:BR4800;  P: 1; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00;  LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 2041; rt: rtKenwood),  // Issue #436 -- native Kenwood serial; default 4800 baud (radio menu can raise to 115200)
     ({Name: 'EXPERTTCI'; } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 7; rt:rtHamlib),
     ({Name: 'ACLOG';      } BR:BR57600; P: 0; C: 1; S: 1; T:1; RA: $00; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 8; rt:rtHamlib),
     ({Name: 'IC905';      } BR:BR19200; P: 1; C: 0; S: 0; T:0; RA: $AC; SW: 1; SFOC: $00; SMOC: $00; SPOC: $00; RX: $00; TX: $00; MB: 0; CW: $00; LSB: $00; USB: $00; FM: $00; AM: $00; DIGL: $00; DIGU: $00; hamlibID: 0; rt: rtIcom),
@@ -680,7 +680,7 @@ const
       'FLRIG',          // HamLib Only
       'TRX-MANAGER',    // HamLib Only
       'FT757GXII',      // HamLib Only
-      'TS890',          // HamLib Only
+      'TS890',          // Issue #436 -- native Kenwood serial + network
       'EXPERTTCI',     // HamLib Only
       'ACLOG',          // HamLib Only
       'IC905',
@@ -817,7 +817,8 @@ uses
    LogSUBS2,
    LogCW,
    uRadioHamLibDirect,
-   uRadioIcomBase;
+   uRadioIcomBase,
+   uRadioKenwoodTS890;  // Issue #436
 
 
 
@@ -954,7 +955,7 @@ begin
       end;
 
    case IntRadioType of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000, FLEX, K2, K3, K4, FTDX10, FTDX101, FTX1F, FT450, FT891, FT950, FT991, FT1200, FT2000, FTDX3000,
       FTDX5000, FTDX9000:
          begin
@@ -1025,7 +1026,7 @@ begin
       end;
 
    case IntRadioType of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000, K2, K3, K4 {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RU;');
@@ -1091,7 +1092,7 @@ begin
       end;
 
    case IntRadioType of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000, K2, K3, K4 {, FTDX9000}:
          begin
          ActiveRadioPtr.WriteBufferToCATPort('RD;');
@@ -1156,7 +1157,7 @@ begin
 
    case IntRadioType of
 
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000:
          begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('UP;', 3);
@@ -1233,7 +1234,7 @@ begin
 
    case IntRadioType of
 
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940,
       TS950, TS990, TS2000:
          begin
          ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('DN;', 3);
@@ -1851,10 +1852,11 @@ begin
             Result := true;
             end;
          end;
-      TS480, TS570, TS590, TS850, TS950, TS990, TS2000:
+      TS480, TS570, TS590, TS850, TS890, TS950, TS990, TS2000:
          begin
          case RadioModel of
             TS590: hiMem := 3;
+            TS890: hiMem := 6;  // Issue #436 -- TS-890 PB memories 1..6
             TS990: hiMem := 6;
             else hiMem := 3;
          end;
@@ -2018,7 +2020,7 @@ begin
       end;
 
    case RadioModel of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, K4:
          begin
          AddToOutputBuffer('FR0;FT1;', 8);
@@ -2087,7 +2089,7 @@ begin
       end;
 
    case RadioModel of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, K4:
          begin
          //ActiveRadioPtr.AddToOutputBuffer {WriteBufferToCATPort}('FR0;FT0;', 8);
@@ -2431,7 +2433,7 @@ begin
 //            msgLen := length(Msg);              //length(Msg);
             //len := Min(msgLen, 24);             // 24 max for Kenwood
             case RadioModel of
-               TS480, TS570, TS590, TS950, TS990, TS2000:
+               TS480, TS570, TS590, TS890, TS950, TS990, TS2000:
                   begin
                   maxLen := 24;
                   pad := true;
@@ -2684,7 +2686,7 @@ begin
                begin
               AddToOutputBuffer('KY ' + Chr(4) + ';RX;', 8); // Chr(4) stops the K3 // ny4i Issue 157
                end;
-            TS480, TS570, TS590, TS950, TS990, TS2000, TS850:
+            TS480, TS570, TS590, TS890, TS950, TS990, TS2000, TS850:
                begin
                AddToOutputBuffer('KY0;', 4);
                AddToOutputBuffer('RX;', 3);
@@ -2787,6 +2789,8 @@ begin
          Result := rmIcomIC7100;
       FLEX:
          Result := rmFlexRadio6000;
+      TS890:                          // Issue #436 -- TS-890 network control
+         Result := rmKenwoodTS890;
    else
       Result := rmNone;
    end;
@@ -3051,6 +3055,15 @@ begin
                logger.Info('[%s.SetUpRadioInterface] Icom data mode ID set to D%d',
                            [Self.RadioName, Self.IcomDataModeID]);
                end;
+         end;
+
+         // Kenwood TS-890 also requires LAN credentials (Issue #436).
+         if Self.tNetObject is TKenwoodTS890Radio then
+         begin
+            TKenwoodTS890Radio(Self.tNetObject).NetworkUsername := Self.NetworkUsername;
+            TKenwoodTS890Radio(Self.tNetObject).NetworkPassword := Self.NetworkPassword;
+            logger.Info('[%s.SetUpRadioInterface] Set Kenwood TS-890 LAN credentials (user=%s, pass=*******)',
+                        [Self.RadioName, Self.NetworkUsername]);
          end;
 
          Self.tNetObject.Connect;
@@ -4060,7 +4073,7 @@ begin
       Exit;
       end;
    case IntRadioType of
-      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS940, TS950, TS990,
+      TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850, TS870, TS890, TS940, TS950, TS990,
       TS2000, FLEX, K2, K3, KX3, K4:
          begin
          if PTTOn then
@@ -4190,32 +4203,32 @@ var
 const
    ra: array[1..2] of RadioPtr = (@Radio1, @Radio2);
 begin
-   RadioSupportsCWByCAT := [TS850, K2, K3, KX3, K4, TS480, TS570, TS590, TS990, TS2000,
+   RadioSupportsCWByCAT := [TS850, K2, K3, KX3, K4, TS480, TS570, TS590, TS890, TS990, TS2000,
                             FLEX, IC705, IC7100, IC7300, IC7410, IC7600, IC7610, IC7700, IC7760,
-                            IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];
+                            IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];  // TS890 -- Issue #436
    // ny4i Issue 119
    RadioSupportsCWSpeedSync :=
-      [TS850, K2, K3, K4, TS480, TS570, TS590, TS990, TS2000, FLEX, FTDX10, FTDX101, FTX1F, FT450, FT710, FT891, FT950, FT991,
+      [TS850, K2, K3, K4, TS480, TS570, TS590, TS890, TS990, TS2000, FLEX, FTDX10, FTDX101, FTX1F, FT450, FT710, FT891, FT950, FT991,
       FT1200, FT2000, FTDX3000, FTDX5000, FTDX9000, IC718, IC746, IC746PRO, IC756PROII,
       IC756PROIII, IC910, IC705, IC7100, IC7200, IC7300, IC7410, IC7600, IC7610,
-      IC7700, IC7760, IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];  // ny4i Issue 120
+      IC7700, IC7760, IC7800, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2, Orion];  // ny4i Issue 120; TS890 -- Issue #436
 
    RadioSupportsPlayDVK := [ K2, K3, K4 // We do not support the KX2 and KX3? I guess not a lot of call for it.
                             ,IC705, IC7300, IC7610, IC7760, IC7850, IC7851, IC9100, IC9700, IC905, IC7300MK2
                             ,FT710, FT991, FT1200, FTDX3000, FTDX5000, FTDX9000, FTDX10, FTDX101, FTX1F
-                            ,TS480, TS570, TS590, TS850, TS950, TS990, TS2000
-                            ]; // NY4I Issue 639
+                            ,TS480, TS570, TS590, TS850, TS890, TS950, TS990, TS2000
+                            ]; // NY4I Issue 639; TS890 -- Issue #436
    IcomRadiosThatSupportRIT := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700, IC905, IC7300MK2];
    IcomRadiosThatSupportVFOB := [IC705, IC7100, IC7300, IC7800, IC7850, IC7851, IC7600, IC7610, IC7700, IC7760, IC9700, IC905, IC7300MK2];
    IcomRadiosThatSupportPSKMode := [IC7600, IC7610, IC7760];
    ICOMRadios := [IC78..IC9700, IC905, IC7300MK2];
    KenwoodRadios := [TS140, TS440, TS450, TS480, TS570, TS590, TS690, TS850,
-                     TS870, TS940, TS950, TS990, TS2000, FLEX];
+                     TS870, TS890, TS940, TS950, TS990, TS2000, FLEX];  // TS890 -- Issue #436
    YaesuRadios := [FTDX10, FTDX101, FTX1F, FT450, FT710, FT736R, FT747GX, FT767, FT817,
                    FT818, FT840, FT847, FT857, FT890, FT891, FT897, FT900, FT920,
                    FT950, FT990, FT991, FT1000, FT1000MP, FT1200, FT2000,
                    FTDX3000, FTDX5000, FTDX9000];
-   HamLibONLYRadios := [FLRIG,TRXMANAGER,FT757GXII,TS890,EXPERTTCI,ACLOG,HAMLIBANY];
+   HamLibONLYRadios := [FLRIG,TRXMANAGER,FT757GXII,EXPERTTCI,ACLOG,HAMLIBANY];  // TS890 removed -- now has native serial via rtKenwood (Issue #436)
    for i := 1 to 2 do
       begin
       TempRadio := ra[i];
