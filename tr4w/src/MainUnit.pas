@@ -1666,7 +1666,7 @@ begin
   1:
   CloseHandle(h);
   2:
-  for i := tw_BANDMAPWINDOW_INDEX to tw_DUPESHEETWINDOW2_INDEX do
+  for i := tw_BANDMAPWINDOW_INDEX to tw_HAMSCOREWINDOW_INDEX do
     if tr4w_WindowsArray[i].WndRect.Right = 0 then
     begin
       tr4w_WindowsArray[i].WndRect.Top := 400;
@@ -1674,6 +1674,16 @@ begin
       tr4w_WindowsArray[i].WndRect.Right := Ord(i) * 30 + 220;
       tr4w_WindowsArray[i].WndRect.Bottom := 600;
     end;
+  // Issue #783 Phase 4: give the HamScore status window enough room for
+  // the URL line (the default 220px is too narrow for a full URL).
+  if tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Right -
+     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Left < 400 then
+    tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Right :=
+      tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Left + 400;
+  if tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Bottom -
+     tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Top < 180 then
+    tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Bottom :=
+      tr4w_WindowsArray[tw_HAMSCOREWINDOW_INDEX].WndRect.Top + 180;
 
   if tr4w_WindowsArray[tw_MAINWINDOW_INDEX].WndRect.Right = 0 then
   begin
