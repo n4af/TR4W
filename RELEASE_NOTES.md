@@ -24,6 +24,23 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.07 (2026-05-14) — NY4I / N4AF
+
+#### New Contest
+
+- **RTC — Real-Time Contest**: a 4-hour mixed-mode (CW + SSB) HF event sponsored by contestonlinescore.com. Exchange is serial number + 4-character Maidenhead grid; scoring is distance-based between grid centers with tiers of 1, 2, 3, or 4 points. TR4W prompts for your 4-character grid when you start a new RTC contest, fills your function-key messages with the rules-spec format, and disables the WARC bands automatically. Note: 160 m, 80 m, and digital modes still let you tune and log, but score 0 and don't count as multipliers per RTC rules.
+
+#### UDP Broadcasts (N1MM-compatible)
+
+- **WARC bands now report the correct MHz label**: prior versions sent meter-band labels (`30` / `17` / `12`) for QSOs on 30 m, 17 m, and 12 m, while every other band reported MHz (`14`, `21`, `28`, etc.). Spotting and scoring tools (N1MM, DXLog, COS) that key off the MHz value were silently dropping every WARC QSO. WARC bands now correctly report `10`, `18`, `24`.
+- **X-QSO tag is well-formed XML**: the `<IsClaimedQso>` UDP field's closing tag was case-mismatched in 4.147.06, which strict XML consumers reject. The tag is now correctly closed.
+
+#### Cabrillo / ADIF Export
+
+- **No more garbage characters after short grids**: when your `MY GRID` was 4 characters (e.g. `EL88`), the Cabrillo file and the ADIF `<MyGrid>` field could include random non-printable characters after the grid (uninitialized memory leaking into the output). Affects RTC and any other contest using a 4-character grid. Now correctly terminated; re-export an affected log after upgrading to clean it up.
+
+---
+
 ### 4.147.06 (2026-05-13) — NY4I / N4AF
 
 #### Logging — X-QSO Support

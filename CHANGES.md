@@ -22,6 +22,38 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.07 (2026-05-14) — NY4I / N4AF
+
+#### RTC Contest (`src/VC.pas`, `src/trdos/LOGGRID.PAS`, `src/trdos/LOGSTUFF.PAS`, `src/trdos/FCONTEST.PAS`, `src/uNewContest.pas`) — Issue #902, PR #903
+
+Real-Time Contest (RTC, contestonlinescore.com) — 4-hour mixed-mode (CW + SSB) HF event. Exchange: serial number + 4-character Maidenhead grid. Distance-based scoring via Haversine between grid centers.
+
+- **Reuse over new infrastructure**: existing `RSTQSONumberAndGridSquareExchange` handles parsing, dupes, Cabrillo, and ADIF. Only contest definition and scoring needed code.
+- **`VC.pas`**: `ContestType.RTC`, `RTCQSOPointMethod`, plus `ContestsArray` / `ContestTypeSA` / `ContestsBooleanArray` / `QSOPointMethodSA` rows. `AE: RSTQSONumberAndGridSquareExchange`, `DM: GridSquares`, `AIE: GridInitialExchange`, `CABName: 'RTC'`, `WA7BNM: 782`, `ciQB1 + ciQM0 + ciMB1 + ciMM0` (per-band dupes, per-band mults, mode-agnostic).
+- **`LOGGRID.PAS`**: new `RTCGridDistance` — pure Haversine between 4-char grid centers, R=6371 km. Verified against rules fixture `FN36 → DM18 = 3664.72 km` (exact). Existing `GetDistanceBetweenGrids` is Vincenty-style and `'LL'`-padded; numerically different, would push borderline QSOs into the wrong scoring tier.
+- **`LOGSTUFF.PAS`**: `RTCQSOPointMethod` case in `CalculateQSOPoints`. Tiers 1/2/3/4 points at <2000 / <4000 / <8000 / ≥8000 km. Out-of-rules QSOs (bands outside 40/20/15/10 or modes other than CW/Phone) score 0 and set `InhibitMults := True`.
+- **`FCONTEST.PAS`**: `RTC` init — `WARCBandsEnabled := False` (kills 30/17/12 at the band-switch level). CW function-key memories: `F3 = '# ' + MyGrid`, `F4 EX = 'NR # ' + MyGrid`, `F5 EX = '@ DE \ # ' + MyGrid`. RST is optional per rules and not transmitted by default. `MyGrid` substituted at FCONTEST init time (same idiom as `MyZone`).
+- **`uNewContest.pas`**: RTC added to the 4-character-grid prompt branch.
+- **Rule enforcement caveat**: TR4W has no per-band toggle (no `Band160Enable` etc.) and no per-mode disable. WARC is killed via the group toggle. 160 / 80 / digital modes are enforced only in the scoring branch — the operator can still tune and log there, but the QSO scores 0 and is excluded from mults.
+
+#### UDP Wire-Format Bug Fixes (`src/trdos/LOGSUBS2.PAS`) — PR #903
+
+- **`BandTypeToUDPContactBand[]` WARC labels were meter-band, not MHz**: other entries are MHz strings (`'1.8'`, `'3.5'`, `'7'`, `'14'`, `'21'`, `'28'`, `'50'`, ...), but the WARC slots had `'30'` / `'17'` / `'12'`. Consumers expecting `<band>18</band>` on 17m were silently dropping every WARC QSO. Fixed to `'10'` / `'18'` / `'24'`.
+- **`<IsClaimedQso>` closing tag case-mismatch**: PR #901's X-QSO work emitted `<IsClaimedQso>...</IsClaimedQSO>` — strict XML parsers reject as malformed. Fixed to `</IsClaimedQso>` to match the opening tag.
+
+#### `cMyGrid` Uninitialized-Memory Bug (`src/trdos/PostUnit.PAS`) — PR #903
+
+- **Cabrillo and ADIF writers leaked stack bytes after short grids**. Line 2349 had `TempGrid[7] := #0;` and line 4051 had `TempGrid[5] := #0;` — both assumed a fixed grid length. For a 4-char grid (e.g. `EL88`), line 2349 left bytes 5–6 holding uninitialized stack memory, which `wsprintf %-7s` then printed as non-printable characters. The mirror at line 4051 silently truncated 6-char grids.
+- Fix: both sites now use `TempGrid[Length(MyGrid) + 1] := #0;` — terminator tracks the actual grid length. Works for 4-, 5-, and 6-char grids.
+- **Latent for years**: every existing contest using `RSTQSONumberAndGridSquareExchange` (EUROPEAN VHF, TESLA, RF-VHF-FD, OZHCR-VHF) prompts for 6-char grids via `uNewContest.pas`. RTC is the first 4-char-grid consumer of that exchange type.
+
+#### Developer Docs (`docs/ADDING_A_NEW_CONTEST.md`, `tr4w/test/udp_listen.py`) — PR #903
+
+- New ~330-line guide distilled from the RTC work covering parallel-array alignment between `ContestsArray` / `ContestTypeSA` / etc., reusable exchange / scoring / multiplier types, the `cMyGrid` trap, the `GetDistanceBetweenGrids`-vs-Haversine trap, FCONTEST function-key idioms, and an end-to-end checklist.
+- `tr4w/test/udp_listen.py` — 38-line port-12060 listener used during testing of the UDP wire-format fixes.
+
+---
+
 ### 4.147.06 (2026-05-13) — NY4I / N4AF
 
 #### X-QSO Support (`src/VC.pas`, `src/uEditQSO.pas`, `src/MainUnit.pas`, `src/trdos/LOGSUBS2.PAS`, `src/uADIF.pas`, `res/`) — Issue #750, PR #901
