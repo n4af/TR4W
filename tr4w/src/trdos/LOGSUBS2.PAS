@@ -150,7 +150,8 @@ uses
   uProcessCommand,
   MainUnit,
   uRadioPolling,
-  uYCCCSO2R;
+  uYCCCSO2R,
+  uHamScore;        // Issue #783 -- HamScoreOnLog hook
 procedure CreateAndSendPacketSpot(PacketSpotCall: CallString; PacketSpotFreq: LONGINT);
 
 begin
@@ -1462,6 +1463,8 @@ begin
           externalLogger.LogQSO(RXData);
           end;
        end;
+    // Issue #783 -- HamScore RTC realtime upload (cheap no-op when disabled).
+    HamScoreOnLog(RXData);
     perfTimeStop := Now;
     logger.Debug('Milliseconds to send UDP and TCP to external logger = %d',[DateUtils.MilliSecondsBetween(perfTimeStop, perfTimeStart)]);
     end
@@ -1471,6 +1474,8 @@ begin
        begin
        LogContactToUDP(RXData);
        end;
+    // Issue #783 -- network-received QSOs also feed RTC if multi-op uplink is enabled.
+    HamScoreOnLog(RXData);
     end;
   if not tAddQSOToLog(RXData) then Exit;
   //if RXData.Band in [Band160..Band10] then

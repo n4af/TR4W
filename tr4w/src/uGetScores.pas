@@ -52,6 +52,12 @@ procedure RunPOSTGetScoresThread;
 function MakePOSTRequestNew: integer;
 procedure ShowGetScoresStatus(Status: PChar);
 procedure CheckServerAnswer(AnswerLength: integer);
+
+// Issue #783 -- HamScore RTC support reuses the dynamicresults fragment
+// the existing scoreboard poster already builds.  This returns just the
+// XML container (no <?xml> prolog, no `xml=` form-encoding prefix), so
+// the RTC uploader can wrap it in a multi-container POST.
+function BuildDynamicResultsXml: AnsiString;
 //procedure SendOnLineResultsToRDXC2010Site;
 
 var
@@ -524,6 +530,105 @@ begin
   sWriteFile(h, GetScoresBuffer, Result);
   CloseHandle(h);
 }
+end;
+
+// ---------------------------------------------------------------------------
+// Issue #783 -- standalone <dynamicresults> builder for the HamScore RTC
+// uploader (uHamScore).  Mirrors the XML produced by MakePOSTRequestNew but
+// returns an AnsiString so the RTC worker thread can build its own copy
+// without sharing the GetScoresBuffer global with the existing 5-minute
+// scoreboard poster.
+//
+// IMPORTANT: when MakePOSTRequestNew's XML schema changes, mirror the change
+// here.  The two functions must stay aligned because hamscore.com expects
+// the same dynamicresults shape.
+// ---------------------------------------------------------------------------
+
+function BuildDynamicResultsXml: AnsiString;
+var
+  TempBand:    BandType;
+  TempMode:    ModeType;
+  m:           RemainingMultiplierType;
+  BandStr:     string;
+  nTotal:      Integer;
+  nQSOs:       Integer;
+  sContest:    string;
+  ts:          string;
+const
+  RTCMultStr:  array[RemainingMultiplierType] of string = ('', 'state', 'country', 'zone', 'prefix');
+  RTCModeStr:  array[ModeType] of string = ('CW', 'DIG', 'PH', 'ALL', '', '');
+begin
+  nTotal := 0;
+  nQSOs  := 0;
+
+  if Length(ContestsArray[Contest].ADIFName) = 0 then
+    sContest := ContestTypeSA[Contest]
+  else
+    sContest := ContestsArray[Contest].ADIFName;
+
+  Result := AnsiString(Format(
+    '<dynamicresults>' +
+    '<soft>%s</soft>' +
+    '<contest>%s</contest>' +
+    '<call>%s</call>' +
+    '<class ops="%s" mode="%s" power="%s" bands="%s" transmitter="%s"></class>' +
+    '<breakdown>',
+    [TR4W_CURRENTVERSION,
+     sContest,
+     string(MyCall),
+     tCategoryOperatorSA[CategoryOperator],
+     tCategoryModeSA[CategoryMode],
+     tCategoryPowerSA[CategoryPower],
+     tCategoryBandSA[CategoryBand],
+     tCategoryTransmitterSA[CategoryTransmitter]]));
+
+  for TempBand := Band160 to AllBands do
+    for TempMode := CW to Phone do
+    begin
+      if QSOTotals[TempBand, TempMode] = 0 then Continue;
+
+      if TempBand = AllBands then
+        begin
+        BandStr := 'total';
+        nQSOs   := nTotal;
+        end
+      else
+        begin
+        BandStr := string(BandStringsArrayWithOutSpaces[TempBand]);
+        nQSOs   := QSOTotals[TempBand, TempMode];
+        nTotal  := nTotal + nQSOs;
+        end;
+
+      Result := Result + AnsiString(Format(
+        '<qso band="%s" mode="%s">%d</qso>',
+        [BandStr, RTCModeStr[TempMode], nQSOs]));
+    end;
+
+  Result := Result + AnsiString(Format(
+    '<qso band="total" mode="ALL">%d</qso>', [nQSOs]));
+
+  for TempBand := Band160 to AllBands do
+    for TempMode := CW to Both do
+      for m := Succ(Low(RemainingMultiplierType)) to High(RemainingMultiplierType) do
+      begin
+        if mo.MTotals[TempBand, TempMode, m] = 0 then Continue;
+
+        if TempBand = AllBands then
+          BandStr := 'total'
+        else
+          BandStr := string(BandStringsArrayWithOutSpaces[TempBand]);
+
+        Result := Result + AnsiString(Format(
+          '<mult band="%s" mode="%s" type="%s">%d</mult>',
+          [BandStr, RTCModeStr[TempMode], RTCMultStr[m],
+           mo.MTotals[TempBand, TempMode, m]]));
+      end;
+
+  tGetSystemTime;
+  ts := SystemTimeToString(UTC);
+  Result := Result + AnsiString(Format(
+    '</breakdown><score>%d</score><timestamp>%s</timestamp></dynamicresults>',
+    [TotalScore, ts]));
 end;
 
 end.

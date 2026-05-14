@@ -110,6 +110,7 @@ uses
   utils_file in 'src\utils\utils_file.pas',
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas',
+  uHamScore in 'src\uHamScore.pas',
   uGridLookup in 'src\uGridLookup.pas',
   Log4D in 'src\Log4D.pas',
   uNetRadioBase in 'src\uNetRadioBase.pas',
@@ -656,6 +657,9 @@ begin
      externalLogger.loggerPort := externalLoggerPort;
      externalLogger.loggerAddress := externalLoggerAddress;
      end;
+  // Issue #783 -- start the HamScore RTC uploader if HAMSCORE ENABLE = TRUE.
+  // No-op if disabled or password is empty.
+  HamScoreInit;
   UpdateDebugLogLevel;
   //logger.debug('**************** Program Startup ************************');
   logger.info('DecimalSeparator = ' + DecimalSeparator);
@@ -1077,6 +1081,9 @@ begin
 //  except sm end;
   end;
   finally
+     // Issue #783 -- stop the HamScore RTC uploader cleanly so the worker
+     // thread isn't holding sockets when the process exits.
+     HamScoreShutdown;
      if Assigned(iniFile) then
         begin
         iniFile.Free;
