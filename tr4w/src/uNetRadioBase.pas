@@ -152,6 +152,13 @@ Type TNetRadioBase = class(TObject)
 
       function GetISConnected: boolean; virtual;
       function GetIsOperational: boolean; virtual;
+      // True if a Disconnect+Connect cycle would help when the radio sits
+      // in IsConnected=True but IsOperational=False for too long.  Default
+      // False -- safe for radios where the two dimensions are independent
+      // (e.g. Flex: TCP up vs SmartSDR slice valid).  TIcomRadio overrides
+      // to True because Icom's "operational" gap means the multi-step
+      // handshake stalled and a fresh AYH is the only recovery.
+      function GetCanRecycleOnStuckHandshake: boolean; virtual;
       function GetAuthFailed: boolean; virtual;
       function BandToFreq(band: TRadioBand): LongInt;  // Map band enum to typical calling frequency
 
@@ -195,6 +202,7 @@ Type TNetRadioBase = class(TObject)
       property IsReceiving: boolean read GetIsReceiving;
       property IsConnected: boolean read GetIsConnected;
       property IsOperational: boolean read GetIsOperational;
+      property CanRecycleOnStuckHandshake: boolean read GetCanRecycleOnStuckHandshake;
       property AuthFailed: boolean read GetAuthFailed;
       property IsRITOn[whichVFO: TVFO]: boolean read GetIsRITOn;
       property IsXITOn[whichVFO: TVFO]: boolean read GetIsXITOn;
@@ -873,6 +881,16 @@ begin
    // Default: connected = operational.
    // Radios with richer state (e.g. Flex slices) override this.
    Result := True;
+end;
+
+function TNetRadioBase.GetCanRecycleOnStuckHandshake: boolean;
+begin
+   // Default False: don't force a Disconnect+Connect cycle when stuck in
+   // IsConnected=True/IsOperational=False.  Radios where the two states
+   // are independent (Flex: TCP vs slice) would just churn TCP without
+   // fixing the actual issue.  Override and return True for radios where
+   // a fresh handshake is the right recovery path (e.g. TIcomRadio).
+   Result := False;
 end;
 
 function TNetRadioBase.GetAuthFailed: boolean;

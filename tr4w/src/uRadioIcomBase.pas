@@ -116,6 +116,8 @@ type
     function BCDToFreq(bcd: string): LongInt;
     procedure ProcessCIVFrame(frame: string); virtual;
     function GetIsConnected: boolean; override;
+    function GetIsOperational: boolean; override;             // Strict: true only when handshake fully complete
+    function GetCanRecycleOnStuckHandshake: boolean; override; // True for network -- fresh AYH is the recovery
     function GetAuthFailed: boolean; override;
     function IsNetworkConnection: boolean;
     function SupportsDataMode: Boolean; virtual;  // Override to True on radios that support $1A $06
@@ -552,6 +554,37 @@ begin
   end
   else
     Result := inherited GetIsConnected;
+end;
+
+// "Operational" is the strict counterpart to IsConnected: True only once the
+// transport has finished its full handshake and reached icsConnected.
+// Distinct from IsConnected (which stays True during the WaitingForHere /
+// WaitingForReady / WaitingForLogin / Authenticated / StreamRequested
+// reconnect dance so the polling thread does not interrupt the handshake).
+//
+// The UI alert color (uRadioPolling.SetRadioAlertState) keys off
+// IsOperational so the operator sees "radio lost" magenta the entire time
+// the radio is unreachable, instead of clearing back to normal the moment
+// a reconnect attempt fires (which is what happened before this override --
+// the base class's GetIsOperational returned True unconditionally).
+function TIcomRadio.GetIsOperational: boolean;
+begin
+  if IsNetworkConnection then
+    Result := (FNetworkTransport <> nil) and
+              (FNetworkTransport.State = icsConnected)
+  else
+    Result := inherited GetIsOperational;
+end;
+
+// Tell the polling thread it's safe to force a Disconnect+Connect cycle
+// when we sit in IsConnected=True / IsOperational=False for too long.
+// For network Icom this means "the multi-step handshake stalled" and a
+// fresh AYH packet is the only recovery (the transport doesn't auto-retry
+// the initial $0003).  For serial Icom this state can't really happen, so
+// return True only for the network path.
+function TIcomRadio.GetCanRecycleOnStuckHandshake: boolean;
+begin
+  Result := IsNetworkConnection;
 end;
 
 function TIcomRadio.GetAuthFailed: boolean;
