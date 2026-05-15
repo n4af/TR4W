@@ -3134,10 +3134,22 @@ begin
             logger.debug('ProcessFilteredStatus:Radio %s] rig.FilteredStatus.Band = NoBand', [rig.RadioName]);
             logger.debug('ProcessFilteredStatus:Radio %s] rig.FilteredStatus.freq = %d', [rig.RadioName,rig.FilteredStatus.Freq]);
             end;
-         if (rig.BandMemory <> rig.FilteredStatus.Band) or
-            (rig.ModeMemory <> rig.FilteredStatus.Mode) then
+         logger.Trace('[ProcessFilteredStatus] rig=%s, ' +
+                      'BandMemory=%d, FS.Band=%d, ' +
+                      'ModeMemory=%d, FS.Mode=%d, ' +
+                      'FS.Freq=%d, ActiveBand(before)=%d, ActiveMode(before)=%d',
+                      [rig.RadioName, Ord(rig.BandMemory), Ord(rig.FilteredStatus.Band),
+                       Ord(rig.ModeMemory), Ord(rig.FilteredStatus.Mode),
+                       rig.FilteredStatus.Freq, Ord(ActiveBand), Ord(ActiveMode)]);
+         // Guard: NoBand/NoMode are sentinels meaning "not yet reported by radio".
+         // Never propagate them into ActiveBand/ActiveMode; they would corrupt the
+         // bandmap, dupe sheet, and multiplier displays until the next valid poll.
+         if (rig.FilteredStatus.Band <> NoBand) and
+            (rig.FilteredStatus.Mode <> NoMode) and
+            ((rig.BandMemory <> rig.FilteredStatus.Band) or
+             (rig.ModeMemory <> rig.FilteredStatus.Mode)) then
             begin
-               ActiveBand := rig.FilteredStatus.Band;   // After reset port, filteredstatus.band is NoBand which is the issue     - FS.freq is set correctly so find out what sets filteredStatus up
+               ActiveBand := rig.FilteredStatus.Band;
                ActiveMode := rig.FilteredStatus.Mode;
                DisplayBandMode(ActiveBand, ActiveMode, False);
                VisibleDupeSheetChanged := True;
@@ -3180,8 +3192,21 @@ begin
 
          //GAV added this section. Changes BandmapBand & Bandmap Mode to follow inactive radio when inactive radio is tuned
 
-         if ((dif > 0) and ((rig.FilteredStatus.Freq <> BandMapCursorFrequency)
-            or (BandMapMode <> ActiveMode)) and (rig.FilteredStatus.Freq <> 0)) then
+         // Issue #908: gate the "follow inactive radio" feature on TwoRadioMode.
+         // The legacy LOGWIND.PAS path checked TwoRadioState <> TwoRadiosDisabled;
+         // this Gav-added polling path forgot the SO2R gate, so an inactive radio
+         // could mutate the bandmap even with TWO RADIO MODE=FALSE.
+         //
+         // Guard: also skip if the inactive radio has not yet reported real
+         // band/mode (NoBand/NoMode are uninitialized sentinels), which would
+         // otherwise blank the active radio's bandmap on first poll.
+         if TwoRadioMode and
+            (rig.FilteredStatus.Band <> NoBand) and
+            (rig.FilteredStatus.Mode <> NoMode) and
+            (dif > 0) and
+            ((rig.FilteredStatus.Freq <> BandMapCursorFrequency) or
+             (BandMapMode <> ActiveMode)) and
+            (rig.FilteredStatus.Freq <> 0) then
             // Gav 4.47.4 #015
             begin
                BandmapBand := rig.FilteredStatus.Band;

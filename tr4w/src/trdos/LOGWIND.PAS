@@ -4466,8 +4466,41 @@ end;
 
 procedure DisplayBandMap;
 begin
-  if not BandMapEnable then Exit;
-  if not tWindowsExist(tw_BANDMAPWINDOW_INDEX) then Exit;
+  // Diagnostic: trace every entry into DisplayBandMap so we can see who
+  // is calling and what state the gates are in.  Useful for tracking
+  // down "bandmap clears unexpectedly" symptoms (issue: bandmap-startup-clear).
+  // Booleans rendered as 0/1 via Ord() to avoid pulling SysUtils.BoolToStr
+  // through this unit's tangled uses chain.
+  logger.Trace('[DisplayBandMap] enter: ' +
+               'BandMapEnable=%d, BandMapWindowExists=%d, ' +
+               'BandMapPreventRefresh=%d, ' +
+               'BandMapBand=%d, BandMapMode=%d, ' +
+               'BandMapAllBands=%d, BandMapAllModes=%d, ' +
+               'BandMapDupeDisplay=%d, BandMapDisplayCQ=%d, ' +
+               'BandMapMultsOnly=%d, WARCBandsEnabled=%d, VHFBandsEnabled=%d, ' +
+               'FCount=%d',
+    [Ord(BandMapEnable),
+     Ord(tWindowsExist(tw_BANDMAPWINDOW_INDEX)),
+     Ord(BandMapPreventRefresh),
+     Ord(BandMapBand), Ord(BandMapMode),
+     Ord(BandMapAllBands),
+     Ord(BandMapAllModes),
+     Ord(BandMapDupeDisplay),
+     Ord(BandMapDisplayCQ),
+     Ord(BandMapMultsOnly),
+     Ord(WARCBandsEnabled),
+     Ord(VHFBandsEnabled),
+     SpotsList.Count]);
+  if not BandMapEnable then
+    begin
+    logger.Trace('[DisplayBandMap] exit: BandMapEnable=False');
+    Exit;
+    end;
+  if not tWindowsExist(tw_BANDMAPWINDOW_INDEX) then
+    begin
+    logger.Trace('[DisplayBandMap] exit: bandmap window does not exist');
+    Exit;
+    end;
 //  if  BandMapPreventRefresh then  Exit;             // GAV  4.45.6
   SpotsList.Display;
   end;
@@ -4897,8 +4930,20 @@ begin
                          //                  going to assume that it is appropriate for the band
                          //                  map on this band to be displayed!
 
-                         if (TwoRadioState <> TwoRadiosDisabled) and BandMapEnable and RadioOnTheMove[radioone] then
+                         // Guard: don't follow the inactive radio if it has not yet
+                         // reported a real band/mode (NoBand/NoMode are uninitialized
+                         // sentinels). Same defect as uRadioPolling.pas inactive branch.
+                         if (TwoRadioState <> TwoRadiosDisabled) and BandMapEnable and
+                            RadioOnTheMove[radioone] and
+                            (FilteredStatus.Band <> NoBand) and
+                            (FilteredStatus.Mode <> NoMode) then
                             begin
+                               logger.Trace('[BMWriter LOGWIND:4935 inactive-FS] ' +
+                                            'BandMapBand:=FS.Band=%d, BandMapMode:=FS.Mode=%d, FS.Freq=%d, ' +
+                                            'TwoRadioState=%d, RadioOnTheMove[1]=%d',
+                                            [Ord(FilteredStatus.Band), Ord(FilteredStatus.Mode),
+                                             FilteredStatus.Freq, Ord(TwoRadioState),
+                                             Ord(RadioOnTheMove[radioone])]);
                                BandMapBand := FilteredStatus.Band;
                                BandMapMode := FilteredStatus.Mode;
                                BandMapCursorFrequency := FilteredStatus.Freq;
