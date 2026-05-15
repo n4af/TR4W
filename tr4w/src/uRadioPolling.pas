@@ -727,21 +727,23 @@ var
    lastHeartbeatTick: LongWord;
    lastRITXITTick: LongWord;
    authErrBuf: array[0..127] of Char;
+   handshakeStuckSinceTick: LongWord;  // GetTickCount when we first noticed IsConnected but not IsOperational; 0 = not tracking
 const
    RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
    RECONNECT_MAX_DELAY = 30000;       // 30 seconds max delay
+   HANDSHAKE_STUCK_MS = 8000;         // Force a Disconnect+Connect cycle if the transport has been mid-handshake (IsConnected but not IsOperational) for this long.  Covers the "radio was off when Connect() fired, the initial AYH packet was lost, no further AYH retries are sent" failure mode -- without this the polling thread spins forever in the connected branch sending CI-V commands that fail with "stream not open".
 
-   // SetRadioAlertState — set or clear RadioDisconnected flag and repaint freq/name
+   // SetRadioAlertState ï¿½ set or clear RadioDisconnected flag and repaint freq/name
    // windows only on a state transition (guarded by current flag value).
    procedure SetRadioAlertState(alertOn: boolean);
    begin
       if alertOn = rig^.RadioDisconnected then
-         Exit;   // No change — do not call InvalidateRect unnecessarily
+         Exit;   // No change ï¿½ do not call InvalidateRect unnecessarily
       rig^.RadioDisconnected := alertOn;
       if alertOn then
-         logger.Info('[pNetworkRadio] %s — alert color ON', [rig^.RadioName])
+         logger.Info('[pNetworkRadio] %s ï¿½ alert color ON', [rig^.RadioName])
       else
-         logger.Info('[pNetworkRadio] %s — alert color OFF', [rig^.RadioName]);
+         logger.Info('[pNetworkRadio] %s ï¿½ alert color OFF', [rig^.RadioName]);
       if rig^.FreqWindowHandle <> 0 then
          Windows.InvalidateRect(rig^.FreqWindowHandle, nil, False);
       if rig^.RadioNameWndHandle <> 0 then
@@ -765,6 +767,7 @@ begin
    lastHeartbeatTick := 0;
    lastRITXITTick := 0;
    reconnectDelay := RECONNECT_INITIAL_DELAY;
+   handshakeStuckSinceTick := 0;
 
    // Keep polling thread alive until stop is requested (e.g. on Reset Radio Ports)
    while not rig^.PollingStopRequested do
@@ -772,13 +775,59 @@ begin
       try
          if ro.IsConnected then
          begin
+         // Stuck-handshake detector: IsConnected is the loose "transport is doing
+         // something" check that stays True throughout the multi-step Icom
+         // handshake (WaitingForHere/WaitingForReady/WaitingForLogin/etc.).
+         // If we sit in that limbo too long -- e.g. the radio was off when our
+         // initial AYH packet was sent, and the transport doesn't auto-retry --
+         // force a Disconnect so the else-branch fires Connect() again with
+         // a fresh handshake.  Without this, the polling thread spins forever
+         // in the connected branch sending CI-V commands that fail with
+         // "stream not open" until the operator manually intervenes.
+         //
+         // Gated on CanRecycleOnStuckHandshake so we only force-recycle for
+         // radios where it actually fixes things.  Flex returns False because
+         // its IsOperational drops when SmartSDR closes (TCP is fine, slice
+         // is gone) -- recycling TCP wouldn't help and would just churn.
+         if (not ro.IsOperational) and ro.CanRecycleOnStuckHandshake then
+            begin
+            if handshakeStuckSinceTick = 0 then
+               handshakeStuckSinceTick := GetTickCount
+            else if (GetTickCount - handshakeStuckSinceTick) > HANDSHAKE_STUCK_MS then
+               begin
+               logger.Warn('[pNetworkRadio] %s handshake stuck (IsConnected but not IsOperational) for >%d ms; forcing Disconnect for retry',
+                  [rig^.RadioName, HANDSHAKE_STUCK_MS]);
+               handshakeStuckSinceTick := 0;
+               try
+                  ro.Disconnect;
+               except
+                  on E: Exception do
+                     logger.Debug('[pNetworkRadio] Forced Disconnect raised: %s - %s', [E.ClassName, E.Message]);
+               end;
+               // Brief sleep so the next iteration sees the new state cleanly,
+               // then loop -- the else-branch will reset wasConnected and
+               // schedule the reconnect via the existing backoff path.
+               Sleep(100);
+               Continue;
+               end;
+            end
+         else
+            handshakeStuckSinceTick := 0;  // operational, or this radio doesn't recycle on stuck
+
          // Radio is connected - poll status
          if not wasConnected then
             begin
-            logger.trace('[pNetworkRadio] Radio connected — querying initial freq/mode/state');
+            logger.trace('[pNetworkRadio] Radio connected ï¿½ querying initial freq/mode/state');
             wasConnected := True;
             reconnectDelay := RECONNECT_INITIAL_DELAY;  // Reset backoff on successful connection
-            SetRadioAlertState(False);  // TCP reconnected — clear alert (operational check below)
+            // Don't unconditionally clear the alert here -- IsConnected is
+            // the loose "transport is doing something" check that stays True
+            // throughout the multi-step Icom handshake (WaitingForHere etc.).
+            // The IsOperational query below (and the per-iteration check at
+            // line ~944) is the strict "fully connected" gate that drives
+            // the alert color; clearing here would briefly turn the alert
+            // off during reconnect even when the radio is unreachable.
+            SetRadioAlertState(not ro.IsOperational);
 
             // For serial radios that require active polling, honour the user-configurable
             // FREQUENCY POLL RATE setting (FreqPollRate, default 10ms, range 10-1000ms).
@@ -798,12 +847,12 @@ begin
             if Assigned(ro) then
                begin
                logger.Debug('[pNetworkRadio] Querying initial freq/mode');
-               ro.QueryActiveVFO;      // $07 $D2 — must be first so FActiveVFO is set before mode routing
+               ro.QueryActiveVFO;      // $07 $D2 ï¿½ must be first so FActiveVFO is set before mode routing
                ro.QueryVFOAFrequency;
                ro.QueryVFOBFrequency;
-               ro.QueryMode;           // $04 — active VFO mode ? routed to FActiveVFO slot
-               ro.QueryVFOAMode;       // $26 $00 — inactive VFO A mode (when VFO B is active)
-               ro.QueryVFOBMode;       // $26 $01 — VFO B mode + data mode
+               ro.QueryMode;           // $04 ï¿½ active VFO mode ? routed to FActiveVFO slot
+               ro.QueryVFOAMode;       // $26 $00 ï¿½ inactive VFO A mode (when VFO B is active)
+               ro.QueryVFOBMode;       // $26 $01 ï¿½ VFO B mode + data mode
                end;
 
             // Poll the remaining states that transceive does not push
@@ -814,14 +863,14 @@ begin
                end;
 
             // CW speed on initial connection:
-            // - CWSpeedSync OFF: program is master — push CodeSpeed to radio so they agree.
-            // - CWSpeedSync ON:  radio is master — do NOT push; leave the radio's speed alone.
+            // - CWSpeedSync OFF: program is master ï¿½ push CodeSpeed to radio so they agree.
+            // - CWSpeedSync ON:  radio is master ï¿½ do NOT push; leave the radio's speed alone.
             //   The $14 $0C query sent during connect will return ro.CWSpeed, and the
             //   polling loop below (ro.CWSpeed -> CodeSpeed sync) will apply it on the
             //   first cycle that sees a valid response.
             if not rig^.CWSpeedSync and (CodeSpeed >= 6) and Assigned(ro) then
                begin
-               logger.Debug('[pNetworkRadio] CWSpeedSync off — pushing program speed %d WPM to radio', [CodeSpeed]);
+               logger.Debug('[pNetworkRadio] CWSpeedSync off ï¿½ pushing program speed %d WPM to radio', [CodeSpeed]);
                ro.SetCWSpeed(CodeSpeed);
                end;
             end;
@@ -851,7 +900,7 @@ begin
          // HamLib Direct: drain user commands first on every cycle (max 50ms latency),
          // then poll when an async callback fired or the heartbeat interval elapsed.
          // Set HAMLIB ASYNC ONLY = TRUE in cfg to disable the heartbeat and only
-         // poll on async callbacks — useful for testing whether transceive is working.
+         // poll on async callbacks ï¿½ useful for testing whether transceive is working.
          if Assigned(ro) and (ro is THamLibDirect) then
             begin
             THamLibDirect(ro).DrainUrgentQueue;
@@ -873,7 +922,7 @@ begin
                lastHeartbeatTick := GetTickCount;
                end;
 
-            // RIT/XIT slow poll — every 5000ms independently of the main heartbeat.
+            // RIT/XIT slow poll ï¿½ every 5000ms independently of the main heartbeat.
             // rig_get_rit/xit trigger $07 D0 side-effects in HamLib's Icom driver
             // which dismiss front-panel menus; polling infrequently keeps them usable.
             if GetTickCount - lastRITXITTick >= 5000 then
@@ -920,7 +969,7 @@ begin
          rig.CurrentStatus.VFO[VFOB].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOB]);
 
          // Sync CW speed from radio ? program (active radio only, when CWSpeedSync enabled)
-         // Only the active radio should update CodeSpeed — in SO2R, the inactive radio
+         // Only the active radio should update CodeSpeed ï¿½ in SO2R, the inactive radio
          // may have a different speed and would otherwise fight the active radio.
          if rig^.CWSpeedSync and (ro.CWSpeed > 0) and (ro.CWSpeed <> CodeSpeed)
             and (rig = ActiveRadioPtr) then
@@ -930,7 +979,7 @@ begin
             DisplayCodeSpeed;  // Refreshes display and persists to SpeedMemory
             end;
 
-         // HamLib Direct skips this — SendPollRequests already logs individual values.
+         // HamLib Direct skips this ï¿½ SendPollRequests already logs individual values.
          if TR4W_HAMLIB_DEBUG and not (ro is THamLibDirect) then
             logger.Info('[pNetworkRadio:%s] pre-UpdateStatus: VFOA=%d VFOB=%d split=%s VFOStatus=%d',
                [rig^.RadioName,
@@ -3111,7 +3160,7 @@ begin
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
                BandMapBand := ActiveBand;
                BandMapMode := ActiveMode;
-               BandMapNeedsRefresh := True; // coalesced via 250ms timer — avoids flash on every VFO poll
+               BandMapNeedsRefresh := True; // coalesced via 250ms timer ï¿½ avoids flash on every VFO poll
             end;
       end
    else
@@ -3139,7 +3188,7 @@ begin
                BandMapMode := rig.FilteredStatus.Mode;
                VisibleDupeSheetChanged := True;
                BandMapCursorFrequency := rig.FilteredStatus.Freq;
-               BandMapNeedsRefresh := True; // coalesced via 250ms timer — avoids flash on every VFO poll
+               BandMapNeedsRefresh := True; // coalesced via 250ms timer ï¿½ avoids flash on every VFO poll
             end;
 
          //GAV End of added
@@ -3762,7 +3811,7 @@ procedure GetVFOInfoForYaesuFTX1(buf: PChar; var VFO: VFOStatusType;
    FrequencyAdder: integer);
    // FTX-1F/FTX-1R IF response layout (30 bytes total, Issue #817):
    //   Pos 1-2:   "IF"
-   //   Pos 3-7:   P1  VFO/memory channel (5 bytes — 2 longer than FTDX10's 3-byte P1)
+   //   Pos 3-7:   P1  VFO/memory channel (5 bytes ï¿½ 2 longer than FTDX10's 3-byte P1)
    //   Pos 8-16:  P2  VFO frequency Hz (9 bytes)
    //   Pos 17:    P3  Clarifier direction (+/-)
    //   Pos 18-21: P3  Clarifier offset 0000-9990 Hz (4 bytes)
@@ -4187,7 +4236,7 @@ begin
    if which = 0 then
       begin
          rig.CurrentStatus.VFO[VFOA].Mode := mode;
-         rig.CurrentStatus.VFO[VFOA].ExtendedMode := em;  // was VFOB — copy-paste bug
+         rig.CurrentStatus.VFO[VFOA].ExtendedMode := em;  // was VFOB ï¿½ copy-paste bug
          rig.CurrentStatus.Mode := mode;
          rig.CurrentStatus.ExtendedMode := em;
       end
