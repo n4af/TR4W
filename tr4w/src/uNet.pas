@@ -254,8 +254,13 @@ begin
           NetDisconnect;
           Windows.ZeroMemory(@StatusArray, SizeOf(StatusArray));
           for i := 1 to 26 do DisplayClientStatus(i);
+          // Issue #910: replaced modal dialog (showwarning) with non-blocking
+          // QuickDisplay toast + title-bar update.  Auto-reconnect is handled
+          // by the existing WM_TIMER path which calls TryConnectToNetwork
+          // every tNetStatusUpdateInterval ms while NetSocket = 0.
+          ShowConnectionStatus(TC_DISCONNECTEDFROM);
           Format(wsprintfBuffer, TC_CONNECTIONTOTR4WSERVERLOST, @ServerAddress[1], ServerPort);
-          showwarning(wsprintfBuffer);
+          QuickDisplay(wsprintfBuffer);
           Exit;
         end;
 

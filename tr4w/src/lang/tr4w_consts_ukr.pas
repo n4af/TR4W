@@ -206,6 +206,7 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   TC_CONNECTINGTO                       = 'З`єднання з';
   TC_CONNECTTOTR4WSERVERFAILED          = 'З`єднання з TR4WSERVER не вдалося. Перевірте значення команди SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'З`єднано з';
+  TC_DISCONNECTEDFROM                   = '** DISCONNECTED from ';
   TC_FAILEDTOCONNECTTO                  = 'Не вдалося з`єднатися з';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Серверний та локальний логи однакові.';
   TC_NETWORK                            = 'Мережа: %s %s:%d';
