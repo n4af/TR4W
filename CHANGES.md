@@ -22,6 +22,18 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.12 (2026-05-16) — NY4I
+
+#### TR4WSERVER disconnect UX (`src/uNet.pas`, `src/lang/*`) — Issue #910
+
+- **Modal dialog replaced with non-blocking toast**: when the TR4WSERVER connection drops, `uNet.pas:252-260` no longer pops a `MessageBox` ("Connection to TR4WSERVER lost.") that blocked the call/exchange windows mid-contest. The notification is now a `QuickDisplay` toast in the status row. `showwarning(wsprintfBuffer)` → `QuickDisplay(wsprintfBuffer)`.
+- **Network window title bar reflects state**: added `ShowConnectionStatus(TC_DISCONNECTEDFROM)` call alongside the toast so the title bar reads `Network : ** DISCONNECTED from LOCALHOST:1061` until reconnect. On reconnect, `ConnectThread` already calls `ShowConnectionStatus(TC_CONNECTEDTO)` which restores the normal title automatically.
+- **Auto-reconnect was already in place** (`uNet.pas:229-246` WM_TIMER handler calls `TryConnectToNetwork` every `tNetStatusUpdateInterval` ms while `NetSocket = 0`); only the notification UX needed fixing.
+- **New language constant `TC_DISCONNECTEDFROM`** added to all 11 language files (`tr4w_consts_*.pas`) via byte-level insertion to preserve original ANSI codepages and CRLF line endings. English: `'** DISCONNECTED from '`; conservative Latin-script translations for ger/pol/cze/ser/esp/rom; English fallback for rus/ukr/mng/chn (translations to follow).
+- **Title-bar color limitation noted**: standard Win32 title bars cannot be colored without custom-painting the non-client area; ASCII `**` prefix + caps used as the visual cue instead. A colored status banner inside the dialog deferred as a future enhancement.
+
+---
+
 ### 4.147.11 (2026-05-16) — NY4I
 
 #### Bandmap inactive-radio guards (`uRadioPolling.pas`, `trdos/LOGWIND.PAS`, `uSpots.pas`) — Issue #908

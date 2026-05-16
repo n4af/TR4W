@@ -24,6 +24,14 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.12 (2026-05-16) — NY4I
+
+#### Multi-Op / Networking
+
+- **Losing connection to the multi-op server no longer pops a modal dialog mid-contest.** Previously, if the TR4WSERVER connection dropped (server restart, network blip, etc.), TR4W would show a "Connection to TR4WSERVER lost." MessageBox that blocked the call window, exchange window, and every other input until you clicked OK. Now you get a transient status-row toast and the Network window title bar changes to "** DISCONNECTED from LOCALHOST:1061" — logging keeps working uninterrupted. The program auto-reconnects every ~5 seconds in the background and the title returns to "Connected to ..." once the server is back. (Issue #910)
+
+---
+
 ### 4.147.11 (2026-05-16) — NY4I
 
 #### Bandmap
