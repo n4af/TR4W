@@ -220,16 +220,27 @@ var
   CurrentCursorPos: integer;
   //    CurCursorPosData                     : integer;
   NumberEntriesDisplayed: integer;
+  // Diagnostic counters -- per-filter rejection tallies (issue: bandmap-startup-clear).
+  // Total of all reject* + rejNoNext + NumberEntriesDisplayed should equal FCount.
+  rejDupeNext, rejBand, rejMode, rejDupeFlag, rejCQ, rejWARC, rejMultsOnly, rejVHF: Integer;
 begin
   bottom := 0;
   top := 1;
   centrefound := False; // 4.79.3
+  rejDupeNext := 0; rejBand := 0; rejMode := 0; rejDupeFlag := 0;
+  rejCQ := 0; rejWARC := 0; rejMultsOnly := 0; rejVHF := 0;
   //  inc(SpotsDisplayed);
   //  setwindowtext(OpModeWindowHandle,inttopchar(SpotsDisplayed));
   if BandMapListBox = 0 then
+    begin
+    logger.Trace('[SpotsList.Display] exit: BandMapListBox=0');
     Exit;
+    end;
   if BandMapPreventRefresh then
+    begin
+    logger.Trace('[SpotsList.Display] exit: BandMapPreventRefresh=True');
     Exit; // Gav 4.45.6
+    end;
   TDXSpotsList.UpdateSpotsMultiplierStatus;
   CurrentCursorPos := tLB_GETCURSEL(BandMapListBox); //0;
   setlength(FiltSpotIndex, FCount);
@@ -238,28 +249,52 @@ begin
   for i := 0 to FCount - 1 do
   begin
     if (FList^[i].FCall = FList^[i + 1].FCall) then
+      begin
+      Inc(rejDupeNext);
       continue;
+      end;
     if not BandMapAllBands then
       if FList^[i].FBand <> BandmapBand then
+        begin
+        Inc(rejBand);
         Continue; //Gav  ActiveBand changed to BandmapBand
+        end;
     if not BandMapAllModes then
       if FList^[i].FMode <> BandmapMode then
+        begin
+        Inc(rejMode);
         Continue; //Gav  ActiveMode changed to BandmapMode
+        end;
     if not BandMapDupeDisplay then
       if FList^[i].FDupe then
+        begin
+        Inc(rejDupeFlag);
         Continue;
+        end;
     if not BandMapDisplayCQ then
       if FList^[i].FCQ then
+        begin
+        Inc(rejCQ);
         Continue;
+        end;
     if not WARCBandsEnabled then
       if FList^[i].FWARCBand then
+        begin
+        Inc(rejWARC);
         Continue;
+        end;
     if BandMapMultsOnly then
       if not ((FList^[i].FMult) or (FList^[i].FCQ)) then
+        begin
+        Inc(rejMultsOnly);
         Continue; //Gav added or FCQ to stop CQ spots being trapped by Mult only filter
+        end;
     if not VHFBandsEnabled then
       if (FList^[i].FBand > Band12) then
+        begin
+        Inc(rejVHF);
         Continue;
+        end;
 
     // SendMessage(BandMapListBox, LB_ADDSTRING, 0, integer(i));         //GAV original message send
 
@@ -270,6 +305,9 @@ begin
     inc(k);
 
   end;
+  logger.Trace('[SpotsList.Display] filter pass: FCount=%d, passed=%d, rejected by: NextDup=%d Band=%d Mode=%d DupeFlag=%d CQ=%d WARC=%d MultsOnly=%d VHF=%d',
+    [FCount, NumberEntriesDisplayed, rejDupeNext, rejBand, rejMode, rejDupeFlag,
+     rejCQ, rejWARC, rejMultsOnly, rejVHF]);
 
   //Gav   Start of added section to limit and centre bandmap on vfo, using pointers to Flist stored in FiltSpotIndex arrray
 
@@ -340,6 +378,8 @@ begin
     SendMessage(BandMapListBox, LB_ADDSTRING, 0, FiltSpotIndex[k]);
   tLB_SETCURSEL(BandMapListBox, CurrentCursorPos);
   tSetWindowRedraw(BandMapListBox, True);
+  logger.Trace('[SpotsList.Display] listbox populated: bottom=%d, top=%d, items_added=%d, CurrentCursorPos=%d, BandMapDisplayLimit=%d',
+    [bottom, top, top - bottom + 1, CurrentCursorPos, BandMapDisplayLimit]);
   // WM_SETREDRAW(True) causes the list box to queue an erase+paint, which
   // produces a visible flash. Cancel the pending erase, then repaint
   // immediately without erasing — owner-draw items fill their own background.
