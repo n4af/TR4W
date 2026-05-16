@@ -22,6 +22,28 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.11 (2026-05-16) — NY4I
+
+#### Bandmap inactive-radio guards (`uRadioPolling.pas`, `trdos/LOGWIND.PAS`, `uSpots.pas`) — Issue #908
+
+- **SO2R gate at inactive-radio polling path (`uRadioPolling.pas:3138`)**: Gav-added "follow inactive radio when tuned" code was missing the `TwoRadioMode` gate that the older `LOGWIND.PAS:4933` legacy path already had. With `TWO RADIO MODE = FALSE`, an inactive radio's polling thread could still mutate `BandMapBand`/`BandMapMode`. Now gated on `TwoRadioMode`.
+- **Sentinel-value guard at three sites**: `FilteredStatus.Band = NoBand` and `FilteredStatus.Mode = NoMode` are "haven't received from radio yet" sentinels. Three sites propagated them unconditionally into globals (`ActiveBand`/`ActiveMode`/`BandMapBand`/`BandMapMode`), blanking the bandmap on startup when an inactive Icom polling thread fired before its handshake completed. Guard added at `uRadioPolling.pas:3088` (active-radio polling), `uRadioPolling.pas:3138` (inactive-radio polling — confirmed culprit), and `LOGWIND.PAS:4933` (legacy LogWind path).
+- **Diagnostic TRACE logging**: `[DisplayBandMap]` entry state, `[SpotsList.Display]` per-filter rejection breakdown (NextDup/Band/Mode/DupeFlag/CQ/WARC/MultsOnly/VHF) + listbox populate stats, `[ProcessFilteredStatus]` polling-thread state on each active-radio poll, `[BMWriter LOGWIND:4933 inactive-FS]` when the legacy LogWind path fires. TRACE-only — no behavior change at default log levels.
+
+---
+
+### 4.147.10 (2026-05-15) — NY4I
+
+#### Icom network disconnect color, recovery, and detection speed (`uRadioIcomBase.pas`, `uNetRadioBase.pas`, `uRadioPolling.pas`, `uIcomNetworkTypes.pas`) — Issue #907
+
+Three compounding defects in Icom network disconnect handling. Surfaced during IC-7760 testing: turn the radio off → ~15 s before magenta "radio lost" indicator appeared → ~1 s later the indicator switched back to normal color → never actually recovered when the radio was turned back on.
+
+- **Alert color flashed back to normal during reconnect**: `TIcomRadio` did not override `GetIsOperational`, so it inherited the base default `True`. When the polling thread fired its 1-second-after-disconnect reconnect, the transport went `Disconnected → WaitingForHere`, the polling thread took the "connected" branch, and `uRadioPolling.pas:781` unconditionally cleared the alert. **Fix**: `TIcomRadio.GetIsOperational` now returns `True` only when `FNetworkTransport.State = icsConnected`; `uRadioPolling.pas:781` changed to `SetRadioAlertState(not ro.IsOperational)`.
+- **No recovery from stuck handshake**: transport sends one `$0003` AYH packet on `Connect()` and sits in `WaitingForHere` forever if no `$0004` reply arrives — exactly what happens when `Connect()` fires while the radio is off. **Fix**: new stuck-handshake detector at top of `pNetworkRadio`'s connected branch — when `IsConnected = True && IsOperational = False` persists >8000 ms, force `Disconnect` so the next iteration re-fires `Connect()` with a fresh AYH. Gated on new virtual `TNetRadioBase.GetCanRecycleOnStuckHandshake` (default `False`); `TIcomRadio` overrides to `True` for network path. Flex (whose `IsOperational` tracks slice validity, not handshake state) and K4 / HamLib Direct (TCP-based) keep the default.
+- **Disconnect detection took 15 seconds**: `ICOM_PING_DEAD_TIMEOUT_MS` was `15000` (150 missed 100 ms pings). **Fix**: lowered to `3000` (30 missed pings).
+
+---
+
 ### 4.147.09 (2026-05-14) — NY4I / N4AF
 
 #### HamScore RTC Realtime Upload (new `src/uHamScore.pas`, hooks across `LOGSUBS2.PAS`, `uEditQSO.pas`, `uCFG.pas`, `MainUnit.pas`, `tr4w.dpr`) — Issue #783

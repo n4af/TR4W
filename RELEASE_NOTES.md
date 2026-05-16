@@ -24,6 +24,25 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.11 (2026-05-16) — NY4I
+
+#### Bandmap
+
+- **The bandmap no longer blanks at startup when a second radio is configured.** If you had a second Icom (e.g. an IC-7760) configured but not in two-radio mode, the bandmap would briefly show your spots and then go blank — the second radio's first polling cycle was overwriting the bandmap with an uninitialized band. The bandmap now stays on your active radio and ignores the second radio entirely unless TWO RADIO MODE = TRUE. (Issue #908)
+- **In two-radio (SO2R) mode, the bandmap still follows the S&P radio when you tune it** — that intentional behavior is preserved. Only the unintended single-radio side-effect was removed.
+
+---
+
+### 4.147.10 (2026-05-15) — NY4I
+
+#### Icom Network Radios (IC-7610, IC-7760, IC-9700, etc.)
+
+- **Power off your Icom and you'll see the magenta "radio lost" indicator within about 3 seconds** instead of 15. (Issue #907)
+- **The magenta indicator no longer flickers off-and-on during reconnect attempts.** If the radio is unreachable, the indicator stays magenta until the radio is actually back up.
+- **Recovery on radio power-up now works.** Previously, if the radio was off when TR4W first tried to connect, the program would sit silently forever — turning the radio on did nothing. Now the program retries the handshake every ~9 seconds while the radio is down, and reconnects within seconds once it comes back online.
+
+---
+
 ### 4.147.09 (2026-05-14) — NY4I / N4AF
 
 #### HamScore RTC Realtime Scoring
