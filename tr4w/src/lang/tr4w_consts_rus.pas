@@ -205,6 +205,7 @@ const
   TC_CONNECTINGTO                       = 'Соединение с ';
   TC_CONNECTTOTR4WSERVERFAILED          = 'Соединение с TR4WSERVER не удалось. Проверьте значение команды SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'Соединено с ';
+  TC_DISCONNECTEDFROM                   = '** DISCONNECTED from ';
   TC_FAILEDTOCONNECTTO                  = 'Не удалось соединиться с ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Серверный и локальный логи одинаковы.';
   TC_NETWORK                            = 'Сеть : %s %s:%d';

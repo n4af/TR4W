@@ -185,6 +185,7 @@ const
   TC_CONNECTINGTO                       = '£¹czê z ';
   TC_CONNECTTOTR4WSERVERFAILED          = 'Pó³aczenie z TR4WSERVER nie zosta³o nawi¹zane. SprawdŸ has³o dostêpowe do serwera!';
   TC_CONNECTEDTO                        = 'Po³¹czony z ';
+  TC_DISCONNECTEDFROM                   = '** Rozlaczony z ';
   TC_FAILEDTOCONNECTTO                  = 'Nie uda³o siê po³¹czyæ z ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Logi serwerowy i lokalne s¹ identyczne.';
   TC_NETWORK                            = 'Sieæ : %s %s:%d';

@@ -188,6 +188,7 @@ const
   TC_CONNECTINGTO                       = 'Connecting to ';
   TC_CONNECTTOTR4WSERVERFAILED          = 'Connect to TR4WSERVER failed. Check SERVER PASSWORD value!!';
   TC_CONNECTEDTO                        = 'Connected to ';
+  TC_DISCONNECTEDFROM                   = '** DISCONNECTED from ';
   TC_FAILEDTOCONNECTTO                  = 'Failed to connect to ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Server and local logs are identical.';
   TC_NETWORK                            = 'Network : %s %s:%d';

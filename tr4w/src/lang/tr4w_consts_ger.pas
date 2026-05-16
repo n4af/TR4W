@@ -197,6 +197,7 @@
   TC_CONNECTINGTO                       = 'Verbinde mit ';
   TC_CONNECTTOTR4WSERVERFAILED          = 'Verbindung zum TR4WSERVER fehlgeschlagen. Check SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'Verbunden mit ';
+  TC_DISCONNECTEDFROM                   = '** Verbindung getrennt - ';
   TC_FAILEDTOCONNECTTO                  = 'Kann nicht verbinden mit ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Serverlog und lokale Logs sind identisch.';
   TC_NETWORK                            = 'Network : %s %s:%d';
