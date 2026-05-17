@@ -141,9 +141,15 @@ begin
       begin
         NewContestDlgWndHandle := hwnddlg;
 
-        CreateStatic(RC_CAPTION, 5, 5, 280, hwnddlg, 445);
+        // Issue #915: shrink left column by 30 px to give the right-side
+        // CATEGORY-* labels room.  CATEGORY-TRANSMITTER (the longest label)
+        // was being clipped on the left because the label area was too
+        // narrow for right-aligned text.  Listbox entries are typically
+        // ~25-30 chars (e.g. "[2025 FLORIDA QSO PARTY NY4I]") which still
+        // fit comfortably at width 250.
+        CreateStatic(RC_CAPTION, 5, 5, 250, hwnddlg, 445);
          {LISTBOX}
-        CreateListBox(5, 35, 280, 370, hwnddlg, NC_LISTBOX);
+        CreateListBox(5, 35, 250, 370, hwnddlg, NC_LISTBOX);
 
         GetPrivateProfileString(_COMMANDS, LATEST_CONFIG_FILE, nil, TR4W_LATESTCFG_FILENAME, SizeOf(FileNameType), TR4W_INI_FILENAME);
         if TR4W_LATESTCFG_FILENAME[0] <> #0 then
@@ -155,7 +161,7 @@ begin
 
         {BUTTON LATEST CONFIG}
             TempCardinal := tWM_SETFONT(
-              CreateWindowEx(0, ButtonPChar, nil, BS_MULTILINE or WS_CHILD or BS_TEXT or WS_VISIBLE {or WS_TABSTOP}, 5, 415, 280, 50 {nHeight}, hwnddlg, NC_BUTTON_LATEST_CONFIG, hInstance, nil),
+              CreateWindowEx(0, ButtonPChar, nil, BS_MULTILINE or WS_CHILD or BS_TEXT or WS_VISIBLE {or WS_TABSTOP}, 5, 415, 250, 50 {nHeight}, hwnddlg, NC_BUTTON_LATEST_CONFIG, hInstance, nil),
               MSSansSerifFont);
 
             Windows.CopyMemory(@TempBuffer1, @TR4W_LATESTCFG_FILENAME, SizeOf(FileNameType));
@@ -169,9 +175,11 @@ begin
           end;
         end;
 
-        tCreateStaticWindow('MY CALL', WS_CHILD or SS_NOTIFY or SS_RIGHT or SS_NOPREFIX or WS_VISIBLE, 300, 5, 125 + 20, h, hwnddlg, 0);
+        // Issue #915: labels shifted left + widened to fit CATEGORY-TRANSMITTER
+        // at right-align.  x was 300, w was 125+20 (=145).  Now x=270, w=155+20.
+        tCreateStaticWindow('MY CALL', WS_CHILD or SS_NOTIFY or SS_RIGHT or SS_NOPREFIX or WS_VISIBLE, 270, 5, 155 + 20, h, hwnddlg, 0);
 
-        tCreateStaticWindow('CONTEST', WS_CHILD or SS_NOTIFY or SS_RIGHT or SS_NOPREFIX or WS_VISIBLE, 300, 33, 125 + 20, h, hwnddlg, 0);
+        tCreateStaticWindow('CONTEST', WS_CHILD or SS_NOTIFY or SS_RIGHT or SS_NOPREFIX or WS_VISIBLE, 270, 33, 155 + 20, h, hwnddlg, 0);
         tWM_SETFONT(CreateWindow(StaticPChar, nil, SS_SUNKEN or SS_center or WS_CHILD or WS_VISIBLE, 305, 95, 300, 40, hwnddlg, 106, hInstance, nil), MSSansSerifFont);
 
         {MY CALL}
@@ -203,7 +211,10 @@ begin
         for TempCardinal := 1 to CSAS do
         begin
           Top := 120 + TempCardinal * (h + 6);
-          InitialCommandsHWNDArray[TempCardinal, 1] := tCreateStaticWindow(InitialCommandsSA2[TempCardinal], WS_CHILD or SS_NOTIFY or SS_RIGHT or SS_NOPREFIX or WS_VISIBLE, 300, Top, 128 + 20, h, hwnddlg, 0);
+          // Issue #915: CATEGORY-* labels shifted left + widened so the
+          // longest one (CATEGORY-TRANSMITTER) fits at right-align without
+          // clipping.  Was: x=300, w=128+20 (=148).  Now: x=270, w=158+20.
+          InitialCommandsHWNDArray[TempCardinal, 1] := tCreateStaticWindow(InitialCommandsSA2[TempCardinal], WS_CHILD or SS_NOTIFY or SS_RIGHT or SS_NOPREFIX or WS_VISIBLE, 270, Top, 158 + 20, h, hwnddlg, 0);
           if TempCardinal < 4 then
             InitialCommandsHWNDArray[TempCardinal, 2] := tCreateEditWindow(WS_EX_STATICEDGE, nil, WS_TABSTOP or WS_CHILD or ES_UPPERCASE, 435 + 20, Top, 173 - 20, h, hwnddlg, 0)
           else

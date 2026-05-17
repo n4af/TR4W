@@ -133,7 +133,7 @@ const
   RC_REPEAT_POTA_HK                     = #9'Ctrl+T';
 
 
-    T_MENU_ARRAY_SIZE                     = 179 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS, separator, Repeat POTA Parks} + 2 {HamScore Resync (Tools) + HamScore Status (Windows menu), Issue #783};
+    T_MENU_ARRAY_SIZE                     = 179 {$IF MMTTYMODE} + 1{$IFEND}{$IF LANG = 'RUS'} + 3{$IFEND} + 2 {RC_RESET_RADIO_PORTS, separator, Repeat POTA Parks} + 2 {HamScore Resync (Tools) + HamScore Status (Windows menu), Issue #783} + 1 {3830 Score under File-Reports} + 1 {Edit Cabrillo Summary under Tools, Issue #914};
   T_MENU_ARRAY                          : array[0..T_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: RC_FILE; mrId: MAXWORD),
  //{
@@ -165,6 +165,7 @@ const
     (mrText: RC_QSOBYCOUNTRY; mrId: menu_qsobycountry),
     (mrText: RC_SCOREBYHOUR; mrId: menu_scorebyhour),
     (mrText: RC_SUMMARY; mrId: menu_summary),
+    (mrText: '3830 Score'; mrId: menu_3830scores),
   //}
     (mrText: nil; mrId: MAXWORD - 2),
     (mrText: '-'; mrId: 0),
@@ -368,6 +369,7 @@ const
     (mrText: 'Download POTA Parks'; mrId: menu_download_pota_parks),  // issue #864
     (mrText: 'Repeat POTA Parks (2nd Op)' + RC_REPEAT_POTA_HK; mrId: menu_repeat_pota_parks),
     (mrText: 'HamScore: Resync log from scratch'; mrId: menu_hamscore_resync),  // Issue #783
+    (mrText: 'Edit Cabrillo Summary...'; mrId: menu_edit_cabrillo_summary),     // Issue #914
  //}
     (mrText: '-'; mrId: 0),
     (mrText: RC_3830; mrId: menu_3830_scores_posting),

@@ -3600,6 +3600,8 @@ begin
 
     menu_cabrillo: OpenStationInformationWindow(integer(@CreateCabrilloFile));
     menu_summary: OpenStationInformationWindow(integer(@SummarySheet));
+    menu_3830scores: ExportTo3830Scores;  // Issue: 3830 quick-submission report
+    menu_edit_cabrillo_summary: OpenStationInformationWindow(0);  // Issue #914
     menu_export_edi: OpenStationInformationWindow(integer(@ExportToEDI));
 
     menu_scorebyhour: ScoreByHour;

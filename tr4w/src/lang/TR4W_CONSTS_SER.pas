@@ -209,6 +209,7 @@ const
   TC_CONNECTTOTR4WSERVERFAILED          = 'Konekcija na TR4WSERVER nije uspela. Proveri ispravnost LOZINKE SERVERA!!';
   TC_CONNECTEDTO                        = 'Konektovan na ';
   TC_DISCONNECTEDFROM                   = '** Diskonektovan sa ';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
   TC_FAILEDTOCONNECTTO                  = 'Konekcija nije uspela na ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Dnevnik na serveru i lokalni dnevnik identicni.';
   TC_NETWORK                            = 'Lokalna mreza : %s %s:%d';

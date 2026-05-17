@@ -2299,6 +2299,8 @@ const
   menu_import_adif                      = 10018;
   menu_export_edi                       = 10019;
   menu_csv                              = 10020;
+  menu_3830scores                       = 10021;
+  menu_edit_cabrillo_summary            = 10022;  // Issue #914
   menu_options                          = 10100;
   menu_messages                         = 10101;
   menu_other_messages                   = 10102;

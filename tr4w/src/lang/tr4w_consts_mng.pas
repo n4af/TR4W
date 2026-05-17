@@ -190,6 +190,7 @@ const
   TC_CONNECTTOTR4WSERVERFAILED          = 'TR4WSERVER сервер лvv холбогдсонгvй. SERVER PASSWORDаа шалгана уу!!';
   TC_CONNECTEDTO                        = 'Холбогдлоо';
   TC_DISCONNECTEDFROM                   = '** DISCONNECTED from ';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
   TC_FAILEDTOCONNECTTO                  = 'Холболт амжилтгvй боллоо';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Серверийн ба локал логууд зов байна';
   TC_NETWORK                            = 'Сvлжээ : %s %s:%d';

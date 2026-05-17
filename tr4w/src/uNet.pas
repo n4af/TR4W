@@ -158,6 +158,7 @@ var
   ServerAddress                         : str31 = 'LOCALHOST';
   ServerPassword                        : Str20 = 'TR4WSERVER';
   ServerPort                            : integer = 1061;
+  ServerAutoSynchronizeLogOnConnect     : boolean = False;  // Issue #912
   NetSocket                             : Cardinal;
   LogSyncSocket                         : Cardinal;
   ConnectedwithServer                   : boolean;
@@ -855,8 +856,44 @@ begin
 //    if tUSQE <> 0 then IdenticalLogs := False;
 
     if not IdenticalLogs then
+      begin
+      // Issue #912: if SERVER AUTO SYNCHRONIZE LOG ON CONNECT is set, skip
+      // the "Difference in logs" dialog AND the GetServerLog dialog entirely
+      // and run the sync headlessly in a worker thread.  The replace happens
+      // on the UI thread via SendMessage (see WM_USER_HEADLESS_SYNC_REPLACE
+      // in tr4w.dpr) so LoadinLog's ListView access is thread-safe.
+      //
+      // Safety: only auto-sync when contests match (or server has no contest
+      // yet); otherwise fall through to the existing dialog so the operator
+      // sees the wrong-server warning.
+      if ServerAutoSynchronizeLogOnConnect and
+         ((s^.liContest = Contest) or (s^.liContest = DUMMYCONTEST)) then
+         begin
+         logger.Info('Auto-synchronizing local log from server (CRC mismatch: local %x, server %x)',
+                     [s^.liLocalCRC32, s^.liSeverCRC32]);
+         QuickDisplay(TC_AUTOSYNCHRONIZINGLOG);
+         NewServerLogHandle := CreateFile(TR4W_SYN_FILENAME,
+                                          GENERIC_READ or GENERIC_WRITE,
+                                          FILE_SHARE_READ or FILE_SHARE_WRITE,
+                                          nil, CREATE_ALWAYS,
+                                          FILE_ATTRIBUTE_ARCHIVE, 0);
+         if NewServerLogHandle = INVALID_HANDLE_VALUE then
+            begin
+            logger.Error('Auto-sync: could not create %s', [TR4W_SYN_FILENAME]);
+            // Fall through to the existing dialog so the operator can react.
+            CreateModalDialog(220, 110, tr4whandle, @LogCompareDlgProc, integer(s));
+            end
+         else
+            begin
+            HeadlessSyncMode := True;
+            if LogSyncThreadID = 0 then
+               tCreateThread(@RunSyncThread, LogSyncThreadID);
+            end;
+         end
+      else
 //      DialogBoxParam(hInstance, MAKEINTRESOURCE(75), tr4whandle, @LogCompareDlgProc, integer(s))
-      CreateModalDialog(220, 110, tr4whandle, @LogCompareDlgProc, integer(s))
+         CreateModalDialog(220, 110, tr4whandle, @LogCompareDlgProc, integer(s));
+      end
     else
       QuickDisplay(TC_SERVERANDLOCALLOGSAREIDENTICAL);
 
