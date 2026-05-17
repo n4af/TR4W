@@ -121,6 +121,7 @@ procedure ExportToEDIByBand(Band: BandType);
 procedure ExportToADIF;
 procedure ExportToTRLogFormat;
 procedure ExportToCSV;   //n4af 04.30.3
+procedure ExportTo3830Scores;
 procedure PrintQSOsByCountry;
 function GenerateCountryMultiplierTotals: boolean;
 procedure QSOsByCountryByBand;
@@ -590,6 +591,183 @@ begin
   WriteScoreInformationToSummarySheet;
   CloseHandle(tReportFileWrite);
   FilePreview;
+end;
+
+procedure ExportTo3830Scores;
+// 3830Scores.com quick-submission report.  Layout adapts to contest rules:
+//   - Mode columns (CW Qs / Ph Qs / Dig Qs) appear only for modes that have
+//     at least one logged QSO.  Ph = USB+LSB+FM per spec.
+//   - Per-band Mults column appears iff MultByBand = TRUE (CQ-WW, etc).
+//   - Bottom Mults summary: per-mode breakdown if MultByMode = TRUE (FQP,
+//     NAQP); single 'Mults: N' otherwise.
+//   - All 8 standard 3830-form bands always rendered (160-2), even when
+//     zero.  Extra VHF/UHF rows appended only if they have QSOs.
+const
+   STD_BANDS        : array[0..7] of BandType =
+      (Band160, Band80, Band40, Band20, Band15, Band10, Band6, Band2);
+   STD_BAND_LABELS  : array[0..7] of string =
+      ('160', ' 80', ' 40', ' 20', ' 15', ' 10', '  6', '  2');
+var
+   buf                                   : string;
+   band                                  : BandType;
+   i                                     : integer;
+   m                                     : RemainingMultiplierType;
+   showCW, showPh, showDig               : boolean;
+   bandQsCW, bandQsPh, bandQsDig         : integer;
+   bandMults                             : integer;
+   sumCW, sumPh, sumDig, sumBandMults    : integer;
+   cwMults, phMults, digMults, totalMults: integer;
+   iniBuf                                : array[0..255] of Char;
+   operatorsStr, classStr, powerStr      : string;
+
+   function CalcBandMults(b: BandType): integer;
+   var
+      mm: RemainingMultiplierType;
+   begin
+      Result := 0;
+      // Note: FM QSOs are folded into Phone by LoadTotalCount (PostUnit ~986)
+      // before RawQSOTotals/MTotals are populated, so RawQSOTotals/MTotals
+      // are indexed by the CW..Both subrange of ModeType.  Don't reference
+      // FM here (compile error: 'Constant expression violates subrange bounds').
+      for mm := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
+         if MultByMode then
+            Result := Result +
+                      mo.MTotals[b, CW, mm] +
+                      mo.MTotals[b, Phone, mm] +
+                      mo.MTotals[b, Digital, mm]
+         else
+            Result := Result + mo.MTotals[b, Both, mm];
+   end;
+
+begin
+   if not CheckLog then Exit;
+   MakeReportFileName('3830Score.txt');
+   if not tOpenFileForWrite(tReportFileWrite, @ReportsFilename[1]) then Exit;
+
+   // RawQSOTotals[band, Phone] already includes FM (folded in by LoadTotalCount).
+   showCW  := RawQSOTotals[AllBands, CW] > 0;
+   showPh  := RawQSOTotals[AllBands, Phone] > 0;
+   showDig := RawQSOTotals[AllBands, Digital] > 0;
+
+   buf := SysUtils.Format('SOFTWARE: %s http://www.tr4w.net'#13#10#13#10,
+                          [TR4W_CURRENTVERSION]);
+   buf := buf + '3830Scores summary'#13#10#13#10;
+
+   // Metadata from the Cabrillo Summary fields the operator saved (read
+   // silently from tr4w.ini [REPORT] - no dialog popup).  Empty values
+   // emit blank lines so the operator types them directly on 3830's form.
+   if GetPrivateProfileString('REPORT', '_OPERATORS',
+         nil, iniBuf, SizeOf(iniBuf), TR4W_INI_FILENAME) > 0
+   then operatorsStr := string(iniBuf) else operatorsStr := '';
+   if GetPrivateProfileString('REPORT', '_CATEGORY-OPERATOR',
+         nil, iniBuf, SizeOf(iniBuf), TR4W_INI_FILENAME) > 0
+   then classStr := string(iniBuf) else classStr := '';
+   if GetPrivateProfileString('REPORT', '_CATEGORY-POWER',
+         nil, iniBuf, SizeOf(iniBuf), TR4W_INI_FILENAME) > 0
+   then powerStr := string(iniBuf) else powerStr := '';
+
+   buf := buf + SysUtils.Format('Call Used: %s'#13#10,        [string(MyCall)]);
+   buf := buf + SysUtils.Format('Operators: %s'#13#10,        [operatorsStr]);
+   buf := buf + SysUtils.Format('Class:     %s'#13#10,        [classStr]);
+   buf := buf + SysUtils.Format('Power:     %s'#13#10#13#10,  [powerStr]);
+
+   // Header row
+   buf := buf + '     ';
+   if showCW       then buf := buf + '    CW Qs';
+   if showPh       then buf := buf + '    Ph Qs';
+   if showDig      then buf := buf + '   Dig Qs';
+   if MultByBand   then buf := buf + '    Mults';
+   buf := buf + #13#10;
+
+   sumCW := 0; sumPh := 0; sumDig := 0; sumBandMults := 0;
+
+   // Standard 8 HF/Low-band rows (always shown, even when zero)
+   for i := Low(STD_BANDS) to High(STD_BANDS) do
+   begin
+      band      := STD_BANDS[i];
+      bandQsCW  := RawQSOTotals[band, CW];
+      bandQsPh  := RawQSOTotals[band, Phone];
+      bandQsDig := RawQSOTotals[band, Digital];
+
+      buf := buf + SysUtils.Format('%4s ', [STD_BAND_LABELS[i]]);
+      if showCW  then buf := buf + SysUtils.Format('%9d', [bandQsCW]);
+      if showPh  then buf := buf + SysUtils.Format('%9d', [bandQsPh]);
+      if showDig then buf := buf + SysUtils.Format('%9d', [bandQsDig]);
+      if MultByBand then
+         begin
+         bandMults := CalcBandMults(band);
+         buf := buf + SysUtils.Format('%9d', [bandMults]);
+         sumBandMults := sumBandMults + bandMults;
+         end;
+      buf := buf + #13#10#13#10;   // blank line between rows for readability
+
+      sumCW  := sumCW  + bandQsCW;
+      sumPh  := sumPh  + bandQsPh;
+      sumDig := sumDig + bandQsDig;
+   end;
+
+   // Extra VHF/UHF rows beyond 2m, only if they have QSOs
+   for band := Band222 to Band24G do
+      begin
+      bandQsCW  := RawQSOTotals[band, CW];
+      bandQsPh  := RawQSOTotals[band, Phone];
+      bandQsDig := RawQSOTotals[band, Digital];
+      if (bandQsCW + bandQsPh + bandQsDig) = 0 then Continue;
+
+      buf := buf + SysUtils.Format('%4s ', [BandStringsArray[band]]);
+      if showCW  then buf := buf + SysUtils.Format('%9d', [bandQsCW]);
+      if showPh  then buf := buf + SysUtils.Format('%9d', [bandQsPh]);
+      if showDig then buf := buf + SysUtils.Format('%9d', [bandQsDig]);
+      if MultByBand then
+         begin
+         bandMults := CalcBandMults(band);
+         buf := buf + SysUtils.Format('%9d', [bandMults]);
+         sumBandMults := sumBandMults + bandMults;
+         end;
+      buf := buf + #13#10#13#10;   // blank line between rows for readability
+
+      sumCW  := sumCW  + bandQsCW;
+      sumPh  := sumPh  + bandQsPh;
+      sumDig := sumDig + bandQsDig;
+      end;
+
+   // Total row
+   buf := buf + 'Total';
+   if showCW     then buf := buf + SysUtils.Format('%9d', [sumCW]);
+   if showPh     then buf := buf + SysUtils.Format('%9d', [sumPh]);
+   if showDig    then buf := buf + SysUtils.Format('%9d', [sumDig]);
+   if MultByBand then buf := buf + SysUtils.Format('%9d', [sumBandMults]);
+   buf := buf + #13#10#13#10;
+
+   // Mults summary
+   if MultByMode then
+      begin
+      cwMults := 0; phMults := 0; digMults := 0;
+      for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
+         begin
+         cwMults  := cwMults  + mo.MTotals[AllBands, CW, m];
+         phMults  := phMults  + mo.MTotals[AllBands, Phone, m];
+         digMults := digMults + mo.MTotals[AllBands, Digital, m];
+         end;
+      if showCW  then buf := buf + SysUtils.Format('CW Mults: %d'#13#10,  [cwMults]);
+      if showPh  then buf := buf + SysUtils.Format('Ph Mults: %d'#13#10,  [phMults]);
+      if showDig then buf := buf + SysUtils.Format('Dig Mults: %d'#13#10, [digMults]);
+      totalMults := cwMults + phMults + digMults;
+      buf := buf + SysUtils.Format('Total Mults: %d'#13#10, [totalMults]);
+      end
+   else
+      begin
+      totalMults := 0;
+      for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
+         totalMults := totalMults + mo.MTotals[AllBands, Both, m];
+      buf := buf + SysUtils.Format('Mults: %d'#13#10, [totalMults]);
+      end;
+
+   buf := buf + SysUtils.Format('Total Score: %d'#13#10, [TotalScore]);
+
+   sWriteFileFromString(tReportFileWrite, buf);
+   CloseHandle(tReportFileWrite);
+   FilePreview;
 end;
 
 procedure WriteTitleBlockToSummarySheet;

@@ -201,7 +201,7 @@ begin
           tCreateStaticWindow(@CabrilloTagSArray[TempTag].ctrTag[1], LeftStyle, 10, Top, 160, TagHeight, hwnddlg, integer(TempTag) + 100);
           if ErmakSpecification and (TempTag = ctOperators) then
           begin
-            tCreateButtonWindow(WS_EX_STATICEDGE, 'Выбрать ...', WS_TABSTOP or WS_CHILD or WS_VISIBLE, 173, Top, 190, TagHeight, hwnddlg, 3);
+            tCreateButtonWindow(WS_EX_STATICEDGE, 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅ ...', WS_TABSTOP or WS_CHILD or WS_VISIBLE, 173, Top, 190, TagHeight, hwnddlg, 3);
             Continue;
           end;
 
@@ -273,7 +273,15 @@ begin
     WM_COMMAND:
       begin
         case wParam of
-            1: asm call CabrilloSummaryProc; end;
+            1:
+              // Issue #914: when opened standalone (Tools -> Edit Cabrillo
+              // Summary), no callback is provided (lParam was 0).  Treat OK
+              // the same as Cancel - the WM_CLOSE/ExitAndClose path saves
+              // all ctrSave fields to tr4w.ini [REPORT] before closing.
+              if CabrilloSummaryProc = nil then
+                goto ExitAndClose
+              else
+                asm call CabrilloSummaryProc; end;
           2: goto ExitAndClose;
           3:
           //DialogBox(hInstance, MAKEINTRESOURCE(50), hwnddlg, @ErmakDlgProc);
