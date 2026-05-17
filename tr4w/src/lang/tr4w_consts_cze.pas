@@ -205,6 +205,7 @@ const
   TC_CONNECTTOTR4WSERVERFAILED          = 'Pøipojení k serveru TR4W neúspìšné. Ovìø heslo!';
   TC_CONNECTEDTO                        = 'Pøipojen k ';
   TC_DISCONNECTEDFROM                   = '** Odpojen od ';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
   TC_FAILEDTOCONNECTTO                  = 'Porucha spojení s ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Deníky na serveru a aktuální deníky jsou identické.';
   TC_NETWORK                            = 'Sí     : %s %s:%d';

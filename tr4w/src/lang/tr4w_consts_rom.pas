@@ -206,6 +206,7 @@ const
   TC_CONNECTTOTR4WSERVERFAILED          = 'Conectarea spre TR4WSERVER esuata. Verifica valoarea la SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'Conectat la ';
   TC_DISCONNECTEDFROM                   = '** Deconectat de la ';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
   TC_FAILEDTOCONNECTTO                  = 'Conectare esuata la ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Logul local si cel de la Server sunt identice.';
   TC_NETWORK                            = 'Reteaua : %s %s:%d';

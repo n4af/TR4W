@@ -223,6 +223,22 @@ begin
 
     WM_DISPLAYCHANGE: if wParam <= 8 then tEightBitsPerPixel := True else tEightBitsPerPixel := False;
 
+    // Issue #912: headless server-log auto-sync.  RunSyncThread (worker)
+    // SendMessages here once the download is complete; we close the temp
+    // file handle and call ReplaceLogByServerLog on the UI thread so
+    // LoadinLog's ListView access is safe.
+    WM_USER_HEADLESS_SYNC_REPLACE:
+      begin
+        if NewServerLogHandle <> INVALID_HANDLE_VALUE then
+          begin
+          CloseHandle(NewServerLogHandle);
+          NewServerLogHandle := INVALID_HANDLE_VALUE;
+          end;
+        ReplaceLogByServerLog(True);
+        logger.Info('Auto-sync: local log replaced with server log.');
+        HeadlessSyncMode := False;
+      end;
+
 //    WM_MOUSEWHEEL: SetStackPointerOnMouseWheel(SHORT(HiWord(Cardinal(wParam))));
     WM_TRAYBALLON:
       begin

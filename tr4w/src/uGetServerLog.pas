@@ -52,6 +52,14 @@ var
   ServerLogListView                     : HWND;
   LogSyncThreadID                       : Cardinal;
   showresverlogcontent                  : boolean = True;
+  HeadlessSyncMode                      : boolean = False;  // Issue #912 - run sync without any dialog UI
+
+const
+  // Issue #912: SendMessage from RunSyncThread (worker) to the UI thread to
+  // drive the post-download replace.  Cannot do this from the worker because
+  // LoadinLog (called by ReplaceLogByServerLog) accesses ListView controls,
+  // and Win32 controls require all messages from their creating thread.
+  WM_USER_HEADLESS_SYNC_REPLACE = WM_USER + 200;
 
 implementation
 uses MainUnit;
@@ -181,7 +189,8 @@ begin
        end;
       sWriteFile(NewServerLogHandle, SyncNetBuffer[Offset], i - Offset);
       TotalBytes := TotalBytes + i - Offset;
-      tSetDlgItemIntFalse(GetServerLogWnd, 108, TotalBytes);
+      if not HeadlessSyncMode then
+        tSetDlgItemIntFalse(GetServerLogWnd, 108, TotalBytes);
     end;
     if i <> 0 then
       goto 1;
@@ -193,15 +202,19 @@ begin
   begin
     if (LogSize <> TotalBytes) or ((TotalBytes - SizeOfTLogHeader) mod SizeOf(ContestExchange) <> 0) then
     begin
-      showwarning(TC_FAILEDTORECEIVESERVERLOG);
+      if HeadlessSyncMode then
+        logger.Error('Auto-sync: failed to receive server log (size=%d, expected=%d)', [TotalBytes, LogSize])
+      else
+        showwarning(TC_FAILEDTORECEIVESERVERLOG);
       goto e;
     end;
-    if showresverlogcontent then
+    if (not HeadlessSyncMode) and showresverlogcontent then
       SendMessage(ServerLogListView, LVM_SETITEMCOUNT, TotalBytes div SizeOf(ContestExchange), 0);
     Windows.SetFilePointer(NewServerLogHandle, SizeOfTLogHeader, nil, FILE_BEGIN);
 
     IndexInServerLogListView := 0;
-    tSetWindowRedraw(ServerLogListView, False);
+    if not HeadlessSyncMode then
+      tSetWindowRedraw(ServerLogListView, False);
     2:
     Windows.ReadFile(NewServerLogHandle, TempRXData, SizeOf(ContestExchange), lpNumberOfBytesWritten, nil);
     if lpNumberOfBytesWritten = SizeOf(ContestExchange) then
@@ -212,19 +225,51 @@ begin
         (not TempRXData.ceQSO_Deleted)) and
         (TempRXData.ceQSO_Skiped = False) then inc(TotalQ);
 
-      if TotalRecords mod 10 = 0 then
-        tSetDlgItemIntFalse(GetServerLogWnd, 101, TotalRecords);
-      if showresverlogcontent then
-        tAddContestExchangeToLog(TempRXData, ServerLogListView, IndexInServerLogListView);
+      if not HeadlessSyncMode then
+        begin
+        if TotalRecords mod 10 = 0 then
+          tSetDlgItemIntFalse(GetServerLogWnd, 101, TotalRecords);
+        if showresverlogcontent then
+          tAddContestExchangeToLog(TempRXData, ServerLogListView, IndexInServerLogListView);
+        end;
       goto 2;
     end;
-    tSetWindowRedraw(ServerLogListView, True);
+    if not HeadlessSyncMode then
+      tSetWindowRedraw(ServerLogListView, True);
   end;
-  tSetDlgItemIntFalse(GetServerLogWnd, 101, TotalRecords);
-  tSetDlgItemIntFalse(GetServerLogWnd, 109, TotalQ);
-  if TotalQ > 0 then EnableWindowTrue(GetServerLogWnd, 107);
+  if not HeadlessSyncMode then
+    begin
+    tSetDlgItemIntFalse(GetServerLogWnd, 101, TotalRecords);
+    tSetDlgItemIntFalse(GetServerLogWnd, 109, TotalQ);
+    if TotalQ > 0 then EnableWindowTrue(GetServerLogWnd, 107);
+    end;
   e:
   LogSyncThreadID := 0;
+  // Issue #912: headless mode drives the replace from the UI thread via
+  // SendMessage.  LoadinLog (called by ReplaceLogByServerLog) accesses
+  // Win32 ListView controls, which require their creating thread.
+  // SendMessage blocks here until the UI handler returns, which is fine -
+  // the worker thread is about to exit anyway.
+  if HeadlessSyncMode then
+    begin
+    if TotalQ > 0 then
+      begin
+      logger.Info('Auto-sync: download complete (%d records, %d QSOs).  Marshalling replace to UI thread.',
+                  [TotalRecords, TotalQ]);
+      SendMessage(tr4whandle, WM_USER_HEADLESS_SYNC_REPLACE, 0, 0);
+      end
+    else
+      begin
+      logger.Warn('Auto-sync: download produced %d records and %d QSOs - skipping replace.',
+                  [TotalRecords, TotalQ]);
+      if NewServerLogHandle <> INVALID_HANDLE_VALUE then
+        begin
+        CloseHandle(NewServerLogHandle);
+        NewServerLogHandle := INVALID_HANDLE_VALUE;
+        end;
+      HeadlessSyncMode := False;
+      end;
+    end;
 end;
 
 end.
