@@ -1291,10 +1291,22 @@ begin
    if roverFullCall <> '' then
       Result := Result + EmitADIFField('APP_TR4W_ROVERCALL', roverFullCall);
 
-   // CONTEST_ID, unless POTA/GENERALQSO (legacy behaviour)
+   // CONTEST_ID, unless POTA/GENERALQSO (legacy behaviour).
+   // Mirror the fallback used by LOGSUBS2.PAS:2782, uGetScores.pas:435 and 564:
+   // if ContestsArray[].ADIFName is empty (true for 156 of TR4W's contests),
+   // fall back to the parallel ContestTypeSA[] string, which IS the standard
+   // ADIF Contest_ID for the major contests (e.g. 'CQ-WPX-SSB', 'CQ-WW-CW',
+   // 'ARRL-DX-CW').  This was the behaviour before Issue #887's extraction;
+   // it did not survive the move into uADIF.pas.
    if not (rec.ceContest in [POTA, GENERALQSO]) then
-      Result := Result + EmitADIFField('CONTEST_ID',
-         string(ContestsArray[rec.ceContest].ADIFName));
+      begin
+      if Length(ContestsArray[rec.ceContest].ADIFName) = 0 then
+         Result := Result + EmitADIFField('CONTEST_ID',
+            string(ContestTypeSA[rec.ceContest]))
+      else
+         Result := Result + EmitADIFField('CONTEST_ID',
+            string(ContestsArray[rec.ceContest].ADIFName));
+      end;
 
    // MODE / SUBMODE
    Result := Result + EmitADIFField('MODE', modeStr);
