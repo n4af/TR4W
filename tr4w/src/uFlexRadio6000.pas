@@ -126,9 +126,6 @@ begin
    FSlice1Exists       := False;
    FCmdSeq             := 0;
    Result := inherited Connect;
-   // Note: the base class OnRadioConnected sends 'ID;' after the TCP connection
-   // is established.  FlexRadio rejects it (unknown command) and returns an error
-   // response.  ProcessMsg handles all R-line errors gracefully — this is harmless.
    // Do NOT send subscriptions here; the radio sends V/H/M lines first and
    // subscriptions are sent from ProcessMsg once the H line arrives.
    if Self.IsConnected then

@@ -469,14 +469,12 @@ begin
       logger.Info('Reading thread already exists, no need to create new one');
       end;
 
-   // Send ID command to verify connection and wake up communication
-   try
-      logger.Info('[OnRadioConnected] Sending ID; command to verify connection');
-      Self.SendToRadio('ID;');
-   except
-      on E: Exception do
-         logger.Error('[OnRadioConnected] Exception sending ID command: %s', [E.Message]);
-   end;
+   // Initial probing is each subclass's responsibility: K4 sends its own
+   // 'RT;XT;RO;FT;ID;MD;DT$;IF;' query, TS-890 sends '##CN;' to start LAN
+   // auth (Issue #436), Icom uses its CI-V transport handshake.  A generic
+   // 'ID;' here was Kenwood-shaped and either redundant (K4), wasted (Flex
+   // rejected it as unknown) or actively broken (TS-890 LAN requires '##CN;'
+   // to be the first byte).
 end;
 
 procedure TNetRadioBase.OnRadioDisconnected(Sender: TObject);

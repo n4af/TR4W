@@ -873,6 +873,20 @@ begin
                logger.Debug('[pNetworkRadio] CWSpeedSync off � pushing program speed %d WPM to radio', [CodeSpeed]);
                ro.SetCWSpeed(CodeSpeed);
                end;
+
+            // StartupCommand: configured per-radio in the .cfg file.  Sent
+            // once, after the first successful connect (not on every reconnect)
+            // to match the legacy semantic from when SetUpRadioInterface sent
+            // it synchronously.  Reset Radio Ports frees and rebuilds the radio
+            // object, which sets StartupCommandSent back to False so the
+            // command fires again on the next first connect.  Issue #436.
+            if (not rig^.StartupCommandSent) and (Length(rig^.StartupCommand) > 0) and Assigned(ro) then
+               begin
+               logger.Info('[pNetworkRadio] Sending StartupCommand for %s: %s',
+                           [rig^.RadioName, rig^.StartupCommand]);
+               ro.SendToRadio(rig^.StartupCommand);
+               rig^.StartupCommandSent := True;
+               end;
             end;
 
          // HamLib Direct: short sleep so FNeedsPoll is checked promptly when
@@ -4223,7 +4237,10 @@ begin
       '<RadioInfo>' + sLineBreak +
       #9 + '<app>TR4W</app>' + sLineBreak +
       #9 + '<StationName>' +  GetLocalComputerName + '</StationName>' + sLineBreak +
-      #9 + '<RadioNr>' + Format('%d',[Math.IfThen(ActiveRadio = RadioOne,1,2)]) + '</RadioNr>' + sLineBreak +
+      // Per N1MM RadioInfo spec: RadioNr identifies the packet's subject
+      // radio (1 or 2), not whichever radio is currently active.  In SO2R,
+      // each radio emits its own packet with its own number.
+      #9 + '<RadioNr>' + Format('%d',[Math.IfThen(rig = @Radio1,1,2)]) + '</RadioNr>' + sLineBreak +
       #9 + '<Freq>' + Format('%d', [freq div 10]) + '</Freq>' + sLineBreak +
       #9 + '<TXFreq>' + Format('%d', [txFreq div 10]) + '</TXFreq>' + sLineBreak +
       #9 + '<Mode>' + sMode + '</Mode>' +  sLineBreak +
@@ -4233,13 +4250,23 @@ begin
       #9 + '<EntryWindowHwnd>' + '0' + '</EntryWindowHwnd>' + sLineBreak +
       #9 + '<Antenna>-1</Antenna>' + sLineBreak +
       #9 + '<Rotors>-1</Rotors>' + sLineBreak +
-      #9 + '<FocusRadioNr>1</FocusRadioNr>' + sLineBreak +
+      // FocusRadioNr / ActiveRadioNr: which radio has operator focus right now.
+      // TR4W tracks this as the global ActiveRadio; both fields reflect it.
+      #9 + '<FocusRadioNr>' + Format('%d',[Math.IfThen(ActiveRadio = RadioOne,1,2)]) + '</FocusRadioNr>' + sLineBreak +
       #9 + '<IsStereo>' + 'False' + '</IsStereo>' + sLineBreak +
       #9 + '<IsSplit>' + StrUtils.IfThen(rig.CurrentStatus.Split,'True','False') + '</IsSplit>' + sLineBreak +
-      #9 + '<ActiveRadioNr>' + '1' + '</ActiveRadioNr>' + sLineBreak +
+      #9 + '<ActiveRadioNr>' + Format('%d',[Math.IfThen(ActiveRadio = RadioOne,1,2)]) + '</ActiveRadioNr>' + sLineBreak +
       #9 + '<IsTransmitting>' + StrUtils.IfThen(rig.CurrentStatus.TXOn,'True','False') + '</IsTransmitting>' + sLineBreak +
       #9 + '<FunctionKeyCaption>' + '' + '</FunctionKeyCaption>' + sLineBreak +
       #9 + '<RadioName>' + rig.RadioName + '</RadioName>' + sLineBreak +
+      // N1MM RadioInfo IsConnected (Issue #917).  Source: rig.RadioDisconnected,
+      // which is maintained by pNetworkRadio's SetRadioAlertState for network
+      // radios (Icom CI-V/IP, K4 TCP, FlexRadio, HamLib Direct, TS-890 LAN).
+      // The legacy serial polling threads (pYaesu/pIcom/pKenwood/pK3/etc.)
+      // do not currently update RadioDisconnected, so this reports True for
+      // serial-attached radios whenever one is configured -- real serial
+      // CAT-port liveness detection is a separate follow-up.
+      #9 + '<IsConnected>' + StrUtils.IfThen(rig.RadioDisconnected,'False','True') + '</IsConnected>' + sLineBreak +
       '</RadioInfo>';
 
    //SetLength(msg,Length(sBuf));
