@@ -22,6 +22,39 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.13 (2026-05-18) — NY4I
+
+#### TR4WSERVER auto-sync log on reconnect (`src/uNet.pas`, `src/uCFG.pas`, `src/uGetServerLog.pas`, `tr4w.dpr`, `src/lang/*`) — Issue #912
+
+- **New `SERVER AUTO SYNCHRONIZE LOG ON CONNECT` config flag** (Boolean, default `FALSE`). When `TRUE`, the "Difference in logs" modal that fires on every client reconnect during a multi-op contest is skipped and the server log is downloaded silently via the existing `RunSyncThread` worker.
+- **Headless sync path**: `ProcessServerLogInfo` in `uNet.pas` dispatches to a new `HeadlessSyncMode` branch in `uGetServerLog.pas`. UI updates (status labels, progress bar, dialog close) are gated on `not HeadlessSyncMode` so the worker can run without a dialog HWND.
+- **Thread-affinity fix for log replace**: `LoadinLog` touches ListView controls and must run on the thread that created them. Worker `PostMessage`s `WM_USER_HEADLESS_SYNC_REPLACE` to the main HWND; new handler in `tr4w.dpr`'s `WindowProc` invokes `LoadinLog` on the UI thread.
+- **Safety gate**: auto-sync only triggers when the server's contest matches the client's (or server reports `DUMMYCONTEST`). Contest mismatch still falls through to the existing dialog so the wrong-server case warns the operator.
+- **Operator feedback**: INFO log line plus transient `QuickDisplay` toast via new `TC_AUTOSYNCHRONIZINGLOG` constant, added to all 11 language files via byte-level insertion to preserve ANSI codepages + CRLF.
+- **Design doc** committed as `docs/NETWORK_LOG_AUTO_SYNC.md`.
+
+#### 3830 Score report + standalone Cabrillo Summary edit (`src/trdos/PostUnit.PAS`, `src/uCbrSum.pas`, `src/uMenu.pas`, `src/MainUnit.pas`, `src/VC.pas`) — Issue #914
+
+- **`ExportTo3830Scores` in `PostUnit.PAS`** writes `<logname>_3830Score.txt` matching the 3830scores.com submission-form layout, then auto-previews in the default text editor. New menu entry `menu_3830scores = 10021` under File → Reports.
+- **Adaptive table layout**: per-band rows always emit all 8 HF/VHF rows (160/80/40/20/15/10/6/2), with additional VHF/UHF rows appended only when non-zero. Mode columns (`CW Qs` / `Ph Qs` / `Dig Qs`) appear only for modes that have logged QSOs. `Ph` reads from `RawQSOTotals[band, Phone]`, which already folds FM via `LoadTotalCount`.
+- **Mults columns adapt to contest type**: per-band Mults column appended iff `MultByBand = TRUE` (CQ-WW, CQ-160). Bottom summary emits per-mode lines (`CW Mults` / `Ph Mults` / `Dig Mults`) + total iff `MultByMode = TRUE` (FQP, NAQP); single `Mults: N` otherwise (CQ-WPX).
+- **Metadata header silently reads `tr4w.ini [REPORT]` keys** (`_OPERATORS`, `_CATEGORY-OPERATOR`, `_CATEGORY-POWER`) — the same keys the Cabrillo Summary dialog writes. `Call Used` reads from `MyCall`. No dialog popup at report time.
+- **New Tools → Edit Cabrillo Summary…** entry (`menu_edit_cabrillo_summary = 10022`) opens the existing Cabrillo Summary dialog standalone. Implementation reuses `OpenStationInformationWindow` with `lParam=0` so `CabrilloSummaryProc` is nil; `WM_COMMAND` case 1 in `uCbrSum.pas` handles the nil-callback branch by saving all `ctrSave=True` fields to `tr4w.ini [REPORT]` then closing (same path as ExitAndClose). Cabrillo file generation flow (`Ctrl+Alt+B`, non-nil callback → `CreateCabrilloFile`) unchanged. Surfaced because the 3830 report depends on those `[REPORT]` values and prior UI only let the operator set them at contest creation or next Cabrillo build.
+
+#### New Contest / Open Config dialog label widths (`src/uNewContest.pas`) — Issue #915
+
+- **CATEGORY-* labels were clipped**: `CATEGORY-OPERATOR` rendered as `ATEGORY-OPERATOR` (missing leading `C`), `CATEGORY-TRANSMITTER` as `EGORY-TRANSMITTER`. Fix: shrink left column (caption / contest listbox / Latest config button) from 280 → 250 px and reclaim 30 px for the right-side labels (`x: 300 → 270`, width `~148 → ~178` px). Right edge of label area (`x=448`) and dropdown/edit controls (`x=455`) unchanged. Listbox at 250 px still fits typical 25–30 char contest folder entries.
+
+#### ADIF `CONTEST_ID` regression (`src/uADIF.pas`) — Issue #887 follow-up
+
+- **`CONTEST_ID` emission was empty for 156 of TR4W's contests** (including all CQ-WW, CQ-WPX, ARRL-DX, etc.). Issue #887 extracted ADIF export from `PostUnit`/`MainUnit` into `uADIF.pas` but dropped the `ContestTypeSA[]` fallback that `LOGSUBS2.PAS:2782`, `uGetScores.pas:435`, and `uGetScores.pas:564` all still use: when `ContestsArray[ceContest].ADIFName` is empty, fall back to the parallel `ContestTypeSA[]` string (which IS the standard ADIF Contest_ID for the majors — `CQ-WPX-SSB`, `CQ-WW-CW`, `ARRL-DX-CW`, etc.). `EmitADIFField` silently suppresses empty values, so the field was missing entirely from exports. Single-line restore at `uADIF.pas:1294-1297` covers all 156 contests without per-contest data entry.
+
+#### Build hygiene: `cty.dat` no longer re-included via gitignore negation (`.gitignore`)
+
+- **Removed `!tr4w/target/cty.dat` negation** that re-included the file under the `tr4w/target/*` blanket ignore. `cty.dat` is rewritten by TR4W at runtime, so it always showed as modified in `git status` and `git add` was willing to stage those runtime edits. The file remains tracked in master (fresh clones still get a working country database); `git add tr4w/target/cty.dat` is now blocked, with `git add -f` as the documented escape if the master copy genuinely needs updating. Recommendation: `git update-index --skip-worktree tr4w/target/cty.dat` once per clone to silence `git status` noise.
+
+---
+
 ### 4.147.12 (2026-05-16) — NY4I
 
 #### TR4WSERVER disconnect UX (`src/uNet.pas`, `src/lang/*`) — Issue #910

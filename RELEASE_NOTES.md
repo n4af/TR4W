@@ -24,6 +24,27 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.13 (2026-05-18) — NY4I
+
+#### Multi-Op / Networking
+
+- **New option to skip the "Difference in logs" dialog on reconnect.** During a multi-op contest, every time a client reconnects to TR4WSERVER (server restart, network blip, laptop wake) the client's local log no longer matches the server's, so TR4W pops a "Difference in logs" modal and waits for you to click Synchronize. Most operators just always click Synchronize — the dialog is more obstacle than safeguard. Set `SERVER AUTO SYNCHRONIZE LOG ON CONNECT = TRUE` in your config to skip the dialog: TR4W will download the server log silently and show a brief status-row toast so you know it happened. Default is `FALSE` (existing behavior preserved). Safety net: if the server's contest doesn't match yours, the dialog still appears so you can catch a wrong-server connection. (Issue #912)
+
+#### Reports
+
+- **New File → Reports → 3830 Score report.** Generates a `<logname>_3830Score.txt` file laid out for the 3830scores.com submission form and opens it in your default text editor. The QSO table shows all 8 HF/VHF bands (160/80/40/20/15/10/6/2) with VHF/UHF bands appended when used; mode columns (CW / Ph / Dig) only appear for modes you actually worked. Mults columns adapt to the contest type — per-band columns for CQ-WW / CQ-160, per-mode summary for FQP / NAQP, single total for CQ-WPX. The header (Call Used / Operators / Class / Power) is filled in from your Cabrillo Summary values automatically, no dialog popup. (Issue #914)
+- **New Tools → Edit Cabrillo Summary… menu item.** You can now edit your Cabrillo Summary (Operators, Category Operator, Category Power, etc.) any time — previously the only chances were when you created the contest or the next time you generated a Cabrillo file (Ctrl+Alt+B). Useful before running the new 3830 Score report, since the 3830 header reads from these same values.
+
+#### New Contest / Open Config Dialog
+
+- **CATEGORY-OPERATOR and CATEGORY-TRANSMITTER labels are no longer cut off** in the New Contest / Open Config dialog. They previously rendered as `ATEGORY-OPERATOR` (missing C) and `EGORY-TRANSMITTER` (missing CAT). The labels now fit cleanly. The contest folder list on the left is 30 px narrower but still fits typical contest folder names. (Issue #915)
+
+#### ADIF Export
+
+- **`<CONTEST_ID>` is now present in exported ADIF files for all contests.** A regression introduced when ADIF export was refactored into its own module had dropped the `CONTEST_ID` field entirely from 156 of TR4W's contests, including every CQ-WW, CQ-WPX, and ARRL-DX flavor. ADIF exports now correctly include `CQ-WW-CW`, `CQ-WPX-SSB`, `ARRL-DX-CW`, etc. as the contest ID. Re-export an affected log after upgrading to get the field included.
+
+---
+
 ### 4.147.12 (2026-05-16) — NY4I
 
 #### Multi-Op / Networking
