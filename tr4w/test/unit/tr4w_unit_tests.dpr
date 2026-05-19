@@ -37,7 +37,11 @@ uses
    uBandLookup          in '..\..\src\uBandLookup.pas',
    uTestBandLookup      in 'uTestBandLookup.pas',
    uCabrilloFormat      in '..\..\src\uCabrilloFormat.pas',
-   uTestCabrilloFormat  in 'uTestCabrilloFormat.pas';
+   uTestCabrilloFormat  in 'uTestCabrilloFormat.pas',
+   uCRC32               in '..\..\src\uCRC32.pas',
+   uTestCRC32           in 'uTestCRC32.pas',
+   utils_math           in '..\..\src\utils\utils_math.pas',
+   uTestUtilsMath       in 'uTestUtilsMath.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -55,6 +59,8 @@ begin
    RegisterSuite(TADIFFixtureTests.Create('ADIFFixtures'));
    RegisterSuite(TBandLookupTests.Create('BandLookup'));
    RegisterSuite(TCabrilloFormatTests.Create('CabrilloFormat'));
+   RegisterSuite(TCRC32Tests.Create('CRC32'));
+   RegisterSuite(TUtilsMathTests.Create('UtilsMath'));
 
    if RunAllSuites then
       begin

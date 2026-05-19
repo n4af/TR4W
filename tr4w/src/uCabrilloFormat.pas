@@ -120,16 +120,24 @@ function FormatCabrilloFreq(band: BandType; freqHz: LongInt;
 begin
    if showFreqInLog then
       begin
-         if freqHz = 0 then
-            Result := AnsiString(tCabrilloFreqString[band])
-         else if (freqHz > 0) and (freqHz < 30000000) then
-            Result := AnsiString(IntToStr(freqHz div 1000))
-         else
-            // freqHz >= 30 MHz -- Cabrillo spec: use band default
-            Result := AnsiString(tCabrilloFreqString[band]);
+      if freqHz = 0 then
+         begin
+         Result := AnsiString(tCabrilloFreqString[band]);
+         end
+      else if (freqHz > 0) and (freqHz < 30000000) then
+         begin
+         Result := AnsiString(IntToStr(freqHz div 1000));
+         end
+      else
+         begin
+         // freqHz >= 30 MHz -- Cabrillo spec: use band default
+         Result := AnsiString(tCabrilloFreqString[band]);
+         end;
       end
    else
+      begin
       Result := AnsiString(tCabrilloFreqString[band]);
+      end;
 end;
 
 function FormatCabrilloMode(mode: ModeType; extMode: ExtendedModeType;
@@ -137,15 +145,23 @@ function FormatCabrilloMode(mode: ModeType; extMode: ExtendedModeType;
 begin
    if mode = Digital then
       begin
-         if extMode in [eNoMode, eRTTY] then
-            Result := 'RY'
-         else
-            Result := 'DG';
+      if extMode in [eNoMode, eRTTY] then
+         begin
+         Result := 'RY';
+         end
+      else
+         begin
+         Result := 'DG';
+         end;
       end
    else if (mode = FM) and modeOverridesToPhone then
-      Result := 'PH'
+      begin
+      Result := 'PH';
+      end
    else
+      begin
       Result := AnsiString(tCabrilloModeString[mode]);
+      end;
 end;
 
 end.

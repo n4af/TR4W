@@ -32,12 +32,14 @@ var
    i: integer;
 begin
    for i := 1 to FreqModeArraySize do
+      begin
       if (Freq >= FreqModeArray[i].frMin) and (Freq <= FreqModeArray[i].frMax) then
          begin
-            Band := FreqModeArray[i].frBand;
-            Mode := FreqModeArray[i].frMode;
-            Exit;
+         Band := FreqModeArray[i].frBand;
+         Mode := FreqModeArray[i].frMode;
+         Exit;
          end;
+      end;
    Band := NoBand;
    Mode := NoMode;
 end;
