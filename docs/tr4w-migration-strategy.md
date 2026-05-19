@@ -42,17 +42,54 @@ infrastructure wiring changes.
 These cover the pure logic that is hardest to manually regression-test and most
 likely to break during the Unicode / 64-bit phases.
 
-| Area | What to test | Notes |
-|------|-------------|-------|
-| **CI-V BCD encode/decode** | `uIcomCIV` — `IcomByteToBCD`, `IcomBCDToFreq`, etc. | Already done — 32 tests, 0 failures |
-| **Exchange parsing** | 5 most popular contests (CQ WW, ARRL DX, NA Sprint, NAQP, SS) | Highest ROI. One bad parse = silent wrong score. Target `ProcessExchange()` in LOGSTUFF.PAS |
-| **Score calculation** | QSO points × multiplier for key contest types | Verify against published claimed scores |
-| **Band↔frequency mapping** | `FreqToBand`, band edge checks | Must survive 64-bit `LongInt→Int64` change |
-| **Dupe checking** | Duplicate detection logic in `LogDupe.pas` | Use synthetic log data, not file I/O |
-| **Cabrillo export** | Key fields: freq, mode, time, call, exchange | Parse the output string — don't rely on file writing |
+Legend: ✅ written · 🟡 writable now (no refactor) · 🟠 partially writable
+· 🔴 blocked on extraction (see *Tier 1 Extraction Pattern* below).
 
-Exchange parsing for the top 5 contests alone provides the most protection per
-hour of test-writing time.
+| Area | Status | What/Where | Notes |
+|------|--------|------------|-------|
+| **CI-V BCD encode/decode** | ✅ | `uTestIcomCIV.pas` — 32 tests, 0 failures | Targets `uIcomCIV` |
+| **Band↔frequency mapping (modern)** | ✅ | `uTestRadioBand.pas` — centre, edges, round-trip | Targets `uRadioBand.TRadioBand` (used by `TNetRadioBase` descendants only) |
+| **Band↔frequency mapping (legacy `BandType`)** | 🟡 | Legacy `BandType` is used by ~109k lines of contest code; not tested today | Small, self-contained lookup function. Must survive 64-bit `LongInt → Int64` change |
+| **Dupe checking** | 🟠 | `DupeAndMultSheet` in `LogDupe.pas` | Methods like `AddCompressedCallToDupeSheet` and the partial-call lookup are testable with synthetic data **if** the object can be instantiated without its file backing — verify before scheduling |
+| **Exchange parsing** | 🔴 | `ProcessExchange()` and per-exchange handlers in `LOGSTUFF.PAS` | Logic is pure-ish but the monolith drags in globals + Win32. Highest ROI once unblocked — one bad parse = silent wrong score |
+| **Score calculation** | 🔴 | `QSOPoints` and related in `LOGSTUFF.PAS` | Verify against published claimed scores once extracted |
+| **Cabrillo export** | 🔴 | Per-QSO line writer in `PostUnit.PAS` (144k lines) | Lift the line formatter into `uCabrilloFormat.pas`; parse the output string, don't rely on file writing |
+
+### Tier 1 Extraction Pattern (monolith-bound logic)
+
+Four Tier 1 areas — exchange parsing, score calculation, dupe checking,
+Cabrillo export — live inside two enormous TRDOS units:
+
+- `LOGSTUFF.PAS` (262k lines)
+- `PostUnit.PAS` (144k lines)
+
+Pulling either of those into the test EXE drags in every global, every Win32
+window, MainUnit, the lot. The existing tests stay clean because they target
+self-contained modern units. To write Tier 1 tests for the monolith-bound
+areas, we first lift the *pure* logic out into its own unit. Function bodies
+do not change; the monolith uses the new unit (or `{$INCLUDE}`s its
+implementation) to keep original call sites working.
+
+**Pattern, one PR per area:**
+
+1. Pick one area (e.g., exchange parsing for NA Sprint).
+2. Create the new unit (e.g., `src/trdos/uExchangeParsing.pas`).
+3. Move the target function and its private helpers verbatim. **Do not refactor**;
+   preserving the exact body keeps behavior identical and `git blame` useful.
+4. Add the new unit to `tr4w.dpr`'s uses clause.
+5. From the monolith, either `uses` the new unit or `{$INCLUDE}` its
+   implementation — whichever produces zero call-site changes.
+6. Build TR4W; confirm zero behavior change (regression test against a known log).
+7. Write the test suite against the now-isolated unit and register it in
+   `tr4w_unit_tests.dpr`.
+
+If a moved function references a global that lives in the monolith, either
+(a) move the global with it, (b) the new unit `uses` the monolith for read-only
+access, or (c) parameterize the dependency into a function argument. Prefer (c)
+where cheap.
+
+Do not bundle extractions across areas — keeps blame readable and any
+regression bisectable.
 
 ### Tier 2 — Write During Phase 1 (Before Unicode Work)
 
@@ -74,6 +111,45 @@ These are lower risk but important to have before `string`→`UnicodeString` cha
   values (D7 overload resolution limitation — see `uTestIcomCIV.pas` for examples).
 - Keep each test method focused on one invariant. Prefer many small tests over
   one large test with multiple assertions.
+
+---
+
+## Pre-Migration Interim Roadmap
+
+Test-coverage work between today and Phase 1, in priority order. Each row is one
+PR. Done one at a time as time allows; **no two extractions in the same PR.**
+
+| # | Item | Effort | Type | Tier 1? |
+|---|------|--------|------|---------|
+| 1 | Legacy `BandType` lookup tests (TR4W contest-code band mapping) | S | Test only | Yes |
+| 2 | `uCTYDAT` callsign → DXCC entity lookup tests | S | Test only | Tier 2 |
+| 3 | `uMults` multiplier count/add/check tests with synthetic data | S | Test only | Tier 2 |
+| 4 | Expand `uTestUtilsText` for predicates used by exchange parsing | S | Test only | Foundation |
+| 5 | Verify `DupeAndMultSheet` can instantiate without file backing; if yes, write tests | S–M | Investigate + test | Yes |
+| 6 | Extract Cabrillo per-QSO line formatter → `uCabrilloFormat.pas` + tests | M | Refactor + test | Yes |
+| 7 | Extract scoring → `uScoring.pas` for one major contest (CQ WW) + tests | M | Refactor + test | Yes |
+| 8 | Extract exchange parser for NA Sprint → `uExchangeParsing.pas` + tests | M | Refactor + test | Yes |
+| 9 | Add CQ WPX, NAQP, ARRL DX, SS to extracted exchange parser | L | Test only | Yes |
+| 10 | Catalog all `asm` blocks (`grep -r 'asm' src/`) — produce Phase 3 worklist | S | Inventory | — |
+| 11 | Audit `TF.pas` `wsprintf` call sites (73 in total) — produce Phase 2 worklist | M | Inventory | — |
+
+**Effort scale:** S = couple of hours · M = half a day to a day · L = a day or two.
+
+### Guidance for picking the next item
+
+- **Items 1–4** require zero production-code changes. They're the safest to schedule
+  between feature work because a failing test means a test bug, not a regression.
+- **Item 5** is a quick spike: instantiate `DupeAndMultSheet` in a test, see what
+  globals or files it demands, decide whether to test in place or extract. The
+  spike itself is the deliverable; if extraction is required, that becomes a
+  follow-up PR.
+- **Items 6–9** follow the *Tier 1 Extraction Pattern* above. Pick the simplest
+  contest for #7 and #8 to validate the pattern; complexity scales up after.
+- **Items 10–11** can run in parallel with anything else — pure inventory work
+  that produces checklists, not code changes.
+
+When in doubt, do item 1 next. It's small, isolated, and protects a function
+that's invoked thousands of times per contest.
 
 ---
 
