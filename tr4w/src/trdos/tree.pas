@@ -36,7 +36,8 @@ uses
   utils_file,
   TF,
   Messages,
-  Windows;
+  Windows,
+  uBandLookup;  // CalculateBandMode now lives here so it can be unit-tested without tree.pas's dependency cone
 
 var
   tempshowcty                           : Cardinal;
@@ -456,7 +457,7 @@ const
 
   MaximumFileNames                      = 300;
 
-  DegreeSymbol                          = 'ш';
+  DegreeSymbol                          = 'пїЅ';
 
   ModemStatusAddressOffset              = 6;
   ModemControlAddressOffset             = 4;
@@ -1135,7 +1136,7 @@ begin
     Exit;
   end;
 
-  if Character = 'н' then
+  if Character = 'пїЅ' then
   begin
     WordValueFromCharacter := 1;
     Exit;
@@ -1405,23 +1406,38 @@ begin
 end;
 
 procedure CalculateBandMode(Freq: Cardinal; var Band: BandType; var Mode: ModeType);
-
-label
-  MoreThan10000;
-var
-  i                                     : integer;
 begin
-//  showint(SizeOf(FreqModeArray));
-  for i := 1 to FreqModeArraySize do
-    if (Freq >= FreqModeArray[i].frMin) and (Freq <= FreqModeArray[i].frMax) then
-    begin
-      Band := FreqModeArray[i].frBand;
-      Mode := FreqModeArray[i].frMode;
-      Exit;
-    end;
-  Band := NoBand;
-  Mode := NoMode;
-
+  // ---------------------------------------------------------------------------
+  // This is a forwarding stub.  The actual implementation lives in
+  // src/uBandLookup.pas.
+  //
+  // WHY:
+  //   Tree.pas is 5,292 lines and `uses` the world (TF, Win32 Windows/Messages,
+  //   uCallSignRoutines, etc.).  Pulling tree.pas into the unit-test EXE
+  //   drags that entire dependency cone in -- which kills the test runner's
+  //   isolation and blows up build/link times.
+  //
+  //   To unit-test CalculateBandMode, the function body was lifted -- verbatim
+  //   -- into src/uBandLookup.pas, which `uses VC` only.  See
+  //   docs/tr4w-migration-strategy.md, section "Tier 1 Extraction Pattern".
+  //
+  // CALLER COMPATIBILITY:
+  //   The 10 existing call sites in LOGPACK / LOGSUBS1 / LOGWIND all
+  //   `uses Tree;` and reach this declaration.  Keeping the stub here means
+  //   none of those files had to change.  Callers see identical behavior
+  //   because the implementation in uBandLookup is the same code that used
+  //   to live here.
+  //
+  // QUALIFIED CALL BELOW:
+  //   `uBandLookup.CalculateBandMode(...)` is qualified deliberately.  Tree's
+  //   own interface still declares CalculateBandMode, so the bare name would
+  //   resolve to this very procedure and infinite-recurse.  The unit prefix
+  //   selects the implementation in uBandLookup.
+  //
+  // DO NOT add logic here.  If band-lookup behavior needs to change, edit
+  // uBandLookup.pas so the unit tests can prove the change.
+  // ---------------------------------------------------------------------------
+  uBandLookup.CalculateBandMode(Freq, Band, Mode);
 end;
 
 function CallFitsFormat(Format: Str20; Call: Str20): boolean;
@@ -2377,7 +2393,7 @@ function GetResponse(Prompt: PChar {string}): ShortString;
 //  Key                         : Char;
   {WLI}
 begin
-  //доделать  inputquery('TR4W', Prompt, InputString);
+  //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ  inputquery('TR4W', Prompt, InputString);
   Result := QuickEditResponse(Prompt, 10);
 
   //   Result := InputString;
@@ -2445,7 +2461,7 @@ procedure GetRidOfPrecedingSpaces(var s: ShortString);
 
 begin
   if s = '' then Exit;
-  {wli было >0}
+  {wli пїЅпїЅпїЅпїЅ >0}
   while ((s[1] = ' ') or (s[1] = TabKey)) and (length(s) >= 2) do
     Delete(s, 1, 1);
 end;
@@ -3842,7 +3858,7 @@ end;
 function UpperCase_old(const s: string): string;
 {
 From FastcodeUpperCaseUnit
-Работает в 2 раза быстрей.
+пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ 2 пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 }
 asm {Size = 134 Bytes}
   push    ebx

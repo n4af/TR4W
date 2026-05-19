@@ -125,13 +125,13 @@ PR. Done one at a time as time allows; **no two extractions in the same PR.**
 | 2 | `uCTYDAT` callsign → DXCC entity lookup tests | S | Test only | Tier 2 |
 | 3 | `uMults` multiplier count/add/check tests with synthetic data | S | Test only | Tier 2 |
 | 4 | Expand `uTestUtilsText` for predicates used by exchange parsing | S | Test only | Foundation |
-| 5 | Verify `DupeAndMultSheet` can instantiate without file backing; if yes, write tests | S–M | Investigate + test | Yes |
+| 5 | ~~Verify `DupeAndMultSheet` can instantiate without file backing~~ — **spike done**: not instantiable without major extraction. See *Dupe Testing Spike Findings* below | M–L | Refactor + test | Yes |
 | 6 | Extract Cabrillo per-QSO line formatter → `uCabrilloFormat.pas` + tests | M | Refactor + test | Yes |
 | 7 | Extract scoring → `uScoring.pas` for one major contest (CQ WW) + tests | M | Refactor + test | Yes |
 | 8 | Extract exchange parser for NA Sprint → `uExchangeParsing.pas` + tests | M | Refactor + test | Yes |
 | 9 | Add CQ WPX, NAQP, ARRL DX, SS to extracted exchange parser | L | Test only | Yes |
-| 10 | Catalog all `asm` blocks (`grep -r 'asm' src/`) — produce Phase 3 worklist | S | Inventory | — |
-| 11 | Audit `TF.pas` `wsprintf` call sites (73 in total) — produce Phase 2 worklist | M | Inventory | — |
+| 10 | ~~Catalog all `asm` blocks — produce Phase 3 worklist~~ — **done** 2026-05-19, see [docs/PHASE_INVENTORIES.md](PHASE_INVENTORIES.md) (600 blocks across 74 files; PostUnit alone has 170) | S | Inventory | — |
+| 11 | ~~Audit `wsprintf` call sites — produce Phase 2 worklist~~ — **done** 2026-05-19, see [docs/PHASE_INVENTORIES.md](PHASE_INVENTORIES.md) (**172 calls** across 37 files — original estimate of 73 was substantially low; PostUnit alone has 92) | M | Inventory | — |
 
 **Effort scale:** S = couple of hours · M = half a day to a day · L = a day or two.
 
@@ -150,6 +150,52 @@ PR. Done one at a time as time allows; **no two extractions in the same PR.**
 
 When in doubt, do item 1 next. It's small, isolated, and protects a function
 that's invoked thousands of times per contest.
+
+### Dupe Testing Spike Findings
+
+Spike for roadmap item 5 (verify `DupeAndMultSheet` can be instantiated in
+a test EXE without its file backing). Performed 2026-05-19.
+
+**Conclusion:** Not feasible without first doing a larger extraction (M–L
+effort, not the S–M originally estimated).
+
+**Why:**
+
+1. `LogDupe.pas` (2,570 lines) has a wide `uses` cone: `LogWind` (172k lines),
+   `LogRadio` (152k lines), `LogSCP`, `Tree`, `uMults`, `uCallsigns`, plus
+   `VC`, `TF`, `Windows`. Linking `LogDupe` into the test EXE pulls the
+   entire TRDOS layer in — the test runner would effectively *be* tr4w.exe.
+
+2. `DupeAndMultSheet` is a Turbo-Pascal-style `object` (not a class), and
+   has only two boolean fields (`DupeSheetEnable`, `tAutoReset`). The
+   actual dupe and multiplier data lives in module-level globals declared
+   immediately below the object definition (`InitialExCallsigns`,
+   `InitialExDupes`, partial-call arrays, dupe-list pointers). The object's
+   methods mutate those globals directly. There is no constructor and no
+   private state to inject.
+
+3. Methods that *look* in-memory-pure on their signatures
+   (`AddCompressedCallToDupeSheet`, `TwoLetterCrunchProcess`,
+   `MakePossibleCallList`, `IsADomesticMult`, `DupeSheetTotals`) all
+   reach into the global state.  Calling any of them in a test requires
+   priming that global state, which requires either `SheetInitAndLoad`
+   (which does file I/O) or hand-initializing every global by hand.
+
+**Recommended next step (deferred — not in current PR scope):**
+
+Extract pure dupe-check and partial-call-match logic plus its underlying
+data structures (DupeList, MultList, partial-call arrays) into a new
+`uDupeCheck.pas` following the Tier 1 Extraction Pattern. `LogDupe.pas`
+keeps the file I/O, UI, and TRDOS-wired glue and forwards in-memory
+operations to the new unit. Expected effort: M–L. Adds another row to
+the roadmap; do not bundle with other items.
+
+Test scope after extraction:
+- Add call X to dupe sheet on band B / mode M; check `IsDupe(X, B, M)` returns True
+- Same call on different band returns False (per-band dupe semantics)
+- Empty sheet returns False for any call
+- Partial-call match: input "K1A", confirm K1ABC appears in the candidate list
+- Mult tracking: per-band, per-mode multiplier flags
 
 ---
 

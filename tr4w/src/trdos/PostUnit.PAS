@@ -52,6 +52,7 @@ uses
   Messages,
   LogCW, // 4.53.2
   Windows,
+  uCabrilloFormat,  // tCabrilloFreqString / tCabrilloModeString + per-field formatters (extracted from this unit, see uCabrilloFormat.pas)
   uSuperCheckPartialFileUpload,
   Dialogs;
 
@@ -347,42 +348,9 @@ const
     'YES',
     'NO');
 
-    // NOTE - The following array is used by LOGContactToUDP so the BandType enumeration on ContestExchange and this array need to be aligned.
-  tCabrilloFreqString                   : array[Band160..BandLight] of PChar =
-    (
-    '1800',
-    '3500',
-    '7000',
-    '14000',
-    '21000',
-    '28000',
-  
-    '10100',
-    '18100',
-    '24900',
-    '50',
-    '144',
-    '222',
-    '432',
-    '902',
-    '1.2G',
-    '2.3G',
-    '3.4G',
-    '5.7G',
-    '10G',
-    '24G',
-    'LIGHT'
-    );
-
-  tCabrilloModeString                   : array[ModeType] of PChar =
-    (
-    'CW',
-    'RY',
-    'PH',
-    nil,
-    nil,
-    'FM'
-    );
+    // tCabrilloFreqString and tCabrilloModeString moved to uCabrilloFormat.pas
+    // (see this unit's interface uses clause).  The arrays are still referenced
+    // by LOGContactToUDP in LOGSUBS2.PAS, which now also `uses uCabrilloFormat`.
 {
   tARRLVESections                       : array[0..NumberSections - 1] of PChar = (
     'AB',

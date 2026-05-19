@@ -33,7 +33,11 @@ uses
    uTestUtilsText       in 'uTestUtilsText.pas',
    uADIF                in '..\..\src\uADIF.pas',
    uTestADIF            in 'uTestADIF.pas',
-   uTestADIFFixtures    in 'uTestADIFFixtures.pas';
+   uTestADIFFixtures    in 'uTestADIFFixtures.pas',
+   uBandLookup          in '..\..\src\uBandLookup.pas',
+   uTestBandLookup      in 'uTestBandLookup.pas',
+   uCabrilloFormat      in '..\..\src\uCabrilloFormat.pas',
+   uTestCabrilloFormat  in 'uTestCabrilloFormat.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -49,6 +53,8 @@ begin
    RegisterSuite(TADIFHelperTests.Create('ADIFHelpers'));
    RegisterSuite(TADIFMappingTests.Create('ADIFMapping'));
    RegisterSuite(TADIFFixtureTests.Create('ADIFFixtures'));
+   RegisterSuite(TBandLookupTests.Create('BandLookup'));
+   RegisterSuite(TCabrilloFormatTests.Create('CabrilloFormat'));
 
    if RunAllSuites then
       begin
