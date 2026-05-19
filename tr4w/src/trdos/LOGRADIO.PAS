@@ -174,6 +174,7 @@ type
       RadioDisconnected:   Boolean;
       RadioName:        Str20;
       StartupCommand  : Str50;
+      StartupCommandSent: Boolean;  // One-shot guard: set True after pNetworkRadio sends StartupCommand on first connect (Issue #436)
       HamLibID:          integer;
       //    lpOverlapped: TOverlapped;
       //    pOver: POverlapped;
@@ -3066,8 +3067,14 @@ begin
                         [Self.RadioName, Self.NetworkUsername]);
          end;
 
-         Self.tNetObject.Connect;
-         logger.Info('[%s.SetUpRadioInterface] Network radio connected', [Self.RadioName]);
+         // Connect is deferred to the polling thread (pNetworkRadio).  Running
+         // it synchronously here blocked the main thread for up to 10 s
+         // (Indy ConnectTimeout) whenever the radio was off or unreachable.
+         // The polling thread's existing reconnect-with-backoff path now
+         // handles the very first connect as well.  Issue #436.
+         Self.StartupCommandSent := False;  // pNetworkRadio sends StartupCommand once after first connect
+         logger.Info('[%s.SetUpRadioInterface] Network radio %s:%d configured; Connect deferred to polling thread (main thread not blocked)',
+                     [Self.RadioName, Self.IPAddress, Self.RadioTCPPort]);
       end
       else
          logger.error('[%s.SetUpRadioInterface] Failed to create network radio', [Self.RadioName]);
@@ -3109,7 +3116,9 @@ begin
       begin
       if Self.tNetObject <> nil then
          begin
-         Self.tNetObject.SendToRadio(Self.StartupCommand);
+         // Network radios: pNetworkRadio sends StartupCommand on first
+         // successful connect.  Sending here would race the deferred
+         // Connect (Issue #436).
          end
       else
          begin

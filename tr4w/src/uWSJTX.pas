@@ -131,7 +131,8 @@ uses
   , LogK1EA // for tPTTViaCommand
   , LogDOM // for ActiveDomesticMult
   , uCFG // for WSJTXRadioControlEnabled
-  , PostUnit // for tCabrilloFreqString
+  , PostUnit
+  , uCabrilloFormat // for tCabrilloFreqString (moved here from PostUnit; see uCabrilloFormat.pas)
   , IdStack // for GStack.AddMulticastMembership
   ;
 // {$R *.dfm}

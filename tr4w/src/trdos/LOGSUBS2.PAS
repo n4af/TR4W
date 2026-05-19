@@ -50,6 +50,7 @@ uses
   idGlobal,
   WinSock2,
   PostUnit,
+  uCabrilloFormat,  // tCabrilloFreqString moved here from PostUnit (extracted for unit testing)
   uTotal,
   uNet,
   BeepUnit,
