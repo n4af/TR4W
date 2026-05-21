@@ -111,6 +111,7 @@ uses
   exportto_trlog in 'src\exportto_trlog.pas',
   uWSJTX in 'src\uWSJTX.pas',
   uHamScore in 'src\uHamScore.pas',
+  uExchangeBuilder in 'src\uExchangeBuilder.pas',
   uGridLookup in 'src\uGridLookup.pas',
   Log4D in 'src\Log4D.pas',
   uNetRadioBase in 'src\uNetRadioBase.pas',
