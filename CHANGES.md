@@ -22,6 +22,24 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.15 (2026-05-21) — NY4I
+
+#### HamScore RTC payload TRACE log + canonical sent/rx exchanges (`src/uHamScore.pas`, `src/uExchangeBuilder.pas`, `src/trdos/LOGSUBS2.PAS`, `src/MainUnit.pas`, `tr4w.dpr`) — Issue #921 / PR #921
+
+- **TRACE-level log of outgoing HamScore RTC POST** (URL, effective username, full XML payload) added in `THamScoreUploader.PostToServer`, guarded by `FLogger.IsTraceEnabled` so the payload is only stringified when trace logging is active.
+- **New shared unit `src/uExchangeBuilder.pas`** exporting two plain-text builders (`BuildSentExchangeText`, `BuildRxExchangeText`) consumed by both the HamScore RTC POST and the N1MM-style UDP `ContactInfo` broadcast in `LOGSUBS2.PAS`. Eliminates the prior duplication where `<SentExchange>` echoed `RXData.ExchString` in both code paths.
+- **`BuildSentExchangeText` rebuilds from the contest's `CQExchange` template** set in `LogCfg.pas` at contest start. Substitutes `#` → `NumberSent` and the CW shorthand `5NN` → `599` so scoring consumers see canonical numeric RST. Whitespace collapsed and trimmed. Empty template falls back to `RXData.ExchString`. Future work: per-contest "RTC exchange template" in the radio/contest factory.
+- **`BuildRxExchangeText` dispatches on `RXData.ceContest`** and rebuilds from parsed `ContestExchange` fields in scoring-canonical order so the operator-typed order ("EL88 1234" vs "1234 EL88") no longer leaks into RTC/UDP submissions. Contests covered: `CQWPXCW`/`CQWPXSSB`/`DARCWAEDCCW` (`RST + serial`), `CQWWCW`/`CQWWSSB`/`IARU` (`RST + zone`), `CQ160CW` (`RST + QTHString`), `ARRLDXCW`/`ARRLDXSSB` (`RST + QTHString` US side or `RST + Power` DX side), `ALLASIANCW`/`ALLASIANSSB` (`RST + Age`), `CWOPS` / CWT (`Name + QTHString`), `CWOPEN` (`serial + Name`), `RTC` (`serial + QTHString` — no RST on air), `ARRLFIELDDAY`/`WINTERFIELDDAY` (`ceClass + QTHString`). Unknown contests fall back to `RXData.ExchString` (no regression).
+- **Default RST inference**: `RSTReceivedString` returns `599` on `CW`/`Digital`, `59` on Phone/FM when `RXData.RSTReceived = 0` (operator accepted parser default).
+- **`LOGSUBS2.PAS` UDP `BuildUDPContact`**: both `<SentExchange>` (previously `Trim(RxData.ExchString)`) and `<exchange1>` (previously a 2-case `ActiveExchange` switch falling back to `ExchString`) now route through the shared builders so HamScore RTC and N1MM-style UDP consumers see identical canonical strings.
+- **`uHamScore.pas`** retains thin `BuildSentExchange` / `BuildRxExchange` wrappers that XML-escape the shared text helpers' output.
+
+#### X-QSO "All" column regression in score grid (`src/MainUnit.pas`) — Issue #750 follow-up
+
+- **`LoadinLog` was double-counting X-QSO records in `QSOTotals[AllBands, Both]`**. Every per-band/per-mode counter (`QSOTotals[Band, Mode]`, `QSOTotals[Band, Both]`, `QSOTotals[AllBands, Mode]`, `ContinentQSOCount`, `TimeSpentByBand`) was inside the `(ceQSO_Deleted = False) and (ceXQSO = False)` guard at lines 5498-5499, but the `inc(QSOTotals[AllBands, Both])` at line 5529 was outside it. Result: the score grid's "All" column counted X-QSO records while every per-band column correctly excluded them (e.g. 13 on 20m, 14 under "All" with one X-QSO). Increment moved inside the guard.
+
+---
+
 ### 4.147.13 (2026-05-18) — NY4I
 
 #### TR4WSERVER auto-sync log on reconnect (`src/uNet.pas`, `src/uCFG.pas`, `src/uGetServerLog.pas`, `tr4w.dpr`, `src/lang/*`) — Issue #912

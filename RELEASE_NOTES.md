@@ -24,6 +24,20 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.15 (2026-05-21) — NY4I
+
+#### HamScore Real-Time Scoring
+
+- **Sent and received exchange strings posted to HamScore are now canonicalized.** Previously, both `<SentExchange>` and `<RxExchange>` in the RTC submission echoed whatever you typed in the exchange window, so an RTC grid contact you copied as "EL88 343" went to the scoreboard as "EL88 343" instead of the canonical "343 EL88". And `<SentExchange>` always showed the received exchange instead of what you actually sent. Both are now rebuilt: SentExchange comes from your contest's sent template with your real serial number; RxExchange is rebuilt from the parsed fields in the order the contest sponsor expects. Supported contests include CQ WPX (CW/SSB), CQ WW (CW/SSB), IARU, WAE CW, CQ 160 CW, ARRL DX (CW/SSB), All Asian (CW/SSB), CWT, CWOpen, ARRL Field Day, Winter Field Day, and the RTC grid contest itself. Other contests fall back to the operator-typed string (same as before — no regression). (Issue #921)
+- **Same canonical exchanges are now emitted in the N1MM-style UDP ContactInfo broadcast.** If you have an external logger (DXKeeper, etc.) consuming TR4W's UDP broadcasts, it will see the same canonical SentExchange and exchange1 fields HamScore sees.
+- **New TRACE-level logging of every HamScore POST.** Set `DEBUG LOG LEVEL = TRACE` in `settings/tr4w.ini` and the full XML payload (URL, username, contact bodies) is written to `tr4w.log` before each upload. Useful for diagnosing scoreboard discrepancies.
+
+#### X-QSO
+
+- **The "All" column on the score grid no longer counts X-QSO records.** When you marked a QSO as X-QSO, the per-band column correctly dropped to (e.g.) 13 but the "All" column still showed 14. The "All" total now matches the per-band totals.
+
+---
+
 ### 4.147.13 (2026-05-18) — NY4I
 
 #### Multi-Op / Networking
