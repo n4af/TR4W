@@ -153,7 +153,8 @@ uses
   MainUnit,
   uRadioPolling,
   uYCCCSO2R,
-  uHamScore;        // Issue #783 -- HamScoreOnLog hook
+  uHamScore,        // Issue #783 -- HamScoreOnLog hook
+  uExchangeBuilder; // Canonical SentExchange builder for UDP broadcast
 procedure CreateAndSendPacketSpot(PacketSpotCall: CallString; PacketSpotFreq: LONGINT);
 
 begin
@@ -3083,15 +3084,13 @@ begin
       else
          sExchange := RXData.ExchString;
       end;}
-   case ActiveExchange of
-      NameAndDomesticOrDXQTHExchange:
-         sExchange := RXData.Name;
-      ClassDomesticOrDXQTHExchange:
-         sExchange := RXData.ceClass;
-      else
-         sExchange := RXData.ExchString;
-      end;
-
+   // Canonical received exchange, per contest, rebuilt from typed fields
+   // so the operator-typed order doesn't leak into consumers. The prior
+   // ActiveExchange dispatch only handled 2 cases and fell back to the
+   // raw operator string; the shared builder covers more contests
+   // (WPX/WAE, CQ WW/IARU, CQ 160, ARRL DX, All Asian, CWT, CWOpen, RTC,
+   // Field Day, Winter FD) with the same logic the RTC POST uses.
+   sExchange := BuildRxExchangeText(RxData);
 
    Result := Result + #9 + '<exchange1>' + sExchange + '</exchange1>' + sLineBreak;
    Result := Result +
@@ -3123,7 +3122,10 @@ begin
             #9 + '<IsClaimedQso>' + Format('%d',[IfThen(RxData.ceQSO_Skiped or RxData.ceXQSO,0,1)]) + '</IsClaimedQso>' + sLineBreak +
             #9 + '<oldtimestamp>' + sTimestamp + '</oldtimestamp>' + sLineBreak +
             #9 + '<oldcall>' + RXData.Callsign + '</oldcall>' + sLineBreak +
-            #9 + '<SentExchange>' + Trim(RxData.ExchString) + '</SentExchange>' + sLineBreak +
+            // SentExchange built from CQExchange template, not the
+            // received string. Pre-fix this echoed RxData.ExchString,
+            // which is wrong for any contest. See uExchangeBuilder.
+            #9 + '<SentExchange>' + BuildSentExchangeText(RxData) + '</SentExchange>' + sLineBreak +
 
       '</' + sRecType + '>'+ sLineBreak ;
 

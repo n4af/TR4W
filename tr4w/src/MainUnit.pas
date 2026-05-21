@@ -5525,8 +5525,12 @@ begin
             inc(TimeSpentByBand[TempRXData.Band]);
             // PreviousBand := TempRXData.Band;
           end;
+          // Issue #750 follow-up: this increment was previously OUTSIDE
+          // the X-QSO guard, so the score grid's "All" column counted
+          // X-QSO records even though every per-band/per-mode counter
+          // skipped them. Moved inside so the totals are consistent.
+          inc(QSOTotals[AllBands, Both]);
         end;
-        inc(QSOTotals[AllBands, Both]);
       end;
     // else
     // asm nop end;

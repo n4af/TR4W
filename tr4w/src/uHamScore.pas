@@ -159,7 +159,8 @@ uses
   ZoneCont,          // GetContinentName, ContinentType
   TF,                // CreateButton, CreateStatic
   MainUnit,          // CloseTR4WWindow, DefTR4WProc, FrmSetFocus (impl/impl cycle is OK)
-  uGetScores;        // BuildDynamicResultsXml (added by this PR)
+  uGetScores,        // BuildDynamicResultsXml (added by this PR)
+  uExchangeBuilder;  // Shared SentExchange / RxExchange canonical builders
 
 const
   DEFAULT_CYCLE_MS = 120000;   // 2 minutes per RTC spec section 1.2
@@ -274,6 +275,19 @@ begin
      tSysTime.qtHour, tSysTime.qtMinute, tSysTime.qtSecond]));
 end;
 
+// XML-escaping wrappers around the plain-text shared builders in
+// uExchangeBuilder.  Keeping the wrappers thin means LOGSUBS2 (UDP
+// broadcast) and uHamScore (RTC POST) emit identical canonical strings.
+function BuildSentExchange(const RXData: ContestExchange): AnsiString;
+begin
+   Result := XmlEscape(AnsiString(BuildSentExchangeText(RXData)));
+end;
+
+function BuildRxExchange(const RXData: ContestExchange): AnsiString;
+begin
+   Result := XmlEscape(AnsiString(BuildRxExchangeText(RXData)));
+end;
+
 // Render a <contactinfo> or <contactreplace> body for one QSO.
 // Used by HamScoreOnLog / HamScoreOnEdit on the main thread; the result
 // goes into TRTCContact.XmlBody and is held until CFM by the worker.
@@ -317,11 +331,13 @@ begin
     #9 + '<txfreq>' + AnsiString(IntToStr(txFreq)) + '</txfreq>' + sLineBreak +
     #9 + '<mode>' + MapModeForRTC(RXData) + '</mode>' + sLineBreak +
     #9 + '<call>' + XmlEscape(AnsiString(RXData.Callsign)) + '</call>' + sLineBreak +
-    #9 + '<SentExchange>' + XmlEscape(Trim(AnsiString(RXData.ExchString))) + '</SentExchange>' + sLineBreak +
-    #9 + '<RxExchange>'   + XmlEscape(Trim(AnsiString(RXData.ExchString))) + '</RxExchange>' + sLineBreak +
-    // RxExchange: TR4W does not store the received exchange string verbatim
-    // separate from the parsed fields; ExchString reflects what was typed.
-    // Spec tolerates a single exchange string; refine later if needed.
+    #9 + '<SentExchange>' + BuildSentExchange(RXData) + '</SentExchange>' + sLineBreak +
+    #9 + '<RxExchange>'   + BuildRxExchange(RXData)   + '</RxExchange>'   + sLineBreak +
+    // SentExchange: built from CQExchange template (LogCfg.pas) with '#'
+    // -> NumberSent and '5NN' -> '599'. RxExchange: rebuilt from parsed
+    // ContestExchange fields in canonical scoring order per contest so
+    // operator-typed order variations don't leak into the submission.
+    // Unsupported contests fall back to the raw operator-typed string.
     #9 + '<countryprefix>' + XmlEscape(AnsiString(RXData.QTH.CountryID)) + '</countryprefix>' + sLineBreak +
     #9 + '<wpxprefix>'     + XmlEscape(AnsiString(RXData.QTH.Prefix))    + '</wpxprefix>' + sLineBreak +
     #9 + '<continent>' + AnsiString(GetContinentName(RXData.QTH.Continent)) + '</continent>' + sLineBreak +
@@ -591,6 +607,11 @@ begin
     http.ReadTimeout            := 30000;
 
     try
+      if FLogger.IsTraceEnabled then
+         begin
+         FLogger.Trace('[HamScore] POST %s user=%s payload=%s',
+            [FURL, effectiveUser, string(xml)]);
+         end;
       http.Post(FURL, body, resp);
       Result := http.ResponseCode;
       responseBody := resp.DataString;
