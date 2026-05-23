@@ -10,14 +10,14 @@ const
   TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
   TC_UKEI                               = 'If within UK/EI, check here';
   TC_EnterYourDistrictCode              = 'If within UK/EI, enter your district code';
-  TC_YUGOSLAVIA                         = 'Yugoslavia';
-  RC_BACKUPLOG                         = 'Backup Log';
-  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I, O or M.';
-  TC_INVALID                            = 'Invalid Entry';
-  TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
-  TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';
-  RC_3830                               =  '3830 Score posting';
-  RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
+  TC_YUGOSLAVIA                         = 'Iugoslavia';
+  RC_BACKUPLOG                         = 'Salvare Log';
+  TC_IMPROPERWINTERFIELDDAYCLASS = 'Clasa Winter Field Day trebuie sa fie H, I, O sau M.';
+  TC_INVALID                            = 'Intrare invalida';
+  TC_FREQ_ZERO                          = 'EROARE: Frecventa invalida inregistrata';
+  TC_FREQ_OFF                           = 'AFISARE FRECVENTA IN LOG este dezactivata';
+  RC_3830                               =  'Postare scor 3830';
+  RC_3830_ARRL                          =  'Trimite log ARRL';  // 4.53.3
   TC_CALLSIGN                           = 'Indicativ';
   TC_BAND                               = 'Banda';
   TC_FREQ                               = 'Frecv';
@@ -43,7 +43,7 @@ const
   TC_DISBALE_CIV                        = 'Anulez modul "CI-V Transceive" din statia ICOM. Vezi manualul de operare al statiei.';
 
   {MAIN}
-  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
+  TC_ENTERYOURISTRICTIFINVE7            = 'Introduceti districtul federal daca sunteti in British Columbia, sau Statul/Provincia';  // 4.97.6
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Utilizeaza ultima versiune';
   TC_SET_VALUE_OF_SET_NOW               = 'Inscrie valoarea lui %s. Inscriu acum?';
   TC_CONFIGURATION_FILE                 = 'Fisier de configurare';
@@ -56,12 +56,12 @@ const
   TC_SORRYNOLOG                         = 'Regret!! NO LOG = TRUE nu permite logarea QSO-urilor pe acest calculator';
   TC_SETCOMPUTERIDVALUE                 = 'Inscrie valoarea COMPUTER ID.';
 
-  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
-  TC_LOGFILENOTFOUND                    = 'Log file not found';
-  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
-  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
-  TC_BACKUPCREATED                      = 'Log file backup created';
-  TC_CANNOTRENAME                       = 'Can not rename';
+  TC_WANTTOCONVERTLOG                   = 'Doriti sa convertiti acest log la cel mai recent format?';
+  TC_LOGFILENOTFOUND                    = 'Fisierul log nu a fost gasit';
+  TC_CANNOTBACKUPLOG                    = 'Nu s-a putut crea o copie de rezerva pentru ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Nu se poate copia fisierul log -- destinatia exista si este doar pentru citire';
+  TC_BACKUPCREATED                      = 'Copia de rezerva a fisierului log creata';
+  TC_CANNOTRENAME                       = 'Nu se poate redenumi';
 
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" Sterge toate logurile din retea';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" Sterge toate filele cu duble din retea';
@@ -104,9 +104,9 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Doresti o versiune mai noua a TR4W ?';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
-  TC_IRTS                               = 'EI/GI, enter your County';
-  TC_EUDX                               = 'EU country, enter your four character country code';
+  TC_LABRE                              = 'Introduceti ID QTH din 2 caractere';
+  TC_IRTS                               = 'EI/GI, introduceti comitatul';
+  TC_EUDX                               = 'Tara UE, introduceti codul de tara din 4 caractere';
   TC_LATEST_CONFIG_FILE                 = 'Ultimul fisier de configurare';
   TC_OPENCONFIGURATIONFILE              = ' - Deschid fisier configurare sau - Incep un nou concurs';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Directorul "%s" exista deja.'#13'Suprascriem ?';
@@ -185,8 +185,8 @@ const
   TC_CANADA                             = 'Canada';
   TC_FRANCE                             = 'Franta';
   TC_HQ_OR_MEMBER                       = 'HQ sau membru';
-  TC_GC                                 = 'special two character designator'  ;
-  TC_GAGARIN                            = 'special two char ID';
+  TC_GC                                 = 'indicator special din doua caractere'  ;
+  TC_GAGARIN                            = 'ID special din doua caractere';
   {UTELNET}
 
   TC_TELNET                             = 'Conectat'#0'Deconectat'#0'Comenzi'#0'Opreste'#0'Sterge'#0'100'#0#0;
@@ -206,7 +206,7 @@ const
   TC_CONNECTTOTR4WSERVERFAILED          = 'Conectarea spre TR4WSERVER esuata. Verifica valoarea la SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'Conectat la ';
   TC_DISCONNECTEDFROM                   = '** Deconectat de la ';
-  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Sincronizare automata log de la server.';
   TC_FAILEDTOCONNECTTO                  = 'Conectare esuata la ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Logul local si cel de la Server sunt identice.';
   TC_NETWORK                            = 'Reteaua : %s %s:%d';
@@ -268,9 +268,9 @@ const
   TC_SAVINGTO                           = 'Salvez %s pe %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'Fisier salvat cu succes pe floppy.';
   TC_FILESAVEDTOSUCCESSFULLY            = 'Fisier salvat cu succes pe %s.';
-  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
-  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
+  TC_IMPROPERTRANSMITTERCOUNT           = 'Numarul de emitatoare FD trebuie sa fie intre 1 si 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'Clasa Field Day trebuie sa fie A, B, C, D, E sau F.';
+  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'Schimbul statiei DX trebuie sa fie "DX".';
 
   {LOGSEND}
 
@@ -582,7 +582,7 @@ const
   RC_SETTINGS                           = 'Setari';
   RC_OPTIONS                            = 'Comenzi de configurare';
   RC_CFG_COMMANDS                       = 'Comenzi de configurare';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
+  RC_RESET_RADIO_PORTS                  = 'Reseteaza porturile radio';
   RC_PROGRAMMES                         = 'Mesaje ale programului';
   RC_CATANDCW                           = 'CAT si manipularea CW';
   RC_RADIOONE                           = 'Statia 1';
@@ -689,7 +689,7 @@ const
   RC_SEARCH                             = '&Cauta';
   RC_GETOFFSET                          = '&Gaseste diferenta';
   RC_LOCALOFFSET                        = 'Diferenta ceasului local';
-  RC_NTPSERVER                          = 'NTP Server';
+  RC_NTPSERVER                          = 'Server NTP';
   RC_SERVERANSWER                       = 'Raspuns server';
   RC_SYNCLOCK                           = '&Sincronizeaza ceasul';
   RC_LOCALTIME                          = 'Ora locala';
@@ -783,10 +783,10 @@ const
   RC_NET_CLDUPE                         = 'Sterge fisier duble din toate logurile';
   RC_NET_CLMULT                         = 'Sterge fisier multipl din toate logurile';
   RC_INC_TIME                           = 'Incrementeaza timpul';
-  RC_NOTES                              = 'Notes';
+  RC_NOTES                              = 'Note';
   RC_DEFAULT                            = 'Prestabilit:';
   RC_DESCRIPTION                        = 'Descriere:';
-  RC_DEVICEMANAGER                      = 'Device Manager';
+  RC_DEVICEMANAGER                      = 'Manager dispozitive';
   RC_SHDX_CALLSIGN                      = 'SH/DX [indicativ]';
   RC_STATIONINFO                        = 'Informatii cu statia';
   RC_MP3_RECENABLE                      = 'Activeaza';
@@ -800,7 +800,7 @@ const
   RC_BANDPLAN                           = 'Plan banda';
   RC_WA7BNM_CALENDAR                    = 'Calendar concursuri de la WA7BNM';
   RC_SEND_BUG                           = 'Trimite o nota daca ai probleme';
-  RC_HOMEPAGE                           = 'TR4W Home Page';
+  RC_HOMEPAGE                           = 'Pagina principala TR4W';
 
 
   RC_OPERATOR                           = 'Operator';

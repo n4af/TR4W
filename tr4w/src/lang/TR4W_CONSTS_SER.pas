@@ -8,17 +8,17 @@ const
   TC_TRANSLATION_AUTHOR                 = 'Dragan Acimovic YT3W';
   TC_TRANSLATOR_EMAIL                   = 'dragan.acimovic@gmail.com';
   TC_EnterYourDistrictCode              = 'IF in UK/EI, enter your district code';
-  TC_PREF_OR_CQZONE                     = 'Enter your CQ ZONE or JA PREFECTURE';
-  TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
+  TC_PREF_OR_CQZONE                     = 'Unesite vašu CQ ZONU ili JA PREFEKTURU';
+  TC_2RADIO_WARN                        = 'GREŠKA: 2 radio ureðaja na istom opsegu';
   TC_UKEI                               = 'Check IF you are within UK/EI';
-  TC_YUGOSLAVIA                         = 'Yugoslavia';
-  RC_BACKUPLOG                         = 'Backup Log';
-  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I, O or M.';
-  TC_INVALID                            = 'Invalid Entry';
-  TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
-  TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';
-  RC_3830                               =  '3830 Score posting';
-  RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
+  TC_YUGOSLAVIA                         = 'Jugoslavija';
+  RC_BACKUPLOG                         = 'Rezervna kopija loga';
+  TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day klasa mora biti H, I, O ili M.';
+  TC_INVALID                            = 'Nevažeæi unos';
+  TC_FREQ_ZERO                          = 'GREŠKA: Logovana nevažeæa frekvencija';
+  TC_FREQ_OFF                           = 'PRIKAZ FREKVENCIJE U LOGU je iskljuèen';
+  RC_3830                               =  '3830 slanje rezultata';
+  RC_3830_ARRL                          =  'Pošalji ARRL log';  // 4.53.3
   TC_FREQ                               = 'Freq';
   TC_POINTS                             = 'Pts';
   TC_OP                                 = 'Op';
@@ -42,7 +42,7 @@ const
   TC_DISBALE_CIV                        = 'Iskljuci "CI-V Transceive" mod u svom ICOM uredjaju. Pogledaj u uputstvu za taj uredjaj.';
 
   {MAIN}
-  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
+  TC_ENTERYOURISTRICTIFINVE7            = 'Unesite federalni distrikt ako ste u British Columbia, ili državu/provinciju';  // 4.97.6
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Koristis poslednju verziju';
   TC_SET_VALUE_OF_SET_NOW               = 'Podesi vrednost za %s. Podesiti sada?';
   TC_CONFIGURATION_FILE                 = 'Konfiguraciona datoteka';
@@ -55,12 +55,12 @@ const
   TC_SORRYNOLOG                         = 'Parametar NO LOG = TRUE zabranjuje upis veza na ovom racunaru';
   TC_SETCOMPUTERIDVALUE                 = 'Podesite vrednost COMPUTER ID';
 
-  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
-  TC_LOGFILENOTFOUND                    = 'Log file not found';
-  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
-  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
-  TC_BACKUPCREATED                      = 'Log file backup created';
-  TC_CANNOTRENAME                       = 'Can not rename';
+  TC_WANTTOCONVERTLOG                   = 'Da li želite da konvertujete ovaj log u najnoviji format?';
+  TC_LOGFILENOTFOUND                    = 'Log fajl nije pronaðen';
+  TC_CANNOTBACKUPLOG                    = 'Nije moguæe napraviti rezervnu kopiju ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Nije moguæe kopirati log fajl -- ciljni fajl postoji i samo je za èitanje';
+  TC_BACKUPCREATED                      = 'Rezervna kopija log fajla napravljena';
+  TC_CANNOTRENAME                       = 'Nije moguæe preimenovati';
 
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" ocisti sve dnevnike u mrezi';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" ocisti sve litse duplih veza na mrezi';
@@ -102,8 +102,8 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Proveri da li je instalirana poslednja verzija TR4W programa';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
-  TC_EUDX                               = 'EU country, enter your four character country code';
+  TC_LABRE                              = 'Unesite QTH ID od 2 znaka';
+  TC_EUDX                               = 'EU zemlja, unesite èetvoroznakovni kod zemlje';
   TC_LATEST_CONFIG_FILE                 = 'Poslednja konfiguraciona datoteka';
   TC_OPENCONFIGURATIONFILE              = ' - Otvori konfiguracionu datoteku ili kreiraj konfiguraciju za novo takmicenje';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Direktorijum "%s" vec postoji.'#13' Presnimiti ga?';
@@ -154,7 +154,7 @@ const
 
   TC_HQ_OR_MEMBER                       = 'HQ ili clan';
   
-  TC_IRTS                               = 'EI/GI, enter your County';
+  TC_IRTS                               = 'EI/GI, unesite svoju oblast';
   TC_NEWENGLAND                         = 'Nova Engleska';
   TC_CALIFORNIA                         = 'Kaliforniji';
   TC_FLORIDA                            = 'Floridi';
@@ -188,8 +188,8 @@ const
   TC_CANADA                             = 'Kanadi';
   TC_FRANCE                             = 'Francuskoj';
   TC_IRELAND                            = 'Irskoj';
-  TC_GC                                 = 'special two character designator'  ;
-  TC_GAGARIN                            = 'special two char ID';
+  TC_GC                                 = 'specijalna dvoznakovna oznaka'  ;
+  TC_GAGARIN                            = 'specijalni dvoznakovni ID';
   {UTELNET}
 
   TC_TELNET                             = 'Konekcija'#0'Diskonekcija'#0'Komande'#0'Zaustavljanje'#0'Brisanje'#0'Korisnici'#0'100'#0'WWV'#0'Filter'#0;
@@ -209,7 +209,7 @@ const
   TC_CONNECTTOTR4WSERVERFAILED          = 'Konekcija na TR4WSERVER nije uspela. Proveri ispravnost LOZINKE SERVERA!!';
   TC_CONNECTEDTO                        = 'Konektovan na ';
   TC_DISCONNECTEDFROM                   = '** Diskonektovan sa ';
-  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-sinhronizacija loga sa servera.';
   TC_FAILEDTOCONNECTTO                  = 'Konekcija nije uspela na ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Dnevnik na serveru i lokalni dnevnik identicni.';
   TC_NETWORK                            = 'Lokalna mreza : %s %s:%d';
@@ -575,7 +575,7 @@ const
   RC_BEACONSM                           = 'Bikon monitor';
   RC_WINCONTROL                         = 'Kontrola prozora';
   RC_SETTIMEZONE                        = 'Podesavanje vremenske zone';
-  RC_PING                               = 'Ping [SERVER ADDRESS]';
+  RC_PING                               = 'Ping [ADRESA SERVERA]';
   RC_RUNSERVER                          = 'Startovanje TR4WSERVER-a';
   RC_DVPVOLCONTROL                      = 'DVP kontrola jacine';
   RC_RECCONTROL                         = 'Kontrola snimanja';
@@ -584,7 +584,7 @@ const
   RC_GRID                               = 'Odredjivanje lokatora';
   RC_CALCULATOR                         = 'Digitron';
   RC_LC                                 = 'LC';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
+  RC_RESET_RADIO_PORTS                  = 'Resetuj radio portove';
 
   RC_GETOFFSET                          = 'Uzmi razliku';
   RC_LOCALOFFSET                        = 'Razlika u lokalnom vremenu';
@@ -610,7 +610,7 @@ const
   RC_OPERATOR                           = 'Operator';
   RC_CALLSIGN                           = 'Pozivni znak';
   RC_MODE                               = 'Mod';
-  RC_BAND                               = 'Band';
+  RC_BAND                               = 'Opseg';
   RC_APPLY                              = '&Primeni';
   RC_RESET                              = '&Resetuj';
   RC_START                              = 'Startuj';
@@ -651,7 +651,7 @@ const
   RC_RM_DEFAULT                         = 'Standardno';
   RC_TELNET                             = 'DX klaster';
   RC_NETWORK                            = 'Mreza';
-  RC_INTERCOM                           = 'Intercom';
+  RC_INTERCOM                           = 'Interfon';
 //  RC_GETSCORES                          = 'RC_POSTSCORETOGS""';
   RC_STATIONS                           = 'Stanice';
   RC_MP3REC                             = 'MP3 snimac';
@@ -816,13 +816,13 @@ const
 
   RC_LOGIN                              = 'Uloguj';
   RC_SYNCHRONIZE                        = 'Sinhronizuj';
-  RC_GET_OFFSET                         = 'Get offset';
+  RC_GET_OFFSET                         = 'Preuzmi offset';
   RC_COLORS                             = 'Boje';
   RC_APPEARANCE                         = 'Izgled';
 
   RC_WA7BNM_CALENDAR                    = 'WA7BNM''s kontest kalendar';
   RC_SEND_BUG                           = 'Posalji raport o gresci';
-  RC_HOMEPAGE                           = 'TR4W Home Page';
+  RC_HOMEPAGE                           = 'TR4W poèetna stranica';
   RC_FREQUENCY                          = 'Frekvencija';
   TC_SPLIT_WARN                       	= 'Paznja: u SPLIT MODU si!!!';
 {FD Additions NY4I}

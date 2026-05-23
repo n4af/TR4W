@@ -29,24 +29,24 @@ const
   TC_DISBALE_CIV                        = 'Disable "CI-V Transceive" mode in your ICOM rig.';
 
   {MAIN}
-  TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'You are using the latest version';
-  TC_SET_VALUE_OF_SET_NOW               = 'Set value of %s. Set now?';
-  TC_CONFIGURATION_FILE                 = 'Configuration file';
-  TC_CURRENT_OPERATOR_CALLSIGN          = 'current operator callsign';
-  TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'Append imported QSOs to current log?';
-  TC_QSO_IMPORTED                       = 'Qs imported.'; // - '345 Qs imported.'
+  TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'U¿ywasz najnowszej wersji';
+  TC_SET_VALUE_OF_SET_NOW               = 'Ustaw wartoœæ %s. Ustawiæ teraz?';
+  TC_CONFIGURATION_FILE                 = 'Plik konfiguracyjny';
+  TC_CURRENT_OPERATOR_CALLSIGN          = 'znak aktualnego operatora';
+  TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'Do³¹czyæ zaimportowane QSO do bie¿¹cego logu?';
+  TC_QSO_IMPORTED                       = 'QSO zaimportowane.'; // - '345 Qs imported.'
   TC_ISADUPE                            = '%s to powtórka!!';
   TC_ERRORINLOGFILE                     = 'B³¹d w pliku logu!';
   TC_HASIMPROPERSYNTAX                  = '%s ma niew³aœciw¹ sk³adniê!!';
   TC_SORRYNOLOG                         = 'Sorry!! Brak LOG = TRUE co uniemo¿liwia logowanie ³¹cznoœci na tym komputerze';
   TC_SETCOMPUTERIDVALUE                 = 'WprowadŸ COMPUTER ID.';
 
-  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
-  TC_LOGFILENOTFOUND                    = 'Log file not found';
-  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
-  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
-  TC_BACKUPCREATED                      = 'Log file backup created';
-  TC_CANNOTRENAME                       = 'Can not rename';
+  TC_WANTTOCONVERTLOG                   = 'Czy chcesz przekonwertowaæ ten log do najnowszego formatu?';
+  TC_LOGFILENOTFOUND                    = 'Nie znaleziono pliku logu';
+  TC_CANNOTBACKUPLOG                    = 'Nie mo¿na utworzyæ kopii zapasowej ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Nie mo¿na skopiowaæ pliku logu -- plik docelowy istnieje i jest tylko do odczytu';
+  TC_BACKUPCREATED                      = 'Utworzono kopiê zapasow¹ pliku logu';
+  TC_CANNOTRENAME                       = 'Nie mo¿na zmieniæ nazwy';
 
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" czyœci wszystkie logi w sieci';
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" czyœci zestawienia stacji w sieci';
@@ -88,7 +88,7 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Czy chcesz sprawdziæ dostêpnoœæ nowszej wersji TR4W ?';
 
   {NEW CONTEST}
-  TC_LATEST_CONFIG_FILE                 = 'Latest config file';
+  TC_LATEST_CONFIG_FILE                 = 'Najnowszy plik konfiguracyjny';
   TC_OPENCONFIGURATIONFILE              = ' - otwórz plik konfiguracyjny albo utwórz nowy contest';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Folder "%s" juz istnieje.'#13'czy nadpisaæ ?';
   TC_IAMIN                              = '&Jestem w %s';
@@ -261,7 +261,7 @@ const
   TC_C9_EUROPE                          = 'Europa';
   TC_C9_AFRICA                          = 'Afryka';
   TC_C9_OCEANIA                         = 'Oceania';
-  TC_C9_ANTARTICA                       ='Antartica';
+  TC_C9_ANTARTICA                       ='Antarktyda';
   TC_C9_ASIA                            = 'Azja';
   TC_C9_UNKNOWN                         = 'Nieznany';
 
@@ -325,7 +325,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'Niew³aœciwy wpis %s !!'#13#13'linia %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Nie mogê znaleŸæ pliku CTY.DAT!!'#13'Ten plik ma siê znajdowaæ w tym samym kaatalogu co program.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Niew³aœciwy wpis w pliku konfiguracyjnym!!'#13#13'Linia %u'#13'%s';
-  TC_THIS_FILE_DOES_NOT_EXIST           = 'This file does not exist. Create an empty file for editing?';
+  TC_THIS_FILE_DOES_NOT_EXIST           = 'Ten plik nie istnieje. Utworzyæ pusty plik do edycji?';
 
   {LOGSUBS1}
 
@@ -521,7 +521,7 @@ const
   TC_THISVERSION2                       = 'Obecna wersja';
   TC_DOWNLOADIT                         = 'Czy pobraæ ostatni¹ wersjê?';
 
-  TC_IMPROPERZONENUMBER                 = 'Improper zone number!!';
+  TC_IMPROPERZONENUMBER                 = 'Nieprawid³owy numer strefy!!';
 
   CLOSE_WORD                            = 'Zamknij';
   CANCEL_WORD                           = 'Anuluj';
@@ -546,7 +546,7 @@ const
   RC_NEWCONTEST                         = 'Nowy contest';
   RC_CLEARLOG                           = 'WyczyÜö log';
   RC_OPENLOGDIR                         = 'Otwºrz katalog logu';
-  RC_EXPORT                             = 'Export';
+  RC_EXPORT                             = 'Eksport';
   RC_INIEXLIST                          = 'Lista raportºw wstúpnych';
   RC_TRLOGFORM                          = 'Format logu wg TR';
   RC_REPORTS                            = 'Raporty';
@@ -619,8 +619,8 @@ const
   RC_REDOPOSSCALLS                      = 'Poka¬ ponownie mo¬liwe znaki';
   RC_QTCFUNCTIONS                       = 'Funkcje QTC';
   RC_RECALLLASTENT                      = 'Przywo¦aj ostatni wpis';
-  RC_VIEWPAKSPOTS                       = 'View packet spots';
-  RC_EXECONFIGFILE                      = 'Execute configuration file';
+  RC_VIEWPAKSPOTS                       = 'Poka¿ spoty packet';
+  RC_EXECONFIGFILE                      = 'Wykonaj plik konfiguracyjny';
   RC_REFRESHBM                          = 'OdÜwie¬ bandmapú';
   RC_DUALINGCQ                          = 'Dualing CQs';
   RC_CURSORINBM                         = 'Kursor w oknie bandmapy';
@@ -654,7 +654,7 @@ const
   RC_GRID                               = 'Lokator';
   RC_CALCULATOR                         = 'Kalkulator';
   RC_LC                                 = 'LC';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
+  RC_RESET_RADIO_PORTS                  = 'Resetuj porty radia';
   RC_NET                                = 'Sieö';
   RC_TIMESYN                            = 'Synchronizowanie czasu';
   RC_SENDMESSAGE                        = 'WyÜlij wiadomoÜö';
@@ -671,7 +671,7 @@ const
   RC_SEARCH                             = '&Wyszukuj';
   RC_GETOFFSET                          = 'OkreÜl rºßnicú';
   RC_LOCALOFFSET                        = 'Rºßnica czasu lokalnego';
-  RC_NTPSERVER                          = 'NTP Server';
+  RC_NTPSERVER                          = 'Serwer NTP';
   RC_SERVERANSWER                       = 'Odpowiedß servera';
   RC_SYNCLOCK                           = 'Synchronizuj zegar';
   RC_LOCALTIME                          = 'Czas lokalny';
@@ -746,7 +746,7 @@ const
   RC_QSOPOINTS                          = 'punkty za QSO';
   RC_AGE                                = 'Wiek operatora';
   RC_FREQUENCYHZ                        = 'CzústotliwoÜö, Hz';
-  RC_PREFIX                             = 'Prefix';
+  RC_PREFIX                             = 'Prefiks';
   RC_ZONE                               = 'Strefa';
   RC_NAME                               = 'Imiú i nazwisko';
   RC_POSTALCODE                         = 'Kod pocztowy';
@@ -771,18 +771,18 @@ const
   RC_DESCRIPTION                        = 'Opis:';
   RC_DEVICEMANAGER                      = 'Menad¬er sprzútowy';
   RC_SHDX_CALLSIGN                      = 'SH/DX [callsign]';
-  RC_STATIONINFO                        = 'Station information';
-  RC_MP3_RECENABLE                      = 'Enable';
-  RC_PLAY                               = '&Play';
-  RC_LISTOFMESS                         = 'List of messages';
+  RC_STATIONINFO                        = 'Informacje o stacji';
+  RC_MP3_RECENABLE                      = 'W³¹cz';
+  RC_PLAY                               = '&Odtwarzaj';
+  RC_LISTOFMESS                         = 'Lista wiadomoœci';
   RC_LOGIN                              = 'Log in';
-  RC_GET_OFFSET                         = 'Get offset';
-  RC_COLORS                             = 'Colors';
-  RC_APPEARANCE                         = 'Appearance';
-  RC_BANDPLAN                           = 'Band plan';
+  RC_GET_OFFSET                         = 'Pobierz offset';
+  RC_COLORS                             = 'Kolory';
+  RC_APPEARANCE                         = 'Wygl¹d';
+  RC_BANDPLAN                           = 'Plan pasm';
   RC_WA7BNM_CALENDAR                    = 'WA7BNM'' s Contest Calendar';
-  RC_SEND_BUG                           = 'Send bug report';
-  RC_HOMEPAGE                           = 'TR4W Home Page';
+  RC_SEND_BUG                           = 'Wyœlij raport o b³êdzie';
+  RC_HOMEPAGE                           = 'Strona domowa TR4W';
 
   RC_OPERATOR                           = 'Operator';
   TC_LIST_OF_COMMAND                    = '&List of commands';

@@ -7,7 +7,7 @@ const
   TC_TRANSLATION_LANGUAGE               = '»ESKY';
   TC_TRANSLATION_AUTHOR                 = 'OK1RR';
   TC_TRANSLATOR_EMAIL                   = 'martin@ok1rr.com';
-  TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
+  TC_2RADIO_WARN                        = 'CHYBA: 2 stanice na jednom p·smu';
   TC_EnterYourDistrictCode              = 'Je-li UK/EI, zadej kÛd distriktu';
   TC_YUGOSLAVIA                         = 'Jugosl·vie';
   RC_BACKUPLOG                          = 'z·loûnÌ denÌk';
@@ -16,8 +16,8 @@ const
   RC_3830                               =  'zasl·nÌ skÛre na 3830';
   RC_3830_ARRL                          =  'odeslat denÌk ARRL';  // 4.53.3
   TC_INVALID                            =  'Neplatn˝ z·znam';
-  TC_FREQ_ZERO                          = 'ERROR: Invalid Frequency logged';
-  TC_FREQ_OFF                           = 'SHOW FREQUENCY IN LOG is turned off';
+  TC_FREQ_ZERO                          = 'CHYBA: Zalogov·na neplatn· frekvence';
+  TC_FREQ_OFF                           = 'ZOBRAZIT FREKVENCI V LOGU je vypnuto';
   TC_FREQ                               = 'frekv';
   TC_POINTS                             = 'body';
   TC_OP                                 = 'Op';
@@ -37,7 +37,7 @@ const
   TC_DISBALE_CIV                        = 'vypnout "CI-V Transceive" mÛd v transceiveru ICOM';
 
   {MAIN}
-  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
+  TC_ENTERYOURISTRICTIFINVE7            = 'Zadejte sv˘j feder·lnÌ okres, pokud jste v British Columbia, nebo sv˘j st·t/provincii';  // 4.97.6
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'pouûÌv·ö poslednÌ (aktu·lnÌ) verzi';
   TC_SET_VALUE_OF_SET_NOW               = 'nastavit nynÌ hodnotu %s ?';
   TC_CONFIGURATION_FILE                 = 'KonfiguraËnÌ soubor';
@@ -54,12 +54,12 @@ const
   TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" pro vymaz·nÌ vöech seznam˘ QSO v sÌti';
   TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" pro vymaz·nÌ vöech seznam˘ n·sobiË˘ v sÌti';
 
-  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
-  TC_LOGFILENOTFOUND                    = 'Log file not found';
-  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
-  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
-  TC_BACKUPCREATED                      = 'Log file backup created';
-  TC_CANNOTRENAME                       = 'Can not rename';
+  TC_WANTTOCONVERTLOG                   = 'Chcete p¯evÈst tento log na nejnovÏjöÌ form·t?';
+  TC_LOGFILENOTFOUND                    = 'Soubor logu nenalezen';
+  TC_CANNOTBACKUPLOG                    = 'Nelze vytvo¯it z·lohu ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Nelze zkopÌrovat soubor logu -- cÌl existuje a je pouze pro ËtenÌ';
+  TC_BACKUPCREATED                      = 'Z·loha souboru logu vytvo¯ena';
+  TC_CANNOTRENAME                       = 'Nelze p¯ejmenovat';
 
   TC_REALLYWANTTOCLEARTHELOG            = 'Opravdu chceö smazat aktu·lnÌ denÌk?';
   TC_MESSAGETOSENDVIANETWORK            = 'Zpr·va pro sÌù';
@@ -97,9 +97,9 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Chceö ovÏ¯it, zda existuje novÏjöÌ verze TR4W ?';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
-  TC_IRTS                               = 'EI/GI, enter your County';
-  TC_EUDX                               = 'EU country, enter your four character country code';
+  TC_LABRE                              = 'Zadejte 2-znakovÈ ID QTH';
+  TC_IRTS                               = 'EI/GI, zadejte svÈ hrabstvÌ';
+  TC_EUDX                               = 'ZemÏ EU, zadejte Ëty¯znakov˝ kÛd zemÏ';
   TC_UKEI                               = 'Zkontrolovat, je-li UK/EI';
   TC_LATEST_CONFIG_FILE                 = 'poslednÌ konfigurace';
   TC_OPENCONFIGURATIONFILE              = ' - Otev¯e konfiguraËnÌ soubor nebo denÌk z·vodu';
@@ -183,8 +183,8 @@ const
   TC_FRANCE                             = 'Francie';
   TC_HQ_OR_MEMBER                       = 'HQ nebo Ëlen';
   TC_IRELAND                            = 'Irsko';
-  TC_GC                                 = 'special two character designator'  ;
-  TC_GAGARIN                            = 'special two char ID';
+  TC_GC                                 = 'speci·lnÌ dvouznakovÈ oznaËenÌ'  ;
+  TC_GAGARIN                            = 'speci·lnÌ dvouznakovÈ ID';
 
   {UTELNET}
 
@@ -205,7 +205,7 @@ const
   TC_CONNECTTOTR4WSERVERFAILED          = 'P¯ipojenÌ k serveru TR4W ne˙spÏönÈ. OvÏ¯ heslo!';
   TC_CONNECTEDTO                        = 'P¯ipojen k ';
   TC_DISCONNECTEDFROM                   = '** Odpojen od ';
-  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Automatick· synchronizace logu ze serveru.';
   TC_FAILEDTOCONNECTTO                  = 'Porucha spojenÌ s ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'DenÌky na serveru a aktu·lnÌ denÌky jsou identickÈ.';
   TC_NETWORK                            = 'SÌù     : %s %s:%d';
@@ -581,7 +581,7 @@ const
   RC_GRID                               = '»tverec (lok·tor)';
   RC_CALCULATOR                         = 'KalkulaËka';
   RC_LC                                 = 'V˝poËet LC';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
+  RC_RESET_RADIO_PORTS                  = 'Resetovat porty stanic';
   RC_GETOFFSET                          = 'Udej rozdÌl';
   RC_LOCALOFFSET                        = 'Chyba mÌstnÌch hodin';
   RC_NTPSERVER                          = 'NTP Server';
@@ -649,9 +649,9 @@ const
 //  RC_GETSCORES                          = 'RC_POSTSCORETOGS""';
   RC_STATIONS                           = 'P¯ehled stanic';
   RC_MP3REC                             = 'MP3 rekordÈr';
-  RC_QUICKMEM                           = 'Quick Memory';
+  RC_QUICKMEM                           = 'Rychl· pamÏù';
   RC_MULTSFREQ                          = 'KmitoËty pro n·sobiËe';
-  RC_ALARM                              = 'Alarm';
+  RC_ALARM                              = 'BudÌk';
   RC_ALTP                               = 'Otev¯Ìt F-kl·vesy';
   RC_ALTX                               = 'Opustit program';
   RC_CTRLJ                              = 'Otev¯Ìt konfiguraËnÌ p¯Ìkazy';

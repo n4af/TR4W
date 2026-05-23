@@ -7,7 +7,7 @@
   TC_TRANSLATION_LANGUAGE               = 'GERMAN';
   TC_TRANSLATION_AUTHOR                 = 'DL4BBH';
   TC_TRANSLATOR_EMAIL                   = 'dl4bbh@darc.de';
-  TC_PREF_OR_CQZONE                     = 'Enter your CQ ZONE or JA PREFECTURE';
+  TC_PREF_OR_CQZONE                     = 'Gib deine CQ ZONE oder JA PRAEFEKTUR ein';
   TC_WAGWarn                            = 'Warnung: Ausserhalb des erlaubten WAG Frequenzbereichs';
   TC_FREQ                               = 'Freq';
   TC_POINTS                             = 'Pkt';
@@ -30,7 +30,7 @@
   TC_DISBALE_CIV                        = 'Disable "CI-V Transceive" Mode in deiner ICOM Rig. Im Benutzerhandbuch zu deinem Transceiver nachsehen.';
 
   {MAIN}
-  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
+  TC_ENTERYOURISTRICTIFINVE7            = 'Gib deinen Bundesbezirk ein, wenn du in British Columbia bist, oder deinen Staat/Provinz';  // 4.97.6
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Du benutzt die aktuellste Version';
   TC_SET_VALUE_OF_SET_NOW               = 'Wert setzen auf %s. Jetzt setzen?';
   TC_CONFIGURATION_FILE                 = 'Konfigurationsdatei';
@@ -66,7 +66,7 @@
   TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" um das Multsheet zu bereinigen';
 
   TC_TRANSMITFREQUENCYKILOHERTZ         = 'Sendefrequenz (KiloHertz): ';
-  TC_SPRINTQSYRULE                      = 'SPRINT QSY RULE!!!';
+  TC_SPRINTQSYRULE                      = 'SPRINT QSY REGEL!!!';
   TC_PADDLE                             = 'Paddle';
   TC_FOOTSW                             = 'Footsw.';
 //  TC_LOG_NOTE                           = 'NOTE';
@@ -90,8 +90,8 @@
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Willst du pruefen, ob es eine neuere Version von TR4W gibt?';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
-  TC_EUDX                               = 'EU country, enter your four character country code';
+  TC_LABRE                              = 'Gib eine 2-stellige QTH-Kennung ein';
+  TC_EUDX                               = 'EU-Land, gib deinen vierstelligen Landescode ein';
   TC_IRTS                               = 'EI/GI, dein County eingeben';
   TC_LATEST_CONFIG_FILE                 = 'Neueste Config Datei';
   TC_OPENCONFIGURATIONFILE              = ' - Konfigurationsdatei oeffnen oder neuen Contest starten';
@@ -166,7 +166,7 @@
   TC_UK                                 = 'UK';
   TC_ARKTIKACLUB                        = 'Club';
   TC_POLAND                             = 'Polen';
-  TC_KAZAKHSTAN                         = 'Kazakhstan';
+  TC_KAZAKHSTAN                         = 'Kasachstan';
   TC_ITALY                              = 'Italien';
   TC_SWITZERLAND                        = 'Schweiz';
   TC_HQ                                 = 'HQ (HQ Station)';
@@ -182,14 +182,14 @@
 
   TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Freeze'#0'Clear'#0'100'#0#0;
   TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'DU BIST NICHT MIT DEM INTERNET VERBUNDEN!';
-  TC_GETHOST                            = 'GET HOST..';
+  TC_GETHOST                            = 'HOST HOLEN..';
   TC_SERVER                             = 'SERVER: %s';
   TC_HOST                               = 'HOST  : %s';
-  TC_CONNECT                            = 'CONNECT..';
-  TC_CONNECTED                          = 'CONNECTED';
+  TC_CONNECT                            = 'VERBINDEN..';
+  TC_CONNECTED                          = 'VERBUNDEN';
   TC_YOUARESPOTTEDBYANOTHERSTATION      = 'Du bist von einer anderen Station gespottet worden.';
-  TC_GC                                 = 'special two character designator'  ;
-  TC_GAGARIN                            = 'special two char ID';
+  TC_GC                                 = 'spezielle zweistellige Kennung'  ;
+  TC_GAGARIN                            = 'spezielle zweistellige ID';
   {UNET}
 
   TC_CONNECTIONTOTR4WSERVERLOST         = 'Verbindung zum TR4WSERVER %s:%d verloren.';
@@ -395,7 +395,7 @@
 
   {UTOTAL}
 
-  TC_QTCPENDING                         = 'QTC Pending';
+  TC_QTCPENDING                         = 'QTC ausstehend';
   TC_ZONE                               = 'Zonen';
   TC_PREFIX                             = 'Prefixe';
   TC_DXMULTS                            = 'DX Mults';
@@ -418,8 +418,8 @@
 
   {UMIXW}
 
-  TC_MIXW_CONNECTED                     = 'Connected';
-  TC_MIXW_DISCONNECTED                  = 'Disconnected';
+  TC_MIXW_CONNECTED                     = 'Verbunden';
+  TC_MIXW_DISCONNECTED                  = 'Getrennt';
 
   {LOGWAE}
 
@@ -461,10 +461,10 @@
   TC_FAILEDTORECEIVESERVERLOG           = 'Empfang des Server Logs fehlgeschlagen.';
 
   {DLPORTIO}
-  TC_DLPORTIODRIVERISNOTINSTALLED       = 'DLPortIO error';
+  TC_DLPORTIODRIVERISNOTINSTALLED       = 'DLPortIO Fehler';
 
   {UCT1BOH}
-  TC_TIMEON                             = 'Time on';
+  TC_TIMEON                             = 'Zeit an';
 
   {ULOGCOMPARE}
   TC_SERVERLOG                          = 'SERVER LOG';
@@ -579,7 +579,7 @@
   RC_GRID                               = 'Grid';
   RC_CALCULATOR                         = 'Kalkulator';
   RC_LC                                 = 'LC';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
+  RC_RESET_RADIO_PORTS                  = 'Radio-Ports zuruecksetzen';
 
   RC_GETOFFSET                          = '&Differenz holen';
   RC_LOCALOFFSET                        = 'Differenz lokale Uhr';
@@ -596,7 +596,7 @@
   RC_DELETESELSPOT                      = 'Ausgewaehlten Spot loeschen';
   RC_REMOVEALLSP                        = 'Alle Spots etfernen';
   RC_SENDINRIG                          = 'QSY inaktive Station';
-  RC_FILE                               = 'File';
+  RC_FILE                               = 'Datei';
   RC_CLEARLOG                           = 'Log bereinigen';
   RC_IMPORT                             = 'Import';
   RC_OPENLOGDIR                         = 'Oeffne Log-Verzeichnis';
@@ -648,7 +648,7 @@
 //  RC_GETSCORES                          = 'RC_POSTSCORETOGS""';
   RC_STATIONS                           = 'Stationen';
   RC_MP3REC                             = 'MP3 Recorder';
-  RC_QUICKMEM                           = 'Quick Memory';
+  RC_QUICKMEM                           = 'Schnellspeicher';
   RC_MULTSFREQ                          = 'Mults Frequenzen';
   RC_ALARM                              = 'Alarm';
   RC_ALTP                               = 'Oeffne F-Tasten';
@@ -657,11 +657,11 @@
   RC_AUTOCQRESUME                       = 'Auto-CQ fortsetzen';
   RC_DUPECHECK                          = 'Dupecheck';
   RC_EDIT                               = 'Editieren';
-  RC_BACKUPLOG                         = 'Backup Log';
+  RC_BACKUPLOG                         = 'Log sichern';
   RC_SWAPMULTVIEW                       = 'Wechsel Mult Anzeige';
   RC_INCNUMBER                          = 'Inkrementiere Nummer';
   RC_TOOGLEMB                           = 'Schalte Multiplierton um';
-  RC_KILLCW                             = 'Kill CW';
+  RC_KILLCW                             = 'CW abbrechen';
   RC_SEARCHLOG                          = 'Logsuche';
   RC_TRANSFREQ                          = 'Sendefrequenz';
   RC_REMINDER                           = 'Erinnerung';

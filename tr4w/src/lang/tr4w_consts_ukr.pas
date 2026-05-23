@@ -15,7 +15,7 @@ const
   TC_FREQ_ZERO                          = 'ПОМИЛКА: недопустиме значення частоти для регістрациї';
   TC_FREQ_OFF                           = 'Запис значення частоти САТ в лог відключена';
   RC_3830                               = 'Надіслати результат на 3830';
-  RC_3830_ARRL                          = 'Submit ARRL Log';  // 4.53.3
+  RC_3830_ARRL                          = 'Надіслати лог ARRL';  // 4.53.3
   TC_CALLSIGN                           = 'Позивний';
   TC_BAND                               = 'Діапазон';
   TC_FREQ                               = 'Частота';
@@ -23,7 +23,7 @@ const
   TC_POINTS                             = 'Оч.';
   TC_OP                                 = 'Оператор';
   TC_NAME                               = 'Ім`я';
-  TC_YUGOSLAVIA                         = 'Yugoslavia';
+  TC_YUGOSLAVIA                         = 'Югославія';
   TC_CHECKCALLSIGN                      = 'Перевірити позивний';
   TC_FREQUENCYFORCALLINKHZ              = 'частоту в кГц для %s';
   TC_DIFVERSION                         = '%s з другої версії программы.'#13'TR4W ожидает версию %s.'#13'Файл, який ви намагаєтесь відкрити має версію %s.';
@@ -39,8 +39,8 @@ const
   TC_DISBALE_CIV                        = 'Відключить режим "CI-V Transceive" в трансівере ICOM.';
 
   {MAIN}
-  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
-  TC_IRTS                               = 'EI/GI, enter your County';
+  TC_ENTERYOURISTRICTIFINVE7            = 'Введіть свій федеральний округ, якщо ви в Британській Колумбії, або свій штат/провінцію';  // 4.97.6
+  TC_IRTS                               = 'EI/GI, введіть ваше графство';
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Ви використовуєте останню версію';
   TC_SET_VALUE_OF_SET_NOW               = 'Необхідно встановити значення команди %s. Встановити зараз?';
   TC_CONFIGURATION_FILE                 = 'Файл конфігурації';
@@ -100,7 +100,7 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Ви хочете перевірити останню версію на сайті програми?'; 
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
+  TC_LABRE                              = 'Введіть 2-символьний ID QTH';
   TC_EUDX                               = '«Країна ЄС, введіть чотиризначний код країни»;';
   TC_LATEST_CONFIG_FILE                 = 'Останній файл конфігурації';
   TC_OPENCONFIGURATIONFILE              = ' - Відкрити файли конфігурації або розмістити новий контест';
@@ -185,8 +185,8 @@ const
   TC_CANADA                             = 'Канаді';
   TC_FRANCE                             = 'Франції';
   TC_HQ_OR_MEMBER                       = 'HQ або член клубу'; 
-  TC_GC                                 = 'special two character designator'  ;
-  TC_GAGARIN                            = 'special two char ID';
+  TC_GC                                 = 'спеціальний 2-символьний ідентифікатор'  ;
+  TC_GAGARIN                            = 'спеціальний 2-символьний ID';
   {UTELNET}
 
 //  TC_TELNET                             = 'З`єднання'#0'Відключення'#0'Команди'#0'Заморозити'#0'Очистити'#0'100'#0';
@@ -206,8 +206,8 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   TC_CONNECTINGTO                       = 'З`єднання з';
   TC_CONNECTTOTR4WSERVERFAILED          = 'З`єднання з TR4WSERVER не вдалося. Перевірте значення команди SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'З`єднано з';
-  TC_DISCONNECTEDFROM                   = '** DISCONNECTED from ';
-  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
+  TC_DISCONNECTEDFROM                   = '** ВІД''ЄДНАНО від ';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Авто-синхронізація логу з сервера.';
   TC_FAILEDTOCONNECTTO                  = 'Не вдалося з`єднатися з';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Серверний та локальний логи однакові.';
   TC_NETWORK                            = 'Мережа: %s %s:%d';
@@ -551,7 +551,7 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   RC_FREQUENCY                          = 'Частота';
   RC_APPLY                              = 'Застосувати';
   RC_RESET                              = 'Скидання';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
+  RC_RESET_RADIO_PORTS                  = 'Скинути порти трансиверів';
   RC_START                              = 'Старт';
   RC_SHOW                               = 'Показати';
   RC_SAVE                               = 'Зберегти';
@@ -810,4 +810,4 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   RC_SPLITOFF                           = 'Режим роботи на частотах ВКЛ/ВИКЛ';
   TC_SPLIT_WARN                         = 'ПОПЕРЕДЖЕННЯ: Ви працюєте в режимі РОБОТА НА РОЗНЕСЕНИХ ЧАСТОТАХ!!!';
   TC_RUNWARN                            = 'Програма TR4W на вашому комп`ютері вже працює';
-  RC_wkMode                             = 'Re-initialize WinKeyer';      // 4.60.1
+  RC_wkMode                             = 'Реініціалізація WinKeyer';      // 4.60.1

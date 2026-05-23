@@ -29,27 +29,27 @@ const
   TC_DISBALE_CIV                        = 'Disable "CI-V Transceive" mode in your ICOM rig.';
 
   {MAIN}
-  TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'You are using the latest version';
-  TC_SET_VALUE_OF_SET_NOW               = 'Set value of %s. Set now?';
-  TC_CONFIGURATION_FILE                 = 'Configuration file';
-  TC_CURRENT_OPERATOR_CALLSIGN          = 'current operator callsign';
-  TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = 'Append imported QSOs to current log?';
-  TC_QSO_IMPORTED                       = 'Qs imported.'; // - '345 Qs imported.'
+  TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Está usando la versión más reciente';
+  TC_SET_VALUE_OF_SET_NOW               = 'Establecer valor de %s. ¿Establecer ahora?';
+  TC_CONFIGURATION_FILE                 = 'Archivo de configuración';
+  TC_CURRENT_OPERATOR_CALLSIGN          = 'indicativo del operador actual';
+  TC_APPENDIMPORTEDQSOSTOCURRENTLOG     = '¿Añadir QSOs importados al log actual?';
+  TC_QSO_IMPORTED                       = 'QSOs importados.'; // - '345 Qs imported.'
   TC_ISADUPE                            = '%s es un dupli!!';
   TC_ERRORINLOGFILE                     = 'Error en  fichero log!';
   TC_HASIMPROPERSYNTAX                  = '%s sintaxis impropia!!';
   TC_SORRYNOLOG                         = 'Mal!! NO LOG = TRUE que prohibe guardar QSOs en este PC';
   TC_SETCOMPUTERIDVALUE                 = 'Elija valor COMPUTER ID.';
   TC_CLEARALLLOGS                       = '"CLEARALLLOGS" para borrar todos los logs de la red';
-  TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" to clear all dupesheets in network';
-  TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" to clear all multsheets in network';
+  TC_CLEAR_DUPESHEET_NET                = '"CLEARDUPESHEET" para borrar todas las hojas de duplicados en red';
+  TC_CLEAR_MULTSHEET_NET                = '"CLEARMULTSHEET" para borrar todas las hojas de multiplicadores en red';
 
-  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
-  TC_LOGFILENOTFOUND                    = 'Log file not found';
-  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
-  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
-  TC_BACKUPCREATED                      = 'Log file backup created';
-  TC_CANNOTRENAME                       = 'Can not rename';
+  TC_WANTTOCONVERTLOG                   = '¿Desea convertir este log al formato más reciente?';
+  TC_LOGFILENOTFOUND                    = 'Archivo de log no encontrado';
+  TC_CANNOTBACKUPLOG                    = 'No se pudo hacer una copia de seguridad de ';
+  TC_CANNOTCOPYLOGREADONLY              = 'No se puede copiar el archivo de log -- el destino existe y es de solo lectura';
+  TC_BACKUPCREATED                      = 'Copia de seguridad del log creada';
+  TC_CANNOTRENAME                       = 'No se puede renombrar';
 
   TC_REALLYWANTTOCLEARTHELOG            = '¿Quiere borrar el actual log?';
   TC_MESSAGETOSENDVIANETWORK            = 'mensaje a enviar via red';
@@ -58,10 +58,10 @@ const
   TC_RULESONQRZRU                       = 'Reglas del %s concurso en QRZ.RU';
   TC_NOTE                               = 'nota';
   TC_DUPESHEETCLEARED                   = 'Hoja de duplicados borrada!';
-  TC_MULTSHEETCLEARED                   = 'Mult sheet cleared!';
+  TC_MULTSHEETCLEARED                   = '¡Hoja de multiplicadores borrada!';
   TC_YESTOCLEARTHEDUPESHEET             = '"YES" para borrar la hoja de duplicados';
   TC_TRANSMITFREQUENCYKILOHERTZ         = 'frecuencia transmision (kiloHertz): ';
-  TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" to clear the multsheet';
+  TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" para borrar la hoja de multiplicadores';
   TC_SPRINTQSYRULE                      = 'SPRINT QSY RULE!!!';
   TC_PADDLE                             = 'Paddle';
   TC_FOOTSW                             = 'Footsw.';
@@ -77,7 +77,7 @@ const
   TC_SAT                                = 'Sab';
 
   {uMP3Recorder}
-  TC_LAME_ERROR                         = 'You may download it from';
+  TC_LAME_ERROR                         = 'Puede descargarlo desde';
 
   {This version TR4W v.4.009 beta was build in 2 December 2008. Do you want to check the latest version ?}
   TC_THISVERSION                        = 'Esta version ';
@@ -85,7 +85,7 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = '¿Quieres buscar la ultima version?';
 
   {NEW CONTEST}
-  TC_LATEST_CONFIG_FILE                 = 'Latest config file';
+  TC_LATEST_CONFIG_FILE                 = 'Último archivo de configuración';
   TC_OPENCONFIGURATIONFILE              = ' - Abrir fichero configuración o inciar un nuevo concurso';
   TC_FOLDERALREADYEXISTSOVERWRITE       = '¿El directorio "%s" ya existe.'#13'sobreescribir?';
   TC_IAMIN                              = '&Estoy en %s';
@@ -131,7 +131,7 @@ const
   TC_DEPARTMENT                         = 'Enter your department:';
   TC_ENTERYOURRDAIDORGRID               = 'Enter your RDA ID (for UA1A stations) or four digit grid square:';
 
-  TC_NEWENGLAND                         = 'New England';
+  TC_NEWENGLAND                         = 'Nueva Inglaterra';
   TC_CALIFORNIA                         = 'California';
   TC_FLORIDA                            = 'Florida';
   TC_MICHIGAN                           = 'Michigan';
@@ -140,7 +140,7 @@ const
   TC_WASHINGTON                         = 'Washington';
   TC_WISCONSIN                          = 'Wisconsin';
   TC_TEXAS                              = 'Texas';
-  TC_NORTHAMERICA                       = 'North America';
+  TC_NORTHAMERICA                       = 'Norteamérica';
   TC_RUSSIA                             = 'Rusia';
   TC_UKRAINE                            = 'Ucrania';
   TC_CZECHREPUBLICORINSLOVAKIA          = 'Czech Republic o en Slovakia';
@@ -153,17 +153,17 @@ const
   TC_GERMANY                            = 'Alemania';
   TC_UK                                 = 'UK';
   TC_ARKTIKACLUB                        = 'club';
-  TC_POLAND                             = 'Poland';
-  TC_KAZAKHSTAN                         = 'Kazakhstan';
-  TC_ITALY                              = 'Italy';
-  TC_SWITZERLAND                        = 'Switzerland';
+  TC_POLAND                             = 'Polonia';
+  TC_KAZAKHSTAN                         = 'Kazajistán';
+  TC_ITALY                              = 'Italia';
+  TC_SWITZERLAND                        = 'Suiza';
   TC_HQ                                 = 'HQ (HQ station)';
   TC_CIS                                = 'CIS';
-  TC_SPAIN                              = 'Spain';
-  TC_JAPAN                              = 'Japan';
-  TC_CANADA                             = 'Canada';
-  TC_FRANCE                             = 'France';
-  TC_HQ_OR_MEMBER                       = 'HQ or member';
+  TC_SPAIN                              = 'España';
+  TC_JAPAN                              = 'Japón';
+  TC_CANADA                             = 'Canadá';
+  TC_FRANCE                             = 'Francia';
+  TC_HQ_OR_MEMBER                       = 'HQ o miembro';
 
   {UTELNET}
 
@@ -244,10 +244,10 @@ const
   TC_SAVINGTO                           = 'Saving %s to %s';
   TC_FILESAVEDTOFLOPPYSUCCESSFULLY      = 'File saved to floppy successfully';
   TC_FILESAVEDTOSUCCESSFULLY            = 'File saved to %s successfully';
-  TC_IMPROPERTRANSMITTERCOUNT           = 'FD transmitters must be between 1 and 99.';
-  TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day class must be A, B, C, D, E or F.';
-  TC_IMPROPERWINTERFIELDDAYCLASS        = 'Winter Field Day class must be H, I, O or M.';
-  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX Station exchange must be "DX".';
+  TC_IMPROPERTRANSMITTERCOUNT           = 'Los transmisores FD deben estar entre 1 y 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS          = 'La clase Field Day debe ser A, B, C, D, E o F.';
+  TC_IMPROPERWINTERFIELDDAYCLASS        = 'La clase Winter Field Day debe ser H, I, O o M.';
+  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'El intercambio de la estación DX debe ser "DX".';
 
   {LOGSEND}
 
@@ -258,8 +258,8 @@ const
   TC_C9_NORTHAMERICA                    = 'Norte America';
   TC_C9_SOUTHAMERICA                    = 'Sudamerica';
   TC_C9_EUROPE                          = 'Europa';
-  TC_C9_AFRICA                          = 'Africa';
-  TC_C9_OCEANIA                         = 'Oceania';
+  TC_C9_AFRICA                          = 'África';
+  TC_C9_OCEANIA                         = 'Oceanía';
   TC_C9_ASIA                            = 'Asia';
   TC_C9_UNKNOWN                         = 'Desconocido';
 
@@ -333,7 +333,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'INVALID STATEMENT IN %s !!'#13#13'Line %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'No encuentro fichero paises CTY.DAT!!'#13'Asegurese de que esta en el mismo directorio del programa.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'INVALID STATEMENT IN CONFIG FILE!!'#13#13'Line %u'#13'%s';
-  TC_THIS_FILE_DOES_NOT_EXIST           = 'This file does not exist. Create an empty file for editing?';
+  TC_THIS_FILE_DOES_NOT_EXIST           = 'Este archivo no existe. ¿Crear un archivo vacío para edición?';
 
   {LOGSUBS1}
 
@@ -394,7 +394,7 @@ const
   TC_NEWOFFTIMEVALUEMINUTES             = 'nuevo off time value (minutes)';
   TC_NEWVALUEFORWAKEUPTIMEOUT           = 'nuevo value for WAKE UP TIME OUT';
   TC_NEWWEIGHTVALUE                     = 'nuevo weight value (.5 - 1.5)';
-  TC_NEWVALUE                           = 'new value';
+  TC_NEWVALUE                           = 'nuevo valor';
 
   {TREE}
 
@@ -465,14 +465,14 @@ const
 
   {UREMMULTS}
 
-  TC_CLEANSWEEPCONGRATULATIONS          = 'CLEAN SWEEP!! CONGRATULATIONS!!';
+  TC_CLEANSWEEPCONGRATULATIONS          = '¡¡BARRIDO COMPLETO!! ¡¡FELICITACIONES!!';
 
   {CFGCMD}
 
   TC_NETWORKTEST                        = 'Prueba Network';
-  TC_MAXIMUMNUMBEROFREMINDERSEXCEEDED   = 'Maximum number of reminders exceeded!!';
-  TC_INVALIDREMINDERTIME                = 'Invalid reminder time!!';
-  TC_INVALIDREMINDERDATE                = 'Invalid reminder date!!';
+  TC_MAXIMUMNUMBEROFREMINDERSEXCEEDED   = '¡¡Se excedió el número máximo de recordatorios!!';
+  TC_INVALIDREMINDERTIME                = '¡¡Hora de recordatorio inválida!!';
+  TC_INVALIDREMINDERDATE                = '¡¡Fecha de recordatorio inválida!!';
   TC_TOOMANYTOTALSCOREMESSAGES          = 'Too many TOTAL SCORE MESSAGEs!!';
   TC_THEFIRSTCOMMANDINCONFIGFILEMUSTBE  = 'The first command in config file must be the MY CALL statement!!';
 
@@ -485,8 +485,8 @@ const
   {ULOGCOMPARE}
   TC_SIZEBYTES                          = 'Tamaño, bytes';
   TC_RECORDS                            = 'Registros';
-  TC_MODIFIED                           = 'Modified';
-  TC_TIMEDIFF                           = 'Time diff.';
+  TC_MODIFIED                           = 'Modificado';
+  TC_TIMEDIFF                           = 'Dif. tiempo';
 
   {POSTUNIT}
   TC_MORETHAN50DIFFERENTHOURSINTHISLOG  = 'Mas de 50 horas diferenes en este log!!';
@@ -499,15 +499,15 @@ const
   TC_DLPORTIODRIVERISNOTINSTALLED       = 'DLPortIO driver no instalado.';
 
   {UCT1BOH}
-  TC_TIMEON                             = 'Time on';
+  TC_TIMEON                             = 'Tiempo activo';
 
   {ULOGCOMPARE}
-  TC_SERVERLOG                          = 'SERVER LOG';
-  TC_LOCALLOG                           = 'LOCAL LOG';
+  TC_SERVERLOG                          = 'LOG DEL SERVIDOR';
+  TC_LOCALLOG                           = 'LOG LOCAL';
 
   {UCHECKLATESTVERSION}
   TC_VERSIONONSERVER                    = 'Version on server';
-  TC_THISVERSION2                       = 'This version';
+  TC_THISVERSION2                       = 'Esta versión';
   TC_DOWNLOADIT                         = 'Download last version?';
 
     {JCTRL1}
@@ -1167,7 +1167,7 @@ const
   WCP1                                  = 'Calls with partial anywhere are shown';
   WCP2                                  = 'Only calls starting with partial shown';
 
-  TC_IMPROPERZONENUMBER                 = 'Improper zone number!!';
+  TC_IMPROPERZONENUMBER                 = '¡¡Número de zona incorrecto!!';
 
   CLOSE_WORD                            = 'Cerrar';
   CANCEL_WORD                           = 'Cancelar';
@@ -1195,20 +1195,20 @@ const
   RC_EXPORT                             = 'Exportar';
   RC_INIEXLIST                          = 'Lista intercambios inciales';
   RC_TRLOGFORM                          = 'Formato TR Log';
-  RC_IMPORT                             = 'Import';
+  RC_IMPORT                             = 'Importar';
   RC_REPORTS                            = 'I';
   RC_ALLCALLS                           = 'Todos los indicativos';
   RC_BANDCHANGES                        = 'Cambios de banda';
   RC_CONTLIST                           = 'Lista Continentes';
   RC_FCC                                = 'Primer indicativo trabajado en cada entidad';
   RC_FCZ                                = 'Primer indicativo trabajado en cada zona';
-  RC_POSSBADZONE                        = 'Possible bad zone';
+  RC_POSSBADZONE                        = 'Posible zona incorrecta';
   RC_QSOBYCOUNTRY                       = 'QSOs con entidad por banda';
   RC_SCOREBYHOUR                        = 'Puntos por hora';
   RC_SUMMARY                            = 'Resumen';
   RC_EXIT                               = 'Salir';
   RC_SETTINGS                           = 'Ajustes';
-  RC_OPTIONS                            = 'Configuration commands';
+  RC_OPTIONS                            = 'Comandos de configuración';
   RC_CFG_COMMANDS                       = 'Configuration commands';
   RC_PROGRAMMES                         = 'Mensajes del programa';
   RC_CATANDCW                           = 'CAT y CW Keying';
@@ -1231,14 +1231,14 @@ const
   RC_MP3REC                             = 'MP3 Recorder';
   RC_MULTSFREQ                          = 'Multis Frequencias';
   RC_ALARM                              = 'Alarma';
-  RC_AUTOCQRESUME                       = 'Auto-CQ resume';
+  RC_AUTOCQRESUME                       = 'Reanudar Auto-CQ';
   RC_DUPECHECK                          = 'Comprobar duplicados';
   RC_EDIT                               = 'Editar';
   RC_SAVETOFLOPPY                       = 'Salvar a disco';
-  RC_SWAPMULTVIEW                       = 'Swap mult view';
+  RC_SWAPMULTVIEW                       = 'Cambiar vista multiplicadores';
   RC_INCNUMBER                          = 'Numero incremental';
   RC_TOOGLEMB                           = 'Toogle multiplier bell';
-  RC_KILLCW                             = 'Kill CW';
+  RC_KILLCW                             = 'Detener CW';
   RC_SEARCHLOG                          = 'Buscar log';
   RC_TRANSFREQ                          = 'Frecuencia transmisor';
   RC_REMINDER                           = 'Recordatorio-nota';
@@ -1247,7 +1247,7 @@ const
   RC_CWSPEED                            = 'Velocidad CW';
   RC_SETSYSDT                           = 'Elige fecha/hora del sistema';
   RC_INITIALIZE                         = 'Inicializar QSO';
-  RC_RESETWAKEUP                        = 'Reset wakeup';
+  RC_RESETWAKEUP                        = 'Restablecer activación';
   RC_DELETELASTQSO                      = 'Borrar el ultimo QSO';
   RC_INITIALEX                          = 'Intercambio incial';
   RC_TOOGLEST                           = 'Intercambiar sidetone';
@@ -1265,14 +1265,14 @@ const
   RC_QTCFUNCTIONS                       = 'Funciones QTCs';
   RC_RECALLLASTENT                      = 'Recupera ultima entrada';
   RC_VIEWPAKSPOTS                       = 'Ver anuncios/spots packet';
-  RC_EXECONFIGFILE                      = 'Execute configuration file';
+  RC_EXECONFIGFILE                      = 'Ejecutar archivo de configuración';
   RC_REFRESHBM                          = 'Redibuja mapa de banda';
   RC_DUALINGCQ                          = 'CQs duales';
   RC_CURSORINBM                         = 'Cursor en ventana mapa de banda';
-  RC_CURSORTELNET                       = 'Cursor in DX Cluster window';
+  RC_CURSORTELNET                       = 'Cursor en ventana de DX Cluster';
   RC_QSOWITHNOCW                        = 'QSO con no CW';
   RC_CT1BOHIS                           = 'CT1BOH info';
-  RC_ADDBANDMAPPH                       = 'Add bandmap place holder';
+  RC_ADDBANDMAPPH                       = 'Añadir marcador de bandmap';
   RC_COMMANDS                           = 'Comandos';
   RC_FOCUSINMW                          = 'Foco en ventana principal';
   RC_TOGGLEINSERT                       = 'Intercambio modo insertar';
@@ -1290,7 +1290,7 @@ const
   RC_BEACONSM                           = 'Monitor balizas';
   RC_WINCONTROL                         = 'Ventana de control';
   RC_SETTIMEZONE                        = 'Elegir zona horaria';
-  RC_PING                               = 'Ping [SERVER ADDRESS]';
+  RC_PING                               = 'Ping [DIRECCIÓN DEL SERVIDOR]';
   RC_RUNSERVER                          = 'Ejecutar TR4WSERVER';
   RC_DVPVOLCONTROL                      = 'Control volumen DVP';
   RC_RECCONTROL                         = 'Control grabacion';
@@ -1298,7 +1298,7 @@ const
   RC_DISTANCE                           = 'Distancia';
   RC_GRID                               = 'Locator';
   RC_CALCULATOR                         = 'Calculadora';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
+  RC_RESET_RADIO_PORTS                  = 'Restablecer puertos de radio';
   RC_LC                                 = 'LC';
   RC_NET                                = 'Red';
   RC_TIMESYN                            = 'Sincronizacion tiempo';
@@ -1356,7 +1356,7 @@ const
   RC_WINCONTROL2                        = 'Ventana de control';
   RC_SHOWMENU                           = '&Ver menu';
   RC_RECVQTC                            = 'Recibiendo QTCs';
-  RC_MIXWINTERFACE                      = 'MixW Interface';
+  RC_MIXWINTERFACE                      = 'Interfaz MixW';
   RC_CONNECTTOMIXW                      = 'Conectar con MixW';
   RC_MEMPROGFUNC                        = 'Funcion de Memorias';
   RC_PRESS_C                            = 'Pulse  &C  para programar la tecla funcion CQ.';
@@ -1365,7 +1365,7 @@ const
   RC_SYNLOG2                            = 'Sincronizar log';
   RC_GETSERVLOG                         = 'Co&ger el log del servidor';
   RC_RECVRECORDS                        = 'Registros recibidos:';
-  RC_SENDRECORDS                        = 'Sended records:';
+  RC_SENDRECORDS                        = 'Registros enviados:';
   RC_CREATEAUNL                         = '&Crear y usar un nuevo log';
   RC_RECVBYTES                          = 'Bytes recibidos:';
   RC_RECVQSOS                           = 'QSOs recibidos:';
@@ -1382,7 +1382,7 @@ const
   RC_COPYTOCLIP                         = 'Copiar al portapapeles';
   RC_DUPECHECKOAR                       = 'Comprueba duplicados en radio inactiva';
   RC_WINKEYSET                          = 'Ajustes Winkeyer';
-  RC_CT1BOHIS2                          = 'CT1BOH info screen';
+  RC_CT1BOHIS2                          = 'Pantalla de información CT1BOH';
   RC_DATE                               = 'Fecha';
   RC_NUMBERSENT                         = 'Numero Envd';
   RC_NUMBERRCVD                         = 'Numero Rcbd';
@@ -1396,42 +1396,42 @@ const
   RC_NAME                               = 'Nombre';
   RC_POSTALCODE                         = 'Codigo Postal';
   RC_POWER                              = 'Potencia';
-  RC_PROGRMESS                          = 'Program message';
-  RC_MESSAGE                            = 'Message';
-  RC_CAPTION                            = 'Caption';
-  RC_IAQSLINT                           = 'Auto QSL Interval (Increase)';
-  RC_DAQSLINT                           = 'Auto QSL Interval (Decrease)';
-  RC_ADDINFO                            = 'Additional information';
-  RC_AI_QSONUMBER                       = 'QSO number';
+  RC_PROGRMESS                          = 'Mensaje de programa';
+  RC_MESSAGE                            = 'Mensaje';
+  RC_CAPTION                            = 'Título';
+  RC_IAQSLINT                           = 'Intervalo Auto QSL (Aumentar)';
+  RC_DAQSLINT                           = 'Intervalo Auto QSL (Disminuir)';
+  RC_ADDINFO                            = 'Información adicional';
+  RC_AI_QSONUMBER                       = 'Número de QSO';
   RC_AI_CALLSIGN                        = 'Callsign';
   RC_AI_CWSPEED                         = 'CW Speed';
   RC_AI_BAND                            = 'Band';
-  RC_CLEARMSHEET                        = 'Clear multsheet';
-  RC_WIKI                               = 'On-line documentation (in Russian)';
-  RC_NET_CLDUPE                         = 'Clear dupesheet in all logs';
-  RC_NET_CLMULT                         = 'Clear multsheet in all logs';
-  RC_INC_TIME                           = 'Increment time';
-  RC_NOTES                              = 'Notes';
-  RC_DEFAULT                            = 'Default:';
-  RC_DESCRIPTION                        = 'Description:';
-  RC_DEVICEMANAGER                      = 'Device Manager';
+  RC_CLEARMSHEET                        = 'Borrar hoja de multiplicadores';
+  RC_WIKI                               = 'Documentación en línea (en ruso)';
+  RC_NET_CLDUPE                         = 'Borrar hoja de duplicados en todos los logs';
+  RC_NET_CLMULT                         = 'Borrar hoja de multiplicadores en todos los logs';
+  RC_INC_TIME                           = 'Incrementar tiempo';
+  RC_NOTES                              = 'Notas';
+  RC_DEFAULT                            = 'Predeterminado:';
+  RC_DESCRIPTION                        = 'Descripción:';
+  RC_DEVICEMANAGER                      = 'Administrador de dispositivos';
   RC_SHDX_CALLSIGN                      = 'SH/DX [callsign]';
-  RC_STATIONINFO                        = 'Station information';
-  RC_MP3_RECENABLE                      = 'Enable';
+  RC_STATIONINFO                        = 'Información de la estación';
+  RC_MP3_RECENABLE                      = 'Habilitar';
   RC_PLAY                               = '&Play';
-  RC_LISTOFMESS                         = 'List of messages';
+  RC_LISTOFMESS                         = 'Lista de mensajes';
   RC_LOGIN                              = 'Log in';
-  RC_SYNCHRONIZE                        = 'Synchronize';
-  RC_GET_OFFSET                         = 'Get offset';
-  RC_COLORS                             = 'Colors';
-  RC_APPEARANCE                         = 'Appearance';
-  RC_BANDPLAN                           = 'Band plan';
+  RC_SYNCHRONIZE                        = 'Sincronizar';
+  RC_GET_OFFSET                         = 'Obtener offset';
+  RC_COLORS                             = 'Colores';
+  RC_APPEARANCE                         = 'Apariencia';
+  RC_BANDPLAN                           = 'Plan de bandas';
   RC_WA7BNM_CALENDAR                    = 'WA7BNM'' s Contest Calendar';
-  RC_SEND_BUG                           = 'Send bug report';
-  RC_HOMEPAGE                           = 'TR4W Home Page';
+  RC_SEND_BUG                           = 'Enviar informe de error';
+  RC_HOMEPAGE                           = 'Página principal de TR4W';
 
-  RC_OPERATOR                           = 'Operator';
+  RC_OPERATOR                           = 'Operador';
   TC_LIST_OF_COMMAND                    = '&List of commands';
-  TC_ENTERYOURBRANCHNUMBER              = 'Enter your Branch number:';
-  TC_ENTERYOURPOSTCODE                  = 'Enter your postcode:';
+  TC_ENTERYOURBRANCHNUMBER              = 'Introduzca su número de sucursal:';
+  TC_ENTERYOURPOSTCODE                  = 'Introduzca su código postal:';
 

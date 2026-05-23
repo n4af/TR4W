@@ -7,15 +7,15 @@ const
   TC_TRANSLATION_AUTHOR                 = 'UR7QM, R8TR';
   TC_EnterYourDistrictCode              = 'Введите ваш код района';
   TC_UKEI                               = 'UK/EI';
-  TC_2RADIO_WARN                        = 'ERROR: 2 Radios on single band';
-  TC_WAGWarn                            = 'Warning: Out of WAG allowed frequency range';
+  TC_2RADIO_WARN                        = 'ОШИБКА: 2 трансивера на одном диапазоне';
+  TC_WAGWarn                            = 'Внимание: Вне разрешенного диапазона частот WAG';
   RC_BACKUPLOG                         = 'Резервное копирование лога';
   TC_IMPROPERWINTERFIELDDAYCLASS = 'Классы в Winter Field Day должны быть H, I, M или O.';
   TC_INVALID                            = 'Неверный ввод';
   TC_FREQ_ZERO                          = 'ОШИБКА: недопустимое значение частоты для регистрации';
   TC_FREQ_OFF                           = 'Запись значения частоты САТ в лог отключена';
   RC_3830                               = 'Отправить результат на 3830';
-  RC_3830_ARRL                          =  'Submit ARRL Log';  // 4.53.3
+  RC_3830_ARRL                          =  'Отправить лог ARRL';  // 4.53.3
   TC_CALLSIGN                           = 'Позывной';
   TC_BAND                               = 'Диапазон';
   TC_FREQ                               = 'Частота';
@@ -23,7 +23,7 @@ const
   TC_POINTS                             = 'Оч.';
   TC_OP                                 = 'Оператор';
   TC_NAME                               = 'Имя';
-  TC_YUGOSLAVIA                         = 'Yugoslavia';
+  TC_YUGOSLAVIA                         = 'Югославия';
   TC_CHECKCALLSIGN                      = 'Проверить позывной';
   TC_FREQUENCYFORCALLINKHZ              = 'частоту в кГц для %s';
   TC_DIFVERSION                         = '%s из другой версии программы.'#13'TR4W ожидает версию %s.'#13'Файл, который вы пытаетесь открыть имеет версию %s.';
@@ -38,8 +38,8 @@ const
   TC_DISBALE_CIV                        = 'Отключите режим "CI-V Transceive" в трансивере ICOM.';
 
   {MAIN}
-  TC_ENTERYOURISTRICTIFINVE7            = 'Enter your federal district if in British Columbia, or your State/Province';  // 4.97.6
-  TC_IRTS                               = 'EI/GI, enter your County';
+  TC_ENTERYOURISTRICTIFINVE7            = 'Введите свой федеральный округ, если вы в Британской Колумбии, или свой штат/провинцию';  // 4.97.6
+  TC_IRTS                               = 'EI/GI, введите ваше графство';
   TC_YOU_ARE_USING_THE_LATEST_VERSION   = 'Вы используете последнюю версию';
   TC_SET_VALUE_OF_SET_NOW               = 'Необходимо установить значение команды %s. Установить сейчас?';
   TC_CONFIGURATION_FILE                 = 'Файл конфигурации';
@@ -67,12 +67,12 @@ const
   TC_YESTOCLEARTHEDUPESHEET             = 'слово "YES" для очистки таблицы повторов';
   TC_CLEARMULTTOCLEARMULTSHEET          = 'слово "CLEARMULT" для очистки таблицы множителей';
 
-  TC_WANTTOCONVERTLOG                   = 'Would you like to convert this log to the latest format?';
-  TC_LOGFILENOTFOUND                    = 'Log file not found';
-  TC_CANNOTBACKUPLOG                    = 'Could not make a backup copy of ';
-  TC_CANNOTCOPYLOGREADONLY              = 'Cannot copy log file -- target exists and is read-only';
-  TC_BACKUPCREATED                      = 'Log file backup created';
-  TC_CANNOTRENAME                       = 'Can not rename';
+  TC_WANTTOCONVERTLOG                   = 'Хотите конвертировать этот лог в новейший формат?';
+  TC_LOGFILENOTFOUND                    = 'Файл лога не найден';
+  TC_CANNOTBACKUPLOG                    = 'Не удалось создать резервную копию ';
+  TC_CANNOTCOPYLOGREADONLY              = 'Невозможно скопировать файл лога -- целевой файл существует и доступен только для чтения';
+  TC_BACKUPCREATED                      = 'Резервная копия лога создана';
+  TC_CANNOTRENAME                       = 'Невозможно переименовать';
 
   TC_TRANSMITFREQUENCYKILOHERTZ         = 'передаваемую частоту (в кГц):';
   TC_SPRINTQSYRULE                      = 'Правило SPRINT QSY!!!';
@@ -99,8 +99,8 @@ const
   TC_DOYOUWANTTOCHECKTHELATESTVERSION   = 'Вы хотите проверить последнюю версию на сайте программы?';
 
   {NEW CONTEST}
-  TC_LABRE                              = 'Enter 2 char QTH ID';
-  TC_EUDX                               = 'EU country, enter your four character country code';
+  TC_LABRE                              = 'Введите 2-символьный ID QTH';
+  TC_EUDX                               = 'Страна ЕС, введите ваш 4-символьный код страны';
   TC_LATEST_CONFIG_FILE                 = 'Последний файл конфигурации';
   TC_OPENCONFIGURATIONFILE              = ' - Открыть файл конфигурации или начать новый контест';
   TC_FOLDERALREADYEXISTSOVERWRITE       = 'Каталог "%s" уже существует.'#13' Переписать его?';
@@ -205,8 +205,8 @@ const
   TC_CONNECTINGTO                       = 'Соединение с ';
   TC_CONNECTTOTR4WSERVERFAILED          = 'Соединение с TR4WSERVER не удалось. Проверьте значение команды SERVER PASSWORD!!';
   TC_CONNECTEDTO                        = 'Соединено с ';
-  TC_DISCONNECTEDFROM                   = '** DISCONNECTED from ';
-  TC_AUTOSYNCHRONIZINGLOG               = 'Auto-synchronizing log from server.';
+  TC_DISCONNECTEDFROM                   = '** ОТКЛЮЧЕНО от ';
+  TC_AUTOSYNCHRONIZINGLOG               = 'Авто-синхронизация лога с сервера.';
   TC_FAILEDTOCONNECTTO                  = 'Не удалось соединиться с ';
   TC_SERVERANDLOCALLOGSAREIDENTICAL     = 'Серверный и локальный логи одинаковы.';
   TC_NETWORK                            = 'Сеть : %s %s:%d';
@@ -668,7 +668,7 @@ const
   RC_GRID                               = 'Квадрат';
   RC_CALCULATOR                         = 'Калькулятор';
   RC_LC                                 = 'Расчет LC-контура';
-  RC_RESET_RADIO_PORTS                  = 'Reset Radio Ports';
+  RC_RESET_RADIO_PORTS                  = 'Сбросить порты трансиверов';
   RC_NET                                = 'Сеть';
   RC_TIMESYN                            = 'Синхр. время на всех компьютерах';
   RC_SENDMESSAGE                        = 'Послать сообщение';
@@ -808,4 +808,4 @@ const
   RC_SPLITOFF                           = 'Режим работы на разнесенных частотах ВКЛ/ВЫКЛ';
  TC_SPLIT_WARN                          = 'ПРЕДУПРЕЖДЕНИЕ: Вы работаете в режиме РАБОТА НА РАЗНЕСЕННЫХ ЧАСТОТАХ!!!';
  TC_RUNWARN                             = 'Программа TR4W на вашем компьютере уже работает ';
- RC_wkMode                              = 'Re-initialize WinKeyer';      // 4.60.1
+ RC_wkMode                              = 'Реинициализация WinKeyer';      // 4.60.1
