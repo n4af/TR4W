@@ -75,6 +75,50 @@ if ($result -eq 0) {
         Write-Host "  Size: $($exeInfo.Length) bytes" -ForegroundColor White
         Write-Host "  Modified: $($exeInfo.LastWriteTime)" -ForegroundColor White
         Write-Host ""
+
+        # ---------------------------------------------------------------
+        # Step 3: Zip the exe for distribution.
+        # The version + branch + timestamp filename means whack-a-mole test
+        # cycles with off-site testers never end up with two ambiguous
+        # "tr4w.exe" attachments sitting in the inbox.
+        # ---------------------------------------------------------------
+        $DIST_DIR = "C:\TR4W\tr4w\target\dist"
+        New-Item -ItemType Directory -Force -Path $DIST_DIR | Out-Null
+
+        # Extract version from Version.pas (e.g. 4.147.15)
+        $versionLine = Select-String -Path "C:\TR4W\tr4w\src\Version.pas" `
+                                     -Pattern "TR4W_CURRENTVERSION_NUMBER\s*=\s*'([^']+)'" `
+                                     | Select-Object -First 1
+        if ($versionLine -and $versionLine.Matches[0].Groups[1].Value) {
+            $version = $versionLine.Matches[0].Groups[1].Value
+        } else {
+            $version = "unknown"
+        }
+
+        # Current git branch (slash-safe for filenames)
+        $branchRaw = (git -C "C:\TR4W" rev-parse --abbrev-ref HEAD 2>$null)
+        if ($LASTEXITCODE -ne 0 -or -not $branchRaw) {
+            $branch = "nobranch"
+        } else {
+            $branch = $branchRaw.Trim() -replace '[/\\:*?"<>|]', '-'
+        }
+
+        $stamp   = Get-Date -Format "yyyyMMdd-HHmmss"
+        $zipName = "tr4w-$version-$branch-$stamp.zip"
+        $zipPath = Join-Path $DIST_DIR $zipName
+
+        Write-Host "=== Packaging EXE ===" -ForegroundColor Cyan
+        Write-Host "Archive: $zipPath" -ForegroundColor Yellow
+
+        Compress-Archive -Path "$EXE_DIR\tr4w.exe" -DestinationPath $zipPath -Force
+        if (Test-Path $zipPath) {
+            $zipInfo = Get-Item $zipPath
+            Write-Host "  Size: $($zipInfo.Length) bytes" -ForegroundColor White
+            Write-Host ""
+        } else {
+            Write-Host "  ZIP STEP FAILED -- archive not created" -ForegroundColor Red
+            Write-Host ""
+        }
     }
 } else {
     Write-Host "=== BUILD FAILED ===" -ForegroundColor Red

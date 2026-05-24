@@ -2338,6 +2338,18 @@ begin
       begin
       exit;   // No need to be here if radio does not support CWBYCAT and not active
       end;
+   // Delphi 7 does NOT initialize stack-allocated locals. Without these two
+   // explicit defaults, `charProcessed` and `sendNow` carried whatever bytes
+   // happened to be on the stack from prior calls. If `charProcessed`
+   // was non-zero on entry, the `if not charProcessed` guard near the bottom
+   // of the rtKenwood block would short-circuit and the letter would never
+   // be appended to CWByCATBuffer -- so by the time the terminator arrived
+   // the buffer was empty, the assembly path ran on a zero-length string,
+   // and no KY command was emitted. Per-char debug output ("Adding (N)...")
+   // appeared because that log happens BEFORE the buffer append.
+   charProcessed := False;
+   sendNow       := False;
+
    // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
 

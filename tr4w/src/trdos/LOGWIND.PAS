@@ -4616,6 +4616,15 @@ begin
 
 
   CurCursorPosData := GetBMSelItemData;
+  // Delphi 7 does not zero stack-allocated locals. Without this default,
+  // CurrentCursorPos was only assigned inside the band/mode/entry loops
+  // when an entry matched CurCursorPosData -- and was then passed to
+  // tLB_SETCURSEL unconditionally at the bottom of the procedure. If no
+  // entry matched (bandmap repopulated, prior selection expired, dupe
+  // filter toggled, frequency walked off) the listbox cursor landed on
+  // whatever was on the stack. -1 is the LB_SETCURSEL convention for
+  // "no selection".
+  CurrentCursorPos := -1;
 
   //  if not DoNotAddToBandMap then
   begin
