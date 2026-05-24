@@ -1,4 +1,9 @@
-!define TR4WVERSION    '147.16'
+; TR4WVERSION is the full version (e.g. '4.147.16') and the single source of
+; truth for both the displayed name and the installer filename. CI passes it
+; via /DTR4WVERSION; local builds use the default below.
+!ifndef TR4WVERSION
+  !define TR4WVERSION  '4.147.16'
+!endif
 !define TR4WINSTFOLDER 'Software\TR4W'
 !define TR4WDRVREG     'SYSTEM\CurrentControlSet\Services\TR4WIO'
 
@@ -17,17 +22,17 @@
 ;!define TR4WLANG    'chn'
 
 !ifdef MMTTYMODE
-Name    "TR4W v.4.${TR4WVERSION} - MMTTY"
+Name    "TR4W v.${TR4WVERSION} - MMTTY"
 !else
-Name    "TR4W v.4.${TR4WVERSION}"
+Name    "TR4W v.${TR4WVERSION}"
 !endif
 
 !ifdef TR4WLANG
-OutFile release\tr4w_setup_4_${TR4WVERSION}_${TR4WLANG}.exe
+OutFile release\tr4w_setup_${TR4WVERSION}_${TR4WLANG}.exe
 !else
-OutFile release\tr4w_setup_4_${TR4WVERSION}.exe
+OutFile release\tr4w_setup_${TR4WVERSION}.exe
 !ifdef MMTTYMODE
-OutFile release\tr4w_setup_4_${TR4WVERSION}_mmtty.exe
+OutFile release\tr4w_setup_${TR4WVERSION}_mmtty.exe
 !endif
 !endif
 
