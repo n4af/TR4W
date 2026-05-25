@@ -25,6 +25,10 @@ concurrency:
   group: tr4w-release-${{ github.ref }}
   cancel-in-progress: false
 
+# Needed so softprops/action-gh-release can create draft releases.
+permissions:
+  contents: write
+
 env:
   # Toolchain locations. Override via repo Settings -> Variables -> Actions
   # to point at non-default installs without editing this file.
@@ -150,3 +154,23 @@ jobs:
           path: ${{ steps.artifact.outputs.path }}
           retention-days: 90
           if-no-files-found: error
+
+      - name: Create draft GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # Tag was already pushed (this workflow triggered off it);
+          # softprops will create the release on the existing tag.
+          tag_name: ${{ github.ref_name }}
+          name: TR4W v${{ steps.ver.outputs.version }}
+          # Draft = True so we can review/edit the notes and add manual
+          # context (radio support, breaking changes, etc.) before
+          # publishing. Promote to a final release via the GitHub UI.
+          draft: true
+          # Auto-generate the changelog body from commits since the
+          # previous tag. The CHANGES.md / RELEASE_NOTES.md sections
+          # for this version can be pasted in during the draft review.
+          generate_release_notes: true
+          # Attach the installer so users can download from the release
+          # page (more discoverable than the workflow artifact tab).
+          files: ${{ steps.artifact.outputs.path }}
+          fail_on_unmatched_files: true
