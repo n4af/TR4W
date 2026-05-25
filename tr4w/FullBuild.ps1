@@ -1,3 +1,12 @@
+param(
+    # When set, build the default (English) tr4w.exe first, then loop
+    # through every other supported LANG_xxx (RUS, SER, ESP, MNG, POL,
+    # CZE, ROM, CHN, GER, UKR) producing tr4w-<lang>.exe in
+    # target\dist\lang-test\. Used to smoke-test the LANG ifdef
+    # mechanism introduced in PR #924; not part of the normal dev loop.
+    [switch]$AllLanguages
+)
+
 $ErrorActionPreference = "Continue"
 
 $LIB = "C:\Indy\Indy\Lib\Core;C:\Indy\Indy\Lib\System;C:\tr4w\tr4w\include;C:\Indy\Indy\Lib\Protocols"
@@ -6,6 +15,7 @@ $PROJECT = "C:\TR4W\tr4w\tr4w.dpr"
 $EXE_DIR = "C:\TR4W\tr4w\target"
 $TEST_DPR = "C:\TR4W\tr4w\test\unit\tr4w_unit_tests.dpr"
 $TEST_DIR = "C:\TR4W\tr4w\test\unit"
+$SRC_DIR  = "C:\TR4W\tr4w\src"
 
 # ---------------------------------------------------------------------------
 # Step 1: Compile and run unit tests.
@@ -128,6 +138,78 @@ if ($result -eq 0) {
             Write-Host ""
         } else {
             Write-Host "  ZIP STEP FAILED -- archive not created" -ForegroundColor Red
+            Write-Host ""
+        }
+
+        # ---------------------------------------------------------------
+        # Step 4 (optional): build every non-English language variant.
+        # Runs LAST -- after tr4wserver and zip have packaged the default
+        # English build -- because each language iteration clears the
+        # TR4W src DCUs and rewrites them under -DLANG_$lang. Nothing
+        # downstream consumes target\tr4w.exe or src\*.dcu, so this loop
+        # can leave them in whatever state the final language produced.
+        #
+        # Indy DCUs at C:\Indy\Indy\Lib\* stay cached across iterations,
+        # which is the only way to keep per-language builds under ~3 min
+        # each instead of ~3 min just for the Indy rebuild alone.
+        #
+        # ESP/POL/CHN are excluded -- they each have many missing
+        # constants tracked separately under issue #925.
+        # ---------------------------------------------------------------
+        if ($AllLanguages) {
+            $LANG_OUT = "C:\TR4W\tr4w\target\dist\lang-test"
+            New-Item -ItemType Directory -Force -Path $LANG_OUT | Out-Null
+
+            # Capture the ENG build that Steps 2/2b/3 already produced
+            # so the summary table includes it alongside the variants.
+            $engHash = (Get-FileHash "$EXE_DIR\tr4w.exe" -Algorithm SHA256).Hash.Substring(0,12)
+            Copy-Item "$EXE_DIR\tr4w.exe" "$LANG_OUT\tr4w-ENG.exe" -Force
+            $langResults = @()
+            $langResults += [PSCustomObject]@{ Lang="ENG"; Status="OK"; Size=(Get-Item "$EXE_DIR\tr4w.exe").Length; Hash=$engHash }
+
+            $otherLangs = @("RUS","SER","MNG","CZE","ROM","GER","UKR")
+            
+            foreach ($lang in $otherLangs) {
+                Write-Host ""
+                Write-Host "=== Building LANG_$lang ===" -ForegroundColor Cyan
+
+                # Clear TR4W src DCUs only (Indy DCUs in C:\Indy\... untouched).
+                # Forces VC.pas and every downstream unit to recompile against
+                # the new -DLANG_$lang flag while Indy stays cached.
+                # -Recurse handles src\trdos\ and src\utils\ subdirs.
+                Get-ChildItem -Path $SRC_DIR -Filter *.dcu -Recurse -File `
+                    | Remove-Item -Force -ErrorAction SilentlyContinue
+                if (Test-Path "$EXE_DIR\tr4w.exe") { Remove-Item "$EXE_DIR\tr4w.exe" -Force }
+
+                Push-Location "C:\TR4W\tr4w"
+                & $DCC32 $PROJECT -`$D+ -`$L+ -`$Y+ "-DLANG_$lang" "/U$LIB" "/I$LIB" "/E$EXE_DIR"
+                $langRc = $LASTEXITCODE
+                Pop-Location
+
+                if ($langRc -eq 0 -and (Test-Path "$EXE_DIR\tr4w.exe")) {
+                    $info = Get-Item "$EXE_DIR\tr4w.exe"
+                    $h = (Get-FileHash "$EXE_DIR\tr4w.exe" -Algorithm SHA256).Hash.Substring(0,12)
+                    Copy-Item "$EXE_DIR\tr4w.exe" "$LANG_OUT\tr4w-$lang.exe" -Force
+                    $langResults += [PSCustomObject]@{ Lang=$lang; Status="OK"; Size=$info.Length; Hash=$h }
+                    Write-Host "  OK  size=$($info.Length) sha256[12]=$h" -ForegroundColor Green
+                } else {
+                    $langResults += [PSCustomObject]@{ Lang=$lang; Status="FAIL"; Size=0; Hash="" }
+                    Write-Host "  FAIL (exit code $langRc)" -ForegroundColor Red
+                }
+            }
+
+            Write-Host ""
+            Write-Host "=== LANGUAGE BUILD SUMMARY ===" -ForegroundColor Cyan
+            $langResults | Format-Table -AutoSize | Out-String | Write-Host
+            $unique = ($langResults | Where-Object Status -eq "OK" | Select-Object -ExpandProperty Hash -Unique).Count
+            $totalOk = ($langResults | Where-Object Status -eq "OK").Count
+            $totalFail = ($langResults | Where-Object Status -eq "FAIL").Count
+            Write-Host "$totalOk built, $totalFail failed, $unique unique binaries" `
+                -ForegroundColor $(if ($totalFail -eq 0 -and $unique -eq $totalOk) {"Green"} else {"Yellow"})
+            Write-Host "Per-language exes: $LANG_OUT\tr4w-<LANG>.exe" -ForegroundColor White
+            Write-Host ""
+            Write-Host "Note: target\tr4w.exe and src\*.dcu are in the state of the LAST language built." -ForegroundColor DarkGray
+            Write-Host "      Re-run FullBuild.ps1 (no -AllLanguages) to restore the ENG baseline." -ForegroundColor DarkGray
             Write-Host ""
         }
     }
