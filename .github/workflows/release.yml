@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Bridge workspace to C:\TR4W (FullBuild.ps1 expects hardcoded paths)
         shell: powershell
@@ -156,7 +156,7 @@ jobs:
           "name=$($installer.Name)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Upload installer artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: tr4w-installer-${{ steps.ver.outputs.version }}
           path: ${{ steps.artifact.outputs.path }}
