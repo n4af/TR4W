@@ -77,6 +77,17 @@ if ($result -eq 0) {
         Write-Host ""
 
         # ---------------------------------------------------------------
+        # Step 2b: Build tr4wserver.exe (required by the NSIS installer).
+        # ---------------------------------------------------------------
+        & "C:\TR4W\tr4w\tr4wserver\BuildServer.ps1"
+        $serverResult = $LASTEXITCODE
+        if ($serverResult -ne 0) {
+            Write-Host "=== TR4W SERVER BUILD FAILED -- aborting ===" -ForegroundColor Red
+            exit $serverResult
+        }
+        Write-Host ""
+
+        # ---------------------------------------------------------------
         # Step 3: Zip the exe for distribution.
         # The version + branch + timestamp filename means whack-a-mole test
         # cycles with off-site testers never end up with two ambiguous
