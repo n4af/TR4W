@@ -1,16 +1,27 @@
+param(
+    # Match FullBuild.ps1's path resolution so the two scripts can be run
+    # standalone OR chained together. Defaults are derived from the script
+    # location and the same env vars FullBuild.ps1 uses.
+    [string]$ProjectRoot = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),
+    [string]$Delphi7Bin  = $(if ($env:DELPHI7_BIN) { $env:DELPHI7_BIN } else { "C:\Program Files (x86)\Borland\Delphi7\Bin" }),
+    [string]$IndyRoot    = $(if ($env:INDY_ROOT)   { $env:INDY_ROOT }   else { "C:\Indy\Indy\Lib" })
+)
+
 $ErrorActionPreference = "Continue"
 
-$LIB     = "C:\Indy\Indy\Lib\Core;C:\Indy\Indy\Lib\System;C:\tr4w\tr4w\include;C:\Indy\Indy\Lib\Protocols"
-$DCC32   = "C:\Program Files (x86)\Borland\Delphi7\Bin\DCC32.EXE"
-$PROJECT = "C:\TR4W\tr4w\tr4wserver\tr4wserver.dpr"
-$EXE_DIR = "C:\TR4W\tr4w\tr4wserver"
+$TR4W_DIR     = Join-Path $ProjectRoot "tr4w"
+$SERVER_DIR   = Join-Path $TR4W_DIR "tr4wserver"
+$DCC32        = Join-Path $Delphi7Bin "DCC32.EXE"
+$PROJECT      = Join-Path $SERVER_DIR "tr4wserver.dpr"
+$EXE_DIR      = $SERVER_DIR
+$LIB          = "$IndyRoot\Core;$IndyRoot\System;$TR4W_DIR\include;$IndyRoot\Protocols"
 
 Write-Host "=== Building TR4W Server ===" -ForegroundColor Cyan
 Write-Host "Project: $PROJECT" -ForegroundColor Yellow
 Write-Host "Output:  $EXE_DIR" -ForegroundColor Yellow
 Write-Host ""
 
-Push-Location "C:\TR4W\tr4w\tr4wserver"
+Push-Location $SERVER_DIR
 & $DCC32 $PROJECT -`$D+ -`$L+ -`$Y+ "/U$LIB" "/I$LIB" "/E$EXE_DIR"
 $result = $LASTEXITCODE
 Pop-Location
