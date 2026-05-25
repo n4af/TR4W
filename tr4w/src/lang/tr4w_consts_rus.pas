@@ -217,7 +217,7 @@ const
 
   TC_FAILEDTOCONNECTTOGETSCORESORG      = 'Не удалось соединиться с сервером';
   TC_NOANSWERFROMSERVER                 = 'Нет ответа от сервера';
-//  TC_UPLOADEDSUCCESSFULLY               = 'Загружено успешно.';
+    TC_UPLOADEDSUCCESSFULLY               = 'Загружено успешно.';
 //  TC_FAILEDTOLOAD                       = 'НЕ УДАЛОСЬ ЗАГРУЗИТЬ. Смотрите GETSCORESANSWER.HTML для уточнения.';
 
   {UBANDMAP}

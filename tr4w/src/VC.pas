@@ -144,21 +144,33 @@ const
   MORSERUNNER                           = False;
   ICOM_LONG_MODECOMMAND                 = True ;
 
+// LANG is selected by passing -DLANG_xxx to DCC32 (e.g. -DLANG_RUS).
+// Default is ENG when no LANG_xxx is defined, so local builds work unchanged.
+{$IFDEF LANG_ENG}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_RUS}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_SER}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_ESP}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_MNG}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_POL}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_CZE}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_ROM}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_CHN}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_GER}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFDEF LANG_UKR}{$DEFINE _LANG_SET}{$ENDIF}
+{$IFNDEF _LANG_SET}{$DEFINE LANG_ENG}{$ENDIF}
+
 const
-         LANG                                  = 'ENG';
-//        LANG                                  = 'RUS';
-//      LANG                                  = 'MNG';
-//        LANG                                  = 'CZE';
-//        LANG                                  = 'SER';
-//         LANG                                  = 'ROM';
-//      LANG                                  = 'GER';
-//        LANG                                  = 'UKR';
-// not implemented
-
-
-//       LANG                                  = 'ESP';
-//       LANG                                  = 'CHN';
-//       LANG                                  = 'POL';
+{$IFDEF LANG_ENG}  LANG = 'ENG';{$ENDIF}
+{$IFDEF LANG_RUS}  LANG = 'RUS';{$ENDIF}
+{$IFDEF LANG_SER}  LANG = 'SER';{$ENDIF}
+{$IFDEF LANG_ESP}  LANG = 'ESP';{$ENDIF}
+{$IFDEF LANG_MNG}  LANG = 'MNG';{$ENDIF}
+{$IFDEF LANG_POL}  LANG = 'POL';{$ENDIF}
+{$IFDEF LANG_CZE}  LANG = 'CZE';{$ENDIF}
+{$IFDEF LANG_ROM}  LANG = 'ROM';{$ENDIF}
+{$IFDEF LANG_CHN}  LANG = 'CHN';{$ENDIF}
+{$IFDEF LANG_GER}  LANG = 'GER';{$ENDIF}
+{$IFDEF LANG_UKR}  LANG = 'UKR';{$ENDIF}
 {$IF LANG = 'ENG'}{$INCLUDE lang\tr4w_consts_eng.pas}{$IFEND}
 {$IF LANG = 'RUS'}{$INCLUDE lang\tr4w_consts_rus.pas} {$IFEND}
 {$IF LANG = 'SER'}{$INCLUDE lang\tr4w_consts_ser.pas}{$IFEND}
