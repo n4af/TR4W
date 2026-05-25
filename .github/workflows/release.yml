@@ -4,17 +4,12 @@
 # Runs the same chain as Howie's local: FullBuild.ps1 -> UPX --lzma -> NSIS installer.
 # Single source of truth = src/Version.pas; passes /DVERSION to NSIS.
 #
-# Requires (one-time setup on win-ci runner):
-#   - Delphi 7 at C:\Program Files (x86)\Borland\Delphi7\Bin\DCC32.EXE   [installed]
-#   - NSIS at C:\Program Files (x86)\NSIS\makensis.exe                    [installed]
-#   - Indy at C:\Indy\Indy\Lib\{Core,System,Protocols}                    [installed]
-#   - UPX in PATH (upx.exe --lzma)                                        [installed: C:\utils\upx.exe]
-#
-# Requires (one-time, in this repo) — already done on the ci/release-workflow branch:
-#   - tr4w/build/full.nsi: TR4WVERSION now holds the FULL version ('4.x.y') and is wrapped
-#     in !ifndef so CI can override via /DTR4WVERSION. The hardcoded "4." prefixes that
-#     used to be in Name/OutFile lines have been dropped (filename pattern changes from
-#     tr4w_setup_4_VERSION.exe to tr4w_setup_VERSION.exe — note for any external scripts).
+# Runner setup (one-time on self-hosted win-ci runner):
+#   - Delphi 7 (DCC32.EXE) -- default install path C:\Program Files (x86)\Borland\Delphi7\Bin\.
+#     Override per-runner by setting repo variable DELPHI7_BIN.
+#   - NSIS (makensis.exe)  -- default C:\Program Files (x86)\NSIS\. Override with NSIS_BIN.
+#   - Indy 10 lib          -- default C:\Indy\Indy\Lib\. Override with INDY_ROOT.
+#   - UPX                  -- must be in PATH (upx.exe --lzma).
 #
 # How releases work:
 #   git tag v4.123.7 && git push --tags    ->    workflow runs    ->    installer artifact
@@ -30,11 +25,16 @@ concurrency:
   group: tr4w-release-${{ github.ref }}
   cancel-in-progress: false
 
+env:
+  # Toolchain locations. Override via repo Settings -> Variables -> Actions
+  # to point at non-default installs without editing this file.
+  DELPHI7_BIN: ${{ vars.DELPHI7_BIN || 'C:\Program Files (x86)\Borland\Delphi7\Bin' }}
+  NSIS_BIN:    ${{ vars.NSIS_BIN    || 'C:\Program Files (x86)\NSIS' }}
+  INDY_ROOT:   ${{ vars.INDY_ROOT   || 'C:\Indy\Indy\Lib' }}
+
 jobs:
   build:
     name: Build TR4W installer
-    # Adjust the second label if your win-ci runner uses a different tag
-    # (e.g. 'windows11-build-runner'). Get current labels via repo Settings -> Actions -> Runners.
     runs-on: [self-hosted, win-ci]
     timeout-minutes: 30
 
@@ -42,28 +42,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v5
 
-      - name: Bridge workspace to C:\TR4W (FullBuild.ps1 expects hardcoded paths)
-        shell: powershell
-        run: |
-          # Remove any prior junction or leftover dir from a previous run
-          if (Test-Path C:\TR4W) {
-            $item = Get-Item C:\TR4W -Force
-            if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-              cmd /c rmdir C:\TR4W
-            } else {
-              throw "C:\TR4W exists as a real directory on this runner - refusing to delete. Investigate before re-running."
-            }
-          }
-          New-Item -ItemType Junction -Path C:\TR4W -Target $env:GITHUB_WORKSPACE | Out-Null
-          if (-not (Test-Path C:\TR4W\tr4w\FullBuild.ps1)) {
-            throw "Junction setup failed: C:\TR4W\tr4w\FullBuild.ps1 not visible after junction"
-          }
-
       - name: Extract version from src/Version.pas
         id: ver
         shell: powershell
         run: |
-          $line = Select-String -Path C:\TR4W\tr4w\src\Version.pas `
+          $line = Select-String -Path "$env:GITHUB_WORKSPACE\tr4w\src\Version.pas" `
                                 -Pattern "TR4W_CURRENTVERSION_NUMBER\s*=\s*'([^']+)'" `
                                 | Select-Object -First 1
           if (-not $line) {
@@ -87,9 +70,9 @@ jobs:
         shell: powershell
         run: |
           $tools = [ordered]@{
-            'DCC32 (Delphi 7)' = 'C:\Program Files (x86)\Borland\Delphi7\Bin\DCC32.EXE'
-            'NSIS makensis'    = 'C:\Program Files (x86)\NSIS\makensis.exe'
-            'Indy Core lib'    = 'C:\Indy\Indy\Lib\Core'
+            'DCC32 (Delphi 7)' = Join-Path $env:DELPHI7_BIN 'DCC32.EXE'
+            'NSIS makensis'    = Join-Path $env:NSIS_BIN    'makensis.exe'
+            'Indy Core lib'    = Join-Path $env:INDY_ROOT   'Core'
           }
           $missing = @()
           foreach ($k in $tools.Keys) {
@@ -103,24 +86,27 @@ jobs:
           }
           Write-Host "All required tools present."
 
-      - name: Run FullBuild.ps1 (tests + main EXE)
+      - name: Run FullBuild.ps1 (tests + main EXE + tr4wserver + zip)
         shell: powershell
-        working-directory: C:\TR4W\tr4w
+        working-directory: ${{ github.workspace }}\tr4w
         run: |
-          .\FullBuild.ps1
+          .\FullBuild.ps1 `
+            -ProjectRoot $env:GITHUB_WORKSPACE `
+            -Delphi7Bin  $env:DELPHI7_BIN `
+            -IndyRoot    $env:INDY_ROOT
           if ($LASTEXITCODE -ne 0) { throw "FullBuild.ps1 failed with exit code $LASTEXITCODE" }
 
       - name: Verify tr4w.exe produced
         shell: powershell
         run: |
-          $exe = 'C:\TR4W\tr4w\target\tr4w.exe'
+          $exe = Join-Path $env:GITHUB_WORKSPACE 'tr4w\target\tr4w.exe'
           if (-not (Test-Path $exe)) { throw "tr4w.exe not produced at $exe" }
           $info = Get-Item $exe
           Write-Host "Built: $($info.FullName) | $($info.Length) bytes | $($info.LastWriteTime)"
 
       - name: UPX compress tr4w.exe (--lzma, matches Howie's make_setup_file.bat)
         shell: powershell
-        working-directory: C:\TR4W\tr4w\build
+        working-directory: ${{ github.workspace }}\tr4w\build
         run: |
           upx.exe ..\target\tr4w.exe --lzma
           if ($LASTEXITCODE -ne 0) { throw "UPX compression failed with exit code $LASTEXITCODE" }
@@ -129,11 +115,11 @@ jobs:
 
       - name: Build NSIS installer (passes /DTR4WVERSION for single-source version)
         shell: powershell
-        working-directory: C:\TR4W\tr4w\build
+        working-directory: ${{ github.workspace }}\tr4w\build
         env:
           TR4W_VERSION: ${{ steps.ver.outputs.version }}
         run: |
-          & "C:\Program Files (x86)\NSIS\makensis.exe" /DTR4WVERSION=$env:TR4W_VERSION full.nsi
+          & (Join-Path $env:NSIS_BIN 'makensis.exe') /DTR4WVERSION=$env:TR4W_VERSION full.nsi
           if ($LASTEXITCODE -ne 0) { throw "makensis failed with exit code $LASTEXITCODE" }
 
       - name: Locate installer
@@ -142,11 +128,13 @@ jobs:
         run: |
           # full.nsi outputs to build\release\ (already a subdir in the repo).
           # If it goes elsewhere, broaden the search root or check OutFile in full.nsi.
-          $installer = Get-ChildItem C:\TR4W\tr4w\build\release -Filter *.exe -Recurse -ErrorAction SilentlyContinue |
+          $releaseDir = Join-Path $env:GITHUB_WORKSPACE 'tr4w\build\release'
+          $buildDir   = Join-Path $env:GITHUB_WORKSPACE 'tr4w\build'
+          $installer = Get-ChildItem $releaseDir -Filter *.exe -Recurse -ErrorAction SilentlyContinue |
                        Sort-Object LastWriteTime -Descending |
                        Select-Object -First 1
           if (-not $installer) {
-            $installer = Get-ChildItem C:\TR4W\tr4w\build -Filter 'tr4w_setup*.exe' -Recurse |
+            $installer = Get-ChildItem $buildDir -Filter 'tr4w_setup*.exe' -Recurse |
                          Sort-Object LastWriteTime -Descending |
                          Select-Object -First 1
           }
@@ -162,15 +150,3 @@ jobs:
           path: ${{ steps.artifact.outputs.path }}
           retention-days: 90
           if-no-files-found: error
-
-      - name: Cleanup junction
-        if: always()
-        shell: powershell
-        run: |
-          if (Test-Path C:\TR4W) {
-            $item = Get-Item C:\TR4W -Force
-            if ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
-              cmd /c rmdir C:\TR4W
-              Write-Host "Junction removed."
-            }
-          }
