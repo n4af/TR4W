@@ -2,7 +2,7 @@
 ; truth for both the displayed name and the installer filename. CI passes it
 ; via /DTR4WVERSION; local builds use the default below.
 !ifndef TR4WVERSION
-  !define TR4WVERSION  '4.147.17'
+  !define TR4WVERSION  '4.147.18'
 !endif
 !define TR4WINSTFOLDER 'Software\TR4W'
 !define TR4WDRVREG     'SYSTEM\CurrentControlSet\Services\TR4WIO'
