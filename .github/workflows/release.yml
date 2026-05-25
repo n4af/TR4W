@@ -1,8 +1,14 @@
 # Place at .github/workflows/release.yml in n4af/tr4w
 #
-# Triggers on tag push matching v4.*.* (e.g. v4.123.7).
+# Triggers:
+#   1. Tag push v4.X.Y       -> English-only build + ENG installer
+#   2. Tag push v4.X.Y-all   -> Full ENG + 7 per-language installers
+#   3. Manual (Actions UI)   -> Run workflow button, "Build all languages" checkbox
+#
 # Runs the same chain as Howie's local: FullBuild.ps1 -> UPX --lzma -> NSIS installer.
-# Single source of truth = src/Version.pas; passes /DVERSION to NSIS.
+# Single source of truth = src/Version.pas; passes /DTR4WVERSION to NSIS.
+# The -all suffix on the tag is stripped before comparing to Version.pas
+# (so both v4.147.17 and v4.147.17-all must match Version.pas = 4.147.17).
 #
 # Runner setup (one-time on self-hosted win-ci runner):
 #   - Delphi 7 (DCC32.EXE) -- default install path C:\Program Files (x86)\Borland\Delphi7\Bin\.
@@ -10,16 +16,19 @@
 #   - NSIS (makensis.exe)  -- default C:\Program Files (x86)\NSIS\. Override with NSIS_BIN.
 #   - Indy 10 lib          -- default C:\Indy\Indy\Lib\. Override with INDY_ROOT.
 #   - UPX                  -- must be in PATH (upx.exe --lzma).
-#
-# How releases work:
-#   git tag v4.123.7 && git push --tags    ->    workflow runs    ->    installer artifact
 
 name: Release Build
 
 on:
   push:
     tags:
-      - 'v4.*.*'
+      - 'v4.*.*'           # matches v4.147.17 and v4.147.17-all
+  workflow_dispatch:
+    inputs:
+      all_languages:
+        description: 'Build all language installers (ENG + 7 langs). Slower (~25 min).'
+        type: boolean
+        default: false
 
 concurrency:
   group: tr4w-release-${{ github.ref }}
@@ -40,11 +49,28 @@ jobs:
   build:
     name: Build TR4W installer
     runs-on: [self-hosted, win-ci]
-    timeout-minutes: 30
+    timeout-minutes: 60   # All-lang mode can take ~25 min on first run; give it room.
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v5
+
+      - name: Determine build mode
+        id: mode
+        shell: powershell
+        run: |
+          # All-languages mode is triggered by EITHER:
+          #   a) A tag ending in '-all' (e.g. v4.147.17-all), OR
+          #   b) workflow_dispatch with the all_languages input set to true.
+          $tagAll = $false
+          if ($env:GITHUB_REF -like 'refs/tags/*') {
+              $tagAll = $env:GITHUB_REF -match '-all$'
+          }
+          $inputAll = '${{ inputs.all_languages }}' -eq 'true'
+          $allLang = $tagAll -or $inputAll
+          $mode = if ($allLang) { 'all_languages' } else { 'english_only' }
+          Write-Host "Trigger: $env:GITHUB_EVENT_NAME | Ref: $env:GITHUB_REF | Mode: $mode"
+          "mode=$mode" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Extract version from src/Version.pas
         id: ver
@@ -61,9 +87,12 @@ jobs:
           "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Validate tag matches Version.pas
+        if: github.event_name == 'push'
         shell: powershell
         run: |
-          $tag = $env:GITHUB_REF -replace '^refs/tags/v', ''
+          # Strip leading 'v' AND trailing '-all' so v4.147.17-all and v4.147.17 both
+          # validate against the same Version.pas entry (4.147.17).
+          $tag = $env:GITHUB_REF -replace '^refs/tags/v', '' -replace '-all$', ''
           $version = "${{ steps.ver.outputs.version }}"
           if ($tag -ne $version) {
             throw "Tag mismatch: refs/tags/v$tag does not match Version.pas ($version). Bump one or the other before re-tagging."
@@ -90,7 +119,13 @@ jobs:
           }
           Write-Host "All required tools present."
 
-      - name: Run FullBuild.ps1 (tests + main EXE + tr4wserver + zip)
+      # ---------------------------------------------------------------
+      # English-only path: FullBuild.ps1 (no flags) + manual UPX + NSIS.
+      # Matches the long-established release flow; kept as-is for the
+      # common case so the proven path isn't disturbed.
+      # ---------------------------------------------------------------
+      - name: Run FullBuild.ps1 (English only)
+        if: steps.mode.outputs.mode == 'english_only'
         shell: powershell
         working-directory: ${{ github.workspace }}\tr4w
         run: |
@@ -100,15 +135,8 @@ jobs:
             -IndyRoot    $env:INDY_ROOT
           if ($LASTEXITCODE -ne 0) { throw "FullBuild.ps1 failed with exit code $LASTEXITCODE" }
 
-      - name: Verify tr4w.exe produced
-        shell: powershell
-        run: |
-          $exe = Join-Path $env:GITHUB_WORKSPACE 'tr4w\target\tr4w.exe'
-          if (-not (Test-Path $exe)) { throw "tr4w.exe not produced at $exe" }
-          $info = Get-Item $exe
-          Write-Host "Built: $($info.FullName) | $($info.Length) bytes | $($info.LastWriteTime)"
-
-      - name: UPX compress tr4w.exe (--lzma, matches Howie's make_setup_file.bat)
+      - name: UPX compress tr4w.exe (English only)
+        if: steps.mode.outputs.mode == 'english_only'
         shell: powershell
         working-directory: ${{ github.workspace }}\tr4w\build
         run: |
@@ -117,7 +145,8 @@ jobs:
           $info = Get-Item ..\target\tr4w.exe
           Write-Host "Compressed: $($info.Length) bytes"
 
-      - name: Build NSIS installer (passes /DTR4WVERSION for single-source version)
+      - name: Build NSIS installer (English only)
+        if: steps.mode.outputs.mode == 'english_only'
         shell: powershell
         working-directory: ${{ github.workspace }}\tr4w\build
         env:
@@ -126,42 +155,65 @@ jobs:
           & (Join-Path $env:NSIS_BIN 'makensis.exe') /DTR4WVERSION=$env:TR4W_VERSION full.nsi
           if ($LASTEXITCODE -ne 0) { throw "makensis failed with exit code $LASTEXITCODE" }
 
-      - name: Locate installer
+      # ---------------------------------------------------------------
+      # All-languages path: FullBuild.ps1 -AllLanguages -BuildInstallers
+      # which handles UPX + NSIS internally for each language. Skips the
+      # manual UPX/NSIS steps above.
+      # ---------------------------------------------------------------
+      - name: Run FullBuild.ps1 (all languages + installers)
+        if: steps.mode.outputs.mode == 'all_languages'
+        shell: powershell
+        working-directory: ${{ github.workspace }}\tr4w
+        run: |
+          .\FullBuild.ps1 `
+            -AllLanguages `
+            -BuildInstallers `
+            -ProjectRoot $env:GITHUB_WORKSPACE `
+            -Delphi7Bin  $env:DELPHI7_BIN `
+            -IndyRoot    $env:INDY_ROOT `
+            -NSISBin     $env:NSIS_BIN
+          if ($LASTEXITCODE -ne 0) { throw "FullBuild.ps1 -AllLanguages failed with exit code $LASTEXITCODE" }
+
+      # ---------------------------------------------------------------
+      # Both paths land their installer(s) under tr4w\build\release\.
+      # ---------------------------------------------------------------
+      - name: Locate installers
         id: artifact
         shell: powershell
         run: |
-          # full.nsi outputs to build\release\ (already a subdir in the repo).
-          # If it goes elsewhere, broaden the search root or check OutFile in full.nsi.
           $releaseDir = Join-Path $env:GITHUB_WORKSPACE 'tr4w\build\release'
-          $buildDir   = Join-Path $env:GITHUB_WORKSPACE 'tr4w\build'
-          $installer = Get-ChildItem $releaseDir -Filter *.exe -Recurse -ErrorAction SilentlyContinue |
-                       Sort-Object LastWriteTime -Descending |
-                       Select-Object -First 1
-          if (-not $installer) {
-            $installer = Get-ChildItem $buildDir -Filter 'tr4w_setup*.exe' -Recurse |
-                         Sort-Object LastWriteTime -Descending |
-                         Select-Object -First 1
+          if (-not (Test-Path $releaseDir)) {
+            throw "Release directory not found: $releaseDir"
           }
-          if (-not $installer) { throw "No installer found under build\release\ or build\tr4w_setup*.exe" }
-          Write-Host "Installer: $($installer.FullName) ($($installer.Length) bytes)"
-          "path=$($installer.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "name=$($installer.Name)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          $installers = Get-ChildItem $releaseDir -Filter 'tr4w_setup_*.exe' -File `
+                      | Sort-Object Name
+          if ($installers.Count -eq 0) {
+            throw "No installers found in $releaseDir"
+          }
+          Write-Host "Found $($installers.Count) installer(s):"
+          $installers | ForEach-Object { Write-Host "  - $($_.Name) ($($_.Length) bytes)" }
+          # Newline-separated for upload-artifact's glob; release step
+          # uses the same glob via $RELEASE_PATTERN below.
+          "release_dir=$releaseDir" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "count=$($installers.Count)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
-      - name: Upload installer artifact
+      - name: Upload installer artifact(s)
         uses: actions/upload-artifact@v7
         with:
-          name: tr4w-installer-${{ steps.ver.outputs.version }}
-          path: ${{ steps.artifact.outputs.path }}
+          name: tr4w-installer-${{ steps.ver.outputs.version }}${{ steps.mode.outputs.mode == 'all_languages' && '-all' || '' }}
+          path: ${{ steps.artifact.outputs.release_dir }}\tr4w_setup_*.exe
           retention-days: 90
           if-no-files-found: error
 
       - name: Create draft GitHub Release
+        # Only create a release when triggered by a tag push. workflow_dispatch
+        # runs are for ad-hoc all-languages builds where the artifact alone is
+        # the desired output -- no release page needed.
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
-          # Tag was already pushed (this workflow triggered off it);
-          # softprops will create the release on the existing tag.
           tag_name: ${{ github.ref_name }}
-          name: TR4W v${{ steps.ver.outputs.version }}
+          name: TR4W v${{ steps.ver.outputs.version }}${{ steps.mode.outputs.mode == 'all_languages' && ' (all languages)' || '' }}
           # Draft = True so we can review/edit the notes and add manual
           # context (radio support, breaking changes, etc.) before
           # publishing. Promote to a final release via the GitHub UI.
@@ -170,7 +222,9 @@ jobs:
           # previous tag. The CHANGES.md / RELEASE_NOTES.md sections
           # for this version can be pasted in during the draft review.
           generate_release_notes: true
-          # Attach the installer so users can download from the release
-          # page (more discoverable than the workflow artifact tab).
-          files: ${{ steps.artifact.outputs.path }}
+          # Attach all installer(s) in build\release\ so users can
+          # download from the release page (more discoverable than the
+          # workflow artifact tab). In english_only mode this is one
+          # file; in all_languages mode it's eight.
+          files: ${{ steps.artifact.outputs.release_dir }}\tr4w_setup_*.exe
           fail_on_unmatched_files: true
