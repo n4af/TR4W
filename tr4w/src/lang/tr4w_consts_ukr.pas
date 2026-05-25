@@ -218,7 +218,7 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
 
   TC_FAILEDTOCONNECTTOGETSCORESORG      = 'Не вдалося з`єднатися із сервером';
   TC_NOANSWERFROMSERVER                 = 'Не вдалося з`єднатися із сервером';
-//  TC_UPLOADEDSUCCESSFULLY             = 'Завантажено успішно.';
+  TC_UPLOADEDSUCCESSFULLY             = 'Завантажено успішно.';
 //  TC_FAILEDTOLOAD                     = 'НЕ ВДАЛОСЯ ЗАВАНТАЖИТИ. Дивіться GETSCORESANSWER.HTML для уточнення.';
 
   {UBANDMAP}
