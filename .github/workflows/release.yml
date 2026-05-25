@@ -156,7 +156,7 @@ jobs:
           "name=$($installer.Name)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Upload installer artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: tr4w-installer-${{ steps.ver.outputs.version }}
           path: ${{ steps.artifact.outputs.path }}
