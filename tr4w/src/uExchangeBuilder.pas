@@ -34,7 +34,8 @@ implementation
 
 uses
   SysUtils, StrUtils,
-  LogCW;     // CQExchange template global
+  LogCW,     // CQExchange template global
+  LOGGRID;   // MyGrid global (operator's home grid, used for RTC sent exchange)
 
 // Collapse runs of whitespace (space + tab) to a single space and trim
 // both ends.  Used after substituting into the CQExchange template so
@@ -91,6 +92,23 @@ function BuildSentExchangeText(const RXData: ContestExchange): string;
 var
    tpl: string;
 begin
+   // RTC HamScore canonical SentExchange is "<serial> <grid>" -- NO RST.
+   // (Per HamScore RTC organizer email 2026-05: the signal report must be
+   // skipped in SentExchange, matching what RxExchange already does.)
+   //
+   // RTC rules permit RST on air, and some operators customize their
+   // CQExchange template to include 5NN/599. We deliberately ignore the
+   // on-air template here so any such customization does NOT leak RST
+   // into the upload string. On-air keying is unaffected -- this only
+   // controls what TR4W reports to HamScore.
+   if RXData.ceContest = RTC then
+      begin
+      Result := CollapseWhitespace(
+                   IntToStr(RXData.NumberSent) + ' ' +
+                   Trim(string(MyGrid)));
+      Exit;
+      end;
+
    tpl := string(CQExchange);
    if tpl = '' then
       begin
@@ -157,9 +175,11 @@ begin
       CWOPEN:
          Result := serial + ' ' + nm;
 
-      // RTC (Real-Time Contest, Issue #902): serial + grid.
-      // Parser uses RSTQSONumberAndGridSquareExchange (which accepts RST
-      // optionally) but the actual on-air exchange is just serial + grid.
+      // RTC (Real-Time Contest, Issue #902): "<serial> <grid>" -- NO RST.
+      // Per HamScore RTC organizer email 2026-05, the signal report is
+      // intentionally omitted from BOTH RxExchange and SentExchange.
+      // Parser accepts RSTQSONumberAndGridSquareExchange (RST optional)
+      // and discards the RST field for the canonical RxExchange string.
       RTC:
          Result := serial + ' ' + qth;
 

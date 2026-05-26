@@ -1,4 +1,8 @@
-*.html 
+*.html
 *.jpg
 *.ini
 *.pos
+# Installers built by FullBuild.ps1 -BuildInstallers (and by CI). Local
+# build output, not source -- must never be committed or CI will bundle
+# stale binaries from prior versions into every release artifact.
+tr4w_setup_*.exe

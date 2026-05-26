@@ -28,7 +28,13 @@ param(
 
     # NSIS install dir (contains makensis.exe). Only consulted when
     # -BuildInstallers is set. Override with $env:NSIS_BIN or -NSISBin.
-    [string]$NSISBin = $(if ($env:NSIS_BIN) { $env:NSIS_BIN } else { "C:\Program Files (x86)\NSIS" })
+    [string]$NSISBin = $(if ($env:NSIS_BIN) { $env:NSIS_BIN } else { "C:\Program Files (x86)\NSIS" }),
+
+    # UPX bin directory (contains upx.exe). Only consulted when
+    # -BuildInstallers is set. Resolution order:
+    #   1. -UpxBin / $env:UPX_BIN explicit directory (validated below)
+    #   2. PATH lookup via Get-Command upx.exe (default if neither set)
+    [string]$UpxBin = $(if ($env:UPX_BIN) { $env:UPX_BIN } else { "" })
 )
 
 $ErrorActionPreference = "Continue"
@@ -62,9 +68,34 @@ if (-not (Test-Path $TR4W_DIR)) { Write-Host "tr4w project dir not found at: $TR
 if ($BuildInstallers) {
     if (-not (Test-Path $MAKENSIS)) { Write-Host "makensis.exe not found at: $MAKENSIS (set NSIS_BIN or pass -NSISBin)" -ForegroundColor Red; exit 2 }
     if (-not (Test-Path $NSI_FILE)) { Write-Host "Installer script not found at: $NSI_FILE" -ForegroundColor Red; exit 2 }
-    if (-not (Get-Command upx.exe -ErrorAction SilentlyContinue)) {
-        Write-Host "upx.exe not found in PATH (required by -BuildInstallers)" -ForegroundColor Red; exit 2
+
+    # Resolve upx.exe -- explicit override (-UpxBin / $env:UPX_BIN) wins;
+    # otherwise discover via PATH. Either way we end up with a full path
+    # in $UPX so the packaging step doesn't depend on PATH at call time.
+    if ($UpxBin) {
+        $UPX = Join-Path $UpxBin "upx.exe"
+        if (-not (Test-Path $UPX)) {
+            Write-Host "upx.exe not found at: $UPX" -ForegroundColor Red
+            Write-Host "Check the -UpxBin parameter or `$env:UPX_BIN value." -ForegroundColor Red
+            exit 2
+        }
+    } else {
+        $upxCmd = Get-Command upx.exe -ErrorAction SilentlyContinue
+        if ($upxCmd) {
+            $UPX = $upxCmd.Source
+        } else {
+            Write-Host "upx.exe not found (required by -BuildInstallers)." -ForegroundColor Red
+            Write-Host ""
+            Write-Host "Fix one of these ways:" -ForegroundColor Yellow
+            Write-Host "  1. Pass -UpxBin <directory-containing-upx.exe> on the command line, OR" -ForegroundColor Yellow
+            Write-Host "  2. Set the UPX_BIN environment variable to that directory (persists), OR" -ForegroundColor Yellow
+            Write-Host "  3. Add the directory containing upx.exe to your PATH and reopen the shell." -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "Download UPX from https://upx.github.io/ if you don't have it." -ForegroundColor Yellow
+            exit 2
+        }
     }
+    Write-Host "Using upx: $UPX" -ForegroundColor DarkGray
 }
 
 # DCU cache architecture (used when -AllLanguages is set):
@@ -85,6 +116,75 @@ if ($BuildInstallers) {
 function Clear-SrcDcus {
     Get-ChildItem -Path $SRC_DIR -Filter *.dcu -Recurse -File `
         | Remove-Item -Force -ErrorAction SilentlyContinue
+}
+
+# Upload one file to VirusTotal and poll for the analysis result.
+# Uses curl.exe for the multipart upload because Windows PowerShell 5.1's
+# Invoke-RestMethod lacks the -Form switch (PS 7+ only). curl.exe ships
+# with Windows 10 1803+ so the dependency is effectively zero.
+# Returns the parsed analysis response object on success, or $null on
+# upload/poll failure (informational only -- callers don't fail the
+# build).
+function Invoke-VirusTotalScan {
+    param(
+        [Parameter(Mandatory=$true)][string]$FilePath,
+        [Parameter(Mandatory=$true)][string]$ApiKey
+    )
+
+    $filesize = (Get-Item $FilePath).Length
+    $uploadUrl = 'https://www.virustotal.com/api/v3/files'
+
+    # Files >32MB need a one-shot large-file upload URL.
+    if ($filesize -gt 33554432) {
+        try {
+            $ulResp = Invoke-RestMethod -Uri 'https://www.virustotal.com/api/v3/files/upload_url' `
+                                        -Method Get `
+                                        -Headers @{ 'x-apikey' = $ApiKey }
+            $uploadUrl = $ulResp.data
+        } catch {
+            Write-Host "    Failed to get large-file upload URL: $_" -ForegroundColor Red
+            return $null
+        }
+    }
+
+    $curlOut = & curl.exe --silent --request POST `
+                          --url $uploadUrl `
+                          --header "x-apikey: $ApiKey" `
+                          --form "file=@$FilePath"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "    curl upload failed (exit $LASTEXITCODE)" -ForegroundColor Red
+        return $null
+    }
+    try {
+        $upResp = $curlOut | ConvertFrom-Json
+    } catch {
+        Write-Host "    Upload response not JSON: $curlOut" -ForegroundColor Red
+        return $null
+    }
+    $analysisId = $upResp.data.id
+    if (-not $analysisId) {
+        Write-Host "    No analysis id in upload response" -ForegroundColor Red
+        return $null
+    }
+
+    # Poll /analyses/{id} every 15s up to 10 minutes total.
+    for ($i = 1; $i -le 40; $i++) {
+        Start-Sleep -Seconds 15
+        try {
+            $poll = Invoke-RestMethod -Uri "https://www.virustotal.com/api/v3/analyses/$analysisId" `
+                                       -Method Get `
+                                       -Headers @{ 'x-apikey' = $ApiKey }
+        } catch {
+            Write-Host "    Poll $i/40 error: $_" -ForegroundColor DarkYellow
+            continue
+        }
+        if ($poll.data.attributes.status -eq 'completed') {
+            return $poll
+        }
+        Write-Host "    Poll $i/40: status=$($poll.data.attributes.status)" -ForegroundColor DarkGray
+    }
+    Write-Host "    Poll timed out after 10 minutes" -ForegroundColor Red
+    return $null
 }
 
 # Helper: UPX + makensis for the exe currently in target\tr4w.exe.
@@ -109,7 +209,7 @@ function Invoke-Packaging {
 
     # UPX --lzma (destructive: overwrites the exe with the compressed copy).
     Write-Host "  upx --lzma $exe" -ForegroundColor DarkGray
-    & upx.exe $exe --lzma | Out-Null
+    & $UPX $exe --lzma | Out-Null
     if ($LASTEXITCODE -ne 0) { Write-Host "  UPX failed (exit $LASTEXITCODE)" -ForegroundColor Red; return $false }
 
     $nsisArgs = @("/DTR4WVERSION=$Version")
@@ -416,6 +516,56 @@ if ($result -eq 0) {
     Write-Host "=== BUILD FAILED ===" -ForegroundColor Red
     Write-Host "Exit code: $result" -ForegroundColor Red
     Write-Host ""
+}
+
+# ---------------------------------------------------------------------------
+# Optional: VirusTotal pre-flight scan of any installers produced.
+# Gated on -BuildInstallers AND $env:VIRUS_TOTAL_API_KEY. Informational
+# only -- never fails the build. CI runs its own VT-scan job with a
+# threshold gate; local is just for catching surprises before tagging.
+# ---------------------------------------------------------------------------
+if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
+    $installers = @(Get-ChildItem -Path $RELEASE_DIR -Filter 'tr4w_setup_*.exe' -File -ErrorAction SilentlyContinue)
+    if ($installers.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== VirusTotal Scan ===" -ForegroundColor Cyan
+        if (-not $env:VIRUS_TOTAL_API_KEY) {
+            Write-Host "VIRUS_TOTAL_API_KEY env var not set -- skipping local scan." -ForegroundColor DarkGray
+            Write-Host "  To enable: `$env:VIRUS_TOTAL_API_KEY = '<your-key>' (persist via System -> Env Vars)." -ForegroundColor DarkGray
+            Write-Host "  CI runs the authoritative scan on tag push regardless." -ForegroundColor DarkGray
+        } else {
+            Write-Host "Scanning $($installers.Count) installer(s) via VirusTotal API..." -ForegroundColor Yellow
+            Write-Host "  (each scan: upload + up to 10 min poll; informational only -- CI is the gate)" -ForegroundColor DarkGray
+            foreach ($inst in $installers) {
+                Write-Host ""
+                Write-Host "  $($inst.Name) ($($inst.Length) bytes)" -ForegroundColor White
+                $vt = Invoke-VirusTotalScan -FilePath $inst.FullName -ApiKey $env:VIRUS_TOTAL_API_KEY
+                if (-not $vt) {
+                    Write-Host "    Scan unavailable -- continuing." -ForegroundColor Yellow
+                    continue
+                }
+                $stats   = $vt.data.attributes.stats
+                $mal     = [int]$stats.malicious
+                $sus     = [int]$stats.suspicious
+                $undet   = [int]$stats.undetected
+                $harm    = [int]$stats.harmless
+                $fail    = [int]$stats.failure
+                $total   = $mal + $sus + $undet + $harm + $fail
+                $sha     = $vt.meta.file_info.sha256
+                if ($mal -ge 4) {
+                    $verdict = "BLOCKED (>= CI threshold of 4)"; $color = "Red"
+                } elseif ($mal -gt 0 -or $sus -gt 0) {
+                    $verdict = "WARN (below CI threshold)"; $color = "Yellow"
+                } else {
+                    $verdict = "CLEAN"; $color = "Green"
+                }
+                Write-Host "    $verdict -- $mal malicious / $sus suspicious / $($undet + $harm) clean of $total engines" -ForegroundColor $color
+                Write-Host "    https://www.virustotal.com/gui/file/$sha" -ForegroundColor Cyan
+            }
+            Write-Host ""
+            Write-Host "Local scan complete. CI VT-scan is the authoritative gate on tag push." -ForegroundColor DarkGray
+        }
+    }
 }
 
 exit $result
