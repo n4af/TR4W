@@ -131,6 +131,37 @@ when the PR touches `src\lang\` or `tr4w_consts_*.pas`. Only use
 `BuildAllInstallers.cmd` if you're producing release-candidate installers locally
 (rare -- CI does this on a tag push).
 
+### `Build.cmd` is incremental after the first run
+
+Despite the script being named `FullBuild.ps1`, plain `Build.cmd` does **not**
+clear DCUs or force a full recompile every time. The name is historical -- it
+refers to the full chain (tests -> main build -> server -> zip -> optional
+installers), not a clean build.
+
+What actually happens:
+
+- **First-ever run** (`tr4w\target\.dcu-managed-by-fullbuild` marker file missing):
+  the script clears `src\*.dcu` to migrate cleanly from the pre-DCU-cache version
+  of the script, then DCC32 does a full ~3-minute compile and drops the marker.
+- **Every subsequent run**: marker exists, `src\*.dcu` is left alone, DCC32 runs
+  **without `-B`** and recompiles only units whose `.pas` files changed. Typical
+  incremental main-build time: ~30 sec, often less.
+
+Per-language DCUs (`tr4w\target\dcu-cache\<lang>\`) are never read or written by
+plain `Build.cmd` -- only by `BuildAll.cmd` / `BuildAllInstallers.cmd` and only
+for non-ENG languages. ENG DCUs always live in `src\` (where Delphi 7 IDE
+expects them, so opening the project in the IDE after a script build doesn't
+trigger a phantom rebuild).
+
+To force a full rebuild manually:
+
+```
+del tr4w\target\.dcu-managed-by-fullbuild
+Build.cmd
+```
+
+Next run will be a full ~3 minute compile and the marker gets recreated.
+
 ### 3a. What lands where
 
 After `Build.cmd`:
