@@ -28,7 +28,13 @@ param(
 
     # NSIS install dir (contains makensis.exe). Only consulted when
     # -BuildInstallers is set. Override with $env:NSIS_BIN or -NSISBin.
-    [string]$NSISBin = $(if ($env:NSIS_BIN) { $env:NSIS_BIN } else { "C:\Program Files (x86)\NSIS" })
+    [string]$NSISBin = $(if ($env:NSIS_BIN) { $env:NSIS_BIN } else { "C:\Program Files (x86)\NSIS" }),
+
+    # UPX bin directory (contains upx.exe). Only consulted when
+    # -BuildInstallers is set. Resolution order:
+    #   1. -UpxBin / $env:UPX_BIN explicit directory (validated below)
+    #   2. PATH lookup via Get-Command upx.exe (default if neither set)
+    [string]$UpxBin = $(if ($env:UPX_BIN) { $env:UPX_BIN } else { "" })
 )
 
 $ErrorActionPreference = "Continue"
@@ -62,9 +68,34 @@ if (-not (Test-Path $TR4W_DIR)) { Write-Host "tr4w project dir not found at: $TR
 if ($BuildInstallers) {
     if (-not (Test-Path $MAKENSIS)) { Write-Host "makensis.exe not found at: $MAKENSIS (set NSIS_BIN or pass -NSISBin)" -ForegroundColor Red; exit 2 }
     if (-not (Test-Path $NSI_FILE)) { Write-Host "Installer script not found at: $NSI_FILE" -ForegroundColor Red; exit 2 }
-    if (-not (Get-Command upx.exe -ErrorAction SilentlyContinue)) {
-        Write-Host "upx.exe not found in PATH (required by -BuildInstallers)" -ForegroundColor Red; exit 2
+
+    # Resolve upx.exe -- explicit override (-UpxBin / $env:UPX_BIN) wins;
+    # otherwise discover via PATH. Either way we end up with a full path
+    # in $UPX so the packaging step doesn't depend on PATH at call time.
+    if ($UpxBin) {
+        $UPX = Join-Path $UpxBin "upx.exe"
+        if (-not (Test-Path $UPX)) {
+            Write-Host "upx.exe not found at: $UPX" -ForegroundColor Red
+            Write-Host "Check the -UpxBin parameter or `$env:UPX_BIN value." -ForegroundColor Red
+            exit 2
+        }
+    } else {
+        $upxCmd = Get-Command upx.exe -ErrorAction SilentlyContinue
+        if ($upxCmd) {
+            $UPX = $upxCmd.Source
+        } else {
+            Write-Host "upx.exe not found (required by -BuildInstallers)." -ForegroundColor Red
+            Write-Host ""
+            Write-Host "Fix one of these ways:" -ForegroundColor Yellow
+            Write-Host "  1. Pass -UpxBin <directory-containing-upx.exe> on the command line, OR" -ForegroundColor Yellow
+            Write-Host "  2. Set the UPX_BIN environment variable to that directory (persists), OR" -ForegroundColor Yellow
+            Write-Host "  3. Add the directory containing upx.exe to your PATH and reopen the shell." -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "Download UPX from https://upx.github.io/ if you don't have it." -ForegroundColor Yellow
+            exit 2
+        }
     }
+    Write-Host "Using upx: $UPX" -ForegroundColor DarkGray
 }
 
 # DCU cache architecture (used when -AllLanguages is set):
@@ -109,7 +140,7 @@ function Invoke-Packaging {
 
     # UPX --lzma (destructive: overwrites the exe with the compressed copy).
     Write-Host "  upx --lzma $exe" -ForegroundColor DarkGray
-    & upx.exe $exe --lzma | Out-Null
+    & $UPX $exe --lzma | Out-Null
     if ($LASTEXITCODE -ne 0) { Write-Host "  UPX failed (exit $LASTEXITCODE)" -ForegroundColor Red; return $false }
 
     $nsisArgs = @("/DTR4WVERSION=$Version")

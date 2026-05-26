@@ -37,7 +37,10 @@ Install once. Defaults match the assumed locations; if yours differ, see
 For `-BuildInstallers` mode (anything that produces `tr4w_setup_*.exe`):
 
 - [ ] **NSIS** -- `C:\Program Files (x86)\NSIS\makensis.exe`
-- [ ] **UPX** -- `upx.exe` in `PATH` (any version that supports `--lzma`)
+- [ ] **UPX** -- `upx.exe` discoverable via one of: `PATH`, the `UPX_BIN`
+  environment variable (directory containing `upx.exe`), or the `-UpxBin`
+  parameter to `FullBuild.ps1`. Any version that supports `--lzma`.
+  Download: https://upx.github.io/
 
 Plain `Build.cmd` and `BuildAll.cmd` only need Delphi 7 + Indy.
 
@@ -54,6 +57,10 @@ differs from the defaults.
   (default `C:\Indy\Indy\Lib`)
 - [ ] `NSIS_BIN` -- NSIS directory containing `makensis.exe`
   (default `C:\Program Files (x86)\NSIS`)
+- [ ] `UPX_BIN` -- directory containing `upx.exe`. **Optional** -- if unset,
+  the script falls back to `PATH` lookup. Set this if you have UPX installed
+  somewhere odd (e.g., `C:\Tools\upx-4.2.4-win64\`) and don't want to modify
+  `PATH`.
 
 Set permanently:
 
@@ -188,8 +195,14 @@ After `BuildAllInstallers.cmd` (everything above plus):
 - **`Indy lib root not found`** -- same for Indy.
 - **`makensis.exe not found`** -- NSIS not installed. Only matters for
   `-BuildInstallers`.
-- **`upx.exe not found in PATH`** -- install UPX and add to PATH. Only matters for
-  `-BuildInstallers`.
+- **`upx.exe not found`** -- only matters for `-BuildInstallers`. The script
+  tries three resolution paths in order:
+  1. `-UpxBin <dir>` command-line parameter, OR
+  2. `UPX_BIN` environment variable (directory containing `upx.exe`), OR
+  3. `PATH` lookup.
+
+  Pick whichever is least disruptive for your machine. Download UPX from
+  https://upx.github.io/ if you don't have it.
 - **`Could not create output file 'tr4w.exe'`** -- `tr4w.exe` is currently
   running. Close it.
 - **`Could not compile used unit 'src\VC.pas'`** -- almost always a missing
