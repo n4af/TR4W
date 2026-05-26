@@ -118,6 +118,75 @@ function Clear-SrcDcus {
         | Remove-Item -Force -ErrorAction SilentlyContinue
 }
 
+# Upload one file to VirusTotal and poll for the analysis result.
+# Uses curl.exe for the multipart upload because Windows PowerShell 5.1's
+# Invoke-RestMethod lacks the -Form switch (PS 7+ only). curl.exe ships
+# with Windows 10 1803+ so the dependency is effectively zero.
+# Returns the parsed analysis response object on success, or $null on
+# upload/poll failure (informational only -- callers don't fail the
+# build).
+function Invoke-VirusTotalScan {
+    param(
+        [Parameter(Mandatory=$true)][string]$FilePath,
+        [Parameter(Mandatory=$true)][string]$ApiKey
+    )
+
+    $filesize = (Get-Item $FilePath).Length
+    $uploadUrl = 'https://www.virustotal.com/api/v3/files'
+
+    # Files >32MB need a one-shot large-file upload URL.
+    if ($filesize -gt 33554432) {
+        try {
+            $ulResp = Invoke-RestMethod -Uri 'https://www.virustotal.com/api/v3/files/upload_url' `
+                                        -Method Get `
+                                        -Headers @{ 'x-apikey' = $ApiKey }
+            $uploadUrl = $ulResp.data
+        } catch {
+            Write-Host "    Failed to get large-file upload URL: $_" -ForegroundColor Red
+            return $null
+        }
+    }
+
+    $curlOut = & curl.exe --silent --request POST `
+                          --url $uploadUrl `
+                          --header "x-apikey: $ApiKey" `
+                          --form "file=@$FilePath"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "    curl upload failed (exit $LASTEXITCODE)" -ForegroundColor Red
+        return $null
+    }
+    try {
+        $upResp = $curlOut | ConvertFrom-Json
+    } catch {
+        Write-Host "    Upload response not JSON: $curlOut" -ForegroundColor Red
+        return $null
+    }
+    $analysisId = $upResp.data.id
+    if (-not $analysisId) {
+        Write-Host "    No analysis id in upload response" -ForegroundColor Red
+        return $null
+    }
+
+    # Poll /analyses/{id} every 15s up to 10 minutes total.
+    for ($i = 1; $i -le 40; $i++) {
+        Start-Sleep -Seconds 15
+        try {
+            $poll = Invoke-RestMethod -Uri "https://www.virustotal.com/api/v3/analyses/$analysisId" `
+                                       -Method Get `
+                                       -Headers @{ 'x-apikey' = $ApiKey }
+        } catch {
+            Write-Host "    Poll $i/40 error: $_" -ForegroundColor DarkYellow
+            continue
+        }
+        if ($poll.data.attributes.status -eq 'completed') {
+            return $poll
+        }
+        Write-Host "    Poll $i/40: status=$($poll.data.attributes.status)" -ForegroundColor DarkGray
+    }
+    Write-Host "    Poll timed out after 10 minutes" -ForegroundColor Red
+    return $null
+}
+
 # Helper: UPX + makensis for the exe currently in target\tr4w.exe.
 # Pass empty $langCode for the no-suffix ENG installer, or the lowercase
 # language code ('rus', 'cze', etc.) for tagged installers per full.nsi.
@@ -447,6 +516,56 @@ if ($result -eq 0) {
     Write-Host "=== BUILD FAILED ===" -ForegroundColor Red
     Write-Host "Exit code: $result" -ForegroundColor Red
     Write-Host ""
+}
+
+# ---------------------------------------------------------------------------
+# Optional: VirusTotal pre-flight scan of any installers produced.
+# Gated on -BuildInstallers AND $env:VIRUSTOTAL_API_KEY. Informational
+# only -- never fails the build. CI runs its own VT-scan job with a
+# threshold gate; local is just for catching surprises before tagging.
+# ---------------------------------------------------------------------------
+if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
+    $installers = @(Get-ChildItem -Path $RELEASE_DIR -Filter 'tr4w_setup_*.exe' -File -ErrorAction SilentlyContinue)
+    if ($installers.Count -gt 0) {
+        Write-Host ""
+        Write-Host "=== VirusTotal Scan ===" -ForegroundColor Cyan
+        if (-not $env:VIRUSTOTAL_API_KEY) {
+            Write-Host "VIRUSTOTAL_API_KEY env var not set -- skipping local scan." -ForegroundColor DarkGray
+            Write-Host "  To enable: `$env:VIRUSTOTAL_API_KEY = '<your-key>' (persist via System -> Env Vars)." -ForegroundColor DarkGray
+            Write-Host "  CI runs the authoritative scan on tag push regardless." -ForegroundColor DarkGray
+        } else {
+            Write-Host "Scanning $($installers.Count) installer(s) via VirusTotal API..." -ForegroundColor Yellow
+            Write-Host "  (each scan: upload + up to 10 min poll; informational only -- CI is the gate)" -ForegroundColor DarkGray
+            foreach ($inst in $installers) {
+                Write-Host ""
+                Write-Host "  $($inst.Name) ($($inst.Length) bytes)" -ForegroundColor White
+                $vt = Invoke-VirusTotalScan -FilePath $inst.FullName -ApiKey $env:VIRUSTOTAL_API_KEY
+                if (-not $vt) {
+                    Write-Host "    Scan unavailable -- continuing." -ForegroundColor Yellow
+                    continue
+                }
+                $stats   = $vt.data.attributes.stats
+                $mal     = [int]$stats.malicious
+                $sus     = [int]$stats.suspicious
+                $undet   = [int]$stats.undetected
+                $harm    = [int]$stats.harmless
+                $fail    = [int]$stats.failure
+                $total   = $mal + $sus + $undet + $harm + $fail
+                $sha     = $vt.meta.file_info.sha256
+                if ($mal -ge 4) {
+                    $verdict = "BLOCKED (>= CI threshold of 4)"; $color = "Red"
+                } elseif ($mal -gt 0 -or $sus -gt 0) {
+                    $verdict = "WARN (below CI threshold)"; $color = "Yellow"
+                } else {
+                    $verdict = "CLEAN"; $color = "Green"
+                }
+                Write-Host "    $verdict -- $mal malicious / $sus suspicious / $($undet + $harm) clean of $total engines" -ForegroundColor $color
+                Write-Host "    https://www.virustotal.com/gui/file/$sha" -ForegroundColor Cyan
+            }
+            Write-Host ""
+            Write-Host "Local scan complete. CI VT-scan is the authoritative gate on tag push." -ForegroundColor DarkGray
+        }
+    }
 }
 
 exit $result

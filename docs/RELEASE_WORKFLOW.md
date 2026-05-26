@@ -61,6 +61,12 @@ differs from the defaults.
   the script falls back to `PATH` lookup. Set this if you have UPX installed
   somewhere odd (e.g., `C:\Tools\upx-4.2.4-win64\`) and don't want to modify
   `PATH`.
+- [ ] `VIRUSTOTAL_API_KEY` -- VirusTotal public API key. **Optional** -- if
+  unset, the local build prints a "skipping scan" note and continues. When set,
+  `BuildAllInstallers.cmd` (and CI) upload each installer to VT and print a
+  CLEAN/WARN/BLOCKED summary. Local scans are informational only; CI is the
+  authoritative gate. Get a free key at https://www.virustotal.com/gui/my-apikey
+  (4 requests/min, 500/day -- plenty for a 1-8-installer release).
 
 Set permanently:
 
@@ -236,7 +242,49 @@ zero config. The mechanism:
 **No symlinks, no junctions, no `C:\TR4W` hardcoding anywhere.** If you find code
 or docs that assume a specific clone path, that's a bug -- file it.
 
-### 3d. How the per-language build works (one paragraph)
+### 3d. Local VirusTotal scan (optional)
+
+When `BuildAllInstallers.cmd` (or any `-BuildInstallers` invocation) finishes
+successfully and the env var `VIRUSTOTAL_API_KEY` is set, `FullBuild.ps1`
+uploads each `tr4w_setup_*.exe` to VirusTotal, polls for analysis completion,
+and prints a one-line verdict per file:
+
+```
+tr4w_setup_4.147.18.exe
+    CLEAN -- 0 malicious / 0 suspicious / 73 clean of 73 engines
+    https://www.virustotal.com/gui/file/<sha256>
+```
+
+Or, if engines flag the file:
+
+```
+    WARN (below CI threshold) -- 2 malicious / 0 suspicious / 71 clean of 73 engines
+    BLOCKED (>= CI threshold of 4) -- 5 malicious / 1 suspicious / 67 clean of 73 engines
+```
+
+**Local scan is informational only** -- it never fails the build. The CI VT-scan
+on tag push (see [section 6](#6-tagging-for-an-english-only-release)) is the
+authoritative gate. Local exists for catching surprises before you tag and
+trigger a release that gets blocked at the CI gate.
+
+When the env var is unset, the script prints a "skipping scan" note and
+continues. Set it once per machine:
+
+```
+[Environment]::SetEnvironmentVariable('VIRUSTOTAL_API_KEY', '<your-key>', 'User')
+```
+
+(reopen the terminal afterward). Or per-session:
+
+```
+$env:VIRUSTOTAL_API_KEY = '<your-key>'
+```
+
+Each VT scan takes 30 sec to ~3 min depending on queue depth -- typically
+~1 min. Upload + 10-min poll cap per installer; if VT is slow or down, the
+script logs the failure and moves on.
+
+### 3e. How the per-language build works (one paragraph)
 
 `tr4w.exe` is the same Delphi 7 project compiled with a different `-DLANG_xxx`
 flag per language. Each language's compiled `.dcu` files live in
@@ -386,11 +434,18 @@ tag. If not, do [section 5](#5-when-to-update-versionpas) first.
    git push origin --tags
    ```
 
-4. **CI fires.** `.github/workflows/release.yml` matches `v4.*.*`, builds English
-   only, UPX-compresses, runs `makensis`, and:
-   - Uploads `tr4w_setup_4.147.18.exe` as a workflow artifact.
-   - Creates a **draft** GitHub Release with auto-generated changelog + the
-     installer attached.
+4. **CI fires.** `.github/workflows/release.yml` matches `v4.*.*` and runs three
+   jobs in sequence:
+   - **build** (Windows runner): compiles, UPX-compresses, runs `makensis`,
+     uploads `tr4w_setup_4.147.18.exe` as a workflow artifact.
+   - **virustotal-scan** (Linux runner): downloads the installer, uploads it to
+     VirusTotal, polls for completion, generates `virustotal-report.md`. Fails
+     the pipeline if any installer hits the threshold
+     (`VT_MALICIOUS_THRESHOLD = 4`), which blocks the release job. An emergency
+     `skip_virustotal` input is available on the `workflow_dispatch` trigger.
+   - **release** (Linux runner): only runs on tag push. Downloads both
+     artifacts, creates a **draft** GitHub Release with auto-generated
+     changelog, the installer, AND the VT report attached.
 
 5. **Watch the run.** GitHub Actions tab, or:
    ```
