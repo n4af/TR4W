@@ -5,8 +5,8 @@ for the English CI build, promoting to a full English installer release, and (fo
 major releases) producing the multi-language installers.
 
 If you only want to compile the source on your dev box and never publish anything,
-sections 1-4 are all you need. Sections 5-7 cover tagging and the GitHub-side
-release flow.
+sections 1-4 are all you need. Section 5 covers the version-bump policy.
+Sections 6-8 cover tagging and the GitHub-side release flow.
 
 ---
 
@@ -202,9 +202,87 @@ rather than approving on faith. Hand the build to whoever does have the hardware
 
 ---
 
-## 5. Tagging for an English-only release
+## 5. When to update `Version.pas`
+
+`src/Version.pas` is the single source of truth for the version string. The CI
+release workflow extracts `TR4W_CURRENTVERSION_NUMBER` and refuses to build if it
+doesn't match the tag (with the `-all` suffix stripped). So getting the timing
+right matters.
+
+There are two patterns. Pick the one that fits the situation:
+
+### Pattern A: Bundled with the feature PR (preferred when possible)
+
+Use this when the feature PR is intended to be the next release.
+
+1. On the feature branch, as part of the PR's commits, bump
+   `TR4W_CURRENTVERSION_NUMBER` and `TR4W_CURRENTVERSIONDATE`.
+2. PR gets reviewed + merged to master normally.
+3. After merge, **immediately** tag master (see [section 6](#6-tagging-for-an-english-only-release)).
+   The bumped version is already on master; no separate bump step.
+
+Pro: one PR, atomic. The version-bump diff and the changes that justify it travel
+together; reviewer sees both.
+
+Con: requires deciding the version number when the PR opens. If multiple PRs are
+in flight, only one of them can carry the bump -- the others need rebasing or
+will conflict.
+
+### Pattern B: Standalone bump on master, no PR
+
+Use this when:
+
+- Several PRs have already merged since the last release and none of them carried
+  a bump, OR
+- You're cutting a release at a point not aligned with any single PR (e.g.,
+  monthly cadence), OR
+- A `-all` tag follows an English `vX.Y.Z` release: bump version, push, tag.
+
+Steps -- runs **directly on master**, no branch, no PR:
+
+```
+git checkout master
+git pull
+# edit tr4w\src\Version.pas: bump TR4W_CURRENTVERSION_NUMBER and _DATE
+git add tr4w\src\Version.pas
+git commit -m "Bump Version.pas to 4.147.18"
+git push origin master
+```
+
+This is the narrow exception to the "no direct commits on master" rule. It
+applies **only** to `Version.pas`-only diffs whose review value is essentially
+zero. Comment-only changes, typo fixes, and everything else still go through a
+branch + PR.
+
+### What NOT to do
+
+- **Don't tag without bumping first.** The CI's tag-vs-`Version.pas` validation
+  will fail, the build won't run, and you'll have to delete the tag and re-push.
+- **Don't bump and then forget to tag.** A bumped `Version.pas` on master with no
+  matching tag means the EXE built locally claims version N+1 but there's no
+  corresponding release artifact anywhere.
+- **Don't reuse a version.** Once `v4.147.18` is tagged and published, the next
+  release is `v4.147.19` or `v4.148.0` -- not a re-tag of `v4.147.18`. Bump it
+  again.
+
+### Version-number conventions
+
+- **Patch bumps** (`4.147.17` -> `4.147.18`): bug fixes, small features, the
+  default for most releases.
+- **Minor bumps** (`4.147.x` -> `4.148.0`): notable feature additions, new radio
+  support, new contest additions.
+- **Major bumps** (`4.x.y` -> `5.0.0`): reserved; not currently planned.
+- **Date** (`TR4W_CURRENTVERSIONDATE`): update to the current "Month, Year" of the
+  release.
+
+---
+
+## 6. Tagging for an English-only release
 
 This is the **normal** release path. Use it for the vast majority of releases.
+
+**Precondition:** `Version.pas` on master reflects the version you're about to
+tag. If not, do [section 5](#5-when-to-update-versionpas) first.
 
 1. **Make sure master is clean and you're on it.**
    ```
@@ -213,60 +291,76 @@ This is the **normal** release path. Use it for the vast majority of releases.
    git status   # should be clean
    ```
 
-2. **Bump the version in `src/Version.pas`.**
-   - Edit `TR4W_CURRENTVERSION_NUMBER`, e.g. `'4.147.18'`.
-   - Update `TR4W_CURRENTVERSIONDATE`, e.g. `'May, 2026'`.
-   - Optional one-line comment after the version literal describing what's in this
-     release.
-   - **Version.pas-only diffs go direct to master** -- no branch, no PR. Larger
-     changes that include the bump went through their own PR earlier.
-
-3. **Commit and push.**
+2. **Confirm the version.**
    ```
-   git add tr4w\src\Version.pas
-   git commit -m "Bump Version.pas to 4.147.18"
-   git push origin master
+   git -C . show HEAD:tr4w/src/Version.pas | findstr CURRENTVERSION_NUMBER
+   ```
+   You should see exactly the version you're about to tag, e.g.
+   `TR4W_CURRENTVERSION_NUMBER = '4.147.18'`.
+
+3. **Create the tag and push it.**
+
+   Annotated tag (recommended -- carries a message and a tagger date):
+   ```
+   git tag -a v4.147.18 -m "TR4W v4.147.18"
+   git push origin v4.147.18
    ```
 
-4. **Tag and push the tag.**
+   Lightweight tag (also works, no message):
    ```
    git tag v4.147.18
    git push origin v4.147.18
    ```
 
-5. **CI fires.** `.github/workflows/release.yml` matches `v4.*.*`, builds English
+   To push **all** local tags at once (rarely needed):
+   ```
+   git push origin --tags
+   ```
+
+4. **CI fires.** `.github/workflows/release.yml` matches `v4.*.*`, builds English
    only, UPX-compresses, runs `makensis`, and:
    - Uploads `tr4w_setup_4.147.18.exe` as a workflow artifact.
    - Creates a **draft** GitHub Release with auto-generated changelog + the
      installer attached.
 
-6. **Watch the run.** GitHub Actions tab, or:
+5. **Watch the run.** GitHub Actions tab, or:
    ```
    gh run watch
    ```
    English-only build is ~3-5 min.
 
-7. **Review and publish the draft release.**
+6. **Review and publish the draft release.**
    - Open the draft on GitHub.
    - Edit the auto-generated notes -- highlight headline changes, call out radio
      additions, breaking changes, contest additions.
    - Verify the installer is attached.
    - **Publish.** This emails watchers and makes the release public.
 
-If the build fails: CI tells you why. Common causes -- tag doesn't match
-`Version.pas` (you tagged before bumping, or vice versa), or a missing language
-constant (won't happen for English-only).
+### Fixing a mis-tag
+
+If you tagged the wrong commit (or tagged before bumping `Version.pas`):
+
+```
+git push --delete origin v4.147.18    # remove tag from remote
+git tag -d v4.147.18                  # remove tag locally
+# fix the underlying issue (bump Version.pas, push, etc.)
+git tag v4.147.18
+git push origin v4.147.18
+```
+
+This is safe as long as the draft release hasn't been published yet. Once
+published, prefer cutting a new version instead of force-retagging.
 
 ---
 
-## 6. Tagging for an all-languages release (major releases only)
+## 7. Tagging for an all-languages release (major releases only)
 
 Use this for major releases where you want shippable installers for every
 language. It's slower (~25 min) and the per-language installers are mostly
 appreciated by international contesters who don't want to muddle through English
 menus.
 
-Same as section 5 except:
+Same as [section 6](#6-tagging-for-an-english-only-release) except:
 
 - **Tag with `-all` suffix:** `v4.147.18-all` instead of `v4.147.18`.
 - CI detects the `-all` suffix and runs `FullBuild.ps1 -AllLanguages
@@ -286,7 +380,7 @@ changed.
 
 ---
 
-## 7. Ad-hoc full builds without a release
+## 8. Ad-hoc full builds without a release
 
 If you want to produce all-language installers for testing without creating a
 GitHub Release (e.g., to give Howie a build of the current master to validate
@@ -303,7 +397,7 @@ release. The artifact lives for 90 days; download it from the run's summary page
 
 ---
 
-## 8. Quick reference
+## 9. Quick reference
 
 | Goal                                  | Command / action                                                  |
 |---------------------------------------|-------------------------------------------------------------------|
@@ -317,7 +411,7 @@ release. The artifact lives for 90 days; download it from the run's summary page
 
 ---
 
-## 9. Related files
+## 10. Related files
 
 - `.github/workflows/release.yml` -- the CI workflow itself
 - `tr4w/FullBuild.ps1` -- the build script
