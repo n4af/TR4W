@@ -25,7 +25,7 @@ const
 
 
 
-TR4W_CURRENTVERSION_NUMBER            = '4.147.18';  // N4af     New Release
+TR4W_CURRENTVERSION_NUMBER            = '4.147.18';  // NY4I     CI test for all-languages workflow path
 
 
 

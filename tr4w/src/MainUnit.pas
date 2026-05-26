@@ -5536,7 +5536,7 @@ begin
     // asm nop end;
 
     inc(CurrentRecord);
-    {
+    {                                              c
     if CurrentRecord = 1976 then
     asm
     nop
