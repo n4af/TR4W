@@ -167,7 +167,32 @@ After `BuildAllInstallers.cmd` (everything above plus):
   `tr4w\target\.dcu-managed-by-fullbuild` and re-run. Script defensively clears
   stale DCUs on the next run.
 
-### 3c. How the per-language build works (one paragraph)
+### 3c. Why clone location doesn't matter
+
+You can clone TR4W to **any path** -- `C:\TR4W`, `D:\newsrc\TR4W`,
+`E:\projects\contesting\tr4w`, whatever -- and the build script Just Works with
+zero config. The mechanism:
+
+- `tr4w\FullBuild.ps1` derives `$ProjectRoot` from `$PSScriptRoot` (the directory
+  it lives in) by going one level up. Every other path in the script
+  (`$SRC_DIR`, `$EXE_DIR`, `$BUILD_DIR`, `$VERSION_PAS`, etc.) is built from
+  `$ProjectRoot` via `Join-Path`. So wherever the script lives, the script
+  finds its own repo.
+- The three `.cmd` wrappers (`Build.cmd`, `BuildAll.cmd`,
+  `BuildAllInstallers.cmd`) invoke `tr4w\FullBuild.ps1` with a **relative** path,
+  so they also work from any clone location -- just run them from the repo root.
+- Toolchain locations (`DELPHI7_BIN`, `INDY_ROOT`, `NSIS_BIN`) are about your dev
+  machine, not the repo. They don't move when you change clone location, so
+  defaults apply and you only override if your toolchain install is non-standard
+  ([section 1a](#1a-non-default-tool-locations)).
+- The CI runner uses the same script with an explicit
+  `-ProjectRoot $env:GITHUB_WORKSPACE` because GitHub's checkout path varies
+  per-runner -- documented in `.github/workflows/release.yml`.
+
+**No symlinks, no junctions, no `C:\TR4W` hardcoding anywhere.** If you find code
+or docs that assume a specific clone path, that's a bug -- file it.
+
+### 3d. How the per-language build works (one paragraph)
 
 `tr4w.exe` is the same Delphi 7 project compiled with a different `-DLANG_xxx`
 flag per language. Each language's compiled `.dcu` files live in
