@@ -520,7 +520,7 @@ if ($result -eq 0) {
 
 # ---------------------------------------------------------------------------
 # Optional: VirusTotal pre-flight scan of any installers produced.
-# Gated on -BuildInstallers AND $env:VIRUSTOTAL_API_KEY. Informational
+# Gated on -BuildInstallers AND $env:VIRUS_TOTAL_API_KEY. Informational
 # only -- never fails the build. CI runs its own VT-scan job with a
 # threshold gate; local is just for catching surprises before tagging.
 # ---------------------------------------------------------------------------
@@ -529,9 +529,9 @@ if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
     if ($installers.Count -gt 0) {
         Write-Host ""
         Write-Host "=== VirusTotal Scan ===" -ForegroundColor Cyan
-        if (-not $env:VIRUSTOTAL_API_KEY) {
-            Write-Host "VIRUSTOTAL_API_KEY env var not set -- skipping local scan." -ForegroundColor DarkGray
-            Write-Host "  To enable: `$env:VIRUSTOTAL_API_KEY = '<your-key>' (persist via System -> Env Vars)." -ForegroundColor DarkGray
+        if (-not $env:VIRUS_TOTAL_API_KEY) {
+            Write-Host "VIRUS_TOTAL_API_KEY env var not set -- skipping local scan." -ForegroundColor DarkGray
+            Write-Host "  To enable: `$env:VIRUS_TOTAL_API_KEY = '<your-key>' (persist via System -> Env Vars)." -ForegroundColor DarkGray
             Write-Host "  CI runs the authoritative scan on tag push regardless." -ForegroundColor DarkGray
         } else {
             Write-Host "Scanning $($installers.Count) installer(s) via VirusTotal API..." -ForegroundColor Yellow
@@ -539,7 +539,7 @@ if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
             foreach ($inst in $installers) {
                 Write-Host ""
                 Write-Host "  $($inst.Name) ($($inst.Length) bytes)" -ForegroundColor White
-                $vt = Invoke-VirusTotalScan -FilePath $inst.FullName -ApiKey $env:VIRUSTOTAL_API_KEY
+                $vt = Invoke-VirusTotalScan -FilePath $inst.FullName -ApiKey $env:VIRUS_TOTAL_API_KEY
                 if (-not $vt) {
                     Write-Host "    Scan unavailable -- continuing." -ForegroundColor Yellow
                     continue

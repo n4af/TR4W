@@ -61,7 +61,7 @@ differs from the defaults.
   the script falls back to `PATH` lookup. Set this if you have UPX installed
   somewhere odd (e.g., `C:\Tools\upx-4.2.4-win64\`) and don't want to modify
   `PATH`.
-- [ ] `VIRUSTOTAL_API_KEY` -- VirusTotal public API key. **Optional** -- if
+- [ ] `VIRUS_TOTAL_API_KEY` -- VirusTotal public API key. **Optional** -- if
   unset, the local build prints a "skipping scan" note and continues. When set,
   `BuildAllInstallers.cmd` (and CI) upload each installer to VT and print a
   CLEAN/WARN/BLOCKED summary. Local scans are informational only; CI is the
@@ -245,7 +245,7 @@ or docs that assume a specific clone path, that's a bug -- file it.
 ### 3d. Local VirusTotal scan (optional)
 
 When `BuildAllInstallers.cmd` (or any `-BuildInstallers` invocation) finishes
-successfully and the env var `VIRUSTOTAL_API_KEY` is set, `FullBuild.ps1`
+successfully and the env var `VIRUS_TOTAL_API_KEY` is set, `FullBuild.ps1`
 uploads each `tr4w_setup_*.exe` to VirusTotal, polls for analysis completion,
 and prints a one-line verdict per file:
 
@@ -271,13 +271,13 @@ When the env var is unset, the script prints a "skipping scan" note and
 continues. Set it once per machine:
 
 ```
-[Environment]::SetEnvironmentVariable('VIRUSTOTAL_API_KEY', '<your-key>', 'User')
+[Environment]::SetEnvironmentVariable('VIRUS_TOTAL_API_KEY', '<your-key>', 'User')
 ```
 
 (reopen the terminal afterward). Or per-session:
 
 ```
-$env:VIRUSTOTAL_API_KEY = '<your-key>'
+$env:VIRUS_TOTAL_API_KEY = '<your-key>'
 ```
 
 Each VT scan takes 30 sec to ~3 min depending on queue depth -- typically

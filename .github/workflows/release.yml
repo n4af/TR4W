@@ -25,7 +25,7 @@
 #   - UPX                  -- must be in PATH (upx.exe --lzma).
 #
 # Secrets required:
-#   - VIRUSTOTAL_API_KEY   -- VT public API key (free tier is fine for the
+#   - VIRUS_TOTAL_API_KEY  -- VT public API key (free tier is fine for the
 #                             release cadence; rate-limited but plenty for 1-8
 #                             scans per release).
 
@@ -257,13 +257,13 @@ jobs:
 
       - name: Scan installers with VirusTotal
         env:
-          VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+          VT_API_KEY: ${{ secrets.VIRUS_TOTAL_API_KEY }}
         shell: bash
         run: |
           set -euo pipefail
 
           if [ -z "${VT_API_KEY:-}" ]; then
-            echo "VIRUSTOTAL_API_KEY secret is empty -- cannot scan." >&2
+            echo "VIRUS_TOTAL_API_KEY secret is empty -- cannot scan." >&2
             exit 1
           fi
 
