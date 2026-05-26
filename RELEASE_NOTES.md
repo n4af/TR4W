@@ -24,6 +24,42 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.19 (2026-05-26) — NY4I / N4AF
+
+#### Continuous Integration & Release Packaging
+
+- **TR4W is now built automatically when a maintainer tags a release.** GitHub Actions compiles the program on a Windows runner, packages the NSIS installer, uploads it to a draft GitHub Release, and (when the tag carries the `-all` suffix) also builds the 7 non-English language installers. The English-only release path is the normal cadence; the all-languages path is for major releases. You'll find the installer on the project's Releases page once a release is published. (PRs #923, #927)
+- **Every CI-built installer is scanned by VirusTotal before release.** The scan report is attached to each draft GitHub Release so you can see exactly which engines (if any) flagged the installer and what they called it. Most flags on unsigned NSIS+UPX-compressed installers are heuristic false positives; the report makes that easy to verify.
+
+#### TS-890 LAN Operation
+
+- **Kenwood TS-890 over LAN is more reliable.** TR4W now sends a keepalive every 5 seconds, waits for the radio's initial time-sync response before sending its setup commands, and parses additional status messages (transmitter band, fine-tune step, RIT, XIT). Reduces intermittent disconnects and fixes cases where band/mode changes on the radio weren't reflected in TR4W. (PR #922)
+
+#### CW-by-CAT (Kenwood & Elecraft)
+
+- **CW-by-CAT now actually sends.** When `RADIO ONE CWByCAT = True` was set and you started typing a callsign, the CW was supposed to be sent via the radio's KY command. A latent uninitialized-variable bug meant the first character was sometimes lost and downstream characters never queued — appearing as "CW just doesn't send." Fixed. (PR #922)
+
+#### Bandmap
+
+- **Bandmap repaint no longer occasionally paints a stray cursor.** A repaint path had an uninitialized variable that produced different cursor behavior across runs; pinned to the no-cursor default unless an active selection actually exists. (PR #922)
+
+#### HamScore Real-Time Scoring — follow-up to 4.147.15
+
+- **RTC `SentExchange` is now `<serial> <grid>`, no RST.** The 4.147.15 work shipped a canonical `RxExchange` that already excluded RST, but `SentExchange` still echoed the operator's CQ-Exchange template — so anyone who customized that template to include `5NN`/`599` for on-air keying was inadvertently sending RST in the HamScore upload too. The HamScore organizers confirmed in May 2026 that RST is intentionally skipped in both fields for RTC; TR4W now builds the canonical SentExchange from your serial number + grid directly, independent of the on-air template. Your on-air keying behavior is unchanged. (PR #929)
+
+#### Language Files
+
+- **Russian, Ukrainian, and other non-English builds compile again** after the constants framework was reworked to derive the language from a compiler flag instead of a hand-edited string. (PR #924)
+- **Several leftover English strings in non-English UIs translated** to their respective languages.
+
+#### Building TR4W Locally
+
+- **New `Build.cmd`, `BuildAll.cmd`, and `BuildAllInstallers.cmd`** at the repo root let you build TR4W locally without touching Delphi 7 IDE settings. `Build.cmd` produces the English `tr4w.exe`; `BuildAll.cmd` adds per-language exes for spot-testing; `BuildAllInstallers.cmd` adds NSIS installers for every language. After the first build, subsequent runs are ~30 seconds.
+- **The build script works from any clone path.** Whether you put TR4W in `C:\TR4W`, `D:\newsrc\TR4W`, or somewhere else, the script auto-detects the location.
+- **New `docs/RELEASE_WORKFLOW.md`** walks through the full lifecycle: PR review → local build → smoke test → English release → all-languages release. Useful for contributors and self-builders.
+
+---
+
 ### 4.147.15 (2026-05-21) — NY4I
 
 #### HamScore Real-Time Scoring

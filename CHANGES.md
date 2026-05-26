@@ -22,6 +22,57 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.19 (2026-05-26) — NY4I / N4AF
+
+#### CI release-build workflow (`.github/workflows/release.yml`, `tr4w/FullBuild.ps1`, `tr4w/build/full.nsi`, `docs/RELEASE_WORKFLOW.md`) — PRs #923, #926, #927
+
+- **New `.github/workflows/release.yml`**: self-hosted Windows runner builds on tag push (`v4.*.*`) or manual `workflow_dispatch`. Three-job pipeline: `build` → `virustotal-scan` (Ubuntu) → `release` (Ubuntu, tag-push only). Validates the tag matches `Version.pas` (strips trailing `-all`), verifies Delphi 7 / Indy / NSIS / UPX present, runs `FullBuild.ps1`, uploads installer artifact, scans via VirusTotal API v3 with `VT_MALICIOUS_THRESHOLD = 8`, creates a draft GitHub Release with installer + `virustotal-report.md` attached.
+- **Tag suffix `-all`** (e.g. `v4.147.19-all`) and the `workflow_dispatch` `all_languages` checkbox switch to `FullBuild.ps1 -AllLanguages -BuildInstallers`, producing 8 installers (ENG + RUS/SER/MNG/CZE/ROM/GER/UKR).
+- **`FullBuild.ps1` parameterized**: `-ProjectRoot`, `-Delphi7Bin`, `-IndyRoot`, `-NSISBin`, `-UpxBin`, `-AllLanguages`, `-BuildInstallers`. `$ProjectRoot` auto-derives from `$PSScriptRoot` so any clone path works (default `C:\TR4W` or `D:\newsrc\TR4W` -- zero config). Each toolchain param defaults via the corresponding env var.
+- **Per-language DCU caching** (`tr4w\target\dcu-cache\<lang>\`): each `-DLANG_xxx` build writes `.dcu`s into a private cache via DCC32's `/N` flag so language iterations don't trample `src\*.dcu`. Canonical ENG DCUs live in `src\` (Delphi 7 IDE-compatible). First build of a given language uses `-B` so DCC32 doesn't read ENG DCUs from `src\`; subsequent iterations are ~5-10 sec incremental.
+- **Marker file `tr4w\target\.dcu-managed-by-fullbuild`** distinguishes first run (clears `src\*.dcu` to migrate from prior script versions) from steady state (incremental compile, ~30 sec).
+- **`Build.cmd`, `BuildAll.cmd`, `BuildAllInstallers.cmd`** thin wrappers added at repo root for the three common modes.
+- **`build/full.nsi` `TR4WVERSION` macro** drives the full version string; CI passes `/DTR4WVERSION=<version>`.
+- **`docs/RELEASE_WORKFLOW.md`** new end-to-end guide; supersedes `docs/LOCAL_BUILD.md` (removed).
+
+#### VirusTotal scanning (`.github/workflows/release.yml`, `tr4w/FullBuild.ps1`, `tr4w/build/release/.gitignore`)
+
+- **CI VirusTotal job**: scans each `tr4w_setup_*.exe` via VT API v3, uploads `virustotal-report.md` as a workflow artifact, blocks the release job if any installer hits `VT_MALICIOUS_THRESHOLD = 8` (raised from initial 4 to absorb the ~7 heuristic false positives the unsigned NSIS+UPX+`inpout32.dll` combination consistently trips). Secret name: `VIRUS_TOTAL_API_KEY`. `workflow_dispatch` input `skip_virustotal` available for emergencies.
+- **Local pre-flight scan in `FullBuild.ps1`**: when `$env:VIRUS_TOTAL_API_KEY` is set and `-BuildInstallers` produced installers, `Invoke-VirusTotalScan` uploads each via `curl.exe` (PS 5.1 `Invoke-RestMethod` lacks `-Form`), polls `/analyses/{id}` up to 10 minutes, prints CLEAN/WARN/BLOCKED verdict + permalink. Informational only -- never fails the local build.
+- **Three stale `tr4w_setup_4_32.*.exe` installers** from March 2025 removed from `tr4w/build/release/`; `tr4w_setup_*.exe` added to that directory's `.gitignore`.
+
+#### RTC HamScore canonical exchange follow-up (`src/uExchangeBuilder.pas`, `tr4w/test/hamscore_mock.py`) — PR #929
+
+- **`BuildSentExchangeText` RTC special case**: ignores the on-air `CQExchange` template and builds the canonical SentExchange directly from `RXData.NumberSent + MyGrid` (no RST). Per HamScore RTC organizer email 2026-05, the signal report is intentionally skipped in BOTH `SentExchange` and `RxExchange`. Operators whose `CQExchange` template included `5NN`/`599` for on-air keying previously leaked RST into the upload; this commit isolates the upload path from the template.
+- **`BuildRxExchangeText` RTC case** reaffirmed at `serial + ' ' + qth` (no RST), with a comment noting the canonical form is intentionally RST-less.
+- **`tr4w/test/hamscore_mock.py`**: pure-stdlib Python local stand-in for HamScore RTC server. Listens on `127.0.0.1:8765`, decodes Basic auth, pretty-prints XML (wraps TR4W's multi-element bodies in a synthetic root for `xml.dom.minidom`), URL-decodes N1MM-style form-encoded bodies, inline-highlights `SentExchange`/`RxExchange`/`Call`/etc., returns `{"Status":"CFM"}` (overridable via `--response CFM|OK|ResyncLog|Error`).
+
+#### TS-890 LAN protocol + radio bug fixes (`src/uRadioKenwood.pas`, `src/uBandmap.pas`, `src/trdos/LOGRADIO.PAS`) — PR #922
+
+- **TS-890 LAN keepalive** every 5 seconds, wait for `##TI;` before init commands, parsing of `TB`/`FT`/`RT`/`XT` status responses. Fixes intermittent disconnects and missing band/mode updates over LAN.
+- **`RadioObject.SendCW` uninitialized-locals fix**: `charProcessed` and `sendNow` were read before assignment; under Delphi 7 codegen this surfaced as silent failure to send CW via CAT on Kenwood and Elecraft radios (CW-by-CAT mode). Both initialized to `False` at function entry. Latent since CW-by-CAT was introduced.
+- **`uBandmap.pas` `CurrentCursorPos` uninitialized fix**: variable was conditionally assigned then unconditionally read in the bandmap repaint path; initialized to `-1` so the no-cursor branch is taken deterministically.
+
+#### `FullBuild.ps1` output zip step (`tr4w/FullBuild.ps1`) — PR #922
+
+- After a successful build, `tr4w.exe` is zipped to `tr4w/target/dist/tr4w-<version>-<branch>-<timestamp>.zip` for off-site tester distribution. Branch name from `git rev-parse --abbrev-ref HEAD` (slash-safe). Disambiguates "two `tr4w.exe` attachments in the inbox" scenarios during whack-a-mole testing.
+
+#### LANG constant derived from compiler flags (`src/VC.pas`, language constants files) — PR #924
+
+- **`{$IFDEF LANG_RUS}` ... `{$ENDIF}`** dispatch in `src/VC.pas` derives the `LANG` const from the `-DLANG_xxx` compiler flag passed by `FullBuild.ps1` (or the IDE). Previously `LANG` was a hand-edited string constant requiring a manual swap before each per-language build; the factored form lets the same source tree compile every language from CI by varying only the compiler flag.
+- **Per-language constants files**: missing translation strings restored where the Russian / Ukrainian files had commented-out or absent definitions (`TC_UPLOADEDSUCCESSFULLY`). Cyrillic strings preserved through byte-level edits to avoid CP1251 → UTF-8 round-trip corruption.
+- **English-fallback strings** in non-English `*_consts_*.pas` files translated to their respective languages.
+
+#### Submodule cleanup
+
+- **Orphan submodule pointers** to `rekor-cli` and `root-signing` removed from the working tree. Eliminates `git status` noise on fresh clones.
+
+#### Online-scoring spec gap analysis (issue tracker only)
+
+- **Issue #930 opened**: catalogues gaps between TR4W's HamScore `dynamicresults` XML and the spec at <https://blog.contestonlinescore.com/online-scoring-xml-specification/>. Missing: `<ops>`, `<club>`, full `<qth>` block, `<class>` `assisted`/`overlay` attributes, per-band `<point>` totals, separate `<soft>`/`<version>` elements. Plus a Phase 3 plan to support ContestOnlineScore.com as a sibling endpoint. No code changes in this version; tracking only. Kept separate from issue #920 (RTC 3.0 protocol, effective 2026-06-01) so #930's incremental fixes can ship before the next RTC contest.
+
+---
+
 ### 4.147.15 (2026-05-21) — NY4I
 
 #### HamScore RTC payload TRACE log + canonical sent/rx exchanges (`src/uHamScore.pas`, `src/uExchangeBuilder.pas`, `src/trdos/LOGSUBS2.PAS`, `src/MainUnit.pas`, `tr4w.dpr`) — Issue #921 / PR #921
