@@ -444,7 +444,8 @@ begin
   Index := Format(RequestBody,
 
    'xml=<?xml version="1.0"?><dynamicresults>' +
-    GSCR + '<soft>' + TR4W_CURRENTVERSION + '</soft>' +
+    GSCR + '<soft>TR4W</soft>' +
+    GSCR + '<version>' + TR4W_CURRENTVERSION_NUMBER + '</version>' +
     GSCR + '<contest>%s</contest>' +
     GSCR + '<call>%s</call>' +
     GSCR + '<class ops="%s" mode="%s" power="%s" bands="%s" transmitter="%s"></class>' +
@@ -568,12 +569,13 @@ begin
 
   Result := AnsiString(Format(
     '<dynamicresults>' +
-    '<soft>%s</soft>' +
+    '<soft>TR4W</soft>' +
+    '<version>%s</version>' +
     '<contest>%s</contest>' +
     '<call>%s</call>' +
     '<class ops="%s" mode="%s" power="%s" bands="%s" transmitter="%s"></class>' +
     '<breakdown>',
-    [TR4W_CURRENTVERSION,
+    [TR4W_CURRENTVERSION_NUMBER,
      sContest,
      string(MyCall),
      tCategoryOperatorSA[CategoryOperator],

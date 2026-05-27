@@ -123,10 +123,11 @@ type
 // ---------------------------------------------------------------------------
 
 var
-  HamScoreEnable:   Boolean = False;
-  HamScoreURL:      ShortString = 'https://hamscore.com/postxml/index.php';
-  HamScoreUsername: ShortString = '';   // empty -> falls back to MyCall
-  HamScorePassword: ShortString = '';
+  HamScoreEnable:          Boolean = False;
+  HamScoreURL:             ShortString = 'https://hamscore.com/postxml/index.php';
+  HamScoreUsername:        ShortString = '';   // empty -> falls back to MyCall
+  HamScorePassword:        ShortString = '';
+  HamScoreSendContactInfo: Boolean = True;     // Issue #931 -- per-QSO <contactinfo> uploads; gated additionally by ContestsBooleanArray RTC_CAPABLE_BIT
 
 // ---------------------------------------------------------------------------
 // Lifecycle (called from tr4w.dpr / shutdown path)
@@ -797,10 +798,25 @@ begin
   FreeAndNil(Uploader);
 end;
 
+// Issue #931 -- gate per-QSO contact-info uploads on:
+//   1. The CFG override (HAMSCORE SEND CONTACT INFO, default TRUE)
+//   2. The contest being marked RTC-capable in ContestsBooleanArray
+// <dynamicresults> score posts remain unaffected (handled elsewhere).
+function ContactInfoUploadAllowed(const RXData: ContestExchange): Boolean;
+   begin
+   if not HamScoreSendContactInfo then
+      begin
+      Result := False;
+      Exit;
+      end;
+   Result := (ContestsBooleanArray[RXData.ceContest] and (1 shl RTC_CAPABLE_BIT)) <> 0;
+   end;
+
 procedure HamScoreOnLog(const RXData: ContestExchange);
 var body: AnsiString;
 begin
   if Uploader = nil then Exit;
+  if not ContactInfoUploadAllowed(RXData) then Exit;
   body := RenderContactBody(rckInfo, RXData);
   if body = '' then Exit;
   Uploader.Enqueue(TRTCContact.Create(rckInfo, AnsiString(RXData.id), body));
@@ -810,6 +826,7 @@ procedure HamScoreOnEdit(const RXData: ContestExchange);
 var body: AnsiString;
 begin
   if Uploader = nil then Exit;
+  if not ContactInfoUploadAllowed(RXData) then Exit;
   body := RenderContactBody(rckReplace, RXData);
   if body = '' then Exit;
   Uploader.Enqueue(TRTCContact.Create(rckReplace, AnsiString(RXData.id), body));
@@ -819,6 +836,7 @@ procedure HamScoreOnDelete(const RXData: ContestExchange);
 var body: AnsiString;
 begin
   if Uploader = nil then Exit;
+  if not ContactInfoUploadAllowed(RXData) then Exit;
   body := RenderDeleteBody(AnsiString(RXData.id));
   Uploader.Enqueue(TRTCContact.Create(rckDelete, AnsiString(RXData.id), body));
 end;

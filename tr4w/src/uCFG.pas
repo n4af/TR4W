@@ -354,6 +354,7 @@ const
    + 1 {ColumnAutoSize}  // Issue 866
    + 1 {CTYUpdateCheckOnStartup}  // Issue 779
    + 4 {HAMSCORE ENABLE/URL/USERNAME/PASSWORD}  // Issue #783
+   + 1 {HAMSCORE SEND CONTACT INFO}  // Issue #931
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -503,6 +504,7 @@ const
  (crCommand: 'HAMSCORE URL';                  crAddress: @HamScoreURL;                    crMin:0;  crMax:200;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctString;        crNetwork: 0),  // Issue #783
  (crCommand: 'HAMSCORE USERNAME';             crAddress: @HamScoreUsername;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctCaseSensitive; crNetwork: 0),  // Issue #783 -- empty falls back to MY CALL
  (crCommand: 'HAMSCORE PASSWORD';             crAddress: @HamScorePassword;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctPassword;      crNetwork: 0),  // Issue #783
+ (crCommand: 'HAMSCORE SEND CONTACT INFO';    crAddress: @HamScoreSendContactInfo;        crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean;       crNetwork: 0),  // Issue #931 -- per-contest RTC contact-info gating override
  (crCommand: 'HAND LOG MODE';                 crAddress: @tHandLogMode;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:1 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HF BAND ENABLE';                crAddress: @HFBandEnable;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'HOUR DISPLAY';                  crAddress: pointer(8);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther; crNetwork: 1),
