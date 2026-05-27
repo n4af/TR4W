@@ -21,7 +21,9 @@
 #   - Delphi 7 (DCC32.EXE) -- default C:\Program Files (x86)\Borland\Delphi7\Bin\.
 #     Override per-runner by setting repo variable DELPHI7_BIN.
 #   - NSIS (makensis.exe)  -- default C:\Program Files (x86)\NSIS\. Override with NSIS_BIN.
-#   - Indy 10 lib          -- default C:\Indy\Indy\Lib\. Override with INDY_ROOT.
+#   - Indy 10 lib          -- bundled in tr4w\include (no install needed).
+#                             Override with $INDY_ROOT only if you want to point
+#                             at an external Indy tree.
 #   - UPX                  -- must be in PATH (upx.exe --lzma).
 #
 # Secrets required:
@@ -57,9 +59,11 @@ permissions:
 env:
   # Toolchain locations. Override via repo Settings -> Variables -> Actions
   # to point at non-default installs without editing this file.
+  # Indy is bundled in tr4w\include -- no external install needed; the
+  # FullBuild.ps1 script defaults to the bundled tree when $env:INDY_ROOT
+  # is unset.
   DELPHI7_BIN: ${{ vars.DELPHI7_BIN || 'C:\Program Files (x86)\Borland\Delphi7\Bin' }}
   NSIS_BIN:    ${{ vars.NSIS_BIN    || 'C:\Program Files (x86)\NSIS' }}
-  INDY_ROOT:   ${{ vars.INDY_ROOT   || 'C:\Indy\Indy\Lib' }}
   # VirusTotal: max malicious detections before blocking the release.
   # TR4W's NSIS + UPX --lzma + bundled inpout32.dll consistently trips
   # ~7 engines on an unsigned build:
@@ -136,10 +140,11 @@ jobs:
       - name: Verify required tools
         shell: powershell
         run: |
+          # Indy is bundled in tr4w\include; FullBuild.ps1 defaults to it.
+          # Only Delphi + NSIS + UPX need external presence checks here.
           $tools = [ordered]@{
             'DCC32 (Delphi 7)' = Join-Path $env:DELPHI7_BIN 'DCC32.EXE'
             'NSIS makensis'    = Join-Path $env:NSIS_BIN    'makensis.exe'
-            'Indy Core lib'    = Join-Path $env:INDY_ROOT   'Core'
           }
           $missing = @()
           foreach ($k in $tools.Keys) {
@@ -165,8 +170,7 @@ jobs:
         run: |
           .\FullBuild.ps1 `
             -ProjectRoot $env:GITHUB_WORKSPACE `
-            -Delphi7Bin  $env:DELPHI7_BIN `
-            -IndyRoot    $env:INDY_ROOT
+            -Delphi7Bin  $env:DELPHI7_BIN
           if ($LASTEXITCODE -ne 0) { throw "FullBuild.ps1 failed with exit code $LASTEXITCODE" }
 
       - name: UPX compress tr4w.exe (English only)
@@ -204,7 +208,6 @@ jobs:
             -BuildInstallers `
             -ProjectRoot $env:GITHUB_WORKSPACE `
             -Delphi7Bin  $env:DELPHI7_BIN `
-            -IndyRoot    $env:INDY_ROOT `
             -NSISBin     $env:NSIS_BIN
           if ($LASTEXITCODE -ne 0) { throw "FullBuild.ps1 -AllLanguages failed with exit code $LASTEXITCODE" }
 

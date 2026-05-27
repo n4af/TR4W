@@ -28,8 +28,10 @@ Install once. Defaults match the assumed locations; if yours differ, see
 [section 1a](#1a-non-default-tool-locations).
 
 - [ ] **Delphi 7** -- `C:\Program Files (x86)\Borland\Delphi7\Bin\DCC32.EXE`
-- [ ] **Indy 10 library** -- `C:\Indy\Indy\Lib\` (with `Core\`, `System\`,
-  `Protocols\` subdirs)
+- [ ] **Indy 10 library** -- **already bundled in `tr4w\include`** (Indy 10.6.3.3).
+  No external install required. If you happen to have your own Indy install
+  (e.g. `C:\Indy\Indy\Lib\`) and prefer to use it, see
+  [section 1a](#1a-non-default-tool-locations).
 - [ ] **PowerShell** -- built into Windows; nothing to install
 - [ ] **Git** -- used by the build script to read the current branch name for zip
   filenames
@@ -53,8 +55,10 @@ differs from the defaults.
 
 - [ ] `DELPHI7_BIN` -- directory containing `DCC32.EXE`
   (default `C:\Program Files (x86)\Borland\Delphi7\Bin`)
-- [ ] `INDY_ROOT` -- Indy `Lib` directory containing `Core`/`System`/`Protocols`
-  (default `C:\Indy\Indy\Lib`)
+- [ ] `INDY_ROOT` -- Indy `Lib` directory containing `Core`/`System`/`Protocols`.
+  **Optional** -- if unset, the script uses the bundled Indy at
+  `tr4w\include`. Set this if you want to point at your own external Indy
+  install (e.g. `C:\Indy\Indy\Lib`).
 - [ ] `NSIS_BIN` -- NSIS directory containing `makensis.exe`
   (default `C:\Program Files (x86)\NSIS`)
 - [ ] `UPX_BIN` -- directory containing `upx.exe`. **Optional** -- if unset,
@@ -198,7 +202,9 @@ After `BuildAllInstallers.cmd` (everything above plus):
 
 - **`DCC32.EXE not found at: <path>`** -- Delphi 7 not at default location. See
   [section 1a](#1a-non-default-tool-locations).
-- **`Indy lib root not found`** -- same for Indy.
+- **`Indy lib root not found`** -- only happens if you've set `INDY_ROOT` or
+  passed `-IndyRoot` to a non-existent path. With both unset the script falls
+  back to the bundled `tr4w\include`, which is always present in the repo.
 - **`makensis.exe not found`** -- NSIS not installed. Only matters for
   `-BuildInstallers`.
 - **`upx.exe not found`** -- only matters for `-BuildInstallers`. The script

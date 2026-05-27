@@ -23,8 +23,14 @@ param(
     [string]$Delphi7Bin = $(if ($env:DELPHI7_BIN) { $env:DELPHI7_BIN } else { "C:\Program Files (x86)\Borland\Delphi7\Bin" }),
 
     # Indy 10 Lib root (the directory containing Core / System / Protocols
-    # subdirs). Set $env:INDY_ROOT to override, or pass -IndyRoot.
-    [string]$IndyRoot = $(if ($env:INDY_ROOT) { $env:INDY_ROOT } else { "C:\Indy\Indy\Lib" }),
+    # subdirs). Resolution order:
+    #   1. -IndyRoot <path> command-line arg (highest precedence)
+    #   2. $env:INDY_ROOT environment variable
+    #   3. Bundled Indy at tr4w\include (default -- no external install needed)
+    # The bundled tree is Indy 10.6.3.3, byte-identical to upstream's 10.6.3.3
+    # tag for the units TR4W actually compiles against. See
+    # [[todo_indy_refresh_with_delphi12]] for the planned upgrade path.
+    [string]$IndyRoot = $(if ($env:INDY_ROOT) { $env:INDY_ROOT } else { Join-Path $PSScriptRoot "include" }),
 
     # NSIS install dir (contains makensis.exe). Only consulted when
     # -BuildInstallers is set. Override with $env:NSIS_BIN or -NSISBin.
