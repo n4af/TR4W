@@ -64,6 +64,12 @@ tr4w/target/*
 !tr4w/target/commands*.ini
 tr4w/tr4w.cfg
 tr4w/tr4w.dof
+# Generated each build by FullBuild.ps1 Write-VersionInfoResource: a
+# language- and version-specific VERSIONINFO PE resource picked up by
+# tr4w.dpr via {$IFDEF VERSIONINFO_RES}{$R tr4w_versioninfo.res}{$ENDIF}.
+# Files never need to be tracked -- always regenerated.
+tr4w/tr4w_versioninfo.rc
+tr4w/tr4w_versioninfo.res
 tr4w/COMPILER.LOG
 tr4w/tr4w.log
 *.RST

@@ -1,5 +1,18 @@
 program tr4w;
 {$IMPORTEDDATA OFF}
+
+// VERSIONINFO PE resource (Windows Properties dialog: File version /
+// Product name / Language / Copyright fields).  Generated per-build
+// by FullBuild.ps1 / Write-VersionInfoResource with the language and
+// version values from Version.pas substituted in.  Guarded so the
+// Delphi 7 IDE -- which doesn't run FullBuild.ps1 -- compiles cleanly
+// without the file present (just produces an EXE with blank version
+// fields, same as the historical behaviour).  Command-line builds
+// pass -DVERSIONINFO_RES to enable.
+{$IFDEF VERSIONINFO_RES}
+{$R tr4w_versioninfo.res}
+{$ENDIF}
+
 //https://groups.google.com/group/tr4w/feeds?hl=ru
 uses
   Messages,
