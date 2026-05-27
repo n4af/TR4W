@@ -159,45 +159,24 @@ jobs:
           Write-Host "All required tools present."
 
       # ---------------------------------------------------------------
-      # English-only path: FullBuild.ps1 (no flags) + manual UPX + NSIS.
-      # Matches the long-established release flow; kept as-is for the
-      # common case so the proven path isn't disturbed.
+      # Both english_only and all_languages go through FullBuild.ps1's
+      # Invoke-Packaging chain (which does the dep check + UPX --lzma +
+      # makensis internally). Single packaging code path = single source
+      # of truth for the build, and the new Test-InstallerDependencies
+      # pre-flight fires on every release.
       # ---------------------------------------------------------------
-      - name: Run FullBuild.ps1 (English only)
+      - name: Run FullBuild.ps1 (English only + installer)
         if: steps.mode.outputs.mode == 'english_only'
         shell: powershell
         working-directory: ${{ github.workspace }}\tr4w
         run: |
           .\FullBuild.ps1 `
+            -BuildInstallers `
             -ProjectRoot $env:GITHUB_WORKSPACE `
-            -Delphi7Bin  $env:DELPHI7_BIN
+            -Delphi7Bin  $env:DELPHI7_BIN `
+            -NSISBin     $env:NSIS_BIN
           if ($LASTEXITCODE -ne 0) { throw "FullBuild.ps1 failed with exit code $LASTEXITCODE" }
 
-      - name: UPX compress tr4w.exe (English only)
-        if: steps.mode.outputs.mode == 'english_only'
-        shell: powershell
-        working-directory: ${{ github.workspace }}\tr4w\build
-        run: |
-          upx.exe ..\target\tr4w.exe --lzma
-          if ($LASTEXITCODE -ne 0) { throw "UPX compression failed with exit code $LASTEXITCODE" }
-          $info = Get-Item ..\target\tr4w.exe
-          Write-Host "Compressed: $($info.Length) bytes"
-
-      - name: Build NSIS installer (English only)
-        if: steps.mode.outputs.mode == 'english_only'
-        shell: powershell
-        working-directory: ${{ github.workspace }}\tr4w\build
-        env:
-          TR4W_VERSION: ${{ steps.ver.outputs.version }}
-        run: |
-          & (Join-Path $env:NSIS_BIN 'makensis.exe') /DTR4WVERSION=$env:TR4W_VERSION full.nsi
-          if ($LASTEXITCODE -ne 0) { throw "makensis failed with exit code $LASTEXITCODE" }
-
-      # ---------------------------------------------------------------
-      # All-languages path: FullBuild.ps1 -AllLanguages -BuildInstallers
-      # which handles UPX + NSIS internally for each language. Skips the
-      # manual UPX/NSIS steps above.
-      # ---------------------------------------------------------------
       - name: Run FullBuild.ps1 (all languages + installers)
         if: steps.mode.outputs.mode == 'all_languages'
         shell: powershell
