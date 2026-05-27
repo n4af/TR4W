@@ -611,13 +611,23 @@ if ($result -eq 0) {
 if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
     $installers = @(Get-ChildItem -Path $RELEASE_DIR -Filter 'tr4w_setup_*.exe' -File -ErrorAction SilentlyContinue)
     if ($installers.Count -gt 0) {
-        Write-Host ""
-        Write-Host "=== VirusTotal Scan ===" -ForegroundColor Cyan
-        if (-not $env:VIRUS_TOTAL_API_KEY) {
+        # In CI the secret is deliberately scoped to the dedicated VT scan
+        # job, not the build job -- the local pre-flight has nothing to do
+        # there. Print one terse line so the log still confirms we
+        # considered scanning, but skip the operator-targeted guidance.
+        $inCI = ($env:GITHUB_ACTIONS -eq 'true')
+        if ($inCI -and -not $env:VIRUS_TOTAL_API_KEY) {
+            Write-Host ""
+            Write-Host "Local VT scan skipped (CI runs authoritative scan in virustotal-scan job)." -ForegroundColor DarkGray
+        } elseif (-not $env:VIRUS_TOTAL_API_KEY) {
+            Write-Host ""
+            Write-Host "=== VirusTotal Scan ===" -ForegroundColor Cyan
             Write-Host "VIRUS_TOTAL_API_KEY env var not set -- skipping local scan." -ForegroundColor DarkGray
             Write-Host "  To enable: `$env:VIRUS_TOTAL_API_KEY = '<your-key>' (persist via System -> Env Vars)." -ForegroundColor DarkGray
             Write-Host "  CI runs the authoritative scan on tag push regardless." -ForegroundColor DarkGray
         } else {
+            Write-Host ""
+            Write-Host "=== VirusTotal Scan ===" -ForegroundColor Cyan
             Write-Host "Scanning $($installers.Count) installer(s) via VirusTotal API..." -ForegroundColor Yellow
             Write-Host "  (each scan: upload + up to 10 min poll; informational only -- CI is the gate)" -ForegroundColor DarkGray
             foreach ($inst in $installers) {
