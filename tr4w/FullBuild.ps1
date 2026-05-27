@@ -124,6 +124,70 @@ function Clear-SrcDcus {
         | Remove-Item -Force -ErrorAction SilentlyContinue
 }
 
+# Pre-flight check: every "File <path>" directive in full.nsi resolves
+# to an existing file on disk. Called before UPX + makensis so we never
+# spend time compressing / packaging when we already know a required
+# DLL or data file is missing.
+#
+# Skips lines with NSIS macros (${TR4WLANG} etc.) -- those are rare and
+# substituting them here duplicates makensis logic; if a macro path is
+# wrong it will surface as a makensis error a few seconds later.
+#
+# Lines using "File /flag <path>" (e.g. /nonfatal, /r) are skipped --
+# /nonfatal means missing is intentionally tolerated, /r is recursive
+# wildcard. Both forms are uncommon in TR4W's full.nsi and the operator
+# wrote them knowing the looser semantics.
+#
+# Returns $true on success, $false with a printed list on any miss.
+function Test-InstallerDependencies {
+    param([Parameter(Mandatory=$true)][string]$NsiPath)
+
+    if (-not (Test-Path $NsiPath)) {
+        Write-Host "  NSI script not found: $NsiPath" -ForegroundColor Red
+        return $false
+    }
+
+    $nsiDir = Split-Path $NsiPath -Parent
+    $missing = New-Object System.Collections.ArrayList
+    $checked = 0
+    $skippedMacro = 0
+    $skippedFlag  = 0
+
+    foreach ($line in Get-Content $NsiPath) {
+        # Plain "File <path>" with no flags. Trailing ;comments stripped.
+        $m = [regex]::Match($line, '^\s*File\s+(.+?)\s*(?:;.*)?$')
+        if (-not $m.Success) { continue }
+        $arg = $m.Groups[1].Value.Trim()
+        if ($arg.StartsWith('/')) { $skippedFlag++; continue }
+
+        $path = $arg.Trim('"')
+        if ($path -match '\$\{') { $skippedMacro++; continue }
+
+        if (-not [System.IO.Path]::IsPathRooted($path)) {
+            $path = Join-Path $nsiDir $path
+        }
+        $checked++
+
+        if (-not (Test-Path -LiteralPath $path)) {
+            [void]$missing.Add($path)
+        }
+    }
+
+    Write-Host "  Verified $checked installer source file(s); skipped $skippedMacro macro / $skippedFlag flag-form line(s)." -ForegroundColor DarkGray
+    if ($missing.Count -gt 0) {
+        Write-Host ""
+        Write-Host "  $($missing.Count) MISSING installer source file(s):" -ForegroundColor Red
+        foreach ($f in $missing) { Write-Host "    $f" -ForegroundColor Red }
+        Write-Host ""
+        Write-Host "  Likely cause: target\ is not fully populated. Run Build.cmd first to" -ForegroundColor Red
+        Write-Host "  produce tr4w.exe, and ensure runtime files (HamLib DLLs, OpenSSL DLLs," -ForegroundColor Red
+        Write-Host "  cty.dat, TRMASTER.DTA, dom\*.dom etc.) are present in tr4w\target\." -ForegroundColor Red
+        return $false
+    }
+
+    return $true
+}
+
 # Upload one file to VirusTotal and poll for the analysis result.
 # Uses curl.exe for the multipart upload because Windows PowerShell 5.1's
 # Invoke-RestMethod lacks the -Form switch (PS 7+ only). curl.exe ships
@@ -209,6 +273,20 @@ function Invoke-Packaging {
     if (-not (Test-Path $exe)) {
         Write-Host "  $exe not present -- skipping packaging" -ForegroundColor Red
         return $false
+    }
+
+    # Pre-flight: every runtime file the NSIS script bundles must exist
+    # on disk BEFORE we spend time UPX-compressing tr4w.exe (which is
+    # destructive) and invoking makensis. Latent defect protector: a
+    # missing HamLib / OpenSSL DLL gets a clear up-front error instead
+    # of producing an installer that's quietly missing those files.
+    # Hard-fails the whole script -- if a runtime DLL is missing for
+    # ENG, it'll be missing for every other language too.
+    Write-Host "  Verifying installer source files..." -ForegroundColor DarkGray
+    if (-not (Test-InstallerDependencies -NsiPath $NSI_FILE)) {
+        Write-Host ""
+        Write-Host "=== INSTALLER DEPENDENCY CHECK FAILED -- aborting build ===" -ForegroundColor Red
+        exit 3
     }
 
     New-Item -ItemType Directory -Force -Path $RELEASE_DIR | Out-Null
