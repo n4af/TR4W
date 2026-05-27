@@ -562,56 +562,12 @@ if ($result -eq 0) {
         Write-Host ""
 
         # ---------------------------------------------------------------
-        # Step 3: Zip the exe for distribution.
-        # The version + branch + timestamp filename means whack-a-mole test
-        # cycles with off-site testers never end up with two ambiguous
-        # "tr4w.exe" attachments sitting in the inbox.
-        # ---------------------------------------------------------------
-        New-Item -ItemType Directory -Force -Path $DIST_DIR | Out-Null
-
-        # Extract version from Version.pas (e.g. 4.147.15)
-        $versionLine = Select-String -Path $VERSION_PAS `
-                                     -Pattern "TR4W_CURRENTVERSION_NUMBER\s*=\s*'([^']+)'" `
-                                     | Select-Object -First 1
-        if ($versionLine -and $versionLine.Matches[0].Groups[1].Value) {
-            $version = $versionLine.Matches[0].Groups[1].Value
-        } else {
-            $version = "unknown"
-        }
-
-        # Current git branch (slash-safe for filenames)
-        $branchRaw = (git -C $ProjectRoot rev-parse --abbrev-ref HEAD 2>$null)
-        if ($LASTEXITCODE -ne 0 -or -not $branchRaw) {
-            $branch = "nobranch"
-        } else {
-            $branch = $branchRaw.Trim() -replace '[/\\:*?"<>|]', '-'
-        }
-
-        $stamp   = Get-Date -Format "yyyyMMdd-HHmmss"
-        $zipName = "tr4w-$version-$branch-$stamp.zip"
-        $zipPath = Join-Path $DIST_DIR $zipName
-
-        Write-Host "=== Packaging EXE ===" -ForegroundColor Cyan
-        Write-Host "Archive: $zipPath" -ForegroundColor Yellow
-
-        Compress-Archive -Path "$EXE_DIR\tr4w.exe" -DestinationPath $zipPath -Force
-        if (Test-Path $zipPath) {
-            $zipInfo = Get-Item $zipPath
-            Write-Host "  Size: $($zipInfo.Length) bytes" -ForegroundColor White
-            Write-Host ""
-        } else {
-            Write-Host "  ZIP STEP FAILED -- archive not created" -ForegroundColor Red
-            Write-Host ""
-        }
-
-        # ---------------------------------------------------------------
-        # Step 3b (optional): build the ENG installer (no language suffix).
-        # Zip above captured the un-UPXed ENG exe for dev distribution;
-        # now UPX+NSIS produces the shippable installer. UPX is destructive
-        # so the order matters: zip first, then UPX, then NSIS.
+        # Step 3 (optional): build the ENG installer (no language suffix).
+        # UPX is destructive (overwrites tr4w.exe with the compressed copy)
+        # so this is the last step that consumes target\tr4w.exe.
         # ---------------------------------------------------------------
         if ($BuildInstallers) {
-            Invoke-Packaging -Version $version -LangCode "" | Out-Null
+            Invoke-Packaging -Version $TR4W_VERSION -LangCode "" | Out-Null
         }
 
         # ---------------------------------------------------------------
@@ -695,7 +651,7 @@ if ($result -eq 0) {
                         # NSIS reads ..\target\tr4w.exe -- packaging consumes
                         # target\tr4w.exe in place (UPX is destructive, then
                         # makensis bundles the compressed exe).
-                        $pkgOk = Invoke-Packaging -Version $version -LangCode $lang.ToLower()
+                        $pkgOk = Invoke-Packaging -Version $TR4W_VERSION -LangCode $lang.ToLower()
                         $status = if ($pkgOk) { "OK" } else { "PKG_FAIL" }
                         $langResults += [PSCustomObject]@{ Lang=$lang; Status=$status; Size=$info.Length; Hash=$h }
                     } else {
