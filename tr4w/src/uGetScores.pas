@@ -42,6 +42,8 @@ uses
   SysUtils,
   IdHTTP,
   IdSSLOpenSSL,
+  uCTYDAT,              // Issue #930 -- ctyGetCountryID / ctyGetCQZone / ctyGetITUZone (native Pascal, no cty.dll)
+  LogGrid,              // Issue #930 -- MyGrid
   Tree
   ;
 function GetScoresDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
@@ -412,126 +414,21 @@ begin
 end;
 }
 
+// Issue #930 -- refactored to call BuildDynamicResultsXml as the single source
+// of truth for the <dynamicresults> payload.  Previously this function
+// duplicated the entire XML build, with a maintenance comment warning that
+// the two had to stay aligned.  Now MakePOSTRequestNew is a thin wrapper that
+// prepends the form-encoding key and the XML prolog and writes the result
+// into GetScoresBuffer for the legacy 5-minute scoreboard poster.
 function MakePOSTRequestNew: integer;
 var
-  TempBand                              : BandType;
-  TempMode                              : ModeType;
-  m                                     : RemainingMultiplierType;
-  BandPchar                             : PChar;
-  RequestBody                           : array[0..10000] of Char;
-  Index                                 : integer;
-//  h                                     : HWND;
-  nTotal                                : integer;
-  nQSOs                                 : integer;
-  sContestName                          : string;
-const
-  GetScoresMults                        : array[RemainingMultiplierType] of PChar = (nil, 'state', 'country', 'zone', 'prefix');
-  GetScoresModesArray                   : array[ModeType] of PChar = ('CW', 'DIG', 'PH', 'ALL', nil, nil);
-
-begin
-  nTotal := 0;
-  nQSOs := 0;
-
-  if length(ContestsArray[Contest].ADIFName) = 0 then
-     begin
-     sContestName := ContestTypeSA[Contest]
-     end
-  else
-     begin
-     sContestName := ContestsArray[Contest].ADIFName;
-     end;
-
-  Index := Format(RequestBody,
-
-   'xml=<?xml version="1.0"?><dynamicresults>' +
-    GSCR + '<soft>TR4W</soft>' +
-    GSCR + '<version>' + TR4W_CURRENTVERSION_NUMBER + '</version>' +
-    GSCR + '<contest>%s</contest>' +
-    GSCR + '<call>%s</call>' +
-    GSCR + '<class ops="%s" mode="%s" power="%s" bands="%s" transmitter="%s"></class>' +
-    GSCR + '<breakdown>',
-    PChar(sContestName),
-    @MyCall[1],
-    tCategoryOperatorSA[CategoryOperator],
-    tCategoryModeSA[CategoryMode],
-    tCategoryPowerSA[CategoryPower],
-    tCategoryBandSA[CategoryBand],
-    tCategoryTransmitterSA[CategoryTransmitter]
-    );
-
-    { QSOTotals is set to the high number even after contacts are deleted. That is not the right score so add up the totals each time  // ny4i
-
-
-    **** NOTE ****
-    You cannot use QSOTotals[TempBand, TempMode] for an accurate score for the total QSOs. QSOTotals[TempBand, TempMode] is not decremented for ALL as that is the log's total QSO count including deleted contacts.
-    QSOTotals[TempBand, TempMode] is accurate for the individual bands so just sum those values to calculate the total     ny4i
-  }
-    
-  for TempBand := Band160 to AllBands do
-    for TempMode := CW to {Both} Phone do  // ModeType goes CW, Digital, Phone
-    begin
-      if QSOTotals[TempBand, TempMode] = 0 then Continue;
-
-      BandPchar := BandStringsArrayWithOutSpaces[TempBand];
-      if TempBand = AllBands then
-         begin
-         BandPchar := 'total';
-         nQSOs := nTotal;
-         end
-      else
-         begin
-         nQSOs := QSOTotals[TempBand, TempMode];
-         nTotal := nTotal + nQSOs;
-         end;
-
-     // nTotal := nTotal + QSOTotals[TempBand, TempMode];
-      Index := Index + Format(@RequestBody[Index],
-        GSCR + '<qso band="%s" mode="%s">%u</qso>',
-        BandPchar,
-        GetScoresModesArray[TempMode],
-        nQSOs {QSOTotals[TempBand, TempMode]});
-    end;
-    Index := Index + Format(@RequestBody[Index],
-        GSCR + '<qso band="total" mode="ALL">%u</qso>',
-        nQSOs {QSOTotals[TempBand, TempMode]});
-
-  for TempBand := Band160 to AllBands do
-    for TempMode := CW to Both do
-      for m := Succ(Low(RemainingMultiplierType)) to High(RemainingMultiplierType) do
-      begin
-        if mo.MTotals[TempBand, TempMode, m] = 0 then Continue;
-
-        BandPchar := BandStringsArrayWithOutSpaces[TempBand];
-        if TempBand = AllBands then
-          BandPchar := 'total';
-
-        Index := Index + Format(@RequestBody[Index],
-          GSCR + '<mult band="%s" mode="%s" type="%s">%u</mult>',
-          BandPchar,
-          GetScoresModesArray[TempMode],
-          GetScoresMults[m],
-          mo.MTotals[TempBand, TempMode, m]
-          );
-      end;
-
-  tGetSystemTime;
-  Index := Index + Format(@RequestBody[Index],
-
-    '</breakdown>' +
-    GSCR + '<score>%u</score>' +
-    GSCR + '<timestamp>%s</timestamp>' + GSCR + '</dynamicresults>', TotalScore, SystemTimeToString(UTC));
-
-  // Copy the URL-encoded XML body into GetScoresBuffer for use by the caller.
-  // HTTP framing is now handled by TIdHTTP in CreateConnectionAndSendReportToGetScores.
-  lstrcpy(GetScoresBuffer, RequestBody);
-  logger.Debug('[MakePOSTRequestNew] %s', [GetScoresBuffer]);
-  Result := Windows.lstrlen(GetScoresBuffer);
-{
-  if not Tree.tOpenFileForWrite(h, 'GetScoresAnswerFileName') then Exit;
-  sWriteFile(h, GetScoresBuffer, Result);
-  CloseHandle(h);
-}
-end;
+   sBody: AnsiString;
+   begin
+   sBody := AnsiString('xml=<?xml version="1.0"?>') + BuildDynamicResultsXml;
+   lstrcpy(GetScoresBuffer, PChar(string(sBody)));
+   logger.Debug('[MakePOSTRequestNew] %s', [GetScoresBuffer]);
+   Result := Windows.lstrlen(GetScoresBuffer);
+   end;
 
 // ---------------------------------------------------------------------------
 // Issue #783 -- standalone <dynamicresults> builder for the HamScore RTC
@@ -545,19 +442,65 @@ end;
 // the same dynamicresults shape.
 // ---------------------------------------------------------------------------
 
+// Issue #930 -- read a Cabrillo-summary field from tr4w.ini [REPORT].
+// Used for <club> (key=_CLUB) and <overlay> (key=_CATEGORY-OVERLAY) which the
+// user enters in the Cabrillo summary dialog (uCbrSum) rather than in a CFG.
+function ReadCabrilloSummaryField(const Key: PChar): string;
+var
+   buf: array[0..255] of Char;
+   n:   Cardinal;
+   begin
+   n := GetPrivateProfileString(CABRILLOSECTION, Key, nil, buf, SizeOf(buf), TR4W_INI_FILENAME);
+   if n = 0 then
+      Result := ''
+   else
+      Result := Trim(string(buf));
+   end;
+
+// Issue #930 -- escape XML special chars so user-entered strings (club name,
+// city, etc.) can't break the dynamicresults parser at the receiver.
+function XmlEscape(const s: string): string;
+var
+   i: Integer;
+   c: Char;
+   begin
+   Result := '';
+   for i := 1 to Length(s) do
+      begin
+      c := s[i];
+      case c of
+         '&': Result := Result + '&amp;';
+         '<': Result := Result + '&lt;';
+         '>': Result := Result + '&gt;';
+         '"': Result := Result + '&quot;';
+         '''': Result := Result + '&apos;';
+         else
+            Result := Result + c;
+         end;
+      end;
+   end;
+
 function BuildDynamicResultsXml: AnsiString;
 var
-  TempBand:    BandType;
-  TempMode:    ModeType;
-  m:           RemainingMultiplierType;
-  BandStr:     string;
-  nTotal:      Integer;
-  nQSOs:       Integer;
-  sContest:    string;
-  ts:          string;
+  TempBand:     BandType;
+  TempMode:     ModeType;
+  m:            RemainingMultiplierType;
+  BandStr:      string;
+  nTotal:       Integer;
+  nQSOs:        Integer;
+  sContest:     string;
+  ts:           string;
+  sClub:        string;
+  sOverlay:     string;
+  sDXCC:        DXMultiplierString;
+  sSection:     string;
+  sState:       string;
+  sGrid4:       string;
+  sZone:        string;
+  qth:          string;
 const
-  RTCMultStr:  array[RemainingMultiplierType] of string = ('', 'state', 'country', 'zone', 'prefix');
-  RTCModeStr:  array[ModeType] of string = ('CW', 'DIG', 'PH', 'ALL', '', '');
+  RTCMultStr:   array[RemainingMultiplierType] of string = ('', 'state', 'country', 'zone', 'prefix');
+  RTCModeStr:   array[ModeType] of string = ('CW', 'DIGI', 'PH', 'ALL', '', '');
 begin
   nTotal := 0;
   nQSOs  := 0;
@@ -567,23 +510,101 @@ begin
   else
     sContest := ContestsArray[Contest].ADIFName;
 
+  // <ops> = MyCall (single-op) -- issue #930.  Multi-op operator-list comes
+  // from the Cabrillo summary _OPERATORS in production use; defer until users
+  // request it (the spec accepts a single call here for single-op).
+  // <club> + <overlay> come from the Cabrillo summary stored in tr4w.ini
+  // [REPORT] -- single source of truth with the Cabrillo header.
+  sClub    := ReadCabrilloSummaryField('_CLUB');
+  sOverlay := ReadCabrilloSummaryField('_CATEGORY-OVERLAY');
+  if sOverlay = '' then
+    sOverlay := 'N/A';
+
   Result := AnsiString(Format(
     '<dynamicresults>' +
     '<soft>TR4W</soft>' +
     '<version>%s</version>' +
     '<contest>%s</contest>' +
     '<call>%s</call>' +
-    '<class ops="%s" mode="%s" power="%s" bands="%s" transmitter="%s"></class>' +
-    '<breakdown>',
+    '<ops>%s</ops>',
     [TR4W_CURRENTVERSION_NUMBER,
-     sContest,
-     string(MyCall),
-     tCategoryOperatorSA[CategoryOperator],
+     XmlEscape(sContest),
+     XmlEscape(string(MyCall)),
+     XmlEscape(string(MyCall))]));
+
+  if sClub <> '' then
+    Result := Result + AnsiString('<club>' + XmlEscape(sClub) + '</club>');
+
+  Result := Result + AnsiString(Format(
+    '<class ops="%s" mode="%s" power="%s" bands="%s" transmitter="%s" assisted="%s" overlay="%s"></class>',
+    [tCategoryOperatorSA[CategoryOperator],
      tCategoryModeSA[CategoryMode],
      tCategoryPowerSA[CategoryPower],
      tCategoryBandSA[CategoryBand],
-     tCategoryTransmitterSA[CategoryTransmitter]]));
+     tCategoryTransmitterSA[CategoryTransmitter],
+     tCategoryAssistedSA[CategoryAssisted],
+     XmlEscape(sOverlay)]));
 
+  // <qth> block -- emit only sub-elements whose source is set.
+  //
+  // Sourcing notes:
+  //   <dxcccountry>: CTY.DAT lookup on MyCall (definitive).
+  //   <cqzone>:      CTY.DAT lookup on MyCall.  Do NOT use MyZone -- its
+  //                  meaning flips per contest (CQ-zone-mode vs ITU-zone-mode
+  //                  per ContestsBooleanArray bit 6), so it cannot be trusted
+  //                  as a CQ-zone source.
+  //   <iaruzone>:    MY ITU ZONE CFG when explicit (multi-zone country
+  //                  override), else CTY.DAT ITU lookup which honors
+  //                  per-callsign exceptions in CTY.DAT.
+  //   <arrlsection>: MY SECTION CFG, falling back to Cabrillo summary
+  //                  [REPORT]/_LOCATION (where users typically enter it).
+  //   <stprvoth>:    MY STATE CFG, falling back to Cabrillo summary
+  //                  [REPORT]/_ADDRESS-STATE-PROVINCE.
+  //   <grid4>:       MyGrid truncated to first 4 chars.
+  sDXCC    := '';
+  if MyCall <> '' then
+     sDXCC := ctyGetCountryID(MyCall);
+
+  sSection := Trim(string(MySection));
+  if sSection = '' then
+     sSection := ReadCabrilloSummaryField('_LOCATION');
+
+  sState := Trim(string(MyState));
+  if sState = '' then
+     sState := ReadCabrilloSummaryField('_ADDRESS-STATE-PROVINCE');
+
+  sZone := '';
+  if MyCall <> '' then
+     sZone := IntToStr(ctyGetCQZone(MyCall));
+
+  // Grid: always emit <grid4> for now -- the New Contest dialog truncates
+  // MyGrid to 4 chars for RTC and most other contests (uNewContest.pas:419),
+  // so 4 chars is what we typically have.  When MyGrid happens to be 6 chars
+  // (e.g. user manually edited tr4w.ini), pass the full value through; the
+  // <grid4> tag name stays the same so we don't have to revisit the receiver.
+  sGrid4 := Trim(string(MyGrid));
+
+  qth := '';
+  if sDXCC <> '' then
+    qth := qth + '<dxcccountry>' + XmlEscape(string(sDXCC)) + '</dxcccountry>';
+  if sZone <> '' then
+    qth := qth + '<cqzone>' + XmlEscape(sZone) + '</cqzone>';
+  if MyITUZone > 0 then
+    qth := qth + '<iaruzone>' + IntToStr(MyITUZone) + '</iaruzone>'
+  else if MyCall <> '' then
+    qth := qth + '<iaruzone>' + IntToStr(ctyGetITUZone(MyCall)) + '</iaruzone>';
+  if sSection <> '' then
+    qth := qth + '<arrlsection>' + XmlEscape(sSection) + '</arrlsection>';
+  if sState <> '' then
+    qth := qth + '<stprvoth>' + XmlEscape(sState) + '</stprvoth>';
+  if sGrid4 <> '' then
+    qth := qth + '<grid4>' + XmlEscape(sGrid4) + '</grid4>';
+  if qth <> '' then
+    Result := Result + AnsiString('<qth>' + qth + '</qth>');
+
+  Result := Result + AnsiString('<breakdown>');
+
+  // Per-band/mode <qso> rows + <total>.
   for TempBand := Band160 to AllBands do
     for TempMode := CW to Phone do
     begin
@@ -609,6 +630,7 @@ begin
   Result := Result + AnsiString(Format(
     '<qso band="total" mode="ALL">%d</qso>', [nQSOs]));
 
+  // Per-band/mode <mult> rows.
   for TempBand := Band160 to AllBands do
     for TempMode := CW to Both do
       for m := Succ(Low(RemainingMultiplierType)) to High(RemainingMultiplierType) do
@@ -625,6 +647,20 @@ begin
           [BandStr, RTCModeStr[TempMode], RTCMultStr[m],
            mo.MTotals[TempBand, TempMode, m]]));
       end;
+
+  // Per-band <point> totals + grand total -- issue #930.  Mirrors the WRTC
+  // UDP emitter in LOGSUBS2 (SendScoreToUDP) which uses QSOPointTotals.
+  for TempBand := Band160 to AllBands do
+     begin
+     if QSOPointTotals[TempBand, Both] = 0 then Continue;
+     if TempBand = AllBands then
+        BandStr := 'total'
+     else
+        BandStr := string(BandStringsArrayWithOutSpaces[TempBand]);
+     Result := Result + AnsiString(Format(
+        '<point band="%s" mode="ALL">%d</point>',
+        [BandStr, QSOPointTotals[TempBand, Both]]));
+     end;
 
   tGetSystemTime;
   ts := SystemTimeToString(UTC);

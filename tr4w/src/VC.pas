@@ -656,6 +656,11 @@ var
 //   BandMapItemHeight                    : integer = 14;
   QZBRandomOffsetEnable                 : boolean;
 //  QZBFixedOffset                        : real;
+  // Issue #930 -- operator's actual ITU zone for HamScore/COS <iaruzone>.
+  // Needed as an explicit CFG because large countries (US, Russia, Canada)
+  // span multiple ITU zones, so the CTY.DAT default-by-prefix can be wrong.
+  // Falls back to ctyGetITUZone(MyCall) when 0.
+  MyITUZone                             : Byte;
 
   RichEditObject                        : TRichEditObject;
   RemMultsDXToolTip                     : HWND;
