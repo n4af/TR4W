@@ -25,7 +25,7 @@ const
 
 
 
-TR4W_CURRENTVERSION_NUMBER            = '4.147.19';  // NY4I     CI test for all-languages workflow path
+TR4W_CURRENTVERSION_NUMBER            = '4.147.21';  // NY4I     CI test for all-languages workflow path
 
 
 
