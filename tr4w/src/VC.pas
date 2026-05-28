@@ -656,6 +656,11 @@ var
 //   BandMapItemHeight                    : integer = 14;
   QZBRandomOffsetEnable                 : boolean;
 //  QZBFixedOffset                        : real;
+  // Issue #930 -- operator's actual ITU zone for HamScore/COS <iaruzone>.
+  // Needed as an explicit CFG because large countries (US, Russia, Canada)
+  // span multiple ITU zones, so the CTY.DAT default-by-prefix can be wrong.
+  // Falls back to ctyGetITUZone(MyCall) when 0.
+  MyITUZone                             : Byte;
 
   RichEditObject                        : TRichEditObject;
   RemMultsDXToolTip                     : HWND;
@@ -3570,7 +3575,7 @@ QSOPartiesCount = 20;
  ({Name: 'YOTA';                       }Email: nil;                      DF: 'YOTA';                 WA7BNM:   0; {SK3BG: nil;    } QRZRUID: 0; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile; P: 0; AE: RSTAgeExchange;                              XM:NoDXMults; QP:YOTAQSOPointMethod; ADIFName:'YOTA';   CABName:'') ,
  ({Name: 'IN7QPNE';                    }Email: nil;                      DF: 'in7qpne_cty';            WA7BNM: 0000; {SK3BG:  nil ;        } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 18; AE: RSTDomesticQTHExchange;                XM:NoDXMults; QP:PAQSOPointMethod; ADIFName:'IN7QPNE-QSO-PARTY';   CABName:'IN7QPNE-QSO-PARTY'),     // 4.88.2
  ({Name: 'MST';                        }Email: nil;                      DF: nil;                 WA7BNM:  3146; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: CallSignPrefix;        ZnM: NoZoneMults; AIE:NoInitialExchange ; DM: NoDomesticMults; P: 0; AE: QSONumberandNameExchange;             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'MST';   CABName:''),          // 4.110.5
- ({Name: 'SST';                        }Email: 'k1usn.radioclub.sst@gmail.com';   DF: 'naqp';              WA7BNM:  218; {SK3BG: 'naqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange;              XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO; ADIFName:'';   CABName:''),
+ ({Name: 'SST';                        }Email: 'k1usn.radioclub.sst@gmail.com';   DF: 'naqp';              WA7BNM:  218; {SK3BG: 'naqp';       } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameQTHInitialExchange; DM: DomesticFile;    P: 0; AE: NameAndDomesticOrDXQTHExchange;              XM:NorthAmericanARRLDXCCWithNoUSACanadaOrkL7; QP:OnePointPerQSO; ADIFName:'K1USN-SST';   CABName:'K1USNSST'),
  ({Name: 'RTC';                        }Email: nil;                      DF: nil;                 WA7BNM:  782; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: GridInitialExchange; DM: GridSquares;     P: 0; AE: RSTQSONumberAndGridSquareExchange;          XM:NoDXMults; QP:RTCQSOPointMethod; ADIFName:'RTC';   CABName:'RTC')   // Issue #902 Real-Time Contest (COS)
  );
 
@@ -3809,7 +3814,12 @@ QSOPartiesCount = 20;
     ciCDC1                              = 128;
     CDC_BIT                             = 7;
 
-    ContestsBooleanArray                : array[ContestType] of Byte =
+    {RTC (REAL-TIME CONTEST) CAPABLE BIT 8 -- HamScore real-time contact upload support, issue #931}
+    ciRTC0                              = 0;
+    ciRTC1                              = 256;
+    RTC_CAPABLE_BIT                     = 8;
+
+    ContestsBooleanArray                : array[ContestType] of Word =
       (
       ({Name: 'DUMMY CONTEST';              }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB0 + ciQM0 + ciMB0 + ciMM0),
       ({Name: '7QP';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
@@ -3864,7 +3874,7 @@ QSOPartiesCount = 20;
       ({Name: 'HA DX';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'YUDX';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),    // 4.57.5    // 4.58.1
       ({Name: 'UKEI';                       }ciCDC0+ ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),    // 4.58.2
-      ({Name: 'HELVETIA';                   }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),    // 4.54.6 issue 214    // 4.56.8
+      ({Name: 'HELVETIA';                   }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0 + ciRTC1),    // 4.54.6 issue 214    // 4.56.8
       ({Name: 'IARU-HF';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'INTERNET SPRINT';            }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'RSGB-IOTA';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),
@@ -3882,14 +3892,14 @@ QSOPartiesCount = 20;
       ({Name: 'MINI80';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'MINI40';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'MICH QSO PARTY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM1),
-      ({Name: 'MINN QSO PARTY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
+      ({Name: 'MINN QSO PARTY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0 + ciRTC1),
       ({Name: 'MO QSO PARTY';              }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
-      ({Name: 'NAQP-CW';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'NAQP-SSB';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'NAQP-RTTY';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'NA-SPRINT-CW';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
+      ({Name: 'NAQP-CW';                    }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0 + ciRTC1),
+      ({Name: 'NAQP-SSB';                   }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0 + ciRTC1),
+      ({Name: 'NAQP-RTTY';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0 + ciRTC1),
+      ({Name: 'NA-SPRINT-CW';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0 + ciRTC1),
       ({Name: 'SSB SPRINT';                 }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
-      ({Name: 'NA-SPRINT-RTTY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
+      ({Name: 'NA-SPRINT-RTTY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0 + ciRTC1),
       ({Name: 'NCCC-SPRINT';                }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'NEQP';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'NC QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),      // issue 292 4.66.1
@@ -3966,11 +3976,11 @@ QSOPartiesCount = 20;
       ({Name: 'BSCI';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'CQMM';                       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
       ({Name: 'SA-SPRINT';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),   // 4.50.5 issue 177
-      ({Name: 'CWOPS';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
+      ({Name: 'CWOPS';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0 + ciRTC1),
       ({Name: 'OZHCR-VHF';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak1 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'CANADA WINTER';          }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM1),
       ({Name: 'CQ-WW-CW';                   }ciCDC0 + ciCQZoneMode1 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'CWOPEN';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
+      ({Name: 'CWOPEN';                     }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0 + ciRTC1),
       ({Name: 'MAKROTHEN';                  }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'EU-SPRINT-SPRING-SSB';       }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'EU-SPRINT-AUTUMN-CW';        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
@@ -3993,9 +4003,9 @@ QSOPartiesCount = 20;
       ({Name: 'VA QSO PARTY';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'YOTA';                       }ciCDC1 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'IN7QPNE     ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),     // 4.99.7
-      ({Name: 'MST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),        // 4.110.5
-      ({Name: 'SST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'RTC';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0)        // Issue #902
+      ({Name: 'MST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0 + ciRTC1),        // 4.110.5
+      ({Name: 'SST';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0 + ciRTC1),
+      ({Name: 'RTC';                        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0 + ciRTC1)        // Issue #902
 
         );
 

@@ -354,6 +354,8 @@ const
    + 1 {ColumnAutoSize}  // Issue 866
    + 1 {CTYUpdateCheckOnStartup}  // Issue 779
    + 4 {HAMSCORE ENABLE/URL/USERNAME/PASSWORD}  // Issue #783
+   + 1 {HAMSCORE SEND CONTACT INFO}  // Issue #931
+   + 1 {MY ITU ZONE}  // Issue #930 -- explicit override of CTY.DAT default for multi-zone countries
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -503,6 +505,7 @@ const
  (crCommand: 'HAMSCORE URL';                  crAddress: @HamScoreURL;                    crMin:0;  crMax:200;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctString;        crNetwork: 0),  // Issue #783
  (crCommand: 'HAMSCORE USERNAME';             crAddress: @HamScoreUsername;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctCaseSensitive; crNetwork: 0),  // Issue #783 -- empty falls back to MY CALL
  (crCommand: 'HAMSCORE PASSWORD';             crAddress: @HamScorePassword;               crMin:0;  crMax:50;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctPassword;      crNetwork: 0),  // Issue #783
+ (crCommand: 'HAMSCORE SEND CONTACT INFO';    crAddress: @HamScoreSendContactInfo;        crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean;       crNetwork: 0),  // Issue #931 -- per-contest RTC contact-info gating override
  (crCommand: 'HAND LOG MODE';                 crAddress: @tHandLogMode;                   crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:1 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'HF BAND ENABLE';                crAddress: @HFBandEnable;                   crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'HOUR DISPLAY';                  crAddress: pointer(8);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckList;    cfFunc: cfAll; crType: ctOther; crNetwork: 1),
@@ -579,6 +582,7 @@ const
  (crCommand: 'MY FOC NUMBER';                 crAddress: @MyFOCNumber;                    crMin:0;  crMax:10;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),      //n4af 04.32.5
  (crCommand: 'MY GRID';                       crAddress: @MyGrid;                         crMin:0;  crMax:7;        crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
  (crCommand: 'MY IOTA';                       crAddress: @MyIOTA;                         crMin:0;  crMax:20;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
+ (crCommand: 'MY ITU ZONE';                   crAddress: @MyITUZone;                      crMin:0;  crMax:90;      crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger; crNetwork: 1),  // Issue #930 -- 0 = use CTY.DAT default
  (crCommand: 'MY NAME';                       crAddress: @MyName;                         crMin:0;  crMax:20;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
  (crCommand: 'MY PARK';                       crAddress: @MyPark;                         crMin:0;  crMax:10;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
  (crCommand: 'MY POSTAL CODE';                crAddress: @MyPostalCode;                   crMin:0;  crMax:20;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
