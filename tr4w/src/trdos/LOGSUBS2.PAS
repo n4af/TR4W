@@ -527,7 +527,7 @@ begin
   end;
   if tLastLogEntryIsDeleted then
   begin
-     
+
     TempRXData.ceQSO_Skiped := False;
     p := TC_YOUHAVERESTOREDTHELASTDELETED;
     LogContactToUDP(TempRXData);
@@ -535,6 +535,9 @@ begin
        begin
        externalLogger.LogQSO(TempRXData);
        end;
+    // Issue #920 -- mirror restoration to HamScore as a (re-)contactinfo
+    // so the server sees the QSO come back with the same ID.
+    HamScoreOnLog(TempRXData);
   end
   else
   begin
@@ -545,6 +548,10 @@ begin
        begin
        externalLogger.DeleteQSO(TempRXData);
        end;
+    // Issue #920 -- mirror the deletion to HamScore via <contactdelete>.
+    // Previously only LogContact had a HamScore hook; ALT-Y deletes
+    // dropped silently from the server's view.
+    HamScoreOnDelete(TempRXData);
   end;
   InvertBoolean(tLastLogEntryIsDeleted);
   tSetFilePointer(-1 * SizeOf(ContestExchange), FILE_END);

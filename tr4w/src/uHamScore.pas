@@ -57,8 +57,9 @@ uses
 
 type
   TRTCEventKind = (
-    rckInfo,         // <contactinfo>    new QSO
-    rckReplace,      // <contactreplace> edited QSO
+    rckInfo,         // <contactinfo>    new OR edited QSO (RTC 3.0: same wire
+                     //                   format for both; edits use the same
+                     //                   QSO ID as the original).
     rckDelete,       // <contactdelete>  deleted QSO
     rckDeleteLog     // <deletelog>      wipe entire log on the server
   );
@@ -124,7 +125,12 @@ type
 
 var
   HamScoreEnable:          Boolean = False;
-  HamScoreURL:             ShortString = 'https://hamscore.com/postxml/index.php';
+  // Issue #920: RTC 3.0 endpoint is http://scoredistributor.net/ (per the
+  // spec).  Users may override via HAMSCORE URL to point at
+  // hamscore.com/postxml/index.php (which also serves 3.0) or any future
+  // mirror.  Plain HTTP is the spec default; if the operator points the URL
+  // at https://... the existing TIdHTTP + TLS path kicks in transparently.
+  HamScoreURL:             ShortString = 'http://scoredistributor.net/';
   HamScoreUsername:        ShortString = '';   // empty -> falls back to MyCall
   HamScorePassword:        ShortString = '';
   HamScoreSendContactInfo: Boolean = True;     // Issue #931 -- per-QSO <contactinfo> uploads; gated additionally by ContestsBooleanArray RTC_CAPABLE_BIT
@@ -161,7 +167,9 @@ uses
   TF,                // CreateButton, CreateStatic
   MainUnit,          // CloseTR4WWindow, DefTR4WProc, FrmSetFocus (impl/impl cycle is OK)
   uGetScores,        // BuildDynamicResultsXml (added by this PR)
-  uExchangeBuilder;  // Shared SentExchange / RxExchange canonical builders
+  uExchangeBuilder,  // Shared SentExchange / RxExchange canonical builders
+  uCabrillo,         // BuildSingleQsoCabrilloLine (RTC 3.0 -- issue #920)
+  PostUnit;          // Contest global (RTC 3.0 deletelog needs contest name)
 
 const
   DEFAULT_CYCLE_MS = 120000;   // 2 minutes per RTC spec section 1.2
@@ -289,69 +297,34 @@ begin
    Result := XmlEscape(AnsiString(BuildRxExchangeText(RXData)));
 end;
 
-// Render a <contactinfo> or <contactreplace> body for one QSO.
-// Used by HamScoreOnLog / HamScoreOnEdit on the main thread; the result
-// goes into TRTCContact.XmlBody and is held until CFM by the worker.
+// Render a <contactinfo> body for one QSO -- RTC 3.0 spec (issue #920).
+//
+// Replaces the 17-field structured body from the 2.4 protocol with a single
+// Cabrillo-format QSO line.  The server's parser is the single source of
+// truth for band/mode/exchange interpretation, eliminating the prior need
+// for TR4W and the server to agree on every field's canonical form.
+//
+// Edits use the same <contactinfo> element as new QSOs, just with the same
+// QSO ID -- no separate <contactreplace> in 3.0.
 function RenderContactBody(AKind: TRTCEventKind; const RXData: ContestExchange): AnsiString;
 var
-  tag:        AnsiString;
-  multCount:  Integer;
-  multBits:   array[1..3] of Integer;
-  i:          Integer;
-  freq:       Integer;
-  txFreq:     Integer;
-begin
-  case AKind of
-    rckInfo:    tag := 'contactinfo';
-    rckReplace: tag := 'contactreplace';
-  else
-    Result := '';   // delete / deletelog use other renderers
-    Exit;
-  end;
+   cabrillo: AnsiString;
+   begin
+   if AKind <> rckInfo then
+      begin
+      Result := '';   // delete / deletelog use other renderers
+      Exit;
+      end;
 
-  // Frequency: RXData.Frequency is Hz; spec wants 10-Hz units.
-  freq   := RXData.Frequency div 10;
-  txFreq := freq;   // TR4W's UDP path checks split state via ActiveRadioPtr;
-                    // we deliberately use the QSO's recorded frequency for both
-                    // sides because the QSO record is what's authoritative AFTER
-                    // the contact, regardless of split state at moment of post.
+   cabrillo := uCabrillo.BuildSingleQsoCabrilloLine(RXData);
 
-  // Multiplier flags 1..N: TR4W tracks 4 mult dimensions (DX, Domestic,
-  // Prefix, Zone); RTC has slots for up to 3.  Map by rank:
-  // first claimed -> slot 1, second -> slot 2, third -> slot 3.
-  multCount := CountMultipliers(RXData);
-  for i := 1 to 3 do
-    if i <= multCount then multBits[i] := 1 else multBits[i] := 0;
-
-  Result :=
-    '<' + tag + '>' + sLineBreak +
-    #9 + '<ID>' + AnsiString(RXData.id) + '</ID>' + sLineBreak +
-    #9 + '<timestamp>' + FormatTimestamp(RXData.tSysTime) + '</timestamp>' + sLineBreak +
-    #9 + '<band>' + MapBandForRTC(RXData.Band) + '</band>' + sLineBreak +
-    #9 + '<rxfreq>' + AnsiString(IntToStr(freq))   + '</rxfreq>' + sLineBreak +
-    #9 + '<txfreq>' + AnsiString(IntToStr(txFreq)) + '</txfreq>' + sLineBreak +
-    #9 + '<mode>' + MapModeForRTC(RXData) + '</mode>' + sLineBreak +
-    #9 + '<call>' + XmlEscape(AnsiString(RXData.Callsign)) + '</call>' + sLineBreak +
-    #9 + '<SentExchange>' + BuildSentExchange(RXData) + '</SentExchange>' + sLineBreak +
-    #9 + '<RxExchange>'   + BuildRxExchange(RXData)   + '</RxExchange>'   + sLineBreak +
-    // SentExchange: built from CQExchange template (LogCfg.pas) with '#'
-    // -> NumberSent and '5NN' -> '599'. RxExchange: rebuilt from parsed
-    // ContestExchange fields in canonical scoring order per contest so
-    // operator-typed order variations don't leak into the submission.
-    // Unsupported contests fall back to the raw operator-typed string.
-    #9 + '<countryprefix>' + XmlEscape(AnsiString(RXData.QTH.CountryID)) + '</countryprefix>' + sLineBreak +
-    #9 + '<wpxprefix>'     + XmlEscape(AnsiString(RXData.QTH.Prefix))    + '</wpxprefix>' + sLineBreak +
-    #9 + '<continent>' + AnsiString(GetContinentName(RXData.QTH.Continent)) + '</continent>' + sLineBreak +
-    #9 + '<zone>' + AnsiString(IntToStr(RXData.Zone)) + '</zone>' + sLineBreak +
-    #9 + '<ismultiplier1>' + AnsiString(IntToStr(multBits[1])) + '</ismultiplier1>' + sLineBreak +
-    #9 + '<ismultiplier2>' + AnsiString(IntToStr(multBits[2])) + '</ismultiplier2>' + sLineBreak +
-    #9 + '<ismultiplier3>' + AnsiString(IntToStr(multBits[3])) + '</ismultiplier3>' + sLineBreak +
-    #9 + '<x-qso>' + AnsiString(IntToStr(Ord(RXData.ceXQSO))) + '</x-qso>' + sLineBreak +
-    #9 + '<points>'  + AnsiString(IntToStr(RXData.QSOPoints))   + '</points>' + sLineBreak +
-    #9 + '<radionr>' + AnsiString(IntToStr(Ord(RXData.ceRadio))) + '</radionr>' + sLineBreak +
-    #9 + '<IsRunQSO>' + AnsiString(IntToStr(Ord(not RXData.ceSearchAndPounce))) + '</IsRunQSO>' + sLineBreak +
-    '</' + tag + '>' + sLineBreak;
-end;
+   Result :=
+      '<contactinfo>' + sLineBreak +
+      #9 + '<ID>' + AnsiString(RXData.id) + '</ID>' + sLineBreak +
+      #9 + '<CabrilloString>' + XmlEscape(cabrillo) + '</CabrilloString>' + sLineBreak +
+      #9 + '<timestamp>' + FormatTimestamp(RXData.tSysTime) + '</timestamp>' + sLineBreak +
+      '</contactinfo>' + sLineBreak;
+   end;
 
 function RenderDeleteBody(const QSOID: AnsiString): AnsiString;
 begin
@@ -362,9 +335,21 @@ begin
 end;
 
 function RenderDeleteLogBody: AnsiString;
+var sContest: string;
 begin
-  // Spec section 1.7: empty container is acceptable.
-  Result := '<deletelog></deletelog>' + sLineBreak;
+  // RTC 3.0 (issue #920): <deletelog> now carries a <contest> child so the
+  // server can scope the wipe to a single contest if the operator has
+  // posted to multiple in the same session.  Prefer ADIFName when set,
+  // else the internal name.
+  if Length(ContestsArray[Contest].ADIFName) = 0 then
+    sContest := ContestTypeSA[Contest]
+  else
+    sContest := ContestsArray[Contest].ADIFName;
+
+  Result :=
+    '<deletelog>' + sLineBreak +
+    #9 + '<contest>' + XmlEscape(AnsiString(sContest)) + '</contest>' + sLineBreak +
+    '</deletelog>' + sLineBreak;
 end;
 
 // ===========================================================================
@@ -558,7 +543,13 @@ begin
     end;
   end;
 
-  Result := '<?xml version="1.0"?>' + sLineBreak + dynResults + sLineBreak;
+  // RTC 3.0 (issue #920): wrap the whole post -- <dynamicresults> and any
+  // <contactinfo>/<contactdelete>/<deletelog> siblings -- in a single <rtc>
+  // outer element.  This is a NEW outer wrapper, not a replacement for
+  // <dynamicresults>; both DXLog and N1MM+ produce the same shape.
+  Result := '<?xml version="1.0"?>' + sLineBreak +
+            '<rtc>' + sLineBreak +
+            dynResults + sLineBreak;
 
   if snapshot <> nil then
     for i := 0 to snapshot.Count - 1 do
@@ -567,6 +558,8 @@ begin
       if contact <> nil then
         Result := Result + contact.XmlBody;
     end;
+
+  Result := Result + '</rtc>' + sLineBreak;
 end;
 
 function THamScoreUploader.PostToServer(const xml: AnsiString; out responseBody: string): Integer;
@@ -644,6 +637,28 @@ begin
   else Result := '';
 end;
 
+// RTC 3.0 (issue #920): extract the Description field that accompanies
+// warnings and errors.  Examples:
+//   {"Status":"CFM","Description":"Warning! Exchange error","TimeStamp":"..."}
+//   {"Status":"Error","Description":"Bad credentials","TimeStamp":"..."}
+// Returns '' when no Description is present (e.g. plain CFM).  Substring
+// scan is sufficient because the server always emits single-line JSON
+// with no embedded escaped quotes in the Description value.
+function ExtractDescription(const responseBody: string): string;
+const
+   KEY = '"Description":"';
+var
+   p, q: Integer;
+   begin
+   Result := '';
+   p := Pos(KEY, responseBody);
+   if p = 0 then Exit;
+   p := p + Length(KEY);
+   q := PosEx('"', responseBody, p);
+   if q <= p then Exit;
+   Result := Copy(responseBody, p, q - p);
+   end;
+
 procedure THamScoreUploader.DoCycle;
 var
   snapshot:     TList;
@@ -651,6 +666,7 @@ var
   responseBody: string;
   httpCode:     Integer;
   status:       string;
+  description:  string;
   hadQSOs:      Boolean;
 begin
   snapshot := TakePendingSnapshot;
@@ -682,9 +698,19 @@ begin
     status := ResponseStatusKind(responseBody);
     if (status = 'CFM') or ((status = 'OK') and not hadQSOs) then
     begin
-      FLogger.Info('[HamScore] Cycle CFM (%d QSO(s) confirmed)', [snapshot.Count]);
+      // RTC 3.0 (issue #920): a CFM may still carry a Description -- the
+      // server uses it to signal warnings like "Exchange error" while still
+      // accepting the QSO.  Surface it to the operator if present.
+      description := ExtractDescription(responseBody);
+      FLogger.Info('[HamScore] Cycle CFM (%d QSO(s) confirmed)%s',
+        [snapshot.Count,
+         IfThen(description <> '', ' -- warning: ' + description, '')]);
       if status = 'CFM' then
-        SetCycleStatus(Format('CFM -- %d QSO(s) confirmed', [snapshot.Count]))
+        if description <> '' then
+          SetCycleStatus(Format('CFM (warning: %s) -- %d QSO(s) confirmed',
+            [description, snapshot.Count]))
+        else
+          SetCycleStatus(Format('CFM -- %d QSO(s) confirmed', [snapshot.Count]))
       else
         SetCycleStatus('OK -- score-only post accepted');
       // snapshot will be freed in finally -- contacts are released
@@ -705,9 +731,21 @@ begin
 
     if status = 'Error' then
     begin
-      FLogger.Error('[HamScore] Server error: %s -- retaining %d QSO(s)',
-        [responseBody, snapshot.Count]);
-      SetCycleStatus('Server error: ' + responseBody);
+      // RTC 3.0 (issue #920): surface the Description rather than the raw
+      // JSON envelope when present.
+      description := ExtractDescription(responseBody);
+      if description <> '' then
+        begin
+        FLogger.Error('[HamScore] Server error: %s -- retaining %d QSO(s)',
+          [description, snapshot.Count]);
+        SetCycleStatus('Server error: ' + description);
+        end
+      else
+        begin
+        FLogger.Error('[HamScore] Server error: %s -- retaining %d QSO(s)',
+          [responseBody, snapshot.Count]);
+        SetCycleStatus('Server error: ' + responseBody);
+        end;
       RestorePending(snapshot);
       snapshot := nil;
       Exit;
@@ -779,7 +817,7 @@ begin
   end;
 
   if HamScoreURL = '' then
-    HamScoreURL := 'https://hamscore.com/postxml/index.php';
+    HamScoreURL := 'http://scoredistributor.net/';   // RTC 3.0 default (issue #920)
 
   Uploader := THamScoreUploader.Create(
     string(HamScoreURL),
@@ -827,9 +865,11 @@ var body: AnsiString;
 begin
   if Uploader = nil then Exit;
   if not ContactInfoUploadAllowed(RXData) then Exit;
-  body := RenderContactBody(rckReplace, RXData);
+  // RTC 3.0 (issue #920): edits use <contactinfo> with the same QSO ID --
+  // server distinguishes new vs edit by ID-already-seen.
+  body := RenderContactBody(rckInfo, RXData);
   if body = '' then Exit;
-  Uploader.Enqueue(TRTCContact.Create(rckReplace, AnsiString(RXData.id), body));
+  Uploader.Enqueue(TRTCContact.Create(rckInfo, AnsiString(RXData.id), body));
 end;
 
 procedure HamScoreOnDelete(const RXData: ContestExchange);

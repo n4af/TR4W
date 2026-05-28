@@ -171,6 +171,16 @@ begin
       CWOPS:
          Result := nm + ' ' + qth;
 
+      // K1USN SST / NAQP family: Name + State (or "DX").  Same exchange
+      // shape; ContestsArray AE field is NameAndDomesticOrDXQTHExchange
+      // for all four.  Rebuilding from canonical fields here lets edits
+      // to QTHString or Name via the Edit QSO dialog flow through to
+      // HamScore (issue surfaced 2026-05-28 when state edit didn't
+      // reach the server because the fallback used the raw operator-
+      // typed ExchString captured at log time).
+      SST, NAQSOCW, NAQSOSSB, NAQSORTTY:
+         Result := nm + ' ' + qth;
+
       // CWOpen: serial + Name
       CWOPEN:
          Result := serial + ' ' + nm;

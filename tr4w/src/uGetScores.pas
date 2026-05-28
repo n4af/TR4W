@@ -560,7 +560,9 @@ begin
   //                  [REPORT]/_LOCATION (where users typically enter it).
   //   <stprvoth>:    MY STATE CFG, falling back to Cabrillo summary
   //                  [REPORT]/_ADDRESS-STATE-PROVINCE.
-  //   <grid4>:       MyGrid truncated to first 4 chars.
+  //   <grid4>/<grid6>: <grid6> when MyGrid is 6+ chars (use first 6 with
+  //                    subsquare lowercased per Maidenhead convention);
+  //                    <grid4> when 4 chars; nothing when empty.
   sDXCC    := '';
   if MyCall <> '' then
      sDXCC := ctyGetCountryID(MyCall);
@@ -577,11 +579,12 @@ begin
   if MyCall <> '' then
      sZone := IntToStr(ctyGetCQZone(MyCall));
 
-  // Grid: always emit <grid4> for now -- the New Contest dialog truncates
-  // MyGrid to 4 chars for RTC and most other contests (uNewContest.pas:419),
-  // so 4 chars is what we typically have.  When MyGrid happens to be 6 chars
-  // (e.g. user manually edited tr4w.ini), pass the full value through; the
-  // <grid4> tag name stays the same so we don't have to revisit the receiver.
+  // Grid: emit <grid6> when MyGrid has the subsquare (6+ chars), <grid4>
+  // when only the 4-char square is known.  The New Contest dialog
+  // truncates MyGrid to 4 chars for RTC and many other contests
+  // (uNewContest.pas:419), so 4 chars is the common case; a 6-char value
+  // appears when the user manually set MY GRID in tr4w.ini or used a
+  // contest dialog that prompts for the full grid.
   sGrid4 := Trim(string(MyGrid));
 
   qth := '';
@@ -597,8 +600,12 @@ begin
     qth := qth + '<arrlsection>' + XmlEscape(sSection) + '</arrlsection>';
   if sState <> '' then
     qth := qth + '<stprvoth>' + XmlEscape(sState) + '</stprvoth>';
-  if sGrid4 <> '' then
-    qth := qth + '<grid4>' + XmlEscape(sGrid4) + '</grid4>';
+  if Length(sGrid4) >= 6 then
+    qth := qth + '<grid6>' +
+      XmlEscape(UpperCase(Copy(sGrid4, 1, 4)) + LowerCase(Copy(sGrid4, 5, 2))) +
+      '</grid6>'
+  else if Length(sGrid4) >= 4 then
+    qth := qth + '<grid4>' + XmlEscape(UpperCase(Copy(sGrid4, 1, 4))) + '</grid4>';
   if qth <> '' then
     Result := Result + AnsiString('<qth>' + qth + '</qth>');
 

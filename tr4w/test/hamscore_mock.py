@@ -4,8 +4,9 @@ hamscore_mock.py -- Local stand-in for the HamScore RTC server.
 
 Listens on http://localhost:8765/ (any path). Logs every POST: client
 address, decoded Basic-auth credentials, headers, raw XML body, and a
-pretty-printed parsed form so you can visually verify SentExchange /
-RxExchange values without making a round-trip to hamscore.com.
+pretty-printed parsed form so you can visually verify the CabrilloString
+value and other RTC 3.0 fields without making a round-trip to
+hamscore.com / scoredistributor.net.
 
 Configure TR4W:
    HAMSCORE URL = http://localhost:8765/postxml/index.php
@@ -22,6 +23,12 @@ client expects (see ResponseStatusKind in src/uHamScore.pas):
 Anything else makes TR4W log "Unexpected response" and retain the QSOs
 for retry. Default = CFM (success-with-QSOs path the RTC fix is testing).
 Override with --response.
+
+RTC 3.0 (issue #920) added a "Description" field that the server uses to
+attach warnings to CFM responses or details to errors. Set --description
+"<text>" to exercise TR4W's Description extraction path. Examples:
+   --response CFM   --description "Warning! Exchange error"
+   --response Error --description "Bad credentials"
 
 No external dependencies -- pure stdlib (http.server + xml.dom.minidom).
 Tested on Python 3.8+.
@@ -42,8 +49,9 @@ SEP = "=" * 72
 
 VALID_RESPONSES = ("CFM", "OK", "ResyncLog", "Error")
 
-# Module-level so the CLI can set it once and every request handler reads it.
+# Module-level so the CLI can set them once and every request handler reads.
 RESPONSE_STATUS = "CFM"
+RESPONSE_DESCRIPTION = ""
 
 
 class HamScoreMockHandler(BaseHTTPRequestHandler):
@@ -106,12 +114,10 @@ class HamScoreMockHandler(BaseHTTPRequestHandler):
          print(body_text if body_text else "<empty>")
       print("-" * 72)
       print("Pretty-printed:")
-      # TR4W's HamScore payload is XML *fragments*, not a single-root
-      # document -- e.g. <dynamicresults>...</dynamicresults> followed
-      # by <deletelog></deletelog>. The real server tolerates this;
-      # Python's xml.dom.minidom strict-parses and rejects it as
-      # "junk after document element". Strip the XML declaration and
-      # wrap in a synthetic root so pretty-printing works.
+      # RTC 3.0 (issue #920) wraps everything in a single <rtc> root, so
+      # the wrapper-strip dance is no longer strictly needed; we keep it
+      # anyway as a graceful fallback when the payload is missing <rtc>
+      # (e.g. older TR4W builds or third-party clients posting fragments).
       try:
          stripped = re.sub(r"<\?xml[^>]*\?>\s*", "", body_text, count=1).strip()
          wrapped = f"<hamscoreMockRoot>{stripped}</hamscoreMockRoot>"
@@ -131,20 +137,42 @@ class HamScoreMockHandler(BaseHTTPRequestHandler):
       except Exception as e:
          print(f"(could not parse as XML: {e})")
 
-      # Inline highlight of the two fields that matter for the RTC fix.
+      # Inline highlights -- RTC 3.0 contactinfo carries just <ID>,
+      # <CabrilloString>, <timestamp>, plus the <contest> child of
+      # <deletelog>.  Show those plus the dynamicresults <score>/<call>
+      # for at-a-glance verification.  Also flag the <rtc> wrapper so
+      # the operator can confirm the post is 3.0-shaped.
       print("-" * 72)
-      print("Highlights (inline tag extracts):")
+      print("Highlights (RTC 3.0 fields):")
       found_any = False
-      for tag in ("Call", "Mode", "Band", "SentExchange", "RxExchange", "Operator"):
-         for m in re.finditer(rf"<{tag}>(.*?)</{tag}>", body_text, re.DOTALL):
+      has_rtc_wrapper = bool(re.search(r"<rtc\b", body_text))
+      print(f"   <rtc> wrapper  {'present' if has_rtc_wrapper else 'MISSING (pre-3.0?)'}")
+      for tag in ("ID", "CabrilloString", "timestamp", "contest",
+                  "call", "score", "soft", "version"):
+         for m in re.finditer(rf"<{tag}\b[^>]*>(.*?)</{tag}>",
+                              body_text, re.DOTALL):
             print(f"   {tag:<14} {m.group(1).strip()!r}")
             found_any = True
       if not found_any:
          print("   (no tags of interest found)")
 
       # JSON response per the protocol TR4W parses
-      # (uHamScore.pas ResponseStatusKind). Case-sensitive "Status" key.
-      response = f'{{"Status":"{RESPONSE_STATUS}"}}\n'.encode("utf-8")
+      # (uHamScore.pas ResponseStatusKind + ExtractDescription).
+      # Case-sensitive "Status" key.  Add Description when set so the
+      # CFM-with-warning and Error-with-detail paths can be exercised.
+      if RESPONSE_DESCRIPTION:
+         # Escape minimal JSON chars so common test strings work.
+         desc = (RESPONSE_DESCRIPTION
+                 .replace("\\", "\\\\")
+                 .replace('"', '\\"'))
+         response_body = (
+            f'{{"Status":"{RESPONSE_STATUS}",'
+            f'"Description":"{desc}",'
+            f'"TimeStamp":"{dt.datetime.utcnow():%Y-%m-%d %H:%M:%S}"}}\n'
+         )
+      else:
+         response_body = f'{{"Status":"{RESPONSE_STATUS}"}}\n'
+      response = response_body.encode("utf-8")
       print(f"Responding: 200 OK  body={response.rstrip().decode()}")
       print(SEP)
       sys.stdout.flush()
@@ -169,7 +197,7 @@ class HamScoreMockHandler(BaseHTTPRequestHandler):
 
 
 def main() -> int:
-   global RESPONSE_STATUS
+   global RESPONSE_STATUS, RESPONSE_DESCRIPTION
    p = argparse.ArgumentParser(description="Local HamScore RTC mock server.")
    p.add_argument("--host", default="127.0.0.1",
                   help="Bind host (default 127.0.0.1). Use 0.0.0.0 to accept "
@@ -183,17 +211,31 @@ def main() -> int:
                        "ResyncLog = ask client to resync. Error = server "
                        "error. Use these to exercise the four code paths "
                        "in src/uHamScore.pas:DoCycle.")
+   p.add_argument("--description", default="",
+                  help="Optional Description field included in the JSON "
+                       "response.  RTC 3.0 uses it to attach warnings to "
+                       "CFM (e.g. 'Warning! Exchange error') or detail to "
+                       "Error.  Exercises ExtractDescription in "
+                       "src/uHamScore.pas and the Settings status line.")
    args = p.parse_args()
 
    RESPONSE_STATUS = args.response
+   RESPONSE_DESCRIPTION = args.description
 
    print(f"HamScore mock listening on http://{args.host}:{args.port}/")
-   print(f'Response status: {{"Status":"{RESPONSE_STATUS}"}}')
+   if RESPONSE_DESCRIPTION:
+      print(f'Response status: {{"Status":"{RESPONSE_STATUS}",'
+            f'"Description":"{RESPONSE_DESCRIPTION}"}}')
+   else:
+      print(f'Response status: {{"Status":"{RESPONSE_STATUS}"}}')
    print("Configure TR4W (in tr4w.ini or via the HAMSCORE commands):")
-   print(f"   HAMSCORE URL      = http://{args.host}:{args.port}/postxml/index.php")
-   print("   HAMSCORE USER     = anything (logged, not validated)")
-   print("   HAMSCORE PASSWORD = anything (logged, not validated)")
-   print("   HAMSCORE ENABLE   = TRUE")
+   print(f"   HAMSCORE URL               = http://{args.host}:{args.port}/postxml/index.php")
+   print("   HAMSCORE USER              = anything (logged, not validated)")
+   print("   HAMSCORE PASSWORD          = anything (logged, not validated)")
+   print("   HAMSCORE ENABLE            = TRUE")
+   print("   HAMSCORE SEND CONTACT INFO = TRUE  (issue #931 -- needed if you want")
+   print("                                       per-QSO <contactinfo> posts, not")
+   print("                                       just the <dynamicresults> score)")
    print("Press Ctrl+C to stop.")
    print()
 
