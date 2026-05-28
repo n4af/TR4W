@@ -36,11 +36,22 @@ param(
     # -BuildInstallers is set. Override with $env:NSIS_BIN or -NSISBin.
     [string]$NSISBin = $(if ($env:NSIS_BIN) { $env:NSIS_BIN } else { "C:\Program Files (x86)\NSIS" }),
 
-    # UPX bin directory (contains upx.exe). Only consulted when
-    # -BuildInstallers is set. Resolution order:
+    # UPX bin directory (contains upx.exe). Only consulted when both
+    # -BuildInstallers AND -UseUpx are set. Resolution order:
     #   1. -UpxBin / $env:UPX_BIN explicit directory (validated below)
     #   2. PATH lookup via Get-Command upx.exe (default if neither set)
-    [string]$UpxBin = $(if ($env:UPX_BIN) { $env:UPX_BIN } else { "" })
+    [string]$UpxBin = $(if ($env:UPX_BIN) { $env:UPX_BIN } else { "" }),
+
+    # When set (and -BuildInstallers is also set), run upx --lzma on
+    # tr4w.exe before passing it to NSIS.  UPX is opt-in as of 2026-05-28
+    # because the on-disk savings (~1 MB exe / ~2 MB installer) no longer
+    # outweigh the AV false-positive cost on operator machines.  A
+    # comparison VirusTotal scan of a no-UPX SER installer (tag
+    # v4.147.21-all) dropped flags from 8+ to 3, with Microsoft Defender
+    # leaving the flag list.  Setting -UseUpx restores the historical
+    # packaging if a future need arises (e.g. distribution to operators
+    # on tightly bandwidth-constrained connections).
+    [switch]$UseUpx
 )
 
 $ErrorActionPreference = "Continue"
@@ -75,33 +86,42 @@ if ($BuildInstallers) {
     if (-not (Test-Path $MAKENSIS)) { Write-Host "makensis.exe not found at: $MAKENSIS (set NSIS_BIN or pass -NSISBin)" -ForegroundColor Red; exit 2 }
     if (-not (Test-Path $NSI_FILE)) { Write-Host "Installer script not found at: $NSI_FILE" -ForegroundColor Red; exit 2 }
 
-    # Resolve upx.exe -- explicit override (-UpxBin / $env:UPX_BIN) wins;
-    # otherwise discover via PATH. Either way we end up with a full path
-    # in $UPX so the packaging step doesn't depend on PATH at call time.
-    if ($UpxBin) {
-        $UPX = Join-Path $UpxBin "upx.exe"
-        if (-not (Test-Path $UPX)) {
-            Write-Host "upx.exe not found at: $UPX" -ForegroundColor Red
-            Write-Host "Check the -UpxBin parameter or `$env:UPX_BIN value." -ForegroundColor Red
-            exit 2
-        }
-    } else {
-        $upxCmd = Get-Command upx.exe -ErrorAction SilentlyContinue
-        if ($upxCmd) {
-            $UPX = $upxCmd.Source
+    # UPX is opt-in (see -UseUpx param doc).  Only resolve upx.exe when the
+    # operator asked for it; default builds skip the resolution entirely so
+    # a missing/uninstalled UPX is not a build blocker.
+    $UPX = $null
+    if ($UseUpx) {
+        # Resolve upx.exe -- explicit override (-UpxBin / $env:UPX_BIN) wins;
+        # otherwise discover via PATH. Either way we end up with a full path
+        # in $UPX so the packaging step doesn't depend on PATH at call time.
+        if ($UpxBin) {
+            $UPX = Join-Path $UpxBin "upx.exe"
+            if (-not (Test-Path $UPX)) {
+                Write-Host "upx.exe not found at: $UPX" -ForegroundColor Red
+                Write-Host "Check the -UpxBin parameter or `$env:UPX_BIN value." -ForegroundColor Red
+                exit 2
+            }
         } else {
-            Write-Host "upx.exe not found (required by -BuildInstallers)." -ForegroundColor Red
-            Write-Host ""
-            Write-Host "Fix one of these ways:" -ForegroundColor Yellow
-            Write-Host "  1. Pass -UpxBin <directory-containing-upx.exe> on the command line, OR" -ForegroundColor Yellow
-            Write-Host "  2. Set the UPX_BIN environment variable to that directory (persists), OR" -ForegroundColor Yellow
-            Write-Host "  3. Add the directory containing upx.exe to your PATH and reopen the shell." -ForegroundColor Yellow
-            Write-Host ""
-            Write-Host "Download UPX from https://upx.github.io/ if you don't have it." -ForegroundColor Yellow
-            exit 2
+            $upxCmd = Get-Command upx.exe -ErrorAction SilentlyContinue
+            if ($upxCmd) {
+                $UPX = $upxCmd.Source
+            } else {
+                Write-Host "upx.exe not found (required by -UseUpx)." -ForegroundColor Red
+                Write-Host ""
+                Write-Host "Fix one of these ways:" -ForegroundColor Yellow
+                Write-Host "  1. Pass -UpxBin <directory-containing-upx.exe> on the command line, OR" -ForegroundColor Yellow
+                Write-Host "  2. Set the UPX_BIN environment variable to that directory (persists), OR" -ForegroundColor Yellow
+                Write-Host "  3. Add the directory containing upx.exe to your PATH and reopen the shell, OR" -ForegroundColor Yellow
+                Write-Host "  4. Drop -UseUpx to build without UPX (the default since 2026-05-28)." -ForegroundColor Yellow
+                Write-Host ""
+                Write-Host "Download UPX from https://upx.github.io/ if you do want to use it." -ForegroundColor Yellow
+                exit 2
+            }
         }
+        Write-Host "Using upx: $UPX" -ForegroundColor DarkGray
+    } else {
+        Write-Host "UPX disabled (default). Pass -UseUpx to enable upx --lzma compression." -ForegroundColor DarkGray
     }
-    Write-Host "Using upx: $UPX" -ForegroundColor DarkGray
 }
 
 # DCU cache architecture (used when -AllLanguages is set):
@@ -404,9 +424,15 @@ function Invoke-Packaging {
     New-Item -ItemType Directory -Force -Path $RELEASE_DIR | Out-Null
 
     # UPX --lzma (destructive: overwrites the exe with the compressed copy).
-    Write-Host "  upx --lzma $exe" -ForegroundColor DarkGray
-    & $UPX $exe --lzma | Out-Null
-    if ($LASTEXITCODE -ne 0) { Write-Host "  UPX failed (exit $LASTEXITCODE)" -ForegroundColor Red; return $false }
+    # Opt-in (-UseUpx); skipped by default since 2026-05-28 because the AV
+    # false-positive cost on operator machines outweighs the ~1 MB savings.
+    if ($UseUpx) {
+        Write-Host "  upx --lzma $exe" -ForegroundColor DarkGray
+        & $UPX $exe --lzma | Out-Null
+        if ($LASTEXITCODE -ne 0) { Write-Host "  UPX failed (exit $LASTEXITCODE)" -ForegroundColor Red; return $false }
+    } else {
+        Write-Host "  Skipping UPX (default since 2026-05-28; -UseUpx restores)" -ForegroundColor DarkGray
+    }
 
     $nsisArgs = @("/DTR4WVERSION=$Version")
     if ($LangCode) { $nsisArgs += "/DTR4WLANG=$LangCode" }

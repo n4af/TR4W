@@ -6,7 +6,9 @@
 #   3. Manual (Actions UI)   -> Run workflow button, "Build all languages" checkbox
 #
 # Pipeline:
-#   build (Windows runner)        -> compile, UPX, NSIS, upload installer artifact
+#   build (Windows runner)        -> compile, NSIS, upload installer artifact
+#                                    (UPX is opt-in via FullBuild.ps1's -UseUpx
+#                                    switch; CI does not pass it as of 2026-05-28)
 #   virustotal-scan (ubuntu)      -> download installer(s), scan via VT API,
 #                                    produce virustotal-report.md, upload as artifact
 #   release (ubuntu)              -> only on tag push; download both artifacts,
@@ -24,7 +26,8 @@
 #   - Indy 10 lib          -- bundled in tr4w\include (no install needed).
 #                             Override with $INDY_ROOT only if you want to point
 #                             at an external Indy tree.
-#   - UPX                  -- must be in PATH (upx.exe --lzma).
+#   - UPX                  -- no longer required.  CI skips UPX entirely;
+#                             FullBuild.ps1 makes it opt-in via -UseUpx.
 #
 # Secrets required:
 #   - VIRUS_TOTAL_API_KEY  -- VT public API key (free tier is fine for the
@@ -141,7 +144,9 @@ jobs:
         shell: powershell
         run: |
           # Indy is bundled in tr4w\include; FullBuild.ps1 defaults to it.
-          # Only Delphi + NSIS + UPX need external presence checks here.
+          # UPX is opt-in in FullBuild.ps1 and CI does NOT pass -UseUpx
+          # (see param doc in FullBuild.ps1).  Only Delphi + NSIS need an
+          # external presence check here.
           $tools = [ordered]@{
             'DCC32 (Delphi 7)' = Join-Path $env:DELPHI7_BIN 'DCC32.EXE'
             'NSIS makensis'    = Join-Path $env:NSIS_BIN    'makensis.exe'
@@ -150,9 +155,6 @@ jobs:
           foreach ($k in $tools.Keys) {
             if (-not (Test-Path $tools[$k])) { $missing += "$($k): $($tools[$k]) not found" }
           }
-          if (-not (Get-Command upx.exe -ErrorAction SilentlyContinue)) {
-            $missing += "UPX: upx.exe not found in PATH"
-          }
           if ($missing.Count -gt 0) {
             throw "Missing required tools:`n$($missing -join "`n")"
           }
@@ -160,10 +162,12 @@ jobs:
 
       # ---------------------------------------------------------------
       # Both english_only and all_languages go through FullBuild.ps1's
-      # Invoke-Packaging chain (which does the dep check + UPX --lzma +
+      # Invoke-Packaging chain (which does the dep check + (opt-in UPX) +
       # makensis internally). Single packaging code path = single source
       # of truth for the build, and the new Test-InstallerDependencies
-      # pre-flight fires on every release.
+      # pre-flight fires on every release.  UPX is opt-in since 2026-05-28
+      # (AV false-positive cost outweighs ~1 MB exe savings); CI does not
+      # pass -UseUpx.
       # ---------------------------------------------------------------
       - name: Run FullBuild.ps1 (English only + installer)
         if: steps.mode.outputs.mode == 'english_only'
