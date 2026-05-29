@@ -22,6 +22,35 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.21 (2026-05-29) — NY4I
+
+#### HamScore RTC 3.0 (`src/uHamScore.pas`, `src/uCabrillo.pas` (NEW), `src/uGetScores.pas`, `src/VC.pas`, `src/uCFG.pas`, `src/uExchangeBuilder.pas`, `src/trdos/LOGSUBS2.PAS`, `test/hamscore_mock.py`) — Issues #920, #930, #931, #932, PR #935
+
+- **RTC 3.0 protocol** (#920): payload wrapped in `<rtc>...</rtc>` with `<dynamicresults>` as a child; `<contactinfo>` blocks use the 3.0 schema (`<ID>` + `<CabrilloString>` + `<timestamp>`). `ExtractDescription` parses the new `Description` JSON field for CFM-with-warning and Error responses. Default `HamScoreURL` set to `http://scoredistributor.net/`.
+- **`dynamicresults` payload completion** (#930): added `<ops>`, `<club>`, `<qth>` blocks (state/section/grid4/grid6/country/continent/zone), assisted/overlay category fields, and `<soft>` / `<version>` split. `ReadCabrilloSummaryField` pulls missing values from `tr4w.ini` `[REPORT]` so no new CFG entries needed for Club/Section/State. `cqzone` always uses `ctyGetCQZone(MyCall)` (`MyZone` global is contest-zone-mode dependent and unsafe here). New `MyITUZone` global + `MY ITU ZONE` CFG, because large countries span multiple ITU zones.
+- **Per-contest gating** (#931): new `HAMSCORE SEND CONTACT INFO` CFG (Boolean) and `RTC_CAPABLE_BIT = 8` flag in `ContestsBooleanArray` (bumped from `Byte` to `Word` for bit 8). `ContactInfoUploadAllowed` gates uploads on both. 12 contests marked RTC-capable.
+- **SST ADIF/CAB names** (#932): SST entry now `ADIFName:'K1USN-SST'; CABName:'K1USNSST'`.
+- **`uCabrillo.pas` (NEW)**: single source of truth for single-QSO Cabrillo line rendering (`BuildSingleQsoCabrilloLine`). Eliminates the prior split between `PostUnit`'s final-log writer and `uExchangeBuilder`'s score-XML fallback that caused "edit didn't reach HamScore" bugs.
+- **`uExchangeBuilder.pas`**: SST/NAQP family arm added so exchange edits flow to HamScore (previously fell through to raw `ExchString`).
+- **`trdos/LOGSUBS2.PAS`**: `DeleteLastContact` (ALT-Y handler) now calls `HamScoreOnDelete`/`HamScoreOnLog` on the delete/restore branches — was silently skipping the hook.
+- **`test/hamscore_mock.py`**: `--description` CLI flag for the 3.0 Description field; pretty-printer + highlights updated; checks for `<rtc>` wrapper presence; banner reminds operator to set `HAMSCORE SEND CONTACT INFO = TRUE`.
+
+#### Build & Release Pipeline (`tr4w/FullBuild.ps1`, `.github/workflows/release.yml`, `tr4w/include/`)
+
+- **UPX opt-in** (`-UseUpx` switch, default off): UPX compression removed from the default build. Prior VirusTotal scans flagged the SER installer with 8 detections (including Microsoft Defender); a no-UPX rebuild dropped this to 3. Trade-off: ~2.4 MB larger installer / ~1 MB larger on-disk EXE, in exchange for fewer AV false positives and one less third-party supply-chain dependency. CI does not pass `-UseUpx`; build locally with `-UseUpx` to restore.
+- **VERSIONINFO PE resource** (`-DVERSIONINFO_RES`): per-language `tr4w_<LANG>.exe` now embeds a Win32 VERSIONINFO block (FileVersion / ProductVersion / language code) generated from `Version.pas` at build time. Right-click → Properties → Details shows language + version.
+- **Indy bundled by default**: `FullBuild.ps1` defaults `IndyRoot` to in-repo `tr4w/include` (Indy 10.6.3.3) instead of requiring an external `C:\Indy` install. `INDY_ROOT` env var still honored.
+- **NSIS pre-flight check**: verifies all required NSIS source files exist before installer build; clearer error than failing mid-package.
+- **`release.yml` english-only path**: routed through `FullBuild.ps1 -BuildInstallers` instead of an ad-hoc inline build, so CI and local share one code path.
+- **Post-build zip step removed**: NSIS installer is the only release artifact; the redundant `.zip` was unused downstream.
+- **VT scan local skip**: when running in CI, the local pre-flight VirusTotal check now emits a single terse skip line.
+
+#### Documentation (`docs/UPDATING_RUNTIME_DLLS.md`)
+
+- **New `UPDATING_RUNTIME_DLLS.md`**: process for refreshing the bundled HamLib, OpenSSL, `inpout32.dll`, and `rigctld.exe` binaries.
+
+---
+
 ### 4.147.19 (2026-05-26) — NY4I / N4AF
 
 #### CI release-build workflow (`.github/workflows/release.yml`, `tr4w/FullBuild.ps1`, `tr4w/build/full.nsi`, `docs/RELEASE_WORKFLOW.md`) — PRs #923, #926, #927
