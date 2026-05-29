@@ -31,7 +31,7 @@ cd tr4w
 **Build configuration:**
 - Compiler settings: `tr4w.cfg` and `tr4w.dof`
 - Output directory: `target/`
-- Unit search paths include: `src`, `src/trdos`, `src/utils`, `include/Indy`
+- Unit search paths include: `src`, `src/trdos`, `src/utils`, `include/Core`, `include/System`, `include/Protocols`
 
 **Creating installer:**
 ```bash
