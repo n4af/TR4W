@@ -1,6 +1,6 @@
 param(
     # When set, after the default ENG build, loop through every other
-    # supported LANG_xxx (RUS, SER, MNG, CZE, ROM, GER, UKR) and rebuild
+    # supported LANG_xxx (RUS, SER, MNG, CZE, ROM, GER, UKR, ESP) and rebuild
     # against each. Excludes POL/CHN (broken constants, issue #925).
     [switch]$AllLanguages,
 
@@ -179,6 +179,7 @@ function Write-VersionInfoResource {
         'ENG' = @{ LangId = 0x0409; CodePage = 1252; Name = 'English (United States)' }
         'RUS' = @{ LangId = 0x0419; CodePage = 1251; Name = 'Russian' }
         'GER' = @{ LangId = 0x0407; CodePage = 1252; Name = 'German' }
+        'ESP' = @{ LangId = 0x0C0A; CodePage = 1252; Name = 'Spanish (Spain)' }
         'CZE' = @{ LangId = 0x0405; CodePage = 1250; Name = 'Czech' }
         'ROM' = @{ LangId = 0x0418; CodePage = 1250; Name = 'Romanian' }
         'UKR' = @{ LangId = 0x0422; CodePage = 1251; Name = 'Ukrainian' }
