@@ -827,3 +827,4 @@ const
   RC_IMPORT                             = 'Import';
   TC_RUNWARN                            = 'jiná instance TR4W je již spuštìna';
   RC_wkMode                             = 'znovu inicializovat WinKeyer';      // 4.60.1
+  TC_SHOW_PASSWORDS                     = 'Show passwords';

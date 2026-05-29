@@ -833,3 +833,4 @@ RC_SPLITOFF                       = 'Set Split Mode Tx';
 TC_RUNWARN                    = 'Another instance of TR4W is already running';
 RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1
 
+  TC_SHOW_PASSWORDS                     = 'Show passwords';

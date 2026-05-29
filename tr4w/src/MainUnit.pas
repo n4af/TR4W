@@ -6972,7 +6972,11 @@ begin
          if NewWidth > 0 then
             begin
             ColumnWidthOverride[TempColumn] := NewWidth;
-            KeyName := 'COLUMN WIDTH ' + ColumnsArray[TempColumn].Text;
+            // Use language-neutral canonical name (see VC.pas) so the CFG
+            // file is portable across language builds. ColumnsArray[].Text
+            // is translated at compile time and would lock the CFG to the
+            // language it was written under.
+            KeyName := 'COLUMN WIDTH ' + StrPas(ColumnCanonicalName[TempColumn]);
             KeyName[Ord(KeyName[0]) + 1] := #0;
             Str(NewWidth, WidthStr);
             WidthStr[Ord(WidthStr[0]) + 1] := #0;

@@ -962,16 +962,26 @@ begin
 
    if StrPos(@Command[1], 'COLUMN WIDTH ') = @Command[1] then
       begin
+      // Match against the canonical (language-neutral) column name first.
+      // Fall back to UpperCase(Text) so CFGs written before the canonical
+      // table existed (i.e. old English builds where Text already happened
+      // to be an English word) continue to load. Without the canonical
+      // path, non-English builds reject COLUMN WIDTH lines because Text
+      // is translated at compile time -- e.g. RC_CALLSIGN resolves to
+      // 'Indicativo' under -DLANG_ESP and never matches 'CALLSIGN'.
       for TempColumn := Low(LogColumnsType) to High(LogColumnsType) do
          begin
-         if UpperCase(ColumnsArray[TempColumn].Text) = Copy(pshortstring(Command)^, 14, 255) then
+         if (StrComp(ColumnCanonicalName[TempColumn],
+                     PChar(Copy(pshortstring(Command)^, 14, 255))) = 0)
+         or (UpperCase(ColumnsArray[TempColumn].Text) =
+                       Copy(pshortstring(Command)^, 14, 255)) then
             begin
             Val(CustomCMD, TempInteger, code);
             if code = 0 then
                begin
                ColumnWidthOverride[TempColumn] := TempInteger;
                logger.Debug('CheckCommand: COLUMN WIDTH %s = %d (col index %d)',
-                  [ColumnsArray[TempColumn].Text, TempInteger, Ord(TempColumn)]);
+                  [ColumnCanonicalName[TempColumn], TempInteger, Ord(TempColumn)]);
                end;
             Result := True;
             Exit;

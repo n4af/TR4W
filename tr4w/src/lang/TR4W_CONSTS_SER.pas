@@ -836,3 +836,4 @@ RC_DVKVOLCONTROL                        = 'DVK kontrola nivoa';
 TC_RUNWARN                    = 'Program TR4W je vec startvan';
 RC_wkMode                     = 'Reinicijalizuj WinKeyer';      // 4.60.1
 
+  TC_SHOW_PASSWORDS                     = 'Show passwords';

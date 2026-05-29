@@ -131,7 +131,7 @@ begin
         // state, no persistence.
         ShowPasswords := False;
         CreateButton(BS_AUTOCHECKBOX or BS_NOTIFY,
-                     'Show passwords', 560, 472, 150, hwnddlg, ID_SHOWPASSWORDS_CB);
+                     TC_SHOW_PASSWORDS, 560, 472, 150, hwnddlg, ID_SHOWPASSWORDS_CB);
         Windows.SendDlgItemMessage(hwnddlg, ID_SHOWPASSWORDS_CB, BM_SETCHECK,
                                    BST_UNCHECKED, 0);
 

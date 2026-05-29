@@ -1,7 +1,7 @@
 param(
     # When set, after the default ENG build, loop through every other
     # supported LANG_xxx (RUS, SER, MNG, CZE, ROM, GER, UKR) and rebuild
-    # against each. Excludes ESP/POL/CHN (broken constants, issue #925).
+    # against each. Excludes POL/CHN (broken constants, issue #925).
     [switch]$AllLanguages,
 
     # When set, run UPX --lzma + makensis after each (ENG + per-lang) build
@@ -608,12 +608,13 @@ if ($result -eq 0) {
         # which is the only way to keep per-language builds under ~3 min
         # each instead of ~3 min just for the Indy rebuild alone.
         #
-        # ESP/POL/CHN are excluded -- they each have many missing
+        # POL/CHN are excluded -- they each have many missing
         # constants tracked separately under issue #925.
+        # (ESP was backfilled 2026-05-28 and is now in the matrix.)
         # ---------------------------------------------------------------
         if ($AllLanguages) {
             $langResults = @()
-            $otherLangs = @("RUS","SER","MNG","CZE","ROM","GER","UKR")
+            $otherLangs = @("RUS","SER","MNG","CZE","ROM","GER","UKR","ESP")
 
             # Per-lang DCUs go to dcu-cache\<lang>\ via DCC32's /N flag.
             # src\*.dcu is the canonical ENG state and stays untouched
