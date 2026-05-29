@@ -5,13 +5,15 @@
 #   2. Tag push v4.X.Y-all   -> Full ENG + 7 per-language installers
 #   3. Manual (Actions UI)   -> Run workflow button, "Build all languages" checkbox
 #
-# Pipeline:
-#   build (Windows runner)        -> compile, NSIS, upload installer artifact
+# Pipeline (TR4W is Windows-only; ALL jobs run on the self-hosted
+# [self-hosted, win-ci] lab runner -- nothing runs on GitHub-hosted servers):
+#   build (win-ci)                -> compile, NSIS, upload installer artifact
 #                                    (UPX is opt-in via FullBuild.ps1's -UseUpx
 #                                    switch; CI does not pass it as of 2026-05-28)
-#   virustotal-scan (ubuntu)      -> download installer(s), scan via VT API,
+#   virustotal-scan (win-ci)      -> download installer(s), scan via VT API
+#                                    (PowerShell 7: .github/scripts/Invoke-VirusTotalScan.ps1),
 #                                    produce virustotal-report.md, upload as artifact
-#   release (ubuntu)              -> only on tag push; download both artifacts,
+#   release (win-ci)              -> only on tag push; download both artifacts,
 #                                    create draft release with installer(s)
 #                                    AND the VT report attached
 #
@@ -224,8 +226,8 @@ jobs:
           if-no-files-found: error
 
   # =================================================================
-  # VirusTotal scan -- runs on ubuntu (we don't need Windows), pulls
-  # the installer artifact from the build job, uploads each installer
+  # VirusTotal scan -- runs on the self-hosted win-ci runner (PowerShell 7).
+  # Pulls the installer artifact from the build job, uploads each installer
   # to VT, polls for completion, builds a Markdown report, and uploads
   # it as a separate artifact for the release job to attach.
   #
@@ -235,7 +237,7 @@ jobs:
   virustotal-scan:
     name: VirusTotal Scan
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, win-ci]
     if: >-
       always()
       && needs.build.result == 'success'
@@ -251,232 +253,20 @@ jobs:
       - name: Scan installers with VirusTotal
         env:
           VT_API_KEY: ${{ secrets.VIRUS_TOTAL_API_KEY }}
-        shell: bash
+        shell: pwsh
         run: |
-          set -euo pipefail
-
-          if [ -z "${VT_API_KEY:-}" ]; then
-            echo "VIRUS_TOTAL_API_KEY secret is empty -- cannot scan." >&2
-            exit 1
-          fi
-
-          # Collect installer files to scan.
-          SCAN_FILES=()
-          while IFS= read -r -d '' f; do
-            SCAN_FILES+=("$f")
-          done < <(find installers -name 'tr4w_setup_*.exe' -print0 2>/dev/null)
-
-          if [ ${#SCAN_FILES[@]} -eq 0 ]; then
-            echo "No installers found to scan." >&2
-            exit 1
-          fi
-
-          echo "Found ${#SCAN_FILES[@]} installer(s) to scan:"
-          printf '  %s\n' "${SCAN_FILES[@]}"
-
-          # --- Helper: upload a file to VirusTotal ---
-          upload_file() {
-            local filepath="$1"
-            local filesize
-            filesize=$(stat -c%s "$filepath")
-            local upload_url="https://www.virustotal.com/api/v3/files"
-
-            # Files >32MB need a special upload URL.
-            if [ "$filesize" -gt 33554432 ]; then
-              echo "  File >32MB, requesting large-file upload URL..." >&2
-              upload_url=$(curl -s --request GET \
-                --url "https://www.virustotal.com/api/v3/files/upload_url" \
-                --header "x-apikey: ${VT_API_KEY}" | jq -r '.data')
-              if [ -z "$upload_url" ] || [ "$upload_url" = "null" ]; then
-                echo "  ERROR: Failed to get large-file upload URL" >&2
-                return 1
-              fi
-            fi
-
-            local response
-            response=$(curl -s --request POST \
-              --url "$upload_url" \
-              --header "x-apikey: ${VT_API_KEY}" \
-              --form "file=@${filepath}")
-
-            local analysis_id
-            analysis_id=$(echo "$response" | jq -r '.data.id // empty')
-            if [ -z "$analysis_id" ]; then
-              echo "  ERROR: Upload failed. Response: $response" >&2
-              return 1
-            fi
-            echo "$analysis_id"
-          }
-
-          # --- Helper: poll for analysis completion ---
-          poll_analysis() {
-            local analysis_id="$1"
-            local max_attempts=40   # 40 * 15s = 10 min max
-            local attempt=0
-            while [ $attempt -lt $max_attempts ]; do
-              attempt=$((attempt + 1))
-              sleep 15
-              local response
-              response=$(curl -s --request GET \
-                --url "https://www.virustotal.com/api/v3/analyses/${analysis_id}" \
-                --header "x-apikey: ${VT_API_KEY}")
-              local status
-              status=$(echo "$response" | jq -r '.data.attributes.status // empty')
-              if [ "$status" = "completed" ]; then
-                echo "$response"
-                return 0
-              fi
-              echo "  Poll $attempt/$max_attempts: status=$status" >&2
-            done
-            echo "  ERROR: Analysis timed out after $max_attempts attempts" >&2
-            return 1
-          }
-
-          declare -A RESULTS
-          declare -A ENGINE_DETAILS
-          SCAN_DATE=$(date -u +"%Y-%m-%d %H:%M UTC")
-          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          REF_NAME="${{ github.ref_name }}"
-
-          for filepath in "${SCAN_FILES[@]}"; do
-            filename=$(basename "$filepath")
-            echo ""
-            echo "Scanning: $filename"
-
-            echo "  Uploading to VirusTotal..."
-            analysis_id=$(upload_file "$filepath") || {
-              RESULTS["$filename"]="UPLOAD_FAILED|||||||"
-              continue
-            }
-            echo "  Analysis ID: $analysis_id"
-
-            echo "  Waiting for analysis..."
-            analysis_response=$(poll_analysis "$analysis_id") || {
-              RESULTS["$filename"]="POLL_TIMEOUT|||||||"
-              continue
-            }
-
-            malicious=$(echo "$analysis_response"  | jq -r '.data.attributes.stats.malicious  // 0')
-            suspicious=$(echo "$analysis_response" | jq -r '.data.attributes.stats.suspicious // 0')
-            undetected=$(echo "$analysis_response" | jq -r '.data.attributes.stats.undetected // 0')
-            harmless=$(echo "$analysis_response"   | jq -r '.data.attributes.stats.harmless   // 0')
-            failure=$(echo "$analysis_response"    | jq -r '.data.attributes.stats.failure    // 0')
-            total=$((malicious + suspicious + undetected + harmless + failure))
-            file_sha256=$(echo "$analysis_response" | jq -r '.meta.file_info.sha256 // empty')
-            permalink="https://www.virustotal.com/gui/file/${file_sha256}"
-
-            engine_details=""
-            if [ "$malicious" -gt 0 ] || [ "$suspicious" -gt 0 ]; then
-              engine_details=$(echo "$analysis_response" | jq -r '
-                [.data.attributes.results | to_entries[]
-                 | select(.value.category == "malicious" or .value.category == "suspicious")
-                 | "\(.key)|\(.value.category)|\(.value.result)"]
-                | join("\n")')
-            fi
-
-            RESULTS["$filename"]="${malicious}|${suspicious}|${undetected}|${harmless}|${total}|${permalink}|${file_sha256}"
-            ENGINE_DETAILS["$filename"]="$engine_details"
-
-            if [ "$malicious" -gt 0 ] || [ "$suspicious" -gt 0 ]; then
-              echo "  Result: ${malicious} malicious, ${suspicious} suspicious out of ${total} engines"
-            else
-              echo "  Result: CLEAN (${total} engines)"
-            fi
-          done
-
-          # --- Pass/fail per threshold ---
-          THRESHOLD="${{ env.VT_MALICIOUS_THRESHOLD }}"
-          SCAN_FAILED=false
-          FAILED_FILES=()
-          for filename in "${!RESULTS[@]}"; do
-            IFS='|' read -r mal sus undet harm tot link sha <<< "${RESULTS[$filename]}"
-            if [ "$mal" = "UPLOAD_FAILED" ] || [ "$mal" = "POLL_TIMEOUT" ]; then
-              SCAN_FAILED=true
-              FAILED_FILES+=("$filename (scan incomplete)")
-            elif [ "$mal" -ge "$THRESHOLD" ]; then
-              SCAN_FAILED=true
-              FAILED_FILES+=("$filename (${mal} malicious detections >= threshold ${THRESHOLD})")
-            fi
-          done
-
-          # --- Markdown report ---
-          {
-            echo "# VirusTotal Scan Report"
-            echo ""
-            echo "**Build**: ${REF_NAME} | **Date**: ${SCAN_DATE} | **Commit**: ${SHORT_SHA}"
-            echo "**Detection threshold**: ${THRESHOLD} malicious engines"
-            echo ""
-            echo "## Results Summary"
-            echo ""
-            echo "| File | Malicious | Suspicious | Clean | Total | Result | Link |"
-            echo "|------|-----------|------------|-------|-------|--------|------|"
-            for filename in "${!RESULTS[@]}"; do
-              IFS='|' read -r mal sus undet harm tot link sha <<< "${RESULTS[$filename]}"
-              if [ "$mal" = "UPLOAD_FAILED" ]; then
-                echo "| ${filename} | - | - | - | - | UPLOAD FAILED | - |"
-              elif [ "$mal" = "POLL_TIMEOUT" ]; then
-                echo "| ${filename} | - | - | - | - | TIMEOUT | - |"
-              elif [ "$mal" -ge "$THRESHOLD" ]; then
-                echo "| ${filename} | **${mal}** | ${sus} | ${undet} | ${tot} | BLOCKED | [View](${link}) |"
-              elif [ "$mal" -gt 0 ] || [ "$sus" -gt 0 ]; then
-                echo "| ${filename} | ${mal} | ${sus} | ${undet} | ${tot} | WARN (below threshold) | [View](${link}) |"
-              else
-                clean=$((undet + harm))
-                echo "| ${filename} | ${mal} | ${sus} | ${clean} | ${tot} | CLEAN | [View](${link}) |"
-              fi
-            done
-
-            HAS_DETECTIONS=false
-            for filename in "${!ENGINE_DETAILS[@]}"; do
-              if [ -n "${ENGINE_DETAILS[$filename]}" ]; then HAS_DETECTIONS=true; break; fi
-            done
-            if [ "$HAS_DETECTIONS" = true ]; then
-              echo ""
-              echo "## Detection Details"
-              echo ""
-              for filename in "${!ENGINE_DETAILS[@]}"; do
-                details="${ENGINE_DETAILS[$filename]}"
-                if [ -n "$details" ]; then
-                  echo "### ${filename}"
-                  echo ""
-                  echo "| Engine | Category | Detection |"
-                  echo "|--------|----------|-----------|"
-                  echo "$details" | while IFS='|' read -r eng cat res; do
-                    echo "| ${eng} | ${cat} | ${res} |"
-                  done
-                  echo ""
-                fi
-              done
-            fi
-
-            echo ""
-            echo "## File Hashes (SHA-256)"
-            echo ""
-            echo '```'
-            for filename in "${!RESULTS[@]}"; do
-              IFS='|' read -r mal sus undet harm tot link sha <<< "${RESULTS[$filename]}"
-              if [ -n "$sha" ] && [ "$sha" != "" ]; then
-                echo "${sha}  ${filename}"
-              fi
-            done
-            echo '```'
-            echo ""
-            echo "---"
-            echo "*Scanned by [VirusTotal](https://www.virustotal.com) via GitHub Actions | Threshold: ${THRESHOLD} malicious detections*"
-          } > virustotal-report.md
-
-          echo ""
-          echo "=== Scan Report ==="
-          cat virustotal-report.md
-
-          if [ "$SCAN_FAILED" = true ]; then
-            echo ""
-            echo "SCAN FAILED -- release will be blocked:"
-            printf '  %s\n' "${FAILED_FILES[@]}"
-            exit 1
-          fi
-          echo ""
-          echo "All installer(s) passed VirusTotal scan (threshold: ${THRESHOLD})"
+          # PowerShell 7 port of the former bash VT-scan (Windows-only project;
+          # whole pipeline runs on the lab runner now). Logic lives in a
+          # standalone, unit-tested script (run it with -SelfTest to validate
+          # the parse/report logic without the API). The API key is passed via
+          # the VT_API_KEY env var above, never on the command line.
+          & '${{ github.workspace }}\.github\scripts\Invoke-VirusTotalScan.ps1' `
+            -InstallerDir 'installers' `
+            -ReportPath   'virustotal-report.md' `
+            -Threshold    ([int]'${{ env.VT_MALICIOUS_THRESHOLD }}') `
+            -RefName      '${{ github.ref_name }}' `
+            -CommitSha    '${{ github.sha }}'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Upload VT report artifact
         if: always()
@@ -494,7 +284,7 @@ jobs:
   release:
     name: Create draft GitHub Release
     needs: [build, virustotal-scan]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, win-ci]
     if: github.event_name == 'push'
 
     steps:
@@ -511,7 +301,8 @@ jobs:
           path: release-files
 
       - name: List release files
-        run: ls -la release-files/
+        shell: pwsh
+        run: Get-ChildItem -LiteralPath release-files | Format-Table Name, Length, LastWriteTime
 
       - name: Create draft GitHub Release
         uses: softprops/action-gh-release@v2
