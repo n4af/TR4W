@@ -19,8 +19,8 @@
 
    The multipart upload uses curl.exe (ships with Windows 10 1803+), NOT
    Invoke-RestMethod -Form. That keeps the script identical under Windows
-   PowerShell 5.1 (FullBuild runs under powershell.exe) and PowerShell 7 (the
-   CI step runs under pwsh) -- no -Form / no pwsh-7 dependency.
+   PowerShell 5.1 (both FullBuild's local pre-flight and the CI step run under
+   powershell.exe) and PowerShell 7 -- no -Form / no pwsh-7 dependency.
 
    The VirusTotal API key is read from the VT_API_KEY environment variable in
    CI mode (mapped from secrets.VIRUS_TOTAL_API_KEY); FullBuild passes its key
@@ -393,9 +393,13 @@ $scanDate = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm') + ' UTC'
 $shortSha = if ($CommitSha.Length -ge 7) { $CommitSha.Substring(0, 7) } else { $CommitSha }
 $report   = New-VtMarkdownReport -Results $results -Threshold $Threshold -RefName $RefName -ShortSha $shortSha -ScanDate $scanDate
 
-# UTF-8 (no BOM under pwsh, which is what the CI step uses) so the Markdown
-# renders cleanly on the release page.
-Set-Content -LiteralPath $ReportPath -Value $report -Encoding utf8
+# Write UTF-8 WITHOUT a BOM so the Markdown renders cleanly on the release
+# page. Windows PowerShell 5.1's `Set-Content -Encoding utf8` would add a BOM,
+# so write via .NET with a BOM-less UTF8Encoding. Resolve the (possibly
+# relative) path against PowerShell's current location -- [IO.File] uses the
+# process working dir, which is not kept in sync with Get-Location.
+$reportFull = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($ReportPath)
+[System.IO.File]::WriteAllText($reportFull, $report, (New-Object System.Text.UTF8Encoding($false)))
 Write-Host ''
 Write-Host '=== Scan Report ==='
 Write-Host $report
