@@ -22,6 +22,20 @@ Various contributors along the way
 
 ---
 
+## Unreleased
+
+<!--
+In-arrears versioning: new user-facing entries accumulate here as work lands; the
+version number is assigned later, when a release is cut. To cut a release: rename this
+"## Unreleased" to "### X.X.X (YYYY-MM-DD) — HANDLE", move it under the appropriate
+"## 4.147.x" month group below, and bump tr4w/src/Version.pas to match. Keep entries
+user-facing — no file paths or source-level jargon.
+-->
+
+_Nothing yet._
+
+---
+
 ## 4.147.x — May 2026
 
 ### 4.147.24 (2026-05-29) — NY4I
