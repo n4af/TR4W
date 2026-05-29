@@ -899,6 +899,7 @@ var
    //  TempString                            : Str10;
    TempElement: TMainWindowElement;
    TempColumn: LogColumnsType;
+   ColumnToken: string;   // language-neutral column token from COLUMN WIDTH line
 begin
 {$IF MAKE_DEFAULT_VALUES = TRUE}
    Result := True;
@@ -969,12 +970,13 @@ begin
       // path, non-English builds reject COLUMN WIDTH lines because Text
       // is translated at compile time -- e.g. RC_CALLSIGN resolves to
       // 'Indicativo' under -DLANG_ESP and never matches 'CALLSIGN'.
+      // The token is extracted once to an AnsiString so the PChar cast
+      // is legal -- Delphi 7 cannot cast a ShortString directly to PChar.
+      ColumnToken := Copy(pshortstring(Command)^, 14, 255);
       for TempColumn := Low(LogColumnsType) to High(LogColumnsType) do
          begin
-         if (StrComp(ColumnCanonicalName[TempColumn],
-                     PChar(Copy(pshortstring(Command)^, 14, 255))) = 0)
-         or (UpperCase(ColumnsArray[TempColumn].Text) =
-                       Copy(pshortstring(Command)^, 14, 255)) then
+         if (StrComp(ColumnCanonicalName[TempColumn], PChar(ColumnToken)) = 0)
+         or (UpperCase(ColumnsArray[TempColumn].Text) = ColumnToken) then
             begin
             Val(CustomCMD, TempInteger, code);
             if code = 0 then

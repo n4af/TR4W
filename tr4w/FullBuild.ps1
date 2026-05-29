@@ -752,7 +752,12 @@ if ($result -eq 0) {
 # threshold gate; local is just for catching surprises before tagging.
 # ---------------------------------------------------------------------------
 if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
-    $installers = @(Get-ChildItem -Path $RELEASE_DIR -Filter 'tr4w_setup_*.exe' -File -ErrorAction SilentlyContinue)
+    # Scan ONLY the installers produced by this build, not anything left over
+    # from prior versions. RELEASE_DIR accumulates stale installers because
+    # NSIS does not sweep old artifacts; without the version filter the local
+    # VT pre-flight burns ~10 min per stale file and the operator sees
+    # confusing version mismatches in the log.
+    $installers = @(Get-ChildItem -Path $RELEASE_DIR -Filter "tr4w_setup_${TR4W_VERSION}*.exe" -File -ErrorAction SilentlyContinue)
     if ($installers.Count -gt 0) {
         # In CI the secret is deliberately scoped to the dedicated VT scan
         # job, not the build job -- the local pre-flight has nothing to do
