@@ -320,74 +320,14 @@ function Test-InstallerDependencies {
     return $true
 }
 
-# Upload one file to VirusTotal and poll for the analysis result.
-# Uses curl.exe for the multipart upload because Windows PowerShell 5.1's
-# Invoke-RestMethod lacks the -Form switch (PS 7+ only). curl.exe ships
-# with Windows 10 1803+ so the dependency is effectively zero.
-# Returns the parsed analysis response object on success, or $null on
-# upload/poll failure (informational only -- callers don't fail the
-# build).
-function Invoke-VirusTotalScan {
-    param(
-        [Parameter(Mandatory=$true)][string]$FilePath,
-        [Parameter(Mandatory=$true)][string]$ApiKey
-    )
-
-    $filesize = (Get-Item $FilePath).Length
-    $uploadUrl = 'https://www.virustotal.com/api/v3/files'
-
-    # Files >32MB need a one-shot large-file upload URL.
-    if ($filesize -gt 33554432) {
-        try {
-            $ulResp = Invoke-RestMethod -Uri 'https://www.virustotal.com/api/v3/files/upload_url' `
-                                        -Method Get `
-                                        -Headers @{ 'x-apikey' = $ApiKey }
-            $uploadUrl = $ulResp.data
-        } catch {
-            Write-Host "    Failed to get large-file upload URL: $_" -ForegroundColor Red
-            return $null
-        }
-    }
-
-    $curlOut = & curl.exe --silent --request POST `
-                          --url $uploadUrl `
-                          --header "x-apikey: $ApiKey" `
-                          --form "file=@$FilePath"
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "    curl upload failed (exit $LASTEXITCODE)" -ForegroundColor Red
-        return $null
-    }
-    try {
-        $upResp = $curlOut | ConvertFrom-Json
-    } catch {
-        Write-Host "    Upload response not JSON: $curlOut" -ForegroundColor Red
-        return $null
-    }
-    $analysisId = $upResp.data.id
-    if (-not $analysisId) {
-        Write-Host "    No analysis id in upload response" -ForegroundColor Red
-        return $null
-    }
-
-    # Poll /analyses/{id} every 15s up to 10 minutes total.
-    for ($i = 1; $i -le 40; $i++) {
-        Start-Sleep -Seconds 15
-        try {
-            $poll = Invoke-RestMethod -Uri "https://www.virustotal.com/api/v3/analyses/$analysisId" `
-                                       -Method Get `
-                                       -Headers @{ 'x-apikey' = $ApiKey }
-        } catch {
-            Write-Host "    Poll $i/40 error: $_" -ForegroundColor DarkYellow
-            continue
-        }
-        if ($poll.data.attributes.status -eq 'completed') {
-            return $poll
-        }
-        Write-Host "    Poll $i/40: status=$($poll.data.attributes.status)" -ForegroundColor DarkGray
-    }
-    Write-Host "    Poll timed out after 10 minutes" -ForegroundColor Red
-    return $null
-}
+# VirusTotal scan logic is shared with the CI release pipeline -- the single
+# source of truth lives in .github/scripts/Invoke-VirusTotalScan.ps1. Dot-
+# source it to load Invoke-VirusTotalScan (curl-based upload + poll, returns
+# the analysis object or $null), ConvertTo-VtResult, and Get-VtVerdict. That
+# script no-ops when dot-sourced; it only runs a scan when invoked directly
+# (the CI release job does that). $ProjectRoot is one level above tr4w\ (see
+# the param block), so the shared script sits at <root>\.github\scripts\.
+. (Join-Path $ProjectRoot '.github\scripts\Invoke-VirusTotalScan.ps1')
 
 # Helper: UPX + makensis for the exe currently in target\tr4w.exe.
 # Pass empty $langCode for the no-suffix ENG installer, or the lowercase
@@ -793,23 +733,17 @@ if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
                     Write-Host "    Scan unavailable -- continuing." -ForegroundColor Yellow
                     continue
                 }
-                $stats   = $vt.data.attributes.stats
-                $mal     = [int]$stats.malicious
-                $sus     = [int]$stats.suspicious
-                $undet   = [int]$stats.undetected
-                $harm    = [int]$stats.harmless
-                $fail    = [int]$stats.failure
-                $total   = $mal + $sus + $undet + $harm + $fail
-                $sha     = $vt.meta.file_info.sha256
-                if ($mal -ge $VT_MALICIOUS_THRESHOLD) {
-                    $verdict = "BLOCKED (>= CI threshold of $VT_MALICIOUS_THRESHOLD)"; $color = "Red"
-                } elseif ($mal -gt 0 -or $sus -gt 0) {
-                    $verdict = "WARN (below CI threshold)"; $color = "Yellow"
-                } else {
-                    $verdict = "CLEAN"; $color = "Green"
+                # Shape via the shared helper so stats parsing + the
+                # threshold verdict live in exactly one place (the same code
+                # the CI report uses).
+                $r = ConvertTo-VtResult -FileName $inst.Name -Analysis $vt -Threshold $VT_MALICIOUS_THRESHOLD
+                switch ($r.Verdict) {
+                    'BLOCKED' { $verdict = "BLOCKED (>= CI threshold of $VT_MALICIOUS_THRESHOLD)"; $color = "Red" }
+                    'WARN'    { $verdict = "WARN (below CI threshold)";                            $color = "Yellow" }
+                    default   { $verdict = "CLEAN";                                                $color = "Green" }
                 }
-                Write-Host "    $verdict -- $mal malicious / $sus suspicious / $($undet + $harm) clean of $total engines" -ForegroundColor $color
-                Write-Host "    https://www.virustotal.com/gui/file/$sha" -ForegroundColor Cyan
+                Write-Host "    $verdict -- $($r.Malicious) malicious / $($r.Suspicious) suspicious / $($r.Undetected + $r.Harmless) clean of $($r.Total) engines" -ForegroundColor $color
+                Write-Host "    https://www.virustotal.com/gui/file/$($r.Sha)" -ForegroundColor Cyan
             }
             Write-Host ""
             Write-Host "Local scan complete. CI VT-scan is the authoritative gate on tag push." -ForegroundColor DarkGray

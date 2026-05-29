@@ -1,0 +1,90 @@
+# Place at .github/workflows/version-guard.yml in n4af/tr4w
+#
+# Purpose:
+#   Guard against tr4w/src/Version.pas being dropped or corrupted by a merge.
+#
+#   On 2026-05-29 an "evil merge" (commit 2beeb9b) resolved a Version.pas
+#   conflict between two version-bumped branches by deleting the file
+#   entirely. Nothing caught it at merge time -- release.yml only reads
+#   Version.pas at TAG time, long after the bad merge had landed on master.
+#
+#   This workflow runs at the moment a change lands -- on every pull request
+#   and on every push to master -- and fails fast if Version.pas is missing
+#   or no longer contains a parseable version string.
+#
+# What it deliberately does NOT do:
+#   It does NOT require the version to be bumped or changed in a PR. The
+#   project's release process intentionally bumps Version.pas LATE -- only
+#   after a PR is validated on a teammate's machine, as a separate step right
+#   before tagging. So a normal PR (and a fresh merge to master) legitimately
+#   still carries the PREVIOUS version string. This guard only asserts the
+#   file exists and parses; the tag/version match stays in release.yml.
+#
+# Runner / shell:
+#   Runs on the same self-hosted [self-hosted, win-ci] runner as release.yml's
+#   build job (TR4W is a Windows-only project) and uses PowerShell with the
+#   SAME Select-String extraction release.yml uses at tag time -- so the guard
+#   and the release job validate Version.pas identically. No toolchain, no
+#   build: this is a sub-second text check.
+
+name: Version.pas Guard
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+# A newer push to the same ref supersedes an in-flight check.
+concurrency:
+  group: version-guard-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  version-guard:
+    name: Verify Version.pas is present and parseable
+    runs-on: [self-hosted, win-ci]
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v5
+
+      - name: Assert Version.pas exists and parses
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $file = Join-Path $env:GITHUB_WORKSPACE 'tr4w\src\Version.pas'
+
+          # 1. Existence -- the exact failure mode of the 2beeb9b evil merge.
+          if (-not (Test-Path $file)) {
+            Write-Host "::error file=tr4w/src/Version.pas::tr4w/src/Version.pas is missing."
+            Write-Host "Version.pas is the single source of truth for the release version and MUST NOT be dropped."
+            Write-Host "If a merge removed it, restore it (e.g. 'git checkout <last-good-commit> -- tr4w/src/Version.pas') before merging."
+            exit 1
+          }
+
+          # 2. Parseable version constant -- identical regex to the
+          #    'Extract version from src/Version.pas' step in release.yml,
+          #    so if this guard passes the release workflow can always read
+          #    the version.
+          $match = Select-String -Path $file `
+                                 -Pattern "TR4W_CURRENTVERSION_NUMBER\s*=\s*'([^']+)'" `
+                   | Select-Object -First 1
+          if (-not $match) {
+            Write-Host "::error file=tr4w/src/Version.pas::Could not find a TR4W_CURRENTVERSION_NUMBER = '...' line in tr4w/src/Version.pas."
+            Write-Host "The file is present but its version constant is missing or malformed."
+            exit 1
+          }
+          $version = $match.Matches[0].Groups[1].Value
+
+          # 3. Sanity-check the shape (dotted numeric, e.g. 4.147.22). Catches a
+          #    constant that survived but got corrupted to garbage. Lenient on
+          #    the major number (future-proof for v5+); NO comparison against
+          #    any expected value -- bumps happen later, by design.
+          if ($version -notmatch '^[0-9]+(\.[0-9]+)+$') {
+            Write-Host "::error file=tr4w/src/Version.pas::TR4W_CURRENTVERSION_NUMBER = '$version' is not a valid dotted version (expected e.g. 4.147.22)."
+            exit 1
+          }
+
+          Write-Host "Version.pas present; TR4W_CURRENTVERSION_NUMBER = '$version' -- OK"
