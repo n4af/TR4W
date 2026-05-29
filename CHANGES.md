@@ -22,7 +22,7 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
-### 4.147.23 (2026-05-29) — NY4I
+### 4.147.24 (2026-05-29) — NY4I
 
 #### Indy library layout cleanup (`tr4w/include/Indy`, `tr4w/tr4w.cfg`, `tr4w/tr4w.dof`, `tr4w/tr4wserver/tr4wserver.cfg`, `tr4w/tr4wserver/tr4wserver.dof`, `tr4w/BatchCompile.cmd`, `tr4w/test/CompileTest.{cmd,ps1}`, `tr4w/test/CompileRadioTester.{cmd,ps1}`, `tr4w/tr4wserver/BuildServer.ps1`, `tr4w/FullBuild.ps1`, `CLAUDE.md`) — PRs #943, #944, #945
 
@@ -31,15 +31,23 @@ Various contributors along the way
 - **Dev/test scripts depend on bundled Indy** (#945): `BatchCompile.cmd`, `test/CompileTest.{cmd,ps1}`, and `test/CompileRadioTester.{cmd,ps1}` hardcoded an external `C:\Indy\Lib\*` install; repointed to `C:\tr4w\tr4w\include\*`. `BuildServer.ps1`'s `$IndyRoot` default changed from `C:\Indy\Indy\Lib` to the bundled `…\tr4w\include` (derived from `$ProjectRoot`), matching `FullBuild.ps1` and the script's own header comment, so standalone server builds no longer need an external Indy. A stale `C:\Indy\Indy\Lib` path in a `FullBuild.ps1` comment was corrected.
 - **Verified**: Delphi 7 IDE build of `tr4w.dpr` against the corrected paths compiles and links.
 
+#### ESP VERSIONINFO LANGID (`tr4w/FullBuild.ps1`) — Issue #941, PR #946
+
+- **ESP added to the VERSIONINFO `$langMap`**: `LangId = 0x0C0A` (Spanish — Spain, International/Modern sort, es-ES), `CodePage = 1252`. The 2026-05-28 ESP backfill added ESP to the build matrix (`$otherLangs`) but not the VERSIONINFO table, so per-language ESP builds printed `No VERSIONINFO LANGID mapping for 'ESP' -- defaulting to ENG` and tagged the exe's embedded version info as English (`0x0409`). Cosmetic metadata only — the UI was already Spanish via `-DLANG_ESP` + the ESP `.res`. Stale param-doc comment updated to list ESP.
+
 ---
 
-### 4.147.22 (2026-05-29) — NY4I / N4AF
+### 4.147.23 (2026-05-29) — NY4I
 
 #### CI: entire release pipeline on the self-hosted runner (`.github/workflows/release.yml`, `.github/scripts/Invoke-VirusTotalScan.ps1` (NEW), `.github/workflows/version-guard.yml` (NEW), `tr4w/FullBuild.ps1`) — PR #942
 
 - **Whole pipeline self-hosted**: the `virustotal-scan` and `release` jobs (previously `ubuntu-latest`) now run on the `[self-hosted, win-ci]` runner alongside `build`. GitHub-hosted runners can't host Delphi 7, and keeping all jobs on one machine removes the cross-OS artifact hand-off. `release.yml` trimmed ~259 lines.
 - **VT scan extracted** to `.github/scripts/Invoke-VirusTotalScan.ps1` (curl-based upload + poll), now shared by CI and the local `FullBuild.ps1` pre-flight — single source of truth.
 - **New `version-guard.yml`**: a "Verify Version.pas is present and parseable" check on pushes/PRs, so a malformed or missing `TR4W_CURRENTVERSION_NUMBER` can't reach a release tag.
+
+---
+
+### 4.147.22 (2026-05-29) — NY4I / N4AF
 
 #### Spanish (ESP) + cross-language CFG portability (`tr4w/src/lang/TR4W_CONSTS_ESP.PAS`, `tr4w/target/commands_help_esp.ini` (NEW), `tr4w/src/VC.pas`, `tr4w/src/uCFG.pas`, `tr4w/src/MainUnit.pas`) — Issues #925, #937, #938, PR #939
 

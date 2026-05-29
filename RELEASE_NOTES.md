@@ -24,13 +24,22 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
-### 4.147.23 (2026-05-29) — NY4I
+### 4.147.24 (2026-05-29) — NY4I
 
 #### For Contributors / Source Builders
 
 - Follow-up to the bundled-Indy change in 4.147.21: leftover references to a separate `C:\Indy` install have been cleaned out of the Delphi IDE project files and the helper build/test scripts. Opening `tr4w.dpr` in Delphi 7, or running the server/test build scripts, now uses the bundled `tr4w/include` copy with no external Indy install required. (Set `INDY_ROOT` to override.)
 - Removed three stray Git submodule pointers (`tr4w/include/Indy`, `tr4w/src/rekor-cli`, `tr4w/src/root-signing`) that produced a harmless but noisy warning at the end of every automated release build.
+- The Spanish installer's embedded version info (Properties → Details) is now correctly tagged Spanish (Spain) instead of English — cosmetic; the program UI was already fully Spanish.
 - No change to the program itself — these are build/packaging fixes only.
+
+---
+
+### 4.147.23 (2026-05-29) — NY4I
+
+#### Internal / Build
+
+- Release-build infrastructure changes only (CI pipeline now runs entirely on the self-hosted Windows runner, plus a version-number sanity check). No effect on the program itself.
 
 ---
 
@@ -40,10 +49,6 @@ Various contributors along the way
 
 - **Spanish (ESP) is now fully supported**, including translated command help — on par with the other shipped languages.
 - Column-width settings saved in a config file now load correctly regardless of the language the config was created in (previously a config saved by an English build wouldn't load in a Spanish/Russian/etc. build).
-
-#### Internal / Build
-
-- Release-build infrastructure changes only (CI pipeline now runs entirely on the self-hosted Windows runner, plus a version-number sanity check). No effect on the program itself.
 
 ---
 
