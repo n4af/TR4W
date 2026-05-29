@@ -11,7 +11,7 @@
 #                                    (UPX is opt-in via FullBuild.ps1's -UseUpx
 #                                    switch; CI does not pass it as of 2026-05-28)
 #   virustotal-scan (win-ci)      -> download installer(s), scan via VT API
-#                                    (PowerShell 7: .github/scripts/Invoke-VirusTotalScan.ps1),
+#                                    (Windows PowerShell 5.1: .github/scripts/Invoke-VirusTotalScan.ps1),
 #                                    produce virustotal-report.md, upload as artifact
 #   release (win-ci)              -> only on tag push; download both artifacts,
 #                                    create draft release with installer(s)
@@ -253,10 +253,12 @@ jobs:
       - name: Scan installers with VirusTotal
         env:
           VT_API_KEY: ${{ secrets.VIRUS_TOTAL_API_KEY }}
-        shell: pwsh
+        shell: powershell
         run: |
-          # PowerShell 7 port of the former bash VT-scan (Windows-only project;
-          # whole pipeline runs on the lab runner now). Logic lives in a
+          # VT-scan under Windows PowerShell 5.1 (the runner has 5.1
+          # machine-wide; the script is runtime-agnostic -- curl.exe upload,
+          # no -Form -- so this CI step and FullBuild's local pre-flight share
+          # one file). Logic lives in a
           # standalone, unit-tested script (run it with -SelfTest to validate
           # the parse/report logic without the API). The API key is passed via
           # the VT_API_KEY env var above, never on the command line.
@@ -301,7 +303,7 @@ jobs:
           path: release-files
 
       - name: List release files
-        shell: pwsh
+        shell: powershell
         run: Get-ChildItem -LiteralPath release-files | Format-Table Name, Length, LastWriteTime
 
       - name: Create draft GitHub Release
