@@ -26,10 +26,26 @@ Various contributors along the way
 
 #### Indy library layout cleanup (`tr4w/include/Indy`, `tr4w/tr4w.cfg`, `tr4w/tr4w.dof`, `tr4w/tr4wserver/tr4wserver.cfg`, `tr4w/tr4wserver/tr4wserver.dof`, `tr4w/BatchCompile.cmd`, `tr4w/test/CompileTest.{cmd,ps1}`, `tr4w/test/CompileRadioTester.{cmd,ps1}`, `tr4w/tr4wserver/BuildServer.ps1`, `tr4w/FullBuild.ps1`, `CLAUDE.md`) — PRs #943, #944, #945
 
-- **Stray submodule gitlink removed** (#943): `tr4w/include/Indy` was committed as a gitlink (mode `160000` → commit `c8220089`) with no `.gitmodules` entry and a target commit absent from the repo. `actions/checkout` post-job cleanup ran `git submodule foreach` and failed with `fatal: No url found for submodule path 'tr4w/include/Indy'` (exit 128) on every tag build. `git rm --cached` dropped the pointer; the build never referenced the path (Indy resolves from `include\Core`, `include\System`, `include\Protocols`).
+- **Stray submodule gitlinks removed** (#943 + follow-up): three accidental gitlinks (mode `160000`) with no `.gitmodules` and target commits absent from the repo — `tr4w/include/Indy` (→ `c8220089`), `tr4w/src/rekor-cli` (→ `5ed77ae`), and `tr4w/src/root-signing` (→ `9f63f63`) — caused `actions/checkout` post-job cleanup (`git submodule foreach`) to fail with `fatal: No url found for submodule path …` (exit 128) on every tag build. The command aborts on the first offending path (`include/Indy` sorts first), so all three had to go. #943 removed `include/Indy`; the two leftover sigstore tool directories under `src/` were removed as a direct follow-up. None were referenced by the build (Indy resolves from `include\Core`, `include\System`, `include\Protocols`).
 - **Stale IDE search paths fixed** (#944): `tr4w.cfg`/`.dof` and `tr4wserver.cfg`/`.dof` listed `-U/-O/-I/-R` and `SearchPath` entries under `include\Indy` (plus `\D7`, `\Lib`, and corrupt `include\Indy]\Lib\*` entries) that no longer exist. Repointed to the bundled Indy 10.6.3.3 tree at `include\Core; include\System; include\Protocols`. CI was unaffected (`FullBuild.ps1`/`BuildServer.ps1` pass correct paths via `/U /I`, overriding the `.cfg`), but Delphi-IDE builds read these files. The `.dof` `[HistoryLists]` MRU entries were intentionally left untouched.
 - **Dev/test scripts depend on bundled Indy** (#945): `BatchCompile.cmd`, `test/CompileTest.{cmd,ps1}`, and `test/CompileRadioTester.{cmd,ps1}` hardcoded an external `C:\Indy\Lib\*` install; repointed to `C:\tr4w\tr4w\include\*`. `BuildServer.ps1`'s `$IndyRoot` default changed from `C:\Indy\Indy\Lib` to the bundled `…\tr4w\include` (derived from `$ProjectRoot`), matching `FullBuild.ps1` and the script's own header comment, so standalone server builds no longer need an external Indy. A stale `C:\Indy\Indy\Lib` path in a `FullBuild.ps1` comment was corrected.
 - **Verified**: Delphi 7 IDE build of `tr4w.dpr` against the corrected paths compiles and links.
+
+---
+
+### 4.147.22 (2026-05-29) — NY4I / N4AF
+
+#### CI: entire release pipeline on the self-hosted runner (`.github/workflows/release.yml`, `.github/scripts/Invoke-VirusTotalScan.ps1` (NEW), `.github/workflows/version-guard.yml` (NEW), `tr4w/FullBuild.ps1`) — PR #942
+
+- **Whole pipeline self-hosted**: the `virustotal-scan` and `release` jobs (previously `ubuntu-latest`) now run on the `[self-hosted, win-ci]` runner alongside `build`. GitHub-hosted runners can't host Delphi 7, and keeping all jobs on one machine removes the cross-OS artifact hand-off. `release.yml` trimmed ~259 lines.
+- **VT scan extracted** to `.github/scripts/Invoke-VirusTotalScan.ps1` (curl-based upload + poll), now shared by CI and the local `FullBuild.ps1` pre-flight — single source of truth.
+- **New `version-guard.yml`**: a "Verify Version.pas is present and parseable" check on pushes/PRs, so a malformed or missing `TR4W_CURRENTVERSION_NUMBER` can't reach a release tag.
+
+#### Spanish (ESP) + cross-language CFG portability (`tr4w/src/lang/TR4W_CONSTS_ESP.PAS`, `tr4w/target/commands_help_esp.ini` (NEW), `tr4w/src/VC.pas`, `tr4w/src/uCFG.pas`, `tr4w/src/MainUnit.pas`) — Issues #925, #937, #938, PR #939
+
+- **ESP enabled end to end**: filled `TR4W_CONSTS_ESP.PAS` and added the full `commands_help_esp.ini`, putting Spanish on par with the other shipped languages.
+- **`ColumnCanonicalName` (`VC.pas`)**: language-neutral column names (`BAND`/`DATE`/`UTC`/…) for persisting `COLUMN WIDTH` settings in CFG files. CFGs were previously language-locked — one saved by an English build failed to load in a Spanish/Russian/etc. build because `ColumnsArray[].Text` is translated at compile time. The canonical names match the historical English values so existing CFGs keep parsing.
+- **Missing language constants filled** across `tr4w_consts_*.pas` (issue #925), using per-codepage byte-level edits to preserve each file's ANSI encoding and CRLF endings.
 
 ---
 
