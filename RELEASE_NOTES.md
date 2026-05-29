@@ -24,6 +24,16 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.23 (2026-05-29) — NY4I
+
+#### For Contributors / Source Builders
+
+- Follow-up to the bundled-Indy change in 4.147.21: leftover references to a separate `C:\Indy` install have been cleaned out of the Delphi IDE project files and the helper build/test scripts. Opening `tr4w.dpr` in Delphi 7, or running the server/test build scripts, now uses the bundled `tr4w/include` copy with no external Indy install required. (Set `INDY_ROOT` to override.)
+- Removed a stray Git submodule pointer at `tr4w/include/Indy` that produced a harmless but noisy warning at the end of every automated release build.
+- No change to the program itself — these are build/packaging fixes only.
+
+---
+
 ### 4.147.21 (2026-05-29) — NY4I
 
 #### HamScore Score Posting

@@ -22,6 +22,17 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.23 (2026-05-29) — NY4I
+
+#### Indy library layout cleanup (`tr4w/include/Indy`, `tr4w/tr4w.cfg`, `tr4w/tr4w.dof`, `tr4w/tr4wserver/tr4wserver.cfg`, `tr4w/tr4wserver/tr4wserver.dof`, `tr4w/BatchCompile.cmd`, `tr4w/test/CompileTest.{cmd,ps1}`, `tr4w/test/CompileRadioTester.{cmd,ps1}`, `tr4w/tr4wserver/BuildServer.ps1`, `tr4w/FullBuild.ps1`, `CLAUDE.md`) — PRs #943, #944, #945
+
+- **Stray submodule gitlink removed** (#943): `tr4w/include/Indy` was committed as a gitlink (mode `160000` → commit `c8220089`) with no `.gitmodules` entry and a target commit absent from the repo. `actions/checkout` post-job cleanup ran `git submodule foreach` and failed with `fatal: No url found for submodule path 'tr4w/include/Indy'` (exit 128) on every tag build. `git rm --cached` dropped the pointer; the build never referenced the path (Indy resolves from `include\Core`, `include\System`, `include\Protocols`).
+- **Stale IDE search paths fixed** (#944): `tr4w.cfg`/`.dof` and `tr4wserver.cfg`/`.dof` listed `-U/-O/-I/-R` and `SearchPath` entries under `include\Indy` (plus `\D7`, `\Lib`, and corrupt `include\Indy]\Lib\*` entries) that no longer exist. Repointed to the bundled Indy 10.6.3.3 tree at `include\Core; include\System; include\Protocols`. CI was unaffected (`FullBuild.ps1`/`BuildServer.ps1` pass correct paths via `/U /I`, overriding the `.cfg`), but Delphi-IDE builds read these files. The `.dof` `[HistoryLists]` MRU entries were intentionally left untouched.
+- **Dev/test scripts depend on bundled Indy** (#945): `BatchCompile.cmd`, `test/CompileTest.{cmd,ps1}`, and `test/CompileRadioTester.{cmd,ps1}` hardcoded an external `C:\Indy\Lib\*` install; repointed to `C:\tr4w\tr4w\include\*`. `BuildServer.ps1`'s `$IndyRoot` default changed from `C:\Indy\Indy\Lib` to the bundled `…\tr4w\include` (derived from `$ProjectRoot`), matching `FullBuild.ps1` and the script's own header comment, so standalone server builds no longer need an external Indy. A stale `C:\Indy\Indy\Lib` path in a `FullBuild.ps1` comment was corrected.
+- **Verified**: Delphi 7 IDE build of `tr4w.dpr` against the corrected paths compiles and links.
+
+---
+
 ### 4.147.21 (2026-05-29) — NY4I
 
 #### HamScore RTC 3.0 (`src/uHamScore.pas`, `src/uCabrillo.pas` (NEW), `src/uGetScores.pas`, `src/VC.pas`, `src/uCFG.pas`, `src/uExchangeBuilder.pas`, `src/trdos/LOGSUBS2.PAS`, `test/hamscore_mock.py`) — Issues #920, #930, #931, #932, PR #935
