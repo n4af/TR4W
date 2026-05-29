@@ -811,3 +811,4 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   TC_SPLIT_WARN                         = 'ПОПЕРЕДЖЕННЯ: Ви працюєте в режимі РОБОТА НА РОЗНЕСЕНИХ ЧАСТОТАХ!!!';
   TC_RUNWARN                            = 'Програма TR4W на вашому комп`ютері вже працює';
   RC_wkMode                             = 'Реініціалізація WinKeyer';      // 4.60.1
+  TC_SHOW_PASSWORDS                     = 'Show passwords';

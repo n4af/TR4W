@@ -24,6 +24,28 @@ Various contributors along the way
 
 ## 4.147.x — May 2026
 
+### 4.147.21 (2026-05-29) — NY4I
+
+#### HamScore Score Posting
+
+- TR4W now speaks the HamScore RTC 3.0 protocol. When the server returns a warning ("exchange mismatch") or error ("bad credentials"), that message appears on the Settings status line so you know why a contact wasn't accepted.
+- Per-QSO contact uploads (the "moving log" feed on HamScore) are now gated by a new `HAMSCORE SEND CONTACT INFO = TRUE` setting plus a per-contest flag. If you run a contest HamScore doesn't track, TR4W no longer wastes time uploading contacts the server would just reject. The realtime score is still uploaded regardless.
+- The score upload now sends your full station profile (club, section/state, grid, continent, country, zones). Most of this is read from the Cabrillo summary you've already filled in — only ITU zone needed a new setting (`MY ITU ZONE`), needed for large countries that span more than one ITU zone.
+- Editing a logged QSO now correctly resubmits the corrected version to HamScore. SST and NAQP exchange edits in particular previously didn't reach HamScore, and ALT-Y deletes weren't sent at all.
+- New `K1USN-SST` ADIF name and `K1USNSST` Cabrillo name for the K1USN SST.
+
+#### Installer / Antivirus
+
+- The TR4W installer is no longer UPX-compressed by default. UPX is a frequent trigger for false-positive antivirus detections — the prior release hit 8 detections including Microsoft Defender; the same build without UPX dropped to 3. The trade-off: about 2.4 MB larger installer download and ~1 MB more disk space per installed EXE. If you want UPX back, build from source with `FullBuild.ps1 -UseUpx`.
+- The installed EXE now reports proper Windows version-info: right-click `tr4w.exe` → Properties → Details to see version and language.
+
+#### For Contributors / Source Builders
+
+- Building from source no longer requires a separate Indy install at `C:\Indy` — the bundled `tr4w/include` copy is used by default. Set `INDY_ROOT` to override.
+- New `docs/UPDATING_RUNTIME_DLLS.md` covers refreshing the bundled HamLib / OpenSSL / inpout32 / rigctld binaries.
+
+---
+
 ### 4.147.19 (2026-05-26) — NY4I / N4AF
 
 #### Continuous Integration & Release Packaging

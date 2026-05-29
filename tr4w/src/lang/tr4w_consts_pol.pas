@@ -789,3 +789,4 @@ const
   TC_ENTERYOURBRANCHNUMBER              = 'Enter your Branch number:';
   TC_ENTERYOURPOSTCODE                  = 'Enter your postcode:';
 
+  TC_SHOW_PASSWORDS                     = 'Show passwords';

@@ -2225,6 +2225,21 @@ var
 {*)}
     );
 
+  // Language-neutral column names used to persist COLUMN WIDTH ... settings
+  // in CFG files. Must stay in sync with ColumnsArray above (same order, same
+  // count). These match the uppercased English Text values that older English
+  // builds historically wrote, so existing CFG files continue to parse.
+  // Without this, CFGs are language-locked: a CFG saved by an English build
+  // fails to load in a Spanish/Russian/etc. build because ColumnsArray[].Text
+  // is translated at compile time.
+  ColumnCanonicalName: array[LogColumnsType] of PChar = (
+    'BAND',     'DATE',     'UTC',      'QSS',      'CALLSIGN', 'QTC',
+    'QSR',      'DX',       'ZN',       'PX',       'PRE',      'CK',
+    'NAME',     'CL.',      'QTH',      'AGE',      'CH.',      'PWR',
+    'FOC#',     'KIDS',     'PTS',      'M',        'ID',       '$',
+    'D',        'FREQ',     'OP'
+    );
+
   {Windows ID`s}
 const
   tr4w_MAINWINDOW_INDEX                 = 0;

@@ -792,3 +792,4 @@ const
   TC_LIST_OF_COMMAND                    = '&List of commands';
   TC_ENTERYOURPOSTCODE                  = 'Enter your postcode:';
   
+  TC_SHOW_PASSWORDS                     = 'Show passwords';
