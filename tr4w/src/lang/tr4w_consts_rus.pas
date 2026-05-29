@@ -809,3 +809,4 @@ const
  TC_SPLIT_WARN                          = 'ПРЕДУПРЕЖДЕНИЕ: Вы работаете в режиме РАБОТА НА РАЗНЕСЕННЫХ ЧАСТОТАХ!!!';
  TC_RUNWARN                             = 'Программа TR4W на вашем компьютере уже работает ';
  RC_wkMode                              = 'Реинициализация WinKeyer';      // 4.60.1
+  TC_SHOW_PASSWORDS                     = 'Show passwords';

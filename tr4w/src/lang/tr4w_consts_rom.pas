@@ -822,3 +822,4 @@ const
   TC_RUNWARN = 'Un alt program TR4W functioneaza deja';
   RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1
   
+  TC_SHOW_PASSWORDS                     = 'Show passwords';

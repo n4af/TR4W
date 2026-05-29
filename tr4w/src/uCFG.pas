@@ -899,6 +899,7 @@ var
    //  TempString                            : Str10;
    TempElement: TMainWindowElement;
    TempColumn: LogColumnsType;
+   ColumnToken: string;   // language-neutral column token from COLUMN WIDTH line
 begin
 {$IF MAKE_DEFAULT_VALUES = TRUE}
    Result := True;
@@ -962,16 +963,27 @@ begin
 
    if StrPos(@Command[1], 'COLUMN WIDTH ') = @Command[1] then
       begin
+      // Match against the canonical (language-neutral) column name first.
+      // Fall back to UpperCase(Text) so CFGs written before the canonical
+      // table existed (i.e. old English builds where Text already happened
+      // to be an English word) continue to load. Without the canonical
+      // path, non-English builds reject COLUMN WIDTH lines because Text
+      // is translated at compile time -- e.g. RC_CALLSIGN resolves to
+      // 'Indicativo' under -DLANG_ESP and never matches 'CALLSIGN'.
+      // The token is extracted once to an AnsiString so the PChar cast
+      // is legal -- Delphi 7 cannot cast a ShortString directly to PChar.
+      ColumnToken := Copy(pshortstring(Command)^, 14, 255);
       for TempColumn := Low(LogColumnsType) to High(LogColumnsType) do
          begin
-         if UpperCase(ColumnsArray[TempColumn].Text) = Copy(pshortstring(Command)^, 14, 255) then
+         if (StrComp(ColumnCanonicalName[TempColumn], PChar(ColumnToken)) = 0)
+         or (UpperCase(ColumnsArray[TempColumn].Text) = ColumnToken) then
             begin
             Val(CustomCMD, TempInteger, code);
             if code = 0 then
                begin
                ColumnWidthOverride[TempColumn] := TempInteger;
                logger.Debug('CheckCommand: COLUMN WIDTH %s = %d (col index %d)',
-                  [ColumnsArray[TempColumn].Text, TempInteger, Ord(TempColumn)]);
+                  [ColumnCanonicalName[TempColumn], TempInteger, Ord(TempColumn)]);
                end;
             Result := True;
             Exit;

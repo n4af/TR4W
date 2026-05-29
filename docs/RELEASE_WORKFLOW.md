@@ -265,7 +265,7 @@ Or, if engines flag the file:
 
 ```
     WARN (below CI threshold) -- 2 malicious / 0 suspicious / 71 clean of 73 engines
-    BLOCKED (>= CI threshold of 4) -- 5 malicious / 1 suspicious / 67 clean of 73 engines
+    BLOCKED (>= CI threshold of 8) -- 9 malicious / 1 suspicious / 63 clean of 73 engines
 ```
 
 **Local scan is informational only** -- it never fails the build. The CI VT-scan
@@ -447,7 +447,7 @@ tag. If not, do [section 5](#5-when-to-update-versionpas) first.
    - **virustotal-scan** (Linux runner): downloads the installer, uploads it to
      VirusTotal, polls for completion, generates `virustotal-report.md`. Fails
      the pipeline if any installer hits the threshold
-     (`VT_MALICIOUS_THRESHOLD = 4`), which blocks the release job. An emergency
+     (`VT_MALICIOUS_THRESHOLD = 8`), which blocks the release job. An emergency
      `skip_virustotal` input is available on the `workflow_dispatch` trigger.
    - **release** (Linux runner): only runs on tag push. Downloads both
      artifacts, creates a **draft** GitHub Release with auto-generated

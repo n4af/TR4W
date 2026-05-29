@@ -1,7 +1,7 @@
 param(
     # When set, after the default ENG build, loop through every other
     # supported LANG_xxx (RUS, SER, MNG, CZE, ROM, GER, UKR) and rebuild
-    # against each. Excludes ESP/POL/CHN (broken constants, issue #925).
+    # against each. Excludes POL/CHN (broken constants, issue #925).
     [switch]$AllLanguages,
 
     # When set, run UPX --lzma + makensis after each (ENG + per-lang) build
@@ -608,12 +608,13 @@ if ($result -eq 0) {
         # which is the only way to keep per-language builds under ~3 min
         # each instead of ~3 min just for the Indy rebuild alone.
         #
-        # ESP/POL/CHN are excluded -- they each have many missing
+        # POL/CHN are excluded -- they each have many missing
         # constants tracked separately under issue #925.
+        # (ESP was backfilled 2026-05-28 and is now in the matrix.)
         # ---------------------------------------------------------------
         if ($AllLanguages) {
             $langResults = @()
-            $otherLangs = @("RUS","SER","MNG","CZE","ROM","GER","UKR")
+            $otherLangs = @("RUS","SER","MNG","CZE","ROM","GER","UKR","ESP")
 
             # Per-lang DCUs go to dcu-cache\<lang>\ via DCC32's /N flag.
             # src\*.dcu is the canonical ENG state and stays untouched
@@ -749,9 +750,21 @@ if ($result -eq 0) {
 # Gated on -BuildInstallers AND $env:VIRUS_TOTAL_API_KEY. Informational
 # only -- never fails the build. CI runs its own VT-scan job with a
 # threshold gate; local is just for catching surprises before tagging.
+#
+# Mirror the CI threshold so the local pre-flight verdict matches what CI
+# will do on tag push. Authoritative value lives in
+# .github/workflows/release.yml (env.VT_MALICIOUS_THRESHOLD); bump both
+# together. Raised from 4 -> 8 in commit cfdab9a to absorb heuristic
+# false positives on unsigned NSIS+inpout32.dll installers.
 # ---------------------------------------------------------------------------
+$VT_MALICIOUS_THRESHOLD = 8
 if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
-    $installers = @(Get-ChildItem -Path $RELEASE_DIR -Filter 'tr4w_setup_*.exe' -File -ErrorAction SilentlyContinue)
+    # Scan ONLY the installers produced by this build, not anything left over
+    # from prior versions. RELEASE_DIR accumulates stale installers because
+    # NSIS does not sweep old artifacts; without the version filter the local
+    # VT pre-flight burns ~10 min per stale file and the operator sees
+    # confusing version mismatches in the log.
+    $installers = @(Get-ChildItem -Path $RELEASE_DIR -Filter "tr4w_setup_${TR4W_VERSION}*.exe" -File -ErrorAction SilentlyContinue)
     if ($installers.Count -gt 0) {
         # In CI the secret is deliberately scoped to the dedicated VT scan
         # job, not the build job -- the local pre-flight has nothing to do
@@ -788,8 +801,8 @@ if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
                 $fail    = [int]$stats.failure
                 $total   = $mal + $sus + $undet + $harm + $fail
                 $sha     = $vt.meta.file_info.sha256
-                if ($mal -ge 4) {
-                    $verdict = "BLOCKED (>= CI threshold of 4)"; $color = "Red"
+                if ($mal -ge $VT_MALICIOUS_THRESHOLD) {
+                    $verdict = "BLOCKED (>= CI threshold of $VT_MALICIOUS_THRESHOLD)"; $color = "Red"
                 } elseif ($mal -gt 0 -or $sus -gt 0) {
                     $verdict = "WARN (below CI threshold)"; $color = "Yellow"
                 } else {
