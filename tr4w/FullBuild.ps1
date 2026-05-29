@@ -544,9 +544,10 @@ if ($result -eq 0) {
         # downstream consumes target\tr4w.exe or src\*.dcu, so this loop
         # can leave them in whatever state the final language produced.
         #
-        # Indy DCUs at C:\Indy\Indy\Lib\* stay cached across iterations,
-        # which is the only way to keep per-language builds under ~3 min
-        # each instead of ~3 min just for the Indy rebuild alone.
+        # Indy DCUs (compiled from the bundled include\ tree) stay cached
+        # across iterations, which is the only way to keep per-language
+        # builds under ~3 min each instead of ~3 min just for the Indy
+        # rebuild alone.
         #
         # POL/CHN are excluded -- they each have many missing
         # constants tracked separately under issue #925.

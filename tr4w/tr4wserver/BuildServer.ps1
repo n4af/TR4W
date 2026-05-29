@@ -4,7 +4,7 @@ param(
     # location and the same env vars FullBuild.ps1 uses.
     [string]$ProjectRoot = (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent),
     [string]$Delphi7Bin  = $(if ($env:DELPHI7_BIN) { $env:DELPHI7_BIN } else { "C:\Program Files (x86)\Borland\Delphi7\Bin" }),
-    [string]$IndyRoot    = $(if ($env:INDY_ROOT)   { $env:INDY_ROOT }   else { "C:\Indy\Indy\Lib" })
+    [string]$IndyRoot    = $(if ($env:INDY_ROOT)   { $env:INDY_ROOT }   else { Join-Path (Join-Path $ProjectRoot "tr4w") "include" })
 )
 
 $ErrorActionPreference = "Continue"
