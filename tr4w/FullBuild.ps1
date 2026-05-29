@@ -750,7 +750,14 @@ if ($result -eq 0) {
 # Gated on -BuildInstallers AND $env:VIRUS_TOTAL_API_KEY. Informational
 # only -- never fails the build. CI runs its own VT-scan job with a
 # threshold gate; local is just for catching surprises before tagging.
+#
+# Mirror the CI threshold so the local pre-flight verdict matches what CI
+# will do on tag push. Authoritative value lives in
+# .github/workflows/release.yml (env.VT_MALICIOUS_THRESHOLD); bump both
+# together. Raised from 4 -> 8 in commit cfdab9a to absorb heuristic
+# false positives on unsigned NSIS+inpout32.dll installers.
 # ---------------------------------------------------------------------------
+$VT_MALICIOUS_THRESHOLD = 8
 if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
     # Scan ONLY the installers produced by this build, not anything left over
     # from prior versions. RELEASE_DIR accumulates stale installers because
@@ -794,8 +801,8 @@ if ($result -eq 0 -and $BuildInstallers -and (Test-Path $RELEASE_DIR)) {
                 $fail    = [int]$stats.failure
                 $total   = $mal + $sus + $undet + $harm + $fail
                 $sha     = $vt.meta.file_info.sha256
-                if ($mal -ge 4) {
-                    $verdict = "BLOCKED (>= CI threshold of 4)"; $color = "Red"
+                if ($mal -ge $VT_MALICIOUS_THRESHOLD) {
+                    $verdict = "BLOCKED (>= CI threshold of $VT_MALICIOUS_THRESHOLD)"; $color = "Red"
                 } elseif ($mal -gt 0 -or $sus -gt 0) {
                     $verdict = "WARN (below CI threshold)"; $color = "Yellow"
                 } else {
