@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Continue"
 
-$LIB = "C:\Indy\Lib\Core;C:\Indy\Lib\System;C:\tr4w\tr4w\include;C:\Indy\Lib\Protocols"
+$LIB = "C:\tr4w\tr4w\include\Core;C:\tr4w\tr4w\include\System;C:\tr4w\tr4w\include;C:\tr4w\tr4w\include\Protocols"
 $DCC32 = "C:\Program Files (x86)\Borland\Delphi7\Bin\DCC32.EXE"
 $SRC = "c:\tr4w\tr4w\src"
 

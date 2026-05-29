@@ -1,8 +1,8 @@
 @echo off
-set LIB=C:\Indy\Lib\Core;
-set LIB=%LIB%C:\Indy\Lib\System;
+set LIB=C:\tr4w\tr4w\include\Core;
+set LIB=%LIB%C:\tr4w\tr4w\include\System;
 set LIB=%LIB%C:\tr4w\tr4w\include;
-set LIB=%LIB%C:\Indy\Lib\Protocols;
+set LIB=%LIB%C:\tr4w\tr4w\include\Protocols;
 set EXE=C:\TR4W\tr4w\target
 cd C:\tr4w\tr4w
 "c:\Program Files (x86)\Borland\Delphi7\Bin\DCC32.EXE" src\uHamLibDirect.pas -$D+ -$L+ -$Y+ -NC:\Temp /U%LIB% /I%LIB% /E%EXE%
