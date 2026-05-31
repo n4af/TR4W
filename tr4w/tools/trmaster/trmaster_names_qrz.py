@@ -31,9 +31,11 @@ import configparser
 import csv
 import json
 import os
+import socket
 import sys
 import time
 import unicodedata
+import urllib.error
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -157,15 +159,27 @@ class QRZNameClient:
             self._session()
         url = QRZ_API_URL + "?" + urllib.parse.urlencode(
             {"s": self._key, "callsign": call})
-        with urllib.request.urlopen(url, timeout=15) as r:
-            raw = r.read()
+        # Network / HTTP layer: a failure here is a real outage -- let it
+        # propagate so the caller's loop stops the pass (don't hammer a failing
+        # API). Caught per-type so each could be handled differently later
+        # (e.g. back off on timeout / 5xx) instead of being treated as a miss.
+        try:
+            with urllib.request.urlopen(url, timeout=15) as r:
+                raw = r.read()
+        except urllib.error.HTTPError:      # server returned 4xx/5xx
+            raise
+        except urllib.error.URLError:       # DNS / refused / unreachable (reason may wrap socket.timeout)
+            raise
+        except socket.timeout:              # connect / read timed out
+            raise
+
+        # Parse layer: a malformed / non-XML body is a per-call problem (HTML
+        # error page or bad encoding -- seen on some DX calls like BD3PZF), not
+        # an outage. Treat it as a cacheable miss so the call is skipped and the
+        # pass continues rather than aborting on one bad response.
         try:
             root = ET.fromstring(raw)
         except ET.ParseError:
-            # QRZ occasionally returns a non-XML / malformed body for a single
-            # call (HTML error page or bad encoding -- seen on some DX calls).
-            # Treat it as a miss (cached + skipped) so one bad response doesn't
-            # abort the whole name pass. Genuine network errors still propagate.
             return None
         ns = self._ns(root)
         s = root.find(f"{ns}Session")
