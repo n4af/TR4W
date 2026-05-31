@@ -296,6 +296,16 @@ var
   QSOTotals                             : QSOTotalArray; { This may not also be exactly the same as
   DupeList.Totals because of dupes read in }
 
+  // Issue #954: highest serial (NumberSent) actually sent, tracked per band
+  // (the AllBands index is the whole-station high-water mark).  The next serial
+  // to send is this value + 1 -- see NextSerialToSend in LOGEDIT.  It is kept in
+  // lockstep with QSOTotals (zeroed in the dupe-sheet reset, updated in LoadinLog
+  // and in the live add), but UNLIKE QSOTotals it INCLUDES X-QSO records (they
+  // consumed a number) and EXCLUDES deleted ones.  That is what stops marking a
+  // QSO X-QSO -- or deleting a mid-log QSO -- from rolling the serial backward
+  // and re-issuing a number already sent on the air.
+  MaxSerialSent                         : array[BandType] of integer;
+
   RemainingMultDisplay                  : RemainingMultiplierType = rmNoRemMultDisplay;
 
 //  RemMultMatrix                         : array[Band160..All, CW..Both, RemainingMultiplierType] of RemainingMultListPointer;
@@ -1326,6 +1336,7 @@ begin
   Windows.ZeroMemory(@RemMultMatrix, SizeOf(RemMultMatrix));
 }
   Windows.ZeroMemory(@QSOTotals, SizeOf(QSOTotals));
+  Windows.ZeroMemory(@MaxSerialSent, SizeOf(MaxSerialSent));  // Issue #954: rebuilt by LoadinLog
   Windows.ZeroMemory(@ContinentQSOCount, SizeOf(ContinentQSOCount));
 
 //  Windows.ZeroMemory(@MultSheet, SizeOf(MultSheet));

@@ -567,7 +567,7 @@ var
   SecString, TempString                 : Str80;
 begin
   Str(Seconds, SecString);
-  Str(TotalContacts + 1, TempString);
+  Str(NextSerialToSend, TempString);  // Issue #954
   TempString := '; Backcopy made for QSO #' + TempString + ' at ' +
     GetTimeString + ' for ' + SecString + ' seconds.';
   PushLogStringIntoEditableLogAndLogPopedQSO(TempString, True);
@@ -1053,7 +1053,7 @@ begin
         {KK1L: 6.68 From here to REPEAT added to put autoCQ in band map and send multi info message.}
       if BandMapEnable and (Radio1.LastDisplayedFreq {LastDisplayedFreq[RadioOne]} <> 0) and (OpMode = CQOpMode) and BandMapDisplayCQ then
       begin
-        Str(TotalContacts + 1, QSONumberString);
+        Str(NextSerialToSend, QSONumberString);  // Issue #954
         BandMapCursorFrequency := ActiveRadioPtr.LastDisplayedFreq {LastDisplayedFreq[ActiveRadio]};
             //            NewBandMapEntry('CQ/ ' + QSONumberString, LastDisplayedFreq[ActiveRadio], 0, ActiveMode, False, False, BandMapDecayTime, True, MyCall);
         tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, ActiveRadioPtr {?});
@@ -1494,6 +1494,7 @@ begin
   if TempMode = FM then TempMode := Phone;
   if ((RXData.Mode <> NoMode) and (RXData.Band <> NoBand) and (RXData.ceRecordKind = rkQSO)) then
   begin
+    UpdateMaxSerialSent(RXData.Band, RXData.NumberSent);  // Issue #954: track highest sent serial
     inc(QSOTotals[RXData.Band, TempMode]);
     inc(QSOTotals[RXData.Band, Both]);
     inc(QSOTotals[AllBands, TempMode]);
@@ -2055,7 +2056,7 @@ nop
                      end;
                      repeat
                        PutUpExchangeWindow;
-                       DisplayNextQSONumber(TotalContacts + 1);
+                       DisplayNextQSONumber;  // Issue #954: value computed inside (NextSerialToSend)
                        ClearContestExchange(ReceivedData);
                        ExchangeHasBeenSent := False;
                      until not SearchAndPounce;

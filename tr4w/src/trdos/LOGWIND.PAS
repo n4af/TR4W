@@ -1760,7 +1760,11 @@ procedure DisplayNextQSONumber;
 const
   QSONumberStringArray                  : array[boolean] of PChar = ('%d', '*%d');   
 begin
-  Format(wsprintfBuffer, QSONumberStringArray[AutoQSONumberDecrement], TotalContacts + 1);
+  // Issue #954: show the next serial we will actually send (high-water mark of
+  // numbers sent + 1), NOT a QSO count.  Count-based display reverted the number
+  // whenever a QSO stopped counting (X-QSO, mid-log delete).  NextSerialToSend
+  // also returns ServerSerialNumber in networked mode, matching the old value.
+  Format(wsprintfBuffer, QSONumberStringArray[AutoQSONumberDecrement], NextSerialToSend);
   if ServerSerialNumber <> 0 then
     if PreviousSerialNumberType = sntReserved then
       Windows.lstrcat(wsprintfBuffer, 'L');

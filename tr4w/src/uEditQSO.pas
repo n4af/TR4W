@@ -718,6 +718,19 @@ begin
      // Issue #783 -- HamScore RTC: send <contactdelete> next cycle.
      HamScoreOnDelete(EditableQSORXData);
      end
+  else if EditableQSORXData.ceXQSO then
+     begin
+     // Issues #949 / #954 -- X-QSO is NOT a delete. The contact really happened,
+     // so it stays in the log and the external logger and keeps the serial it
+     // consumed; it is only removed from the CONTEST score. So drop it from the
+     // score feeds (contactdelete to UDP + HamScore) but deliberately DO NOT
+     // touch the external logger. (The serial it consumed is preserved because
+     // the next serial is the high-water mark of numbers actually sent, not a
+     // QSO count -- the X-QSO record stays in the log so it still counts toward
+     // that mark.  See NextSerialToSend / MaxSerialSent, Issue #954.)
+     SendDeletedContactToUDP(EditableQSORXData);
+     HamScoreOnDelete(EditableQSORXData);
+     end
   else
      begin
      LogEditedContactToUDP(EditableQSORxData);
