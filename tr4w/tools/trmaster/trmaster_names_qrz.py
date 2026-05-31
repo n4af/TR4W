@@ -301,6 +301,8 @@ def main(argv=None):
                            hit_max_age_days=args.max_age_days,
                            miss_max_age_days=args.miss_max_age_days)
 
+    log(f"  resolving up to {args.limit or 'all'} new QRZ lookup(s) "
+        f"(sleep {args.sleep}s); status every 100 ...")
     rows = []
     new_lookups = 0
     try:
@@ -321,6 +323,9 @@ def main(argv=None):
             if nm:
                 rows.append((call, nm))
             if will_query:
+                # heartbeat so a long silent run shows it's alive and progressing
+                if new_lookups % 100 == 0:
+                    log(f"  ... {new_lookups} lookups, {len(rows)} names so far (at {call})")
                 # periodic atomic flush so a kill loses at most --save-every lookups
                 if args.save_every and new_lookups % args.save_every == 0:
                     client.save()
