@@ -180,6 +180,7 @@ Type TNetRadioBase = class(TObject)
       requiresPolling: Boolean;        // True for most radios, False for K4 with AI5
       autoUpdateCommand: string;       // Command to enable push updates (e.g., 'AI5;')
       pollingInterval: Integer;        // Milliseconds between polls (default 100)
+      bAddTermination: Boolean;        // True (default): SendToRadio appends CR/LF (WriteLn). Kenwood TS-890 LAN sets this False -- its CAT parser rejects a trailing CR/LF; the K4 tolerates/ignores it, so it stays True.
 
       constructor Create(ProcRef: TProcessMsgRef); overload;
       constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
@@ -187,6 +188,12 @@ Type TNetRadioBase = class(TObject)
 
       procedure SendToRadio(s: string); overload; virtual;
       procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload; Virtual; Abstract;
+      // Per-radio state setters -- base owns storage; radio classes call these to
+      // reflect on/off state into the field the matching display getter reads.
+      procedure SetRITOn(value: boolean);
+      procedure SetXITOn(value: boolean);
+      procedure SetSplitOn(value: boolean);
+      procedure SetTransmitting(value: boolean);
       function ModeToString(mode: TRadioMode): string;
       property radioPort: integer read GetRadioPort write SetRadioPort;
       property radioAddress: string read GetRadioAddress write SetRadioAddress;
@@ -288,6 +295,7 @@ begin
    logger.Trace('trace output');
    }
    baseProcMsg := ProcRef;
+   bAddTermination := True;   // default: append CR/LF; radios that must not (e.g. TS-890 LAN) set this False in their own constructor
    for iVFO := Low(TVFO) to High(TVFO) do
       begin
       Self.vfo[iVFO] := TRadioVFO.Create;
@@ -766,8 +774,19 @@ begin
             // Network connection
             logger.Trace('[%s %s TX] (%s) Hex:[%s]',[Self.rigLabel, Self.radioModel, s, String2Hex(s)]);
             nLen := length(s);
-            socket.IOHandler.WriteLn(s);
-            //socket.IOHandler.Write(s,nLen,0);
+            // Most network radios accept or simply ignore a trailing CR/LF, so
+            // by default we append one (WriteLn). The Kenwood TS-890 LAN CAT
+            // parser is the exception: once authenticated it rejects a trailing
+            // CR/LF with '?;', so it sets bAddTermination := False and we send
+            // the bare ';'-terminated command -- matching Kenwood's own ARCP.
+            if bAddTermination then
+               begin
+               socket.IOHandler.WriteLn(s);
+               end
+            else
+               begin
+               socket.IOHandler.Write(s);
+               end;
             end
          else
             begin
@@ -935,6 +954,46 @@ end;
 function TNetRadioBase.GetSplitEnabled: boolean;
 begin
    Result := Self.localSplitEnabled;
+end;
+
+// ---- Per-radio state setters: one place owns where each flag is stored. ----
+// RIT/XIT are written to every VFO copy so the per-VFO display getters return
+// the per-radio value regardless of which VFO the window queries. (RIT/XIT/Split
+// are per-radio on the rigs we support; a future per-VFO radio can still write
+// vfo[].RITState directly.)
+procedure TNetRadioBase.SetRITOn(value: boolean);
+var
+   v: TVFO;
+begin
+   Self.RITState := value;   // legacy scalar, kept in sync
+   for v := Low(TVFO) to High(TVFO) do
+      begin
+      Self.vfo[v].RITState := value;
+      end;
+end;
+
+procedure TNetRadioBase.SetXITOn(value: boolean);
+var
+   v: TVFO;
+begin
+   Self.XITState := value;
+   for v := Low(TVFO) to High(TVFO) do
+      begin
+      Self.vfo[v].XITState := value;
+      end;
+end;
+
+procedure TNetRadioBase.SetSplitOn(value: boolean);
+begin
+   Self.localSplitEnabled := value;
+end;
+
+procedure TNetRadioBase.SetTransmitting(value: boolean);
+begin
+   if value then
+      Self.radioState := rsTransmit
+   else
+      Self.radioState := rsReceive;
 end;
 
 function TNetRadioBase.GetVFO(whichVFO: TVFO): TRadioVFO;

@@ -37,7 +37,7 @@ type
       ksNone,
       ksWaitingForCN,    // Sent ##CN;, awaiting ##CN1
       ksWaitingForID,    // Sent ##ID0...;, awaiting ##ID1
-      ksWaitingForTI,    // Got ##ID1, awaiting ##UE/##TI to finish handshake
+      ksWaitingForTI,    // legacy/unused: real TS-890 does NOT send ##UE/##TI; auth completes at ##ID1
       ksAuthenticated,   // Auth complete; normal Kenwood CAT
       ksAuthFailed       // Auth was rejected; connection unusable
    );
@@ -50,6 +50,7 @@ type TKenwoodTS890Radio = class(TNetRadioBase)
       logger: TLogLogger;
 
       procedure SendAuthCredentials;
+      procedure SendPostLoginSetup;
       procedure HandleAuthMessage(const sMessage: string);
       procedure InitializeAfterAuth;
       function ModeCharToMode(ch: Char): TRadioMode;
@@ -134,6 +135,12 @@ begin
    NetworkUsername := '';
    NetworkPassword := '';
 
+   // The TS-890 LAN CAT parser rejects a trailing CR/LF (responds '?;') once
+   // authenticated, so send bare ';'-terminated commands. (Proven via telnet:
+   // the K4 ignores a trailing CR/LF; the TS-890 does not. The default is set
+   // in uNetRadioBase.Create -- see SendToRadio / bAddTermination.)
+   Self.bAddTermination := False;
+
    // TS-890 uses AI2 for state push, but the LAN protocol REQUIRES
    // periodic traffic from the client. Per the LAN HOWTO:
    //   "The TS-890 will close the TCP connection if it does not receive
@@ -209,6 +216,19 @@ begin
                 [Self.rigLabel, idLen, pwLen, string(NetworkUsername)]);
 end;
 
+procedure TKenwoodTS890Radio.SendPostLoginSetup;
+begin
+   // Post-login LAN-session setup the ARCP-890 reference controller sends right
+   // after ##ID1; (##VP = version/voice-protocol probe, ##KN = LAN notification
+   // channels). Match the reference so the radio keeps the socket open and
+   // pushes state over LAN. Responses (##VP0;/##KN21;/##KN02;) are ignored in
+   // HandleAuthMessage once authenticated.
+   Self.SendToRadio('##VP;');
+   Self.SendToRadio('##KN2;');
+   Self.SendToRadio('##KN0;');
+   logger.Debug('[%s.SendPostLoginSetup] Sent ##VP; ##KN2; ##KN0;', [Self.rigLabel]);
+end;
+
 procedure TKenwoodTS890Radio.HandleAuthMessage(const sMessage: string);
 begin
    if FAuthState = ksWaitingForCN then
@@ -231,13 +251,17 @@ begin
       begin
       if AnsiStartsStr('##ID1', sMessage) then
          begin
-         // Per LAN HOWTO: after ##ID1 the radio also sends ##UE1; and
-         // ##TI1; (often batched on the same TCP segment). The radio is
-         // not ready for CAT until it has sent ##TI1; -- so don't fire
-         // InitializeAfterAuth yet; wait for ##TI in ksWaitingForTI.
-         FAuthState := ksWaitingForTI;
-         logger.Info('[%s.HandleAuthMessage] Credentials accepted; awaiting ##TI handshake',
+         // ##ID1; = auth success. Real-hardware capture (Kenwood ARCP-890 vs a
+         // TS-890S) shows the radio does NOT send ##UE/##TI here -- the
+         // controller drives the rest (##VP; / ##KN2; / ##KN0;) and plain CAT
+         // (ID;) already works immediately after ##ID1;. The previous
+         // "wait for ##TI" left TR4W idle, so the radio closed the socket and
+         // we reconnected in a loop. Go straight to CAT.
+         FAuthState := ksAuthenticated;
+         logger.Info('[%s.HandleAuthMessage] Credentials accepted; CAT-ready',
                      [Self.rigLabel]);
+         SendPostLoginSetup;
+         InitializeAfterAuth;
          end
       else
          begin
@@ -248,25 +272,13 @@ begin
       Exit;
       end;
 
-   if FAuthState = ksWaitingForTI then
+   if FAuthState = ksAuthenticated then
       begin
-      // ##UE1; arrives between ##ID and ##TI -- just log it and keep waiting.
-      if AnsiStartsStr('##UE', sMessage) then
-         begin
-         logger.Debug('[%s.HandleAuthMessage] Received %s; awaiting ##TI',
-                      [Self.rigLabel, sMessage]);
-         Exit;
-         end;
-      if AnsiStartsStr('##TI', sMessage) then
-         begin
-         FAuthState := ksAuthenticated;
-         logger.Info('[%s.HandleAuthMessage] Authenticated and CAT-ready (%s)',
-                     [Self.rigLabel, sMessage]);
-         InitializeAfterAuth;
-         Exit;
-         end;
-      // Other ## frames while waiting for TI -- log and keep waiting.
-      logger.Debug('[%s.HandleAuthMessage] Unexpected post-ID frame: %s',
+      // Post-auth ## frames are LAN-control responses/notifications:
+      //   ##VP0;/##VP1; (replies to ##VP;), ##KN21;/##KN02;/##KN71; (##KN),
+      //   and on some firmwares ##UE;/##TI;. None require action -- the CAT
+      //   session is already running -- so just log and ignore them.
+      logger.Debug('[%s.HandleAuthMessage] post-auth control frame (ignored): %s',
                    [Self.rigLabel, sMessage]);
       Exit;
       end;
@@ -345,6 +357,12 @@ begin
       ParseRTResponse(sMessage)
    else if AnsiStartsStr('XT', sMessage) then
       ParseXTResponse(sMessage)
+   else if AnsiStartsStr('TX', sMessage) then
+      // Radio pushes TX0; when it goes to transmit (AI2). Surface it so the
+      // main window's TX indicator updates.
+      Self.SetTransmitting(True)
+   else if AnsiStartsStr('RX', sMessage) then
+      Self.SetTransmitting(False)
    else if AnsiStartsStr('PS', sMessage) then
       // Keepalive heartbeat response (PS1; = power on). No state to track;
       // the round-trip itself is what keeps the LAN connection from being
@@ -454,7 +472,7 @@ end;
 procedure TKenwoodTS890Radio.ParseTBResponse(const sMessage: string);
 begin
    if Length(sMessage) < 3 then Exit;
-   Self.localSplitEnabled := (sMessage[3] = '1');
+   Self.SetSplitOn(sMessage[3] = '1');   // base setter -> localSplitEnabled the window reads
    logger.Trace('[%s.ParseTBResponse] Split = %s',
                 [Self.rigLabel, BoolToStr(Self.localSplitEnabled, True)]);
 end;
@@ -474,7 +492,7 @@ end;
 procedure TKenwoodTS890Radio.ParseRTResponse(const sMessage: string);
 begin
    if Length(sMessage) < 3 then Exit;
-   Self.RITState := (sMessage[3] = '1');
+   Self.SetRITOn(sMessage[3] = '1');   // base setter -> per-VFO RITState the window reads
    logger.Trace('[%s.ParseRTResponse] RIT = %s',
                 [Self.rigLabel, BoolToStr(Self.RITState, True)]);
 end;
@@ -483,7 +501,7 @@ end;
 procedure TKenwoodTS890Radio.ParseXTResponse(const sMessage: string);
 begin
    if Length(sMessage) < 3 then Exit;
-   Self.XITState := (sMessage[3] = '1');
+   Self.SetXITOn(sMessage[3] = '1');   // base setter -> per-VFO XITState the window reads
    logger.Trace('[%s.ParseXTResponse] XIT = %s',
                 [Self.rigLabel, BoolToStr(Self.XITState, True)]);
 end;

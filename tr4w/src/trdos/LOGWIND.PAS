@@ -1495,6 +1495,18 @@ end;
 
 
 
+function EffectiveBandFreq(Band: BandType; Mode: ModeType): longint;
+begin
+  // FreqMemory holds the last-used frequency per band/mode and is 0 until a
+  // band has been visited. Fall back to the built-in DefaultFreqMemory so a
+  // band change to an un-visited band tunes to that band's default instead of
+  // 0 Hz (which the radio rejects). Microwave rows with no default stay 0 and
+  // are caught by the freq<=0 guard in SetRadioFreq.
+  Result := FreqMemory[Band, Mode];
+  if Result = 0 then
+    Result := DefaultFreqMemory[Band, Mode];
+end;
+
 procedure DisplayBandMode(Band: BandType; Mode: ModeType; UpdateRadio: boolean);
 begin
 
@@ -1527,12 +1539,12 @@ begin
   if ActiveRadio = RadioOne then
   begin
     Radio1.UpdateBandOutputInfo(Band, Mode);
-    if UpdateRadio then Radio1.SetRadioFreq(FreqMemory[Band, Mode], ActiveMode, 'A');
+    if UpdateRadio then Radio1.SetRadioFreq(EffectiveBandFreq(Band, Mode), ActiveMode, 'A');
   end
   else
   begin
     Radio2.UpdateBandOutputInfo(Band, Mode);
-    if UpdateRadio then Radio2.SetRadioFreq(FreqMemory[Band, Mode], ActiveMode, 'A');
+    if UpdateRadio then Radio2.SetRadioFreq(EffectiveBandFreq(Band, Mode), ActiveMode, 'A');
   end;
   UpdateAllStationsList;
   SendStationStatus(sstBandModeFreq);

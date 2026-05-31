@@ -889,6 +889,14 @@ begin
       Digital: Result := rmData;
       Phone: Result := rmUSB;
       FM: Result := rmFM;
+   else
+      // Both / NoMode have no specific radio mode. Without this else the
+      // function Result was left UNINITIALIZED -> garbage TRadioMode (often
+      // rmData), which made a band change shove the radio into DATA. Return the
+      // "none" mode so the caller sends no mode command and the radio keeps its
+      // mode. (Use Low(TRadioMode), which is rmNone; the bare identifier rmNone
+      // is ambiguous in LOGRADIO -- it also exists in TRadioModel, which wins.)
+      Result := Low(TRadioMode);
    end;
  //  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
            //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
@@ -3275,6 +3283,12 @@ const
 
 begin
    logger.debug('[SetRadioFreq] set frequency to %u',[freq]);
+
+   if Freq <= 0 then
+      begin
+      logger.debug('[SetRadioFreq] freq <= 0 (no band memory or default for this band/mode) -- skipping tune');
+      Exit;
+      end;
 
    if Self.tNetObject <> nil then
       begin
