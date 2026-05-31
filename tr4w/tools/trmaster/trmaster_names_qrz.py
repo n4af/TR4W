@@ -158,7 +158,15 @@ class QRZNameClient:
         url = QRZ_API_URL + "?" + urllib.parse.urlencode(
             {"s": self._key, "callsign": call})
         with urllib.request.urlopen(url, timeout=15) as r:
-            root = ET.fromstring(r.read())
+            raw = r.read()
+        try:
+            root = ET.fromstring(raw)
+        except ET.ParseError:
+            # QRZ occasionally returns a non-XML / malformed body for a single
+            # call (HTML error page or bad encoding -- seen on some DX calls).
+            # Treat it as a miss (cached + skipped) so one bad response doesn't
+            # abort the whole name pass. Genuine network errors still propagate.
+            return None
         ns = self._ns(root)
         s = root.find(f"{ns}Session")
         if s is not None:
