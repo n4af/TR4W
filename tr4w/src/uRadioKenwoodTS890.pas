@@ -62,6 +62,7 @@ type TKenwoodTS890Radio = class(TNetRadioBase)
       procedure ParseFTResponse(const sMessage: string);
       procedure ParseRTResponse(const sMessage: string);
       procedure ParseXTResponse(const sMessage: string);
+      procedure ParseRFResponse(const sMessage: string);
 
    public
       NetworkUsername: ShortString;   // Set by LOGRADIO before Connect; "Admin ID" on the radio
@@ -357,6 +358,9 @@ begin
       ParseRTResponse(sMessage)
    else if AnsiStartsStr('XT', sMessage) then
       ParseXTResponse(sMessage)
+   else if AnsiStartsStr('RF', sMessage) then
+      // RIT/XIT frequency offset, pushed unsolicited under AI2 as the knob turns.
+      ParseRFResponse(sMessage)
    else if AnsiStartsStr('TX', sMessage) then
       // Radio pushes TX0; when it goes to transmit (AI2). Surface it so the
       // main window's TX indicator updates.
@@ -416,8 +420,19 @@ begin
       end;
 
    Self.vfo[whichVFO].frequency := freqVal;
-   logger.Trace('[%s.ParseFAOrFBResponse] %s = %d Hz',
-                [Self.rigLabel, VFOToString(whichVFO), freqVal]);
+   // Derive and store the band from the reported frequency. Without this,
+   // vfo[].band stays NoBand -> GetBand returns NoBand -> FilteredStatus.Band
+   // is NoBand -> ProcessFilteredStatus (uRadioPolling ~3161) skips the whole
+   // ActiveBand/ActiveMode/DisplayBandMode update, so the main-window
+   // band-above-freq, the band table, AND the mode never follow the radio
+   // (only the frequency updates, via a separate path). The Kenwood reports a
+   // frequency rather than a band number, so we derive it; the K4 sets
+   // vfo[].band for exactly the same reason.
+   if Self.vfo[whichVFO].frequency > 0 then
+      Self.vfo[whichVFO].band := FreqToRadioBand(Self.vfo[whichVFO].frequency);
+   logger.Trace('[%s.ParseFAOrFBResponse] %s = %d Hz (band %d)',
+                [Self.rigLabel, VFOToString(whichVFO), freqVal,
+                 Ord(Self.vfo[whichVFO].band)]);
 end;
 
 procedure TKenwoodTS890Radio.ParseOMResponse(const sMessage: string);
@@ -504,6 +519,41 @@ begin
    Self.SetXITOn(sMessage[3] = '1');   // base setter -> per-VFO XITState the window reads
    logger.Trace('[%s.ParseXTResponse] XIT = %s',
                 [Self.rigLabel, BoolToStr(Self.XITState, True)]);
+end;
+
+// Format: RF<P1><P2P2P2P2>;  P1 = direction (0 = +, 1 = -), P2 = 4-digit RIT/XIT
+// offset in Hz (0000-9999), e.g. RF10030 = -30 Hz, RF00000 = centered.  The
+// TS-890 pushes this UNSOLICITED under AI2 as the RIT/XIT knob turns -- validated
+// against N2SKH's capture: 276 RF frames from the radio, zero client RF; queries.
+// So there is nothing to poll; we just stop discarding the frames we already
+// receive.  Stored as the active VFO's RIT offset; the polling bridge copies
+// vfo[].RITOffset -> CurrentStatus.RITFreq, which the main window displays.
+// (RIT/XIT on/off arrive separately as RT;/XT; -- see ParseRT/XTResponse.)
+procedure TKenwoodTS890Radio.ParseRFResponse(const sMessage: string);
+var
+   magVal, convErr, offset: Integer;
+begin
+   // "RF" + direction(1) + 4 digits => 7 chars minimum (semicolon already stripped).
+   if Length(sMessage) < 7 then
+      begin
+      logger.Warn('[%s.ParseRFResponse] Short RF reply: %s', [Self.rigLabel, sMessage]);
+      Exit;
+      end;
+
+   Val(Copy(sMessage, 4, 4), magVal, convErr);   // P2: 4-digit magnitude in Hz
+   if convErr <> 0 then
+      begin
+      logger.Warn('[%s.ParseRFResponse] Non-numeric RF offset: %s',
+                  [Self.rigLabel, sMessage]);
+      Exit;
+      end;
+
+   offset := magVal;
+   if sMessage[3] = '1' then          // P1 = 1 => minus direction
+      offset := -offset;
+
+   Self.vfo[nrVFOA].RITOffset := offset;
+   logger.Trace('[%s.ParseRFResponse] RIT/XIT offset = %d Hz', [Self.rigLabel, offset]);
 end;
 
 // ============================================================================
