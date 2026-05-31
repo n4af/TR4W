@@ -38,6 +38,32 @@ _Nothing yet._
 
 ## 4.147.x — May 2026
 
+### 4.147.25 (2026-05-31) — NY4I
+
+#### Serial Numbers
+
+- Marking a QSO as X-QSO no longer rolls your sent serial number backward. The next number you send is now based on the highest number you've actually sent, so it only ever moves forward — even after you X-QSO a contact or delete one from the middle of the log. (Previously the count-based number could revert and hand the same serial to two stations.) (#954)
+- When you mark a contact X-QSO, it now stays in your external log (e.g. DXKeeper) — it's only removed from the contest score and the real-time score feeds. (#949)
+
+#### Radio Control — Kenwood TS-890 over LAN
+
+- The TS-890 now connects reliably over the network: the login no longer hangs waiting for a message the radio doesn't send, and commands are sent in the exact format its CAT parser expects (a stray line-ending was causing it to reject every command after login).
+- Band changes no longer drop the radio into DATA mode or send an empty frequency, and RIT, XIT, Split, and transmit (TX/RX) state toggled on the radio now show correctly in TR4W.
+
+#### Super Check Partial
+
+- The bundled callsign database (TRMASTER.DTA) has been refreshed to 53,281 calls for better Super Check Partial suggestions while you type.
+
+#### In-App Command Help
+
+- The configuration-command help text has been cleaned up and filled in — entries for commands that no longer exist were removed, and descriptions were written for many that had been left blank.
+
+#### For Contributors / Power Users
+
+- New offline tool to rebuild the Super Check Partial database (TRMASTER.DTA) from public sources, plus a one-step release script. Build/CI fix so the release pipeline's malware scan runs correctly on the self-hosted Windows runner.
+
+---
+
 ### 4.147.24 (2026-05-29) — NY4I
 
 #### For Contributors / Source Builders

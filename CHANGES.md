@@ -35,6 +35,41 @@ _Nothing yet._
 
 ## 4.147.x — May 2026
 
+### 4.147.25 (2026-05-31) — NY4I
+
+#### Serial number derived from highest serial sent, not QSO count (`src/trdos/LOGEDIT.PAS`, `LOGDUPE.PAS`, `LOGWIND.PAS`, `LOGSUBS1.PAS`, `LOGSUBS2.PAS`, `LogSend.pas`, `src/MainUnit.pas`, `src/uEditQSO.pas`) — Issues #954, #949
+
+- **Serial no longer rolls backward on X-QSO / mid-log delete** (#954): the next serial was `TotalContacts + 1`, a count of *scoring* QSOs, so marking a QSO X-QSO (or deleting a mid-log QSO) dropped the count — the next serial reverted, was re-sent on the air via the `#` macro, and was re-stamped into `NumberSent` (a duplicate serial). New per-band high-water mark `MaxSerialSent` (`LOGDUPE`) tracks the largest `NumberSent` over non-deleted records **including X-QSO** (they consumed a number); new `NextSerialToSend` / `UpdateMaxSerialSent` (`LOGEDIT`) return `max + 1`, which only ever advances (`UpdateMaxSerialSent` ignores the `$FFFF` ADIF import sentinel and non-positive values). `LoadinLog` and the live add feed the mark; the next-number display (`DisplayNextQSONumber`), the `#` macro (CW + voice), the `NumberSent` stamp, and the CQ-spot labels all moved from `TotalContacts + 1` to `NextSerialToSend`. `TotalContacts`/`QSOTotals` are untouched, so the #750 score grid, status display, every-10 beep, and `AUTO QSO NUMBER DECREMENT` (F2 repeat) are unchanged; networked mode still uses `ServerSerialNumber`.
+- **X-QSO no longer deletes the contact from the external log** (#949): `uEditQSO` marks X-QSO by sending a `contactdelete` to the score feeds (UDP + HamScore) while leaving the external logger (DXKeeper) alone — the contact stays logged externally but drops out of the contest score.
+
+#### Kenwood TS-890 LAN handshake + CR/LF transport, band/RIT/XIT/TX fixes (`src/uRadioKenwoodTS890.pas`, `src/uNetRadioBase.pas`, `src/trdos/LOGRADIO.PAS`, `src/trdos/LOGWIND.PAS`) — PR #951
+
+- **Handshake**: the TS-890 LAN login does not send `##TI;`; the old path waited for it and hung after `##ID1;`. It now proceeds straight to authenticated (post-login `##VP;`/`##KN2;`/`##KN0;` + `AI2` init). The 5 s `PS;` keepalive is retained (the radio drops an idle LAN link after ~10 s).
+- **CR/LF transport**: `TNetRadioBase.SendToRadio` appended CR/LF via `WriteLn`; the TS-890's CAT parser rejects the trailing bytes with `?;` once authenticated (the K4 tolerates them, which is why it never surfaced). New `bAddTermination` flag (default `True`; `TKenwoodTS890Radio` sets it `False` → bare `Write`), so every other radio's wire output stays byte-identical.
+- **Band/mode**: `ModeTypeToNetMode` (`LOGRADIO`) had no `else`, so `Both`/`NoMode` produced an uninitialized result → intermittent `OM0D;` (USB-DATA) on band change; added `else Result := Low(TRadioMode)`. `SetRadioFreq` now guards freq ≤ 0, and `EffectiveBandFreq` (`LOGWIND`) falls back to `DefaultFreqMemory` for un-visited bands (was sending `FA00000000000;`).
+- **RIT/XIT/Split/TX display**: per-radio parse handlers now call base setters `SetRITOn`/`SetXITOn`/`SetSplitOn`/`SetTransmitting` on `TNetRadioBase`, so toggles made on the radio (pushed via AI2) reach the main window.
+
+#### Offline TRMASTER.DTA builder toolset + regenerated database (`tr4w/tools/trmaster/`, `tr4w/target/TRMASTER.DTA`) — PR #948
+
+- **New offline toolset** (`tr4w/tools/trmaster`, Python) rebuilds the Super Check Partial database from public sources; `build_trmaster.cmd` orchestrates the seed + CWops + FOC + QRZ-name passes (a bare `trmaster_build.py` run yields 0 CWops/FOC).
+- **Regenerated `TRMASTER.DTA`**: 53,281 calls.
+- **QRZ name-lookup robustness**: a malformed QRZ XML response no longer aborts the whole name pass (treated as a cacheable miss); network/HTTP/timeout errors are separated from XML parse errors so only the latter are swallowed; added a progress heartbeat every 100 lookups.
+
+#### Help INI: prune, document, and fill config-command descriptions (`tr4w/target/commands_help_eng.ini`) — PRs #952, #955
+
+- **Prune + document** (#952): removed 90 dead `[SECTION]` blocks (nil-address, not-in-array, commented-out, unused-legacy) validated against the live CFGCA tables; kept 5 marked "PENDING RE-IMPLEMENTATION".
+- **Description fills** (#955): filled 30 of the remaining 55 `TO BE COMPLETED` `DESCRIPTION`/`DEFAULT` placeholders.
+
+#### CI: run VirusTotal scan under Windows PowerShell 5.1, not pwsh (`.github/workflows/release.yml`, `.github/scripts/Invoke-VirusTotalScan.ps1`) — PR #947
+
+- The self-hosted `win-ci` runner (LocalSystem) only has Windows PowerShell 5.1 machine-wide; `shell: pwsh` failed with "pwsh: command not found". The VT scan step and script are now 5.1-safe (`curl.exe` upload, `ConvertFrom-Json`, BOM-less .NET writes).
+
+#### Release tooling (`tr4w/build/Invoke-Release.ps1` — NEW)
+
+- **New release orchestrator** (PowerShell 5.1): regenerate TRMASTER, download CTY.DAT (URL/UA/validation pulled from the app's Alt-O fetch path), bump `Version.pas`, local build, commit, and tag `v<ver>` to trigger CI. It *calls* `build_trmaster.cmd` rather than duplicating it.
+
+---
+
 ### 4.147.24 (2026-05-29) — NY4I
 
 #### Indy library layout cleanup (`tr4w/include/Indy`, `tr4w/tr4w.cfg`, `tr4w/tr4w.dof`, `tr4w/tr4wserver/tr4wserver.cfg`, `tr4w/tr4wserver/tr4wserver.dof`, `tr4w/BatchCompile.cmd`, `tr4w/test/CompileTest.{cmd,ps1}`, `tr4w/test/CompileRadioTester.{cmd,ps1}`, `tr4w/tr4wserver/BuildServer.ps1`, `tr4w/FullBuild.ps1`, `CLAUDE.md`) — PRs #943, #944, #945
