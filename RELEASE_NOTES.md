@@ -36,6 +36,32 @@ _Nothing yet._
 
 ---
 
+## 4.148.x — June 2026
+
+### 4.148.0 (2026-06-01) — NY4I
+
+#### Radio Control — Kenwood TS-890 over LAN
+
+- The band and mode shown in TR4W now follow the radio. Previously only the frequency tracked the rig — the band display, band table, and mode wouldn't update when you changed bands on the radio (and startup could show NONSSB). (#959)
+- The RIT/XIT offset (the actual amount of clarifier shift) is now displayed, not just the on/off state.
+- When you switch the radio's operating VFO (A/B), TR4W now follows it correctly — per-VFO modes no longer appear swapped, the main window tracks the receive VFO's frequency/band/mode, and the Radio 1 window highlights the active VFO.
+- CW sent to the TS-890 over CAT is no longer zero-padded, which also corrects the reported keying length.
+- Connecting to a radio over a VPN no longer times out — the connection window was too short for a VPN's slightly longer handshake, so a rig that worked on the local network would report "Connect timed out" over VPN. (#959)
+
+#### Usability
+
+- Fixed a typo in the QSO Number pop-up (Ctrl-/ → Additional Information): it read "QSO nuber" and now reads "QSO number." (#962)
+
+#### Super Check Partial
+
+- The bundled callsign database (TRMASTER.DTA) has been refreshed again for better Super Check Partial suggestions as you type.
+
+#### For Contributors / Power Users
+
+- The monthly-release script is more robust: a one-step MonthlyBuild command, hardened tagging that can't tag a stale build, and a fix to an internal bug that made the release script hang.
+
+---
+
 ## 4.147.x — May 2026
 
 ### 4.147.25 (2026-05-31) — NY4I

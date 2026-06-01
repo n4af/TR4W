@@ -33,6 +33,37 @@ _Nothing yet._
 
 ---
 
+## 4.148.x — June 2026
+
+### 4.148.0 (2026-06-01) — NY4I
+
+#### TS-890 LAN follow-ups: band/mode display, RIT/XIT offset, operating-VFO tracking, CW KY, VPN connect (`src/uRadioKenwoodTS890.pas`, `src/uNetRadioBase.pas`, `src/uRadioPolling.pas`, `tr4w.dpr`) — Issue #959
+
+- **Band/mode now follow the radio**: `ParseFAOrFBResponse` derives `vfo[].band` from the reported frequency. Without it `FilteredStatus.Band` stayed `NoBand` and `ProcessFilteredStatus` skipped the `ActiveBand`/`ActiveMode`/`DisplayBandMode` update, so only the frequency tracked the radio (band-above-freq, band table, and mode did not; startup showed `NONSSB`).
+- **RIT/XIT offset displayed**: new `ParseRFResponse` parses the offset from the unsolicited `RF` push (direction + 4-digit Hz) into `vfo[].RITOffset`, surfaced as `CurrentStatus.RITFreq` (on/off via `RT`/`XT` already worked).
+- **Operating-VFO tracking**: new base `FActiveVFO` + `GetActiveVFO`/`SetActiveVFO` (default `nrVFOA`, default-preserving so K4/Icom/Flex/HamLib are unchanged); `pNetworkRadio`'s aggregate status and `VFOStatus` follow `GetActiveVFO` instead of a hardcoded `nrVFOA`. TS-890 drives it from `FR` (FR0=A, FR1=B), fixing the operating-relative `OM` mode mapping (A/B no longer swap per-VFO modes), the main window following the RX VFO, and the Radio 1 window active-VFO highlight.
+- **CW `KY` pad-off**: split `TS890` out of the padded-Kenwood arm — variable-length `KY <space><text>;` instead of fixed 24-byte padding; corrects the 890 CW timer (it had counted the never-keyed padding). Other Kenwoods (480/570/590/950/990/2000) keep the fixed 24-byte P2.
+- **VPN connect timeout**: `uNetRadioBase` `ConnectTimeout` 10 ms → 5000 ms; 10 ms only worked same-subnet and tripped "Connect timed out" on a VPN handshake (~95 ms). Runs on the reconnect thread, no UI block.
+- **Project files**: added `uRadioKenwoodTS890` and `uBandLookup` to `tr4w.dpr`'s `uses`.
+
+#### QSO Number popup typo (`src/MainUnit.pas`) — Issue #962
+
+- **"QSO nuber" → "QSO number"**: corrected the hardcoded literal at `MainUnit.pas:3420` (Ctrl-/ → Additional Information → QSO Number popup; English literal, not a `TC_` resource).
+
+#### Super Check Partial database refresh (`tr4w/target/TRMASTER.DTA`)
+
+- **Regenerated `TRMASTER.DTA`** from the offline builder (SCP sources + CWops/FOC + QRZ name backfill).
+
+#### Build & release tooling (`tr4w/build/Invoke-Release.ps1`, `utils/`, `tr4w/tools/trmaster/`)
+
+- **`Invoke-Release.ps1` infinite-recursion fix**: the `function Git { & git … }` helper recursed into itself — PowerShell command resolution is case-insensitive and functions outrank executables, so a bare `& git` resolved back to the function → call-depth overflow that pegged a core and ballooned RSS before aborting. All call sites now invoke `git.exe`; a guard comment documents why.
+- **Monthly-release wrapper + docs** (`utils/MonthlyBuild.cmd`, `docs/RELEASE_WORKFLOW.md`): `MonthlyBuild.cmd` wraps `Invoke-Release.ps1`; the workflow doc gained a TL;DR distinguishing the interim (`TagIt`) vs monthly (`MonthlyBuild`) paths.
+- **`TagIt` hardening**: fast-forwards local master to origin and verifies the tag matches `Version.pas` before tagging/pushing, so an interim tag can't land on a stale pre-bump commit.
+- **`utils/` reorg**: moved the build/tag helper scripts and added `BuildEnglishInstaller.cmd` under `utils/`.
+- **TRMASTER builder progress** (#958): `build_trmaster.cmd` reports the QRZ name-cache size during backfill.
+
+---
+
 ## 4.147.x — May 2026
 
 ### 4.147.25 (2026-05-31) — NY4I
