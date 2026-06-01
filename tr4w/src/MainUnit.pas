@@ -3417,7 +3417,7 @@ begin
 {$IF tDebugMode}
         CPUButtonProc;
 {$ELSE}
-        Format(wsprintfBuffer, 'QSO nuber %u', TotalContacts);
+        Format(wsprintfBuffer, 'QSO number %u', TotalContacts);
         ShowMessage(wsprintfBuffer);
 {$IFEND}
       end;
