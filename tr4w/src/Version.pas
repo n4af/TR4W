@@ -25,7 +25,7 @@ const
 
 
 
-TR4W_CURRENTVERSION_NUMBER            = '4.147.25';  
+TR4W_CURRENTVERSION_NUMBER            = '4.147.26';  
 
 
 
