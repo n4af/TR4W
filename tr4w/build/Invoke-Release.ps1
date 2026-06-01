@@ -90,10 +90,14 @@ function Info([string] $m) { Write-Host "    $m" }
 function Warn([string] $m) { Write-Host "WARNING: $m" -ForegroundColor Yellow }
 function Fail([string] $m) { Write-Host "ERROR: $m" -ForegroundColor Red; exit 1 }
 
+# NOTE: invoke the binary as 'git.exe', never bare 'git'. PowerShell command
+# resolution is case-insensitive and functions outrank external executables, so
+# inside a function named 'Git' a bare '& git' resolves back to THIS function ->
+# infinite recursion -> "call depth overflow". '.exe' forces the application.
 # git that must succeed
-function Git { & git -C $RepoRoot @args; if ($LASTEXITCODE -ne 0) { Fail "git $($args -join ' ') failed (exit $LASTEXITCODE)" } }
+function Git { & git.exe -C $RepoRoot @args; if ($LASTEXITCODE -ne 0) { Fail "git $($args -join ' ') failed (exit $LASTEXITCODE)" } }
 # git whose exit code we inspect ourselves
-function GitTry { & git -C $RepoRoot @args 2>$null; return $LASTEXITCODE }
+function GitTry { & git.exe -C $RepoRoot @args 2>$null; return $LASTEXITCODE }
 
 # ---------------------------------------------------------------------------
 # 0. Validate inputs / compute tag
@@ -114,20 +118,20 @@ foreach ($p in @($VersionPas, $FullBuild)) { if (-not (Test-Path $p)) { Fail "No
 # 1. Git preconditions: on master, clean-ish, current, tag is free
 # ---------------------------------------------------------------------------
 Step "Git preconditions"
-$branch = (& git -C $RepoRoot rev-parse --abbrev-ref HEAD).Trim()
+$branch = (& git.exe -C $RepoRoot rev-parse --abbrev-ref HEAD).Trim()
 if ($branch -ne 'master') { Fail "On branch '$branch'; releases are tagged from master. Checkout master first." }
 
 # Pull so we don't tag a stale tree
 Git fetch origin master
-$behind = (& git -C $RepoRoot rev-list --count 'HEAD..origin/master').Trim()
+$behind = (& git.exe -C $RepoRoot rev-list --count 'HEAD..origin/master').Trim()
 if ($behind -ne '0') { Git merge --ff-only origin/master }
 
 # Tag must not already exist (local or remote)
 if ((GitTry rev-parse -q --verify "refs/tags/$Tag") -eq 0) { Fail "Tag $Tag already exists locally. Bump the version or delete the tag." }
-if ((& git -C $RepoRoot ls-remote --tags origin "$Tag") ) { Fail "Tag $Tag already exists on origin." }
+if ((& git.exe -C $RepoRoot ls-remote --tags origin "$Tag") ) { Fail "Tag $Tag already exists on origin." }
 
 # Warn on unexpected dirty files (the data files are expected to change; flag anything else)
-$dirty = (& git -C $RepoRoot status --porcelain) | Where-Object {
+$dirty = (& git.exe -C $RepoRoot status --porcelain) | Where-Object {
    $_ -and ($_ -notmatch 'target/cty\.dat') -and ($_ -notmatch 'target/TRMASTER\.DTA') -and ($_ -notmatch 'src/Version\.pas')
 }
 if ($dirty) {
@@ -238,7 +242,7 @@ if (Test-Path $Changes)  { Git add $Changes }
 if (Test-Path $RelNotes) { Git add $RelNotes }
 # Data files: clear skip-worktree (if set) then force past the target/* gitignore
 foreach ($df in @($CtyFile, $TrmasterFile)) {
-   & git -C $RepoRoot update-index --no-skip-worktree $df 2>$null   # ok if it wasn't set
+   & git.exe -C $RepoRoot update-index --no-skip-worktree $df 2>$null   # ok if it wasn't set
    Git add -f $df
 }
 
@@ -249,7 +253,7 @@ Git tag -a $Tag -m "TR4W $Version"
 Git push origin $Tag
 
 # Re-apply skip-worktree so day-to-day runtime rewrites stay out of git status
-foreach ($df in @($CtyFile, $TrmasterFile)) { & git -C $RepoRoot update-index --skip-worktree $df 2>$null }
+foreach ($df in @($CtyFile, $TrmasterFile)) { & git.exe -C $RepoRoot update-index --skip-worktree $df 2>$null }
 
 Step "Done"
 Info "Pushed master + tag $Tag. CI is building now:"
