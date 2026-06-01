@@ -301,6 +301,12 @@ def main(argv=None):
                            hit_max_age_days=args.max_age_days,
                            miss_max_age_days=args.miss_max_age_days)
 
+    # Show the cumulative cache state up front -- this is the real "how far along
+    # the backfill is" number (it grows across runs toward the candidate count),
+    # unlike the per-run lookup counter below.
+    cached = len(client._cache)
+    named = sum(1 for v in client._cache.values() if isinstance(v, dict) and v.get("name"))
+    log(f"  QRZ name cache: {cached} entries ({named} named, {cached - named} cached-misses)")
     log(f"  resolving up to {args.limit or 'all'} new QRZ lookup(s) "
         f"(sleep {args.sleep}s); status every 100 ...")
     rows = []
@@ -325,7 +331,7 @@ def main(argv=None):
             if will_query:
                 # heartbeat so a long silent run shows it's alive and progressing
                 if new_lookups % 100 == 0:
-                    log(f"  ... {new_lookups} lookups, {len(rows)} names so far (at {call})")
+                    log(f"  ... {new_lookups} new lookups this run, cache now {len(client._cache)} entries (at {call})")
                 # periodic atomic flush so a kill loses at most --save-every lookups
                 if args.save_every and new_lookups % args.save_every == 0:
                     client.save()
