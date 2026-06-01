@@ -102,6 +102,7 @@ Type TNetRadioBase = class(TObject)
       baseProcMsg: TProcessMsgRef;
       SocketLock: TCriticalSection;
       FLastValidResponse: TDateTime;  // Track last valid response for timeout detection
+      FActiveVFO: TVFO;  // RX/operating VFO; nrVFOA = swap model (K4: A/B swaps contents so A is always active), selectable-model radios (Kenwood FR, Flex slice) drive it via SetActiveVFO
 
       function GetRadioPort: integer;
       procedure SetRadioPort(Value: Integer);
@@ -225,6 +226,12 @@ Type TNetRadioBase = class(TObject)
       // property Fields[Index: Integer]: TFieldSpec read GetField;
       //property FVFO[whichVFO: TVFO]: TRadioVFO read GetVFO;
 
+      // Active (RX/operating) VFO. Default nrVFOA = "swap" model (K4: A/B
+      // exchanges contents, so the active VFO is always A). Selectable-model
+      // radios (Kenwood FR, Flex slice) call SetActiveVFO so the aggregate
+      // main-window status (in pNetworkRadio) follows the receiving VFO.
+      function GetActiveVFO: TVFO;
+      procedure SetActiveVFO(vfo: TVFO);
 
    published
 
@@ -296,6 +303,7 @@ begin
    }
    baseProcMsg := ProcRef;
    bAddTermination := True;   // default: append CR/LF; radios that must not (e.g. TS-890 LAN) set this False in their own constructor
+   FActiveVFO := nrVFOA;      // default swap-model (active VFO always A); selectable-model radios update via SetActiveVFO
    for iVFO := Low(TVFO) to High(TVFO) do
       begin
       Self.vfo[iVFO] := TRadioVFO.Create;
@@ -652,7 +660,14 @@ begin
 
       socket.Port := Self.radioPort;
       socket.Host := Self.radioAddress;
-      socket.ConnectTimeout := 10;
+      // Connect runs on a background thread (the reconnect loop), so a longer
+      // timeout does not block the UI. The original 10ms was too short for
+      // anything but a same-subnet LAN: a VPN/WAN TCP handshake to N2SKH's radio
+      // measured ~95ms, so 10ms always tripped "Connect timed out" before the
+      // handshake finished (ARCP and telnet succeed because they use the multi-
+      // second OS default). 5000ms covers a slow/jittery VPN while still failing
+      // in ~5s when a radio is genuinely off. - raised from 10 on 2026-05-31.
+      socket.ConnectTimeout := 5000;
 
       try
           // Force disconnect to clear any corrupted socket state
@@ -934,6 +949,16 @@ end;
 function TNetRadioBase.GetMode(whichVFO: TVFO): TRadioMode;
 begin
    Result := Self.vfo[whichVFO].mode;
+end;
+
+function TNetRadioBase.GetActiveVFO: TVFO;
+begin
+   Result := FActiveVFO;
+end;
+
+procedure TNetRadioBase.SetActiveVFO(vfo: TVFO);
+begin
+   FActiveVFO := vfo;
 end;
 
 function TNetRadioBase.GetDataMode(whichVFO: TVFO): TRadioMode;

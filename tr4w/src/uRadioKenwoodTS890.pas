@@ -63,6 +63,7 @@ type TKenwoodTS890Radio = class(TNetRadioBase)
       procedure ParseRTResponse(const sMessage: string);
       procedure ParseXTResponse(const sMessage: string);
       procedure ParseRFResponse(const sMessage: string);
+      procedure ParseFRResponse(const sMessage: string);
 
    public
       NetworkUsername: ShortString;   // Set by LOGRADIO before Connect; "Admin ID" on the radio
@@ -173,9 +174,13 @@ begin
    // auth phase. If the operator never set credentials (empty NetworkUsername),
    // skip auth entirely and go straight to initialization.
    if Length(NetworkUsername) > 0 then
-      FAuthState := ksWaitingForCN
+      begin
+      FAuthState := ksWaitingForCN;
+      end
    else
+      begin
       FAuthState := ksAuthenticated;
+      end;
 
    Result := Inherited Connect;
 
@@ -299,8 +304,9 @@ begin
    // Prime our cached state with explicit queries.
    Self.SendToRadio('FA;');     // VFO A frequency
    Self.SendToRadio('FB;');     // VFO B frequency
-   Self.SendToRadio('OM0;');    // VFO A mode
-   Self.SendToRadio('OM1;');    // VFO B mode
+   Self.SendToRadio('FR;');     // operating (RX) VFO -- needed to map OM0/OM1 to physical VFOs
+   Self.SendToRadio('OM0;');    // operating-VFO mode (OM is operating-relative)
+   Self.SendToRadio('OM1;');    // other-VFO mode
    Self.SendToRadio('KS;');     // CW keyer speed
    Self.SendToRadio('TB;');     // Split (TX/RX VFO)
    Self.SendToRadio('FT;');     // TX VFO selection
@@ -354,6 +360,10 @@ begin
       ParseTBResponse(sMessage)
    else if AnsiStartsStr('FT', sMessage) then
       ParseFTResponse(sMessage)
+   else if AnsiStartsStr('FR', sMessage) then
+      // Operating (RX) VFO -- pushed under AI2 on A/B. Tracked because the OM
+      // mode reply is operating-VFO-relative (see ParseOMResponse).
+      ParseFRResponse(sMessage)
    else if AnsiStartsStr('RT', sMessage) then
       ParseRTResponse(sMessage)
    else if AnsiStartsStr('XT', sMessage) then
@@ -376,10 +386,14 @@ begin
       begin
       // ID024 = TS-890S. Anything else means we connected to the wrong radio.
       if AnsiStartsStr('ID024', sMessage) then
-         logger.Info('[%s.ProcessMessage] Confirmed TS-890S (ID024)', [Self.rigLabel])
+         begin
+         logger.Info('[%s.ProcessMessage] Confirmed TS-890S (ID024)', [Self.rigLabel]);
+         end
       else
+         begin
          logger.Warn('[%s.ProcessMessage] Unexpected ID response: %s',
                      [Self.rigLabel, sMessage]);
+         end;
       end
    else
       begin
@@ -429,7 +443,9 @@ begin
    // frequency rather than a band number, so we derive it; the K4 sets
    // vfo[].band for exactly the same reason.
    if Self.vfo[whichVFO].frequency > 0 then
+      begin
       Self.vfo[whichVFO].band := FreqToRadioBand(Self.vfo[whichVFO].frequency);
+      end;
    logger.Trace('[%s.ParseFAOrFBResponse] %s = %d Hz (band %d)',
                 [Self.rigLabel, VFOToString(whichVFO), freqVal,
                  Ord(Self.vfo[whichVFO].band)]);
@@ -450,9 +466,22 @@ begin
    vfoChar  := sMessage[3];
    modeChar := sMessage[4];
 
+   // KENWOOD QUIRK: the OM P1 byte is OPERATING-VFO-relative, NOT a fixed VFO
+   // A/B -- '0' = the operating (FR-selected) VFO, '1' = the other VFO. Map it
+   // to the physical VFO via the base active VFO (GetActiveVFO, set from FR). Without this,
+   // after an A/B swap to VFO B the radio's OM0 (= B's mode) is filed under
+   // VFO A and the per-VFO modes display swapped (issue #1, confirmed in the
+   // A/B capture: FR1 then OM with the modes transposed).
    case vfoChar of
-      '0': whichVFO := nrVFOA;
-      '1': whichVFO := nrVFOB;
+      '0': whichVFO := Self.GetActiveVFO;
+      '1': if Self.GetActiveVFO = nrVFOA then
+              begin
+              whichVFO := nrVFOB;
+              end
+           else
+              begin
+              whichVFO := nrVFOA;
+              end;
    else
       logger.Warn('[%s.ParseOMResponse] Unexpected VFO char in: %s',
                   [Self.rigLabel, sMessage]);
@@ -460,9 +489,10 @@ begin
    end;
 
    Self.vfo[whichVFO].mode := ModeCharToMode(modeChar);
-   logger.Trace('[%s.ParseOMResponse] %s mode = %s (char %s)',
+   logger.Trace('[%s.ParseOMResponse] %s mode = %s (OM%s, operating=%s)',
                 [Self.rigLabel, VFOToString(whichVFO),
-                 Self.ModeToString(Self.vfo[whichVFO].mode), modeChar]);
+                 Self.ModeToString(Self.vfo[whichVFO].mode), vfoChar,
+                 VFOToString(Self.GetActiveVFO)]);
 end;
 
 procedure TKenwoodTS890Radio.ParseKSResponse(const sMessage: string);
@@ -472,7 +502,10 @@ var
    convErr: Integer;
 begin
    // Format: KS<3-digit WPM>;
-   if Length(sMessage) < 5 then Exit;
+   if Length(sMessage) < 5 then
+      begin
+      Exit;
+      end;
    wpmStr := Copy(sMessage, 3, 3);
    Val(wpmStr, wpmVal, convErr);
    if convErr = 0 then
@@ -486,7 +519,10 @@ end;
 // TS-890 Split is a global on/off flag separate from FR/FT VFO selection.
 procedure TKenwoodTS890Radio.ParseTBResponse(const sMessage: string);
 begin
-   if Length(sMessage) < 3 then Exit;
+   if Length(sMessage) < 3 then
+      begin
+      Exit;
+      end;
    Self.SetSplitOn(sMessage[3] = '1');   // base setter -> localSplitEnabled the window reads
    logger.Trace('[%s.ParseTBResponse] Split = %s',
                 [Self.rigLabel, BoolToStr(Self.localSplitEnabled, True)]);
@@ -498,15 +534,50 @@ end;
 // gets fleshed out.
 procedure TKenwoodTS890Radio.ParseFTResponse(const sMessage: string);
 begin
-   if Length(sMessage) < 3 then Exit;
+   if Length(sMessage) < 3 then
+      begin
+      Exit;
+      end;
    logger.Trace('[%s.ParseFTResponse] TX VFO = %s',
                 [Self.rigLabel, IfThen(sMessage[3] = '1', 'B', 'A')]);
+end;
+
+// Format: FR<0|1>;  -- 0 = VFO A is the operating (RX) VFO, 1 = VFO B. The radio
+// pushes this under AI2 when A/B is pressed. We must track it because the OM
+// (mode) reply is operating-VFO-relative: OM0 = the operating VFO's mode, OM1 =
+// the other VFO's. ParseOMResponse uses the base active VFO (GetActiveVFO) to file each OM reply
+// under the correct physical VFO -- fixes the A/B mode-swap (issue #1).
+procedure TKenwoodTS890Radio.ParseFRResponse(const sMessage: string);
+begin
+   if Length(sMessage) < 3 then
+      begin
+      Exit;
+      end;
+
+   // TS-890 is a selectable-RX-VFO radio: FR moves the RX pointer (FR0=A, FR1=B)
+   // without swapping VFO contents. Drive the base FActiveVFO so BOTH the main-
+   // window display (via pNetworkRadio / GetActiveVFO) and the operating-relative
+   // OM mode mapping follow the receiving VFO.
+   if sMessage[3] = '1' then
+      begin
+      Self.SetActiveVFO(nrVFOB);
+      end
+   else
+      begin
+      Self.SetActiveVFO(nrVFOA);
+      end;
+
+   logger.Trace('[%s.ParseFRResponse] operating (RX) VFO = %s',
+                [Self.rigLabel, VFOToString(Self.GetActiveVFO)]);
 end;
 
 // Format: RT<0|1>;  -- 0 = RIT off, 1 = RIT on.
 procedure TKenwoodTS890Radio.ParseRTResponse(const sMessage: string);
 begin
-   if Length(sMessage) < 3 then Exit;
+   if Length(sMessage) < 3 then
+      begin
+      Exit;
+      end;
    Self.SetRITOn(sMessage[3] = '1');   // base setter -> per-VFO RITState the window reads
    logger.Trace('[%s.ParseRTResponse] RIT = %s',
                 [Self.rigLabel, BoolToStr(Self.RITState, True)]);
@@ -515,7 +586,10 @@ end;
 // Format: XT<0|1>;  -- 0 = XIT off, 1 = XIT on.
 procedure TKenwoodTS890Radio.ParseXTResponse(const sMessage: string);
 begin
-   if Length(sMessage) < 3 then Exit;
+   if Length(sMessage) < 3 then
+      begin
+      Exit;
+      end;
    Self.SetXITOn(sMessage[3] = '1');   // base setter -> per-VFO XITState the window reads
    logger.Trace('[%s.ParseXTResponse] XIT = %s',
                 [Self.rigLabel, BoolToStr(Self.XITState, True)]);
@@ -550,7 +624,9 @@ begin
 
    offset := magVal;
    if sMessage[3] = '1' then          // P1 = 1 => minus direction
+      begin
       offset := -offset;
+      end;
 
    Self.vfo[nrVFOA].RITOffset := offset;
    logger.Trace('[%s.ParseRFResponse] RIT/XIT offset = %d Hz', [Self.rigLabel, offset]);
@@ -679,7 +755,9 @@ begin
    Self.SendToRadio(Format('%s%.11d;', [sCmd, freq]));
 
    if mode <> rmNone then
+      begin
       Self.SetMode(mode, vfo);
+      end;
 end;
 
 procedure TKenwoodTS890Radio.SetMode(mode: TRadioMode; vfo: TVFO = nrVFOA);
@@ -804,12 +882,18 @@ begin
 
    magnitude := Abs(hz);
    if magnitude > 9999 then
+      begin
       magnitude := 9999;
+      end;
 
    if hz > 0 then
-      Self.SendToRadio(Format('RU%.5d;', [magnitude]))
+      begin
+      Self.SendToRadio(Format('RU%.5d;', [magnitude]));
+      end
    else
+      begin
       Self.SendToRadio(Format('RD%.5d;', [magnitude]));
+      end;
 end;
 
 procedure TKenwoodTS890Radio.SetXITFreq(whichVFO: TVFO; hz: integer);
@@ -827,9 +911,13 @@ procedure TKenwoodTS890Radio.Split(splitOn: boolean);
 begin
    if FAuthState <> ksAuthenticated then Exit;
    if splitOn then
-      Self.SendToRadio('FT1;')   // TX = VFO B
+      begin
+      Self.SendToRadio('FT1;');   // TX = VFO B
+      end
    else
+      begin
       Self.SendToRadio('FT0;');  // TX = VFO A (split off)
+      end;
 end;
 
 procedure TKenwoodTS890Radio.SetBand(band: TRadioBand; vfo: TVFO = nrVFOA);

@@ -728,6 +728,7 @@ var
    lastRITXITTick: LongWord;
    authErrBuf: array[0..127] of Char;
    handshakeStuckSinceTick: LongWord;  // GetTickCount when we first noticed IsConnected but not IsOperational; 0 = not tracking
+   actVFO: TVFO;                       // active (RX) VFO for the aggregate main-window status (ro.GetActiveVFO)
 const
    RECONNECT_INITIAL_DELAY = 1000;    // 1 second initial delay
    RECONNECT_MAX_DELAY = 30000;       // 30 seconds max delay
@@ -956,14 +957,23 @@ begin
                end;
             end;
 
-         rig^.CurrentStatus.Freq := ro.frequency[nrVFOA];
-         rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
-         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[nrVFOA],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
-         rig^.CurrentStatus.RITFreq :=  ro.RITOffset[nrVFOA];
+         // Aggregate "main window" status follows the active (RX/operating) VFO.
+         // Swap-model radios (K4) return nrVFOA from GetActiveVFO -- unchanged
+         // from before. Selectable-model radios (Kenwood FR, Flex) return the
+         // receiving VFO, so the main window tracks A/B selection on the radio.
+         actVFO := ro.GetActiveVFO;
+         rig^.CurrentStatus.Freq := ro.frequency[actVFO];
+         rig^.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[actVFO]);
+         GetTRModeAndExtendedModeFromNetworkMode(ro.mode[actVFO],rig^.CurrentStatus.Mode,rig^.CurrentStatus.ExtendedMode);
+         rig^.CurrentStatus.RITFreq :=  ro.RITOffset[actVFO];
          rig^.CurrentStatus.Split := ro.IsSplitEnabled;
-         rig^.CurrentStatus.RIT := ro.IsRITOn[nrVFOA];
-         rig^.CurrentStatus.XIT := ro.IsXITOn[nrVFOA];
+         rig^.CurrentStatus.RIT := ro.IsRITOn[actVFO];
+         rig^.CurrentStatus.XIT := ro.IsXITOn[actVFO];
          rig^.CurrentStatus.TXOn := ro.IsTransmitting;
+         if actVFO = nrVFOB then
+            rig^.CurrentStatus.VFOStatus := VFOB
+         else
+            rig^.CurrentStatus.VFOStatus := VFOA;
 
          // VFO A
          rig.CurrentStatus.VFO[VFOA].Frequency := ro.frequency[nrVFOA];
@@ -972,7 +982,7 @@ begin
          rig.CurrentStatus.VFO[VFOA].XIT := ro.IsXITOn[nrVFOA];
          rig.CurrentStatus.VFO[VFOA].RITFreq := ro.RITOffset[nrVFOA];
          rig.CurrentStatus.VFO[VFOA].Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
-         rig.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[nrVFOA]);
+         rig.CurrentStatus.Band := GetTR4WBandFromNetworkBand(ro.band[actVFO]);  // aggregate band follows active VFO
 
          // VFO B
          rig.CurrentStatus.VFO[VFOB].Frequency := ro.frequency[nrVFOB];
