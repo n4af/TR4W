@@ -2371,6 +2371,8 @@ begin
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
+         // This whould really be changed to a queue where we send the CW speed command, send the KY coommand and then send the KS command as consecutive commands for the Kenwood.
+         // It also illustrates that we should have a branch in this case just for ELecraft and not lump it into Kenwood. The K3 and K4 handle this but now Kenwood.     NY4I 2026 June 1
          if Msg = ControlF then// increase speed
             begin
             CodeSpeed := CodeSpeed + Round(CodeSpeed * 0.06); // increase 6 %
@@ -2454,7 +2456,16 @@ begin
 //            msgLen := length(Msg);              //length(Msg);
             //len := Min(msgLen, 24);             // 24 max for Kenwood
             case RadioModel of
-               TS480, TS570, TS590, TS890, TS950, TS990, TS2000:
+               TS890:
+                  begin
+                  // TS-890 accepts the space-prefixed KY form with a variable-length
+                  // P2 (KY <space><text>;), so no 24-byte padding -- and never KY2
+                  // (P1='2' would key the fill spaces as dead air). The other Kenwoods
+                  // reject a short P2 under P1=space, so they keep the fixed-24 fill.
+                  maxLen := 24;
+                  pad := false;
+                  end;
+               TS480, TS570, TS590, TS950, TS990, TS2000:
                   begin
                   maxLen := 24;
                   pad := true;
