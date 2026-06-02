@@ -1,5 +1,7 @@
 # TR4W Change Log
 
+**This is a developer-level document with far more technical detail than is needed for most users of TR4W.** While you are welcome to read it for the internals of how it all works, if you are just interested in the changes that may affect how you use TR4W, the RELEASE NOTES may be of more value to you. You can find those [here](/RELEASE_NOTES.md).
+
 > TRLOG 4 Windows — Free Amateur Radio Contest Logging Application  
 > Repository: [github.com/n4af/TR4W](https://github.com/n4af/TR4W)  
 > Generated: 2026-03-19
