@@ -41,7 +41,12 @@ uses
    uCRC32               in '..\..\src\uCRC32.pas',
    uTestCRC32           in 'uTestCRC32.pas',
    utils_math           in '..\..\src\utils\utils_math.pas',
-   uTestUtilsMath       in 'uTestUtilsMath.pas';
+   uTestUtilsMath       in 'uTestUtilsMath.pas',
+   uGridDistance        in '..\..\src\uGridDistance.pas',
+   uTestGridDistance    in 'uTestGridDistance.pas',
+   utils_file           in '..\..\src\utils\utils_file.pas',
+   uTestUtilsFile       in 'uTestUtilsFile.pas',
+   uTestADIFRegression  in 'uTestADIFRegression.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -61,6 +66,9 @@ begin
    RegisterSuite(TCabrilloFormatTests.Create('CabrilloFormat'));
    RegisterSuite(TCRC32Tests.Create('CRC32'));
    RegisterSuite(TUtilsMathTests.Create('UtilsMath'));
+   RegisterSuite(TGridDistanceTests.Create('GridDistance'));
+   RegisterSuite(TUtilsFileTests.Create('UtilsFile'));
+   RegisterSuite(TADIFRegressionTests.Create('ADIFRegression'));
 
    if RunAllSuites then
       begin
