@@ -57,6 +57,7 @@ type
 var
   IOPlugin                              : THandle;
   IOPLuginisloaded                      : boolean;
+  inpout32LoadAttempted                 : boolean = False;  // load on demand once; a failed load must not re-warn on every OpenLPT
   DlWriteByte                           : TDlPortWritePortUchar;
   DlReadByte                            : TDlPortReadPortUchar;
   dwStatus                              : DWORD;
@@ -118,18 +119,30 @@ uses MainUnit;
 
 procedure DriverCreate;
 begin
-if  not DriverIsLoaded then
-  begin
-    IOPlugin := LoadLibrary(PChar('inpout32.dll' + #0));
-    if (IOPlugin <> 0) then
+   if DriverIsLoaded then
       begin
-        DlWriteByte := TDlPortWritePortUchar(GetProcAddress(IOPlugin,'Out32'));
-        DlReadByte := TDlPortReadPortUchar(GetProcAddress(IOPlugin,'Inp32'));
-        IOPLuginisloaded :=  TIsInpOutDriverOpen(GetProcAddress(IOPlugin,'IsInpOutDriverOpen'));
+      Exit;
+      end;
+   // Attempt the load at most once. inpout32.dll is no longer bundled; if it is
+   // absent we warn and disable LPT (see NoInpOut32Message) -- without this guard
+   // each of the several OpenLPT calls would re-attempt the load and re-warn.
+   if inpout32LoadAttempted then
+      begin
+      Exit;
+      end;
+   inpout32LoadAttempted := True;
+
+   IOPlugin := LoadLibrary(PChar('inpout32.dll' + #0));
+   if (IOPlugin <> 0) then
+      begin
+      DlWriteByte := TDlPortWritePortUchar(GetProcAddress(IOPlugin, 'Out32'));
+      DlReadByte := TDlPortReadPortUchar(GetProcAddress(IOPlugin, 'Inp32'));
+      IOPLuginisloaded := TIsInpOutDriverOpen(GetProcAddress(IOPlugin, 'IsInpOutDriverOpen'));
       end
-     else
-     NoInpOut32Message;
-  end   
+   else
+      begin
+      NoInpOut32Message;
+      end;
 end;
 
 procedure DriverDestroy;
@@ -139,6 +152,7 @@ begin
   DlWriteByte := nil;
   DlReadByte := nil;
   IOPLuginisloaded := false;
+  inpout32LoadAttempted := false;   // allow a fresh load attempt after an explicit teardown
 end;
 
 
@@ -152,11 +166,24 @@ end;
 
 function GetPortByte(Address: Word; Offset: TOffsetType): Byte;
 begin
+  // inpout32.dll absent/not loaded: the port-I/O pointer is nil. Return 0 (a safe
+  // "nothing asserted" default) instead of calling through nil. Not every caller
+  // guards on DriverIsLoaded(), so this chokepoint must be self-protecting.
+  Result := 0;
+  if not Assigned(DlReadByte) then
+    begin
+    Exit;
+    end;
   Result := DlReadByte(Address + Word(Offset));
 end;
 
 procedure SetPortByte(Address: Word; Offset: TOffsetType; data: Byte);
 begin
+  // inpout32.dll absent/not loaded: pointer is nil -> no-op rather than crash.
+  if not Assigned(DlWriteByte) then
+    begin
+    Exit;
+    end;
   DlWriteByte(Address + Word(Offset), data);
 end;
 
@@ -164,9 +191,18 @@ end;
 
 
 procedure NoInpOut32Message;
-begin;
-  showwarning('Enable to load InpOut32.dll'#13#10'Check it is installed in same directory as TR4W.exe');
-  halt;
+var
+  msg: string;
+begin
+  // inpout32.dll is no longer bundled (it was the AV "vulndriver" false-positive
+  // trigger on the installer). When it is absent we DISABLE parallel-port (LPT)
+  // features and continue -- we must NOT halt, or a stale LPT port left in a
+  // user's config would crash startup. Reached only when an LPT port is mapped.
+  msg := 'Parallel-port (LPT) features require inpout32.dll, which is no longer'#13#10 +
+         'bundled with TR4W. Download it from http://www.highrez.co.uk/ and place'#13#10 +
+         'inpout32.dll in the same folder as tr4w.exe. LPT features are disabled'#13#10 +
+         'until then; the rest of TR4W is unaffected.';
+  showwarning(PChar(msg));
 end;
 
 

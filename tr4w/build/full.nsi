@@ -115,7 +115,12 @@ Section "tr4w.exe" secexe
 	File ..\target\tr4w.exe
 	File ..\target\r150s.dat
 	File ..\target\rfobl.dat
-	File ..\target\inpout32.dll
+	; inpout32.dll is intentionally NOT bundled: its kernel port-I/O driver is
+	; flagged by several AV engines (hacktool/vulndriver) and was the only
+	; true-positive trigger on the installer. Direct parallel-port (LPT) keying
+	; is a legacy feature; users who need it supply inpout32.dll themselves
+	; (next to tr4w.exe). TR4W loads it on demand only when an LPT port is
+	; configured, and runs fine without it otherwise. See uIO.pas.
 	File ..\target\libeay32.dll
 	File ..\target\ssleay32.dll
 	File ..\target\libhamlib-4.dll
