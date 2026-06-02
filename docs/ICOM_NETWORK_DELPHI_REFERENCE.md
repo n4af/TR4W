@@ -825,5 +825,5 @@ end;
 ## References
 
 - wfview project (open source Icom network control): https://gitlab.com/eliggett/wfview
-- TR4W Icom CI-V wiki: https://github.com/n4af/TR4W/wiki/Icom-CI-V-Information
+- TR4W Icom CI-V wiki: https://github.com/TR4W/TR4W/wiki/Icom-CI-V-Information
 - Icom CI-V Reference Manuals (per radio model, from Icom website)

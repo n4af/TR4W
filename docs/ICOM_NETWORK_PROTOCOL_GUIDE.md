@@ -979,5 +979,5 @@ wfview is the most mature open-source implementation. When something doesn't wor
 
 - wfview project (open source): https://gitlab.com/eliggett/wfview
 - Icom CI-V Reference Manuals (per radio model): Available from Icom's website
-- TR4W implementation (Delphi 7): https://github.com/n4af/TR4W
-- TR4QT implementation (Qt/C++): https://github.com/n4af/TR4QT
+- TR4W implementation (Delphi 7): https://github.com/TR4W/TR4W
+- TR4QT implementation (Qt/C++): https://github.com/ny4i/TR4QT

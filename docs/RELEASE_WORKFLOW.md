@@ -47,7 +47,7 @@ Sections 6-8 cover tagging and the GitHub-side release flow.
 
 ## 0. Audience and assumptions
 
-- You have **write access** to `n4af/TR4W` on GitHub.
+- You have **write access** to `TR4W/TR4W` on GitHub.
 - You're on Windows with the toolchain installed (Delphi 7, Indy, NSIS, UPX -- see
   section 1).
 - You're working from a clone of the repo (default `C:\TR4W`; Howie uses

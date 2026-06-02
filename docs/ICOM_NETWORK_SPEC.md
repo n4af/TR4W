@@ -706,5 +706,5 @@ ICOM NETWORK PASSWORD = pass
 
 - Protocol reference: `docs/ICOM_NETWORK_DELPHI_REFERENCE.md`
 - wfview project: https://gitlab.com/eliggett/wfview
-- TR4W Icom CI-V wiki: https://github.com/n4af/TR4W/wiki/Icom-CI-V-Information
+- TR4W Icom CI-V wiki: https://github.com/TR4W/TR4W/wiki/Icom-CI-V-Information
 - Existing codebase: `uRadioIcomBase.pas`, `uNetRadioBase.pas`, `uRadioFactory.pas`
