@@ -1,13 +1,13 @@
 # TR4W Dialog System — Session Context & Analysis
 **Date:** March 16–23, 2026  
 **Contributor:** toms@bettersoftwaresolutions.com (NY4I / Tom)  
-**Repo:** n4af/TR4W  
+**Repo:** TR4W/TR4W  
 
 ---
 
 ## Project Background
 
-TR4W is a ham radio contest logging software hosted at the GitHub repo **n4af/TR4W**. The project is written in **Delphi 7** using a Petzold-style Win32 message loop (no standard VCL main form). NY4I (Tom, 362 commits) and N4AF (Howie, 318 commits) are the primary contributors.
+TR4W is a ham radio contest logging software hosted at the GitHub repo **TR4W/TR4W**. The project is written in **Delphi 7** using a Petzold-style Win32 message loop (no standard VCL main form). NY4I (Tom, 362 commits) and N4AF (Howie, 318 commits) are the primary contributors.
 
 A migration from Delphi 7 to current Delphi (Alexandria) is being planned. A related project, **TR4QT**, is a Qt/C++ port at github.com/ny4i/TR4QT.
 
@@ -84,7 +84,7 @@ The question was raised: *Is it worthwhile to generate a `.RES` definition for t
 
 ## Source Files Analyzed
 
-The following Pascal units were downloaded and analyzed from the n4af/TR4W repository:
+The following Pascal units were downloaded and analyzed from the TR4W/TR4W repository:
 
 | Unit | Purpose |
 |------|---------|
@@ -143,7 +143,7 @@ The following Pascal units were downloaded and analyzed from the n4af/TR4W repos
 | `tr4w_mng.rc` | Decompiled Mongolian RC (1095 lines) | workspace |
 | `tr4w_res_comparison.md` | Full comparison matrix of all 9 language RES files | workspace |
 | `tr4w_dialog_catalog.md` | Complete dialog inventory (code-built vs resource-based) | workspace |
-| `docs/dialog_analysis.md` | Dialog inventory committed to repo | [GitHub — master branch](https://github.com/n4af/TR4W/blob/master/docs/dialog_analysis.md) |
+| `docs/dialog_analysis.md` | Dialog inventory committed to repo | [GitHub — master branch](https://github.com/TR4W/TR4W/blob/master/docs/dialog_analysis.md) |
 
 ---
 
@@ -173,7 +173,7 @@ dialog_y = mweiY * 8
 
 ## Related Documents in `/docs`
 
-- [`dialog_analysis.md`](https://github.com/n4af/TR4W/blob/master/docs/dialog_analysis.md) — Complete dialog inventory with tw_ enum table, modal dialog table, mwe explanation
+- [`dialog_analysis.md`](https://github.com/TR4W/TR4W/blob/master/docs/dialog_analysis.md) — Complete dialog inventory with tw_ enum table, modal dialog table, mwe explanation
 - `NETWORK_RADIO_FACTORY_ANALYSIS.md` — Radio factory network analysis
 - `RADIO_FACTORY_README.md` — Radio factory documentation
 - `RADIO_FACTORY_UPDATE.txt` — Radio factory update notes

@@ -932,4 +932,4 @@ Key individual releases in this period include version 4.195 (February 2010), wh
 
 ---
 
-*This changelog was generated from the Git commit history of the [n4af/TR4W](https://github.com/n4af/TR4W) repository. Repository: [github.com/n4af/TR4W](https://github.com/n4af/TR4W)*
+*This changelog was generated from the Git commit history of the [TR4W/TR4W](https://github.com/TR4W/TR4W) repository. Repository: [github.com/TR4W/TR4W](https://github.com/TR4W/TR4W)*

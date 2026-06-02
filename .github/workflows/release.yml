@@ -1,4 +1,4 @@
-# Place at .github/workflows/release.yml in n4af/tr4w
+# Place at .github/workflows/release.yml in TR4W/TR4W
 #
 # Triggers:
 #   1. Tag push v4.X.Y       -> English-only build + ENG installer

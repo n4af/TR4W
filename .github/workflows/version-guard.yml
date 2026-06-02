@@ -1,4 +1,4 @@
-# Place at .github/workflows/version-guard.yml in n4af/tr4w
+# Place at .github/workflows/version-guard.yml in TR4W/TR4W
 #
 # Purpose:
 #   Guard against tr4w/src/Version.pas being dropped or corrupted by a merge.

@@ -3,7 +3,7 @@
 **This is a developer-level document with far more technical detail than is needed for most users of TR4W.** While you are welcome to read it for the internals of how it all works, if you are just interested in the changes that may affect how you use TR4W, the RELEASE NOTES may be of more value to you. You can find those [here](/RELEASE_NOTES.md).
 
 > TRLOG 4 Windows — Free Amateur Radio Contest Logging Application  
-> Repository: [github.com/n4af/TR4W](https://github.com/n4af/TR4W)  
+> Repository: [github.com/TR4W/TR4W](https://github.com/TR4W/TR4W)  
 > Generated: 2026-03-19
 
 ## Contributors
@@ -1319,7 +1319,7 @@ The repository was first committed on April 25, 2014 at version 4.30.3 by Howard
 
 ---
 
-*This changelog was generated from the Git commit history of the [n4af/TR4W](https://github.com/n4af/TR4W) repository on March 19, 2026.*
+*This changelog was generated from the Git commit history of the [TR4W/TR4W](https://github.com/TR4W/TR4W) repository on March 19, 2026.*
 
 ---
 
