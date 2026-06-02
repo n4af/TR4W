@@ -38,6 +38,14 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.1 (2026-06-02) — NY4I
+
+#### Parallel-Port (LPT) Keying
+
+- The installer no longer includes inpout32.dll — the component several antivirus engines flagged as a "vulnerable driver," which is what caused some browsers and antivirus tools to block the download. Serial, USB, and network keying and rig control are completely unaffected. If you use direct parallel-port (LPT) keying, footswitch, paddle, or band-data output, you now supply inpout32.dll yourself: download it from highrez.co.uk and place it in the same folder as tr4w.exe. If you have an LPT port configured but the file isn't present, TR4W now shows a reminder and keeps running, instead of failing to start.
+
+---
+
 ### 4.148.0 (2026-06-01) — NY4I
 
 #### Radio Control — Kenwood TS-890 over LAN

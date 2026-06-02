@@ -35,6 +35,15 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.1 (2026-06-02) — NY4I
+
+#### Stop bundling inpout32.dll to clear AV false positive (`tr4w/build/full.nsi`, `tr4w/src/uIO.pas`, `tr4w/target/inpout32.dll`) — PR #963
+
+- **Removed `inpout32.dll` from the installer and the repo**: its kernel port-I/O driver was the installer's only true-positive VirusTotal flag (`hacktool`/`vulndriver`, e.g. DrWeb `Tool.VulnDriver.32`) and the cause of Chrome Safe Browsing / SmartScreen download blocks on the unsigned installer. `inpout32` is used only for direct parallel-port (LPT) keying / relay / footswitch / paddle / band-output — never for serial/USB/network keying or CAT — and is loaded on demand in `uIO.DriverCreate` via `OpenLPT`, gated by `tGetPortType = ParallelInterface`, so non-LPT users never touch it. LPT users now supply `inpout32.dll` themselves (next to `tr4w.exe`).
+- **`uIO` fail-safe when the DLL is absent**: `NoInpOut32Message` no longer `halt`s — it warns (with download + placement guidance) and returns, so a stale LPT port left in a config can't crash startup. `DriverCreate` attempts the load at most once (`inpout32LoadAttempted`) to avoid re-warning across the multiple `OpenLPT` calls. `GetPortByte`/`SetPortByte` are now nil-safe no-ops when the DLL is absent, protecting the LPT paths (stereo pin, band output, footswitch/paddle) that don't pre-check `DriverIsLoaded()`.
+
+---
+
 ### 4.148.0 (2026-06-01) — NY4I
 
 #### TS-890 LAN follow-ups: band/mode display, RIT/XIT offset, operating-VFO tracking, CW KY, VPN connect (`src/uRadioKenwoodTS890.pas`, `src/uNetRadioBase.pas`, `src/uRadioPolling.pas`, `tr4w.dpr`) — Issue #959
