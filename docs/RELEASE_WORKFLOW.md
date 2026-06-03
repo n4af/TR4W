@@ -1,5 +1,40 @@
 # TR4W Build & Release Workflow
 
+## TL;DR — the caveman version
+
+Two release commands. Pick one. Both run from the repo root (e.g. `C:\TR4W\`).
+
+**Interim release** — English only, between monthlies, **no** CTY.DAT / TRMASTER.DTA refresh:
+
+```
+:: 1. bump Version.pas (number + date) -- locally on master OR on the GitHub web UI
+:: 2. tag it:
+utils\TagIt.cmd 4.147.27           :: English installer only
+utils\TagIt.cmd 4.147.27-all       :: all 8 languages (use when non-English testers need a build)
+```
+
+`TagIt` fast-forwards your local master to origin first (so it picks up a GitHub-web
+bump and never tags a stale checkout), checks the tag matches `Version.pas`, then
+creates and pushes the tag. CI builds the installer(s).
+
+**Monthly release** — the superset: refreshes CTY.DAT + TRMASTER.DTA, bumps
+`Version.pas` for you (number + date), builds locally, commits, pushes, tags **all
+languages**:
+
+```
+utils\MonthlyBuild.cmd 4.148.0            :: do the real thing
+utils\MonthlyBuild.cmd 4.148.0 -DryRun    :: rehearse -- does everything EXCEPT commit/push/tag
+```
+
+**The one rule:** the tag number must equal `TR4W_CURRENTVERSION_NUMBER` in
+`Version.pas`. `TagIt` *checks* it for you; `MonthlyBuild` *sets* it for you. (On
+2026-06-01 a hand `git tag` landed on a stale pre-bump commit and CI rejected it —
+that's exactly what `TagIt`'s check prevents.)
+
+Everything below is the detail behind those two commands.
+
+---
+
 End-to-end guide covering: reviewing a PR, building locally, smoke-testing, tagging
 for the English CI build, promoting to a full English installer release, and (for
 major releases) producing the multi-language installers.
@@ -12,7 +47,7 @@ Sections 6-8 cover tagging and the GitHub-side release flow.
 
 ## 0. Audience and assumptions
 
-- You have **write access** to `n4af/TR4W` on GitHub.
+- You have **write access** to `TR4W/TR4W` on GitHub.
 - You're on Windows with the toolchain installed (Delphi 7, Indy, NSIS, UPX -- see
   section 1).
 - You're working from a clone of the repo (default `C:\TR4W`; Howie uses
@@ -135,13 +170,16 @@ to verify before merging).
 
 ## 3. Building locally
 
-Run from the **repo root** (e.g., `C:\TR4W\`):
+The build wrappers live in `utils\`. Invoke them with the `utils\` prefix from the
+**repo root** (e.g., `C:\TR4W\` -> `utils\Build.cmd`). They resolve their own paths,
+so they work from any clone location. (Bare names like `Build.cmd` below are
+shorthand for `utils\Build.cmd`.)
 
 | Wrapper                 | What it does                                                                    | When to use                                | Typical duration                                       |
 |-------------------------|---------------------------------------------------------------------------------|--------------------------------------------|--------------------------------------------------------|
-| `Build.cmd`             | English `tr4w.exe` + `tr4wserver.exe` + zip                                     | PR review, day-to-day dev iteration        | ~30 sec (cached) to ~3 min (first build)               |
-| `BuildAll.cmd`          | The above + 7 per-language exes in `tr4w\target\dist\lang-test\`                | Verify every language still compiles       | ~25 min first time / ~1-2 min on re-run unchanged      |
-| `BuildAllInstallers.cmd`| All the above + 8 installers in `tr4w\build\release\` (ENG + 7 langs)           | Producing shippable installers locally     | First time same as `BuildAll` + ~10 sec per installer  |
+| `utils\Build.cmd`             | English `tr4w.exe` + `tr4wserver.exe` + zip                               | PR review, day-to-day dev iteration        | ~30 sec (cached) to ~3 min (first build)               |
+| `utils\BuildAll.cmd`          | The above + 7 per-language exes in `tr4w\target\dist\lang-test\`          | Verify every language still compiles       | ~25 min first time / ~1-2 min on re-run unchanged      |
+| `utils\BuildAllInstallers.cmd`| All the above + 8 installers in `tr4w\build\release\` (ENG + 7 langs)     | Producing shippable installers locally     | First time same as `BuildAll` + ~10 sec per installer  |
 
 **For PR review, `Build.cmd` is almost always enough.** Only use `BuildAll.cmd`
 when the PR touches `src\lang\` or `tr4w_consts_*.pas`. Only use
@@ -531,11 +569,13 @@ release. The artifact lives for 90 days; download it from the run's summary page
 
 | Goal                                  | Command / action                                                  |
 |---------------------------------------|-------------------------------------------------------------------|
-| Build English locally                 | `Build.cmd`                                                       |
-| Build every language locally          | `BuildAll.cmd`                                                    |
-| Build every language + installers     | `BuildAllInstallers.cmd`                                          |
-| Ship English release                  | Bump `Version.pas` on master, push, tag `vX.Y.Z`, push tag        |
-| Ship all-languages release            | Same as above with tag `vX.Y.Z-all`                               |
+| Build English locally                 | `utils\Build.cmd`                                                 |
+| Build every language locally          | `utils\BuildAll.cmd`                                              |
+| Build every language + installers     | `utils\BuildAllInstallers.cmd`                                    |
+| Interim English release               | Bump `Version.pas`, then `utils\TagIt.cmd X.Y.Z`                  |
+| Interim all-languages release         | Bump `Version.pas`, then `utils\TagIt.cmd X.Y.Z-all`              |
+| Monthly release (CTY + TRMASTER refresh, all langs) | `utils\MonthlyBuild.cmd X.Y.Z`                      |
+| Rehearse a monthly release            | `utils\MonthlyBuild.cmd X.Y.Z -DryRun`                            |
 | Ad-hoc all-langs build, no release    | Actions tab -> Release Build -> Run workflow -> check the box     |
 | Check the CI runner has the right tools | Repo Settings -> Variables -> Actions: `DELPHI7_BIN`, `NSIS_BIN`, `INDY_ROOT` |
 
@@ -547,5 +587,11 @@ release. The artifact lives for 90 days; download it from the run's summary page
 - `tr4w/FullBuild.ps1` -- the build script
 - `tr4w/build/full.nsi` -- NSIS installer script
 - `tr4w/src/Version.pas` -- single source of truth for the version string
-- `Build.cmd`, `BuildAll.cmd`, `BuildAllInstallers.cmd` -- thin wrappers around
-  `FullBuild.ps1`
+- `utils/Build.cmd`, `utils/BuildAll.cmd`, `utils/BuildAllInstallers.cmd`,
+  `utils/BuildEnglishInstaller.cmd` -- thin wrappers around `FullBuild.ps1`
+- `tr4w/build/Invoke-Release.ps1` -- full **monthly** release orchestrator
+  (refresh CTY.DAT + TRMASTER.DTA -> bump `Version.pas` -> local build -> commit ->
+  push -> tag `-all`)
+- `utils/MonthlyBuild.cmd` -- caveman wrapper around `Invoke-Release.ps1`
+- `utils/TagIt.cmd`, `utils/TagIt.ps1` -- guarded **interim** tagger (ff-pull origin
+  + verify tag == `Version.pas`, then tag + push)

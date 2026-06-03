@@ -1,10 +1,10 @@
 @echo off
 REM Compile RadioFactoryTester.dpr using Delphi 7 command-line compiler
 
-set LIB=C:\Indy\Lib\Core;
-set LIB=%LIB%C:\Indy\Lib\System;
+set LIB=C:\tr4w\tr4w\include\Core;
+set LIB=%LIB%C:\tr4w\tr4w\include\System;
 set LIB=%LIB%C:\tr4w\tr4w\include;
-set LIB=%LIB%C:\Indy\Lib\Protocols;
+set LIB=%LIB%C:\tr4w\tr4w\include\Protocols;
 
 set EXE=C:\TR4W\tr4w\target
 cd C:\tr4w\tr4w

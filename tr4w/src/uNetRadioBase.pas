@@ -102,6 +102,7 @@ Type TNetRadioBase = class(TObject)
       baseProcMsg: TProcessMsgRef;
       SocketLock: TCriticalSection;
       FLastValidResponse: TDateTime;  // Track last valid response for timeout detection
+      FActiveVFO: TVFO;  // RX/operating VFO; nrVFOA = swap model (K4: A/B swaps contents so A is always active), selectable-model radios (Kenwood FR, Flex slice) drive it via SetActiveVFO
 
       function GetRadioPort: integer;
       procedure SetRadioPort(Value: Integer);
@@ -180,6 +181,7 @@ Type TNetRadioBase = class(TObject)
       requiresPolling: Boolean;        // True for most radios, False for K4 with AI5
       autoUpdateCommand: string;       // Command to enable push updates (e.g., 'AI5;')
       pollingInterval: Integer;        // Milliseconds between polls (default 100)
+      bAddTermination: Boolean;        // True (default): SendToRadio appends CR/LF (WriteLn). Kenwood TS-890 LAN sets this False -- its CAT parser rejects a trailing CR/LF; the K4 tolerates/ignores it, so it stays True.
 
       constructor Create(ProcRef: TProcessMsgRef); overload;
       constructor Create(address: string; port: integer;ProcRef: TProcessMsgRef); overload;
@@ -187,6 +189,12 @@ Type TNetRadioBase = class(TObject)
 
       procedure SendToRadio(s: string); overload; virtual;
       procedure SendToRadio(whichVFO: TVFO; sCmd: string; sData: string); overload; Virtual; Abstract;
+      // Per-radio state setters -- base owns storage; radio classes call these to
+      // reflect on/off state into the field the matching display getter reads.
+      procedure SetRITOn(value: boolean);
+      procedure SetXITOn(value: boolean);
+      procedure SetSplitOn(value: boolean);
+      procedure SetTransmitting(value: boolean);
       function ModeToString(mode: TRadioMode): string;
       property radioPort: integer read GetRadioPort write SetRadioPort;
       property radioAddress: string read GetRadioAddress write SetRadioAddress;
@@ -218,6 +226,12 @@ Type TNetRadioBase = class(TObject)
       // property Fields[Index: Integer]: TFieldSpec read GetField;
       //property FVFO[whichVFO: TVFO]: TRadioVFO read GetVFO;
 
+      // Active (RX/operating) VFO. Default nrVFOA = "swap" model (K4: A/B
+      // exchanges contents, so the active VFO is always A). Selectable-model
+      // radios (Kenwood FR, Flex slice) call SetActiveVFO so the aggregate
+      // main-window status (in pNetworkRadio) follows the receiving VFO.
+      function GetActiveVFO: TVFO;
+      procedure SetActiveVFO(vfo: TVFO);
 
    published
 
@@ -288,6 +302,8 @@ begin
    logger.Trace('trace output');
    }
    baseProcMsg := ProcRef;
+   bAddTermination := True;   // default: append CR/LF; radios that must not (e.g. TS-890 LAN) set this False in their own constructor
+   FActiveVFO := nrVFOA;      // default swap-model (active VFO always A); selectable-model radios update via SetActiveVFO
    for iVFO := Low(TVFO) to High(TVFO) do
       begin
       Self.vfo[iVFO] := TRadioVFO.Create;
@@ -644,7 +660,14 @@ begin
 
       socket.Port := Self.radioPort;
       socket.Host := Self.radioAddress;
-      socket.ConnectTimeout := 10;
+      // Connect runs on a background thread (the reconnect loop), so a longer
+      // timeout does not block the UI. The original 10ms was too short for
+      // anything but a same-subnet LAN: a VPN/WAN TCP handshake to N2SKH's radio
+      // measured ~95ms, so 10ms always tripped "Connect timed out" before the
+      // handshake finished (ARCP and telnet succeed because they use the multi-
+      // second OS default). 5000ms covers a slow/jittery VPN while still failing
+      // in ~5s when a radio is genuinely off. - raised from 10 on 2026-05-31.
+      socket.ConnectTimeout := 5000;
 
       try
           // Force disconnect to clear any corrupted socket state
@@ -766,8 +789,19 @@ begin
             // Network connection
             logger.Trace('[%s %s TX] (%s) Hex:[%s]',[Self.rigLabel, Self.radioModel, s, String2Hex(s)]);
             nLen := length(s);
-            socket.IOHandler.WriteLn(s);
-            //socket.IOHandler.Write(s,nLen,0);
+            // Most network radios accept or simply ignore a trailing CR/LF, so
+            // by default we append one (WriteLn). The Kenwood TS-890 LAN CAT
+            // parser is the exception: once authenticated it rejects a trailing
+            // CR/LF with '?;', so it sets bAddTermination := False and we send
+            // the bare ';'-terminated command -- matching Kenwood's own ARCP.
+            if bAddTermination then
+               begin
+               socket.IOHandler.WriteLn(s);
+               end
+            else
+               begin
+               socket.IOHandler.Write(s);
+               end;
             end
          else
             begin
@@ -917,6 +951,16 @@ begin
    Result := Self.vfo[whichVFO].mode;
 end;
 
+function TNetRadioBase.GetActiveVFO: TVFO;
+begin
+   Result := FActiveVFO;
+end;
+
+procedure TNetRadioBase.SetActiveVFO(vfo: TVFO);
+begin
+   FActiveVFO := vfo;
+end;
+
 function TNetRadioBase.GetDataMode(whichVFO: TVFO): TRadioMode;
 begin
    Result := Self.vfo[whichVFO].dataMode;
@@ -935,6 +979,46 @@ end;
 function TNetRadioBase.GetSplitEnabled: boolean;
 begin
    Result := Self.localSplitEnabled;
+end;
+
+// ---- Per-radio state setters: one place owns where each flag is stored. ----
+// RIT/XIT are written to every VFO copy so the per-VFO display getters return
+// the per-radio value regardless of which VFO the window queries. (RIT/XIT/Split
+// are per-radio on the rigs we support; a future per-VFO radio can still write
+// vfo[].RITState directly.)
+procedure TNetRadioBase.SetRITOn(value: boolean);
+var
+   v: TVFO;
+begin
+   Self.RITState := value;   // legacy scalar, kept in sync
+   for v := Low(TVFO) to High(TVFO) do
+      begin
+      Self.vfo[v].RITState := value;
+      end;
+end;
+
+procedure TNetRadioBase.SetXITOn(value: boolean);
+var
+   v: TVFO;
+begin
+   Self.XITState := value;
+   for v := Low(TVFO) to High(TVFO) do
+      begin
+      Self.vfo[v].XITState := value;
+      end;
+end;
+
+procedure TNetRadioBase.SetSplitOn(value: boolean);
+begin
+   Self.localSplitEnabled := value;
+end;
+
+procedure TNetRadioBase.SetTransmitting(value: boolean);
+begin
+   if value then
+      Self.radioState := rsTransmit
+   else
+      Self.radioState := rsReceive;
 end;
 
 function TNetRadioBase.GetVFO(whichVFO: TVFO): TRadioVFO;

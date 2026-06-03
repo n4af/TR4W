@@ -318,7 +318,7 @@ begin
       begin
         if ActiveRadioPtr^.LastDisplayedFreq <> 0 then
         begin
-          Str(TotalContacts + 1, QSONumberString);
+          Str(NextSerialToSend, QSONumberString);  // Issue #954
           //   BandMapCursorFrequency := ActiveRadioPtr^.LastDisplayedFreq;      // GAV Removed, not required
           tCreateAndAddNewSpot('CQ/ ' + QSONumberString, False, ActiveRadioPtr);
           LastCQFrequency := ActiveRadioPtr^.LastDisplayedFreq;

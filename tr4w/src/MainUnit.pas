@@ -3417,7 +3417,7 @@ begin
 {$IF tDebugMode}
         CPUButtonProc;
 {$ELSE}
-        Format(wsprintfBuffer, 'QSO nuber %u', TotalContacts);
+        Format(wsprintfBuffer, 'QSO number %u', TotalContacts);
         ShowMessage(wsprintfBuffer);
 {$IFEND}
       end;
@@ -4698,7 +4698,7 @@ begin
 
     // Not the way to do this as the radio does not know the extendedMode--just Mode. NY4I
     //RData.ExtMode := ActiveRadioptr.CurrentStatus.ExtendedMode; // 4.93.3
-    RData.NumberSent := TotalContacts + 1;
+    RData.NumberSent := NextSerialToSend;  // Issue #954: highest sent serial + 1, not a QSO count
     RData.Frequency := Freq;
 
     if ActiveMode in [Phone, FM] then
@@ -4755,7 +4755,7 @@ begin
     end;
   end;
   // ny4i Don't do this please - Issue 466 -=> Rdata.ExtMode := ActiveRadioptr^.CurrentStatus.ExtendedMode ; // 4.93.3
-  RData.NumberSent := TotalContacts + 1;
+  RData.NumberSent := NextSerialToSend;  // Issue #954: highest sent serial + 1, not a QSO count
   RData.Frequency := Freq;
 
   if RData.RSTSent = 0 then
@@ -5489,6 +5489,13 @@ begin
       if (not TempRXData.ceQSO_Skiped) and (TempRXData.Band <> NoBand) and
         (TempRXData.Mode <> NoMode) then
       begin
+        // Issue #954: feed the serial high-water mark.  This counts every
+        // non-deleted QSO that consumed a number -- INCLUDING X-QSO -- which is
+        // exactly why it lives OUTSIDE the #750 guard below: marking a QSO X-QSO
+        // (or deleting a mid-log QSO) must not roll the sent serial backward.
+        // Range/sentinel filtering is handled inside UpdateMaxSerialSent.
+        if not TempRXData.ceQSO_Deleted then
+          UpdateMaxSerialSent(TempRXData.Band, TempRXData.NumberSent);
         // Issue #750: X-QSO records are kept in the log (and the
         // editable log view -- they paint grayed) but contribute
         // nothing to QSOTotals, multipliers, points, or the dupe

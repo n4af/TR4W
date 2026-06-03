@@ -131,6 +131,7 @@ uses
   uSerialPort in 'src\uSerialPort.pas',
   uRadioFactory in 'src\uRadioFactory.pas',
   uRadioElecraftK4 in 'src\uRadioElecraftK4.pas',
+  uRadioKenwoodTS890 in 'src\uRadioKenwoodTS890.pas',
   uIcomNetworkTypes in 'src\uIcomNetworkTypes.pas',
   uIcomNetworkTransport in 'src\uIcomNetworkTransport.pas',
   uIcomNetworkDiscovery in 'src\uIcomNetworkDiscovery.pas',
@@ -157,6 +158,7 @@ uses
   uYCCCSO2R in 'src\uYCCCSO2R.pas',
   uFlexRadio6000 in 'src\uFlexRadio6000.pas',
   uRadioBand in 'src\uRadioBand.pas',
+  uBandLookup in 'src\uBandLookup.pas',
   uRadioIcom7100 in 'src\uRadioIcom7100.pas',
   uIcomCIV in 'src\uIcomCIV.pas',
   // uRadioManager uses Generics.Collections (Delphi 2009+) - not Delphi 7 IDE compatible

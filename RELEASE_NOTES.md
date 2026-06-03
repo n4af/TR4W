@@ -22,7 +22,109 @@ Various contributors along the way
 
 ---
 
+## Unreleased
+
+<!--
+In-arrears versioning: new user-facing entries accumulate here as work lands; the
+version number is assigned later, when a release is cut. To cut a release: rename this
+"## Unreleased" to "### X.X.X (YYYY-MM-DD) — HANDLE", move it under the appropriate
+"## 4.147.x" month group below, and bump tr4w/src/Version.pas to match. Keep entries
+user-facing — no file paths or source-level jargon.
+-->
+
+_Nothing yet._
+
+---
+
+## 4.148.x — June 2026
+
+### 4.148.1 (2026-06-02) — NY4I
+
+#### Parallel-Port (LPT) Keying
+
+- The installer no longer includes inpout32.dll — the component several antivirus engines flagged as a "vulnerable driver," which is what caused some browsers and antivirus tools to block the download. Serial, USB, and network keying and rig control are completely unaffected. If you use direct parallel-port (LPT) keying, footswitch, paddle, or band-data output, you now supply inpout32.dll yourself: download it from highrez.co.uk and place it in the same folder as tr4w.exe. If you have an LPT port configured but the file isn't present, TR4W now shows a reminder and keeps running, instead of failing to start.
+
+---
+
+### 4.148.0 (2026-06-01) — NY4I
+
+#### Radio Control — Kenwood TS-890 over LAN
+
+- The band and mode shown in TR4W now follow the radio. Previously only the frequency tracked the rig — the band display, band table, and mode wouldn't update when you changed bands on the radio (and startup could show NONSSB). (#959)
+- The RIT/XIT offset (the actual amount of clarifier shift) is now displayed, not just the on/off state.
+- When you switch the radio's operating VFO (A/B), TR4W now follows it correctly — per-VFO modes no longer appear swapped, the main window tracks the receive VFO's frequency/band/mode, and the Radio 1 window highlights the active VFO.
+- CW sent to the TS-890 over CAT is no longer zero-padded, which also corrects the reported keying length.
+- Connecting to a radio over a VPN no longer times out — the connection window was too short for a VPN's slightly longer handshake, so a rig that worked on the local network would report "Connect timed out" over VPN. (#959)
+
+#### Usability
+
+- Fixed a typo in the QSO Number pop-up (Ctrl-/ → Additional Information): it read "QSO nuber" and now reads "QSO number." (#962)
+
+#### Super Check Partial
+
+- The bundled callsign database (TRMASTER.DTA) has been refreshed again for better Super Check Partial suggestions as you type.
+
+#### For Contributors / Power Users
+
+- The monthly-release script is more robust: a one-step MonthlyBuild command, hardened tagging that can't tag a stale build, and a fix to an internal bug that made the release script hang.
+
+---
+
 ## 4.147.x — May 2026
+
+### 4.147.25 (2026-05-31) — NY4I
+
+#### Serial Numbers
+
+- Marking a QSO as X-QSO no longer rolls your sent serial number backward. The next number you send is now based on the highest number you've actually sent, so it only ever moves forward — even after you X-QSO a contact or delete one from the middle of the log. (Previously the count-based number could revert and hand the same serial to two stations.) (#954)
+- When you mark a contact X-QSO, it now stays in your external log (e.g. DXKeeper) — it's only removed from the contest score and the real-time score feeds. (#949)
+
+#### Radio Control — Kenwood TS-890 over LAN
+
+- The TS-890 now connects reliably over the network: the login no longer hangs waiting for a message the radio doesn't send, and commands are sent in the exact format its CAT parser expects (a stray line-ending was causing it to reject every command after login).
+- Band changes no longer drop the radio into DATA mode or send an empty frequency, and RIT, XIT, Split, and transmit (TX/RX) state toggled on the radio now show correctly in TR4W.
+
+#### Super Check Partial
+
+- The bundled callsign database (TRMASTER.DTA) has been refreshed to 53,281 calls for better Super Check Partial suggestions while you type.
+
+#### In-App Command Help
+
+- The configuration-command help text has been cleaned up and filled in — entries for commands that no longer exist were removed, and descriptions were written for many that had been left blank.
+
+#### For Contributors / Power Users
+
+- New offline tool to rebuild the Super Check Partial database (TRMASTER.DTA) from public sources, plus a one-step release script. Build/CI fix so the release pipeline's malware scan runs correctly on the self-hosted Windows runner.
+
+---
+
+### 4.147.24 (2026-05-29) — NY4I
+
+#### For Contributors / Source Builders
+
+- Follow-up to the bundled-Indy change in 4.147.21: leftover references to a separate `C:\Indy` install have been cleaned out of the Delphi IDE project files and the helper build/test scripts. Opening `tr4w.dpr` in Delphi 7, or running the server/test build scripts, now uses the bundled `tr4w/include` copy with no external Indy install required. (Set `INDY_ROOT` to override.)
+- Removed three stray Git submodule pointers (`tr4w/include/Indy`, `tr4w/src/rekor-cli`, `tr4w/src/root-signing`) that produced a harmless but noisy warning at the end of every automated release build.
+- The Spanish installer's embedded version info (Properties → Details) is now correctly tagged Spanish (Spain) instead of English — cosmetic; the program UI was already fully Spanish.
+- No change to the program itself — these are build/packaging fixes only.
+
+---
+
+### 4.147.23 (2026-05-29) — NY4I
+
+#### Internal / Build
+
+- Release-build infrastructure changes only (CI pipeline now runs entirely on the self-hosted Windows runner, plus a version-number sanity check). No effect on the program itself.
+
+---
+
+### 4.147.22 (2026-05-29) — NY4I / N4AF
+
+#### Language Support
+
+- **Spanish (ESP) is now fully supported**, including translated command help — on par with the other shipped languages.
+- Column-width settings saved in a config file now load correctly regardless of the language the config was created in (previously a config saved by an English build wouldn't load in a Spanish/Russian/etc. build).
+
+---
 
 ### 4.147.21 (2026-05-29) — NY4I
 
@@ -830,4 +932,4 @@ Key individual releases in this period include version 4.195 (February 2010), wh
 
 ---
 
-*This changelog was generated from the Git commit history of the [n4af/TR4W](https://github.com/n4af/TR4W) repository. Repository: [github.com/n4af/TR4W](https://github.com/n4af/TR4W)*
+*This changelog was generated from the Git commit history of the [TR4W/TR4W](https://github.com/TR4W/TR4W) repository. Repository: [github.com/TR4W/TR4W](https://github.com/TR4W/TR4W)*

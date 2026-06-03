@@ -170,6 +170,8 @@ function QuickEditResponseWithPartials(Prompt: Str80; MaxInputLength: integer):
 procedure Send88Message;
 procedure ShowStationInformation(Call: CallPtr {CallString});
 function TotalContacts: integer;
+function NextSerialToSend: integer;  { Issue #954: next serial to send = highest sent + 1 }
+procedure UpdateMaxSerialSent(Band: BandType; SerialNum: integer);  { Issue #954 }
 function TotalCWContacts: integer;
 function TotalPhoneContacts: integer;
 function TotalScore: LONGINT;
@@ -289,6 +291,46 @@ begin
      logger.debug('In TotalContacts, (QSONumberByBand is false so AllBands) returning ' + IntToStr(Result));
      end;
 
+end;
+
+// Issue #954.  Record that SerialNum was sent on Band, keeping the per-band and
+// whole-station (AllBands) high-water marks.  Ignores values that are not real
+// contest serials: non-positive / unset numbers and the ADIF import sentinel
+// ($FFFF = uADIF.SENTINEL_WORD), which is stamped on imported QSOs that carried
+// no sent-serial field.  No real contest serial comes anywhere near 65535, so
+// this filter is unambiguous and a single bad import can never poison the
+// high-water mark.  Called from the two places QSOTotals is built (LoadinLog and
+// the live add); isolated as its own procedure so the long callers don't inline
+// the global's address (Delphi 7 codegen).
+procedure UpdateMaxSerialSent(Band: BandType; SerialNum: integer);
+begin
+   if (SerialNum <= 0) or (SerialNum >= $FFFF) then
+      Exit;
+   if SerialNum > MaxSerialSent[Band] then
+      MaxSerialSent[Band] := SerialNum;
+   if SerialNum > MaxSerialSent[AllBands] then
+      MaxSerialSent[AllBands] := SerialNum;
+end;
+
+// Issue #954.  The next serial to send is one past the HIGHEST serial we have
+// actually sent (max NumberSent in the log), NOT a QSO count.  Counting QSOs
+// (the historical TotalContacts + 1) silently drops the number whenever a QSO
+// stops counting -- X-QSO, or a deleted mid-log QSO -- and then re-issues a
+// serial already sent on the air.  Tracking the high-water mark is monotonic
+// across both cases.  Networked operation is unchanged: it still uses the
+// server-assigned serial.
+function NextSerialToSend: integer;
+begin
+   if ServerSerialNumber <> 0 then
+      begin
+      Result := ServerSerialNumber;  // == old (ServerSerialNumber - 1) + 1
+      Exit;
+      end;
+
+   if QSONumberByBand then
+      Result := MaxSerialSent[ActiveBand] + 1
+   else
+      Result := MaxSerialSent[AllBands] + 1;
 end;
 
 procedure BandDownOrUp(Direction: DirectionType);

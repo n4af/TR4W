@@ -1,0 +1,9 @@
+# build tooling only -- never commit data artifacts or downloads
+__pycache__/
+*.pyc
+_work/
+seed/
+*.dta
+*.DTA
+*.xlsx
+*.csv

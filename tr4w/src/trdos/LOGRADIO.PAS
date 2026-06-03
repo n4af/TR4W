@@ -889,6 +889,14 @@ begin
       Digital: Result := rmData;
       Phone: Result := rmUSB;
       FM: Result := rmFM;
+   else
+      // Both / NoMode have no specific radio mode. Without this else the
+      // function Result was left UNINITIALIZED -> garbage TRadioMode (often
+      // rmData), which made a band change shove the radio into DATA. Return the
+      // "none" mode so the caller sends no mode command and the radio keeps its
+      // mode. (Use Low(TRadioMode), which is rmNone; the bare identifier rmNone
+      // is ambiguous in LOGRADIO -- it also exists in TRadioModel, which wins.)
+      Result := Low(TRadioMode);
    end;
  //  ModeType = (CW, Digital, Phone, Both, NoMode, FM); { Use for TR }
            //AM, CW, CW-R, DATA-L, DATA-U, FM, LSB, USB, RTTY, RTTY-R, WBFM
@@ -2363,6 +2371,8 @@ begin
    case RadioParametersArray[RadioModel].rt of
       rtKenwood:
          begin
+         // This whould really be changed to a queue where we send the CW speed command, send the KY coommand and then send the KS command as consecutive commands for the Kenwood.
+         // It also illustrates that we should have a branch in this case just for ELecraft and not lump it into Kenwood. The K3 and K4 handle this but now Kenwood.     NY4I 2026 June 1
          if Msg = ControlF then// increase speed
             begin
             CodeSpeed := CodeSpeed + Round(CodeSpeed * 0.06); // increase 6 %
@@ -2446,7 +2456,16 @@ begin
 //            msgLen := length(Msg);              //length(Msg);
             //len := Min(msgLen, 24);             // 24 max for Kenwood
             case RadioModel of
-               TS480, TS570, TS590, TS890, TS950, TS990, TS2000:
+               TS890:
+                  begin
+                  // TS-890 accepts the space-prefixed KY form with a variable-length
+                  // P2 (KY <space><text>;), so no 24-byte padding -- and never KY2
+                  // (P1='2' would key the fill spaces as dead air). The other Kenwoods
+                  // reject a short P2 under P1=space, so they keep the fixed-24 fill.
+                  maxLen := 24;
+                  pad := false;
+                  end;
+               TS480, TS570, TS590, TS950, TS990, TS2000:
                   begin
                   maxLen := 24;
                   pad := true;
@@ -3275,6 +3294,12 @@ const
 
 begin
    logger.debug('[SetRadioFreq] set frequency to %u',[freq]);
+
+   if Freq <= 0 then
+      begin
+      logger.debug('[SetRadioFreq] freq <= 0 (no band memory or default for this band/mode) -- skipping tune');
+      Exit;
+      end;
 
    if Self.tNetObject <> nil then
       begin

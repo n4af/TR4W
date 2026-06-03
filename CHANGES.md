@@ -1,7 +1,9 @@
 # TR4W Change Log
 
+**This is a developer-level document with far more technical detail than is needed for most users of TR4W.** While you are welcome to read it for the internals of how it all works, if you are just interested in the changes that may affect how you use TR4W, the RELEASE NOTES may be of more value to you. You can find those [here](/RELEASE_NOTES.md).
+
 > TRLOG 4 Windows — Free Amateur Radio Contest Logging Application  
-> Repository: [github.com/n4af/TR4W](https://github.com/n4af/TR4W)  
+> Repository: [github.com/TR4W/TR4W](https://github.com/TR4W/TR4W)  
 > Generated: 2026-03-19
 
 ## Contributors
@@ -20,7 +22,130 @@ Various contributors along the way
 
 ---
 
+## Unreleased
+
+<!--
+In-arrears versioning: new developer-facing entries accumulate here as commits/PRs
+land; the version number is assigned later, when a release is cut. To cut a release:
+rename this "## Unreleased" to "### X.X.X (YYYY-MM-DD) — HANDLE", move it under the
+appropriate "## 4.147.x" month group below, and bump tr4w/src/Version.pas to match.
+-->
+
+_Nothing yet._
+
+---
+
+## 4.148.x — June 2026
+
+### 4.148.1 (2026-06-02) — NY4I
+
+#### Stop bundling inpout32.dll to clear AV false positive (`tr4w/build/full.nsi`, `tr4w/src/uIO.pas`, `tr4w/target/inpout32.dll`) — PR #963
+
+- **Removed `inpout32.dll` from the installer and the repo**: its kernel port-I/O driver was the installer's only true-positive VirusTotal flag (`hacktool`/`vulndriver`, e.g. DrWeb `Tool.VulnDriver.32`) and the cause of Chrome Safe Browsing / SmartScreen download blocks on the unsigned installer. `inpout32` is used only for direct parallel-port (LPT) keying / relay / footswitch / paddle / band-output — never for serial/USB/network keying or CAT — and is loaded on demand in `uIO.DriverCreate` via `OpenLPT`, gated by `tGetPortType = ParallelInterface`, so non-LPT users never touch it. LPT users now supply `inpout32.dll` themselves (next to `tr4w.exe`).
+- **`uIO` fail-safe when the DLL is absent**: `NoInpOut32Message` no longer `halt`s — it warns (with download + placement guidance) and returns, so a stale LPT port left in a config can't crash startup. `DriverCreate` attempts the load at most once (`inpout32LoadAttempted`) to avoid re-warning across the multiple `OpenLPT` calls. `GetPortByte`/`SetPortByte` are now nil-safe no-ops when the DLL is absent, protecting the LPT paths (stereo pin, band output, footswitch/paddle) that don't pre-check `DriverIsLoaded()`.
+
+---
+
+### 4.148.0 (2026-06-01) — NY4I
+
+#### TS-890 LAN follow-ups: band/mode display, RIT/XIT offset, operating-VFO tracking, CW KY, VPN connect (`src/uRadioKenwoodTS890.pas`, `src/uNetRadioBase.pas`, `src/uRadioPolling.pas`, `tr4w.dpr`) — Issue #959
+
+- **Band/mode now follow the radio**: `ParseFAOrFBResponse` derives `vfo[].band` from the reported frequency. Without it `FilteredStatus.Band` stayed `NoBand` and `ProcessFilteredStatus` skipped the `ActiveBand`/`ActiveMode`/`DisplayBandMode` update, so only the frequency tracked the radio (band-above-freq, band table, and mode did not; startup showed `NONSSB`).
+- **RIT/XIT offset displayed**: new `ParseRFResponse` parses the offset from the unsolicited `RF` push (direction + 4-digit Hz) into `vfo[].RITOffset`, surfaced as `CurrentStatus.RITFreq` (on/off via `RT`/`XT` already worked).
+- **Operating-VFO tracking**: new base `FActiveVFO` + `GetActiveVFO`/`SetActiveVFO` (default `nrVFOA`, default-preserving so K4/Icom/Flex/HamLib are unchanged); `pNetworkRadio`'s aggregate status and `VFOStatus` follow `GetActiveVFO` instead of a hardcoded `nrVFOA`. TS-890 drives it from `FR` (FR0=A, FR1=B), fixing the operating-relative `OM` mode mapping (A/B no longer swap per-VFO modes), the main window following the RX VFO, and the Radio 1 window active-VFO highlight.
+- **CW `KY` pad-off**: split `TS890` out of the padded-Kenwood arm — variable-length `KY <space><text>;` instead of fixed 24-byte padding; corrects the 890 CW timer (it had counted the never-keyed padding). Other Kenwoods (480/570/590/950/990/2000) keep the fixed 24-byte P2.
+- **VPN connect timeout**: `uNetRadioBase` `ConnectTimeout` 10 ms → 5000 ms; 10 ms only worked same-subnet and tripped "Connect timed out" on a VPN handshake (~95 ms). Runs on the reconnect thread, no UI block.
+- **Project files**: added `uRadioKenwoodTS890` and `uBandLookup` to `tr4w.dpr`'s `uses`.
+
+#### QSO Number popup typo (`src/MainUnit.pas`) — Issue #962
+
+- **"QSO nuber" → "QSO number"**: corrected the hardcoded literal at `MainUnit.pas:3420` (Ctrl-/ → Additional Information → QSO Number popup; English literal, not a `TC_` resource).
+
+#### Super Check Partial database refresh (`tr4w/target/TRMASTER.DTA`)
+
+- **Regenerated `TRMASTER.DTA`** from the offline builder (SCP sources + CWops/FOC + QRZ name backfill).
+
+#### Build & release tooling (`tr4w/build/Invoke-Release.ps1`, `utils/`, `tr4w/tools/trmaster/`)
+
+- **`Invoke-Release.ps1` infinite-recursion fix**: the `function Git { & git … }` helper recursed into itself — PowerShell command resolution is case-insensitive and functions outrank executables, so a bare `& git` resolved back to the function → call-depth overflow that pegged a core and ballooned RSS before aborting. All call sites now invoke `git.exe`; a guard comment documents why.
+- **Monthly-release wrapper + docs** (`utils/MonthlyBuild.cmd`, `docs/RELEASE_WORKFLOW.md`): `MonthlyBuild.cmd` wraps `Invoke-Release.ps1`; the workflow doc gained a TL;DR distinguishing the interim (`TagIt`) vs monthly (`MonthlyBuild`) paths.
+- **`TagIt` hardening**: fast-forwards local master to origin and verifies the tag matches `Version.pas` before tagging/pushing, so an interim tag can't land on a stale pre-bump commit.
+- **`utils/` reorg**: moved the build/tag helper scripts and added `BuildEnglishInstaller.cmd` under `utils/`.
+- **TRMASTER builder progress** (#958): `build_trmaster.cmd` reports the QRZ name-cache size during backfill.
+
+---
+
 ## 4.147.x — May 2026
+
+### 4.147.25 (2026-05-31) — NY4I
+
+#### Serial number derived from highest serial sent, not QSO count (`src/trdos/LOGEDIT.PAS`, `LOGDUPE.PAS`, `LOGWIND.PAS`, `LOGSUBS1.PAS`, `LOGSUBS2.PAS`, `LogSend.pas`, `src/MainUnit.pas`, `src/uEditQSO.pas`) — Issues #954, #949
+
+- **Serial no longer rolls backward on X-QSO / mid-log delete** (#954): the next serial was `TotalContacts + 1`, a count of *scoring* QSOs, so marking a QSO X-QSO (or deleting a mid-log QSO) dropped the count — the next serial reverted, was re-sent on the air via the `#` macro, and was re-stamped into `NumberSent` (a duplicate serial). New per-band high-water mark `MaxSerialSent` (`LOGDUPE`) tracks the largest `NumberSent` over non-deleted records **including X-QSO** (they consumed a number); new `NextSerialToSend` / `UpdateMaxSerialSent` (`LOGEDIT`) return `max + 1`, which only ever advances (`UpdateMaxSerialSent` ignores the `$FFFF` ADIF import sentinel and non-positive values). `LoadinLog` and the live add feed the mark; the next-number display (`DisplayNextQSONumber`), the `#` macro (CW + voice), the `NumberSent` stamp, and the CQ-spot labels all moved from `TotalContacts + 1` to `NextSerialToSend`. `TotalContacts`/`QSOTotals` are untouched, so the #750 score grid, status display, every-10 beep, and `AUTO QSO NUMBER DECREMENT` (F2 repeat) are unchanged; networked mode still uses `ServerSerialNumber`.
+- **X-QSO no longer deletes the contact from the external log** (#949): `uEditQSO` marks X-QSO by sending a `contactdelete` to the score feeds (UDP + HamScore) while leaving the external logger (DXKeeper) alone — the contact stays logged externally but drops out of the contest score.
+
+#### Kenwood TS-890 LAN handshake + CR/LF transport, band/RIT/XIT/TX fixes (`src/uRadioKenwoodTS890.pas`, `src/uNetRadioBase.pas`, `src/trdos/LOGRADIO.PAS`, `src/trdos/LOGWIND.PAS`) — PR #951
+
+- **Handshake**: the TS-890 LAN login does not send `##TI;`; the old path waited for it and hung after `##ID1;`. It now proceeds straight to authenticated (post-login `##VP;`/`##KN2;`/`##KN0;` + `AI2` init). The 5 s `PS;` keepalive is retained (the radio drops an idle LAN link after ~10 s).
+- **CR/LF transport**: `TNetRadioBase.SendToRadio` appended CR/LF via `WriteLn`; the TS-890's CAT parser rejects the trailing bytes with `?;` once authenticated (the K4 tolerates them, which is why it never surfaced). New `bAddTermination` flag (default `True`; `TKenwoodTS890Radio` sets it `False` → bare `Write`), so every other radio's wire output stays byte-identical.
+- **Band/mode**: `ModeTypeToNetMode` (`LOGRADIO`) had no `else`, so `Both`/`NoMode` produced an uninitialized result → intermittent `OM0D;` (USB-DATA) on band change; added `else Result := Low(TRadioMode)`. `SetRadioFreq` now guards freq ≤ 0, and `EffectiveBandFreq` (`LOGWIND`) falls back to `DefaultFreqMemory` for un-visited bands (was sending `FA00000000000;`).
+- **RIT/XIT/Split/TX display**: per-radio parse handlers now call base setters `SetRITOn`/`SetXITOn`/`SetSplitOn`/`SetTransmitting` on `TNetRadioBase`, so toggles made on the radio (pushed via AI2) reach the main window.
+
+#### Offline TRMASTER.DTA builder toolset + regenerated database (`tr4w/tools/trmaster/`, `tr4w/target/TRMASTER.DTA`) — PR #948
+
+- **New offline toolset** (`tr4w/tools/trmaster`, Python) rebuilds the Super Check Partial database from public sources; `build_trmaster.cmd` orchestrates the seed + CWops + FOC + QRZ-name passes (a bare `trmaster_build.py` run yields 0 CWops/FOC).
+- **Regenerated `TRMASTER.DTA`**: 53,281 calls.
+- **QRZ name-lookup robustness**: a malformed QRZ XML response no longer aborts the whole name pass (treated as a cacheable miss); network/HTTP/timeout errors are separated from XML parse errors so only the latter are swallowed; added a progress heartbeat every 100 lookups.
+
+#### Help INI: prune, document, and fill config-command descriptions (`tr4w/target/commands_help_eng.ini`) — PRs #952, #955
+
+- **Prune + document** (#952): removed 90 dead `[SECTION]` blocks (nil-address, not-in-array, commented-out, unused-legacy) validated against the live CFGCA tables; kept 5 marked "PENDING RE-IMPLEMENTATION".
+- **Description fills** (#955): filled 30 of the remaining 55 `TO BE COMPLETED` `DESCRIPTION`/`DEFAULT` placeholders.
+
+#### CI: run VirusTotal scan under Windows PowerShell 5.1, not pwsh (`.github/workflows/release.yml`, `.github/scripts/Invoke-VirusTotalScan.ps1`) — PR #947
+
+- The self-hosted `win-ci` runner (LocalSystem) only has Windows PowerShell 5.1 machine-wide; `shell: pwsh` failed with "pwsh: command not found". The VT scan step and script are now 5.1-safe (`curl.exe` upload, `ConvertFrom-Json`, BOM-less .NET writes).
+
+#### Release tooling (`tr4w/build/Invoke-Release.ps1` — NEW)
+
+- **New release orchestrator** (PowerShell 5.1): regenerate TRMASTER, download CTY.DAT (URL/UA/validation pulled from the app's Alt-O fetch path), bump `Version.pas`, local build, commit, and tag `v<ver>` to trigger CI. It *calls* `build_trmaster.cmd` rather than duplicating it.
+
+---
+
+### 4.147.24 (2026-05-29) — NY4I
+
+#### Indy library layout cleanup (`tr4w/include/Indy`, `tr4w/tr4w.cfg`, `tr4w/tr4w.dof`, `tr4w/tr4wserver/tr4wserver.cfg`, `tr4w/tr4wserver/tr4wserver.dof`, `tr4w/BatchCompile.cmd`, `tr4w/test/CompileTest.{cmd,ps1}`, `tr4w/test/CompileRadioTester.{cmd,ps1}`, `tr4w/tr4wserver/BuildServer.ps1`, `tr4w/FullBuild.ps1`, `CLAUDE.md`) — PRs #943, #944, #945
+
+- **Stray submodule gitlinks removed** (#943 + follow-up): three accidental gitlinks (mode `160000`) with no `.gitmodules` and target commits absent from the repo — `tr4w/include/Indy` (→ `c8220089`), `tr4w/src/rekor-cli` (→ `5ed77ae`), and `tr4w/src/root-signing` (→ `9f63f63`) — caused `actions/checkout` post-job cleanup (`git submodule foreach`) to fail with `fatal: No url found for submodule path …` (exit 128) on every tag build. The command aborts on the first offending path (`include/Indy` sorts first), so all three had to go. #943 removed `include/Indy`; the two leftover sigstore tool directories under `src/` were removed as a direct follow-up. None were referenced by the build (Indy resolves from `include\Core`, `include\System`, `include\Protocols`).
+- **Stale IDE search paths fixed** (#944): `tr4w.cfg`/`.dof` and `tr4wserver.cfg`/`.dof` listed `-U/-O/-I/-R` and `SearchPath` entries under `include\Indy` (plus `\D7`, `\Lib`, and corrupt `include\Indy]\Lib\*` entries) that no longer exist. Repointed to the bundled Indy 10.6.3.3 tree at `include\Core; include\System; include\Protocols`. CI was unaffected (`FullBuild.ps1`/`BuildServer.ps1` pass correct paths via `/U /I`, overriding the `.cfg`), but Delphi-IDE builds read these files. The `.dof` `[HistoryLists]` MRU entries were intentionally left untouched.
+- **Dev/test scripts depend on bundled Indy** (#945): `BatchCompile.cmd`, `test/CompileTest.{cmd,ps1}`, and `test/CompileRadioTester.{cmd,ps1}` hardcoded an external `C:\Indy\Lib\*` install; repointed to `C:\tr4w\tr4w\include\*`. `BuildServer.ps1`'s `$IndyRoot` default changed from `C:\Indy\Indy\Lib` to the bundled `…\tr4w\include` (derived from `$ProjectRoot`), matching `FullBuild.ps1` and the script's own header comment, so standalone server builds no longer need an external Indy. A stale `C:\Indy\Indy\Lib` path in a `FullBuild.ps1` comment was corrected.
+- **Verified**: Delphi 7 IDE build of `tr4w.dpr` against the corrected paths compiles and links.
+
+#### ESP VERSIONINFO LANGID (`tr4w/FullBuild.ps1`) — Issue #941, PR #946
+
+- **ESP added to the VERSIONINFO `$langMap`**: `LangId = 0x0C0A` (Spanish — Spain, International/Modern sort, es-ES), `CodePage = 1252`. The 2026-05-28 ESP backfill added ESP to the build matrix (`$otherLangs`) but not the VERSIONINFO table, so per-language ESP builds printed `No VERSIONINFO LANGID mapping for 'ESP' -- defaulting to ENG` and tagged the exe's embedded version info as English (`0x0409`). Cosmetic metadata only — the UI was already Spanish via `-DLANG_ESP` + the ESP `.res`. Stale param-doc comment updated to list ESP.
+
+---
+
+### 4.147.23 (2026-05-29) — NY4I
+
+#### CI: entire release pipeline on the self-hosted runner (`.github/workflows/release.yml`, `.github/scripts/Invoke-VirusTotalScan.ps1` (NEW), `.github/workflows/version-guard.yml` (NEW), `tr4w/FullBuild.ps1`) — PR #942
+
+- **Whole pipeline self-hosted**: the `virustotal-scan` and `release` jobs (previously `ubuntu-latest`) now run on the `[self-hosted, win-ci]` runner alongside `build`. GitHub-hosted runners can't host Delphi 7, and keeping all jobs on one machine removes the cross-OS artifact hand-off. `release.yml` trimmed ~259 lines.
+- **VT scan extracted** to `.github/scripts/Invoke-VirusTotalScan.ps1` (curl-based upload + poll), now shared by CI and the local `FullBuild.ps1` pre-flight — single source of truth.
+- **New `version-guard.yml`**: a "Verify Version.pas is present and parseable" check on pushes/PRs, so a malformed or missing `TR4W_CURRENTVERSION_NUMBER` can't reach a release tag.
+
+---
+
+### 4.147.22 (2026-05-29) — NY4I / N4AF
+
+#### Spanish (ESP) + cross-language CFG portability (`tr4w/src/lang/TR4W_CONSTS_ESP.PAS`, `tr4w/target/commands_help_esp.ini` (NEW), `tr4w/src/VC.pas`, `tr4w/src/uCFG.pas`, `tr4w/src/MainUnit.pas`) — Issues #925, #937, #938, PR #939
+
+- **ESP enabled end to end**: filled `TR4W_CONSTS_ESP.PAS` and added the full `commands_help_esp.ini`, putting Spanish on par with the other shipped languages.
+- **`ColumnCanonicalName` (`VC.pas`)**: language-neutral column names (`BAND`/`DATE`/`UTC`/…) for persisting `COLUMN WIDTH` settings in CFG files. CFGs were previously language-locked — one saved by an English build failed to load in a Spanish/Russian/etc. build because `ColumnsArray[].Text` is translated at compile time. The canonical names match the historical English values so existing CFGs keep parsing.
+- **Missing language constants filled** across `tr4w_consts_*.pas` (issue #925), using per-codepage byte-level edits to preserve each file's ANSI encoding and CRLF endings.
+
+---
 
 ### 4.147.21 (2026-05-29) — NY4I
 
@@ -1194,7 +1319,7 @@ The repository was first committed on April 25, 2014 at version 4.30.3 by Howard
 
 ---
 
-*This changelog was generated from the Git commit history of the [n4af/TR4W](https://github.com/n4af/TR4W) repository on March 19, 2026.*
+*This changelog was generated from the Git commit history of the [TR4W/TR4W](https://github.com/TR4W/TR4W) repository on March 19, 2026.*
 
 ---
 

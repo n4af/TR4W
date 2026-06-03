@@ -74,7 +74,7 @@ begin
     if DVPMessagesArrayIndex = DVPArraySize then Exit;
     if FileName = '#' then
     begin
-      QSONumber := TotalContacts + 1;
+      QSONumber := NextSerialToSend;  // Issue #954
       if AutoQSONumberDecrement then
         if (ActiveMainWindow = awCallWindow)
         //if tr4w_CallWindowActive
@@ -170,7 +170,7 @@ begin
 
         '#':
           begin
-            QSONumber := TotalContacts + 1;
+            QSONumber := NextSerialToSend;  // Issue #954
 
             if TailEnding then inc(QSONumber);
 
@@ -461,7 +461,7 @@ begin
 
           CASE SendChar OF
               '#': BEGIN
-                   QSONumber := TotalContacts + 1;
+                   QSONumber := NextSerialToSend;  // Issue #954
 
                    IF TailEnding THEN Inc (QSONumber);
 
