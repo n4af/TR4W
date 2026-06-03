@@ -235,17 +235,16 @@ begin
 
           CursorFontColor := clwhite;
 
-          if Spot.FBand = BandmapBand then //GAV change Activeband to BandmapBand
-          begin
             if (Abs(spot.FFrequency - BandMapCursorFrequency) <=
               BandMapGuardBand) then
               //GAV added to change turn current spot in bandmap red
-              BandColor := clred
-            else
-              BandColor := clblue;
-          end
-          else
-            BandColor := clsilver;
+              BandColor := clred ;
+
+             if (Spot.FBand = InactiveRadioPtr.BandMemory) and TwoRadioMode or
+                (Spot.FBand = BandmapBand) and SingleRadioMode  then
+                  BandColor := clblue
+             else
+                  BandColor := clsilver;
 
           if (lobyte(BandmapDRAWITEMSTRUCT^.itemState) = ODS_SELECTED) then
             SelectedItem := True;
