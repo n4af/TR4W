@@ -738,31 +738,39 @@ begin
    FilePreview;
 end;
 
+function ContestFriendlyParens: string;
+// Returns ' (<FriendlyName>)' for the current contest, or '' when the contest
+// has no FriendlyName defined.  Shared by the human-readable summary-sheet and
+// score-report headers so the friendly-name formatting lives in one place.
+var
+  sFriendly                             : string;
+begin
+  sFriendly := string(ContestsArray[Contest].FriendlyName);
+  if sFriendly <> '' then
+     begin
+     Result := ' (' + sFriendly + ')';
+     end
+  else
+     begin
+     Result := '';
+     end;
+end;
+
 procedure WriteTitleBlockToSummarySheet;
 var
   nNumberOfBytesToWrite                 : integer;
   TempTag                               : CabrilloTags;
 begin
-  asm
-  push offset MyGrid[1]
-  push offset MyCall[1]
-  end;
-  tGetDateFormat(ContestDates[0]);
-  asm
-  push eax
-  push offset ContestName[1]
-  push offset ContestName[1]
-  end;
-  nNumberOfBytesToWrite := wsprintf(wsprintfBuffer,
+  // Title block built as a plain string -- replaces the prior inline-asm
+  // wsprintf argument pushing.  The contest's friendly name is shown in
+  // parentheses after the contest name when one is defined (ContestFriendlyParens).
+  sWriteFileFromString(tReportFileWrite,
     #13#10 +
-    '%21s SUMMARY SHEET'#13#10#13#10 +
-    '               CONTEST: %s'#13#10 +
-    '            START DATE: %s'#13#10 +
-    '         CALLSIGN USED: %s'#13#10 +
-    '               LOCATOR: %s'#13#10#13#10
-    );
-  asm add esp,28 end;
-  sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+    SysUtils.Format('%21s SUMMARY SHEET', [string(ContestName)]) + #13#10#13#10 +
+    '               CONTEST: ' + string(ContestName) + ContestFriendlyParens + #13#10 +
+    '            START DATE: ' + string(tGetDateFormat(ContestDates[0])) + #13#10 +
+    '         CALLSIGN USED: ' + string(MyCall) + #13#10 +
+    '               LOCATOR: ' + string(MyGrid) + #13#10#13#10);
 
 //  for i := 147 to 167 - 2 + 2 do
   for TempTag := Low(CabrilloTags) to High(CabrilloTags) do
@@ -778,32 +786,17 @@ begin
     sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
   end;
 
-//  TempInteger := tRestartInfo.riQSOByOpMode[SearchAndPounceOpMode];
-  CallsignsList.GetTotalWorkedStations;
-  asm
-  push eax
-  mov eax,dword ptr [tRestartInfo+$8]
-  push eax
-  mov eax,dword ptr [tRestartInfo+$4]
-  push eax
-//  push TempInteger
-  push tRestartInfo.riCQTotalCounter
-  end;
-  MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False);
-  asm
-  push eax
-  end;
-
-  nNumberOfBytesToWrite := wsprintf(wsprintfBuffer,
-    #13#10'        OPERATING TIME: %s' +
-    #13#10'            CQ COUNTER: %d' +
-    #13#10'            RUN/SEARCH: %d/%d Qs' +
-    #13#10'      UNIQUE CALLSIGNS: %d'#13#10 +
-    #13#10'            SOFTWARE: ' + TR4W_CURRENTVERSION + ' http://www.tr4w.net'#13#10
-    );
-  asm add esp,28
-  end;
-  sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+  // Footer built as a plain string -- replaces the prior inline-asm wsprintf
+  // arg pushing.  The run/search counts had been read from raw byte offsets
+  // [tRestartInfo+$4]/[+$8], which are riQSOByOpMode[CQOpMode] (run) and
+  // riQSOByOpMode[SearchAndPounceOpMode] (search); see RestartInfo in LOGDUPE.
+  sWriteFileFromString(tReportFileWrite,
+    #13#10'        OPERATING TIME: ' + string(MillisecondsToFormattedString(TimeSpentByBand[AllBands] * 1000, False)) +
+    #13#10'            CQ COUNTER: ' + IntToStr(tRestartInfo.riCQTotalCounter) +
+    #13#10'            RUN/SEARCH: ' + IntToStr(tRestartInfo.riQSOByOpMode[CQOpMode]) + '/' +
+                                       IntToStr(tRestartInfo.riQSOByOpMode[SearchAndPounceOpMode]) + ' Qs' +
+    #13#10'      UNIQUE CALLSIGNS: ' + IntToStr(CallsignsList.GetTotalWorkedStations) + #13#10 +
+    #13#10'            SOFTWARE: ' + TR4W_CURRENTVERSION + ' http://www.tr4w.net'#13#10);
 
 
 end;
@@ -1217,7 +1210,7 @@ begin
   //  if Header = '' then
   //  Header := GetResponse('Enter contest name and callsign : ');
 
-  WriteLnVarCenter(FileWrite, ContestName + ' ' + MyCall);
+  WriteLnVarCenter(FileWrite, ContestName + ContestFriendlyParens + ' ' + MyCall);
   WriteLn(FileWrite);
 
   Write(FileWrite, 'HR     160       80       40       20       15       10   HR TOT CUM TOTAL');
