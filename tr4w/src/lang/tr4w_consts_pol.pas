@@ -325,6 +325,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'Niew³aœciwy wpis %s !!'#13#13'linia %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Nie mogê znaleŸæ pliku CTY.DAT!!'#13'Ten plik ma siê znajdowaæ w tym samym kaatalogu co program.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Niew³aœciwy wpis w pliku konfiguracyjnym!!'#13#13'Linia %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parametr „%s” nie ma wartoœci w pliku konfiguracyjnym – pozostawiono wartoœæ domyœln¹.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Ten plik nie istnieje. Utworzyæ pusty plik do edycji?';
 
   {LOGSUBS1}

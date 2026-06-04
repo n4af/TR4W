@@ -333,6 +333,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'INVALID STATEMENT IN %s !!'#13#13'Line %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'No encuentro fichero paises CTY.DAT!!'#13'Asegurese de que esta en el mismo directorio del programa.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'INVALID STATEMENT IN CONFIG FILE!!'#13#13'Line %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'El parámetro "%s" no tiene valor en el archivo de configuración; se ha dejado en su valor predeterminado.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Este archivo no existe. ¿Crear un archivo vacío para edición?';
 
   {LOGSUBS1}

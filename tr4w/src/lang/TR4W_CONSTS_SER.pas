@@ -348,6 +348,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'Neispravna instrukcija u %s !!'#13#13'linija %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Nemoguce naci CTY fajl CTY.DAT!!'#13'Proveri da li se taj fajl nalazi u direktorijumu programa.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Neispravna istrukcija u konfiguracionom fajlu!!'#13#13'linija %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parametar „%s“ nema vrednost u konfiguracionom fajlu -- ostavljen je na podrazumevanoj vrednosti.';
 
   {LOGSUBS1}
 

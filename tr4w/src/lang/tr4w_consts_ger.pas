@@ -338,6 +338,7 @@
   TC_INVALIDSTATEMENTIN                 = 'Ungueltige Angabe in %s !!'#13#13'Zeile %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Kann die Datei CTY.DAT nicht finden!!'#13'Stell sicher, dass diese Datei im selben Verzeichnis wie das Programm ist.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Ungueltiger Eintrag in der Konfiguratiosdatei.'#13#13'Zeile %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Der Parameter „%s“ hat keinen Wert in der Konfigurationsdatei – er wurde auf dem Standardwert belassen.';
 
   {LOGSUBS1}
 

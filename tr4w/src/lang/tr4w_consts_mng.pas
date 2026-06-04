@@ -292,6 +292,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'Синтакс алдаатай команд %s !!'#13#13'м?р %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'CTY.DAT файл олдохгvй байна!!'#13'Энэ файл програмын хавтасанд байгаа юм уу?';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Config файлийн синтакс алдаатай команд!!'#13#13'Мор %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parameter "%s" has no value in the config file -- left at its default.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Энэ файл байхгvй байна. Шинэ файл нээх vv?';
 
   {LOGSUBS1}

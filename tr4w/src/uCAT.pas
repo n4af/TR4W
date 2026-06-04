@@ -33,7 +33,9 @@ uses
   CFGCMD,
   LogWind,
   LogK1EA,
-  Tree;
+  Tree,
+  Classes,
+  uK4Discovery;
 
 procedure CloseCATAndKeyerForThisRadio;
 function CATDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
@@ -49,6 +51,125 @@ uses
   uRadioPolling,
   MainUnit;
 
+// Issue #968 -- the default network TCP port is per radio MODEL, not per CAT
+// family: the K4, Flex and the Kenwoods all carry rt = rtKenwood (they share a
+// Kenwood-style CAT dialect) yet use four different network ports, so we cannot
+// key off RadioParametersArray[].rt for them.  Icom is the one clean family case.
+// Returns 0 for a radio that has no network port (serial-only) -> no default.
+function DefaultNetworkPortForRadio(rt: InterfacedRadioType): Integer;
+begin
+   case rt of
+      K4:     Result := 9200;
+      FLEX:   Result := 4992;
+      TS890:  Result := 60000;
+      TS990:  Result := 50000;    // NOT the same as the TS-890
+   else
+      if RadioParametersArray[rt].rt = rtICOM then
+         begin
+         Result := 50001;         // any Icom network model
+         end
+      else
+         begin
+         Result := 0;             // not a network radio -> no default
+         end;
+   end;
+end;
+
+// Issue #968 -- when the dialog is showing a network radio (control-port combo
+// 122 = index 21) and the TCP-port edit (131) is empty/0, pre-fill it with the
+// selected model's default port.  Never overwrites a port the operator typed.
+procedure ApplyDefaultNetworkPort(hwnddlg: HWND);
+var
+   typeIdx : Integer;
+   port    : UINT;
+   def     : Integer;
+   ok      : BOOL;
+begin
+   if tCB_GETCURSEL(hwnddlg, 122) <> 21 then   // 21 = Network
+      begin
+      Exit;
+      end;
+
+   typeIdx := tCB_GETCURSEL(hwnddlg, 121);
+   if typeIdx < 0 then                          // CB_ERR -- no selection
+      begin
+      Exit;
+      end;
+
+   port := Windows.GetDlgItemInt(hwnddlg, 131, ok, False);
+   if port <> 0 then                            // operator already set a port
+      begin
+      Exit;
+      end;
+
+   def := DefaultNetworkPortForRadio(InterfacedRadioType(typeIdx));
+   if def <> 0 then
+      begin
+      Windows.SetDlgItemInt(hwnddlg, 131, def, False);
+      end;
+end;
+
+// Issue #853 -- run network discovery for the radio type currently selected in
+// the RADIO ONE/TWO dialog and, on a single hit, write its IP into the IP edit
+// (control 130).  Kept in its own procedure (Delphi 7 codegen hygiene -- avoids
+// adding inline logic to the long dialog proc).  K4 only for now; Flex/Icom
+// discovery wire in at the type check below.
+procedure RunNetworkDiscoveryForRadio(hwnddlg: HWND);
+var
+  radios       : TList;
+  i            : Integer;
+  msg          : string;
+  savedCursor  : HCURSOR;
+begin
+  if InterfacedRadioType(tCB_GETCURSEL(hwnddlg, 121)) <> K4 then
+     begin
+     Windows.MessageBox(hwnddlg,
+        'Network discovery is currently available only for the Elecraft K4.',
+        'Discover Radio', MB_OK or MB_ICONINFORMATION);
+     Exit;
+     end;
+
+  savedCursor := SetCursor(LoadCursor(0, IDC_WAIT));
+  EnableWindowFalse(hwnddlg, 140);
+  try
+     radios := TK4Discovery.DiscoverRadios(3000);
+  finally
+     EnableWindowTrue(hwnddlg, 140);
+     SetCursor(savedCursor);
+  end;
+
+  try
+     if radios.Count = 0 then
+        begin
+        Windows.MessageBox(hwnddlg, 'No Elecraft K4 found on the network.',
+           'Discover Radio', MB_OK or MB_ICONINFORMATION);
+        end
+     else
+        begin
+        // Fill the IP edit (130) from the first (or only) radio found.
+        Windows.SetDlgItemText(hwnddlg, 130,
+           PChar(PK4DiscoveredRadio(radios[0])^.IPAddress));
+        // Issue #968 -- discovery gives us the IP but not the port; fill the
+        // model default (K4 -> 9200) so the radio is immediately connectable.
+        ApplyDefaultNetworkPort(hwnddlg);
+        if radios.Count > 1 then
+           begin
+           msg := 'More than one K4 found; filled in the first.  All found:' + #13#10;
+           for i := 0 to radios.Count - 1 do
+              msg := msg + #13#10 +
+                 TK4Discovery.Hostname(PK4DiscoveredRadio(radios[i])^) + '  (' +
+                 PK4DiscoveredRadio(radios[i])^.IPAddress + ')';
+           Windows.MessageBox(hwnddlg, PChar(msg), 'Discover Radio',
+              MB_OK or MB_ICONINFORMATION);
+           end;
+        end;
+  finally
+     for i := 0 to radios.Count - 1 do
+        Dispose(PK4DiscoveredRadio(radios[i]));
+     radios.Free;
+  end;
+end;
+
 function CATDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 label
   1;
@@ -61,7 +182,7 @@ var
   RadioType                             : InterfacedRadioType;
   hamLibCheckBoxWind                    : HWnd;
   LabelX, LabelW, EditX, EditW, NewY   : Integer;
-  Rect111, Rect131, HamLibCheckRect     : TRect;
+  Rect111, Rect131, HamLibCheckRect, RectIP : TRect;
   ptTemp                                : TPoint;
   DlgWindowRect                         : TRect;
 
@@ -201,6 +322,18 @@ begin
         // ES_PASSWORD masks the text with bullets
         CreateEdit(ES_AUTOHSCROLL or ES_PASSWORD, EditX, NewY + 28, EditW, 22, hwnddlg, 133);
 
+        // Issue #853: dynamic "Discover" button (ID 140), placed just to the
+        // left of the IP-address edit (control 130, which lives in the dialog
+        // resource), in the gap after the label.  Runs network discovery for the
+        // selected radio type and fills in the IP.  Enabled only for network
+        // radios -- see the cat-port enable blocks below.  (Placeholder '?'
+        // glyph; SVG icon swaps in later.)
+        GetWindowRect(GetDlgItem(hwnddlg, 130), RectIP);
+        ptTemp.x := RectIP.Left;
+        ptTemp.y := RectIP.Top;
+        Windows.ScreenToClient(hwnddlg, ptTemp);
+        CreateButton(BS_PUSHBUTTON, '?', ptTemp.x - 26, ptTemp.y, 22, hwnddlg, 140);
+
         // The dialog was expanded 56px to make room for the two Icom credential
         // rows (USERNAME + PASSWORD), inserted at the position of the HamLib
         // checkbox. Without adjustment, the credential rows cover the checkbox
@@ -274,6 +407,7 @@ begin
         if (CATWTR^.tCATPortType = NETWORK) then
            begin
            EnableWindowTrue(hwnddlg, 130);
+           EnableWindowTrue(hwnddlg, 140);
            EnableWindowTrue(hwnddlg, 131);
            EnableWindowTrue(hwnddlg, 132);
            EnableWindowTrue(hwnddlg, 133);
@@ -287,6 +421,7 @@ begin
            EnableWindowTrue(hwnddlg, 125);
            EnableWindowTrue(hwnddlg, 128);
            EnableWindowFalse(hwnddlg, 130);
+           EnableWindowFalse(hwnddlg, 140);
            EnableWindowFalse(hwnddlg, 131);
            EnableWindowFalse(hwnddlg, 132);
            EnableWindowFalse(hwnddlg, 133);
@@ -349,12 +484,14 @@ begin
              if i = 21 then     // Network
                 begin
                 EnableWindowTrue(hwnddlg, 130);
+                EnableWindowTrue(hwnddlg, 140);
                 EnableWindowTrue(hwnddlg, 131);
                 EnableWindowTrue(hwnddlg, 132);
                 EnableWindowTrue(hwnddlg, 133);
                 EnableWindowFalse(hwnddlg,124);
                 EnableWindowFalse(hwnddlg,125);
                 EnableWindowFalse(hwnddlg,128);
+                ApplyDefaultNetworkPort(hwnddlg);   // Issue #968 -- default port on switch to Network
                 end
              else
                 begin
@@ -362,6 +499,7 @@ begin
                 EnableWindowTrue(hwnddlg, 125);
                 EnableWindowTrue(hwnddlg, 128);
                 EnableWindowFalse(hwnddlg,130);
+                EnableWindowFalse(hwnddlg,140);
                 EnableWindowFalse(hwnddlg,131);
                 EnableWindowFalse(hwnddlg,132);
                 EnableWindowFalse(hwnddlg,133);
@@ -373,6 +511,7 @@ begin
             i := tCB_GETCURSEL(hwnddlg, 121);
             tCB_SETCURSEL(hwnddlg, 128, Cardinal(RadioParametersArray[InterfacedRadioType(i)].br));
             UpdateNetworkCredentialsVisibility;
+            ApplyDefaultNetworkPort(hwnddlg);   // Issue #968 -- default port when the radio type changes
 {
             I := tCB_GETCURSEL(hwnddlg, 121);
             TempByte := 2;
@@ -407,6 +546,9 @@ begin
               tCB_SETCURSEL(hwnddlg, 127, 2);
               ButtonsEnable;
             end;
+
+          140: {Discover -- Issue #853}
+            RunNetworkDiscoveryForRadio(hwnddlg);
 
           1000:
              begin

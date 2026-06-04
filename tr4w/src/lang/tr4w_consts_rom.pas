@@ -346,6 +346,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'COMANDA INVALIDA IN %s !!'#13#13'Linia %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Lipsa fisierul cu entitati CTY.DAT !!'#13'Verifica daca fisierul este in directorul programului.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'COMANDA INVALIDA IN FISIERUL DE CONFIGURARE !!'#13#13' in linia %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parametrul „%s” nu are nicio valoare în fiºierul de configurare -- este lãsat la valoarea implicitã.';
 
   {LOGSUBS1}
 

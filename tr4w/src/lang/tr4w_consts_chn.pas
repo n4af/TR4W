@@ -330,6 +330,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'INVALID STATEMENT IN %s !!'#13#13'Line %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Unable to find CTY.DAT country file!!'#13'Make sure this file is in the same directory as the program.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'INVALID STATEMENT IN CONFIG FILE!!'#13#13'Line %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parameter "%s" has no value in the config file -- left at its default.';
 
   {LOGSUBS1}
 
