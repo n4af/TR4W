@@ -330,6 +330,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'INVALID STATEMENT IN %s !!'#13#13'Line %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Unable to find CTY.DAT country file!!'#13'Make sure this file is in the same directory as the program.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'INVALID STATEMENT IN CONFIG FILE!!'#13#13'Line %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parameter "%s" has no value in the config file -- left at its default.';
 
   {LOGSUBS1}
 
@@ -786,10 +787,22 @@ const
   RC_WA7BNM_CALENDAR                    = 'WA7BNM÷ëÞø¦Ûö×åõÎÆ';
   RC_SEND_BUG                           = 'õÏÑùÀÁùÔÙøïïöÊåõÑÊ';
   RC_HOMEPAGE                           = 'TR4WùæÖùá¦';
+  RC_FREQUENCY                          = 'Frequency';
+  TC_SPLIT_WARN                       = 'Warning: You are in SPLIT MODE !!!';
+{FD Additions NY4I}
 
+TC_IMPROPERTRANSMITTERCOUNT = 'FD transmitters must be between 1 and 99.';
+TC_IMPROPERARRLFIELDDAYCLASS = 'Field Day class must be A, B, C, D, E or F.';
+TC_IMPROPERWINTERFIELDDAYCLASS = 'Winter Field Day class must be H, I, O or M.';
+TC_ARRLFIELDDAYIMPROPERDXEXCHANGE = 'DX Station exchange must be "DX".';
 
-  RC_OPERATOR                           = 'Operator';
-  TC_LIST_OF_COMMAND                    = '&List of commands';
-  TC_ENTERYOURPOSTCODE                  = 'Enter your postcode:';
-  
+RC_SPLITOFF                       = 'Set Split Mode Tx';
+TC_RUNWARN                    = 'Another instance of TR4W is already running';
+RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1
+
   TC_SHOW_PASSWORDS                     = 'Show passwords';
+
+TC_TOOLTIP_DISCOVERY = 'Discover radios on the network';
+TC_DISCOVER_NOT_AVAILABLE = 'Network discovery is not available for radio %s';
+TC_DISCOVER_NONE_FOUND = 'No radio of type %s found on the network';
+TC_DISCOVER_MULTI_FOUND = 'More than one %s found; filled in the first.  All found:';

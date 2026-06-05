@@ -338,6 +338,7 @@
   TC_INVALIDSTATEMENTIN                 = 'Ungueltige Angabe in %s !!'#13#13'Zeile %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Kann die Datei CTY.DAT nicht finden!!'#13'Stell sicher, dass diese Datei im selben Verzeichnis wie das Programm ist.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Ungueltiger Eintrag in der Konfiguratiosdatei.'#13#13'Zeile %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Der Parameter „%s“ hat keinen Wert in der Konfigurationsdatei – er wurde auf dem Standardwert belassen.';
 
   {LOGSUBS1}
 
@@ -829,4 +830,8 @@ RC_SPLITOFF                       = 'Split Mode Tx setzen';
 TC_RUNWARN                    = 'Eine andere Instanz von TR4W laeuft schon';
 RC_wkMode                     = 'Neu-Initialisierung WinKeyer';      // 4.60.1
 
-  TC_SHOW_PASSWORDS                     = 'Show passwords';
+  TC_SHOW_PASSWORDS                     = 'Passwörter anzeigen';
+  TC_TOOLTIP_DISCOVERY = 'Radios im Netzwerk entdecken';
+  TC_DISCOVER_NOT_AVAILABLE = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND = 'More than one %s found; filled in the first.  All found:';

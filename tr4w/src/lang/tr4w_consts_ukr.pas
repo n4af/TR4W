@@ -359,6 +359,7 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   TC_INVALIDSTATEMENTIN                 = 'Помилка синтаксису команди %s !!'#13#13'рядок %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Неможливо знайти файл країн CTY.DAT!!'#13'Переконайтеся, що цей файл знаходиться в директорії програми.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Помилка синтаксису команди!!'#13#13'рядок %u:'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Параметр "%s" не має значення у файлі конфігурації -- залишено значення за замовчуванням.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Цей файл відсутній. Створити порожній файл для подальшого редагування?'; 
 
   {LOGSUBS1}
@@ -811,4 +812,8 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   TC_SPLIT_WARN                         = 'ПОПЕРЕДЖЕННЯ: Ви працюєте в режимі РОБОТА НА РОЗНЕСЕНИХ ЧАСТОТАХ!!!';
   TC_RUNWARN                            = 'Програма TR4W на вашому комп`ютері вже працює';
   RC_wkMode                             = 'Реініціалізація WinKeyer';      // 4.60.1
-  TC_SHOW_PASSWORDS                     = 'Show passwords';
+  TC_SHOW_PASSWORDS                     = 'показати паролі';
+  TC_TOOLTIP_DISCOVERY                  = 'Відкрийте для себе радіо в мережі';
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';

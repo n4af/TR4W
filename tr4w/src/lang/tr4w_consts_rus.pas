@@ -357,6 +357,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'Ошибка синтаксиса команды %s !!'#13#13'строка %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Невозможно найти файл стран CTY.DAT!!'#13'Убедитесь, что этот файл находится в директории программы.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Ошибка синтаксиса команды!!'#13#13'строка %u:'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Параметр «%s» не имеет значения в файле конфигурации — оставлено значение по умолчанию.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Данный файл отсутствует. Создать пустой файл для последующего редактирования?';
 
   {LOGSUBS1}
@@ -806,7 +807,11 @@ const
   RC_ALTX                               = 'Выйти из программы';
   RC_CTRLJ                              = 'Окно конфигурирования команд Ctrl-J';
   RC_SPLITOFF                           = 'Режим работы на разнесенных частотах ВКЛ/ВЫКЛ';
- TC_SPLIT_WARN                          = 'ПРЕДУПРЕЖДЕНИЕ: Вы работаете в режиме РАБОТА НА РАЗНЕСЕННЫХ ЧАСТОТАХ!!!';
- TC_RUNWARN                             = 'Программа TR4W на вашем компьютере уже работает ';
- RC_wkMode                              = 'Реинициализация WinKeyer';      // 4.60.1
-  TC_SHOW_PASSWORDS                     = 'Show passwords';
+  TC_SPLIT_WARN                         = 'ПРЕДУПРЕЖДЕНИЕ: Вы работаете в режиме РАБОТА НА РАЗНЕСЕННЫХ ЧАСТОТАХ!!!';
+  TC_RUNWARN                            = 'Программа TR4W на вашем компьютере уже работает ';
+  RC_wkMode                             = 'Реинициализация WinKeyer';      // 4.60.1
+  TC_SHOW_PASSWORDS                     = 'Показать пароль';
+  TC_TOOLTIP_DISCOVERY                  = 'Откройте для себя радио в сети';  
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';

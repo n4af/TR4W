@@ -346,6 +346,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'COMANDA INVALIDA IN %s !!'#13#13'Linia %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Lipsa fisierul cu entitati CTY.DAT !!'#13'Verifica daca fisierul este in directorul programului.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'COMANDA INVALIDA IN FISIERUL DE CONFIGURARE !!'#13#13' in linia %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parametrul ?%s? nu are nicio valoare în fioierul de configurare -- este lasat la valoarea implicita.';
 
   {LOGSUBS1}
 
@@ -822,4 +823,8 @@ const
   TC_RUNWARN = 'Un alt program TR4W functioneaza deja';
   RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1
   
-  TC_SHOW_PASSWORDS                     = 'Show passwords';
+  TC_SHOW_PASSWORDS                     = 'Show password';
+  TC_TOOLTIP_DISCOVERY                  = 'Descoperiþi radiouri în reþea';
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';

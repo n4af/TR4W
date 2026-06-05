@@ -325,6 +325,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'Niew³aœciwy wpis %s !!'#13#13'linia %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Nie mogê znaleŸæ pliku CTY.DAT!!'#13'Ten plik ma siê znajdowaæ w tym samym kaatalogu co program.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Niew³aœciwy wpis w pliku konfiguracyjnym!!'#13#13'Linia %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parametr „%s” nie ma wartoœci w pliku konfiguracyjnym – pozostawiono wartoœæ domyœln¹.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Ten plik nie istnieje. Utworzyæ pusty plik do edycji?';
 
   {LOGSUBS1}
@@ -528,6 +529,7 @@ const
   HELP_WORD                             = 'Pomoc';
   OK_WORD                               = 'OK';
   EXIT_WORD                             = 'WyjÜcie';
+  RC_OPERATOR                           = 'Operator';
   RC_CALLSIGN                           = 'Znak wywo¦awczy';
   RC_MODE                               = 'Emisja';
   RC_BAND                               = 'Pasmo';
@@ -784,9 +786,16 @@ const
   RC_SEND_BUG                           = 'Wyœlij raport o b³êdzie';
   RC_HOMEPAGE                           = 'Strona domowa TR4W';
 
-  RC_OPERATOR                           = 'Operator';
+  
   TC_LIST_OF_COMMAND                    = '&List of commands';
   TC_ENTERYOURBRANCHNUMBER              = 'Enter your Branch number:';
   TC_ENTERYOURPOSTCODE                  = 'Enter your postcode:';
 
+  RC_SPLITOFF                           = 'Set Split Mode Tx';
+  TC_RUNWARN                            = 'Another instance of TR4W is already running';
+  RC_wkMode                             = 'Re-initialize WinKeyer';      // 4.60.1
   TC_SHOW_PASSWORDS                     = 'Show passwords';
+  TC_TOOLTIP_DISCOVERY                  = 'Discover radios on the network';
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';

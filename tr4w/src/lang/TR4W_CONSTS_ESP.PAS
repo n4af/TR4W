@@ -333,6 +333,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'INVALID STATEMENT IN %s !!'#13#13'Line %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'No encuentro fichero paises CTY.DAT!!'#13'Asegurese de que esta en el mismo directorio del programa.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'INVALID STATEMENT IN CONFIG FILE!!'#13#13'Line %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'El parámetro "%s" no tiene valor en el archivo de configuración; se ha dejado en su valor predeterminado.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Este archivo no existe. ¿Crear un archivo vacío para edición?';
 
   {LOGSUBS1}
@@ -1530,3 +1531,7 @@ const
   TC_WORKSAMEASESCONKEYBOARD            = 'Funciona igual que "Esc" en el teclado';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
   TC_SHOW_PASSWORDS                     = 'Mostrar contraseñas';
+  TC_TOOLTIP_DISCOVERY                  = 'Descubre radios en la red';
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';

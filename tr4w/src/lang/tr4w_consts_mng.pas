@@ -292,6 +292,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'Синтакс алдаатай команд %s !!'#13#13'м?р %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'CTY.DAT файл олдохгvй байна!!'#13'Энэ файл програмын хавтасанд байгаа юм уу?';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'Config файлийн синтакс алдаатай команд!!'#13#13'Мор %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parameter "%s" has no value in the config file -- left at its default.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Энэ файл байхгvй байна. Шинэ файл нээх vv?';
 
   {LOGSUBS1}
@@ -732,6 +733,10 @@ const
   TC_IMPROPERARRLFIELDDAYCLASS          = 'Field Day-ын ангилал A, B, C, D, E, F байна';
   TC_ARRLFIELDDAYIMPROPERDXEXCHANGE     = 'DX станц "DX" гэж нэвтрvvлнэ';
   RC_SPLITOFF                           = 'SPLIT-ийг залгах ба салгах ON/OFF';
-  TC_RUNWARN                    = 'Another instance of TR4W is already running';
-  RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1
-  TC_SHOW_PASSWORDS                     = 'Show passwords';
+  TC_RUNWARN                            = 'TR4W-ийн ??р нэг жишээ аль хэдийн ажиллаж байна';
+  RC_wkMode                             = 'Re-initialize WinKeyer';      // 4.60.1
+  TC_SHOW_PASSWORDS                     = 'Нууц vгсийг харуулах';
+  TC_TOOLTIP_DISCOVERY                  = 'Сvлжээнд радио илрvvлэх';
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';

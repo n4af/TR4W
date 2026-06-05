@@ -1123,6 +1123,20 @@ begin
 
                      ctByte, ctWord, ctInteger:
                         begin
+                           // Issue #968 -- a blank value (e.g. "RADIO ONE TCP PORT=")
+                           // means the parameter was never set.  Leave the variable at its
+                           // default and surface a clear, non-fatal notice that names the
+                           // parameter, instead of rejecting the line as "invalid statement".
+                           // A non-empty but non-numeric value (e.g. "abc") still fails the
+                           // Val check below, so the defensive catch for typos is preserved.
+                           if CustomCMD = '' then
+                              begin
+                              Format(wsprintfBuffer, TC_PARAMETERHASNOVALUE, @Command[1]);
+                              showwarning(wsprintfBuffer);
+                              logger.Warn('[CheckCommand] %s has no value -- left at its default', [pshortstring(Command)^]);
+                              Result := True;
+                              Exit;
+                              end;
                            Val(CustomCMD, TempInteger, code);
                            //              TempInteger := round(ValExt(@CustomCMD[1], code));
                            if code <> 0 then

@@ -182,7 +182,7 @@ var
   Inact_Freq: Cardinal = 0;
   Inact_Band: BandType;
   so2r_swap: boolean = false;
-function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
+function CreateToolTip(Control: HWND; Text: PChar): HWND;
 
 function DeviceIoControlHandler
   (
@@ -8324,7 +8324,7 @@ jmp @@all
   end;
 end;
 
-function CreateToolTip(Control: HWND; var ti: TOOLINFO): HWND;
+function CreateToolTip(Control: HWND; Text: PChar): HWND;
 const
   TOOLTIPS_CLASS = 'tooltips_class32';
   TTS_ALWAYSTIP = $01;
@@ -8335,10 +8335,12 @@ const
   TTF_TRACK = $0020;
   TTF_CENTERTIP = $0002;
   TTF_ABSOLUTE = $0080;
-  TTM_ADDTOOL = $0400 + 50;
+  TTM_ADDTOOL = $0400 + 4;   // TTM_ADDTOOLA (ANSI). $0400+50 is TTM_ADDTOOLW, which reads our ANSI PChar as UTF-16 -> garbage/CJK.
   TTM_SETTITLE = (WM_USER + 32);
   ICC_WIN95_CLASSES = $000000FF;
 
+var
+  ti: TOOLINFO;
 begin
   Result := CreateWindow(TOOLTIPS_CLASS, nil, WS_POPUP or TTS_NOPREFIX
     {or TTS_BALLOON } or TTS_ALWAYSTIP, 100, 100, 100, 100, Control, 0,
@@ -8353,8 +8355,9 @@ begin
     //ti.uFlags := 0;//TTF_ABSOLUTE or TTF_TRACK;
     ti.uFlags := {TTF_CENTERTIP or }TTF_TRANSPARENT or TTF_SUBCLASS;
     ti.HWND := Control;
+    ti.lpszText := Text;
     Windows.GetClientRect(Control, ti.rect);
-    SendMessage(Result, TTM_ADDTOOL, 1, integer(@ti));
+    SendMessage(Result, TTM_ADDTOOL, 0, integer(@ti));
   end;
 end;
 

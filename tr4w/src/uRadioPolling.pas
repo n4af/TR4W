@@ -721,6 +721,7 @@ procedure pNetworkRadio(rig: RadioPtr); // Network classes (K4 network, Flex 600
 var
    ro: TNetRadioBase;
    wasConnected: Boolean;
+   loggedNoConnInfo: Boolean;   // Issue #968 -- log the "no IP/port" skip once, not every cycle
    reconnectDelay: Integer;
    sleepRemaining: Integer;
    lastPollTick: LongWord;
@@ -769,6 +770,7 @@ begin
    lastRITXITTick := 0;
    reconnectDelay := RECONNECT_INITIAL_DELAY;
    handshakeStuckSinceTick := 0;
+   loggedNoConnInfo := False;
 
    // Keep polling thread alive until stop is requested (e.g. on Reset Radio Ports)
    while not rig^.PollingStopRequested do
@@ -1082,6 +1084,24 @@ begin
             begin
             Break;
             end;
+
+         // Issue #968 -- a network radio with no IP address or a 0 TCP port has
+         // nothing to connect to.  ro.Connect would just return -1 every cycle
+         // (the port=0 / address=0 guards in TNetRadioBase.Connect) and flood the
+         // log once per second.  Idle quietly until the operator supplies the
+         // connection info; log the reason once so it is still discoverable.
+         if (rig^.RadioTCPPort = 0) or (Length(rig^.IPAddress) = 0) then
+            begin
+            if not loggedNoConnInfo then
+               begin
+               logger.Warn('[pNetworkRadio] %s has no IP address/TCP port configured -- not attempting to connect until set',
+                  [rig^.RadioName]);
+               loggedNoConnInfo := True;
+               end;
+            Continue;
+            end;
+         loggedNoConnInfo := False;
+
          try
             logger.Info('[pNetworkRadio] Reconnection attempt (delay: %dms)', [reconnectDelay]);
             ro.Connect;

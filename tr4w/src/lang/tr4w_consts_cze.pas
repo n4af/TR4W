@@ -345,6 +345,7 @@ const
   TC_INVALIDSTATEMENTIN                 = 'NESPRÁVNÝ PØÍKAZ V %s!'#13#13'Øádek %u'#13'%s';
   TC_UNABLETOFINDCTYDAT                 = 'Nelze nalézt soubor CTY.DAT (seznam zemí)!'#13'Tento soubor musí být ve stejném adresáøi, jako program TR4W.';
   TC_INVALIDSTATEMENTINCONFIGFILE       = '%s:'#13'NESPRÁVNÝ PØÍKAZ V KONFIGURAÈNÍM SOUBORU!'#13#13'Øádek %u'#13'%s';
+  TC_PARAMETERHASNOVALUE                = 'Parametr „%s“ nemá v konfiguraèním souboru žádnou hodnotu -- ponechán na výchozí hodnotì.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Tento soubor neexistuje. Vytvoøit soubor pro editaci?';
 
   {LOGSUBS1}
@@ -828,3 +829,7 @@ const
   TC_RUNWARN                            = 'jiná instance TR4W je již spuštìna';
   RC_wkMode                             = 'znovu inicializovat WinKeyer';      // 4.60.1
   TC_SHOW_PASSWORDS                     = 'Show passwords';
+  TC_TOOLTIP_DISCOVERY                  = 'Discover radios on the network';
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';
