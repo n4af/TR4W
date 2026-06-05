@@ -47,7 +47,7 @@ _Nothing yet._
 
 #### Network Radio Setup
 
-- **Find your radio on the network automatically**: a new "Discover" button in the Radio 1 / Radio 2 setup dialog scans your local network and fills in the radio's IP address for you. It works for the Elecraft K4 and Icom network radios, and now finds a radio on any subnet, not just the one your PC is on. (#853)
+- **Find your radio on the network automatically**: a new "Discover" button in the Radio 1 / Radio 2 setup dialog scans your local network and fills in the radio's IP address for you. It works for the Elecraft K4 and Icom network radios, and now finds a radio on any subnet your PC is on. (#853)
 - **Correct default network port per radio**: when you choose a network radio type, TR4W pre-fills the right TCP port for that model (K4, FlexRadio, Kenwood TS-890/TS-990, Icom) so you don't have to look it up. (#968)
 - **Cleaner setup**: leaving a network port blank no longer throws a confusing "invalid statement" error, and a radio with no address set no longer floods the log with connection retries.
 
