@@ -565,7 +565,6 @@ var
   ShortIntegers: boolean;
   ShowQSOStatusCall: CallString;
   //  ShowSearchAndPounce                   : boolean;
-  SingleRadioMode: boolean;
   SkipActiveBand: boolean;
   SpaceBarDupeCheckEnable: boolean = True;
   StartSendingNowKey: Char = '''';

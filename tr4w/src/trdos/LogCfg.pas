@@ -534,6 +534,10 @@ begin
   if ConfigFileName = cfgCFG then ClearDomesticCountryList;
   LineNumberInConfigFile := 0;
   CurrentConfigFile := ConfigFileName;
+  // Issue #965 -- reset per file so TWO RADIO MODE "wins" only within a single
+  // file; a later-loaded contest .cfg can still override the mode set by the ini.
+  TwoRadioModeWasSet := False;
+  logger.Info('[Config] Loading %s', [CFGFilesArray[ConfigFileName]]);
   EnumerateLinesInFile(CFGFilesArray[ConfigFileName], EnmuCFGFile, True);
 
   // STOPGAP: Re-read ctPassword fields with original case from the INI file.

@@ -241,7 +241,7 @@ begin
               BandColor := clred ;
 
              if (Spot.FBand = InactiveRadioPtr.BandMemory) and TwoRadioMode or
-                (Spot.FBand = BandmapBand) and SingleRadioMode  then
+                (Spot.FBand = BandmapBand) and (not TwoRadioMode)  then
                   BandColor := clblue
              else
                   BandColor := clsilver;

@@ -323,10 +323,15 @@ var
    WSJTXRadioControlEnabled: boolean = false;
    SpotCollectorEnabled: boolean = false;
    CTYUpdateCheckOnStartup: boolean = true;
+   // Issue #965 -- TRUE once a TWO RADIO MODE line has been parsed in the current
+   // config file.  Reset per file in LogCfg.ReadInConfigFile so a contest .cfg can
+   // still override the mode set by tr4w.ini.  Used to make TWO RADIO MODE win over
+   // a (deprecated) SINGLE RADIO MODE line appearing later in the SAME file.
+   TwoRadioModeWasSet: boolean = false;
 
 const
 
-   CommandsArraySize = 416 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}     // 4.91.3
+   CommandsArraySize = 415 {RadioOneCWSpeedSync} + 1 {RadioTwoCWSpeedSync}     // 4.91.3
    + 1 {RadioOneCWByCAT} + 1 {RadioTwoCWByCAT} //ny4i // 4.44.5
    + 9 {UDPBroadcast Variables} + 4 {New UDP Broadcasst Ports}
    + 1 {ServerAutoSynchronizeLogOnConnect - Issue #912}
@@ -781,7 +786,6 @@ const
  (crCommand: 'SHOW TYPED CALLSIGN';           crAddress: @tShowTypedCallsign;             crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'SIMULATOR ENABLE';              crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'SINGLE BAND SCORE';             crAddress: pointer(25);                     crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:1 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctBand; crNetwork: 1),
- (crCommand: 'SINGLE RADIO MODE';             crAddress: @SingleRadioMode;                crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 0),
  (crCommand: 'SKIP ACTIVE BAND';              crAddress: @SkipActiveBand;                 crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'SLASH MARK CHAR';               crAddress: @SlashMarkChar;                  crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctChar; crNetwork: 1),
  (crCommand: 'SPACE BAR DUPE CHECK ENABLE';   crAddress: @SpaceBarDupeCheckEnable;        crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
@@ -1001,6 +1005,49 @@ begin
          Result := True;
          Exit;
          end;
+      end;
+
+   // Issue #965 -- TWO RADIO MODE is the sole mode knob.  Remember that it was
+   // specified in THIS config file so a (deprecated) SINGLE RADIO MODE line below
+   // cannot flip the mode back -- TWO RADIO MODE wins.  We do NOT Exit here: the
+   // command table below applies the actual boolean value to TwoRadioMode.
+   if pshortstring(Command)^ = 'TWO RADIO MODE' then
+      begin
+      if CustomCMD[1] in ['T', 'F'] then
+         begin
+         TwoRadioModeWasSet := True;
+         logger.Info('[RadioMode] TWO RADIO MODE = %s -- this file decides the mode; any SINGLE RADIO MODE line in this file is ignored', [CustomCMD]);
+         end;
+      end;
+
+   // Issue #965 -- SINGLE RADIO MODE is the deprecated inverse of TWO RADIO MODE.
+   // Kept parseable so existing .cfg files still load (Option A): TRUE => single
+   // => TwoRadioMode False; FALSE => two-radio => TwoRadioMode True.  But if THIS
+   // file already specified TWO RADIO MODE, that wins and SINGLE RADIO MODE here is
+   // inert (still consumed so it is not flagged as an unknown command).
+   if pshortstring(Command)^ = 'SINGLE RADIO MODE' then
+      begin
+      if CustomCMD[1] in ['T', 'F'] then
+         begin
+         if not TwoRadioModeWasSet then
+            begin
+            TwoRadioMode := CustomCMD[1] = 'F';
+            if TwoRadioMode then
+               begin
+               logger.Info('[RadioMode] SINGLE RADIO MODE = %s applied (deprecated alias) -- TwoRadioMode now TRUE (two-radio/SO2R)', [CustomCMD]);
+               end
+            else
+               begin
+               logger.Info('[RadioMode] SINGLE RADIO MODE = %s applied (deprecated alias) -- TwoRadioMode now FALSE (single radio)', [CustomCMD]);
+               end;
+            end
+         else
+            begin
+            logger.Info('[RadioMode] SINGLE RADIO MODE = %s IGNORED -- TWO RADIO MODE already set in this file (TWO RADIO MODE wins)', [CustomCMD]);
+            end;
+         Result := True;
+         end;
+      Exit;
       end;
 
    //logger.trace('Searching for %s',[Command]);
