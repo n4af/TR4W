@@ -365,13 +365,13 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Запис DVP. Натисніть ESCAPE або RETURN, щоб зупинити.';
-  TC_ALTRCOMMANDDISABLED                = 'Alt-R команда вимкнена у рядку Single Radio Mode = True';
+  TC_ALTRCOMMANDDISABLED                = 'Команда Alt-R потребує TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'Немає запрограмованого CQ повідомлення в CQ MEMORY AltF1.';
 
   {LOGSUBS2}
 
   TC_WASADUPE                           = 'Зв`язок з %s вже був.';
-  TC_ALTDCOMMANDDISABLED                = 'Alt-D команда вимкнена відповідно до рядка SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Команда Alt-D потребує TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Ви відновили останній видалений зв`язок!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Ви видалили останній зв`язок!! Використовуйте Alt-Y для відновлення.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Ви дійсно хочете вийти з програми?';

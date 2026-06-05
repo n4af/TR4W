@@ -335,14 +335,14 @@ const
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Recording DVP. Press ESCAPE or RETURN to stop.';
-  TC_ALTRCOMMANDDISABLED                = 'Alt-R Command disabled by single Radio Mode = True';
+  TC_ALTRCOMMANDDISABLED                = 'Alt-R command requires TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'No CQ message programmed into CQ MEMORY AltF1.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'This file does not exist. Create an empty file for editing?';
 
   {LOGSUBS2}
 
   TC_WASADUPE                           = '%s was a dupe.';
-  TC_ALTDCOMMANDDISABLED                = 'Alt-D command disabled by SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Alt-D command requires TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'You have restored the last deleted log entry!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'You have deleted the last log entry!!  Use Alt-Y to restore it.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Do you really want to exit the program?';

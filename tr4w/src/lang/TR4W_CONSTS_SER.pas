@@ -353,14 +353,14 @@ const
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Snimanje DVP. Pritisni ESCAPE ili ENTER za prekid.';
-  TC_ALTRCOMMANDDISABLED                = 'Alt-R komanda iskljucena u liniji SINGLE RADIO MODE = TRUE';
+  TC_ALTRCOMMANDDISABLED                = 'Alt-R komanda zahteva TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'Nije isprogramirana CQ poruka u CQ MEMORY AltF1.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Ova datoteka ne postiji. Napraviti praznu datoteku za editovanje?';
 
   {LOGSUBS2}
 
 //  TC_WASADUPE                           = '%s je bila dupla.';
-  TC_ALTDCOMMANDDISABLED                = 'Alt-D komanda iskljucena saglasno liniji SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Alt-D komanda zahteva TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Vratio si poslednju obrisanu vezu iz dnevnika!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Obrisao si poslednju vezu iz dnevnika! Pritisni Alt-Y za njeno vracanje.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Da li zelis da napustis program?';

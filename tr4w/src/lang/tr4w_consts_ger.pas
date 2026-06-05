@@ -343,14 +343,14 @@
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Nehme DVP auf . ESCAPE oder RETURN zum Stoppen druecken.';
-  TC_ALTRCOMMANDDISABLED                = 'Alt-R Kommando durch Radio Mode = True deaktiviert';
+  TC_ALTRCOMMANDDISABLED                = 'Alt-R Kommando erfordert TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'Es ist keine CQ Message in Memory AltF1 eingetragen.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Diese Datei existiert nicht. Eine leere Datei zum Bearbeiten anlegen?';
 
   {LOGSUBS2}
 
 //  TC_WASADUPE                           = '%s was a dupe.';
-  TC_ALTDCOMMANDDISABLED                = 'Alt-D ist deaktiviert durch SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Alt-D Kommando erfordert TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Du hast den zuletzt geloeschten Eintrag wiederhergestellt!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Du hast den letzten Logeintrag geloescht!! Mit Alt-Y wiederherstellen.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Willst du das Programm wirklich beenden?';

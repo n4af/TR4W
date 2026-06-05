@@ -351,13 +351,13 @@ const
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Nahrává se DVP. Stiskni ESC nebo RETURN pro ukonèení.';
-  TC_ALTRCOMMANDDISABLED                = 'Pøíkaz Alt-R je blokován volbou SINGLE RADIO MODE = TRUE';
+  TC_ALTRCOMMANDDISABLED                = 'Pøíkaz Alt-R vyžaduje TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'V pamìti CQ [AltF1] není naprogramována žádná MSG.';
 
   {LOGSUBS2}
 
 //  TC_WASADUPE                           = '%s bylo duplicitní.';
-  TC_ALTDCOMMANDDISABLED                = 'Pøíkaz Alt-D je blokován volbou SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Pøíkaz Alt-D vyžaduje TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Poslední smazaný záznam v deníku byl obnoven!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Smazal jsi poslední záznam v deníku!  Stiskni ALT-Y k jeho obnovení.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Chceš skuteènì ukonèit program?';

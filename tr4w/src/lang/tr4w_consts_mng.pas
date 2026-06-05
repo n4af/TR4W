@@ -297,11 +297,11 @@ const
 
   {LOGSUBS1}
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'DVP бичиж байна.ESCAPE буюу ENTER дарвал зогсоно';
-  TC_ALTRCOMMANDDISABLED                = 'Alt-R команд Single Radio Mode горимыг зогсооно = True';
+  TC_ALTRCOMMANDDISABLED                = 'Alt-R команд TWO RADIO MODE = TRUE шаардлагатай';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'CQ MEMORY AltF1 -д CQ кодыг програмчлаагvй байна';
   {LOGSUBS2}
   TC_WASADUPE                           = '%s давтагдсан холбоо байна';
-  TC_ALTDCOMMANDDISABLED                = 'Alt-D команд SINGLE RADIO MODE горимыг хvчингvй болгоно = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Alt-D команд TWO RADIO MODE = TRUE шаардлагатай';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Хамгийн сvvлд устгасан холбоогоо сэргээлээ!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Та сvvлчийн холбоогоо устгалаа!!  Alt-Y ахин дарвал лог руу буцаж орно';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Та програмаас гармаар байна уу?';
