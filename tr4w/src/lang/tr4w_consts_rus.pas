@@ -363,13 +363,13 @@ const
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Запись DVP. Нажмите ESCAPE или RETURN для остановки.';
-  TC_ALTRCOMMANDDISABLED                = 'Alt-R команда отключена в строке Single Radio Mode = True';
+  TC_ALTRCOMMANDDISABLED                = 'Команда Alt-R требует TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'Нет запрограммированного CQ сообщения в CQ MEMORY AltF1.';
 
   {LOGSUBS2}
 
   TC_WASADUPE                           = 'Связь с %s уже была.';
-  TC_ALTDCOMMANDDISABLED                = 'Alt-D команда отключена согласно строке SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Команда Alt-D требует TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Вы восстановили последнюю удаленную связь!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Вы удалили последнюю связь!! Используйте Alt-Y для ее восстановления.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Вы действительно хотите выйти из программы?';

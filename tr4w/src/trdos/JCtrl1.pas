@@ -1419,7 +1419,7 @@ begin
     }
 
     SRM:
-      if SingleRadioMode = True then
+      if not TwoRadioMode then
         RESULT := SRM1
       else
         RESULT := SRM2;

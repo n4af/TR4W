@@ -774,7 +774,6 @@ var
   SearchAndPounceMode                   : boolean;
   SelectedColors                        : ColorRecord;
   SendAltDSpotsToPacket                 : boolean;
-  SingleRadioMode                       : boolean;
   SCount                                : integer = 0;
   SpecialCommand                        : SpecialCommandType {= NoSpecialCommand};
   SplitFreq                             : LONGINT;

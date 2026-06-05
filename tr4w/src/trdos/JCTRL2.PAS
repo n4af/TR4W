@@ -961,7 +961,7 @@ begin
           else
             DDXState := Off;
     }
-    SRM: InvertBoolean(SingleRadioMode); // := not SingleRadioMode;
+    SRM: InvertBoolean(TwoRadioMode); // #965: SINGLE RADIO MODE is a deprecated alias of TWO RADIO MODE
     SAB: InvertBoolean(SkipActiveBand); // := not SkipActiveBand;
 
     SMC:
@@ -1376,7 +1376,7 @@ begin
           else
             WriteLn(FileWrite, 'TRUE');
     }
-    SRM: WriteLn(FileWrite, SingleRadioMode);
+    SRM: WriteLn(FileWrite, not TwoRadioMode);
     SAB: WriteLn(FileWrite, SkipActiveBand);
     {KK1L: 6.65}
     SAS: WriteLn(FileWrite, CallWindowShowAllSpots);
@@ -1740,7 +1740,7 @@ begin
     SLG: TempStringIsTrue := tLogLogGridlines;
     //    SEN:      if DDXState <> Off then asm inc ebx end;//TempStringIsTrue := True; //TempString := 'TRUE';
 
-    SRM: TempStringIsTrue := SingleRadioMode;
+    SRM: TempStringIsTrue := not TwoRadioMode;
     SAB: TempStringIsTrue := SkipActiveBand;
 
     {KK1L: 6.65}

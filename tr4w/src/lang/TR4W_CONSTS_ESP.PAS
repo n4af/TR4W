@@ -339,13 +339,13 @@ const
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Grabando DVP. Pulse ESCAPE o RETURN para parar.';
-  TC_ALTRCOMMANDDISABLED                = 'Alt-R desactiva le modo de radio unica = True';
+  TC_ALTRCOMMANDDISABLED                = 'El comando Alt-R requiere TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'Sin mensaje CQ programado en la MEMORIA CQ AltF1.';
 
   {LOGSUBS2}
 
   TC_WASADUPE                           = '%s es un duplicado.';
-  TC_ALTDCOMMANDDISABLED                = 'Alt-D desactivado por SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'El comando Alt-D requiere TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Ha recuperado la ultima entrada borrada del log!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Ha borrado la ultima entrada del log!!  Use Alt-Y para recuperarla.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = '¿Quiere salir del programa?';

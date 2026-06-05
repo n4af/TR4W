@@ -331,13 +331,13 @@ const
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Zapisywanie wiadomoœci g³osowych. Naciœnij ESCAPE lub RETURN aby zatrzymaæ.';
-  TC_ALTRCOMMANDDISABLED                = 'Polecenie Alt-R deaktywowane przez ustawienie Single Radio Mode = True';
+  TC_ALTRCOMMANDDISABLED                = 'Polecenie Alt-R wymaga TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'CQ - brak zaprogramowanej informacji w pamiêci pod funkcyjnym klawiszem AltF1.';
 
   {LOGSUBS2}
 
   TC_WASADUPE                           = '%s by³ powtórzony.';
-  TC_ALTDCOMMANDDISABLED                = 'Polecenie Alt-D deaktywowane przez ustawienie SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Polecenie Alt-D wymaga TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Przywróci³eœ ostatni usuniêty wpis do logu!!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Usun¹³eœ ostatni wpis do logu!!  U¿yj Alt-Y aby je przwróciæ.';
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Czy naprawdê chcesz wyjœæ z programu ?';

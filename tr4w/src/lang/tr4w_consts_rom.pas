@@ -351,14 +351,14 @@ const
   {LOGSUBS1}
 
   TC_RECORDDVPPRESSESCAPEORRETURNTOSTOP = 'Inregistrare DVP. Apasa ESCAPE sau RETURN la oprire.';
-  TC_ALTRCOMMANDDISABLED                = 'Comanda Alt-R dezactivata prin -SINGLE RADIO MODE = TRUE';
+  TC_ALTRCOMMANDDISABLED                = 'Comanda Alt-R necesitã TWO RADIO MODE = TRUE';
   TC_NOCQMESPROGRAMMEDINTOCQMEMORYALTF1 = 'Nu exista mesaj programat in memoria CQ activata cu AltF1.';
   TC_THIS_FILE_DOES_NOT_EXIST           = 'Acest fisier nu exista. Facem un fisier nou ptr editare?';
 
   {LOGSUBS2}
 
   TC_WASADUPE                           = '%s a fost o dubla.';
-  TC_ALTDCOMMANDDISABLED                = 'Comanda Alt-D este dezactivata prin -SINGLE RADIO MODE = TRUE';
+  TC_ALTDCOMMANDDISABLED                = 'Comanda Alt-D necesitã TWO RADIO MODE = TRUE';
   TC_YOUHAVERESTOREDTHELASTDELETED      = 'Ai refacut ultimul QSO inscris in log !!';
   TC_YOUHAVEDELETEDTHELASTLOGENTRY      = 'Ai sters ultimul QSO inscris in log !! Cu Alt-Y il poti readuce !'; 
   TC_DOYOUREALLYWANTTOEXITTHEPROGRAM    = 'Doresti SIGUR sa parasesti programul ?';
