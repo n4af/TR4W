@@ -825,16 +825,20 @@ const
   RC_SEND_BUG                           = 'Posalji raport o gresci';
   RC_HOMEPAGE                           = 'TR4W poèetna stranica';
   RC_FREQUENCY                          = 'Frekvencija';
-  TC_SPLIT_WARN                       	= 'Paznja: u SPLIT MODU si!!!';
+  TC_SPLIT_WARN                         = 'Paznja: u SPLIT MODU si!!!';
 {FD Additions NY4I}
  
-TC_IMPROPERTRANSMITTERCOUNT 			= 'FD predajnici moraju biti izmedju 1 i 99.';
-TC_IMPROPERARRLFIELDDAYCLASS 			= 'Field Day klasa mora biti A, B, C, D, E ili F.';
-TC_ARRLFIELDDAYIMPROPERDXEXCHANGE 		= 'DX Station razmena mora biti "DX".';
-RC_SPLITOFF                       		= 'Split ukljucen ON/OFF';
-TC_ISLANDSTATION                        = 'Ostrvska stanica';
-RC_DVKVOLCONTROL                        = 'DVK kontrola nivoa';
-TC_RUNWARN                    = 'Program TR4W je vec startvan';
-RC_wkMode                     = 'Reinicijalizuj WinKeyer';      // 4.60.1
+  TC_IMPROPERTRANSMITTERCOUNT 			 = 'FD predajnici moraju biti izmedju 1 i 99.';
+  TC_IMPROPERARRLFIELDDAYCLASS 			 = 'Field Day klasa mora biti A, B, C, D, E ili F.';
+  TC_ARRLFIELDDAYIMPROPERDXEXCHANGE 	 = 'DX Station razmena mora biti "DX".';
+  RC_SPLITOFF                       	 = 'Split ukljucen ON/OFF';
+  TC_ISLANDSTATION                      = 'Ostrvska stanica';
+  RC_DVKVOLCONTROL                      = 'DVK kontrola nivoa';
+  TC_RUNWARN                            = 'Program TR4W je vec startvan';
+  RC_wkMode                             = 'Reinicijalizuj WinKeyer';      // 4.60.1
 
   TC_SHOW_PASSWORDS                     = 'Show passwords';
+  TC_TOOLTIP_DISCOVERY                  = 'Discover radios on the network';
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';

@@ -1531,3 +1531,7 @@ const
   TC_WORKSAMEASESCONKEYBOARD            = 'Funciona igual que "Esc" en el teclado';
   TC_YUGOSLAVIA                         = 'Yugoslavia';
   TC_SHOW_PASSWORDS                     = 'Mostrar contraseñas';
+  TC_TOOLTIP_DISCOVERY                  = 'Descubre radios en la red';
+  TC_DISCOVER_NOT_AVAILABLE             = 'Network discovery is not available for radio %s';
+  TC_DISCOVER_NONE_FOUND                = 'No radio of type %s found on the network';
+  TC_DISCOVER_MULTI_FOUND               = 'More than one %s found; filled in the first.  All found:';

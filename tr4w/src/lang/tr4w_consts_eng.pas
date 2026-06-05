@@ -835,3 +835,8 @@ TC_RUNWARN                    = 'Another instance of TR4W is already running';
 RC_wkMode                     = 'Re-initialize WinKeyer';      // 4.60.1
 
   TC_SHOW_PASSWORDS                     = 'Show passwords';
+
+TC_TOOLTIP_DISCOVERY = 'Discover radios on the network';
+TC_DISCOVER_NOT_AVAILABLE = 'Network discovery is not available for radio %s';
+TC_DISCOVER_NONE_FOUND = 'No radio of type %s found on the network';
+TC_DISCOVER_MULTI_FOUND = 'More than one %s found; filled in the first.  All found:';

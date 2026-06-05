@@ -120,12 +120,16 @@ var
   i            : Integer;
   msg          : string;
   savedCursor  : HCURSOR;
+  radioName    : string;
+  rt           : InterfacedRadioType;
 begin
-  if InterfacedRadioType(tCB_GETCURSEL(hwnddlg, 121)) <> K4 then
+  rt := InterfacedRadioType(tCB_GETCURSEL(hwnddlg, 121));
+  radioName := InterfacedRadioTypeSA[rt];
+
+  if rt <> K4 then
      begin
-     Windows.MessageBox(hwnddlg,
-        'Network discovery is currently available only for the Elecraft K4.',
-        'Discover Radio', MB_OK or MB_ICONINFORMATION);
+     Format(wsprintfBuffer, TC_DISCOVER_NOT_AVAILABLE, PChar(radioName));
+     showwarning(wsprintfBuffer);
      Exit;
      end;
 
@@ -141,8 +145,8 @@ begin
   try
      if radios.Count = 0 then
         begin
-        Windows.MessageBox(hwnddlg, 'No Elecraft K4 found on the network.',
-           'Discover Radio', MB_OK or MB_ICONINFORMATION);
+        Format(wsprintfBuffer, TC_DISCOVER_NONE_FOUND, PChar(radioName));
+        showwarning(wsprintfBuffer);
         end
      else
         begin
@@ -154,13 +158,13 @@ begin
         ApplyDefaultNetworkPort(hwnddlg);
         if radios.Count > 1 then
            begin
-           msg := 'More than one K4 found; filled in the first.  All found:' + #13#10;
+           Format(wsprintfBuffer, TC_DISCOVER_MULTI_FOUND, PChar(radioName));
+           msg := string(wsprintfBuffer) + #13#10;
            for i := 0 to radios.Count - 1 do
               msg := msg + #13#10 +
                  TK4Discovery.Hostname(PK4DiscoveredRadio(radios[i])^) + '  (' +
                  PK4DiscoveredRadio(radios[i])^.IPAddress + ')';
-           Windows.MessageBox(hwnddlg, PChar(msg), 'Discover Radio',
-              MB_OK or MB_ICONINFORMATION);
+           showwarning(PChar(msg));
            end;
         end;
   finally
@@ -185,6 +189,8 @@ var
   Rect111, Rect131, HamLibCheckRect, RectIP : TRect;
   ptTemp                                : TPoint;
   DlgWindowRect                         : TRect;
+  hDiscoverBmp                          : HBITMAP;
+  hDiscoverBtn                          : HWND;
 
   procedure ButtonsEnable;
   begin
@@ -326,13 +332,30 @@ begin
         // left of the IP-address edit (control 130, which lives in the dialog
         // resource), in the gap after the label.  Runs network discovery for the
         // selected radio type and fills in the IP.  Enabled only for network
-        // radios -- see the cat-port enable blocks below.  (Placeholder '?'
-        // glyph; SVG icon swaps in later.)
+        // radios -- see the cat-port enable blocks below.
         GetWindowRect(GetDlgItem(hwnddlg, 130), RectIP);
         ptTemp.x := RectIP.Left;
         ptTemp.y := RectIP.Top;
         Windows.ScreenToClient(hwnddlg, ptTemp);
-        CreateButton(BS_PUSHBUTTON, '?', ptTemp.x - 26, ptTemp.y, 22, hwnddlg, 140);
+        // Show the radar-sweep glyph (BITMAP resource 853, imported into each
+        // tr4w_<lang>.res).  If the bitmap is not in the linked resources, fall
+        // back to a '?' caption so the button still works before the import.
+        hDiscoverBmp := LoadBitmap(hInstance, MAKEINTRESOURCE(853));
+        if hDiscoverBmp <> 0 then
+           begin
+           hDiscoverBtn := CreateButton(BS_PUSHBUTTON or BS_BITMAP, '',
+              ptTemp.x - 26, ptTemp.y, 22, hwnddlg, 140);
+           Windows.SendMessage(hDiscoverBtn, BM_SETIMAGE, IMAGE_BITMAP,
+              Integer(hDiscoverBmp));
+           end
+        else
+           begin
+           hDiscoverBtn := CreateButton(BS_PUSHBUTTON, '?', ptTemp.x - 26, ptTemp.y, 22, hwnddlg, 140);
+           end;
+
+        // Hover tooltip for the Discover button (hardcoded for now -- a
+        // TC_TOOLTIP_DISCOVERY resource string can replace the literal later).
+        CreateToolTip(hDiscoverBtn, TC_TOOLTIP_DISCOVERY{'Discover radios on the network'});
 
         // The dialog was expanded 56px to make room for the two Icom credential
         // rows (USERNAME + PASSWORD), inserted at the position of the HamLib
