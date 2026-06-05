@@ -103,7 +103,8 @@ var
    CMD: ShortString;
    I: Integer;
 begin
-   if FileString^[1] in [';', '[', '_'] then Exit;
+   // Same comment/section markers as EnmuCFGFile (;  #  [  _) -- keep in sync.
+   if FileString^[1] in [';', '#', '[', '_'] then Exit;
 
    GetRidOfPrecedingSpaces(FileString^);
    GetRidOfPostcedingSpaces(FileString^);
@@ -741,7 +742,11 @@ var
   CMD                                   : ShortString;
  begin
 
-  if FileString^[1] in [';', '[', '_'] then Exit;
+  // Lines whose FIRST character (column 1, before any spaces are stripped) is a
+  // comment/section marker are ignored:  ;  and  #  are comments,  [  is a
+  // section header,  _  is an internal marker.  Kept in sync with the same test
+  // in RestoreCFGPasswordCase so both passes treat comments identically.
+  if FileString^[1] in [';', '#', '[', '_'] then Exit;
 
   GetRidOfPrecedingSpaces(FileString^);
   GetRidOfPostcedingSpaces(FileString^);
