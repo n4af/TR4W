@@ -35,7 +35,9 @@ uses
   LogK1EA,
   Tree,
   Classes,
-  uK4Discovery;
+  uK4Discovery,
+  uIcomNetworkDiscovery,
+  uIcomNetworkTypes;
 
 procedure CloseCATAndKeyerForThisRadio;
 function CATDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
@@ -109,14 +111,55 @@ begin
       end;
 end;
 
+// Issue #853 -- run the right discovery engine for the radio type and copy the
+// discovered IP addresses into Found.  Keeps the per-engine record types
+// (PK4DiscoveredRadio vs PDiscoveredRadio) out of the dialog flow.  The caller
+// has already confirmed rt is discoverable (K4 or an Icom network model).
+procedure DiscoverNetworkRadios(rt: InterfacedRadioType; Found: TStringList);
+var
+  list : TList;
+  i    : Integer;
+begin
+  if rt = K4 then
+     begin
+     list := TK4Discovery.DiscoverRadios(3000);
+     try
+        for i := 0 to list.Count - 1 do
+           begin
+           Found.Add(PK4DiscoveredRadio(list[i])^.IPAddress);
+           end;
+     finally
+        for i := 0 to list.Count - 1 do
+           begin
+           Dispose(PK4DiscoveredRadio(list[i]));
+           end;
+        list.Free;
+     end;
+     end
+  else if RadioParametersArray[rt].rt = rtICOM then
+     begin
+     list := TIcomNetworkDiscovery.DiscoverRadios(3000);
+     try
+        for i := 0 to list.Count - 1 do
+           begin
+           Found.Add(PDiscoveredRadio(list[i])^.IPAddress);
+           end;
+     finally
+        for i := 0 to list.Count - 1 do
+           begin
+           Dispose(PDiscoveredRadio(list[i]));
+           end;
+        list.Free;
+     end;
+     end;
+end;
+
 // Issue #853 -- run network discovery for the radio type currently selected in
 // the RADIO ONE/TWO dialog and, on a single hit, write its IP into the IP edit
-// (control 130).  Kept in its own procedure (Delphi 7 codegen hygiene -- avoids
-// adding inline logic to the long dialog proc).  K4 only for now; Flex/Icom
-// discovery wire in at the type check below.
+// (control 130).  Dispatches to K4 or Icom discovery via DiscoverNetworkRadios.
 procedure RunNetworkDiscoveryForRadio(hwnddlg: HWND);
 var
-  radios       : TList;
+  found        : TStringList;
   i            : Integer;
   msg          : string;
   savedCursor  : HCURSOR;
@@ -126,24 +169,26 @@ begin
   rt := InterfacedRadioType(tCB_GETCURSEL(hwnddlg, 121));
   radioName := InterfacedRadioTypeSA[rt];
 
-  if rt <> K4 then
+  // Discoverable types: the K4, and any Icom network model (rtICOM).
+  if (rt <> K4) and (RadioParametersArray[rt].rt <> rtICOM) then
      begin
      Format(wsprintfBuffer, TC_DISCOVER_NOT_AVAILABLE, PChar(radioName));
      showwarning(wsprintfBuffer);
      Exit;
      end;
 
-  savedCursor := SetCursor(LoadCursor(0, IDC_WAIT));
-  EnableWindowFalse(hwnddlg, 140);
+  found := TStringList.Create;
   try
-     radios := TK4Discovery.DiscoverRadios(3000);
-  finally
-     EnableWindowTrue(hwnddlg, 140);
-     SetCursor(savedCursor);
-  end;
+     savedCursor := SetCursor(LoadCursor(0, IDC_WAIT));
+     EnableWindowFalse(hwnddlg, 140);
+     try
+        DiscoverNetworkRadios(rt, found);
+     finally
+        EnableWindowTrue(hwnddlg, 140);
+        SetCursor(savedCursor);
+     end;
 
-  try
-     if radios.Count = 0 then
+     if found.Count = 0 then
         begin
         Format(wsprintfBuffer, TC_DISCOVER_NONE_FOUND, PChar(radioName));
         showwarning(wsprintfBuffer);
@@ -151,26 +196,23 @@ begin
      else
         begin
         // Fill the IP edit (130) from the first (or only) radio found.
-        Windows.SetDlgItemText(hwnddlg, 130,
-           PChar(PK4DiscoveredRadio(radios[0])^.IPAddress));
+        Windows.SetDlgItemText(hwnddlg, 130, PChar(found[0]));
         // Issue #968 -- discovery gives us the IP but not the port; fill the
-        // model default (K4 -> 9200) so the radio is immediately connectable.
+        // model default (K4=9200, Icom=50001, ...) so the radio is connectable.
         ApplyDefaultNetworkPort(hwnddlg);
-        if radios.Count > 1 then
+        if found.Count > 1 then
            begin
            Format(wsprintfBuffer, TC_DISCOVER_MULTI_FOUND, PChar(radioName));
            msg := string(wsprintfBuffer) + #13#10;
-           for i := 0 to radios.Count - 1 do
-              msg := msg + #13#10 +
-                 TK4Discovery.Hostname(PK4DiscoveredRadio(radios[i])^) + '  (' +
-                 PK4DiscoveredRadio(radios[i])^.IPAddress + ')';
+           for i := 0 to found.Count - 1 do
+              begin
+              msg := msg + #13#10 + found[i];
+              end;
            showwarning(PChar(msg));
            end;
         end;
   finally
-     for i := 0 to radios.Count - 1 do
-        Dispose(PK4DiscoveredRadio(radios[i]));
-     radios.Free;
+     found.Free;
   end;
 end;
 

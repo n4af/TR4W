@@ -339,6 +339,7 @@ type
     CivAddress: Byte;
     RemoteId:   LongWord;
   end;
+  PDiscoveredRadio = ^TDiscoveredRadio;
 
   // TX sequence buffer entry — stores sent packets for radio's retransmit requests
   TSeqBufEntry = record
