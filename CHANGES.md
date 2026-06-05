@@ -37,6 +37,43 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.3 (2026-06-05) — NY4I
+
+#### Single/Two Radio Mode consolidation (`src/uCFG.pas`, `src/trdos/LogCfg.pas`, `src/trdos/LOGSUBS1.PAS`, `LOGSUBS2.PAS`, `LOGSTUFF.PAS`, `LOGWIND.PAS`, `src/uBandmap.pas`, `src/trdos/JCtrl1.pas`, `JCTRL2.PAS`) — Issue #965 (PR #971)
+
+- **`TWO RADIO MODE` is now the sole radio-mode setting** (TRUE = two-radio/SO2R, FALSE = single radio, the default); `SINGLE RADIO MODE` is retained only as a deprecated parse-alias so existing `.cfg` files still load. Removed the duplicate `SingleRadioMode` globals (declared in both `LOGSTUFF.PAS` and `LOGWIND.PAS` — two separate variables, a latent write-vs-read mismatch) and re-pointed every reader to `not TwoRadioMode`.
+- **`TWO RADIO MODE` wins per config file**: a new per-file `TwoRadioModeWasSet` flag (uCFG, reset in `LogCfg.ReadInConfigFile`) makes a trailing/leftover `SINGLE RADIO MODE` line inert; because the flag resets per file, a contest `.cfg` can still override the mode set by `tr4w.ini`. Added INFO logging of the per-file decision (a `[Config] Loading <file>` banner plus an applied/ignored `[RadioMode]` line) to make a user's mode conflict diagnosable from `tr4w.log`.
+- **`#` accepted as a config comment character**: `EnmuCFGFile` and `RestoreCFGPasswordCase` now skip a column-1 `#` alongside `;` `[` `_` (both passes kept in sync); a `#` in column 1 previously produced an "invalid statement in config file" error.
+- **i18n**: `TC_ALTRCOMMANDDISABLED` / `TC_ALTDCOMMANDDISABLED` reworded to reference `TWO RADIO MODE = TRUE` across all 11 language const files (config keyword kept English; edited byte-safely per codepage).
+
+#### Network Radio Discovery — Elecraft K4 & Icom (`src/uK4Discovery.pas`, `src/uIcomNetworkDiscovery.pas`, `src/uIcomNetworkTypes.pas`, `src/uCAT.pas`, `src/uRadioPolling.pas`) — Issues #853, #968 (PRs #969, #970)
+
+- **K4 network discovery**: new `uK4Discovery.pas` broadcasts `findk4` on UDP 9100 out every local interface (per-interface `BoundIP`), parses `k4:<call>:<ip>:<serial>` replies; an inline "Discover" button in the RADIO ONE/TWO dialog (`uCAT.pas`) fills the IP from the radio found.
+- **Icom network discovery**: `uIcomNetworkDiscovery.DiscoverRadios` rewritten to broadcast the "Are You There" packet out every local interface (per-NIC bind via `GStack`, `IncUsage`/`DecUsage`, IP de-dup) so an Icom on any subnet is found, not just the default route; `uIcomNetworkTypes` adds `PDiscoveredRadio`; `uCAT.DiscoverNetworkRadios` dispatches the right engine. Tested on IC-7760.
+- **Per-model default TCP ports**: `DefaultNetworkPortForRadio` is keyed per model, not CAT family (K4=9200, FLEX=4992, TS890=60000, TS990=50000, Icom=50001); `ApplyDefaultNetworkPort` fills the port field only when empty/0. `uRadioPolling` skips the connect attempt (logging once) when the IP is empty or the port is 0, ending the per-second "port = 0. result = -1" log flood.
+- **Config parser blank-value tolerance**: `CheckCommand` leaves the variable at its default for a blank integer value (e.g. `RADIO ONE TCP PORT=`) with a clear non-fatal notice (new `TC_PARAMETERHASNOVALUE`, all 11 languages) instead of "Invalid statement"; a non-numeric value still fails validation.
+- **Discover button polish**: bitmap resource 853 (magnifier) via `BS_BITMAP`/`BM_SETIMAGE` with `?` fallback; hover tooltip (`TC_TOOLTIP_DISCOVERY`) via the `CreateToolTip` helper (fixed `TTM_ADDTOOL` to the ANSI `$0400+4` variant — `+50` rendered the ANSI PChar as CJK); three discovery dialogs now i18n + radio-type-parameterized (`TC_DISCOVER_NOT_AVAILABLE` / `_NONE_FOUND` / `_MULTI_FOUND`).
+
+#### Contest friendly names (`src/VC.pas`, `src/trdos/PostUnit.PAS`) — PR #967
+
+- **`TContestInfo.FriendlyName`**: new compiled-in human-friendly contest name (blank → fall back to `ContestTypeSA[ct]`); ~130 of 185 live entries filled via an offline WA7BNM cabnames join + hand-fill. Corrected 5 mis-shared WA7BNM ids (ARRL-VHF-JAN, YBDX, OK-OM SSB, BCQP, SST). `PostUnit.ContestFriendlyParens` shows it in parentheses on the summary-sheet `CONTEST:` line and the centered score-report title.
+- **De-asm**: `WriteTitleBlockToSummarySheet`'s two inline-asm `wsprintf` arg-push blocks converted to plain Pascal; footer run/search counts now use the named `riQSOByOpMode[...]` fields instead of raw `[tRestartInfo+$4]` / `[+$8]` offsets.
+
+#### Bandmap SO2R highlighting (`src/uBandmap.pas`) — Issue #960 — N4AF
+
+- **Inactive-radio band highlight in two-radio mode**: when `TWO RADIO MODE = TRUE`, the bandmap highlights the *inactive* (S&P) radio's band and grays the run radio's band, restoring the pre-4.147 SO2R paradigm.
+
+#### Test coverage & refactor (`src/uGridDistance.pas`, `src/uTestGridDistance.pas`, `src/uTestUtilsFile.pas`, `src/uTestADIFRegression.pas`) — PR #966
+
+- **`uGridDistance.pas` (NEW)**: `RTCGridDistance`'s Haversine (Issue #902) extracted from trdos `LOGGRID` so it is unit-testable; `LOGGRID.RTCGridDistance` delegates (no duplicated math). New regression suites: grid-distance fixture (FN36→DM18 = 3664.72 km + symmetry/zero/short/case), `sWriteFileFromString` 255/256/257-byte round-trip (v4.147.04 overflow fix), and ADIF (CQZ import, MODE-less stays NoMode, `CONTEST_ID` fallback). 809 tests pass.
+
+#### Build & repo hygiene (`tr4w/tr4w.dsm`, `.gitignore`, `tr4w/build/full.nsi`, docs, CI) — PR #964
+
+- **Untrack `tr4w.dsm`**: the 9.7 MB Delphi IDE symbol file (swept into the issue-960 merge via `commit -a`) is `git rm --cached` with `*.dsm` added to `.gitignore`; `full.nsi`'s local-build `TR4WVERSION` fallback `4.148.beta` → `4.148.1` (CI passes `/DTR4WVERSION`, so installers are unaffected).
+- **Repo URL update**: `n4af/TR4W` → `TR4W/TR4W` across docs, changelogs, and CI comments after the org transfer; fixed a `n4af/TR4QT` → `ny4i/TR4QT` typo.
+
+---
+
 ### 4.148.1 (2026-06-02) — NY4I
 
 #### Stop bundling inpout32.dll to clear AV false positive (`tr4w/build/full.nsi`, `tr4w/src/uIO.pas`, `tr4w/target/inpout32.dll`) — PR #963

@@ -38,6 +38,29 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.3 (2026-06-05) — NY4I
+
+#### Radio Mode / SO2R
+
+- **One radio-mode setting**: the old, conflicting "Single Radio Mode" and "Two Radio Mode" options are now a single **TWO RADIO MODE** setting (TRUE = two radios / SO2R, FALSE = single radio). Existing configuration files still load — and if both old settings happen to be present, TWO RADIO MODE now wins, so a stray leftover line can't silently put you in the wrong mode. (#965)
+- **Two-radio bandmap highlight restored**: in two-radio mode the bandmap again highlights the inactive (search-and-pounce) radio's band and grays the running radio's band — the SO2R behavior from before 4.147. (#960)
+
+#### Network Radio Setup
+
+- **Find your radio on the network automatically**: a new "Discover" button in the Radio 1 / Radio 2 setup dialog scans your local network and fills in the radio's IP address for you. It works for the Elecraft K4 and Icom network radios, and now finds a radio on any subnet, not just the one your PC is on. (#853)
+- **Correct default network port per radio**: when you choose a network radio type, TR4W pre-fills the right TCP port for that model (K4, FlexRadio, Kenwood TS-890/TS-990, Icom) so you don't have to look it up. (#968)
+- **Cleaner setup**: leaving a network port blank no longer throws a confusing "invalid statement" error, and a radio with no address set no longer floods the log with connection retries.
+
+#### Configuration Files
+
+- **`#` now works as a comment**: you can disable a line in a configuration file by starting it with `#` (in addition to the existing `;`). Previously a line beginning with `#` produced a "config file error."
+
+#### Reports & Scoring
+
+- **Friendly contest names**: the summary sheet and score report now show a readable contest name in parentheses next to the contest, for roughly 130 contests. (#967)
+
+---
+
 ### 4.148.1 (2026-06-02) — NY4I
 
 #### Parallel-Port (LPT) Keying
