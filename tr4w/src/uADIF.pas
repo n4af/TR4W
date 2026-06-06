@@ -349,13 +349,23 @@ begin
       tagBody := Copy(s, p, gtPos - p);
       p := gtPos + 1;  // advance past '>'
 
-      // Terminators
+      // <EOR> terminates a QSO record.  <EOH> only ends the optional
+      // ADIF header (spec IV.A.2: an ADI file is an optional Header,
+      // terminated by <EOH>, followed by one or more <EOR> records; a
+      // headerless file starts straight into records).  A full document
+      // reaches this single-record lexer -- the WSJT-X "Logged ADIF" UDP
+      // message is <adif_ver><programid><EOH><call...><EOR> -- so skip
+      // <EOH> and keep parsing the record that follows rather than
+      // stopping at the header boundary.  Restores the pre-Issue-#887
+      // behaviour, where the inline parser terminated on <EOR> only.
       tagUpper := AnsiUpperCase(tagBody);
-      if (tagUpper = 'EOR') or (tagUpper = 'EOH') then
+      if tagUpper = 'EOR' then
          begin
          Result := True;
          Exit;
          end;
+      if tagUpper = 'EOH' then
+         Continue;
 
       // Parse '<NAME:LEN>' or '<NAME:LEN:TYPE>'
       colonPos := AnsiPos(':', tagBody);
