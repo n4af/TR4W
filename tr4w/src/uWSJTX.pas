@@ -137,6 +137,37 @@ uses
   ;
 // {$R *.dfm}
 
+// Warn (non-modally) when the operator in a WSJT-X-logged ADIF record
+// differs from TR4W's current operator -- the user may have changed the
+// operator in one program but not the other.  The QSO is still logged
+// as-is (with WSJT-X's operator); this only flags the mismatch so the
+// user can reconcile it.  Banner + beep, never a modal dialog: FT4/FT8
+// auto-sequences QSOs and the mismatch persists across all of them, so a
+// per-QSO dialog would be unusable.
+procedure WarnIfWSJTXOperatorMismatch(const adifOp, tr4wOp: OperatorType);
+var
+   msg, adifStr, tr4wStr : string;
+begin
+   // Trim so a blank or whitespace-only operator (e.g. a stray space
+   // left in WSJT-X's Operator field, which arrives as <operator:1> )
+   // is treated as "no operator" and never flags a mismatch.
+   adifStr := Trim(string(PChar(@adifOp[0])));
+   tr4wStr := Trim(string(PChar(@tr4wOp[0])));
+   logger.Debug('[uWSJTX] op-mismatch check: ADIF=[%s] TR4W=[%s]',
+                [adifStr, tr4wStr]);
+   if (adifStr = '') or (tr4wStr = '') then
+      Exit;
+   if AnsiCompareText(adifStr, tr4wStr) = 0 then
+      Exit;
+   msg := 'OP MISMATCH: WSJT-X=' + adifStr + '  TR4W=' + tr4wStr;
+   // QuickDisplayError = flashing QuickCommand banner + DoABeep, and it
+   // auto-clears after ~30s.  (The bare SetTextInQuickCommandWindow used
+   // before had no persistence, so the next status write overwrote it
+   // before it could be seen.)
+   QuickDisplayError(PChar(msg));
+   logger.Warn('[uWSJTX] ' + msg);
+end;
+
 constructor TWSJTXServer.Create;
 begin
   started := false;
@@ -636,6 +667,11 @@ begin
                 // processed a record if true
               begin
                  logger.Debug('[uWSJTX] QTHString is %s',[TempRXData.QTHString]);
+                // Flag a WSJT-X/TR4W operator mismatch (non-modal).  Done
+                // here, before the ParametersOkay gate, so it runs for
+                // every parsed record regardless of whether the QSO logs.
+                WarnIfWSJTXOperatorMismatch(TempRXData.ceOperator,
+                  CurrentOperator);
                 ctyLocateCall(TempRXData.Callsign, TempRXData.QTH);
 
                 if DoingDXMults then
@@ -692,9 +728,13 @@ begin
                   {LastDisplayedFreq[ActiveRadio]}, TempRXData) then
                 begin
                   TempRXData.DomesticQTH := TempRXData.QTHString;
-                  ReceivedData.ceSearchAndPounce := OpMode =
+                  // Set these on the record actually being logged
+                  // (TempRXData), not ReceivedData -- otherwise the
+                  // WSJT-X QSO logs with a blank Computer ID and an
+                  // unset S&P flag.
+                  TempRXData.ceSearchAndPounce := OpMode =
                     SearchAndPounceOpMode;
-                  ReceivedData.ceComputerID := ComputerID;
+                  TempRXData.ceComputerID := ComputerID;
                   LogContact(TempRXData, True);
                   tElapsedTimeFromLastQSO := Windows.GetTickCount;
                   UpdateWindows;
