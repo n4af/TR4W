@@ -290,6 +290,14 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
+      # Full history + tags so the notes step can resolve the previous
+      # tag from git ancestry (checked out first so its clean step does
+      # not wipe the artifacts downloaded below).
+      - name: Checkout (full history + tags for the changelog range)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Download installer artifact
         uses: actions/download-artifact@v4
         with:
@@ -306,6 +314,32 @@ jobs:
         shell: powershell
         run: Get-ChildItem -LiteralPath release-files | Format-Table Name, Length, LastWriteTime
 
+      # Generate the changelog body ourselves against the REAL previous
+      # tag. GitHub's built-in generate_release_notes auto-detects the
+      # previous tag via semver and skips '-all' tags (they parse as a
+      # prerelease), which made e.g. v4.148.4 diff against v4.148.2 and
+      # re-list everything already shipped in v4.148.3-all. git describe
+      # walks history instead, so the '-all' suffix no longer matters.
+      - name: Generate release notes (scoped to the real previous tag)
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $tag = $env:GITHUB_REF_NAME
+          $prev = (& git describe --tags --abbrev=0 "$tag^" 2>$null)
+          if ($LASTEXITCODE -ne 0) { $prev = $null }
+          $req = @{ tag_name = $tag }
+          if ($prev) { Write-Host "Previous tag (git ancestry): $prev"; $req.previous_tag_name = $prev }
+          else { Write-Host "No previous tag found; GitHub will auto-detect the range." }
+          [System.IO.File]::WriteAllText("$PWD\notes-request.json", ($req | ConvertTo-Json -Compress), (New-Object System.Text.UTF8Encoding($false)))
+          $resp = & curl.exe -sS -X POST -H "Authorization: Bearer $env:GH_TOKEN" -H "Accept: application/vnd.github+json" -H "Content-Type: application/json" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/$env:GITHUB_REPOSITORY/releases/generate-notes" -d "@notes-request.json"
+          $body = ($resp | ConvertFrom-Json).body
+          if (-not $body) { throw "generate-notes returned an empty body. Response: $resp" }
+          [System.IO.File]::WriteAllText("$PWD\release-notes.md", $body, (New-Object System.Text.UTF8Encoding($false)))
+          Write-Host "--- release notes (previous tag: $prev) ---"
+          Write-Host $body
+
       - name: Create draft GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -315,10 +349,11 @@ jobs:
           # context (radio support, breaking changes, etc.) before
           # publishing. Promote to a final release via the GitHub UI.
           draft: true
-          # Auto-generate the changelog body from commits since the
-          # previous tag. The CHANGES.md / RELEASE_NOTES.md sections
-          # for this version can be pasted in during the draft review.
-          generate_release_notes: true
+          # Body is generated in the previous step against the real
+          # previous tag (git ancestry), so the '-all' suffix no longer
+          # widens the range. CHANGES.md / RELEASE_NOTES.md sections can
+          # still be pasted in during the draft review.
+          body_path: release-notes.md
           # Attach all installer(s) AND the VT report so users can
           # download both from the release page.
           files: |
