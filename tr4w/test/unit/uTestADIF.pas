@@ -28,7 +28,8 @@ type
       procedure Test_SingleField_EORTerminated;
       procedure Test_MultipleFields;
       procedure Test_BareEOR;
-      procedure Test_EOHTreatedSameAsEOR;
+      procedure Test_EOHSkipped_HeaderThenRecord;
+      procedure Test_EOHAlone_NotARecordTerminator;
       procedure Test_NoTerminator_ReturnsFalseButKeepsFields;
       procedure Test_EmptyValue;
       procedure Test_MultilineRecord;
@@ -149,14 +150,41 @@ begin
    CheckEquals(0, Length(fields), 'no fields');
 end;
 
-procedure TADIFLexerTests.Test_EOHTreatedSameAsEOR;
+procedure TADIFLexerTests.Test_EOHSkipped_HeaderThenRecord;
 var
    fields : TADIFFieldList;
 begin
-   BeginTest('Test_EOHTreatedSameAsEOR');
-   CheckTrue(ParseADIFFieldsList('<PROGRAMID:4>TR4W<EOH>', fields),
-             'EOH is also a valid terminator');
-   CheckEquals(1, Length(fields), 'one header field');
+   BeginTest('Test_EOHSkipped_HeaderThenRecord');
+   // ADIF IV.A.2: an optional Header (terminated by <EOH>) precedes one
+   // or more <EOR> records.  WSJT-X sends exactly this shape, so the
+   // single-record lexer must skip <EOH> and keep parsing the record
+   // that follows -- the call/grid must survive the header boundary.
+   // Regression guard for Issue #887: the lexer used to stop at <EOH>,
+   // which dropped every WSJT-X-logged QSO.
+   CheckTrue(ParseADIFFieldsList(
+      '<PROGRAMID:6>WSJT-X<EOH>'#13#10 +
+      '<CALL:4>W7CT <GRIDSQUARE:4>DN41<EOR>', fields),
+      'header + record -> reaches EOR -> True');
+   CheckEquals(3, Length(fields), 'header field + two record fields');
+   CheckEquals('PROGRAMID', fields[0].Name, 'header field kept (sets FromWSJTX)');
+   CheckEquals('WSJT-X', fields[0].Value, 'programid value');
+   CheckEquals('CALL', fields[1].Name, 'record field parsed after <EOH>');
+   CheckEquals('W7CT', fields[1].Value, 'call survives the header boundary');
+   CheckEquals('GRIDSQUARE', fields[2].Name, 'grid field name');
+   CheckEquals('DN41', fields[2].Value, 'grid survives the header boundary');
+end;
+
+procedure TADIFLexerTests.Test_EOHAlone_NotARecordTerminator;
+var
+   fields : TADIFFieldList;
+begin
+   BeginTest('Test_EOHAlone_NotARecordTerminator');
+   // <EOH> ends a header, not a record.  With no following <EOR> there
+   // is no complete record, so Result is False -- the header field is
+   // still extracted (forgiving, same as the no-terminator case).
+   CheckFalse(ParseADIFFieldsList('<PROGRAMID:4>TR4W<EOH>', fields),
+              'EOH alone is not a record terminator -> False');
+   CheckEquals(1, Length(fields), 'header field still extracted');
    CheckEquals('PROGRAMID', fields[0].Name, 'name');
    CheckEquals('TR4W', fields[0].Value, 'value');
 end;
@@ -337,7 +365,8 @@ begin
    Test_SingleField_EORTerminated;
    Test_MultipleFields;
    Test_BareEOR;
-   Test_EOHTreatedSameAsEOR;
+   Test_EOHSkipped_HeaderThenRecord;
+   Test_EOHAlone_NotARecordTerminator;
    Test_NoTerminator_ReturnsFalseButKeepsFields;
 
    Test_EmptyValue;
