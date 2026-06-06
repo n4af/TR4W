@@ -38,6 +38,20 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.4 (2026-06-06) — NY4I
+
+#### DX Cluster
+
+- **Insert your station info into cluster commands automatically**: lines in your `cluster_commands.txt` can now contain placeholders like `{MY_CALL}`, `{MY_STATE}`, `{MY_GRID}`, `{BAND}`, `{FREQ}`, `{DATE}` or `{TIME}` (and more). When you pick the command from the cluster window's **Commands** button, the placeholder is replaced with the current value before the command is sent — so one command file works no matter who's operating or what band you're on. Hover over a command to preview exactly what will be sent. To include a literal brace in a command, double it (`{{` or `}}`). (#973)
+
+#### WSJT-X / Digital
+
+- **WSJT-X contacts log again**: a recent change had stopped WSJT-X-logged contacts (FT8/FT4, ARRL-DIGI, etc.) from being recorded in TR4W. They now log correctly. (#975)
+- **Operator now recorded on WSJT-X contacts**: WSJT-X QSOs now fill in the operator / computer-ID column just like hand-logged contacts.
+- **Operator-mismatch alert**: if the operator set in WSJT-X differs from the operator set in TR4W, you'll get a flashing on-screen warning and a beep when the contact logs, so you can fix whichever one is wrong. A blank operator in WSJT-X won't trigger it. (#977)
+
+---
+
 ### 4.148.3 (2026-06-05) — NY4I
 
 #### Radio Mode / SO2R

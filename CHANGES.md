@@ -37,6 +37,22 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.4 (2026-06-06) — NY4I
+
+#### DX cluster command field substitution (`src/uTelnet.pas`) — Issue #973 (PR #974)
+
+- **`{TOKEN}` substitution in `cluster_commands.txt`**: cluster command lines may embed `{TOKEN}` placeholders that expand to live program values when a command is chosen from the cluster window **Commands** popup. New `ExpandClusterTokens` / `ClusterTokenValue` / `NormalizeClusterToken` form one case-insensitive brace expander used by both the send path and the hover preview. Doubled braces are literal escapes (`{{` → `{`, `}}` → `}`); an unrecognized token is left verbatim so a typo is visible. Tokens: `MY_CALL`, `MY_STATE`, `MY_SECTION`, `MY_NAME`, `MY_GRID`, `MY_ZONE`, `MY_CHECK`, `MY_PREC`, `MY_CLASS`, `MY_PARK`, `MY_POSTALCODE`, `CALL` (current call-window entry), `DATE`, `TIME`, `BAND`, `FREQ`.
+- **Expansion at send time**, not menu-build time: the popup stores the raw template, so values are evaluated fresh per send. The expanded string is capped at 250 chars so `SendViaTelnetSocket`'s CRLF append cannot overflow its 256-byte `wsprintfBuffer`.
+- **Hover preview**: `TrackPopupMenu` has no native tooltips, so a create-once `TTF_TRACK` tracking tooltip is driven from a new `WM_MENUSELECT` handler in `TelnetWndDlgProc`; it previews the highlighted command's expanded value, re-asserting `HWND_TOPMOST` after each activation so it draws above the top-most menu, and hides on `WM_EXITMENULOOP`.
+
+#### WSJT-X ADIF logging (`src/uADIF.pas`, `src/uWSJTX.pas`, `tr4w/test/unit/uTestADIF.pas`) — Issues #975, #977
+
+- **`<EOH>` regression fix** (`uADIF.pas`): the single-record lexer `ParseADIFFieldsList` terminated on the first `<EOR>` **or** `<EOH>`, so a full ADI document (WSJT-X's "Logged ADIF" UDP message is `<adif_ver><programid><EOH><call…><EOR>`) parsed only the header and dropped the record — every WSJT-X-logged QSO silently failed to log. `<EOH>` now only ends the optional header and is skipped; only `<EOR>` (or end of input) terminates a record. Restores the pre-Issue-#887 behaviour and keeps `programid` (so `FromWSJTX` is set). Regression introduced 2026-05-11 by `dd471f2` + `417eada`. Replaced `Test_EOHTreatedSameAsEOR` with `Test_EOHSkipped_HeaderThenRecord` and `Test_EOHAlone_NotARecordTerminator` (817/817 unit tests pass).
+- **Computer ID / S&P flag on logged QSOs** (`uWSJTX.pas`): the `LOGGEDADIFV` handler logs `TempRXData` but set `ceComputerID` / `ceSearchAndPounce` on `ReceivedData`, so WSJT-X QSOs logged with a blank `Id` column and an unset S&P flag; both are now set on `TempRXData` (the record actually logged).
+- **Operator-mismatch warning** (`uWSJTX.pas`): when a WSJT-X record's `<operator>` differs from `CurrentOperator`, a non-modal `QuickDisplayError` banner + beep flags it (the QSO still logs as-is). Runs before the `ParametersOkay` gate so it fires for every parsed record; operators are trimmed and compared case-insensitively, so a blank or whitespace-only operator (`<operator:1> `) never false-flags.
+
+---
+
 ### 4.148.3 (2026-06-05) — NY4I
 
 #### Single/Two Radio Mode consolidation (`src/uCFG.pas`, `src/trdos/LogCfg.pas`, `src/trdos/LOGSUBS1.PAS`, `LOGSUBS2.PAS`, `LOGSTUFF.PAS`, `LOGWIND.PAS`, `src/uBandmap.pas`, `src/trdos/JCtrl1.pas`, `JCTRL2.PAS`) — Issue #965 (PR #971)
