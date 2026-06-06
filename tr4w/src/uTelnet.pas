@@ -224,7 +224,253 @@ var
 implementation
 uses uNet,
   uBandmap,
+  LogGrid,
   MainUnit;
+
+// ---------------------------------------------------------------------------
+//  Issue #973 - field substitution in cluster_commands.txt
+//
+//  Cluster command lines may embed {TOKEN} placeholders that are expanded to
+//  live program values at send time (and previewed in a hover tooltip).
+//  Doubled braces are literal escapes: {{ -> {  and  }} -> }.
+//  Unknown tokens are left verbatim so a typo is visible in the preview
+//  rather than silently transmitted as a blank into a live cluster filter.
+// ---------------------------------------------------------------------------
+
+var
+  TelCmdTooltip: HWND = 0;                   // tracking tooltip for the preview
+  ClusterTooltipText: array[0..511] of Char; // stable storage for the tip text
+
+// Trim surrounding spaces and upper-case A..Z so token matching is
+// case-insensitive and tolerant of '{ MY_CALL }'.
+function NormalizeClusterToken(const S: AnsiString): AnsiString;
+var
+   i, First, Last: integer;
+   c: Char;
+begin
+   First := 1;
+   Last := Length(S);
+   while (First <= Last) and (S[First] = ' ') do
+      begin
+      Inc(First);
+      end;
+   while (Last >= First) and (S[Last] = ' ') do
+      begin
+      Dec(Last);
+      end;
+   Result := '';
+   for i := First to Last do
+      begin
+      c := S[i];
+      if (c >= 'a') and (c <= 'z') then
+         begin
+         c := Chr(Ord(c) - 32);
+         end;
+      Result := Result + c;
+      end;
+end;
+
+{ Returns the live value for a single (already normalized) token name.        }
+{ Found is set False for an unrecognized token so the caller can leave it      }
+{ verbatim. This is the single source of truth for the token vocabulary.       }
+function ClusterTokenValue(const Token: AnsiString; var Found: boolean): AnsiString;
+var
+   RealFreq: Real;
+   FreqStr: ShortString;
+begin
+   Found := True;
+   if Token = 'MY_CALL' then
+      Result := MyCall
+   else if Token = 'MY_STATE' then
+      Result := MyState
+   else if Token = 'MY_SECTION' then
+      Result := MySection
+   else if Token = 'MY_NAME' then
+      Result := MyName
+   else if Token = 'MY_GRID' then
+      Result := MyGrid
+   else if Token = 'MY_ZONE' then
+      Result := MyZone
+   else if Token = 'MY_CHECK' then
+      Result := MyCheck
+   else if Token = 'MY_PREC' then
+      Result := MyPrec
+   else if Token = 'MY_CLASS' then
+      Result := MyFDClass
+   else if Token = 'MY_PARK' then
+      Result := MyPark
+   else if Token = 'MY_POSTALCODE' then
+      Result := MyPostalCode
+   else if Token = 'CALL' then
+      Result := CallWindowString
+   else if Token = 'DATE' then
+      Result := GetDateString
+   else if Token = 'TIME' then
+      Result := GetTimeString
+   else if Token = 'BAND' then
+      Result := BandStringsArrayWithOutSpaces[ActiveBand]
+   else if Token = 'FREQ' then
+      begin
+      RealFreq := Radio1.FilteredStatus.Freq / 1000.0;   { Hz -> kHz }
+      Str(RealFreq: 0: 1, FreqStr);
+      Result := FreqStr;
+      end
+   else
+      begin
+      Found := False;
+      end;
+end;
+
+// Expands every {TOKEN} in Src. Pure transform - no global state is mutated -
+// so it is safe to call both from the send path and from the menu-hover proc.
+function ExpandClusterTokens(Src: PChar): AnsiString;
+var
+   S, Token, Value: AnsiString;
+   i, Len, j: integer;
+   Found: boolean;
+begin
+   S := Src;
+   Result := '';
+   i := 1;
+   Len := Length(S);
+   while i <= Len do
+      begin
+      if (S[i] = '{') and (i < Len) and (S[i + 1] = '{') then
+         begin
+         Result := Result + '{';
+         Inc(i, 2);
+         end
+      else if (S[i] = '}') and (i < Len) and (S[i + 1] = '}') then
+         begin
+         Result := Result + '}';
+         Inc(i, 2);
+         end
+      else if S[i] = '{' then
+         begin
+         j := i + 1;
+         while (j <= Len) and (S[j] <> '}') do
+            begin
+            Inc(j);
+            end;
+         if j > Len then
+            begin
+            { Unterminated brace - emit the remainder literally. }
+            Result := Result + Copy(S, i, Len - i + 1);
+            i := Len + 1;
+            end
+         else
+            begin
+            Token := NormalizeClusterToken(Copy(S, i + 1, j - i - 1));
+            Value := ClusterTokenValue(Token, Found);
+            if Found then
+               begin
+               Result := Result + Value;
+               end
+            else
+               begin
+               Result := Result + Copy(S, i, j - i + 1);   // leave {TOKEN} verbatim
+               end;
+            i := j + 1;
+            end;
+         end
+      else
+         begin
+         Result := Result + S[i];
+         Inc(i);
+         end;
+      end;
+end;
+
+{ Creates the once-per-window tracking tooltip used to preview expanded        }
+{ command values. TrackPopupMenu has no native tooltips, so a manually         }
+{ positioned TTF_TRACK tooltip is driven from WM_MENUSELECT.                   }
+function CreateClusterCommandTooltip(Owner: HWND): HWND;
+const
+   TTF_TRACK = $0020;
+   TTF_ABSOLUTE = $0080;
+var
+   ti: TOOLINFO;
+begin
+   Result := CreateWindowEx(0, 'tooltips_class32', nil,
+      WS_POPUP or TTS_NOPREFIX or TTS_ALWAYSTIP,
+      0, 0, 0, 0, Owner, 0, hInstance, nil);
+   if Result = 0 then
+      begin
+      Exit;
+      end;
+   SetWindowPos(Result, HWND_TOPMOST, 0, 0, 0, 0,
+      SWP_NOACTIVATE or SWP_NOMOVE or SWP_NOSIZE);
+   Windows.ZeroMemory(@ti, SizeOf(ti));
+   ti.cbSize := SizeOf(ti);
+   ti.uFlags := TTF_TRACK or TTF_ABSOLUTE;
+   ti.HWND := Owner;
+   ti.uId := 0;
+   ti.lpszText := nil;
+   SendMessage(Result, TTM_ADDTOOL, 0, Integer(@ti));
+   SendMessage(Result, TTM_SETMAXTIPWIDTH, 0, 600);
+end;
+
+{ Hides the preview tooltip (menu closed, or item carries no tokens). }
+procedure HideClusterCommandTooltip;
+var
+   ti: TOOLINFO;
+begin
+   if TelCmdTooltip = 0 then
+      begin
+      Exit;
+      end;
+   Windows.ZeroMemory(@ti, SizeOf(ti));
+   ti.cbSize := SizeOf(ti);
+   ti.HWND := tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle;
+   ti.uId := 0;
+   SendMessage(TelCmdTooltip, TTM_TRACKACTIVATE, 0, Integer(@ti));
+end;
+
+{ Shows the expanded value of the highlighted command item near the cursor.    }
+{ Only real command items (id 1000..) that actually contain a token produce a   }
+{ preview; everything else hides the tooltip to avoid noise.                    }
+procedure ShowClusterCommandTooltip(ItemId, Flags: word);
+var
+   Expanded: AnsiString;
+   ti: TOOLINFO;
+   pt: TPoint;
+begin
+   if TelCmdTooltip = 0 then
+      begin
+      Exit;
+      end;
+   if (ItemId < 1000)                            or
+      (ItemId > 1000 + MAXITEMSINTELNETPOPUPMENU) or
+      ((Flags and MF_POPUP) <> 0)                 then
+      begin
+      HideClusterCommandTooltip;
+      Exit;
+      end;
+   GetMenuString(TelPopMemu, ItemId, wsprintfBuffer, 256, MF_BYCOMMAND);
+   Expanded := ExpandClusterTokens(wsprintfBuffer);
+   if Expanded = AnsiString(wsprintfBuffer) then
+      begin
+      { No substitution occurred - nothing useful to preview. }
+      HideClusterCommandTooltip;
+      Exit;
+      end;
+   lstrcpyn(ClusterTooltipText, PChar(Expanded), SizeOf(ClusterTooltipText));
+   Windows.ZeroMemory(@ti, SizeOf(ti));
+   ti.cbSize := SizeOf(ti);
+   ti.HWND := tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle;
+   ti.uId := 0;
+   ti.lpszText := ClusterTooltipText;
+   SendMessage(TelCmdTooltip, TTM_UPDATETIPTEXT, 0, Integer(@ti));
+   GetCursorPos(pt);
+   SendMessage(TelCmdTooltip, TTM_TRACKPOSITION, 0,
+      MakeLong(pt.X + 16, pt.Y + 16));
+   SendMessage(TelCmdTooltip, TTM_TRACKACTIVATE, Integer(True), Integer(@ti));
+   // The popup menu is itself a top-most window and re-asserts its z-order on
+   // every mouse move (which is what drives WM_MENUSELECT), so lift the tooltip
+   // back above the menu after each activation - otherwise it renders behind it.
+   SetWindowPos(TelCmdTooltip, HWND_TOPMOST, 0, 0, 0, 0,
+      SWP_NOACTIVATE or SWP_NOMOVE or SWP_NOSIZE);
+end;
 
 function TelnetWndDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam:
   lParam): BOOL; stdcall;
@@ -240,6 +486,7 @@ var
   TDIS: PDrawItemStruct;
   InfoBuffer: array[0..127] of Char;
   StringType: TelnetStringType;
+  ExpandedClusterCommand: AnsiString;   { Issue #973 }
 const
   TelnetStringColor: array[TelnetStringType] of tr4wColors = (trGreen, trBlue,
     trBlack, trLightGray, trRed, trRed, trBlack);
@@ -393,6 +640,9 @@ begin
         EnumerateLinesInFile('CLUSTER_COMMANDS.TXT', EnumCLUSTERCOMMANDSTXT,
           True);
 
+        // Issue #973: tooltip that previews each command's expanded value.
+        TelCmdTooltip := CreateClusterCommandTooltip(hwnddlg);
+
         //tLB_ADDSTRING(TelnetListBox,'DX DE SM6WET:    28025.0  G0ORH        SRI, THIS IS CORRECT           0953Z JO68  ');
         //tLB_ADDSTRING(TelnetListBox,'DX DE G4MJS:     14180.0  2DONCG       YOUR TURN TO MAKE A BREW       0953Z JO01  ');
         //tLB_ADDSTRING(TelnetListBox,'DX DE LU6FL:      1845.0  LU6FL        CQ CQ TEST SSB                 0953Z FF97  ');
@@ -402,6 +652,20 @@ begin
 
       end;
     //    WM_HELP: tWinHelp(7);
+
+    // Issue #973: preview the highlighted command's expanded value in a tooltip.
+    WM_MENUSELECT:
+      begin
+        if (HiWord(wParam) = $FFFF) and (lParam = 0) then
+          HideClusterCommandTooltip   // menu closed
+        else
+          ShowClusterCommandTooltip(LoWord(wParam), HiWord(wParam));
+      end;
+
+    WM_EXITMENULOOP:
+      begin
+        HideClusterCommandTooltip;
+      end;
 
     WM_COMMAND:
       begin
@@ -429,7 +693,13 @@ begin
             GetMenuString(TelPopMemu, wParam, wsprintfBuffer, 256,
               MF_BYCOMMAND);
             //n4af    4.51.1
-            SendViaTelnetSocket(wsprintfBuffer);
+            // Issue #973: expand {TOKEN} fields to live values before sending.
+            // Cap to 250 so SendViaTelnetSocket's CRLF append cannot overflow
+            // its 256-byte wsprintfBuffer when expansion grows the string.
+            ExpandedClusterCommand := ExpandClusterTokens(wsprintfBuffer);
+            if Length(ExpandedClusterCommand) > 250 then
+              SetLength(ExpandedClusterCommand, 250);
+            SendViaTelnetSocket(PChar(ExpandedClusterCommand));
           end;
 
         case wParam of
