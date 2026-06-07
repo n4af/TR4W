@@ -102,10 +102,10 @@ const
     (ctrTag: '_CATEGORY-MODE';          ctrCFG:True;  ctrSave: True; ctrList: True),
     (ctrTag: '_CATEGORY-OPERATOR';      ctrCFG:True;  ctrSave: False; ctrList: True),    // ny4i changed this since we dete3rmine from the log
     (ctrTag: '_CATEGORY-POWER';         ctrCFG:True;  ctrSave: True; ctrList: True),
-    (ctrTag: '_CATEGORY-STATION';       ctrCFG:False; ctrSave: True; ctrList: False),
-    (ctrTag: '_CATEGORY-TIME';          ctrCFG:True;  ctrSave: False; ctrList: True),
+    (ctrTag: '_CATEGORY-STATION';       ctrCFG:False; ctrSave: True; ctrList: True), // Issue #976: now a drop-down
+    (ctrTag: '_CATEGORY-TIME';          ctrCFG:True;  ctrSave: True; ctrList: True),  // Issue #976: persist + restore selection
     (ctrTag: '_CATEGORY-TRANSMITTER';   ctrCFG:False; ctrSave: True; ctrList: False),
-    (ctrTag: '_CATEGORY-OVERLAY';       ctrCFG:True;  ctrSave: False; ctrList:  True),
+    (ctrTag: '_CATEGORY-OVERLAY';       ctrCFG:True;  ctrSave: True; ctrList:  True),  // Issue #976: persist + restore selection
     (ctrTag: '_CERTIFICATE';            ctrCFG:True;  ctrSave: True; ctrList: False),
     (ctrTag: '_OPERATORS';              ctrCFG:True;  ctrSave: True; ctrList: False),
     (ctrTag: '_CLUB';                   ctrCFG:False; ctrSave: True;  ctrList: False),
@@ -216,7 +216,17 @@ begin
             end;
 
             if TempTag in [ctCategoryAssisted..ctCategoryPower] then
-              SendMessage(TempHWND, CB_SETCURSEL, integer(InitialTagsValuesArray[TempTag]^), 0);
+              SendMessage(TempHWND, CB_SETCURSEL, integer(InitialTagsValuesArray[TempTag]^), 0)
+            else if CabrilloTagSArray[TempTag].ctrSave then
+            begin
+              // Issue #976: restore the saved value into ctrSave drop-downs
+              // that are outside the index-based range above (e.g.
+              // CATEGORY-STATION).  GetDlgItemText on exit saves it back.
+              if GetPrivateProfileString(FormatSpecification,
+                  CabrilloTagSArray[TempTag].ctrTag, nil, TempBuffer1,
+                  SizeOf(TempBuffer1), TR4W_INI_FILENAME) > 0 then
+                SendMessage(TempHWND, CB_SELECTSTRING, -1, integer(@TempBuffer1));
+            end;
           end
           else
           begin
@@ -281,7 +291,15 @@ begin
               if CabrilloSummaryProc = nil then
                 goto ExitAndClose
               else
+              begin
+                // Issue #976: after the export callback finishes (it
+                // generates the Cabrillo file, opens it for review, and
+                // prompts for the SuperCheckPartial upload), close the dialog
+                // -- otherwise the user is dropped back at OK/Cancel and has
+                // to hit Cancel to finish a successful export.
                 asm call CabrilloSummaryProc; end;
+                goto ExitAndClose;
+              end;
           2: goto ExitAndClose;
           3:
           //DialogBox(hInstance, MAKEINTRESOURCE(50), hwnddlg, @ErmakDlgProc);
