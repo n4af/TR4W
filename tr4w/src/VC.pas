@@ -2442,6 +2442,7 @@ const
   menu_ctrl_shdxcallsign                = 10425;
   menu_ctrl_execute_config              = 10426;
   menu_ctrl_redoposscalls               = 10406; // 4.53.9
+  menu_alt_ctrl_redoposscalls           = 10428; // Issue #20 -- long-path rotor turn
 
   menu_mainwindow_setfocus              = 10500;
   menu_insertmode                       = 10501;

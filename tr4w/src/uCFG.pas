@@ -361,6 +361,7 @@ const
    + 4 {HAMSCORE ENABLE/URL/USERNAME/PASSWORD}  // Issue #783
    + 1 {HAMSCORE SEND CONTACT INFO}  // Issue #931
    + 1 {MY ITU ZONE}  // Issue #930 -- explicit override of CTY.DAT default for multi-zone countries
+   + 2 {PSTROTATOR IP ADDRESS + PSTROTATOR UDP PORT}  // Issue #732
    ;
 
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
@@ -636,6 +637,8 @@ const
  (crCommand: 'POSSIBLE CALLS';                crAddress: @PossibleCallEnable;             crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'PREFIX MULTIPLIER';             crAddress: pointer(3);                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 2; crKind: ckList; cfFunc: cfAll; crType: ctMultiplier; crNetwork: 1),
  (crCommand: 'PRINTER ENABLE';                crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
+ (crCommand: 'PSTROTATOR IP ADDRESS';         crAddress: @PSTRotatorIPAddress;            crMin:0;  crMax:255;     crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 0),   // Issue #732
+ (crCommand: 'PSTROTATOR UDP PORT';           crAddress: @PSTRotatorUDPPort;              crMin:1;  crMax:65535;   crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger; crNetwork: 0),   // Issue #732
  (crCommand: 'PTT ENABLE';                    crAddress: @PTTEnable;                      crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'PTT LOCKOUT';                   crAddress: @PTTLockout;                     crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'PTT TURN ON DELAY';             crAddress: @PTTTurnOnDelay;                 crMin:0;  crMax:MAXWORD; crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctInteger; crNetwork: 1),

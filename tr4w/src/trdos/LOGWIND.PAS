@@ -129,7 +129,7 @@ type
     State: K5KAStateType;
   end;
 
-  RotatorType = (NoRotator, DCU1Rotator, OrionRotator, YaesuRotator, AlfaSpidRotator); {KK1L: 6.71 Added YaesuRotator}
+  RotatorType = (NoRotator, DCU1Rotator, OrionRotator, YaesuRotator, AlfaSpidRotator, PSTRotator); {KK1L: 6.71 Added YaesuRotator} {Issue #732: PSTRotator (UDP)}
 
   RateBandArrayType = array[Band160..Band10] of Byte;
 
@@ -422,7 +422,7 @@ const
 
   TenMinuteRuleTypeSA                   : array[TenMinuteRuleType] of PChar = ('NONE', 'TIME OF FIRST QSO');
 
-  RotatorTypeSA                         : array[RotatorType] of PChar = ('NONE', 'DCU1', 'ORION', 'YAESU', 'ALFA SPID');
+  RotatorTypeSA                         : array[RotatorType] of PChar = ('NONE', 'DCU1', 'ORION', 'YAESU', 'ALFA SPID', 'PSTROTATOR');
 
   CallWindowPositionTypeSA              : array[CallWindowPositionType] of PChar = ('NORMAL', 'UP');
 
