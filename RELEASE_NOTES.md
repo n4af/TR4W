@@ -38,6 +38,28 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.5 (2026-06-07) — NY4I
+
+#### Cabrillo Categories & Export
+
+- **Category choices match the current Cabrillo spec**: the contest category drop-downs are updated — Transmitter offers **TWO**, Mode adds **FM**, Time adds **8-HOURS**, Overlay drops OVER-50 and adds **YOUTH** and **YL**, and Station adds **DISTRIBUTED**, **ROVER-LIMITED**, **ROVER-UNLIMITED**, and **EXPLORER**. (#976)
+- **Station, Time, and Overlay categories now stick**: Station Category is now a drop-down, and your Time and Overlay choices are remembered the next time you open the Cabrillo Summary — previously they weren't saved.
+- **OK closes the export dialog**: clicking **OK** in the Cabrillo Summary now finishes the export and closes the dialog. Previously a successful export left the dialog open, so you had to click Cancel to get out.
+
+#### WSJT-X / Digital
+
+- **Band follows WSJT-X when you have no rig connected**: if no radio is set up in TR4W, switching bands in WSJT-X now moves TR4W to the matching band (band indicator, totals row, and band map all update). With a radio connected, nothing changes. (#978)
+
+#### Contests
+
+- **TESLA contest renamed HF-TESLA**: the TESLA Memorial HF CW Contest now appears as **HF-TESLA**, with the correct Cabrillo name. (#745)
+
+#### Exchange Entry
+
+- **Clearer domestic-QTH error**: when an entered section/QTH isn't recognized for a domestic contest, the message now reads **"Invalid ARRL Section"** instead of a generic, misspelled prompt.
+
+---
+
 ### 4.148.4 (2026-06-06) — NY4I
 
 #### DX Cluster

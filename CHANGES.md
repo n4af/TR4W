@@ -37,6 +37,34 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.5 (2026-06-07) — NY4I
+
+#### Cabrillo category compliance & dialog/export fixes (`src/VC.pas`, `src/trdos/PostUnit.PAS`, `src/uCbrSum.pas`, `src/uNewContest.pas`) — Issue #976 (PR #982)
+
+- **Category lists brought into spec**: `CATEGORY-TRANSMITTER` `'M/S'` → `'TWO'`; `CATEGORY-MODE` adds `FM` (`cmFM`/`'FM'`); `CATEGORY-TIME` adds `8-HOURS` (`NumberTimeCategories` 3→4); `CATEGORY-OVERLAY` drops `OVER-50`, adds `YOUTH`+`YL` (`NumberOverlayCategories` 5→6); `CATEGORY-STATION` adds `DISTRIBUTED / ROVER-LIMITED / ROVER-UNLIMITED / EXPLORER` → 11 types (`NumberStationCategories` 7→11). Each array's matching `Number*Categories` constant bumped in the same edit. The `cmDIGITAL`↔`'RTTY'` string swap and the Russian `ErmakOverlayCategory` list are deliberately left untouched (audited follow-up / gated behind `ErmakSpecification`).
+- **Cabrillo Summary dialog** (`uCbrSum.pas`): `CATEGORY-STATION` is now a drop-down (`ctrList: True`) populated from the corrected `StationCategory`, with a string-based saved-value restore (`GetPrivateProfileString` → `CB_SELECTSTRING`) for `ctrSave` drop-downs outside the index-based restore range. `CATEGORY-TIME` and `CATEGORY-OVERLAY` now persist (`ctrSave: True`) — they previously had no program-variable backing, so their selection was never saved. **OK now auto-closes after export** (`goto ExitAndClose` after the callback), so a successful export no longer requires clicking Cancel; standalone "Edit Cabrillo Summary" behaviour is unchanged.
+- **New Contest dialog** (`uNewContest.pas`): removed the dangling `CATEGORY-OVERLAY` label (`InitialCommandsSA2[3]` → `nil`) — it had a label but no control was ever created.
+- **Safety**: categories persist by string value (`GetDlgItemText` → `WritePrivateProfileString`), not array index, so reordering/removing entries does not mis-map existing `.cfg` files.
+
+#### WSJT-X dial-frequency band follow with no radio defined (`src/trdos/LOGEDIT.PAS`, `src/uWSJTX.pas`) — Issue #978 (PR #980)
+
+- **Follow WSJT-X band when no rig is interfaced**: in the `WSJTX_MESSAGETYPE_STATUSV` handler, when `ActiveRadioPtr.RadioModel = NoInterfacedRadio` **and** `ActiveRadioPtr.tNetObject = nil`, TR4W derives the band from the dial frequency (`GetBandMapBandModeFromFrequency`) and calls the new `GoToBand` on an actual band change. Same multi-band gate as Alt-B (`MULTIPLE BANDS` enabled or no QSOs yet); band only, mode unchanged. With any radio defined it does nothing.
+- **Refactor (pure extraction)**: the Alt-B refresh sequence (dupe sheet, multipliers, band map, spot info, next-QSO-number) is extracted into `RefreshAfterBandChange`; new `GoToBand(NewBand)` jumps to a band then `DisplayBandMode(ActiveBand, ActiveMode, False)` (`UpdateRadio=False`, no rig to tune) + `RefreshAfterBandChange`. `BandDownOrUp` reuses `RefreshAfterBandChange` — Alt-B behaviour is unchanged. Runs on the WSJT-X UDP worker thread, consistent with the rest of that handler.
+
+#### Contest rename: TESLA → HF-TESLA (`src/VC.pas`) — Issue #745 (PR #984)
+
+- **`TESLA` contest renamed `HF-TESLA`** across `QSOPointMethodSA`, `ContestTypeSA`, and the `ContestInfo` table; populated `WA7BNM: 566`, `CABName: 'HF-TESLA'`, and `FriendlyName: 'TESLA Memorial HF CW Contest'`. Scoring (`TeslaQSOPointMethod`) and contest flags are unchanged.
+
+#### Domestic-QTH exchange error message (`src/trdos/LOGSTUFF.PAS`)
+
+- **Clearer rejection text**: a failed domestic-QTH lookup in `ProcessClassAndDomesticOrDXQTHExchange` now shows `'Invalid ARRL Section'` instead of the generic (and misspelled) `TC_IMPROPERDOMESITCQTH` constant. Note: this hardcodes the English string, bypassing the i18n constant — to be folded back into the localized constant set during the i18n pass.
+
+#### Release workflow (`.github/workflows/release.yml`) — PR #979
+
+- **Auto-generated release notes scoped to the real previous tag**: the draft-release step no longer relies on `generate_release_notes: true` (which auto-detects the baseline via semver and skips `-all` prerelease-style tags, so `v4.148.4` diffed against `v4.148.2` and re-listed shipped work). It now resolves the previous tag by git ancestry (`git describe --tags --abbrev=0 <tag>^`), calls `releases/generate-notes` with an explicit `previous_tag_name`, and feeds the result via `body_path`. Requires `fetch-depth: 0`; PowerShell 5.1-safe (curl.exe + `ConvertFrom-Json` + BOM-less writes). Full end-to-end path exercises only on the next real tag push.
+
+---
+
 ### 4.148.4 (2026-06-06) — NY4I
 
 #### DX cluster command field substitution (`src/uTelnet.pas`) — Issue #973 (PR #974)
