@@ -280,6 +280,38 @@ var
      ShowWindow(GetDlgItem(hwnddlg, 132), ShowCmd);
      ShowWindow(GetDlgItem(hwnddlg, 133), ShowCmd);
   end;
+
+  // Guard a title-bar X close when there are changes that have not been
+  // applied.  (Cancel/Escape discard immediately per the Win32 convention; the
+  // X gets a safety net because it is easy to hit by accident.)
+  // The OK button (118) is enabled exactly when such changes
+  // exist (ButtonsEnable on any edit and on Reset; disabled at init and after
+  // Apply), so its enabled state is the dirty flag.  Returns True when the
+  // dialog may close now:
+  //    no unapplied changes -> True (no prompt)
+  //    Yes    -> apply the changes, then True
+  //    No     -> discard, True
+  //    Cancel -> False (keep the dialog open).  Cancel is the default button so
+  //              an accidental Enter/Escape on the prompt loses nothing.
+  function MayClose: Boolean;
+  begin
+     Result := True;
+     if not IsWindowEnabled(GetDlgItem(hwnddlg, 118)) then
+        begin
+        Exit;
+        end;
+     case MessageBox(hwnddlg, TC_SAVECHANGES, tr4w_ClassName,
+             MB_YESNOCANCEL or MB_ICONQUESTION or MB_TOPMOST or MB_DEFBUTTON3) of
+        IDYES:
+           begin
+           RestartPollingThread(hwnddlg);
+           end;
+        IDCANCEL:
+           begin
+           Result := False;
+           end;
+     end;
+  end;
 begin
 
   Result := False;
@@ -534,6 +566,13 @@ begin
         UpdateNetworkCredentialsVisibility;
         EnableWindowFalse(hwnddlg, 117);
         EnableWindowFalse(hwnddlg, 118);
+
+        // Relabel the Close button (119) as "Cancel".  It already discards all
+        // form changes (WM_CLOSE just EndDialog(0); nothing is persisted unless
+        // OK/Apply call RestartPollingThread), so the new label simply makes the
+        // edit-commit semantics explicit.  Done at runtime to cover all
+        // languages without touching the per-language resources.
+        Windows.SetDlgItemText(hwnddlg, 119, CANCEL_WORD);
       end;
 
     WM_COMMAND:
@@ -588,7 +627,7 @@ begin
 
         end;
         case wParam of
-          2, 119: goto 1;
+          2, 119: goto 1;   // Cancel / Escape -- discard immediately (per Win32 dialog convention)
           117: {Apply}
             begin
               EnableWindowFalse(hwnddlg, 117);
@@ -601,14 +640,33 @@ begin
               goto 1;
             end;
 
-          116:
+          116: {Reset -- form only; nothing is persisted until OK/Apply}
 
             begin
-            
+              // Reset every combo to its first entry.  For the keyer RTS (126)
+              // and DTR (127) combos this is index 0 = 'OFF'
+              // (RTS_DTR_Values_Array = OFF/ON/CW/PTT), so they end up OFF.
               for i := 121 to 128 do tCB_SETCURSEL(hwnddlg, i, 0);
-              tCB_SETCURSEL(hwnddlg, 128, 2);
-              tCB_SETCURSEL(hwnddlg, 126, 3);
-              tCB_SETCURSEL(hwnddlg, 127, 2);
+              tCB_SETCURSEL(hwnddlg, 128, 2);   // baud rate -> 4800 (default)
+
+              // Reset the network edits to defaults.  IP ADDRESS is a string
+              // and may be blank.  TCP PORT is an integer (ctInteger): a blank
+              // value triggers the Issue #968 "has no value" warning on apply,
+              // so reset it to 0 -- the in-range default that means "no port".
+              Windows.SetDlgItemText(hwnddlg, 130, '');     // IP ADDRESS
+              Windows.SetDlgItemInt(hwnddlg, 131, 0, False);  // TCP PORT -> 0
+
+              // NAME (control 129) is a freeform rig label; reset it to the
+              // documented per-radio default ('Rig 1' / 'Rig 2').
+              if CATWTR = @Radio1 then
+                 begin
+                 Windows.SetDlgItemText(hwnddlg, 129, 'Rig 1');
+                 end
+              else
+                 begin
+                 Windows.SetDlgItemText(hwnddlg, 129, 'Rig 2');
+                 end;
+
               ButtonsEnable;
             end;
 
@@ -644,7 +702,12 @@ begin
         end;
       end;
 
-    WM_CLOSE: 1: EndDialog(hwnddlg, 0);
+    WM_CLOSE:   // the title-bar X -- confirm if there are unapplied changes
+      begin
+        if not MayClose then Exit;   // Result is already False -> dialog stays open
+        1:
+        EndDialog(hwnddlg, 0);
+      end;
   end;
 end;
 
