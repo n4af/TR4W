@@ -213,6 +213,7 @@ procedure CheckQuestionMark;
 function Get101Window(h: HWND): HWND;
 procedure InvertBooleanCommand(Command: PBoolean);
 procedure RunExplorer(Command: PChar);
+procedure OpenInDefaultTextEditor(FileName: PChar);   // Issue #986
 procedure RunOptionsDialog(f: CFGFunc);
 procedure OpenUrl(url: PChar);
 function ParseADIFRecord(sADIF: string; var exch: ContestExchange): boolean;
@@ -3655,9 +3656,9 @@ begin
 
     menu_historytxt:
       begin
-        // OpenUrl('http://www.tr4w.com/');
-        Format(wsprintfBuffer, 'notepad %shistory.txt', TR4W_PATH_NAME);
-        WinExec(wsprintfBuffer, SW_SHOW);
+        // Issue #986 -- open in the system default text editor, not Notepad.
+        Format(wsprintfBuffer, '%shistory.txt', TR4W_PATH_NAME);
+        OpenInDefaultTextEditor(wsprintfBuffer);
       end;
 
     menu_wiki_rus:
@@ -8110,6 +8111,55 @@ begin
 
   Format(wsprintfBuffer, TempPchar, Command);
   WinExec(wsprintfBuffer, SW_SHOW);
+end;
+
+const
+  ASSOCF_NONE         = $00000000;   // Issue #986
+  ASSOCSTR_EXECUTABLE = 2;           // the executable registered for the type
+
+// AssocQueryStringA asks Windows which executable is registered for a file
+// extension (here, ".txt").  Declared directly because Delphi 7's ShlwApi
+// import unit does not expose it.
+function AssocQueryStringA(flags: DWORD; str: DWORD; pszAssoc, pszExtra,
+  pszOut: PChar; pcchOut: PDWORD): HRESULT; stdcall;
+  external 'shlwapi.dll' name 'AssocQueryStringA';
+
+// Issue #986 -- open FileName in the user's default text editor (the program
+// registered for the ".txt" extension) instead of hard-coding Notepad.  Shared
+// by every "open in editor" path (the file-preview window, history.txt, ...).
+// Falls back to Notepad if no .txt association can be resolved or the editor
+// fails to launch, so the behavior never regresses on a misconfigured system.
+procedure OpenInDefaultTextEditor(FileName: PChar);
+var
+  editor   : array[0..1023] of Char;
+  cmdBuf   : array[0..1279] of Char;   // local: caller may pass wsprintfBuffer
+  len      : DWORD;
+  launched : boolean;
+begin
+  launched := False;
+  len := SizeOf(editor);
+  editor[0] := #0;
+  if AssocQueryStringA(ASSOCF_NONE, ASSOCSTR_EXECUTABLE, '.txt', nil,
+        editor, @len) = S_OK then
+     begin
+     if editor[0] <> #0 then
+        begin
+        // The file path may contain spaces, so pass it as a quoted argument.
+        Format(cmdBuf, '"%s"', FileName);
+        if ShellExecute(0, nil, editor, cmdBuf, nil,
+              SW_SHOWNORMAL) > 32 then
+           begin
+           launched := True;
+           end;
+        end;
+     end;
+
+  if not launched then
+     begin
+     // Fallback: Notepad, opened in a normal (non-maximized) window.
+     Format(cmdBuf, 'Notepad %s', FileName);
+     WinExec(cmdBuf, SW_SHOWNORMAL);
+     end;
 end;
 
 procedure RunOptionsDialog(f: CFGFunc);
