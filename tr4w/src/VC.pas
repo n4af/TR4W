@@ -3069,7 +3069,7 @@ const
     'EUROPEAN FIELD DAY', //    EuropeanFieldDayQSOPointMethod,
     'EUROPEAN SPRINT', //    EuropeanSprintQSOPointMethod,
     'EUROPEAN VHF', //    EuropeanVHFQSOPointMethod,
-    'TESLA', //    TeslaQSOPointMethod,
+    'HF-TESLA', //    TeslaQSOPointMethod,
     'FISTS', //    FistsQSOPointMethod,
     'FOC MARATHON' , // FOCMarathonPointMethod,
     'HA DX', //    HADXQSOPointMethod,
@@ -3451,7 +3451,7 @@ QSOPartiesCount = 20;
  ({Name: 'EU-SPRINT-SPRING-CW';        }Email: nil;                      DF: nil;                 WA7BNM:  317;                         QRZRUID: 216 ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NameInitialExchange; DM: NoDomesticMults; P: 0; AE: QSONumberAndNameExchange;                    XM:NoDXMults; QP:EuropeanSprintQSOPointMethod; ADIFName:'';   CABName:''; FriendlyName: ''),
  ({Name: 'EUROPEAN HFC';               }Email: nil;                      DF: nil;                 WA7BNM:   82; {SK3BG: 'euhfcs';     } QRZRUID: 31  ; Pxm: NoPrefixMults; ZnM: EUHFCYear; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTZoneExchange;                             XM:NoDXMults; QP:OnePointPerQSO; ADIFName:'';   CABName:''; FriendlyName: 'European HF Championship'),
  ({Name: 'EUROPEAN VHF';               }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:EuropeanVHFQSOPointMethod; ADIFName:'';   CABName:''; FriendlyName: ''),
- ({Name: 'TESLA      ';                }Email: nil;                      DF: nil;                 WA7BNM: 0000; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:TeslaQSOPointMethod; ADIFName:'';   CABName:''; FriendlyName: ''),
+ ({Name: 'HF-TESLA    ';               }Email: nil;                      DF: nil;                 WA7BNM: 566; {SK3BG: nil;           } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: NoDomesticMults; P: 0; AE: RSTQSONumberAndGridSquareExchange;           XM:NoDXMults; QP:TeslaQSOPointMethod; ADIFName:'';   CABName:'HF-TESLA'; FriendlyName: 'TESLA Memorial HF CW Contest'),
  ({Name: 'ARRL FIELD DAY';             }Email: 'fieldday@arrl.org';      DF: 'arrlsect';          WA7BNM:   57; {SK3BG: nil;          } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; {DM: NoDomesticMults;}    P: 0; AE: ClassDomesticOrDXQTHExchange;                XM:ARRLDXCC; QP:ARRLFieldDayQSOPointMethod; ADIFName:'ARRL-FIELD-DAY';   CABName:'ARRL-FD'; FriendlyName: 'ARRL Field Day'),   //ny4i Issue 222
  ({Name: 'FISTS';                      }Email: nil;                      DF: 's49p8';             WA7BNM:  251; {SK3BG: 'fistsspr';   } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTQTHNameAndFistsNumberOrPowerExchange;     XM:NoDXMults; QP:FistsQSOPointMethod; ADIFName:'';   CABName:''; FriendlyName: 'FISTS Winter Unlimited Sprint'),
  ({Name: 'FOC MARATHON';               }Email: nil;                      DF: nil;                 WA7BNM:  0000; {SK3BG: nil;         } QRZRUID: 0   ; Pxm: NoPrefixMults; ZnM: NoZoneMults; AIE: NoInitialExchange; DM: DomesticFile;    P: 0; AE: RSTPowerExchange;                  XM:CQDXCC; QP:FOCMarathonQSOPointMethod; ADIFName:'';   CABName:''; FriendlyName: ''),            //n4af
@@ -3645,7 +3645,7 @@ QSOPartiesCount = 20;
       'EU-SPRINT-SPRING-CW',
       'EUROPEAN HFC',
       'EUROPEAN VHF',
-      'TESLA',
+      'HF-TESLA',
       'ARRL-FD',    // The internal name is ARRL-FD. If we change it here, it breaks old files so leave as ARRL-FD. I use the ADIFNAME fiels in the ContestSA array for the right value// 4.89.6
       'FISTS',
       'FOC MARATHON',  //n4af
@@ -3880,7 +3880,7 @@ QSOPartiesCount = 20;
       ({Name: 'EU-SPRINT-SPRING-CW';        }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'EUROPEAN HFC';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM1 + ciMB1 + ciMM0),
       ({Name: 'EUROPEAN VHF';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),
-      ({Name: 'TESLA       ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),      // 4.57.4
+      ({Name: 'HF-TESLA    ';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB1 + ciMM0),      // 4.57.4
       ({Name: 'ARRL-FIELD DAY';             }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled1 + ciErmak0 + ciQB1 + ciQM1 + ciMB0 + ciMM0),
       ({Name: 'FISTS';                      }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),
       ({Name: 'FOC MARATHON';               }ciCDC0 + ciCQZoneMode0 + ciVHFEnabled0 + ciErmak0 + ciQB1 + ciQM0 + ciMB0 + ciMM0),    //n4af
