@@ -159,6 +159,7 @@ procedure AddQTCToQTCBuffer(var QTCBuffer: LogEntryArray; QTCString: Str80;
 //procedure BandDown;
 //procedure BandUp;
 procedure BandDownOrUp(Direction: DirectionType);
+procedure GoToBand(NewBand: BandType);
 procedure CleanUpDisplay;
 function DetermineQTCNumberAndQuanity(InputString: Str80; var QTCNumber:
   integer; var Quantity: integer): boolean;
@@ -333,6 +334,40 @@ begin
       Result := MaxSerialSent[AllBands] + 1;
 end;
 
+// Shared display refresh after the active band changes.  Both the Alt-B
+// band step (BandDownOrUp) and the WSJT-X "follow the dial frequency"
+// path (GoToBand) use this so the two stay in sync.
+procedure RefreshAfterBandChange;
+begin
+  if QSOByBand then
+    CallsignsList.DisplayDupeSheet(ActiveRadioPtr);
+  if MultByBand then
+    VisibleLog.ShowRemainingMultipliers;
+  BandMapBand := ActiveBand;
+  DisplayBandMap;
+  ShowSpotInfo;
+  if QSONumberByBand then
+    DisplayNextQSONumber;
+end;
+
+// Jump straight to a specific band (e.g. WSJT-X dial frequency when no
+// radio is defined), mirroring the Alt-B band-change refresh and the same
+// multi-band gate.  Mode is intentionally left unchanged for now.
+procedure GoToBand(NewBand: BandType);
+begin
+  if (NewBand = NoBand) or (NewBand = ActiveBand) then
+    Exit;
+  if (not MultipleBandsEnabled) and (TotalContacts <> 0) then
+    Exit;
+  PutRadioOutOfSplit(ActiveRadio); // n4af 4.46.5
+  ActiveBand := NewBand;
+  // Repaint the band indicator + totals-row highlight (UpdateRadio=False:
+  // there is no radio to tune).  This is the same call uRadioPolling makes
+  // from its worker thread when a connected radio changes band.
+  DisplayBandMode(ActiveBand, ActiveMode, False);
+  RefreshAfterBandChange;
+end;
+
 procedure BandDownOrUp(Direction: DirectionType);
 begin
 
@@ -349,15 +384,7 @@ begin
     begin
       PutRadioOutOfSplit(ActiveRadio); // n4af 4.46.5
       BandChange(ActiveBand, Direction);
-      if QSOByBand then
-        CallsignsList.DisplayDupeSheet(ActiveRadioPtr);
-      if MultByBand then
-        VisibleLog.ShowRemainingMultipliers;
-      BandMapBand := ActiveBand;
-      DisplayBandMap;
-      ShowSpotInfo;
-      if QSONumberByBand then
-        DisplayNextQSONumber;
+      RefreshAfterBandChange;
     end;
   end;
 end;
