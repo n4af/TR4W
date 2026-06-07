@@ -3020,6 +3020,41 @@ begin
   Result := TempBrush;
 end;
 
+// Issue #20 -- shared body for Ctrl-P (short path) and Alt-Ctrl-P (long path).
+// Redoes the possible-calls display, then turns the rotor either to the typed
+// heading (when the Call window holds a 2-3 digit bearing) or to the last beam
+// heading shown.  When longPath is True the bearing is reflected 180 degrees.
+procedure RedoPossibleCallsAndTurnRotor(longPath: boolean);
+var
+   heading: integer;
+begin
+   ShowStationInformation(@CallWindowString);
+   DisplayGridSquareStatus(CallWindowString);
+   VisibleLog.DoPossibleCalls(CallWindowString);
+
+   if
+      (
+      (length(CallWindowString) in [2, 3]) and
+      (StringIsAllNumbers(CallWindowString)) and
+      ((StrToInt(CallWindowString) div 2) in [0..180])
+      ) then
+      begin
+      heading := StrToInt(CallWindowString);
+      tCleareCallWindow;
+      end
+   else
+      begin
+      heading := LastHeadingShown;
+      end;
+
+   if longPath then
+      begin
+      heading := (heading + 180) mod 360;
+      end;
+
+   RotorControl(heading);
+end;
+
 procedure ProcessMenu(menuID: integer);
 var
   LowordWparam: integer;
@@ -3292,21 +3327,12 @@ begin
 
     menu_ctrl_redoposscalls:
       begin
-        ShowStationInformation(@CallWindowString);
-        DisplayGridSquareStatus(CallWindowString);
-        VisibleLog.DoPossibleCalls(CallWindowString);
-        if
-          (
-          (length(CallWindowString) in [2, 3]) and
-          (StringIsAllNumbers(CallWindowString)) and
-          ((StrToInt(CallWindowString) div 2) in [0..180])
-          ) then
-        begin
-          RotorControl(StrToInt(CallWindowString));
-          tCleareCallWindow
-        end
-        else
-          RotorControl(LastHeadingShown);
+        RedoPossibleCallsAndTurnRotor(False);   // Ctrl-P -- short path
+      end;
+
+    menu_alt_ctrl_redoposscalls:                // Issue #20
+      begin
+        RedoPossibleCallsAndTurnRotor(True);    // Alt-Ctrl-P -- long path
       end;
 
     menu_ctrl_qtcfunctions:

@@ -600,6 +600,12 @@ var
   UDPBroadcastRotorPort: integer = 12040; // ny4i 4.44.9
   UDPBroadcastAllQSOs: boolean; // ny4i Issue 82
 
+  // Issue #732 -- PSTRotator native UDP interface (separate from the N1MM
+  // broadcast above).  Active when ActiveRotatorType = PSTRotator.  PstRotator
+  // listens on its "UDP Control Port" (default 12000) at the configured host.
+  PSTRotatorIPAddress: string[255] = '127.0.0.1';
+  PSTRotatorUDPPort: integer = 12000;
+
   WaitForStrength: boolean = True;
 
   WindowDupeCheckCall: CallString;
@@ -712,6 +718,7 @@ procedure SpeedUp;
 
 procedure StuffInit;
 procedure SendUDPRotorCommand(Heading: integer);
+procedure SendPSTRotorCommand(Heading: integer);   // Issue #732
 function ValidClass(sClass: Str10): boolean;
 
 { Header and Stamp routines - used when generating a log string }
@@ -8313,6 +8320,15 @@ begin
   begin
     SendUDPRotorCommand(Heading);
   end;
+
+  // Issue #732 -- PSTRotator is a UDP-only rotator type: send its native
+  // command and stop (it has no serial port, so the serial path below is N/A).
+  if ActiveRotatorType = PSTRotator then
+  begin
+    SendPSTRotorCommand(Heading);
+    Exit;
+  end;
+
   if ActiveRotatorPort = NoPort then
     Exit;
   case ActiveRotatorType of
@@ -8342,6 +8358,10 @@ begin
 
   sWriteFile(CPUKeyer.SerialPortConfigured_Handle[ActiveRotatorPort],
     wsprintfBuffer, nNumberOfBytesToWrite);
+
+  logger.Trace('[RotorControl] serial rotor (%s) on %s, %u bytes: %s',   // Issue #989
+    [RotatorTypeSA[ActiveRotatorType], PortTypeSA[ActiveRotatorPort],
+     nNumberOfBytesToWrite, PChar(@wsprintfBuffer)]);
 end;
 
 function MarineOrAirMobileStation(Call: CallString): boolean;
@@ -9364,9 +9384,26 @@ begin
   //msg := RawToBytes(sBuf[1], Length(sBuf));
   //udp.Broadcast(msg, UDPBroadcastRotorPort);     // ny4i 4.44.9
   udp.BroadcastEnabled := true;
+  logger.Trace('[SendUDPRotorCommand] N1MM -> %s:%d %s',   // Issue #989
+    [UDPBroadcastAddress, UDPBroadcastRotorPort, sBuf]);
   udp.Send(UDPBroadcastAddress, UDPBroadcastRotorPort, sBuf);
 
 end; // SendUDPRotatorCommand
+
+procedure SendPSTRotorCommand(Heading: integer); // Issue #732
+// Send an azimuth to PstRotator via its native UDP interface.  PstRotator
+// listens on its "UDP Control Port" (PSTRotatorUDPPort, default 12000) at
+// PSTRotatorIPAddress.  Reuses the shared 'udp' Indy client, same as the N1MM
+// path above.  Command format per the PstRotator UDP spec:
+//   <PST><AZIMUTH>nnn</AZIMUTH></PST>
+var
+  sBuf: AnsiString;
+begin
+  sBuf := '<PST><AZIMUTH>' + SysUtils.Format('%d', [Heading]) + '</AZIMUTH></PST>';
+  logger.Trace('[SendPSTRotorCommand] -> %s:%d %s',   // Issue #989
+    [PSTRotatorIPAddress, PSTRotatorUDPPort, sBuf]);
+  udp.Send(PSTRotatorIPAddress, PSTRotatorUDPPort, sBuf);
+end; // SendPSTRotorCommand
 
 function ValidClass(sClass: Str10): boolean; // ny4i 4.45.3
 var
