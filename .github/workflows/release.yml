@@ -290,13 +290,33 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-      # Full history + tags so the notes step can resolve the previous
-      # tag from git ancestry (checked out first so its clean step does
-      # not wipe the artifacts downloaded below).
-      - name: Checkout (full history + tags for the changelog range)
+      # Checkout at the tag with the DEFAULT shallow fetch: actions/checkout
+      # then fetches only the single triggering ref and never pulls
+      # refs/heads/*. That matters on the self-hosted Windows runner
+      # (case-insensitive NTFS, 'files' ref backend): two branch names that
+      # differ only in case -- e.g. Issue861PLus vs Issue861Plus -- cannot
+      # both be stored on disk, and a previous `fetch-depth: 0` (which fetches
+      # EVERY head) aborted the entire release job on that collision
+      # ("references that only differ in casing" -> the retry's --unshallow
+      # then failed "on a complete repository"). The notes step only needs
+      # TAGS + history for `git describe`, not branch heads, so the next step
+      # fetches tags explicitly. Checked out first so its clean step does not
+      # wipe the artifacts downloaded below.
+      - name: Checkout source at the tag
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+
+      - name: Fetch tags + history for the changelog range
+        shell: powershell
+        run: |
+          # Fetch ONLY refs/tags/* (never refs/heads/*), so a case-only
+          # branch-name collision can never break the release again. A very
+          # large --depth fully deepens history whether the repo is currently
+          # shallow or already complete -- unlike --unshallow, which errors
+          # ("does not make sense") once a prior fetch has completed the repo.
+          # git describe needs the ancestry from the tag back to the previous
+          # tag, and the previous tag's ref itself, both of which this provides.
+          git fetch --prune --no-tags --depth=2147483647 origin "+refs/tags/*:refs/tags/*"
+          if ($LASTEXITCODE -ne 0) { throw "Tag fetch failed with exit code $LASTEXITCODE" }
 
       - name: Download installer artifact
         uses: actions/download-artifact@v4
