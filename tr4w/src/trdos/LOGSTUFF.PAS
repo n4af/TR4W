@@ -1304,7 +1304,7 @@ begin
     logger.debug('Calling FoundDomesticQTH from ProcessClassAndDomesticOrDXQTHExchange - QTHString = (%s)', [RXData.QTHString]);
     if not FoundDomesticQTH(RXData) then
     begin
-      ExchangeErrorMessage := TC_IMPROPERDOMESITCQTH;
+      ExchangeErrorMessage := 'Invalid ARRL Section'; {TC_IMPROPERDOMESITCQTH;}
       logger.error('[ProcessClassAndDomesticOrDXQTHExchange] Improper Domestic QTH = Exchange = (%s), DomesticQTH = (%s)', [Exchange, RXData.QTHString]);
       // misspelled in the constants file //ny4i 4.45.3
       Exit; // This was before the above code that flips the values. // ny4i 4.45.3
