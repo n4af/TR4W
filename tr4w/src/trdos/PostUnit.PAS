@@ -251,10 +251,10 @@ const
 //  NumberBandCategories                  = 13;
 //  NumberPowerCategories                 = 3;
 //  NumberModeCategories                  = 4;
-  NumberOverlayCategories               = 5;
+  NumberOverlayCategories               = 6;
   NumberAssistedCategories              = 2;
-  NumberStationCategories               = 7;
-  NumberTimeCategories                  = 3;
+  NumberStationCategories               = 11;
+  NumberTimeCategories                  = 4;
   NumberTransmitterCategories           = 5;
   NumberCertificateCategories           = 2;
   NumberSections                        = 81;
@@ -282,6 +282,7 @@ const
  }
   TimeCategory                          : array[0..NumberTimeCategories - 1] of PChar = (
     '6-HOURS',
+    '8-HOURS',
     '12-HOURS',
     '24-HOURS'
     );
@@ -301,13 +302,17 @@ const
 }
   StationCategory                       : array[0..NumberStationCategories - 1] of PChar =
     (
+    'DISTRIBUTED',
     'FIXED',
     'MOBILE',
     'PORTABLE',
     'ROVER',
+    'ROVER-LIMITED',
+    'ROVER-UNLIMITED',
     'EXPEDITION',
     'HQ',
-    'SCHOOL'
+    'SCHOOL',
+    'EXPLORER'
     );
 {
   BandCategory                          : array[0..NumberBandCategories - 1] of PChar = (
@@ -340,9 +345,10 @@ const
   OverlayCategory                       : array[0..NumberOverlayCategories - 1] of PChar = (
     'CLASSIC',  //n4af 4.35.4
     'ROOKIE',
-    'NOVICE-TECH',
     'TB-WIRES',
-    'OVER-50');
+    'YOUTH',
+    'NOVICE-TECH',
+    'YL');
 
     Certificate                 : array[0..NumberCertificateCategories - 1] of PChar = (           //N4AF 37.0.1
     'YES',

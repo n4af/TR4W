@@ -62,7 +62,10 @@ const
   InitialCommandsSA2                    : array[1..CSAS] of PChar = (
     nil,
     nil,
-    'CATEGORY-OVERLAY',
+    // Issue #976: CATEGORY-OVERLAY removed -- it was only a dangling label
+    // (no control was ever created for it).  Restore it as a real drop-down
+    // when the New Contest dialog is rebuilt in modern Delphi.
+    nil,
     'CATEGORY-ASSISTED',
     'CATEGORY-BAND',
     'CATEGORY-MODE',

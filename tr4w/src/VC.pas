@@ -753,7 +753,7 @@ type
   tLogLevels = (llNone, llFatal, llError, llWarn, llInfo, llDebug, llTrace);
   tCategoryAssisted = (caNONASSISTED, caASSISTED);
   tCategoryBand = (cbALL, cb160M, cb80M, cb40M, cb20M, cb15M, cb10M, cb6M, cb2M, cb222, cb432, cb902, cb12G);
-  tCategoryMode = (cmCW, cmDIGITAL, cmRTTY, cmSSB, cmMIXED);
+  tCategoryMode = (cmCW, cmDIGITAL, cmRTTY, cmSSB, cmMIXED, cmFM); // Issue #976: FM added (appended; existing cmDIGITAL/cmRTTY string swap left as a separate follow-up)
   tCertificate = (Yes, No);
   tCategoryOperator = (coSINGLEOP, coMULTIOP, coCHECKLOG);
   tCategoryPower = (cpHIGH, cpLOW, cpQRP);
@@ -764,11 +764,11 @@ const
   tLogLevelsSA                          : array[tLogLevels] of PChar = ('NONE' ,'FATAL', 'ERROR', 'WARN', 'INFO', 'DEBUG', 'TRACE');
   tCategoryAssistedSA                   : array[tCategoryAssisted] of PChar = ('NON-ASSISTED', 'ASSISTED');
   tCategoryBandSA                       : array[tCategoryBand] of PChar = ('ALL', '160M', '80M', '40M', '20M', '15M', '10M', '6M', '2M', '222', '432', '902', '1.2G');
-  tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'DIGI', 'SSB', 'MIXED');    // 4.90.14
+  tCategoryModeSA                       : array[tCategoryMode] of PChar = ('CW', 'RTTY', 'DIGI', 'SSB', 'MIXED', 'FM');    // 4.90.14; FM added Issue #976
   tCertificateSA                        : array[tCertificate] of PChar = ('Yes', 'No');
   tCategoryOperatorSA                   : array[tCategoryOperator] of PChar = ('SINGLE-OP', 'MULTI-OP', 'CHECKLOG');
   tCategoryPowerSA                      : array[tCategoryPower] of PChar = ('HIGH', 'LOW', 'QRP');
-  tCategoryTransmitterSA                : array[tCategoryTransmitter] of PChar = ('ONE', 'M/S', 'LIMITED', 'UNLIMITED', 'SWL');
+  tCategoryTransmitterSA                : array[tCategoryTransmitter] of PChar = ('ONE', 'TWO', 'LIMITED', 'UNLIMITED', 'SWL');
 
 var
   CategoryAssisted                      : tCategoryAssisted;
