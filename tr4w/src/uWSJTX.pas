@@ -442,6 +442,24 @@ begin
               Unpack(AData, index, DECall);
               Unpack(AData, index, DEGrid);
               Unpack(AData, index, DXGrid);
+
+              // Issue #978: with no radio defined, follow the WSJT-X dial
+              // frequency to set the active band (band only, and only on an
+              // actual change).  GoToBand applies the same multi-band gate
+              // and display refresh as an Alt-B band change.
+              if (ActiveRadioPtr.RadioModel = NoInterfacedRadio) and
+                 (ActiveRadioPtr.tNetObject = nil) then
+                begin
+                GetBandMapBandModeFromFrequency(frequency, TempBand, TempMode);
+                if (TempBand <> NoBand) and (TempBand <> ActiveBand) then
+                  begin
+                  logger.debug('[uWSJTX] No radio defined; following WSJT-X to band '
+                    + string(BandStringsArray[TempBand]) + ' (' + IntToStr(frequency)
+                    + ' Hz)');
+                  GoToBand(TempBand);
+                  end;
+                end;
+
               if logger.IsTraceEnabled then
                 begin
                 logger.trace('[uWSJTX] WSJTX Status>>> Frequency: ' +
