@@ -424,7 +424,7 @@ const
   E_MENU_ARRAY_SIZE                     = 7;
   E_MENU_ARRAY                          : array[0..E_MENU_ARRAY_SIZE] of MenuRecord = (
     (mrText: '&File'; mrId: MAXWORD),
-    (mrText: 'Open with &Notepad'; mrId: 101),
+    (mrText: 'Open in text &editor'; mrId: 101),
     (mrText: 'Explore'; mrId: 107),
     (mrText: '-'; mrId: 0),
     (mrText: 'E&xit'; mrId: 102),

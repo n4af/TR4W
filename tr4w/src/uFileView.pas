@@ -230,8 +230,8 @@ begin
       case wParam of
         101:
           begin
-            Format(wsprintfBuffer, 'Notepad %s', PreviewFileNameAddress);
-            WinExec(wsprintfBuffer, SW_SHOWMAXIMIZED);
+            // Issue #986 -- open in the system default text editor, not Notepad.
+            OpenInDefaultTextEditor(PreviewFileNameAddress);
           end;
 {
         102:
