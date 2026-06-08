@@ -76,10 +76,11 @@ var
 procedure SendClientStatus;
 function TelnetWndDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam:
   lParam): BOOL; stdcall;
-procedure ConnectToTelnetCluster;
+function TelnetThreadProc(Param: Pointer): DWORD; stdcall;   // Issue #23 -- DX cluster I/O thread
+procedure StartTelnetConnect;                                // Issue #23 -- main-thread launcher
 procedure Disconnect;
 function TestSocketBuffer: Integer; // Gav 4.44.6
-procedure TelnetConnectionError;
+procedure TelnetConnectionError(wsaErr: integer);            // Issue #23 -- explicit code (marshaled)
 function SendViaTelnetSocket(p: PChar): integer;
 procedure AddStringToTelnetConsole(p: PChar; c: TelnetStringType);
 procedure SaveTelnetWindowSpots;
@@ -210,6 +211,9 @@ var
   OldTelnetFreezeMode: boolean;
   TelnetFreezeMode: boolean;
   TelThreadID: Cardinal;
+  TelThreadHandle: THandle;     // Issue #23 -- kept so we can join the I/O thread before teardown
+  TelnetStopRequested: boolean; // Issue #23 -- set by Disconnect so a thread that is still
+                                // connecting bails out after connect instead of orphaning
   TelnetSock: Cardinal;
   TelToolbar: HWND;
   TelnetListBox: HWND;
@@ -226,6 +230,29 @@ uses uNet,
   uBandmap,
   LogGrid,
   MainUnit;
+
+// Issue #23 -- DX cluster I/O thread <-> main-thread message protocol.  The
+// cluster thread does ALL blocking network I/O (connect + recv) and never
+// touches UI or shared spot/bandmap state; it only posts these to the telnet
+// window, which does that work on the main (UI) thread.  Declared here so both
+// TelnetWndDlgProc (handler) and TelnetThreadProc (sender) see them.
+const
+  WM_TELNET_MSG         = WM_USER + 250;
+  TELNET_CONNECTED      = 1;   // lParam = 0
+  TELNET_CONNECT_FAILED = 2;   // lParam = WSA error code
+  TELNET_DATA           = 3;   // lParam = PTelnetChunk (handler disposes it)
+  TELNET_CLOSED         = 4;   // lParam = WSA error code (0 = graceful close)
+
+type
+  PTelnetChunk = ^TTelnetChunk;
+  TTelnetChunk = record
+    Len:  integer;
+    Data: array[0..8192] of Char;
+  end;
+
+var
+  PendingTelnetHost: array[0..255] of Char;   // set on the main thread before the I/O thread starts
+  PendingTelnetPort: Word;
 
 // ---------------------------------------------------------------------------
 //  Issue #973 - field substitution in cluster_commands.txt
@@ -484,11 +511,16 @@ var
   TempTextColor: Cardinal;
   TempPoint: TPoint;
   TDIS: PDrawItemStruct;
-  InfoBuffer: array[0..127] of Char;
+  InfoBuffer: array[0..1023] of Char;   // Issue #23 -- LB_GETTEXT has no size limit; must hold the
+                                        // longest list item (error messages run ~230 chars, far past
+                                        // the old 128, overrunning the stack).  AddStringToTelnetConsole
+                                        // caps items to this size so this read can never overrun.
   StringType: TelnetStringType;
   ExpandedClusterCommand: AnsiString;   { Issue #973 }
 const
-  TelnetStringColor: array[TelnetStringType] of tr4wColors = (trGreen, trBlue,
+  // Issue #23 -- tstTR4W (status messages) was green for no real reason; show it
+  // as normal black text.  Errors stay red.
+  TelnetStringColor: array[TelnetStringType] of tr4wColors = (trBlack, trBlue,
     trBlack, trLightGray, trRed, trRed, trBlack);
   //  TelnetStringOffset                    : array[TelnetStringType] of integer = (15, 2, 15, 15, 15, 20, 15);
 begin
@@ -528,42 +560,73 @@ begin
 
     WM_WINDOWPOSCHANGING, WM_EXITSIZEMOVE: DefTR4WProc(Msg, lParam, hwnddlg);
 
-    WM_SOCK:
+    // Issue #23 -- messages from the DX cluster I/O thread (TelnetThreadProc).
+    // All UI and spot/bandmap processing happen here, on the main thread.
+    WM_TELNET_MSG:
       begin
-        i := recv(TelnetSock, TelnetBuffer, SizeOf(TelnetBuffer) - 1, 0);
-        if i < 1 then
-          if WindowsOSversion = VER_PLATFORM_WIN32_NT then
-          begin
-            TelnetConnectionError;
-            Disconnect;
-            Exit;
-          end;
+        case wParam of
+          TELNET_CONNECTED:
+            begin
+              if TR4W_TELNET_DEBUG then
+                 begin
+                 logger.Info('[Telnet] Connected to %s:%d', [PChar(@PendingTelnetHost[0]), PendingTelnetPort]);
+                 end;
+              Format(wsprintfBuffer, '%s%s:%u', TC_CONNECTEDTO,
+                @PendingTelnetHost[0], PendingTelnetPort);
+              AddStringToTelnetConsole(wsprintfBuffer, tstTR4W);
+              Windows.ZeroMemory(@TelnetBuffer, SizeOf(TelnetBuffer));
+              if ConnectionCommand <> '' then
+                 SendViaTelnetSocket(@ConnectionCommand[1])
+              else
+                 SetDlgItemText(hwnddlg, 106, @MyCall[1]);
+              SendClientStatus;
+              EnableTelnetToolbatButtons(True);
+              EnableWindowTrue(hwnddlg, 104);
+            end;
 
-        //   showmessage(@TelnetBuffer);
+          TELNET_CONNECT_FAILED:
+            begin
+              // Issue #23 -- keep the detailed WinSock reason in the log for
+              // diagnostics, but show the operator a short message naming the
+              // host they tried to reach (the raw message is long and unwrapped).
+              logger.Error('[Telnet] Could not connect to %s:%d -- WinSock %d: %s',
+                [PChar(@PendingTelnetHost[0]), PendingTelnetPort, lParam,
+                 SysErrorMessage(lParam)]);
+              Format(wsprintfBuffer, '%s%s:%u', TC_FAILEDTOCONNECTTO,
+                @PendingTelnetHost[0], PendingTelnetPort);
+              AddStringToTelnetConsole(wsprintfBuffer, tstError);
+              Disconnect;
+            end;
 
-        TelnetBuffer[i] := #0;
-        spotcnt := spotcnt + 1;       // beta test alleviate # screen writes
-        if spotcnt = 1 then
-        begin
-          move(TelnetBuffer[0], SpotsBuffer[0], i);
-          spotcnt := spotcnt + 1;
-          exit;
-        end
-        else
-        begin
-          spotcnt := 0;
-          ProcessTelnetString(i);
-          move(SpotsBuffer[0], TelnetBuffer[0], i);
-          ProcessTelnetString(i);
+          TELNET_DATA:
+            begin
+              if lParam <> 0 then
+                 begin
+                 Move(PTelnetChunk(lParam)^.Data[0], TelnetBuffer[0],
+                      PTelnetChunk(lParam)^.Len);
+                 // Issue #23 -- null-terminate like the old recv path did
+                 // (TelnetBuffer[i] := #0); ProcessTelnetString treats it as a
+                 // C string, so without this it reads past Len into stale data.
+                 TelnetBuffer[PTelnetChunk(lParam)^.Len] := #0;
+                 ProcessTelnetString(PTelnetChunk(lParam)^.Len);
+                 Dispose(PTelnetChunk(lParam));
+                 end;
+            end;
 
-       end;                               // end beta
-
-        //Except on E : Exception do
-       //    begin
-           //TLogger.GetInstance.Debug(Format('ProcessTelnet Exception, %s error raised, with message <%s> ',[E.ClassName,E.Message]));
-       //    end;
-        //end;
-
+          TELNET_CLOSED:
+            begin
+              // Ignore if the user already disconnected (TelnetSock cleared);
+              // otherwise this is a server-initiated / network close.
+              if TelnetSock <> 0 then
+                 begin
+                 if lParam <> 0 then
+                    begin
+                    TelnetConnectionError(lParam);
+                    end;
+                 Disconnect;
+                 end;
+            end;
+        end;
       end;
 
     WM_INITDIALOG:
@@ -725,13 +788,7 @@ begin
 {$IFEND}
 
           //          DialogBox(hInstance, MAKEINTRESOURCE(44), hwnddlg, @SpotsFilterDlgProc);
-          200: if TelThreadID = 0 then
-            begin
-              logger.Debug('Calling tCreateThread from TelnetThread');
-              tCreateThread(@ConnectToTelnetCluster, TelThreadID);
-              logger.Debug('Created Telnet (Cluster)  thread with threadid of %d', [TelThreadID]);
-              //              ConnectToTelnetCluster;
-            end;
+          200: StartTelnetConnect;   // Issue #23 -- launch the DX cluster I/O thread
 
           104:
             begin
@@ -814,112 +871,227 @@ begin
   end;
 end;
 
-procedure ConnectToTelnetCluster;
+// Runs on the DX cluster I/O thread.  Connects (blocking), then loops on
+// blocking recv, posting each chunk to the telnet window.  Posts CONNECTED /
+// CONNECT_FAILED / CLOSED for lifecycle.  Does NO UI and touches NO shared
+// contest/bandmap state -- that all happens on the main thread in the handler.
+function TelnetThreadProc(Param: Pointer): DWORD; stdcall;
 var
-
-  StackTelHandle: HWND;
-
-  port: Word;
-  i: integer;
-
-label
-  processed;
+  localSock: DWORD;
+  n:         integer;
+  wnd:       HWND;
+  chunk:     PTelnetChunk;
+  recvBuf:   array[0..8191] of Char;
 begin
+  Result := 0;
+  wnd := tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle;
+
+  if TR4W_TELNET_DEBUG then
+     begin
+     logger.Info('[Telnet] Connecting to %s:%d', [PChar(@PendingTelnetHost[0]), PendingTelnetPort]);
+     end;
+
+  if not GetConnection(localSock, PendingTelnetHost, PendingTelnetPort, SOCK_STREAM) then
+     begin
+     PostMessage(wnd, WM_TELNET_MSG, TELNET_CONNECT_FAILED, WSAGetLastError);
+     Exit;
+     end;
+
+  // Issue #23 -- if Disconnect/window-close happened while we were blocked in
+  // connect, bail out now (closing the freshly-connected socket) instead of
+  // publishing it and entering the recv loop -- avoids an orphaned thread/socket.
+  if TelnetStopRequested then
+     begin
+     closesocket(localSock);
+     Exit;
+     end;
+
+  TelnetSock := localSock;   // publish for the send path (main thread); recv uses localSock
+  PostMessage(wnd, WM_TELNET_MSG, TELNET_CONNECTED, 0);
+
+  while True do
+     begin
+     n := recv(localSock, recvBuf, SizeOf(recvBuf) - 1, 0);
+     if n < 1 then
+        begin
+        // 0 = graceful close, < 0 = error (incl. a Disconnect that closed the
+        // socket out from under us).  Report and end the thread.
+        PostMessage(wnd, WM_TELNET_MSG, TELNET_CLOSED, WSAGetLastError);
+        Break;
+        end;
+
+     New(chunk);
+     chunk^.Len := n;
+     Move(recvBuf[0], chunk^.Data[0], n);
+     chunk^.Data[n] := #0;
+     if TR4W_TELNET_DEBUG then
+        begin
+        logger.Info('[Telnet RX %d] %s', [n, PChar(@chunk^.Data[0])]);
+        end;
+     PostMessage(wnd, WM_TELNET_MSG, TELNET_DATA, LPARAM(chunk));
+     end;
+end;
+
+// Runs on the MAIN thread (Connect button).  Reads host:port from the dialog
+// (UI access stays on the UI thread), then spawns the I/O thread.
+procedure StartTelnetConnect;
+var
+  StackTelHandle: HWND;
+  i: integer;
+begin
+  if TelThreadID <> 0 then
+     begin
+     Exit;   // already connecting / connected
+     end;
+
   StackTelHandle := tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle;
-  port := 23;
-  i := Windows.GetDlgItemText(StackTelHandle, 102, TempBuffer1,
-    SizeOf(TempBuffer1));
+  PendingTelnetPort := 23;
+  i := Windows.GetDlgItemText(StackTelHandle, 102, TempBuffer1, SizeOf(TempBuffer1));
 
-  while i <> 0 do
-  begin
-    if TempBuffer1[i] = ':' then
-    begin
-      port := pchartoint(@TempBuffer1[i + 1]);
-      TempBuffer1[i] := #0;
-    end;
-    if TempBuffer1[i] = ' ' then //ny4i 4.43.5 plus this bug fix.
-    begin
-      TempBuffer1[i] := #0;
-    end;
-    dec(i);
-  end;
+  // TempBuffer1 is 0-based; scan [length-1 .. 0].  ':' splits host:port; ' '
+  // terminates the host.
+  dec(i);
+  while i >= 0 do
+     begin
+     if TempBuffer1[i] = ':' then
+        begin
+        PendingTelnetPort := pchartoint(@TempBuffer1[i + 1]);
+        TempBuffer1[i] := #0;
+        end;
+     if TempBuffer1[i] = ' ' then
+        begin
+        TempBuffer1[i] := #0;
+        end;
+     dec(i);
+     end;
 
-  if not GetConnection(TelnetSock, TempBuffer1, port, SOCK_STREAM) then
+  Windows.lstrcpyn(PendingTelnetHost, TempBuffer1, SizeOf(PendingTelnetHost));
 
-  begin
-    TelnetConnectionError;
-    TelThreadID := 0;
-    Disconnect;
-    Exit;
-  end;
-
-  AddStringToTelnetConsole(TC_CONNECTED, tstTR4W);
-
-  if WSAAsyncSelect(TelnetSock, StackTelHandle, WM_SOCK, FD_READ or FD_CLOSE) <>
-    0 then
-  begin
-    TelnetConnectionError;
-    Disconnect;
-    Exit;
-  end;
-
-  //  ClusterTypeDetermined := False;
-  Windows.ZeroMemory(@TelnetBuffer, SizeOf(TelnetBuffer));
-  //  Status := SOCK_CLIENT;
-
-  if ConnectionCommand <> '' then
-    SendViaTelnetSocket(@ConnectionCommand[1])
-  else
-    SetDlgItemText(StackTelHandle, 106, @MyCall[1]);
-
-  SendClientStatus;
+  // Issue #23 -- immediate visual feedback so connect is not a black box:
+  // show the attempt in the window and switch the toolbar to the connected
+  // state (grays Connect, enables Disconnect) the instant the user clicks.
+  Format(wsprintfBuffer, '%s%s:%u', TC_CONNECTINGTO, @PendingTelnetHost[0],
+    PendingTelnetPort);
+  AddStringToTelnetConsole(wsprintfBuffer, tstTR4W);
   EnableTelnetToolbatButtons(True);
-  EnableWindowTrue(StackTelHandle, 104);
-  //  tEnableMenuItem(menu_ctrl_sendspot, MF_ENABLED);
-  processed:
 
+  // Issue #23 -- start each session live: a Freeze left on from a previous
+  // connection would silently suppress auto-scroll on reconnect, looking like
+  // the cluster is dead.  Clear the mode and un-press the Freeze toolbar button.
+  TelnetFreezeMode := False;
+  OldTelnetFreezeMode := False;
+  SendMessage(TelToolbar, TB_CHECKBUTTON, 203, 0);
+
+  TelnetStopRequested := False;
+  logger.Debug('Starting DX cluster I/O thread');
+  TelThreadHandle := tCreateThread(@TelnetThreadProc, TelThreadID);
+  logger.Debug('Created DX cluster thread with threadid of %d', [TelThreadID]);
 end;
 
 procedure Disconnect;
 var
   StackTelHandle: HWND;
 begin
+  if TR4W_TELNET_DEBUG then   // Issue #23 -- log every disconnect
+     begin
+     logger.Info('[Telnet] Disconnecting (socket %d)', [TelnetSock]);
+     end;
   StackTelHandle := tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle;
+
+  // Issue #23 -- show a disconnect message only if we were actually connected
+  // (TelnetSock <> 0).  A failed connect routes through here too but never
+  // connected, so "DISCONNECTED from" would be wrong there.
+  if TelnetSock <> 0 then
+     begin
+     Format(wsprintfBuffer, '%s%s:%u', TC_DISCONNECTEDFROM, @PendingTelnetHost[0],
+       PendingTelnetPort);
+     AddStringToTelnetConsole(wsprintfBuffer, tstTR4W);
+     end;
+
+  // Tell a still-connecting thread to bail (it checks this after connect, since
+  // we can't unblock its in-progress connect via the socket).
+  TelnetStopRequested := True;
+
+  // Close the socket first -- this unblocks the I/O thread's recv so it can
+  // exit -- then JOIN the thread before any teardown.  Without the join the
+  // main thread tore down (and kept allocating/logging) while the raw I/O
+  // thread was still terminating, which corrupted state and crashed.
   closesocket(TelnetSock);
+  TelnetSock := 0;
+  if TelThreadHandle <> 0 then
+     begin
+     WaitForSingleObject(TelThreadHandle, 5000);
+     CloseHandle(TelThreadHandle);
+     TelThreadHandle := 0;
+     end;
+  TelThreadID := 0;
+
   EnableWindowFalse(StackTelHandle, 104);
   EnableWindowTrue(StackTelHandle, 102);
   EnableTelnetToolbatButtons(False);
-  TelnetSock := 0;
-  TelThreadID := 0;
   //  tEnableMenuItem(menu_ctrl_sendspot, MF_BYCOMMAND + MF_GRAYED);
   SendClientStatus;
 end;
 
-procedure TelnetConnectionError;
+procedure TelnetConnectionError(wsaErr: integer);
+var
+  msg: PChar;
 begin
-  AddStringToTelnetConsole(SysErrorMessage(WSAGetLastError), tstError);
+  // Issue #23 -- log the WinSock error to the general error log always
+  // (independent of TELNET DEBUG) and show it in the telnet window.  The code is
+  // passed in (not read from WSAGetLastError) because it may have been captured
+  // on the I/O thread and marshaled here -- WSAGetLastError is per-thread.
+  msg := SysErrorMessage(wsaErr);
+  logger.Error('[Telnet] WinSock error %d: %s', [wsaErr, msg]);
+  AddStringToTelnetConsole(msg, tstError);
 end;
 
 function SendViaTelnetSocket(p: PChar): integer;
+var
+  sent: integer;
 begin
+  Result := 0;
   if TelnetSock = 0 then
     Exit;
+  if TR4W_TELNET_DEBUG then   // Issue #23
+     begin
+     logger.Info('[Telnet TX] %s', [p]);
+     end;
   AddStringToTelnetConsole(p, tstSend);
-  WinSock2.Send(TelnetSock, wsprintfBuffer, Format(wsprintfBuffer, '%s'#13#10,
-    p), 0);
-  Result := WSAGetLastError;
-  if Result <> 0 then
-    TelnetConnectionError;
+  // Issue #23 -- key off the send() return, not WSAGetLastError (which is only
+  // meaningful after SOCKET_ERROR and can read stale after a successful send,
+  // wrongly tearing down a healthy link).  Always runs on the main thread now,
+  // so a real failure can tear the dead socket down directly (closing it also
+  // unblocks the I/O thread's recv).
+  sent := WinSock2.Send(TelnetSock, wsprintfBuffer,
+    Format(wsprintfBuffer, '%s'#13#10, p), 0);
+  if sent = SOCKET_ERROR then
+  begin
+    Result := WSAGetLastError;
+    TelnetConnectionError(Result);
+    Disconnect;
+  end;
 end;
 
 procedure AddStringToTelnetConsole(p: PChar; c: TelnetStringType);
 var
   Handle: HWND;
+  buf: array[0..1023] of Char;   // Issue #23 -- bound the list item to InfoBuffer's size
 begin
+  if TR4W_TELNET_DEBUG then   // Issue #23 -- every line written to the telnet window
+     begin
+     logger.Info('[Telnet WINDOW t=%d] %s', [Ord(c), p]);
+     end;
+
   Handle := TelnetListBox;
 
+  // Issue #23 -- copy into a bounded buffer first.  The owner-draw handler reads
+  // each item back via LB_GETTEXT (which has no size limit) into a same-sized
+  // stack buffer; capping here guarantees that read can never overrun the stack.
+  Windows.lstrcpyn(buf, p, SizeOf(buf));
+
   SendMessage(Handle, LB_SETITEMDATA, SendMessage(Handle, LB_ADDSTRING, 0,
-    integer(p)), integer(c));
+    integer(@buf)), integer(c));
 
   if TelnetFreezeMode then
     Exit;
