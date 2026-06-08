@@ -6,7 +6,7 @@
  const
   TC_TRANSLATION_LANGUAGE               = 'ENGLISH';
   TC_TRANSLATION_AUTHOR                 = 'N4AF';
-  TC_TRANSLATOR_EMAIL                   = 'tr4w@qrz.ru';
+  TC_TRANSLATOR_EMAIL                   = 'ny4i@ny4i.com';
   TC_WAGWarn                            = 'Warning: Out of WAG allowed frequency range';
   TC_FREQ                               = 'Freq';
   TC_POINTS                             = 'Pts';
@@ -184,7 +184,7 @@
   {UTELNET}
 
   TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Freeze'#0'Clear'#0'100'#0#0;
-  TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'YOUR NOT CONNECTED TO THE INTERNET!';
+  TC_YOURNOTCONNECTEDTOTHEINTERNET      = 'YOU ARE NOT CONNECTED TO THE INTERNET!';
   TC_GETHOST                            = 'GET HOST..';
   TC_SERVER                             = 'SERVER: %s';
   TC_HOST                               = 'HOST  : %s';

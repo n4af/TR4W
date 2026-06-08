@@ -2769,6 +2769,7 @@ var
   TR4W_HAMLIB_DEBUG                     : boolean;
   TR4W_HAMLIB_ASYNC_ONLY                : boolean;  // Disable heartbeat — async callbacks only (testing)
   TR4W_HAMLIB_TRACE                     : boolean;  // Enable HamLib internal trace → target/hamlib_trace.log
+  TR4W_TELNET_DEBUG                     : boolean;  // Issue #23 — log all DX cluster I/O + telnet-window writes (INFO, gated)
 
   TR4W_LC_FILENAME                      : PChar = 'LUCONSZ.TTF';
 
