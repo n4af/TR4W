@@ -211,6 +211,7 @@ procedure ImportFromADIF;
 procedure StartNewContest;
 procedure CheckQuestionMark;
 function Get101Window(h: HWND): HWND;
+function TelnetWantsClipboardKey(const aMsg: TMsg): boolean;   // Issue #23
 procedure InvertBooleanCommand(Command: PBoolean);
 procedure RunExplorer(Command: PChar);
 procedure OpenInDefaultTextEditor(FileName: PChar);   // Issue #986
@@ -8186,6 +8187,39 @@ begin
      Format(cmdBuf, 'Notepad %s', FileName);
      WinExec(cmdBuf, SW_SHOWNORMAL);
      end;
+end;
+
+// Issue #23 -- let the DX Cluster window's command field handle the standard
+// clipboard/edit keys (Ctrl-C/V/X, plus Select-All/Undo) itself, instead of the
+// main accelerator table stealing them (Ctrl-V = Execute Config File, Ctrl-C =
+// Clear Mult Sheet).  Returns True when aMsg is one of those keystrokes AND
+// focus is inside the telnet (cluster) window, so the main loop can skip
+// TranslateAccelerator and let the keystroke reach the edit via DispatchMessage.
+// Deliberately scoped to the telnet window only for now so other windows can be
+// vetted separately before extending this behavior.
+function TelnetWantsClipboardKey(const aMsg: TMsg): boolean;
+var
+   hTelnet: HWND;
+begin
+   Result := False;
+   if aMsg.message <> WM_KEYDOWN then Exit;
+   if (GetKeyState(VK_CONTROL) and $8000) = 0 then Exit;   // Ctrl not held
+   case aMsg.wParam of
+      Ord('A'), Ord('C'), Ord('V'), Ord('X'), Ord('Z'): ;   // clipboard / edit keys
+   else
+      Exit;
+   end;
+
+   hTelnet := tr4w_WindowsArray[tw_TELNETWINDOW_INDEX].WndHandle;
+   if hTelnet = 0 then Exit;
+   if aMsg.hwnd = hTelnet then
+      begin
+      Result := True;
+      end
+   else if IsChild(hTelnet, aMsg.hwnd) then
+      begin
+      Result := True;
+      end;
 end;
 
 procedure RunOptionsDialog(f: CFGFunc);

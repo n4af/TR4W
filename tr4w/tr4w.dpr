@@ -911,7 +911,12 @@ begin
   while (GetMessage(Msg, 0, 0, 0)) do
   begin
 
-    if TranslateAccelerator(tr4whandle, tr4w_accelerators, Msg) <> 0 then
+    // Issue #23 -- when a clipboard/edit key (Ctrl-C/V/X/A/Z) is pressed with
+    // the DX Cluster command field focused, skip the main accelerator table so
+    // the keystroke reaches the field (e.g. Ctrl-V pastes) instead of firing
+    // Execute Config File / Clear Mult Sheet.
+    if (not TelnetWantsClipboardKey(Msg)) and
+       (TranslateAccelerator(tr4whandle, tr4w_accelerators, Msg) <> 0) then
     begin
       asm nop end;
       goto NoTransMess;
