@@ -37,6 +37,37 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.6 (2026-06-08) — NY4I
+
+#### DX Cluster: clipboard keys, I/O threading rework, crash fix (`src/uTelnet.pas`, `tr4w.dpr`, `src/MainUnit.pas`, `src/utils/utils_net.pas`, `src/VC.pas`, `src/uCFG.pas`) — Issue #23 (PR #991)
+
+- **Ctrl-V / clipboard keys in the command field**: the global accelerator table (Ctrl-V = Execute Config File, Ctrl-C = Clear Mult Sheet) consumed the standard clipboard/edit keys before the focused field saw them. New `TelnetWantsClipboardKey` (`MainUnit`) returns True for Ctrl-C/V/X/A/Z while focus is inside the telnet window; the main message loop (`tr4w.dpr`) skips `TranslateAccelerator` for those so the keystroke reaches the combobox edit via `DispatchMessage`. Scoped to the telnet window only.
+- **All blocking network I/O moved to a dedicated thread**: `TelnetThreadProc` does connect + blocking `recv` and posts `WM_TELNET_MSG` (CONNECTED/CONNECT_FAILED/DATA/CLOSED) to the window; the main thread does all UI and `ProcessTelnetString` spot/bandmap work. Replaces the old inverted model (connect on a throwaway worker that touched UI; recv on the main thread via `WSAAsyncSelect`/`WM_SOCK`). Received bytes are marshaled as heap chunks (`New`/`Dispose`, `IsMultiThread` set). Thread joined (`WaitForSingleObject`+`CloseHandle`) on teardown; `TelnetStopRequested` bails a still-connecting thread on window close. Sustained ~32 spots/sec in testing with no UI stalls.
+- **Stack-overrun crash fixed**: `WM_DRAWITEM` read each list item via `LB_GETTEXT` into a 128-byte `InfoBuffer`; a long line (a ~230-char WinSock error) overran the stack and corrupted an adjacent `AnsiString`, faulting in `_LStrClr`. `InfoBuffer` enlarged to 1024 and `AddStringToTelnetConsole` caps each item via `lstrcpyn`, bounding every `LB_GETTEXT` reader (also fixes a latent overrun in `SaveTelnetWindowSpots`). Restored the `TelnetBuffer[Len] := #0` terminator the refactor dropped.
+- **`GetConnection` hardening** (`utils_net.pas`): sets the socket to `INVALID_SOCKET` on every failure path (no stale/double-closed handle for the 6 callers), checks `WSAStartup`/`socket()`, and preserves the real connect error across `closesocket` via `WSASetLastError` (a failed connect previously surfaced "The operation completed successfully").
+- **`TELNET DEBUG` flag + connect UX**: new `TELNET DEBUG` config command (`uCFG`, `TR4W_TELNET_DEBUG` in `VC`) gating INFO logging of RX/TX/window writes and connect/disconnect; `TelnetConnectionError` always logs the WinSock code to the error log. Immediate Connect feedback (status line + Connect grays/Disconnect enables); connect/connected/disconnected/failed messages reuse `TC_CONNECTINGTO`/`TC_CONNECTEDTO`/`TC_DISCONNECTEDFROM`/`TC_FAILEDTOCONNECTTO`; `tstTR4W` status text recolored green→black; Freeze resets per connection. ENG consts: `TC_YOURNOTCONNECTEDTOTHEINTERNET` typo + translator email.
+
+#### Rotator control: PSTRotator, long-path turn, TRACE logging (`src/trdos/LOGSTUFF.PAS`, `src/trdos/LOGWIND.PAS`, `src/uCFG.pas`, `src/MainUnit.pas`) — Issues #732, #20, #989 (PR #990)
+
+- **PSTRotator UDP rotator type** (#732): new `PSTRotator` value in `RotatorType`/`RotatorTypeSA` (`LOGWIND`). `RotorControl` routes `ActiveRotatorType = PSTRotator` to new `SendPSTRotorCommand`, which sends `<PST><AZIMUTH>nnn</AZIMUTH></PST>` over UDP via the shared Indy `udp` client to `PSTRotatorIPAddress`:`PSTRotatorUDPPort` (defaults 127.0.0.1:12000). N1MM broadcast and serial paths untouched. New config commands `PSTROTATOR IP ADDRESS` / `PSTROTATOR UDP PORT` (`CommandsArraySize` +2). Selecting the type is the enable; `ROTATOR TYPE = NONE` disables.
+- **Alt-Ctrl-P long-path turn** (#20): Ctrl-P body extracted into `RedoPossibleCallsAndTurnRotor(longPath)` (`MainUnit`); Ctrl-P → `False` (short), new `menu_alt_ctrl_redoposscalls` (10428) → `True` ((heading + 180) mod 360). Accelerator added to all language `.res`.
+- **TRACE logging of rotor commands** (#989): `logger.Trace` of the datagram/command + target in `SendPSTRotorCommand`, `SendUDPRotorCommand`, and the serial path of `RotorControl`.
+
+#### Radio configuration dialog: real Reset, explicit Cancel (`src/uCAT.pas`) — PR #987
+
+- **Reset is now a true form-only reset**: also clears IP ADDRESS, sets TCP PORT to 0 (in-range default; blank tripped the #968 "has no value" warning), sets KEYER RTS/DTR to OFF, and restores NAME to the per-radio default (Rig 1/Rig 2). OK stays enabled to commit the reset.
+- **Close → Cancel + unapplied-change guard**: the Close button is relabeled "Cancel" at runtime via `CANCEL_WORD` (all languages, no resource edit). The title-bar X now prompts (`TC_SAVECHANGES`, Yes/No/Cancel) when the OK button is enabled (the dirty flag); Cancel/Escape discard immediately.
+
+#### File preview: open in the default text editor (`src/MainUnit.pas`, `src/uFileView.pas`, `src/uMenu.pas`) — Issue #986 (PR #988)
+
+- **Open previewed files in the system default `.txt` editor instead of Notepad**: new `OpenInDefaultTextEditor` resolves the executable registered for `.txt` via `AssocQueryStringA(ASSOCSTR_EXECUTABLE)` and launches it with `ShellExecute` (quoted path, `SW_SHOWNORMAL`), falling back to Notepad if no association resolves. Routes the file-preview window and the `history.txt` menu through it. Menu label `Open with &Notepad` → `Open in text &editor`.
+
+#### CI: release job tag fetch (`.github/workflows/release.yml`) — PR #985
+
+- **`fetch tags-only` in the release job**: the release checkout's `fetch-depth: 0` fetched every `refs/heads/*`; on the case-insensitive Windows runner, two branches differing only in case aborted the fetch and killed the release job (first hit on the v4.148.5 tag). Switched to the default shallow checkout plus an explicit `git fetch +refs/tags/*` with a large `--depth` — the notes step only needs tags + history for `git describe`, so no `refs/heads/*` are fetched and a case-only collision can't break a release again.
+
+---
+
 ### 4.148.5 (2026-06-07) — NY4I
 
 #### Cabrillo category compliance & dialog/export fixes (`src/VC.pas`, `src/trdos/PostUnit.PAS`, `src/uCbrSum.pas`, `src/uNewContest.pas`) — Issue #976 (PR #982)

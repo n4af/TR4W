@@ -38,6 +38,31 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.6 (2026-06-08) — NY4I
+
+#### DX Cluster
+
+- **Copy/paste works in the command field**: Ctrl-V (paste), Ctrl-C (copy), and Ctrl-X (cut) now work while typing a cluster command — previously only right-click → Paste did. (#23)
+- **Connecting no longer freezes TR4W**: the cluster connection runs in the background, so connecting to a slow or unreachable host no longer locks up the program. You get immediate feedback — "Connecting to host:port", the Connect button grays out and Disconnect enables — and a clear "Could not connect to host:port" if it fails (the full technical reason is saved to the log).
+- **Fixed a crash** that could occur when a long connection-error message was displayed.
+- **Polish**: status messages are no longer green, and Freeze turns off each time you connect so you always return to live spots. A new **TELNET DEBUG** setting logs cluster traffic for troubleshooting.
+
+#### Rotator Control
+
+- **PSTRotator support**: a new rotator type, **PSTROTATOR**, points your antenna through PSTRotator over the network. Set ROTATOR TYPE = PSTROTATOR and the PSTROTATOR IP ADDRESS / UDP PORT (defaults 127.0.0.1 : 12000). (#732)
+- **Long-path turn**: **Alt-Ctrl-P** turns the rotator to the long path; **Ctrl-P** still turns short path. (#20)
+- With debug logging at TRACE, the exact commands sent to the rotator are now logged for troubleshooting. (#989)
+
+#### Radio Setup
+
+- **The radio configuration window's Reset button now fully resets the form** — clearing the IP address and TCP port, setting keyer RTS/DTR to OFF, and restoring the radio name to its default — the **Close button is now labeled Cancel**, and closing with the **X** asks before discarding unapplied changes.
+
+#### Usability
+
+- **Previewed files open in your default text editor**: log/summary/Cabrillo/ADIF previews (and the History file) now open in whatever editor you've set for .txt files — Notepad++, VS Code, etc. — instead of always Notepad. (#986)
+
+---
+
 ### 4.148.5 (2026-06-07) — NY4I
 
 #### Cabrillo Categories & Export
