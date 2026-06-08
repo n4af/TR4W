@@ -51,8 +51,26 @@ param(
     # leaving the flag list.  Setting -UseUpx restores the historical
     # packaging if a future need arises (e.g. distribution to operators
     # on tightly bandwidth-constrained connections).
-    [switch]$UseUpx
+    [switch]$UseUpx,
+
+    # When set (with -AllLanguages), compile the non-English language variants
+    # CONCURRENTLY instead of in the serial loop. Each language compiles in its
+    # own throwaway git worktree (isolating the shared tr4w_versioninfo.res and
+    # target\tr4w.exe that would otherwise collide), then installers are packaged
+    # SERIALLY back in the main tree. Measured ~4x faster on the 4-core win-ci
+    # runner (8 cold lang compiles: ~46 min serial -> ~12 min). The serial loop
+    # remains the default/fallback; this switch only swaps the compile strategy.
+    [switch]$ParallelLanguages,
+
+    # Max concurrent language compiles when -ParallelLanguages is set. Defaults
+    # to the logical CPU count (DCC32 is single-threaded; one build per core is
+    # the sweet spot -- more than cores adds memory/disk contention with no gain).
+    [int]$Throttle = [int]$env:NUMBER_OF_PROCESSORS
 )
+
+# Guard: a 0/blank NUMBER_OF_PROCESSORS (or a silly override) must not stall the
+# pool. Clamp to a sane floor.
+if ($Throttle -lt 1) { $Throttle = 4 }
 
 $ErrorActionPreference = "Continue"
 
@@ -159,7 +177,12 @@ function Clear-SrcDcus {
 function Write-VersionInfoResource {
     param(
         [Parameter(Mandatory=$true)][string]$Lang,
-        [Parameter(Mandatory=$true)][string]$VersionString
+        [Parameter(Mandatory=$true)][string]$VersionString,
+        # Which tr4w\ dir to emit tr4w_versioninfo.rc/.res into. Defaults to the
+        # main checkout; the parallel-language path passes a per-worktree tr4w\
+        # so concurrent builds each get their own .res (no shared-file race --
+        # see the -ParallelLanguages block).
+        [string]$Tr4wDir = $TR4W_DIR
     )
 
     # Parse "4.147.19" into 4 numeric parts; pad with 0 to make it
@@ -228,8 +251,8 @@ function Write-VersionInfoResource {
 }
 "@
 
-    $rcPath  = Join-Path $TR4W_DIR "tr4w_versioninfo.rc"
-    $resPath = Join-Path $TR4W_DIR "tr4w_versioninfo.res"
+    $rcPath  = Join-Path $Tr4wDir "tr4w_versioninfo.rc"
+    $resPath = Join-Path $Tr4wDir "tr4w_versioninfo.res"
     Set-Content -Path $rcPath -Value $rc -Encoding ASCII
 
     $brcc32 = Join-Path $Delphi7Bin "brcc32.exe"
@@ -242,7 +265,7 @@ function Write-VersionInfoResource {
     # parser splits on the dot in "-fotr4w_versioninfo.res", leaving
     # brcc32 to complain "Could not open input file .res". Use the
     # stop-parsing token --% so PowerShell passes the args verbatim.
-    Push-Location $TR4W_DIR
+    Push-Location $Tr4wDir
     # Pre-delete stale output so a brcc32 failure can't be masked by a
     # leftover .res from a previous successful run.
     if (Test-Path $resPath) { Remove-Item $resPath -Force }
@@ -394,6 +417,206 @@ function Invoke-Packaging {
     $sz = (Get-Item $installerPath).Length
     Write-Host "  Installer: $installerPath ($sz bytes)" -ForegroundColor Green
     return $true
+}
+
+# ---------------------------------------------------------------------------
+# Parallel language compile (used when -ParallelLanguages is set).
+#
+# WHY worktrees: each language compile embeds a per-language VERSIONINFO via the
+# {$R tr4w_versioninfo.res} directive, whose path is hardcoded relative to
+# tr4w.dpr -- so ALL builds in one tree share that single .res. Two concurrent
+# builds would race on it (and on target\tr4w.exe). Giving each concurrent
+# compile its own detached git worktree isolates BOTH files for free, and lets
+# us reuse Write-VersionInfoResource + the DCC32 invocation unchanged.
+#
+# Strategy:
+#   1. Create a pool of $Throttle worktrees, all detached at the main build's
+#      HEAD (so they compile byte-identical source).
+#   2. Feed the languages through the pool, $Throttle compiling at once. Each
+#      slot: gen that language's .res into ITS worktree (serial/fast, isolated),
+#      then launch DCC32 async in that worktree (the expensive, parallel part).
+#      On exit, copy the worktree's tr4w.exe to a collection dir.
+#   3. Package SERIALLY back in the main tree (which already has tr4wserver.exe
+#      + all the runtime DLLs/data NSIS bundles) -- packaging is ~3s/lang, not
+#      worth parallelizing and avoids any shared-path issues in build\release\.
+#
+# Returns the same [{Lang;Status;Size;Hash}] shape the serial loop produces, so
+# the caller's summary + ENG relink are identical for both paths.
+# ---------------------------------------------------------------------------
+
+# Run git with its stderr fully isolated to a temp file. git emits routine
+# informational text ("Preparing worktree...", checkout progress) on STDERR; the
+# usual `& git ... 2>&1 | Out-Null` merges that into PowerShell's error stream,
+# which surfaces as a *terminating* NativeCommandError and aborts the script.
+# Routing git through Start-Process (streams -> files) means PowerShell never
+# sees that output as an error. Returns @{ Code = <exit>; Out = <stdout text> }.
+function Invoke-GitCmd {
+    param([Parameter(Mandatory=$true)][string[]]$GitArgs)
+    $o = [System.IO.Path]::GetTempFileName()
+    $e = [System.IO.Path]::GetTempFileName()
+    try {
+        $p = Start-Process -FilePath 'git' -ArgumentList $GitArgs -NoNewWindow -Wait -PassThru `
+                 -RedirectStandardOutput $o -RedirectStandardError $e
+        $out = Get-Content -Raw $o -ErrorAction SilentlyContinue
+        if (-not $out) { $out = '' }
+        return @{ Code = $p.ExitCode; Out = $out.Trim() }
+    } finally {
+        Remove-Item $o, $e -Force -ErrorAction SilentlyContinue
+    }
+}
+
+function Invoke-ParallelLangBuilds {
+    param(
+        [Parameter(Mandatory=$true)][string[]]$Langs,
+        [Parameter(Mandatory=$true)][int]$Throttle,
+        [Parameter(Mandatory=$true)][string]$Version,
+        [Parameter(Mandatory=$true)][bool]$DoInstallers
+    )
+
+    # Commit the main build is on -- worktrees detach here so they build the
+    # exact same source that produced the ENG exe a moment ago.
+    $headSha = (Invoke-GitCmd @('-C', $ProjectRoot, 'rev-parse', 'HEAD')).Out
+    if (-not $headSha) {
+        Write-Host "  Could not resolve HEAD via git -- cannot create worktrees." -ForegroundColor Red
+        return @($Langs | ForEach-Object { [PSCustomObject]@{ Lang=$_; Status="FAIL"; Size=0; Hash="" } })
+    }
+
+    # Worktrees live OUTSIDE the repo (sibling dir) so git never treats them as
+    # nested working copies. Collected per-language exes go under target\.
+    $wtBase  = Join-Path (Split-Path $ProjectRoot -Parent) "tr4w-parbuild"
+    $collect = Join-Path $EXE_DIR "lang-parallel"
+    if (Test-Path $collect) { Remove-Item $collect -Recurse -Force -ErrorAction SilentlyContinue }
+    New-Item -ItemType Directory -Force -Path $collect | Out-Null
+
+    Write-Host "  Parallel compile: throttle=$Throttle  HEAD=$($headSha.Substring(0,12))  worktrees=$wtBase" -ForegroundColor DarkGray
+
+    # Clean any leftovers from a prior interrupted run, then (re)create the pool.
+    if (Test-Path $wtBase) {
+        Get-ChildItem $wtBase -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+            Invoke-GitCmd @('-C', $ProjectRoot, 'worktree', 'remove', '--force', $_.FullName) | Out-Null
+        }
+        Remove-Item $wtBase -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    Invoke-GitCmd @('-C', $ProjectRoot, 'worktree', 'prune') | Out-Null
+    New-Item -ItemType Directory -Force -Path $wtBase | Out-Null
+
+    $pool = @()
+    for ($i = 0; $i -lt $Throttle; $i++) {
+        $wtPath = Join-Path $wtBase "wt_$i"
+        Write-Host "  Creating worktree wt_$i ..." -ForegroundColor DarkGray
+        $addRc = (Invoke-GitCmd @('-C', $ProjectRoot, 'worktree', 'add', '--detach', $wtPath, $headSha)).Code
+        $wtTr4w = Join-Path $wtPath "tr4w"
+        if ($addRc -ne 0 -or -not (Test-Path (Join-Path $wtTr4w "tr4w.dpr"))) {
+            Write-Host "  wt_$i creation FAILED (git rc=$addRc, no tr4w.dpr) -- aborting parallel build." -ForegroundColor Red
+            return @($Langs | ForEach-Object { [PSCustomObject]@{ Lang=$_; Status="FAIL"; Size=0; Hash="" } })
+        }
+        $pool += [PSCustomObject]@{ Index=$i; WtRoot=$wtPath; Tr4w=$wtTr4w; Busy=$false; Proc=$null; Lang=$null; Sw=$null; ExeDir=$null }
+    }
+
+    # --- Throttled compile loop ---
+    $queue = New-Object System.Collections.Queue
+    $Langs | ForEach-Object { $queue.Enqueue($_) }
+    $compiled = @{}   # lang -> @{ Ok; Seconds; CollectedExe }
+
+    while ($queue.Count -gt 0 -or @($pool | Where-Object Busy).Count -gt 0) {
+        foreach ($slot in @($pool | Where-Object { -not $_.Busy })) {
+            if ($queue.Count -eq 0) { break }
+            $lang   = $queue.Dequeue()
+            $wtTr4w = $slot.Tr4w
+            $exeDir = Join-Path $wtTr4w "target"
+            New-Item -ItemType Directory -Force -Path $exeDir | Out-Null
+            $builtExe = Join-Path $exeDir "tr4w.exe"
+            if (Test-Path $builtExe) { Remove-Item $builtExe -Force }
+
+            # Per-worktree Indy/library search paths -- keep the whole compile
+            # self-contained in this worktree (no cross-tree DCU mixing).
+            $wtLib = "$wtTr4w\include\Core;$wtTr4w\include\System;$wtTr4w\include;$wtTr4w\include\Protocols"
+
+            # VERSIONINFO into THIS worktree's tr4w\ (serial, ~1s; isolated).
+            $viOk = Write-VersionInfoResource -Lang $lang -VersionString $Version -Tr4wDir $wtTr4w
+
+            # -B = cold full rebuild (fresh worktree src\ has no DCUs anyway;
+            # -B makes that explicit and matches the serial path's behaviour).
+            $dccArgs = @("tr4w.dpr", '-$D+', '-$L+', '-$Y+', '-B', "-DLANG_$lang")
+            if ($viOk) { $dccArgs += "-DVERSIONINFO_RES" }
+            $dccArgs += @("/U$wtLib", "/I$wtLib", "/E$exeDir")
+
+            $outLog = Join-Path $collect "$lang.compile.out.log"
+            $errLog = Join-Path $collect "$lang.compile.err.log"
+            $proc = Start-Process -FilePath $DCC32 -ArgumentList $dccArgs `
+                        -WorkingDirectory $wtTr4w -NoNewWindow -PassThru `
+                        -RedirectStandardOutput $outLog -RedirectStandardError $errLog
+            # Cache the handle so .ExitCode is readable after exit (PowerShell
+            # drops it otherwise). Best-effort -- exe presence is the real gate.
+            try { $null = $proc.Handle } catch {}
+
+            $slot.Busy = $true; $slot.Proc = $proc; $slot.Lang = $lang; $slot.ExeDir = $exeDir
+            $slot.Sw = [System.Diagnostics.Stopwatch]::StartNew()
+            Write-Host ("  [{0:HH:mm:ss}] compile {1} on wt_{2}  (queued={3})" -f (Get-Date), $lang, $slot.Index, $queue.Count) -ForegroundColor DarkGray
+        }
+
+        Start-Sleep -Milliseconds 750
+
+        foreach ($slot in @($pool | Where-Object { $_.Busy -and $_.Proc.HasExited })) {
+            $slot.Sw.Stop()
+            $lang     = $slot.Lang
+            $builtExe = Join-Path $slot.ExeDir "tr4w.exe"
+            $secs     = [math]::Round($slot.Sw.Elapsed.TotalSeconds, 1)
+            # Success gate = exe produced (a failed/partial compile leaves none,
+            # since we cleared it pre-launch). ExitCode is logged when available.
+            $rc = try { $slot.Proc.ExitCode } catch { $null }
+            if (Test-Path $builtExe) {
+                $dest = Join-Path $collect "tr4w-$lang.exe"
+                Copy-Item -Path $builtExe -Destination $dest -Force
+                $compiled[$lang] = @{ Ok=$true; Seconds=$secs; CollectedExe=$dest }
+                Write-Host ("  [{0:HH:mm:ss}] OK   {1} on wt_{2}  {3}s  exit={4}" -f (Get-Date), $lang, $slot.Index, $secs, $rc) -ForegroundColor Green
+            } else {
+                $compiled[$lang] = @{ Ok=$false; Seconds=$secs; CollectedExe=$null }
+                Write-Host ("  [{0:HH:mm:ss}] FAIL {1} on wt_{2}  {3}s  exit={4}  (see $collect\$lang.compile.out.log)" -f (Get-Date), $lang, $slot.Index, $secs, $rc) -ForegroundColor Red
+            }
+            $slot.Busy = $false; $slot.Proc = $null; $slot.Lang = $null; $slot.ExeDir = $null
+        }
+    }
+
+    # --- Package (or stash) in the MAIN tree, serially ---
+    if (-not $DoInstallers) {
+        New-Item -ItemType Directory -Force -Path $LANG_OUT | Out-Null
+    }
+    $langResults = @()
+    foreach ($lang in $Langs) {
+        $c = $compiled[$lang]
+        if (-not $c -or -not $c.Ok) {
+            $langResults += [PSCustomObject]@{ Lang=$lang; Status="FAIL"; Size=0; Hash="" }
+            continue
+        }
+        $size = (Get-Item $c.CollectedExe).Length
+        $hash = (Get-FileHash $c.CollectedExe -Algorithm SHA256).Hash.Substring(0,12)
+
+        if ($DoInstallers) {
+            # Stage this language's exe where Invoke-Packaging/NSIS expect it
+            # (main target\tr4w.exe), then package. Serial -> no collision.
+            Copy-Item -Path $c.CollectedExe -Destination (Join-Path $EXE_DIR "tr4w.exe") -Force
+            $pkgOk = Invoke-Packaging -Version $Version -LangCode $lang.ToLower()
+            $status = if ($pkgOk) { "OK" } else { "PKG_FAIL" }
+            $langResults += [PSCustomObject]@{ Lang=$lang; Status=$status; Size=$size; Hash=$hash }
+        } else {
+            $langFinalExe = Join-Path $LANG_OUT "tr4w-$lang.exe"
+            if (Test-Path $langFinalExe) { Remove-Item $langFinalExe -Force }
+            Copy-Item -Path $c.CollectedExe -Destination $langFinalExe -Force
+            Write-Host "  Saved $langFinalExe" -ForegroundColor Green
+            $langResults += [PSCustomObject]@{ Lang=$lang; Status="OK"; Size=$size; Hash=$hash }
+        }
+    }
+
+    # --- Tear down the worktree pool ---
+    foreach ($slot in $pool) {
+        Invoke-GitCmd @('-C', $ProjectRoot, 'worktree', 'remove', '--force', $slot.WtRoot) | Out-Null
+    }
+    Invoke-GitCmd @('-C', $ProjectRoot, 'worktree', 'prune') | Out-Null
+    Remove-Item $wtBase -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Host "  Worktree pool removed." -ForegroundColor DarkGray
+
+    return $langResults
 }
 
 # ---------------------------------------------------------------------------
@@ -570,6 +793,15 @@ if ($result -eq 0) {
                 New-Item -ItemType Directory -Force -Path $LANG_OUT | Out-Null
             }
 
+            if ($ParallelLanguages) {
+                # Parallel path: isolated-worktree concurrent compile, then
+                # serial packaging. Returns the same result shape as the serial
+                # loop below, so the summary + ENG relink are identical.
+                Write-Host ""
+                Write-Host "=== Building languages IN PARALLEL (throttle $Throttle, isolated worktrees) ===" -ForegroundColor Cyan
+                $langResults = Invoke-ParallelLangBuilds -Langs $otherLangs -Throttle $Throttle `
+                                   -Version $TR4W_VERSION -DoInstallers ([bool]$BuildInstallers)
+            } else {
             foreach ($lang in $otherLangs) {
                 Write-Host ""
                 Write-Host "=== Building LANG_$lang ===" -ForegroundColor Cyan
@@ -639,6 +871,7 @@ if ($result -eq 0) {
                     Write-Host "  FAIL (exit code $langRc)" -ForegroundColor Red
                 }
             }
+            }  # end serial-vs-parallel branch ($ParallelLanguages)
 
             Write-Host ""
             Write-Host "=== LANGUAGE BUILD SUMMARY ===" -ForegroundColor Cyan

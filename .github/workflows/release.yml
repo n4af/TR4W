@@ -188,8 +188,14 @@ jobs:
         shell: powershell
         working-directory: ${{ github.workspace }}\tr4w
         run: |
+          # -ParallelLanguages compiles the 8 non-English variants concurrently
+          # in isolated git worktrees (then packages serially), cutting the
+          # all-languages build from ~46 min to ~12 min on the 4-core runner.
+          # -Throttle defaults to the CPU count. To fall back to the serial
+          # loop (e.g. if a runner misbehaves), just drop -ParallelLanguages.
           .\FullBuild.ps1 `
             -AllLanguages `
+            -ParallelLanguages `
             -BuildInstallers `
             -ProjectRoot $env:GITHUB_WORKSPACE `
             -Delphi7Bin  $env:DELPHI7_BIN `
