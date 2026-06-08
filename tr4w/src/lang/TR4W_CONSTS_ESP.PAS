@@ -59,7 +59,7 @@ const
   TC_NOTE                               = 'nota';
   TC_DUPESHEETCLEARED                   = 'Hoja de duplicados borrada!';
   TC_MULTSHEETCLEARED                   = '¡Hoja de multiplicadores borrada!';
-  TC_YESTOCLEARTHEDUPESHEET             = '"YES" para borrar la hoja de duplicados';
+  TC_YESTOCLEARTHEDUPESHEET             = '"Si" para borrar la hoja de duplicados';
   TC_TRANSMITFREQUENCYKILOHERTZ         = 'frecuencia transmision (kiloHertz): ';
   TC_CLEARMULTTOCLEARMULTSHEET          = '"CLEARMULT" para borrar la hoja de multiplicadores';
   TC_SPRINTQSYRULE                      = 'SPRINT QSY RULE!!!';
@@ -112,24 +112,24 @@ const
   TC_RFAS                               = 'Entre sus coordenadas geograficas:';
   TC_ENTERYOURSIXDIGITGRIDSQUARE        = 'Entre sus seis digitos del locator:';
   TC_ISLANDSTATION                      = 'Estacion de isla';
-  TC_ENTERYOURNAMEANDSTATE              = 'Entre su name (y estado si esta en norteamerica):';
+  TC_ENTERYOURNAMEANDSTATE              = 'Entre su name (y estado US si esta en norteamerica):';
   TC_ENTERYOURNAMEANDQTH                = 'Entre su nombre y QTH (estado US, provincia canadiense o pais DX):';
-  TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Entre su precedence, your check'#13'(last two digits of year licensed) and ARRL section:';
+  TC_ENTERYOURPRECEDENCECHECKSECTION    = 'Entre su precedence, su check'#13'(last dos numeros de ano licensed) y ARRL section:';
   TC_ENTERYOURQTHANDTHENAME             = 'Entre su QTH que quiere enviar'#13'y el nombre que quiere usar:';
-  TC_ENTERFIRSTTWODIGITSOFYOURQTH       = 'Enter dos primeros digitos de su QTH:';
+  TC_ENTERFIRSTTWODIGITSOFYOURQTH       = 'Entre dos primeros digitos de su QTH:';
   TC_ENTERYOURAGEINMYSTATEFIELD         = 'Entre su edad en el campo MY STATE:';
   TC_ENTERYOURQTHORPOWER                = 'Entre su QTH que quiere enviar si estña en norteamerica o su potencia como MY STATE si es de fuera:';
   TC_ENTERFIRSTTWOLETTERSOFYOURGRID     = 'Entre las dos primeras letras de su locator:';
-  TC_ENTERYOURSQUAREID                  = 'Enter your square ID:';
+  TC_ENTERYOURSQUAREID                  = 'Entre su square ID:';
 
-  TC_ENTERYOURMEMBERSHIPNUMBER          = 'Enter your membership number:';
-  TC_ENTERYOURCONTINENT                 = 'Enter your continent (and possible additional ID, i.e. SAYL or NAQRP)';
-  TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Enter your county if you in %s state. Enter your state, Canadian Province or "DX" if outside of %s:';
-  TC_PREFECTURE                         = 'Enter your prefecture:';
-  TC_STATIONCLASS                       = 'Enter your station class:';
-  TC_AGECALLSIGNAGE                     = 'Enter your age (and Silent Key callsign and age):';
-  TC_DEPARTMENT                         = 'Enter your department:';
-  TC_ENTERYOURRDAIDORGRID               = 'Enter your RDA ID (for UA1A stations) or four digit grid square:';
+  TC_ENTERYOURMEMBERSHIPNUMBER          = 'Entre su membership number:';
+  TC_ENTERYOURCONTINENT                 = 'Entre su continent (and possible additional ID, i.e. SAYL or NAQRP)';
+  TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX  = 'Entre su pais si lo esta en %s estade. Entre su estado US, provincia canadiense o pais DX of %s:';
+  TC_PREFECTURE                         = 'Entre su prefecture:';
+  TC_STATIONCLASS                       = 'Entre su station class:';
+  TC_AGECALLSIGNAGE                     = 'Entre su edad (and Silent Key callsign y edad):';
+  TC_DEPARTMENT                         = 'Entre su department:';
+  TC_ENTERYOURRDAIDORGRID               = 'Entre su RDA ID (for UA1A stations) or cuatro digit locator:';
 
   TC_NEWENGLAND                         = 'Nueva Inglaterra';
   TC_CALIFORNIA                         = 'California';
