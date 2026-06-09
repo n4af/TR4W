@@ -38,6 +38,18 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.7 (2026-06-08) — NY4I
+
+#### Crash Recovery
+
+- **The restart file is saved after each QSO again.** The **UPDATE RESTART FILE ENABLE** setting — which had quietly been doing nothing for years — now works and is **on by default**, so after an unexpected shutdown TR4W restores more of your latest operating state. Set `UPDATE RESTART FILE ENABLE = FALSE` if you'd rather it only save on operator change, log load, and exit. (#950)
+
+#### Translations
+
+- **Spanish**: translation refinements. (#992)
+
+---
+
 ### 4.148.6 (2026-06-08) — NY4I
 
 #### DX Cluster

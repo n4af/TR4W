@@ -37,6 +37,32 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.7 (2026-06-08) — NY4I
+
+#### Config: restore UPDATE RESTART FILE ENABLE (`src/uCFG.pas`, `src/trdos/LOGSUBS2.PAS`, `src/trdos/CFGDEF.PAS`) — Issue #950 (PR #996)
+
+- **The command was a silent no-op in two independent layers, both fixed**: (1) the `CFGCA` entry was marked `crS: csRem` (retired tombstone), so `CheckCommand` (`uCFG.pas`) recognized it — no "invalid statement" warning — but `Exit`ed before applying it, leaving `UpdateRestartFileEnable` untouched; changed to `csOld`. (2) The per-QSO `if UpdateRestartFileEnable then Sheet.SaveRestartFile;` in `LogContact` (`LOGSUBS2.PAS`) was commented out; re-enabled. (The original live calls were lost in the 596-line accidental deletion in `43ce836`, 2020.)
+- **Default restored to True**: `SetConfigurationDefaultValues` (`CFGDEF.PAS`) had `UpdateRestartFileEnable := True` commented out. The per-QSO restart-file save is now on by default; `UPDATE RESTART FILE ENABLE = FALSE` disables it. The save runs on the main thread via the single centralized `DupeAndMultSheet.SaveRestartFile`, so it cannot collide with itself and needs no write queue.
+- **Documented `crS` / `CFGStatus`** above the `CFGCA` array: `csNew`/`csOld` = active (applied), `csRem` = retired (recognized but not applied + hidden from the Options dialog); flip `csRem→csOld` to re-activate.
+
+#### Build: parallel language compile (`tr4w/FullBuild.ps1`) — PR #995
+
+- **`-ParallelLanguages` switch**: compiles the per-language builds concurrently in isolated git worktrees instead of serially, reducing full-build wall-clock time.
+
+#### CI: Claude review workflows (`.github/workflows/claude-code-review.yml`) — PR #993
+
+- **Added the Claude GitHub Actions (#993), then removed the automatic on-every-PR review** (`claude-code-review.yml`) to keep it opt-in.
+
+#### Docs: VCL-in-Win32 coexistence (`docs/VCL_WIN32_COEXISTENCE.md`) — PR #994
+
+- **Captured the technique** for running Delphi VCL forms alongside the legacy raw-Win32 message loop (`Application.ShowMainForm := False`, `TForm.Create(nil)`, `IsDialogMessage` hook) as a reference for the Delphi 12/13 migration.
+
+#### i18n: Spanish (`src/lang/TR4W_CONSTS_ESP.PAS`) — PR #992
+
+- **Spanish translation refinements** to `TC_`/`RC_` constants.
+
+---
+
 ### 4.148.6 (2026-06-08) — NY4I
 
 #### DX Cluster: clipboard keys, I/O threading rework, crash fix (`src/uTelnet.pas`, `tr4w.dpr`, `src/MainUnit.pas`, `src/utils/utils_net.pas`, `src/VC.pas`, `src/uCFG.pas`) — Issue #23 (PR #991)
