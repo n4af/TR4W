@@ -365,6 +365,11 @@ const
    + 1 {TELNET DEBUG}  // Issue #23
    ;
 
+   // crS (CFGStatus): csNew / csOld = active -- the command's value IS applied.
+   //   csRem = retired -- still recognized so old configs do not error, but the
+   //   parser does NOT apply it (CheckCommand exits early) and it is hidden from
+   //   the Options dialog. csNew vs csOld is informational only; no code reads
+   //   the difference. To re-activate a retired command, change csRem to csOld.
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
    CFGCA: array[1..CommandsArraySize] of CFGRecord =
       (
@@ -833,7 +838,7 @@ const
  (crCommand: 'UDP BROADCAST ALL QSOS';        crAddress: @UDPBroadcastAllQSOs;            crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),  // ny4i Issue 82
  (crCommand: 'UNKNOWN COUNTRY FILE ENABLE';   crAddress: @UnknownCountryFileEnable;       crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'UNKNOWN COUNTRY FILE NAME';     crAddress: @UnknownCountryFileName;         crMin:0;  crMax:255;     crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctString; crNetwork: 1),
- (crCommand: 'UPDATE RESTART FILE ENABLE';    crAddress: @UpdateRestartFileEnable;        crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
+ (crCommand: 'UPDATE RESTART FILE ENABLE';    crAddress: @UpdateRestartFileEnable;        crMin:0;  crMax:0;       crS: csOld; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal;  cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'USE BIOS KEY CALLS';            crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'USE CONTROL PORT';              crAddress: @tUseControlPort;                crMin:0;  crMax:0;       crS: csNew; crA: 0; crC:0 ; crP:0; crJ: 1; crKind: ckNormal;   cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),
  (crCommand: 'USE IRQS';                      crAddress: nil;                             crMin:0;  crMax:0;       crS: csRem; crA: 0; crC:0 ; crP:0; crJ: 0; crKind: ckNormal; cfFunc: cfAll; crType: ctBoolean; crNetwork: 1),

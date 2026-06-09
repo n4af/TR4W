@@ -1558,7 +1558,7 @@ begin
     if QSOTotals[AllBands, Both] > 0 then
       if QSOTotals[AllBands, Both] mod FloppyFileSaveFrequency = 0 then
         SaveLogFileToFloppy;
-//  if UpdateRestartFileEnable then Sheet.SaveRestartFile;
+  if UpdateRestartFileEnable then Sheet.SaveRestartFile;
   BeSilent := False;
   NameCallsignPutUp := '';
   if CheckLogFileSize then

@@ -553,7 +553,7 @@ begin
 
   //  UnknownCountryFileEnable := False;
   //  UnknownCountryFileName := 'UNKNOWN.CTY';
-  //  UpdateRestartFileEnable := True;
+  UpdateRestartFileEnable := True;
      //   UseBIOSKeyCalls := False;
   //  UserInfoShown := NoUserInfo;
 
