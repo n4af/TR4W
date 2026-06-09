@@ -365,6 +365,11 @@ const
    + 1 {TELNET DEBUG}  // Issue #23
    ;
 
+   // crS (CFGStatus): csNew / csOld = active -- the command's value IS applied.
+   //   csRem = retired -- still recognized so old configs do not error, but the
+   //   parser does NOT apply it (CheckCommand exits early) and it is hidden from
+   //   the Options dialog. csNew vs csOld is informational only; no code reads
+   //   the difference. To re-activate a retired command, change csRem to csOld.
    // Note if crAddress says pointer(NN), then it is calling a function at position NN in the an array
    CFGCA: array[1..CommandsArraySize] of CFGRecord =
       (
