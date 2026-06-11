@@ -1,9 +1,9 @@
 #requires -Version 5.1
 <#
 .SYNOPSIS
-  TR4W release prep + tag. Regenerates TRMASTER.DTA, refreshes CTY.DAT, bumps
-  Version.pas, does a local compile, then commits and tags so CI builds the
-  installers.
+  TR4W release prep + tag. Regenerates TRMASTER.DTA, refreshes CTY.DAT and
+  TRCLUSTER.DAT, bumps Version.pas, does a local compile, then commits and tags
+  so CI builds the installers.
 
 .DESCRIPTION
   Run on a Windows dev box (Windows PowerShell 5.1 -- same shell the CI runner
@@ -17,8 +17,8 @@
 
   Order (each step aborts on failure):
     preconditions -> CHANGES check -> TRMASTER regen+validate -> CTY download+
-    validate -> Version.pas bump -> LOCAL build -> confirm -> commit -> push
-    master -> tag -> push tag.
+    validate -> TRCLUSTER download+validate -> Version.pas bump -> LOCAL build
+    -> confirm -> commit -> push master -> tag -> push tag.
 
 .PARAMETER Version
   Release version, e.g. 4.147.25  (no leading 'v', no '-all').
@@ -26,6 +26,10 @@
 .PARAMETER CtyUrl
   URL of the current CTY.DAT. Default points at AD1C / country-files.com --
   VERIFY this is the variant you ship before relying on it.
+
+.PARAMETER ClusterUrl
+  URL of the current TRCLUSTER.DAT (DX-cluster telnet host list read by
+  uTelnet.pas). Default points at dxcluster.info.
 
 .PARAMETER EnglishOnly
   Tag without '-all' (ENG-only build). Default is all languages.
@@ -35,6 +39,9 @@
 
 .PARAMETER SkipCty
   Don't download CTY.DAT; ship whatever is already in target\.
+
+.PARAMETER SkipCluster
+  Don't download TRCLUSTER.DAT; ship whatever is already in target\.
 
 .PARAMETER DryRun
   Do everything locally (regen, download, bump, build) but DO NOT commit, tag,
@@ -52,9 +59,11 @@
 param(
    [Parameter(Mandatory = $true)][string] $Version,
    [string] $CtyUrl = 'https://www.country-files.com/cty/cty.dat',   # from uCTYUpdate.pas CTY_DOWNLOAD_URL (the app's Alt-O fetch)
+   [string] $ClusterUrl = 'http://www.dxcluster.info/telnet/TRCLUSTER.DAT',
    [switch] $EnglishOnly,
    [switch] $SkipTrmaster,
    [switch] $SkipCty,
+   [switch] $SkipCluster,
    [switch] $DryRun,
    [switch] $Yes
 )
@@ -74,6 +83,7 @@ $Changes     = Join-Path $RepoRoot 'CHANGES.md'
 $RelNotes    = Join-Path $RepoRoot 'RELEASE_NOTES.md'
 $CtyFile     = Join-Path $Target 'cty.dat'
 $TrmasterFile= Join-Path $Target 'TRMASTER.DTA'
+$ClusterFile = Join-Path $Target 'trcluster.dat'
 
 # We CALL the existing build_trmaster.cmd (no duplicated logic). It takes no args,
 # writes TRMASTER.DTA in its own dir (OUT=TRMASTER.DTA), returns exit 0/1, and
@@ -132,7 +142,7 @@ if ((& git.exe -C $RepoRoot ls-remote --tags origin "$Tag") ) { Fail "Tag $Tag a
 
 # Warn on unexpected dirty files (the data files are expected to change; flag anything else)
 $dirty = (& git.exe -C $RepoRoot status --porcelain) | Where-Object {
-   $_ -and ($_ -notmatch 'target/cty\.dat') -and ($_ -notmatch 'target/TRMASTER\.DTA') -and ($_ -notmatch 'src/Version\.pas')
+   $_ -and ($_ -notmatch 'target/cty\.dat') -and ($_ -notmatch 'target/TRMASTER\.DTA') -and ($_ -notmatch 'target/trcluster\.dat') -and ($_ -notmatch 'src/Version\.pas')
 }
 if ($dirty) {
    Warn "Working tree has changes beyond the release data files:"
@@ -196,6 +206,34 @@ if (-not $SkipCty) {
 } else { Step "CTY.DAT (skipped -- using existing target\ copy)" }
 
 # ---------------------------------------------------------------------------
+# 4b. Download + validate TRCLUSTER.DAT into target\
+#     Static DX-cluster telnet host list (one host[:port] per line) read by
+#     uTelnet.pas. Unlike cty.dat this is a normally-tracked repo file (un-
+#     ignored via .gitignore negation, NOT runtime-rewritten), so a plain
+#     git add commits any refresh.
+# ---------------------------------------------------------------------------
+if (-not $SkipCluster) {
+   Step "TRCLUSTER.DAT download"
+   $tmp = Join-Path $env:TEMP "trcluster_dl_$([guid]::NewGuid().ToString('N')).dat"
+   Info "GET $ClusterUrl   (UA 'TR4W', follow redirects)"
+   & curl.exe -fsSL -A 'TR4W' -o $tmp $ClusterUrl
+   if ($LASTEXITCODE -ne 0) { Fail "TRCLUSTER.DAT download failed (curl exit $LASTEXITCODE). Check the URL / connectivity." }
+   $len = (Get-Item $tmp).Length
+   if ($len -lt 1000) { Fail "Downloaded TRCLUSTER.DAT is only $len bytes -- looks truncated/wrong; not shipping it." }
+   # Sanity: reject an HTML/error page, and require a plausible number of
+   # host[:port] lines (the real file has 700+).
+   $lines = Get-Content $tmp
+   $firstNonEmpty = $lines | Where-Object { $_.Trim() -ne '' } | Select-Object -First 1
+   if ($firstNonEmpty -like '<*') { Fail "Downloaded TRCLUSTER.DAT looks like an HTML/error page (starts with '<'); aborting." }
+   $hostLines = @($lines | Where-Object { $_.Trim() -match '^[A-Za-z0-9][A-Za-z0-9._\-]*(:\d{1,5})?\s*$' })
+   if ($hostLines.Count -lt 20) { Fail "Downloaded TRCLUSTER.DAT has only $($hostLines.Count) host-shaped lines -- looks wrong; aborting." }
+   Info "Downloaded OK ($len bytes, $($hostLines.Count) host entries)"
+   if (Test-Path $ClusterFile) { Copy-Item $ClusterFile "$ClusterFile.bak" -Force }
+   Copy-Item $tmp $ClusterFile -Force
+   Remove-Item $tmp -Force
+} else { Step "TRCLUSTER.DAT (skipped -- using existing target\ copy)" }
+
+# ---------------------------------------------------------------------------
 # 5. Bump Version.pas (number + date), preserving formatting
 # ---------------------------------------------------------------------------
 Step "Version.pas"
@@ -228,7 +266,7 @@ if ($DryRun) {
    exit 0
 }
 Step "Ready to release"
-Info "Will commit Version.pas + cty.dat + TRMASTER.DTA (+ changelogs if changed),"
+Info "Will commit Version.pas + cty.dat + TRMASTER.DTA + trcluster.dat (+ changelogs if changed),"
 Info "push master, tag $Tag, and push the tag (this triggers the CI installer build)."
 if (-not $Yes) { $a = Read-Host "Proceed with commit/tag/push? (y/N)"; if ($a -ne 'y') { Fail "Aborted by user (nothing committed)." } }
 
@@ -245,8 +283,11 @@ foreach ($df in @($CtyFile, $TrmasterFile)) {
    & git.exe -C $RepoRoot update-index --no-skip-worktree $df 2>$null   # ok if it wasn't set
    Git add -f $df
 }
+# trcluster.dat is a normally-tracked repo file (un-ignored via .gitignore
+# negation, not skip-worktree) -- a plain add commits any refresh.
+if (Test-Path $ClusterFile) { Git add $ClusterFile }
 
-$commitMsg = "Release $Version`n`nVersion.pas -> $Version ($DateStr); refreshed CTY.DAT and TRMASTER.DTA. Tag $Tag triggers the CI installer build."
+$commitMsg = "Release $Version`n`nVersion.pas -> $Version ($DateStr); refreshed CTY.DAT, TRMASTER.DTA, and TRCLUSTER.DAT. Tag $Tag triggers the CI installer build."
 Git commit -m $commitMsg
 Git push origin master
 Git tag -a $Tag -m "TR4W $Version"
