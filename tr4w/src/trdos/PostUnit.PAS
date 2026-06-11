@@ -2263,7 +2263,6 @@ end;
 
 function tGenerateSummaryPortionOfCabrilloFile: boolean;
 var
-  nNumberOfBytesToWrite                 : Cardinal;
   T2                                    : PChar;
   T3                                    : String;
   TempTag                               : CabrilloTags;
@@ -2302,18 +2301,11 @@ begin
       else if length(ContestName) <> 0  then      // 4.78.3
          T3 := ContestName;
 
-  asm
-  call TotalScore
-  push eax
-  push t3
-  push t2
-//  push t1
-  end;
-  nNumberOfBytesToWrite := wsprintf(wsprintfBuffer,
-    'START-OF-LOG: 3.0'#13#10'CREATED-BY: ' + TR4W_CURRENTVERSION + #13#10'CALLSIGN: %s'#13#10'CONTEST: %s'#13#10'CLAIMED-SCORE: %d'#13#10);
-  asm add esp,20
-  end;
-  sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+  // Issue #998: asm-push wsprintf -> SysUtils.Format + sWriteFileFromString.
+  // %s=CALLSIGN(T2), %s=CONTEST(T3), %d=CLAIMED-SCORE(TotalScore).
+  sWriteFileFromString(tReportFileWrite, SysUtils.Format(
+    'START-OF-LOG: 3.0'#13#10'CREATED-BY: ' + TR4W_CURRENTVERSION + #13#10'CALLSIGN: %s'#13#10'CONTEST: %s'#13#10'CLAIMED-SCORE: %d'#13#10,
+    [string(T2), T3, TotalScore]));
 
   for TempTag := Low(CabrilloTags) to High(CabrilloTags) do
   begin
@@ -2341,16 +2333,11 @@ begin
     TempPchar := @CabrilloTagsArray[TempTag].ctrTag[1];
     if TempTag = ctOperators then
        begin
-       Format(TempBuffer2, '%s', PChar(GetOperatorsFromLog));
+       StrPCopy(TempBuffer2, GetOperatorsFromLog);   // Issue #998 (was custom Format '%s')
        end;
-    asm
-    push offset TempBuffer2
-    push TempPchar
-    end;
-    nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, '%s: %s'#13#10);
-    asm add esp,16
-    end;
-    sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+    // Issue #998: %s=tag(TempPchar), %s=value(TempBuffer2).
+    sWriteFileFromString(tReportFileWrite, SysUtils.Format('%s: %s'#13#10,
+      [string(TempPchar), string(PChar(@TempBuffer2))]));
   end;
 
   if MyGrid <> '' then
@@ -2363,11 +2350,9 @@ begin
       for TempErmakField := Low(TErmakFields) to High(TErmakFields) do
       begin
         ControlID := integer(TempErmakField) + (Operator) * 100;
-        asm
-        push ControlID
-        end;
-        wsprintf(TempBuffer2, OPERATORINFO);
-        asm add esp,12 end;
+        // Issue #998: builds the INI key into TempBuffer2 (not file output).
+        // OPERATORINFO is C '_OP_INFO_%03u' (zero-pad); Delphi Format uses '%.3u'.
+        StrPCopy(TempBuffer2, SysUtils.Format('_OP_INFO_%.3u', [ControlID]));
         TempInteger := GetPrivateProfileString(ERMAKSECTION, TempBuffer2, '?', TempBuffer1, SizeOf(TempBuffer1), TR4W_INI_FILENAME);
         TempPchar := @TempBuffer1[0];
         if TempErmakField = efOp then
