@@ -812,10 +812,8 @@ var
   Band                                  : BandType;
   Mode                                  : ModeType;
   TempMode                              : ModeType;
-  nNumberOfBytesToWrite                 : integer;
   BString                               : PChar;
   MString                               : PChar;
-  TempInteger                           : integer;
   SumInteger                            : integer;
   m                                     : RemainingMultiplierType;
   TotalLine                             : boolean;
@@ -835,8 +833,7 @@ begin
        begin
        Continue;
        end;
-    nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10s', mn[m]);
-    sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+    sWriteFileFromString(tReportFileWrite, SysUtils.Format('%10s', [string(mn[m])]));
   end;
 
   sWriteFile(tReportFileWrite, breakline, length(breakline));
@@ -862,33 +859,20 @@ begin
         end;
 
         SumInteger := QSOPointTotals[Band, TempMode];
-        asm
-        push SumInteger
-        end;
-
-        TempInteger := PostQSOTotals[Band, TempMode];
-        asm
-        push TempInteger
-        end;
-
-        TempInteger := RawQSOTotals[Band, TempMode];
-        asm
-        push TempInteger
-        end;
-
-        asm
-        push MString
-        push BString
-        end;
-      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %5s%4s %8d  %12d %8d');
-      if contest = WINTERFIELDDAY then
-         begin
-         inc(totalMults);
-         end;
-
-        asm add esp,28
-        end;
-        sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+      // Issue #998: asm-push wsprintf -> SysUtils.Format + sWriteFileFromString
+      // (removes the asm, the custom Format function, and the PChar buffer in one).
+      // Arg order matches the original right-to-left pushes: %5s=BString,
+      // %4s=MString, %8d=RawQSOTotals, %12d=PostQSOTotals, %8d=QSOPointTotals.
+        sWriteFileFromString(tReportFileWrite,
+          SysUtils.Format(#13#10' %5s%4s %8d  %12d %8d',
+            [string(BString), string(MString),
+             RawQSOTotals[Band, TempMode],
+             PostQSOTotals[Band, TempMode],
+             SumInteger]));
+        if contest = WINTERFIELDDAY then
+           begin
+           inc(totalMults);
+           end;
 
         for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
         begin
@@ -900,31 +884,28 @@ begin
              begin
              if totalLine then
                 begin
-                nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', totalMults);
+                sWriteFileFromString(tReportFileWrite, SysUtils.Format('%10d', [totalMults]));
                 end
              else
                 begin
-                nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', 1);
+                sWriteFileFromString(tReportFileWrite, SysUtils.Format('%10d', [1]));
                 end;
              end
           else
              begin
-             nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', mo.MTotals[Band, TempMode, m]);
+             sWriteFileFromString(tReportFileWrite, SysUtils.Format('%10d', [mo.MTotals[Band, TempMode, m]]));
              end;
-          sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
         end;
       end;
 //  sWriteFile(tReportFileWrite, breakline, length(breakline));
   if QTCEnable then
   begin
-    nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    There were %d QTC points.', TotalNumberQTCsProcessed);
-    sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+    sWriteFileFromString(tReportFileWrite, SysUtils.Format(#13#10#13#10'    There were %d QTC points.', [TotalNumberQTCsProcessed]));
   end;
   if Contest <> ARRLFIELDDAY then
-     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', TotalScore)      // 4.108.9
+     sWriteFileFromString(tReportFileWrite, SysUtils.Format(#13#10#13#10'    Claimed Score = %d points.', [TotalScore]))      // 4.108.9
   else
-     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'     Claimed Score = %d points.', SumInteger);     // 4.108.9
-  sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+     sWriteFileFromString(tReportFileWrite, SysUtils.Format(#13#10#13#10'     Claimed Score = %d points.', [SumInteger]));     // 4.108.9
 end;
 
 function CalculateTotals: boolean;
