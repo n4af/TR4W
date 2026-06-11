@@ -608,7 +608,7 @@ const
   RC_SWAPMULTVIEW                       = 'Переключить вид множителей';
   RC_INCNUMBER                          = 'Увеличить номер';
   RC_TOOGLEMB                           = 'Переключить звук при новом множителе';
-  RC_KILLCW                             = 'Выключить CW';
+  RC_KILLCW                             = 'Переключение CW';
   RC_SEARCHLOG                          = 'Поиск по логу';
   RC_TRANSFREQ                          = 'Ввод частоты передачи';
   RC_REMINDER                           = 'Напоминания';

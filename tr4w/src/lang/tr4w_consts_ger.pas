@@ -662,7 +662,7 @@
   RC_SWAPMULTVIEW                       = 'Wechsel Mult Anzeige';
   RC_INCNUMBER                          = 'Inkrementiere Nummer';
   RC_TOOGLEMB                           = 'Schalte Multiplierton um';
-  RC_KILLCW                             = 'CW abbrechen';
+  RC_KILLCW                             = 'CW umschalten';
   RC_SEARCHLOG                          = 'Logsuche';
   RC_TRANSFREQ                          = 'Sendefrequenz';
   RC_REMINDER                           = 'Erinnerung';

@@ -3297,7 +3297,10 @@ begin
         focus := GetFocus;
         if ActiveMode = CW then
           if not CWEnable then
-            Exit;
+             begin
+             logger.Warn('Trying menu_ctrl_sendkeyboardinput while CWEnable is false');
+             Exit;
+             end;
         tCardinal := tr4whandle;
         if QTCRWindow <> 0 then
           tCardinal := QTCRWindow;
@@ -7137,6 +7140,8 @@ begin
     2: WinExec('cmd.exe', SW_SHOW);
     3: ProcessMenu(menu_colors);
     4:
+      // TODO: candidate for LogCW.SetCWState(False, ...) once the 'CW Off'/'CW On'
+      // quick-display text is parameterized (Issue 380 cleanup). Left inline for now.
       begin
         if CWEnabled or CWEnable then
         begin
@@ -7148,6 +7153,7 @@ begin
         end;
       end;
     5:
+      // TODO: candidate for LogCW.SetCWState(True, ...) (Issue 380 cleanup). Left inline for now.
       begin
         CWEnabled := True;
         CWEnable := true;

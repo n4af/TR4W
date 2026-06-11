@@ -663,7 +663,7 @@ const
   RC_SWAPMULTVIEW                       = 'Zmìnit zobrazení násobièù';
   RC_INCNUMBER                          = 'Zvìtšit èíslo o 1';
   RC_TOOGLEMB                           = 'Ovladaè signálu pro násobiè';
-  RC_KILLCW                             = 'Blokovat CW';
+  RC_KILLCW                             = 'Pøepínaè CW';
   RC_SEARCHLOG                          = 'Vyhledat spojení v deníku';
   RC_TRANSFREQ                          = 'Vysílací kmitoèet';
   RC_REMINDER                           = 'Pøipomínka';

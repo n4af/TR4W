@@ -357,12 +357,12 @@ end;
 
 procedure scDISABLECW;
 begin
-  CWEnable := False;
+   SetCWState(False, False); // both flags + flush/PTT + display, no Alt-K prompt (command, not key)
 end;
 
 procedure scENABLECW;
 begin
-  CWEnable := True;
+   SetCWState(True, False); // both flags + display, no Alt-K prompt (command, not key)
 end;
 
 procedure scSAPMODE;
@@ -377,7 +377,8 @@ end;
 
 procedure scCWENABLETOGGLE;
 begin
-  CWEnable := not CWEnable;
+  //CWEnable := not CWEnable;  // Going to try and call ToggleCW
+  ToggleCW(false); // no display as this was a command.
 end;
 
 procedure scEXECUTE;

@@ -595,7 +595,7 @@ const
   RC_SWAPMULTVIEW                       = 'Zamie¸ widok mno¬nikºw';
   RC_INCNUMBER                          = 'Zwiúksz numer';
   RC_TOOGLEMB                           = 'Prze¦¦cz dzwonek mno¬nikºw';
-  RC_KILLCW                             = 'Zako¸cz CW';
+  RC_KILLCW                             = 'Prze¦¦cz CW';
   RC_SEARCHLOG                          = 'Szukaj w logu';
   RC_TRANSFREQ                          = 'CzústotliwoÜö nadawcza';
   RC_REMINDER                           = 'Przypominacz';

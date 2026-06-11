@@ -1238,8 +1238,8 @@ const
   RC_SAVETOFLOPPY                       = 'Salvar a disco';
   RC_SWAPMULTVIEW                       = 'Cambiar vista multiplicadores';
   RC_INCNUMBER                          = 'Numero incremental';
-  RC_TOOGLEMB                           = 'Toogle multiplier bell';
-  RC_KILLCW                             = 'Detener CW';
+  RC_TOOGLEMB                           = 'Intercambiar alerta multiplicador';
+  RC_KILLCW                             = 'Alternar CW';
   RC_SEARCHLOG                          = 'Buscar log';
   RC_TRANSFREQ                          = 'Frecuencia transmisor';
   RC_REMINDER                           = 'Recordatorio-nota';

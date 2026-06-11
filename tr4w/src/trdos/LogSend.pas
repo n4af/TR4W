@@ -130,7 +130,11 @@ begin
 // So, it's more efficient to use \ than NY4I
 // I wonder if this could be improved to buffer the characters? // 4.44.5
 
-  if CWEnabled = False then Exit;
+  if CWEnabled = False then
+     begin
+     logger.warn('Attempting SendCrypticCWString with CWEnabled = false');
+     Exit;
+     end;
   if length(SendString) = 0 then Exit;
   //SetSpeed(DisplayedCodeSpeed); //ny4i This seems superflous. The speed should be set already
 
