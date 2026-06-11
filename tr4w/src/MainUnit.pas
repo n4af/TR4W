@@ -3294,6 +3294,12 @@ begin
     menu_ctrl_sendkeyboardinput:
       // if (ActiveMode = CW) or (ActiveMode = Digital) then
       begin
+        // Issue #1006: if a Send Keyboard Input dialog is already open, do not
+        // open a second one. Clicking a (send from keyboard) function-key button
+        // re-enters here while the dialog is up -- the modal disables only the
+        // main window, not the function-key window -- and the nested modal plus
+        // the single SendKeyboardWindow handle leaves the dialog unclosable.
+        if SendKeyboardInputDialogOpen then Exit;
         focus := GetFocus;
         if ActiveMode = CW then
           if not CWEnable then
