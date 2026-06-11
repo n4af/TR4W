@@ -667,6 +667,7 @@ const
   RC_ABOUT                              = 'Na temat';
   RC_CONFFILE                           = 'Plik konfiguracyjny';
   RC_EDITQSO                            = 'Edytuj QSO';
+  TC_EDITFUNCTIONKEY                    = 'Edytuj %s WiadomoÜö';
   RC_DELETED                            = '&Usuniúte';
   RC_DUPE                               = 'Powtºrka';
   RC_LOGSEARCH                          = 'Wyszukiwanie w logu';

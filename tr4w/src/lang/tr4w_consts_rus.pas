@@ -680,6 +680,7 @@ const
   RC_ABOUT                              = 'О программе';
   RC_CONFFILE                           = 'Файл конфигурации';
   RC_EDITQSO                            = 'Редактирование связи';
+  TC_EDITFUNCTIONKEY                    = 'Редактирование %s Сообщение';
   RC_DELETED                            = '&Удалена';
   RC_DUPE                               = 'Повтор';
   RC_LOGSEARCH                          = 'Поиск в логе';

@@ -83,6 +83,11 @@ var
   ReminderDlgHandle                     : HWND;
   AltPListView                          : HWND;
   LastSelectedMessage                   : integer;
+  // Row to pre-select when the dialog next opens (0 = F1, the historical
+  // default). A caller -- e.g. right-click on a function-key button -- sets
+  // this just before OpenListOfMessages to jump straight to that key; the
+  // dialog consumes and resets it on WM_INITDIALOG. Issue #1001.
+  InitialAltPSelection                  : integer;
 
 implementation
 uses MainUnit;
@@ -106,7 +111,10 @@ begin
 
     WM_INITDIALOG:
       begin
-        LastSelectedMessage := 0;
+        // Honor a caller-requested initial row (Issue #1001), then reset to the
+        // default so a subsequent plain open (Alt-P) lands on F1 as before.
+        LastSelectedMessage := InitialAltPSelection;
+        InitialAltPSelection := 0;
         AltWnd := hwnddlg;
 //        AltPListView := Get101Window(hwnddlg);
 

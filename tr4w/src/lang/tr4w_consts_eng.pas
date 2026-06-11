@@ -724,6 +724,7 @@
   RC_ABOUT                              = 'About';
   RC_CONFFILE                           = 'Configuration file';
   RC_EDITQSO                            = 'Edit QSO';
+  TC_EDITFUNCTIONKEY                    = 'Edit %s message';
   RC_DELETED                            = 'Deleted';
   RC_DUPE                               = 'Dupe';
 //  RC_LOGSEARCH                          = 'Log search';

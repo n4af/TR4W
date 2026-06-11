@@ -39,6 +39,8 @@ utils_text,
 function FunctionKeysWindowDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 procedure ShowFMessages(VirtualKey: Byte);
 procedure GetButtonByRDblClick(h: HWND);
+procedure EditFunctionKeyMessage(h: HWND);
+procedure ShowFunctionKeyContextMenu(h: HWND);
 
 const
   ButtonsColor                          : array[112..123] of tcolor =
@@ -276,20 +278,117 @@ begin
   end;
 end;
 
-procedure GetButtonByRDblClick(h: HWND);
+// Resolve which Alt-P editor row the on-screen function-key button `h` maps to,
+// and set the CQ vs S&P target window. The 12 buttons are labelled F1..F12 but
+// display whichever shift bank the window currently shows (plain / Ctrl / Alt),
+// so we read the live modifier state. The editor lists F1..AltF12, hence
+// row = (button - 112) + bank offset (0/12/24). Returns -1 if `h` is not a
+// function-key button. Caller must capture this BEFORE the modifier is released
+// (e.g. before popping a menu). Issue #1001.
+function ResolveFunctionKeyRow(h: HWND): integer;
 var
   i                                     : integer;
+  plus                                  : integer;
 begin
+  Result := -1;
   for i := 112 to 123 do
-    if h = KeysHandles[i] then
-    begin
-      if OpMode = SearchAndPounceOpMode then
-        MesWindow := ExMsgWin
-      else
-        MesWindow := CQMsgWin;
-//      tDialogBox(72, @MemoryProgramDlgProc);
-      OpenListOfMessages;
-    end;
+     begin
+     if h = KeysHandles[i] then
+        begin
+        if OpMode = SearchAndPounceOpMode then
+           MesWindow := ExMsgWin
+        else
+           MesWindow := CQMsgWin;
+        plus := 0;
+        if (GetKeyState(VK_MENU) and $8000) <> 0 then
+           plus := 24
+        else if (GetKeyState(VK_CONTROL) and $8000) <> 0 then
+           plus := 12;
+        Result := (i - 112) + plus;
+        Break;
+        end;
+     end;
+end;
+
+// Open the Alt-P message editor focused on the function key whose button is `h`
+// (mode- and shift-bank-aware). Used by the legacy right-double-click path.
+procedure EditFunctionKeyMessage(h: HWND);
+var
+  row                                   : integer;
+begin
+  row := ResolveFunctionKeyRow(h);
+  if row < 0 then Exit;
+  InitialAltPSelection := row;
+//tDialogBox(72, @MemoryProgramDlgProc);
+  OpenListOfMessages;
+  FrmSetFocus;   // see note in ShowFunctionKeyContextMenu
+end;
+
+procedure GetButtonByRDblClick(h: HWND);
+begin
+  EditFunctionKeyMessage(h);
+end;
+
+// Right-click a function-key button -> show a one-item context menu that opens
+// the editor on that key. The target row is captured NOW (while any Alt/Ctrl
+// modifier is still held) so the bank stays correct even after the user
+// releases the modifier to click the menu. Label is composed from translated
+// words; the key name (e.g. "F3") is not translated. Issue #1001.
+procedure ShowFunctionKeyContextMenu(h: HWND);
+const
+  ID_EDITFKEY                           = 1;
+var
+  row                                   : integer;
+  prefix                                : string;
+  keyName                               : string;
+  caption                               : string;
+  p                                     : integer;
+  hMenu                                 : Windows.HMENU;   // qualified: an 'HMENU' identifier in this unit's scope shadows the type
+  pt                                    : Windows.TPoint;
+  cmd                                   : integer;
+begin
+  row := ResolveFunctionKeyRow(h);
+  if row < 0 then Exit;
+
+  case row div 12 of            // 0 = plain, 1 = Ctrl, 2 = Alt
+     1: prefix := 'Ctrl-F';
+     2: prefix := 'Alt-F';
+  else
+     prefix := 'F';
+  end;
+  keyName := prefix + IntToStr((row mod 12) + 1);   // e.g. 'F3', 'Ctrl-F10' (not translated)
+  // TC_EDITFUNCTIONKEY is the per-language 'Edit %s message' format; substitute
+  // the key name for %s. Pos/Copy avoids a wsprintf varargs call.
+  caption := TC_EDITFUNCTIONKEY;
+  p := Pos('%s', caption);
+  if p > 0 then
+     caption := Copy(caption, 1, p - 1) + keyName + Copy(caption, p + 2, Length(caption));
+
+  hMenu := Windows.CreatePopupMenu;
+  Windows.AppendMenu(hMenu, MF_STRING, ID_EDITFKEY, PChar(caption));
+  Windows.GetCursorPos(pt);
+  // NB: do NOT SetForegroundWindow here -- it fires WM_SETFOCUS, whose handler
+  // calls ShowFMessages(0) and reverts the function-key window to the plain
+  // bank while the menu is up (mismatching an "Edit Ctrl-Fn" label). The app is
+  // already foreground on right-click, so the menu dismisses fine without it
+  // (same as the band-map popup). Issue #1001.
+  cmd := integer(Windows.TrackPopupMenu(hMenu,
+                 TPM_RETURNCMD or TPM_LEFTALIGN or TPM_TOPALIGN or TPM_LEFTBUTTON,
+                 pt.x, pt.y, 0, tr4whandle, nil));
+  Windows.DestroyMenu(hMenu);
+
+  if cmd = ID_EDITFKEY then
+     begin
+     InitialAltPSelection := row;    // captured before the modifier was released
+     OpenListOfMessages;
+     end;
+
+  // Right-clicking the button + showing the menu (and the modal editor) leaves
+  // focus off the Call window. Restore it -- the Ctrl/Alt bank-switch handler in
+  // the main loop only fires when focus is the Call/Exchange window, so without
+  // this those keys stop updating the F-key labels. Mirrors the left-click
+  // (BN_CLICKED) handler above. Issue #1001.
+  FrmSetFocus;
 end;
 
 end.

@@ -682,6 +682,7 @@ TC_TELNET                             = 'Connect'#0'Disconnect'#0'Commands'#0'Fr
   RC_ABOUT                              = 'Про програму';
   RC_CONFFILE                           = 'Файл конфігурації';
   RC_EDITQSO                            = 'Редагування зв`язку';
+  TC_EDITFUNCTIONKEY                    = 'Редагування %s Повідомлення';
   RC_DELETED                            = '&Видалена';
   RC_DUPE                               = 'Повтор';
   RC_LOGSEARCH                          = 'Пошук у лозі';

@@ -597,6 +597,7 @@ const
   RC_SAVEINFOLDER  			 			= 'Хавтас нээж хадгалах уу  (огноо,тэмцээн, дуудлага)';
   RC_CONFFILE                           = 'Тохируулгын файл';
   RC_EDITQSO                            = 'Холбоогоо засварлах';
+  TC_EDITFUNCTIONKEY                    = 'Edit %s message';
   RC_DELETED                            = '&Устгах';
   RC_DUPE                               = 'Давтагдсан ХОЛБОО!!!';
   RC_LOGSEARCH                          = 'Дуудлага хайх';

@@ -1082,6 +1082,13 @@ begin
         begin
           GetButtonByRDblClick(Msg.HWND);
         end;
+
+      WM_RBUTTONDOWN:
+        begin
+          // Issue #1001: right-click a function-key button -> context menu to
+          // edit that key's message (CQ vs S&P aware). No-op elsewhere.
+          ShowFunctionKeyContextMenu(Msg.HWND);
+        end;
 {
       WM_RBUTTONDOWN:
         begin

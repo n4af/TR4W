@@ -684,6 +684,7 @@ const
   RC_ABOUT                              = 'Despre';
   RC_CONFFILE                           = 'Fisier de configurare';
   RC_EDITQSO                            = 'Editeaza QSO';
+  TC_EDITFUNCTIONKEY                    = 'Editeaza %s Mesaj';
   RC_DELETED                            = '&Sters';
   RC_DUPE                               = 'Dubla';
   RC_LOGSEARCH                          = 'Cauta in log';
