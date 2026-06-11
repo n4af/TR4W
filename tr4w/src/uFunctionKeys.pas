@@ -347,6 +347,16 @@ var
   pt                                    : Windows.TPoint;
   cmd                                   : integer;
 begin
+  // Issue #1007: ignore right-click while Alt or Ctrl is held. The window is
+  // showing the Alt-F/Ctrl-F bank then, and popping the menu + the FrmSetFocus
+  // that follows would flash the labels back to plain (WM_SETFOCUS ->
+  // ShowFMessages(0)). Right-click edits the plain F-keys only; edit the
+  // Alt-F/Ctrl-F messages via the Alt-P editor.
+  if ((GetKeyState(VK_MENU) and $8000) <> 0)    or
+     ((GetKeyState(VK_CONTROL) and $8000) <> 0) then
+     begin
+     Exit;
+     end;
   row := ResolveFunctionKeyRow(h);
   if row < 0 then Exit;
 
