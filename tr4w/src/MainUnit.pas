@@ -4641,6 +4641,25 @@ begin
     method_buffered;
 end;
 
+// Issue #1010: after an exchange-parsing error, drop the caret right after the
+// offending token in the exchange window so the operator can fix it in place
+// instead of arrowing back from end-of-line. No-op if no token was recorded or
+// it isn't found in the current exchange text. Kept as its own procedure (not
+// inlined into the long ParametersOkay) per the Delphi 7 codegen caution.
+procedure PositionExchangeCursorAtErrorToken;
+var
+  p: integer;
+begin
+  if ExchangeErrorToken = '' then
+    Exit;
+  p := Pos(ExchangeErrorToken, ExchangeWindowString);
+  if p > 0 then
+  begin
+    p := (p - 1) + Length(ExchangeErrorToken);   // 0-based caret just past the token
+    Windows.SendMessage(wh[mweExchange], EM_SETSEL, p, p);
+  end;
+end;
+
 function ParametersOkay(Call: CallString;
   ExchangeString: Str40 {CallString};
   Band: BandType;
@@ -4678,6 +4697,7 @@ begin
   LookForOnDeckCall(ExchangeString);
 
   ExchangeErrorMessage := nil;
+  ExchangeErrorToken := '';   // Issue #1010
 
   if NoLog then
   begin
@@ -4847,7 +4867,10 @@ begin
   ParametersOkay := ProcessExchange(ExchangeString, RData);
 
   if ExchangeErrorMessage <> nil then
+  begin
     QuickDisplayError(ExchangeErrorMessage);
+    PositionExchangeCursorAtErrorToken;   // Issue #1010: caret after the offending token
+  end;
 
   if Result = False then
     Exit;
