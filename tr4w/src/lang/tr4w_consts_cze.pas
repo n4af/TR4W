@@ -721,6 +721,7 @@ const
   RC_ABOUT                              = 'O programu TR4W';
   RC_CONFFILE                           = 'Konfiguraèní soubor';
   RC_EDITQSO                            = 'Edituj QSO';
+  TC_EDITFUNCTIONKEY                    = 'Edituj %s zprávu';
   RC_DELETED                            = '&Smazáno';
   RC_DUPE                               = 'duplicitní';
 //  RC_LOGSEARCH                          = 'Prohledat deník';

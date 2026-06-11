@@ -1312,6 +1312,7 @@ const
 //  RC_SAVEINFOLDER                       = 'Salvar en directorio ''[año][concurso][indicativo] ''';
   RC_CONFFILE                           = 'Fichero configuracion';
   RC_EDITQSO                            = 'Editar QSO';
+  TC_EDITFUNCTIONKEY                    = 'Editar %s Mensaje';
   RC_DELETED                            = '&Borrados';
   RC_DUPE                               = 'Duplicado';
   RC_LOGSEARCH                          = 'Busqueda en el Log';

@@ -727,6 +727,7 @@ const
   RC_ABOUT                              = 'O programu';
   RC_CONFFILE                           = 'Konfiguraciona datoteka';
   RC_EDITQSO                            = 'Izmeni QSO';
+  TC_EDITFUNCTIONKEY                    = 'Izmeni %s Poruka';
   RC_DELETED                            = '&Obrisano';
   RC_DUPE                               = 'Dupla';
 //  RC_LOGSEARCH                          = 'Log search';

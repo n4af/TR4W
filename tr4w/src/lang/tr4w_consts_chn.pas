@@ -669,6 +669,7 @@ const
   RC_ABOUT                              = 'х≈¶ф¶ќ';
   RC_CONFFILE                           = 'щ≈Ќч-оц÷«фђ¶';
   RC_EDITQSO                            = 'ч-÷ш-—QSO';
+  TC_EDITFUNCTIONKEY                    = 'Edit %s message';
   RC_DELETED                            = 'х»ащўд&D';
   RC_DUPE                               = 'щ‘ўшпп';
   RC_LOGSEARCH                          = 'ц„ехђ„ц–№ч+в';

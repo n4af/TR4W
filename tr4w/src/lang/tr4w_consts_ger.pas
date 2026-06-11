@@ -720,6 +720,7 @@
   RC_ABOUT                              = 'ueber';
   RC_CONFFILE                           = 'Konfigurationsdatei';
   RC_EDITQSO                            = 'Editiere QSO';
+  TC_EDITFUNCTIONKEY                    = 'Editiere %s Nachricht';
   RC_DELETED                            = 'Geloescht';
   RC_DUPE                               = 'Dupe';
 //  RC_LOGSEARCH                          = 'Log search';
