@@ -158,6 +158,7 @@ procedure SetNewCodeSpeed;
 procedure SetUpToSendOnActiveRadio;
 procedure SetUpToSendOnInactiveRadio;
 
+procedure SetCWState(Enable, DisplayPrompt: boolean);
 procedure ToggleCW(DisplayPrompt: boolean);
 procedure ShowOtherMemoryStatus;
 
@@ -646,7 +647,11 @@ begin
   BufferStart                                               := 0;
   BufferEnd                                                 := 0;
 
-  if not CWEnable then Exit;
+  if not CWEnable then
+     begin
+     logger.Warn('Trying SendKeyboardInput while CWEnable is false');
+     Exit;
+     end;
 
   SetUpToSendOnActiveRadio;
 
@@ -2134,41 +2139,57 @@ begin
   DebugMsg('<<<<< EXIT SetUpToSendOnInactiveRadio');
 end;
 
-procedure ToggleCW(DisplayPrompt: boolean);
-
+// Single owner of the CW on/off state. Keeps the two flags (CWEnable and
+// CWEnabled) coherent, flushes the keyer buffer and drops PTT when disabling,
+// and refreshes the speed display. All callers that turn CW on or off should
+// route through here so the on-screen state can never disagree with reality.
+// ny4i 2026JUN10 (Issue 380)
+procedure SetCWState(Enable, DisplayPrompt: boolean);
 begin
-  if ActiveMode = CW then
-  begin
-    if CWEnabled or CWEnable then
-    begin
-      if DisplayPrompt then QuickDisplay(TC_CWDISABLEDWITHALTK);
-      FlushCWBufferAndClearPTT;
-      CWEnabled                                             := False;
-      CWEnable                                              := false;
-    end
-    else
-    begin
-      CWEnabled                                             := True;
-      CWEnable                                              := true;
+   if Enable then
+      begin
+      CWEnable  := True;
+      CWEnabled := True;
       QuickDisplay(nil);
-    end;
-  end
-  else
-  begin
+      end
+   else
+      begin
+      if DisplayPrompt then
+         begin
+         QuickDisplay(TC_CWDISABLEDWITHALTK);
+         end;
+      FlushCWBufferAndClearPTT;
+      CWEnable  := False;
+      CWEnabled := False;
+      end;
+   DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
+   SetSpeed(CodeSpeed);
+end;
 
-    if DVKEnable then
-    begin
-      Escape_proc;
-      if DisplayPrompt then QuickDisplay(TC_VOICEKEYERDISABLEDWITHALTK);
-    end
-    else
-      SetTextInQuickCommandWindow(nil);
-
-    InvertBoolean(DVKEnable);
-  end;
-
-  DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
-  SetSpeed(CodeSpeed);
+procedure ToggleCW(DisplayPrompt: boolean);
+begin
+   if ActiveMode = CW then
+      begin
+      SetCWState(not (CWEnabled or CWEnable), DisplayPrompt);
+      end
+   else
+      begin
+      if DVKEnable then
+         begin
+         Escape_proc;
+         if DisplayPrompt then
+            begin
+            QuickDisplay(TC_VOICEKEYERDISABLEDWITHALTK);
+            end;
+         end
+      else
+         begin
+         SetTextInQuickCommandWindow(nil);
+         end;
+      InvertBoolean(DVKEnable);
+      DisplayCodeSpeed {(CodeSpeed, CWEnabled, DVPOn, ActiveMode)};
+      SetSpeed(CodeSpeed);
+      end;
 end;
 
 procedure CWInit;

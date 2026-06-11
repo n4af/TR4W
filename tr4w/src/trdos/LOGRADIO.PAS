@@ -2358,7 +2358,7 @@ begin
    charProcessed := False;
    sendNow       := False;
 
-   // scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
+   //scWK_Reset;    // n4af 4.46.3  // ny4i This would not be necessary as this code is in the radio object. It is ONLY used by CWByCAT.
    localMsg := Msg;
 
    (* Removed network code as AddToOutputBuffer will send to net radio // ny4i  This is a bad kludge. We should call a new procedure to handle CW for networked radios

@@ -613,7 +613,7 @@ const
   RC_SWAPMULTVIEW                       = 'Schimba afisarea multipl';
   RC_INCNUMBER                          = 'Incrementeaza numarul';
   RC_TOOGLEMB                           = 'Comuta -beep- la multipl';
-  RC_KILLCW                             = 'Opreste CW';
+  RC_KILLCW                             = 'Comuta CW';
   RC_SEARCHLOG                          = 'Cauta in log';
   RC_TRANSFREQ                          = 'Frecventa de emisie';
   RC_REMINDER                           = 'Atentionare';

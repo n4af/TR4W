@@ -2378,7 +2378,7 @@ const
   menu_alt_swapmults                    = 10305;
   menu_alt_incnumber                    = 10306;
   menu_alt_multbell                     = 10307;
-  menu_alt_killcw                       = 10308;
+  menu_alt_killcw                       = 10308;      // This is relaly a toggle CW command - ny4i 2026JUN10
   menu_alt_searchlog                    = 10309;
   menu_alt_transfreq                    = 10310;     //  4.47.3 restore menuid
   menu_alt_reminder                     = 10311;

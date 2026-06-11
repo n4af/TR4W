@@ -666,7 +666,7 @@
   RC_SWAPMULTVIEW                       = 'Swap mult view';
   RC_INCNUMBER                          = 'Increment number';
   RC_TOOGLEMB                           = 'Toogle multiplier bell';
-  RC_KILLCW                             = 'Kill CW';
+  RC_KILLCW                             = 'Toggle CW';
   RC_SEARCHLOG                          = 'Search log';
   RC_TRANSFREQ                          = 'Transmit frequency';
   RC_REMINDER                           = 'Reminder';
