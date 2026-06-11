@@ -432,6 +432,7 @@ var
   EscapeExitsSearchAndPounce: boolean = True;
   ExchangeHasBeenSent: boolean;
   ExchangeErrorMessage: PChar;
+  ExchangeErrorToken: Str40;   // Issue #1010: the offending exchange token, so the caller can place the caret right after it
   ExchangeMemoryFileEnable: boolean;
   ExchangeWindowString: Str40;
   ExternalLoggerAddress: string[255] = '127.0.0.1';
@@ -1312,11 +1313,14 @@ begin
     if not FoundDomesticQTH(RXData) then
     begin
       ExchangeErrorMessage := 'Invalid ARRL Section'; {TC_IMPROPERDOMESITCQTH;}
+      ExchangeErrorToken := RXData.QTHString;   // Issue #1010: caret goes after the bad section
       logger.error('[ProcessClassAndDomesticOrDXQTHExchange] Improper Domestic QTH = Exchange = (%s), DomesticQTH = (%s)', [Exchange, RXData.QTHString]);
       // misspelled in the constants file //ny4i 4.45.3
       Exit; // This was before the above code that flips the values. // ny4i 4.45.3
     end;
     isClassValid := ValidClass(RXData.ceClass);
+    if not isClassValid then
+      ExchangeErrorToken := RXData.ceClass;   // Issue #1010: caret goes after the bad class
     Result := IsClassValid;
   end
   else
