@@ -40,6 +40,7 @@ uses
 function SendKeyboardCWDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): BOOL; stdcall;
 function NewSendKeyboardEditProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lParam): UINT; stdcall;
 procedure CloseSendKeyboardInputDialog(StopSending: boolean);
+function SendKeyboardInputDialogOpen: boolean;
 
 implementation
 uses
@@ -59,7 +60,6 @@ begin
   case Msg of
     WM_INITDIALOG:
       begin
-
         Windows.SetWindowText(hwnddlg, RC_SENDINGCW);
         tWM_SETFONT(CreateEdit(ES_LEFT or ES_AUTOHSCROLL or ES_UPPERCASE, 5, 5, 380, 26, hwnddlg, 101), MainWindowEditFont);
         CreateButton(BS_DEFPUSHBUTTON, CLOSE_WORD, 390, 5, 60, hwnddlg, 102);
@@ -178,7 +178,12 @@ begin
   newpos := 0;
   ControlAMode := False;
   tAutoSendMode := False;
-  if StopSending then
+  // Only tear down the keyer/port if CW is actually being sent. When idle, the
+  // keying line is already low and the WinKeyer buffer already empty, so
+  // FlushCWBuffer (TurnOffActivePort + wkClearBuffer) is pure no-op work that
+  // can cost ~300ms of serial/port teardown. CWStillBeingSent is keyer-mode
+  // aware (CWByCAT / WinKeyer / YCCC / CPU keyer). Issue #1006.
+  if StopSending and CWStillBeingSent then
   begin
     CPUKeyer.FlushCWBuffer;
   end;
@@ -187,6 +192,15 @@ begin
 {$IFEND}
 
   EndDialog(SendKeyboardWindow, 0);
+  SendKeyboardWindow := 0;   // Issue #1006: keep the open/closed flag honest
+end;
+
+// Issue #1006: true while the Send Keyboard Input dialog is open, so callers can
+// avoid opening a second (nested) instance that the single SendKeyboardWindow
+// handle cannot unwind.
+function SendKeyboardInputDialogOpen: boolean;
+begin
+  Result := SendKeyboardWindow <> 0;
 end;
 
 end.
