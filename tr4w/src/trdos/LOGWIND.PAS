@@ -1922,12 +1922,12 @@ var
 begin
 
   Score := TotalScore;
-  asm
-  push eax
-  end;
-  wsprintf(wsprintfBuffer, TC_PTS);
-  asm add esp,12
-  end;
+  // Issue #997: asm-push wsprintf -> Format (the TF.Format idiom already used
+  // ~18x in this unit; LOGWIND deliberately avoids SysUtils -- see the BoolToStr
+  // note below).  The old code relied on `Score := TotalScore` leaving the value
+  // in EAX for the `push eax` -- a fragile Delphi-7 codegen assumption that 64-bit
+  // would break.  TC_PTS = '%d Pts'.
+  Format(wsprintfBuffer, TC_PTS, Score);
   SetMainWindowText(mweTotalScore, wsprintfBuffer);
 
   //  tSetWindowText(TotalScoreWindowHandle, IntToStr(Score) + ' Pts');
