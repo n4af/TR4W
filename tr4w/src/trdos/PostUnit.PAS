@@ -2560,21 +2560,8 @@ if TempRXData.DomMultQTH = '' then
 
         QSONumberAndNameExchange:
           begin
-            asm
-                push cMyName
-                push nrSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3d %-7s');
-            asm add esp,16
-            end;
-
-            asm
-            push csName
-            push nrReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3u %-7s');
-            asm add esp,16
-            end;
+            SetMyEx('%-3d %-7s', [nrSent, string(cMyName)]);
+            SetHisEx('%-3u %-7s', [nrReceived, string(csName)]);
           end;
 
 
@@ -2583,33 +2570,17 @@ if TempRXData.DomMultQTH = '' then
         RSTAndPostalCodeExchange:
           begin
             if contacts = 1 then
-              Format(CABRILLO_MYEX, '%-3s %-10s', RSTSent, @MyPostalCode[1])
+              SetMyEx('%-3s %-10s', [string(RSTSent), string(PChar(@MyPostalCode[1]))])
             else
-              Format(CABRILLO_MYEX, '%-3s %-10s', RSTSent, @PreviousQTHString[1]);
-            Format(CABRILLO_HISEX, '%-3s %-10s', RSTReceived, @TempRXData.QTHString[1]);
+              SetMyEx('%-3s %-10s', [string(RSTSent), string(PChar(@PreviousQTHString[1]))]);
+            SetHisEx('%-3s %-10s', [string(RSTReceived), string(PChar(@TempRXData.QTHString[1]))]);
           end;
 
         RSTQSONumberAndGridSquareExchange:
-
-
           begin
-            asm
-                push cMyGrid
-                push nrSent
-                push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-4.4d %-7s');
-            asm add esp,20
-            end;
-
-            asm
-                push csQTHString
-                 push nrReceived
-                push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-4.4u %-7s');
-            asm add esp,20
-            end;
+            // %-4.4d/%-4.4u carry a precision, so C->Delphi maps directly.
+            SetMyEx('%-3s %-4.4d %-7s', [string(RSTSent), nrSent, string(cMyGrid)]);
+            SetHisEx('%-3s %-4.4u %-7s', [string(RSTReceived), nrReceived, string(csQTHString)]);
           end;
 
  {         RSTAndSerialNumberAndGridandPossibleMemberNumber:
@@ -2623,93 +2594,38 @@ if TempRXData.DomMultQTH = '' then
           if nrReceived <  1 then
           p := nil;
 
- if cMystate[1] <> '' then
- begin
-            asm
-               push cMyState
-               push RSTSent
-             end ;
-  //            wsprintf(CABRILLO_MYEX, '%-3s  %-11s') ;      // n4af 4.70.3
-                wsprintf(CABRILLO_MYEX, '%-3s  %-8s') ;        // 4.98.11
- end ;
+          if cMystate[1] <> '' then
+             begin
+             SetMyEx('%-3s  %-8s', [string(RSTSent), string(cMyState)]);        // 4.98.11
+             end;
 
- if cMystate[1] = '' then
-   begin
-            asm
-               push nrSent
-               push RSTSent
-            end;
-    wsprintf(CABRILLO_MYEX, '%-3s  %-6d') ;
-   end;
+          if cMystate[1] = '' then
+             begin
+             SetMyEx('%-3s  %-6d', [string(RSTSent), nrSent]);
+             end;
 
-            asm add esp,16
-            end ;
-
-   if p  <> nil then
-    begin
-             asm
-                push csQTHString
-                 push nrReceived
-                push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %6d %-6s');
-            asm add esp,20
-            end;
-     end;
-     if p = nil then
-     begin
-             asm
-                push csQTHString
-
-                push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s   %9s');
-            asm add esp,16
-            end;
-     end;
+          if p <> nil then
+             begin
+             SetHisEx('%-3s %6d %-6s', [string(RSTReceived), nrReceived, string(csQTHString)]);
+             end;
+          if p = nil then
+             begin
+             SetHisEx('%-3s   %9s', [string(RSTReceived), string(csQTHString)]);
+             end;
             end;
 
         RSTPrefectureExchange:
           begin
-            asm
-                push cMyZone
-                push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7d');
-            asm add esp,16
-            end;
-
-            asm
-                mov  eax,csQTHString
-//                add  eax,1
-                push eax
-                push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-
+            SetMyEx('%-3s %-7d', [string(RSTSent), cMyZone]);
+            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
           end;
 
         NameAndDomesticOrDXQTHExchange:
           begin
-//            csName := PChar(string(TempRXData.Name));
-            cMyName := PChar(string(MyName));
-            asm
-                push cMyState
-                push cMyName
-            end;
-            wsprintf(CABRILLO_MYEX, '  %-10s %-4s');
-            asm add esp,16
-            end;
-
-            asm
-                push csQTHString
-                push csName
-            end;
-            wsprintf(CABRILLO_HISEX, '  %-10s %-4s');
-            asm add esp,16
-            end;
+            // cMyName was PChar(string(MyName)) (null-terminated copy of MyName);
+            // string(MyName) yields the same content directly.
+            SetMyEx('  %-10s %-4s', [string(MyName), string(cMyState)]);
+            SetHisEx('  %-10s %-4s', [string(csName), string(csQTHString)]);
           end;
 
         QSONumberPrecedenceCheckDomesticQTHExchange:
