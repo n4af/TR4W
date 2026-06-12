@@ -186,10 +186,9 @@ begin
           begin
             CreateWindowEx(0, LISTBOX, nil, WS_CHILD or WS_VISIBLE  or LBS_EXTENDEDSEL  or LBS_NOINTEGRALHEIGHT or LBS_NOSEL or LBS_OWNERDRAWFIXED or LBS_HASSTRINGS,
               c * 50, 100, 50, 200, hwnddlg, 48 + c, hInstance, nil);
-            asm
-            mov edx,[MainFixedFont]
-            call tWM_SETFONT
-            end;
+            // Issue #997: asm tWM_SETFONT (EAX = the listbox just created above)
+            // -> re-fetch that control by its child id (48 + c) and set its font.
+            tWM_SETFONT(GetDlgItem(hwnddlg, 48 + c), MainFixedFont);
 
             tCreateStaticWindow(inttopchar(c), defStyle, c * 50, 80, 50, 0, hwnddlg, 300 + c);
           end;
