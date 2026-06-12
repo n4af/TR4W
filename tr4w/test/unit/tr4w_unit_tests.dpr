@@ -38,6 +38,7 @@ uses
    uTestBandLookup      in 'uTestBandLookup.pas',
    uCabrilloFormat      in '..\..\src\uCabrilloFormat.pas',
    uTestCabrilloFormat  in 'uTestCabrilloFormat.pas',
+   uCabrilloExchange    in '..\..\src\uCabrilloExchange.pas',
    uCRC32               in '..\..\src\uCRC32.pas',
    uTestCRC32           in 'uTestCRC32.pas',
    utils_math           in '..\..\src\utils\utils_math.pas',
