@@ -41,7 +41,7 @@ function LogSearchDlgProc(hwnddlg: HWND; Msg: UINT; wParam: wParam; lParam: lPar
 procedure EditLogInSearch;
 
 implementation
-uses MainUnit;
+uses MainUnit, SysUtils;   // Issue #997: SysUtils for Format/StrPCopy
 const
   MAXSEARCHINDEX                        = 255;
 var
@@ -146,14 +146,10 @@ begin
                 end;
               end;
               CloseLogFile;
-              asm
-              call GetTickCount
-              sub eax, StartCPU
-              push eax
-              push LogSearchListViewIndex
-              end;
-              wsprintf(wsprintfBuffer, TC_ENTRIESPERMS);
-              asm add esp,16 end;
+              // Issue #997: asm-push wsprintf -> SysUtils.Format.
+              // TC_ENTRIESPERMS = '%u entries per %u ms'; args = index, elapsed ms.
+              StrPCopy(wsprintfBuffer, SysUtils.Format(TC_ENTRIESPERMS,
+                [LogSearchListViewIndex, Windows.GetTickCount - StartCPU]));
               Windows.SetDlgItemText(hwnddlg, 104, wsprintfBuffer);
               if LogSearchListViewIndex > 0 then EnsureListViewColumnVisible(LogSearchListView);
             end;
