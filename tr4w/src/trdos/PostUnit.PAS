@@ -2726,47 +2726,26 @@ if TempRXData.DomMultQTH = '' then
         QSONumberDomesticOrDXQTHExchange, QSONumberDomesticQTHExchange:
           if (Contest = UKRAINECHAMPIONSHIP) or (Contest = CUPURAL) then
           begin
-            Format(CABRILLO_MYEX, '%-4s %-6.4d', cMyState, nrSent);
-            Format(CABRILLO_HISEX, '%-4s %-6.4u', csQTHString, nrReceived);
+            SetMyEx('%-4s %-6.4d', [string(cMyState), nrSent]);
+            SetHisEx('%-4s %-6.4u', [string(csQTHString), nrReceived]);
           end
           else
           begin
-            asm
-                  push cMyState
-                  push nrSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-4d %-6s');
-            asm add esp,16
-            end;
-
-            asm
-                  push csQTHString
-                  push nrReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-4.4u %-6s');
-            asm add esp,16
-            end;
+            SetMyEx('%-4d %-6s', [nrSent, string(cMyState)]);
+            SetHisEx('%-4.4u %-6s', [nrReceived, string(csQTHString)]);
           end;
 
         QSONumberAndPossibleDomesticQTHExchange, RSTQSONumberAndDomesticQTHExchange, RSTQSONumberAndPossibleDomesticQTHExchange:
           begin
-
-            asm
-            push cMyState
-            push nrSent
-            push RSTSent
-            end;
-
-          if cMyState = 'TRC' then      // 4.63.3
-           wsprintf(CABRILLO_MYEX, '%-3s %d%-6s')
-           else
-            if ContestTitle = 'PGA' then       // 4.92.4
-             wsprintf(CABRILLO_MYEX, '%-3s %3.3d%s     ')
-           else
-               wsprintf(CABRILLO_MYEX, '%-3s %-4.4d %6s      ');
-
-            asm add esp,20
-            end;
+            // All nrSent/nrReceived specs here carry a width or precision (%d,
+            // %3.3d, %-4.4d, %4.4d, %5.3d, %5d) -- none is a bare %0Nd -- so the
+            // C->Delphi mapping is direct (no %.*d needed).
+            if cMyState = 'TRC' then      // 4.63.3
+               SetMyEx('%-3s %d%-6s', [string(RSTSent), nrSent, string(cMyState)])
+            else if ContestTitle = 'PGA' then       // 4.92.4
+               SetMyEx('%-3s %3.3d%s     ', [string(RSTSent), nrSent, string(cMyState)])
+            else
+               SetMyEx('%-3s %-4.4d %6s      ', [string(RSTSent), nrSent, string(cMyState)]);
 
             if Contest = UKEI then           // 4.58.2
             if TempRXData.QTHString = '' then
@@ -2785,25 +2764,14 @@ if TempRXData.DomMultQTH = '' then
               }
             end;
 
-
-
-            asm
-            push csQTHString
-            push nrReceived
-            push RSTReceived
-            end;
             if Contest = DARC10M then     // n4af 4.43.7
-            wsprintf(CABRILLO_HISEX, '%-3s %4.4d %3s')
+               SetHisEx('%-3s %4.4d %3s', [string(RSTReceived), nrReceived, string(csQTHString)])
+            else if ContestTitle = 'PGA' then           // 4.92.4
+               SetHisEx('%-3s%5.3d%s', [string(RSTReceived), nrReceived, string(csQTHString)])
+            else if csQTHString = 'TRC' then      // 4.63.3
+               SetHisEx('%-3s%5d%-8s', [string(RSTReceived), nrReceived, string(csQTHString)])
             else
-             if ContestTitle = 'PGA' then           // 4.92.4
-               wsprintf(CABRILLO_HISEX, '%-3s%5.3d%s')
-            else
-             if csQTHString = 'TRC' then      // 4.63.3
-              wsprintf(CABRILLO_HISEX, '%-3s%5d%-8s')
-            else
-               wsprintf(CABRILLO_HISEX, '%-3s %4.4d %4s');
-            asm add esp,20
-            end;
+               SetHisEx('%-3s %4.4d %4s', [string(RSTReceived), nrReceived, string(csQTHString)]);
           end;
 
         RSTZoneAndPossibleDomesticQTHExchange:
@@ -2821,66 +2789,29 @@ if TempRXData.DomMultQTH = '' then
         RSTZoneOrDomesticQTH, RSTZoneOrSocietyExchange:
           begin
             if MyState <> '' then
-            begin
-              asm
-              push cMyState
-              push RSTSent
-              end;
-              wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-              asm add esp,16
-              end;
-            end
+               begin
+               SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
+               end
             else
-            begin
-              asm
-              push cMyZone
-              push RSTSent
-              end;
-              wsprintf(CABRILLO_MYEX, '%-3s %-7d');
-              asm add esp,16
-              end;
-            end;
+               begin
+               SetMyEx('%-3s %-7d', [string(RSTSent), cMyZone]);
+               end;
 
             if TempRXData.QTHString <> '' then
-            begin
-              asm
-              push csQTHString
-              push RSTReceived
-              end;
-              wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-              asm add esp,16
-              end;
-            end
+               begin
+               SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
+               end
             else
-            begin
-              asm
-              push HisZone
-              push RSTReceived
-              end;
-              wsprintf(CABRILLO_HISEX, '%-3s %-7u');
-              asm add esp,16
-              end;
-            end;
-
+               begin
+               SetHisEx('%-3s %-7u', [string(RSTReceived), HisZone]);
+               end;
           end;
 
         QSONumberAndCoordinatesSum: {RFASCHAMPIONSHIP}
           begin
-            asm
-            push nrSent
-            push cMyState
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %03.4d    ');
-            asm add esp,16
-            end;
-
-            asm
-            push nrReceived
-            push csQTHString
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %03.4u');
-            asm add esp,16
-            end;
+            // %03.4d/%03.4u: precision present -> C drops the 0 flag -> %3.4d/%3.4u.
+            SetMyEx('%-3s %3.4d    ', [string(cMyState), nrSent]);
+            SetHisEx('%-3s %3.4u', [string(csQTHString), nrReceived]);
           end;
 
         ClassDomesticOrDXQTHExchange:
@@ -2895,21 +2826,8 @@ if TempRXData.DomMultQTH = '' then
 
         QSONumberAndGeoCoordinates:
           begin
-            asm
-            push cMyState
-            push nrSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3.4d %-7s ');
-            asm add esp,16
-            end;
-
-            asm
-            push csQTHString
-            push nrReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3.4u %-7s');
-            asm add esp,16
-            end;
+            SetMyEx('%-3.4d %-7s ', [nrSent, string(cMyState)]);
+            SetHisEx('%-3.4u %-7s', [nrReceived, string(csQTHString)]);
           end;
 
         RSTQSONumberExchange:
@@ -2982,26 +2900,9 @@ if TempRXData.DomMultQTH = '' then
         QSONumberAndZone:
           begin
 //            if (Contest = RFCHAMPIONSHIPSSB) or (Contest = RFCHAMPIONSHIPCW) then
-            begin
-              asm
-                push nrReceived
-                push HisZone
-              end;
-
-            wsprintf(CABRILLO_HISEX, '  %-4u   %0.3d');   // 4.98.4
-
-
-              asm add esp,16
-              end;
-
-              asm
-                push nrSent
-                push cMyState
-              end;
-              wsprintf(CABRILLO_MYEX, '  %s    %03.4d ');
-              asm add esp,16
-              end;
-            end;
+            // %0.3d / %03.4d: precision present -> C drops the 0 flag -> %.3d / %3.4d.
+            SetHisEx('  %-4u   %.3d', [HisZone, nrReceived]);   // 4.98.4
+            SetMyEx('  %s    %3.4d ', [string(cMyState), nrSent]);
           end;
 
         RSTZoneExchange:
@@ -3015,83 +2916,37 @@ if TempRXData.DomMultQTH = '' then
           begin
           hisnr := (nrreceived div 1000);    // 4.53.2
            rxnr := (nrreceived mod 1000);    // 4.53.2
-            asm
-             push nrSent            // 4.53.2
-             push pnr     // 4.53.2
-            end;
-            wsprintf(CABRILLO_MYEX, '%-.3u%-7.4d');    // 4.72.9
-            asm add esp,16
-            end;
-
-
-
-            asm
-               push RXNR     // 4.53.4           // 4.72.9
-              push HisNR      //4.53.4
-
-            end;
+            SetMyEx('%-.3u%-7.4d', [pnr, nrSent]);    // 4.72.9
           //  pnr := temprxdata.numberreceived div  1000;      // 4.53.2
               pnr := RXNR;
-             wsprintf(CABRILLO_HISEX, '%-.4d%-.4d');    // 4.53.4        // 4.72.9
-             asm add esp,16
-             end;
+            SetHisEx('%-.4d%-.4d', [HisNR, RXNR]);    // 4.53.4        // 4.72.9
           end;
 
         RSTAndQSONumberOrFrenchDepartmentExchange, RSTAndQSONumberOrDomesticQTHExchange, RSTDomesticQTHOrQSONumberExchange:
           begin
+           // %03.4u: precision present -> %3.4u.  %03u (HISEX else): no precision,
+           // unsigned, so %.3u == %03u (no sign, no negative-zero-pad concern).
            if (MyState <> '') and (Contest <> PCC) then      // 4.83.2
-            begin
-              asm
-              push cMyState
-              push RSTSent
-              end;
-              wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-              asm add esp,16
-              end;
-            end
-            else
-             if StringIsAllNumbers(MyState) then
               begin
-               asm
-               push nrSent
-               push RSTSent
-               end;
-              wsprintf(CABRILLO_MYEX, '%-4s %03.4u/M   ');  // n4af 4.43.12
-              asm add esp,16
+              SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
+              end
+           else if StringIsAllNumbers(MyState) then
+              begin
+              SetMyEx('%-4s %3.4u/M   ', [string(RSTSent), nrSent]);  // n4af 4.43.12
+              end
+           else
+              begin
+              SetMyEx('%-4s %3.4u   ', [string(RSTSent), nrSent]);  // n4af 4.43.12
               end;
-             end
-              else
-               begin
-                asm
-                push nrSent
-                push RSTSent
-                end;
-               wsprintf(CABRILLO_MYEX, '%-4s %03.4u   ');  // n4af 4.43.12
-               asm add esp,16
-               end;
-              end;
-
 
             if TempRXData.QTHString {.DomMultQTH} <> '' then
-           begin
-             asm
-              push csQTHString
-              push RSTReceived
-             end;
-              wsprintf(CABRILLO_HISEX, '%-3s %-3s'); // 4.84.2
-              asm add esp,16
-              end;
-            end
+               begin
+               SetHisEx('%-3s %-3s', [string(RSTReceived), string(csQTHString)]); // 4.84.2
+               end
             else
-            begin
-              asm
-              push nrReceived
-              push RSTReceived
-              end;
-              wsprintf(CABRILLO_HISEX, '%-3s %03u');
-              asm add esp,16
-              end;
-            end;
+               begin
+               SetHisEx('%-3s %.3u', [string(RSTReceived), nrReceived]);
+               end;
           end;
       end;
 //----------------------------
