@@ -4054,7 +4054,6 @@ label
 var
   Note                                  : PChar;
   Minutes, Hour                         : integer;
-  nNumberOfBytesToWrite                 : integer;
 begin
   MakeReportFileName('Notes.txt');
   if not OpenLogFile then Exit;
@@ -4074,18 +4073,11 @@ begin
       Minutes := TempRXData.tSysTime.qtMinute;
       Hour := TempRXData.tSysTime.qtHour;
       Note := @TempRXData.Prefix;
-      asm
-      push Note
-      push Minutes
-      push Hour
-      end;
-      tGetDateFormat(TempRXData.tSysTime);
-      asm
-      push eax
-      end;
-      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, '%s %02u:%02u: %s'#13#10);
-      asm add esp,24 end;
-      sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+      // Issue #998: asm-push wsprintf -> SysUtils.Format. cdecl arg order is
+      // %s=date, %02u=Hour, %02u=Minutes, %s=Note (%02u -> %.2u zero-pad).
+      sWriteFileFromString(tReportFileWrite,
+        SysUtils.Format('%s %.2u:%.2u: %s'#13#10,
+          [string(tGetDateFormat(TempRXData.tSysTime)), Hour, Minutes, string(Note)]));
     end;
 
     goto 1;
