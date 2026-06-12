@@ -2285,19 +2285,7 @@ var
   RSTReceived                           : PChar;
   Freq                                  : PChar;
   ModeString                            : PChar;
-  cMyZone                               : integer;
-  cMyState                              : PChar;
-  cMyName                               : PChar;
-  csName                                : PChar;
-  cMyFOCNumber                          : PChar;
-  cMyCheck                              : PChar;
-  csCheck                               : integer {PChar};
-  crFOCNr                               : PChar;
-  cMyGrid                               : PChar;
-  csPower                               : PChar;
-  hisAge                                : Integer;
   csQTHString                           : PChar;
-  HisZone                               : integer;
   nrReceived                            : integer;
   nrSent                                : integer;
   tempcategoryoperator                  : tcategoryoperator;
@@ -2311,14 +2299,11 @@ var
   myStationEx                           : TMyStationExchange;  // #998 capstone: My-station fields for FormatCabrilloExchange
   cRandomCharsReceived                  : PChar;
   cKids                                 : PChar;
-  TempGrid                              : Str20;
   previousqsonr                         : integer;
   TransmitterIDPos                      : integer;
   contacts                              : integer;
   PreviousQTHString                     : Str10;
   pnr                                   : integer;
-  hisnr                                 : integer;
-  rxnr                                  : integer;
   slOperators                           : TStringList;
 
 
@@ -2340,17 +2325,9 @@ begin
       try
       slOperators := TStringList.Create;
       slOperators.Duplicates := dupIgnore;
-      TempGrid := MyGrid;
-  // Issue #902 -- null-terminate after the actual grid length.
-  // Old code wrote #0 at byte 7 unconditionally; for 4-char grids (e.g. EL88)
-  // that left bytes 5..6 holding uninitialized stack memory, which leaked
-  // into the Cabrillo MY-EXCH column as random non-printables.
-  TempGrid[Length(MyGrid) + 1] := #0;
-  cMyGrid := @TempGrid[1];
-
-  cMyName := @MyName[1];
-  cMyZone := StrToInt(MyZone);
-  cMyState := @MyState[1];
+      // Issue #998 capstone: the My-station / his-zone / his-name locals that fed
+      // the exchange `case` were removed here -- FormatCabrilloExchange now derives
+      // them from the rx/my it is passed (PostUnit builds myStationEx at the call).
 
   previousqsonr := 0;
   1:
@@ -2488,9 +2465,6 @@ if TempRXData.DomMultQTH = '' then
   csQTHString := 'DX';
   end;
   end;
-    HisZone := TempRXData.Zone;
-
-    csName := @TempRXData.Name[1];
 
     if GoodLookingQSO then
     begin
