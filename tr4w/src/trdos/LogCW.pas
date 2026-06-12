@@ -118,6 +118,8 @@ var
   Short9                                : Char = 'N';
 
 procedure AddStringToBuffer(Msg: Str160; Tone: integer);
+procedure BeginCWCapture;   // '=' repeat-last-CW-message
+procedure EndCWCapture;
 procedure AppendConfigFile(AddedLine: Str160);
 function CalculateElements(sMsg: string): integer;
 //procedure ClearPTTForceOn;
@@ -170,6 +172,12 @@ procedure DisplayCrypticSSBMenu;
 var
   KeyStatus                             : KeyStatusType;
   slElements                            : TStringList;
+  // '=' repeat-last-CW-message: BeginCWCapture/EndCWCapture bracket one message;
+  // AddStringToBuffer appends the actual expanded characters it sends into
+  // CWBurstAccum, which EndCWCapture promotes to LastCWMessage for replay.
+  CWCaptureActive                       : boolean = False;
+  CWBurstAccum                          : Str160 = '';
+  LastCWMessage                         : Str160 = '';
 implementation
 
 uses
@@ -191,6 +199,21 @@ type
 //   NEWCW                           : TCW;
 
 
+procedure BeginCWCapture;
+begin
+   CWCaptureActive := True;
+   CWBurstAccum := '';
+end;
+
+procedure EndCWCapture;
+begin
+   CWCaptureActive := False;
+   if CWBurstAccum <> '' then
+      begin
+      LastCWMessage := CWBurstAccum;
+      end;
+end;
+
 procedure AddStringToBuffer(Msg: Str160; Tone: integer);
 var
   i                                     : integer;
@@ -200,6 +223,12 @@ begin
    //localMsg                                               := Format('Adding %s to CW Buffer', [Msg]);
    //AddStringToTelnetConsole(PChar(localMsg),tstAlert);
    logger.Debug('[AddStringToBuffer] Adding (%s) to CW Buffer',[Msg]);
+   // '=' repeat-last-CW-message: record the actual expanded text being sent
+   // (skip the CWByCAT control sentinel, which is not on-air content).
+   if CWCaptureActive and (Msg <> CWByCATBufferTerminator) then
+      begin
+      CWBurstAccum := CWBurstAccum + Msg;
+      end;
    if ( (Msg = CWByCATBufferTerminator) or
         ((CWEnable and CWEnabled and IsCWByCATActive )) ) then   // ny4i 4.44.5    + Issue 111
       begin

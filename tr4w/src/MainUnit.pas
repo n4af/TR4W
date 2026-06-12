@@ -4105,6 +4105,21 @@ begin
     CallWindowCharConsumed := True; // prevent WM_CHAR from inserting '-' into the cleared field
     Exit;
   end;
+
+  // '=' repeat-last-CW-message: replay the exact characters last sent on CW.
+  if (key = '=') and (ActiveMode = CW) then
+     begin
+     if LastCWMessage <> '' then
+        begin
+        AddStringToBuffer(LastCWMessage, CWTone);
+        if IsCWByCATActive then
+           begin
+           AddStringToBuffer(CWByCATBufferTerminator, CWTone);
+           end;
+        end;
+     CallWindowCharConsumed := True; // prevent WM_CHAR from inserting '=' into the call field
+     Exit;
+     end;
   // start sending now code
   if Key = StartSendingNowKey then
     if tAutoSendMode = False then
