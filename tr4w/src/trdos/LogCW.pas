@@ -319,14 +319,12 @@ begin
       CWThreadHandle                                        := tCreateThread(@CWThreadProc, CWThreadID);
       logger.Info('Created CW thread with threadid of %d',[CWThreadID] );
      //                  THREAD_PRIORITY_ABOVE_NORMAL
-      asm
-
-      //push THREAD_PRIORITY_ABOVE_NORMAL
-      //push THREAD_PRIORITY_HIGHEST
-      push THREAD_PRIORITY_TIME_CRITICAL
-      push eax
-      call SetThreadPriority
-      end;
+      // Issue #997: asm SetThreadPriority -> Pascal call. The old `push eax`
+      // pushed a STALE EAX -- the preceding logger.Info clobbered the thread
+      // handle -- so this priority was never actually applied. Now set it on the
+      // real handle (CWThreadHandle). BEHAVIOR CHANGE: CW thread now actually
+      // runs TIME_CRITICAL; verify CW keying timing.
+      SetThreadPriority(CWThreadHandle, THREAD_PRIORITY_TIME_CRITICAL);
 
 {$IF OZCR2008}
       if tMessagesExhangeEnable then SetTimer(tr4whandle, UPDATE_NET_CW_MESSAGE, 250, @SendMessageStatus);

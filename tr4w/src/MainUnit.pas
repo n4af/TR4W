@@ -5388,11 +5388,11 @@ begin
     tPaddleThreadID);
   logger.Info('Created PaddleAndFootSwitch thread with threadid of %d',
     [tPaddleThreadID]);
-  asm
- push THREAD_PRIORITY_LOWEST
- push eax
- call SetThreadPriority
-  end;
+  // Issue #997: asm SetThreadPriority -> Pascal call. The old `push eax` pushed a
+  // stale handle (clobbered by the preceding logger.Info), so this never applied;
+  // now set it on the real handle. BEHAVIOR CHANGE: paddle/foot-switch thread now
+  // actually runs LOWEST.
+  SetThreadPriority(tPaddleFootSwitchThread, THREAD_PRIORITY_LOWEST);
 end;
 {
 procedure TryToLoadRICHED32DLL;
