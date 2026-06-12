@@ -229,7 +229,11 @@ implementation
 uses uNet,
   uBandmap,
   LogGrid,
-  SysUtils,
+  SysUtils,   // Issue #997: provides SysUtils.Format/StrPCopy for asm removal.
+              // ORDER/QUALIFICATION MATTERS: SysUtils also declares SysErrorMessage,
+              // which differs from TF.SysErrorMessage (SysUtils trims the trailing
+              // CRLF, TF does not).  Call sites needing TF's behavior are explicitly
+              // TF-qualified (see TelnetConnectionError / WinSock error display).
   MainUnit;
 
 // Issue #23 -- DX cluster I/O thread <-> main-thread message protocol.  The
@@ -592,7 +596,7 @@ begin
               // host they tried to reach (the raw message is long and unwrapped).
               logger.Error('[Telnet] Could not connect to %s:%d -- WinSock %d: %s',
                 [PChar(@PendingTelnetHost[0]), PendingTelnetPort, lParam,
-                 SysErrorMessage(lParam)]);
+                 TF.SysErrorMessage(lParam)]);   // Issue #997: keep TF's PChar version (SysUtils in uses returns a trimmed string)
               Format(wsprintfBuffer, '%s%s:%u', TC_FAILEDTOCONNECTTO,
                 @PendingTelnetHost[0], PendingTelnetPort);
               AddStringToTelnetConsole(wsprintfBuffer, tstError);
