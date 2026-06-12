@@ -174,6 +174,7 @@ var
   
   TempTag                               : CabrilloTags;
   TempHWND                              : HWND;
+  SummaryCallback                       : procedure;   // Issue #997: typed call of the Pointer callback
 const
   Left                                  = 10;
   TagHeight                             = 20;
@@ -297,7 +298,10 @@ begin
                 // prompts for the SuperCheckPartial upload), close the dialog
                 // -- otherwise the user is dropped back at OK/Cancel and has
                 // to hit Cancel to finish a successful export.
-                asm call CabrilloSummaryProc; end;
+                // Issue #997: asm `call CabrilloSummaryProc` (untyped Pointer
+                // callback, parameterless) -> typed parameterless call.
+                @SummaryCallback := CabrilloSummaryProc;
+                SummaryCallback;
                 goto ExitAndClose;
               end;
           2: goto ExitAndClose;

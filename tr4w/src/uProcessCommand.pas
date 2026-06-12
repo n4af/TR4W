@@ -217,6 +217,7 @@ var
   TempInt, Result1                      : integer;
   i                                     : integer;
   p                                     : Pointer;
+  cmdProc                               : procedure;   // Issue #997: typed call of a Pointer command handler
 begin
   FoundCommand := False;
 
@@ -250,15 +251,15 @@ begin
     begin
       if StrComp(sCommandsArray[i].caCommand, @CommandString[1]) = 0 then
       begin
-        p := sCommandsArray[i].caAddress;
-        asm
-        call p
-        end;
+        // Issue #997: asm `call p` (untyped Pointer command handler,
+        // parameterless) -> typed call, guarded against a nil entry in the
+        // command-table (sCommandsArray) definition.
+        @cmdProc := sCommandsArray[i].caAddress;
+        if Assigned(cmdProc) then
+           cmdProc;
 
-        p := PChar(sCommandsArray[i].caCommand);
-        asm push p end;
-        wsprintf(QuickDisplayBuffer, '"%s" command is executed.');
-        asm add esp,12 end;
+        // Issue #997: asm wsprintf-push -> TF.Format.
+        Format(QuickDisplayBuffer, '"%s" command is executed.', PChar(sCommandsArray[i].caCommand));
         QuickDisplay(QuickDisplayBuffer);
 
         Break;
@@ -624,6 +625,7 @@ procedure scBOOLSWAP;
 var
   i                                     : integer;
   p                                     : Pointer;
+  cmdProc                               : procedure;   // Issue #997: typed call of a Pointer change-handler
 begin
   for i := 1 to CommandsArraySize do
     if StrComp(@scFileName[1], CFGCA[i].crCommand) = 0 then
@@ -632,8 +634,11 @@ begin
         PBoolean(CFGCA[i].crAddress)^ := not PBoolean(CFGCA[i].crAddress)^;
         if CFGCA[i].crP <> 0 then
         begin
-          p := CommandsProcArray[CFGCA[i].crP];
-          asm call P end;
+          // Issue #997: asm `call P` (untyped Pointer change-handler) -> typed
+          // call, guarded against a nil entry in the CommandsProcArray definition.
+          @cmdProc := CommandsProcArray[CFGCA[i].crP];
+          if Assigned(cmdProc) then
+             cmdProc;
           Format(QuickDisplayBuffer, '%s=%s', @scFileName[1], BA[PBoolean(CFGCA[i].crAddress)^]);
           QuickDisplay(QuickDisplayBuffer);
         end;
