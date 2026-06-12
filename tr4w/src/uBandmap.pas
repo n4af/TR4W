@@ -353,10 +353,8 @@ begin
     WM_INITDIALOG:
       begin
         BandMapListBox := CreateOwnerDrawListBox(LB_STYLE_1, hwnddlg);
-        asm
-            mov edx,[MainFixedFont]
-            call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> TF helper (EAX = BandMapListBox above).
+        tWM_SETFONT(BandMapListBox, MainFixedFont);
 
         BandMapStatusBar := Windows.GetDlgItem(hwnddlg, 102);
 

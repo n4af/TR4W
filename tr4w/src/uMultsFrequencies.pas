@@ -85,10 +85,8 @@ begin
     WM_INITDIALOG:
       begin
         MultsFrequenciesHandle := Get101Window(hwnddlg);
-        asm
-            mov edx,[MainFixedFont]
-            call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> TF helper (EAX = MultsFrequenciesHandle above).
+        tWM_SETFONT(MultsFrequenciesHandle, MainFixedFont);
         ListView_SetTextBkColor(MultsFrequenciesHandle, $0000FF00);
         ListView_SetBkColor(MultsFrequenciesHandle, $0000FF00);
 //        ListView_SetTextColor(MultsFrequenciesHandle, $00FFFFFF);
