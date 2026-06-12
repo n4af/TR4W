@@ -102,6 +102,7 @@ var
 
 implementation
 uses
+  SysUtils,   // Issue #997: Format/StrPCopy
   LOGSUBS2,
   MainUnit,
   uNet,
@@ -385,11 +386,8 @@ begin
   // immediately without erasing — owner-draw items fill their own background.
   ValidateRect(BandMapListBox, nil);
   RedrawWindow(BandMapListBox, nil, 0, RDW_INVALIDATE or RDW_NOERASE or RDW_UPDATENOW);
-  asm push NumberEntriesDisplayed
-  end;
-  wsprintf(wsprintfBuffer, TC_SPOTS);
-  asm add esp,12
-  end;
+  // Issue #997: asm-push wsprintf -> SysUtils.Format (TC_SPOTS = '%d spots').
+  StrPCopy(wsprintfBuffer, SysUtils.Format(TC_SPOTS, [NumberEntriesDisplayed]));
   SetTextInBMSB(5, wsprintfBuffer);
   if NumberEntriesDisplayed = 0 then
     ClearSpotInfo;
