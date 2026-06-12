@@ -891,7 +891,7 @@ var
    Changed: array[0..CommandsArraySize - 1] of boolean;
 
 implementation
-uses MainUnit;
+uses MainUnit, SysUtils;   // Issue #997 -- SysUtils for Format/StrPCopy (asm-to-Pascal conversion)
 var
    TempBand: BandType;
    TempMode: ModeType;
@@ -1228,6 +1228,9 @@ begin
                Proc := AdditionalProcsArray[CFGCA[i].crA];
                if Assigned(Proc) then
                   begin
+                  // Issue #997 -- LEFT AS ASM: Proc is an untyped Pointer (not a
+                  // typed proc var) and the block captures the AL boolean return
+                  // into Result.  Not one of the convertible Pattern C cases.
                   asm
                      call Proc
                      mov byte ptr result,al
@@ -1502,12 +1505,8 @@ begin
 
    if not StringIsAllNumbers(TimeString) then
       begin
-         asm
-          push TimeString
-         end;
-         wsprintf(wsprintfBuffer, '%s '#13 + TC_INVALIDREMINDERTIME);
-         asm add esp,12
-         end;
+         // Issue #997 -- replaced wsprintf-push asm with SysUtils.Format
+         SysUtils.StrPCopy(wsprintfBuffer, SysUtils.Format('%s '#13 + TC_INVALIDREMINDERTIME, [TimeString]));
          ShowMessage(wsprintfBuffer);
          //      showmessage(TimeString + #13 + 'Invalid reminder time!!');
          Exit;
