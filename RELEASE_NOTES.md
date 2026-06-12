@@ -38,6 +38,35 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.10 (2026-06-12) — NY4I
+
+#### Function Keys
+
+- You can now **right-click a function key to edit that key's message** directly — it picks the right CQ vs Search-and-Pounce message for your current mode. (#1001)
+- Right-clicking a function key while holding **Alt or Ctrl** no longer pops up a spurious menu. (#1007)
+
+#### Send From Keyboard
+
+- Fixed a **Send Keyboard Input dialog that could open duplicated or refuse to close**. (#1006)
+
+#### Data Entry
+
+- When an exchange you type **can't be parsed, the cursor now lands right after the part it didn't understand**, so you can correct it without hunting for it. (#1010)
+
+#### CW
+
+- CW enable / disable / toggle now behaves consistently (driven by a single internal switch). (#380)
+
+#### Cabrillo & Log Export (bug fixes)
+
+- **CSV export no longer writes stray duplicate lines** for skipped, deleted, or non-QSO records.
+
+#### Bundled Data
+
+- The **DX cluster list (TRCLUSTER.DAT) is refreshed each monthly build**, and a fresh copy ships with this release. (#391)
+
+---
+
 ### 4.148.7 (2026-06-08) — NY4I
 
 #### Crash Recovery

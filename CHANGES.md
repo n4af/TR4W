@@ -37,6 +37,51 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.10 (2026-06-12) — NY4I
+
+#### Cabrillo log writer: full inline-asm removal (`src/trdos/PostUnit.PAS`) — Issue #998 (PRs #1013–#1025)
+
+- **PostUnit.PAS taken from ~170 inline x86 `asm` blocks to zero.** The dominant idiom (manual cdecl `wsprintf` varargs push + `asm add esp,N` cleanup) and the custom `Format(CABRILLO_*)` external-`wsprintfA` overloads were replaced with standard `SysUtils.Format`; the PChar exchange buffers (`CABRILLO_FIRST_PART`, `CABRILLO_BUFFER`, `CABRILLO_MYEX`/`CABRILLO_HISEX`) became Delphi strings. Done in 10 output-diff-validated sub-batches (report/export routines → Cabrillo header/assembly → all ~33 `case ActiveExchange` arms → QTC block → buffer→string cleanup). 64-bit / Delphi-12 prerequisite.
+- **Two latent bugs fixed.** (a) *EDI export negative serial* — C `%03d` counts the sign in the field width (`-1`→`-01`) whereas Delphi `%.3d` pads digits (`-1`→`-001`); reproduced C semantics with `%.*d` + precision `3-Ord(v<0)`. (b) *CSV export out-of-guard write* — the per-QSO `sWriteFile` sat outside the `GoodLookingQSO` guard, re-emitting the stale buffer for skipped/deleted/non-QSO records; moved inside the guard.
+- Removed a benign 8-byte stack over-pop in the EDI per-QSO block.
+
+#### Capstone: testable exchange formatter (`src/uCabrilloExchange.pas`, `test/unit/uTestCabrilloExchange.pas`, `tr4w.dpr`) — Issue #998 (PR #1027)
+
+- **Extracted the ~415-line `case ActiveExchange of` (MY-EXCH/HIS-EXCH column builder) out of `tGenerateLogPortionOfCabrilloFile`** into a dependency-light `uCabrilloExchange.FormatCabrilloExchange` (`VC` + `SysUtils` only), taking a `ContestExchange` + `TMyStationExchange` record + the derived RST/QTH strings + `var pnr`. PostUnit builds the record and calls it.
+- **39 golden-line unit tests** pin every exchange arm + branch (894 tests total). Replaces per-contest manual Cabrillo diffing with the test harness.
+- Added `uCabrilloExchange` + `uCabrilloFormat` to `tr4w.dpr` (IDE Project Manager + Find-in-Files coverage).
+
+#### Inline-asm removal: small units (`src/uDistance.pas`, `uSpots.pas`, `uLogSearch.pas`, `uNewContest.pas`, `uEditQSO.pas`, `src/trdos/LOGWIND.PAS`) — Issue #997 (PR #1026)
+
+- **Converted the clean `wsprintf`-push idiom to `Format` in 6 units** (every real asm block in each). `LOGWIND.DisplayTotalScore`'s `push eax` had relied on `Score := TotalScore` leaving the value in EAX — a fragile Delphi-7 codegen assumption 64-bit would break.
+
+#### CW: single enable/disable state owner (`src/trdos/LogCW.pas`) — Issue #380 (PR #1000)
+
+- **Routed `scENABLECW` / `scDISABLECW` / `ToggleCW` through one `SetCWState` owner** of both the `CWEnable` / `CWEnabled` flags.
+
+#### Function keys: right-click to edit (`src/uFunctionKeys.pas`, `tr4w.dpr`) — Issues #1001, #1007 (PRs #1005, #1008)
+
+- **Right-click a function key to edit that key's message** via a context menu (mode-aware CQ vs S&P). (#1001)
+- **Ignore the function-key right-click while Alt or Ctrl is held** (avoids the spurious menu/flash). (#1007)
+
+#### Send-from-keyboard dialog (`src/uSendKeyboard.pas`, `src/MainUnit.pas`) — Issue #1006 (PR #1009)
+
+- **Fixed the duplicate / unclosable Send Keyboard Input dialog**; added an idle-close optimization (skip `FlushCWBuffer` when CW isn't being sent).
+
+#### Exchange parse errors: cursor positioning (`src/trdos/LOGSTUFF.PAS`, `src/MainUnit.pas`) — Issue #1010 (PR #1011)
+
+- **On an exchange parse error, place the entry cursor after the offending token** (general pattern; FD class/section first).
+
+#### Release: refresh TRCLUSTER.DAT (`tr4w/build/Invoke-Release.ps1`) — Issue #391 (PR #1002)
+
+- **Monthly build downloads a fresh TRCLUSTER.DAT** from dxcluster.info and refreshes the repo copy; a fresh copy ships now.
+
+#### Docs
+
+- New Contest Dialog design investigation; Delphi-12 I18N (Translation Manager) migration notes.
+
+---
+
 ### 4.148.7 (2026-06-08) — NY4I
 
 #### Config: restore UPDATE RESTART FILE ENABLE (`src/uCFG.pas`, `src/trdos/LOGSUBS2.PAS`, `src/trdos/CFGDEF.PAS`) — Issue #950 (PR #996)
