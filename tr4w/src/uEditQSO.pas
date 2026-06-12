@@ -834,15 +834,8 @@ begin
     if FType = ctInteger then
       w := PDWORD(ValueAdr)^;
 
-    asm
-      xor eax,eax
-      mov eax,dword ptr W
-      push eax
-    end;
-
-    wsprintf(IntToPCharBuffer, '%d');
-    asm add esp,12
-    end;
+    // Issue #997: asm-push wsprintf -> Format (single %d arg = W).
+    Format(IntToPCharBuffer, '%d', W);
     Value := IntToPCharBuffer;
   end;
   tCreateStaticWindow(Caption, LeftStyle, 10, CurrentEditRow * 20 + 400, 70, ws,

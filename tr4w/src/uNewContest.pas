@@ -681,12 +681,8 @@ end;
 
 procedure DisplayCheckBox(Text: PChar);
 begin
-  asm
-  push Text
-  end;
-  wsprintf(wsprintfBuffer, TC_IAMIN);
-  asm add esp,12
-  end;
+  // Issue #997: asm-push wsprintf -> Format (TC_IAMIN = '&I am in %s').
+  Format(wsprintfBuffer, TC_IAMIN, Text);
   Windows.SetWindowText(NewContestCheckBox, wsprintfBuffer);
   Windows.ShowWindow(NewContestCheckBox, SW_SHOW);
 end;
@@ -701,13 +697,9 @@ end;
 procedure EnterCountyOrState(State: PChar);
 begin
   DisplayInitialCommand(icmyState);
-  asm
-  push State
-  push State
-  end;
-  wsprintf(wsprintfBuffer, TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX);
-  asm add esp,16
-  end;
+  // Issue #997: asm-push wsprintf -> Format. TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX
+  // has two %s, both = State.
+  Format(wsprintfBuffer, TC_ENTERYOURCOUNTYORSTATEPOROVINCEDX, State, State);
   Windows.SetWindowText(NewContestCommentWndHandle, wsprintfBuffer);
 end;
 
