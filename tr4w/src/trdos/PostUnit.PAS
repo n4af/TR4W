@@ -2653,207 +2653,74 @@ if TempRXData.DomMultQTH = '' then
             if MyState = '' then cMyState := 'DX';
             if TempRXData.QTHString = '' then csQTHString := 'DX';
 
-            asm
-                push cMyState
-                push cMyName
-                push nrSent
-            end;
-//            wsprintf(CABRILLO_MYEX, '%-10d %-7s %-4s');
-            wsprintf(CABRILLO_MYEX, '%-4d %-7s %-8s');      // 4.88.3
-            asm add esp,20
-            end;
-
-            asm
-                push csQTHString
-                push csName
-                push nrReceived
-            end;
-      //      wsprintf(CABRILLO_HISEX, '%-4u %-10s %-4s');
-              wsprintf(CABRILLO_HISEX, '%-4u %-5s %-4s');   // 4.88.3
-            asm add esp,20
-            end;
+            SetMyEx('%-4d %-7s %-8s', [nrSent, string(cMyName), string(cMyState)]);    // 4.88.3
+            SetHisEx('%-4u %-5s %-4s', [nrReceived, string(csName), string(csQTHString)]);  // 4.88.3
           end;
 
         RSTAgeAndPossibleSK:
           begin
-//            csQTHString
-            asm
-                        push cMyState
-                        push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-16s');
-            asm add esp,16
-            end;
-
+            SetMyEx('%-3s %-16s', [string(RSTSent), string(cMyState)]);
             nrReceived := TempRXData.Age;
-            asm
-            push csQTHString
-            push nrReceived
-            push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %u %s');
-            asm add esp,20
-            end;
-
+            SetHisEx('%-3s %u %s', [string(RSTReceived), nrReceived, string(csQTHString)]);
           end;
 
         RSTAgeExchange:
           begin
-
-            asm
-                        push cMyState
-                        push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-
+            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
             nrReceived := TempRXData.Age;
-            asm
-                        push nrReceived
-                        push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7u');
-            asm add esp,16
-            end;
+            SetHisEx('%-3s %-7u', [string(RSTReceived), nrReceived]);
           end;
 
         AgeAndQSONumberExchange:      // 4.55.4
           begin
-            asm
-                push nrSent
-                push cMyState
-
-
-      {      xor eax,eax         // 4.119.3
-           mov ax, word ptr TempRXData.RSTSent
-
-           push eax  }
-           end;
-            wsprintf(CABRILLO_MYEX, '%-2s %03d ');
-            asm add esp,20
-            end;
-
-
+            // nrSent '%03d' / nrReceived '%04d' = zero-pad to WIDTH (sign in
+            // width) -> '%.*d' + precision N-Ord(v<0) (EDI negative note).
+            SetMyEx('%-2s %.*d ', [string(cMyState), 3 - Ord(nrSent < 0), nrSent]);
             hisAge := TempRXData.Age ;
             nrreceived := TempRXData.NumberReceived;          // n4af 04.42.4
-            asm
-            push  nrReceived
-            end;
-            asm
-            push hisAge
-       {     xor eax,eax                      // 4.119.3
-            mov ax, word ptr TempRXData.RSTSent
-            push eax   }
-            end;
-
-            wsprintf(CABRILLO_HISEX, ' %-3d %04d');       // n4af 4.42.4
-            asm add esp,20
-            end;
+            SetHisEx(' %-3d %.*d', [hisAge, 4 - Ord(nrReceived < 0), nrReceived]);   // n4af 4.42.4
           end;
 
          QSONumberAndAgeExchange:      // 4.119.1
           begin
-            asm
-                push cMyState
-                push nrSent
-
-
-            xor eax,eax
-           mov ax, word ptr TempRXData.RSTSent
-
-           push eax
-           end;
-            wsprintf(CABRILLO_MYEX, '%-3d %03d %-2s      ');
-            asm add esp,20
-            end;
-
-
+            // Unreachable by any active contest (no AE: / no FCONTEST assign);
+            // converted for completeness.  RSTSent here is the numeric RST.
+            // nrSent '%03d' -> '%.*d' (sign-in-width); hisAge '%02d' -> '%.2d'.
+            SetMyEx('%-3d %.*d %-2s      ', [TempRXData.RSTSent, 3 - Ord(nrSent < 0), nrSent, string(cMyState)]);
             hisAge := TempRXData.Age ;
             nrreceived := TempRXData.NumberReceived;          // n4af 04.42.4
-            asm
-            push  hisAge
-            end;
-            asm
-            push nrReceived
-            xor eax,eax
-            mov ax, word ptr TempRXData.RSTSent
-            push eax
-            end;
-
-            wsprintf(CABRILLO_HISEX, ' %-3d %3d %02d');       // n4af 4.42.4
-            asm add esp,20
-            end;
+            SetHisEx(' %-3d %3d %.2d', [TempRXData.RSTSent, nrReceived, hisAge]);       // n4af 4.42.4
           end;
 
         RSTPowerExchange:
         begin
          csPower := @TempRXData.Power[1];
          if contest = FOCMARATHON then
-        begin
-        cMyFOCNumber :=  @MyFOCNumber[1];
-        crFOCNr := @TempRXData.Power[1];
-         asm
-                        push cMyFOCNumber
-                        push RSTSent
+            begin
+            cMyFOCNumber :=  @MyFOCNumber[1];
+            crFOCNr := @TempRXData.Power[1];
+            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyFOCNumber)]);
+            SetHisEx('%-3s %-7s', [string(RSTReceived), string(crFOCNr)]);
             end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-            asm add esp,16
+         if Contest <> FOCMARATHON then
+            begin
+            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csPower)]);
+            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
             end;
-
-            asm
-                       push crFOCnr
-                       push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-
-             end;
-             if Contest <> FOCMARATHON then
-
-              begin
-
-            asm
-                        push csPower
-                        push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-
-            asm
-                        push cMyState
-                        push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-          end;
           end;
         RSTAndOrGridExchange:
           begin
-            asm
-                push csQTHString
-                push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-
-            asm
-                push cMyGrid
-                push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-            asm add esp,16
-            end;
+            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
+            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyGrid)]);
           end;
 
         QSONumberAndGridSquare:
           begin
-            Format(CABRILLO_MYEX, '%03d %-6.4s ', nrSent, cMyState);
-            Format(CABRILLO_HISEX, '%03.4u %-6s', nrReceived, csQTHString);
+            // nrSent '%03d' -> '%.*d' (sign-in-width); '%-6.4s' truncates to 4
+            // chars (precision) -- maps directly.  '%03.4u': precision present
+            // so C ignores the 0 flag -> '%3.4u'.
+            SetMyEx('%.*d %-6.4s ', [3 - Ord(nrSent < 0), nrSent, string(cMyState)]);
+            SetHisEx('%3.4u %-6s', [nrReceived, string(csQTHString)]);
           end;
 
         QSONumberDomesticOrDXQTHExchange, QSONumberDomesticQTHExchange:
@@ -3057,21 +2924,8 @@ if TempRXData.DomMultQTH = '' then
         RSTAndContinentExchange:
           begin
             csQTHString := @TempRXData.QTHString[1];
-            asm
-            push csQTHString
-            push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-
-            asm
-            push cMyState
-            push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-            asm add esp,16
-            end;
+            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
+            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
           end;
 
         RSTDomesticQTHExchange:
