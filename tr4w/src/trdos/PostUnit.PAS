@@ -176,7 +176,6 @@ var
   CABRILLO_RST_SEND                     : array[0..3] of Char;
   CABRILLO_RST_RCVD                     : array[0..3] of Char;
   CABRILLO_BUFFER                       : array[0..255] of Char;
-  CABRILLO_FIRST_PART                   : array[0..255] of Char;
   CABRILLO_MYEX                         : array[0..64 - 1] of Char;
   CABRILLO_HISEX                        : array[0..64 - 1] of Char;
 
@@ -2300,10 +2299,10 @@ var
   nrSent                                : integer;
   tempcategoryoperator                  : tcategoryoperator;
 
-  T1                                    : PChar;
-  T2                                    : PChar;
-  T3                                    : PChar;
   T4                                    : PChar;      // 4.73.6
+  sFirstPart                            : string;     // Issue #998: replaces CABRILLO_FIRST_PART
+  sPrefix                               : string;     // Issue #998: QSO:/X-QSO: line prefix
+  sFmt                                  : string;     // Issue #998: assembly format string
   cRandomCharsReceived                  : PChar;
   cKids                                 : PChar;
   TempGrid                              : Str20;
@@ -2491,41 +2490,26 @@ if TempRXData.DomMultQTH = '' then
     begin
 
           {Make First part}
-      asm
-            lea  eax,MyCall[1]
-            push eax
-            movzx eax,TempRXData.tSysTime.qtMinute
-            push eax
-
-            movzx eax,TempRXData.tSysTime.qtHour
-            push eax
-
-            movzx eax,TempRXData.tSysTime.qtDay
-            push eax
-
-            movzx eax,TempRXData.tSysTime.qtMonth
-            push eax
-
-            movzx eax,TempRXData.tSysTime.qtYear
-            add eax,2000
-            push eax
-
-            push ModeString
-            push Freq
-      end;
-      // Issue #750: X-QSO records use the 'X-QSO:' Cabrillo prefix
-      // instead of 'QSO:'.  Same argument set on the stack -- only the
-      // literal prefix in the format string differs.  The 2-char wider
-      // prefix shifts later columns by 2 chars; Cabrillo parsers are
-      // expected to be tolerant of column alignment for X-QSO lines.
+      // Issue #998: asm-push wsprintf -> SysUtils.Format; the CABRILLO_FIRST_PART
+      // PChar buffer is replaced by the local sFirstPart string.  cdecl arg
+      // order: freq, mode, year, month, day, hour, minute, mycall.  %02d -> %.2d
+      // (date/time fields are always non-negative).
+      // Issue #750: X-QSO records use the 'X-QSO:' prefix instead of 'QSO:';
+      // only the literal prefix differs (the 2-char-wider prefix shifts later
+      // columns by 2 -- Cabrillo parsers tolerate X-QSO column alignment).
       if TempRXData.ceXQSO then
-         wsprintf(CABRILLO_FIRST_PART,
-                  'X-QSO: %5s %s %d-%02d-%02d %02d%02d %-7s ')
+         sPrefix := 'X-QSO: '
       else
-         wsprintf(CABRILLO_FIRST_PART,
-                  'QSO: %5s %s %d-%02d-%02d %02d%02d %-7s ');
-      asm add esp,40
-      end;
+         sPrefix := 'QSO: ';
+      sFirstPart := SysUtils.Format(sPrefix + '%5s %s %d-%.2d-%.2d %.2d%.2d %-7s ',
+        [string(Freq),
+         string(ModeString),
+         TempRXData.tSysTime.qtYear + 2000,
+         TempRXData.tSysTime.qtMonth,
+         TempRXData.tSysTime.qtDay,
+         TempRXData.tSysTime.qtHour,
+         TempRXData.tSysTime.qtMinute,
+         string(PChar(@MyCall[1]))]);
 {
       ActiveExchange := RSTQSONumberExchange;
       nrReceived := StrToInt(TempRXData.ceClass);
@@ -3405,28 +3389,21 @@ if TempRXData.DomMultQTH = '' then
         T4 := '0';
  if CategoryOperator <> coMULTIOP then
  T4 := '';
-      T1 := CABRILLO_FIRST_PART;
-      T2 := CABRILLO_MYEX;
-      T3 := CABRILLO_HISEX;
-
-      asm
-      push t4
-      push t3
-      push HisCallsign
-      push t2
-      push t1
-      end;
-
-         if Contest = ARKTIKA_SPRING then
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%-12s%-10s%-10s'#13#10)
-     else
-//      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-11s%-10s %-5s'#13#10);   // 4.92.8
-        nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, '%s%s%-15s%-10s %-5s'#13#10);   // 4.100.3
-      asm add esp,24
-      end;
-
-//      if Radio2ID <> #0 then if TempRXData.ceComputerID = Radio2ID then CABRILLO_BUFFER[80] := '1';
-      sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+      // Issue #998: asm-push wsprintf -> SysUtils.Format. cdecl arg order is
+      // first-part, my-exchange, his-callsign, his-exchange, multi-op flag.
+      // ARKTIKA_SPRING uses a narrower layout that consumes only the first 4
+      // args (the multi-op flag is omitted); Delphi Format ignores the extra
+      // trailing argument, so a single arg list serves both formats.
+      if Contest = ARKTIKA_SPRING then
+         sFmt := '%s%-12s%-10s%-10s'#13#10           // 4.100.3
+      else
+         sFmt := '%s%s%-15s%-10s %-5s'#13#10;        // 4.100.3
+      sWriteFileFromString(tReportFileWrite, SysUtils.Format(sFmt,
+        [sFirstPart,
+         string(PChar(@CABRILLO_MYEX[0])),
+         string(HisCallsign),
+         string(PChar(@CABRILLO_HISEX[0])),
+         string(T4)]));
 
       previousqsonr := nrReceived mod 1000;
     end;
