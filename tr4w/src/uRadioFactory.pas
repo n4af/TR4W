@@ -35,6 +35,7 @@ type
       rmIcomIC7100,
       rmFlexRadio6000,
       rmKenwoodTS890,   // Issue #436 -- TS-890 network (Kenwood CAT over TCP + ##CN/##ID auth)
+      rmKenwoodTS990,   // TS-990 network (reuses the TS-890 CAT/auth path)
       rmHamLibDirect
    );
 
@@ -60,6 +61,15 @@ type
                                         dtr: Boolean = False): TNetRadioBase;
       class function GetSupportedModels: string;
       class function IsModelSupported(model: TRadioModel): boolean;
+
+      // Network metadata (Issue #1028) -- single source of truth for "is this a
+      // network radio", its default TCP/UDP port, and whether TR4W can auto-
+      // discover it on the LAN.  Keyed by TRadioModel; legacy InterfacedRadioType
+      // callers bridge via ModelForInterfacedType.
+      class function ModelForInterfacedType(rt: InterfacedRadioType): TRadioModel;
+      class function DefaultNetworkPort(model: TRadioModel): integer;
+      class function IsNetworkModel(model: TRadioModel): boolean;
+      class function IsDiscoverable(model: TRadioModel): boolean;
    end;
 
    ERadioFactoryException = class(Exception);
@@ -201,6 +211,17 @@ begin
          Result.radioPort := port;
          Result.radioModel := 'Kenwood TS-890S';
          logger.Info('[RadioFactory] Created Kenwood TS-890 instance (Issue #436)');
+         logger.Info('[RadioFactory] Remember to set NetworkUsername/NetworkPassword before Connect');
+         end;
+
+      rmKenwoodTS990:
+         begin
+         // Reuses the TS-890 network class (shared Kenwood CAT-over-TCP + ##CN/##ID auth).
+         Result := TKenwoodTS890Radio.Create;
+         Result.radioAddress := address;
+         Result.radioPort := port;
+         Result.radioModel := 'Kenwood TS-990S';
+         logger.Info('[RadioFactory] Created Kenwood TS-990 instance (via TS-890 class)');
          logger.Info('[RadioFactory] Remember to set NetworkUsername/NetworkPassword before Connect');
          end;
 
@@ -443,6 +464,7 @@ begin
       rmIcomIC7100:     Result := 'Icom IC-7100';
       rmFlexRadio6000:  Result := 'FlexRadio 6000';
       rmKenwoodTS890:   Result := 'Kenwood TS-890S';
+      rmKenwoodTS990:   Result := 'Kenwood TS-990S';
       rmHamLibDirect:   Result := 'HamLib Direct (DLL)';
    else
       Result := 'Unknown';
@@ -463,6 +485,7 @@ begin
              '  - Icom IC-7850 (implemented)'#13#10 +
              '  - Icom IC-905 (implemented)'#13#10 +
              '  - Kenwood TS-890S (implemented, Issue #436)'#13#10 +
+             '  - Kenwood TS-990S (implemented, via TS-890 class)'#13#10 +
              '  - HamLib Direct via DLL (implemented)'#13#10 +
              '  - Elecraft K3 (planned)'#13#10 +
              '  - Yaesu FTdx101 (planned)'#13#10 +
@@ -485,7 +508,64 @@ begin
              (model = rmIcomIC7100) or
              (model = rmFlexRadio6000) or
              (model = rmKenwoodTS890) or
+             (model = rmKenwoodTS990) or
              (model = rmHamLibDirect);
+end;
+
+// Maps the legacy InterfacedRadioType (LOGRADIO RadioParametersArray order) to
+// the factory's TRadioModel.  Single source of truth -- RadioObject.MapRadio
+// ModelToFactory delegates here.  Radios with no factory model -> rmNone.
+class function TRadioFactory.ModelForInterfacedType(rt: InterfacedRadioType): TRadioModel;
+begin
+   case rt of
+      K4:             Result := rmElecraftK4;
+      IC7610:         Result := rmIcomIC7610;
+      IC7300:         Result := rmIcomIC7300;
+      IC9700:         Result := rmIcomIC9700;
+      IC705:          Result := rmIcomIC705;
+      IC7300MK2:      Result := rmIcomIC7300MK2;
+      IC7600:         Result := rmIcomIC7600;
+      IC7760:         Result := rmIcomIC7760;
+      IC7850, IC7851: Result := rmIcomIC7850;
+      IC905:          Result := rmIcomIC905;
+      IC7100:         Result := rmIcomIC7100;
+      FLEX:           Result := rmFlexRadio6000;
+      TS890:          Result := rmKenwoodTS890;
+      TS990:          Result := rmKenwoodTS990;
+   else
+      Result := rmNone;
+   end;
+end;
+
+// The default network port per model.  0 means "not a network radio".
+class function TRadioFactory.DefaultNetworkPort(model: TRadioModel): integer;
+begin
+   case model of
+      rmElecraftK4:     Result := 9200;
+      rmFlexRadio6000:  Result := 4992;
+      rmKenwoodTS890:   Result := 60000;
+      rmKenwoodTS990:   Result := 50000;
+      rmIcomIC7610, rmIcomIC9700, rmIcomIC705, rmIcomIC7300MK2,
+      rmIcomIC7600, rmIcomIC7760, rmIcomIC7850, rmIcomIC905:
+                        Result := 50001;   // Icom network models (CI-V over UDP)
+   else
+      Result := 0;                          // serial-only / not a network radio
+   end;
+end;
+
+// A model is a network radio iff it carries a default network port.
+class function TRadioFactory.IsNetworkModel(model: TRadioModel): boolean;
+begin
+   Result := DefaultNetworkPort(model) > 0;
+end;
+
+// Discoverable = a network radio with LAN auto-discovery.  Every network radio
+// qualifies EXCEPT the Kenwoods (network, but no discovery protocol wired yet).
+class function TRadioFactory.IsDiscoverable(model: TRadioModel): boolean;
+begin
+   Result := IsNetworkModel(model)
+             and (model <> rmKenwoodTS890)
+             and (model <> rmKenwoodTS990);
 end;
 
 initialization
