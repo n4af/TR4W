@@ -175,8 +175,8 @@ var
 
   CABRILLO_RST_SEND                     : array[0..3] of Char;
   CABRILLO_RST_RCVD                     : array[0..3] of Char;
-  CABRILLO_MYEX                         : array[0..64 - 1] of Char;
-  CABRILLO_HISEX                        : array[0..64 - 1] of Char;
+  CABRILLO_MYEX                         : string;   // Issue #998: was array[0..63] of Char
+  CABRILLO_HISEX                        : string;   // Issue #998: was array[0..63] of Char
 
   ADIF_FREQ_STRING                      : array[0..15] of Char;
 
@@ -2275,16 +2275,16 @@ end;
 // custom Format(CABRILLO_*) idioms with standard SysUtils.Format.  They write the
 // formatted exchange into the fixed CABRILLO_MYEX / CABRILLO_HISEX buffers (kept
 // until every case arm in tGenerateLogPortionOfCabrilloFile is converted; a later
-// sub-batch turns those buffers into strings -- at which point only these two
-// bodies change, not the ~33 call sites).  PChar args are passed as string(p).
+// the formatted exchange into the CABRILLO_MYEX / CABRILLO_HISEX string globals.
+// PChar args are passed as string(p).
 procedure SetMyEx(const fmt: string; const args: array of const);
 begin
-   StrPCopy(CABRILLO_MYEX, SysUtils.Format(fmt, args));
+   CABRILLO_MYEX := SysUtils.Format(fmt, args);
 end;
 
 procedure SetHisEx(const fmt: string; const args: array of const);
 begin
-   StrPCopy(CABRILLO_HISEX, SysUtils.Format(fmt, args));
+   CABRILLO_HISEX := SysUtils.Format(fmt, args);
 end;
 
 function tGenerateLogPortionOfCabrilloFile: boolean;
@@ -2533,8 +2533,10 @@ if TempRXData.DomMultQTH = '' then
       Windows.lstrcat(CABRILLO_RST_RCVD, '599');
 }
           {Make Exchanges Strings}
-      Windows.ZeroMemory(@CABRILLO_MYEX,SizeOf(CABRILLO_MYEX));
-      Windows.ZeroMemory(@CABRILLO_HISEX,SizeOf(CABRILLO_HISEX));
+      // Issue #998: cleared each QSO so an arm that writes only one side leaves
+      // the other empty (was ZeroMemory on the fixed buffers).
+      CABRILLO_MYEX := '';
+      CABRILLO_HISEX := '';
       case ActiveExchange of
 
         // Issue #998: GridExchange and Grid2Exchange had byte-identical bodies
@@ -2951,7 +2953,9 @@ if TempRXData.DomMultQTH = '' then
       end;
 //----------------------------
 
-      StrUpper(CABRILLO_HISEX);
+      // Issue #998: StrUpper (ASCII a-z only) on the old PChar buffer -> UpperCase
+      // on the string (also ASCII a-z; Cabrillo exchanges are ASCII so identical).
+      CABRILLO_HISEX := UpperCase(CABRILLO_HISEX);
 
   if CategoryOperator = coMULTIOP then
       if temprxdata.cecomputerid = ComputerID then        // 4.73.6
@@ -2972,9 +2976,9 @@ if TempRXData.DomMultQTH = '' then
          sFmt := '%s%s%-15s%-10s %-5s'#13#10;        // 4.100.3
       sWriteFileFromString(tReportFileWrite, SysUtils.Format(sFmt,
         [sFirstPart,
-         string(PChar(@CABRILLO_MYEX[0])),
+         CABRILLO_MYEX,
          string(HisCallsign),
-         string(PChar(@CABRILLO_HISEX[0])),
+         CABRILLO_HISEX,
          string(T4)]));
 
       previousqsonr := nrReceived mod 1000;
