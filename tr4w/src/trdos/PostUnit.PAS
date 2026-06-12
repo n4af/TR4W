@@ -1688,18 +1688,10 @@ begin
       TotalCountryQSOs := 0;
       tCountryName := ctyGetCountryNamePchar(CountryIndex);
       tCountryID := @CTY.ctyTable[CountryIndex].ID[1];
-      begin
-        asm
-        push pchar(tCountryID)
-        push pchar(tCountryName)
-        mov eax,dword ptr Count
-        push eax
-        end;
-        wsprintf(wsprintfBuffer, '%4u %-23s %-5s');
-        asm add esp,20
-        end;
-        Write(FileWrite, wsprintfBuffer);
-      end;
+      // Issue #998: asm-push wsprintf -> SysUtils.Format, written straight to the
+      // text file. %4u=Count, %-23s=country name, %-5s=country ID.
+      Write(FileWrite, SysUtils.Format('%4u %-23s %-5s',
+        [Count, string(tCountryName), string(tCountryID)]));
 
       for TempBand := Band160 to Band10 do
       begin
