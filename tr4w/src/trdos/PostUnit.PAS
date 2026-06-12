@@ -3924,8 +3924,7 @@ var
   FirstQSO                              : boolean;
   QSONumber, NumberBandChanges, NumberTwoXmtrQSOs, LastBandChangeQSO: integer;
   FileWrite                             : HWND;
-  P1, P2, p3, p4, sr                    : PChar;
-  lpNumberOfBytesWritten                : Cardinal;
+  sr                                    : PChar;
 begin
   if not OpenLogFile then Exit;
   MakeReportFileName('BandChange.txt');
@@ -3977,26 +3976,19 @@ begin
           inc(NumberTwoXmtrQSOs);
         end;
 
-        P1 := BandStringsArray[LastBand];
-        P2 := ModeStringArray[LastMode];
-        p3 := BandStringsArray[TempRXData.Band];
-        p4 := ModeStringArray[TempRXData.Mode];
-        asm
-        push sr
-        movzx eax, TempRXData.tSysTime.qtMinute
-        push eax
-        movzx eax, TempRXData.tSysTime.qtHour
-        push eax
-        push p4
-        push p3
-        push p2
-        push p1
-        push NumberBandChanges
-        end;
-        lpNumberOfBytesWritten := wsprintf(CABRILLO_BUFFER, '%4d.  Band change from %s%s to %s%s at %02d:%02d.%s'#13#10);
-        asm add esp,36
-        end;
-        sWriteFile(FileWrite, CABRILLO_BUFFER, lpNumberOfBytesWritten);
+        // Issue #998: asm-push wsprintf -> SysUtils.Format. cdecl arg order is
+        // NumberBandChanges, fromBand, fromMode, toBand, toMode, Hour, Minute, sr
+        // (%02d -> %.2d zero-pad).
+        sWriteFileFromString(FileWrite,
+          SysUtils.Format('%4d.  Band change from %s%s to %s%s at %.2d:%.2d.%s'#13#10,
+            [NumberBandChanges,
+             string(BandStringsArray[LastBand]),
+             string(ModeStringArray[LastMode]),
+             string(BandStringsArray[TempRXData.Band]),
+             string(ModeStringArray[TempRXData.Mode]),
+             TempRXData.tSysTime.qtHour,
+             TempRXData.tSysTime.qtMinute,
+             string(sr)]));
 
               //        WriteLn(FileWrite);
         LastBandChangeQSO := QSONumber;
@@ -4009,13 +4001,8 @@ begin
   if NumberTwoXmtrQSOs > 0 then
   begin
 
-    asm
-    push NumberTwoXmtrQSOs
-    end;
-    lpNumberOfBytesWritten := wsprintf(CABRILLO_BUFFER, #13#10'There were %d second radio QSOs made.');
-    asm add esp,12
-    end;
-    sWriteFile(FileWrite, CABRILLO_BUFFER, lpNumberOfBytesWritten);
+    sWriteFileFromString(FileWrite,
+      SysUtils.Format(#13#10'There were %d second radio QSOs made.', [NumberTwoXmtrQSOs]));
   end;
 
   CloseLogFile;
