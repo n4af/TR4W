@@ -3747,11 +3747,10 @@ end;
 procedure PrintFirstZoneMultiplierCallsigns;
 
 var
-  Lines, Count, MaxNumberOfZones, ZoneIndex: integer;
+  Lines, MaxNumberOfZones, ZoneIndex    : integer;
   TempString                            : Str80;
   FileWrite                             : Text;
   Band                                  : BandType;
-  p                                     : PChar;
 begin
 
   OpenFileForWrite(FileWrite, ReportsFilename);
@@ -3794,24 +3793,16 @@ begin
       WriteLn(FileWrite, '---- --------    --------    --------    --------    --------    --------');
       Lines := 5;
     end;
-    SetLength(TempString, 80);
-
-    for Band := Band10 downto Band160 do
-    begin
-      p := @CountryMultTotals^[Band, ZoneIndex].FirstCall[1];
-      asm
-               push p
-      end;
-    end;
-    asm
-            push ZoneIndex
-    end;
-
-    Count := wsprintf(@TempString[1],
-      '%-4u %-11s %-11s %-11s %-11s %-11s %-11s');
-    asm add esp,36
-    end;
-    SetLength(TempString, Count);
+    // Issue #998: asm-push wsprintf -> SysUtils.Format. cdecl arg order is
+    // %-4u=ZoneIndex, then the FirstCall for bands 160/80/40/20/15/10.
+    TempString := SysUtils.Format('%-4u %-11s %-11s %-11s %-11s %-11s %-11s',
+      [ZoneIndex,
+       string(PChar(@CountryMultTotals^[Band160, ZoneIndex].FirstCall[1])),
+       string(PChar(@CountryMultTotals^[Band80,  ZoneIndex].FirstCall[1])),
+       string(PChar(@CountryMultTotals^[Band40,  ZoneIndex].FirstCall[1])),
+       string(PChar(@CountryMultTotals^[Band20,  ZoneIndex].FirstCall[1])),
+       string(PChar(@CountryMultTotals^[Band15,  ZoneIndex].FirstCall[1])),
+       string(PChar(@CountryMultTotals^[Band10,  ZoneIndex].FirstCall[1]))]);
       {
                Str(ZoneIndex: 3, TempString);
 
