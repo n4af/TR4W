@@ -804,6 +804,11 @@ var
     tCallWindowSetFocus;
     CleanUpDisplay;
 
+    // A prior bad-exchange attempt (e.g. TC_IMPROPERARRLFIELDDAYCLASS) leaves
+    // an error in the QuickCommand window on its own 30s flash timer.  Once a
+    // corrected QSO is logged that error is stale, so clear it now.
+    ClearQuickDisplayText;
+
     Result := True;
 
     if OpMode = SearchAndPounceOpMode then
