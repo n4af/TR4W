@@ -2272,6 +2272,22 @@ begin
   Result := True;
 end;
 
+// Issue #998: thin wrappers that replace the per-exchange asm-push wsprintf and
+// custom Format(CABRILLO_*) idioms with standard SysUtils.Format.  They write the
+// formatted exchange into the fixed CABRILLO_MYEX / CABRILLO_HISEX buffers (kept
+// until every case arm in tGenerateLogPortionOfCabrilloFile is converted; a later
+// sub-batch turns those buffers into strings -- at which point only these two
+// bodies change, not the ~33 call sites).  PChar args are passed as string(p).
+procedure SetMyEx(const fmt: string; const args: array of const);
+begin
+   StrPCopy(CABRILLO_MYEX, SysUtils.Format(fmt, args));
+end;
+
+procedure SetHisEx(const fmt: string; const args: array of const);
+begin
+   StrPCopy(CABRILLO_HISEX, SysUtils.Format(fmt, args));
+end;
+
 function tGenerateLogPortionOfCabrilloFile: boolean;
 label
   1;
@@ -2521,30 +2537,25 @@ if TempRXData.DomMultQTH = '' then
       Windows.ZeroMemory(@CABRILLO_HISEX,SizeOf(CABRILLO_HISEX));
       case ActiveExchange of
 
-        GridExchange:
+        // Issue #998: GridExchange and Grid2Exchange had byte-identical bodies
+        // (only the debug-log label differed); merged into one case label.
+        GridExchange, Grid2Exchange:
           begin
-            Format(CABRILLO_MYEX, '%-11s', cMyGrid);
+            SetMyEx('%-11s', [string(cMyGrid)]);
             logger.debug('[CabDetail-GridExchange] MyExchange = (%s)',[CABRILLO_MYEX]);
-            Format(CABRILLO_HISEX, '%-11s', csQTHString);
-          end;
-
-        Grid2Exchange:
-          begin
-            Format(CABRILLO_MYEX, '%-11s', cMyGrid);
-            logger.debug('[CabDetail-Grid2Exchange] MyExchange = (%s)',[CABRILLO_MYEX]);
-            Format(CABRILLO_HISEX, '%-11s', csQTHString);
+            SetHisEx('%-11s', [string(csQTHString)]);
           end;
 
         RSTAndGrid3Exchange:                // 4.96.3
           begin
-            Format(CABRILLO_MYEX, '%-7s%-11s ', RSTSent, cMyGrid);
-            Format(CABRILLO_HISEX, '%-3s %-11s ', RSTReceived, csQTHString);
+            SetMyEx('%-7s%-11s ', [string(RSTSent), string(cMyGrid)]);
+            SetHisEx('%-3s %-11s ', [string(RSTReceived), string(csQTHString)]);
           end;
 
         RSTNameAndQTHExchange:
           begin
-            Format(CABRILLO_MYEX, '%-3s %-5s %-7s', RSTSent, cMyName, cMyState);
-            Format(CABRILLO_HISEX, '%-3s %-5s %-7s', RSTReceived, csName, csQTHString);
+            SetMyEx('%-3s %-5s %-7s', [string(RSTSent), string(cMyName), string(cMyState)]);
+            SetHisEx('%-3s %-5s %-7s', [string(RSTReceived), string(csName), string(csQTHString)]);
           end;
 
         QSONumberAndNameExchange:
@@ -2711,26 +2722,12 @@ if TempRXData.DomMultQTH = '' then
             cMyCheck := @MyCheck[1];
             cMyState := @MySection[1];
 
-            asm
-                push cMyState
-                push cMyCheck
-                push cMyName
-                push nrSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-4d %s %s %-3s ');
-            asm add esp,24
-            end;
+            // Issue #998. MYEX: serial, my-prec, my-check, my-section.
+            SetMyEx('%-4d %s %s %-3s ', [nrSent, string(cMyName), string(cMyCheck), string(cMyState)]);
             if nrReceived = -1 then
             nrReceived := 0;
-            asm
-                push csQTHString
-                push csCheck
-                push csName
-                push nrReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-4d %s %02u %-3s');
-            asm add esp,24
-            end;
+            // HISEX: serial, his-prec(csName), his-check(%02u -> %.2u), his-section.
+            SetHisEx('%-4d %s %.2u %-3s', [nrReceived, string(csName), csCheck, string(csQTHString)]);
           end;
 
         QSONumberNameDomesticOrDXQTHExchange:
@@ -3031,11 +3028,11 @@ if TempRXData.DomMultQTH = '' then
             if MyState = '' then
               cMyState := 'DX';
 
-            Format(CABRILLO_MYEX, '%-3s %02u %-4s', RSTSent, cMyZone, cMyState);
+            SetMyEx('%-3s %.2u %-4s', [string(RSTSent), cMyZone, string(cMyState)]);
 
             if TempRXData.QTHString = '' then
               csQTHString := 'DX';
-            Format(CABRILLO_HISEX, '%-3s %02u %-3s', RSTReceived, HisZone, csQTHString);
+            SetHisEx('%-3s %.2u %-3s', [string(RSTReceived), HisZone, string(csQTHString)]);
           end;
 
         RSTZoneOrDomesticQTH, RSTZoneOrSocietyExchange:
@@ -3105,12 +3102,12 @@ if TempRXData.DomMultQTH = '' then
 
         ClassDomesticOrDXQTHExchange:
           begin
-            Format(CABRILLO_MYEX, '%-3s %-7s ', @MyFDClass[1], @MySection[1]);
+            SetMyEx('%-3s %-7s ', [string(PChar(@MyFDClass[1])), string(PChar(@MySection[1]))]);
             if Contest in [ARRLFIELDDAY, WINTERFIELDDAY] then
                begin
                csQTHString := @TempRXData.QTHString[1];   // Issue 407 ny4i
                end;
-            Format(CABRILLO_HISEX, '%-3s %-7s', @TempRXData.ceClass[1], csQTHString);
+            SetHisEx('%-3s %-7s', [string(PChar(@TempRXData.ceClass[1])), string(csQTHString)]);
           end;
 
         QSONumberAndGeoCoordinates:
@@ -3134,10 +3131,12 @@ if TempRXData.DomMultQTH = '' then
 
         RSTQSONumberExchange:
           begin
-
-            Format(CABRILLO_MYEX, '%-3s %03d ', RSTSent, nrSent);      // issue 177        // 4.92.8
-
-            Format(Cabrillo_HISEX, '%-3s %-03.3u',RSTReceived, nrReceived);   // issue 177    // 4.92.8
+            // Issue #998.  nrSent was C '%03d' (zero-pad to WIDTH 3, sign counted
+            // in the width); reproduced with '%.*d' + precision 3-Ord(v<0) (see
+            // the EDI %0Nd-of-negatives note).  nrReceived was '%-03.3u' -- a
+            // precision is present so C ignores the 0 flag, giving '%-3.3u'.
+            SetMyEx('%-3s %.*d ', [string(RSTSent), 3 - Ord(nrSent < 0), nrSent]);   // issue 177
+            SetHisEx('%-3s %-3.3u', [string(RSTReceived), nrReceived]);              // issue 177
           end;
         RSTAndContinentExchange:
           begin
@@ -3163,22 +3162,8 @@ if TempRXData.DomMultQTH = '' then
           begin
             if Contest in [ CQVHF {, MMAA}] then
             begin
-              asm
-                    push csQTHString
-             //       push RSTReceived
-              end;
-               wsprintf(CABRILLO_HISEX, ' %-7s');
-          //    wsprintf(CABRILLO_HISEX, '%-13s %-15s');    // 4.100.3
-              asm add esp,16
-              end;
-
-              asm
-                    push cMyGrid
-             //       push RSTSent
-              end;
-              wsprintf(CABRILLO_MYEX, '%-7s');
-              asm add esp,16
-              end;
+              SetHisEx(' %-7s', [string(csQTHString)]);
+              SetMyEx('%-7s', [string(cMyGrid)]);
             end
             else
             begin
@@ -3186,20 +3171,8 @@ if TempRXData.DomMultQTH = '' then
 //              if MyCounty <> '' then cMyState := @MyCounty[1];
               if Contest in [SPDX, PACC] then cMyState := inttopchar(nrSent);
               if TempRXData.QTHString = '' then csQTHString := 'DX';
-              asm
-                    push csQTHString
-                    push RSTReceived
-              end;
-         wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-       //         wsprintf(CABRILLO_HISEX, '%-3s %-20s'); // 4.100.3
-
-              asm
-                    push cMyState
-                    push RSTSent
-              end;
-              wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-              asm add esp,16
-              end;
+              SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
+              SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
             end;
           end;
 
@@ -3232,21 +3205,8 @@ if TempRXData.DomMultQTH = '' then
                  end;
               end;
 
-            asm
-                push csQTHString
-                push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7s');
-            asm add esp,16
-            end;
-
-            asm
-                push cMyState
-                push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7s');
-            asm add esp,16
-            end;
+            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
+            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
           end;
 
         QSONumberAndZone:
@@ -3277,21 +3237,8 @@ if TempRXData.DomMultQTH = '' then
         RSTZoneExchange:
           begin
             if Contest in [JIDXSSB, JIDXCW] then cMyZone := StrToInt(MyState);
-            asm
-                push HisZone
-                push RSTReceived
-            end;
-            wsprintf(CABRILLO_HISEX, '%-3s %-7.2d');       // 4.51.1 issue185
-            asm add esp,16
-            end;
-
-            asm
-                push cMyZone
-                push RSTSent
-            end;
-            wsprintf(CABRILLO_MYEX, '%-3s %-7.2d');   // 4.51.1   issue#185
-            asm add esp,16
-            end;
+            SetHisEx('%-3s %-7.2d', [string(RSTReceived), HisZone]);   // 4.51.1 issue185
+            SetMyEx('%-3s %-7.2d', [string(RSTSent), cMyZone]);        // 4.51.1 issue#185
           end;
 
          QSONumberAndPreviousQSONumber:
