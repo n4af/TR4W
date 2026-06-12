@@ -2076,23 +2076,6 @@ procedure ExportToCSV;              //n4af 04/18/14 new procedure added
 label
   1;
 
-var
- 
-  tCallStringLength                     : Cardinal;
-
-  tBandString                           : PChar;
-  tBandStringLength                     : Cardinal;
-
-  tModeString                           : PChar;
-  tModeStringLength                     : Cardinal;
-
-  tRSTSendStringLength                  : Cardinal;
-  tRSTRcvdStringLength                  : Cardinal;
-
-  tContestName                          : PChar;
-  tContestNamelength                    : Cardinal;
-  nNumberOfBytesToWrite                 : Cardinal;
-
 begin
 
   lstrcpy(tReportsFilename, TR4W_LOG_FILENAME);
@@ -2119,80 +2102,26 @@ begin
   begin
     if GoodLookingQSO then
     begin
-      tContestName := ContestTypeSA[Contest];
-      tContestNamelength := Windows.lstrlen(tContestName);
-
-      tCallStringLength := length(TempRXData.Callsign);
-
-      tBandString := ADIFBANDSTRINGSARRAY[TempRXData.Band];
-      tBandStringLength := Windows.lstrlen(tBandString);
-     
-          //          if TempRXData.ceFMMode then TempMode := FM else TempMode := TempRXData.Mode;
-      tModeString := ADIFModeString[TempRXData.Mode];
-      tModeStringLength := Windows.lstrlen(tModeString);
-
-      if TempRXData.RSTSent > 99 then tRSTSendStringLength := 3 else tRSTSendStringLength := 2;
-      if TempRXData.RSTReceived > 99 then tRSTRcvdStringLength := 3 else tRSTRcvdStringLength := 2;
-
-     asm
-        push tContestName
-     //   mov eax,dword ptr tContestNamelength
-      //  push eax
-
-        xor eax,eax
-       mov ax, word ptr TempRXData.RSTReceived
-        push eax
-    //    push tRSTRcvdStringLength
-
-       xor eax,eax
-        mov ax, word ptr TempRXData.RSTSent
-        push eax
-    //    push tRSTSendStringLength
-
-        movzx eax,TempRXData.tSysTime.qtSecond
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtMinute
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtHour
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtDay
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtMonth
-        push eax
-
-        movzx eax,TempRXData.tSysTime.qtYear
-        add eax,2000
-        push eax
-
-        push tModeString
-    //    mov eax,dword ptr tModeStringLength
-    //    push eax
-
-        push tBandString
-    //    mov eax,dword ptr tBandStringLength
-    //    push eax
-
-        lea  eax,TempRXData.Callsign+1
-        push eax
-  //       mov eax,dword ptr tCallStringLength
-   //      push eax
-
+      // Issue #998: asm-push wsprintf -> SysUtils.Format, written INSIDE the
+      // GoodLookingQSO guard.  The old write sat outside the guard and re-emitted
+      // the stale buffer for skipped/deleted/non-QSO records; now only good QSOs
+      // are written.  cdecl arg order: callsign, band, mode, year, month, day,
+      // hour, minute, second, rst-sent, rst-rcvd, contest name.  %02d -> %.2d.
+      sWriteFileFromString(tReportFileWrite, SysUtils.Format(
+        '%s,%s,%s,%u%.2d%.2d,%.2d%.2d%.2d,%u,%u,%s'#13#10,
+        [string(PChar(@TempRXData.Callsign[1])),
+         string(ADIFBANDSTRINGSARRAY[TempRXData.Band]),
+         string(ADIFModeString[TempRXData.Mode]),
+         TempRXData.tSysTime.qtYear + 2000,
+         TempRXData.tSysTime.qtMonth,
+         TempRXData.tSysTime.qtDay,
+         TempRXData.tSysTime.qtHour,
+         TempRXData.tSysTime.qtMinute,
+         TempRXData.tSysTime.qtSecond,
+         TempRXData.RSTSent,
+         TempRXData.RSTReceived,
+         string(ContestTypeSA[Contest])]));
       end;
-
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER,
-        '%s,%s,%s,%u%02d%02d,%02d%02d%02d,%u,%u,%s');
-
-
-      end;
-
-      sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
-
-      sWriteFile(tReportFileWrite, #13#10, 2);
-     //  sWriteFile(tReportFileWrite, #13#10);
     goto 1;
    end;
   
