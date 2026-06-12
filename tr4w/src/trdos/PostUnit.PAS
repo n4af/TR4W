@@ -3636,12 +3636,9 @@ end;
 procedure PrintFirstCountryMultiplierCallsigns;
 
 var
-  Lines, Count, CountryIndex            : integer;
-  TempString                            : ShortString;
+  Lines, CountryIndex                   : integer;
   Prefix                                : string;
   FileWrite                             : Text;
-  Band                                  : BandType;
-  p                                     : PChar;
 begin
 
   MakeReportFileName('firstcallineachcountry.txt');
@@ -3676,24 +3673,17 @@ begin
         Lines := 5;
       end;
 
-      for Band := Band10 downto Band160 do
-      begin
-        p := @CountryMultTotals^[Band, CountryIndex].FirstCall[1];
-        asm
-               push p
-        end;
-      end;
-//      Prefix := ctyGetCountryID(CountryIndex);
       Prefix := CTY.ctyTable[CountryIndex].ID;
-      asm
-               push Prefix
-      end;
-      Count := wsprintf(@TempString[1], '%-6s %-11s %-11s %-11s %-11s %-11s %-11s');
-      asm add esp,36
-      end;
-      SetLength(TempString, Count);
-
-      WriteLn(FileWrite, TempString);
+      // Issue #998: asm-push wsprintf -> SysUtils.Format. cdecl arg order is
+      // %-6s=Prefix, then the FirstCall for bands 160/80/40/20/15/10.
+      WriteLn(FileWrite, SysUtils.Format('%-6s %-11s %-11s %-11s %-11s %-11s %-11s',
+        [Prefix,
+         string(PChar(@CountryMultTotals^[Band160, CountryIndex].FirstCall[1])),
+         string(PChar(@CountryMultTotals^[Band80,  CountryIndex].FirstCall[1])),
+         string(PChar(@CountryMultTotals^[Band40,  CountryIndex].FirstCall[1])),
+         string(PChar(@CountryMultTotals^[Band20,  CountryIndex].FirstCall[1])),
+         string(PChar(@CountryMultTotals^[Band15,  CountryIndex].FirstCall[1])),
+         string(PChar(@CountryMultTotals^[Band10,  CountryIndex].FirstCall[1]))]));
       inc(Lines);
     end;
 
