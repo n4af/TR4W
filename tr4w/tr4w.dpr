@@ -678,6 +678,11 @@ begin
   ReadInConfigFile(cfgCFG);          //n4af 4.31.5
   ReadInConfigFile(cfgCommMes);      //common messages gets precedence - n4af
 
+  // Issue #1012: the S&P F1 caption is derived from DE ENABLE, whose value is
+  // only known after the config files above are read.  Recompute it now so
+  // DE ENABLE = FALSE shows "Call" instead of the default "DE+Call".
+  UpdateSAndPF1Caption;
+
   if WSJTXEnabled then
      begin
      wsjtx := TWSJTXServer.Create;
