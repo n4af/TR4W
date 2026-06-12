@@ -2793,39 +2793,10 @@ end;
 //------------------------------------------------------------------------------
 function RadioObject.MapRadioModelToFactory: TRadioModel;
 begin
-   // Maps InterfacedRadioType to TRadioModel for factory pattern
-   Result := rmNone;
-
-   case Self.RadioModel of
-      K4:
-         Result := rmElecraftK4;
-      IC7610:
-         Result := rmIcomIC7610;
-      IC7300:
-         Result := rmIcomIC7300;
-      IC9700:
-         Result := rmIcomIC9700;
-      IC705:
-         Result := rmIcomIC705;
-      IC7300MK2:
-         Result := rmIcomIC7300MK2;
-      IC7600:
-         Result := rmIcomIC7600;
-      IC7760:
-         Result := rmIcomIC7760;
-      IC7850, IC7851:
-         Result := rmIcomIC7850;
-      IC905:
-         Result := rmIcomIC905;
-      IC7100:
-         Result := rmIcomIC7100;
-      FLEX:
-         Result := rmFlexRadio6000;
-      TS890:                          // Issue #436 -- TS-890 network control
-         Result := rmKenwoodTS890;
-   else
-      Result := rmNone;
-   end;
+   // Issue #1028 -- the InterfacedRadioType -> TRadioModel mapping now lives on
+   // the radio factory (single source of truth, alongside the per-model network
+   // metadata).  Delegate to it.
+   Result := TRadioFactory.ModelForInterfacedType(Self.RadioModel);
 end;
 //------------------------------------------------------------------------------
 procedure RadioObject.SetUpRadioInterface;

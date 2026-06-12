@@ -43,11 +43,34 @@ uses
   LogRadio;
 
 procedure SetConfigurationDefaultValues;
+procedure UpdateSAndPF1Caption;        // Issue #1012
 
 implementation
 uses MainUnit;
 { Here are the default values that are used if nothing else in the
   configuration file addresses these variables.                     }
+
+// Issue #1012 (and #69): the S&P F1 ("send call") caption is derived from the
+// DE ENABLE setting.  DEEnable's final value is only known after the config
+// files are read, so this decision is factored out here and re-applied
+// post-config (see tr4w.dpr) rather than computed only once with the
+// compiled-in default of True.  RUS uses a language-fixed F1 caption that does
+// not depend on DE ENABLE, so it is left untouched.
+procedure UpdateSAndPF1Caption;
+begin
+{$IF LANG = 'RUS'}
+   // RUS S&P F1 caption is language-fixed; nothing to recompute.
+{$ELSE}
+   if DEEnable then
+      begin
+      SetEXCaptionMemoryString(CW, F1, 'DE+Call');
+      end
+   else
+      begin
+      SetEXCaptionMemoryString(CW, F1, 'Call');
+      end;
+{$IFEND}
+end;
 
 procedure SetConfigurationDefaultValues;
 var
@@ -435,14 +458,7 @@ begin
   SetEXCaptionMemoryString(CW, F1, '��� ��������');
   SetEXCaptionMemoryString(CW, F2, '�����. �����');
 {$ELSE}
- if DEEnable then        // ny4i Issue 69
-    begin
-    SetEXCaptionMemoryString(CW, F1, 'DE+Call');
-    end
- else
-    begin
-    SetEXCaptionMemoryString(CW, F1, 'Call');
-    end;
+  UpdateSAndPF1Caption;        // ny4i Issue 69 / Issue 1012
 
   SetEXCaptionMemoryString(CW, F2, 'S&P Exchange');
   SetEXCaptionMemoryString(Phone, F2, 'S&P Exchange');

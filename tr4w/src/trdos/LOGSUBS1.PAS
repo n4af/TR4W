@@ -215,7 +215,11 @@ begin // 1
 
     CW:
       begin
+        // '=' repeat-last-CW-message: bracket the send so AddStringToBuffer
+        // records the actual expanded characters as LastCWMessage.
+        BeginCWCapture;
         SendCrypticCWstring(Message);
+        EndCWCapture;
       end;
 {$IF MMTTYMODE}
     Digital:

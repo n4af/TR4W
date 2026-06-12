@@ -51,35 +51,46 @@ implementation
 
 uses
   uRadioPolling,
+  uRadioFactory,   // Issue #1028 -- network metadata (port / is-network / discoverable)
   MainUnit;
 
-// Issue #968 -- the default network TCP port is per radio MODEL, not per CAT
-// family: the K4, Flex and the Kenwoods all carry rt = rtKenwood (they share a
-// Kenwood-style CAT dialect) yet use four different network ports, so we cannot
-// key off RadioParametersArray[].rt for them.  Icom is the one clean family case.
-// Returns 0 for a radio that has no network port (serial-only) -> no default.
+// Issue #968 / #1028 -- the default network port is a property of the radio
+// MODEL, now owned by the radio factory (single source of truth, keyed by
+// TRadioModel).  Returns 0 for a radio that has no network port (serial-only).
 function DefaultNetworkPortForRadio(rt: InterfacedRadioType): Integer;
 begin
-   case rt of
-      K4:     Result := 9200;
-      FLEX:   Result := 4992;
-      TS890:  Result := 60000;
-      TS990:  Result := 50000;    // NOT the same as the TS-890
-   else
-      if RadioParametersArray[rt].rt = rtICOM then
-         begin
-         Result := 50001;         // any Icom network model
-         end
-      else
-         begin
-         Result := 0;             // not a network radio -> no default
-         end;
-   end;
+   Result := TRadioFactory.DefaultNetworkPort(TRadioFactory.ModelForInterfacedType(rt));
 end;
 
-// Issue #968 -- when the dialog is showing a network radio (control-port combo
-// 122 = index 21) and the TCP-port edit (131) is empty/0, pre-fill it with the
-// selected model's default port.  Never overwrites a port the operator typed.
+// Issue #1028 -- True if `port` is the default network port of SOME network
+// radio model.  Lets us tell a stale leftover default (e.g. 50001 from a
+// previously-selected Icom) apart from a custom port the operator deliberately
+// typed.
+function IsSomeModelDefaultPort(port: Integer): Boolean;
+var
+   rt: InterfacedRadioType;
+begin
+   Result := False;
+   if port = 0 then
+      begin
+      Exit;
+      end;
+   for rt := Low(InterfacedRadioType) to High(InterfacedRadioType) do
+      begin
+      if DefaultNetworkPortForRadio(rt) = port then
+         begin
+         Result := True;
+         Exit;
+         end;
+      end;
+end;
+
+// Issue #968 / #1028 -- when the dialog is showing a network radio (control-port
+// combo 122 = index 21), set the TCP-port edit (131) to the selected model's
+// default port when the field is EMPTY or still holds a DIFFERENT model's
+// default (a stale leftover from the previous radio type -- e.g. 50001 from an
+// Icom when switching to a K4, which should become 9200).  Never clobbers a
+// genuinely custom (non-default) port the operator typed.
 procedure ApplyDefaultNetworkPort(hwnddlg: HWND);
 var
    typeIdx : Integer;
@@ -98,14 +109,16 @@ begin
       Exit;
       end;
 
-   port := Windows.GetDlgItemInt(hwnddlg, 131, ok, False);
-   if port <> 0 then                            // operator already set a port
+   def := DefaultNetworkPortForRadio(InterfacedRadioType(typeIdx));
+   if def = 0 then                              // not a network radio -> no default
       begin
       Exit;
       end;
 
-   def := DefaultNetworkPortForRadio(InterfacedRadioType(typeIdx));
-   if def <> 0 then
+   port := Windows.GetDlgItemInt(hwnddlg, 131, ok, False);
+   // Empty, or a stale default from a different model -> apply this model's
+   // default.  A non-default custom port (not any model's default) is kept.
+   if (port = 0) or (IsSomeModelDefaultPort(port) and (Integer(port) <> def)) then
       begin
       Windows.SetDlgItemInt(hwnddlg, 131, def, False);
       end;
@@ -169,8 +182,9 @@ begin
   rt := InterfacedRadioType(tCB_GETCURSEL(hwnddlg, 121));
   radioName := InterfacedRadioTypeSA[rt];
 
-  // Discoverable types: the K4, and any Icom network model (rtICOM).
-  if (rt <> K4) and (RadioParametersArray[rt].rt <> rtICOM) then
+  // Issue #1028 -- discoverability is now a radio-factory property (network
+  // radios with LAN auto-discovery: K4, the network Icoms, FLEX).
+  if not TRadioFactory.IsDiscoverable(TRadioFactory.ModelForInterfacedType(rt)) then
      begin
      Format(wsprintfBuffer, TC_DISCOVER_NOT_AVAILABLE, PChar(radioName));
      showwarning(wsprintfBuffer);
