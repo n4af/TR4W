@@ -67,12 +67,8 @@ begin
           if Grid2 = '' then Exit;
 
           I := GetDistanceBetweenGrids(Grid1, Grid2);
-          asm
-          push i
-          end;
-          wsprintf(wsprintfBuffer, '%u km');
-          asm add esp,12    end;
-          Windows.SetDlgItemText(hwnddlg, 108, wsprintfBuffer);
+          // Issue #997: asm-push wsprintf -> SysUtils.Format (single %u arg = I).
+          Windows.SetDlgItemText(hwnddlg, 108, PChar(SysUtils.Format('%u km', [I])));
 
           TR4W_WM_SetTest(hwnddlg, 108, IntToStr(GetDistanceBetweenGrids(Grid1, Grid2)) + ' km');
           TR4W_WM_SetTest(hwnddlg, 109, IntToStr(GetEuropeanDistanceBetweenGrids(Grid1, Grid2)) + ' km');
