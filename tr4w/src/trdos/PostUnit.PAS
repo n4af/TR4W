@@ -53,6 +53,7 @@ uses
   LogCW, // 4.53.2
   Windows,
   uCabrilloFormat,  // tCabrilloFreqString / tCabrilloModeString + per-field formatters (extracted from this unit, see uCabrilloFormat.pas)
+  uCabrilloExchange, // #998 capstone: FormatCabrilloExchange (the case ActiveExchange MYEX/HISEX builder, extracted + unit-tested)
   uSuperCheckPartialFileUpload,
   Dialogs;
 
@@ -2271,21 +2272,9 @@ begin
   Result := True;
 end;
 
-// Issue #998: thin wrappers that replace the per-exchange asm-push wsprintf and
-// custom Format(CABRILLO_*) idioms with standard SysUtils.Format.  They write the
-// formatted exchange into the fixed CABRILLO_MYEX / CABRILLO_HISEX buffers (kept
-// until every case arm in tGenerateLogPortionOfCabrilloFile is converted; a later
-// the formatted exchange into the CABRILLO_MYEX / CABRILLO_HISEX string globals.
-// PChar args are passed as string(p).
-procedure SetMyEx(const fmt: string; const args: array of const);
-begin
-   CABRILLO_MYEX := SysUtils.Format(fmt, args);
-end;
-
-procedure SetHisEx(const fmt: string; const args: array of const);
-begin
-   CABRILLO_HISEX := SysUtils.Format(fmt, args);
-end;
+// Issue #998 capstone: the per-exchange SetMyEx/SetHisEx + the whole
+// `case ActiveExchange of` were extracted into uCabrilloExchange.pas
+// (FormatCabrilloExchange) so the exchange formatting is unit-testable.
 
 function tGenerateLogPortionOfCabrilloFile: boolean;
 label
@@ -2319,6 +2308,7 @@ var
   sFmt                                  : string;     // Issue #998: assembly format string
   sCall1                                : string;     // Issue #998: QTC from-call (QTCR/QTCS swap)
   sCall2                                : string;     // Issue #998: QTC to-call (QTCR/QTCS swap)
+  myStationEx                           : TMyStationExchange;  // #998 capstone: My-station fields for FormatCabrilloExchange
   cRandomCharsReceived                  : PChar;
   cKids                                 : PChar;
   TempGrid                              : Str20;
@@ -2533,424 +2523,25 @@ if TempRXData.DomMultQTH = '' then
       Windows.lstrcat(CABRILLO_RST_RCVD, '599');
 }
           {Make Exchanges Strings}
-      // Issue #998: cleared each QSO so an arm that writes only one side leaves
-      // the other empty (was ZeroMemory on the fixed buffers).
-      CABRILLO_MYEX := '';
-      CABRILLO_HISEX := '';
-      case ActiveExchange of
-
-        // Issue #998: GridExchange and Grid2Exchange had byte-identical bodies
-        // (only the debug-log label differed); merged into one case label.
-        GridExchange, Grid2Exchange:
-          begin
-            SetMyEx('%-11s', [string(cMyGrid)]);
-            logger.debug('[CabDetail-GridExchange] MyExchange = (%s)',[CABRILLO_MYEX]);
-            SetHisEx('%-11s', [string(csQTHString)]);
-          end;
-
-        RSTAndGrid3Exchange:                // 4.96.3
-          begin
-            SetMyEx('%-7s%-11s ', [string(RSTSent), string(cMyGrid)]);
-            SetHisEx('%-3s %-11s ', [string(RSTReceived), string(csQTHString)]);
-          end;
-
-        RSTNameAndQTHExchange:
-          begin
-            SetMyEx('%-3s %-5s %-7s', [string(RSTSent), string(cMyName), string(cMyState)]);
-            SetHisEx('%-3s %-5s %-7s', [string(RSTReceived), string(csName), string(csQTHString)]);
-          end;
-
-        QSONumberAndNameExchange:
-          begin
-            SetMyEx('%-3d %-7s', [nrSent, string(cMyName)]);
-            SetHisEx('%-3u %-7s', [nrReceived, string(csName)]);
-          end;
-
-
-
-
-        RSTAndPostalCodeExchange:
-          begin
-            if contacts = 1 then
-              SetMyEx('%-3s %-10s', [string(RSTSent), string(PChar(@MyPostalCode[1]))])
-            else
-              SetMyEx('%-3s %-10s', [string(RSTSent), string(PChar(@PreviousQTHString[1]))]);
-            SetHisEx('%-3s %-10s', [string(RSTReceived), string(PChar(@TempRXData.QTHString[1]))]);
-          end;
-
-        RSTQSONumberAndGridSquareExchange:
-          begin
-            // %-4.4d/%-4.4u carry a precision, so C->Delphi maps directly.
-            SetMyEx('%-3s %-4.4d %-7s', [string(RSTSent), nrSent, string(cMyGrid)]);
-            SetHisEx('%-3s %-4.4u %-7s', [string(RSTReceived), nrReceived, string(csQTHString)]);
-          end;
-
- {         RSTAndSerialNumberAndGridandPossibleMemberNumber:
-          begin
-          end;
-  }
-       RSTQSONumberOrDomesticQTHExchange:      //n4af 4.40.6
-          begin
-         p  := (IntToPchar(nrReceived)) ;
-
-          if nrReceived <  1 then
-          p := nil;
-
-          if cMystate[1] <> '' then
-             begin
-             SetMyEx('%-3s  %-8s', [string(RSTSent), string(cMyState)]);        // 4.98.11
-             end;
-
-          if cMystate[1] = '' then
-             begin
-             SetMyEx('%-3s  %-6d', [string(RSTSent), nrSent]);
-             end;
-
-          if p <> nil then
-             begin
-             SetHisEx('%-3s %6d %-6s', [string(RSTReceived), nrReceived, string(csQTHString)]);
-             end;
-          if p = nil then
-             begin
-             SetHisEx('%-3s   %9s', [string(RSTReceived), string(csQTHString)]);
-             end;
-            end;
-
-        RSTPrefectureExchange:
-          begin
-            SetMyEx('%-3s %-7d', [string(RSTSent), cMyZone]);
-            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
-          end;
-
-        NameAndDomesticOrDXQTHExchange:
-          begin
-            // cMyName was PChar(string(MyName)) (null-terminated copy of MyName);
-            // string(MyName) yields the same content directly.
-            SetMyEx('  %-10s %-4s', [string(MyName), string(cMyState)]);
-            SetHisEx('  %-10s %-4s', [string(csName), string(csQTHString)]);
-          end;
-
-        QSONumberPrecedenceCheckDomesticQTHExchange:
-          begin
-            CID_TWO_BYTES[0] := TempRXData.Precedence;
-            csName := CID_TWO_BYTES;
-
-            cMyName := @MyPrec[1] ;
-            csCheck := {inttopchar}(TempRXData.Check);
-            cMyCheck := @MyCheck[1];
-            cMyState := @MySection[1];
-
-            // Issue #998. MYEX: serial, my-prec, my-check, my-section.
-            SetMyEx('%-4d %s %s %-3s ', [nrSent, string(cMyName), string(cMyCheck), string(cMyState)]);
-            if nrReceived = -1 then
-            nrReceived := 0;
-            // HISEX: serial, his-prec(csName), his-check(%02u -> %.2u), his-section.
-            SetHisEx('%-4d %s %.2u %-3s', [nrReceived, string(csName), csCheck, string(csQTHString)]);
-          end;
-
-        QSONumberNameDomesticOrDXQTHExchange:
-          begin
-            csName := @TempRXData.Name[1];
-            cMyName := @MyName[1];
-            if MyState = '' then cMyState := 'DX';
-            if TempRXData.QTHString = '' then csQTHString := 'DX';
-
-            SetMyEx('%-4d %-7s %-8s', [nrSent, string(cMyName), string(cMyState)]);    // 4.88.3
-            SetHisEx('%-4u %-5s %-4s', [nrReceived, string(csName), string(csQTHString)]);  // 4.88.3
-          end;
-
-        RSTAgeAndPossibleSK:
-          begin
-            SetMyEx('%-3s %-16s', [string(RSTSent), string(cMyState)]);
-            nrReceived := TempRXData.Age;
-            SetHisEx('%-3s %u %s', [string(RSTReceived), nrReceived, string(csQTHString)]);
-          end;
-
-        RSTAgeExchange:
-          begin
-            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
-            nrReceived := TempRXData.Age;
-            SetHisEx('%-3s %-7u', [string(RSTReceived), nrReceived]);
-          end;
-
-        AgeAndQSONumberExchange:      // 4.55.4
-          begin
-            // nrSent '%03d' / nrReceived '%04d' = zero-pad to WIDTH (sign in
-            // width) -> '%.*d' + precision N-Ord(v<0) (EDI negative note).
-            SetMyEx('%-2s %.*d ', [string(cMyState), 3 - Ord(nrSent < 0), nrSent]);
-            hisAge := TempRXData.Age ;
-            nrreceived := TempRXData.NumberReceived;          // n4af 04.42.4
-            SetHisEx(' %-3d %.*d', [hisAge, 4 - Ord(nrReceived < 0), nrReceived]);   // n4af 4.42.4
-          end;
-
-         QSONumberAndAgeExchange:      // 4.119.1
-          begin
-            // Unreachable by any active contest (no AE: / no FCONTEST assign);
-            // converted for completeness.  RSTSent here is the numeric RST.
-            // nrSent '%03d' -> '%.*d' (sign-in-width); hisAge '%02d' -> '%.2d'.
-            SetMyEx('%-3d %.*d %-2s      ', [TempRXData.RSTSent, 3 - Ord(nrSent < 0), nrSent, string(cMyState)]);
-            hisAge := TempRXData.Age ;
-            nrreceived := TempRXData.NumberReceived;          // n4af 04.42.4
-            SetHisEx(' %-3d %3d %.2d', [TempRXData.RSTSent, nrReceived, hisAge]);       // n4af 4.42.4
-          end;
-
-        RSTPowerExchange:
-        begin
-         csPower := @TempRXData.Power[1];
-         if contest = FOCMARATHON then
-            begin
-            cMyFOCNumber :=  @MyFOCNumber[1];
-            crFOCNr := @TempRXData.Power[1];
-            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyFOCNumber)]);
-            SetHisEx('%-3s %-7s', [string(RSTReceived), string(crFOCNr)]);
-            end;
-         if Contest <> FOCMARATHON then
-            begin
-            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csPower)]);
-            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
-            end;
-          end;
-        RSTAndOrGridExchange:
-          begin
-            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
-            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyGrid)]);
-          end;
-
-        QSONumberAndGridSquare:
-          begin
-            // nrSent '%03d' -> '%.*d' (sign-in-width); '%-6.4s' truncates to 4
-            // chars (precision) -- maps directly.  '%03.4u': precision present
-            // so C ignores the 0 flag -> '%3.4u'.
-            SetMyEx('%.*d %-6.4s ', [3 - Ord(nrSent < 0), nrSent, string(cMyState)]);
-            SetHisEx('%3.4u %-6s', [nrReceived, string(csQTHString)]);
-          end;
-
-        QSONumberDomesticOrDXQTHExchange, QSONumberDomesticQTHExchange:
-          if (Contest = UKRAINECHAMPIONSHIP) or (Contest = CUPURAL) then
-          begin
-            SetMyEx('%-4s %-6.4d', [string(cMyState), nrSent]);
-            SetHisEx('%-4s %-6.4u', [string(csQTHString), nrReceived]);
-          end
-          else
-          begin
-            SetMyEx('%-4d %-6s', [nrSent, string(cMyState)]);
-            SetHisEx('%-4.4u %-6s', [nrReceived, string(csQTHString)]);
-          end;
-
-        QSONumberAndPossibleDomesticQTHExchange, RSTQSONumberAndDomesticQTHExchange, RSTQSONumberAndPossibleDomesticQTHExchange:
-          begin
-            // All nrSent/nrReceived specs here carry a width or precision (%d,
-            // %3.3d, %-4.4d, %4.4d, %5.3d, %5d) -- none is a bare %0Nd -- so the
-            // C->Delphi mapping is direct (no %.*d needed).
-            if cMyState = 'TRC' then      // 4.63.3
-               SetMyEx('%-3s %d%-6s', [string(RSTSent), nrSent, string(cMyState)])
-            else if ContestTitle = 'PGA' then       // 4.92.4
-               SetMyEx('%-3s %3.3d%s     ', [string(RSTSent), nrSent, string(cMyState)])
-            else
-               SetMyEx('%-3s %-4.4d %6s      ', [string(RSTSent), nrSent, string(cMyState)]);
-
-            if Contest = UKEI then           // 4.58.2
-            if TempRXData.QTHString = '' then
-               csQTHString := '--';
-
-            if Contest = IOTA then
-            begin
-              if csQTHString[0] = #0 then csQTHString := '------';
-              {
-              else
-              begin
-                Windows.ZeroMemory(@IOTAString, SizeOf(IOTAString));
-                IOTAString := Copy(TempRXData.DomesticQTH, 1, 2) + '-' + Copy(TempRXData.DomesticQTH, 3, 3);
-                csQTHString := @IOTAString[1];
-              end;
-              }
-            end;
-
-            if Contest = DARC10M then     // n4af 4.43.7
-               SetHisEx('%-3s %4.4d %3s', [string(RSTReceived), nrReceived, string(csQTHString)])
-            else if ContestTitle = 'PGA' then           // 4.92.4
-               SetHisEx('%-3s%5.3d%s', [string(RSTReceived), nrReceived, string(csQTHString)])
-            else if csQTHString = 'TRC' then      // 4.63.3
-               SetHisEx('%-3s%5d%-8s', [string(RSTReceived), nrReceived, string(csQTHString)])
-            else
-               SetHisEx('%-3s %4.4d %4s', [string(RSTReceived), nrReceived, string(csQTHString)]);
-          end;
-
-        RSTZoneAndPossibleDomesticQTHExchange:
-          begin
-            if MyState = '' then
-              cMyState := 'DX';
-
-            SetMyEx('%-3s %.2u %-4s', [string(RSTSent), cMyZone, string(cMyState)]);
-
-            if TempRXData.QTHString = '' then
-              csQTHString := 'DX';
-            SetHisEx('%-3s %.2u %-3s', [string(RSTReceived), HisZone, string(csQTHString)]);
-          end;
-
-        RSTZoneOrDomesticQTH, RSTZoneOrSocietyExchange:
-          begin
-            if MyState <> '' then
-               begin
-               SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
-               end
-            else
-               begin
-               SetMyEx('%-3s %-7d', [string(RSTSent), cMyZone]);
-               end;
-
-            if TempRXData.QTHString <> '' then
-               begin
-               SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
-               end
-            else
-               begin
-               SetHisEx('%-3s %-7u', [string(RSTReceived), HisZone]);
-               end;
-          end;
-
-        QSONumberAndCoordinatesSum: {RFASCHAMPIONSHIP}
-          begin
-            // %03.4d/%03.4u: precision present -> C drops the 0 flag -> %3.4d/%3.4u.
-            SetMyEx('%-3s %3.4d    ', [string(cMyState), nrSent]);
-            SetHisEx('%-3s %3.4u', [string(csQTHString), nrReceived]);
-          end;
-
-        ClassDomesticOrDXQTHExchange:
-          begin
-            SetMyEx('%-3s %-7s ', [string(PChar(@MyFDClass[1])), string(PChar(@MySection[1]))]);
-            if Contest in [ARRLFIELDDAY, WINTERFIELDDAY] then
-               begin
-               csQTHString := @TempRXData.QTHString[1];   // Issue 407 ny4i
-               end;
-            SetHisEx('%-3s %-7s', [string(PChar(@TempRXData.ceClass[1])), string(csQTHString)]);
-          end;
-
-        QSONumberAndGeoCoordinates:
-          begin
-            SetMyEx('%-3.4d %-7s ', [nrSent, string(cMyState)]);
-            SetHisEx('%-3.4u %-7s', [nrReceived, string(csQTHString)]);
-          end;
-
-        RSTQSONumberExchange:
-          begin
-            // Issue #998.  nrSent was C '%03d' (zero-pad to WIDTH 3, sign counted
-            // in the width); reproduced with '%.*d' + precision 3-Ord(v<0) (see
-            // the EDI %0Nd-of-negatives note).  nrReceived was '%-03.3u' -- a
-            // precision is present so C ignores the 0 flag, giving '%-3.3u'.
-            SetMyEx('%-3s %.*d ', [string(RSTSent), 3 - Ord(nrSent < 0), nrSent]);   // issue 177
-            SetHisEx('%-3s %-3.3u', [string(RSTReceived), nrReceived]);              // issue 177
-          end;
-        RSTAndContinentExchange:
-          begin
-            csQTHString := @TempRXData.QTHString[1];
-            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
-            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
-          end;
-
-        RSTDomesticQTHExchange:
-          begin
-            if Contest in [ CQVHF {, MMAA}] then
-            begin
-              SetHisEx(' %-7s', [string(csQTHString)]);
-              SetMyEx('%-7s', [string(cMyGrid)]);
-            end
-            else
-            begin
-              if MyState = '' then cMyState := 'DX';
-//              if MyCounty <> '' then cMyState := @MyCounty[1];
-              if Contest in [SPDX, PACC] then cMyState := inttopchar(nrSent);
-              if TempRXData.QTHString = '' then csQTHString := 'DX';
-              SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
-              SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
-            end;
-          end;
-
-        RSTDomesticOrDXQTHExchange:
-           begin
-                //-                if MyState = '' then cMyState := 'DX';
-           if TempRXData.QTHString = '' then
-              begin
-              if TempRXData.DXQTH = '' then
-                 begin
-                 csQTHString := 'DX';
-                 end
-              else
-                 begin
-                 if Contest = FLORIDAQSOPARTY then
-                    begin
-                    csQTHString := @TempRXData.QTH.Prefix[1];
-                    end
-                 else
-                    begin
-                    csQTHString := @TempRXData.DXQTH[1];
-                    end;
-                 end;
-              end
-           else if TempRXData.QTHString = 'DX' then
-              begin
-              if Contest = FLORIDAQSOPARTY then
-                 begin
-                 csQTHString := @TempRXData.QTH.Prefix[1];
-                 end;
-              end;
-
-            SetHisEx('%-3s %-7s', [string(RSTReceived), string(csQTHString)]);
-            SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
-          end;
-
-        QSONumberAndZone:
-          begin
-//            if (Contest = RFCHAMPIONSHIPSSB) or (Contest = RFCHAMPIONSHIPCW) then
-            // %0.3d / %03.4d: precision present -> C drops the 0 flag -> %.3d / %3.4d.
-            SetHisEx('  %-4u   %.3d', [HisZone, nrReceived]);   // 4.98.4
-            SetMyEx('  %s    %3.4d ', [string(cMyState), nrSent]);
-          end;
-
-        RSTZoneExchange:
-          begin
-            if Contest in [JIDXSSB, JIDXCW] then cMyZone := StrToInt(MyState);
-            SetHisEx('%-3s %-7.2d', [string(RSTReceived), HisZone]);   // 4.51.1 issue185
-            SetMyEx('%-3s %-7.2d', [string(RSTSent), cMyZone]);        // 4.51.1 issue#185
-          end;
-
-         QSONumberAndPreviousQSONumber:
-          begin
-          hisnr := (nrreceived div 1000);    // 4.53.2
-           rxnr := (nrreceived mod 1000);    // 4.53.2
-            SetMyEx('%-.3u%-7.4d', [pnr, nrSent]);    // 4.72.9
-          //  pnr := temprxdata.numberreceived div  1000;      // 4.53.2
-              pnr := RXNR;
-            SetHisEx('%-.4d%-.4d', [HisNR, RXNR]);    // 4.53.4        // 4.72.9
-          end;
-
-        RSTAndQSONumberOrFrenchDepartmentExchange, RSTAndQSONumberOrDomesticQTHExchange, RSTDomesticQTHOrQSONumberExchange:
-          begin
-           // %03.4u: precision present -> %3.4u.  %03u (HISEX else): no precision,
-           // unsigned, so %.3u == %03u (no sign, no negative-zero-pad concern).
-           if (MyState <> '') and (Contest <> PCC) then      // 4.83.2
-              begin
-              SetMyEx('%-3s %-7s', [string(RSTSent), string(cMyState)]);
-              end
-           else if StringIsAllNumbers(MyState) then
-              begin
-              SetMyEx('%-4s %3.4u/M   ', [string(RSTSent), nrSent]);  // n4af 4.43.12
-              end
-           else
-              begin
-              SetMyEx('%-4s %3.4u   ', [string(RSTSent), nrSent]);  // n4af 4.43.12
-              end;
-
-            if TempRXData.QTHString {.DomMultQTH} <> '' then
-               begin
-               SetHisEx('%-3s %-3s', [string(RSTReceived), string(csQTHString)]); // 4.84.2
-               end
-            else
-               begin
-               SetHisEx('%-3s %.3u', [string(RSTReceived), nrReceived]);
-               end;
-          end;
-      end;
+      // Issue #998 capstone: the per-exchange MYEX/HISEX builder was extracted
+      // into uCabrilloExchange.FormatCabrilloExchange (dependency-light + unit-
+      // tested).  Build the My-station record and pass the per-QSO derived
+      // strings; it fills CABRILLO_MYEX / CABRILLO_HISEX (and carries pnr).
+      myStationEx.MyState      := string(MyState);
+      myStationEx.MyGrid       := string(MyGrid);
+      myStationEx.MyName       := string(MyName);
+      myStationEx.MyZone       := string(MyZone);
+      myStationEx.MyFDClass    := string(MyFDClass);
+      myStationEx.MySection    := string(MySection);
+      myStationEx.MyCheck      := string(MyCheck);
+      myStationEx.MyPrec       := string(MyPrec);
+      myStationEx.MyFOCNumber  := string(MyFOCNumber);
+      myStationEx.MyPostalCode := string(MyPostalCode);
+      FormatCabrilloExchange(ActiveExchange, Contest, ContestTitle, ContestName,
+        TempRXData, myStationEx,
+        string(RSTSent), string(RSTReceived), string(csQTHString),
+        string(PChar(@PreviousQTHString[1])),
+        contacts, pnr, CABRILLO_MYEX, CABRILLO_HISEX);
 //----------------------------
 
       // Issue #998: StrUpper (ASCII a-z only) on the old PChar buffer -> UpperCase
