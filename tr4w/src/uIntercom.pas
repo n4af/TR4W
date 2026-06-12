@@ -71,11 +71,8 @@ begin
 
 //          Color := clgreen;
           GradientRect(IntercomDIS^.HDC, IntercomDIS^.rcItem, Color, Color, gdHorizontal);
-          asm
-          mov eax,Color
-          bswap eax
-          mov TextColor,eax
-          end;
+          // Issue #997: removed dead asm (it set TextColor via bswap, but the
+          // next line unconditionally overwrites TextColor).
           TextColor := $00FFFFFF - Color;
           Windows.SetTextColor(IntercomDIS^.HDC, TextColor);
           SetBkMode(IntercomDIS^.HDC, TRANSPARENT);
@@ -97,10 +94,8 @@ begin
     WM_INITDIALOG:
       begin
         IntercomListBoxHandle := CreateOwnerDrawListBox(LB_STYLE_3,hwnddlg);
-        asm
-            mov edx,[MainFixedFont]
-            call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> TF helper (EAX = IntercomListBoxHandle above).
+        tWM_SETFONT(IntercomListBoxHandle, MainFixedFont);
 
         EnumerateLinesInFile('INTERCOM.TXT', EnumINTERCOMTXT, false);
       end;
