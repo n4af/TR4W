@@ -812,10 +812,8 @@ var
   Band                                  : BandType;
   Mode                                  : ModeType;
   TempMode                              : ModeType;
-  nNumberOfBytesToWrite                 : integer;
   BString                               : PChar;
   MString                               : PChar;
-  TempInteger                           : integer;
   SumInteger                            : integer;
   m                                     : RemainingMultiplierType;
   TotalLine                             : boolean;
@@ -835,8 +833,7 @@ begin
        begin
        Continue;
        end;
-    nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10s', mn[m]);
-    sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+    sWriteFileFromString(tReportFileWrite, SysUtils.Format('%10s', [string(mn[m])]));
   end;
 
   sWriteFile(tReportFileWrite, breakline, length(breakline));
@@ -862,33 +859,20 @@ begin
         end;
 
         SumInteger := QSOPointTotals[Band, TempMode];
-        asm
-        push SumInteger
-        end;
-
-        TempInteger := PostQSOTotals[Band, TempMode];
-        asm
-        push TempInteger
-        end;
-
-        TempInteger := RawQSOTotals[Band, TempMode];
-        asm
-        push TempInteger
-        end;
-
-        asm
-        push MString
-        push BString
-        end;
-      nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, #13#10' %5s%4s %8d  %12d %8d');
-      if contest = WINTERFIELDDAY then
-         begin
-         inc(totalMults);
-         end;
-
-        asm add esp,28
-        end;
-        sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+      // Issue #998: asm-push wsprintf -> SysUtils.Format + sWriteFileFromString
+      // (removes the asm, the custom Format function, and the PChar buffer in one).
+      // Arg order matches the original right-to-left pushes: %5s=BString,
+      // %4s=MString, %8d=RawQSOTotals, %12d=PostQSOTotals, %8d=QSOPointTotals.
+        sWriteFileFromString(tReportFileWrite,
+          SysUtils.Format(#13#10' %5s%4s %8d  %12d %8d',
+            [string(BString), string(MString),
+             RawQSOTotals[Band, TempMode],
+             PostQSOTotals[Band, TempMode],
+             SumInteger]));
+        if contest = WINTERFIELDDAY then
+           begin
+           inc(totalMults);
+           end;
 
         for m := Low(RemainingMultiplierType) to High(RemainingMultiplierType) do
         begin
@@ -900,31 +884,28 @@ begin
              begin
              if totalLine then
                 begin
-                nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', totalMults);
+                sWriteFileFromString(tReportFileWrite, SysUtils.Format('%10d', [totalMults]));
                 end
              else
                 begin
-                nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', 1);
+                sWriteFileFromString(tReportFileWrite, SysUtils.Format('%10d', [1]));
                 end;
              end
           else
              begin
-             nNumberOfBytesToWrite := Format(wsprintfBuffer, '%10d', mo.MTotals[Band, TempMode, m]);
+             sWriteFileFromString(tReportFileWrite, SysUtils.Format('%10d', [mo.MTotals[Band, TempMode, m]]));
              end;
-          sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
         end;
       end;
 //  sWriteFile(tReportFileWrite, breakline, length(breakline));
   if QTCEnable then
   begin
-    nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    There were %d QTC points.', TotalNumberQTCsProcessed);
-    sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+    sWriteFileFromString(tReportFileWrite, SysUtils.Format(#13#10#13#10'    There were %d QTC points.', [TotalNumberQTCsProcessed]));
   end;
   if Contest <> ARRLFIELDDAY then
-     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'    Claimed Score = %d points.', TotalScore)      // 4.108.9
+     sWriteFileFromString(tReportFileWrite, SysUtils.Format(#13#10#13#10'    Claimed Score = %d points.', [TotalScore]))      // 4.108.9
   else
-     nNumberOfBytesToWrite := Format(wsprintfBuffer, #13#10#13#10'     Claimed Score = %d points.', SumInteger);     // 4.108.9
-  sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+     sWriteFileFromString(tReportFileWrite, SysUtils.Format(#13#10#13#10'     Claimed Score = %d points.', [SumInteger]));     // 4.108.9
 end;
 
 function CalculateTotals: boolean;
@@ -1707,18 +1688,10 @@ begin
       TotalCountryQSOs := 0;
       tCountryName := ctyGetCountryNamePchar(CountryIndex);
       tCountryID := @CTY.ctyTable[CountryIndex].ID[1];
-      begin
-        asm
-        push pchar(tCountryID)
-        push pchar(tCountryName)
-        mov eax,dword ptr Count
-        push eax
-        end;
-        wsprintf(wsprintfBuffer, '%4u %-23s %-5s');
-        asm add esp,20
-        end;
-        Write(FileWrite, wsprintfBuffer);
-      end;
+      // Issue #998: asm-push wsprintf -> SysUtils.Format, written straight to the
+      // text file. %4u=Count, %-23s=country name, %-5s=country ID.
+      Write(FileWrite, SysUtils.Format('%4u %-23s %-5s',
+        [Count, string(tCountryName), string(tCountryID)]));
 
       for TempBand := Band160 to Band10 do
       begin
@@ -2282,7 +2255,6 @@ end;
 
 function tGenerateSummaryPortionOfCabrilloFile: boolean;
 var
-  nNumberOfBytesToWrite                 : Cardinal;
   T2                                    : PChar;
   T3                                    : String;
   TempTag                               : CabrilloTags;
@@ -2321,18 +2293,11 @@ begin
       else if length(ContestName) <> 0  then      // 4.78.3
          T3 := ContestName;
 
-  asm
-  call TotalScore
-  push eax
-  push t3
-  push t2
-//  push t1
-  end;
-  nNumberOfBytesToWrite := wsprintf(wsprintfBuffer,
-    'START-OF-LOG: 3.0'#13#10'CREATED-BY: ' + TR4W_CURRENTVERSION + #13#10'CALLSIGN: %s'#13#10'CONTEST: %s'#13#10'CLAIMED-SCORE: %d'#13#10);
-  asm add esp,20
-  end;
-  sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+  // Issue #998: asm-push wsprintf -> SysUtils.Format + sWriteFileFromString.
+  // %s=CALLSIGN(T2), %s=CONTEST(T3), %d=CLAIMED-SCORE(TotalScore).
+  sWriteFileFromString(tReportFileWrite, SysUtils.Format(
+    'START-OF-LOG: 3.0'#13#10'CREATED-BY: ' + TR4W_CURRENTVERSION + #13#10'CALLSIGN: %s'#13#10'CONTEST: %s'#13#10'CLAIMED-SCORE: %d'#13#10,
+    [string(T2), T3, TotalScore]));
 
   for TempTag := Low(CabrilloTags) to High(CabrilloTags) do
   begin
@@ -2360,16 +2325,11 @@ begin
     TempPchar := @CabrilloTagsArray[TempTag].ctrTag[1];
     if TempTag = ctOperators then
        begin
-       Format(TempBuffer2, '%s', PChar(GetOperatorsFromLog));
+       StrPCopy(TempBuffer2, GetOperatorsFromLog);   // Issue #998 (was custom Format '%s')
        end;
-    asm
-    push offset TempBuffer2
-    push TempPchar
-    end;
-    nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, '%s: %s'#13#10);
-    asm add esp,16
-    end;
-    sWriteFile(tReportFileWrite, wsprintfBuffer, nNumberOfBytesToWrite);
+    // Issue #998: %s=tag(TempPchar), %s=value(TempBuffer2).
+    sWriteFileFromString(tReportFileWrite, SysUtils.Format('%s: %s'#13#10,
+      [string(TempPchar), string(PChar(@TempBuffer2))]));
   end;
 
   if MyGrid <> '' then
@@ -2382,11 +2342,9 @@ begin
       for TempErmakField := Low(TErmakFields) to High(TErmakFields) do
       begin
         ControlID := integer(TempErmakField) + (Operator) * 100;
-        asm
-        push ControlID
-        end;
-        wsprintf(TempBuffer2, OPERATORINFO);
-        asm add esp,12 end;
+        // Issue #998: builds the INI key into TempBuffer2 (not file output).
+        // OPERATORINFO is C '_OP_INFO_%03u' (zero-pad); Delphi Format uses '%.3u'.
+        StrPCopy(TempBuffer2, SysUtils.Format('_OP_INFO_%.3u', [ControlID]));
         TempInteger := GetPrivateProfileString(ERMAKSECTION, TempBuffer2, '?', TempBuffer1, SizeOf(TempBuffer1), TR4W_INI_FILENAME);
         TempPchar := @TempBuffer1[0];
         if TempErmakField = efOp then
