@@ -175,7 +175,6 @@ var
 
   CABRILLO_RST_SEND                     : array[0..3] of Char;
   CABRILLO_RST_RCVD                     : array[0..3] of Char;
-  CABRILLO_BUFFER                       : array[0..255] of Char;
   CABRILLO_MYEX                         : array[0..64 - 1] of Char;
   CABRILLO_HISEX                        : array[0..64 - 1] of Char;
 
@@ -2292,7 +2291,6 @@ function tGenerateLogPortionOfCabrilloFile: boolean;
 label
   1;
 var
-  nNumberOfBytesToWrite                 : Cardinal;
   HisCallsign                           : PChar;
   RSTSent                               : PChar;
   RSTReceived                           : PChar;
@@ -2319,6 +2317,8 @@ var
   sFirstPart                            : string;     // Issue #998: replaces CABRILLO_FIRST_PART
   sPrefix                               : string;     // Issue #998: QSO:/X-QSO: line prefix
   sFmt                                  : string;     // Issue #998: assembly format string
+  sCall1                                : string;     // Issue #998: QTC from-call (QTCR/QTCS swap)
+  sCall2                                : string;     // Issue #998: QTC to-call (QTCR/QTCS swap)
   cRandomCharsReceived                  : PChar;
   cKids                                 : PChar;
   TempGrid                              : Str20;
@@ -2989,51 +2989,36 @@ if TempRXData.DomMultQTH = '' then
 
       cKids := @TempRXData.Kids[1];
       cRandomCharsReceived := @TempRXData.RandomCharsReceived[1];
-      asm
-            push nrReceived
-            push cKids
-            push nrSent
-      end;
-
+      // Issue #998: asm-push wsprintf -> SysUtils.Format + sWriteFileFromString
+      // (last asm block in this unit).  QTC: freq mode date time <call1>
+      // <randomchars> <call2> <sentNr> <kids> <rcvdNr>.  For rkQTCR the
+      // from/to calls are MyCall/HisCallsign; for rkQTCS they swap.
+      // %02d -> %.2d (date/time), %04u -> %.4u (sent number).
       if TempRXData.ceRecordKind = rkQTCR then
-        asm
-        push HisCallsign
-        push cRandomCharsReceived
-        lea  eax,MyCall[1]
-        push eax
-        end
+         begin
+         sCall1 := string(PChar(@MyCall[1]));
+         sCall2 := string(HisCallsign);
+         end
       else
-        asm
-        lea  eax,MyCall[1]
-        push eax
-        push cRandomCharsReceived
-        push HisCallsign
-        end;
-
-      asm
-            movzx eax,TempRXData.tSysTime.qtMinute
-            push eax
-
-            movzx eax,TempRXData.tSysTime.qtHour
-            push eax
-
-            movzx eax,TempRXData.tSysTime.qtDay
-            push eax
-
-            movzx eax,TempRXData.tSysTime.qtMonth
-            push eax
-
-            movzx eax,TempRXData.tSysTime.qtYear
-            add eax,2000
-            push eax
-
-            push ModeString
-            push Freq
-      end;
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER, 'QTC: %5s %s %d-%02d-%02d %02d%02d %-14s%-11s%-14s%04u %-14s%u'#13#10);
-      asm add esp,60
-      end;
-      sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+         begin
+         sCall1 := string(HisCallsign);
+         sCall2 := string(PChar(@MyCall[1]));
+         end;
+      sWriteFileFromString(tReportFileWrite, SysUtils.Format(
+        'QTC: %5s %s %d-%.2d-%.2d %.2d%.2d %-14s%-11s%-14s%.4u %-14s%u'#13#10,
+        [string(Freq),
+         string(ModeString),
+         TempRXData.tSysTime.qtYear + 2000,
+         TempRXData.tSysTime.qtMonth,
+         TempRXData.tSysTime.qtDay,
+         TempRXData.tSysTime.qtHour,
+         TempRXData.tSysTime.qtMinute,
+         sCall1,
+         string(cRandomCharsReceived),
+         sCall2,
+         nrSent,
+         string(cKids),
+         nrReceived]));
     end;
     goto 1;
   end;
