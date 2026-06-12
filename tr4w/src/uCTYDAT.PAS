@@ -421,7 +421,7 @@ begin
               begin
                 if r.Name[0] = '!' then
                 begin
-                  asm nop end;
+                  // Issue #997: removed asm nop (no-op).
                   Windows.CopyMemory(@r.ID[1], @p[i - l], l);
                   r.ID[0] := CHR(l);
                   ReplaceCountry(r);
