@@ -1727,9 +1727,6 @@ procedure ExportToEDIByBand(Band: BandType);
 label
   1;
 var
-  nNumberOfBytesToWrite                 : Cardinal;
-  p                                     : PChar;
-  TempInteger                           : integer;
   TempTag                               : CabrilloTags;
 const
   EDI_ModeCodes                         : array[ModeType] of integer = (2, 7, 1, 0, 0, 6);
@@ -1760,19 +1757,9 @@ begin
   Windows.GetDlgItemText(CreateCabrilloWindow, integer(ctName) + 200, @TempBuffer1, SizeOf(TempBuffer1));
   Windows.GetDlgItemText(CreateCabrilloWindow, integer(ctCategoryOperator) + 200, @TempBuffer2, SizeOf(TempBuffer2));
 
-  TempInteger := QSOTotals[Band, Both];
-  p := EDIFBANDSTRINGSARRAY[Band];
-  asm
-  push TempInteger
-  push offset TempBuffer2
-  push offset wsprintfBuffer
-  push offset TempBuffer1
-  push p
-  push offset MyGrid[1]
-  push offset MyCall[1]
-  push offset ContestName[1]
-  end;
-  nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER,
+  // Issue #998: asm-push wsprintf -> SysUtils.Format. cdecl arg order is
+  // ContestName, MyCall, MyGrid, BandString, Name, Address, Section, QSOcount.
+  sWriteFileFromString(tReportFileWrite, SysUtils.Format(
     '[REG1TEST;1]'#13#10 +
     'TName=%s'#13#10 +
     'PCall=%s'#13#10 +
@@ -1781,10 +1768,15 @@ begin
     'RName=%s'#13#10 +
     'PAdr1=%s'#13#10 +
     'PSect=%s'#13#10 +
-    '[QSORecords;%u]'#13#10
-    );
-  asm add esp,40 end;
-  sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+    '[QSORecords;%u]'#13#10,
+    [string(PChar(@ContestName[1])),
+     string(PChar(@MyCall[1])),
+     string(PChar(@MyGrid[1])),
+     string(EDIFBANDSTRINGSARRAY[Band]),
+     string(PChar(@TempBuffer1)),
+     string(PChar(@wsprintfBuffer)),
+     string(PChar(@TempBuffer2)),
+     QSOTotals[Band, Both]]));
 
   ReadVersionBlock;
   1:
@@ -1793,74 +1785,27 @@ begin
     if GoodLookingQSO then
     begin
       if TempRXData.Band <> Band then goto 1;
-      TempInteger := EDI_ModeCodes[TempRXData.Mode];
-
-      p := EDI_DupeArray[TempRXData.ceDupe];
-      asm
-      push p
-      end;
-
-      p := EDI_NewArray[TempRXData.DXMult];
-      asm
-      push p
-      end;
-
-      p := EDI_NewArray[TempRXData.DomesticMult];
-      asm
-      push p
-
-      xor eax, eax
-      mov ax, TempRXData.QSOPoints
-      push eax
-
-      push offset TempRXData.QTHString[1]
-
-      push TempRXData.NumberReceived
-
-      xor eax, eax
-      mov ax, TempRXData.RSTReceived
-      push eax
-
-      push TempRXData.NumberSent
-
-      xor eax, eax
-      mov ax, TempRXData.RSTSent
-      push eax
-
-      push TempInteger
-
-      push offset TempRXData.Callsign[1]
-
-      xor eax, eax
-      mov al, TempRXData.tSysTime.qtMinute
-      push eax
-
-      xor eax, eax
-      mov al, TempRXData.tSysTime.qtHour
-      push eax
-
-      xor eax, eax
-      mov al, TempRXData.tSysTime.qtDay
-      push eax
-
-      xor eax, eax
-      mov al, TempRXData.tSysTime.qtMonth
-      push eax
-
-      xor eax, eax
-      mov al, TempRXData.tSysTime.qtYear
-      push eax
-      end;
-
-      nNumberOfBytesToWrite := wsprintf(CABRILLO_BUFFER,
-        '%02d%02d%02d;' + {date}
-        '%02d%02d;' + {time}
+      // Issue #998: asm-push wsprintf -> SysUtils.Format. cdecl arg order is
+      // date (Year/Month/Day), time (Hour/Minute), callsign, mode code,
+      // rst-sent, sent-qso#, rst-rcvd, rcvd-qso#, rcvd-WWL, qso-points,
+      // new-WWL, new-DXCC, dupe.  %02d -> %.2d (always non-negative here).
+      // The new/dupe flag arrays are nil when false -> string(nil) = '' (EDI
+      // blank field).
+      //
+      // The two QSO-number fields were C '%03d' = zero-pad to WIDTH 3 with the
+      // sign counted in the width (-1 -> "-01").  Delphi '%.3d' pads DIGITS
+      // (-1 -> "-001"), which differs for negatives (the "no serial" sentinel
+      // is -1).  We reproduce C semantics with '%.*d' and precision = 3 minus
+      // the sign character, supplied as an argument before each value.
+      sWriteFileFromString(tReportFileWrite, SysUtils.Format(
+        '%.2d%.2d%.2d;' + {date}
+        '%.2d%.2d;' + {time}
         '%s;' + {callsign}
         '%d;' + {mode code}
         '%d;' + {rst sent}
-        '%03d;' + {sent qso number}
+        '%.*d;' + {sent qso number (C %03d)}
         '%d;' + {rst received}
-        '%03d;' + {received qso number}
+        '%.*d;' + {received qso number (C %03d)}
         ';' + {Received Exchange}
         '%s;' + {Received WWL}
         '%d;' + {QSO points}
@@ -1868,10 +1813,23 @@ begin
         '%s;' + {New-WWL}
         '%s;' + {New-DXCC}
         '%s' + {Duplicate-QSO}
-        #13#10
-        );
-      asm add esp,72 end;
-      sWriteFile(tReportFileWrite, CABRILLO_BUFFER, nNumberOfBytesToWrite);
+        #13#10,
+        [TempRXData.tSysTime.qtYear,
+         TempRXData.tSysTime.qtMonth,
+         TempRXData.tSysTime.qtDay,
+         TempRXData.tSysTime.qtHour,
+         TempRXData.tSysTime.qtMinute,
+         string(PChar(@TempRXData.Callsign[1])),
+         EDI_ModeCodes[TempRXData.Mode],
+         TempRXData.RSTSent,
+         3 - Ord(TempRXData.NumberSent < 0), TempRXData.NumberSent,
+         TempRXData.RSTReceived,
+         3 - Ord(TempRXData.NumberReceived < 0), TempRXData.NumberReceived,
+         string(PChar(@TempRXData.QTHString[1])),
+         TempRXData.QSOPoints,
+         string(EDI_NewArray[TempRXData.DomesticMult]),
+         string(EDI_NewArray[TempRXData.DXMult]),
+         string(EDI_DupeArray[TempRXData.ceDupe])]));
 
     end;
     goto 1;
