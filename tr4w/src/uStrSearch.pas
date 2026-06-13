@@ -11,8 +11,8 @@ unit uStrSearch;
     1. Their exact behavior can be frozen by golden-master unit tests
        (uTestStrSearch) -- TF.pas itself cannot be linked into the test
        harness because it pulls in MainUnit and the whole UI graph.
-    2. The asm bodies can then be replaced with the Delphi RTL / pure Pascal
-       and proven bit-identical against the frozen baseline.
+    2. The asm bodies were then replaced with the Delphi RTL / pure Pascal
+       (see implementation) and proven equivalent against the frozen baseline.
 
   TF.pas keeps the public names (StrPos, StrPosPartial, StrComp_JOH_IA32_6)
   and forwards here, so existing callers are unaffected.
@@ -44,127 +44,80 @@ function StrComp_JOH_IA32_6(const Str1, Str2: PChar): integer;
 
 implementation
 
-function StrComp_JOH_IA32_6(const Str1, Str2: PChar): integer; assembler;
-asm
-  sub   eax, edx
-  jz    @@Exit
-@@Loop:
-  movzx ecx, [eax+edx]
-  cmp   cl, [edx]
-  jne   @@SetResult
-  inc   edx
-  test  cl, cl
-  jnz   @@Loop
-  xor   eax, eax
-  ret
-@@SetResult:
-  sbb   eax, eax
-  or    al, 1
-@@Exit:
+uses
+  SysUtils;
+
+// Issue #997: x86 inline-asm bodies replaced by the Delphi RTL / pure Pascal.
+// Equivalence to the original asm is frozen by uTestStrSearch (31 golden cases).
+
+function StrComp_JOH_IA32_6(const Str1, Str2: PChar): integer;
+var
+  Cmp: integer;
+begin
+  // The original asm normalized its result to exactly -1 / 0 / +1
+  // (sbb eax,eax; or al,1). SysUtils.StrComp instead returns the raw byte
+  // difference of the first mismatch (e.g. '' vs 'A' -> -65). Normalize the
+  // sign to preserve the original contract byte-for-byte.
+  Cmp := SysUtils.StrComp(Str1, Str2);
+  if Cmp < 0 then
+    Result := -1
+  else if Cmp > 0 then
+    Result := 1
+  else
+    Result := 0;
 end;
 
-function StrPosPartial(const Str1, Str2: PChar): PChar; assembler;
-asm
-        PUSH    EDI
-        PUSH    ESI
-        PUSH    EBX
+function StrPosPartial(const Str1, Str2: PChar): PChar;
+var
+  Len1, Len2: integer;
+  i, j: integer;
+  Matched: boolean;
+begin
+  // Like StrPos, but '?' in Str2 matches any single character -- EXCEPT the
+  // FIRST pattern character, which is always matched literally (the original
+  // asm seeded its scan with an exact match on Str2[0], so a leading '?'
+  // looks for a literal '?'). See uTestStrSearch for the frozen cases.
+  Result := nil;
+  if (Str1 = nil) or (Str2 = nil) then
+    Exit;
 
-        OR      EAX,EAX//str1
-        JE      @@2
-        OR      EDX,EDX//str2
-        JE      @@2
+  Len2 := SysUtils.StrLen(Str2);
+  if Len2 = 0 then          // empty pattern -> nil (matches the asm)
+    Exit;
 
-        MOV     EBX,EAX
-        MOV     EDI,EDX
-        XOR     AL,AL
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        DEC     ECX
-        JE      @@2
+  Len1 := SysUtils.StrLen(Str1);
+  if Len1 < Len2 then       // pattern longer than text -> nil
+    Exit;
 
-        MOV     ESI,ECX     //length of str2
-        MOV     EDI,EBX
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        SUB     ECX,ESI     //if str2 > str1
-        JBE     @@2
-        MOV     EDI,EBX     //str1 to edi
-        LEA     EBX,[ESI-1] //length str1
-@@1:    MOV     ESI,EDX     //str2 to esi
-        LODSB               //mov esi to eax, inc esi
-        REPNE   SCASB       //find [eax] in [edi] ,inc edi, dec ecx
-        JNE     @@2
-        MOV     EAX,ECX
-        PUSH    EDI
-        MOV     ECX,EBX
+  for i := 0 to Len1 - Len2 do
+    begin
+    // First character is literal (no wildcard), exactly as the asm scan.
+    if Str1[i] <> Str2[0] then
+      Continue;
 
-@@4:    CMPSB               //compare edi with esi
-        JE      @@SAME
-        CMP     BYTE PTR [ESI-1],'?'
-        JNZ     @@5
-@@SAME:
-        DEC     ECX
-        JNE     @@4
-@@5:
-        POP     EDI
-        MOV     ECX,EAX
-        JNE     @@1
-        LEA     EAX,[EDI-1]
-        JMP     @@3
-@@2:    XOR     EAX,EAX
-@@3:    POP     EBX
-        POP     ESI
-        POP     EDI
+    Matched := True;
+    for j := 1 to Len2 - 1 do
+      begin
+      if (Str1[i + j] <> Str2[j]) and (Str2[j] <> '?') then
+        begin
+        Matched := False;
+        Break;
+        end;
+      end;
+
+    if Matched then
+      begin
+      Result := Str1 + i;
+      Exit;
+      end;
+    end;
 end;
 
-function StrPos(const Str1, Str2: PChar): PChar; assembler;
-asm
-        PUSH    EDI
-        PUSH    ESI
-        PUSH    EBX
-
-        OR      EAX,EAX//str1
-        JE      @@2
-        OR      EDX,EDX//str2
-        JE      @@2
-
-        MOV     EBX,EAX
-        MOV     EDI,EDX
-        XOR     AL,AL
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        DEC     ECX
-        JE      @@2
-
-        MOV     ESI,ECX     //length of str2
-        MOV     EDI,EBX
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        SUB     ECX,ESI     //if str2 > str1
-        JBE     @@2
-        MOV     EDI,EBX     //str1 to edi
-        LEA     EBX,[ESI-1] //length str1
-@@1:    MOV     ESI,EDX     //str2 to esi
-        LODSB               //mov esi to eax, inc esi
-        REPNE   SCASB       //find [eax] in [edi] ,inc edi, dec ecx
-        JNE     @@2
-        MOV     EAX,ECX
-        PUSH    EDI
-        MOV     ECX,EBX
-        REPE    CMPSB       //compare edi with esi
-        POP     EDI
-        MOV     ECX,EAX
-        JNE     @@1
-        LEA     EAX,[EDI-1]
-        JMP     @@3
-@@2:    XOR     EAX,EAX
-@@3:    POP     EBX
-        POP     ESI
-        POP     EDI
+function StrPos(const Str1, Str2: PChar): PChar;
+begin
+  // TF's original asm body was Borland's classic StrPos verbatim, so the RTL
+  // is bit-equivalent (including empty-pattern / over-length / nil -> nil).
+  Result := SysUtils.StrPos(Str1, Str2);
 end;
 
 end.
