@@ -414,12 +414,8 @@ begin
   begin
     DoABeep(Warning);
     p := @QTCCallsign[1];
-    asm
-    push p
-    end;
-    wsprintf(wsprintfBuffer, TC_SORRYYOUALREADYHAVE10QTCSWITH);
-    asm add esp,12
-    end;
+    // Issue #997: asm wsprintf-push -> TF.Format.
+    Format(wsprintfBuffer, TC_SORRYYOUALREADYHAVE10QTCSWITH, p);
     QuickDisplay(wsprintfBuffer);
     Exit;
   end;
@@ -549,21 +545,13 @@ begin
     QRVString[0] := Char(Format(@QRVString[1], 'QTC %u/%u', QTCNumber, NumberMessagesToBeSent));
 //    asm add esp,16 end;
 
-    asm
-    lea eax, [QRVString]
-    call SendStringAndStop
-    end;
+    // Issue #997: asm `lea eax,[QRVString]; call SendStringAndStop` -> direct call.
+    SendStringAndStop(QRVString);
     SendStringAndStop(' QRV?');
 
-    asm
-    lea eax, [QRVString+1]
-    push eax
-    lea eax, [QTCCallsign+1]
-    push eax
-    end;
-    wsprintf(wsprintfBuffer, TC_ISQRVFOR);
-    asm add esp,16
-    end;
+    // Issue #997: asm wsprintf-push -> TF.Format. TC_ISQRVFOR = 'Is %s QRV for %s?';
+    // cdecl-reverse pushes -> arg1=QTCCallsign, arg2=QRVString.
+    Format(wsprintfBuffer, TC_ISQRVFOR, @QTCCallsign[1], @QRVString[1]);
 
     if YesOrNo2(tr4whandle, wsprintfBuffer) <> IDOK then Exit;
     //tDialogBox(63, @QTCSDlgProc);
