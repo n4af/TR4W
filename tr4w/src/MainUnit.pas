@@ -6282,10 +6282,10 @@ begin
   MapBase := Windows.MapViewOfFile(MapFin, FILE_MAP_ALL_ACCESS, 0, 0, 0);
   if MapBase = nil then
     goto 3;
-  asm
- add eax, SizeOfTLogHeader
- mov RescoredRXData,eax
-  end;
+  // Issue #997: asm pointer-arith that assumed EAX still held MapViewOfFile's
+  // return -> explicit (same pattern as the advance-by-record near the end of
+  // this function).
+  RescoredRXData := Pointer(Cardinal(MapBase) + SizeOfTLogHeader);
 
   if UpdAction = actGetCRC32 then
   begin
