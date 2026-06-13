@@ -8,13 +8,17 @@ function ArcTan2(const Y, X: extended): extended;
 
 implementation
 
+uses
+  Math;
+
+// Issue #997: the FPTAN/FPATAN inline-asm bodies are replaced by the Delphi
+// RTL Math unit (which implements the identical x87 ops). The RTL calls MUST
+// be Math.-qualified: an unqualified Tan/ArcTan2 here would bind to the local
+// function of the same name and recurse infinitely. Equivalence to the asm
+// baseline is frozen by uTestUtilsMath (15 golden cases, 1e-12 tolerance).
 function Tan(const X: extended): extended;
-{  Tan := Sin(X) / Cos(X) }
-asm
-        FLD    X
-        FPTAN
-        FSTP   ST(0)      { FPTAN pushes 1.0 after result }
-        FWAIT
+begin
+  Result := Math.Tan(X);
 end;
 
 function ArcCos(const X: extended): extended;
@@ -23,11 +27,8 @@ begin
 end;
 
 function ArcTan2(const Y, X: extended): extended;
-asm
-        FLD     Y
-        FLD     X
-        FPATAN
-        FWAIT
+begin
+  Result := Math.ArcTan2(Y, X);
 end;
 
 end.
