@@ -121,10 +121,8 @@ begin
         Windows.SetWindowText(hwnddlg, RC_LISTOFMESS);
         AltPListView := CreateListView2(0, 0, 790, 350, hwnddlg);
 
-        asm
-        mov edx,[TerminalFont]
-        call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT (EAX = AltPListView above).
+        tWM_SETFONT(AltPListView, TerminalFont);
         ListView_SetExtendedListViewStyle(AltPListView, LVS_EX_GRIDLINES or LVS_EX_FULLROWSELECT);
         elvc.Mask := LVCF_TEXT or LVCF_WIDTH or LVCF_FMT;
         elvc.fmt := LVCFMT_LEFT;
@@ -204,13 +202,10 @@ begin
         elvi.iItem := TempInt;
         elvi.iSubItem := 0;
 
-        asm
-            push ModeString
-        end;
-
-        wsprintf(wsprintfBuffer, OthermessagesArray[TempInt].omCommand);
-        asm add esp,12
-        end;
+        // Issue #997: asm wsprintf-push -> TF.Format. The format is a RUNTIME
+        // string (omCommand, e.g. 'CQ %s EXCHANGE'); TF.Format == wsprintfA so the
+        // runtime C format + ModeString work directly.
+        Format(wsprintfBuffer, OthermessagesArray[TempInt].omCommand, ModeString);
         elvi.pszText := wsprintfBuffer;
 
         ListView_InsertItem(AltPListView, elvi);
@@ -275,17 +270,9 @@ begin
       TempInt := Ord(Key) - Ord(F1) + 1 - 24;
     end;
 
-    asm
-            mov eax, TempInt
-            push eax
-            push ButtonString
-            push ModeString
-            push OpModeString
-    end;
-
-    wsprintf(wsprintfBuffer, '%s %s MEMORY %sF%u');
-    asm add esp,24
-    end;
+    // Issue #997: asm wsprintf-push -> TF.Format. cdecl-reverse pushes ->
+    // OpModeString, ModeString, ButtonString, TempInt (%s %s MEMORY %sF%u).
+    Format(wsprintfBuffer, '%s %s MEMORY %sF%u', OpModeString, ModeString, ButtonString, TempInt);
 
     elvi.pszText := wsprintfBuffer;
     ListView_InsertItem(AltPListView, elvi);
