@@ -8081,14 +8081,8 @@ begin
     FILE_FLAG_SEQUENTIAL_SCAN, 0);
   SetFilePointer(h, 0, nil, FILE_END);
 
-  asm
- push Text
- call windows.GetTickCount
- push eax
-  end;
-  r := wsprintf(TempBuffer1, '%u %s'#13#10);
-  asm add esp,16
-  end;
+  // Issue #997: asm wsprintf-push -> TF.Format (cdecl-reverse: GetTickCount, Text).
+  r := Format(TempBuffer1, '%u %s'#13#10, Windows.GetTickCount, Text);
   Windows.WriteFile(h, TempBuffer1, r, t, nil);
   CloseHandle(h);
   // AddStringToTelnetConsole(Text, tstSend);
@@ -8111,7 +8105,7 @@ end;
 procedure InvertBooleanCommand(Command: PBoolean);
 var
   i: integer;
-  p: Pointer;
+  cmdProc: procedure;   // Issue #997: typed call of a Pointer change-handler
 begin
   for i := 1 to CommandsArraySize do
     if CFGCA[i].crAddress = Command then
@@ -8119,10 +8113,11 @@ begin
       InvertBoolean(Command^);
       Windows.WritePrivateProfileString(_COMMANDS, CFGCA[i].crCommand,
         BA[Command^], TR4W_INI_FILENAME);
-      p := CommandsProcArray[CFGCA[i].crP];
-      asm
- call p
-      end;
+      // Issue #997: asm `call p` (untyped Pointer change-handler) -> typed call,
+      // nil-guarded against a nil entry in the CommandsProcArray definition.
+      @cmdProc := CommandsProcArray[CFGCA[i].crP];
+      if Assigned(cmdProc) then
+         cmdProc;
     end;
 end;
 
