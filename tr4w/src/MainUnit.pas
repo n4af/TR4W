@@ -5783,8 +5783,7 @@ begin
     ListView_InsertItem(ListViewHandle, elvi);
     elvi.iSubItem := ColumnsArray[logColCallsign].pos; //(logColCallsign);
     elvi.pszText := @RXData.Prefix;
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if RXData.ceQSO_Skiped then
@@ -5805,10 +5804,7 @@ begin
 
   // P1 := BandStringsArray[RXData.Band];
   // P2 := ModeString[RXData.Mode];
-  asm
-// push p2
-// push p1
-  end;
+  // Issue #997: removed empty asm (commented push p1/p2); Format below does it.
   Format(LogDisplayBuffer, TWO_STRINGS, BandStringsArray[RXData.Band],
     ModeStringArray[RXData.Mode]);
 
@@ -5831,21 +5827,18 @@ begin
   elvi.iSubItem := ColumnsArray[logColDate].pos;
   // elvi.pszText := LogDisplayBuffer;
   elvi.pszText := tGetDateFormat(RXData.tSysTime);
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   Format(LogDisplayBuffer, '%02d:%02d', RXData.tSysTime.qtHour,
     RXData.tSysTime.qtMinute);
   elvi.iSubItem := ColumnsArray[logColTime].pos; //Ord(logColTime);
   elvi.pszText := LogDisplayBuffer;
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   CID_TWO_BYTES[0] := RXData.ceComputerID;
   elvi.iSubItem := ColumnsArray[logColComputerID].pos; //Ord(logColComputerID);
   elvi.pszText := @CID_TWO_BYTES;
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   if RXData.ceRecordKind = rkNote then
     Exit;
@@ -5853,8 +5846,7 @@ begin
   begin
     elvi.iSubItem := ColumnsArray[logColNumberSent].pos; //Ord(logColNumberSent);
     elvi.pszText := inttopchar(RXData.NumberSent {+10020});
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   elvi.iSubItem := ColumnsArray[logColCallsign].pos; //Ord(logColCallsign);
@@ -5866,8 +5858,7 @@ begin
   end
   else
     elvi.pszText := @RXData.Callsign[1]; //@RXData.Callsign[1];
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   if ColumnsArray[logColNumberReceive].Enable then
     if RXData.NumberReceived <> -1 then
@@ -5875,8 +5866,7 @@ begin
       elvi.iSubItem := ColumnsArray[logColNumberReceive].pos;
       //Ord(logColNumberReceive);
       elvi.pszText := inttopchar(RXData.NumberReceived);
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
 
   if RXData.ceRecordKind in [rkQTCR, rkQTCS] then
@@ -5884,13 +5874,11 @@ begin
     elvi.iSubItem := ColumnsArray[logColQTC].pos; //Ord(logColQTC);
     Format(LogDisplayBuffer, '%04d %s', RXData.NumberSent, @RXData.Kids[1]);
     elvi.pszText := LogDisplayBuffer;
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
     elvi.iSubItem := ColumnsArray[logColNumberSent].pos; //Ord(logColNumberSent);
     elvi.pszText := @RXData.RandomCharsReceived[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     Exit;
   end;
 
@@ -5898,16 +5886,14 @@ begin
   begin
     elvi.iSubItem := ColumnsArray[logColClass].pos; //Ord(logColDXMult);
     elvi.pszText := @RXData.ceClass[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColDXMult].Enable then
   begin
     elvi.iSubItem := ColumnsArray[logColDXMult].pos; //Ord(logColDXMult);
     elvi.pszText := @RXData.DXQTH[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColZoneMult].Enable then
@@ -5916,8 +5902,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColZoneMult].pos; //Ord(logColZoneMult);
       elvi.pszText := inttopchar(RXData.Zone);
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
 
@@ -5928,16 +5913,14 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColPower].pos;
       elvi.pszText := @RXData.Power[1];
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end
   else if (ColumnsArray[logColFOC].Enable) then
   begin
     elvi.iSubItem := ColumnsArray[logColFOC].pos;
     elvi.pszText := @RXData.Power[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   end;
 
@@ -5945,8 +5928,7 @@ begin
   begin
     elvi.iSubItem := ColumnsArray[logColPrefixMult].pos; //Ord(logColPrefixMult);
     elvi.pszText := @RXData.Prefix[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   Mults := 0;
@@ -5985,8 +5967,7 @@ begin
     MultString[Mults] := #0;
     elvi.iSubItem := ColumnsArray[logColTotalMults].pos; //Ord(logColTotalMults);
     elvi.pszText := MultString; //inttopchar(Mults);
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColPrecedence].Enable then
@@ -5994,8 +5975,7 @@ begin
     elvi.iSubItem := ColumnsArray[logColPrecedence].pos; //rd(logColPrecedence);
     CID_TWO_BYTES[0] := RXData.Precedence;
     elvi.pszText := CID_TWO_BYTES;
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColCheck].Enable then
@@ -6004,8 +5984,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColCheck].pos; //Ord(logColCheck);
       elvi.pszText := inttopchar(RXData.Check);
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
 
@@ -6015,8 +5994,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColChapter].pos; //Ord(logColCheck);
       elvi.pszText := @RXData.Chapter[1];
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
 
@@ -6032,14 +6010,12 @@ begin
     end
     else
       elvi.pszText := @RXData.QTHString[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   elvi.iSubItem := ColumnsArray[logColPoints].pos; //Ord(logColPoints);
   elvi.pszText := inttopchar(RXData.QSOPoints);
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   if ColumnsArray[logColAge].Enable then
   begin
@@ -6047,8 +6023,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColAge].pos; //Ord(logColAge);
       elvi.pszText := inttopchar(RXData.Age);
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
 
@@ -6056,8 +6031,7 @@ begin
   begin
     elvi.iSubItem := ColumnsArray[logColKids].pos; //Ord(logColAge);
     elvi.pszText := @RXData.Kids[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColName].Enable then
@@ -6066,8 +6040,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColName].pos; //Ord(logColName);
       elvi.pszText := @RXData.Name[1];
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
   if RXData.ceSearchAndPounce then
@@ -6076,32 +6049,28 @@ begin
     elvi.iSubItem := ColumnsArray[logColSearchAndPounce].pos;
     //Ord(logColSearchAndPounce);
     elvi.pszText := '$';
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if RXData.ceDupe then
   begin
     elvi.iSubItem := ColumnsArray[logColDupe].pos; //Ord(logColDupe);
     elvi.pszText := 'D';
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if RXData.Frequency <> 0 then
   begin
     elvi.iSubItem := ColumnsArray[logColFreq].pos; //Ord(logColFreq);
     elvi.pszText := FreqToPChar {FreqToPCharWithoutHZ}(RXData.Frequency);
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if RXData.ceOperator[0] <> #0 then
   begin
     elvi.iSubItem := ColumnsArray[logColOperator].pos;
     elvi.pszText := RXData.ceOperator;
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   // Issue #750: stash the X-QSO flag on the just-built row so the
@@ -6113,10 +6082,7 @@ begin
 
   Exit;
 
-  setitem:
-  ListView_SetItem(ListViewHandle, elvi);
-  asm ret
-  end;
+  // Issue #997: setitem label-subroutine removed; call sites inline ListView_SetItem.
 end;
 
 procedure LogEnsureVisible;
