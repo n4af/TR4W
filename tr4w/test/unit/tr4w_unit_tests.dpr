@@ -50,7 +50,9 @@ uses
    uTestUtilsFile       in 'uTestUtilsFile.pas',
    uTestADIFRegression  in 'uTestADIFRegression.pas',
    uFreqTimeFormat      in '..\..\src\uFreqTimeFormat.pas',
-   uTestFreqTimeFormat  in 'uTestFreqTimeFormat.pas';
+   uTestFreqTimeFormat  in 'uTestFreqTimeFormat.pas',
+   uStrSearch           in '..\..\src\uStrSearch.pas',
+   uTestStrSearch       in 'uTestStrSearch.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -75,6 +77,7 @@ begin
    RegisterSuite(TUtilsFileTests.Create('UtilsFile'));
    RegisterSuite(TADIFRegressionTests.Create('ADIFRegression'));
    RegisterSuite(TFreqTimeFormatTests.Create('FreqTimeFormat'));
+   RegisterSuite(TStrSearchTests.Create('StrSearch'));
 
    if RunAllSuites then
       begin

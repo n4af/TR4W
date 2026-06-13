@@ -118,8 +118,8 @@ function DeleteSlashes(p: PChar): PChar;
 function SetParameterInArray(ArrayPtr: PInteger; ArrayLength: integer; aVar: PInteger; ValueToSet: integer): boolean;
 function GetGUID: string;
 function GetValueFromArray(PCharArrayAddress: PChar; ArraySize: Byte; CMD: PChar): Byte;
-function StrPos(const Str1, Str2: PChar): PChar; ASSEMBLER;
-function StrPosPartial(const Str1, Str2: PChar): PChar; ASSEMBLER;
+function StrPos(const Str1, Str2: PChar): PChar;
+function StrPosPartial(const Str1, Str2: PChar): PChar;
 function GetDialogItemText(h: HWND; Control: integer): ShortString;
 function GetNumberFromCharBuffer(p: PChar): integer;
 procedure tLoadKeyboardLayout;
@@ -247,7 +247,7 @@ const
 
 implementation
 
-uses MainUnit, uFreqTimeFormat;   // Issue #997: freq/time formatters extracted + golden-tested
+uses MainUnit, uFreqTimeFormat, uStrSearch;   // Issue #997: freq/time formatters + PChar search helpers extracted + golden-tested
 function Format(Output: PChar; Format: PChar; c: Char): integer; external user32 Name 'wsprintfA';
 
 function Format(Output: PChar; Format: PChar; s1: PChar; u1: integer; u2: integer; u3: integer; u4: integer; u5: integer; u6: integer; s2: PChar; s3: PChar): integer; external user32 Name 'wsprintfA';
@@ -726,22 +726,9 @@ begin
 end;
 
 function StrComp_JOH_IA32_6(const Str1, Str2: PChar): integer;
-asm
-  sub   eax, edx
-  jz    @@Exit
-@@Loop:
-  movzx ecx, [eax+edx]
-  cmp   cl, [edx]
-  jne   @@SetResult
-  inc   edx
-  test  cl, cl
-  jnz   @@Loop
-  xor   eax, eax
-  ret
-@@SetResult:
-  sbb   eax, eax
-  or    al, 1
-@@Exit:
+begin
+  // Issue #997: extracted to uStrSearch (golden-master tested).
+  Result := uStrSearch.StrComp_JOH_IA32_6(Str1, Str2);
 end;
 
 procedure tLoadKeyboardLayout;
@@ -875,108 +862,16 @@ end;
 
 
 
-function StrPosPartial(const Str1, Str2: PChar): PChar; assembler;
-asm
-        PUSH    EDI
-        PUSH    ESI
-        PUSH    EBX
-
-        OR      EAX,EAX//str1
-        JE      @@2
-        OR      EDX,EDX//str2
-        JE      @@2
-
-        MOV     EBX,EAX
-        MOV     EDI,EDX
-        XOR     AL,AL
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        DEC     ECX
-        JE      @@2
-
-        MOV     ESI,ECX     //length of str2
-        MOV     EDI,EBX
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        SUB     ECX,ESI     //if str2 > str1
-        JBE     @@2
-        MOV     EDI,EBX     //str1 to edi
-        LEA     EBX,[ESI-1] //length str1
-@@1:    MOV     ESI,EDX     //str2 to esi
-        LODSB               //mov esi to eax, inc esi
-        REPNE   SCASB       //find [eax] in [edi] ,inc edi, dec ecx
-        JNE     @@2
-        MOV     EAX,ECX
-        PUSH    EDI
-        MOV     ECX,EBX
-
-@@4:    CMPSB               //compare edi with esi
-        JE      @@SAME
-        CMP     BYTE PTR [ESI-1],'?'
-        JNZ     @@5
-@@SAME:
-        DEC     ECX
-        JNE     @@4
-@@5:
-        POP     EDI
-        MOV     ECX,EAX
-        JNE     @@1
-        LEA     EAX,[EDI-1]
-        JMP     @@3
-@@2:    XOR     EAX,EAX
-@@3:    POP     EBX
-        POP     ESI
-        POP     EDI
+function StrPosPartial(const Str1, Str2: PChar): PChar;
+begin
+  // Issue #997: extracted to uStrSearch (golden-master tested).
+  Result := uStrSearch.StrPosPartial(Str1, Str2);
 end;
 
-function StrPos(const Str1, Str2: PChar): PChar; assembler;
-asm
-        PUSH    EDI
-        PUSH    ESI
-        PUSH    EBX
-
-        OR      EAX,EAX//str1
-        JE      @@2
-        OR      EDX,EDX//str2
-        JE      @@2
-
-        MOV     EBX,EAX
-        MOV     EDI,EDX
-        XOR     AL,AL
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        DEC     ECX
-        JE      @@2
-
-        MOV     ESI,ECX     //length of str2
-        MOV     EDI,EBX
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        SUB     ECX,ESI     //if str2 > str1
-        JBE     @@2
-        MOV     EDI,EBX     //str1 to edi
-        LEA     EBX,[ESI-1] //length str1
-@@1:    MOV     ESI,EDX     //str2 to esi
-        LODSB               //mov esi to eax, inc esi
-        REPNE   SCASB       //find [eax] in [edi] ,inc edi, dec ecx
-        JNE     @@2
-        MOV     EAX,ECX
-        PUSH    EDI
-        MOV     ECX,EBX
-        REPE    CMPSB       //compare edi with esi
-        POP     EDI
-        MOV     ECX,EAX
-        JNE     @@1
-        LEA     EAX,[EDI-1]
-        JMP     @@3
-@@2:    XOR     EAX,EAX
-@@3:    POP     EBX
-        POP     ESI
-        POP     EDI
+function StrPos(const Str1, Str2: PChar): PChar;
+begin
+  // Issue #997: extracted to uStrSearch (golden-master tested).
+  Result := uStrSearch.StrPos(Str1, Str2);
 end;
 
 function GetValueFromArray(PCharArrayAddress: PChar; ArraySize: Byte; CMD: PChar): Byte;
