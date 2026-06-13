@@ -123,20 +123,12 @@ begin
   if tr4w_WindowsArray[tw_INTERCOMWINDOW_INDEX].WndHandle = 0 then
     ProcessMenu(menu_windows_intercom);
 
-  asm
-  push mes
-
-  xor eax,eax
-  mov al,byte ptr  Sender
-  push eax
-
-  xor eax,eax
-  call GetTimeString
-  push eax
-  end;
-  stored := wsprintf(wsprintfBuffer, '%s %C :   %s');
-  asm add esp,20
-  end;
+  // Issue #997: manual cdecl varargs push -> TF.Format (itself wsprintfA, so
+  // identical marshalling). The asm pushes were right-to-left, so the format
+  // arg order is: GetTimeString (%s), Sender (%C), mes (%s). Sender is pushed
+  // zero-extended (xor eax,eax; mov al,Sender) -> Ord(Sender). This binds the
+  // (PChar, integer, PChar) overload.
+  stored := TF.Format(wsprintfBuffer, '%s %C :   %s', GetTimeString, Ord(Sender), mes);
 
   if IntercomFileenable then
   begin
