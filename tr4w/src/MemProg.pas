@@ -101,10 +101,8 @@ begin
           end;
 
           MessagesValues[I] := CreateWindowEx(0, StaticPChar, nil, SS_NOPREFIX or SS_LEFTNOWORDWRAP + WS_CHILD + WS_VISIBLE, Left, Top, 600, LineHeight - 2 + 2, hwnddlg, 0, hInstance, nil);
-          asm
-                  mov edx,[TerminalFont]
-                  call tWM_SETFONT
-          end;
+          // Issue #997: asm tWM_SETFONT (EAX = MessagesValues[I] above).
+          tWM_SETFONT(MessagesValues[I], TerminalFont);
 
             //                  if RegisterHotKey(hwnddlg, I + 100, 0, I) = False then ShowMessage(inttopchar(I));
           if RegisterHotKey(hwnddlg, I, 0, I) = False then
@@ -116,16 +114,12 @@ begin
           RegisterHotKey(hwnddlg, I + 24, MOD_ALT, I);
         end;
         MsgEditLabelHWND := CreateWindowEx(0, StaticPChar, 'Msg =', {SS_SUNKEN + } SS_NOPREFIX or SS_LEFTNOWORDWRAP + WS_CHILD {+ WS_VISIBLE}, 5, 400 - 40, 70, LineHeight, hwnddlg, 73, hInstance, nil);
-        asm
-                  mov edx,[TerminalFont]
-                  call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT (EAX = MsgEditLabelHWND above).
+        tWM_SETFONT(MsgEditLabelHWND, TerminalFont);
 
         MsgEditHWND := CreateWindowEx(0, EditPChar, nil, ES_AUTOHSCROLL or {WS_HSCROLL or} ES_UPPERCASE or {WS_BORDER + } WS_CHILD { WS_VISIBLE}, 75, 400 - 40, 510, LineHeight, hwnddlg, 88, hInstance, nil);
-        asm
-            mov edx,[TerminalFont]
-            call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT (EAX = MsgEditHWND above).
+        tWM_SETFONT(MsgEditHWND, TerminalFont);
         OldMsgEditProc := Pointer(Windows.SetWindowLong(MsgEditHWND, GWL_WNDPROC, integer(@NewMsgEditProc)));
         if MesWindow = ExMsgWin then ShowExFunctionKeyStatus;
         if MesWindow = CQMsgWin then ShowCQFunctionKeyStatus;
