@@ -1356,13 +1356,9 @@ begin
     SSN:
       if StartSendingNowKey <> ' ' then
       begin
-        asm
-        movzx eax, StartSendingNowKey
-        push eax
-        end;
-        wsprintf(wsprintfBuffer, SSN1);
-        asm add esp,12
-        end;
+        // Issue #997: asm wsprintf-push -> TF.Format. SSN1 = 'Use a %c key...';
+        // the Format(...; c: Char) overload handles %c (StartSendingNowKey is Char).
+        Format(wsprintfBuffer, SSN1, StartSendingNowKey);
         RESULT := wsprintfBuffer;
       end
       else
