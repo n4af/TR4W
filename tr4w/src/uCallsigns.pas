@@ -557,11 +557,11 @@ begin
 
   P1 := BandStringsArray[Band];
   P2 := ModeStringarray[Mode];
-  asm
-  push p2
-  push p1
-  end;
- 
+  // Issue #997: removed orphaned `asm push p2/push p1` -- leftover from the
+  // earlier conversion below; the SysUtils.Format call replaced the wsprintf
+  // that consumed these pushes, and the matching `add esp,16` was already
+  // commented out, so the pushes fed nothing (absorbed by the stack frame).
+
   // Issue #997 - wsprintf-push formatting converted to SysUtils.Format
   StrPCopy(wsprintfBuffer, SysUtils.Format(TC_DUPESHEET+' - %s',
     [string(BandStringsArray[Band]), string(ModeStringArray[Mode]), string(PChar(@Radio.RadioName[1]))]));
