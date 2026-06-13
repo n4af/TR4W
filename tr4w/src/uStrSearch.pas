@@ -132,28 +132,19 @@ begin
   Result := SysUtils.StrPos(Str1, Str2);
 end;
 
-procedure StrU(var Str: ShortString); assembler;
-asm
-        PUSH    ECX
-        PUSH    ESI
-        MOV     ESI , Str
-        LODSB
-        XOR     ECX , ECX
-        XCHG    CL,AL
-        INC     ECX
-        ADD     ECX,ESI
-@@1:    LODSB
-        CMP     ECX, ESI
-        JE      @@2
-        CMP     AL,'a'
-        JB      @@1
-        CMP     AL,'z'
-        JA      @@1
-        SUB     AL,20H
-        MOV     [ESI-1],AL
-        JMP     @@1
-@@2:    POP     ESI
-        POP     ECX
+procedure StrU(var Str: ShortString);
+var
+  i: integer;
+begin
+  // Upcase only ASCII 'a'..'z' in place (subtract $20); leave every other
+  // byte -- digits, punctuation and >127 extended/code-page chars -- alone,
+  // exactly as the original asm (CMP 'a'/'z'; JB/JA skip). Equivalence frozen
+  // by uTestStrSearch.
+  for i := 1 to Length(Str) do
+    begin
+    if Str[i] in ['a'..'z'] then
+      Str[i] := Chr(Ord(Str[i]) - $20);
+    end;
 end;
 
 end.
