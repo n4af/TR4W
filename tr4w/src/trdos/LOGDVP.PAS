@@ -459,14 +459,9 @@ begin
         for i := 1 to length(DVPMessagesArray[Index]) do
         begin
           TempChar := DVPMessagesArray[Index][i];
-          asm
-          xor eax,eax
-          mov al,TempChar
-          push eax
-          end;
-          wsprintf(WAVFile, 'LETTERSANDNUMBERS\%C.WAV');
-          asm add esp,12
-          end;
+          // Issue #997: asm wsprintf-push -> TF.Format. %C -> %c (Char overload);
+          // TempChar is an ASCII letter/digit/'_', so %c output == the old %C.
+          Format(WAVFile, 'LETTERSANDNUMBERS\%c.WAV', TempChar);
           if PlayWAVFile(WAVFile, True) = prExitThread then goto ExitLabel;
         end;
       end;
@@ -488,14 +483,8 @@ begin
       begin
         TempChar := DVPMessagesArray[Index][i];
         if TempChar = '/' then TempChar := '_';
-        asm
-        xor eax,eax
-        mov al,TempChar
-        push eax
-        end;
-        wsprintf(WAVFile, 'LETTERSANDNUMBERS\%C.WAV');
-        asm add esp,12
-        end;
+        // Issue #997: asm wsprintf-push -> TF.Format. %C -> %c (Char overload).
+        Format(WAVFile, 'LETTERSANDNUMBERS\%c.WAV', TempChar);
         if PlayWAVFile(WAVFile, True) = prExitThread then goto ExitLabel;
       end;
     end;
