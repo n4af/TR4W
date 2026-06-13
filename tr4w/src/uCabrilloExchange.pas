@@ -47,8 +47,10 @@ type
 // already-formatted RST display strings; HisQTH is the his-QTH already selected
 // by PostUnit (DoingDomesticMults / LiteralDomesticQTH / ... ); PrevQTH is the
 // previous QSO's QTHString (RSTAndPostalCode); pnr is carried across QSOs
-// (QSONumberAndPreviousQSONumber).  Result is always True (mirrors the old
-// fall-through behaviour).
+// (QSONumberAndPreviousQSONumber).  Result is True for every handled
+// ActiveExchange; it is False only when ActiveExchange is unhandled (Issue
+// #1043), in which case both columns are set to an "ERROR EXCHANGE NOT
+// HANDLED" marker instead of being written silently.
 function FormatCabrilloExchange(
     ActiveExchange : ExchangeType;
     Contest        : ContestType;
@@ -61,6 +63,15 @@ function FormatCabrilloExchange(
     out   MyEx, HisEx : string) : boolean;
 
 implementation
+
+uses
+  Log4D;   // Issue #1043: lets this unit log an unhandled ActiveExchange. This
+           // is the one dependency beyond VC/SysUtils; Log4D is self-contained
+           // and already linked by the unit-test harness (see uADIF), so the
+           // dependency-light/testable nature is preserved.
+
+var
+  logger: TLogLogger;
 
 function StringIsAllNumbersLocal(const s: string): boolean;
 var
@@ -484,7 +495,25 @@ begin
            SetHisEx('%-3s %.3u', [RSTReceived, nrReceived]);
            end;
       end;
+    else
+       begin
+       // Issue #1043: no contest should reach here. Rather than silently writing
+       // a blank/garbage exchange (the worst smell), log it and write a loud
+       // marker into BOTH columns so the offending QSO line is obvious in the
+       // Cabrillo output and gets reported. (PostUnit uppercases HisEx, so the
+       // marker is all-caps to keep both columns identical.)
+       logger.Error(SysUtils.Format(
+         'FormatCabrilloExchange: unhandled ActiveExchange %d (contest "%s") -- ' +
+         'wrote ERROR marker to the Cabrillo line. See Issue #1043.',
+         [Ord(ActiveExchange), ContestName]));
+       MyEx   := 'ERROR EXCHANGE NOT HANDLED';
+       HisEx  := 'ERROR EXCHANGE NOT HANDLED';
+       Result := False;
+       end;
   end;
 end;
+
+initialization
+  logger := TLogLogger.GetLogger('uCabrilloExchange');
 
 end.
