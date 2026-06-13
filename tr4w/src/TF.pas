@@ -1030,6 +1030,12 @@ end;
 
 //function _Pow10(val: Extended; Power: Integer): Extended;
 
+// Issue #997: DEFERRED to the Delphi 12 mirror clone. This is Borland's RTL
+// internal _Pow10 (FPU + power-of-10 tables), called only by ValExt below.
+// In D12, ValExt collapses to the RTL `Val` intrinsic and this helper is
+// deleted outright. Converting the float-parse path now would need a careful
+// golden harness (precision + the `code` error index + whitespace handling)
+// and risks a subtle CTY.DAT lat/lon regression; not worth it in D7.
 procedure _Pow10;
 asm
 // -> FST(0)  val
@@ -1182,6 +1188,14 @@ asm
            DW  $59F0,$6ED5,$1162,$AE35,$7BCA        // 10**4608
 end;
 
+// Issue #997: DEFERRED to the Delphi 12 mirror clone. This is Borland's RTL
+// internal _ValExt (string -> extended with a `code` error index), used only
+// by uCTYDAT to parse CTY.DAT latitude/longitude. In D12 this becomes the RTL
+// `Val(Source, Result, code)` intrinsic (which exists in D7 too), retiring
+// both this body and _Pow10. Deferred because proving float-parse equivalence
+// (precision, the `code` semantics, leading/trailing whitespace) needs a
+// dedicated golden harness, and a lat/lon parse regression silently corrupts
+// beam-heading/distance math.
 function ValExt(Source: PChar; var code: integer): extended;
 //function _ValExt( s: AnsiString; VAR code: Integer ) : Extended;
 //procedure _ValExt;
@@ -1453,7 +1467,7 @@ begin
 
   if not NewLine then
   begin
-    asm nop end;
+    // Issue #997: removed a bare `asm nop end;` no-op anchor (no codegen effect).
     goto LastLine;
   end;
 
