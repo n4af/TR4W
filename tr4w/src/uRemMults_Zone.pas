@@ -63,16 +63,12 @@ begin
         end;
 
         Index := SendMessage(DS^.hwndItem, LB_GETITEMDATA, DS^.ItemID, 0);
-        asm
-        mov eax, Index
-        cmp byte ptr [ActiveZoneMult],EUHFCYear
-        jz @@1
-        add eax,1
-        @@1:
-        push eax
-        end;
-        wsprintf(RemMultsBuf, '%02u');
-        asm add esp,12 end;
+        // Issue #997: asm control-flow + wsprintf -> Pascal. The zone label is
+        // Index, +1 unless ActiveZoneMult = EUHFCYear (the asm's `jz @@1` skip).
+        if ActiveZoneMult = EUHFCYear then
+           Format(RemMultsBuf, '%02u', Index)
+        else
+           Format(RemMultsBuf, '%02u', Index + 1);
         p := @RemMultsBuf;
 
         I := Windows.lstrlen(p);
@@ -96,10 +92,8 @@ begin
     WM_INITDIALOG:
       begin
         RemainingMultsZoneWindowHandle := GetDlgItem(hwnddlg, 101);
-        asm
-        mov edx,[MainFixedFont]
-        call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT (EAX = RemainingMultsZoneWindowHandle above).
+        tWM_SETFONT(RemainingMultsZoneWindowHandle, MainFixedFont);
         tLB_SETCOLUMNWIDTH(hwnddlg, 40);
         tr4w_WindowsArray[tw_STATIONS_RM_ZONE].WndHandle := hwnddlg;
         VisibleLog.ShowRemainingMultipliers;
