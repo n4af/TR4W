@@ -902,6 +902,11 @@ var
 function CheckCommand(Command: PChar; CustomCMD: ShortString): boolean;
 label
    AdditionalProc;
+type
+   // Issue #997: every AdditionalProcsArray entry is a param-less boolean
+   // function (default register convention); this type lets us call Proc
+   // through a typed cast instead of inline asm.
+   TAdditionalProc = function: Boolean;
 var
    i: integer;
    TempInteger: integer;
@@ -1228,13 +1233,11 @@ begin
                Proc := AdditionalProcsArray[CFGCA[i].crA];
                if Assigned(Proc) then
                   begin
-                  // Issue #997 -- LEFT AS ASM: Proc is an untyped Pointer (not a
-                  // typed proc var) and the block captures the AL boolean return
-                  // into Result.  Not one of the convertible Pattern C cases.
-                  asm
-                     call Proc
-                     mov byte ptr result,al
-                     end;
+                  // Issue #997: was inline asm (`call Proc; mov result,al`).
+                  // Proc is an untyped Pointer into AdditionalProcsArray; every
+                  // entry is a param-less boolean function (register), so a
+                  // typed cast + call is exactly equivalent.
+                  Result := TAdditionalProc(Proc)();
                   end
                else
                   begin
