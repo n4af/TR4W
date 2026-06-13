@@ -109,13 +109,11 @@ begin
           Exit;
         end;
 
-        SendMessage(DS^.hwndItem, LB_GETITEMDATA, DS^.ItemID, 0);
-        asm
-        mov byte ptr rmt,al
-        mov al,0
-        shr eax,$10
-        mov index,eax
-        end;
+        // Issue #997: asm bit-extraction from the LB_GETITEMDATA result (rmt =
+        // low byte, Index = high word) -> Pascal HiWord/LoWord. This is exactly
+        // the commented-out original intent just below (lines 121-122).
+        Index := HiWord(SendMessage(DS^.hwndItem, LB_GETITEMDATA, DS^.ItemID, 0));
+        rmt := RemainingMultiplierType(LoWord(SendMessage(DS^.hwndItem, LB_GETITEMDATA, DS^.ItemID, 0)));
 //if ActiveZoneMult = EUHFCYear then        dec(Index);
 
 //        Index := HiWord(SendMessage(DS^.hwndItem, LB_GETITEMDATA, DS^.ItemID, 0));
@@ -162,18 +160,10 @@ begin
 //              else
               Gradient := not mo.IsZnMult(Index, MultBand, MultMode);
 
-              if Gradient then
-                asm nop end;
-              asm
-                mov eax, Index
-                cmp byte ptr [ActiveZoneMult],EUHFCYear
-                jnz @@1
-//                sub eax,1
-                @@1:
-                push eax
-              end;
-              wsprintf(RemMultsBuf, '%02u');
-              asm add esp,12 end;
+              // Issue #997: removed `if Gradient then asm nop end` (no-op anchor)
+              // and the control-flow asm whose conditional `sub eax,1` was already
+              // commented out -- so it just formatted Index.
+              Format(RemMultsBuf, '%02u', Index);
               p := @RemMultsBuf;
             end;
 {
