@@ -61,6 +61,7 @@ type
       procedure Test_PreviousQSONumber_PnrCarry;
       procedure Test_FrenchDept_AllNumbersBranch;
       procedure Test_FrenchDept_StateBranch;
+      procedure Test_UnhandledExchange_ErrorMarker;
    public
       procedure RunAllTests; override;
    end;
@@ -469,6 +470,20 @@ begin
    CheckEquals('599 GA ', HisEx, 'FrenchDept QTH HisEx');
 end;
 
+procedure TCabrilloExchangeTests.Test_UnhandledExchange_ErrorMarker;
+var rx: ContestExchange; my: TMyStationExchange; pnr: integer; MyEx, HisEx: string; ok: boolean;
+begin
+   BeginTest('Test_UnhandledExchange_ErrorMarker');
+   rx := EmptyRx;  my := EmptyMy;  pnr := 0;
+   // Issue #1043: UnknownExchange is deliberately not in the case, so it hits
+   // the else -- a loud ERROR marker in both columns + Result False, instead of
+   // silently writing a blank exchange.
+   ok := FormatCabrilloExchange(UnknownExchange, GENERALQSO, '', '', rx, my, '599', '599', '', '', 1, pnr, MyEx, HisEx);
+   CheckFalse(ok, 'Unhandled exchange returns False');
+   CheckEquals('ERROR EXCHANGE NOT HANDLED', MyEx,  'Unhandled MyEx marker');
+   CheckEquals('ERROR EXCHANGE NOT HANDLED', HisEx, 'Unhandled HisEx marker');
+end;
+
 // ---------------------------------------------------------------------------
 
 procedure TCabrilloExchangeTests.RunAllTests;
@@ -511,6 +526,7 @@ begin
    Test_PreviousQSONumber_PnrCarry;
    Test_FrenchDept_AllNumbersBranch;
    Test_FrenchDept_StateBranch;
+   Test_UnhandledExchange_ErrorMarker;
 end;
 
 end.

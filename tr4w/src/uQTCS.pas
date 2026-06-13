@@ -102,16 +102,9 @@ begin
     WM_INITDIALOG:
       begin
 //        P2 := PChar(string(QTCCallsign));
-        asm
-//          push p2
-          lea eax,[QTCCallsign+1]
-          push eax
-          lea eax,[QRVString+1]
-          push eax
-        end;
-        wsprintf(wsprintfBuffer, TC_QTC_FOR);
-        asm add esp,16
-        end;
+        // Issue #997: asm wsprintf-push -> TF.Format. TC_QTC_FOR = '%s for %s';
+        // cdecl-reverse pushes -> arg1=QRVString, arg2=QTCCallsign.
+        TF.Format(wsprintfBuffer, TC_QTC_FOR, @QRVString[1], @QTCCallsign[1]);
 
         Windows.SetWindowText(hwnddlg, wsprintfBuffer);
         QTCTXButtonsPChar[1] := @QRVString[1];
@@ -146,16 +139,8 @@ begin
           Number := QTCsToBeSendArray[I].qsNumber;
           Time := QTCsToBeSendArray[I].qsTime;
           p := @QTCsToBeSendArray[I].qsCall[1];
-          asm
-          push Number
-          push p
-          push Time
-          end;
-       //    wsprintf(wsprintfBuffer, '%04u %-13s %u');
-          wsprintf(wsprintfBuffer, '%04u %-8s %u');       // n4af 04.40.2
-
-          asm add esp,20
-          end;
+          // Issue #997: asm wsprintf-push -> TF.Format. cdecl-reverse -> Time, p, Number.
+          TF.Format(wsprintfBuffer, '%04u %-8s %u', Time, p, Number);       // n4af 04.40.2
           {QTC}
           tCreateStaticWindow
             (
@@ -170,14 +155,12 @@ begin
             hwnddlg,
             I + 200
                     );
-          asm
-          mov edx,[MainWindowEditFont]
-          call tWM_SETFONT
-          end;
+          // Issue #997: asm tWM_SETFONT (EAX = the static window just created with
+          // child id I+200) -> re-fetch by id and set its font.
+          tWM_SETFONT(GetDlgItem(hwnddlg, I + 200), MainWindowEditFont);
 
-          asm push i          end;
-          wsprintf(wsprintfBuffer, '&%u');
-          asm add esp,12      end;
+          // Issue #997: asm wsprintf-push -> TF.Format.
+          TF.Format(wsprintfBuffer, '&%u', i);
           {ALT+x}
           tCreateButtonWindow
             (
@@ -265,13 +248,8 @@ begin
 
               if QTCWasSend = NumberMessagesToBeSent then
               begin
-                asm
-                push QTCWasSend
-                push QTCNumber
-                end;
-                wsprintf(wsprintfBuffer, 'QSL %u/%u ?');
-                asm add esp,16
-                end;
+                // Issue #997: asm wsprintf-push -> TF.Format (cdecl-reverse: QTCNumber, QTCWasSend).
+                TF.Format(wsprintfBuffer, 'QSL %u/%u ?', QTCNumber, QTCWasSend);
                 if YesOrNo2(tr4whandle, wsprintfBuffer) <> IDOK then Exit;
                 SaveQTCS;
                 Exit;
@@ -286,10 +264,8 @@ begin
             end;
 
           QTC_SEND_QRVSTRING:
-            asm
-            lea eax, [QRVString]
-            call SendStringAndStop
-            end;
+            // Issue #997: asm call SendStringAndStop -> direct call.
+            SendStringAndStop(QRVString);
 
           QTC_SEND_QRV: SendStringAndStop('QRV?');
 
@@ -320,12 +296,8 @@ begin
               if YesOrNo(hwnddlg, TC_DOYOUREALLYWANTSTOPNOW) = IDno then Exit;
               if QTCWasSend = 0 then goto ABORT_QTC;
 
-              asm
-              push QTCWasSend
-              end;
-              wsprintf(wsprintfBuffer, TC_WASMESSAGENUMBERCONFIRMED);
-              asm add esp,12
-              end;
+              // Issue #997: asm wsprintf-push -> TF.Format.
+              TF.Format(wsprintfBuffer, TC_WASMESSAGENUMBERCONFIRMED, QTCWasSend);
 
               if YesOrNo(hwnddlg, wsprintfBuffer) = IDno then dec(QTCWasSend);
               if QTCWasSend < 1 then goto ABORT_QTC;
@@ -388,13 +360,9 @@ begin
   end;
 
   SetLength(TempString, 160);
-  asm
-          push Number
-          push p
-          push Time
-  end;
-  TempString[0] := CHR(wsprintf(@TempString[1], Format));
-  asm add esp,20  end;
+  // Issue #997: asm wsprintf-push -> TF.Format (QUALIFIED -- the local var
+  // `Format` shadows TF.Format). Runtime format `Format`; cdecl-reverse -> Time, p, Number.
+  TempString[0] := CHR(TF.Format(@TempString[1], Format, Time, p, Number));
   SendStringAndStop(TempString);
 end;
 

@@ -2975,17 +2975,10 @@ begin
    DirectionChar := InOutArray[MessageType];
 
    P1 := GetFullTimeString(True);
-   asm
-  push count
-  push p
-  push DirectionChar
-  push p1
-  push bgcolor
-   end;
-   lpNumberOfBytesWritten := wsprintf(TempBuffer1,
-      '<TR%s><TD>%s</TD><TD>%s</TD><TD>%s</TD><TD>%d</TD><TD>');
-   asm add esp,28
-   end;
+   // Issue #997: asm wsprintf -> Format
+   lpNumberOfBytesWritten := StrLen(StrPCopy(TempBuffer1,
+      SysUtils.Format('<TR%s><TD>%s</TD><TD>%s</TD><TD>%s</TD><TD>%d</TD><TD>',
+      [string(bgColor), string(P1), string(DirectionChar), string(p), count])));
    h := CPUKeyer.tDebugFile[port];
    sWriteFile(h, TempBuffer1, lpNumberOfBytesWritten);
    if Count > 0 then
@@ -2993,13 +2986,9 @@ begin
          for i := 0 to Count - 1 do
             begin
                tChar := p[i]; //rig.tBuf[I];
-               asm
-               movzx eax,tChar
-               push eax
-               end;
-               lpNumberOfBytesWritten := wsprintf(TempBuffer1, '[%#x]');
-               asm add esp,12
-               end;
+               // Issue #997: asm wsprintf -> Format (%#x = alt-form hex with 0x prefix; no direct Delphi spec)
+               lpNumberOfBytesWritten := StrLen(StrPCopy(TempBuffer1,
+                  '[0x' + SysUtils.Format('%x', [Ord(tChar)]) + ']'));
                sWriteFile(h, TempBuffer1, lpNumberOfBytesWritten);
             end;
       end;

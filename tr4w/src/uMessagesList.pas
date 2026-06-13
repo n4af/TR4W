@@ -129,7 +129,8 @@ begin
   case Msg of
     WM_SETFONT:
       begin
-        asm nop end;
+        // Issue #997: removed asm nop. WM_SETFONT is intentionally ignored
+        // (Result stays False -> default processing).
       end;
 
     WM_INITDIALOG:

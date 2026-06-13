@@ -492,11 +492,8 @@ begin
   begin
     QTH.Continent := CTY.ctyTable[CountryTable.LastLocatedCountry^.Country].DefaultContinent; // CountryTable.GetContinent(Call); //0fm
     QTH.CountryID := CTY.ctyTable[CountryTable.LastLocatedCountry^.Country].ID; //CountryTable.GetCountryID(QTH.Country);
-  end
-  else
-    asm
-  nop
-    end;
+  end;
+  // Issue #997: removed a no-op `else asm nop end` (no runtime effect).
 //18
   //QTH.Zone := CountryTable.GetZone(Call); //0fm
 //22

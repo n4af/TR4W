@@ -48,7 +48,11 @@ uses
    uTestGridDistance    in 'uTestGridDistance.pas',
    utils_file           in '..\..\src\utils\utils_file.pas',
    uTestUtilsFile       in 'uTestUtilsFile.pas',
-   uTestADIFRegression  in 'uTestADIFRegression.pas';
+   uTestADIFRegression  in 'uTestADIFRegression.pas',
+   uFreqTimeFormat      in '..\..\src\uFreqTimeFormat.pas',
+   uTestFreqTimeFormat  in 'uTestFreqTimeFormat.pas',
+   uStrSearch           in '..\..\src\uStrSearch.pas',
+   uTestStrSearch       in 'uTestStrSearch.pas';
 
 begin
    IsMultiThread := True;  // Match main application setting
@@ -72,6 +76,8 @@ begin
    RegisterSuite(TGridDistanceTests.Create('GridDistance'));
    RegisterSuite(TUtilsFileTests.Create('UtilsFile'));
    RegisterSuite(TADIFRegressionTests.Create('ADIFRegression'));
+   RegisterSuite(TFreqTimeFormatTests.Create('FreqTimeFormat'));
+   RegisterSuite(TStrSearchTests.Create('StrSearch'));
 
    if RunAllSuites then
       begin

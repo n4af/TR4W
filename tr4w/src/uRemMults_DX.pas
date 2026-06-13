@@ -83,10 +83,8 @@ begin
     WM_INITDIALOG:
       begin
         RemainingMultsDXWindowHandle := GetDlgItem(hwnddlg, 101);
-        asm
-        mov edx,[MainFixedFont]
-       call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> TF helper (EAX = RemainingMultsDXWindowHandle above).
+        tWM_SETFONT(RemainingMultsDXWindowHandle, MainFixedFont);
         tLB_SETCOLUMNWIDTH(hwnddlg, 40);
         tr4w_WindowsArray[tw_STATIONS_RM_DX].WndHandle := hwnddlg;
         VisibleLog.ShowRemainingMultipliers;

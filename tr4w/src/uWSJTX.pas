@@ -428,6 +428,7 @@ begin
             end;
           WSJTX_MESSAGETYPE_STATUSV:
             begin
+              logger.trace('[uWSJTX] WSJTX_MESSAGETYPE_STATUSV message received');
               Unpack(AData, index, frequency);
               Unpack(AData, index, mode);
               Unpack(AData, index, DXCall);
@@ -492,12 +493,21 @@ begin
                     VisibleLog.ShowDomesticMultiplierStatus(DXGrid);
                     end;
                   DisplayBeamHeading(DXCall, DXGrid);
-                  end;
-                end;
+                  end
+                else
+                   begin
+                   logger.debug('DXCall (%s) was not equal to sCallSentToWindow (%s)', [DXCall, sCallSentToWindow]);
+                   end;
+                end
+              else
+                 begin
+                 logger.debug('[uWSJTX]Status message received for %s, but Transmitting is false in WSJT-X UDP Message', [DXCall])
+                 end;
               end;
 
           WSJTX_MESSAGETYPE_DECODEV:
             begin {............................................................Decode}
+              logger.trace('[uWSJTX] WSJTX_MESSAGETYPE_DECODEDVV message received');
               // This is where we need to look for CQ decodes and highlight the call by sending back
               // a message to the UDP receiver in WSJT-X.
               Unpack(AData, index, isNew);
@@ -630,10 +640,15 @@ begin
               end;
             end;
 
-          WSJTX_MESSAGETYPE_CLEARV: Self.HandleMessage_Clear;
+          WSJTX_MESSAGETYPE_CLEARV:
+             begin
+             logger.trace('[uWSJTX] WSJTX_MESSAGETYPE_CLEARV message received');
+             Self.HandleMessage_Clear;
+             end;
 
           WSJTX_MESSAGETYPE_QSOV:
             begin {..........I may grab this from the ADIF record so this would not be needed   QSO logged}
+              logger.trace('[uWSJTX] WSJTX_MESSAGETYPE_QSOV message received');
               if logger.IsTraceEnabled then
               begin
                 Unpack(AData, index, date);
@@ -650,7 +665,7 @@ begin
 
               if logger.IsTraceEnabled then
               begin
-                logger.Trace('[uWSJTX] QSO logged: Date:' +
+                logger.Trace('[uWSJTX::WSJTX_MESSAGETYPE_QSOV] QSO logged: Date:' +
                   FormatDateTime('dd-mmm-yyyy hh:mm:ss', date)
                   + ' DX Call:' + DXCall + ' DX Grid:' + DXGrid
                   + ' Frequency:' + IntToStr(frequency) + ' Mode:' + mode +
@@ -669,10 +684,11 @@ begin
             end;
           WSJTX_MESSAGETYPE_WSPRDECODEV:
             begin
-              logger.Trace('[uWSJTX] Received message 10');
+              logger.Trace('[uWSJTX] Received message WSJTX_MESSAGETYPE_WSPRDECODEV');
             end;
           WSJTX_MESSAGETYPE_LOGGEDADIFV:
             begin // Note that ParseADIFRecord has some logic to determine where to put the gridsquare
+              logger.Trace('[uWSJTX] Received message WSJTX_MESSAGETYPE_LOGGEDADIFV');
               if logger.IsDebugEnabled then
               begin
                 logger.debug('[uWSJTX] TotalContacts at start of uWSJTX ADIF UDP message = ' + IntToStr(TotalContacts));

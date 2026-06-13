@@ -977,10 +977,8 @@ begin
 
   MapBase := Windows.MapViewOfFile(MapFin, FILE_MAP_ALL_ACCESS, 0, 0, 0);
   if MapBase = nil then goto 3;
-  asm
-   add eax, SizeOfTLogHeader
-   mov RescoredRXData,eax
-  end;
+  // Issue #997: asm pointer-arith (EAX = MapViewOfFile return) -> explicit.
+  RescoredRXData := Pointer(Cardinal(MapBase) + SizeOfTLogHeader);
 
   1:
 
@@ -1001,11 +999,8 @@ begin
   inc(QSOCounter);
   if QSOCounter <> LogSize then
   begin
-    asm
-    mov eax,RescoredRXData
-    add eax,SizeOfContestExchange
-    mov RescoredRXData,eax
-    end;
+    // Issue #997: asm advance-by-one-record -> explicit pointer arithmetic.
+    RescoredRXData := Pointer(Cardinal(RescoredRXData) + SizeOfContestExchange);
     goto 1;
   end;
 

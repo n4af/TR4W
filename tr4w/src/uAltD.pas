@@ -74,10 +74,9 @@ begin
           AltDEditWindowHandle := CreateEdit( WS_MaximizeBox or WS_MinimizeBOX or  ES_CENTER or ES_UPPERCASE or WS_BORDER,15, 27, 250, 30, hwnddlg, 101);
       //  altdeditwindowhandle := createmodaldialog( 250,15,hwnddlg,@newaltdeditproc,0);
 
-        asm
-    mov edx,[MainWindowEditFont]
-    call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> call the TF helper directly.
+        // EAX held AltDEditWindowHandle (the CreateEdit result above), EDX = font.
+        tWM_SETFONT(AltDEditWindowHandle, MainWindowEditFont);
         CreateOKCancelButtons(hwnddlg);
 
 //        AltDEditWindowHandle := Get101Window(hwnddlg);

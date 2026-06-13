@@ -37,6 +37,8 @@ function MakeLogString(RXData: ContestExchange): Str80;
 
 implementation
 
+uses SysUtils;   // Issue #997: SysUtils.Format for asm-block removal
+
 procedure QTHReceivedHeader(var LogString: Str80; var Underline: Str80);
 
 begin
@@ -692,41 +694,20 @@ begin
   //         LogString := LogString + Exchange.Date
   //       else
 
-  SetLength(TimeString, 9);
   MonthString := MonthTags[Exchange.tSysTime.qtMonth];
   Year := (Exchange.tSysTime.qtYear + 2000) mod 100;
-  asm
-   mov ax,word ptr Year
-   movzx eax,ax
-   push eax
-
-   push MonthString
-
-   movzx eax,Exchange.tSysTime.qtDay
-   push eax
-  end;
-  wsprintf(@TimeString[1], '%02u-%s-%02u');
-  asm add esp,20
-  end;
+  // Issue #997: asm wsprintf-push -> SysUtils.Format, assigned straight to the
+  // string.  Format DD-Mon-YY (e.g. 01-Jan-25); args were pushed cdecl-reverse.
+  TimeString := SysUtils.Format('%.2u-%s-%.2u', [Exchange.tSysTime.qtDay, MonthString, Year]);
   LogString := LogString + TimeString;
 
   //         LogString := LogString + GetDateString;
 
   while length(LogString) < LogEntryHourAddress - 1 do
     LogString := LogString + ' ';
-  SetLength(TimeString, 5);
-  asm
-
-   movzx eax, Exchange.tSysTime.qtMinute
-   push eax
-
-   movzx eax, Exchange.tSysTime.qtHour
-   push eax
-
-  end;
-  wsprintf(@TimeString[1], '%.2hu:%.2hu');
-  asm add esp,16
-  end;
+  // Issue #997: asm wsprintf-push -> SysUtils.Format (HH:MM), assigned straight
+  // to the string.  Args were pushed cdecl-reverse (hour last -> first spec).
+  TimeString := SysUtils.Format('%.2u:%.2u', [Exchange.tSysTime.qtHour, Exchange.tSysTime.qtMinute]);
   LogString := LogString + TimeString;
 
   //   TimeString := IntToStr(Exchange.tSysTime.wHour);

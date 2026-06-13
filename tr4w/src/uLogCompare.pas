@@ -76,10 +76,8 @@ begin
 
         s := PLogFileInformation(lParam);
         LogCompareListView := Get101Window(hwnddlg);
-        asm
-        mov edx,[MainFixedFont]
-        call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> TF helper (EAX = LogCompareListView above).
+        tWM_SETFONT(LogCompareListView, MainFixedFont);
         ListView_SetExtendedListViewStyle(LogCompareListView, LVS_EX_GRIDLINES or LVS_EX_FULLROWSELECT);
 
         elvc.Mask := LVCF_TEXT or LVCF_WIDTH or LVCF_FMT;
@@ -110,13 +108,11 @@ begin
 
         elvi.iSubItem := 1;
         elvi.pszText := inttopchar(s^.liServerLogSize);
-        asm call setitem
-        end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
 
         elvi.iSubItem := 2;
         elvi.pszText := inttopchar(s^.liLocalLogSize);
-        asm call setitem
-        end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
 
         //----------------------------------------------------
 
@@ -130,13 +126,11 @@ begin
 //        I := s^.liServerLogSize - s^.liLocalLogSize;
 
         elvi.pszText := inttopchar(s^.liServerLogSize div SizeOf(ContestExchange) - 1);
-        asm call setitem
-        end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
 
         elvi.iSubItem := 2;
         elvi.pszText := inttopchar(s^.liLocalLogSize div SizeOf(ContestExchange) - 1);
-        asm call setitem
-        end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
 
         //----------------------------------------------------
 {
@@ -152,13 +146,11 @@ begin
 
         elvi.iSubItem := 1;
         elvi.pszText := inttopcharHEX(integer(s^.liSeverCRC32));
-        asm call setitem
-        end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
 
         elvi.iSubItem := 2;
         elvi.pszText := inttopcharHEX(integer(s^.liLocalCRC32));
-        asm call setitem
-        end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
 
         //----------------------------------------------------
 {
@@ -218,7 +210,7 @@ begin
 
         elvi.iSubItem := 2;
         elvi.pszText := inttopchar(tUSQ);
-        asm call setitem end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
         //----------------------------------------------------
 {
         if tUSQE <> 0 then
@@ -233,7 +225,7 @@ begin
 
         elvi.iSubItem := 2;
         elvi.pszText := inttopchar(tUSQE);
-        asm call setitem end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
         //----------------------------------------------------
 {
         if s^.liContest <> Contest then
@@ -248,24 +240,20 @@ begin
 
         elvi.iSubItem := 1;
         elvi.pszText := ContestTypeSA[s^.liContest];
-        asm call setitem
-        end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
 
         elvi.iSubItem := 2;
         elvi.pszText := ContestTypeSA[Contest];
-        asm call setitem
-        end;
+        ListView_SetItem(LogCompareListView, elvi);   // Issue #997: was asm call setitem
 
         DifferentContests := s^.liContest <> Contest;
         if s^.liContest = DUMMYCONTEST then DifferentContests := False;
         if DifferentContests then EnableWindowFalse(hwnddlg, 1);
         //if DifferentContests then Windows.PostMessage(tr4w_WindowsArray[tw_NETWINDOW_INDEX].WndHandle, WM_CLOSE, 0, 0);
         Exit;
-
-        setitem:
-        ListView_SetItem(LogCompareListView, elvi);
-        asm ret
-        end;
+        // Issue #997: removed the `setitem:` label subroutine (was reached via
+        // `asm call setitem` / returned via `asm ret`); call sites now inline
+        // ListView_SetItem(LogCompareListView, elvi) directly.
        // OpenGetServerLogDlg := False;
       end;
 

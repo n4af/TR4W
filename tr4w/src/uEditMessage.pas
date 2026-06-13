@@ -135,11 +135,8 @@ begin
           Windows.SetDlgItemText(hwnddlg, 101 + i, TempBuffer1);
           //if I = 2 then Continue;
 
-          GetDlgItem(hwnddlg, 101 + i);
-          asm
-          mov edx,[TerminalFont]
-          call tWM_SETFONT
-          end;
+          // Issue #997: asm tWM_SETFONT (EAX = GetDlgItem result) -> direct call.
+          tWM_SETFONT(GetDlgItem(hwnddlg, 101 + i), TerminalFont);
 
         end;
         if MesWindow = OtherMsgWin then EnableWindowFalse(hwnddlg, 103);
@@ -366,10 +363,8 @@ begin
     0,
     hInstance,
     nil);
-  asm
-            mov edx,[MainFixedFont]
-            call tWM_SETFONT
-  end;
+  // Issue #997: asm tWM_SETFONT (EAX = HintListView from CreateWindowEx above).
+  tWM_SETFONT(HintListView, MainFixedFont);
   ListView_SetExtendedListViewStyle(HintListView, LVS_EX_GRIDLINES + LVS_EX_FULLROWSELECT);
   AddHintsToHintListBox;
   HintListBoxCreated := True;

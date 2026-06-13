@@ -298,7 +298,7 @@ begin
   wkSendAdminCommand(wkHOSTOPEN);
 //  Sleep(150);
 
-  asm mov dword ptr wkREADBuffer[0], 0 end;
+  PCardinal(@wkREADBuffer[0])^ := 0;   // Issue #997: was asm (zero first dword)
   if wkRead(1) then
   begin
     // The keyer's HOST OPEN response is its firmware-revision byte.
@@ -615,10 +615,9 @@ begin
             nil
             );
 
-          asm
-          mov edx,[MSSansSerifFont]
-          call tWM_SETFONT
-          end;
+          // Issue #997: asm tWM_SETFONT (EAX = the COMBOBOX just created above);
+          // re-fetch it by its child id and set its font.
+          tWM_SETFONT(GetDlgItem(hwnddlg, 100 + High(WK2ComboSettingsNamesArray) + High(WK2SettingsNamesArray) + c), MSSansSerifFont);
         end;
 
         for c := 1 to wkRange do
@@ -635,11 +634,8 @@ begin
         tCB_ADDSTRING(hwnddlg, PORT_CB, 'NONE');
         for c := 1 to 20 do
         begin
-          asm
-          push c
-          end;
-          wsprintf(@wkREADBuffer, 'SERIAL %u');
-          asm add esp,12 end;
+          // Issue #997: asm wsprintf-push -> TF.Format (c is the integer loop var).
+          Format(@wkREADBuffer, 'SERIAL %u', c);
           tCB_ADDSTRING_PCHAR(hwnddlg, PORT_CB, @wkREADBuffer[0]);
         end;
         tCB_SETCURSEL(hwnddlg, PORT_CB, Cardinal(WinKeySettings.wksWinKey2Port));
@@ -999,14 +995,9 @@ var
   msg: string;
 begin
   Result := False;
-  asm
-  xor eax,eax
-  mov al,byte ptr WinKeySettings.wksWinKey2Port
-  push eax
-  end;
-  wsprintf(@wkREADBuffer, _COM);
-  asm add esp,12
-  end;
+  // Issue #997: asm wsprintf-push -> TF.Format (_COM = '\\.\COM%u', same as
+  // tree.pas). wksWinKey2Port is a PortType enum -> Ord = the port number.
+  Format(@wkREADBuffer, _COM, Ord(WinKeySettings.wksWinKey2Port));
   WinKeyHandle := CreateFile(@wkREADBuffer, GENERIC_READ or GENERIC_WRITE, 0, nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL {FILE_FLAG_OVERLAPPED}, 0);
   if WinKeyHandle = INVALID_HANDLE_VALUE then
   begin

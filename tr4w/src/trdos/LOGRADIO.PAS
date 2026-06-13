@@ -1588,11 +1588,11 @@ begin
    if Swap then
       begin
       c := PDWORD(@tYaesuFreq5Bytes)^;
-      asm
-         MOV EAX,c
-         BSWAP EAX
-         MOV c,EAX
-      end;
+      // Issue #997: BSWAP EAX -> reverse the four bytes (c is Cardinal).
+      c := ((c and $000000FF) shl 24) or
+           ((c and $0000FF00) shl 8)  or
+           ((c and $00FF0000) shr 8)  or
+           ((c and $FF000000) shr 24);
       PDWORD(@tYaesuFreq5Bytes)^ := c;
       end;
 end;

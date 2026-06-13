@@ -2123,17 +2123,16 @@ end;
 procedure tAltI;
 var
   lpTranslated: LongBool;
+  Value: Cardinal;
 begin
-  Windows.GetDlgItemInt(tr4whandle, EXCHANGEWINDOWID, lpTranslated, False);
+  Value := Windows.GetDlgItemInt(tr4whandle, EXCHANGEWINDOWID, lpTranslated, False);
   if lpTranslated then
   begin
-    asm
- inc eax
- push eax
-    end;
-    wsprintf(wsprintfBuffer, ' %u');
-    asm add esp,12
-    end;
+    // Issue #997: asm `inc eax; push eax; wsprintf(' %u')` -> TF.Format. The
+    // Integer() cast is load-bearing: it forces the Format(...; i: integer)
+    // wsprintfA overload. Without it, the Cardinal arg can bind a different
+    // overload and the field doesn't update.
+    Format(wsprintfBuffer, ' %u', Integer(Value + 1));
     SetMainWindowText(mweExchange, wsprintfBuffer);
     PlaceCaretToTheEnd(wh[mweExchange]);
   end;
@@ -2764,10 +2763,8 @@ begin
     or LBS_MULTICOLUMN or WS_CHILD or WS_VISIBLE,
     0, EditableLogHeight + ws * 13 {line6}, MainWindowChildsWidth, ws,
     tr4whandle, MainWindowPCLID, hInstance, nil);
-  asm
- mov edx,[MainFont] //hh
- call tWM_SETFONT
-  end;
+  // Issue #997: asm tWM_SETFONT (EAX = wh[mwePossibleCall] above).
+  tWM_SETFONT(wh[mwePossibleCall], MainFont);
   SendMessage(wh[mwePossibleCall], LB_SETCOLUMNWIDTH, 5 * ws {19 * ws2}, 0);
 
   CreateTotalWindow;
@@ -5024,10 +5021,8 @@ begin
         ws * 2,
         tr4whandle,
         999 + c);
-    asm
- mov edx,[MainFont]
- call tWM_SETFONT
-    end;
+    // Issue #997: asm tWM_SETFONT (EAX = TotWinheadHandles[c]; both branches store it).
+    tWM_SETFONT(TotWinheadHandles[c], MainFont);
 
   end;
 
@@ -5388,11 +5383,11 @@ begin
     tPaddleThreadID);
   logger.Info('Created PaddleAndFootSwitch thread with threadid of %d',
     [tPaddleThreadID]);
-  asm
- push THREAD_PRIORITY_LOWEST
- push eax
- call SetThreadPriority
-  end;
+  // Issue #997: asm SetThreadPriority -> Pascal call. The old `push eax` pushed a
+  // stale handle (clobbered by the preceding logger.Info), so this never applied;
+  // now set it on the real handle. BEHAVIOR CHANGE: paddle/foot-switch thread now
+  // actually runs LOWEST.
+  SetThreadPriority(tPaddleFootSwitchThread, THREAD_PRIORITY_LOWEST);
 end;
 {
 procedure TryToLoadRICHED32DLL;
@@ -5424,10 +5419,8 @@ begin
     nil, CallsignExchangeWinStyle,
     ws * 15 {col4}, Top, 13 * ws, MainWindowEditHeight, tr4whandle, ID,
     hInstance, nil);
-  asm
- mov edx,[MainWindowEditFont]
- call tWM_SETFONT
-  end;
+  // Issue #997: asm tWM_SETFONT (EAX = Result above).
+  tWM_SETFONT(Result, MainWindowEditFont);
   SendMessage(Result, EM_LIMITTEXT, 12, 0);
 end;
 
@@ -5676,10 +5669,8 @@ begin
     WC_LISTVIEW, nil, Style + integer(NoColumnHeader) * LVS_NOCOLUMNHEADER, X,
     Y,
     Width, Height, Parent, 0, hInstance, nil);
-  asm
- mov edx,[MainFont];
- call tWM_SETFONT
-  end;
+  // Issue #997: asm tWM_SETFONT (EAX = Result above).
+  tWM_SETFONT(Result, MainFont);
   if DefaultSize then
   begin
     Factor := 17;
@@ -5791,8 +5782,7 @@ begin
     ListView_InsertItem(ListViewHandle, elvi);
     elvi.iSubItem := ColumnsArray[logColCallsign].pos; //(logColCallsign);
     elvi.pszText := @RXData.Prefix;
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if RXData.ceQSO_Skiped then
@@ -5813,10 +5803,7 @@ begin
 
   // P1 := BandStringsArray[RXData.Band];
   // P2 := ModeString[RXData.Mode];
-  asm
-// push p2
-// push p1
-  end;
+  // Issue #997: removed empty asm (commented push p1/p2); Format below does it.
   Format(LogDisplayBuffer, TWO_STRINGS, BandStringsArray[RXData.Band],
     ModeStringArray[RXData.Mode]);
 
@@ -5839,21 +5826,18 @@ begin
   elvi.iSubItem := ColumnsArray[logColDate].pos;
   // elvi.pszText := LogDisplayBuffer;
   elvi.pszText := tGetDateFormat(RXData.tSysTime);
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   Format(LogDisplayBuffer, '%02d:%02d', RXData.tSysTime.qtHour,
     RXData.tSysTime.qtMinute);
   elvi.iSubItem := ColumnsArray[logColTime].pos; //Ord(logColTime);
   elvi.pszText := LogDisplayBuffer;
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   CID_TWO_BYTES[0] := RXData.ceComputerID;
   elvi.iSubItem := ColumnsArray[logColComputerID].pos; //Ord(logColComputerID);
   elvi.pszText := @CID_TWO_BYTES;
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   if RXData.ceRecordKind = rkNote then
     Exit;
@@ -5861,8 +5845,7 @@ begin
   begin
     elvi.iSubItem := ColumnsArray[logColNumberSent].pos; //Ord(logColNumberSent);
     elvi.pszText := inttopchar(RXData.NumberSent {+10020});
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   elvi.iSubItem := ColumnsArray[logColCallsign].pos; //Ord(logColCallsign);
@@ -5874,8 +5857,7 @@ begin
   end
   else
     elvi.pszText := @RXData.Callsign[1]; //@RXData.Callsign[1];
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   if ColumnsArray[logColNumberReceive].Enable then
     if RXData.NumberReceived <> -1 then
@@ -5883,8 +5865,7 @@ begin
       elvi.iSubItem := ColumnsArray[logColNumberReceive].pos;
       //Ord(logColNumberReceive);
       elvi.pszText := inttopchar(RXData.NumberReceived);
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
 
   if RXData.ceRecordKind in [rkQTCR, rkQTCS] then
@@ -5892,13 +5873,11 @@ begin
     elvi.iSubItem := ColumnsArray[logColQTC].pos; //Ord(logColQTC);
     Format(LogDisplayBuffer, '%04d %s', RXData.NumberSent, @RXData.Kids[1]);
     elvi.pszText := LogDisplayBuffer;
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
     elvi.iSubItem := ColumnsArray[logColNumberSent].pos; //Ord(logColNumberSent);
     elvi.pszText := @RXData.RandomCharsReceived[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     Exit;
   end;
 
@@ -5906,16 +5885,14 @@ begin
   begin
     elvi.iSubItem := ColumnsArray[logColClass].pos; //Ord(logColDXMult);
     elvi.pszText := @RXData.ceClass[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColDXMult].Enable then
   begin
     elvi.iSubItem := ColumnsArray[logColDXMult].pos; //Ord(logColDXMult);
     elvi.pszText := @RXData.DXQTH[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColZoneMult].Enable then
@@ -5924,8 +5901,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColZoneMult].pos; //Ord(logColZoneMult);
       elvi.pszText := inttopchar(RXData.Zone);
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
 
@@ -5936,16 +5912,14 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColPower].pos;
       elvi.pszText := @RXData.Power[1];
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end
   else if (ColumnsArray[logColFOC].Enable) then
   begin
     elvi.iSubItem := ColumnsArray[logColFOC].pos;
     elvi.pszText := @RXData.Power[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   end;
 
@@ -5953,8 +5927,7 @@ begin
   begin
     elvi.iSubItem := ColumnsArray[logColPrefixMult].pos; //Ord(logColPrefixMult);
     elvi.pszText := @RXData.Prefix[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   Mults := 0;
@@ -5993,8 +5966,7 @@ begin
     MultString[Mults] := #0;
     elvi.iSubItem := ColumnsArray[logColTotalMults].pos; //Ord(logColTotalMults);
     elvi.pszText := MultString; //inttopchar(Mults);
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColPrecedence].Enable then
@@ -6002,8 +5974,7 @@ begin
     elvi.iSubItem := ColumnsArray[logColPrecedence].pos; //rd(logColPrecedence);
     CID_TWO_BYTES[0] := RXData.Precedence;
     elvi.pszText := CID_TWO_BYTES;
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColCheck].Enable then
@@ -6012,8 +5983,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColCheck].pos; //Ord(logColCheck);
       elvi.pszText := inttopchar(RXData.Check);
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
 
@@ -6023,8 +5993,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColChapter].pos; //Ord(logColCheck);
       elvi.pszText := @RXData.Chapter[1];
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
 
@@ -6040,14 +6009,12 @@ begin
     end
     else
       elvi.pszText := @RXData.QTHString[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   elvi.iSubItem := ColumnsArray[logColPoints].pos; //Ord(logColPoints);
   elvi.pszText := inttopchar(RXData.QSOPoints);
-  asm call setitem
-  end;
+  ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
 
   if ColumnsArray[logColAge].Enable then
   begin
@@ -6055,8 +6022,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColAge].pos; //Ord(logColAge);
       elvi.pszText := inttopchar(RXData.Age);
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
 
@@ -6064,8 +6030,7 @@ begin
   begin
     elvi.iSubItem := ColumnsArray[logColKids].pos; //Ord(logColAge);
     elvi.pszText := @RXData.Kids[1];
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if ColumnsArray[logColName].Enable then
@@ -6074,8 +6039,7 @@ begin
     begin
       elvi.iSubItem := ColumnsArray[logColName].pos; //Ord(logColName);
       elvi.pszText := @RXData.Name[1];
-      asm call setitem
-      end;
+      ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
     end;
   end;
   if RXData.ceSearchAndPounce then
@@ -6084,32 +6048,28 @@ begin
     elvi.iSubItem := ColumnsArray[logColSearchAndPounce].pos;
     //Ord(logColSearchAndPounce);
     elvi.pszText := '$';
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if RXData.ceDupe then
   begin
     elvi.iSubItem := ColumnsArray[logColDupe].pos; //Ord(logColDupe);
     elvi.pszText := 'D';
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if RXData.Frequency <> 0 then
   begin
     elvi.iSubItem := ColumnsArray[logColFreq].pos; //Ord(logColFreq);
     elvi.pszText := FreqToPChar {FreqToPCharWithoutHZ}(RXData.Frequency);
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   if RXData.ceOperator[0] <> #0 then
   begin
     elvi.iSubItem := ColumnsArray[logColOperator].pos;
     elvi.pszText := RXData.ceOperator;
-    asm call setitem
-    end;
+    ListView_SetItem(ListViewHandle, elvi);   // Issue #997: was asm call setitem
   end;
 
   // Issue #750: stash the X-QSO flag on the just-built row so the
@@ -6121,10 +6081,7 @@ begin
 
   Exit;
 
-  setitem:
-  ListView_SetItem(ListViewHandle, elvi);
-  asm ret
-  end;
+  // Issue #997: setitem label-subroutine removed; call sites inline ListView_SetItem.
 end;
 
 procedure LogEnsureVisible;
@@ -6325,10 +6282,10 @@ begin
   MapBase := Windows.MapViewOfFile(MapFin, FILE_MAP_ALL_ACCESS, 0, 0, 0);
   if MapBase = nil then
     goto 3;
-  asm
- add eax, SizeOfTLogHeader
- mov RescoredRXData,eax
-  end;
+  // Issue #997: asm pointer-arith that assumed EAX still held MapViewOfFile's
+  // return -> explicit (same pattern as the advance-by-record near the end of
+  // this function).
+  RescoredRXData := Pointer(Cardinal(MapBase) + SizeOfTLogHeader);
 
   if UpdAction = actGetCRC32 then
   begin
@@ -6495,11 +6452,8 @@ begin
   inc(QSOCounter);
   if QSOCounter <> LogSize then
   begin
-    asm
- mov eax,RescoredRXData
- add eax,SizeOfContestExchange
- mov RescoredRXData,eax
-    end;
+    // Issue #997: asm pointer arith -> Pascal (advance to the next log record).
+    RescoredRXData := Pointer(Cardinal(RescoredRXData) + SizeOfContestExchange);
     goto 1;
   end;
   4:
@@ -6959,11 +6913,8 @@ begin
 
   for i := 0 to l - 4 do
   begin
-  asm
-  mov eax,p
-  add eax,i
-  mov p,eax
-  end;
+  // Issue #997: asm pointer arith -> Pascal (p := p + i, preserved exactly).
+  p := Pointer(Cardinal(p) + Cardinal(i));
   if PInteger(p)^ = 0 then sm;
   end;
   }
@@ -6979,6 +6930,7 @@ begin
     logger.debug('[PutCallToCallWindow] Exiting early because call (%s) = MyCall (%s)', [call, MyCall]);
     exit; // n4af issue 158
   end;
+  logger.debug('Calling Windows.SetWindowText wh[mweCall] to %s',[call]);
   Windows.SetWindowText(wh[mweCall], @Call[1]);
   PlaceCaretToTheEnd(wh[mweCall]);
 end;
@@ -8123,14 +8075,8 @@ begin
     FILE_FLAG_SEQUENTIAL_SCAN, 0);
   SetFilePointer(h, 0, nil, FILE_END);
 
-  asm
- push Text
- call windows.GetTickCount
- push eax
-  end;
-  r := wsprintf(TempBuffer1, '%u %s'#13#10);
-  asm add esp,16
-  end;
+  // Issue #997: asm wsprintf-push -> TF.Format (cdecl-reverse: GetTickCount, Text).
+  r := Format(TempBuffer1, '%u %s'#13#10, Windows.GetTickCount, Text);
   Windows.WriteFile(h, TempBuffer1, r, t, nil);
   CloseHandle(h);
   // AddStringToTelnetConsole(Text, tstSend);
@@ -8153,7 +8099,7 @@ end;
 procedure InvertBooleanCommand(Command: PBoolean);
 var
   i: integer;
-  p: Pointer;
+  cmdProc: procedure;   // Issue #997: typed call of a Pointer change-handler
 begin
   for i := 1 to CommandsArraySize do
     if CFGCA[i].crAddress = Command then
@@ -8161,10 +8107,11 @@ begin
       InvertBoolean(Command^);
       Windows.WritePrivateProfileString(_COMMANDS, CFGCA[i].crCommand,
         BA[Command^], TR4W_INI_FILENAME);
-      p := CommandsProcArray[CFGCA[i].crP];
-      asm
- call p
-      end;
+      // Issue #997: asm `call p` (untyped Pointer change-handler) -> typed call,
+      // nil-guarded against a nil entry in the CommandsProcArray definition.
+      @cmdProc := CommandsProcArray[CFGCA[i].crP];
+      if Assigned(cmdProc) then
+         cmdProc;
     end;
 end;
 

@@ -36,20 +36,20 @@ type
 
 const
 
-  ZVANIYA                               : array[0..7] of PChar = ('б/р', '1', '2', '3', 'КМС', 'МС', 'МСМК', 'ЗМС');
+  ZVANIYA                               : array[0..7] of PChar = ('пїЅ/пїЅ', '1', '2', '3', 'пїЅпїЅпїЅ', 'пїЅпїЅ', 'пїЅпїЅпїЅпїЅ', 'пїЅпїЅпїЅ');
 
   ERMAKFIELDS                           = 8;
 
   eOpFields                             : array[TErmakFields] of PChar = (
-    'Оператор',
-    'Фамилия',
-    'Имя',
-    'Отчество',
-    'Год рожден.',
-    'Разряд',
-    'Позывной',
-    'Категория',
-    'Тренер'
+    'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ',
+    'пїЅпїЅпїЅпїЅпїЅпїЅпїЅ',
+    'пїЅпїЅпїЅ',
+    'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ',
+    'пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ.',
+    'пїЅпїЅпїЅпїЅпїЅпїЅ',
+    'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ',
+    'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ',
+    'пїЅпїЅпїЅпїЅпїЅпїЅ'
     );
 
   eOpFieldsLength                       : array[TErmakFields] of Byte = (
@@ -112,7 +112,7 @@ begin
         Left := FIRSTLEFT;
 //        Windows.SetDlgItemText(hwnddlg, 73, KIR_);
 
-        Windows.SetWindowText(hwnddlg, 'Данные для отчета в формате Ермак');
+        Windows.SetWindowText(hwnddlg, 'пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ');
         CreateOKCancelButtons(hwnddlg);
 
         for TempErmakField := Low(TErmakFields) to High(TErmakFields) do
@@ -137,7 +137,7 @@ begin
             case TempErmakField of
               efOp:
                 begin
-                  Format(TempBuffer2, 'Оператор %u', Operator);
+                  Format(TempBuffer2, 'пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ %u', Operator);
                   tCreateButtonWindow(WS_EX_STATICEDGE, TempBuffer2, BS_AUTOCHECKBOX + WS_CHILD + WS_VISIBLE + WS_TABSTOP, 10, Top, 89, FIELDHEIGTH, hwnddlg, ControlID);
                   Windows.SendDlgItemMessage(hwnddlg, ControlID, BM_SETCHECK, integer(TempBuffer1[0] = '1'), 0);
                 end;
@@ -145,10 +145,9 @@ begin
               efLevel:
                 begin
                   CreateWindowEx(0, COMBOBOX, nil, CBS_DROPDOWNLIST or WS_DISABLED or WS_CHILD or WS_VISIBLE or WS_VSCROLL or WS_TABSTOP, Left, Top, eOpFieldsLength[efLevel], 200, hwnddlg, ControlID, hInstance, nil);
-                  asm
-                  mov edx,[MSSansSerifFont]
-                  call tWM_SETFONT
-                  end;
+                  // Issue #997: asm tWM_SETFONT (EAX = the combobox just created above)
+                  // -> re-fetch that control by its child id (ControlID) and set its font.
+                  tWM_SETFONT(GetDlgItem(hwnddlg, ControlID), MSSansSerifFont);
                   for TempInteger := 0 to 7 do
                     tCB_ADDSTRING_PCHAR(hwnddlg, ControlID, ZVANIYA[TempInteger]);
                   if TempBuffer1[0] in ['0'..'7'] then

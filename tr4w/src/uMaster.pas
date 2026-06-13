@@ -72,9 +72,7 @@ begin
           *
           ((masterrect.Bottom - masterrect.Top) div OneMasterItemHeight)
           ;
-        asm
-        nop
-        end;
+        // Issue #997: removed asm nop (no-op).
       end;
 
 //    WM_CTLCOLORLISTBOX: RESULT := BOOL(tr4wBrushArray[SCPDupeBackground]);
@@ -114,10 +112,8 @@ begin
       begin
         tr4w_WindowsArray[tw_MASTERWINDOW_INDEX].WndHandle := hwnddlg;
         MasterListBox := CreateOwnerDrawListBox(LB_STYLE_2, hwnddlg);
-        asm
-            mov edx,[MainFixedFont]
-            call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> TF helper (EAX = MasterListBox above).
+        tWM_SETFONT(MasterListBox, MainFixedFont);
         tLB_SETCOLUMNWIDTH(hwnddlg, 80);
         if SCPMinimumLetters = 0 then SCPMinimumLetters := 3;
 //        Windows.SendMessage(MasterListBox, LB_GETITEMRECT, 0, integer(@masterrect));

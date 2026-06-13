@@ -1694,8 +1694,8 @@ begin
     end
     else
       if ActiveWindow = CallWindow then
-        asm
-nop
+        begin
+        // Issue #997: was asm nop (no-op then-branch)
         end
 //        WindowEditor(CallWindowString, Key, ExtendedKey)
       else
@@ -2103,11 +2103,8 @@ nop
                          else
                          begin
                            ActivateExchangeWindow;
-                         end
-                       else
-                         asm
-                       nop
                          end;
+                       // Issue #997: removed a no-op `else asm nop end`.
                      AltC:
                        if (ActiveMode = cw) or (ActiveDVKPort <> NoPort) or DVPEnable then
                        begin

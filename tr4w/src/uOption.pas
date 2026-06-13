@@ -491,6 +491,7 @@ var
   TempInteger                           : integer;
   TempReal                              : REAL;
   p                                     : Pointer;
+  cmdProc                               : procedure;   // Issue #997: typed call of a Pointer change-handler
   c                                     : integer;
 //  h                                     :HWND;
   TempColor                             : Ptr4wColors;
@@ -769,8 +770,11 @@ begin
     Change:
     if CFGCA[Index].crP <> 0 then
     begin
-      p := CommandsProcArray[CFGCA[Index].crP];
-      asm call P end;
+      // Issue #997: asm `call P` (untyped Pointer change-handler) -> typed
+      // call, guarded against a nil entry in the CommandsProcArray definition.
+      @cmdProc := CommandsProcArray[CFGCA[Index].crP];
+      if Assigned(cmdProc) then
+         cmdProc;
     end;
 
     EnableButtons:
@@ -793,11 +797,10 @@ begin
   Changed[Row] := False;
   Index := IndexArray[Row + 1];
   ListView_GetItemText(SettingshLV, Row, COMMAND_FIELD, @TempBuffer1, SizeOf(TempBuffer1));
-  ListView_GetItemText(SettingshLV, Row, VALUE_FIELD, @TempBuffer2, SizeOf(TempBuffer2));
-  asm
-  cmp eax,0
-  jz NoText;
-  end;
+  // Issue #997: asm `cmp eax,0 / jz NoText` tested the char count returned by
+  // the VALUE_FIELD ListView_GetItemText -> test that result directly.
+  if ListView_GetItemText(SettingshLV, Row, VALUE_FIELD, @TempBuffer2, SizeOf(TempBuffer2)) = 0 then
+     goto NoText;
 
   p := TR4W_INI_FILENAME;
   lpAppName := _COMMANDS;

@@ -148,11 +148,8 @@ begin
 //  glTranslatef(-1.3, -0.15, 0.15);
 
   glCallLists(4, GL_UNSIGNED_BYTE, @txtIntro);
-  asm
-  fld [theta]
-  fadd [delta]
-  fstp [theta]
-  end;
+  // Issue #997: FPU asm (fld/fadd/fstp) -> Pascal. theta, delta are Single.
+  theta := theta + delta;
 
 //  Windows.SetDlgItemInt(AboutHWND, 102, round(theta), False);
   SwapBuffers(OGLDC);

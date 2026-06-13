@@ -118,8 +118,8 @@ function DeleteSlashes(p: PChar): PChar;
 function SetParameterInArray(ArrayPtr: PInteger; ArrayLength: integer; aVar: PInteger; ValueToSet: integer): boolean;
 function GetGUID: string;
 function GetValueFromArray(PCharArrayAddress: PChar; ArraySize: Byte; CMD: PChar): Byte;
-function StrPos(const Str1, Str2: PChar): PChar; ASSEMBLER;
-function StrPosPartial(const Str1, Str2: PChar): PChar; ASSEMBLER;
+function StrPos(const Str1, Str2: PChar): PChar;
+function StrPosPartial(const Str1, Str2: PChar): PChar;
 function GetDialogItemText(h: HWND; Control: integer): ShortString;
 function GetNumberFromCharBuffer(p: PChar): integer;
 procedure tLoadKeyboardLayout;
@@ -133,7 +133,7 @@ function StrToInt(s: ShortString): integer;
 function PCharToInt(p: PChar): integer;
 function BooleanToStr(b: boolean): string;
 //function CenterString(s: string; count: byte): string;
-procedure strU(Str: ShortString) assembler;
+procedure strU(var Str: ShortString);
 procedure SetMainWindowText(Window: TMainWindowElement; Text: PChar);
 function IntegerBetween(v: integer; i: integer; k: integer): boolean;
 
@@ -247,7 +247,7 @@ const
 
 implementation
 
-uses MainUnit;
+uses MainUnit, uFreqTimeFormat, uStrSearch;   // Issue #997: freq/time formatters + PChar search helpers extracted + golden-tested
 function Format(Output: PChar; Format: PChar; c: Char): integer; external user32 Name 'wsprintfA';
 
 function Format(Output: PChar; Format: PChar; s1: PChar; u1: integer; u2: integer; u3: integer; u4: integer; u5: integer; u6: integer; s2: PChar; s3: PChar): integer; external user32 Name 'wsprintfA';
@@ -307,66 +307,19 @@ begin  // This does not handle negative numbers very well.
 end;
 
 function FreqToPChar(i: integer): PChar;
-var
-  hz                                    : integer;
 begin
-  if i = 0 then
-  begin
-    Result := nil;
-    Exit;
-  end;
-  hz := (i mod 1000) div 10;
-  asm
-    {Hz}
-    mov eax,hz
-    push eax
-
-    {khz}
-    mov eax,[i]
-    mov ecx,1000
-    cdq
-    idiv ecx
-    push eax
-  end;
-  wsprintf(FreqToPCharBuffer, '%u.%02u');
-  asm add esp,16
-  end;
-  Result := FreqToPCharBuffer;
+  // Issue #997: extracted to uFreqTimeFormat (golden-master tested).
+  Result := uFreqTimeFormat.FreqToPChar(i);
 end;
 
 function FreqToPCharWithoutHZ(i: integer): PChar;
 begin
-  if i = 0 then
-  begin
-    Result := nil;
-    Exit;
-  end;
-
-  asm
-    {khz}
-    mov eax,[i]
-    mov ecx,1000
-    cdq
-    idiv ecx
-    push eax
-  end;
-  wsprintf(FreqToPCharBuffer, '%6u');
-  asm add esp,12
-  end;
-  Result := FreqToPCharBuffer;
+  Result := uFreqTimeFormat.FreqToPCharWithoutHZ(i);   // Issue #997: extracted
 end;
 
 function kHzToPChar(Freq: Word): PChar;
 begin
-  asm
-   mov ax,word ptr Freq
-   movzx eax,ax
-   push eax
-  end;                                
-  wsprintf(FreqToPCharBuffer, '%6u');
-  asm add esp,12
-  end;
-  Result := FreqToPCharBuffer;
+  Result := uFreqTimeFormat.kHzToPChar(Freq);   // Issue #997: extracted
 end;
 
 function ArrayToString(const a: array of Char): string;
@@ -434,53 +387,9 @@ begin
 end;
 
 function MillisecondsToFormattedString(msecs: Cardinal; WithMsec: boolean): PChar;
-var
-  Value                                 : Cardinal;
-  minuts                                : Word;
-  Seconds                               : Word;
-  milliseconds                          : Word;
-  //  hour                                  : word;
 begin
-  //if msecs>999+59*
-  Value := msecs;
-
-  milliseconds := Value mod 1000;
-  Value := Value div 1000;
-
-  Seconds := Value mod 60;
-  Value := Value div 60;
-
-  minuts := Value mod 60;
-  Value := Value div 60;
-  //  hour := Value;
-  asm
- mov ax,word ptr milliseconds
- movzx eax,ax
- push eax
-
-
-
- mov ax,word ptr seconds
- movzx eax,ax
- push eax
-
-
- mov ax,word ptr minuts
- movzx eax,ax
- push eax
-
- mov ax,word ptr value
- movzx eax,ax
- push eax
-
-  end;
-  if WithMsec then
-    wsprintf(MillisecondsBuffer, '%.2hu:%.2hu:%.2hu:%.3hu')
-  else
-    wsprintf(MillisecondsBuffer, '%.2hu:%.2hu:%.2hu');
-  asm add esp,24
-  end;
-  Result := MillisecondsBuffer;
+  // Issue #997: extracted to uFreqTimeFormat (golden-master tested).
+  Result := uFreqTimeFormat.MillisecondsToFormattedString(msecs, WithMsec);
   //  MessageBox(0, Result, '���������', MB_OK);
 
 end;
@@ -812,57 +721,14 @@ end;
 
 function SystemTimeToString(SysTime: SYSTEMTIME): PChar;
 begin
-  asm
-
- mov ax,word ptr SysTime.wSecond
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wMinute
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wHour
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wDay
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wMonth
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wYear
- movzx eax,ax
- push eax
-
-  end;
-
-  wsprintf(SystemTimeToStringBuffer, '%.2hu-%.2hu-%.2hu %.2hu:%.2hu:%.2hu');
-  asm add esp,32
-  end;
-  Result := SystemTimeToStringBuffer;
+  // Issue #997: extracted to uFreqTimeFormat (golden-master tested).
+  Result := uFreqTimeFormat.SystemTimeToString(SysTime);
 end;
 
 function StrComp_JOH_IA32_6(const Str1, Str2: PChar): integer;
-asm
-  sub   eax, edx
-  jz    @@Exit
-@@Loop:
-  movzx ecx, [eax+edx]
-  cmp   cl, [edx]
-  jne   @@SetResult
-  inc   edx
-  test  cl, cl
-  jnz   @@Loop
-  xor   eax, eax
-  ret
-@@SetResult:
-  sbb   eax, eax
-  or    al, 1
-@@Exit:
+begin
+  // Issue #997: extracted to uStrSearch (golden-master tested).
+  Result := uStrSearch.StrComp_JOH_IA32_6(Str1, Str2);
 end;
 
 procedure tLoadKeyboardLayout;
@@ -996,108 +862,16 @@ end;
 
 
 
-function StrPosPartial(const Str1, Str2: PChar): PChar; assembler;
-asm
-        PUSH    EDI
-        PUSH    ESI
-        PUSH    EBX
-
-        OR      EAX,EAX//str1
-        JE      @@2
-        OR      EDX,EDX//str2
-        JE      @@2
-
-        MOV     EBX,EAX
-        MOV     EDI,EDX
-        XOR     AL,AL
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        DEC     ECX
-        JE      @@2
-
-        MOV     ESI,ECX     //length of str2
-        MOV     EDI,EBX
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        SUB     ECX,ESI     //if str2 > str1
-        JBE     @@2
-        MOV     EDI,EBX     //str1 to edi
-        LEA     EBX,[ESI-1] //length str1
-@@1:    MOV     ESI,EDX     //str2 to esi
-        LODSB               //mov esi to eax, inc esi
-        REPNE   SCASB       //find [eax] in [edi] ,inc edi, dec ecx
-        JNE     @@2
-        MOV     EAX,ECX
-        PUSH    EDI
-        MOV     ECX,EBX
-
-@@4:    CMPSB               //compare edi with esi
-        JE      @@SAME
-        CMP     BYTE PTR [ESI-1],'?'
-        JNZ     @@5
-@@SAME:
-        DEC     ECX
-        JNE     @@4
-@@5:
-        POP     EDI
-        MOV     ECX,EAX
-        JNE     @@1
-        LEA     EAX,[EDI-1]
-        JMP     @@3
-@@2:    XOR     EAX,EAX
-@@3:    POP     EBX
-        POP     ESI
-        POP     EDI
+function StrPosPartial(const Str1, Str2: PChar): PChar;
+begin
+  // Issue #997: extracted to uStrSearch (golden-master tested).
+  Result := uStrSearch.StrPosPartial(Str1, Str2);
 end;
 
-function StrPos(const Str1, Str2: PChar): PChar; assembler;
-asm
-        PUSH    EDI
-        PUSH    ESI
-        PUSH    EBX
-
-        OR      EAX,EAX//str1
-        JE      @@2
-        OR      EDX,EDX//str2
-        JE      @@2
-
-        MOV     EBX,EAX
-        MOV     EDI,EDX
-        XOR     AL,AL
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        DEC     ECX
-        JE      @@2
-
-        MOV     ESI,ECX     //length of str2
-        MOV     EDI,EBX
-        MOV     ECX,0FFFFFFFFH
-        REPNE   SCASB
-        NOT     ECX
-        SUB     ECX,ESI     //if str2 > str1
-        JBE     @@2
-        MOV     EDI,EBX     //str1 to edi
-        LEA     EBX,[ESI-1] //length str1
-@@1:    MOV     ESI,EDX     //str2 to esi
-        LODSB               //mov esi to eax, inc esi
-        REPNE   SCASB       //find [eax] in [edi] ,inc edi, dec ecx
-        JNE     @@2
-        MOV     EAX,ECX
-        PUSH    EDI
-        MOV     ECX,EBX
-        REPE    CMPSB       //compare edi with esi
-        POP     EDI
-        MOV     ECX,EAX
-        JNE     @@1
-        LEA     EAX,[EDI-1]
-        JMP     @@3
-@@2:    XOR     EAX,EAX
-@@3:    POP     EBX
-        POP     ESI
-        POP     EDI
+function StrPos(const Str1, Str2: PChar): PChar;
+begin
+  // Issue #997: extracted to uStrSearch (golden-master tested).
+  Result := uStrSearch.StrPos(Str1, Str2);
 end;
 
 function GetValueFromArray(PCharArrayAddress: PChar; ArraySize: Byte; CMD: PChar): Byte;
@@ -1256,6 +1030,12 @@ end;
 
 //function _Pow10(val: Extended; Power: Integer): Extended;
 
+// Issue #997: DEFERRED to the Delphi 12 mirror clone. This is Borland's RTL
+// internal _Pow10 (FPU + power-of-10 tables), called only by ValExt below.
+// In D12, ValExt collapses to the RTL `Val` intrinsic and this helper is
+// deleted outright. Converting the float-parse path now would need a careful
+// golden harness (precision + the `code` error index + whitespace handling)
+// and risks a subtle CTY.DAT lat/lon regression; not worth it in D7.
 procedure _Pow10;
 asm
 // -> FST(0)  val
@@ -1408,6 +1188,14 @@ asm
            DW  $59F0,$6ED5,$1162,$AE35,$7BCA        // 10**4608
 end;
 
+// Issue #997: DEFERRED to the Delphi 12 mirror clone. This is Borland's RTL
+// internal _ValExt (string -> extended with a `code` error index), used only
+// by uCTYDAT to parse CTY.DAT latitude/longitude. In D12 this becomes the RTL
+// `Val(Source, Result, code)` intrinsic (which exists in D7 too), retiring
+// both this body and _Pow10. Deferred because proving float-parse equivalence
+// (precision, the `code` semantics, leading/trailing whitespace) needs a
+// dedicated golden harness, and a lat/lon parse regression silently corrupts
+// beam-heading/distance math.
 function ValExt(Source: PChar; var code: integer): extended;
 //function _ValExt( s: AnsiString; VAR code: Integer ) : Extended;
 //procedure _ValExt;
@@ -1679,7 +1467,7 @@ begin
 
   if not NewLine then
   begin
-    asm nop end;
+    // Issue #997: removed a bare `asm nop end;` no-op anchor (no codegen effect).
     goto LastLine;
   end;
 
@@ -1832,28 +1620,12 @@ begin
 //  if Result = -1 then MessageBox(0, SysErrorMessage(GetLastError), nil, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
 end;
 
-procedure strU(Str: ShortString) assembler;
-asm
-        PUSH    ECX
-        PUSH    ESI
-        MOV     ESI , Str
-        LODSB
-        XOR     ECX , ECX
-        XCHG    CL,AL
-        INC     ECX
-        ADD     ECX,ESI
-@@1:    LODSB
-        CMP     ECX, ESI
-        JE      @@2
-        CMP     AL,'a'
-        JB      @@1
-        CMP     AL,'z'
-        JA      @@1
-        SUB     AL,20H
-        MOV     [ESI-1],AL
-        JMP     @@1
-@@2:    POP     ESI
-        POP     ECX
+procedure strU(var Str: ShortString);
+begin
+  // Issue #997: extracted to uStrSearch (golden-master tested). Now 'var' to
+  // make the in-place upcase contract explicit (the old by-value asm modified
+  // the caller's string anyway -- see uStrSearch / the LogCfg note).
+  uStrSearch.StrU(Str);
 end;
 
 function CreateComboBox(hwndParent: HWND; HMENU: HMENU): HWND;

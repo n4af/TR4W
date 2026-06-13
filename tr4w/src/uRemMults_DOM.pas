@@ -89,10 +89,8 @@ begin
       begin
         tr4w_WindowsArray[tw_STATIONS_RM_DOM].WndHandle := hwnddlg;
         RemainingMultsDOMWindowHandle := GetDlgItem(hwnddlg, 101);
-        asm
-        mov edx,[MainFixedFont]
-        call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> TF helper (EAX = RemainingMultsDOMWindowHandle above).
+        tWM_SETFONT(RemainingMultsDOMWindowHandle, MainFixedFont);
         SetRemMultsColumnWudth;
 
         VisibleLog.ShowRemainingMultipliers;

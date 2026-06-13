@@ -239,14 +239,20 @@ begin
   Pack(AData,temp);
 end;
 
-function SwapEndian32(Value: integer): integer; register;
-asm
-  bswap eax
+function SwapEndian32(Value: integer): integer;
+begin
+  // Issue #997: bswap eax -> reverse the four bytes (big<->little endian).
+  Result := Integer(
+    ((Cardinal(Value) and $000000FF) shl 24) or
+    ((Cardinal(Value) and $0000FF00) shl 8)  or
+    ((Cardinal(Value) and $00FF0000) shr 8)  or
+    ((Cardinal(Value) and $FF000000) shr 24));
 end;
 
-function SwapEndian16(Value: smallint): smallint; register;
-asm
-  rol   ax, 8
+function SwapEndian16(Value: smallint): smallint;
+begin
+  // Issue #997: rol ax,8 on a 16-bit value -> swap the two bytes.
+  Result := SmallInt(((Word(Value) shl 8) or (Word(Value) shr 8)) and $FFFF);
 end;
 
 procedure Pack(var AData: TIdBytes; const ADateTime: TDateTime) overload;

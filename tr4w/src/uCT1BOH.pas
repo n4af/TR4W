@@ -55,10 +55,8 @@ begin
         Windows.SetWindowText(hwnddlg, RC_CT1BOHIS2);
         hLV := CreateListView2(0, 0, 655+20, 132+20, hwnddlg);
 //        hLV := Get101Window(hwnddlg);
-        asm
-        mov edx,[MainFixedFont]
-        call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> TF helper (EAX = hLV above).
+        tWM_SETFONT(hLV, MainFixedFont);
         ListView_SetExtendedListViewStyle(hLV, LVS_EX_GRIDLINES or LVS_EX_FULLROWSELECT);
         {Insert Header}
         lvc.Mask := LVCF_TEXT or LVCF_WIDTH or LVCF_FMT;

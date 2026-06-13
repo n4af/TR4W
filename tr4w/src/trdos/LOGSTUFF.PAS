@@ -8346,12 +8346,10 @@ begin
       end;
   end;
   Windows.ZeroMemory(@wsprintfBuffer, SizeOf(wsprintfBuffer));
-  asm
-  push heading
-  end;
-  nNumberOfBytesToWrite := wsprintf(wsprintfBuffer, TempPchar);
-  asm add esp,12
-  end;
+  // Issue #997: asm wsprintf-push -> TF.Format. TempPchar is the per-rotator
+  // runtime format (e.g. 'M%03u'#$D); heading fills %03u. Format == wsprintfA,
+  // so the runtime C format and the returned byte count are preserved.
+  nNumberOfBytesToWrite := Format(wsprintfBuffer, TempPchar, heading);
 
   if ActiveRotatorType = AlfaSpidRotator then
   begin

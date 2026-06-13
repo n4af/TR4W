@@ -24,6 +24,7 @@ interface
 uses
 //  spectrum_vis,
   LogK1EA,
+  SysUtils, // Issue #997 (StrPCopy/Format for asm-block removal; placed before TF so unqualified Format still resolves to TF.Format)
   TF,
   Version,
   VC,
@@ -332,8 +333,8 @@ var
 //    $02, $00, $10, $00, $64, $61, $74, $61, {} $50, $75, $0D, $00
 //    );
 
-  WaveBuffer                            : array[0..1] of Tbuffer; //двойной аудио-буфер
-  whead                                 : array[0..1] of twavehdr; //заголовок для аудио-буфера
+  WaveBuffer                            : array[0..1] of Tbuffer; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅ
+  whead                                 : array[0..1] of twavehdr; //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ-пїЅпїЅпїЅпїЅпїЅпїЅ
   wfx                                   : TWAVEFORMATEX;
   hwi                                   : HWAVEin;
   MP3RecorderMode                       : TMP3RecorderMode;
@@ -374,15 +375,10 @@ begin
         end
         else
         begin
-          SysErrorMessage(GetLastError);
-          asm
-          push eax
-          end;
-
-          wsprintf(TR4W_TEMP_MP3_FILENAME,
-            'LAME_ENC.DLL: %s ' + TC_LAME_ERROR + ':' + #13#10#13#10' http://www.tr4w.com/files/');
-          asm add esp,12
-          end;
+          // Issue #997 (asm push/wsprintf/add esp -> StrPCopy + SysUtils.Format)
+          SysUtils.StrPCopy(TR4W_TEMP_MP3_FILENAME,
+            SysUtils.Format('LAME_ENC.DLL: %s ' + TC_LAME_ERROR + ':' + #13#10#13#10' http://www.tr4w.com/files/',
+              [SysErrorMessage(GetLastError)]));
           showwarning(TR4W_TEMP_MP3_FILENAME);
           goto 1;
         end;

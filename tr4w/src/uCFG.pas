@@ -891,7 +891,7 @@ var
    Changed: array[0..CommandsArraySize - 1] of boolean;
 
 implementation
-uses MainUnit;
+uses MainUnit, SysUtils;   // Issue #997 -- SysUtils for Format/StrPCopy (asm-to-Pascal conversion)
 var
    TempBand: BandType;
    TempMode: ModeType;
@@ -902,6 +902,11 @@ var
 function CheckCommand(Command: PChar; CustomCMD: ShortString): boolean;
 label
    AdditionalProc;
+type
+   // Issue #997: every AdditionalProcsArray entry is a param-less boolean
+   // function (default register convention); this type lets us call Proc
+   // through a typed cast instead of inline asm.
+   TAdditionalProc = function: Boolean;
 var
    i: integer;
    TempInteger: integer;
@@ -1228,10 +1233,11 @@ begin
                Proc := AdditionalProcsArray[CFGCA[i].crA];
                if Assigned(Proc) then
                   begin
-                  asm
-                     call Proc
-                     mov byte ptr result,al
-                     end;
+                  // Issue #997: was inline asm (`call Proc; mov result,al`).
+                  // Proc is an untyped Pointer into AdditionalProcsArray; every
+                  // entry is a param-less boolean function (register), so a
+                  // typed cast + call is exactly equivalent.
+                  Result := TAdditionalProc(Proc)();
                   end
                else
                   begin
@@ -1502,12 +1508,8 @@ begin
 
    if not StringIsAllNumbers(TimeString) then
       begin
-         asm
-          push TimeString
-         end;
-         wsprintf(wsprintfBuffer, '%s '#13 + TC_INVALIDREMINDERTIME);
-         asm add esp,12
-         end;
+         // Issue #997 -- replaced wsprintf-push asm with SysUtils.Format
+         SysUtils.StrPCopy(wsprintfBuffer, SysUtils.Format('%s '#13 + TC_INVALIDREMINDERTIME, [TimeString]));
          ShowMessage(wsprintfBuffer);
          //      showmessage(TimeString + #13 + 'Invalid reminder time!!');
          Exit;

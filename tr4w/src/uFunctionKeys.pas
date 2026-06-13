@@ -205,10 +205,8 @@ begin
         for i := 112 to 123 do
         begin
           KeysHandles[i] := tCreateButtonWindow(0, nil, BS_OWNERDRAW or BS_AUTORADIOBUTTON or BS_PUSHLIKE or BS_LEFT or WS_CHILD or WS_VISIBLE or BS_NOTIFY, 0, 0, 0, 0, hwnddlg, i);
-          asm
-            mov edx,[MainFixedFont]
-            call tWM_SETFONT
-          end;
+          // Issue #997: asm tWM_SETFONT -> TF helper (EAX = KeysHandles[i] above).
+          tWM_SETFONT(KeysHandles[i], MainFixedFont);
         end;
 //        FKCloseButton := tCreateButtonWindow(0, nil, BS_OWNERDRAW or BS_PUSHLIKE or WS_CHILD or WS_VISIBLE or BS_NOTIFY, 0, 0, 0, 0, hwnddlg, FKCloseButtonID);
 

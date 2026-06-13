@@ -451,16 +451,9 @@ begin
               //        WriteLn('INVALID STATEMENT IN ', FileName, '!!  Line ', LineNumber);
               //        WriteLn(FileString);
         FileString[length(FileString) + 1] := #0;
-        asm
-        lea eax,[FileString+1]
-        push eax
-        push LineNumber
-        lea eax,[FileName+1]
-        push eax
-        end;
-        wsprintf(wsprintfBuffer, TC_INVALIDSTATEMENTIN);
-        asm add esp,20
-        end;
+        // Issue #997: asm wsprintf-push -> TF.Format. Args pushed cdecl-reverse;
+        // format is %s(FileName) / %u(LineNumber) / %s(FileString).
+        Format(wsprintfBuffer, TC_INVALIDSTATEMENTIN, @FileName[1], LineNumber, @FileString[1]);
         showwarning(wsprintfBuffer);
         Exit;
       end;
@@ -475,13 +468,8 @@ begin
   else
   begin
     FileName[Ord(FileName[0]) + 1] := #0;
-    asm
-    lea eax, [FileName+1]
-    push eax
-    end;
-    wsprintf(wsprintfBuffer, TC_UNABLETOFIND);
-    asm add esp,12
-    end;
+    // Issue #997: asm wsprintf-push -> TF.Format.
+    Format(wsprintfBuffer, TC_UNABLETOFIND, @FileName[1]);
     showwarning(wsprintfBuffer);
     Exit;
   end;
@@ -764,9 +752,8 @@ var
 
   inc(LineNumberInConfigFile);
 
-  if CurrentConfigFile = cfgINI then
-    if LineNumberInConfigFile > 155 then
-      asm nop end;
+  // Issue #997: removed a no-op `if cfgINI then if line > 155 then asm nop end`
+  // (a debugger breakpoint anchor; no runtime effect).
 
   if CurrentConfigFile = cfgCFG then
   begin

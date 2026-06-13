@@ -229,6 +229,11 @@ implementation
 uses uNet,
   uBandmap,
   LogGrid,
+  SysUtils,   // Issue #997: provides SysUtils.Format/StrPCopy for asm removal.
+              // ORDER/QUALIFICATION MATTERS: SysUtils also declares SysErrorMessage,
+              // which differs from TF.SysErrorMessage (SysUtils trims the trailing
+              // CRLF, TF does not).  Call sites needing TF's behavior are explicitly
+              // TF-qualified (see TelnetConnectionError / WinSock error display).
   MainUnit;
 
 // Issue #23 -- DX cluster I/O thread <-> main-thread message protocol.  The
@@ -591,7 +596,7 @@ begin
               // host they tried to reach (the raw message is long and unwrapped).
               logger.Error('[Telnet] Could not connect to %s:%d -- WinSock %d: %s',
                 [PChar(@PendingTelnetHost[0]), PendingTelnetPort, lParam,
-                 SysErrorMessage(lParam)]);
+                 TF.SysErrorMessage(lParam)]);   // Issue #997: keep TF's PChar version (SysUtils in uses returns a trimmed string)
               Format(wsprintfBuffer, '%s%s:%u', TC_FAILEDTOCONNECTTO,
                 @PendingTelnetHost[0], PendingTelnetPort);
               AddStringToTelnetConsole(wsprintfBuffer, tstError);
@@ -679,10 +684,8 @@ begin
         EnableTelnetToolbatButtons(False);
 
         TelnetListBox := Get101Window(hwnddlg);
-        asm
-            mov edx,[LucidaConsoleFont]
-            call tWM_SETFONT
-        end;
+        // Issue #997: asm tWM_SETFONT -> call the existing TF helper directly
+        tWM_SETFONT(TelnetListBox, LucidaConsoleFont);
 
         TelnetCommandWindow := GetDlgItem(hwnddlg, 106);
 
@@ -1041,7 +1044,7 @@ begin
   // (independent of TELNET DEBUG) and show it in the telnet window.  The code is
   // passed in (not read from WSAGetLastError) because it may have been captured
   // on the I/O thread and marshaled here -- WSAGetLastError is per-thread.
-  msg := SysErrorMessage(wsaErr);
+  msg := TF.SysErrorMessage(wsaErr);   // Issue #997: keep TF's PChar version (SysUtils added to uses returns string)
   logger.Error('[Telnet] WinSock error %d: %s', [wsaErr, msg]);
   AddStringToTelnetConsole(msg, tstError);
 end;
@@ -1116,16 +1119,9 @@ begin
     Exit;
   TimeString := GetTimeString;
   TimeString[2] := '-';
-  asm
-  push TimeString
-  call GetDateString
-  push eax
-  lea  eax,TR4W_PATH_NAME
-  push eax
-  end;
-  wsprintf(wsprintfBuffer, '%sDXCluster\dxcluster %s %s.txt');
-  asm add esp,20
-  end;
+  // Issue #997: asm wsprintf -> Format
+  StrPCopy(wsprintfBuffer, SysUtils.Format('%sDXCluster\dxcluster %s %s.txt',
+    [string(PChar(@TR4W_PATH_NAME)), string(GetDateString), string(TimeString)]));
 
   TelnetLogHandle := CreateFile(wsprintfBuffer, GENERIC_WRITE, FILE_SHARE_WRITE,
     nil, CREATE_NEW, FILE_ATTRIBUTE_ARCHIVE, 0);
@@ -1559,13 +1555,9 @@ begin
     if AskForFrequencies then
     begin
       Call[length(Call) + 1] := #0;
-      asm
-        lea  eax, Call+1
-        push eax
-      end;
-      wsprintf(wsprintfBuffer, TC_FREQUENCYFORCALLINKHZ);
-      asm add esp,12
-      end;
+      // Issue #997: asm wsprintf -> Format
+      StrPCopy(wsprintfBuffer, SysUtils.Format(TC_FREQUENCYFORCALLINKHZ,
+        [string(PChar(@Call[1]))]));
       TempFrequency := QuickEditFreq(wsprintfBuffer, 10);
     end;
   if TempFrequency <= 0 then

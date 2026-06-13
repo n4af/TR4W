@@ -257,7 +257,7 @@ var
   tExitFromDVPThread                    : boolean;
   //   tNetEvent                       : Cardinal;
 
-  ActiveDVKPort                         : PortType; //надо убрать
+  ActiveDVKPort                         : PortType; //пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
   ActiveFootSwitchPort                  : PortType {= NoPort};
 //  ActiveKeyerPort                       : PortType {= NoPort};
 //  tActiveKeyerHandle                    : HWND = INVALID_HANDLE_VALUE;
@@ -1908,7 +1908,7 @@ end;
 function K1EAKeyer.BufferEmpty: boolean;
 
 begin
-  BufferEmpty := CWBufferStart = CWBufferEnd - 0 {добавил -1};
+  BufferEmpty := CWBufferStart = CWBufferEnd - 0 {пїЅпїЅпїЅпїЅпїЅпїЅпїЅ -1};
 end;
 
 function K1EAKeyer.CWStillBeingSent: boolean;
@@ -1922,7 +1922,7 @@ begin
 //  GetExitCodeThread(CWThreadHandle, lpExitCode);
 //  Windows.TerminateThread(CATWTR^.tRadioInterfaceThreadHandle, lpExitCode);
 
-  //  CWBufferStart := CWBufferEnd; должно помочь что-бы не сьедался первый знак в букве
+  //  CWBufferStart := CWBufferEnd; пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ-пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
 {
   I := 0;
   if CWBufferEnd > 0
@@ -1975,11 +1975,10 @@ begin
   logger.Info('Calling tCreateThread from DoABeep');
   TR4W_BeepThread := tCreateThread(@tDoABeep, TR4W_BeepThreadID);
   logger.Info('Created Beep thread with threadid of %d',[TR4W_BeepThreadID] );
-  asm
-   push THREAD_PRIORITY_IDLE
-   push eax
-   call SetThreadPriority
-  end;
+  // Issue #997: asm SetThreadPriority -> Pascal call. The old `push eax` pushed a
+  // stale handle (clobbered by the preceding logger.Info), so this never applied;
+  // now set it on the real handle. BEHAVIOR CHANGE: beep thread now runs IDLE.
+  SetThreadPriority(TR4W_BeepThread, THREAD_PRIORITY_IDLE);
 
   {   Exit;
      if not BeepEnable then
