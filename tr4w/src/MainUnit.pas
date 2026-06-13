@@ -2123,17 +2123,16 @@ end;
 procedure tAltI;
 var
   lpTranslated: LongBool;
+  Value: Cardinal;
 begin
-  Windows.GetDlgItemInt(tr4whandle, EXCHANGEWINDOWID, lpTranslated, False);
+  Value := Windows.GetDlgItemInt(tr4whandle, EXCHANGEWINDOWID, lpTranslated, False);
   if lpTranslated then
   begin
-    asm
- inc eax
- push eax
-    end;
-    wsprintf(wsprintfBuffer, ' %u');
-    asm add esp,12
-    end;
+    // Issue #997: asm `inc eax; push eax; wsprintf(' %u')` -> TF.Format. The
+    // Integer() cast is load-bearing: it forces the Format(...; i: integer)
+    // wsprintfA overload. Without it, the Cardinal arg can bind a different
+    // overload and the field doesn't update.
+    Format(wsprintfBuffer, ' %u', Integer(Value + 1));
     SetMainWindowText(mweExchange, wsprintfBuffer);
     PlaceCaretToTheEnd(wh[mweExchange]);
   end;
@@ -6453,11 +6452,8 @@ begin
   inc(QSOCounter);
   if QSOCounter <> LogSize then
   begin
-    asm
- mov eax,RescoredRXData
- add eax,SizeOfContestExchange
- mov RescoredRXData,eax
-    end;
+    // Issue #997: asm pointer arith -> Pascal (advance to the next log record).
+    RescoredRXData := Pointer(Cardinal(RescoredRXData) + SizeOfContestExchange);
     goto 1;
   end;
   4:
@@ -6917,11 +6913,8 @@ begin
 
   for i := 0 to l - 4 do
   begin
-  asm
-  mov eax,p
-  add eax,i
-  mov p,eax
-  end;
+  // Issue #997: asm pointer arith -> Pascal (p := p + i, preserved exactly).
+  p := Pointer(Cardinal(p) + Cardinal(i));
   if PInteger(p)^ = 0 then sm;
   end;
   }
