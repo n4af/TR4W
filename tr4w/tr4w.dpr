@@ -85,6 +85,7 @@ uses
   LPT in 'src\LPT.pas',
   uGetServerLog in 'src\uGetServerLog.pas',
   TF in 'src\TF.pas',
+  uFreqTimeFormat in 'src\uFreqTimeFormat.pas',
   uLogEdit in 'src\uLogEdit.pas',
   uIntercom in 'src\uIntercom.pas',
   uLogCompare in 'src\uLogCompare.pas',

@@ -247,7 +247,7 @@ const
 
 implementation
 
-uses MainUnit;
+uses MainUnit, uFreqTimeFormat;   // Issue #997: freq/time formatters extracted + golden-tested
 function Format(Output: PChar; Format: PChar; c: Char): integer; external user32 Name 'wsprintfA';
 
 function Format(Output: PChar; Format: PChar; s1: PChar; u1: integer; u2: integer; u3: integer; u4: integer; u5: integer; u6: integer; s2: PChar; s3: PChar): integer; external user32 Name 'wsprintfA';
@@ -307,66 +307,19 @@ begin  // This does not handle negative numbers very well.
 end;
 
 function FreqToPChar(i: integer): PChar;
-var
-  hz                                    : integer;
 begin
-  if i = 0 then
-  begin
-    Result := nil;
-    Exit;
-  end;
-  hz := (i mod 1000) div 10;
-  asm
-    {Hz}
-    mov eax,hz
-    push eax
-
-    {khz}
-    mov eax,[i]
-    mov ecx,1000
-    cdq
-    idiv ecx
-    push eax
-  end;
-  wsprintf(FreqToPCharBuffer, '%u.%02u');
-  asm add esp,16
-  end;
-  Result := FreqToPCharBuffer;
+  // Issue #997: extracted to uFreqTimeFormat (golden-master tested).
+  Result := uFreqTimeFormat.FreqToPChar(i);
 end;
 
 function FreqToPCharWithoutHZ(i: integer): PChar;
 begin
-  if i = 0 then
-  begin
-    Result := nil;
-    Exit;
-  end;
-
-  asm
-    {khz}
-    mov eax,[i]
-    mov ecx,1000
-    cdq
-    idiv ecx
-    push eax
-  end;
-  wsprintf(FreqToPCharBuffer, '%6u');
-  asm add esp,12
-  end;
-  Result := FreqToPCharBuffer;
+  Result := uFreqTimeFormat.FreqToPCharWithoutHZ(i);   // Issue #997: extracted
 end;
 
 function kHzToPChar(Freq: Word): PChar;
 begin
-  asm
-   mov ax,word ptr Freq
-   movzx eax,ax
-   push eax
-  end;                                
-  wsprintf(FreqToPCharBuffer, '%6u');
-  asm add esp,12
-  end;
-  Result := FreqToPCharBuffer;
+  Result := uFreqTimeFormat.kHzToPChar(Freq);   // Issue #997: extracted
 end;
 
 function ArrayToString(const a: array of Char): string;
@@ -434,53 +387,9 @@ begin
 end;
 
 function MillisecondsToFormattedString(msecs: Cardinal; WithMsec: boolean): PChar;
-var
-  Value                                 : Cardinal;
-  minuts                                : Word;
-  Seconds                               : Word;
-  milliseconds                          : Word;
-  //  hour                                  : word;
 begin
-  //if msecs>999+59*
-  Value := msecs;
-
-  milliseconds := Value mod 1000;
-  Value := Value div 1000;
-
-  Seconds := Value mod 60;
-  Value := Value div 60;
-
-  minuts := Value mod 60;
-  Value := Value div 60;
-  //  hour := Value;
-  asm
- mov ax,word ptr milliseconds
- movzx eax,ax
- push eax
-
-
-
- mov ax,word ptr seconds
- movzx eax,ax
- push eax
-
-
- mov ax,word ptr minuts
- movzx eax,ax
- push eax
-
- mov ax,word ptr value
- movzx eax,ax
- push eax
-
-  end;
-  if WithMsec then
-    wsprintf(MillisecondsBuffer, '%.2hu:%.2hu:%.2hu:%.3hu')
-  else
-    wsprintf(MillisecondsBuffer, '%.2hu:%.2hu:%.2hu');
-  asm add esp,24
-  end;
-  Result := MillisecondsBuffer;
+  // Issue #997: extracted to uFreqTimeFormat (golden-master tested).
+  Result := uFreqTimeFormat.MillisecondsToFormattedString(msecs, WithMsec);
   //  MessageBox(0, Result, '���������', MB_OK);
 
 end;
@@ -812,38 +721,8 @@ end;
 
 function SystemTimeToString(SysTime: SYSTEMTIME): PChar;
 begin
-  asm
-
- mov ax,word ptr SysTime.wSecond
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wMinute
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wHour
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wDay
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wMonth
- movzx eax,ax
- push eax
-
- mov ax,word ptr SysTime.wYear
- movzx eax,ax
- push eax
-
-  end;
-
-  wsprintf(SystemTimeToStringBuffer, '%.2hu-%.2hu-%.2hu %.2hu:%.2hu:%.2hu');
-  asm add esp,32
-  end;
-  Result := SystemTimeToStringBuffer;
+  // Issue #997: extracted to uFreqTimeFormat (golden-master tested).
+  Result := uFreqTimeFormat.SystemTimeToString(SysTime);
 end;
 
 function StrComp_JOH_IA32_6(const Str1, Str2: PChar): integer;
