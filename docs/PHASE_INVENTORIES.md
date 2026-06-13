@@ -24,82 +24,86 @@ all blocks in the project.
 
 ### Files sorted by count (descending)
 
-| File | `asm` blocks |
-|------|--------------|
-| tr4w/src/trdos/PostUnit.PAS | 170 |
-| tr4w/src/utils/SysUtils.pas | 58 |
-| tr4w/src/MainUnit.pas | 56 |
-| tr4w/src/MySU.pas | 39 |
-| tr4w/src/uVariants.pas | 24 |
-| tr4w/src/TF.pas | 20 |
-| tr4w/src/uLogCompare.pas | 17 |
-| tr4w/src/uQTCS.pas | 14 |
-| tr4w/src/trdos/LOGDVP.PAS | 10 |
-| tr4w/src/uWinKey.pas | 8 |
-| tr4w/src/trdos/LOGSTUFF.PAS | 8 |
-| tr4w/src/uQTCR.pas | 7 |
-| tr4w/src/uGetScores.pas | 6 |
-| tr4w/src/uComObj.pas | 6 |
-| tr4w/src/trdos/tree.pas | 6 |
-| tr4w/src/trdos/_JCtrl1.pas | 6 |
-| tr4w/src/trdos/LOGWAE.PAS | 6 |
-| tr4w/src/trdos/JCtrl1.pas | 6 |
-| tr4w/src/uTelnet.pas | 5 |
-| tr4w/src/uAltP.pas | 5 |
-| tr4w/src/trdos/LogCfg.pas | 5 |
-| tr4w/src/tr4wserverUnit.pas | 5 |
-| tr4w/src/uRemMults.pas | 4 |
-| tr4w/src/uRadioPolling.pas | 4 |
-| tr4w/src/uProcessCommand.pas | 4 |
-| tr4w/src/uNewContest.pas | 4 |
-| tr4w/src/uIntercom.pas | 4 |
-| tr4w/src/uEditMessage.pas | 4 |
-| tr4w/src/uCFG.pas | 4 |
-| tr4w/src/trdos/LOGWIND.PAS | 4 |
-| tr4w/src/trdos/LOGSUBS2.PAS | 4 |
-| tr4w/src/jwamswsock.pas | 4 |
-| tr4w/src/exportto_trlog.pas | 4 |
-| tr4w/src/uRemMults_Zone.pas | 3 |
-| tr4w/src/uCallsigns.pas | 3 |
-| tr4w/src/uCRC32.pas | 3 |
-| tr4w/src/trdos/LOGK1EA.PAS | 3 |
-| tr4w/src/MemProg.pas | 3 |
-| tr4w/src/utils/utils_text.pas | 2 |
-| tr4w/src/utils/utils_math.pas | 2 |
-| tr4w/src/utils/networkmessageutils.pas | 2 |
-| tr4w/src/uSpots.pas | 2 |
-| tr4w/src/uOption.pas | 2 |
-| tr4w/src/uNet.pas | 2 |
-| tr4w/src/uMaster.pas | 2 |
-| tr4w/src/uMP3Recorder.pas | 2 |
-| tr4w/src/uMMTTY.pas | 2 |
-| tr4w/src/uLogSearch.pas | 2 |
-| tr4w/src/uFunctionKeys.pas | 2 |
-| tr4w/src/uEditQSO.pas | 2 |
-| tr4w/src/uDistance.pas | 2 |
-| tr4w/src/trdos/JCTRL2.PAS | 2 |
-| tr4w/src/trdos/BeepUnit.pas | 2 |
-| tr4w/src/t_.pas | 2 |
-| tr4w/src/LPTIO.pas | 2 |
-| tr4w/src/DLPortIO.pas | 2 |
-| tr4w/src/uRemMults_DX.pas | 1 |
-| tr4w/src/uRemMults_DOM.pas | 1 |
-| tr4w/src/uMultsFrequencies.pas | 1 |
-| tr4w/src/uMessagesList.pas | 1 |
-| tr4w/src/uErmak.pas | 1 |
-| tr4w/src/uDupesheet.pas | 1 |
-| tr4w/src/uCbrSum.pas | 1 |
-| tr4w/src/uCTYDAT.PAS | 1 |
-| tr4w/src/uCT1BOH.pas | 1 |
-| tr4w/src/uBeacons.pas | 1 |
-| tr4w/src/uBandmap.pas | 1 |
-| tr4w/src/uAltD.pas | 1 |
-| tr4w/src/uAbout.pas | 1 |
-| tr4w/src/trdos/ZONECONT.PAS | 1 |
-| tr4w/src/trdos/LogCW.pas | 1 |
-| tr4w/src/trdos/LOGRADIO.PAS | 1 |
-| tr4w/src/trdos/LOGGRID.PAS | 1 |
-| tr4w/src/trdos/LOGEDIT.PAS | 1 |
+**Status as of 2026-06-13** (branch `asm-removal-batch-997` + the #998/#1026 PRs). All genuinely-convertible TR4W inline asm is removed; the remainder is the hardware/RTL-shadow/decision tail handled in the D12 mirror clone.
+
+Legend: ✅ done (asm removed — converted, or all blocks were dead/commented) · 🔧 partial (live asm removed; only the parked/deferred tail remains in-file) · ⏸ parked (hardware/low-level; gone in 64-bit anyway, needs a design decision) · ⌛ defer (shadow-RTL whose clean replacement is D12-only → mirror clone) · ⏭ skip (vendored RTL / 3rd-party file replaced wholesale, or scratch/backup)
+
+| File | `asm` blocks | Status |
+|------|--------------|--------|
+| ~~tr4w/src/trdos/PostUnit.PAS~~ | 170 | ✅ done (#998) |
+| tr4w/src/utils/SysUtils.pas | 58 | ⏭ skip (vendored RTL) |
+| tr4w/src/MainUnit.pas | 56 | 🔧 partial — UI/format/setitem/pointer-arith done; RDTSC `GetCPU`, MM-hooks, LPT IOCTL parked |
+| tr4w/src/MySU.pas | 39 | ⏭ skip (vendored RTL) |
+| tr4w/src/uVariants.pas | 24 | ⏭ skip (vendored RTL) |
+| tr4w/src/TF.pas | 20 | 🔧 partial — string/format/nop done; `ValExt`/`_Pow10` deferred to mirror clone |
+| ~~tr4w/src/uLogCompare.pas~~ | 17 | ✅ done |
+| ~~tr4w/src/uQTCS.pas~~ | 14 | ✅ done |
+| ~~tr4w/src/trdos/LOGDVP.PAS~~ | 10 | ✅ done |
+| tr4w/src/uWinKey.pas | 8 | 🔧 partial — K6VVA_WK_DEBUG block deferred (conditional `{$IF}`) |
+| ~~tr4w/src/trdos/LOGSTUFF.PAS~~ | 8 | ✅ done (rotator converted; floppy block dead/commented) |
+| ~~tr4w/src/uQTCR.pas~~ | 7 | ✅ done |
+| ~~tr4w/src/uGetScores.pas~~ | 6 | ✅ done (only live block was in dead `MakePOSTRequest`) |
+| tr4w/src/uComObj.pas | 6 | ⏭ skip (vendored RTL) |
+| tr4w/src/trdos/tree.pas | 6 | 🔧 partial — `GetFullTimeString` done; `UpperCase_old` (FastCode) + 3841 = shadow-RTL skip |
+| tr4w/src/trdos/_JCtrl1.pas | 6 | ⏭ skip (backup file, not compiled) |
+| ~~tr4w/src/trdos/LOGWAE.PAS~~ | 6 | ✅ done |
+| ~~tr4w/src/trdos/JCtrl1.pas~~ | 6 | ✅ done (incl. SSN1 `%c`) |
+| ~~tr4w/src/uTelnet.pas~~ | 5 | ✅ done |
+| ~~tr4w/src/uAltP.pas~~ | 5 | ✅ done |
+| ~~tr4w/src/trdos/LogCfg.pas~~ | 5 | ✅ done |
+| tr4w/src/tr4wserverUnit.pas | 5 | 🔧 partial — MapView pointer-arith done; SERVERDEBUG wsprintf conditional; @573 dead |
+| ~~tr4w/src/uRemMults.pas~~ | 4 | ✅ done |
+| ~~tr4w/src/uRadioPolling.pas~~ | 4 | ✅ done |
+| ~~tr4w/src/uProcessCommand.pas~~ | 4 | ✅ done |
+| ~~tr4w/src/uNewContest.pas~~ | 4 | ✅ done (#1026) |
+| ~~tr4w/src/uIntercom.pas~~ | 4 | ✅ done (setfont + `%C` wsprintf→TF.Format) |
+| ~~tr4w/src/uEditMessage.pas~~ | 4 | ✅ done (setfont; rest commented) |
+| ~~tr4w/src/uCFG.pas~~ | 4 | ✅ done (incl. AdditionalProc typed-call) |
+| ~~tr4w/src/trdos/LOGWIND.PAS~~ | 4 | ✅ done (DisplayTotalScore; rest commented) |
+| ~~tr4w/src/trdos/LOGSUBS2.PAS~~ | 4 | ✅ done |
+| tr4w/src/jwamswsock.pas | 4 | ⏭ skip (vendored JEDI WinSock) |
+| ~~tr4w/src/exportto_trlog.pas~~ | 4 | ✅ done |
+| ~~tr4w/src/uRemMults_Zone.pas~~ | 3 | ✅ done |
+| ~~tr4w/src/uCallsigns.pas~~ | 3 | ✅ done (incl. orphan-asm cleanup) |
+| tr4w/src/uCRC32.pas | 3 | ⌛ defer — bit-identical to on-disk log CRCs; D12 `System.Hash` only if byte-equal |
+| tr4w/src/trdos/LOGK1EA.PAS | 3 | 🔧 partial — SetThreadPriority done; DOS `INT $F1`/`OUT $20` parked |
+| ~~tr4w/src/MemProg.pas~~ | 3 | ✅ done |
+| tr4w/src/utils/utils_text.pas | 2 | ⏭ skip (shadow-RTL `StrComp`/`StrUpper`) |
+| ~~tr4w/src/utils/utils_math.pas~~ | 2 | ✅ done (→ `Math` RTL, golden-tested) |
+| ~~tr4w/src/utils/networkmessageutils.pas~~ | 2 | ✅ done (SwapEndian32/16 → bit ops) |
+| ~~tr4w/src/uSpots.pas~~ | 2 | ✅ done (#1026) |
+| ~~tr4w/src/uOption.pas~~ | 2 | ✅ done |
+| ~~tr4w/src/uNet.pas~~ | 2 | ✅ done (all commented/dead) |
+| ~~tr4w/src/uMaster.pas~~ | 2 | ✅ done |
+| ~~tr4w/src/uMP3Recorder.pas~~ | 2 | ✅ done |
+| ~~tr4w/src/uMMTTY.pas~~ | 2 | ✅ done (all commented/dead) |
+| ~~tr4w/src/uLogSearch.pas~~ | 2 | ✅ done (#1026) |
+| ~~tr4w/src/uFunctionKeys.pas~~ | 2 | ✅ done (setfont; rest commented) |
+| ~~tr4w/src/uEditQSO.pas~~ | 2 | ✅ done (#1026) |
+| ~~tr4w/src/uDistance.pas~~ | 2 | ✅ done (#1026) |
+| tr4w/src/trdos/JCTRL2.PAS | 2 | ⏭ skip (unused; revert per NY4I) |
+| tr4w/src/trdos/BeepUnit.pas | 2 | ⏸ parked (`in`/`out` port I/O) |
+| tr4w/src/t_.pas | 2 | ⏭ skip (scratch; not in tr4w.dpr) |
+| tr4w/src/LPTIO.pas | 2 | ⏸ parked (parallel-port driver I/O) |
+| tr4w/src/DLPortIO.pas | 2 | ⏸ parked (parallel-port driver I/O) |
+| ~~tr4w/src/uRemMults_DX.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uRemMults_DOM.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uMultsFrequencies.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uMessagesList.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uErmak.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uDupesheet.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uCbrSum.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uCTYDAT.PAS~~ | 1 | ✅ done |
+| ~~tr4w/src/uCT1BOH.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uBeacons.pas~~ | 1 | ✅ done (commented/dead) |
+| ~~tr4w/src/uBandmap.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uAltD.pas~~ | 1 | ✅ done |
+| ~~tr4w/src/uAbout.pas~~ | 1 | ✅ done (FPU → Pascal) |
+| ~~tr4w/src/trdos/ZONECONT.PAS~~ | 1 | ✅ done |
+| ~~tr4w/src/trdos/LogCW.pas~~ | 1 | ✅ done (SetThreadPriority) |
+| ~~tr4w/src/trdos/LOGRADIO.PAS~~ | 1 | ✅ done (Yaesu BSWAP → bit ops) |
+| ~~tr4w/src/trdos/LOGGRID.PAS~~ | 1 | ✅ done (commented/dead) |
+| ~~tr4w/src/trdos/LOGEDIT.PAS~~ | 1 | ✅ done (commented/dead) |
 
 ### Observations
 
