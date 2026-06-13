@@ -6930,6 +6930,7 @@ begin
     logger.debug('[PutCallToCallWindow] Exiting early because call (%s) = MyCall (%s)', [call, MyCall]);
     exit; // n4af issue 158
   end;
+  logger.debug('Calling Windows.SetWindowText wh[mweCall] to %s',[call]);
   Windows.SetWindowText(wh[mweCall], @Call[1]);
   PlaceCaretToTheEnd(wh[mweCall]);
 end;
