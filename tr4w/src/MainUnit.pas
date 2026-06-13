@@ -2764,10 +2764,8 @@ begin
     or LBS_MULTICOLUMN or WS_CHILD or WS_VISIBLE,
     0, EditableLogHeight + ws * 13 {line6}, MainWindowChildsWidth, ws,
     tr4whandle, MainWindowPCLID, hInstance, nil);
-  asm
- mov edx,[MainFont] //hh
- call tWM_SETFONT
-  end;
+  // Issue #997: asm tWM_SETFONT (EAX = wh[mwePossibleCall] above).
+  tWM_SETFONT(wh[mwePossibleCall], MainFont);
   SendMessage(wh[mwePossibleCall], LB_SETCOLUMNWIDTH, 5 * ws {19 * ws2}, 0);
 
   CreateTotalWindow;
@@ -5024,10 +5022,8 @@ begin
         ws * 2,
         tr4whandle,
         999 + c);
-    asm
- mov edx,[MainFont]
- call tWM_SETFONT
-    end;
+    // Issue #997: asm tWM_SETFONT (EAX = TotWinheadHandles[c]; both branches store it).
+    tWM_SETFONT(TotWinheadHandles[c], MainFont);
 
   end;
 
@@ -5424,10 +5420,8 @@ begin
     nil, CallsignExchangeWinStyle,
     ws * 15 {col4}, Top, 13 * ws, MainWindowEditHeight, tr4whandle, ID,
     hInstance, nil);
-  asm
- mov edx,[MainWindowEditFont]
- call tWM_SETFONT
-  end;
+  // Issue #997: asm tWM_SETFONT (EAX = Result above).
+  tWM_SETFONT(Result, MainWindowEditFont);
   SendMessage(Result, EM_LIMITTEXT, 12, 0);
 end;
 
@@ -5676,10 +5670,8 @@ begin
     WC_LISTVIEW, nil, Style + integer(NoColumnHeader) * LVS_NOCOLUMNHEADER, X,
     Y,
     Width, Height, Parent, 0, hInstance, nil);
-  asm
- mov edx,[MainFont];
- call tWM_SETFONT
-  end;
+  // Issue #997: asm tWM_SETFONT (EAX = Result above).
+  tWM_SETFONT(Result, MainFont);
   if DefaultSize then
   begin
     Factor := 17;
