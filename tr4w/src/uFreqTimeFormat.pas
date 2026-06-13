@@ -29,6 +29,7 @@ function FreqToPCharWithoutHZ(i: integer): PChar;
 function kHzToPChar(Freq: Word): PChar;
 function MillisecondsToFormattedString(msecs: Cardinal; WithMsec: boolean): PChar;
 function SystemTimeToString(SysTime: SYSTEMTIME): PChar;
+function FormatFullTime(Hour, Minute, Second, Milliseconds: Word; WithMilliseconds: boolean): PChar;
 
 implementation
 
@@ -38,6 +39,7 @@ var
   FreqToPCharBuffer        : array[0..15] of Char;
   MillisecondsBuffer       : array[0..31] of Char;
   SystemTimeToStringBuffer : array[0..31] of Char;
+  FullTimeBuffer           : array[0..31] of Char;
 
 function FreqToPChar(i: integer): PChar;
 var
@@ -109,6 +111,21 @@ begin
       [SysTime.wYear, SysTime.wMonth, SysTime.wDay,
        SysTime.wHour, SysTime.wMinute, SysTime.wSecond]));
   Result := SystemTimeToStringBuffer;
+end;
+
+function FormatFullTime(Hour, Minute, Second, Milliseconds: Word; WithMilliseconds: boolean): PChar;
+{ Pure formatting extracted VERBATIM (asm intact) from tree.GetFullTimeString so
+  it can be golden-master tested before/after asm removal. tree forwards the UTC
+  fields. Local copies (h/m/s/ms) keep the asm operands in memory (the original
+  read the UTC global), avoiding register-param clobber. }
+begin
+  // Issue #997: asm wsprintf-push -> SysUtils.Format (proven byte-identical to
+  // the asm baseline by uTestFreqTimeFormat). %.2hu/%.3hu -> %.2u/%.3u.
+  if WithMilliseconds then
+    StrPCopy(FullTimeBuffer, SysUtils.Format('%.2u:%.2u:%.2u:%.3u', [Hour, Minute, Second, Milliseconds]))
+  else
+    StrPCopy(FullTimeBuffer, SysUtils.Format('%.2u:%.2u:%.2u', [Hour, Minute, Second]));
+  Result := FullTimeBuffer;
 end;
 
 end.

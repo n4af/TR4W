@@ -1020,6 +1020,8 @@ uses
   LogWind
   ,
   LogK1EA
+  ,
+  uFreqTimeFormat   // Issue #997: golden-tested time formatter
   ;
 
 //{WLI}FUNCTION  BYTADDR  (Call: Pointer; NumberCalls: INTEGER; A: Pointer): INTEGER; EXTERNAL;
@@ -2493,34 +2495,10 @@ function GetFullTimeString(WithMilliseconds: boolean): PChar;
 
 begin
   tGetSystemTime;
-
-  //  NewHours := tr4w_HourWithHourOffset(LocalTime.wHour);
-  asm
- mov ax,word ptr UTC.wMilliseconds
- movzx eax,ax
- push eax
-
-
- mov ax,word ptr UTC.wSecond
- movzx eax,ax
- push eax
-
- mov ax,word ptr UTC.wMinute
- movzx eax,ax
- push eax
-
- mov ax,word ptr UTC.wHour
- movzx eax,ax
- push eax
-
-  end;
-  if WithMilliseconds then
-    wsprintf(GetFullTimeStringBuffer, '%.2hu:%.2hu:%.2hu:%.3hu')
-  else
-    wsprintf(GetFullTimeStringBuffer, '%.2hu:%.2hu:%.2hu');
-  asm add esp,24
-  end;
-  Result := GetFullTimeStringBuffer;
+  // Issue #997: asm wsprintf -> uFreqTimeFormat.FormatFullTime (golden-tested,
+  // proven byte-identical to the asm). Same UTC fields, same HH:MM:SS[:mmm].
+  Result := uFreqTimeFormat.FormatFullTime(UTC.wHour, UTC.wMinute, UTC.wSecond,
+              UTC.wMilliseconds, WithMilliseconds);
 end;
 
 function GetTimeString: PChar;

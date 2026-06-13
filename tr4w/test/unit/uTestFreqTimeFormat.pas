@@ -28,6 +28,7 @@ type
       procedure Test_Milliseconds_NoMsec;
       procedure Test_Milliseconds_WithMsec;
       procedure Test_SystemTimeToString;
+      procedure Test_FormatFullTime;
    public
       procedure RunAllTests; override;
    end;
@@ -113,6 +114,19 @@ begin
    CheckEquals('05-03-07 09:08:04',   string(SystemTimeToString(ST(5, 3, 7, 9, 8, 4))),        'STTS low values');
 end;
 
+// FormatFullTime(Hour, Minute, Second, Milliseconds, WithMs)
+//   = '%.2hu:%.2hu:%.2hu[:%.3hu]'  (extracted from tree.GetFullTimeString)
+procedure TFreqTimeFormatTests.Test_FormatFullTime;
+begin
+   BeginTest('Test_FormatFullTime');
+   CheckEquals('14:05:09',     string(FormatFullTime(14, 5, 9, 123, False)),  'FFT no-ms');
+   CheckEquals('14:05:09:123', string(FormatFullTime(14, 5, 9, 123, True)),   'FFT with-ms');
+   CheckEquals('00:00:00',     string(FormatFullTime(0, 0, 0, 0, False)),     'FFT midnight no-ms');
+   CheckEquals('00:00:00:000', string(FormatFullTime(0, 0, 0, 0, True)),      'FFT midnight with-ms');
+   CheckEquals('23:59:59:999', string(FormatFullTime(23, 59, 59, 999, True)), 'FFT max with-ms');
+   CheckEquals('01:02:03:004', string(FormatFullTime(1, 2, 3, 4, True)),      'FFT zero-pad with-ms');
+end;
+
 procedure TFreqTimeFormatTests.RunAllTests;
 begin
    Test_FreqToPChar;
@@ -121,6 +135,7 @@ begin
    Test_Milliseconds_NoMsec;
    Test_Milliseconds_WithMsec;
    Test_SystemTimeToString;
+   Test_FormatFullTime;
 end;
 
 end.
