@@ -1,8 +1,8 @@
 unit uStrSearch;
 
 {
-  PChar substring-search helpers extracted from TF.pas for the Issue #997
-  inline-asm removal effort.
+  String helpers (PChar substring search + ShortString upcase) extracted from
+  TF.pas for the Issue #997 inline-asm removal effort.
 
   These three routines were originally hand-written x86 inline assembler
   (JOH-style IA32). They are extracted here into a dependency-light unit so
@@ -34,6 +34,17 @@ unit uStrSearch;
       (the original asm seeds the scan with an exact match on Str2[0], so a
       leading '?' looks for a literal '?'). Returns a pointer into Str1 to
       the start of the match, or nil.
+
+    StrU(var Str)
+      Upcases the ASCII letters 'a'..'z' of a ShortString IN PLACE; all other
+      bytes (digits, punctuation, and >127 extended/code-page characters) are
+      left untouched. The original TF.pas routine was declared with a by-value
+      parameter but, as a bare 'assembler' proc, received a pointer to the
+      caller's string and wrote through it -- so it modified the original. The
+      whole case-insensitive config loader depends on this (see the LogCfg
+      "Case-Sensitivity Problem" note and the ctPassword re-read STOPGAP). The
+      parameter is therefore declared 'var' here to make that real contract
+      explicit; all call sites (TF only) already pass a local variable.
 }
 
 interface
@@ -41,6 +52,7 @@ interface
 function StrPos(const Str1, Str2: PChar): PChar;
 function StrPosPartial(const Str1, Str2: PChar): PChar;
 function StrComp_JOH_IA32_6(const Str1, Str2: PChar): integer;
+procedure StrU(var Str: ShortString);
 
 implementation
 
@@ -118,6 +130,30 @@ begin
   // TF's original asm body was Borland's classic StrPos verbatim, so the RTL
   // is bit-equivalent (including empty-pattern / over-length / nil -> nil).
   Result := SysUtils.StrPos(Str1, Str2);
+end;
+
+procedure StrU(var Str: ShortString); assembler;
+asm
+        PUSH    ECX
+        PUSH    ESI
+        MOV     ESI , Str
+        LODSB
+        XOR     ECX , ECX
+        XCHG    CL,AL
+        INC     ECX
+        ADD     ECX,ESI
+@@1:    LODSB
+        CMP     ECX, ESI
+        JE      @@2
+        CMP     AL,'a'
+        JB      @@1
+        CMP     AL,'z'
+        JA      @@1
+        SUB     AL,20H
+        MOV     [ESI-1],AL
+        JMP     @@1
+@@2:    POP     ESI
+        POP     ECX
 end;
 
 end.

@@ -133,7 +133,7 @@ function StrToInt(s: ShortString): integer;
 function PCharToInt(p: PChar): integer;
 function BooleanToStr(b: boolean): string;
 //function CenterString(s: string; count: byte): string;
-procedure strU(Str: ShortString) assembler;
+procedure strU(var Str: ShortString);
 procedure SetMainWindowText(Window: TMainWindowElement; Text: PChar);
 function IntegerBetween(v: integer; i: integer; k: integer): boolean;
 
@@ -1606,28 +1606,12 @@ begin
 //  if Result = -1 then MessageBox(0, SysErrorMessage(GetLastError), nil, MB_OK or MB_ICONINFORMATION {or MB_RTLREADING } or MB_TASKMODAL);
 end;
 
-procedure strU(Str: ShortString) assembler;
-asm
-        PUSH    ECX
-        PUSH    ESI
-        MOV     ESI , Str
-        LODSB
-        XOR     ECX , ECX
-        XCHG    CL,AL
-        INC     ECX
-        ADD     ECX,ESI
-@@1:    LODSB
-        CMP     ECX, ESI
-        JE      @@2
-        CMP     AL,'a'
-        JB      @@1
-        CMP     AL,'z'
-        JA      @@1
-        SUB     AL,20H
-        MOV     [ESI-1],AL
-        JMP     @@1
-@@2:    POP     ESI
-        POP     ECX
+procedure strU(var Str: ShortString);
+begin
+  // Issue #997: extracted to uStrSearch (golden-master tested). Now 'var' to
+  // make the in-place upcase contract explicit (the old by-value asm modified
+  // the caller's string anyway -- see uStrSearch / the LogCfg note).
+  uStrSearch.StrU(Str);
 end;
 
 function CreateComboBox(hwndParent: HWND; HMENU: HMENU): HWND;
