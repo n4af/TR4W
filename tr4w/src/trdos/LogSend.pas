@@ -130,12 +130,26 @@ begin
 // So, it's more efficient to use \ than NY4I
 // I wonder if this could be improved to buffer the characters? // 4.44.5
 
-  if CWEnabled = False then
+  // Issue #1040: key CW only when this is genuinely a CW send (CW mode with CW
+  // enabled) OR an MMTTY/RTTY send (DigitalModeEnable=True -> we want to drive
+  // MMTTY).  Any other state -- notably Digital mode with DigitalModeEnable=
+  // False (e.g. FT8 via WSJT-X, where the external app transmits) -- must NOT
+  // key CW when a call is typed / DE / exchange / a function key fires.
+  // DigitalModeEnable is what makes Digital a real (RTTY) mode here (see the
+  // mode-cycle in LOGSUBS2 and the DIG status text in JCtrl1).
+  if not (((ActiveMode = CW) and CWEnabled) or
+          DigitalModeEnable)                then
      begin
-     logger.warn('Attempting SendCrypticCWString with CWEnabled = false');
+     if (ActiveMode = CW) and (not CWEnabled) then
+        begin
+        logger.warn('Attempting SendCrypticCWString with CWEnabled = false');
+        end;
      Exit;
      end;
-  if length(SendString) = 0 then Exit;
+  if length(SendString) = 0 then
+     begin
+     Exit;
+     end;
   //SetSpeed(DisplayedCodeSpeed); //ny4i This seems superflous. The speed should be set already
 
 
