@@ -536,6 +536,16 @@ begin
   if ConfigFileName = cfgINI then
      EnumerateLinesInFile(TR4W_INI_FILENAME, RestoreCFGPasswordCase, False);
 
+  // CW-state desync fix: the 'CW ENABLE' config command writes only CWEnable,
+  // but the actual transmit gate (SendCrypticCWString) and the Alt-K toggle
+  // (SetCWState) key off CWEnabled, while the speed display ORs the two.  With
+  // nothing syncing them, "CW ENABLE = FALSE" left CWEnabled at its True
+  // default -- so the display showed "WPM" yet no CW was sent until two Alt-K
+  // toggles reconciled both.  Mirror the configured value into the runtime gate
+  // after every config read so the two can never start out of step.  (CWEnable
+  // and CWEnabled represent the same thing and SetCWState always sets both.)
+  CWEnabled := CWEnable;
+
   if ConfigFileName = cfgCFG then if not ConfigurationOkay then halt;
 end;
 

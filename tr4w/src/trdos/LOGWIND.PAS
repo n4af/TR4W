@@ -1562,7 +1562,13 @@ begin
   DisplayedCodeSpeed := CodeSpeed;
   if ActiveMode = CW then
   begin
-    if CWEnable or CWEnabled {CWEnabled} then
+    // CW-state desync fix: show the ACTUAL transmit gate (CWEnabled), not
+    // CWEnable OR CWEnabled.  The OR let a stale CWEnable mask a disabled gate,
+    // so the display read "WPM" while Enter sent nothing.  CWEnable and
+    // CWEnabled are now kept in step at config load (see ReadInConfigFile), so
+    // this matches CWEnable too -- but keying off the gate the sender checks
+    // means the UI can never claim CW is on when it will not transmit.
+    if CWEnabled then
        begin
        tPChar := '%u WPM';
        end
