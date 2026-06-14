@@ -37,6 +37,66 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.12 (2026-06-14) — NY4I
+
+#### Inline-asm removal: TF / radios / utils / server (`src/TF.pas`, `src/uStrSearch.pas`, `src/utils/utils_math.pas`, `src/utils/networkmessageutils.pas`, `src/uIntercom.pas`, `src/uCallsigns.pas`, `src/uCFG.pas`, `src/trdos/LOGRADIO.PAS`, `src/MainUnit.pas`, `src/tr4wserverUnit.pas`) — Issue #997 (PR #1045)
+
+- **Continued the inline-asm sweep beyond PostUnit.** Extracted TF's PChar search/upcase helpers into a dependency-light `uStrSearch` (`StrPos`/`StrComp` → `SysUtils`; the `?`-wildcard `StrPosPartial` and ASCII `strU` as pure Pascal) with 38 golden tests; `utils_math` `Tan`/`ArcTan2` → `Math`; `networkmessageutils` `SwapEndian32/16` and the `LOGRADIO` Yaesu BCD byte-swap → portable bit ops; `uIntercom` `wsprintf` → `TF.Format`; `uCFG` untyped-`Pointer` AdditionalProc call → typed call; the memory-mapped-log pointer arithmetic in `MainUnit`/`tr4wserverUnit` → explicit `Pointer(Cardinal(MapBase)+offset)`; removed the last live `asm nop`. `TF.ValExt`/`_Pow10` (RTL-internal float parse) flagged for the mirror clone. `docs/PHASE_INVENTORIES.md` Phase-3 table status-marked.
+
+#### Cabrillo: fail loudly on an unhandled exchange (`src/uCabrilloExchange.pas`, `test/unit/uTestCabrilloExchange.pas`) — Issue #1043 (PR #1045)
+
+- **`FormatCabrilloExchange` no longer writes a blank exchange silently.** Any `ActiveExchange` not in the `case` now logs (Log4D) and writes an `ERROR EXCHANGE NOT HANDLED` marker into both columns (returns `False`). Golden test added (`UnknownExchange`).
+
+#### Contest defs: ARRL VHF exchange (`src/VC.pas`) — (PR #1045)
+
+- **ARRL January/June/September VHF set to `RSTandorGridExchange`** so the Cabrillo exchange carries RST + grid.
+
+#### CW enable/disable state desync (`src/trdos/LogCfg.pas`, `src/trdos/LOGWIND.PAS`) — (PR #1047)
+
+- **`CW ENABLE` and the runtime CW gate are now kept in step.** Config wrote only `CWEnable`, while the transmit gate/toggle used `CWEnabled` and the speed display OR'd the two — so `CW ENABLE = FALSE` showed "WPM" yet sent nothing until two Alt-K toggles. `ReadInConfigFile` now mirrors `CWEnabled := CWEnable` after each config read; `DisplayCodeSpeed` reads the real gate.
+
+#### Editable-log window: last row clipped (`src/MainUnit.pas`) — (PR #1046)
+
+- **`CheckEditableWindowHeight` shrink-then-grow sizing.** The old shrink-only loop left the last loaded row clipped; it now grows to the smallest height where all `LinesInEditableLog` rows are fully visible (clean bottom border at every row count).
+
+#### CW keyed in digital mode (`src/trdos/LogSend.pas`) — Issue #1040 (PR #1046)
+
+- **`SendCrypticCWString` keys CW only for a real CW send (`ActiveMode = CW` and `CWEnabled`) or an MMTTY/RTTY send (`DigitalModeEnable = True`).** A digital mode with `DIGITAL MODE ENABLE = FALSE` (e.g. FT8/WSJT-X) no longer keys CW on DE/exchange/function keys.
+
+#### Network connect-retry log spam (`src/uNet.pas`, `src/TF.pas`) — Issue #1041 (PR #1046)
+
+- **Fixed the `nclsTrying`/`nclsFailed` ping-pong** that re-logged both lines every 5 s; the try/fail pair now logs once, then goes silent until the state changes. `tCreateThread` gained an optional `Quiet` flag; thread create/destroy log symmetrically.
+
+#### Band map double-click vs AUTO S&P (`src/trdos/LOGRADIO.PAS`, `src/uRadioPolling.pas`) — Issue #1048 / #795 (PR #1048)
+
+- **A bandmap-commanded QSY no longer trips the #795 "tune the VFO → clear the entry" logic.** `SetRadioFreq` records the commanded VFO-A freq (`tCommandedQSYFreq`); the auto-S&P clear fires only when the radio lands far from it (a genuine manual dial turn). Latent since #795; only bit with `AUTO S&P ENABLE = TRUE`.
+
+#### Build & docs — Issue #1031
+
+- **`utils/TagIt.ps1` validates the committed `Version.pas` the tag will capture** (dirty / unpushed / `HEAD ≠ origin/master` guards). Added `docs/FORK_PROCESS.md` (Delphi-7 → TR4W-2026 mirror-clone runbook).
+
+---
+
+### 4.148.11 (2026-06-12) — NY4I
+
+#### Radio factory: network port + discoverability (`src/uRadioFactory.pas`, `src/uCAT.pas`, `src/trdos/LOGRADIO.PAS`) — Issue #1028 (PR #1030)
+
+- **`uRadioFactory` is now the single source of truth for is-network-radio, default network port, and discoverability** (`ModelForInterfacedType`, `DefaultNetworkPort`, `IsNetworkModel`, `IsDiscoverable`; added `rmKenwoodTS990` reusing the TS-890 class). `uCAT` delegates port/discovery decisions to it; `ApplyDefaultNetworkPort` now replaces a stale different-model default (fixes IC-7760 :50001 → K4 :9200). `LOGRADIO.MapRadioModelToFactory` delegates to the factory.
+
+#### Search & Pounce F1 caption (`src/trdos/CFGDEF.PAS`, `tr4w.dpr`) — Issue #1012
+
+- **The S&P F1 ("send call") caption is recomputed after config load** (it was computed once in `SetConfigurationDefaultValues`, before config), so it shows "Call" instead of "DE+Call" when `DE ENABLE = FALSE`.
+
+#### CW: replay the last-sent message (`src/trdos/LogCW.pas`, `src/trdos/LOGSUBS1.PAS`)
+
+- **Capture the actually-sent (expanded) CW characters; `=` in the call window replays exactly what was last sent** (so post-log `@`/`#` macros don't re-expand to blanks).
+
+#### QuickDisplay: clear stale exchange-error text (`src/MainUnit.pas`) — Issue #1030
+
+- **A failed exchange validation (e.g. `TC_IMPROPERARRLFIELDDAYCLASS`) no longer keeps flashing after the QSO is corrected and logged.** `TryLogContact`'s successful-log path now calls `ClearQuickDisplayText`.
+
+---
+
 ### 4.148.10 (2026-06-12) — NY4I
 
 #### Cabrillo log writer: full inline-asm removal (`src/trdos/PostUnit.PAS`) — Issue #998 (PRs #1013–#1025)

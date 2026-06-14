@@ -38,6 +38,62 @@ _Nothing yet._
 
 ## 4.148.x — June 2026
 
+### 4.148.12 (2026-06-14) — NY4I
+
+#### Band Map
+
+- Double-clicking a spot no longer occasionally clears the callsign it just loaded into the call window. (This only showed up with "jump to S&P when you tune" / AUTO S&P enabled.) (#1048)
+
+#### CW
+
+- Setting **`CW ENABLE = FALSE` now actually keeps CW off** from startup — the display and keying agree, with no need to toggle CW off then on (Alt-K) twice. (#1047)
+
+#### Digital / FT8
+
+- In a digital mode (for example FT8 via WSJT-X), **typing a callsign no longer keys CW**. (#1040)
+
+#### Log Window
+
+- The **bottom row of the log window is no longer cut off** — it shows fully with a clean border, at every row-count setting. (#1046)
+
+#### VHF
+
+- ARRL January, June, and September VHF now produce the proper **RST + grid exchange** in the Cabrillo file.
+
+#### Cabrillo
+
+- If a contest's exchange isn't handled by the Cabrillo generator, that line is now **flagged with an error marker (and logged) instead of written blank**, so it can't slip by unnoticed. (#1043)
+
+#### Multi-Op / Networking
+
+- While the network server is unreachable, the log **no longer fills with repeated "trying / failed to connect" messages**. (#1041)
+
+#### Under the Hood
+
+- Continued removal of legacy inline assembly across the radio, formatting, and utility code for the Delphi 12 / 64-bit migration — no on-air change. (#997)
+
+---
+
+### 4.148.11 (2026-06-12) — NY4I
+
+#### Radio Control
+
+- Network radio setup is more reliable: each model now has the correct default network port and discovery behavior, and switching between models (e.g. IC-7760 → K4) no longer leaves a stale port. (#1028)
+
+#### Search & Pounce
+
+- The F1 send-call label shows **"Call" instead of "DE+Call" when DE is disabled** (`DE ENABLE = FALSE`). (#1012)
+
+#### CW
+
+- Press **`=` to resend exactly what you last sent** on CW.
+
+#### Display
+
+- A **stuck exchange-error message** (for example, an improper Field Day class) now clears once you log the corrected QSO. (#1030)
+
+---
+
 ### 4.148.10 (2026-06-12) — NY4I
 
 #### Function Keys
