@@ -139,7 +139,7 @@ function IntegerBetween(v: integer; i: integer; k: integer): boolean;
 
 function ValExt(Source: PChar; var code: integer): extended;
 
-function tCreateThread(lpStartAddress: TFNThreadStartRoutine; var lpThreadId: DWORD): THandle;
+function tCreateThread(lpStartAddress: TFNThreadStartRoutine; var lpThreadId: DWORD; Quiet: boolean = False): THandle;
 
 //function tgethostbyname(h_Name: PChar): PChar;
 function tDialogBox(WindowID: Byte; WinProcAdr: Pointer): integer;
@@ -1022,10 +1022,14 @@ begin
 
 end;
 
-function tCreateThread(lpStartAddress: TFNThreadStartRoutine; var lpThreadId: DWORD): THandle;
+function tCreateThread(lpStartAddress: TFNThreadStartRoutine; var lpThreadId: DWORD; Quiet: boolean): THandle;
 begin
   Result := CreateThread(nil, 0, lpStartAddress, nil, 0, lpThreadId);
-  logger.Debug('[tCreateThread] Created thread %d',[lpThreadId]);
+  // Issue #1041: Quiet suppresses this per-create debug line so the network
+  // connect-retry loop (one thread every 5s while the server is unreachable)
+  // does not spam the log -- loud on a genuine attempt, silent on retries.
+  if not Quiet then
+    logger.Debug('[tCreateThread] Created thread %d',[lpThreadId]);
 end;
 
 //function _Pow10(val: Extended; Power: Integer): Extended;

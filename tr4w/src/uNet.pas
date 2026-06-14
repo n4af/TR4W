@@ -617,15 +617,36 @@ var
   // else.  We log only on transitions: first attempt, recover, fail.
   FConnectLogState : TNetConnectLogState = nclsInitial;
 
+  // Issue #1041: was THIS connect attempt an announced one (first / after a
+  // recovery) rather than a silent retry?  ConnectThread reads it at exit to
+  // log its destruction at the same volume as its creation.  No lock needed:
+  // NetThreadID gates a single connect thread at a time, so the value set when
+  // the thread is created stays put for that thread's whole life.
+  FConnectThreadAnnounced : boolean = False;
+
 procedure TryConnectToNetwork;
+var
+  announce: boolean;
 begin
-  // Only log on state transitions.
-  if FConnectLogState <> nclsTrying then
+  // Issue #1041: log the "trying" line only on a GENUINE new attempt -- the
+  // first one (nclsInitial) or after we'd been connected and dropped
+  // (nclsConnected).  The old condition (<> nclsTrying) re-fired here every
+  // retry because after a failure the state is nclsFailed; that, paired with
+  // the fail handler flipping it back to nclsFailed, made the "trying" debug
+  // and the "failed" warn ping-pong every 5s instead of going silent.  While
+  // we are in the silent retry phase (nclsFailed) we must NOT relabel the
+  // state, so neither line repeats until something actually changes.
+  announce := FConnectLogState in [nclsInitial, nclsConnected];
+  if announce then
      begin
      logger.Debug('TryConnectToNetwork -> %s:%d  (will retry every 5s while server is unreachable; further attempts logged only on state change)', [ServerAddress, ServerPort]);
      FConnectLogState := nclsTrying;
      end;
-  if NetThreadID = 0 then tCreateThread(@ConnectThread, NetThreadID);
+  if NetThreadID = 0 then
+     begin
+     FConnectThreadAnnounced := announce;
+     tCreateThread(@ConnectThread, NetThreadID, not announce {Quiet on silent retries});
+     end;
 end;
 
 procedure ConnectThread;
@@ -693,10 +714,13 @@ begin
        end;
   end;
   2:
-  // Demoted from debug to trace: this fires every ~5s during a retry loop
-  // and was drowning the log.  Still available for thread-lifecycle
-  // debugging at trace level.
-  logger.Trace('[ConnectThread] Thread %d exiting, NetThreadID cleared', [GetCurrentThreadId]);
+  // Issue #1041: log destruction at the same volume as creation -- debug on a
+  // genuine (announced) attempt so create/destroy pair up in the log, trace
+  // during the silent retry loop so it stays quiet.
+  if FConnectThreadAnnounced then
+     logger.Debug('[ConnectThread] Thread %d destroyed, NetThreadID cleared', [GetCurrentThreadId])
+  else
+     logger.Trace('[ConnectThread] Thread %d exiting, NetThreadID cleared', [GetCurrentThreadId]);
   NetThreadID := 0;
 end;
 
