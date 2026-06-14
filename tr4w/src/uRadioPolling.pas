@@ -3139,7 +3139,15 @@ begin
          if rig.LastDisplayedFreq <> 0 then
             if dif > AutoSAPEnableRate then
                if dif <= 10000 then
-                  if AutoSAPEnable {and (Not Switch) } then // n4af 4.44.10
+                  if AutoSAPEnable and
+                     // Issue #795 vs bandmap: #795 made a MANUAL dial QSY clear
+                     // the call/exchange in S&P.  But a COMMANDED QSY (bandmap
+                     // double-click, spot click, typed freq) also moves the VFO
+                     // and may have just placed a call -- don't clobber it.
+                     // SetRadioFreq records the commanded VFO-A freq; treat this
+                     // as a manual tune (and clear) only if we landed FAR from
+                     // the last commanded freq.
+                     (Abs(rig.FilteredStatus.Freq - rig.tCommandedQSYFreq) > AutoSAPEnableRate) then // n4af 4.44.10
                     // if OpMode = CQOpMode then    // 4.139.3
                         begin
                            SetOpMode(SearchAndPounceOpMode);

@@ -165,6 +165,7 @@ type
       tTwoRadioMode:     TRMode;
       RadioOnTheMove:    boolean;
       LastDisplayedFreq: integer;
+      tCommandedQSYFreq: integer;  // Issue #795 vs bandmap: last app-commanded VFO-A freq; auto-S&P treats a QSY landing here as commanded (don't clear the entry), not a manual dial tune
       SpeedMemory:       integer;
       BandMemory:        BandType;
       ModeMemory:        ModeType;
@@ -3271,6 +3272,13 @@ begin
       logger.debug('[SetRadioFreq] freq <= 0 (no band memory or default for this band/mode) -- skipping tune');
       Exit;
       end;
+
+   // Issue #795 vs bandmap double-click: record the app-commanded VFO-A
+   // frequency so the auto-S&P "QSY clears the entry" logic (uRadioPolling) can
+   // tell a COMMANDED QSY (bandmap/spot/typed freq -- a call may have been
+   // placed deliberately) from a MANUAL dial QSY (which #795 wants to clear).
+   if VFO = 'A' then
+      Self.tCommandedQSYFreq := Freq;
 
    if Self.tNetObject <> nil then
       begin
