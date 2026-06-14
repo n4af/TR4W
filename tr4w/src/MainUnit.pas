@@ -7115,18 +7115,39 @@ begin
 end;
 
 procedure CheckEditableWindowHeight;
-label
-  1;
 var
-  h: integer;
+  h, guard: integer;
 begin
+  // Size the editable-log list so ALL LinesInEditableLog loaded rows are fully
+  // visible.  The old loop shrank to the largest height where only
+  // LinesInEditableLog-1 rows fit, which always left the next (loaded) row
+  // clipped at the bottom with no border.  Instead: shrink if too many rows
+  // fit, then grow to the SMALLEST height where every LinesInEditableLog row
+  // shows whole -- the list's static edge then forms a clean bottom border
+  // matching the top.  (Reported: editable-log bottom row cut off.)
   h := 30 + LinesInEditableLog * (ws + 2) {EditableLogWindowHeight};
-  1:
-  h := h - 1;
   Windows.SetWindowPos(wh[mweEditableLog], HWND_TOP, 0, ws * 7,
     MainWindowChildsWidth, h, SWP_SHOWWINDOW);
-  if ListView_GetCountPerPage(wh[mweEditableLog]) > LinesInEditableLog - 1 then
-    goto 1;
+
+  guard := 0;
+  while (ListView_GetCountPerPage(wh[mweEditableLog]) > LinesInEditableLog)
+        and (guard < 200) do
+    begin
+    h := h - 1;
+    Inc(guard);
+    Windows.SetWindowPos(wh[mweEditableLog], HWND_TOP, 0, ws * 7,
+      MainWindowChildsWidth, h, SWP_SHOWWINDOW);
+    end;
+
+  guard := 0;
+  while (ListView_GetCountPerPage(wh[mweEditableLog]) < LinesInEditableLog)
+        and (guard < 200) do
+    begin
+    h := h + 1;
+    Inc(guard);
+    Windows.SetWindowPos(wh[mweEditableLog], HWND_TOP, 0, ws * 7,
+      MainWindowChildsWidth, h, SWP_SHOWWINDOW);
+    end;
 end;
 
 function CheckCommandInCallsignWindow: boolean;
